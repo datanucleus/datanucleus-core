@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2004 Andy Jefferson and others. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!NOTATION DN_AUTOSTART.1_0 PUBLIC
+          "-//DataNucleus//DTD DataNucleus AutoStarter Metadata 1.0//EN">
+<!--
+This is the XML DTD for the DataNucleus AutoStarter 1.0 Metadata.
+All DataNucleus Auto Starter 1.0 metadata descriptors must include a DOCTYPE
+of the following form:
+
+  <!DOCTYPE datanucleus_autostart
+    PUBLIC "-//DataNucleus//DTD DataNucleus AutoStarter Metadata 1.0//EN"
+    "http://www.datanucleus.org/dtd/datanucleus_autostart_1_0.dtd">
+-->
+
+<!ELEMENT datanucleus_autostart ((class)*)>
+
+<!ELEMENT class EMPTY>
+<!ATTLIST class name CDATA #REQUIRED>
+<!ATTLIST class table CDATA #IMPLIED>
+<!ATTLIST class table-owner CDATA #IMPLIED>
+<!ATTLIST class type CDATA #REQUIRED>
+<!ATTLIST class version CDATA #IMPLIED>
+<!ATTLIST class interface-name CDATA #IMPLIED>

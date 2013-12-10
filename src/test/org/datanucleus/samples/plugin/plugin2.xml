@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<plugin>
+<extension point="org.datanucleusx.plugin.test2.testID">
+<level1 attr11="1">
+    <level2 attr21="2211" attr22="2221">
+        <level3 attr31="db2"/>
+    </level2>
+    <level2 attr21="2212" attr22="2222">
+        <level3 attr31="3311"/>
+        <level3 attr31="3312"/>
+    </level2>
+</level1>
+<level1 attr11="2">
+</level1>
+</extension>
+<extension point="org.datanucleus.plugin.test2.testID">
+<level1 attr11="A"/>
+</extension>
+</plugin>

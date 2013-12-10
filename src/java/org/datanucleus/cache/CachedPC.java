@@ -1,0 +1,184 @@
+/**********************************************************************
+Copyright (c) 2005 Andy Jefferson and others. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Contributors:
+    ...
+**********************************************************************/
+package org.datanucleus.cache;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.StringUtils;
+
+/**
+ * An object that is stored in the Level2 Cache keyed by the identity of the persistable object.
+ * Comprises a map of the field values keyed by the absolute field number in the class, the loaded fields array,
+ * and the version of the object that is represented with these values.
+ * Where the field is a relation field (PC, Map, Collection, array) we store the id of any referenced persistable 
+ * object. This is used when regenerating the object, and recreating its relations. Note that the "id" is the OID
+ * or SingleFieldIdentity where applicable otherwise is CachedId
+ */
+public class CachedPC implements Serializable
+{
+    /** Class of the object being cached. */
+    private Class cls;
+
+    /** Values for the fields, keyed by the abs field number. Any relation fields store the id of the related object. */
+    private Map<Integer, Object> fieldValues = null;
+
+    /** Version of the cached object (if any) - Long, Timestamp etc. */
+    private Object version;
+
+    /** The loaded fields array. TODO Note that this could be interpreted from the keys of fieldValues. */
+    private boolean[] loadedFields;
+
+    /**
+     * Constructor.
+     * @param cls The class of the object
+     * @param loadedFields The loaded fields
+     * @param vers The version (optional)
+     */
+    public CachedPC(Class cls, boolean[] loadedFields, Object vers)
+    {
+        this.cls = cls;
+        this.loadedFields = new boolean[loadedFields.length];
+        for (int i=0;i<loadedFields.length;i++)
+        {
+            this.loadedFields[i] = loadedFields[i];
+        }
+        this.version = vers;
+    }
+
+    public Class getObjectClass()
+    {
+        return cls;
+    }
+
+    public void setFieldValue(Integer fieldNumber, Object value)
+    {
+        if (fieldValues == null)
+        {
+            fieldValues = new HashMap<Integer, Object>();
+        }
+        fieldValues.put(fieldNumber, value);
+    }
+
+    public Object getFieldValue(Integer fieldNumber)
+    {
+        if (fieldValues == null)
+        {
+            return null;
+        }
+        return fieldValues.get(fieldNumber);
+    }
+
+    public void setVersion(Object ver)
+    {
+        this.version = ver;
+    }
+
+    public Object getVersion()
+    {
+        return version;
+    }
+
+    /**
+     * Accessor for the loaded fields of this object.
+     * Use setLoadedField() if you want to update a flag.
+     * @return The loaded fields flags
+     */
+    public boolean[] getLoadedFields()
+    {
+        return loadedFields;
+    }
+
+    public int[] getLoadedFieldNumbers()
+    {
+        return ClassUtils.getFlagsSetTo(loadedFields, true);
+    }
+
+    public void setLoadedField(int fieldNumber, boolean loaded)
+    {
+    	loadedFields[fieldNumber] = loaded;
+    }
+
+    public synchronized CachedPC getCopy()
+    {
+    	CachedPC copy = new CachedPC(cls, loadedFields, version);
+    	if (fieldValues != null)
+    	{
+    	    // TODO Some (mutable) field values may need copying
+    		copy.fieldValues = new HashMap<Integer, Object>(fieldValues.size());
+    		Iterator<Map.Entry<Integer, Object>> entryIter = fieldValues.entrySet().iterator();
+    		while (entryIter.hasNext())
+    		{
+    		    Map.Entry<Integer, Object> entry = entryIter.next();
+    		    Integer key = entry.getKey();
+    		    Object val = entry.getValue();
+    		    if (val != null && val instanceof CachedPC)
+    		    {
+    		        val = ((CachedPC)val).getCopy();
+    		    }
+    		    copy.fieldValues.put(key, val);
+    		}
+    	}
+    	return copy;
+    }
+
+    /**
+     * Method to return a sting form of the cached object.
+     * Returns something like "CachedPC : version=1 loadedFlags=[YY]"
+     * @return The string form
+     */
+    public String toString()
+    {
+        return toString(false);
+    }
+
+    /**
+     * Method to return a sting form of the cached object.
+     * Returns something like "CachedPC : version=1 loadedFlags=[YY]".
+     * @param debug Whether to include the field values in the return
+     * @return The string form
+     */
+    public String toString(boolean debug)
+    {
+        return "CachedPC : cls=" + cls.getName() + " version=" + version +
+            " loadedFlags=" + StringUtils.booleanArrayToString(loadedFields) +
+            (debug ? (" vals=" + StringUtils.mapToString(fieldValues)) : "");
+    }
+
+    public static class CachedId implements Serializable
+    {
+        String className;
+        Object id;
+        public CachedId(String className, Object id)
+        {
+            this.className = className;
+            this.id = id;
+        }
+        public String getClassName()
+        {
+            return className;
+        }
+        public Object getId()
+        {
+            return id;
+        }
+    }
+}

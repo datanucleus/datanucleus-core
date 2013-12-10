@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin
+   id="org.datanucleus"
+   name="JPOX Core"
+   provider-name="JPOX"
+   version="1.0">
+   
+   <extension-point id="testID" name="testName" schema="/org/datanucleus/samples/plugin/plugin1.xsd"/>
+   <extension-point id="testID2" name="testName2" schema="/org/datanucleus/samples/plugin/plugin1.xsd"/>
+</plugin>

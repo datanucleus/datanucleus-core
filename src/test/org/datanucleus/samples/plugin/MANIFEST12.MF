@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JPOX Plugin Test
+Bundle-SymbolicName: org.datanucleus.plugin.test12;singleton:=true
+Bundle-Vendor: JPOX
+Bundle-Version: 1.2.0.b2
+Bundle-Localization: plugin
+Require-Bundle: org.datanucleus.plugin.test11;bundle-version=(1.2.0.b2 

@@ -1,0 +1,16 @@
+<BODY>
+    This package provides classes implementing caching within DataNucleus.
+    There are 2 caches used internally :-
+    <P>
+        The first is within the PersistenceManager and is the <B>Level 1 Cache</B>. 
+        There are 3 available implementations of a Level 1 Cache here :- <I>SoftRefCache</I>, 
+        <I>WeakRefCache</I> and <I>HardRefCache</I>. They provide varying degrees of object 
+        retention during the garbage collection process.
+    </P>
+    <P>
+        The second is across multiple PersistenceManagers within the same PersistenceManagerFactory, 
+        and is the <B>Level 2 Cache</B>. There is one implementation of a Level 2 Cache here :- 
+        <I>DefaultLevel2Cache</I>. Alternatively, there are plugins for EHCache, SwarmCache, OSCache
+        and Coherence products
+    </P>
+</BODY>

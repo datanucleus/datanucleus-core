@@ -1,0 +1,24 @@
+<BODY>
+    <P>
+        Provides classes representing the MetaData for files, packages, classes, fields, containers, etc. 
+        Structured to map to the JDO2 Meta-Data file structure, though also now maps to the JPA Meta-Data structure
+        approximately.
+    </P>
+    <P>
+        Key aspects of this package are
+    </P>
+    <UL>
+    <LI><B>MetaDataManager</B> is the entry point into this package. A call is typically made to <I>getMetaDataForClass</I> 
+        and the MetaDataManager will take care of finding the MetaData, parsing any files, and populating the MetaData.</LI>
+    <LI><B>MetaDataMerger</B> is responsible for merging annotations with metadata, and JDO MetaData with ORM MetaData</LI>
+    <LI><B>FileMetaData</B> is the top level of a metadata representation, represening the actual file. It will contain 
+        metadata for a series of packages, etc. The components are laid out in a tree</LI>
+    <LI><B>ClassMetaData</B> is the most used class, and is the representation of the persistence of a class. 
+        It contains a series of <B>FieldMetaData</B>/<B>PropertyMetaData</B>objects, representing the fields and properties
+        of the class.</LI>
+    </UL>
+    <P>
+        The "data" classes have a lifecycle, being created, then populated, and finally initialised. When a file is read in
+        all classes are read and populated at that time.
+    </P>
+</BODY>

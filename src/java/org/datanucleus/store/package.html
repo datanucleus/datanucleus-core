@@ -1,0 +1,11 @@
+<BODY>
+    Package handling the storage of classes to the datastore, and the management of the datastore.
+    Each type of datastore will have its own subpackage (e.g org.datanucleus.store.rdbms) and its own StoreManager.
+    When providing support for a new datastore you need to extend AbstractStoreManager.
+    <p>
+        The package also provides definition of StoreData - data held about each class and utilised by
+        the StoreManager to perform its duties. This data is populated either at runtime when classes
+        are requested, or when using an "auto-starter". There are several auto-start mechanisms. This
+        package has ClassesAutoStarter and XMLAutoStarter.
+    </p>
+</BODY>
