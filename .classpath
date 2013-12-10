@@ -12,7 +12,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry excluding="**" kind="src" output="target/classes" path="META-INF">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
