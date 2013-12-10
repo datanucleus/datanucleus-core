@@ -148,7 +148,7 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
             String asmClassName, String asmClassDesc, boolean detachListener, boolean includeFrames,
             EnhancementNamer namer)
     {
-        String[] argNames = new String[] {"objPC"};
+        String[] argNames = new String[] {"this"};
         String fieldTypeDesc = Type.getDescriptor(mmd.getType());
 
         mv.visitCode();
@@ -268,6 +268,10 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
             }
 
             mv.visitLabel(l4);
+            if (includeFrames)
+            {
+                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+            }
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, 
                 namer.getGetMethodPrefixMethodName() + mmd.getName(), "()" + fieldTypeDesc);

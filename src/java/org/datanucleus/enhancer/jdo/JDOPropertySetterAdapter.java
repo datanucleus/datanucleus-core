@@ -147,7 +147,7 @@ public class JDOPropertySetterAdapter extends MethodVisitor
     public static void generateSetXXXMethod(MethodVisitor mv, AbstractMemberMetaData mmd,
             String asmClassName, String asmClassDesc, boolean includeFrames, EnhancementNamer namer)
     {
-        String[] argNames = new String[] {"objPC", "val"};
+        String[] argNames = new String[] {"this", "val"};
         String fieldTypeDesc = Type.getDescriptor(mmd.getType());
 
         mv.visitCode();
