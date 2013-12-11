@@ -1120,18 +1120,21 @@ public abstract class AbstractStateManager implements ObjectProvider
         {
             // Check if we are trying to just retrieve the PK fields
             int[] pkNums = cmd.getPKMemberPositions();
-            boolean pkFieldsOnly = true;
-            for (int i=0;i<pkNums.length;i++)
+            if (pkNums != null && pkNums.length > 0)
             {
-                if (pkNums[i] != fieldNumbers[i])
+                boolean pkFieldsOnly = true;
+                for (int i=0;i<pkNums.length;i++)
                 {
-                    pkFieldsOnly = false;
-                    break;
+                    if (pkNums[i] != fieldNumbers[i])
+                    {
+                        pkFieldsOnly = false;
+                        break;
+                    }
                 }
-            }
-            if (pkFieldsOnly)
-            {
-                return;
+                if (pkFieldsOnly)
+                {
+                    return;
+                }
             }
         }
 
