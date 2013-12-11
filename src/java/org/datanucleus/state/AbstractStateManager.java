@@ -1092,6 +1092,8 @@ public abstract class AbstractStateManager implements ObjectProvider
 
     /**
      * Convenience method to load fields from the datastore.
+     * Note that if the fieldNumbers is null/empty we still should call the persistence handler since it may mean
+     * that the version field needs loading.
      * @param fieldNumbers The field numbers.
      */
     protected void loadFieldsFromDatastore(int[] fieldNumbers)
@@ -1114,28 +1116,6 @@ public abstract class AbstractStateManager implements ObjectProvider
                     " but is actually of type " + className);
             }
             flags &= ~FLAG_NEED_INHERITANCE_VALIDATION;
-        }
-
-        if (cmd.getNoOfPrimaryKeyMembers() == fieldNumbers.length)
-        {
-            // Check if we are trying to just retrieve the PK fields
-            int[] pkNums = cmd.getPKMemberPositions();
-            if (pkNums != null && pkNums.length > 0)
-            {
-                boolean pkFieldsOnly = true;
-                for (int i=0;i<pkNums.length;i++)
-                {
-                    if (pkNums[i] != fieldNumbers[i])
-                    {
-                        pkFieldsOnly = false;
-                        break;
-                    }
-                }
-                if (pkFieldsOnly)
-                {
-                    return;
-                }
-            }
         }
 
         // TODO If the field has "loadFetchGroup" defined, then add it to the fetch plan etc
