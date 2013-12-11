@@ -1116,6 +1116,25 @@ public abstract class AbstractStateManager implements ObjectProvider
             flags &= ~FLAG_NEED_INHERITANCE_VALIDATION;
         }
 
+        if (cmd.getNoOfPrimaryKeyMembers() == fieldNumbers.length)
+        {
+            // Check if we are trying to just retrieve the PK fields
+            int[] pkNums = cmd.getPKMemberPositions();
+            boolean pkFieldsOnly = true;
+            for (int i=0;i<pkNums.length;i++)
+            {
+                if (pkNums[i] != fieldNumbers[i])
+                {
+                    pkFieldsOnly = false;
+                    break;
+                }
+            }
+            if (pkFieldsOnly)
+            {
+                return;
+            }
+        }
+
         // TODO If the field has "loadFetchGroup" defined, then add it to the fetch plan etc
         myEC.getStoreManager().getPersistenceHandler().fetchObject(this, fieldNumbers);
     }
