@@ -294,14 +294,13 @@
                 <version>2.4.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <manifestLocation>${basedir}/target/classes/META-INF</manifestLocation>
                     <instructions>
                         <Bundle-SymbolicName>org.datanucleus;singleton:=true</Bundle-SymbolicName>
                         <Import-Package>
                             javax.jdo*;version="${jdo.version}",
                             *;resolution:=optional
                         </Import-Package>
-                        <PreMainClass>org.datanucleus.enhancer.DataNucleusClassFileTransformer</PreMainClass>
+                        <PremainClass>org.datanucleus.enhancer.DataNucleusClassFileTransformer</PremainClass>
                     </instructions>
                 </configuration>
                 <executions>
