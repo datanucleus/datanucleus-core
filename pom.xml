@@ -218,11 +218,9 @@
                 </includes>
             </resource>
             <resource>
-                <!-- Need to have MANIFEST.MF in place before packaging, so unit-tests will work -->
                 <directory>${basedir}/META-INF</directory>
                 <targetPath>META-INF</targetPath>
                 <includes>
-                    <include>MANIFEST.MF</include>
                     <include>LICENSE.txt</include>
                     <include>LICENSE_ASM.txt</include>
                     <include>NOTICE.txt</include>
@@ -294,7 +292,6 @@
                 <version>2.4.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <manifestLocation>${basedir}/target/classes/META-INF</manifestLocation>
                     <instructions>
                         <Bundle-SymbolicName>org.datanucleus;singleton:=true</Bundle-SymbolicName>
                         <Import-Package>
@@ -306,7 +303,8 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>compile</phase>
+                        <!-- Need to have MANIFEST.MF in place before packaging, so unit-tests will work -->
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>manifest</goal>
                         </goals>
