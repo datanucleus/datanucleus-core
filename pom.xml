@@ -9,6 +9,7 @@
     <groupId>org.datanucleus</groupId>
     <artifactId>datanucleus-core</artifactId>
     <version>3.2.11-SNAPSHOT</version>
+    <packaging>bundle</packaging>
     <name>DataNucleus Core</name>
     <description>
         DataNucleus Core provides the primary components of a heterogenous Java persistence solution. 
@@ -18,6 +19,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jdo.version>3.0</jdo.version>
     </properties>
 
     <licenses>
@@ -65,7 +67,7 @@
         <dependency>
             <groupId>javax.jdo</groupId>
             <artifactId>jdo-api</artifactId>
-            <version>[3.0, )</version>
+            <version>[${jdo.version}, )</version>
             <scope>provided</scope>
         </dependency>
         <!-- JTA transactions -->
@@ -286,40 +288,20 @@
                     </includes>
                 </configuration>
             </plugin>
-            <!-- For one day when we use BND to generate MANIFEST.MF -->
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.3.5</version>
+                <version>2.4.0</version>
                 <extensions>true</extensions>
-                <!--executions>
-                    <execution>
-                        <phase>process-classes</phase>
-                        <id>felix-bundle-manifest</id>
-                        <goals>
-                            <goal>manifest</goal>
-                        </goals>
-                    </execution>
-                </executions-->
                 <configuration>
-                    <manifestLocation>${project.build.directory}/bnd/</manifestLocation>
-                    <dumpInstructions>${project.build.directory}/bnd/instructions.properties</dumpInstructions>
+                    <manifestLocation>META-INF</manifestLocation>
                     <instructions>
                         <Bundle-SymbolicName>org.datanucleus;singleton:=true</Bundle-SymbolicName>
                         <Import-Package>
-                            javax.jdo*;version="3.0.0",
+                            javax.jdo*;version="${jdo.version}",
                             *;resolution:=optional
                         </Import-Package>
                     </instructions>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <archive>
-                        <manifestFile>META-INF/MANIFEST.MF</manifestFile>
-                    </archive>
                 </configuration>
             </plugin>
             <plugin>
