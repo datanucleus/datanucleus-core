@@ -294,15 +294,24 @@
                 <version>2.4.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <manifestLocation>META-INF</manifestLocation>
+                    <manifestLocation>${basedir}/target/classes/META-INF</manifestLocation>
                     <instructions>
                         <Bundle-SymbolicName>org.datanucleus;singleton:=true</Bundle-SymbolicName>
                         <Import-Package>
                             javax.jdo*;version="${jdo.version}",
                             *;resolution:=optional
                         </Import-Package>
+                        <PreMainClass>org.datanucleus.enhancer.DataNucleusClassFileTransformer</PreMainClass>
                     </instructions>
                 </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
