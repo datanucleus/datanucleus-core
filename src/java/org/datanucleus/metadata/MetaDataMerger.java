@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -221,6 +222,12 @@ public class MetaDataMerger
         {
             AbstractMemberMetaData ormFmd = ormCmd.getMetaDataForMemberAtRelativePosition(i);
             AbstractMemberMetaData primaryFmd = primaryCmd.getMetaDataForMember(ormFmd.getName());
+            if (Boolean.TRUE.equals(ormFmd.primaryKey) && (primaryFmd == null || Boolean.FALSE.equals(primaryFmd.primaryKey)))
+            {
+                // Root metadata (annotations/JDO file) had no PK info for this field but the ORM is trying to set it as the PK!
+                throw new NucleusUserException(LOCALISER.msg("044025", ormFmd.getFullFieldName())).setFatal();
+            }
+
             if (primaryFmd == null)
             {
                 // Field not specified in JDO MetaData but is in ORM MetaData
@@ -341,10 +348,10 @@ public class MetaDataMerger
         {
             primaryFmd.defaultFetchGroup = ormFmd.defaultFetchGroup;
         }
-        if (Boolean.FALSE.equals(primaryFmd.primaryKey) && Boolean.TRUE.equals(ormFmd.primaryKey))
+        /*if (Boolean.FALSE.equals(primaryFmd.primaryKey) && Boolean.TRUE.equals(ormFmd.primaryKey))
         {
             primaryFmd.primaryKey = Boolean.valueOf(ormFmd.isPrimaryKey());
-        }
+        }*/
         if (ormFmd.getTable() != null)
         {
             primaryFmd.table = ormFmd.getTable();
