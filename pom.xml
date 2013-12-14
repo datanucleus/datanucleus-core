@@ -21,13 +21,19 @@
         <url>scm:git:git://github.com/datanucleus/datanucleus-core.git</url>
         <developerConnection>scm:git:git://github.com/datanucleus/datanucleus-core.git</developerConnection>
     </scm>
-    
+
     <properties>
         <jdo.version>3.0</jdo.version>
     </properties>
     
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <overview>${basedir}/src/java/org/datanucleus/overview.html</overview>
+                </configuration>
+            </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
@@ -175,5 +181,4 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-
 </project>
