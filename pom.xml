@@ -1,67 +1,56 @@
-<?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.datanucleus</groupId>
+    
+    <parent>
+        <groupId>org.datanucleus</groupId>
+        <artifactId>datanucleus-maven-parent</artifactId>
+        <version>3.3-SNAPSHOT</version>
+    </parent>
+    
     <artifactId>datanucleus-core</artifactId>
     <version>3.2.11-SNAPSHOT</version>
-    <packaging>bundle</packaging>
+    
     <name>DataNucleus Core</name>
     <description>
         DataNucleus Core provides the primary components of a heterogenous Java persistence solution. 
         It supports persistence API's being layered on top of the core functionality.
     </description>
-    <url>http://www.datanucleus.org</url>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jdo.version>3.0</jdo.version>
-    </properties>
-
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
 
     <scm>
         <connection>scm:git:git://github.com/datanucleus/datanucleus-core.git</connection>
         <url>scm:git:git://github.com/datanucleus/datanucleus-core.git</url>
         <developerConnection>scm:git:git://github.com/datanucleus/datanucleus-core.git</developerConnection>
     </scm>
-
-    <developers>
-        <developer>
-            <id>andy</id>
-            <name>Andy</name>
-            <organization>DataNucleus</organization>
-        </developer>
-    </developers>
-
-    <repositories>
-        <repository>
-            <id>DN_M2_Repo</id>
-            <url>http://www.datanucleus.org/downloads/maven2/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>datanucleus-nightly</id>
-            <name>DataNucleus Nightly</name>
-            <url>file:${user.home}/htdocs/downloads/maven2-nightly/</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
-
+    
+    <properties>
+        <jdo.version>3.0</jdo.version>
+    </properties>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-Xmx128m</argLine><!-- For SoftValueMapTest -->
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>org.datanucleus;singleton:=true</Bundle-SymbolicName>
+                        <Import-Package>
+                            javax.jdo*;version="${jdo.version}",
+                            *;resolution:=optional
+                        </Import-Package>
+                        <PremainClass>org.datanucleus.enhancer.DataNucleusClassFileTransformer</PremainClass>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
     <dependencies>
         <!-- Required for JDO bytecode enhancement contract -->
         <dependency>
@@ -185,175 +174,6 @@
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
-
-        <!-- Test dependencies -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
-    <build>
-        <sourceDirectory>src/java</sourceDirectory>
-        <resources>
-            <resource>
-                <filtering>true</filtering>
-                <directory>src/java</directory>
-                <includes>
-                    <include>**/plugin.xml</include>
-                    <include>**/*.properties</include>
-                    <include>**/*.dtd</include>
-                    <include>**/*.xsd</include>
-                    <include>**/*.jdo</include>
-                    <include>**/META-INF/services/*</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>${basedir}</directory>
-                <includes>
-                    <include>plugin.xml</include>
-                    <include>schema/*</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>${basedir}/META-INF</directory>
-                <targetPath>META-INF</targetPath>
-                <includes>
-                    <include>LICENSE.txt</include>
-                    <include>LICENSE_ASM.txt</include>
-                    <include>NOTICE.txt</include>
-                    <include>README.txt</include>
-                </includes>
-            </resource>
-        </resources>
-
-        <testSourceDirectory>src/test</testSourceDirectory>
-        <testResources>
-            <testResource>
-                <directory>${basedir}/src/test</directory>
-                <includes>
-                    <include>**/persistence*.xml</include>
-                    <include>**/plugin*.xml</include>
-                    <include>**/*.jdo*</include>
-                    <include>**/*.orm*</include>
-                    <include>**/*.xsd</include>
-                    <include>**/*.jdoquery*</include>
-                    <include>**/*.MF</include>
-                    <include>log4j.properties</include>
-                </includes>
-            </testResource>
-        </testResources>
-
-        <plugins>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <overview>${basedir}/src/java/org/datanucleus/overview.html</overview>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>2.4.1</version>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>${basedir}</directory>
-                            <includes>
-                                <include>*.log</include>
-                            </includes>
-                        </fileset>
-                    </filesets>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.10</version>
-                <configuration>
-                    <argLine>-Xmx128m</argLine><!-- For SoftValueMapTest -->
-                    <includes>
-                        <include>**/*Test.java</include>
-                    </includes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.4.0</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>org.datanucleus;singleton:=true</Bundle-SymbolicName>
-                        <Import-Package>
-                            javax.jdo*;version="${jdo.version}",
-                            *;resolution:=optional
-                        </Import-Package>
-                        <PremainClass>org.datanucleus.enhancer.DataNucleusClassFileTransformer</PremainClass>
-                    </instructions>
-                </configuration>
-                <executions>
-                    <execution>
-                        <!-- Need to have MANIFEST.MF in place before packaging, so unit-tests will work -->
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>manifest</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>2.3.1</version>
-            </plugin>
-        </plugins>
-
-        <extensions> 
-            <extension> 
-                <groupId>org.apache.maven.wagon</groupId> 
-                <artifactId>wagon-ssh-external</artifactId> 
-                <version>2.2</version> 
-            </extension> 
-        </extensions> 
-    </build>
-
-    <profiles>
-        <profile>
-            <id>release-sign-artifacts</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.1</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
