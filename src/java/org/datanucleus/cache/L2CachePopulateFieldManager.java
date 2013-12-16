@@ -587,6 +587,11 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
                 // Make a copy of a StringBuffer for the cache since it is mutable but final
                 cachedPC.setFieldValue(fieldNumber, new StringBuffer((StringBuffer)value));
             }
+            else if (value instanceof StringBuilder)
+            {
+                // Make a copy of a StringBuilder for the cache since it is mutable but final
+                cachedPC.setFieldValue(fieldNumber, new StringBuilder((StringBuilder)value));
+            }
             else if (value instanceof SCO)
             {
                 // SCO wrapper - so replace with unwrapped

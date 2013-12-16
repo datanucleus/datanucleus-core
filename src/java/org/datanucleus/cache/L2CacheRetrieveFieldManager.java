@@ -362,6 +362,11 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                 // Use our own copy of this mutable type
                 return new StringBuffer(((StringBuffer)value).toString());
             }
+            else if (value instanceof StringBuilder)
+            {
+                // Use our own copy of this mutable type
+                return new StringBuilder(((StringBuilder)value).toString());
+            }
             else if (value instanceof Date)
             {
                 // Use our own copy of this mutable type

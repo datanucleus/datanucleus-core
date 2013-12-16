@@ -1100,7 +1100,7 @@ public class ClassUtils
         // Check against our known (supported) java.lang classes
         if (baseType.equals("String") || baseType.equals("Object") || baseType.equals("Boolean") || baseType.equals("Byte") ||
             baseType.equals("Character") || baseType.equals("Double") || baseType.equals("Float") || baseType.equals("Integer") ||
-            baseType.equals("Long") || baseType.equals("Short") || baseType.equals("Number") || baseType.equals("StringBuffer"))
+            baseType.equals("Long") || baseType.equals("Short") || baseType.equals("Number") || baseType.equals("StringBuffer") || baseType.equals("StringBuilder"))
         {
             return "java.lang." + baseType;
         }
