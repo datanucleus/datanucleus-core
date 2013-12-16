@@ -932,6 +932,33 @@ public abstract class AbstractClassMetaData extends MetaData
                     throw new InvalidClassMetaDataException(LOCALISER, "044093", fullName);
                 }
             }
+
+            if (pcSuperclassMetaData.getIdentityType() == IdentityType.APPLICATION && pcSuperclassMetaData.getNoOfPopulatedPKMembers() > 0)
+            {
+                // TODO Allow for overriding superclass members
+                // Check whether the superclass defines PK fields and this class defines some more
+                int noOfPkKeys = 0;
+                Iterator memberIter = members.iterator();
+                while (memberIter.hasNext())
+                {
+                    AbstractMemberMetaData mmd = (AbstractMemberMetaData)memberIter.next();
+                    if (mmd.isPrimaryKey())
+                    {
+                        if (mmd.fieldBelongsToClass())
+                        {
+                            noOfPkKeys++;
+                        }
+                        else
+                        {
+                            // TODO Check any overriding doesn't make something PK when it wasn't before
+                        }
+                    }
+                }
+                if (noOfPkKeys > 0)
+                {
+                    throw new InvalidClassMetaDataException(LOCALISER, "044034", getFullClassName(), noOfPkKeys, pcSuperclassMetaData.getNoOfPopulatedPKMembers());
+                }
+            }
         }
     }
 
