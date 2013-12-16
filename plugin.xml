@@ -130,6 +130,8 @@ Contributors:
         <java-type name="java.lang.Enum" dfg="true" embedded="true"/>
         <java-type name="java.lang.StringBuffer" dfg="true" embedded="true" 
             converter-name="dn.stringbuffer-string"/>
+        <java-type name="java.lang.StringBuilder" dfg="true" embedded="true" 
+            converter-name="dn.stringbuilder-string"/>
         <java-type name="java.lang.Class" dfg="true" embedded="true" 
             converter-name="dn.class-string"/>
 
@@ -290,6 +292,8 @@ Contributors:
             converter-class="org.datanucleus.store.types.converters.SqlTimestampLongConverter"/>
         <type-converter name="dn.stringbuffer-string" member-type="java.lang.StringBuffer" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.StringBufferStringConverter"/>
+        <type-converter name="dn.stringbuilder-string" member-type="java.lang.StringBuilder" datastore-type="java.lang.String"
+            converter-class="org.datanucleus.store.types.converters.StringBuilderStringConverter"/>
         <type-converter name="dn.timezone-string" member-type="java.util.TimeZone" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.TimeZoneStringConverter"/>
         <type-converter name="dn.uri-string" member-type="java.net.URI" datastore-type="java.lang.String"
