@@ -225,6 +225,7 @@ public class TypeManagerTest extends TestCase
         checkStringConverterType(Date.class, org.datanucleus.store.types.converters.DateStringConverter.class);
         checkStringConverterType(Locale.class, org.datanucleus.store.types.converters.LocaleStringConverter.class);
         checkStringConverterType(StringBuffer.class, org.datanucleus.store.types.converters.StringBufferStringConverter.class);
+        checkStringConverterType(StringBuilder.class, org.datanucleus.store.types.converters.StringBuilderStringConverter.class);
         checkStringConverterType(TimeZone.class, org.datanucleus.store.types.converters.TimeZoneStringConverter.class);
         checkStringConverterType(URI.class, org.datanucleus.store.types.converters.URIStringConverter.class);
         checkStringConverterType(URL.class, org.datanucleus.store.types.converters.URLStringConverter.class);
