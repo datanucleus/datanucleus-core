@@ -175,7 +175,7 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
             return singleString;
         }
 
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         if (type == BULK_UPDATE)
         {
             str.append("UPDATE " + from + " SET " + update + " ");

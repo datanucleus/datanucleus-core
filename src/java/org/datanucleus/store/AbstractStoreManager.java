@@ -845,10 +845,10 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 (getBooleanProperty(PropertyNames.PROPERTY_SERIALIZE_READ) ? ", useLocking" : ""));
 
             // Schema : Auto-Create/Validate
-            StringBuffer autoCreateOptions = null;
+            StringBuilder autoCreateOptions = null;
             if (autoCreateTables || autoCreateColumns || autoCreateConstraints)
             {
-                autoCreateOptions = new StringBuffer();
+                autoCreateOptions = new StringBuilder();
                 boolean first = true;
                 if (autoCreateTables)
                 {
@@ -878,10 +878,10 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                     first = false;
                 }
             }
-            StringBuffer validateOptions = null;
+            StringBuilder validateOptions = null;
             if (validateTables || validateColumns || validateConstraints)
             {
-                validateOptions = new StringBuffer();
+                validateOptions = new StringBuilder();
                 boolean first = true;
                 if (validateTables)
                 {

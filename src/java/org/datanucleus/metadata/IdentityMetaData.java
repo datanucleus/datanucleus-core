@@ -196,7 +196,7 @@ public class IdentityMetaData extends MetaData
      */
     public String toString(String prefix,String indent)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (strategy != null)
         {
             sb.append(prefix).append("<datastore-identity strategy=\"" + strategy + "\"");

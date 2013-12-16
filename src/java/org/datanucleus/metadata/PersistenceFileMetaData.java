@@ -140,7 +140,7 @@ public class PersistenceFileMetaData extends MetaData
             indent = "";
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("<persistence>\n");
 
         // Add persistence units

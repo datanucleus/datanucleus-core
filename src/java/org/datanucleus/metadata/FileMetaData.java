@@ -418,7 +418,7 @@ public class FileMetaData extends MetaData
             indent = "";
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<jdo");
         if (catalog != null)
         {

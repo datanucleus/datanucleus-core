@@ -389,10 +389,10 @@ public abstract class AbstractSQLQuery extends Query
         boolean complete = false;
         int charPos = 0;
         char[] statement = compiledSQL.toCharArray();
-        StringBuffer paramName = null;
+        StringBuilder paramName = null;
         int paramPos = 0;
         boolean colonParam = true;
-        StringBuffer runtimeJdbcText = new StringBuffer();
+        StringBuilder runtimeJdbcText = new StringBuilder();
         while (!complete)
         {
             char c = statement[charPos];
@@ -402,7 +402,7 @@ public abstract class AbstractSQLQuery extends Query
                 // New positional/numbered parameter
                 colonParam = false;
                 paramPos++;
-                paramName = new StringBuffer();
+                paramName = new StringBuilder();
             }
             else if (c == ':')
             {
@@ -418,14 +418,14 @@ public abstract class AbstractSQLQuery extends Query
                     {
                         colonParam = true;
                         paramPos++;
-                        paramName = new StringBuffer();
+                        paramName = new StringBuilder();
                     }
                 }
                 else
                 {
                     colonParam = true;
                     paramPos++;
-                    paramName = new StringBuffer();
+                    paramName = new StringBuilder();
                 }
             }
             else

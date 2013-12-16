@@ -573,7 +573,7 @@ public class PriorityQueue extends org.datanucleus.store.types.simple.PriorityQu
      **/
     public String toString()
     {
-        StringBuffer s = new StringBuffer("[");
+        StringBuilder s = new StringBuilder("[");
         int i=0;
         Iterator iter=iterator();
         while (iter.hasNext())

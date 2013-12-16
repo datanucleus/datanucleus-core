@@ -777,21 +777,21 @@ class AUID implements Comparable
 
     /**
      * Appends the String representation of this AUID to the specified
-     * StringBuffer or if null to a new created StringBuffer and returns the
-     * StringBuffer. This method is called by <code>toString</code>,
+     * StringBuilder or if null to a new created StringBuilder and returns the
+     * StringBuilder. This method is called by <code>toString</code>,
      * therefore it is sufficient to override this method together with
      * providing new parse methods to create a new string representation of an
      * AUID.
      * 
      * @param sb
-     *            the StringBuffer to use
-     * @return a StringBuffer to which this AUID has been appended
+     *            the StringBuilder to use
+     * @return a StringBuilder to which this AUID has been appended
      */
-    public StringBuffer toStringBuffer(StringBuffer sb)
+    public StringBuilder toStringBuilder(StringBuilder sb)
     {
         if (sb == null)
         {
-            sb = new StringBuffer();
+            sb = new StringBuilder();
         }
         toHex(sb, getTimeLow(), 8);
         sb.append('-');
@@ -910,7 +910,7 @@ class AUID implements Comparable
      * <code>value</code> into a hex representation and appends it to
      * <code>result</code>.
      */
-    private void toHex(StringBuffer result, long value, int nibbles)
+    private void toHex(StringBuilder result, long value, int nibbles)
     {
         if (nibbles > 0)
         {
@@ -1295,7 +1295,7 @@ class AUID implements Comparable
 
     public String toString()
     {
-        return toStringBuffer(null).toString();
+        return toStringBuilder(null).toString();
     }
 
     /*

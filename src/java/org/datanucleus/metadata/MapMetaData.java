@@ -585,7 +585,7 @@ public class MapMetaData extends ContainerMetaData
      */
     public String toString(String prefix,String indent)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<map key-type=\"").append(key.type).append("\" value-type=\"").append(value.type).append("\"");
         if (key.embedded != null)
         {

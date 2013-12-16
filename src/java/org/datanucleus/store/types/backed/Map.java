@@ -576,7 +576,7 @@ public class Map extends org.datanucleus.store.types.simple.Map implements Backe
      **/
     public String toString()
     {
-        StringBuffer s = new StringBuffer("{");
+        StringBuilder s = new StringBuilder("{");
 
         Iterator i = entrySet().iterator();
         boolean hasNext = i.hasNext();

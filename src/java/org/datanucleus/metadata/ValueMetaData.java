@@ -111,7 +111,7 @@ public class ValueMetaData extends AbstractElementMetaData
     public String toString(String prefix, String indent)
     {
         // Field needs outputting so generate metadata
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<value");
         if (mappedBy != null)
         {

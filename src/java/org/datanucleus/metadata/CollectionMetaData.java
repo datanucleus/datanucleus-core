@@ -314,7 +314,7 @@ public class CollectionMetaData extends ContainerMetaData
      */
     public String toString(String prefix,String indent)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<collection element-type=\"").append(element.type).append("\"");
         if (element.embedded != null)
         {

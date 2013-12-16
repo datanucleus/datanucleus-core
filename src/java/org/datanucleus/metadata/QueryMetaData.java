@@ -199,7 +199,7 @@ public class QueryMetaData extends MetaData
      */
     public String toString(String prefix,String indent)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<query name=\"" + name + "\"\n");
         sb.append(prefix).append("       language=\"" + language + "\"\n");
         if (unique)

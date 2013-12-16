@@ -152,7 +152,7 @@ public class PrimaryKeyMetaData extends MetaData implements ColumnMetaDataContai
      */
     public String toString(String prefix,String indent)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<primary-key" + 
             (name != null ? (" name=\"" + name + "\"") : "") +
             (columnName != null ? (" column=\"" + columnName + "\"") : "") +

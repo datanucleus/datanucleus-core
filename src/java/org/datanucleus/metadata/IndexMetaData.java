@@ -114,7 +114,7 @@ public class IndexMetaData extends AbstractConstraintMetaData implements ColumnM
      */
     public String toString(String prefix,String indent)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<index unique=\"" + unique + "\"");
         if (table != null)
         {

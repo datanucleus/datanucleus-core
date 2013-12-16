@@ -286,7 +286,7 @@ public class SCOUtils
      */
     public static String getSCOWrapperOptionsMessage(boolean useCache, boolean queued, boolean allowNulls, boolean lazyLoading)
     {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         if (useCache)
         {
             str.append("cached");

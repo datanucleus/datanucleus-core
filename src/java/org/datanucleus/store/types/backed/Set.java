@@ -553,7 +553,7 @@ public class Set extends org.datanucleus.store.types.simple.Set implements Backe
      **/
     public String toString()
     {
-        StringBuffer s = new StringBuffer("[");
+        StringBuilder s = new StringBuilder("[");
         int i=0;
         Iterator iter=iterator();
         while (iter.hasNext())

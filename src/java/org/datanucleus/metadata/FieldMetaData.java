@@ -82,7 +82,7 @@ public class FieldMetaData extends AbstractMemberMetaData
         }
 
         // Field needs outputting so generate metadata
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<field name=\"" + name + "\"");
         if (persistenceModifier != null && !StringUtils.isWhitespace(persistenceModifier.toString()))
         {

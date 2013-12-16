@@ -843,7 +843,7 @@ public class ClassMetaData extends AbstractClassMetaData
      */
     public String toString(String prefix,String indent)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<class name=\"" + name + "\"\n");
         if (identityType != null)
         {

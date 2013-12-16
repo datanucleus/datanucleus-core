@@ -77,7 +77,7 @@ public class FetchGroupMemberMetaData extends MetaData
 
     public String toString(String prefix, String indent)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (recursionDepth != 1)
         {
             sb.append(prefix).append("<field name=\"" + name + "\" recursion-depth=\"" + recursionDepth + "\"/>\n");

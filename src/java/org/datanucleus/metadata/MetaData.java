@@ -348,7 +348,7 @@ public class MetaData implements Serializable
             return "";
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Iterator iter = extensions.iterator();
         while (iter.hasNext())
         {

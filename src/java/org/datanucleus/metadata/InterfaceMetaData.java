@@ -481,7 +481,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
      */
     public String toString(String prefix,String indent)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<interface name=\"" + name + "\"\n");
         if (identityType != null)
         {

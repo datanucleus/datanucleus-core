@@ -839,7 +839,7 @@ public class NucleusContext implements Serializable
             FileInputStream fis = null;
             try
             {
-                StringBuffer str = new StringBuffer();
+                StringBuilder str = new StringBuilder();
                 fis = new FileInputStream(file);
                 int content;
                 while ((content = fis.read()) != -1)

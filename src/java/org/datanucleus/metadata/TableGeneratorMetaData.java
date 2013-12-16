@@ -206,7 +206,7 @@ public class TableGeneratorMetaData extends MetaData
      */
     public String toString(String prefix, String indent)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<table-generator name=\"" + name + "\"\n");
 
         // Add extensions

@@ -96,7 +96,7 @@ public class PropertyMetaData extends AbstractMemberMetaData implements Comparab
         }
 
         // Field needs outputting so generate metadata
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<property name=\"" + name + "\"");
         if (persistenceModifier != null && !StringUtils.isWhitespace(persistenceModifier.toString()))
         {

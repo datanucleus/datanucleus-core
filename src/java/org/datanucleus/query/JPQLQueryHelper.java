@@ -95,7 +95,7 @@ public class JPQLQueryHelper
             DyadicExpression dyExpr = (DyadicExpression)expr;
             Expression left = dyExpr.getLeft();
             Expression right = dyExpr.getRight();
-            StringBuffer str = new StringBuffer("(");
+            StringBuilder str = new StringBuilder("(");
             if (left != null)
             {
                 str.append(JPQLQueryHelper.getJPQLForExpression(left));
@@ -208,7 +208,7 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("length"))
             {
-                StringBuffer str = new StringBuffer("LENGTH(");
+                StringBuilder str = new StringBuilder("LENGTH(");
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
                 if (args != null && !args.isEmpty())
                 {
@@ -233,14 +233,14 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("isEmpty"))
             {
-                StringBuffer str = new StringBuffer();
+                StringBuilder str = new StringBuilder();
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
                 str.append(" IS EMPTY");
                 return str.toString();
             }
             else if (method.equalsIgnoreCase("indexOf"))
             {
-                StringBuffer str = new StringBuffer("LOCATE(");
+                StringBuilder str = new StringBuilder("LOCATE(");
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
                 Expression firstExpr = args.get(0);
                 str.append(",").append(JPQLQueryHelper.getJPQLForExpression(firstExpr));
@@ -254,7 +254,7 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("substring"))
             {
-                StringBuffer str = new StringBuffer("SUBSTRING(");
+                StringBuilder str = new StringBuilder("SUBSTRING(");
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
                 Expression firstExpr = args.get(0);
                 str.append(",").append(JPQLQueryHelper.getJPQLForExpression(firstExpr));
@@ -268,7 +268,7 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("trim"))
             {
-                StringBuffer str = new StringBuffer("TRIM(BOTH ");
+                StringBuilder str = new StringBuilder("TRIM(BOTH ");
 
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
                 if (args.size() > 0)
@@ -284,7 +284,7 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("trimLeft"))
             {
-                StringBuffer str = new StringBuffer("TRIM(LEADING ");
+                StringBuilder str = new StringBuilder("TRIM(LEADING ");
 
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
                 if (args.size() > 0)
@@ -300,7 +300,7 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("trimLeft"))
             {
-                StringBuffer str = new StringBuffer("TRIM(TRAILING ");
+                StringBuilder str = new StringBuilder("TRIM(TRAILING ");
 
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
                 if (args.size() > 0)
@@ -316,7 +316,7 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("matches"))
             {
-                StringBuffer str = new StringBuffer();
+                StringBuilder str = new StringBuilder();
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
                 str.append(" LIKE ");
                 Expression firstExpr = args.get(0);
@@ -330,7 +330,7 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("contains"))
             {
-                StringBuffer str = new StringBuffer();
+                StringBuilder str = new StringBuilder();
                 Expression firstExpr = args.get(0);
                 str.append(JPQLQueryHelper.getJPQLForExpression(firstExpr));
                 str.append(" MEMBER OF ");
@@ -352,7 +352,7 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("COALESCE"))
             {
-                StringBuffer str = new StringBuffer("COALESCE(");
+                StringBuilder str = new StringBuilder("COALESCE(");
                 for (int i=0;i<args.size();i++)
                 {
                     Expression argExpr = args.get(i);
@@ -367,7 +367,7 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("NULLIF"))
             {
-                StringBuffer str = new StringBuffer("NULLIF(");
+                StringBuilder str = new StringBuilder("NULLIF(");
                 for (int i=0;i<args.size();i++)
                 {
                     Expression argExpr = args.get(i);

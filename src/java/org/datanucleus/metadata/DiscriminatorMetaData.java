@@ -262,7 +262,7 @@ public class DiscriminatorMetaData extends MetaData
      */
     public String toString(String prefix,String indent)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<discriminator");
         if (strategy != null)
         {

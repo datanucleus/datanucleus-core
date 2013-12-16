@@ -312,7 +312,7 @@ public class PersistenceUnitMetaData extends MetaData
     public String toString(String prefix, String indent)
     {
         // Field needs outputting so generate metadata
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<persistence-unit name=\"" + name + "\"");
         if (transactionType != null)
         {

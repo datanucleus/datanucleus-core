@@ -213,7 +213,7 @@ public class ForeignKeyMetaData extends AbstractConstraintMetaData implements Co
         }
 
         // Field needs outputting so generate metadata
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<foreign-key deferred=\"" + deferred + "\"\n");
         sb.append(prefix).append("       unique=\"" + unique + "\"");
         if (updateAction != null)

@@ -607,7 +607,7 @@ public class Collection extends org.datanucleus.store.types.simple.Collection im
      **/
     public String toString()
     {
-        StringBuffer s = new StringBuffer("[");
+        StringBuilder s = new StringBuilder("[");
         int i=0;
         Iterator iter=iterator();
         while (iter.hasNext())

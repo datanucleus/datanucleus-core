@@ -543,7 +543,7 @@ class PluginParser
         {
             int savedIdx = skipWS();
 
-            StringBuffer digits = new StringBuffer();
+            StringBuilder digits = new StringBuilder();
             int radix;
             char c = ci.current();
 
@@ -671,7 +671,7 @@ class PluginParser
                 return null;
             }
 
-            StringBuffer id = new StringBuffer();
+            StringBuilder id = new StringBuilder();
             id.append(c);
             // hyphen symbol is valid according OSGi specification
             while (Character.isJavaIdentifierPart(c = ci.next()) || c=='-')
@@ -691,7 +691,7 @@ class PluginParser
             skipWS();
             char c = ci.current();
 
-            StringBuffer id = new StringBuffer();
+            StringBuilder id = new StringBuilder();
 
             while ((c>='A' && c<='Z') || (c>='a' && c<='z') || (c>='0' && c<='9' ) || c=='.' || c=='_' || c=='-' || c=='[' || c==']' || c=='(' || c==')')
             {
@@ -720,7 +720,7 @@ class PluginParser
                 return null;
             }
 
-            StringBuffer qn = new StringBuffer(id);
+            StringBuilder qn = new StringBuilder(id);
 
             while (parseChar('.'))
             {
@@ -819,7 +819,7 @@ class PluginParser
                 return null;
             }
 
-            StringBuffer lit = new StringBuffer();
+            StringBuilder lit = new StringBuilder();
             char c;
 
             while ((c = ci.next()) != quote)
@@ -908,7 +908,7 @@ class PluginParser
 
         public String remaining()
         {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             char c = ci.current();
             while (c != CharacterIterator.DONE)
             {

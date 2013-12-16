@@ -87,7 +87,7 @@ public class UniqueMetaData extends AbstractConstraintMetaData implements Column
      */
     public String toString(String prefix,String indent)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<unique");
         if (table != null)
         {

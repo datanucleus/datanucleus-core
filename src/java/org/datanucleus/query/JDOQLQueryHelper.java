@@ -149,7 +149,7 @@ public class JDOQLQueryHelper
             DyadicExpression dyExpr = (DyadicExpression)expr;
             Expression left = dyExpr.getLeft();
             Expression right = dyExpr.getRight();
-            StringBuffer str = new StringBuffer("(");
+            StringBuilder str = new StringBuilder("(");
             if (dyExpr.getOperator() == Expression.OP_DISTINCT)
             {
                 // Distinct goes in front of the left expression
@@ -256,7 +256,7 @@ public class JDOQLQueryHelper
         else if (expr instanceof InvokeExpression)
         {
             InvokeExpression invExpr = (InvokeExpression)expr;
-            StringBuffer str = new StringBuffer();
+            StringBuilder str = new StringBuilder();
             if (invExpr.getLeft() != null)
             {
                 str.append(JDOQLQueryHelper.getJDOQLForExpression(invExpr.getLeft())).append(".");

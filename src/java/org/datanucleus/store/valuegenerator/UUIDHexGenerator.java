@@ -47,7 +47,7 @@ public class UUIDHexGenerator extends AbstractUUIDGenerator
      */
     protected String getIdentifier()
     {
-        StringBuffer str = new StringBuffer(32);
+        StringBuilder str = new StringBuilder(32);
 
         str.append(TypeConversionHelper.getHexFromInt(IP_ADDRESS));
         str.append(TypeConversionHelper.getHexFromInt(JVM_UNIQUE));
