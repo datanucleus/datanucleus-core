@@ -25,7 +25,6 @@ import java.security.ProtectionDomain;
 import java.util.Map;
 
 import org.datanucleus.util.CommandLine;
-import org.datanucleus.util.StringUtils;
 
 /**
  * Entry Point (as per Java) for transforming classes at runtime. 
