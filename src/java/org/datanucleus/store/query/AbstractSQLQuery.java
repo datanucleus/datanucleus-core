@@ -84,7 +84,7 @@ public abstract class AbstractSQLQuery extends Query
         }
 
         // Remove any end-of-line chars for when user dumped the query in a text file with one word per line!
-        this.inputSQL = sqlText.replace("\n", " ").trim();
+        this.inputSQL = sqlText.replace('\n', ' ').trim();
 
         // Detect type of SQL statement
         String firstToken = new StringTokenizer(inputSQL, " ").nextToken();

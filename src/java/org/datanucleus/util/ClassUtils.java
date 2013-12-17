@@ -270,16 +270,16 @@ public class ClassUtils
         // Remove the ".class" suffix
         classname = classname.substring(0,classname.length()-6);
 
-        String file_separator = System.getProperty("file.separator");
+        char file_separator = File.separatorChar;
 
         // Remove any leading separator
         if (classname.indexOf(file_separator) == 0)
         {
-            classname = classname.substring(file_separator.length());
+            classname = classname.substring(1);
         }
 
         // Change all separator characters to "."
-        classname = classname.replace(file_separator,".");
+        classname = classname.replace(file_separator,'.');
 
         return classname;
     }
@@ -438,14 +438,13 @@ public class ClassUtils
     {
         Enumeration jarEntries = jar.entries();
         HashSet classes = new HashSet();
-        String file_separator = System.getProperty("file.separator");
         while (jarEntries.hasMoreElements())
         {
             String entry = ((JarEntry)jarEntries.nextElement()).getName();
             if (entry.endsWith(".class") && !ClassUtils.isInnerClass(entry))
             {
                 String className = entry.substring(0, entry.length()-6); // Omit ".class"
-                className = className.replace(file_separator, ".");
+                className = className.replace(File.separatorChar, '.');
                 classes.add(className);
             }
         }
@@ -553,7 +552,6 @@ public class ClassUtils
 
         String[] classNames = new String[classFiles.size()];
         Iterator<File> iter = classFiles.iterator();
-        String file_separator = System.getProperty("file.separator");
         int i = 0;
         while (iter.hasNext())
         {
@@ -561,7 +559,7 @@ public class ClassUtils
 
             // Omit root part and trailing ".class"
             String classname = filename.substring(dir.getAbsolutePath().length()+1, filename.length()-6);
-            classNames[i++] = classname.replace(file_separator, ".");
+            classNames[i++] = classname.replace(File.separatorChar, '.');
         }
         return classNames;
     }
@@ -1318,7 +1316,6 @@ public class ClassUtils
      */
     public static String getClassNameForFileName(final String fileName, ClassLoaderResolver clr)
     {
-        String file_separator = System.getProperty("file.separator");
         if (!fileName.endsWith(".class"))
         {
             // We only support class files
@@ -1327,7 +1324,7 @@ public class ClassUtils
 
         // Omit ".class"
         String name = fileName.substring(0, fileName.length()-6);
-        name = StringUtils.replaceAll(name, file_separator, ".");
+        name = name.replace(File.separatorChar, '.');
 
         while (name.indexOf(".") >= 0)
         {

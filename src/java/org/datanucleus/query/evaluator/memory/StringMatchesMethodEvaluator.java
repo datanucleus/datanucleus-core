@@ -89,7 +89,7 @@ public class StringMatchesMethodEvaluator implements InvocationEvaluator
             // Convert JPQL like expression to String.matches input
             String matchesArg = arg;
             matchesArg = StringUtils.replaceAll(matchesArg, "%", ".*");
-            matchesArg = StringUtils.replaceAll(matchesArg, "_", ".");
+            matchesArg = matchesArg.replace('_', '.');
             arg = matchesArg;
         }
 

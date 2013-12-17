@@ -91,7 +91,7 @@ public class RuntimeEnhancer
                 return super.loadClass(name, resolve);
             }
 
-            String resource = StringUtils.replaceAll(name, ".", "/")+".class";
+            String resource = name.replace('.', '/') + ".class";
             try
             {
                 //read the class bytes, and define the class

@@ -108,7 +108,7 @@ public class DataNucleusClassFileTransformer implements ClassFileTransformer
             ProtectionDomain protectionDomain, byte[] classfileBuffer)
         throws IllegalClassFormatException
     {
-        String name = StringUtils.replaceAll(className,"/",".");
+        String name = className.replace('/','.');
         if (name.startsWith("java."))
         {
             return null;

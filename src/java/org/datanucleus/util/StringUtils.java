@@ -136,10 +136,8 @@ public class StringUtils
     }
 
     /**
-     * Replaces each substring of this string that matches toReplace.
-     * Used to replace replaceAll when using J2SDK 1.3.1.
-     * This method is available at String.replace in J2SDK 1.4.
-     * TODO Remove this when enhancer moves to 2.0
+     * A more efficient version than {@link String#replace(CharSequence, CharSequence)} which uses
+     * Regex for the implementation and requires compilation for every execution. 
      * @param theString The string to use
      * @param toReplace The string to replace.
      * @param replacement The replacement string.
@@ -156,15 +154,15 @@ public class StringUtils
             return theString;
         }
 
-        StringBuilder stringBuffer = new StringBuilder(theString);
+        StringBuilder stringBuilder = new StringBuilder(theString);
         int index = theString.length();
         int offset = toReplace.length();
         while ((index=theString.lastIndexOf(toReplace, index-1)) > -1)
         {
-            stringBuffer.replace(index,index+offset, replacement);
+            stringBuilder.replace(index,index+offset, replacement);
         }
 
-        return stringBuffer.toString();
+        return stringBuilder.toString();
     }
 
     /**
