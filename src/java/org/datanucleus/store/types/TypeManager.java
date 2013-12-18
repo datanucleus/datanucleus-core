@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
+import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.PluginManager;
@@ -719,9 +720,12 @@ public class TypeManager implements Serializable
                         addJavaType(type);
                     }
                 }
+                catch (ClassNotResolvedException cnre)
+                {
+                    NucleusLogger.PERSISTENCE.debug("Not enabling java type support for " + javaName + " : java type not present in CLASSPATH");
+                }
                 catch (Exception e)
                 {
-                    // Class not found so ignore. Should log this
                     NucleusLogger.PERSISTENCE.debug("Not enabling java type support for " + javaName + " : " + e.getMessage());
                 }
             }
