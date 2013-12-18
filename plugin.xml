@@ -439,6 +439,8 @@ Contributors:
 
         <query-method-evaluator class="java.lang.String" method="charAt"
             evaluator="org.datanucleus.query.evaluator.memory.StringCharAtMethodEvaluator"/>
+        <query-method-evaluator class="java.lang.String" method="concat"
+            evaluator="org.datanucleus.query.evaluator.memory.StringConcatMethodEvaluator"/>
         <query-method-evaluator class="java.lang.String" method="endsWith"
             evaluator="org.datanucleus.query.evaluator.memory.StringEndsWithMethodEvaluator"/>
         <query-method-evaluator class="java.lang.String" method="equals"
