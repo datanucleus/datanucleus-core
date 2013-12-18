@@ -722,7 +722,7 @@ public class TypeManager implements Serializable
                 catch (Exception e)
                 {
                     // Class not found so ignore. Should log this
-                    NucleusLogger.PERSISTENCE.debug("Error in loading java type support for " + javaName + " : " + e.getMessage());
+                    NucleusLogger.PERSISTENCE.debug("Not enabling java type support for " + javaName + " : " + e.getMessage());
                 }
             }
         }
