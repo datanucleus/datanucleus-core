@@ -20,6 +20,7 @@ package org.datanucleus.flush;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.scostore.CollectionStore;
 import org.datanucleus.store.scostore.Store;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Add operation for a collection.
@@ -72,6 +73,6 @@ public class CollectionAddOperation implements SCOOperation
 
     public String toString()
     {
-        return "COLLECTION ADD : " + op + " field=" + store.getOwnerMemberMetaData().getName();
+        return "COLLECTION ADD : " + op + " field=" + store.getOwnerMemberMetaData().getName() + " value=" + StringUtils.toJVMIDString(value);
     }
 }

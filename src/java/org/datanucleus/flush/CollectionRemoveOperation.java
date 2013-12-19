@@ -20,6 +20,7 @@ package org.datanucleus.flush;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.scostore.CollectionStore;
 import org.datanucleus.store.scostore.Store;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Remove operation for a collection.
@@ -75,6 +76,6 @@ public class CollectionRemoveOperation implements SCOOperation
 
     public String toString()
     {
-        return "COLLECTION REMOVE : " + op + " field=" + store.getOwnerMemberMetaData().getName();
+        return "COLLECTION REMOVE : " + op + " field=" + store.getOwnerMemberMetaData().getName() + " value=" + StringUtils.toJVMIDString(value);
     }
 }
