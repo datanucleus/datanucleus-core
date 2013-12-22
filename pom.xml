@@ -50,7 +50,7 @@
                             javax.jdo*;version="${jdo.version}",
                             *;resolution:=optional
                         </Import-Package>
-                        <PremainClass>org.datanucleus.enhancer.DataNucleusClassFileTransformer</PremainClass>
+                        <Premain-Class>org.datanucleus.enhancer.DataNucleusClassFileTransformer</Premain-Class>
                     </instructions>
                 </configuration>
             </plugin>
