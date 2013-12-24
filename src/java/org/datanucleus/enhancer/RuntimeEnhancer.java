@@ -133,16 +133,14 @@ public class RuntimeEnhancer
         }
     }
 
-    public RuntimeEnhancer()
-    {
-        this(null, null);
-    }
-
-    public RuntimeEnhancer(String api)
-    {
-        this(api, null);
-    }
-
+    /**
+     * Constructor for a runtime enhancer for an API.
+     * Creates its own NucleusContext for enhancement. Note that this is because the NucleusContext
+     * currently is for runtime or enhancement, so we isolate things; in future we could take in the NucleusContext
+     * from whatever operation has it (e.g PMF, EMF).
+     * @param api The API
+     * @param contextProps Properties for use by the NucleusContext (e.g ClassLoaderResolver class name, pluginRegistry).
+     */
     public RuntimeEnhancer(String api, Map contextProps)
     {
         nucleusContext = new NucleusContext(api, NucleusContext.ContextType.ENHANCEMENT, contextProps);

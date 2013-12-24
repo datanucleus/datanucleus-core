@@ -27,9 +27,17 @@ import java.util.Map;
 import org.datanucleus.util.CommandLine;
 
 /**
- * Entry Point (as per Java) for transforming classes at runtime. 
+ * Entry Point (as per Java) for transforming classes at runtime.
  * Before loading classes, the JVM invokes the ClassFileTranformer to transform the class.
  * Will never process classes in packages "java.", "javax.", "org.datanucleus." (when not "test" or "samples").
+ * Accepts the following (optional) arguments
+ * <ul>
+ * <li>api : JDO, JPA - default=JDO</li>
+ * <li>generatePK : true, false - default=true</li>
+ * <li>generateConstructor : true, false - default=true</li>
+ * <li>detachListener : true, false - default=false</li>
+ * <li>default args : package names of classes to be enhanced when encountered
+ * </ul>
  */
 public class DataNucleusClassFileTransformer implements ClassFileTransformer
 {
@@ -37,16 +45,6 @@ public class DataNucleusClassFileTransformer implements ClassFileTransformer
 
     /** User input package name(s) (comma-separated) that should be processed. */
     private CommandLine cmd = new CommandLine();
-
-    public DataNucleusClassFileTransformer()
-    {
-        this(null, null);
-    }
-
-    public DataNucleusClassFileTransformer(String arguments)
-    {
-        this(arguments, null);
-    }
 
     public DataNucleusClassFileTransformer(String arguments, Map contextProps)
     {
@@ -59,8 +57,15 @@ public class DataNucleusClassFileTransformer implements ClassFileTransformer
             cmd.parse(arguments.split("[\\s,=]+"));
         }
 
+        String api = cmd.getOptionArg("api") != null ? cmd.getOptionArg("api") : null;
+        if (api == null)
+        {
+        	api = "JDO";
+        	DataNucleusEnhancer.LOGGER.debug("ClassFileTransformer API not specified so falling back to JDO. You should specify '-api={API}' when specifying the javaagent");
+        }
+
         // Create the RuntimeEnhancer with the specified API and options/properties
-        enhancer = new RuntimeEnhancer(cmd.getOptionArg("api") != null ? cmd.getOptionArg("api") : null, contextProps);
+        enhancer = new RuntimeEnhancer(api, contextProps);
         if (cmd.hasOption("generateConstructor"))
         {
             String val = cmd.getOptionArg("generateConstructor");
@@ -89,7 +94,8 @@ public class DataNucleusClassFileTransformer implements ClassFileTransformer
 
     public static void premain(String agentArguments, Instrumentation instrumentation)
     {
-        instrumentation.addTransformer(new DataNucleusClassFileTransformer(agentArguments));
+    	// Called when invoking the JRE with javaagent, at startup
+        instrumentation.addTransformer(new DataNucleusClassFileTransformer(agentArguments, null));
     } 
 
     /**
