@@ -302,11 +302,11 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
 
         if (range != null)
         {
-            str.append("RANGE " + range);
+            str.append("RANGE " + range + " ");
         }
         else if (fromInclNo > 0 || toExclNo != Long.MAX_VALUE)
         {
-            str.append("RANGE " + fromInclNo + "," + toExclNo);
+            str.append("RANGE " + fromInclNo + "," + toExclNo + " ");
         }
 
         singleString = str.toString().trim();
