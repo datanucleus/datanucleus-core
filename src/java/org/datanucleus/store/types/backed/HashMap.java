@@ -536,6 +536,7 @@ public class HashMap extends org.datanucleus.store.types.simple.HashMap implemen
         }
         else if (backingStore != null)
         {
+            // TODO NUCCORE-1100 Return Collection instead of Set
             return new Set(ownerOP, ownerMmd, true, backingStore.valueSetStore());
         }
 

@@ -125,6 +125,7 @@ public interface MapStore extends Store
 
     /**
      * Accessor for the values in the Map.
+     * TODO Change this to CollectionStore since a Map can have duplicate values
      * @return Values for the Map.
      */
     SetStore valueSetStore();

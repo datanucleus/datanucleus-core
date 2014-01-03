@@ -920,10 +920,9 @@ public class SCOUtils
      */
     public static void populateMapDelegateWithStoreData(Map delegate, MapStore store, ObjectProvider ownerOP)
     {
-        java.util.HashSet keys = new java.util.HashSet();
-
         // If we have persistable keys then load them. The keys query will pull in the key fetch plan
         // so this instantiates them in the cache
+        java.util.Set keys = new java.util.HashSet();
         if (!store.keysAreEmbedded() && !store.keysAreSerialised())
         {
             // Retrieve the persistable keys
@@ -937,7 +936,7 @@ public class SCOUtils
 
         // If we have persistable values then load them. The values query will pull in the value fetch plan
         // so this instantiates them in the cache
-        java.util.HashSet values = new java.util.HashSet();
+        java.util.List values = new java.util.ArrayList();
         if (!store.valuesAreEmbedded() && !store.valuesAreSerialised())
         {
             // Retrieve the persistable values
