@@ -39,6 +39,7 @@ public class PropertyNames
     public static final String PROPERTY_PERSISTENCE_BY_REACHABILITY_AT_COMMIT = "datanucleus.persistenceByReachabilityAtCommit";
     public static final String PROPERTY_MANAGE_RELATIONSHIPS = "datanucleus.manageRelationships";
     public static final String PROPERTY_MANAGE_RELATIONSHIPS_CHECKS = "datanucleus.manageRelationshipsChecks";
+    public static final String PROPERTY_FIND_OBJECT_TYPE_CONVERSION = "datanucleus.findObject.typeConversion";
     public static final String PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED = "datanucleus.findObject.validateWhenCached";
     public static final String PROPERTY_ALLOW_CALLBACKS = "datanucleus.allowCallbacks";
     public static final String PROPERTY_DATASTORE_IDENTITY_TYPE = "datanucleus.datastoreIdentityType";
