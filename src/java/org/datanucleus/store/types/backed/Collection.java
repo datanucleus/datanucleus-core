@@ -91,7 +91,7 @@ public class Collection extends org.datanucleus.store.types.simple.Collection im
         {
             ClassLoaderResolver clr = ec.getClassLoaderResolver();
             this.backingStore = (CollectionStore)
-            ((BackedSCOStoreManager)ec.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.Collection.class);
+                ((BackedSCOStoreManager)ec.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.Collection.class);
         }
 
         // Set up our delegate
@@ -110,6 +110,45 @@ public class Collection extends org.datanucleus.store.types.simple.Collection im
         {
             NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(op, ownerMmd.getName(), this,
                 useCache, queued, allowNulls, SCOUtils.useCachedLazyLoading(op, ownerMmd)));
+        }
+    }
+
+    /**
+     * Constructor used when creating a Collection for "Map.values" with specified backing store.
+     * @param ownerOP ObjectProvider for the owning object
+     * @param mmd Metadata for the member
+     * @param allowNulls Whether nulls are allowed
+     * @param backingStore The backing store
+     */
+    Collection(ObjectProvider ownerOP, AbstractMemberMetaData mmd, boolean allowNulls, CollectionStore backingStore)
+    {
+        super(ownerOP, mmd);
+
+        this.allowNulls = allowNulls;
+
+        // Set up our delegate
+        this.delegate = new java.util.HashSet();
+
+        ExecutionContext ec = ownerOP.getExecutionContext();
+        allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
+        queued = ec.isDelayDatastoreOperationsEnabled();
+        useCache = SCOUtils.useContainerCache(ownerOP, mmd);
+
+        ClassLoaderResolver clr = ec.getClassLoaderResolver();
+        if (backingStore != null)
+        {
+            this.backingStore = backingStore;
+        }
+        else if (!SCOUtils.collectionHasSerialisedElements(mmd) && 
+                mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
+        {
+            this.backingStore = (CollectionStore)
+                ((BackedSCOStoreManager)ec.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.Collection.class);
+        }
+        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+        {
+            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this,
+                useCache, queued, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
         }
     }
 

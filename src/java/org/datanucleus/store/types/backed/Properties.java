@@ -557,7 +557,7 @@ public class Properties extends org.datanucleus.store.types.simple.Properties im
         }
         else if (backingStore != null)
         {
-            return new Set(ownerOP, ownerMmd, true, backingStore.valueSetStore());
+            return new org.datanucleus.store.types.backed.Collection(ownerOP, ownerMmd, true, backingStore.valueCollectionStore());
         }
         
         return delegate.values();

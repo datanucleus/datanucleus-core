@@ -535,8 +535,7 @@ public class LinkedHashMap extends org.datanucleus.store.types.simple.LinkedHash
         }
         else if (backingStore != null)
         {
-            // TODO NUCCORE-1100 Return Collection instead of Set
-            return new Set(ownerOP, ownerMmd, true, backingStore.valueSetStore());
+            return new org.datanucleus.store.types.backed.Collection(ownerOP, ownerMmd, true, backingStore.valueCollectionStore());
         }
 
         return delegate.values();

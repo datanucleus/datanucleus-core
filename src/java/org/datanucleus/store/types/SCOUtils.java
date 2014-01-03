@@ -940,7 +940,7 @@ public class SCOUtils
         if (!store.valuesAreEmbedded() && !store.valuesAreSerialised())
         {
             // Retrieve the persistable values
-            SetStore valuestore = store.valueSetStore();
+            CollectionStore valuestore = store.valueCollectionStore();
             Iterator valueIter = valuestore.iterator(ownerOP);
             while (valueIter.hasNext())
             {

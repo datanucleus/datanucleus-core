@@ -118,20 +118,19 @@ public interface MapStore extends Store
     void clear(ObjectProvider op);
 
     /**
-     * Accessor for the keys in the Map.
+     * Accessor for a backing store representing the key set for the Map.
      * @return Keys for the Map.
      */
     SetStore keySetStore();
 
     /**
-     * Accessor for the values in the Map.
-     * TODO Change this to CollectionStore since a Map can have duplicate values
+     * Accessor for a backing store representing the values in the Map.
      * @return Values for the Map.
      */
-    SetStore valueSetStore();
+    CollectionStore valueCollectionStore();
 
     /**
-     * Accessor for the entry set for the Map.
+     * Accessor for a backing store representing the entry set for the Map.
      * @return Entry set for the Map.
      */
     SetStore entrySetStore();
