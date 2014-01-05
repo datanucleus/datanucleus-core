@@ -344,15 +344,13 @@ public class JDOQLParser implements Parser
 
             // Nulls positioning
             Node nullsNode = null;
-            if (p.parseString("NULLS FIRST") ||
-                p.parseString("nulls first"))
+            if (p.parseString("NULLS FIRST") || p.parseString("nulls first"))
             {
                 nullsNode = new Node(NodeType.OPERATOR, "nulls first");
             }
-            else if (p.parseString("NULLS LAST") ||
-                p.parseString("nulls last"))
+            else if (p.parseString("NULLS LAST") || p.parseString("nulls last"))
             {
-                nullsNode = new Node(NodeType.OPERATOR, "nulls first");
+                nullsNode = new Node(NodeType.OPERATOR, "nulls last");
             }
 
             Node expr = new Node(NodeType.OPERATOR, "order");
