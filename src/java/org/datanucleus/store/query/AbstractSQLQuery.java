@@ -98,7 +98,7 @@ public abstract class AbstractSQLQuery extends Query
             unique = true;
         }
         else if (firstToken.equalsIgnoreCase("UPDATE") || firstToken.equalsIgnoreCase("INSERT") ||
-                firstToken.equalsIgnoreCase("MERGE") || firstToken.equalsIgnoreCase("CREATE"))
+                firstToken.equalsIgnoreCase("MERGE"))
         {
             type = BULK_UPDATE;
             unique = true;

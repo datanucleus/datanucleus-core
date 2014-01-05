@@ -1791,7 +1791,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
                     // Bulk update/delete return a Long
                     return result;
                 }
-                else
+                else if (type == SELECT)
                 {
                     // Select, so return the range of objects
                     Collection qr = (Collection)result;
@@ -1844,6 +1844,11 @@ public abstract class Query implements Serializable, ExecutionContextListener
 
                         return qr;
                     }
+                }
+                else
+                {
+                    // 'Other' statement, so just return the result
+                    return result;
                 }
             }
             finally
