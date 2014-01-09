@@ -25,6 +25,43 @@ import java.util.Map;
 /**
  * Interface for any Level 2 Cache used internally.
  * Provides the typical controls required internally and including the JDO2/JPA1 L2 cache methods.
+ * <p>
+ * JDO and JPA allow the use of a level 2 (L2) cache, with the cache shared between
+ * PersistenceManagers/EntityManagers. The objects in the level 2 cache don't pertain to any
+ * one manager. The L2 cache in DataNucleus is as follows :-
+ * </p>
+ * <p>
+ * The L2 cache stores an object of type <i>org.datanucleus.cache.CachedPC</i> and is keyed
+ * by the identity of the object. The <i>CachedPC</i> contains a persistable object (<b>not</b>
+ * connected to an ObjectProvider), together with the indicators for which fields are loaded, as
+ * well as values for any relation fields. The persistable object will have values as null for
+ * any relation fields, and it is these relation field values stored in the <i>CachedPC</i>
+ * that provide linkage to other objects. 
+ * </p>
+ * <p>
+ * The relation field values also do not store actual objects; they store the identities of the 
+ * related objects. For example if an object X has a 1-1 relation with another persistable 
+ * object Y then in the relation field values for X for that field we store the identity of
+ * Y. Similarly if the field is a Collection, then the relation field values will be a 
+ * Collection of identities of the related objects. This provides isolation of each object
+ * in the L2 cache (so objects aren't storing references to other objects and so allowing garbage
+ * collection etc).
+ * </p>
+ * <p>
+ * Objects are stored in the L2 cache in the following situations
+ * </p>
+ * <ul>
+ * <li>An object is retrieved (from the datastore) within a transaction, and it is
+ * stored in the L2 cache if no object with that identity already exists there.</li>
+ * <li>At commit() of the transaction any object that has been modified during that
+ * transaction will be stored/updated in the L2 cache if its persistable object is
+ * still in memory in the PM/EM (could have been garbage collected since flushing)</li>
+ * </ul>
+ * <p>
+ * Each class can be configured to be <i>cacheable</i> or not. The default for a persistable
+ * class is to be cacheable. Configuration is performed via annotations or XML metadata.
+ * If a class is not cacheable then objects of that type aren't stored in the L2 cache.
+ * </p>
  */
 public interface Level2Cache extends Serializable
 {
