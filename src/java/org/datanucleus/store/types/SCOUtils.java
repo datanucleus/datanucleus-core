@@ -28,6 +28,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -1441,8 +1445,16 @@ public class SCOUtils
     {
         if (declaredType.isInterface())
         {
-            // Instantiate as ArrayList/HashSet/HashMap
-            if (List.class.isAssignableFrom(declaredType))
+            // Instantiate as most appropriate concrete implementation
+            if (SortedSet.class.isAssignableFrom(declaredType))
+            {
+                return TreeSet.class;
+            }
+            else if (SortedMap.class.isAssignableFrom(declaredType))
+            {
+                return TreeMap.class;
+            }
+            else if (List.class.isAssignableFrom(declaredType))
             {
                 return ArrayList.class;
             }
