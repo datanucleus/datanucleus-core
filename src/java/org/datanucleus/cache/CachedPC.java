@@ -163,7 +163,7 @@ public class CachedPC implements Serializable
             (debug ? (" vals=" + StringUtils.mapToString(fieldValues)) : "");
     }
 
-    public static class CachedId implements Serializable
+    public static class CachedId implements Serializable, Comparable<CachedId>
     {
         String className;
         Object id;
@@ -179,6 +179,27 @@ public class CachedPC implements Serializable
         public Object getId()
         {
             return id;
+        }
+        public boolean equals(Object obj)
+        {
+            if (obj == null || !(obj instanceof CachedId))
+            {
+                return false;
+            }
+            CachedId other = (CachedId)obj;
+            return other.className.equals(className) && other.id.equals(id);
+        }
+        public int hashCode()
+        {
+            return className.hashCode() ^ id.hashCode();
+        }
+        public int compareTo(CachedId obj)
+        {
+            if (obj == null)
+            {
+                return 1;
+            }
+            return hashCode() - obj.hashCode();
         }
     }
 }
