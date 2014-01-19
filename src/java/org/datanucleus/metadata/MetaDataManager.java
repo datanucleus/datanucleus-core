@@ -1141,45 +1141,6 @@ public abstract class MetaDataManager implements Serializable
     }
 
     /**
-     * Accessor for any scanner for metadata classes (optional).
-     * Looks for the persistence property "datanucleus.metadata.scanner" (if defined)
-     * @param clr The classloader resolver
-     * @return scanner instance or null if it doesn't exist or cannot be instantiated
-     */
-    protected MetaDataScanner getScanner(ClassLoaderResolver clr)
-    {
-        Object so = nucleusContext.getPersistenceConfiguration().getProperty(PropertyNames.PROPERTY_METADATA_SCANNER);
-        if (so == null)
-        {
-            return null;
-        }
-        if (so instanceof MetaDataScanner)
-        {
-            return (MetaDataScanner)so;
-        }
-        else if (so instanceof String)
-        {
-            try 
-            {
-                Class clazz = clr.classForName((String) so);
-                return (MetaDataScanner) clazz.newInstance();
-            }
-            catch (Throwable t)
-            {
-                throw new NucleusUserException(LOCALISER.msg("044012", so), t);
-            }
-        }
-        else
-        {
-            if (NucleusLogger.METADATA.isDebugEnabled())
-            {
-                NucleusLogger.METADATA.debug(LOCALISER.msg("044011", so));
-            }
-            return null;
-        }
-    }
-
-    /**
      * Method to load user-provided (dynamic) metadata (from the JDO MetaData API).
      * @param fileMetaData FileMetaData to register/populate/initialise
      * @param loader ClassLoader to use in loading the metadata (if any)
@@ -1238,6 +1199,97 @@ public abstract class MetaDataManager implements Serializable
             {
                 updateLock.unlock();
             }
+        }
+    }
+
+    /**
+     * Convenience method to allow the unloading of metadata, for example where the user wants to reload a class definition
+     * and that class maybe has different metadata with the new definition.
+     * @param className Name of the class
+     */
+    public void unloadMetaDataForClass(String className)
+    {
+        try
+        {
+            updateLock.lock();
+
+            // Remove any reference to the AbstractClassMetaData
+            AbstractClassMetaData cmd = classMetaDataByClass.remove(className);
+            Iterator<Map.Entry<String, AbstractClassMetaData>> iter = classMetaDataByDiscriminatorName.entrySet().iterator();
+            while (iter.hasNext())
+            {
+                Map.Entry<String, AbstractClassMetaData> entry = iter.next();
+                if (entry.getValue() == cmd)
+                {
+                    iter.remove();
+                }
+            }
+            iter = classMetaDataByEntityName.entrySet().iterator();
+            while (iter.hasNext())
+            {
+                Map.Entry<String, AbstractClassMetaData> entry = iter.next();
+                if (entry.getValue() == cmd)
+                {
+                    iter.remove();
+                }
+            }
+            Iterator<Map.Entry> entryIter = classMetaDataByAppIdClassName.entrySet().iterator();
+            while (entryIter.hasNext())
+            {
+                Map.Entry entry = entryIter.next();
+                Collection<AbstractClassMetaData> collCmds = (Collection<AbstractClassMetaData>) entry.getValue();
+                if (collCmds.size() > 0)
+                {
+                    collCmds.remove(cmd);
+                }
+            }
+
+            directSubclassesByClass.remove(className);
+            discriminatorLookupByRootClassName.remove(className);
+            classesWithoutPersistenceInfo.remove(className);
+        }
+        finally
+        {
+            updateLock.unlock();
+        }
+    }
+
+    /**
+     * Accessor for any scanner for metadata classes (optional).
+     * Looks for the persistence property "datanucleus.metadata.scanner" (if defined)
+     * @param clr The classloader resolver
+     * @return scanner instance or null if it doesn't exist or cannot be instantiated
+     */
+    protected MetaDataScanner getScanner(ClassLoaderResolver clr)
+    {
+        Object so = nucleusContext.getPersistenceConfiguration().getProperty(PropertyNames.PROPERTY_METADATA_SCANNER);
+        if (so == null)
+        {
+            return null;
+        }
+        if (so instanceof MetaDataScanner)
+        {
+            return (MetaDataScanner)so;
+        }
+        else if (so instanceof String)
+        {
+            try 
+            {
+                Class clazz = clr.classForName((String) so);
+                return (MetaDataScanner) clazz.newInstance();
+            }
+            catch (Throwable t)
+            {
+                throw new NucleusUserException(LOCALISER.msg("044012", so), t);
+            }
+        }
+        else
+        {
+            if (NucleusLogger.METADATA.isDebugEnabled())
+            {
+                NucleusLogger.METADATA.debug(LOCALISER.msg("044011", so));
+            }
+            return null;
         }
     }
 
