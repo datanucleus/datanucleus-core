@@ -24,18 +24,17 @@ import java.util.Enumeration;
 
 /**
  * Class to allow resolution and loading of classes in a persistence framework.
- * Implementations are to define the rules for resolving the classes. For example
- * JDO (used outside a J2EE container) would likely differ from EJB3 (used within
- * a J2EE container).
+ * Implementations are to define the rules for resolving the classes. For example JDO used within JavaSE would likely 
+ * differ from JDO used within a JavaEE container.
  * 
  * The search class path order is:
  * <ul>
- * <li>the primary classloader argument</li>
- * <li>the primary classloader (set using setPrimary and kept in ThreadLocal variable).</li>
- * <li>the current thread context classloader.</li>
- * <li>the pm classloader.</li>
- * <li>the registered classloader.</li> 
- * <li>the user registered classloader.</li> 
+ * <li>the primary classloader argument passed in for the specific call</li>
+ * <li>the primary classloader (set using setPrimary and kept in ThreadLocal variable)</li>
+ * <li>the current thread context classloader (<i>Thread.currentThread().getContextClassLoader()</i>)</li>
+ * <li>the ExecutionContext classloader</li>
+ * <li>the runtime classloader (for creating implementation of persistent interfaces)</li>
+ * <li>the user registered classloader (if one was provided by persistence property <i>datanucleus.primaryClassLoader</i>, or the classLoader for the enhancer)</li>
  * </ul>
  */
 public interface ClassLoaderResolver
@@ -101,22 +100,6 @@ public interface ClassLoaderResolver
      * @return Whether they are assignable
      */
     public boolean isAssignableFrom(String class_name_1, String class_name_2);
-    
-    /**
-     * ClassLoader registered to load classes created at runtime. One ClassLoader can
-     * be registered, and if one ClassLoader is already registered, the registered ClassLoader
-     * is replaced by <code>loader</code>.
-     * @param loader The ClassLoader in which classes are defined
-     */
-    public void setRuntimeClassLoader(ClassLoader loader);
-
-    /**
-     * ClassLoader registered by users to load classes. One ClassLoader can
-     * be registered, and if one ClassLoader is already registered, the registered ClassLoader
-     * is replaced by <code>loader</code>.
-     * @param loader The ClassLoader in which classes are loaded
-     */
-    public void registerUserClassLoader(ClassLoader loader);
 
     /**
      * Finds all the resources with the given name.
@@ -138,7 +121,23 @@ public interface ClassLoaderResolver
      * @see ClassLoader#getResource(java.lang.String)
      */
     public URL getResource(String resourceName, ClassLoader primary);
-    
+
+    /**
+     * ClassLoader registered to load classes created at runtime. One ClassLoader can
+     * be registered, and if one ClassLoader is already registered, the registered ClassLoader
+     * is replaced by <code>loader</code>.
+     * @param loader The ClassLoader in which classes are defined
+     */
+    public void setRuntimeClassLoader(ClassLoader loader);
+
+    /**
+     * ClassLoader registered by users to load classes. One ClassLoader can
+     * be registered, and if one ClassLoader is already registered, the registered ClassLoader
+     * is replaced by <code>loader</code>.
+     * @param loader The ClassLoader in which classes are loaded
+     */
+    public void registerUserClassLoader(ClassLoader loader);
+
     /**
      * Sets the primary classloader for the current thread.
      * The primary should be kept in a ThreadLocal variable.
