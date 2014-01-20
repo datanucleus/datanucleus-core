@@ -52,6 +52,7 @@ import org.datanucleus.util.WeakValueMap;
  * <LI>The loader returned by Thread.getContextClassLoader() at the time of creating an ExecutionContext.</LI>
  * <LI>The loader registered for dynamically creating and loading classes at runtime.</LI>
  * </OL>
+ * TODO Provide a way of flushing a classname from the cached classes so we can reload a class
  */
 public class ClassLoaderResolverImpl implements ClassLoaderResolver
 {
