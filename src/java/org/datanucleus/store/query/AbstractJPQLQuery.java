@@ -157,7 +157,7 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
         }
         if (getFetchPlan() != null)
         {
-            queryCacheKey += getFetchPlan().toString();
+            queryCacheKey += (" " + getFetchPlan().toString());
         }
 
         return queryCacheKey;

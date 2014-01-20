@@ -209,7 +209,7 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
 
         if (getFetchPlan() != null)
         {
-            queryCacheKey += getFetchPlan().toString();
+            queryCacheKey += (" " + getFetchPlan().toString());
         }
 
         return queryCacheKey;
