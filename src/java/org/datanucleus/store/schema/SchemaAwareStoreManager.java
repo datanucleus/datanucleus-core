@@ -27,11 +27,27 @@ import java.util.Set;
 public interface SchemaAwareStoreManager
 {
     /**
+     * Method that will create an actual schema in the datastore (if the datastore supports it).
+     * @param schemaName Name of the schema to create
+     * @throws UnsupportedOperationException If not supported
+     * @since 4.0
+     */
+//    void createSchema(String schemaName);
+
+    /**
      * SchemaTool : create the schema for the specified classes (if supported by this datastore).
      * @param classNames Names of the classes
      * @param props Any optional properties
      */
     void createSchema(Set<String> classNames, Properties props);
+
+    /**
+     * Method that will drop a schema from the datastore (if the datastore supports it).
+     * @param schemaName Name of the schema to drop
+     * @throws UnsupportedOperationException If not supported
+     * @since 4.0
+     */
+//    void dropSchema(String schemaName);
 
     /**
      * SchemaTool : delete the schema for the specified classes (if supported by this datastore).
