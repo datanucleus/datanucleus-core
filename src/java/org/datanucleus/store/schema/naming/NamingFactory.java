@@ -113,5 +113,5 @@ public interface NamingFactory
      * @param idxmd The index metadata
      * @return Name of the index
      */
-    String getIndexName(AbstractMemberMetaData cmd, IndexMetaData idxmd);
+    String getIndexName(AbstractMemberMetaData mmd, IndexMetaData idxmd);
 }
