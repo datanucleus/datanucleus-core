@@ -24,6 +24,8 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.IndexMetaData;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Abstract base for any naming factory, providing convenience facilities like truncation.
@@ -134,6 +136,34 @@ public abstract class AbstractNamingFactory implements NamingFactory
     public String getColumnName(AbstractMemberMetaData mmd, ColumnType type)
     {
         return getColumnName(mmd, type, 0);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.naming.NamingFactory#getIndexName(org.datanucleus.metadata.AbstractClassMetaData, org.datanucleus.metadata.IndexMetaData, int)
+     */
+    @Override
+    public String getIndexName(AbstractClassMetaData cmd, IndexMetaData idxmd, int position)
+    {
+        if (!StringUtils.isWhitespace(idxmd.getName()))
+        {
+            return idxmd.getName();
+        }
+
+        return cmd.getName() + wordSeparator + position + wordSeparator + "IDX";
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.naming.NamingFactory#getIndexName(org.datanucleus.metadata.AbstractMemberMetaData, org.datanucleus.metadata.IndexMetaData)
+     */
+    @Override
+    public String getIndexName(AbstractMemberMetaData mmd, IndexMetaData idxmd)
+    {
+        if (!StringUtils.isWhitespace(idxmd.getName()))
+        {
+            return idxmd.getName();
+        }
+
+        return mmd.getClassName(false) + wordSeparator + mmd.getName() + wordSeparator + "IDX";
     }
 
     /** The number of characters used to build the hash. */

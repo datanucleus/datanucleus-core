@@ -19,6 +19,7 @@ package org.datanucleus.store.schema.naming;
 
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.IndexMetaData;
 
 /**
  * Representation of a naming factory for schema components (tables, columns, etc).
@@ -96,4 +97,21 @@ public interface NamingFactory
      * @return The column name
      */
     String getColumnName(AbstractMemberMetaData mmd, ColumnType type, int position);
+
+    /**
+     * Method to return the name of an index specified at class level.
+     * @param cmd Metadata for the class
+     * @param idxmd The index metadata
+     * @param position Number of the index at class level (first is 0)
+     * @return Name of the index
+     */
+    String getIndexName(AbstractClassMetaData cmd, IndexMetaData idxmd, int position);
+
+    /**
+     * Method to return the name of an index specified at member level.
+     * @param mmd Metadata for the member
+     * @param idxmd The index metadata
+     * @return Name of the index
+     */
+    String getIndexName(AbstractMemberMetaData cmd, IndexMetaData idxmd);
 }
