@@ -430,6 +430,10 @@ public class SchemaTool
             System.exit(2);
             return;
         }
+        finally
+        {
+            storeMgr.close();
+        }
     }
 
     /**
