@@ -42,12 +42,12 @@ public interface SchemaAwareStoreManager
     void createSchema(Set<String> classNames, Properties props);
 
     /**
-     * Method that will drop a schema from the datastore (if the datastore supports it).
-     * @param schemaName Name of the schema to drop
+     * Method that will delete a schema from the datastore (if the datastore supports it).
+     * @param schemaName Name of the schema to delete
      * @throws UnsupportedOperationException If not supported
      * @since 4.0
      */
-//    void dropSchema(String schemaName);
+//    void deleteSchema(String schemaName);
 
     /**
      * SchemaTool : delete the schema for the specified classes (if supported by this datastore).
