@@ -64,6 +64,62 @@ public class IdentityUtils
     }
 
     /**
+     * Method to return a persistable form of the identity of a persistable object.
+     * This can be used by datastores that don't use foreign keys and want to store the explicit class of the persistable object.
+     * @param api API adapter
+     * @param id The id
+     * @return String form
+     */
+    public static String getPersistableIdentityForId(ApiAdapter api, Object id)
+    {
+        if (id == null)
+        {
+            return null;
+        }
+        if (api.isSingleFieldIdentity(id))
+        {
+            return api.getTargetClassNameForSingleFieldIdentity(id) + ":" + api.getTargetKeyForSingleFieldIdentity(id);
+        }
+        else
+        {
+            return id.toString();
+        }
+    }
+
+    /**
+     * Convenience method to find an object given a string form of its identity, and the metadata for the class (or a superclass).
+     * @param persistableId The persistable id
+     * @param cmd (Root) metadata for the class
+     * @param ec Execution Context
+     * @return The object
+     */
+    public static Object getObjectFromPersistableIdentity(String persistableId, AbstractClassMetaData cmd, ExecutionContext ec)
+    {
+        ClassLoaderResolver clr = ec.getClassLoaderResolver();
+        Object id = null;
+        if (cmd.getIdentityType() == IdentityType.DATASTORE)
+        {
+            id = OIDFactory.getInstance(ec.getNucleusContext(), persistableId);
+        }
+        else if (cmd.getIdentityType() == IdentityType.APPLICATION)
+        {
+            if (cmd.usesSingleFieldIdentityClass())
+            {
+                String className = persistableId.substring(0, persistableId.indexOf(':'));
+                cmd = ec.getMetaDataManager().getMetaDataForClass(className, clr);
+                String idStr = persistableId.substring(persistableId.indexOf(':')+1);
+                id = ec.getApiAdapter().getNewApplicationIdentityObjectId(clr, cmd, idStr);
+            }
+            else
+            {
+                Class cls = clr.classForName(cmd.getFullClassName());
+                id = ec.newObjectId(cls, persistableId);
+            }
+        }
+        return ec.findObject(id, true, false, null);
+    }
+
+    /**
      * Convenience method to return the identity as a String.
      * Typically outputs the toString() form of the identity object however with SingleFieldIdentity
      * it outputs the class+key since SingleFieldIdentity just return the key.
