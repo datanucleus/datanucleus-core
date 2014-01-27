@@ -331,8 +331,8 @@ public class IdentityUtils
     }
 
     /**
-     * Convenience method to find an object given a string form of its identity, and the metadata for the
-     * class (or a superclass).
+     * Convenience method to find an object given a string form of its identity, and the metadata for the class (or a superclass).
+     * <b>Developers should move to using "persistable identity" and method getObjectFromPersistableIdentity()</b>.
      * @param idStr The id string
      * @param cmd Metadata for the class
      * @param ec Execution Context
