@@ -468,17 +468,17 @@ public class SchemaTool
 
     public void createSchema(SchemaAwareStoreManager storeMgr, Set<String> classNames)
     {
-        storeMgr.createSchema(classNames, getPropertiesForSchemaTool());
+        storeMgr.createSchemaForClasses(classNames, getPropertiesForSchemaTool());
     }
 
     public void deleteSchema(SchemaAwareStoreManager storeMgr, Set<String> classNames)
     {
-        storeMgr.deleteSchema(classNames, getPropertiesForSchemaTool());
+        storeMgr.deleteSchemaForClasses(classNames, getPropertiesForSchemaTool());
     }
 
     public void validateSchema(SchemaAwareStoreManager storeMgr, Set<String> classNames)
     {
-        storeMgr.validateSchema(classNames, getPropertiesForSchemaTool());
+        storeMgr.validateSchemaForClasses(classNames, getPropertiesForSchemaTool());
     }
 
     /**
