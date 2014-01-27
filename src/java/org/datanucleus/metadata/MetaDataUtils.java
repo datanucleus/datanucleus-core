@@ -600,36 +600,6 @@ public class MetaDataUtils
     }
 
     /**
-     * Convenience method that takes a result set that contains a discriminator column and returns
-     * the class name that it represents.
-     * @param discrimValue Discriminator value
-     * @param dismd Metadata for the discriminator at the root (defining the strategy)
-     * @param ec ExecutionContext
-     * @return The class name for the object represented by this value
-     * @deprecated Use MetaDataManager.getClassNameFromDiscriminatorValue instead. This will be removed
-     */
-    public static String getClassNameFromDiscriminatorValue(String discrimValue, 
-            DiscriminatorMetaData dismd, ExecutionContext ec)
-    {
-        if (discrimValue == null)
-        {
-            return null;
-        }
-
-        if (dismd.getStrategy() == DiscriminatorStrategy.CLASS_NAME)
-        {
-            return discrimValue;
-        }
-        else if (dismd.getStrategy() == DiscriminatorStrategy.VALUE_MAP)
-        {
-            AbstractClassMetaData baseCmd = (AbstractClassMetaData)((InheritanceMetaData)dismd.getParent()).getParent();
-            AbstractClassMetaData rootCmd = baseCmd.getBaseAbstractClassMetaData();
-            return ec.getMetaDataManager().getClassNameForDiscriminatorValueWithRoot(rootCmd, discrimValue);
-        }
-        return null;
-    }
-
-    /**
      * Searches the meta data tree upwards starting with the given leaf, stops as 
      * soon as it finds an extension with the given key.
      *
