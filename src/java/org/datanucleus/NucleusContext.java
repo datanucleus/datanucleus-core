@@ -47,6 +47,7 @@ import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.exceptions.TransactionIsolationNotSupportedException;
+import org.datanucleus.identity.DatastoreUniqueOID;
 import org.datanucleus.identity.IdentityKeyTranslator;
 import org.datanucleus.identity.IdentityStringTranslator;
 import org.datanucleus.identity.OID;
@@ -1849,6 +1850,11 @@ public class NucleusContext implements Serializable
         AbstractClassMetaData cmd = null;
         if (id instanceof OID)
         {
+            if (id instanceof DatastoreUniqueOID)
+            {
+                // This doesn't have the class name so can't get metadata
+                return false;
+            }
             cmd = getMetaDataManager().getMetaDataForClass(((OID)id).getPcClass(), getClassLoaderResolver(id.getClass().getClassLoader()));
         }
         else if (getApiAdapter().isSingleFieldIdentity(id))
