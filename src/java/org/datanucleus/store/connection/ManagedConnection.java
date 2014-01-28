@@ -97,4 +97,22 @@ public interface ManagedConnection
      * @return Whether the ConnectionManager should call close() on it when a txn ends
      */
     boolean closeAfterTransactionEnd();
+
+    /**
+     * Set this position in the txn as a savepoint with the provided name (if supported, otherwise do nothing).
+     * @param name Name of savepoint
+     */
+    void setSavepoint(String name);
+
+    /**
+     * Release the named savepoint (or do nothing if not supported).
+     * @param name Name of savepoint
+     */
+    void releaseSavepoint(String name);
+
+    /**
+     * Rollback the connection to the named savepoint (or do nothing if not supported).
+     * @param name Name of savepoint
+     */
+    void rollbackToSavepoint(String name);
 }

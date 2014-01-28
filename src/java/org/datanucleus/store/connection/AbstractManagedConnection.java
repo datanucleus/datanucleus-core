@@ -158,6 +158,21 @@ public abstract class AbstractManagedConnection implements ManagedConnection
         return true;
     }
 
+    public void setSavepoint(String name)
+    {
+        // Override this if you support savepoints
+    }
+
+    public void releaseSavepoint(String name)
+    {
+        // Override this if you support savepoints
+    }
+
+    public void rollbackToSavepoint(String name)
+    {
+        // Override this if you support savepoints
+    }
+
     /**
      * Method to return a string form of this object for convenience debug.
      * @return The String form
