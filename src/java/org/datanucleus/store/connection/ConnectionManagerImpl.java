@@ -453,15 +453,15 @@ public class ConnectionManagerImpl implements ConnectionManager
                     }
                     public void transactionSetSavepoint(String name)
                     {
-                        // TODO Call mconn.transactionSetSavepoint
+                        mconn.setSavepoint(name);
                     }
                     public void transactionReleaseSavepoint(String name)
                     {
-                        // TODO Call mconn.releaseSavepoint
+                        mconn.releaseSavepoint(name);
                     }
                     public void transactionRollbackToSavepoint(String name)
                     {
-                        // TODO Call mconn.rollbackToSavepoint
+                        mconn.rollbackToSavepoint(name);
                     }
                 });
         }
@@ -499,15 +499,15 @@ public class ConnectionManagerImpl implements ConnectionManager
                     public void transactionEnded() {}
                     public void transactionSetSavepoint(String name)
                     {
-                        // TODO Call mconn.setSavepoint
+                        mconn.setSavepoint(name);
                     }
                     public void transactionReleaseSavepoint(String name)
                     {
-                        // TODO Call mconn.releaseSavepoint
+                        mconn.releaseSavepoint(name);
                     }
                     public void transactionRollbackToSavepoint(String name)
                     {
-                        // TODO Call mconn.rollbackToSavepoint
+                        mconn.rollbackToSavepoint(name);
                     }
                 });
         }
