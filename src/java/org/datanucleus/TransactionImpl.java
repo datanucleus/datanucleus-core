@@ -737,6 +737,10 @@ public class TransactionImpl implements Transaction
     @Override
     public void setSavepoint(String name)
     {
+        if (!active)
+        {
+            return;
+        }
         TransactionEventListener[] ls = getListenersForEvent();
         for (TransactionEventListener tel : ls)
         {
@@ -750,6 +754,10 @@ public class TransactionImpl implements Transaction
     @Override
     public void releaseSavepoint(String name)
     {
+        if (!active)
+        {
+            return;
+        }
         TransactionEventListener[] ls = getListenersForEvent();
         for (TransactionEventListener tel : ls)
         {
@@ -763,6 +771,10 @@ public class TransactionImpl implements Transaction
     @Override
     public void rollbackToSavepoint(String name)
     {
+        if (!active)
+        {
+            return;
+        }
         TransactionEventListener[] ls = getListenersForEvent();
         for (TransactionEventListener tel : ls)
         {
