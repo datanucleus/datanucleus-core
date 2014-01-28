@@ -731,6 +731,36 @@ public class TransactionImpl implements Transaction
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.Transaction#setSavepoint(java.lang.String)
+     */
+    @Override
+    public void setSavepoint(String name)
+    {
+        throw new UnsupportedOperationException("Dont currently support savepoints");
+        // TODO Implement this
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.Transaction#releaseSavepoint(java.lang.String)
+     */
+    @Override
+    public void releaseSavepoint(String name)
+    {
+        throw new UnsupportedOperationException("Dont currently support savepoints");
+        // TODO Implement this
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.Transaction#rollbackToSavepoint(java.lang.String)
+     */
+    @Override
+    public void rollbackToSavepoint(String name)
+    {
+        throw new UnsupportedOperationException("Dont currently support savepoints");
+        // TODO Implement this
+    }
+
     /**
      * Mutator for the synchronization object to be notified on transaction completion.
      * @param sync The synchronization object to be notified on transaction completion

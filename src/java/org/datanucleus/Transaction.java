@@ -279,6 +279,24 @@ public interface Transaction
     boolean isCommitting();
 
     /**
+     * Method to register the current position as a savepoint with the provided name (assuming the datastore supports it).
+     * @param name Savepoint name
+     */
+    void setSavepoint(String name);
+
+    /**
+     * Method to deregister the current position as a savepoint with the provided name (assuming the datastore supports it).
+     * @param name Savepoint name
+     */
+    void releaseSavepoint(String name);
+
+    /**
+     * Method to rollback the transaction to the specified savepoint (assuming the datastore supports it).
+     * @param name Savepoint name
+     */
+    void rollbackToSavepoint(String name);
+
+    /**
      * Adds a transaction listener. After commit or rollback, listeners are cleared
      * @param listener
      */
