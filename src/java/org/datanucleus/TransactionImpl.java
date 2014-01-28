@@ -737,8 +737,11 @@ public class TransactionImpl implements Transaction
     @Override
     public void setSavepoint(String name)
     {
-        throw new UnsupportedOperationException("Dont currently support savepoints");
-        // TODO Implement this
+        TransactionEventListener[] ls = getListenersForEvent();
+        for (TransactionEventListener tel : ls)
+        {
+            tel.transactionSetSavepoint(name);
+        }
     }
 
     /* (non-Javadoc)
@@ -747,8 +750,11 @@ public class TransactionImpl implements Transaction
     @Override
     public void releaseSavepoint(String name)
     {
-        throw new UnsupportedOperationException("Dont currently support savepoints");
-        // TODO Implement this
+        TransactionEventListener[] ls = getListenersForEvent();
+        for (TransactionEventListener tel : ls)
+        {
+            tel.transactionReleaseSavepoint(name);
+        }
     }
 
     /* (non-Javadoc)
@@ -757,8 +763,11 @@ public class TransactionImpl implements Transaction
     @Override
     public void rollbackToSavepoint(String name)
     {
-        throw new UnsupportedOperationException("Dont currently support savepoints");
-        // TODO Implement this
+        TransactionEventListener[] ls = getListenersForEvent();
+        for (TransactionEventListener tel : ls)
+        {
+            tel.transactionRollbackToSavepoint(name);
+        }
     }
 
     /**

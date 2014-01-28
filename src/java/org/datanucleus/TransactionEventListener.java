@@ -61,4 +61,25 @@ public interface TransactionEventListener
      * Method invoked when the transaction is rolled back.
      */
     void transactionRolledBack();
+
+    /**
+     * Savepoint to be registered under this name.
+     * Do nothing if not supported
+     * @param name Name of the savepoint
+     */
+    void transactionSetSavepoint(String name);
+
+    /**
+     * Savepoint to be released for this name.
+     * Do nothing if not supported
+     * @param name Name of the savepoint
+     */
+    void transactionReleaseSavepoint(String name);
+
+    /**
+     * Invoke a rollback to this savepoint name.
+     * Do nothing if not supported.
+     * @param name Name of the savepoint
+     */
+    void transactionRollbackToSavepoint(String name);
 }

@@ -446,12 +446,22 @@ public class ConnectionManagerImpl implements ConnectionManager
                         }
                         mconn.transactionPreClose();
                     }
-                    public void transactionPreFlush()
-                    {
-                    }
+                    public void transactionPreFlush() {}
                     public void transactionFlushed()
                     {
                         mconn.transactionFlushed();
+                    }
+                    public void transactionSetSavepoint(String name)
+                    {
+                        // TODO Call mconn.transactionSetSavepoint
+                    }
+                    public void transactionReleaseSavepoint(String name)
+                    {
+                        // TODO Call mconn.releaseSavepoint
+                    }
+                    public void transactionRollbackToSavepoint(String name)
+                    {
+                        // TODO Call mconn.rollbackToSavepoint
                     }
                 });
         }
@@ -460,18 +470,12 @@ public class ConnectionManagerImpl implements ConnectionManager
             transaction.bindTransactionEventListener(
                 new TransactionEventListener()
                 {
-                    public void transactionStarted()
-                    {
-                    }
-                    
-                    public void transactionPreFlush()
-                    {
-                    }
+                    public void transactionStarted() {}
+                    public void transactionPreFlush() {}
                     public void transactionFlushed()
                     {
                         mconn.transactionFlushed();
                     }
-
                     public void transactionPreCommit()
                     {
                         if (mconn.isLocked())
@@ -481,9 +485,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                         }
                         mconn.transactionPreClose();
                     }
-                    public void transactionCommitted()
-                    {
-                    }
+                    public void transactionCommitted() {}
                     public void transactionPreRollBack()
                     {
                         if (mconn.isLocked())
@@ -493,11 +495,19 @@ public class ConnectionManagerImpl implements ConnectionManager
                         }
                         mconn.transactionPreClose();
                     }
-                    public void transactionRolledBack()
+                    public void transactionRolledBack() {}
+                    public void transactionEnded() {}
+                    public void transactionSetSavepoint(String name)
                     {
+                        // TODO Call mconn.setSavepoint
                     }
-                    public void transactionEnded()
+                    public void transactionReleaseSavepoint(String name)
                     {
+                        // TODO Call mconn.releaseSavepoint
+                    }
+                    public void transactionRollbackToSavepoint(String name)
+                    {
+                        // TODO Call mconn.rollbackToSavepoint
                     }
                 });
         }

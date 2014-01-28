@@ -643,12 +643,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         getStoreManager().transactionStarted(this);
         postBegin();
     }
-    public void transactionPreFlush() 
-    {
-    }
-    public void transactionFlushed()
-    {
-    }
+    public void transactionPreFlush() {}
+    public void transactionFlushed() {}
     public void transactionPreCommit()
     {
         preCommit();
@@ -667,9 +663,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         getStoreManager().transactionRolledBack(this);
         postRollback();
     }
-    public void transactionEnded()
-    {
-    }
+    public void transactionEnded() {}
+    public void transactionSetSavepoint(String name) {}
+    public void transactionReleaseSavepoint(String name) {}
+    public void transactionRollbackToSavepoint(String name) {}
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.ExecutionContext#getStatistics()
