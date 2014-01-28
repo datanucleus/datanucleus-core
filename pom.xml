@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.datanucleus</groupId>
         <artifactId>datanucleus-maven-parent</artifactId>
-        <version>3.3</version>
+        <version>4.0.0</version>
     </parent>
 
     <artifactId>datanucleus-core</artifactId>
@@ -25,6 +25,17 @@
     <properties>
         <jdo.version>3.0</jdo.version>
     </properties>
+
+    <repositories>
+        <!-- For any artifacts that aren't present in Maven Central -->
+        <repository>
+            <id>DN_M2_Repo</id>
+            <url>http://www.datanucleus.org/downloads/maven2/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
