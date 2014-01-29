@@ -37,7 +37,7 @@ import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.properties.BooleanPropertyValidator;
 import org.datanucleus.properties.CorePropertyValidator;
 import org.datanucleus.properties.IntegerPropertyValidator;
-import org.datanucleus.properties.PersistencePropertyValidator;
+import org.datanucleus.properties.PropertyValidator;
 import org.datanucleus.properties.PropertyStore;
 import org.datanucleus.properties.StringPropertyValidator;
 import org.datanucleus.util.Localiser;
@@ -45,7 +45,7 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.PersistenceUtils;
 
 /**
- * Class providing configuration for persistence. 
+ * Class providing configuration for the context. 
  * Properties are defined in plugin.xml (aliases, default value, validators etc). 
  * Property values are stored in two maps. 
  * <ul>
@@ -71,7 +71,7 @@ public class Configuration extends PropertyStore implements Serializable
     /** Mapping for the properties of the plugins, PropertyMapping, keyed by the property name. */
     private Map<String, PropertyMapping> propertyMappings = new HashMap<String, PropertyMapping>();
 
-    private Map<String, PersistencePropertyValidator> propertyValidators = new HashMap();
+    private Map<String, PropertyValidator> propertyValidators = new HashMap();
 
     /**
      * Convenience class wrapping the plugin property specification information.
@@ -790,14 +790,14 @@ public class Configuration extends PropertyStore implements Serializable
             return;
         }
 
-        PersistencePropertyValidator validator = propertyValidators.get(validatorName);
+        PropertyValidator validator = propertyValidators.get(validatorName);
         if (validator == null)
         {
             // Not yet instantiated so try to create validator
             try
             {
                 Class validatorCls = nucCtx.getClassLoaderResolver(getClass().getClassLoader()).classForName(validatorName);
-                validator = (PersistencePropertyValidator)validatorCls.newInstance();
+                validator = (PropertyValidator)validatorCls.newInstance();
                 propertyValidators.put(validatorName, validator);
             }
             catch (Exception e)

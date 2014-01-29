@@ -53,28 +53,12 @@ public interface NucleusContext
      */
     String getApiName();
 
-    /**
-     * Accessor for the configuration.
-     * @return Returns the configuration.
-     */
     Configuration getConfiguration();
 
-    /**
-     * Accessor for the Plugin Manager
-     * @return the PluginManager
-     */
     PluginManager getPluginManager();
 
-    /**
-     * Accessor for the Meta-Data Manager.
-     * @return Returns the MetaDataManager.
-     */
     MetaDataManager getMetaDataManager();
 
-    /**
-     * Accessor for the Type Manager
-     * @return the TypeManager
-     */
     TypeManager getTypeManager();
 
     /**

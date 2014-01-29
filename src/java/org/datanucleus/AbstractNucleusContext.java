@@ -41,23 +41,23 @@ public abstract class AbstractNucleusContext implements NucleusContext
     /** Localisation of messages. */
     protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
-    /** Configuration defining features of the persistence process. */
+    /** Configuration for this context. */
     protected final Configuration config;
 
-    /** Manager for Plug-ins. */
+    /** Manager for plug-ins. */
     protected final PluginManager pluginManager;
 
-    /** MetaDataManager for handling the MetaData for this PMF/EMF. */
+    /** MetaDataManager for handling the MetaData. */
     protected MetaDataManager metaDataManager = null;
+
+    /** API adapter used by the context. **/
+    protected final ApiAdapter apiAdapter;
+
+    /** Manager for java types. */
+    protected TypeManager typeManager;
 
     /** Name of the class providing the ClassLoaderResolver. */
     protected final String classLoaderResolverClassName;
-
-    /** ApiAdapter used by the context. **/
-    protected final ApiAdapter apiAdapter;
-
-    /** Manager for java types and SCO wrappers. */
-    protected TypeManager typeManager;
 
     /** Map of the ClassLoaderResolver, keyed by the clr class and the primaryLoader name. */
     protected transient Map<String, ClassLoaderResolver> classLoaderResolverMap = new HashMap<String, ClassLoaderResolver>();
@@ -149,7 +149,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
             String apiName = getApiName();
             try
             {
-                metaDataManager = (MetaDataManager) getPluginManager().createExecutableExtension(
+                metaDataManager = (MetaDataManager)pluginManager.createExecutableExtension(
                     "org.datanucleus.metadata_manager", new String[]{"name"}, new String[]{apiName}, 
                     "class", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[]{this});
             }

@@ -25,7 +25,7 @@ import org.datanucleus.store.connection.ConnectionFactory;
 /**
  * Validator for persistence properties used by core.
  */
-public class CorePropertyValidator implements PersistencePropertyValidator
+public class CorePropertyValidator implements PropertyValidator
 {
     /**
      * Validate the specified property.

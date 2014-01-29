@@ -36,6 +36,7 @@ import org.datanucleus.transaction.jta.JTASyncRegistry;
 
 /**
  * Context for use in the persistence process.
+ * Adds on many extra services to the basic context, for transactions, executionContext, identity handling, object providers, autostart, store manager, L2 cache etc.
  */
 public interface PersistenceNucleusContext extends NucleusContext
 {
@@ -98,10 +99,6 @@ public interface PersistenceNucleusContext extends NucleusContext
 
     JTASyncRegistry getJtaSyncRegistry();
 
-    /**
-     * Accessor for the StoreManager
-     * @return the StoreManager
-     */
     StoreManager getStoreManager();
 
     /**
@@ -111,16 +108,8 @@ public interface PersistenceNucleusContext extends NucleusContext
      */
     CallbackHandler getValidationHandler(ExecutionContext ec);
 
-    /**
-     * Return whether there is an L2 cache.
-     * @return Whether the L2 cache is enabled
-     */
     boolean hasLevel2Cache();
 
-    /**
-     * Accessor for the DataStore (level 2) Cache
-     * @return The datastore cache
-     */
     Level2Cache getLevel2Cache();
 
     /**

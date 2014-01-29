@@ -20,7 +20,7 @@ package org.datanucleus.properties;
 /**
  * Validator for a property that represents a boolean.
  */
-public class BooleanPropertyValidator implements PersistencePropertyValidator
+public class BooleanPropertyValidator implements PropertyValidator
 {
     /**
      * Method to validate the property, allowing only Boolean or String(with boolean values).

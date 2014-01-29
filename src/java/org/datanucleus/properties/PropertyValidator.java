@@ -18,10 +18,9 @@ Contributors:
 package org.datanucleus.properties;
 
 /**
- * Interface defining a validator for a persistence property.
- * @version $Revision$
+ * Interface defining a validator for a DataNucleus property.
  */
-public interface PersistencePropertyValidator
+public interface PropertyValidator
 {
     /**
      * Method to validate the value of this property.

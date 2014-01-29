@@ -20,7 +20,7 @@ package org.datanucleus.properties;
 /**
  * Validator for a property that represents a String.
  */
-public class StringPropertyValidator implements PersistencePropertyValidator
+public class StringPropertyValidator implements PropertyValidator
 {
     /**
      * Method to validate the property, allowing only String.

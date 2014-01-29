@@ -20,7 +20,7 @@ package org.datanucleus.properties;
 /**
  * Validator for a property that represents an integer.
  */
-public class IntegerPropertyValidator implements PersistencePropertyValidator
+public class IntegerPropertyValidator implements PropertyValidator
 {
     /**
      * Method to validate the property, allowing only Integer or String(with Integer values).
