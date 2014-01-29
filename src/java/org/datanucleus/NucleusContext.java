@@ -36,12 +36,12 @@ public interface NucleusContext
 {
     /**
      * Method to initialise the context for use.
-     * This creates the required StoreManager(s).
+     * If any services are considered essential for operation then they will be enabled here, otherwise left for lazy initialisation.
      */
     void initialise();
 
     /**
-     * Clear out resources
+     * Clear out resources for the supported services.
      */
     void close();
 
