@@ -143,7 +143,7 @@ public class RuntimeEnhancer
      */
     public RuntimeEnhancer(String api, Map contextProps)
     {
-        nucleusContext = new NucleusContext(api, NucleusContext.ContextType.ENHANCEMENT, contextProps);
+        nucleusContext = new EnhancementNucleusContextImpl(api, contextProps);
         clr = nucleusContext.getClassLoaderResolver(null);
 
         classEnhancerOptions.add(ClassEnhancer.OPTION_GENERATE_PK);

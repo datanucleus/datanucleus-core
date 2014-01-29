@@ -25,7 +25,7 @@ import java.util.Map;
 import javax.transaction.xa.XAResource;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.NucleusContext;
+import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.TransactionEventListener;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.federation.FederatedStoreManager;
@@ -51,7 +51,7 @@ public class ConnectionManagerImpl implements ConnectionManager
         org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
     /** Context for this connection manager. */
-    NucleusContext nucleusContext;
+    PersistenceNucleusContext nucleusContext;
 
     /** Registry of factories for connections, keyed by their symbolic name. */
     Map<String, ConnectionFactory> factories = new HashMap<String, ConnectionFactory>();
@@ -65,7 +65,7 @@ public class ConnectionManagerImpl implements ConnectionManager
      * Constructor.
      * @param context Context for this manager.
      */
-    public ConnectionManagerImpl(NucleusContext context)
+    public ConnectionManagerImpl(PersistenceNucleusContext context)
     {
         this.nucleusContext = context;
     }

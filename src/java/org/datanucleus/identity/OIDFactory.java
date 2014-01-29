@@ -18,7 +18,7 @@ Contributors:
 package org.datanucleus.identity;
 
 import org.datanucleus.ClassConstants;
-import org.datanucleus.NucleusContext;
+import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.util.ClassUtils;
 
 /**
@@ -39,7 +39,7 @@ public class OIDFactory
      * @param value the id value
      * @return an OID instance
      */
-    public static OID getInstance(NucleusContext nucleusCtx, String className, Object value)
+    public static OID getInstance(PersistenceNucleusContext nucleusCtx, String className, Object value)
     {
         // Get the OID class to use for this NucleusContext
         Class oidClass = nucleusCtx.getDatastoreIdentityClass();
@@ -66,7 +66,7 @@ public class OIDFactory
      * @param value the id value
      * @return an OID instance
      */
-    public static OID getInstance(NucleusContext nucleusCtx, long value)
+    public static OID getInstance(PersistenceNucleusContext nucleusCtx, long value)
     {
         // Get the OID class to use for this NucleusContext
         Class oidClass = nucleusCtx.getDatastoreIdentityClass();
@@ -92,7 +92,7 @@ public class OIDFactory
      * @param oidString result of toString on an OID
      * @return an OID instance
      */
-    public static OID getInstance(NucleusContext nucleusCtx, String oidString)
+    public static OID getInstance(PersistenceNucleusContext nucleusCtx, String oidString)
     {
         // Get the OID class to use for this NucleusContext
         Class oidClass = nucleusCtx.getDatastoreIdentityClass();

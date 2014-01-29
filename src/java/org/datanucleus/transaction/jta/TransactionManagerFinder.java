@@ -49,7 +49,7 @@ public class TransactionManagerFinder
      */
     public TransactionManager getTransactionManager(ClassLoaderResolver clr)
     {
-        String jtaLocatorName = nucleusContext.getPersistenceConfiguration().getStringProperty(
+        String jtaLocatorName = nucleusContext.getConfiguration().getStringProperty(
             PropertyNames.PROPERTY_TRANSACTION_JTA_LOCATOR);
         PluginManager pluginMgr = nucleusContext.getPluginManager();
         if (jtaLocatorName != null)

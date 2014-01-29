@@ -32,7 +32,7 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class ExecutionContextPool
 {
-    private NucleusContext nucCtx;
+    private PersistenceNucleusContext nucCtx;
 
     private long maxIdle = 20;
     private long expirationTime;
@@ -41,15 +41,15 @@ public class ExecutionContextPool
 
     private CleanUpThread cleaner;
 
-    public ExecutionContextPool(NucleusContext nucCtx)
+    public ExecutionContextPool(PersistenceNucleusContext nucCtx)
     {
-        this.maxIdle = nucCtx.getPersistenceConfiguration().getIntProperty(PropertyNames.PROPERTY_EXECUTION_CONTEXT_MAX_IDLE);
+        this.maxIdle = nucCtx.getConfiguration().getIntProperty(PropertyNames.PROPERTY_EXECUTION_CONTEXT_MAX_IDLE);
         this.nucCtx = nucCtx;
         this.expirationTime = 30000; // 30 seconds
         this.recyclableECs = new ConcurrentHashMap<ExecutionContext, Long>();
 
         // Start cleanup thread to run every 60 secs
-        if (nucCtx.getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_EXECUTION_CONTEXT_REAPER_THREAD))
+        if (nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_EXECUTION_CONTEXT_REAPER_THREAD))
         {
             cleaner = new CleanUpThread(this, expirationTime*2);
             cleaner.start();
@@ -63,7 +63,7 @@ public class ExecutionContextPool
 
     protected ExecutionContext create(Object owner, Map<String, Object> options)
     {
-        if (nucCtx.getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_MULTITHREADED))
+        if (nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_MULTITHREADED))
         {
             return new ExecutionContextThreadedImpl(nucCtx, owner, options);
         }

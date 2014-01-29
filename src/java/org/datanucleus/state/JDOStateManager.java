@@ -56,7 +56,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.ExecutionContext.EmbeddedOwnerRelation;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.FetchPlanForClass;
-import org.datanucleus.NucleusContext;
+import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.cache.CachedPC;
@@ -223,7 +223,7 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
 
         clearSavedFields();
 
-        NucleusContext nucCtx = myEC.getNucleusContext();
+        PersistenceNucleusContext nucCtx = myEC.getNucleusContext();
         myPC = null;
         myID = null;
         myInternalID = null;
@@ -3949,7 +3949,7 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
         {
             setDetaching(true);
 
-            String detachedState = myEC.getNucleusContext().getPersistenceConfiguration().getStringProperty(PropertyNames.PROPERTY_DETACH_DETACHED_STATE);
+            String detachedState = myEC.getNucleusContext().getConfiguration().getStringProperty(PropertyNames.PROPERTY_DETACH_DETACHED_STATE);
             if (detachedState.equalsIgnoreCase("all"))
             {
                 loadUnloadedFields();
@@ -4220,7 +4220,7 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
      */
     private int[] getFieldsNumbersToDetach()
     {
-        String detachedState = myEC.getNucleusContext().getPersistenceConfiguration().getStringProperty(
+        String detachedState = myEC.getNucleusContext().getConfiguration().getStringProperty(
             PropertyNames.PROPERTY_DETACH_DETACHED_STATE);
         if (detachedState.equalsIgnoreCase("all"))
         {
@@ -4355,7 +4355,7 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
             }
             else
             {
-                if (!myEC.getNucleusContext().getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE))
+                if (!myEC.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE))
                 {
                     // We cant assume that this object was detached from this datastore so we check it
                     try
@@ -4440,7 +4440,7 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
             }
             else
             {
-                if (!myEC.getNucleusContext().getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE))
+                if (!myEC.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE))
                 {
                     // We cant assume that this object was detached from this datastore so we check it
                     try

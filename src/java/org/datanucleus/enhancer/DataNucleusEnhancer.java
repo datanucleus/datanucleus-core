@@ -145,11 +145,11 @@ public class DataNucleusEnhancer
 
         // Create NucleusContext for enhancement 
         // TODO Aim to separate MetaDataManager from NucleusContext so we can just have MetaDataManager here
-        NucleusContext nucleusContext = new NucleusContext(apiName, NucleusContext.ContextType.ENHANCEMENT, props);
+        NucleusContext nucleusContext = new EnhancementNucleusContextImpl(apiName, props);
         if (props != null)
         {
             // Superimpose any user-provided properties
-            nucleusContext.getPersistenceConfiguration().setPersistenceProperties(props);
+            nucleusContext.getConfiguration().setPersistenceProperties(props);
         }
         this.metadataMgr = nucleusContext.getMetaDataManager();
         this.clr = nucleusContext.getClassLoaderResolver(null);

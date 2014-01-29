@@ -173,7 +173,7 @@ public class JDOQLCompiler extends JavaQueryCompiler implements SymbolResolver
         compilation.setQueryLanguage(getLanguage());
 
         // Apply compilation optimisations
-        boolean optimise = metaDataManager.getNucleusContext().getPersistenceConfiguration().getBooleanProperty(
+        boolean optimise = metaDataManager.getNucleusContext().getConfiguration().getBooleanProperty(
             PropertyNames.PROPERTY_QUERY_COMPILE_OPTIMISED);
         if (optimise)
         {

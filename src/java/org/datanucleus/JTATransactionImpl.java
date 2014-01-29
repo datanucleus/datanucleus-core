@@ -87,7 +87,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         this.autoJoin = autoJoin;
 
         // we only make sense in combination with ResourceType.JTA. Verify this has been set.
-        PersistenceConfiguration conf = ec.getNucleusContext().getPersistenceConfiguration();
+        Configuration conf = ec.getNucleusContext().getConfiguration();
         if (!(ConnectionResourceType.JTA.toString().equalsIgnoreCase(conf.getStringProperty(
                 ConnectionFactory.DATANUCLEUS_CONNECTION_RESOURCE_TYPE)) && 
             ConnectionResourceType.JTA.toString().equalsIgnoreCase(conf.getStringProperty(

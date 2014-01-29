@@ -113,7 +113,7 @@ public class FetchPlan implements Serializable
         groups.add(FetchPlan.DEFAULT);
 
         // Extension property to define the default detachmentOptions
-        String flds = ec.getNucleusContext().getPersistenceConfiguration().getStringProperty("datanucleus.detachmentFields");
+        String flds = ec.getNucleusContext().getConfiguration().getStringProperty("datanucleus.detachmentFields");
         if (flds != null)
         {
             if (flds.equals("load-unload-fields"))

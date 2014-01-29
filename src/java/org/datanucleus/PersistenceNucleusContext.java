@@ -1,0 +1,211 @@
+/**********************************************************************
+Copyright (c) 2014 Andy Jefferson and others. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Contributors:
+    ...
+**********************************************************************/
+package org.datanucleus;
+
+import java.util.Map;
+import java.util.Set;
+
+import org.datanucleus.cache.Level2Cache;
+import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.identity.IdentityKeyTranslator;
+import org.datanucleus.identity.IdentityStringTranslator;
+import org.datanucleus.management.FactoryStatistics;
+import org.datanucleus.management.jmx.ManagementManager;
+import org.datanucleus.metadata.AbstractClassMetaData;
+import org.datanucleus.state.CallbackHandler;
+import org.datanucleus.state.ObjectProviderFactory;
+import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.autostart.AutoStartMechanism;
+import org.datanucleus.transaction.TransactionManager;
+import org.datanucleus.transaction.jta.JTASyncRegistry;
+
+/**
+ * Context for use in the persistence process.
+ */
+public interface PersistenceNucleusContext extends NucleusContext
+{
+    AutoStartMechanism getAutoStartMechanism();
+
+    ObjectProviderFactory getObjectProviderFactory();
+
+    ExecutionContextPool getExecutionContextPool();
+
+    /**
+     * Method to return an ExecutionContext for use in persistence.
+     * @param owner The owner object for the context. A PM for example
+     * @param options Any options affecting startup
+     * @return The ExecutionContext
+     */
+    ExecutionContext getExecutionContext(Object owner, Map<String, Object> options);
+
+    /**
+     * Accessor for the class to use for datastore identity.
+     * @return Class for datastore-identity
+     */
+    Class getDatastoreIdentityClass();
+
+    /**
+     * Accessor for the current identity string translator to use (if any).
+     * @return Identity string translator instance (or null if persistence property not set)
+     */
+    IdentityStringTranslator getIdentityStringTranslator();
+
+    /**
+     * Accessor for the current identity key translator to use (if any).
+     * @return Identity key translator instance (or null if persistence property not set)
+     */
+    IdentityKeyTranslator getIdentityKeyTranslator();
+
+    /**
+     * Accessor for whether statistics gathering is enabled.
+     * @return Whether the user has enabled statistics or JMX management is enabled
+     */
+    boolean statisticsEnabled();
+
+    /**
+     * Accessor for the JMX manager (if required).
+     * Does nothing if the property "datanucleus.jmxType" is unset.
+     * @return The JMX manager
+     */
+    ManagementManager getJMXManager();
+
+    FactoryStatistics getStatistics();
+
+    ImplementationCreator getImplementationCreator();
+
+    TransactionManager getTransactionManager();
+
+    /**
+     * Accessor for the JTA transaction manager (if using JTA).
+     * @return the JTA Transaction Manager
+     */
+    javax.transaction.TransactionManager getJtaTransactionManager();
+
+    JTASyncRegistry getJtaSyncRegistry();
+
+    /**
+     * Accessor for the StoreManager
+     * @return the StoreManager
+     */
+    StoreManager getStoreManager();
+
+    /**
+     * Method to return a handler for validation (JSR303).
+     * @param ec The ExecutionContext that the handler is for.
+     * @return The handler (or null if not supported on this PMF/EMF, or no validator present)
+     */
+    CallbackHandler getValidationHandler(ExecutionContext ec);
+
+    /**
+     * Return whether there is an L2 cache.
+     * @return Whether the L2 cache is enabled
+     */
+    boolean hasLevel2Cache();
+
+    /**
+     * Accessor for the DataStore (level 2) Cache
+     * @return The datastore cache
+     */
+    Level2Cache getLevel2Cache();
+
+    /**
+     * Object the array of registered ExecutionContext listeners.
+     * @return array of {@link org.datanucleus.ExecutionContext.LifecycleListener}
+     */
+    ExecutionContext.LifecycleListener[] getExecutionContextListeners();
+
+    /**
+     * Register a new Listener for ExecutionContext events.
+     * @param listener the listener to register
+     */
+    void addExecutionContextListener(ExecutionContext.LifecycleListener listener);
+
+    /**
+     * Unregister a Listener from ExecutionContext events.
+     * @param listener the listener to unregister
+     */
+    void removeExecutionContextListener(ExecutionContext.LifecycleListener listener);
+
+    /**
+     * Mutator for whether we are in JCA mode.
+     * @param jca true if using JCA connector
+     */
+    void setJcaMode(boolean jca);
+
+    /**
+     * Accessor for the JCA mode.
+     * @return true if using JCA connector.
+     */
+    boolean isJcaMode();
+
+    /** 
+     * Convenience accessor for the FetchGroupManager.
+     * Creates it if not yet existing.
+     * @return The FetchGroupManager
+     */
+    FetchGroupManager getFetchGroupManager();
+
+    /**
+     * Method to add a dynamic FetchGroup for use by this OMF.
+     * @param grp The group
+     */
+    void addInternalFetchGroup(FetchGroup grp);
+
+    /**
+     * Method to remove a dynamic FetchGroup from use by this OMF.
+     * @param grp The group
+     */
+    void removeInternalFetchGroup(FetchGroup grp);
+
+    /**
+     * Method to create a new internal fetch group for the class+name.
+     * @param cls Class that it applies to
+     * @param name Name of group
+     * @return The group
+     */
+    FetchGroup createInternalFetchGroup(Class cls, String name);
+
+    /**
+     * Accessor for an internal fetch group for the specified class.
+     * @param cls The class
+     * @param name Name of the group
+     * @return The FetchGroup
+     * @throws NucleusUserException if the class is not persistable
+     */
+    FetchGroup getInternalFetchGroup(Class cls, String name);
+
+    /**
+     * Accessor for the fetch groups for the specified name.
+     * @param name Name of the group
+     * @return The FetchGroup
+     */
+    Set<FetchGroup> getFetchGroupsWithName(String name);
+
+    /**
+     * Convenience method to return if the supplied id is of an object that is cacheable in the L2 cache.
+     * @param id The identity
+     * @return Whether the object it refers to is considered cacheable
+     */
+    boolean isClassWithIdentityCacheable(Object id);
+
+    /**
+     * Convenience method to return if objects of this type are cached for this NucleusContext.
+     * Uses the "cacheable" flag of the class, and the cache-mode to determine whether to cache
+     */
+    boolean isClassCacheable(AbstractClassMetaData cmd);
+}

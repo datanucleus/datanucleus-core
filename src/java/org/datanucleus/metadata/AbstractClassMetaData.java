@@ -1112,7 +1112,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 else
                 {
                     // Superclass exists and has a table or uses its superclass, so default based on that
-                    if (mmgr.getNucleusContext().getPersistenceConfiguration().getStringProperty("datanucleus.defaultInheritanceStrategy").equalsIgnoreCase("TABLE_PER_CLASS"))
+                    if (mmgr.getNucleusContext().getConfiguration().getStringProperty("datanucleus.defaultInheritanceStrategy").equalsIgnoreCase("TABLE_PER_CLASS"))
                     {
                         // Each class has its own table
                         inheritanceMetaData = new InheritanceMetaData();
@@ -1212,7 +1212,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 else
                 {
                     // Superclass exists and has a table or uses its superclass, so default based on that
-                    if (mmgr.getNucleusContext().getPersistenceConfiguration().getStringProperty("datanucleus.defaultInheritanceStrategy").equalsIgnoreCase("TABLE_PER_CLASS"))
+                    if (mmgr.getNucleusContext().getConfiguration().getStringProperty("datanucleus.defaultInheritanceStrategy").equalsIgnoreCase("TABLE_PER_CLASS"))
                     {
                         // Each class has its own table
                         inheritanceMetaData.strategy = InheritanceStrategy.NEW_TABLE;

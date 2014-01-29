@@ -25,7 +25,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.datanucleus.ClassConstants;
-import org.datanucleus.PersistenceConfiguration;
+import org.datanucleus.Configuration;
 import org.datanucleus.exceptions.NucleusUserException;
 
 /**
@@ -75,7 +75,7 @@ public class PersistenceUtils
             // Try to load it as a resource in the CLASSPATH
             try
             {
-                InputStream is = PersistenceConfiguration.class.getClassLoader().getResourceAsStream(filename);
+                InputStream is = Configuration.class.getClassLoader().getResourceAsStream(filename);
                 props.load(is);
                 is.close();
             }

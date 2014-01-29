@@ -105,7 +105,7 @@ public interface ExecutionContext
      * Accessor for the context in which this execution context is running.
      * @return Returns the context.
      */
-    NucleusContext getNucleusContext();
+    PersistenceNucleusContext getNucleusContext();
 
     /**
      * Accessor for the API adapter.

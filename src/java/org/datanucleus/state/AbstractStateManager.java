@@ -1005,7 +1005,7 @@ public abstract class AbstractStateManager implements ObjectProvider
             return fieldNumbers;
         }
         // TODO Drop this check when we're confident that this doesn't affect some use-cases
-        if (!myEC.getNucleusContext().getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_LOADFIELDS, true))
+        if (!myEC.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_LOADFIELDS, true))
         {
             return fieldNumbers;
         }

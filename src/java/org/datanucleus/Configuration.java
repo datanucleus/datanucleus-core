@@ -57,7 +57,7 @@ import org.datanucleus.util.PersistenceUtils;
  * int, Object, String types. When accessing properties the user-provided value is taken first (if available),
  * otherwise the default value is used (or null).
  */
-public class PersistenceConfiguration extends PropertyStore implements Serializable
+public class Configuration extends PropertyStore implements Serializable
 {
     /** Localisation of messages. */
     protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
@@ -98,10 +98,11 @@ public class PersistenceConfiguration extends PropertyStore implements Serializa
      * Initialises all basic properties with suitable defaults, including any specified in meta-data in plugins.
      * @param nucCtx NucleusContext
      */
-    public PersistenceConfiguration(NucleusContext nucCtx)
+    public Configuration(NucleusContext nucCtx)
     {
         this.nucCtx = nucCtx;
 
+        // TODO Only load up properties for the context that is in use, so most of these are not required in enhancement context
         // NucleusContext level features
         addDefaultBooleanProperty(PropertyNames.PROPERTY_IGNORE_CACHE, null, false, false, true);
         addDefaultBooleanProperty(PropertyNames.PROPERTY_OPTIMISTIC, null, false, false, true);
@@ -826,12 +827,12 @@ public class PersistenceConfiguration extends PropertyStore implements Serializa
         {
             return true;
         }
-        if (!(obj instanceof PersistenceConfiguration))
+        if (!(obj instanceof Configuration))
         {
             return false;
         }
 
-        PersistenceConfiguration config = (PersistenceConfiguration)obj;
+        Configuration config = (Configuration)obj;
         if (properties == null)
         {
             if (config.properties != null)

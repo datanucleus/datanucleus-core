@@ -32,7 +32,7 @@ import javax.cache.spi.CachingProvider;
 import javax.cache.Caching;
 
 import org.datanucleus.NucleusContext;
-import org.datanucleus.PersistenceConfiguration;
+import org.datanucleus.Configuration;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.cache.AbstractLevel2Cache;
 import org.datanucleus.cache.CachedPC;
@@ -66,7 +66,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
             if (tmpcache == null)
             {
                 MutableConfiguration cacheConfig = new MutableConfiguration();
-                PersistenceConfiguration conf = nucleusCtx.getPersistenceConfiguration();
+                Configuration conf = nucleusCtx.getConfiguration();
                 if (conf.hasProperty(PropertyNames.PROPERTY_CACHE_L2_READ_THROUGH))
                 {
                     cacheConfig.setReadThrough(conf.getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_READ_THROUGH));

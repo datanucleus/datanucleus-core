@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.datanucleus.NucleusContext;
-import org.datanucleus.PersistenceConfiguration;
+import org.datanucleus.Configuration;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -55,7 +55,7 @@ public abstract class AbstractLevel2Cache implements Level2Cache
     public AbstractLevel2Cache(NucleusContext nucleusCtx)
     {
         this.nucleusCtx = nucleusCtx;
-        PersistenceConfiguration conf = nucleusCtx.getPersistenceConfiguration();
+        Configuration conf = nucleusCtx.getConfiguration();
         maxSize = conf.getIntProperty(PropertyNames.PROPERTY_CACHE_L2_MAXSIZE);
         clearAtClose = conf.getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CLEARATCLOSE, true);
 

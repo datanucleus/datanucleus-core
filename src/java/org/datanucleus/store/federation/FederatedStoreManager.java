@@ -30,7 +30,8 @@ import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.NucleusContext;
-import org.datanucleus.PersistenceConfiguration;
+import org.datanucleus.NucleusContextHelper;
+import org.datanucleus.Configuration;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -97,23 +98,23 @@ public class FederatedStoreManager implements StoreManager
         this.nucleusContext = nucleusContext;
 
         // Primary StoreManager
-        Map<String, Object> datastoreProps = nucleusContext.getPersistenceConfiguration().getDatastoreProperties();
-        this.primaryStoreMgr = NucleusContext.createStoreManagerForProperties(
-            nucleusContext.getPersistenceConfiguration().getPersistenceProperties(), 
+        Map<String, Object> datastoreProps = nucleusContext.getConfiguration().getDatastoreProperties();
+        this.primaryStoreMgr = NucleusContextHelper.createStoreManagerForProperties(
+            nucleusContext.getConfiguration().getPersistenceProperties(), 
             datastoreProps, clr, nucleusContext);
 
         // Correct transaction isolation level to match the datastore capabilities
-        String transactionIsolation = nucleusContext.getPersistenceConfiguration().getStringProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION);
+        String transactionIsolation = nucleusContext.getConfiguration().getStringProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION);
         if (transactionIsolation != null)
         {
-            String reqdIsolation = NucleusContext.getTransactionIsolationForStoreManager(primaryStoreMgr, transactionIsolation);
+            String reqdIsolation = NucleusContextHelper.getTransactionIsolationForStoreManager(primaryStoreMgr, transactionIsolation);
             if (!transactionIsolation.equalsIgnoreCase(reqdIsolation))
             {
-                nucleusContext.getPersistenceConfiguration().setProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION, reqdIsolation);
+                nucleusContext.getConfiguration().setProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION, reqdIsolation);
             }
         }
 
-        Set<String> propNamesWithDatastore = nucleusContext.getPersistenceConfiguration().getPropertyNamesWithPrefix("datanucleus.datastore.");
+        Set<String> propNamesWithDatastore = nucleusContext.getConfiguration().getPropertyNamesWithPrefix("datanucleus.datastore.");
         if (propNamesWithDatastore != null)
         {
             secondaryStoreMgrMap = new HashMap<String, StoreManager>();
@@ -123,12 +124,12 @@ public class FederatedStoreManager implements StoreManager
             {
                 String datastorePropName = nameIter.next();
                 String datastoreName = datastorePropName.substring("datanucleus.datastore.".length());
-                String filename = nucleusContext.getPersistenceConfiguration().getStringProperty(datastorePropName);
+                String filename = nucleusContext.getConfiguration().getStringProperty(datastorePropName);
 
-                PersistenceConfiguration datastoreConf = new PersistenceConfiguration(nucleusContext);
+                Configuration datastoreConf = new Configuration(nucleusContext);
                 datastoreConf.setPropertiesUsingFile(filename);
                 datastoreConf.setProperty(PROPERTY_DATA_FEDERATION_DATASTORE_NAME, datastoreName);
-                StoreManager storeMgr = NucleusContext.createStoreManagerForProperties(
+                StoreManager storeMgr = NucleusContextHelper.createStoreManagerForProperties(
                     datastoreConf.getPersistenceProperties(), datastoreConf.getDatastoreProperties(), clr, 
                     nucleusContext);
                 secondaryStoreMgrMap.put(datastoreName, storeMgr);

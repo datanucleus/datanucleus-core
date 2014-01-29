@@ -30,7 +30,6 @@ import javax.cache.configuration.MutableConfiguration;
 import javax.cache.spi.CachingProvider;
 
 import org.datanucleus.NucleusContext;
-import org.datanucleus.PersistenceConfiguration;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.QueryUtils;
 import org.datanucleus.store.query.Query;
@@ -51,7 +50,7 @@ public class JavaxCacheQueryResultCache implements QueryResultsCache
      */
     public JavaxCacheQueryResultCache(NucleusContext nucleusCtx)
     {
-        PersistenceConfiguration conf = nucleusCtx.getPersistenceConfiguration();
+        org.datanucleus.Configuration conf = nucleusCtx.getConfiguration();
         String cacheName = conf.getStringProperty("datanucleus.cache.queryResults.cacheName");
         if (cacheName == null)
         {

@@ -141,7 +141,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
     /** Context for the persistence process. */
-    NucleusContext nucCtx;
+    PersistenceNucleusContext nucCtx;
 
     /** The owning PersistenceManager/EntityManager object. */
     private Object owner;
@@ -266,10 +266,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param options Any options affecting startup
      * @throws NucleusUserException if an error occurs allocating the necessary requested components
      */
-    public ExecutionContextImpl(NucleusContext ctx, Object owner, Map<String, Object> options)
+    public ExecutionContextImpl(PersistenceNucleusContext ctx, Object owner, Map<String, Object> options)
     {
         this.nucCtx = ctx;
-        if (ctx.getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_MULTITHREADED))
+        if (ctx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_MULTITHREADED))
         {
             this.lock = new ReentrantLock();
         }
@@ -314,7 +314,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // do nothing
         }
 
-        PersistenceConfiguration conf = nucCtx.getPersistenceConfiguration();
+        Configuration conf = nucCtx.getConfiguration();
 
         // copy default configuration from factory for overrideable properties
         Iterator<Map.Entry<String, Object>> propIter = conf.getManagerOverrideableProperties().entrySet().iterator();
@@ -365,7 +365,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 ManagementManager mgmtMgr = nucCtx.getJMXManager();
                 name = mgmtMgr.getDomainName() + ":InstanceName=" + mgmtMgr.getInstanceName() +
                         ",Type=" + ManagerStatistics.class.getName() +
-                        ",Name=Manager" + NucleusContext.random.nextLong();
+                        ",Name=Manager" + NucleusContextHelper.random.nextLong();
             }
             statistics = new ManagerStatistics(name, nucCtx.getStatistics());
             if (nucCtx.getJMXManager() != null)
@@ -682,7 +682,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     protected void initialiseLevel1Cache()
     {
-        String level1Type = nucCtx.getPersistenceConfiguration().getStringProperty(PropertyNames.PROPERTY_CACHE_L1_TYPE);
+        String level1Type = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_CACHE_L1_TYPE);
         if (level1Type != null && level1Type.equalsIgnoreCase("none"))
         {
             return;
@@ -766,7 +766,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * Gets the context in which this context is running
      * @return Returns the context.
      */
-    public NucleusContext getNucleusContext()
+    public PersistenceNucleusContext getNucleusContext()
     {
         return nucCtx;
     }
@@ -814,8 +814,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }*/
         if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
         {
-            String intName = getNucleusContext().getPersistenceConfiguration().getInternalNameForProperty(name);
-            getNucleusContext().getPersistenceConfiguration().validatePropertyValue(intName, value);
+            String intName = getNucleusContext().getConfiguration().getInternalNameForProperty(name);
+            getNucleusContext().getConfiguration().validatePropertyValue(intName, value);
             properties.setProperty(intName.toLowerCase(Locale.ENGLISH), value);
         }
         else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_CACHE_L2_TYPE))
@@ -829,10 +829,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
         else
         {
-            String intName = getNucleusContext().getPersistenceConfiguration().getInternalNameForProperty(name);
+            String intName = getNucleusContext().getConfiguration().getInternalNameForProperty(name);
             if (intName != null && !intName.equalsIgnoreCase(name))
             {
-                getNucleusContext().getPersistenceConfiguration().validatePropertyValue(intName, value);
+                getNucleusContext().getConfiguration().validatePropertyValue(intName, value);
                 properties.setProperty(intName.toLowerCase(Locale.ENGLISH), value);
             }
             else
@@ -854,7 +854,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         while (propertiesIter.hasNext())
         {
             Map.Entry<String, Object> entry = propertiesIter.next();
-            String propName = nucCtx.getPersistenceConfiguration().getCaseSensitiveNameForPropertyName(entry.getKey());
+            String propName = nucCtx.getConfiguration().getCaseSensitiveNameForPropertyName(entry.getKey());
             props.put(propName, entry.getValue());
         }
         return props;
@@ -865,7 +865,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
         {
             assertIsOpen();
-            String intName = getNucleusContext().getPersistenceConfiguration().getInternalNameForProperty(name);
+            String intName = getNucleusContext().getConfiguration().getInternalNameForProperty(name);
             return properties.getBooleanProperty(intName);
         }
         return null;
@@ -876,7 +876,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
         {
             assertIsOpen();
-            String intName = getNucleusContext().getPersistenceConfiguration().getInternalNameForProperty(name);
+            String intName = getNucleusContext().getConfiguration().getInternalNameForProperty(name);
             return properties.getIntProperty(intName);
         }
         return null;
@@ -887,7 +887,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
         {
             assertIsOpen();
-            String intName = getNucleusContext().getPersistenceConfiguration().getInternalNameForProperty(name);
+            String intName = getNucleusContext().getConfiguration().getInternalNameForProperty(name);
             return properties.getStringProperty(intName);
         }
         return null;
@@ -898,7 +898,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
         {
             assertIsOpen();
-            String intName = getNucleusContext().getPersistenceConfiguration().getInternalNameForProperty(name);
+            String intName = getNucleusContext().getConfiguration().getInternalNameForProperty(name);
             return properties.getProperty(intName.toLowerCase(Locale.ENGLISH));
         }
         return null;
@@ -906,7 +906,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     public Set<String> getSupportedProperties()
     {
-        return nucCtx.getPersistenceConfiguration().getManagedOverrideablePropertyNames();
+        return nucCtx.getConfiguration().getManagedOverrideablePropertyNames();
     }
 
     /**
@@ -1504,7 +1504,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     private boolean isNonTxAtomic()
     {
-        return getNucleusContext().getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_NONTX_ATOMIC);
+        return getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_NONTX_ATOMIC);
     }
 
     /**
@@ -1887,7 +1887,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         ThreadContextInfo threadInfo = acquireThreadContextInfo();
         try
         {
-            boolean allowMergeOfTransient = nucCtx.getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ALLOW_ATTACH_OF_TRANSIENT, false);
+            boolean allowMergeOfTransient = nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ALLOW_ATTACH_OF_TRANSIENT, false);
             if (getBooleanProperty(PropertyNames.PROPERTY_ALLOW_ATTACH_OF_TRANSIENT) != null)
             {
                 allowMergeOfTransient = getBooleanProperty(PropertyNames.PROPERTY_ALLOW_ATTACH_OF_TRANSIENT);
@@ -3311,7 +3311,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         boolean performValidationWhenCached = 
-            (nucCtx.getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED));
+            (nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED));
         List<ObjectProvider> opsToValidate = new ArrayList<ObjectProvider>();
         if (validate)
         {
@@ -3681,7 +3681,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         boolean performValidationWhenCached = 
-            (nucCtx.getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED));
+            (nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED));
         if (validate && (!fromCache || performValidationWhenCached))
         {
             // User requests validation of the instance so go to the datastore to validate it
@@ -3870,7 +3870,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         boolean isInDirty = dirtyOPs.contains(op);
         boolean isInIndirectDirty = indirectDirtyOPs.contains(op);
         if (!isDelayDatastoreOperationsEnabled() && !isInDirty && !isInIndirectDirty && 
-            dirtyOPs.size() >= getNucleusContext().getPersistenceConfiguration().getIntProperty(PropertyNames.PROPERTY_FLUSH_AUTO_OBJECT_LIMIT))
+            dirtyOPs.size() >= getNucleusContext().getConfiguration().getIntProperty(PropertyNames.PROPERTY_FLUSH_AUTO_OBJECT_LIMIT))
         {
             // Reached flush limit so flush
             flushInternal(false);
@@ -4899,7 +4899,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         String setting = (String)getProperty(PropertyNames.PROPERTY_CACHE_L2_RETRIEVE_MODE);
         if (setting == null)
         {
-            setting = nucCtx.getPersistenceConfiguration().getStringProperty(PropertyNames.PROPERTY_CACHE_L2_RETRIEVE_MODE);
+            setting = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_CACHE_L2_RETRIEVE_MODE);
         }
         return setting;
     }
@@ -4909,7 +4909,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         String setting = (String)getProperty(PropertyNames.PROPERTY_CACHE_L2_STORE_MODE);
         if (setting == null)
         {
-            setting = nucCtx.getPersistenceConfiguration().getStringProperty(PropertyNames.PROPERTY_CACHE_L2_STORE_MODE);
+            setting = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_CACHE_L2_STORE_MODE);
         }
         return setting;
     }
@@ -5066,7 +5066,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     protected void putObjectsIntoLevel2Cache(Set<ObjectProvider> ops)
     {
-        int batchSize = nucCtx.getPersistenceConfiguration().getIntProperty(PropertyNames.PROPERTY_CACHE_L2_BATCHSIZE);
+        int batchSize = nucCtx.getConfiguration().getIntProperty(PropertyNames.PROPERTY_CACHE_L2_BATCHSIZE);
         Level2Cache l2Cache = nucCtx.getLevel2Cache();
         Map<Object, CachedPC> dataToUpdate = new HashMap<Object, CachedPC>();
         for (ObjectProvider op : ops)
@@ -5602,7 +5602,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return callbacks;
         }
 
-        if (!getNucleusContext().getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ALLOW_CALLBACKS))
+        if (!getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ALLOW_CALLBACKS))
         {
             callbacks = new NullCallbackHandler();
             return callbacks;

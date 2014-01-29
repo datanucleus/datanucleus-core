@@ -553,7 +553,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
         }
         else
         {
-            return ec.getNucleusContext().getPersistenceConfiguration().getBooleanProperty(name, resultIfNotSet);
+            return ec.getNucleusContext().getConfiguration().getBooleanProperty(name, resultIfNotSet);
         }
     }
 
@@ -573,7 +573,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
         }
         else
         {
-            String value = ec.getNucleusContext().getPersistenceConfiguration().getStringProperty(name);
+            String value = ec.getNucleusContext().getConfiguration().getStringProperty(name);
             return (value != null ? value : resultIfNotSet);
         }
     }

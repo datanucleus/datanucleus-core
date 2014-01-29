@@ -40,7 +40,7 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
      * @param owner Owner object (PM, EM)
      * @param options Any options affecting startup
      */
-    public ExecutionContextThreadedImpl(NucleusContext ctx, Object owner, Map<String, Object> options)
+    public ExecutionContextThreadedImpl(PersistenceNucleusContext ctx, Object owner, Map<String, Object> options)
     {
         super(ctx, owner, options);
     }

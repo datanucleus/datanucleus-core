@@ -30,7 +30,7 @@ import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.NucleusContext;
-import org.datanucleus.PersistenceConfiguration;
+import org.datanucleus.Configuration;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -89,7 +89,7 @@ public class QueryManager
     protected void initialiseQueryCaches()
     {
         // Instantiate the query compilation cache (generic)
-        PersistenceConfiguration conf = nucleusCtx.getPersistenceConfiguration();
+        Configuration conf = nucleusCtx.getConfiguration();
         String cacheType = conf.getStringProperty("datanucleus.cache.queryCompilation.type");
         if (cacheType != null && !cacheType.equalsIgnoreCase("none"))
         {

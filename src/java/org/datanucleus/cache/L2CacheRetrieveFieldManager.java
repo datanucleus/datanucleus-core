@@ -313,7 +313,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                         MetaDataUtils.isMemberEmbedded(mmd, relType,
                             ec.getClassLoaderResolver(), ec.getMetaDataManager()))
                     {
-                        if (ec.getNucleusContext().getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CACHE_EMBEDDED))
+                        if (ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CACHE_EMBEDDED))
                         {
                             if (value instanceof CachedPC)
                             {

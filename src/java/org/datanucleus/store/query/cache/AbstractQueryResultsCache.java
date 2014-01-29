@@ -49,7 +49,7 @@ public class AbstractQueryResultsCache implements QueryResultsCache
 
     public AbstractQueryResultsCache(NucleusContext nucleusCtx)
     {
-        maxSize = nucleusCtx.getPersistenceConfiguration().getIntProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_MAXSIZE);
+        maxSize = nucleusCtx.getConfiguration().getIntProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_MAXSIZE);
         nucCtx = nucleusCtx;
     }
 

@@ -36,7 +36,7 @@ public class CustomJNDITransactionManagerLocator extends JNDIBasedTransactionMan
     public CustomJNDITransactionManagerLocator(NucleusContext nucleusCtx)
     {
         super();
-        jndiLocation = nucleusCtx.getPersistenceConfiguration().getStringProperty(PropertyNames.PROPERTY_TRANSACTION_JTA_JNDI_LOCATION);
+        jndiLocation = nucleusCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_TRANSACTION_JTA_JNDI_LOCATION);
         if (jndiLocation == null)
         {
             // TODO Localise this

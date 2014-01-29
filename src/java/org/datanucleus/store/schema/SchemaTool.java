@@ -34,9 +34,11 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
+import org.datanucleus.AbstractNucleusContext;
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.NucleusContext;
-import org.datanucleus.PersistenceConfiguration;
+import org.datanucleus.PersistenceNucleusContext;
+import org.datanucleus.PersistenceNucleusContextImpl;
+import org.datanucleus.Configuration;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.FileMetaData;
@@ -262,7 +264,7 @@ public class SchemaTool
         }
 
         // Create a NucleusContext for use with this mode
-        NucleusContext nucleusCtx = null;
+        PersistenceNucleusContext nucleusCtx = null;
         try
         {
             if (propsFileName != null)
@@ -492,7 +494,7 @@ public class SchemaTool
      * @return The NucleusContext to use
      * @throws NucleusException Thrown if an error occurs in creating the required NucleusContext
      */
-    public static NucleusContext getNucleusContextForMode(Mode mode, String api, Map userProps, 
+    public static PersistenceNucleusContext getNucleusContextForMode(Mode mode, String api, Map userProps, 
             String persistenceUnitName, String ddlFile, boolean verbose)
     {
         // Extract any properties that affect NucleusContext startup
@@ -500,7 +502,7 @@ public class SchemaTool
         if (userProps != null)
         {
             // Possible properties to check for
-            for (String startupPropName : NucleusContext.STARTUP_PROPERTIES)
+            for (String startupPropName : AbstractNucleusContext.STARTUP_PROPERTIES)
             {
                 if (userProps.containsKey(startupPropName))
                 {
@@ -514,8 +516,8 @@ public class SchemaTool
         }
 
         // Initialise the context for this API
-        NucleusContext nucleusCtx = new NucleusContext(api, startupProps);
-        PersistenceConfiguration propConfig = nucleusCtx.getPersistenceConfiguration();
+        PersistenceNucleusContext nucleusCtx = new PersistenceNucleusContextImpl(api, startupProps);
+        Configuration propConfig = nucleusCtx.getConfiguration();
 
         // Generate list of properties for SchemaTool usage
         Map props = new HashMap();

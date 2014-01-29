@@ -88,7 +88,7 @@ public class WeakLevel2Cache implements Level2Cache
         apiAdapter = nucleusCtx.getApiAdapter();
         pinnedCache = new HashMap();
         unpinnedCache = new WeakValueMap();
-        maxSize = nucleusCtx.getPersistenceConfiguration().getIntProperty(PropertyNames.PROPERTY_CACHE_L2_MAXSIZE);
+        maxSize = nucleusCtx.getConfiguration().getIntProperty(PropertyNames.PROPERTY_CACHE_L2_MAXSIZE);
     }
 
     /**

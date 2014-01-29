@@ -35,6 +35,7 @@ import junit.framework.TestCase;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ClassLoaderResolverImpl;
 import org.datanucleus.NucleusContext;
+import org.datanucleus.PersistenceNucleusContextImpl;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.store.types.converters.TypeConverter;
@@ -60,7 +61,7 @@ public class TypeManagerTest extends TestCase
         Properties props = new Properties();
         props.setProperty("bundle-check-action", "EXCEPTION");
         PluginManager pluginMgr = new PluginManager(null, clr, props);
-        NucleusContext nucCtx = new NucleusContext(null, null, pluginMgr);
+        NucleusContext nucCtx = new PersistenceNucleusContextImpl(null, null, pluginMgr);
         typeMgr = nucCtx.getTypeManager();
     }
 

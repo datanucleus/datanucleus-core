@@ -106,7 +106,7 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
 
         // Parse the single-string query for errors
         JDOQLSingleStringParser parser = new JDOQLSingleStringParser(this, query);
-        boolean allowAllSyntax = ec.getNucleusContext().getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
+        boolean allowAllSyntax = ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
         if (ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL) != null)
         {
             allowAllSyntax = ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
@@ -358,7 +358,7 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
             from, candidateClass, candidateCollection, 
             this.filter, getParsedImports(), this.ordering, this.result, this.grouping, this.having, 
             explicitParameters, explicitVariables, this.update);
-        boolean allowAllSyntax = ec.getNucleusContext().getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
+        boolean allowAllSyntax = ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
         if (ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL) != null)
         {
             allowAllSyntax = ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
@@ -428,7 +428,7 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
                 subquery.from, subquery.candidateClass, null,
                 subquery.filter, getParsedImports(), subquery.ordering, subquery.result, 
                 subquery.grouping, subquery.having, subquery.explicitParameters, null, null);
-            boolean allowAllSyntax = ec.getNucleusContext().getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
+            boolean allowAllSyntax = ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
             if (ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL) != null)
             {
                 allowAllSyntax = ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);

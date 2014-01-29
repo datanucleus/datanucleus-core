@@ -96,7 +96,7 @@ public class TransactionImpl implements Transaction
         this.ecListener = (TransactionEventListener) ec;
         this.txnMgr = ec.getNucleusContext().getTransactionManager();
 
-        PersistenceConfiguration config = ec.getNucleusContext().getPersistenceConfiguration();
+        Configuration config = ec.getNucleusContext().getConfiguration();
 
         int isolationLevel = TransactionUtils.getTransactionIsolationLevelForName(
             config.getStringProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION));

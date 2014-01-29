@@ -24,8 +24,8 @@ import javax.jdo.spi.JDOImplHelper;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.NucleusContext;
-import org.datanucleus.PersistenceConfiguration;
+import org.datanucleus.Configuration;
+import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.cache.CachedPC;
 import org.datanucleus.exceptions.ClassNotResolvedException;
@@ -53,9 +53,9 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
     /** Single pool of all ObjectProvider objects. TODO Consider having one pool per object type. */
 //    ObjectProviderPool opPool = null;
 
-    public ObjectProviderFactoryImpl(NucleusContext nucCtx)
+    public ObjectProviderFactoryImpl(PersistenceNucleusContext nucCtx)
     {
-        PersistenceConfiguration conf = nucCtx.getPersistenceConfiguration();
+        Configuration conf = nucCtx.getConfiguration();
         String opClassName = conf.getStringProperty(PropertyNames.PROPERTY_OBJECT_PROVIDER_CLASS_NAME);
         if (StringUtils.isWhitespace(opClassName))
         {

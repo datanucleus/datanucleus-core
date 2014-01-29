@@ -361,7 +361,7 @@ public class SCOUtils
 
         // Check whether we should cache collections based on PMF/PM
         boolean useCache = 
-            ownerOP.getExecutionContext().getNucleusContext().getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS);
+            ownerOP.getExecutionContext().getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS);
         if (ownerOP.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS) != null)
         {
             useCache = ownerOP.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS);
@@ -398,7 +398,7 @@ public class SCOUtils
 
         AbstractClassMetaData cmd = ownerOP.getClassMetaData();
         Boolean lazyCollections =
-            ownerOP.getExecutionContext().getNucleusContext().getPersistenceConfiguration().getBooleanObjectProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS_LAZY);
+            ownerOP.getExecutionContext().getNucleusContext().getConfiguration().getBooleanObjectProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS_LAZY);
         if (lazyCollections != null)
         {
             // Global setting for PMF
@@ -1320,7 +1320,7 @@ public class SCOUtils
                 boolean exists = false;
                 if (api.isDetached(object))
                 {
-                    if (ec.getNucleusContext().getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE))
+                    if (ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE))
                     {
                         // Assume that it is detached from this datastore
                         exists = true;
@@ -1485,7 +1485,7 @@ public class SCOUtils
      */
     public static boolean detachAsWrapped(ObjectProvider ownerOP)
     {
-        return ownerOP.getExecutionContext().getNucleusContext().getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_DETACH_AS_WRAPPED);
+        return ownerOP.getExecutionContext().getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_DETACH_AS_WRAPPED);
     }
 
     /**

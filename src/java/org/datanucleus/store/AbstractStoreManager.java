@@ -31,7 +31,7 @@ import java.util.Properties;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.NucleusContext;
+import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.Transaction;
 import org.datanucleus.api.ApiAdapter;
@@ -132,7 +132,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     protected final boolean validateConstraints;
 
     /** Nucleus Context. */
-    protected final NucleusContext nucleusContext;
+    protected final PersistenceNucleusContext nucleusContext;
 
     /** Manager for value generation. Lazy initialised, so use getValueGenerationManager() to access. */
     private ValueGenerationManager valueGenerationMgr;
@@ -171,7 +171,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      * @param nucleusContext The corresponding nucleus context.
      * @param props Any properties controlling this datastore
      */
-    protected AbstractStoreManager(String key, ClassLoaderResolver clr, NucleusContext nucleusContext,
+    protected AbstractStoreManager(String key, ClassLoaderResolver clr, PersistenceNucleusContext nucleusContext,
             Map<String, Object> props)
     {
         this.storeManagerKey = key;
@@ -761,7 +761,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#getNucleusContext()
      */   
-    public NucleusContext getNucleusContext()
+    public PersistenceNucleusContext getNucleusContext()
     {
         return nucleusContext;
     }
@@ -1730,7 +1730,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         {
             return true;
         }
-        return nucleusContext.getPersistenceConfiguration().hasProperty(name);
+        return nucleusContext.getConfiguration().hasProperty(name);
     }
 
     /* (non-Javadoc)
@@ -1744,7 +1744,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         {
             return super.getProperty(name);
         }
-        return nucleusContext.getPersistenceConfiguration().getProperty(name);
+        return nucleusContext.getConfiguration().getProperty(name);
     }
 
     /* (non-Javadoc)
@@ -1758,7 +1758,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         {
             return super.getIntProperty(name);
         }
-        return nucleusContext.getPersistenceConfiguration().getIntProperty(name);
+        return nucleusContext.getConfiguration().getIntProperty(name);
     }
 
     /* (non-Javadoc)
@@ -1772,7 +1772,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         {
             return super.getStringProperty(name);
         }
-        return nucleusContext.getPersistenceConfiguration().getStringProperty(name);
+        return nucleusContext.getConfiguration().getStringProperty(name);
     }
 
     /* (non-Javadoc)
@@ -1786,7 +1786,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         {
             return super.getBooleanProperty(name);
         }
-        return nucleusContext.getPersistenceConfiguration().getBooleanProperty(name);
+        return nucleusContext.getConfiguration().getBooleanProperty(name);
     }
 
     /* (non-Javadoc)
@@ -1800,7 +1800,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         {
             return super.getBooleanProperty(name, resultIfNotSet);
         }
-        return nucleusContext.getPersistenceConfiguration().getBooleanProperty(name, resultIfNotSet);
+        return nucleusContext.getConfiguration().getBooleanProperty(name, resultIfNotSet);
     }
 
     /* (non-Javadoc)
@@ -1814,7 +1814,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         {
             return super.getBooleanObjectProperty(name);
         }
-        return nucleusContext.getPersistenceConfiguration().getBooleanObjectProperty(name);
+        return nucleusContext.getConfiguration().getBooleanObjectProperty(name);
     }
 
     /* (non-Javadoc)

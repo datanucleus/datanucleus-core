@@ -26,7 +26,7 @@ import javax.validation.ValidatorFactory;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.PersistenceConfiguration;
+import org.datanucleus.Configuration;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.state.CallbackHandler;
 import org.datanucleus.util.StringUtils;
@@ -40,7 +40,7 @@ public class BeanValidatorHandler implements CallbackHandler
 {
     Validator validator;
     ClassLoaderResolver clr;
-    PersistenceConfiguration conf;
+    Configuration conf;
 
     /**
      * Constructor for a validation handler.
@@ -48,7 +48,7 @@ public class BeanValidatorHandler implements CallbackHandler
      */
     public BeanValidatorHandler(ExecutionContext ec, ValidatorFactory factory)
     {
-        conf = ec.getNucleusContext().getPersistenceConfiguration();
+        conf = ec.getNucleusContext().getConfiguration();
         clr = ec.getClassLoaderResolver();
 
         validator = factory.usingContext().traversableResolver(new PersistenceTraversalResolver(ec)).getValidator();

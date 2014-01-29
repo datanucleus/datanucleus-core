@@ -44,8 +44,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
+import org.datanucleus.PersistenceNucleusContext;
+import org.datanucleus.PersistenceNucleusContextImpl;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
+import org.datanucleus.enhancer.EnhancementNucleusContextImpl;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NoPersistenceInformationException;
 import org.datanucleus.exceptions.NucleusException;
@@ -214,10 +217,10 @@ public abstract class MetaDataManager implements Serializable
         nucleusContext = ctx;
         updateLock = new ReentrantLock();
 
-        validateXML = nucleusContext.getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_XML_VALIDATE);
-        supportXMLNamespaces = nucleusContext.getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_XML_NAMESPACE_AWARE);
-        allowXML = nucleusContext.getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_ALLOW_XML);
-        allowAnnotations = nucleusContext.getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_ALLOW_ANNOTATIONS);
+        validateXML = nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_XML_VALIDATE);
+        supportXMLNamespaces = nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_XML_NAMESPACE_AWARE);
+        allowXML = nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_ALLOW_XML);
+        allowAnnotations = nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_ALLOW_ANNOTATIONS);
 
         annotationManager = new AnnotationManagerImpl(this);
 
@@ -229,19 +232,15 @@ public abstract class MetaDataManager implements Serializable
             classesWithoutPersistenceInfo.add(iter.next());
         }
 
-        if (nucleusContext.isStoreManagerInitialised())
+        allowORM = nucleusContext.supportsORMMetaData();
+        if (allowORM)
         {
-            // Object datastores don't "map" for persistence so don't need ORM
-            allowORM = nucleusContext.getStoreManager().getSupportedOptions().contains("ORM");
-            if (allowORM)
+            Boolean configOrm = 
+                nucleusContext.getConfiguration().getBooleanObjectProperty(PropertyNames.PROPERTY_METADATA_SUPPORT_ORM);
+            if (configOrm != null && !configOrm.booleanValue())
             {
-                Boolean configOrm = 
-                    nucleusContext.getPersistenceConfiguration().getBooleanObjectProperty(PropertyNames.PROPERTY_METADATA_SUPPORT_ORM);
-                if (configOrm != null && !configOrm.booleanValue())
-                {
-                    // User has turned it off
-                    allowORM = false;
-                }
+                // User has turned it off
+                allowORM = false;
             }
         }
     }
@@ -410,7 +409,7 @@ public abstract class MetaDataManager implements Serializable
      */
     public boolean isEnhancing()
     {
-        return getNucleusContext().getType() == NucleusContext.ContextType.ENHANCEMENT;
+        return getNucleusContext() instanceof EnhancementNucleusContextImpl;
     }
 
     /**
@@ -925,7 +924,7 @@ public abstract class MetaDataManager implements Serializable
                 {
                     classNames.addAll(pumd.getClassNames());
                 }
-                if (getNucleusContext().getType() == NucleusContext.ContextType.PERSISTENCE) // TODO Why not when enhancing? document it
+                if (getNucleusContext() instanceof PersistenceNucleusContextImpl) // TODO Why not when enhancing? document it
                 {
                     Set jarFileNames = pumd.getJarFiles();
                     if (jarFileNames != null)
@@ -1262,7 +1261,7 @@ public abstract class MetaDataManager implements Serializable
      */
     protected MetaDataScanner getScanner(ClassLoaderResolver clr)
     {
-        Object so = nucleusContext.getPersistenceConfiguration().getProperty(PropertyNames.PROPERTY_METADATA_SCANNER);
+        Object so = nucleusContext.getConfiguration().getProperty(PropertyNames.PROPERTY_METADATA_SCANNER);
         if (so == null)
         {
             return null;
@@ -1898,11 +1897,11 @@ public abstract class MetaDataManager implements Serializable
             }
         }
 
-        if (isPersistentInterface && nucleusContext.getImplementationCreator() != null)
+        if (isPersistentInterface && nucleusContext instanceof PersistenceNucleusContext && ((PersistenceNucleusContext)nucleusContext).getImplementationCreator() != null)
         {
             // JDO2 "persistent interfaces" - deliberately kept separate from normal persistence since it is 
             // largely undocumented and best left alone TODO this is very time consuming. got to do some cache
-            classes.add(nucleusContext.getImplementationCreator().newInstance(intfClass, clr).getClass());
+            classes.add(((PersistenceNucleusContext)nucleusContext).getImplementationCreator().newInstance(intfClass, clr).getClass());
 
             int numClasses = classes.size() + generatedClassNames.size();
             String[] classNames = new String[numClasses];
@@ -2377,7 +2376,7 @@ public abstract class MetaDataManager implements Serializable
      */
     public PersistenceUnitMetaData getMetaDataForPersistenceUnit(String unitName)
     {
-        String filename = nucleusContext.getPersistenceConfiguration().getStringProperty("datanucleus.persistenceXmlFilename");
+        String filename = nucleusContext.getConfiguration().getStringProperty("datanucleus.persistenceXmlFilename");
         PersistenceFileMetaData[] files = MetaDataUtils.parsePersistenceFiles(nucleusContext.getPluginManager(),
             filename, validateXML, nucleusContext.getClassLoaderResolver(null));
         if (files == null)
@@ -2857,7 +2856,7 @@ public abstract class MetaDataManager implements Serializable
     {
         synchronized(cmd)
         {
-            if (getNucleusContext().getType() == NucleusContext.ContextType.PERSISTENCE && 
+            if (getNucleusContext() instanceof PersistenceNucleusContextImpl && 
                 cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE &&
                 !getNucleusContext().getApiAdapter().isPersistable(cls))
             {
@@ -3021,9 +3020,13 @@ public abstract class MetaDataManager implements Serializable
                         acmd.initialise(clr, MetaDataManager.this);
                         if (acmd.hasExtension("cache-pin") && acmd.getValueForExtension("cache-pin").equalsIgnoreCase("true"))
                         {
+                            // TODO This should be done by NucleusContext, to limit interaction between components
                             // Register as auto-pinned in the L2 cache
                             Class cls = clr.classForName(acmd.getFullClassName());
-                            nucleusContext.getLevel2Cache().pinAll(cls, false);
+                            if (nucleusContext instanceof PersistenceNucleusContext)
+                            {
+                                ((PersistenceNucleusContext)nucleusContext).getLevel2Cache().pinAll(cls, false);
+                            }
                         }
                     }
                     // Catch and rethrow exception since AccessController.doPrivileged swallows it!

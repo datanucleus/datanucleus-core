@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.management.jmx;
 
 import org.datanucleus.NucleusContext;
+import org.datanucleus.NucleusContextHelper;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.util.NucleusLogger;
@@ -61,12 +62,12 @@ public class ManagementManager
     {
         this.nucleusContext = ctxt;
 
-        this.domainName = ctxt.getPersistenceConfiguration().getStringProperty("datanucleus.PersistenceUnitName");
+        this.domainName = ctxt.getConfiguration().getStringProperty("datanucleus.PersistenceUnitName");
         if (this.domainName == null)
         {
             this.domainName = "datanucleus";
         }
-        this.instanceName = "datanucleus-" + NucleusContext.random.nextInt();
+        this.instanceName = "datanucleus-" + NucleusContextHelper.random.nextInt();
 
         startManagementServer();
     }
@@ -146,7 +147,7 @@ public class ManagementManager
     {
         if (mgmtServer == null)
         {
-            String jmxType = nucleusContext.getPersistenceConfiguration().getStringProperty(PropertyNames.PROPERTY_JMX_TYPE);
+            String jmxType = nucleusContext.getConfiguration().getStringProperty(PropertyNames.PROPERTY_JMX_TYPE);
             try
             {
                 mgmtServer = (ManagementServer) nucleusContext.getPluginManager().createExecutableExtension(

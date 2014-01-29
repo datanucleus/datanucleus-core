@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.PersistenceConfiguration;
+import org.datanucleus.Configuration;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.QueryResultMetaData;
@@ -110,7 +110,7 @@ public abstract class AbstractSQLQuery extends Query
             unique = true;
         }
 
-        PersistenceConfiguration conf = ec.getNucleusContext().getPersistenceConfiguration();
+        Configuration conf = ec.getNucleusContext().getConfiguration();
         if (ec.getApiAdapter().getName().equalsIgnoreCase("JDO"))
         {
             // Check for strict SQL if required

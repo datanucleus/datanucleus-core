@@ -314,7 +314,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
                     MetaDataUtils.isMemberEmbedded(mmd, mmd.getRelationType(ec.getClassLoaderResolver()),
                         ec.getClassLoaderResolver(), ec.getMetaDataManager()))
                 {
-                    if (ec.getNucleusContext().getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CACHE_EMBEDDED))
+                    if (ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CACHE_EMBEDDED))
                     {
                         // Put object in cached as (nested) CachedPC
                         ObjectProvider valueOP = ec.findObjectProvider(value);

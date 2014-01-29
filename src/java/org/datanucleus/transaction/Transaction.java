@@ -28,7 +28,7 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-import org.datanucleus.NucleusContext;
+import org.datanucleus.NucleusContextHelper;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.omg.CORBA.SystemException;
@@ -55,7 +55,7 @@ public class Transaction
         org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
     /** this id of this instance **/
-    private static final int nodeId = NucleusContext.random.nextInt();
+    private static final int nodeId = NucleusContextHelper.random.nextInt();
 
     /** sequence number for global transactions **/
     private static int nextGlobalTransactionId = 1;
