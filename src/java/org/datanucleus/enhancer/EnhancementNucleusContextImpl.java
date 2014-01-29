@@ -18,28 +18,9 @@ Contributors:
 package org.datanucleus.enhancer;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.datanucleus.AbstractNucleusContext;
-import org.datanucleus.ExecutionContext;
-import org.datanucleus.ExecutionContextPool;
-import org.datanucleus.FetchGroup;
-import org.datanucleus.FetchGroupManager;
-import org.datanucleus.ImplementationCreator;
-import org.datanucleus.ExecutionContext.LifecycleListener;
-import org.datanucleus.cache.Level2Cache;
-import org.datanucleus.identity.IdentityKeyTranslator;
-import org.datanucleus.identity.IdentityStringTranslator;
-import org.datanucleus.management.FactoryStatistics;
-import org.datanucleus.management.jmx.ManagementManager;
-import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.plugin.PluginManager;
-import org.datanucleus.state.CallbackHandler;
-import org.datanucleus.state.ObjectProviderFactory;
-import org.datanucleus.store.StoreManager;
-import org.datanucleus.store.autostart.AutoStartMechanism;
-import org.datanucleus.transaction.TransactionManager;
-import org.datanucleus.transaction.jta.JTASyncRegistry;
 
 /**
  * NucleusContext to use when enhancing. Just provides basic plugin, type and metadata services.
@@ -85,162 +66,10 @@ public class EnhancementNucleusContextImpl extends AbstractNucleusContext
         }
     }
 
-    // TODO Drop these methods when we remove them from NucleusContext
-    public AutoStartMechanism getAutoStartMechanism()
-    {
-        return null;
-    }
-
-    public ExecutionContextPool getExecutionContextPool()
-    {
-        return null;
-    }
-
-    public ObjectProviderFactory getObjectProviderFactory()
-    {
-        return null;
-    }
-
-    public ExecutionContext getExecutionContext(Object owner, Map<String, Object> options)
-    {
-        return null;
-    }
-
-    public Class getDatastoreIdentityClass()
-    {
-        return null;
-    }
-
-    public IdentityStringTranslator getIdentityStringTranslator()
-    {
-        return null;
-    }
-
-    public IdentityKeyTranslator getIdentityKeyTranslator()
-    {
-        return null;
-    }
-
-    public boolean statisticsEnabled()
-    {
-        return false;
-    }
-
-    public ManagementManager getJMXManager()
-    {
-        return null;
-    }
-
-    public FactoryStatistics getStatistics()
-    {
-        return null;
-    }
-
-    public ImplementationCreator getImplementationCreator()
-    {
-        return null;
-    }
-
-    public TransactionManager getTransactionManager()
-    {
-        return null;
-    }
-
-    public javax.transaction.TransactionManager getJtaTransactionManager()
-    {
-        return null;
-    }
-
-    public JTASyncRegistry getJtaSyncRegistry()
-    {
-        return null;
-    }
-
-    public boolean isStoreManagerInitialised()
-    {
-        return false;
-    }
-
-    public StoreManager getStoreManager()
-    {
-        return null;
-    }
-
-    public CallbackHandler getValidationHandler(ExecutionContext ec)
-    {
-        return null;
-    }
-
-    public boolean hasLevel2Cache()
-    {
-        return false;
-    }
-
-    public Level2Cache getLevel2Cache()
-    {
-        return null;
-    }
-
-    public LifecycleListener[] getExecutionContextListeners()
-    {
-        return null;
-    }
-
-    public void addExecutionContextListener(LifecycleListener listener)
-    {
-    }
-
-    public void removeExecutionContextListener(LifecycleListener listener)
-    {
-    }
-
-    public void setJcaMode(boolean jca)
-    {
-    }
-
-    public boolean isJcaMode()
-    {
-        return false;
-    }
-
-    public FetchGroupManager getFetchGroupManager()
-    {
-        return null;
-    }
-
-    public void addInternalFetchGroup(FetchGroup grp)
-    {
-    }
-
-    public void removeInternalFetchGroup(FetchGroup grp)
-    {
-    }
-
-    public FetchGroup createInternalFetchGroup(Class cls, String name)
-    {
-        return null;
-    }
-
-    public FetchGroup getInternalFetchGroup(Class cls, String name)
-    {
-        return null;
-    }
-
-    public Set<FetchGroup> getFetchGroupsWithName(String name)
-    {
-        return null;
-    }
-
-    public boolean isClassWithIdentityCacheable(Object id)
-    {
-        return false;
-    }
-
-    public boolean isClassCacheable(AbstractClassMetaData cmd)
-    {
-        return false;
-    }
-
+    /* (non-Javadoc)
+     * @see org.datanucleus.AbstractNucleusContext#logConfigurationDetails()
+     */
+    @Override
     protected void logConfigurationDetails()
     {
     }
