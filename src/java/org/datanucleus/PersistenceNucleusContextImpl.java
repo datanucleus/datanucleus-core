@@ -166,7 +166,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     public PersistenceNucleusContextImpl(String apiName, Map startupProps, PluginManager pluginMgr)
     {
         super(apiName, startupProps, pluginMgr);
-        NucleusLogger.GENERAL.info(">> PersistenceNucleusContext for " + apiName);
     }
 
     public synchronized void initialise()
