@@ -29,16 +29,15 @@ import org.datanucleus.management.jmx.ManagementManager;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.state.CallbackHandler;
 import org.datanucleus.state.ObjectProviderFactory;
-import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.autostart.AutoStartMechanism;
 import org.datanucleus.transaction.TransactionManager;
 import org.datanucleus.transaction.jta.JTASyncRegistry;
 
 /**
  * Context for use in the persistence process.
- * Adds on many extra services to the basic context, for transactions, executionContext, identity handling, object providers, autostart, store manager, L2 cache etc.
+ * Adds on many extra services to the basic+schema contexts, for transactions, executionContext, identity handling, object providers, autostart, L2 cache etc.
  */
-public interface PersistenceNucleusContext extends NucleusContext
+public interface PersistenceNucleusContext extends SchemaNucleusContext
 {
     AutoStartMechanism getAutoStartMechanism();
 
@@ -98,8 +97,6 @@ public interface PersistenceNucleusContext extends NucleusContext
     javax.transaction.TransactionManager getJtaTransactionManager();
 
     JTASyncRegistry getJtaSyncRegistry();
-
-    StoreManager getStoreManager();
 
     /**
      * Method to return a handler for validation (JSR303).
