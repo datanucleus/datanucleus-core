@@ -153,6 +153,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     /** Map of ClassMetaData, keyed by the class discriminator name. */
     protected Map<String, AbstractClassMetaData> classMetaDataByDiscriminatorName = new ConcurrentHashMap();
 
+    // TODO Add cache of concrete subclasses by class name, to be used in id lookups
+
     /** Cache subclass information as that is expensive to compute, keyed by class name */
     protected Map<String, Set<String>> directSubclassesByClass = new ConcurrentHashMap();
 
