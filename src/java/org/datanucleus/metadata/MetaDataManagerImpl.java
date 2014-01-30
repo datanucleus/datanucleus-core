@@ -480,7 +480,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             return null;
         }
         boolean originatingLoadCall = false;
-        if (loadedMetaData == null)
+        if (loadedMetaData == null && listeners != null)
         {
             originatingLoadCall = true;
             loadedMetaData = new ArrayList<AbstractClassMetaData>();
@@ -538,7 +538,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             return null;
         }
         boolean originatingLoadCall = false;
-        if (loadedMetaData == null)
+        if (loadedMetaData == null && listeners != null)
         {
             originatingLoadCall = true;
             loadedMetaData = new ArrayList<AbstractClassMetaData>();
@@ -651,7 +651,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             return null;
         }
         boolean originatingLoadCall = false;
-        if (loadedMetaData == null)
+        if (loadedMetaData == null && listeners != null)
         {
             originatingLoadCall = true;
             loadedMetaData = new ArrayList<AbstractClassMetaData>();
@@ -815,7 +815,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             return null;
         }
         boolean originatingLoadCall = false;
-        if (loadedMetaData == null)
+        if (loadedMetaData == null && listeners != null)
         {
             originatingLoadCall = true;
             loadedMetaData = new ArrayList<AbstractClassMetaData>();
@@ -1158,7 +1158,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             return;
         }
         boolean originatingLoadCall = false;
-        if (loadedMetaData == null)
+        if (loadedMetaData == null && listeners != null)
         {
             originatingLoadCall = true;
             loadedMetaData = new ArrayList<AbstractClassMetaData>();
@@ -1571,8 +1571,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     /** Temporary list of the FileMetaData objects utilised in this call for metadata. */
     protected ArrayList<FileMetaData> utilisedFileMetaData = new ArrayList();
 
-    /** Temporary list of class metadata loaded during the current call. */
-    protected List<AbstractClassMetaData> loadedMetaData = null;
+    /** Temporary list of class metadata loaded during the current call, for use with listeners. */
+    private List<AbstractClassMetaData> loadedMetaData = null;
 
     /* (non-Javadoc)
      * @see org.datanucleus.metadata.MetaDataManager#getMetaDataForClass(java.lang.Class, org.datanucleus.ClassLoaderResolver)
@@ -1590,7 +1590,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         }
 
         boolean originatingLoadCall = false;
-        if (loadedMetaData == null)
+        if (loadedMetaData == null && listeners != null)
         {
             originatingLoadCall = true;
             loadedMetaData = new ArrayList<AbstractClassMetaData>();
@@ -1661,7 +1661,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
     protected void processListenerLoadingCall()
     {
-        if (!loadedMetaData.isEmpty())
+        if (!loadedMetaData.isEmpty() && listeners != null)
         {
             // Notify any listeners of the metadata loaded during this call
             Iterator<AbstractClassMetaData> loadedIter = new ArrayList(loadedMetaData).iterator();
@@ -2877,14 +2877,14 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
     /**
      * Convenience method to populate the MetaData for the specified class/interface.
-     * @param acmd MetaData
+     * @param cmd MetaData
      * @param clr ClassLoader resolver
      * @param loader The primary class loader
      */
-    protected void populateAbstractClassMetaData(final AbstractClassMetaData acmd, final ClassLoaderResolver clr, 
+    protected void populateAbstractClassMetaData(final AbstractClassMetaData cmd, final ClassLoaderResolver clr, 
             final ClassLoader loader)
     {
-        if (!acmd.isPopulated() && !acmd.isInitialised())
+        if (!cmd.isPopulated() && !cmd.isInitialised())
         {
             // Do as PrivilegedAction since populate() uses reflection to get additional fields
             AccessController.doPrivileged(new PrivilegedAction()
@@ -2893,7 +2893,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 {
                     try
                     {
-                        acmd.populate(clr, loader, MetaDataManagerImpl.this);
+                        cmd.populate(clr, loader, MetaDataManagerImpl.this);
                     }
                     // Catch and rethrow exception since AccessController.doPriveleged swallows it!
                     catch (NucleusException ne)
@@ -2902,7 +2902,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     }
                     catch (Exception e)
                     {
-                        throw new NucleusUserException("Exception during population of metadata for " + acmd.getFullClassName(), e);
+                        throw new NucleusUserException("Exception during population of metadata for " + cmd.getFullClassName(), e);
                     }
                     return null;
                 }
@@ -2914,27 +2914,28 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      * Method called (by AbstractClassMetaData.initialise()) when a class has its metadata initialised.
      * @param acmd Metadata that has been initialised
      */
-    public void abstractClassMetaDataInitialised(AbstractClassMetaData acmd)
+    public void abstractClassMetaDataInitialised(AbstractClassMetaData cmd)
     {
-        if (acmd.getIdentityType() == IdentityType.APPLICATION && !acmd.usesSingleFieldIdentityClass())
+        if (cmd.getIdentityType() == IdentityType.APPLICATION && !cmd.usesSingleFieldIdentityClass())
         {
             // Register the app-id object-id class lookup
-            classMetaDataByAppIdClassName.put(acmd.getObjectidClass(), acmd);
+            classMetaDataByAppIdClassName.put(cmd.getObjectidClass(), cmd);
         }
+
         if (listeners != null && loadedMetaData != null)
         {
-            loadedMetaData.add(acmd);
+            loadedMetaData.add(cmd);
         }
     }
 
     /**
      * Convenience method to initialise the MetaData for the specified class/interface.
-     * @param acmd MetaData
+     * @param cmd MetaData
      * @param clr ClassLoaderResolver
      */
-    protected void initialiseAbstractClassMetaData(final AbstractClassMetaData acmd, final ClassLoaderResolver clr)
+    protected void initialiseAbstractClassMetaData(final AbstractClassMetaData cmd, final ClassLoaderResolver clr)
     {
-        if (!acmd.isInitialised())
+        if (!cmd.isInitialised())
         {
             // Do as PrivilegedAction since uses reflection
             // [JDOAdapter.isValidPrimaryKeyClass calls reflective methods]
@@ -2944,17 +2945,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 {
                     try
                     {
-                        acmd.initialise(clr, MetaDataManagerImpl.this);
-                        if (acmd.hasExtension("cache-pin") && acmd.getValueForExtension("cache-pin").equalsIgnoreCase("true"))
-                        {
-                            // TODO This should be done by NucleusContext, to limit interaction between components
-                            // Register as auto-pinned in the L2 cache
-                            Class cls = clr.classForName(acmd.getFullClassName());
-                            if (nucleusContext instanceof PersistenceNucleusContext)
-                            {
-                                ((PersistenceNucleusContext)nucleusContext).getLevel2Cache().pinAll(cls, false);
-                            }
-                        }
+                        cmd.initialise(clr, MetaDataManagerImpl.this);
                     }
                     // Catch and rethrow exception since AccessController.doPrivileged swallows it!
                     catch (NucleusException ne)
@@ -2963,7 +2954,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     }
                     catch (Exception e)
                     {
-                        throw new NucleusUserException("Exception during initialisation of metadata for " + acmd.getFullClassName(), e);
+                        throw new NucleusUserException("Exception during initialisation of metadata for " + cmd.getFullClassName(), e);
                     }
                     return null;
                 }

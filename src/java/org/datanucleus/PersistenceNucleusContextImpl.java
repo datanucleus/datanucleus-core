@@ -47,6 +47,7 @@ import org.datanucleus.management.FactoryStatistics;
 import org.datanucleus.management.jmx.ManagementManager;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.FileMetaData;
+import org.datanucleus.metadata.MetaDataListener;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.metadata.QueryMetaData;
@@ -170,7 +171,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
 
     public synchronized void initialise()
     {
-        ClassLoaderResolver clr = getClassLoaderResolver(null);
+        final ClassLoaderResolver clr = getClassLoaderResolver(null);
         clr.registerUserClassLoader((ClassLoader)config.getProperty(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY));
 
         boolean generateSchema = false;
@@ -239,6 +240,23 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             this.storeMgr = new FederatedStoreManager(clr, this);
         }
         NucleusLogger.DATASTORE.debug("StoreManager now created");
+
+        // Make sure MetaDataManager is initialised, and add a listener for classes being loaded, so we can set up any pinning in the L2 cache
+        MetaDataManager mmgr = getMetaDataManager();
+        final Level2Cache cache = getLevel2Cache();
+        mmgr.registerListener(new MetaDataListener()
+        {
+            @Override
+            public void loaded(AbstractClassMetaData cmd)
+            {
+                if (cmd.hasExtension("cache-pin") && cmd.getValueForExtension("cache-pin").equalsIgnoreCase("true"))
+                {
+                    // Register as auto-pinned in the L2 cache
+                    Class cls = clr.classForName(cmd.getFullClassName());
+                    cache.pinAll(cls, false);
+                }
+            }
+        });
 
         // ========== Initialise the StoreManager contents ==========
         // A). Load any classes specified by auto-start
