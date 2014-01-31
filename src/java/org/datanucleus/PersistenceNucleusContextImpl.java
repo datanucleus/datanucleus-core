@@ -241,22 +241,26 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         }
         NucleusLogger.DATASTORE.debug("StoreManager now created");
 
-        // Make sure MetaDataManager is initialised, and add a listener for classes being loaded, so we can set up any pinning in the L2 cache
+        // Make sure MetaDataManager is initialised
         MetaDataManager mmgr = getMetaDataManager();
         final Level2Cache cache = getLevel2Cache();
-        mmgr.registerListener(new MetaDataListener()
+        if (cache != null)
         {
-            @Override
-            public void loaded(AbstractClassMetaData cmd)
+            // Add listener for metadata loading so we can pin any classes in the L2 cache that are marked for that
+            mmgr.registerListener(new MetaDataListener()
             {
-                if (cmd.hasExtension("cache-pin") && cmd.getValueForExtension("cache-pin").equalsIgnoreCase("true"))
+                @Override
+                public void loaded(AbstractClassMetaData cmd)
                 {
-                    // Register as auto-pinned in the L2 cache
-                    Class cls = clr.classForName(cmd.getFullClassName());
-                    cache.pinAll(cls, false);
+                    if (cmd.hasExtension("cache-pin") && cmd.getValueForExtension("cache-pin").equalsIgnoreCase("true"))
+                    {
+                        // Register as auto-pinned in the L2 cache
+                        Class cls = clr.classForName(cmd.getFullClassName());
+                        cache.pinAll(cls, false);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         // ========== Initialise the StoreManager contents ==========
         // A). Load any classes specified by auto-start
