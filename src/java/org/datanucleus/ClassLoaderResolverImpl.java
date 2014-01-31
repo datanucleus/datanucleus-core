@@ -40,17 +40,17 @@ import org.datanucleus.util.WeakValueMap;
  * It supports up to 3 class loaders, based loosely on JDO Spec section 12.5.
  * The class loaders will be used in this order:
  * <OL>
- * <LI>The loader that loaded the class or instance referred to in the API that caused this class to be loaded.</LI>
- * <UL>
- * <LI>In case of query, this is the loader of the candidate class, or the loader of the object passed to the newQuery</LI>
- * <LI>In case of navigation from a persistent instance, this is the loader of the class of the instance.</LI>
- * <LI>In the case of getExtent with subclasses, this is the loader of the candidate class.</LI>
- * <LI>In the case of getObjectById, this is the loader of the object id instance.</LI>
- * <LI>Other cases do not have an explicit loader.</LI>
- * </UL>
- * <LI>The loader returned in the current context by Thread.getContextClassLoader().</LI>
- * <LI>The loader returned by Thread.getContextClassLoader() at the time of creating an ExecutionContext.</LI>
- * <LI>The loader registered for dynamically creating and loading classes at runtime.</LI>
+ *   <LI>The loader that loaded the class or instance referred to in the API that caused this class to be loaded.</LI>
+ *   <UL>
+ *     <LI>In case of query, this is the loader of the candidate class, or the loader of the object passed to the newQuery</LI>
+ *     <LI>In case of navigation from a persistent instance, this is the loader of the class of the instance.</LI>
+ *     <LI>In the case of getExtent with subclasses, this is the loader of the candidate class.</LI>
+ *     <LI>In the case of getObjectById, this is the loader of the object id instance.</LI>
+ *     <LI>Other cases do not have an explicit loader.</LI>
+ *   </UL>
+ *   <LI>The loader returned in the current context by Thread.getContextClassLoader().</LI>
+ *   <LI>The loader returned by Thread.getContextClassLoader() at the time of creating an ExecutionContext.</LI>
+ *   <LI>The loader registered for dynamically creating and loading classes at runtime.</LI>
  * </OL>
  * TODO Provide a way of flushing a classname from the cached classes so we can reload a class
  */
@@ -60,11 +60,11 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
     protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
         org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
-    /** ClassLoader initialised by the ExecutionContext. */
-    protected final ClassLoader ecContextLoader;
+    /** ClassLoader initialised by the context (ExecutionContext). */
+    protected final ClassLoader contextLoader;
 
     /** Hash code cache for performance improvement */
-    protected int ecContextLoaderHashCode = 0;
+    protected int contextLoaderHashCode = 0;
 
     /** ClassLoader registered to load runtime created classes. */
     protected ClassLoader runtimeLoader;
@@ -91,15 +91,15 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
     ThreadLocal primary = new ThreadLocal();
 
     /**
-     * Constructor for PersistenceManager cases.
-     * @param pmLoader Loader from PM initialisation time.
+     * Constructor for ExecutionContext cases.
+     * @param ctxLoader Loader from ExecutionContext initialisation time.
      */
-    public ClassLoaderResolverImpl(ClassLoader pmLoader)
+    public ClassLoaderResolverImpl(ClassLoader ctxLoader)
     {
-        ecContextLoader = pmLoader;
-        if (pmLoader != null)
+        contextLoader = ctxLoader;
+        if (contextLoader != null)
         {
-            ecContextLoaderHashCode = ecContextLoader.hashCode();
+            contextLoaderHashCode = contextLoader.hashCode();
         }
     }
 
@@ -109,7 +109,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
      */
     public ClassLoaderResolverImpl()
     {
-        ecContextLoader = null;
+        contextLoader = null;
     }
 
     /**
@@ -167,8 +167,8 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
             return String.class;
         }
 
-        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        String cacheKey = newCacheKey(name, primary, contextClassLoader);
+        ClassLoader threadClassLoader = Thread.currentThread().getContextClassLoader();
+        String cacheKey = newCacheKey(name, primary, threadClassLoader);
 
         //lookup in loaded and unloaded classes cache
         Class cls = loadedClasses.get(cacheKey);
@@ -194,12 +194,12 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
         if (cls == null)
         {
             // Try the loader for the current thread
-            cls = classOrNull(name, contextClassLoader);
+            cls = classOrNull(name, threadClassLoader);
         }
         if (cls == null)
         {
-            // Try the loader for the PM context
-            cls = classOrNull(name, ecContextLoader);
+            // Try the loader for the context
+            cls = classOrNull(name, contextLoader);
         }
         if (cls == null && runtimeLoader != null)
         {
@@ -277,8 +277,9 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
             return String.class;
         }
 
-        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        String cacheKey = newCacheKey(name, primary, contextClassLoader);
+        ClassLoader threadClassLoader = Thread.currentThread().getContextClassLoader();
+        String cacheKey = newCacheKey(name, primary, threadClassLoader);
+
         //only lookup in loaded classes cache
         Class cls = loadedClasses.get(cacheKey);
 
@@ -298,12 +299,12 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
         if (cls == null)
         {
             // Try the loader for the current thread
-            cls = ClassOrNullWithInitialize(name, contextClassLoader);
+            cls = ClassOrNullWithInitialize(name, threadClassLoader);
         }
         if (cls == null)
         {
-            // Try the loader for the PM context
-            cls = ClassOrNullWithInitialize(name, ecContextLoader);
+            // Try the loader for the context
+            cls = ClassOrNullWithInitialize(name, contextLoader);
         }
         if (cls == null && runtimeLoader != null)
         {
@@ -344,7 +345,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
         {
             h = h ^ contextClassLoader.hashCode();
         }
-        h = h ^ ecContextLoaderHashCode;
+        h = h ^ contextLoaderHashCode;
         h = h ^ runtimeLoaderHashCode;
         h = h ^ userRegisteredLoaderHashCode;
         return prefix + h;
@@ -600,7 +601,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
     {
         final List list = new ArrayList();
         final ClassLoader userClassLoader = (ClassLoader) this.primary.get();
-        final ClassLoader ctxClassLoader = Thread.currentThread().getContextClassLoader();
+        final ClassLoader threadClassLoader = Thread.currentThread().getContextClassLoader();
         
         AccessController.doPrivileged(new PrivilegedAction()
         {
@@ -631,18 +632,18 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
         				}
         			}
 
-        			if (ctxClassLoader != null)
+        			if (threadClassLoader != null)
         			{
-        				Enumeration resourceEnum = ctxClassLoader.getResources(name);
+        				Enumeration resourceEnum = threadClassLoader.getResources(name);
         				while (resourceEnum.hasMoreElements())
         				{
         					list.add(resourceEnum.nextElement());
         				}
         			}
 
-        			if (ecContextLoader != null)
+        			if (contextLoader != null)
         			{
-        				Enumeration pmResourceEnum = ecContextLoader.getResources(name);
+        				Enumeration pmResourceEnum = contextLoader.getResources(name);
         				while (pmResourceEnum.hasMoreElements())
         				{
         					list.add(pmResourceEnum.nextElement());
@@ -727,10 +728,10 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
                     }
                 }
 
-                ClassLoader ctxClassLoader = Thread.currentThread().getContextClassLoader();
-                if (ctxClassLoader != null)
+                ClassLoader threadClassLoader = Thread.currentThread().getContextClassLoader();
+                if (threadClassLoader != null)
                 {
-                    url = ctxClassLoader.getResource(resName);
+                    url = threadClassLoader.getResource(resName);
                     if (url != null)
                     {
                         resources.put(resName, url);
@@ -738,9 +739,9 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
                     }
                 }
 
-                if (ecContextLoader != null)
+                if (contextLoader != null)
                 {
-                    url = ecContextLoader.getResource(resName);
+                    url = contextLoader.getResource(resName);
                     if (url != null)
                     {
                         resources.put(resName, url);
@@ -794,7 +795,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
     public String toString()
     {
         return "ClassLoaderResolver: primary=" + primary +
-            " pmContextLoader=" + ecContextLoader +
+            " contextLoader=" + contextLoader +
             " runtimeLoader=" + runtimeLoader + 
             " registeredLoader=" + userRegisteredLoader;
     }
