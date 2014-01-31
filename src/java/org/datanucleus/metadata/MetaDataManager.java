@@ -253,6 +253,13 @@ public interface MetaDataManager
     String[] getSubclassesForClass(String className, boolean includeDescendents);
 
     /**
+     * Accessor for the names of all concrete subclasses of the provided class.
+     * @param className Name of the class that we want the known concrete subclasses for.
+     * @return Names of the subclasses. Returns null if there are no subclasses
+     */
+    String[] getConcreteSubclassesForClass(String className);
+
+    /**
      * Accessor for the list of names of classes that are declared to implement the specified interface
      * (using &lt;implements&gt; in the MetaData). This will include subclasses of declared classes. Ignore abstract classes.
      * The array of implementation class names will have the initial implementations first followed by

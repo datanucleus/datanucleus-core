@@ -153,10 +153,11 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     /** Map of ClassMetaData, keyed by the class discriminator name. */
     protected Map<String, AbstractClassMetaData> classMetaDataByDiscriminatorName = new ConcurrentHashMap();
 
-    // TODO Add cache of concrete subclasses by class name, to be used in id lookups
-
     /** Cache subclass information as that is expensive to compute, keyed by class name */
     protected Map<String, Set<String>> directSubclassesByClass = new ConcurrentHashMap();
+
+    /** Cache of names of concrete subclass for a class name. Used for fast lookups from ids. */
+    protected Map<String, Set<String>> concreteSubclassNamesByClassName = new ConcurrentHashMap<String, Set<String>>();
 
     /** Map of QueryMetaData, keyed by the (class name + query name). */
     protected Map<String, QueryMetaData> queryMetaDataByName = null;
@@ -181,6 +182,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
     /** Listeners for metadata load. */
     protected Set<MetaDataListener> listeners = null;
+
+    /** Temporary list of class metadata loaded during the current call, for use with listeners. */
+    private List<AbstractClassMetaData> listenersLoadedMetaData = null;
 
     /** Number of user metadata items. */
     protected int userMetaDataNumber = 0;
@@ -264,6 +268,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
         directSubclassesByClass.clear();
         directSubclassesByClass = null;
+        concreteSubclassNamesByClassName.clear();
+        concreteSubclassNamesByClassName = null;
 
         if (classMetaDataByEntityName != null)
         {
@@ -482,10 +488,10 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             return null;
         }
         boolean originatingLoadCall = false;
-        if (loadedMetaData == null && listeners != null)
+        if (listenersLoadedMetaData == null && listeners != null)
         {
             originatingLoadCall = true;
-            loadedMetaData = new ArrayList<AbstractClassMetaData>();
+            listenersLoadedMetaData = new ArrayList<AbstractClassMetaData>();
         }
 
         try
@@ -540,10 +546,10 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             return null;
         }
         boolean originatingLoadCall = false;
-        if (loadedMetaData == null && listeners != null)
+        if (listenersLoadedMetaData == null && listeners != null)
         {
             originatingLoadCall = true;
-            loadedMetaData = new ArrayList<AbstractClassMetaData>();
+            listenersLoadedMetaData = new ArrayList<AbstractClassMetaData>();
         }
 
         try
@@ -653,10 +659,10 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             return null;
         }
         boolean originatingLoadCall = false;
-        if (loadedMetaData == null && listeners != null)
+        if (listenersLoadedMetaData == null && listeners != null)
         {
             originatingLoadCall = true;
-            loadedMetaData = new ArrayList<AbstractClassMetaData>();
+            listenersLoadedMetaData = new ArrayList<AbstractClassMetaData>();
         }
 
         try
@@ -817,10 +823,10 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             return null;
         }
         boolean originatingLoadCall = false;
-        if (loadedMetaData == null && listeners != null)
+        if (listenersLoadedMetaData == null && listeners != null)
         {
             originatingLoadCall = true;
-            loadedMetaData = new ArrayList<AbstractClassMetaData>();
+            listenersLoadedMetaData = new ArrayList<AbstractClassMetaData>();
         }
 
         try
@@ -1160,10 +1166,10 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             return;
         }
         boolean originatingLoadCall = false;
-        if (loadedMetaData == null && listeners != null)
+        if (listenersLoadedMetaData == null && listeners != null)
         {
             originatingLoadCall = true;
-            loadedMetaData = new ArrayList<AbstractClassMetaData>();
+            listenersLoadedMetaData = new ArrayList<AbstractClassMetaData>();
         }
 
         try
@@ -1246,6 +1252,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 }
             }
 
+            // TODO Remove this class from subclass lookups of other classes
+            concreteSubclassNamesByClassName.remove(className);
             directSubclassesByClass.remove(className);
             discriminatorLookupByRootClassName.remove(className);
             classesWithoutPersistenceInfo.remove(className);
@@ -1573,9 +1581,6 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     /** Temporary list of the FileMetaData objects utilised in this call for metadata. */
     protected ArrayList<FileMetaData> utilisedFileMetaData = new ArrayList();
 
-    /** Temporary list of class metadata loaded during the current call, for use with listeners. */
-    private List<AbstractClassMetaData> loadedMetaData = null;
-
     /* (non-Javadoc)
      * @see org.datanucleus.metadata.MetaDataManager#getMetaDataForClass(java.lang.Class, org.datanucleus.ClassLoaderResolver)
      */
@@ -1592,10 +1597,10 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         }
 
         boolean originatingLoadCall = false;
-        if (loadedMetaData == null && listeners != null)
+        if (listenersLoadedMetaData == null && listeners != null)
         {
             originatingLoadCall = true;
-            loadedMetaData = new ArrayList<AbstractClassMetaData>();
+            listenersLoadedMetaData = new ArrayList<AbstractClassMetaData>();
         }
 
         AbstractClassMetaData cmd = null;
@@ -1663,10 +1668,10 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
     protected void processListenerLoadingCall()
     {
-        if (!loadedMetaData.isEmpty() && listeners != null)
+        if (!listenersLoadedMetaData.isEmpty() && listeners != null)
         {
             // Notify any listeners of the metadata loaded during this call
-            Iterator<AbstractClassMetaData> loadedIter = new ArrayList(loadedMetaData).iterator();
+            Iterator<AbstractClassMetaData> loadedIter = new ArrayList(listenersLoadedMetaData).iterator();
             while (loadedIter.hasNext())
             {
                 AbstractClassMetaData acmd = loadedIter.next();
@@ -1679,7 +1684,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             }
         }
 
-        loadedMetaData = null;
+        listenersLoadedMetaData = null;
     }
 
     /* (non-Javadoc)
@@ -1733,80 +1738,6 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     protected void registerMetaDataForClass(String fullClassName, AbstractClassMetaData cmd)
     {
         classMetaDataByClass.put(fullClassName, cmd);
-
-        // invalidate our cache of subclass information
-        directSubclassesByClass.clear();
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.metadata.MetaDataManager#getSubclassesForClass(java.lang.String, boolean)
-     */
-    @Override
-    public String[] getSubclassesForClass(String className, boolean includeDescendents)
-    {
-        Collection subclassNames = new HashSet();
-        provideSubclassesForClass(className, includeDescendents, subclassNames);
-        if (subclassNames.size() > 0)
-        {
-            return (String[])subclassNames.toArray(new String[subclassNames.size()]);
-        }
-
-        return null;
-    }
-
-    /**
-     * Provide the subclasses of a particular class to a given <code>consumer</code>
-     * @param className Name of the class that we want the known subclasses for.
-     * @param includeDescendents Whether to include subclasses of subclasses etc
-     * @param consumer the Collection (Set) where discovered subclasses are added
-     */
-    private void provideSubclassesForClass(String className, boolean includeDescendents, Collection consumer)
-    {
-        // make use of cached subclass information or we have quadratic complexity here
-        Set directSubClasses = directSubclassesByClass.get(className);
-        if (directSubClasses == null)
-        {
-            directSubClasses = computeDirectSubclassesForClass(className);
-            directSubclassesByClass.put(className, directSubClasses);
-        }
-        consumer.addAll(directSubClasses);
-
-        if (includeDescendents) 
-        {
-            Iterator subClassNameIter = directSubClasses.iterator();
-            while (subClassNameIter.hasNext())
-            {
-                //go deeper in subclasses
-                provideSubclassesForClass((String)subClassNameIter.next(), includeDescendents, consumer);
-            }
-        }
-    }
-
-    /**
-     * Calculate the subclasses of a particular class.
-     * Runs in O(n) of the number of all known classes
-     * @param className Name of the class to find subclasses for
-     * @return Set<ClassMetaData>
-     */
-    private Set computeDirectSubclassesForClass(String className)
-    {
-        Set result = new HashSet();
-        Collection cmds = classMetaDataByClass.values();
-        Iterator cmdIter = cmds.iterator();
-        while (cmdIter.hasNext())
-        {
-            AbstractClassMetaData acmd = (AbstractClassMetaData)cmdIter.next();
-            if (acmd instanceof ClassMetaData)
-            {
-                ClassMetaData cmd = (ClassMetaData)acmd;
-                if (cmd.getPersistenceCapableSuperclass() != null &&
-                    cmd.getPersistenceCapableSuperclass().equals(className))
-                {
-                    result.add(cmd.getFullClassName());
-                }
-            }
-        }
-        return result;
     }
 
     /* (non-Javadoc)
@@ -2913,24 +2844,6 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     }
 
     /**
-     * Method called (by AbstractClassMetaData.initialise()) when a class has its metadata initialised.
-     * @param acmd Metadata that has been initialised
-     */
-    public void abstractClassMetaDataInitialised(AbstractClassMetaData cmd)
-    {
-        if (cmd.getIdentityType() == IdentityType.APPLICATION && !cmd.usesSingleFieldIdentityClass())
-        {
-            // Register the app-id object-id class lookup
-            classMetaDataByAppIdClassName.put(cmd.getObjectidClass(), cmd);
-        }
-
-        if (listeners != null && loadedMetaData != null)
-        {
-            loadedMetaData.add(cmd);
-        }
-    }
-
-    /**
      * Convenience method to initialise the MetaData for the specified class/interface.
      * @param cmd MetaData
      * @param clr ClassLoaderResolver
@@ -2961,6 +2874,107 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     return null;
                 }
             });
+        }
+    }
+
+    /**
+     * Method called (by AbstractClassMetaData.initialise()) when a class has its metadata initialised.
+     * @param acmd Metadata that has been initialised
+     */
+    public void abstractClassMetaDataInitialised(AbstractClassMetaData cmd)
+    {
+        if (cmd.getIdentityType() == IdentityType.APPLICATION && !cmd.usesSingleFieldIdentityClass())
+        {
+            // Register the app-id object-id class lookup
+            classMetaDataByAppIdClassName.put(cmd.getObjectidClass(), cmd);
+        }
+
+        if (cmd instanceof ClassMetaData)
+        {
+            if (cmd.getPersistenceCapableSuperclass() != null)
+            {
+                // Add to direct subclasses for the superclass
+                Set<String> directSubclasses = directSubclassesByClass.get(cmd.getPersistenceCapableSuperclass());
+                if (directSubclasses == null)
+                {
+                    directSubclasses = new HashSet<String>();
+                    directSubclassesByClass.put(cmd.getPersistenceCapableSuperclass(), directSubclasses);
+                }
+                directSubclasses.add(cmd.getFullClassName());
+
+                if (!((ClassMetaData)cmd).isAbstract())
+                {
+                    // Concrete class, so add to cache of concrete subclasses for all superclasses
+                    AbstractClassMetaData theCmd = cmd;
+                    while (theCmd.getPersistenceCapableSuperclass() != null)
+                    {
+                        theCmd = theCmd.getSuperAbstractClassMetaData();
+                        Set<String> subclassNames = concreteSubclassNamesByClassName.get(theCmd.getFullClassName());
+                        if (subclassNames == null)
+                        {
+                            subclassNames = new HashSet();
+                            concreteSubclassNamesByClassName.put(theCmd.getFullClassName(), subclassNames);
+                        }
+                        subclassNames.add(cmd.getFullClassName());
+                    }
+                }
+            }
+        }
+
+        if (listeners != null && listenersLoadedMetaData != null)
+        {
+            listenersLoadedMetaData.add(cmd);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.metadata.MetaDataManager#getConcreteSubclassesForClass(java.lang.String)
+     */
+    @Override
+    public String[] getConcreteSubclassesForClass(String className)
+    {
+        Set<String> concreteSubclasses = concreteSubclassNamesByClassName.get(className);
+        return (concreteSubclasses == null ? null : concreteSubclasses.toArray(new String[concreteSubclasses.size()]));
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.metadata.MetaDataManager#getSubclassesForClass(java.lang.String, boolean)
+     */
+    @Override
+    public String[] getSubclassesForClass(String className, boolean includeDescendents)
+    {
+        Collection subclassNames2 = new HashSet();
+        provideSubclassesForClass(className, includeDescendents, subclassNames2);
+        if (subclassNames2.size() > 0)
+        {
+            return (String[])subclassNames2.toArray(new String[subclassNames2.size()]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Provide the subclasses of a particular class to a given <code>consumer</code>
+     * @param className Name of the class that we want the known subclasses for.
+     * @param includeDescendents Whether to include subclasses of subclasses etc
+     * @param consumer the Collection (Set) where discovered subclasses are added
+     */
+    private void provideSubclassesForClass(String className, boolean includeDescendents, Collection consumer)
+    {
+        Set<String> subclasses = directSubclassesByClass.get(className);
+        if (subclasses != null)
+        {
+            consumer.addAll(subclasses);
+
+            if (includeDescendents) 
+            {
+                Iterator subClassNameIter = subclasses.iterator();
+                while (subClassNameIter.hasNext())
+                {
+                    //go deeper in subclasses
+                    provideSubclassesForClass((String)subClassNameIter.next(), includeDescendents, consumer);
+                }
+            }
         }
     }
 
