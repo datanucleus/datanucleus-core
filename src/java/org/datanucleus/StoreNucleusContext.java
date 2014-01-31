@@ -20,10 +20,10 @@ package org.datanucleus;
 import org.datanucleus.store.StoreManager;
 
 /**
- * Context for schema operations in DataNucleus.
+ * Context for datastore operations in DataNucleus.
  * Adds on the store management service to the basic context.
  */
-public interface SchemaNucleusContext extends NucleusContext
+public interface StoreNucleusContext extends NucleusContext
 {
     StoreManager getStoreManager();
 }

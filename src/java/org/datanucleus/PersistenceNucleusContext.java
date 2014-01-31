@@ -35,9 +35,9 @@ import org.datanucleus.transaction.jta.JTASyncRegistry;
 
 /**
  * Context for use in the persistence process.
- * Adds on many extra services to the basic+schema contexts, for transactions, executionContext, identity handling, object providers, autostart, L2 cache etc.
+ * Adds on many extra services to the basic+store contexts, for transactions, executionContext, identity handling, object providers, autostart, L2 cache etc.
  */
-public interface PersistenceNucleusContext extends SchemaNucleusContext
+public interface PersistenceNucleusContext extends StoreNucleusContext
 {
     AutoStartMechanism getAutoStartMechanism();
 
