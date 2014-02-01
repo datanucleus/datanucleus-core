@@ -852,6 +852,7 @@ public class TypeManager implements Serializable
         }
         catch (Exception e)
         {
+            // This will fail if we have a TypeConverter converting an interface, and the field is of the implementation type
         }
 
         try
@@ -862,6 +863,7 @@ public class TypeManager implements Serializable
         }
         catch (Exception e2)
         {
+            // Not a JPA wrapper type
         }
 
         // Maybe there is a toDatastoreType but not precise member type so just find the toDatastoreType method
