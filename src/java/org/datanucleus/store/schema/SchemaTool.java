@@ -39,6 +39,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PersistenceNucleusContextImpl;
 import org.datanucleus.Configuration;
+import org.datanucleus.StoreNucleusContext;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.FileMetaData;
@@ -57,6 +58,8 @@ import org.datanucleus.util.StringUtils;
  * SchemaTool providing an interface for the maintenance of schemas.
  * These utilities include:-
  * <ul>
+ * <li>creation of a schema in the datastore</li>
+ * <li>deletion of a schema in the datastore</li>
  * <li>creation of tables representing classes specified in input data</li>
  * <li>deletion of tables representing classes specified in input data</li>
  * <li>validation of tables representing classes specified in input data</li>
@@ -65,8 +68,16 @@ import org.datanucleus.util.StringUtils;
  */
 public class SchemaTool
 {
+    /** Localiser for messages. */
+    protected static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.Localisation",
+        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
+
+    public static final NucleusLogger LOGGER = NucleusLogger.getLoggerInstance("DataNucleus.SchemaTool");
+
     public enum Mode
     {
+        CREATE_SCHEMA,
+        DELETE_SCHEMA,
         CREATE,
         DELETE,
         DELETE_CREATE,
@@ -75,12 +86,11 @@ public class SchemaTool
         SCHEMA_INFO
     }
 
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Name of the persistence API to use. */
     private String apiName = "JDO";
+
+    /** Name of the schema (for use with createSchema, deleteSchema modes). */
+    private String schemaName = null;
 
     /** Name of a file in which to put the DDL (or null if wanting to execute in the datastore). */
     private String ddlFilename = null;
@@ -94,26 +104,6 @@ public class SchemaTool
     /** Whether to operate in verbose mode. */
     private boolean verbose = false;
 
-    /** create mode **/
-    public static final int SCHEMATOOL_CREATE_MODE = 1;
-
-    /** delete mode **/
-    public static final int SCHEMATOOL_DELETE_MODE = 2;
-
-    /** delete+create mode **/
-    public static final int SCHEMATOOL_DELETECREATE_MODE = 3;
-
-    /** validate mode **/
-    public static final int SCHEMATOOL_VALIDATE_MODE = 4;
-
-    /** database info mode **/
-    public static final int SCHEMATOOL_DATABASE_INFO_MODE = 5;
-
-    /** schema info mode **/
-    public static final int SCHEMATOOL_SCHEMA_INFO_MODE = 6;
-
-    public static final NucleusLogger LOGGER = NucleusLogger.getLoggerInstance("DataNucleus.SchemaTool");
-
     /**
      * Entry method when invoked from the command line.
      * @param args List of options for processing by the available methods in this class.
@@ -124,25 +114,26 @@ public class SchemaTool
         SchemaTool tool = new SchemaTool();
 
         CommandLine cmd = new CommandLine();
+        cmd.addOption("createSchema", "createSchema", "schemaName", LOCALISER.msg(false, "014024"));
+        cmd.addOption("deleteSchema", "deleteSchema", "schemaName", LOCALISER.msg(false, "014025"));
+
         cmd.addOption("create", "create", null, LOCALISER.msg(false, "014026"));
         cmd.addOption("delete", "delete", null, LOCALISER.msg(false, "014027"));
         cmd.addOption("deletecreate", "deletecreate", null, LOCALISER.msg(false, "014044"));
         cmd.addOption("validate", "validate", null, LOCALISER.msg(false, "014028"));
+
         cmd.addOption("dbinfo", "dbinfo", null, LOCALISER.msg(false, "014029"));
         cmd.addOption("schemainfo", "schemainfo", null, LOCALISER.msg(false, "014030"));
         cmd.addOption("help", "help", null, LOCALISER.msg(false, "014033"));
 
         cmd.addOption("ddlFile", "ddlFile", "ddlFile", LOCALISER.msg(false, "014031"));
         cmd.addOption("completeDdl", "completeDdl", null, LOCALISER.msg(false, "014032"));
-
         cmd.addOption("includeAutoStart", "includeAutoStart", null, "Include Auto-Start Mechanisms");
-
         cmd.addOption("api", "api", "api", "API Adapter (JDO, JPA, etc)");
         cmd.addOption("v", "verbose", null, "verbose output");
-
-        cmd.addOption("pu", "persistenceUnit", "<persistence-unit>", 
-            "name of the persistence unit to handle the schema for");
+        cmd.addOption("pu", "persistenceUnit", "<persistence-unit>", "name of the persistence unit to handle the schema for");
         cmd.addOption("props", "properties", "props", "path to a properties file");
+
         cmd.parse(args);
 
         // Remaining command line args are filenames (class files, metadata files)
@@ -188,12 +179,7 @@ public class SchemaTool
         }
         else if (cmd.hasOption("help"))
         {
-            System.out.println(LOCALISER.msg(false, "014023"));
-            System.out.println(LOCALISER.msg(false, "014024"));
-            System.out.println(LOCALISER.msg(false, "014025"));
-            System.out.println(cmd.toString());
-            System.out.println(LOCALISER.msg(false, "014034"));
-            System.out.println(LOCALISER.msg(false, "014035"));
+            System.out.println(LOCALISER.msg(false, "014023", cmd.toString()));
             System.exit(0);
         }
         LOGGER.info(msg);
@@ -202,6 +188,10 @@ public class SchemaTool
         // Extract the selected options
         String propsFileName = null;
         String persistenceUnitName = null;
+        if (cmd.hasOption("schemaName"))
+        {
+            tool.setSchemaName(cmd.getOptionArg("schemaName"));
+        }
         if (cmd.hasOption("ddlFile"))
         {
             tool.setDdlFile(cmd.getOptionArg("ddlFile"));
@@ -264,7 +254,7 @@ public class SchemaTool
         }
 
         // Create a NucleusContext for use with this mode
-        PersistenceNucleusContext nucleusCtx = null;
+        StoreNucleusContext nucleusCtx = null;
         try
         {
             if (propsFileName != null)
@@ -394,22 +384,30 @@ public class SchemaTool
 
         try
         {
-            if (mode == Mode.CREATE)
+            if (mode == Mode.CREATE_SCHEMA)
             {
-                tool.createSchema(schemaStoreMgr, classNames);
+                tool.createSchema(schemaStoreMgr, tool.getSchemaName());
+            }
+            else if (mode == Mode.DELETE_SCHEMA)
+            {
+                tool.deleteSchema(schemaStoreMgr, tool.getSchemaName());
+            }
+            else if (mode == Mode.CREATE)
+            {
+                tool.createSchemaForClasses(schemaStoreMgr, classNames);
             }
             else if (mode == Mode.DELETE)
             {
-                tool.deleteSchema(schemaStoreMgr, classNames);
+                tool.deleteSchemaForClasses(schemaStoreMgr, classNames);
             }
             else if (mode == Mode.DELETE_CREATE)
             {
-                tool.deleteSchema(schemaStoreMgr, classNames);
-                tool.createSchema(schemaStoreMgr, classNames);
+                tool.deleteSchemaForClasses(schemaStoreMgr, classNames);
+                tool.createSchemaForClasses(schemaStoreMgr, classNames);
             }
             else if (mode == Mode.VALIDATE)
             {
-                tool.validateSchema(schemaStoreMgr, classNames);
+                tool.validateSchemaForClasses(schemaStoreMgr, classNames);
             }
             else if (mode == Mode.DATABASE_INFO)
             {
@@ -468,17 +466,27 @@ public class SchemaTool
         return props;
     }
 
-    public void createSchema(SchemaAwareStoreManager storeMgr, Set<String> classNames)
+    public void createSchema(SchemaAwareStoreManager storeMgr, String schemaName)
+    {
+        storeMgr.createSchema(schemaName, getPropertiesForSchemaTool());
+    }
+
+    public void deleteSchema(SchemaAwareStoreManager storeMgr, String schemaName)
+    {
+        storeMgr.deleteSchema(schemaName, getPropertiesForSchemaTool());
+    }
+
+    public void createSchemaForClasses(SchemaAwareStoreManager storeMgr, Set<String> classNames)
     {
         storeMgr.createSchemaForClasses(classNames, getPropertiesForSchemaTool());
     }
 
-    public void deleteSchema(SchemaAwareStoreManager storeMgr, Set<String> classNames)
+    public void deleteSchemaForClasses(SchemaAwareStoreManager storeMgr, Set<String> classNames)
     {
         storeMgr.deleteSchemaForClasses(classNames, getPropertiesForSchemaTool());
     }
 
-    public void validateSchema(SchemaAwareStoreManager storeMgr, Set<String> classNames)
+    public void validateSchemaForClasses(SchemaAwareStoreManager storeMgr, Set<String> classNames)
     {
         storeMgr.validateSchemaForClasses(classNames, getPropertiesForSchemaTool());
     }
@@ -494,7 +502,7 @@ public class SchemaTool
      * @return The NucleusContext to use
      * @throws NucleusException Thrown if an error occurs in creating the required NucleusContext
      */
-    public static PersistenceNucleusContext getNucleusContextForMode(Mode mode, String api, Map userProps, 
+    public static StoreNucleusContext getNucleusContextForMode(Mode mode, String api, Map userProps, 
             String persistenceUnitName, String ddlFile, boolean verbose)
     {
         // Extract any properties that affect NucleusContext startup
@@ -756,59 +764,45 @@ public class SchemaTool
         return this;
     }
 
-    /**
-     * Accessor for the DDL filename
-     * @return the file to use when outputing the DDL
-     */
+    public String getSchemaName()
+    {
+        return schemaName;
+    }
+
+    public SchemaTool setSchemaName(String schemaName)
+    {
+        this.schemaName = schemaName;
+        return this;
+    }
+
     public String getDdlFile()
     {
         return ddlFilename;
     }
 
-    /**
-     * Mutator for the DDL file
-     * @param file the file to use when outputting the DDL
-     * @return The SchemaTool instance
-     */
     public SchemaTool setDdlFile(String file)
     {
         this.ddlFilename = file;
         return this;
     }
 
-    /**
-     * Mutator for the flag to output complete DDL (when using DDL file)
-     * @param completeDdl Whether to return complete DDL
-     * @return The SchemaTool instance
-     */
     public SchemaTool setCompleteDdl(boolean completeDdl)
     {
         this.completeDdl = completeDdl;
         return this;
     }
 
-    /**
-     * @return whether to use generate DDL (or just update DDL)
-     */
     public boolean getCompleteDdl()
     {
         return completeDdl;
     }
 
-    /**
-     * Mutator for the flag to include auto-start mechanisms in schema updates
-     * @param include Whether to include the auto-start mechanism specified by persistence props
-     * @return The SchemaTool instance
-     */
     public SchemaTool setIncludeAutoStart(boolean include)
     {
         this.includeAutoStart = include;
         return this;
     }
 
-    /**
-     * @return whether to include auto-start mechanisms in schema updates
-     */
     public boolean getIncludeAutoStart()
     {
         return includeAutoStart;

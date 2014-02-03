@@ -740,7 +740,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 {
                     schemaTool.setDdlFile(config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_TARGET));
                 }
-                schemaTool.createSchema(schemaStoreMgr, schemaClassNames);
+                schemaTool.createSchemaForClasses(schemaStoreMgr, schemaClassNames);
             }
             else if (mode == Mode.DELETE)
             {
@@ -759,7 +759,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 {
                     schemaTool.setDdlFile(config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_TARGET));
                 }
-                schemaTool.deleteSchema(schemaStoreMgr, schemaClassNames);
+                schemaTool.deleteSchemaForClasses(schemaStoreMgr, schemaClassNames);
             }
             else if (mode == Mode.DELETE_CREATE)
             {
@@ -777,7 +777,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 {
                     schemaTool.setDdlFile(config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_TARGET));
                 }
-                schemaTool.deleteSchema(schemaStoreMgr, schemaClassNames);
+                schemaTool.deleteSchemaForClasses(schemaStoreMgr, schemaClassNames);
 
                 String createScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_SOURCE);
                 if (!StringUtils.isWhitespace(createScript))
@@ -793,7 +793,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 {
                     schemaTool.setDdlFile(config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_TARGET));
                 }
-                schemaTool.createSchema(schemaStoreMgr, schemaClassNames);
+                schemaTool.createSchemaForClasses(schemaStoreMgr, schemaClassNames);
             }
 
             String loadScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_LOAD_SOURCE);

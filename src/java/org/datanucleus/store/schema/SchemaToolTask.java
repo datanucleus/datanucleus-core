@@ -30,12 +30,13 @@ import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.FileSet;
+import org.datanucleus.store.schema.SchemaTool.Mode;
 import org.datanucleus.util.Localiser;
 
 /**
  * SchemaTool Ant Task. Accepts the following parameters
  * <UL>
- * <LI><B>mode</B> Mode of operation (<B>"create"</B>, "delete", "deletecreate", "validate", "dbinfo", "schemainfo").</LI>
+ * <LI><B>mode</B> Mode of operation (<B>"create"</B>, "delete", "deletecreate", "validate", "dbinfo", "schemainfo", etc).</LI>
  * <LI><B>verbose</B> Verbose output.</LI>
  * <LI><B>props</B> Name of a properties file for use in SchemaTool (PMF properties)</LI>
  * <LI><B>ddlFile</B> Name of a file to output the DDL into</LI>
@@ -50,7 +51,10 @@ public class SchemaToolTask extends Java
         org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
     /** Operating mode */
-    private int runMode = SchemaTool.SCHEMATOOL_CREATE_MODE;
+    private Mode mode = Mode.CREATE;
+
+    /** Schema name (optional, for when using CREATE_SCHEMA, DELETE_SCHEMA). */
+    private String schemaName;
 
     /** Filesets of files (mapping or class) to be used in generating the schema. */
     List<FileSet> filesets = new ArrayList<FileSet>();
@@ -71,27 +75,43 @@ public class SchemaToolTask extends Java
     public void execute()
     throws BuildException
     {
-        if (runMode == SchemaTool.SCHEMATOOL_CREATE_MODE)
+        if (mode == Mode.CREATE_SCHEMA)
+        {
+            if (schemaName == null)
+            {
+                throw new BuildException("If using 'create schema' then need to set schemaName");
+            }
+            createArg().setValue("-createSchema " + schemaName);
+        }
+        else if (mode == Mode.DELETE_SCHEMA)
+        {
+            if (schemaName == null)
+            {
+                throw new BuildException("If using 'create schema' then need to set schemaName");
+            }
+            createArg().setValue("-deleteSchema " + schemaName);
+        }
+        else if (mode == Mode.CREATE)
         {
             createArg().setValue("-create");
         }
-        else if (runMode == SchemaTool.SCHEMATOOL_DELETE_MODE)
+        else if (mode == Mode.DELETE)
         {
             createArg().setValue("-delete");
         }
-        else if (runMode == SchemaTool.SCHEMATOOL_DELETECREATE_MODE)
+        else if (mode == Mode.DELETE_CREATE)
         {
             createArg().setValue("-deletecreate");
         }
-        else if (runMode == SchemaTool.SCHEMATOOL_VALIDATE_MODE)
+        else if (mode == Mode.VALIDATE)
         {
             createArg().setValue("-validate");
         }
-        else if (runMode == SchemaTool.SCHEMATOOL_DATABASE_INFO_MODE)
+        else if (mode == Mode.DATABASE_INFO)
         {
             createArg().setValue("-dbinfo");
         }
-        else if (runMode == SchemaTool.SCHEMATOOL_SCHEMA_INFO_MODE)
+        else if (mode == Mode.SCHEMA_INFO)
         {
             createArg().setValue("-schemainfo");
         }
@@ -177,6 +197,15 @@ public class SchemaToolTask extends Java
     }
 
     /**
+     * Set the schema name (for use with CREATE_SCHEMA/DELETE_SCHEMA methods).
+     * @param schemaName Name of the schema
+     */
+    public void setSchemaName(String schemaName)
+    {
+        this.schemaName = schemaName;
+    }
+
+    /**
      * Mutator for whether to output complete DDL.
      * @param complete Whether to give complete DDL
      */
@@ -239,29 +268,37 @@ public class SchemaToolTask extends Java
         {
             return;
         }
-        if (mode.equalsIgnoreCase("create"))
+        if (mode.equalsIgnoreCase("createSchema"))
         {
-            this.runMode = SchemaTool.SCHEMATOOL_CREATE_MODE;
+            this.mode = Mode.CREATE_SCHEMA;
+        }
+        else if (mode.equalsIgnoreCase("deleteSchema"))
+        {
+            this.mode = Mode.DELETE_SCHEMA;
+        }
+        else if (mode.equalsIgnoreCase("create"))
+        {
+            this.mode = Mode.CREATE;
         }
         else if (mode.equalsIgnoreCase("delete"))
         {
-            this.runMode = SchemaTool.SCHEMATOOL_DELETE_MODE;
+            this.mode = Mode.DELETE;
         }
         else if (mode.equalsIgnoreCase("deletecreate"))
         {
-            this.runMode = SchemaTool.SCHEMATOOL_DELETECREATE_MODE;
+            this.mode = Mode.DELETE_CREATE;
         }
         else if (mode.equalsIgnoreCase("validate"))
         {
-            this.runMode = SchemaTool.SCHEMATOOL_VALIDATE_MODE;
+            this.mode = Mode.VALIDATE;
         }
         else if (mode.equalsIgnoreCase("dbinfo"))
         {
-            this.runMode = SchemaTool.SCHEMATOOL_DATABASE_INFO_MODE;
+            this.mode = Mode.DATABASE_INFO;
         }        
         else if (mode.equalsIgnoreCase("schemainfo"))
         {
-            this.runMode = SchemaTool.SCHEMATOOL_SCHEMA_INFO_MODE;
+            this.mode = Mode.SCHEMA_INFO;
         }        
         else
         {
