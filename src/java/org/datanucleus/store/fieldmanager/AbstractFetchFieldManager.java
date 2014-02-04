@@ -19,8 +19,6 @@ package org.datanucleus.store.fieldmanager;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 
 /**
@@ -55,62 +53,5 @@ public abstract class AbstractFetchFieldManager extends AbstractFieldManager
     {
         this.ec = ec;
         this.cmd = cmd;
-    }
-
-    protected boolean isMemberEmbedded(AbstractMemberMetaData mmd, AbstractMemberMetaData ownerMmd, RelationType relationType)
-    {
-
-        boolean embedded = false;
-        if (relationType != RelationType.NONE)
-        {
-            // Determine if this relation field is embedded
-            if (RelationType.isRelationSingleValued(relationType))
-            {
-                if (ownerMmd != null && ownerMmd.getEmbeddedMetaData() != null)
-                {
-                    // Is this a nested embedded (from JDO definition) with specification for this field?
-                    AbstractMemberMetaData[] embMmds = ownerMmd.getEmbeddedMetaData().getMemberMetaData();
-                    if (embMmds != null)
-                    {
-                        for (int i=0;i<embMmds.length;i++)
-                        {
-                            if (embMmds[i].getName().equals(mmd.getName()))
-                            {
-                                embedded = true;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (mmd.isEmbedded() || mmd.getEmbeddedMetaData() != null)
-            {
-                // Does this field have @Embedded definition?
-                embedded = true;
-            }
-            else if (RelationType.isRelationMultiValued(relationType))
-            {
-                // Is this an embedded element/key/value?
-                if (mmd.hasCollection() && mmd.getElementMetaData() != null && mmd.getElementMetaData().getEmbeddedMetaData() != null)
-                {
-                    // Embedded collection element
-                    embedded = true;
-                }
-                else if (mmd.hasArray() && mmd.getElementMetaData() != null && mmd.getElementMetaData().getEmbeddedMetaData() != null)
-                {
-                    // Embedded array element
-                    embedded = true;
-                }
-                else if (mmd.hasMap() && 
-                        ((mmd.getKeyMetaData() != null && mmd.getKeyMetaData().getEmbeddedMetaData() != null) || 
-                        (mmd.getValueMetaData() != null && mmd.getValueMetaData().getEmbeddedMetaData() != null)))
-                {
-                    // Embedded map key/value
-                    embedded = true;
-                }
-            }
-        }
-
-        return embedded;
     }
 }

@@ -21,7 +21,6 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
-import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 
 /**
@@ -44,69 +43,6 @@ public abstract class AbstractStoreFieldManager extends AbstractFieldManager
         this.op = op;
         this.cmd = op.getClassMetaData();
         this.insert = insert;
-    }
-
-    /**
-     * Convenience method to return if the specified member is embedded.
-     * @param mmd Metadata for the member we are interested in
-     * @param relationType Relation type of the member we are interested in
-     * @param ownerMmd Optional metadata for the owner member (for nested embeddeds only. Set to null if not relevant to the member in question).
-     * @return Whether the member is embedded
-     */
-    protected boolean isMemberEmbedded(AbstractMemberMetaData mmd, RelationType relationType, AbstractMemberMetaData ownerMmd)
-    {
-        boolean embedded = false;
-        if (relationType != RelationType.NONE)
-        {
-            // Determine if this relation field is embedded
-            if (RelationType.isRelationSingleValued(relationType))
-            {
-                if (ownerMmd != null && ownerMmd.getEmbeddedMetaData() != null)
-                {
-                    // Is this a nested embedded (from JDO definition) with specification for this field?
-                    AbstractMemberMetaData[] embMmds = ownerMmd.getEmbeddedMetaData().getMemberMetaData();
-                    if (embMmds != null)
-                    {
-                        for (int i=0;i<embMmds.length;i++)
-                        {
-                            if (embMmds[i].getName().equals(mmd.getName()))
-                            {
-                                embedded = true;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (mmd.isEmbedded() || mmd.getEmbeddedMetaData() != null)
-            {
-                // Does this field have @Embedded definition?
-                embedded = true;
-            }
-            else if (RelationType.isRelationMultiValued(relationType))
-            {
-                // Is this an embedded element/key/value?
-                if (mmd.hasCollection() && mmd.getElementMetaData() != null && mmd.getElementMetaData().getEmbeddedMetaData() != null)
-                {
-                    // Embedded collection element
-                    embedded = true;
-                }
-                else if (mmd.hasArray() && mmd.getElementMetaData() != null && mmd.getElementMetaData().getEmbeddedMetaData() != null)
-                {
-                    // Embedded array element
-                    embedded = true;
-                }
-                else if (mmd.hasMap() && 
-                        ((mmd.getKeyMetaData() != null && mmd.getKeyMetaData().getEmbeddedMetaData() != null) || 
-                        (mmd.getValueMetaData() != null && mmd.getValueMetaData().getEmbeddedMetaData() != null)))
-                {
-                    // Embedded map key/value
-                    embedded = true;
-                }
-            }
-        }
-
-        return embedded;
     }
 
     protected boolean isStorable(int fieldNumber)
