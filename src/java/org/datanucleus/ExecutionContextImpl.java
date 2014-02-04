@@ -3501,7 +3501,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         else
         {
             // We dont know the object class so try to deduce it from what is known by the StoreManager
-            originalClassName = getStoreManager().getClassNameForObjectID(id, clr, this);
+            originalClassName = getClassNameForObjectId(id);
             checkedClassName = true;
         }
 
@@ -3509,8 +3509,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (checkInheritance)
         {
             // Validate the inheritance level
-            className =
-                (checkedClassName ? originalClassName : getStoreManager().getClassNameForObjectID(id, clr, this));
+            className = (checkedClassName ? originalClassName : getClassNameForObjectId(id));
             if (className == null)
             {
                 throw new NucleusObjectNotFoundException(LOCALISER.msg("010026"), id);
@@ -3571,6 +3570,48 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             className = originalClassName;
         }
         return new ClassDetailsForId(id, className, pc);
+    }
+
+    protected String getClassNameForObjectId(Object id)
+    {
+        String className = null;
+        ApiAdapter api = getApiAdapter();
+        if (api.isDatastoreIdentity(id) || api.isSingleFieldIdentity(id))
+        {
+            // OID or SingleFieldIdentity, so check that the implied class is managed
+            className = getStoreManager().manageClassForIdentity(id, clr);
+        }
+        else
+        {
+            // User-provided PK TODO Search for this
+        }
+
+        if (className != null)
+        {
+            String[] subclasses = getMetaDataManager().getConcreteSubclassesForClass(className);
+            int numConcrete = 0;
+            String concreteClassName = null;
+            if (subclasses != null && subclasses.length > 0)
+            {
+                numConcrete = subclasses.length;
+                concreteClassName = subclasses[0];
+            }
+            Class rootCls = clr.classForName(className);
+            if (!Modifier.isAbstract(rootCls.getModifiers()))
+            {
+                concreteClassName = className;
+                numConcrete++;
+            }
+            if (numConcrete == 1)
+            {
+                NucleusLogger.GENERAL.info(">> findById " + id + " has single concrete class applicable = " + concreteClassName); // TODO Remove this debug (NUCCORE-1113)
+                // Single possible concrete class, so return it
+                return concreteClassName;
+            }
+        }
+
+        // If we have multiple possible classes then refer to the datastore to resolve it
+        return getStoreManager().getClassNameForObjectID(id, clr, this);
     }
 
     /**
