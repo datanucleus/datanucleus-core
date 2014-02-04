@@ -1,10 +1,10 @@
 /**********************************************************************
-Copyright (c) 2012 Andy Jefferson and others. All rights reserved.
+Copyright (c) 2014 Andy Jefferson and others. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,22 +13,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 Contributors:
-   ...
+    ...
 **********************************************************************/
 package org.datanucleus.store.fieldmanager;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 
 /**
- * Abstract field manager for storage of objects.
+ * Abstract field manager for retrieval of objects.
  * To be extended by store plugins.
  */
-public abstract class AbstractStoreFieldManager extends AbstractFieldManager
+public abstract class AbstractFetchFieldManager extends AbstractFieldManager
 {
     protected ExecutionContext ec;
 
@@ -36,25 +35,31 @@ public abstract class AbstractStoreFieldManager extends AbstractFieldManager
 
     protected AbstractClassMetaData cmd;
 
-    protected boolean insert;
-
-    public AbstractStoreFieldManager(ObjectProvider op, boolean insert)
+    /**
+     * Constructor to use when retrieving values of fields of existing objects.
+     * @param op ObjectProvider for the object
+     */
+    public AbstractFetchFieldManager(ObjectProvider op)
     {
-        this.ec = op.getExecutionContext();
         this.op = op;
+        this.ec = op.getExecutionContext();
         this.cmd = op.getClassMetaData();
-        this.insert = insert;
     }
 
     /**
-     * Convenience method to return if the specified member is embedded.
-     * @param mmd Metadata for the member we are interested in
-     * @param relationType Relation type of the member we are interested in
-     * @param ownerMmd Optional metadata for the owner member (for nested embeddeds only. Set to null if not relevant to the member in question).
-     * @return Whether the member is embedded
+     * Constructor to use when creating new objects of the specified type, say from a query.
+     * @param ec ExecutionContext
+     * @param cmd Metadata for the class
      */
-    protected boolean isMemberEmbedded(AbstractMemberMetaData mmd, RelationType relationType, AbstractMemberMetaData ownerMmd)
+    public AbstractFetchFieldManager(ExecutionContext ec, AbstractClassMetaData cmd)
     {
+        this.ec = ec;
+        this.cmd = cmd;
+    }
+
+    protected boolean isMemberEmbedded(AbstractMemberMetaData mmd, AbstractMemberMetaData ownerMmd, RelationType relationType)
+    {
+
         boolean embedded = false;
         if (relationType != RelationType.NONE)
         {
@@ -107,29 +112,5 @@ public abstract class AbstractStoreFieldManager extends AbstractFieldManager
         }
 
         return embedded;
-    }
-
-    protected boolean isStorable(int fieldNumber)
-    {
-        AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-        return isStorable(mmd);
-    }
-
-    protected boolean isStorable(AbstractMemberMetaData mmd)
-    {
-        if (mmd.getPersistenceModifier() != FieldPersistenceModifier.PERSISTENT)
-        {
-            // Member not persistent so ignore
-            return false;
-        }
-
-        if ((insert && mmd.isInsertable()) || (!insert && mmd.isUpdateable()))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
     }
 }
