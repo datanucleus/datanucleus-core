@@ -378,22 +378,6 @@ public interface MetaDataManager
     ClassMetaData getClassMetaDataForImplementationOfPersistentInterface(String interfaceName);
 
     /**
-     * Method to register a persistent interface and its implementation with the MetaData system.
-     * @param imd MetaData for the interface
-     * @param implClass The implementation class
-     * @param clr ClassLoader Resolver to use
-     */
-    void registerPersistentInterface(InterfaceMetaData imd, Class implClass, ClassLoaderResolver clr);
-
-    /**
-     * Method to register the metadata for an implementation of a persistent abstract class.
-     * @param cmd MetaData for the abstract class
-     * @param implClass The implementation class
-     * @param clr ClassLoader resolver
-     */
-    void registerImplementationOfAbstractClass(ClassMetaData cmd, Class implClass, ClassLoaderResolver clr);
-
-    /**
      * Method to parse all available "persistence.xml" files and return the metadata
      * for the persistence unit with the specified name.
      * @param unitName Name of the persistence-unit
@@ -410,29 +394,14 @@ public interface MetaDataManager
      */
     void registerFile(String fileURLString, FileMetaData filemd, ClassLoaderResolver clr);
 
-    /**
-     * Method to register a discriminator value (when using VALUE_MAP strategy) for the specified class.
-     * @param cmd Metadata for the class
-     * @param discrimValue The value to register against this class
-     */
-    void registerDiscriminatorValueForClass(AbstractClassMetaData cmd, String discrimValue);
-
     String getClassNameForDiscriminatorValueWithRoot(AbstractClassMetaData rootCmd, String discrimValue);
 
     String getDiscriminatorValueForClass(AbstractClassMetaData cmd, String discrimValue);
 
-    /**
-     * Convenience method that takes a result set that contains a discriminator column and returns
-     * the class name that it represents.
-     * @param discrimValue Discriminator value
-     * @param dismd Metadata for the discriminator at the root (defining the strategy)
-     * @return The class name for the object represented by this value
-     */
     String getClassNameFromDiscriminatorValue(String discrimValue, DiscriminatorMetaData dismd);
 
     /**
-     * Convenience method to get the MetaData for all referenced classes with the passed set of 
-     * classes as root.
+     * Convenience method to get the MetaData for all referenced classes with the passed set of classes as root.
      * @param classNames Names of the root classes
      * @param clr ClassLoader resolver
      * @return List of AbstractClassMetaData objects for the referenced classes
@@ -447,10 +416,30 @@ public interface MetaDataManager
      */
     boolean isFieldTypePersistable(Class type);
 
+    /**
+     * Method to register a persistent interface and its implementation with the MetaData system.
+     * This is called by the JDOImplementationCreator.
+     * @param imd MetaData for the interface
+     * @param implClass The implementation class
+     * @param clr ClassLoader Resolver to use
+     */
+    void registerPersistentInterface(InterfaceMetaData imd, Class implClass, ClassLoaderResolver clr);
+
+    /**
+     * Method to register the metadata for an implementation of a persistent abstract class.
+     * This is called by the JDOImplementationCreator.
+     * @param cmd MetaData for the abstract class
+     * @param implClass The implementation class
+     * @param clr ClassLoader resolver
+     */
+    void registerImplementationOfAbstractClass(ClassMetaData cmd, Class implClass, ClassLoaderResolver clr);
+
     // These methods are part of the internal load process so ought to be protected/private
+
     void addORMDataToClass(Class c, ClassLoaderResolver clr);
     void addAnnotationsDataToClass(Class c, AbstractClassMetaData cmd, ClassLoaderResolver clr);
     void abstractClassMetaDataInitialised(AbstractClassMetaData acmd);
     void registerSequencesForFile(FileMetaData filemd);
     void registerTableGeneratorsForFile(FileMetaData filemd);
+    void registerDiscriminatorValueForClass(AbstractClassMetaData cmd, String discrimValue);
 }
