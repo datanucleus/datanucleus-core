@@ -5896,7 +5896,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param name Name of the group
      * @return The FetchGroup
      */
-    public Set getFetchGroupsWithName(String name)
+    public Set<FetchGroup> getFetchGroupsWithName(String name)
     {
         if (fetchGrpMgr == null)
         {

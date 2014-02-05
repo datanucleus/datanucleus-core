@@ -921,7 +921,7 @@ public interface ExecutionContext
      * @param name Name of the group
      * @return The FetchGroup
      */
-    Set getFetchGroupsWithName(String name);
+    Set<FetchGroup> getFetchGroupsWithName(String name);
 
     /**
      * Accessor for the lock object for this ExecutionContext.
@@ -1024,8 +1024,8 @@ public interface ExecutionContext
         public int getOwnerFieldNum() {return ownerFieldNum;}
     }
 
-    void setObjectProviderAssociatedValue(ObjectProvider op,Object key, Object value);
-    Object getObjectProviderAssociatedValue(ObjectProvider op,Object key);
-    void removeObjectProviderAssociatedValue(ObjectProvider op,Object key);
+    void setObjectProviderAssociatedValue(ObjectProvider op, Object key, Object value);
+    Object getObjectProviderAssociatedValue(ObjectProvider op, Object key);
+    void removeObjectProviderAssociatedValue(ObjectProvider op, Object key);
     boolean containsObjectProviderAssociatedValue(ObjectProvider op, Object key);
 }
