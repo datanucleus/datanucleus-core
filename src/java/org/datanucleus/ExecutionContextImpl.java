@@ -3583,7 +3583,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
         else
         {
-            // User-provided PK TODO Search for this
+            Collection<AbstractClassMetaData> cmds = getMetaDataManager().getClassMetaDataWithApplicationId(id.getClass().getName());
+            if (cmds != null && cmds.size() == 1)
+            {
+                // Only 1 possible class using this id type, so return it
+                return cmds.iterator().next().getFullClassName();
+            }
         }
 
         if (className != null)
