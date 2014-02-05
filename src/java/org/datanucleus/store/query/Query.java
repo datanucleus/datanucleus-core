@@ -44,6 +44,7 @@ import org.datanucleus.exceptions.NucleusUnsupportedOptionException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.exceptions.TransactionNotActiveException;
 import org.datanucleus.exceptions.TransactionNotReadableException;
+import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.QueryResultMetaData;
 import org.datanucleus.query.JDOQLQueryHelper;
 import org.datanucleus.query.QueryUtils;
@@ -685,6 +686,33 @@ public abstract class Query implements Serializable, ExecutionContextListener
     public String getCandidateClassName()
     {
         return candidateClassName;
+    }
+
+    protected AbstractClassMetaData getCandidateClassMetaData()
+    {
+        AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(candidateClass, clr);
+        if (candidateClass.isInterface())
+        {
+            // Query of interface
+            String[] impls = ec.getMetaDataManager().getClassesImplementingInterface(candidateClass.getName(), clr);
+            if (impls.length == 1 && cmd.isImplementationOfPersistentDefinition())
+            {
+                // Only the generated implementation, so just use its metadata
+            }
+            else
+            {
+                // Use metadata for the persistent interface
+                cmd = ec.getMetaDataManager().getMetaDataForInterface(candidateClass, clr);
+                if (cmd == null)
+                {
+                    throw new NucleusUserException("Attempting to query an interface yet it is not declared 'persistent'." +
+                        " Define the interface in metadata as being persistent to perform this operation, and make sure" +
+                        " any implementations use the same identity and identity member(s)");
+                }
+            }
+        }
+
+        return cmd;
     }
 
     /**
