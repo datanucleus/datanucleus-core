@@ -370,39 +370,12 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.metadata.MetaDataManager#getAllowMetaDataLoad()
-     */
-    @Override
-    public boolean getAllowMetaDataLoad()
-    {
-        return allowMetaDataLoad;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.metadata.MetaDataManager#isAllowXML()
-     */
-    @Override
-    public boolean isAllowXML()
-    {
-        return allowXML;
-    }
-
-    /* (non-Javadoc)
      * @see org.datanucleus.metadata.MetaDataManager#setAllowXML(boolean)
      */
     @Override
     public void setAllowXML(boolean allow)
     {
         this.allowXML = allow;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.metadata.MetaDataManager#isAllowAnnotations()
-     */
-    @Override
-    public boolean isAllowAnnotations()
-    {
-        return allowAnnotations;
     }
 
     /* (non-Javadoc)
@@ -2007,36 +1980,6 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         }
 
         return cmd;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.metadata.MetaDataManager#getMetaDataForMember(java.lang.String, java.lang.String, org.datanucleus.ClassLoaderResolver)
-     */
-    @Override
-    public AbstractMemberMetaData getMetaDataForMember(String className, String memberName, ClassLoaderResolver clr)
-    {
-        if (className == null || memberName == null)
-        {
-            return null;
-        }
-
-        AbstractClassMetaData cmd = getMetaDataForClass(className, clr);
-        return (cmd != null ? cmd.getMetaDataForMember(memberName) : null);
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.metadata.MetaDataManager#getMetaDataForMember(java.lang.Class, org.datanucleus.ClassLoaderResolver, java.lang.String)
-     */
-    @Override
-    public AbstractMemberMetaData getMetaDataForMember(Class c, ClassLoaderResolver clr, String memberName)
-    {
-        if (c == null || memberName == null)
-        {
-            return null;
-        }
-
-        AbstractClassMetaData cmd = getMetaDataForClass(c, clr);
-        return (cmd != null ? cmd.getMetaDataForMember(memberName) : null);
     }
 
     /* (non-Javadoc)

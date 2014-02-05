@@ -39,6 +39,8 @@ public interface MetaDataManager
 
     ApiAdapter getApiAdapter();
 
+    AnnotationManager getAnnotationManager();
+
     /**
      * Method to register a listener to be notified when metadata for a class/interface is initialised.
      * @param listener The listener
@@ -51,30 +53,11 @@ public interface MetaDataManager
      */
     void deregisterListener(MetaDataListener listener);
 
-    boolean getAllowMetaDataLoad();
-
     void setAllowMetaDataLoad(boolean allow);
-
-    boolean isAllowAnnotations();
-
-    boolean isAllowXML();
 
     void setAllowXML(boolean allow);
 
     void setAllowAnnotations(boolean allow);
-
-    /**
-     * Accessor for whether the MetaData manager supports ORM concepts and metadata.
-     * With object datastores this will return false.
-     * @return Whether we support ORM
-     */
-    boolean supportsORM();
-
-    /**
-     * Accessor for whether we are managing the enhancement process.
-     * @return Whether we are enhancing
-     */
-    boolean isEnhancing();
 
     /**
      * Mutator for whether to validate the MetaData files for XML compliance.
@@ -88,7 +71,18 @@ public interface MetaDataManager
      */
     void setXmlNamespaceAware(boolean aware);
 
-    AnnotationManager getAnnotationManager();
+    /**
+     * Accessor for whether the MetaData manager supports ORM concepts and metadata.
+     * With object datastores this will return false.
+     * @return Whether we support ORM
+     */
+    boolean supportsORM();
+
+    /**
+     * Accessor for whether we are managing the enhancement process.
+     * @return Whether we are enhancing
+     */
+    boolean isEnhancing();
 
     /**
      * Method to load up all metadata defined by the specified metadata files.
@@ -135,13 +129,6 @@ public interface MetaDataManager
     void loadUserMetaData(FileMetaData fileMetaData, ClassLoader loader);
 
     /**
-     * Convenience method to allow the unloading of metadata, for example where the user wants to reload a class definition
-     * and that class maybe has different metadata with the new definition.
-     * @param className Name of the class
-     */
-    void unloadMetaDataForClass(String className);
-
-    /**
      * Method to load the metadata from the specified files.
      * Supports absolute/relative file names, or CLASSPATH resources.
      * @param metadataFiles array of MetaData files
@@ -149,6 +136,13 @@ public interface MetaDataManager
      * @return List of FileMetaData
      */
     Collection<FileMetaData> loadFiles(String[] metadataFiles, ClassLoaderResolver clr);
+
+    /**
+     * Convenience method to allow the unloading of metadata, for example where the user wants to reload a class definition
+     * and that class maybe has different metadata with the new definition.
+     * @param className Name of the class
+     */
+    void unloadMetaDataForClass(String className);
 
     /**
      * Convenience method to return if the specified class is a known persistable class.
@@ -280,26 +274,6 @@ public interface MetaDataManager
      * @return The ClassMetaData for an implementation of a reference type
      */
     ClassMetaData getMetaDataForImplementationOfReference(Class referenceClass, Object implValue, ClassLoaderResolver clr);
-
-    /**
-     * Accessor for the MetaData for a field/property of a class. 
-     * Utilises getMetaDataForClass, and then finds the relevant field/property.
-     * @param className The name of the class owning the field/property
-     * @param memberName The name of the field to find MetaData for
-     * @param clr ClassLoaderResolver resolver for any loading of classes
-     * @return The metadata for this field/property (or null if not found)
-     */
-    AbstractMemberMetaData getMetaDataForMember(String className, String memberName, ClassLoaderResolver clr);
-
-    /**
-     * Accessor for the MetaData for a field/property of a class.
-     * Utilises getMetaDataForClass, and then finds the relevant field/property.
-     * @param c The class owning the field/property
-     * @param clr the ClassLoaderResolver
-     * @param memberName The name of the field/property to find MetaData for
-     * @return The metadata for this field/property (or null if not found)
-     */
-    AbstractMemberMetaData getMetaDataForMember(Class c, ClassLoaderResolver clr, String memberName);
 
     /**
      * Accessor for the MetaData for a named query for a class.
