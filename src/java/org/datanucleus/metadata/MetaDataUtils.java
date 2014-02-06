@@ -1091,8 +1091,7 @@ public class MetaDataUtils
                                     if (embMmd.isEmbedded() || embMmd.getEmbeddedMetaData() != null)
                                     {
                                         // Embedded Field is marked in nested embedded definition as embedded
-                                        embedded = true;
-                                        break;
+                                        return true;
                                     }
                                 }
                             }
@@ -1109,7 +1108,7 @@ public class MetaDataUtils
                         {
                             if (embMmds[i].getName().equals(mmd.getName()))
                             {
-                                embedded = true;
+                                return true;
                             }
                         }
                     }
