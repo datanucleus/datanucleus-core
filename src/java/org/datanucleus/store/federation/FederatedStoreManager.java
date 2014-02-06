@@ -215,18 +215,13 @@ public class FederatedStoreManager implements StoreManager
         return getStoreManagerForClass(cmd);
     }
 
-    public void addClass(String className, ClassLoaderResolver clr)
-    {
-        getStoreManagerForClass(className, clr).addClass(className, clr);
-    }
-
-    public void addClasses(String[] classNames, ClassLoaderResolver clr)
+    public void manageClasses(ClassLoaderResolver clr, String... classNames)
     {
         if (classNames != null)
         {
             for (int i=0;i<classNames.length;i++)
             {
-                addClass(classNames[i], clr);
+                getStoreManagerForClass(classNames[i], clr).manageClasses(clr, classNames[i]);
             }
         }
     }
@@ -340,15 +335,15 @@ public class FederatedStoreManager implements StoreManager
         primaryStoreMgr.printInformation(category, ps);        
     }
 
-    public void removeAllClasses(ClassLoaderResolver clr)
+    public void unmanageAllClasses(ClassLoaderResolver clr)
     {
-        primaryStoreMgr.removeAllClasses(clr);
+        primaryStoreMgr.unmanageAllClasses(clr);
         if (secondaryStoreMgrMap != null)
         {
             Collection<StoreManager> secStoreMgrs = secondaryStoreMgrMap.values();
             for (StoreManager storeMgr : secStoreMgrs)
             {
-                storeMgr.removeAllClasses(clr);
+                storeMgr.unmanageAllClasses(clr);
             }
         }
     }

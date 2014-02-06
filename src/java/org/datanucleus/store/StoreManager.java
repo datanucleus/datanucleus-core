@@ -149,50 +149,50 @@ public interface StoreManager
     ManagedConnection getConnection(ExecutionContext ec, Map options);
 
     /**
-     * Convenience accessor for the driver name to use for the connection.
-     * @return driver name
-     */
-    String getConnectionDriverName();
-
-    /**
      * Convenience accessor for the URL for the connection.
      * @return connection URL
      */
     String getConnectionURL();
 
     /**
-     * Convenience accessor for the user name to use for the connection.
+     * Convenience accessor for the driver name to use for the connection (where supported).
+     * @return driver name
+     */
+    String getConnectionDriverName();
+
+    /**
+     * Convenience accessor for the user name to use for the connection (where required).
      * @return user name
      */
     String getConnectionUserName();
 
     /**
-     * Convenience accessor for the password to use for the connection.
+     * Convenience accessor for the password to use for the connection (where required).
      * @return Password
      */
     String getConnectionPassword();
 
     /**
-     * Convenience accessor for the factory for the connection (transactional).
-     * @return Connection Factory (transactional)
+     * Convenience accessor for the primary connection factory.
+     * @return Connection Factory (primary)
      */
     Object getConnectionFactory();
 
     /**
-     * Convenience accessor for the factory name for the connection (transactional).
-     * @return Connection Factory name (transactional)
+     * Convenience accessor for the factory name for the primary connection factory.
+     * @return Connection Factory name (primary)
      */
     String getConnectionFactoryName();
 
     /**
-     * Convenience accessor for the factory for the connection (non-transactional).
-     * @return Connection Factory (non-transactional)
+     * Convenience accessor for the secondary connection factory.
+     * @return Connection Factory (secondary)
      */
     Object getConnectionFactory2();
 
     /**
-     * Convenience accessor for the factory name for the connection (non-transactional).
-     * @return Connection Factory name (non-transactional)
+     * Convenience accessor for the factory name for the secondary connection factory.
+     * @return Connection Factory name (secondary)
      */
     String getConnectionFactory2Name();
 
@@ -265,24 +265,16 @@ public interface StoreManager
     boolean managesClass(String className);
 
     /**
-     * Method to add a class to the managed list for this datastore manager.
-     * @param className Name of the class
-     * @param clr The ClassLoaderResolver
-     */
-    void addClass(String className, ClassLoaderResolver clr);
-
-    /**
-     * Add classes to the persistence model for the datastore.
-     * <p>
+     * Manage the specified classes.
      * This method is primarily useful for applications that wish to perform all
      * of their datastore initialization up front, rather than wait for the runtime to do it on-demand.
-     * @param classNames The class(es) to be added.
      * @param clr The ClassLoaderResolver
+     * @param classNames The class(es) to be managed
      * @exception org.datanucleus.store.exceptions.DatastoreValidationException
      *      If there is some mismatch between the current datastore contents and
      *      those necessary to enable persistence of the given classes.
      */
-    void addClasses(String[] classNames, ClassLoaderResolver clr);
+    void manageClasses(ClassLoaderResolver clr, String... classNames);
 
     /**
      * Remove all classes from the persistence model for the datastore.
@@ -291,7 +283,7 @@ public interface StoreManager
      * In the case of RDBMS this means drop all tables for types managed by us.
      * @param clr The ClassLoaderResolver
      */
-    void removeAllClasses(ClassLoaderResolver clr);
+    void unmanageAllClasses(ClassLoaderResolver clr);
 
     /**
      * Convenience method to ensure that the class defined by the passed OID/SingleFIeldIdentity is 

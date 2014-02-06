@@ -945,19 +945,11 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     {
         return storeDataMgr.managesClass(className);
     }
-    
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#addClass(java.lang.String, org.datanucleus.ClassLoaderResolver)
-     */
-    public void addClass(String className, ClassLoaderResolver clr)
-    {
-        addClasses(new String[] {className}, clr);
-    }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#addClasses(java.lang.String[], org.datanucleus.ClassLoaderResolver)
+     * @see org.datanucleus.store.StoreManager#addClasses(org.datanucleus.ClassLoaderResolver, java.lang.String[])
      */
-    public void addClasses(String[] classNames, ClassLoaderResolver clr)
+    public void manageClasses(ClassLoaderResolver clr, String... classNames)
     {
         if (classNames == null)
         {
@@ -997,7 +989,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#removeAllClasses(org.datanucleus.ClassLoaderResolver)
      */
-    public void removeAllClasses(ClassLoaderResolver clr)
+    public void unmanageAllClasses(ClassLoaderResolver clr)
     {
         // Do nothing.
     }
@@ -1036,7 +1028,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         // If the class is not yet managed, manage it
         if (!managesClass(className))
         {
-            addClass(className, clr);
+            manageClasses(clr, className);
         }
 
         return className;
@@ -1058,7 +1050,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         // Create Extent using JDOQL query
         if (!managesClass(c.getName()))
         {
-            addClass(c.getName(), ec.getClassLoaderResolver());
+            manageClasses(ec.getClassLoaderResolver(), c.getName());
         }
         return new DefaultCandidateExtent(ec, c, subclasses, cmd);
     }
@@ -1690,7 +1682,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 if (!storeDataMgr.managesClass(subclassNames[i]))
                 {
                     // We have no knowledge of this class so load it now
-                    addClass(subclassNames[i], clr);
+                    manageClasses(clr, subclassNames[i]);
                 }
                 subclasses.add(subclassNames[i]);
             }

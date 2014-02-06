@@ -3796,7 +3796,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         // If the class is not yet managed, manage it
         if (!getStoreManager().managesClass(cmd.getFullClassName()))
         {
-            getStoreManager().addClass(cmd.getFullClassName(), clr);
+            getStoreManager().manageClasses(clr, cmd.getFullClassName());
         }
 
         IdentityKeyTranslator translator = getNucleusContext().getIdentityKeyTranslator();

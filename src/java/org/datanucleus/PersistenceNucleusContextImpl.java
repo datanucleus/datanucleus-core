@@ -281,7 +281,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         {
             // User is using a persistence-unit, so load up its persistence-unit classes into StoreManager
             Collection<String> loadedClasses = getMetaDataManager().getClassesWithMetaData();
-            this.storeMgr.addClasses(loadedClasses.toArray(new String[loadedClasses.size()]), clr);
+            this.storeMgr.manageClasses(clr, loadedClasses.toArray(new String[loadedClasses.size()]));
         }
         // ==========================================================
 
@@ -520,7 +520,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 // Load the classes into the StoreManager
                 try
                 {
-                    storeMgr.addClasses(classesToLoad, clr);
+                    storeMgr.manageClasses(clr, classesToLoad);
                 }
                 catch (Exception e)
                 {
