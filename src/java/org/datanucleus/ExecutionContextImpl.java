@@ -425,7 +425,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         }
 
-        if (getDetachOnClose())
+        if (getBooleanProperty(PropertyNames.PROPERTY_DETACH_ON_CLOSE))
         {
             // "detach-on-close", detaching all currently cached objects.
             performDetachOnClose();
@@ -734,6 +734,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return getNucleusContext().getTypeManager();
     }
 
+    public MetaDataManager getMetaDataManager()
+    {
+        return getNucleusContext().getMetaDataManager();
+    }
+
     public LockManager getLockManager()
     {
         if (lockMgr == null)
@@ -743,42 +748,24 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return lockMgr;
     }
 
-    /**
-     * Acessor for the current FetchPlan.
-     * @return FetchPlan
-     */
     public FetchPlan getFetchPlan()
     {
         assertIsOpen();
         return fetchPlan;
     }
 
-    /**
-     * Method to return the owner PM object.
-     * @return The owner manager object
-     */
-    public Object getOwner()
-    {
-        return owner;
-    }
-
-    /**
-     * Gets the context in which this context is running
-     * @return Returns the context.
-     */
     public PersistenceNucleusContext getNucleusContext()
     {
         return nucCtx;
     }
 
     /**
-     * Accessor for the MetaDataManager for this context (and its factory).
-     * This is used as the interface to MetaData in the context/Factory.
-     * @return Returns the MetaDataManager.
+     * Accessor for the owner of this ExecutionContext. This will typically be a PersistenceManager (JDO) or a dummy PersistenceManager representing an EntityManager (JPA).
+     * @return The owner
      */
-    public MetaDataManager getMetaDataManager()
+    public Object getOwner()
     {
-        return getNucleusContext().getMetaDataManager();
+        return owner;
     }
 
     /* (non-Javadoc)
@@ -910,24 +897,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Accessor for the datastore read timeout in milliseconds.
-     * @return Datastore read timeout in milliseconds (if specified)
-     */
-    public Integer getDatastoreReadTimeoutMillis()
-    {
-        return properties.getIntProperty(PropertyNames.PROPERTY_DATASTORE_READ_TIMEOUT.toLowerCase(Locale.ENGLISH));
-    }
-
-    /**
-     * Accessor for the datastore write timeout in milliseconds.
-     * @return Datastore write timeout in milliseconds (if specified)
-     */
-    public Integer getDatastoreWriteTimeoutMillis()
-    {
-        return properties.getIntProperty(PropertyNames.PROPERTY_DATASTORE_WRITE_TIMEOUT.toLowerCase(Locale.ENGLISH));
-    }
-
-    /**
      * Accessor for whether the object manager is multithreaded.
      * @return Whether to run multithreaded.
      */
@@ -937,58 +906,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Accessor for whether to detach objects on close of the context.
-     * <b>This is not suitable for use in JCA mode.</b>
-     * @return Whether to detach on close.
-     */
-    protected boolean getDetachOnClose()
-    {
-        return properties.getBooleanProperty(PropertyNames.PROPERTY_DETACH_ON_CLOSE.toLowerCase(Locale.ENGLISH));
-    }
-
-    /**
-     * Accessor for whether to detach all objects on commit of the transaction.
-     * @return Whether to detach all on commit.
-     */
-    protected boolean getDetachAllOnCommit()
-    {
-        return properties.getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_COMMIT.toLowerCase(Locale.ENGLISH));
-    }
-
-    /**
-     * Accessor for whether to detach all objects on rollback of the transaction.
-     * @return Whether to detach all on rollback.
-     */
-    protected boolean getDetachAllOnRollback()
-    {
-        return properties.getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_ROLLBACK.toLowerCase(Locale.ENGLISH));
-    }
-
-    /**
      * Accessor for whether to run the reachability algorithm at commit time.
      * @return Whether to run PBR at commit
      */
     protected boolean getReachabilityAtCommit()
     {
         return properties.getBooleanProperty(PropertyNames.PROPERTY_PERSISTENCE_BY_REACHABILITY_AT_COMMIT.toLowerCase(Locale.ENGLISH));
-    }
-
-    /**
-     * Accessor for whether to copy on attaching.
-     * @return Whether to copy on attaching
-     */
-    public boolean getCopyOnAttach()
-    {
-        return properties.getBooleanProperty(PropertyNames.PROPERTY_COPY_ON_ATTACH.toLowerCase(Locale.ENGLISH));
-    }
-
-    /**
-     * Accessor for whether to ignore the cache.
-     * @return Whether to ignore the cache.
-     */
-    public boolean getIgnoreCache()
-    {
-        return properties.getBooleanProperty(PropertyNames.PROPERTY_IGNORE_CACHE.toLowerCase(Locale.ENGLISH));
     }
 
     /**
@@ -1569,7 +1492,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 performLevel2CacheUpdateAtCommit();
             }
 
-            if (getDetachAllOnCommit())
+            if (getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_COMMIT))
             {
                 // "detach-on-commit"
                 performDetachAllOnTxnEndPreparation();
@@ -2131,7 +2054,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 // Detached : attach it
                 assertDetachable(obj);
-                if (getCopyOnAttach())
+                if (getBooleanProperty(PropertyNames.PROPERTY_COPY_ON_ATTACH))
                 {
                     // Attach a copy and return the copy
                     persistedPc = attachObjectCopy(ownerOP, obj, api.getIdForObject(obj) == null);
@@ -4296,7 +4219,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 performLevel2CacheUpdateAtCommit();
             }
 
-            if (getDetachAllOnCommit())
+            if (getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_COMMIT))
             {
                 // "detach-on-commit"
                 performDetachAllOnTxnEndPreparation();
@@ -4746,7 +4669,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 lock.lock();
             }
 
-            if (getDetachAllOnCommit())
+            if (getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_COMMIT))
             {
                 // Detach-all-on-commit
                 performDetachAllOnTxnEnd();
@@ -4770,7 +4693,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                             ops[i].postCommit(getTransaction());
 
                             // TODO Change this check so that we remove all objects that are no longer suitable for caching
-                            if (getDetachAllOnCommit() && api.isDetachable(ops[i].getObject()))
+                            if (getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_COMMIT) && api.isDetachable(ops[i].getObject()))
                             {
                                 // "DetachAllOnCommit" - Remove the object from the L1 cache since it is now detached
                                 removeObjectProvider(ops[i]);
@@ -4851,7 +4774,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 throw new RollbackStateTransitionException((Exception[]) failures.toArray(new Exception[failures.size()]));
             }
 
-            if (getDetachAllOnRollback())
+            if (getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_ROLLBACK))
             {
                 // "detach-on-rollback"
                 performDetachAllOnTxnEndPreparation();
@@ -4879,7 +4802,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 lock.lock();
             }
 
-            if (getDetachAllOnRollback())
+            if (getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_ROLLBACK))
             {
                 // "detach-on-rollback"
                 performDetachAllOnTxnEnd();

@@ -231,9 +231,9 @@ public abstract class Query implements Serializable, ExecutionContextListener
         }
         this.clr = ec.getClassLoaderResolver();
 
-        this.ignoreCache = ec.getIgnoreCache();
-        this.readTimeoutMillis = ec.getDatastoreReadTimeoutMillis();
-        this.writeTimeoutMillis = ec.getDatastoreWriteTimeoutMillis();
+        this.ignoreCache = ec.getBooleanProperty(PropertyNames.PROPERTY_IGNORE_CACHE);
+        this.readTimeoutMillis = ec.getIntProperty(PropertyNames.PROPERTY_DATASTORE_READ_TIMEOUT);
+        this.writeTimeoutMillis = ec.getIntProperty(PropertyNames.PROPERTY_DATASTORE_WRITE_TIMEOUT);
     }
 
     /**

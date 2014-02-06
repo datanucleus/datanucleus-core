@@ -208,24 +208,6 @@ public interface ExecutionContext
     boolean isClosed();
 
     /**
-     * Accessor for whether to ignore the cache.
-     * @return Whether to ignore the cache.
-     */
-    boolean getIgnoreCache();
-
-    /**
-     * Accessor for the datastore read timeout in milliseconds.
-     * @return Datastore read timeout in milliseconds (if specified)
-     */
-    Integer getDatastoreReadTimeoutMillis();
-
-    /**
-     * Accessor for the datastore write timeout in milliseconds.
-     * @return Datastore write timeout in milliseconds (if specified)
-     */
-    Integer getDatastoreWriteTimeoutMillis();
-
-    /**
      * Method to find the ObjectProvider for the passed persistable object when it is managed by this manager.
      * @param pc The persistable object
      * @return The ObjectProvider
