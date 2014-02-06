@@ -146,7 +146,7 @@ public class PropertyNames
     public static final String PROPERTY_MAPPING = "datanucleus.mapping";
     public static final String PROPERTY_MAPPING_CATALOG = "datanucleus.mapping.Catalog";
     public static final String PROPERTY_MAPPING_SCHEMA = "datanucleus.mapping.Schema";
-    public static final String PROPERTY_TENANT_ID = "datanucleus.TenantID";
+    public static final String PROPERTY_MAPPING_TENANT_ID = "datanucleus.TenantID";
 
     public static final String PROPERTY_IDENTIFIER_CASE = "datanucleus.identifier.case";
     public static final String PROPERTY_IDENTIFIER_TABLE_PREFIX = "datanucleus.identifier.tablePrefix";

@@ -239,7 +239,7 @@ public class Configuration extends PropertyStore implements Serializable
             StringPropertyValidator.class.getName(), true, false);
         addDefaultProperty(PropertyNames.PROPERTY_MAPPING_CATALOG, null, null, null, true, false);
         addDefaultProperty(PropertyNames.PROPERTY_MAPPING_SCHEMA, null, null, null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_TENANT_ID, null, null, null, true, false);
+        addDefaultProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID, null, null, null, true, false);
 
         // ExecutionContext level features
         addDefaultBooleanProperty(PropertyNames.PROPERTY_PERSISTENCE_BY_REACHABILITY_AT_COMMIT, null, true, false, true);

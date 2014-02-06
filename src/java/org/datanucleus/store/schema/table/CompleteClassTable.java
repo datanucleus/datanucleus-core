@@ -133,7 +133,7 @@ public class CompleteClassTable implements Table
             columns.add(col);
         }
 
-        if (storeMgr.getStringProperty(PropertyNames.PROPERTY_TENANT_ID) != null)
+        if (storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID) != null)
         {
             // Multitenancy discriminator present : Add restriction for this tenant
             if ("true".equalsIgnoreCase(cmd.getValueForExtension("multitenancy-disable")))
