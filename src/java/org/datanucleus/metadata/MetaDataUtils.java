@@ -1021,4 +1021,102 @@ public class MetaDataUtils
         }
         return embedded;
     }
+
+    /**
+     * Convenience method to return if the specified member is embedded.
+     * Only applies to relation fields, since all other fields are always "embedded".
+     * @param mmd Metadata for the member we are interested in
+     * @param relationType Relation type of the member we are interested in
+     * @param ownerMmd Optional metadata for the owner member (for nested embeddeds only. Set to null if not relevant to the member in question).
+     * @return Whether the member is embedded
+     */
+    public boolean isMemberEmbedded(MetaDataManager mmgr, ClassLoaderResolver clr, AbstractMemberMetaData mmd, RelationType relationType, AbstractMemberMetaData ownerMmd)
+    {
+        boolean embedded = false;
+        if (relationType != RelationType.NONE)
+        {
+            // Determine if this relation field is embedded
+            if (RelationType.isRelationSingleValued(relationType))
+            {
+                AbstractClassMetaData mmdCmd = mmgr.getMetaDataForClass(mmd.getType(), clr);
+                if (mmdCmd != null && mmdCmd.isEmbeddedOnly())
+                {
+                    // Member type is embedded-only, so has to be embedded
+                    return true;
+                }
+            }
+            if (mmd.isEmbedded() || mmd.getEmbeddedMetaData() != null)
+            {
+                // Does this field have @Embedded definition?
+                return true;
+            }
+            else if (RelationType.isRelationMultiValued(relationType))
+            {
+                // Is this an embedded element/key/value?
+                if (mmd.hasCollection() && mmd.getElementMetaData() != null && mmd.getElementMetaData().getEmbeddedMetaData() != null)
+                {
+                    // Embedded collection element
+                    return true;
+                }
+                else if (mmd.hasArray() && mmd.getElementMetaData() != null && mmd.getElementMetaData().getEmbeddedMetaData() != null)
+                {
+                    // Embedded array element
+                    return true;
+                }
+                else if (mmd.hasMap() && 
+                        ((mmd.getKeyMetaData() != null && mmd.getKeyMetaData().getEmbeddedMetaData() != null) || 
+                        (mmd.getValueMetaData() != null && mmd.getValueMetaData().getEmbeddedMetaData() != null)))
+                {
+                    // Embedded map key/value
+                    return true;
+                }
+            }
+
+            if (RelationType.isRelationSingleValued(relationType) && ownerMmd != null)
+            {
+                // Maybe part of a nested embedded?
+                if (ownerMmd.hasCollection())
+                {
+                    // This is a field of the element of the collection, so check for any metadata spec for it
+                    EmbeddedMetaData embmd = ownerMmd.getElementMetaData().getEmbeddedMetaData();
+                    if (embmd != null)
+                    {
+                        AbstractMemberMetaData[] embMmds = embmd.getMemberMetaData();
+                        if (embMmds != null)
+                        {
+                            for (AbstractMemberMetaData embMmd : embMmds)
+                            {
+                                if (embMmd.getName().equals(mmd.getName()))
+                                {
+                                    if (embMmd.isEmbedded() || embMmd.getEmbeddedMetaData() != null)
+                                    {
+                                        // Embedded Field is marked in nested embedded definition as embedded
+                                        embedded = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (ownerMmd.getEmbeddedMetaData() != null)
+                {
+                    // Is this a nested embedded (from JDO definition) with specification for this field?
+                    AbstractMemberMetaData[] embMmds = ownerMmd.getEmbeddedMetaData().getMemberMetaData();
+                    if (embMmds != null)
+                    {
+                        for (int i=0;i<embMmds.length;i++)
+                        {
+                            if (embMmds[i].getName().equals(mmd.getName()))
+                            {
+                                embedded = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return embedded;
+    }
 }
