@@ -1924,6 +1924,12 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         return this;
     }
 
+    // TODO Drop this, and use getColumnMetaData. See spatial tests though since they don't yet allow its removal
+    public String getColumn()
+    {
+        return column;
+    }
+
     public AbstractMemberMetaData setColumn(String col)
     {
         this.column = (StringUtils.isWhitespace(col) ? null : col);
