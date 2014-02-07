@@ -35,6 +35,12 @@ import org.datanucleus.store.types.TypeManager;
 public interface NucleusContext
 {
     /**
+     * Method called when initialising the Configuration to load up defaults for the properties appropriate for this NucleusContext.
+     * @param conf The configuration
+     */
+    void applyDefaultProperties(Configuration conf);
+
+    /**
      * Method to initialise the context for use.
      * If any services are considered essential for operation then they will be enabled here, otherwise left for lazy initialisation.
      */

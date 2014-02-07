@@ -35,27 +35,24 @@ import java.util.Set;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.properties.BooleanPropertyValidator;
-import org.datanucleus.properties.CorePropertyValidator;
 import org.datanucleus.properties.IntegerPropertyValidator;
 import org.datanucleus.properties.PropertyValidator;
 import org.datanucleus.properties.PropertyStore;
-import org.datanucleus.properties.StringPropertyValidator;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.PersistenceUtils;
 
 /**
  * Class providing configuration for the context. 
- * Properties are defined in plugin.xml (aliases, default value, validators etc). 
- * Property values are stored in two maps. 
+ * Properties are defined by the context, and optionally defined in plugin.xml for any datastore/api plugins.
+ * Property values are stored in maps. 
  * <ul>
  * <li>The first is the default value for the property (where a default is defined). The default comes from
  *     either the plugin defining it, or for the API being used (overrides any plugin default).</li>
- * <li>The second is the user-provided value (where the user has provided one).</li>
+ * <li>The second is the user-provided value (where the user has provided one). This is held in the superclass PropertyStore.</li>
  * </ul>
- * Components can then access these properties using any of the convenience accessors for boolean, Boolean, long, 
- * int, Object, String types. When accessing properties the user-provided value is taken first (if available),
- * otherwise the default value is used (or null).
+ * Components can then access these properties using any of the convenience accessors for boolean, Boolean, long, int, Object, String types.
+ * When accessing properties the user-provided value is taken first (if available), otherwise the default value is used (or null).
  */
 public class Configuration extends PropertyStore implements Serializable
 {
@@ -65,11 +62,11 @@ public class Configuration extends PropertyStore implements Serializable
 
     private NucleusContext nucCtx;
 
-    /** Map of default properties, used as a fallback. */
-    private Map<String, Object> defaultProperties = new HashMap<String, Object>();
-
     /** Mapping for the properties of the plugins, PropertyMapping, keyed by the property name. */
     private Map<String, PropertyMapping> propertyMappings = new HashMap<String, PropertyMapping>();
+
+    /** Map of default properties, used as a fallback. */
+    private Map<String, Object> defaultProperties = new HashMap<String, Object>();
 
     private Map<String, PropertyValidator> propertyValidators = new HashMap();
 
@@ -94,7 +91,7 @@ public class Configuration extends PropertyStore implements Serializable
     }
 
     /**
-     * Constructor for this NucleusContext.
+     * Create a configuration object for the specified NucleusContext.
      * Initialises all basic properties with suitable defaults, including any specified in meta-data in plugins.
      * @param nucCtx NucleusContext
      */
@@ -102,233 +99,8 @@ public class Configuration extends PropertyStore implements Serializable
     {
         this.nucCtx = nucCtx;
 
-        // TODO Only load up properties for the context that is in use, so most of these are not required in enhancement context
-
-        // Plugins/ClassLoader
-        addDefaultProperty(PropertyNames.PROPERTY_PLUGIN_REGISTRY_CLASSNAME, null, null, null, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_PLUGIN_ALLOW_USER_BUNDLES, null, true, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_PLUGIN_VALIDATEPLUGINS, null, false, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_PLUGIN_REGISTRYBUNDLECHECK, null, "EXCEPTION", 
-            CorePropertyValidator.class.getName(), false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CLASSLOADER_RESOLVER_NAME, null, "datanucleus", null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY, null, null, null, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_LOCALISE_MESSAGECODES, null, false, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_LOCALISE_LANGUAGE, null, null, null, false, false);
-
-        // MetaData
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_ALWAYS_DETACHABLE, null, false, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_XML_VALIDATE, null, false, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_XML_NAMESPACE_AWARE, null, true, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_AUTOREGISTER, null, true, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_ALLOW_XML, null, true, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_ALLOW_ANNOTATIONS, null, true, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_ALLOW_LOAD_AT_RUNTIME, null, true, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_SUPPORT_ORM, null, null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_METADATA_JDO_SUFFIX, null, "jdo", null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_METADATA_ORM_SUFFIX, null, "orm", null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_METADATA_JDOQUERY_SUFFIX, null, "jdoquery", null, false, false);
-
-        // PersistenceContext level features
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_IGNORE_CACHE, null, false, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_OPTIMISTIC, null, false, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_MULTITHREADED, null, false, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_RETAIN_VALUES, null, false, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_RESTORE_VALUES, null, false, false, true);
-        addDefaultProperty(PropertyNames.PROPERTY_JMX_TYPE, null, null, null, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_ENABLE_STATISTICS, null, false, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_PMF_NAME, null, null, null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_PERSISTENCE_UNIT_NAME, null, null, null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_PERSISTENCE_XML_FILENAME, null, null, null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_SERVER_TIMEZONE_ID, null, null,
-            CorePropertyValidator.class.getName(), false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_PROPERTIES_FILE, null, null, null, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_PERSISTENCE_UNIT_LOAD_CLASSES, null, false, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_EXECUTION_CONTEXT_REAPER_THREAD, null, false, false, false);
-        addDefaultIntegerProperty(PropertyNames.PROPERTY_EXECUTION_CONTEXT_MAX_IDLE, null, 20, false, false);
-
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_OBJECT_PROVIDER_REAPER_THREAD, null, false, false, false);
-        addDefaultIntegerProperty(PropertyNames.PROPERTY_OBJECT_PROVIDER_MAX_IDLE, null, 0, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_OBJECT_PROVIDER_CLASS_NAME, null, null, null, false, false);
-
-        addDefaultProperty(PropertyNames.PROPERTY_DATASTORE_IDENTITY_TYPE, null, "datanucleus", null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_IDENTITY_STRING_TRANSLATOR_TYPE, null, null, null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_IDENTITY_KEY_TRANSLATOR_TYPE, null, null, null, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_USE_IMPLEMENTATION_CREATOR, null, true, false, false);
-
-        // Transactions
-        addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_TYPE, null, null,
-            CorePropertyValidator.class.getName(), false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_JTA_LOCATOR, null, null, null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_JTA_JNDI_LOCATION, null, null, null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION, null, "read-committed", 
-            CorePropertyValidator.class.getName(), false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_NONTX_READ, null, true, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_NONTX_WRITE, null, true, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_NONTX_ATOMIC, null, true, false, true);
-
-        // Flush process
-        addDefaultIntegerProperty(PropertyNames.PROPERTY_FLUSH_AUTO_OBJECT_LIMIT, null, 1, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_FLUSH_MODE, null, null, 
-            CorePropertyValidator.class.getName(), false, true);
-
-        // Value Generation
-        addDefaultProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ISOLATION, null, "read-committed", 
-            CorePropertyValidator.class.getName(), false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ATTRIBUTE, null, "New", 
-            CorePropertyValidator.class.getName(), false, false);
-        addDefaultIntegerProperty(PropertyNames.PROPERTY_VALUEGEN_SEQUENCE_ALLOCSIZE, null, 10, false, false);
-        addDefaultIntegerProperty(PropertyNames.PROPERTY_VALUEGEN_INCREMENT_ALLOCSIZE, null, 10, false, false);
-
-        // Bean Validation
-        addDefaultProperty(PropertyNames.PROPERTY_VALIDATION_MODE, null, "auto", 
-            CorePropertyValidator.class.getName(), false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_VALIDATION_GROUP_PREPERSIST, null, null, null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_VALIDATION_GROUP_PREUPDATE, null, null, null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_VALIDATION_GROUP_PREREMOVE, null, null, null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_VALIDATION_FACTORY, null, null, null, false, false);
-
-        // Auto-Start Mechanism
-        addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM, null, "None", null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_MODE, null, "Quiet", 
-            CorePropertyValidator.class.getName(), true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_XMLFILE, null, "datanucleusAutoStart.xml", null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_CLASSNAMES, null, null, null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_METADATAFILES, null, null, null, true, false);
-
-        // Schema Generation
-        addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_MODE, null, "none",
-            CorePropertyValidator.class.getName(), false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_MODE, null, "none",
-            CorePropertyValidator.class.getName(), false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_TARGET, null, "datanucleus-schema-create.ddl", 
-            null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_TARGET, null, "datanucleus-schema-drop.ddl", 
-            null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_SOURCE, null, null, null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_SOURCE, null, null, null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_LOAD_SOURCE, null, null, null, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_SCHEMA, null, false, true, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_TABLES, null, false, true, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_COLUMNS, null, false, true, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_CONSTRAINTS, null, false, true, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_VALIDATE_SCHEMA, null, false, true, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_VALIDATE_TABLES, null, false, true, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_VALIDATE_COLUMNS, null, false, true, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_VALIDATE_CONSTRAINTS, null, false, true, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_WARNONERROR, null, false, true, false);
-
-        // Schema and identifier naming
-        addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_CASE, null, null,
-            CorePropertyValidator.class.getName(), true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_TABLE_PREFIX, null, null, null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_TABLE_SUFFIX, null, null, null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_WORD_SEPARATOR, null, null, null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_FACTORY, null, "datanucleus2", null, true, false);
-
-        // Datastore
-        addDefaultProperty(PropertyNames.PROPERTY_STORE_MANAGER_TYPE, null, null, null, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_STORE_ALLOW_REFS_WITHOUT_IMPLS, null, false, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY, null, false, true, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_DATASTORE_FIXED, null, false, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION, null, "EXCEPTION", 
-            CorePropertyValidator.class.getName(), true, false);
-        addDefaultIntegerProperty(PropertyNames.PROPERTY_DATASTORE_READ_TIMEOUT, null, null, true, true);
-        addDefaultIntegerProperty(PropertyNames.PROPERTY_DATASTORE_WRITE_TIMEOUT, null, null, true, true);
-        addDefaultProperty(PropertyNames.PROPERTY_MAPPING, null, null, 
-            StringPropertyValidator.class.getName(), true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_MAPPING_CATALOG, null, null, null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_MAPPING_SCHEMA, null, null, null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID, null, null, null, true, false);
-
-        // ExecutionContext level features
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_PERSISTENCE_BY_REACHABILITY_AT_COMMIT, null, true, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS, null, true, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS_CHECKS, null, true, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_SERIALIZE_READ, null, false, false, true);
-        addDefaultProperty(PropertyNames.PROPERTY_DELETION_POLICY, null, "JDO2", 
-            CorePropertyValidator.class.getName(), false, true);
-        addDefaultProperty(PropertyNames.PROPERTY_DEFAULT_INHERITANCE_STRATEGY, null, "JDO2", 
-            CorePropertyValidator.class.getName(), false, false);
-        // TODO Would be nice to set the default here to "false" but JDO TCK "instanceCallbacks" fails
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED, null, true, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_TYPE_CONVERSION, null, true, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_ALLOW_CALLBACKS, null, true, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_COMMIT, null, false, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_ROLLBACK, null, false, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_DETACH_ON_CLOSE, null, false, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_COPY_ON_ATTACH, null, true, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE, null, true, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_ALLOW_ATTACH_OF_TRANSIENT, null, false, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_DETACH_AS_WRAPPED, null, false, false, true);
-        addDefaultProperty(PropertyNames.PROPERTY_DETACH_DETACHMENT_FIELDS, null, "load-fields", 
-            CorePropertyValidator.class.getName(), false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_DETACH_DETACHED_STATE, null, "fetch-groups", 
-            CorePropertyValidator.class.getName(), false, false);
-        addDefaultIntegerProperty(PropertyNames.PROPERTY_MAX_FETCH_DEPTH, null, 1, false, true);
-
-        // Connection
-        addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_URL, null, null, null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_DRIVER_NAME, null, null, null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_USER_NAME, null, null, null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_PASSWORD, null, null, null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_PASSWORD_DECRYPTER, null, null, null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY_NAME, null, null, null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY2_NAME, null, null, null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY, null, null, null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY2, null, null, null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE, null, null, 
-            CorePropertyValidator.class.getName(), true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE2, null, null,
-            CorePropertyValidator.class.getName(), true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_POOLINGTYPE, null, null, null, true, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_POOLINGTYPE2, null, null, null, true, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_CONNECTION_NONTX_RELEASE_AFTER_USE, null, true, true, false);
-
-        // Cache
-        addDefaultProperty(PropertyNames.PROPERTY_CACHE_L1_TYPE, null, "soft", null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CACHE_L2_TYPE, null, "soft", null, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS, null, true, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS_LAZY, null, null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CACHE_L2_MODE, null, "UNSPECIFIED", 
-            CorePropertyValidator.class.getName(), false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CACHE_L2_NAME, null, "datanucleus", null, false, false);
-        addDefaultIntegerProperty(PropertyNames.PROPERTY_CACHE_L2_MAXSIZE, null, -1, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_LOADFIELDS, null, true, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CLEARATCLOSE, null, true, false, false);
-        addDefaultIntegerProperty(PropertyNames.PROPERTY_CACHE_L2_TIMEOUT, null, -1, false, false);
-        addDefaultIntegerProperty(PropertyNames.PROPERTY_CACHE_L2_BATCHSIZE, null, 100, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CACHE_EMBEDDED, null, true, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_READ_THROUGH, null, true, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_WRITE_THROUGH, null, true, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_STATISTICS_ENABLED, null, false, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_STORE_BY_VALUE, null, true, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CACHE_L2_RETRIEVE_MODE, null, "use",
-            CorePropertyValidator.class.getName(), false, true);
-        addDefaultProperty(PropertyNames.PROPERTY_CACHE_L2_STORE_MODE, null, "use",
-            CorePropertyValidator.class.getName(), false, true);
-        addDefaultProperty(PropertyNames.PROPERTY_CACHE_L2_UPDATE_MODE, null, "commit-and-datastore-read", 
-            CorePropertyValidator.class.getName(), false, true);
-
-        addDefaultProperty(PropertyNames.PROPERTY_CACHE_QUERYCOMPILE_TYPE, null, "soft", null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CACHE_QUERYCOMPILEDATASTORE_TYPE, null, "soft", null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_TYPE, null, "soft", null, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_NAME, null, "datanucleus-query", null, false, false);
-        addDefaultIntegerProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_MAXSIZE, null, -1, false, false);
-
-        // Queries
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_SQL_ALLOWALL, null, false, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL, null, false, false, true);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_FLUSH_BEFORE_EXECUTE, null, false, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_USE_FETCHPLAN, null, true, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_CHECK_UNUSED_PARAMS, null, true, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_COMPILE_OPTIMISED, null, false, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_LOAD_RESULTS_AT_COMMIT, null, true, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_COMPILATION_CACHED, null, true, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_RESULTS_CACHED, null, false, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_EVALUATE_IN_MEMORY, null, false, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_RESULTCACHE_VALIDATEOBJECTS, null, true, false, false);
-        addDefaultProperty(PropertyNames.PROPERTY_QUERY_RESULT_SIZE_METHOD, null, "last", null, false, false);
-        addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_COMPILE_NAMED_QUERIES_AT_STARTUP, null, false, false, false);
+        // Load up properties for the context that is in use
+        nucCtx.applyDefaultProperties(this);
 
         // Add properties from plugins
         ConfigurationElement[] propElements =
@@ -400,7 +172,7 @@ public class Configuration extends PropertyStore implements Serializable
      * @param name Name of the property
      * @return Whether it is for the datastore
      */
-    public boolean isPropertyForDatastore(String name)
+    private boolean isPropertyForDatastore(String name)
     {
         PropertyMapping mapping = propertyMappings.get(name.toLowerCase(Locale.ENGLISH));
         return (mapping != null ? mapping.datastore : false);
@@ -516,21 +288,21 @@ public class Configuration extends PropertyStore implements Serializable
         }
     }
 
-    private void addDefaultBooleanProperty(String name, String internalName, Boolean value, 
+    public void addDefaultBooleanProperty(String name, String internalName, Boolean value, 
             boolean datastore, boolean managerOverrideable)
     {
         addDefaultProperty(name, internalName, value!=null?""+value:null, 
             BooleanPropertyValidator.class.getName(), datastore, managerOverrideable);
     }
 
-    private void addDefaultIntegerProperty(String name, String internalName, Integer value, 
+    public void addDefaultIntegerProperty(String name, String internalName, Integer value, 
             boolean datastore, boolean managerOverrideable)
     {
         addDefaultProperty(name, internalName, value!=null?""+value:null,
             IntegerPropertyValidator.class.getName(), datastore, managerOverrideable);
     }
 
-    private void addDefaultProperty(String name, String internalName, String value, 
+    public void addDefaultProperty(String name, String internalName, String value, 
             String validatorName, boolean datastore, boolean managerOverrideable)
     {
         // Add the mapping

@@ -28,6 +28,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.plugin.PluginManager;
+import org.datanucleus.properties.CorePropertyValidator;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -113,6 +114,36 @@ public abstract class AbstractNucleusContext implements NucleusContext
         {
             this.apiAdapter = null;
         }
+    }
+
+    public void applyDefaultProperties(Configuration conf)
+    {
+        conf.addDefaultProperty(PropertyNames.PROPERTY_PLUGIN_REGISTRY_CLASSNAME, null, null, null, false, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_PLUGIN_ALLOW_USER_BUNDLES, null, true, false, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_PLUGIN_VALIDATEPLUGINS, null, false, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_PLUGIN_REGISTRYBUNDLECHECK, null, "EXCEPTION", 
+            CorePropertyValidator.class.getName(), false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CLASSLOADER_RESOLVER_NAME, null, "datanucleus", null, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY, null, null, null, false, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_LOCALISE_MESSAGECODES, null, false, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_LOCALISE_LANGUAGE, null, null, null, false, false);
+
+        // MetaData
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_ALWAYS_DETACHABLE, null, false, false, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_XML_VALIDATE, null, false, false, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_XML_NAMESPACE_AWARE, null, true, false, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_AUTOREGISTER, null, true, false, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_ALLOW_XML, null, true, false, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_ALLOW_ANNOTATIONS, null, true, false, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_ALLOW_LOAD_AT_RUNTIME, null, true, false, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_SUPPORT_ORM, null, null, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_METADATA_JDO_SUFFIX, null, "jdo", null, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_METADATA_ORM_SUFFIX, null, "orm", null, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_METADATA_JDOQUERY_SUFFIX, null, "jdoquery", null, false, false);
+
+        // Used by the metadata service
+        conf.addDefaultProperty(PropertyNames.PROPERTY_DEFAULT_INHERITANCE_STRATEGY, null, "JDO2", 
+            CorePropertyValidator.class.getName(), false, false);
     }
 
     public synchronized void initialise()
