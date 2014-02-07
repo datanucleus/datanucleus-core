@@ -1924,16 +1924,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         return this;
     }
 
-    /**
-     * Method to return the shortcut column name.
-     * TODO Deprecate this. Should use getColumnMetaData instead
-     * @return The column shortcut name
-     */
-    public String getColumn()
-    {
-        return column;
-    }
-
     public AbstractMemberMetaData setColumn(String col)
     {
         this.column = (StringUtils.isWhitespace(col) ? null : col);
