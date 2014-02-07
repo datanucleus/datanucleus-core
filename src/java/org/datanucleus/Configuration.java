@@ -535,7 +535,7 @@ public class Configuration extends PropertyStore implements Serializable
 
     public void validatePropertyValue(String name, Object value)
     {
-        String validatorName = null; // TODO Work this out
+        String validatorName = null;
         PropertyMapping mapping = propertyMappings.get(name.toLowerCase(Locale.ENGLISH));
         if (mapping != null)
         {
