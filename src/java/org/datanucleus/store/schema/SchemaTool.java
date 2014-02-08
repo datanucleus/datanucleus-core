@@ -114,8 +114,8 @@ public class SchemaTool
         SchemaTool tool = new SchemaTool();
 
         CommandLine cmd = new CommandLine();
-        cmd.addOption("createSchema", "createSchema", "schemaName", LOCALISER.msg(false, "014024"));
-        cmd.addOption("deleteSchema", "deleteSchema", "schemaName", LOCALISER.msg(false, "014025"));
+        cmd.addOption("createSchema", "createSchema", "createSchema", LOCALISER.msg(false, "014024"));
+        cmd.addOption("deleteSchema", "deleteSchema", "deleteSchema", LOCALISER.msg(false, "014025"));
 
         cmd.addOption("create", "create", null, LOCALISER.msg(false, "014026"));
         cmd.addOption("delete", "delete", null, LOCALISER.msg(false, "014027"));
@@ -166,6 +166,24 @@ public class SchemaTool
         {
             mode = Mode.VALIDATE;
             msg = LOCALISER.msg(false, "014002");
+        }
+        else if (cmd.hasOption("createSchema"))
+        {
+            mode = Mode.CREATE_SCHEMA;
+            if (cmd.hasOption("deleteSchema"))
+            {
+                tool.setSchemaName(cmd.getOptionArg("createSchema"));
+            }
+            msg = LOCALISER.msg(false, "014034", tool.getSchemaName());
+        }
+        else if (cmd.hasOption("deleteSchema"))
+        {
+            mode = Mode.DELETE_SCHEMA;
+            if (cmd.hasOption("deleteSchema"))
+            {
+                tool.setSchemaName(cmd.getOptionArg("deleteSchema"));
+            }
+            msg = LOCALISER.msg(false, "014035", tool.getSchemaName());
         }
         else if (cmd.hasOption("dbinfo"))
         {
