@@ -188,10 +188,6 @@ public class SchemaTool
         // Extract the selected options
         String propsFileName = null;
         String persistenceUnitName = null;
-        if (cmd.hasOption("schemaName"))
-        {
-            tool.setSchemaName(cmd.getOptionArg("schemaName"));
-        }
         if (cmd.hasOption("ddlFile"))
         {
             tool.setDdlFile(cmd.getOptionArg("ddlFile"));
