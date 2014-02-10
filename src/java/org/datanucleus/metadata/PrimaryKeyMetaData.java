@@ -57,11 +57,14 @@ public class PrimaryKeyMetaData extends MetaData implements ColumnMetaDataContai
 
     public PrimaryKeyMetaData setColumnName(String name)
     {
-        this.columnName = (StringUtils.isWhitespace(name) ? null : name);
-        if (columns == null || columns.size() == 0)
+        if (!StringUtils.isWhitespace(name))
         {
-            ColumnMetaData colmd = newColumnMetadata();
-            colmd.setName(columnName);
+            this.columnName = (StringUtils.isWhitespace(name) ? null : name);
+            if (columns == null || columns.size() == 0)
+            {
+                ColumnMetaData colmd = newColumnMetadata();
+                colmd.setName(columnName);
+            }
         }
         return this;
     }
