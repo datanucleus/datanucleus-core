@@ -21,7 +21,6 @@ package org.datanucleus.metadata;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -36,58 +35,13 @@ public class PrimaryKeyMetaData extends MetaData implements ColumnMetaDataContai
     /** Column name of PK. */
     protected String columnName = null;
 
-    /** MetaData for columns to be used in PK. */
-    protected ColumnMetaData[] columnMetaData=null;
-
-    // -------------------------------------------------------------------------
-    // Fields below here are used in the metadata parse process where the parser
-    // dynamically adds fields/columns as it encounters them in the MetaData files.
-    // They are typically cleared at the point of initialise() and not used thereafter.
-
-    /**
-     * the columns elements to be included in the index. Suitable to be empty
-     * when this metadata is contained within a field, element, key, value, or join elements
-     */
-    protected List columns = new ArrayList();
+    protected List<ColumnMetaData> columns = null;
 
     /**
      * Default constructor. Set the fields using setters, before populate().
      */
     public PrimaryKeyMetaData()
     {
-    }
-
-    /**
-     * Initialisation method. This should be called AFTER using the populate
-     * method if you are going to use populate. It creates the internal
-     * convenience arrays etc needed for normal operation.
-     */
-    public void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
-    {
-        // Set up the columnMetaData
-        if (columns.size() == 0 && columnName != null)
-        {
-            columnMetaData = new ColumnMetaData[1];
-            columnMetaData[0] = new ColumnMetaData();
-            columnMetaData[0].setName(columnName);
-            columnMetaData[0].parent = this;
-            columnMetaData[0].initialise(clr, mmgr);
-        }
-        else
-        {
-            columnMetaData = new ColumnMetaData[columns.size()];
-            for (int i=0; i<columnMetaData.length; i++)
-            {
-                columnMetaData[i] = (ColumnMetaData) columns.get(i);
-                columnMetaData[i].initialise(clr, mmgr);
-            }
-        }
-
-        // Clean out parsing data
-        columns.clear();
-        columns = null;
-
-        setInitialised();
     }
 
     public String getName()
@@ -104,6 +58,11 @@ public class PrimaryKeyMetaData extends MetaData implements ColumnMetaDataContai
     public PrimaryKeyMetaData setColumnName(String name)
     {
         this.columnName = (StringUtils.isWhitespace(name) ? null : name);
+        if (columns == null || columns.size() == 0)
+        {
+            ColumnMetaData colmd = newColumnMetadata();
+            colmd.setName(columnName);
+        }
         return this;
     }
 
@@ -118,6 +77,10 @@ public class PrimaryKeyMetaData extends MetaData implements ColumnMetaDataContai
      */
     public void addColumn(ColumnMetaData colmd)
     {
+        if (columns == null)
+        {
+            columns = new ArrayList<ColumnMetaData>();
+        }
         columns.add(colmd);
         colmd.parent = this;
     }
@@ -132,14 +95,18 @@ public class PrimaryKeyMetaData extends MetaData implements ColumnMetaDataContai
         addColumn(colmd);
         return colmd;
     }
-    
+
     /**
      * Accessor for columnMetaData
      * @return Returns the columnMetaData.
      */
     public final ColumnMetaData[] getColumnMetaData()
     {
-        return columnMetaData;
+        if (columns == null)
+        {
+            return null;
+        }
+        return columns.toArray(new ColumnMetaData[columns.size()]);
     }
 
     //  ----------------------------- Utilities ---------------------------------
@@ -159,11 +126,11 @@ public class PrimaryKeyMetaData extends MetaData implements ColumnMetaDataContai
             ">\n");
 
         // Add columns
-        if (columnMetaData != null)
+        if (columns != null)
         {
-            for (int i=0;i<columnMetaData.length;i++)
+            for (ColumnMetaData colmd : columns)
             {
-                sb.append(columnMetaData[i].toString(prefix + indent,indent));
+                sb.append(colmd.toString(prefix + indent,indent));
             }
         }
 
