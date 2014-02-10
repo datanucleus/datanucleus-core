@@ -48,11 +48,11 @@ public class JoinMetaData extends MetaData implements ColumnMetaDataContainer
     UniqueMetaData uniqueMetaData;
 
     /** PrimaryKey MetaData */
-    protected PrimaryKeyMetaData primaryKeyMetaData;
+    PrimaryKeyMetaData primaryKeyMetaData;
 
     /** column elements */
-    final List<ColumnMetaData> columns = new ArrayList();
-       
+    List<ColumnMetaData> columns = null;
+
     /** if is outer join. Outer joins return all elements from at least one of the sides joined. */
     boolean outer = false;
 
@@ -69,21 +69,10 @@ public class JoinMetaData extends MetaData implements ColumnMetaDataContainer
     String columnName;
 
     /** The indexing value */
-    protected IndexedValue indexed=null;
+    IndexedValue indexed=null;
 
     /** Whether to add a unique constraint. */
-    protected boolean unique;
-
-    // -------------------------------------------------------------------------
-    // Fields below here are not represented in the output MetaData. They are
-    // for use internally in the operation of the JDO system. The majority are
-    // for convenience to save iterating through the fields since the fields
-    // are fixed once initialised.
-
-    /**
-     * Contains the metadata for column
-     */
-    protected ColumnMetaData[] columnMetaData;
+    boolean unique;
 
     /**
      * Constructor to create a copy of the passed JoinMetaData.
@@ -98,9 +87,12 @@ public class JoinMetaData extends MetaData implements ColumnMetaDataContainer
         this.outer = joinmd.outer;
         this.indexed = joinmd.indexed;
         this.unique = joinmd.unique;
-        for (int i=0;i<joinmd.columns.size();i++)
+        if (joinmd.columns != null)
         {
-            addColumn(new ColumnMetaData(joinmd.columns.get(i)));
+            for (ColumnMetaData colmd : joinmd.columns)
+            {
+                addColumn(new ColumnMetaData(colmd));
+            }
         }
     }
 
@@ -125,62 +117,31 @@ public class JoinMetaData extends MetaData implements ColumnMetaDataContainer
             throw new InvalidMemberMetaDataException(LOCALISER, "044130", mmd.getClassName(), mmd.getFullFieldName());
         }
 
-        // Cater for user specifying column name, or columns
-        if (columns.size() == 0 && columnName != null)
-        {
-            columnMetaData = new ColumnMetaData[1];
-            columnMetaData[0] = new ColumnMetaData();
-            columnMetaData[0].setName(columnName);
-            columnMetaData[0].parent = this;
-            columnMetaData[0].initialise(clr, mmgr);
-        }
-        else
-        {
-            columnMetaData = new ColumnMetaData[columns.size()];
-            for (int i=0; i<columnMetaData.length; i++)
-            {
-                columnMetaData[i] = columns.get(i);
-                columnMetaData[i].initialise(clr, mmgr);
-            }
-        }
-
-        if (foreignKeyMetaData != null)
-        {
-            foreignKeyMetaData.initialise(clr, mmgr);
-        }
-
         // Interpret the "indexed" value to create our IndexMetaData where it wasn't specified that way
-        if (indexMetaData == null && columnMetaData != null && indexed != null && indexed != IndexedValue.FALSE)
+        if (indexMetaData == null && indexed != null && indexed != IndexedValue.FALSE)
         {
             indexMetaData = new IndexMetaData();
             indexMetaData.setUnique(indexed == IndexedValue.UNIQUE);
-            for (int i=0;i<columnMetaData.length;i++)
+            if (columns != null)
             {
-                indexMetaData.addColumn(columnMetaData[i]);
+                for (ColumnMetaData colmd : columns)
+                {
+                    indexMetaData.addColumn(colmd);
+                }
             }
-        }
-        if (indexMetaData != null)
-        {
-            indexMetaData.initialise(clr, mmgr);
         }
 
         if (uniqueMetaData == null && unique)
         {
             uniqueMetaData = new UniqueMetaData();
             uniqueMetaData.setTable(columnName);
-            for (int i=0;i<columnMetaData.length;i++)
+            if (columns != null)
             {
-                uniqueMetaData.addColumn(columnMetaData[i]);
+                for (ColumnMetaData colmd : columns)
+                {
+                    uniqueMetaData.addColumn(colmd);
+                }
             }
-        }
-        if (uniqueMetaData != null)
-        {
-            uniqueMetaData.initialise(clr, mmgr);
-        }
-
-        if (primaryKeyMetaData != null)
-        {
-            primaryKeyMetaData.initialise(clr, mmgr);
         }
 
         setInitialised();
@@ -192,6 +153,10 @@ public class JoinMetaData extends MetaData implements ColumnMetaDataContainer
      */
     public void addColumn(ColumnMetaData colmd)
     {
+        if (columns == null)
+        {
+            columns = new ArrayList<ColumnMetaData>();
+        }
         columns.add(colmd);
         colmd.parent = this;
     }
@@ -308,7 +273,18 @@ public class JoinMetaData extends MetaData implements ColumnMetaDataContainer
 
     public JoinMetaData setColumnName(String columnName)
     {
-        this.columnName = (StringUtils.isWhitespace(columnName) ? null : columnName);
+        if (!StringUtils.isWhitespace(columnName))
+        {
+            ColumnMetaData colmd = new ColumnMetaData();
+            colmd.setName(columnName);
+            colmd.parent = this;
+            addColumn(colmd);
+            this.columnName = columnName;
+        }
+        else
+        {
+            this.columnName = null;
+        }
         return this;
     }
 
@@ -318,7 +294,11 @@ public class JoinMetaData extends MetaData implements ColumnMetaDataContainer
      */
     public final ColumnMetaData[] getColumnMetaData()
     {
-        return columnMetaData;
+        if (columns == null)
+        {
+            return null;
+        }
+        return columns.toArray(new ColumnMetaData[columns.size()]);
     }
 
     /**
@@ -465,11 +445,11 @@ public class JoinMetaData extends MetaData implements ColumnMetaDataContainer
         }
 
         // Add columns
-        if (columnMetaData != null)
+        if (columns != null)
         {
-            for (int i=0;i<columnMetaData.length;i++)
+            for (ColumnMetaData colmd : columns)
             {
-                sb.append(columnMetaData[i].toString(prefix + indent,indent));
+                sb.append(colmd.toString(prefix + indent,indent));
             }
         }
 
