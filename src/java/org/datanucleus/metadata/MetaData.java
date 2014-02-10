@@ -231,19 +231,7 @@ public class MetaData implements Serializable
 
     public int getNoOfExtensions()
     {
-        if (extensions == null)
-        {
-            return 0;
-        }
-        return extensions.size();
-    }
-
-    public void assertIfInitialised()
-    {
-        if (isInitialised())
-        {
-            throw new NucleusException("MetaData is already initialised so attribute cannot be set.");
-        }
+        return (extensions != null ? extensions.size() : 0);
     }
 
     public ExtensionMetaData[] getExtensions()
@@ -359,14 +347,12 @@ public class MetaData implements Serializable
     }
 
     /**
-     * Convenience method to return supported vendors. Allows us to support
-     * datanucleus AND jpox as vendors.
+     * Convenience method to return supported vendors. Allows us to support "datanucleus" AND "jpox" as vendors.
      * @param vendorName Name of vendor
      * @return Whether supported
      */
     private boolean isSupportedVendor(String vendorName)
     {
-        return (vendorName.equalsIgnoreCase(VENDOR_NAME) || 
-                vendorName.equalsIgnoreCase(VENDOR_NAME_OLD));
+        return (vendorName.equalsIgnoreCase(VENDOR_NAME) || vendorName.equalsIgnoreCase(VENDOR_NAME_OLD));
     }
 }
