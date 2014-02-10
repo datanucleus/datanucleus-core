@@ -88,7 +88,7 @@ public class CorePropertyValidator implements PropertyValidator
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_DEFAULT_INHERITANCE_STRATEGY))
+        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_METADATA_DEFAULT_INHERITANCE_STRATEGY))
         {
             if (value instanceof String)
             {

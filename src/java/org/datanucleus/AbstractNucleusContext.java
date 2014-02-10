@@ -140,9 +140,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
         conf.addDefaultProperty(PropertyNames.PROPERTY_METADATA_JDO_SUFFIX, null, "jdo", null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_METADATA_ORM_SUFFIX, null, "orm", null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_METADATA_JDOQUERY_SUFFIX, null, "jdoquery", null, false, false);
-
-        // Used by the metadata service
-        conf.addDefaultProperty(PropertyNames.PROPERTY_DEFAULT_INHERITANCE_STRATEGY, null, "JDO2", 
+        conf.addDefaultProperty(PropertyNames.PROPERTY_METADATA_DEFAULT_INHERITANCE_STRATEGY, null, "JDO2", 
             CorePropertyValidator.class.getName(), false, false);
     }
 

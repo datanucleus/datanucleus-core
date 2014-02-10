@@ -22,6 +22,30 @@ package org.datanucleus;
  */
 public class PropertyNames
 {
+    public static final String PROPERTY_PLUGIN_REGISTRY_CLASSNAME = "datanucleus.plugin.pluginRegistryClassName";
+    public static final String PROPERTY_PLUGIN_ALLOW_USER_BUNDLES = "datanucleus.plugin.allowUserBundles";
+    public static final String PROPERTY_PLUGIN_VALIDATEPLUGINS = "datanucleus.plugin.validatePlugins";
+    public static final String PROPERTY_PLUGIN_REGISTRYBUNDLECHECK = "datanucleus.plugin.pluginRegistryBundleCheck";
+
+    public static final String PROPERTY_CLASSLOADER_RESOLVER_NAME = "datanucleus.classLoaderResolverName";
+    public static final String PROPERTY_CLASSLOADER_PRIMARY = "datanucleus.primaryClassLoader";
+    public static final String PROPERTY_LOCALISE_MESSAGECODES = "datanucleus.localisation.messageCodes";
+    public static final String PROPERTY_LOCALISE_LANGUAGE = "datanucleus.localisation.language";
+
+    public static final String PROPERTY_METADATA_ALWAYS_DETACHABLE = "datanucleus.metadata.alwaysDetachable";
+    public static final String PROPERTY_METADATA_XML_VALIDATE = "datanucleus.metadata.xml.validate";
+    public static final String PROPERTY_METADATA_XML_NAMESPACE_AWARE = "datanucleus.metadata.xml.namespaceAware";
+    public static final String PROPERTY_METADATA_AUTOREGISTER = "datanucleus.metadata.autoregistration";
+    public static final String PROPERTY_METADATA_ALLOW_XML = "datanucleus.metadata.allowXML";
+    public static final String PROPERTY_METADATA_ALLOW_ANNOTATIONS = "datanucleus.metadata.allowAnnotations";
+    public static final String PROPERTY_METADATA_ALLOW_LOAD_AT_RUNTIME = "datanucleus.metadata.allowLoadAtRuntime";
+    public static final String PROPERTY_METADATA_SUPPORT_ORM = "datanucleus.metadata.supportORM";
+    public static final String PROPERTY_METADATA_JDO_SUFFIX = "datanucleus.metadata.jdoFileExtension";
+    public static final String PROPERTY_METADATA_ORM_SUFFIX = "datanucleus.metadata.ormFileExtension";
+    public static final String PROPERTY_METADATA_JDOQUERY_SUFFIX = "datanucleus.metadata.jdoqueryFileExtension";
+    public static final String PROPERTY_METADATA_SCANNER = "datanucleus.metadata.scanner";
+    public static final String PROPERTY_METADATA_DEFAULT_INHERITANCE_STRATEGY = "datanucleus.metadata.defaultInheritanceStrategy";
+
     public static final String PROPERTY_IGNORE_CACHE = "datanucleus.IgnoreCache";
     public static final String PROPERTY_OPTIMISTIC = "datanucleus.Optimistic";
     public static final String PROPERTY_MULTITHREADED = "datanucleus.Multithreaded";
@@ -35,7 +59,6 @@ public class PropertyNames
     public static final String PROPERTY_PROPERTIES_FILE = "datanucleus.propertiesFile";
     public static final String PROPERTY_PERSISTENCE_UNIT_LOAD_CLASSES = "datanucleus.persistenceUnitLoadClasses";
     public static final String PROPERTY_DELETION_POLICY = "datanucleus.deletionPolicy";
-    public static final String PROPERTY_DEFAULT_INHERITANCE_STRATEGY = "datanucleus.defaultInheritanceStrategy";
     public static final String PROPERTY_PERSISTENCE_BY_REACHABILITY_AT_COMMIT = "datanucleus.persistenceByReachabilityAtCommit";
     public static final String PROPERTY_MANAGE_RELATIONSHIPS = "datanucleus.manageRelationships";
     public static final String PROPERTY_MANAGE_RELATIONSHIPS_CHECKS = "datanucleus.manageRelationshipsChecks";
@@ -46,16 +69,6 @@ public class PropertyNames
     public static final String PROPERTY_IDENTITY_STRING_TRANSLATOR_TYPE = "datanucleus.identityStringTranslatorType";
     public static final String PROPERTY_IDENTITY_KEY_TRANSLATOR_TYPE = "datanucleus.identityKeyTranslatorType";
     public static final String PROPERTY_USE_IMPLEMENTATION_CREATOR = "datanucleus.useImplementationCreator";
-
-    public static final String PROPERTY_PLUGIN_REGISTRY_CLASSNAME = "datanucleus.plugin.pluginRegistryClassName";
-    public static final String PROPERTY_PLUGIN_ALLOW_USER_BUNDLES = "datanucleus.plugin.allowUserBundles";
-    public static final String PROPERTY_PLUGIN_VALIDATEPLUGINS = "datanucleus.plugin.validatePlugins";
-    public static final String PROPERTY_PLUGIN_REGISTRYBUNDLECHECK = "datanucleus.plugin.pluginRegistryBundleCheck";
-
-    public static final String PROPERTY_CLASSLOADER_RESOLVER_NAME = "datanucleus.classLoaderResolverName";
-    public static final String PROPERTY_CLASSLOADER_PRIMARY = "datanucleus.primaryClassLoader";
-    public static final String PROPERTY_LOCALISE_MESSAGECODES = "datanucleus.localisation.messageCodes";
-    public static final String PROPERTY_LOCALISE_LANGUAGE = "datanucleus.localisation.language";
 
     public static final String PROPERTY_JMX_TYPE = "datanucleus.jmxType";
     public static final String PROPERTY_ENABLE_STATISTICS = "datanucleus.enableStatistics";
@@ -76,19 +89,6 @@ public class PropertyNames
 
     public static final String PROPERTY_FLUSH_MODE = "datanucleus.flush.mode";
     public static final String PROPERTY_FLUSH_AUTO_OBJECT_LIMIT = "datanucleus.datastoreTransactionFlushLimit";
-
-    public static final String PROPERTY_METADATA_ALWAYS_DETACHABLE = "datanucleus.metadata.alwaysDetachable";
-    public static final String PROPERTY_METADATA_XML_VALIDATE = "datanucleus.metadata.xml.validate";
-    public static final String PROPERTY_METADATA_XML_NAMESPACE_AWARE = "datanucleus.metadata.xml.namespaceAware";
-    public static final String PROPERTY_METADATA_AUTOREGISTER = "datanucleus.metadata.autoregistration";
-    public static final String PROPERTY_METADATA_ALLOW_XML = "datanucleus.metadata.allowXML";
-    public static final String PROPERTY_METADATA_ALLOW_ANNOTATIONS = "datanucleus.metadata.allowAnnotations";
-    public static final String PROPERTY_METADATA_ALLOW_LOAD_AT_RUNTIME = "datanucleus.metadata.allowLoadAtRuntime";
-    public static final String PROPERTY_METADATA_SUPPORT_ORM = "datanucleus.metadata.supportORM";
-    public static final String PROPERTY_METADATA_JDO_SUFFIX = "datanucleus.metadata.jdoFileExtension";
-    public static final String PROPERTY_METADATA_ORM_SUFFIX = "datanucleus.metadata.ormFileExtension";
-    public static final String PROPERTY_METADATA_JDOQUERY_SUFFIX = "datanucleus.metadata.jdoqueryFileExtension";
-    public static final String PROPERTY_METADATA_SCANNER = "datanucleus.metadata.scanner";
 
     public static final String PROPERTY_ATTACH_SAME_DATASTORE = "datanucleus.attachSameDatastore";
     public static final String PROPERTY_DETACH_ALL_ON_COMMIT = "datanucleus.DetachAllOnCommit";
