@@ -71,7 +71,7 @@ public class MetaData implements Serializable
     /** Vendor name (DataNucleus) used for extensions. */
     public static final String VENDOR_NAME = "datanucleus";
 
-    /** Vendor name (JPOX) used for extensions. */
+    /** Vendor name (JPOX) used for extensions. Deprecated. TODO Remove this */
     public static final String VENDOR_NAME_OLD = "jpox";
 
     /** List of extensions for this MetaData element. */
