@@ -120,7 +120,6 @@ public class PropertyNames
     public static final String PROPERTY_CACHE_L2_TYPE = "datanucleus.cache.level2.type";
     public static final String PROPERTY_CACHE_COLLECTIONS = "datanucleus.cache.collections";
     public static final String PROPERTY_CACHE_COLLECTIONS_LAZY = "datanucleus.cache.collections.lazy";
-
     public static final String PROPERTY_CACHE_L2_NAME = "datanucleus.cache.level2.cacheName";
     public static final String PROPERTY_CACHE_L2_MAXSIZE = "datanucleus.cache.level2.maxSize";
     public static final String PROPERTY_CACHE_L2_LOADFIELDS = "datanucleus.cache.level2.loadFields";
@@ -136,7 +135,6 @@ public class PropertyNames
     public static final String PROPERTY_CACHE_L2_RETRIEVE_MODE = "datanucleus.cache.level2.retrieveMode";
     public static final String PROPERTY_CACHE_L2_STORE_MODE = "datanucleus.cache.level2.storeMode";
     public static final String PROPERTY_CACHE_L2_UPDATE_MODE = "datanucleus.cache.level2.updateMode";
-
     public static final String PROPERTY_CACHE_QUERYCOMPILE_TYPE = "datanucleus.cache.queryCompilation.type";
     public static final String PROPERTY_CACHE_QUERYCOMPILEDATASTORE_TYPE = "datanucleus.cache.queryCompilationDatastore.type";
     public static final String PROPERTY_CACHE_QUERYRESULTS_TYPE = "datanucleus.cache.queryResults.type";
