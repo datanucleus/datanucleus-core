@@ -29,7 +29,7 @@ import org.datanucleus.util.StringUtils;
  * name lower-cased. 
  * The field-name attribute is required; it associates a persistent field with the named property.
  */
-public class PropertyMetaData extends AbstractMemberMetaData implements Comparable, ColumnMetaDataContainer
+public class PropertyMetaData extends AbstractMemberMetaData
 {
     /** Name of the field that this property is wrapping (when part of a persistent class). */
     protected String fieldName;

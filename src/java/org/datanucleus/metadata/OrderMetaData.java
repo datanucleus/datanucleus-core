@@ -38,25 +38,25 @@ import org.datanucleus.util.StringUtils;
 public class OrderMetaData extends MetaData implements ColumnMetaDataContainer
 {
     /** The name of the column (if specified as input) */
-    String columnName = null;
+    protected String columnName = null;
 
     /** the columns  */
-    List<ColumnMetaData> columns = null;
+    protected List<ColumnMetaData> columns = null;
 
     /** IndexMetaData. */
-    IndexMetaData indexMetaData;
+    protected IndexMetaData indexMetaData;
 
     /** The indexing value specified as input. */
-    IndexedValue indexed = null;
+    protected IndexedValue indexed = null;
 
     /** Name of the field in the element that is the ordering field. */
-    String mappedBy = null;
+    protected String mappedBy = null;
 
     /** Ordering when using an "ordered list" where the elements are retrieved in a particular order. */
-    String ordering = null;
+    protected String ordering = null;
 
     /** Ordering of fields (when using "ordered List"), splitting the "ordering" apart by comma-separated parts. */
-    FieldOrder[] fieldOrders = null;
+    protected FieldOrder[] fieldOrders = null;
 
     /**
      * Copy constructor.

@@ -124,10 +124,12 @@ public class KeyMetaData extends AbstractElementMetaData
         sb.append(">\n");
 
         // Add columns
-        for (int i=0;i<columns.size();i++)
+        if (columns != null)
         {
-            ColumnMetaData colmd = columns.get(i);
-            sb.append(colmd.toString(prefix + indent,indent));
+            for (ColumnMetaData colmd : columns)
+            {
+                sb.append(colmd.toString(prefix + indent,indent));
+            }
         }
 
         // Add index metadata

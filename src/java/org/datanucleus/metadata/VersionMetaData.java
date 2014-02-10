@@ -46,10 +46,10 @@ import org.datanucleus.util.StringUtils;
 public class VersionMetaData extends MetaData
 {
     /** strategy for generating the version. */
-    private VersionStrategy versionStrategy;
+    protected VersionStrategy versionStrategy;
 
     /** column name */
-    private String columnName;
+    protected String columnName;
 
     /** Contains the metadata for column. */
     protected ColumnMetaData columnMetaData;
@@ -63,9 +63,6 @@ public class VersionMetaData extends MetaData
     /** Name of the field that contains the version (if not generating a surrogate column). */
     protected String fieldName = null;
 
-    /**
-     * Default constructor. Set the fields using setters, before populate().
-     */
     public VersionMetaData()
     {
     }
@@ -97,7 +94,6 @@ public class VersionMetaData extends MetaData
                 columnMetaData = new ColumnMetaData();
                 columnMetaData.setName(columnName);
                 columnMetaData.parent = this;
-                columnMetaData.initialise(clr, mmgr);
             }
 
             // Interpret the "indexed" value to create our IndexMetaData where it wasn't specified that way
@@ -105,12 +101,8 @@ public class VersionMetaData extends MetaData
             {
                 indexMetaData = new IndexMetaData();
                 indexMetaData.setUnique(indexed == IndexedValue.UNIQUE);
-                // Note we only support a single column version here
                 indexMetaData.addColumn(columnMetaData);
-            }
-            if (indexMetaData != null)
-            {
-                indexMetaData.initialise(clr, mmgr);
+                indexMetaData.parent = this;
             }
         }
         else

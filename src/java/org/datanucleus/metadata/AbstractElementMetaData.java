@@ -38,9 +38,6 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
     /** Whether to add a unique constraint */
     protected boolean unique;
 
-    /** column name value. */
-    protected String columnName;
-
     /** Field that this is mapped to. */
     protected String mappedBy;
 
@@ -59,16 +56,9 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
     /** EmbeddedMetaData */
     protected EmbeddedMetaData embeddedMetaData;
 
-    /** Columns ColumnMetaData */
-    protected final List<ColumnMetaData> columns = new ArrayList<ColumnMetaData>();
+    protected String columnName;
 
-    // -------------------------------------------------------------------------
-    // Fields below here are not represented in the output MetaData. They are
-    // for use internally in the operation of the JDO system. The majority are
-    // for convenience to save iterating through the fields since the fields
-    // are fixed once initialised.
-
-    protected ColumnMetaData columnMetaData[];
+    protected List<ColumnMetaData> columns = null;
 
     /**
      * Constructor to create a copy of the passed metadata object.
@@ -98,9 +88,12 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
         {
             setEmbeddedMetaData(new EmbeddedMetaData(aemd.embeddedMetaData));
         }
-        for (int i=0;i<columns.size();i++)
+        if (aemd.columns != null)
         {
-            addColumn(new ColumnMetaData(aemd.columns.get(i)));
+            for (ColumnMetaData colmd : aemd.columns)
+            {
+                addColumn(new ColumnMetaData(colmd));
+            }
         }
     }
 
@@ -132,56 +125,39 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
     public void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
     {
         // Cater for user specifying column name, or columns
-        if (columns.size() == 0 && columnName != null)
+        if (columns == null && columnName != null)
         {
-            columnMetaData = new ColumnMetaData[1];
-            columnMetaData[0] = new ColumnMetaData();
-            columnMetaData[0].setName(columnName);
-            columnMetaData[0].parent = this;
-            columnMetaData[0].initialise(clr, mmgr);
-        }
-        else
-        {
-            columnMetaData = new ColumnMetaData[columns.size()];
-        	for (int i=0; i<columnMetaData.length; i++)
-        	{
-            	columnMetaData[i] = columns.get(i);
-            	columnMetaData[i].initialise(clr, mmgr);
-        	}
+            ColumnMetaData colmd = new ColumnMetaData();
+            colmd.setName(columnName);
+            colmd.parent = this;
+            addColumn(colmd);
         }
 
         // Interpret the "indexed" value to create our IndexMetaData where it wasn't specified that way
-        if (indexMetaData == null && columnMetaData != null && indexed != null && indexed != IndexedValue.FALSE)
+        if (indexMetaData == null && indexed != null && indexed != IndexedValue.FALSE)
         {
             indexMetaData = new IndexMetaData();
             indexMetaData.setUnique(indexed == IndexedValue.UNIQUE);
-            for (int i=0;i<columnMetaData.length;i++)
+            if (columns != null)
             {
-                indexMetaData.addColumn(columnMetaData[i]);
+                for (ColumnMetaData colmd : columns)
+                {
+                    indexMetaData.addColumn(colmd);
+                }
             }
-        }
-        if (indexMetaData != null)
-        {
-            indexMetaData.initialise(clr, mmgr);
         }
 
         if (uniqueMetaData == null && unique)
         {
             uniqueMetaData = new UniqueMetaData();
             uniqueMetaData.setTable(columnName);
-            for (int i=0;i<columnMetaData.length;i++)
+            if (columns != null)
             {
-                uniqueMetaData.addColumn(columnMetaData[i]);
+                for (ColumnMetaData colmd : columns)
+                {
+                    uniqueMetaData.addColumn(colmd);
+                }
             }
-        }
-        if (uniqueMetaData != null)
-        {
-            uniqueMetaData.initialise(clr, mmgr);
-        }
-
-        if (foreignKeyMetaData != null)
-        {
-            foreignKeyMetaData.initialise(clr, mmgr);
         }
 
         if (embeddedMetaData != null)
@@ -190,16 +166,6 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
         }
 
         setInitialised();
-    }
-
-    public final String getColumnName()
-    {
-        return columnName;
-    }
-
-    public void setColumnName(String columnName)
-    {
-        this.columnName = (StringUtils.isWhitespace(columnName) ? null : columnName);
     }
 
     public String getMappedBy()
@@ -230,6 +196,15 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
     public void setUnique(boolean unique)
     {
         this.unique = unique;
+    }
+
+    /**
+     * Accessor for foreignKeyMetaData
+     * @return Returns the foreignKeyMetaData.
+     */
+    public final ForeignKeyMetaData getForeignKeyMetaData()
+    {
+        return foreignKeyMetaData;
     }
 
     public ForeignKeyAction getDeleteAction()
@@ -286,49 +261,45 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
         }
     }
 
+    public final String getColumnName()
+    {
+        return columnName;
+    }
+
+    public void setColumnName(String columnName)
+    {
+        if (!StringUtils.isWhitespace(columnName))
+        {
+            this.columnName = columnName;
+            if (columns == null)
+            {
+                ColumnMetaData colmd = new ColumnMetaData();
+                colmd.setName(columnName);
+                colmd.parent = this;
+                addColumn(colmd);
+            }
+            else if (columns.size() == 1)
+            {
+                this.columns.iterator().next().setName(columnName);
+            }
+        }
+        else
+        {
+            this.columnName = null;
+        }
+    }
+
     /**
      * Accessor for columnMetaData
      * @return Returns the columnMetaData.
      */
     public final ColumnMetaData[] getColumnMetaData()
     {
-        return columnMetaData;
-    }
-
-    /**
-     * Accessor for embeddedMetaData
-     * @return Returns the embeddedMetaData.
-     */
-    public final EmbeddedMetaData getEmbeddedMetaData()
-    {
-        return embeddedMetaData;
-    }
-
-    /**
-     * Accessor for foreignKeyMetaData
-     * @return Returns the foreignKeyMetaData.
-     */
-    public final ForeignKeyMetaData getForeignKeyMetaData()
-    {
-        return foreignKeyMetaData;
-    }
-
-    /**
-     * Accessor for indexMetaData
-     * @return Returns the indexMetaData.
-     */
-    public final IndexMetaData getIndexMetaData()
-    {
-        return indexMetaData;
-    }
-
-    /**
-     * Accessor for uniqueMetaData
-     * @return Returns the uniqueMetaData.
-     */
-    public final UniqueMetaData getUniqueMetaData()
-    {
-        return uniqueMetaData;
+        if (columns == null)
+        {
+            return new ColumnMetaData[0];
+        }
+        return columns.toArray(new ColumnMetaData[columns.size()]);
     }
 
     /**
@@ -337,6 +308,10 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
      */
     public void addColumn(ColumnMetaData colmd)
     {
+        if (columns == null)
+        {
+            columns = new ArrayList<ColumnMetaData>();
+        }
         columns.add(colmd);
         colmd.parent = this;
     }
@@ -350,6 +325,15 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
         ColumnMetaData colmd = new ColumnMetaData();
         addColumn(colmd);
         return colmd;
+    }
+
+    /**
+     * Accessor for embeddedMetaData
+     * @return Returns the embeddedMetaData.
+     */
+    public final EmbeddedMetaData getEmbeddedMetaData()
+    {
+        return embeddedMetaData;
     }
 
     /**
@@ -395,6 +379,15 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
     }
 
     /**
+     * Accessor for indexMetaData
+     * @return Returns the indexMetaData.
+     */
+    public final IndexMetaData getIndexMetaData()
+    {
+        return indexMetaData;
+    }
+
+    /**
      * Mutator for the Index MetaData 
      * @param indexMetaData The indexMetaData to set.
      */
@@ -413,6 +406,15 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
         IndexMetaData idxmd = new IndexMetaData();
         setIndexMetaData(idxmd);
         return idxmd;
+    }
+
+    /**
+     * Accessor for uniqueMetaData
+     * @return Returns the uniqueMetaData.
+     */
+    public final UniqueMetaData getUniqueMetaData()
+    {
+        return uniqueMetaData;
     }
 
     /**

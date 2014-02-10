@@ -39,44 +39,46 @@ import org.datanucleus.util.StringUtils;
 public class JoinMetaData extends MetaData implements ColumnMetaDataContainer
 {
     /** the foreign-key element. */
-    ForeignKeyMetaData foreignKeyMetaData;
+    protected ForeignKeyMetaData foreignKeyMetaData;
 
     /** the index element. */
-    IndexMetaData indexMetaData;
+    protected IndexMetaData indexMetaData;
 
     /** the unique element. */
-    UniqueMetaData uniqueMetaData;
+    protected UniqueMetaData uniqueMetaData;
 
     /** PrimaryKey MetaData */
-    PrimaryKeyMetaData primaryKeyMetaData;
-
-    /** column elements */
-    List<ColumnMetaData> columns = null;
+    protected PrimaryKeyMetaData primaryKeyMetaData;
 
     /** if is outer join. Outer joins return all elements from at least one of the sides joined. */
-    boolean outer = false;
+    protected boolean outer = false;
 
     /** the table name. */
-    String table;
+    protected String table;
 
     /** the catalog name. */
-    String catalog;
+    protected String catalog;
 
     /** the schema name. */
-    String schema;
-
-    /** the column name. */
-    String columnName;
+    protected String schema;
 
     /** The indexing value */
-    IndexedValue indexed=null;
+    protected IndexedValue indexed=null;
 
     /** Whether to add a unique constraint. */
-    boolean unique;
+    protected boolean unique;
+
+    protected String columnName;
+
+    protected List<ColumnMetaData> columns = null;
+
+    public JoinMetaData()
+    {        
+    }
 
     /**
-     * Constructor to create a copy of the passed JoinMetaData.
-     * @param joinmd Existing join metadata to copy
+     * Copy constructor.
+     * @param joinmd Metadata to copy
      */
     public JoinMetaData(JoinMetaData joinmd)
     {
@@ -94,13 +96,6 @@ public class JoinMetaData extends MetaData implements ColumnMetaDataContainer
                 addColumn(new ColumnMetaData(colmd));
             }
         }
-    }
-
-    /**
-     * Default constructor. Use setters to set fields, before populate().
-     */
-    public JoinMetaData()
-    {        
     }
 
     /**

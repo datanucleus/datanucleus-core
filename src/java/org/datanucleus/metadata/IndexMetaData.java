@@ -55,21 +55,18 @@ public class IndexMetaData extends AbstractConstraintMetaData implements ColumnM
      */
     boolean unique = false;
 
+    public IndexMetaData()
+    {
+    }
+
     /**
-     * Constructor to create a copy of the passed metadata.
+     * Copy constructor.
      * @param imd The metadata to copy
      */
     public IndexMetaData(IndexMetaData imd)
     {
         super(imd);
         this.unique = imd.unique;
-    }
-
-    /**
-     * Default constructor. Set fields using setters, before populate().
-     */
-    public IndexMetaData()
-    {
     }
 
     public String getName()

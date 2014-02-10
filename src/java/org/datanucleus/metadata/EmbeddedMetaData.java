@@ -63,13 +63,8 @@ public class EmbeddedMetaData extends MetaData
     /** Fields/properties of the embedded object. */
     protected final List members = new ArrayList();
 
-    // -------------------------------------------------------------------------
-    // Fields below here are not represented in the output MetaData. They are
-    // for use internally in the operation of the JDO system. The majority are
-    // for convenience to save iterating through the fields since the fields
-    // are fixed once initialised.
-
-    protected AbstractMemberMetaData fieldMetaData[];
+    // TODO Drop this and just use "members" above
+    protected AbstractMemberMetaData memberMetaData[];
 
     /**
      * Constructor to create a copy of the passed metadata.
@@ -390,11 +385,11 @@ public class EmbeddedMetaData extends MetaData
      */
     public void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
     {
-        fieldMetaData = new AbstractMemberMetaData[members.size()];
-        for (int i=0; i<fieldMetaData.length; i++)
+        memberMetaData = new AbstractMemberMetaData[members.size()];
+        for (int i=0; i<memberMetaData.length; i++)
         {
-            fieldMetaData[i] = (AbstractMemberMetaData) members.get(i);
-            fieldMetaData[i].initialise(clr, mmgr);
+            memberMetaData[i] = (AbstractMemberMetaData) members.get(i);
+            memberMetaData[i].initialise(clr, mmgr);
         }
 
         if (discriminatorMetaData != null)
@@ -411,7 +406,7 @@ public class EmbeddedMetaData extends MetaData
      */
     public final AbstractMemberMetaData[] getMemberMetaData()
     {
-        return fieldMetaData;
+        return memberMetaData;
     }
 
     public final String getOwnerMember()

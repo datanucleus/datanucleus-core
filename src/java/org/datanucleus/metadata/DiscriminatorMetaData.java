@@ -46,9 +46,13 @@ public class DiscriminatorMetaData extends MetaData
     /** Definition of any indexing of the discriminator column. */
     protected IndexMetaData indexMetaData;
 
+    public DiscriminatorMetaData()
+    {
+    }
+
     /**
-     * Constructor to copy from the supplied discriminator metadata.
-     * @param dmd DiscriminatorMetaData
+     * Copy constructor.
+     * @param dmd DiscriminatorMetaData to copy
      */
     public DiscriminatorMetaData(final DiscriminatorMetaData dmd)
     {
@@ -65,13 +69,6 @@ public class DiscriminatorMetaData extends MetaData
         {
             setIndexMetaData(new IndexMetaData(dmd.indexMetaData));
         }
-    }
-
-    /**
-     * Default constructor. Set fields using setters, before populate().
-     */
-    public DiscriminatorMetaData()
-    {
     }
 
     /**
@@ -104,25 +101,13 @@ public class DiscriminatorMetaData extends MetaData
             }
         }
 
-        if (columnMetaData == null && columnName != null)
-        {
-            columnMetaData = new ColumnMetaData();
-            columnMetaData.setName(columnName);
-            columnMetaData.parent = this;
-            columnMetaData.initialise(clr, mmgr);
-        }
-
         // Interpret the "indexed" value to create our IndexMetaData where it wasn't specified that way
         if (indexMetaData == null && columnMetaData != null && indexed != null && indexed != IndexedValue.FALSE)
         {
             indexMetaData = new IndexMetaData();
             indexMetaData.setUnique(indexed == IndexedValue.UNIQUE);
-            // Note we only support a single column discriminator here
             indexMetaData.addColumn(columnMetaData);
-        }
-        if (indexMetaData != null)
-        {
-            indexMetaData.initialise(clr, mmgr);
+            indexMetaData.parent = this;
         }
 
         setInitialised();
@@ -214,7 +199,24 @@ public class DiscriminatorMetaData extends MetaData
 
     public DiscriminatorMetaData setColumnName(String columnName)
     {
-        this.columnName = (StringUtils.isWhitespace(columnName) ? null : columnName);
+        if (!StringUtils.isWhitespace(columnName))
+        {
+            if (columnMetaData == null)
+            {
+                columnMetaData = new ColumnMetaData();
+                columnMetaData.setName(columnName);
+                columnMetaData.parent = this;
+            }
+            else
+            {
+                columnMetaData.setName(columnName);
+            }
+            this.columnName = columnName;
+        }
+        else
+        {
+            this.columnName = null;
+        }
         return this;
     }
 

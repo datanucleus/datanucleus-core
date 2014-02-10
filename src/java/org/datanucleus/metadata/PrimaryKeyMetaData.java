@@ -37,9 +37,6 @@ public class PrimaryKeyMetaData extends MetaData implements ColumnMetaDataContai
 
     protected List<ColumnMetaData> columns = null;
 
-    /**
-     * Default constructor. Set the fields using setters, before populate().
-     */
     public PrimaryKeyMetaData()
     {
     }
@@ -60,11 +57,20 @@ public class PrimaryKeyMetaData extends MetaData implements ColumnMetaDataContai
         if (!StringUtils.isWhitespace(name))
         {
             this.columnName = (StringUtils.isWhitespace(name) ? null : name);
-            if (columns == null || columns.size() == 0)
+            if (columns == null)
             {
                 ColumnMetaData colmd = newColumnMetadata();
                 colmd.setName(columnName);
+                addColumn(colmd);
             }
+            else if (columns.size() == 1)
+            {
+                this.columns.iterator().next().setName(columnName);
+            }
+        }
+        else
+        {
+            this.columnName = null;
         }
         return this;
     }

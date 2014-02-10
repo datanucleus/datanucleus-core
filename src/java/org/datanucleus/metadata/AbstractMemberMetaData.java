@@ -1242,10 +1242,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             // Can't be not indexed and have index metadata, so just obey overriding flag
             indexMetaData = null;
         }
-        if (indexMetaData != null)
-        {
-            indexMetaData.initialise(clr, mmgr);
-        }
         if (uniqueMetaData == null && uniqueConstraint)
         {
             uniqueMetaData = new UniqueMetaData();
@@ -1255,15 +1251,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 uniqueMetaData.addColumn(columnMetaData[i]);
             }
         }
-        if (uniqueMetaData != null)
-        {
-            uniqueMetaData.initialise(clr, mmgr);
-        }
 
-        if (foreignKeyMetaData != null)
-        {
-            foreignKeyMetaData.initialise(clr, mmgr);
-        }
         if (orderMetaData != null)
         {
             orderMetaData.initialise(clr, mmgr);

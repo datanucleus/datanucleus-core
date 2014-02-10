@@ -155,23 +155,21 @@ public class InterfaceMetaData extends AbstractClassMetaData
                 joinMetaData[i] = joins.get(i);
                 joinMetaData[i].initialise(clr, mmgr);
             }
+
             indexMetaData = new IndexMetaData[indexes.size()];
             for (int i=0; i<indexMetaData.length; i++)
             {
                 indexMetaData[i] = indexes.get(i);
-                indexMetaData[i].initialise(clr, mmgr);
             }
             foreignKeyMetaData = new ForeignKeyMetaData[foreignKeys.size()];
             for (int i=0; i<foreignKeyMetaData.length; i++)
             {
                 foreignKeyMetaData[i] = foreignKeys.get(i);
-                foreignKeyMetaData[i].initialise(clr, mmgr);
             }
             uniqueMetaData = new UniqueMetaData[uniqueConstraints.size()];
             for (int i=0; i<uniqueMetaData.length; i++)
             {
                 uniqueMetaData[i] = uniqueConstraints.get(i);
-                uniqueMetaData[i].initialise(clr, mmgr);
             }
 
             if (fetchGroups != null)

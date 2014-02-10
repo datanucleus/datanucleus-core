@@ -42,8 +42,7 @@ import org.datanucleus.util.Localiser;
  * </OL>
  * <h3>MetaData Extensability</h3>
  * <p>
- * All MetaData elements are extensible with extensions for a "vendor-name". Extensions take the form
- * of a key and a value.
+ * All MetaData elements are extensible with extensions for a "vendor-name". Extensions take the form of a key and a value.
  */
 public class MetaData implements Serializable
 {
@@ -72,7 +71,7 @@ public class MetaData implements Serializable
     public static final String VENDOR_NAME = "datanucleus";
 
     /** Vendor name (JPOX) used for extensions. Deprecated. TODO Remove this */
-    public static final String VENDOR_NAME_OLD = "jpox";
+    private static final String VENDOR_NAME_OLD = "jpox";
 
     /** List of extensions for this MetaData element. */
     protected Collection<ExtensionMetaData> extensions = null;
