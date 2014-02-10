@@ -18,7 +18,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.metadata;
 
-import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -34,7 +33,7 @@ public class IdentityMetaData extends MetaData
     protected ColumnMetaData columnMetaData;
 
     /** strategy tag value. */
-    protected IdentityStrategy strategy;
+    protected IdentityStrategy strategy = IdentityStrategy.NATIVE;
 
     /** sequence tag value. */
     protected String sequence;
@@ -47,28 +46,6 @@ public class IdentityMetaData extends MetaData
      */
     public IdentityMetaData()
     {
-    }
-
-    /**
-     * Method to initialise all internal convenience arrays needed.
-     */
-    public void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
-    {
-        if (strategy == null)
-        {
-            strategy = IdentityStrategy.NATIVE;
-        }
-
-        // Cater for user specifying column name, or column
-        if (columnMetaData == null && columnName != null)
-        {
-            columnMetaData = new ColumnMetaData();
-            columnMetaData.setName(columnName);
-            columnMetaData.parent = this;
-            columnMetaData.initialise(clr, mmgr);
-        }
-
-        setInitialised();
     }
 
     /**
@@ -115,7 +92,24 @@ public class IdentityMetaData extends MetaData
      */
     public IdentityMetaData setColumnName(String columnName)
     {
-        this.columnName = (StringUtils.isWhitespace(columnName) ? null : columnName);
+        if (!StringUtils.isWhitespace(columnName))
+        {
+            this.columnName = columnName;
+            if (columnMetaData == null)
+            {
+                columnMetaData = new ColumnMetaData();
+                columnMetaData.setName(columnName);
+                columnMetaData.parent = this;
+            }
+            else
+            {
+                columnMetaData.setName(columnName);
+            }
+        }
+        else
+        {
+            this.columnName = null;
+        }
         return this;
     }
 
@@ -175,14 +169,7 @@ public class IdentityMetaData extends MetaData
      */
     public IdentityMetaData setValueGeneratorName(String generator)
     {
-        if (StringUtils.isWhitespace(generator))
-        {
-            valueGeneratorName = null;
-        }
-        else
-        {
-            this.valueGeneratorName = generator;
-        }
+        this.valueGeneratorName = (StringUtils.isWhitespace(generator) ? null : generator);
         return this;
     }
 
