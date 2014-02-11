@@ -48,7 +48,7 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-Xmx128m</argLine><!-- For SoftValueMapTest -->
+                    <argLine>${argLine} -Xmx128m</argLine><!-- For SoftValueMapTest -->
                 </configuration>
             </plugin>
             <plugin>
