@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
+import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.PersistenceNucleusContext;
@@ -66,8 +67,6 @@ import org.datanucleus.store.exceptions.NoExtentException;
 import org.datanucleus.store.federation.FederatedStoreManager;
 import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.schema.StoreSchemaHandler;
-import org.datanucleus.store.schema.naming.DN2NamingFactory;
-import org.datanucleus.store.schema.naming.JPANamingFactory;
 import org.datanucleus.store.schema.naming.NamingCase;
 import org.datanucleus.store.schema.naming.NamingFactory;
 import org.datanucleus.store.valuegenerator.AbstractDatastoreGenerator;
@@ -639,15 +638,25 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     {
         if (namingFactory == null)
         {
-            // TODO Make this pluggable and use "identifier_namingfactory" plugin point
-//            String namingFactoryName = getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_NAMING_FACTORY);
-            if (nucleusContext.getApiName().equalsIgnoreCase("JPA"))
+            // Create the NamingFactory
+            String namingFactoryName = getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_NAMING_FACTORY);
+            String namingFactoryClassName = nucleusContext.getPluginManager().getAttributeValueForExtension("org.datanucleus.identifier_namingfactory", 
+                "name", namingFactoryName, "class-name");
+            if (namingFactoryClassName == null)
             {
-                namingFactory = new JPANamingFactory(nucleusContext);
+                // TODO Localise this
+                throw new NucleusUserException("Error in specified NamingFactory " + namingFactoryName + " not found");
             }
-            else
+            try
             {
-                namingFactory = new DN2NamingFactory(nucleusContext);
+                Class[] argTypes = new Class[] {ClassConstants.NUCLEUS_CONTEXT};
+                Object[] args = new Object[] {nucleusContext};
+                namingFactory = (NamingFactory)nucleusContext.getPluginManager().createExecutableExtension(
+                    "org.datanucleus.identifier_namingfactory", "name", namingFactoryName, "class-name", argTypes, args);
+            }
+            catch (Throwable thr)
+            {
+                NucleusLogger.GENERAL.debug(">> Exception creating NamingFactory", thr);
             }
 
             // Set the case TODO Handle quoted cases (not specifiable via this property currently)

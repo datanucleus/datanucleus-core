@@ -53,7 +53,7 @@ Contributors:
     <extension-point id="annotations" name="Annotations" schema="schema/annotations.exsd"/>
     <extension-point id="class_annotation_handler" name="Class Annotation Handler" schema="schema/class_annotation_handler.exsd"/>
     <extension-point id="member_annotation_handler" name="Member Annotation Handler" schema="schema/member_annotation_handler.exsd"/>
-    <!--extension-point id="identifier_namingfactory" name="Identifier NamingFactory" schema="schema/identifier_namingfactory.exsd"/-->
+    <extension-point id="identifier_namingfactory" name="Identifier NamingFactory" schema="schema/identifier_namingfactory.exsd"/>
 
     <!-- LEVEL1 CACHES -->
     <extension point="org.datanucleus.cache_level1">
@@ -98,6 +98,12 @@ Contributors:
     <!-- IDENTITY STRING TRANSLATOR -->
     <extension point="org.datanucleus.identity_string_translator">
         <identitystringtranslator name="xcalia" class-name="org.datanucleus.identity.XcaliaIdentityStringTranslator"/>
+    </extension>
+
+    <!-- NAMING FACTORY -->
+    <extension point="org.datanucleus.identifier_namingfactory">
+        <namingfactory name="datanucleus2" class-name="org.datanucleus.store.schema.naming.DN2NamingFactory"/>
+        <namingfactory name="jpa" class-name="org.datanucleus.store.schema.naming.JPANamingFactory"/>
     </extension>
 
     <!-- JAVA TYPES -->

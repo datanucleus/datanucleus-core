@@ -264,13 +264,14 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_VALIDATE_CONSTRAINTS, null, false, true, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_WARNONERROR, null, false, true, false);
 
-        // Schema and identifier naming
+        // Schema identifier naming
+        conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_NAMING_FACTORY, null, "datanucleus2", null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_CASE, null, null,
             CorePropertyValidator.class.getName(), true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_TABLE_PREFIX, null, null, null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_TABLE_SUFFIX, null, null, null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_WORD_SEPARATOR, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_FACTORY, null, "datanucleus2", null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_FACTORY, null, "datanucleus2", null, true, false); // TODO Migrate RDBMS to use NamingFactory and drop this
 
         // Datastore
         conf.addDefaultProperty(PropertyNames.PROPERTY_STORE_MANAGER_TYPE, null, null, null, false, false);
