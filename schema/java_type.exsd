@@ -121,7 +121,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.datanucleus.sco.SCO"/>
+                  <meta.attribute kind="java" basedOn=":org.datanucleus.store.types.SCO"/>
                </appInfo>
             </annotation>
          </attribute>
@@ -131,7 +131,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.datanucleus.sco.SCO"/>
+                  <meta.attribute kind="java" basedOn=":org.datanucleus.store.types.SCO"/>
                </appInfo>
             </annotation>
          </attribute>
