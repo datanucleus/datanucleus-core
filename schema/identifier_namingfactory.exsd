@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.datanucleus">
+<schema targetNamespace="org.datanucleus" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.datanucleus" id="store_identifierfactory" name="Identifier Factory"/>
+         <meta.schema plugin="org.datanucleus" id="identifier_namingfactory" name="Identifier NamingFactory"/>
       </appInfo>
       <documentation>
          Extension allowing definition of a factory for creating datastore identifiers.
@@ -11,9 +11,14 @@
    </annotation>
 
    <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
       <complexType>
          <sequence>
-            <element ref="identifierfactory" minOccurs="1" maxOccurs="unbounded"/>
+            <element ref="namingfactory" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -42,7 +47,7 @@
       </complexType>
    </element>
 
-   <element name="identifierfactory">
+   <element name="namingfactory">
       <complexType>
          <attribute name="name" type="string">
             <annotation>
@@ -57,7 +62,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.datanucleus.store.mapped.IdentifierFactory"/>
+                  <meta.attribute kind="java" basedOn=":org.datanucleus.store.schema.naming.NamingFactory"/>
                </appInfo>
             </annotation>
          </attribute>
@@ -100,13 +105,5 @@
       </documentation>
    </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="copyright"/>
-      </appInfo>
-      <documentation>
-         
-      </documentation>
-   </annotation>
 
 </schema>

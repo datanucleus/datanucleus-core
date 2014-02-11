@@ -639,7 +639,8 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     {
         if (namingFactory == null)
         {
-            // TODO Make this pluggable
+            // TODO Make this pluggable and use "identifier_namingfactory" plugin point
+//            String namingFactoryName = getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_NAMING_FACTORY);
             if (nucleusContext.getApiName().equalsIgnoreCase("JPA"))
             {
                 namingFactory = new JPANamingFactory(nucleusContext);

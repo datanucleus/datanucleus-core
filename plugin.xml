@@ -53,11 +53,7 @@ Contributors:
     <extension-point id="annotations" name="Annotations" schema="schema/annotations.exsd"/>
     <extension-point id="class_annotation_handler" name="Class Annotation Handler" schema="schema/class_annotation_handler.exsd"/>
     <extension-point id="member_annotation_handler" name="Member Annotation Handler" schema="schema/member_annotation_handler.exsd"/>
-
-    <!-- TODO Move these to RDBMS plugin when GAE doesn't use "mappings" -->
-    <extension-point id="store_datastoreadapter" name="Datastore Adapter" schema="schema/datastoreadapter.exsd"/>
-    <extension-point id="store_mapping" name="Types Mapping" schema="schema/mapping.exsd"/>
-    <extension-point id="store_identifierfactory" name="Identifier Factory" schema="schema/identifierfactory.exsd"/>
+    <!--extension-point id="identifier_namingfactory" name="Identifier NamingFactory" schema="schema/identifier_namingfactory.exsd"/-->
 
     <!-- LEVEL1 CACHES -->
     <extension point="org.datanucleus.cache_level1">

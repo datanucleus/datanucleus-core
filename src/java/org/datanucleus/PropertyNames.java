@@ -146,11 +146,12 @@ public class PropertyNames
     public static final String PROPERTY_MAPPING_SCHEMA = "datanucleus.mapping.Schema";
     public static final String PROPERTY_MAPPING_TENANT_ID = "datanucleus.TenantID";
 
+    public static final String PROPERTY_IDENTIFIER_NAMING_FACTORY = "datanucleus.identifier.namingFactory";
     public static final String PROPERTY_IDENTIFIER_CASE = "datanucleus.identifier.case";
     public static final String PROPERTY_IDENTIFIER_TABLE_PREFIX = "datanucleus.identifier.tablePrefix";
     public static final String PROPERTY_IDENTIFIER_TABLE_SUFFIX = "datanucleus.identifier.tableSuffix";
     public static final String PROPERTY_IDENTIFIER_WORD_SEPARATOR = "datanucleus.identifier.wordSeparator";
-    public static final String PROPERTY_IDENTIFIER_FACTORY = "datanucleus.identifierFactory";
+    public static final String PROPERTY_IDENTIFIER_FACTORY = "datanucleus.identifierFactory"; // TODO Drop this when RDBMS uses NamingFactory
 
     public static final String PROPERTY_STORE_MANAGER_TYPE = "datanucleus.storeManagerType";
     public static final String PROPERTY_STORE_ALLOW_REFS_WITHOUT_IMPLS = "datanucleus.store.allowReferencesWithNoImplementations";
