@@ -31,7 +31,7 @@ import org.datanucleus.util.StringUtils;
  * column elements are mapped elsewhere, and the column elements contain only
  * the column name.
  */
-public class IndexMetaData extends AbstractConstraintMetaData implements ColumnMetaDataContainer
+public class IndexMetaData extends AbstractConstraintMetaData
 {
     /**
      * You can use UNIQUE constraints to ensure that no duplicate values are
@@ -126,11 +126,11 @@ public class IndexMetaData extends AbstractConstraintMetaData implements ColumnM
                 sb.append(prefix).append(indent).append("<field name=\"" + memberName + "\"/>");
             }
         }
-        if (columns != null)
+        if (columnNames != null)
         {
-            for (ColumnMetaData colmd : columns)
+            for (String columnName : columnNames)
             {
-                sb.append(colmd.toString(prefix + indent,indent));
+                sb.append(prefix).append(indent).append("<column name=\"" + columnName + "\"/>");
             }
         }
 

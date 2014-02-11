@@ -115,7 +115,7 @@ public class OrderMetaData extends MetaData implements ColumnMetaDataContainer
             {
                 for (ColumnMetaData colmd : columns)
                 {
-                    indexMetaData.addColumn(colmd);
+                    indexMetaData.addColumn(colmd.getName());
                 }
             }
         }

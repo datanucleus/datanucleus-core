@@ -34,8 +34,8 @@ public class AbstractConstraintMetaData extends MetaData
     /** The member names for this constraint. */
     protected List<String> memberNames = null;
 
-    /** The columns for this constraint. TODO Could we make this columnNames? */
-    protected List<ColumnMetaData> columns = null;
+    /** The column names for this constraint. */
+    protected List<String> columnNames = null;
 
     /**
      * Default constructor. Set fields using setters before populate().
@@ -60,11 +60,11 @@ public class AbstractConstraintMetaData extends MetaData
                 addMember(memberName);
             }
         }
-        if (acmd.columns != null)
+        if (acmd.columnNames != null)
         {
-            for (ColumnMetaData colmd : acmd.columns)
+            for (String columnName : acmd.columnNames)
             {
-                addColumn(new ColumnMetaData(colmd));
+                addColumn(columnName);
             }
         }
     }
@@ -82,31 +82,6 @@ public class AbstractConstraintMetaData extends MetaData
         memberNames.add(memberName);
     }
 
-    /**
-     * Add a new ColumnMetaData element
-     * @param colmd MetaData for the column
-     */
-    public void addColumn(ColumnMetaData colmd)
-    {
-        if (columns == null)
-        {
-            columns = new ArrayList<ColumnMetaData>();
-        }
-        columns.add(colmd);
-        colmd.parent = this;
-    }
-
-    /**
-     * Method to create a new column, add it, and return it.
-     * @return The column metadata
-     */
-    public ColumnMetaData newColumnMetaData()
-    {
-        ColumnMetaData colmd = new ColumnMetaData();
-        addColumn(colmd);
-        return colmd;
-    }
-
     public final String[] getMemberNames()
     {
         if (memberNames == null)
@@ -116,22 +91,35 @@ public class AbstractConstraintMetaData extends MetaData
         return memberNames.toArray(new String[memberNames.size()]);
     }
 
-    public final ColumnMetaData[] getColumnMetaData()
-    {
-        if (columns == null)
-        {
-            return null;
-        }
-        return columns.toArray(new ColumnMetaData[columns.size()]);
-    }
-
     public int getNumberOfMembers()
     {
         return (memberNames != null ? memberNames.size() : 0);
     }
 
+    /**
+     * Add a new column that is part of the constraint.
+     * @param columnName Name for the column
+     */
+    public void addColumn(String columnName)
+    {
+        if (columnNames == null)
+        {
+            columnNames = new ArrayList<String>();
+        }
+        columnNames.add(columnName);
+    }
+
+    public final String[] getColumnNames()
+    {
+        if (columnNames == null)
+        {
+            return null;
+        }
+        return columnNames.toArray(new String[columnNames.size()]);
+    }
+
     public int getNumberOfColumns()
     {
-        return (columns != null ? columns.size() : 0);
+        return (columnNames != null ? columnNames.size() : 0);
     }
 }

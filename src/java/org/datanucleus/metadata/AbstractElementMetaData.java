@@ -142,7 +142,7 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
             {
                 for (ColumnMetaData colmd : columns)
                 {
-                    indexMetaData.addColumn(colmd);
+                    indexMetaData.addColumn(colmd.getName());
                 }
             }
         }
@@ -155,7 +155,7 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
             {
                 for (ColumnMetaData colmd : columns)
                 {
-                    uniqueMetaData.addColumn(colmd);
+                    uniqueMetaData.addColumn(colmd.getName());
                 }
             }
         }

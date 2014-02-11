@@ -23,26 +23,23 @@ import org.datanucleus.util.StringUtils;
 /**
  * MetaData representing a unique constraint.
  */
-public class UniqueMetaData extends AbstractConstraintMetaData implements ColumnMetaDataContainer
+public class UniqueMetaData extends AbstractConstraintMetaData
 {
     /** Whether the unique is initially deferred. */
     boolean deferred = false;
 
+    public UniqueMetaData()
+    {
+    }
+
     /**
-     * Constructor to create a copy of the passed metadata using the provided parent.
+     * Copy constructor.
      * @param umd The metadata to copy
      */
     public UniqueMetaData(UniqueMetaData umd)
     {
         super(umd);
         this.deferred = umd.deferred;
-    }
-
-    /**
-     * Default constructor. Set fields using setters, before populate().
-     */
-    public UniqueMetaData()
-    {
     }
 
     public String getName()
@@ -106,11 +103,11 @@ public class UniqueMetaData extends AbstractConstraintMetaData implements Column
                 sb.append(prefix).append(indent).append("<field name=\"" + memberName + "\"/>");
             }
         }
-        if (columns != null)
+        if (columnNames != null)
         {
-            for (ColumnMetaData colmd : columns)
+            for (String columnName : columnNames)
             {
-                sb.append(colmd.toString(prefix + indent,indent));
+                sb.append(prefix).append(indent).append("<column name=\"" + columnName + "\"/>");
             }
         }
 

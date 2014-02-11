@@ -121,7 +121,7 @@ public class JoinMetaData extends MetaData implements ColumnMetaDataContainer
             {
                 for (ColumnMetaData colmd : columns)
                 {
-                    indexMetaData.addColumn(colmd);
+                    indexMetaData.addColumn(colmd.getName());
                 }
             }
         }
@@ -134,7 +134,7 @@ public class JoinMetaData extends MetaData implements ColumnMetaDataContainer
             {
                 for (ColumnMetaData colmd : columns)
                 {
-                    uniqueMetaData.addColumn(colmd);
+                    uniqueMetaData.addColumn(colmd.getName());
                 }
             }
         }

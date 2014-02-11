@@ -1234,7 +1234,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             indexMetaData.setUnique(indexed == IndexedValue.UNIQUE);
             for (int i=0;i<columnMetaData.length;i++)
             {
-                indexMetaData.addColumn(columnMetaData[i]);
+                indexMetaData.addColumn(columnMetaData[i].getName());
             }
         }
         else if (indexed == IndexedValue.TRUE && indexMetaData != null)
@@ -1248,7 +1248,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             uniqueMetaData.setTable(column);
             for (int i=0;i<columnMetaData.length;i++)
             {
-                uniqueMetaData.addColumn(columnMetaData[i]);
+                uniqueMetaData.addColumn(columnMetaData[i].getName());
             }
         }
 

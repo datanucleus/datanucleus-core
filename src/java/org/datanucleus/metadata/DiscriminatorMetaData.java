@@ -106,7 +106,7 @@ public class DiscriminatorMetaData extends MetaData
         {
             indexMetaData = new IndexMetaData();
             indexMetaData.setUnique(indexed == IndexedValue.UNIQUE);
-            indexMetaData.addColumn(columnMetaData);
+            indexMetaData.addColumn(columnMetaData.getName());
             indexMetaData.parent = this;
         }
 

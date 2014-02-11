@@ -19,6 +19,9 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.metadata;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -34,8 +37,20 @@ import org.datanucleus.util.StringUtils;
  * the column elements contained in the foreign-key element have only the column
  * name.
  */
-public class ForeignKeyMetaData extends AbstractConstraintMetaData implements ColumnMetaDataContainer
+public class ForeignKeyMetaData extends MetaData implements ColumnMetaDataContainer
 {
+    /** the constraint name */
+    protected String name;
+
+    /** the constraint table name. Name of the table to which this applies (null implies the enclosing class' table). */
+    protected String table;
+
+    /** The member names for this constraint. */
+    protected List<String> memberNames = null;
+
+    /** The columns for this constraint. */
+    protected List<ColumnMetaData> columns = null;
+
     /**
      * The unique attribute specifies whether the foreign key constraint is
      * defined to be a unique constraint as well. This is most often used with
@@ -68,24 +83,101 @@ public class ForeignKeyMetaData extends AbstractConstraintMetaData implements Co
 
     protected boolean fkDefinitionApplies = false;
 
-    /**
-     * Default constructor. Set fields using setters, before populate().
-     */
     public ForeignKeyMetaData()
     {
     }
 
     /**
-     * Constructor to create a copy of the passed metadata using the provided parent.
+     * Copy constructor.
      * @param fkmd The metadata to copy
      */
     public ForeignKeyMetaData(ForeignKeyMetaData fkmd)
     {
-        super(fkmd);
+        super(null, fkmd);
+        this.name = fkmd.name;
+        this.table = fkmd.table;
+
+        if (fkmd.memberNames != null)
+        {
+            for (String memberName : fkmd.memberNames)
+            {
+                addMember(memberName);
+            }
+        }
+        if (fkmd.columns != null)
+        {
+            for (ColumnMetaData colmd : fkmd.columns)
+            {
+                addColumn(new ColumnMetaData(colmd));
+            }
+        }
+
         this.unique = fkmd.unique;
         this.deferred = fkmd.deferred;
         this.deleteAction = fkmd.deleteAction;
         this.updateAction = fkmd.updateAction;
+    }
+
+    /**
+     * Add a new member that is part of this constraint.
+     * @param memberName member name for the field/property
+     */
+    public void addMember(String memberName)
+    {
+        if (memberNames == null)
+        {
+            memberNames = new ArrayList<String>();
+        }
+        memberNames.add(memberName);
+    }
+
+    public final String[] getMemberNames()
+    {
+        if (memberNames == null)
+        {
+            return null;
+        }
+        return memberNames.toArray(new String[memberNames.size()]);
+    }
+
+    public int getNumberOfMembers()
+    {
+        return (memberNames != null ? memberNames.size() : 0);
+    }
+
+    public void addColumn(ColumnMetaData colmd)
+    {
+        if (columns == null)
+        {
+            columns = new ArrayList<ColumnMetaData>();
+        }
+        columns.add(colmd);
+        colmd.parent = this;
+    }
+
+    /**
+     * Method to create a new column, add it, and return it.
+     * @return The column metadata
+     */
+    public ColumnMetaData newColumnMetaData()
+    {
+        ColumnMetaData colmd = new ColumnMetaData();
+        addColumn(colmd);
+        return colmd;
+    }
+
+    public final ColumnMetaData[] getColumnMetaData()
+    {
+        if (columns == null)
+        {
+            return null;
+        }
+        return columns.toArray(new ColumnMetaData[columns.size()]);
+    }
+
+    public int getNumberOfColumns()
+    {
+        return (columns != null ? columns.size() : 0);
     }
 
     public final String getName()

@@ -101,7 +101,7 @@ public class VersionMetaData extends MetaData
             {
                 indexMetaData = new IndexMetaData();
                 indexMetaData.setUnique(indexed == IndexedValue.UNIQUE);
-                indexMetaData.addColumn(columnMetaData);
+                indexMetaData.addColumn(columnMetaData.getName());
                 indexMetaData.parent = this;
             }
         }
