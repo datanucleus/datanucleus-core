@@ -101,6 +101,9 @@ public interface NamingFactory
 
     /**
      * Method to return the name of the column for the position of the specified EMBEDDED field, within the specified owner field.
+     * For example, say we have a class Type1 with field "field1" that is marked as embedded, and this is of type Type2. 
+     * In turn Type2 has a field "field2" that is also embedded, of type Type3. Type3 has a field "name". So to get the column name for
+     * Type3.name in the table for Type1 we call "getColumnName(mmdForField1InType1, {mmdForField2InType2, mmdForNameInType3}, 0)".
      * @param ownerMmd Metadata for owner field that embeds the field(s) being considered here.
      * @param mmds MetaData for the field(s) with the column. If this is a nested embedded then there will be multiple values here
      * @param position The position of the column (where this field has multiple columns)
