@@ -141,36 +141,46 @@ public abstract class AbstractNamingFactory implements NamingFactory
         EmbeddedMetaData embmd = ownerMmd.getEmbeddedMetaData();
         if (embmd != null)
         {
+            boolean checked = false;
             int mmdNo = 0;
-            AbstractMemberMetaData[] embMmds = embmd.getMemberMetaData();
-            if (embMmds != null)
+            while (!checked)
             {
-                boolean found = false;
-                for (int i=0;i<embMmds.length;i++)
+                AbstractMemberMetaData[] embMmds = embmd.getMemberMetaData();
+                if (embMmds != null)
                 {
-                    if (embMmds[i].getFullFieldName().equals(mmds[mmdNo].getFullFieldName()))
+                    boolean checkedEmbmd = false;
+                    for (int i=0;i<embMmds.length;i++)
                     {
-                        found = true;
-                        if (mmds.length == mmdNo+1)
+                        if (embMmds[i].getFullFieldName().equals(mmds[mmdNo].getFullFieldName()))
                         {
-                            // Found last embedded field, so use column data if present
-                            ColumnMetaData[] colmds = embMmds[i].getColumnMetaData();
-                            if (colmds != null && colmds.length > position)
+                            if (mmds.length == mmdNo+1)
                             {
-                                String colName = colmds[position].getName();
-                                return prepareIdentifierNameForUse(colName, SchemaComponent.COLUMN);
+                                // Found last embedded field, so use column data if present
+                                checked = true;
+                                ColumnMetaData[] colmds = embMmds[i].getColumnMetaData();
+                                if (colmds != null && colmds.length > position)
+                                {
+                                    String colName = colmds[position].getName();
+                                    return prepareIdentifierNameForUse(colName, SchemaComponent.COLUMN);
+                                }
                             }
+                            else
+                            {
+                                // Go to next level in embMmds if present
+                                checkedEmbmd = true;
+                                mmdNo++;
+                                embmd = embMmds[i].getEmbeddedMetaData();
+                                if (embmd == null)
+                                {
+                                    // No more info specified so drop out here
+                                    checked = true;
+                                }
+                            }
+                        }
+                        if (checked || checkedEmbmd)
+                        {
                             break;
                         }
-                        else
-                        {
-                            // Go to next level in embMmds
-                            // TODO Find nested members in embMmds
-                        }
-                    }
-                    if (found)
-                    {
-                        break;
                     }
                 }
             }
