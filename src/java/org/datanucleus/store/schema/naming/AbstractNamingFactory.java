@@ -24,6 +24,8 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.ColumnMetaData;
+import org.datanucleus.metadata.EmbeddedMetaData;
 import org.datanucleus.metadata.IndexMetaData;
 import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.util.StringUtils;
@@ -128,6 +130,61 @@ public abstract class AbstractNamingFactory implements NamingFactory
     public String getColumnName(AbstractMemberMetaData mmd, ColumnType type)
     {
         return getColumnName(mmd, type, 0);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.naming.NamingFactory#getColumnName(org.datanucleus.metadata.AbstractMemberMetaData, org.datanucleus.metadata.AbstractMemberMetaData[], int)
+     */
+    @Override
+    public String getColumnName(AbstractMemberMetaData ownerMmd, AbstractMemberMetaData[] mmds, int position)
+    {
+        EmbeddedMetaData embmd = ownerMmd.getEmbeddedMetaData();
+        if (embmd != null)
+        {
+            int mmdNo = 0;
+            AbstractMemberMetaData[] embMmds = embmd.getMemberMetaData();
+            if (embMmds != null)
+            {
+                boolean found = false;
+                for (int i=0;i<embMmds.length;i++)
+                {
+                    if (embMmds[i].getFullFieldName().equals(mmds[mmdNo].getFullFieldName()))
+                    {
+                        found = true;
+                        if (mmds.length == mmdNo+1)
+                        {
+                            // Found last embedded field, so use column data if present
+                            ColumnMetaData[] colmds = embMmds[i].getColumnMetaData();
+                            if (colmds != null && colmds.length > position)
+                            {
+                                String colName = colmds[position].getName();
+                                return prepareIdentifierNameForUse(colName, SchemaComponent.COLUMN);
+                            }
+                            break;
+                        }
+                        else
+                        {
+                            // Go to next level in embMmds
+                            // TODO Find nested members in embMmds
+                        }
+                    }
+                    if (found)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        // EmbeddedMetaData doesn't specify this members column, so generate one based on the names of the member(s).
+        StringBuilder str = new StringBuilder(ownerMmd.getName());
+        for (int i=0;i<mmds.length;i++)
+        {
+            str.append(wordSeparator);
+            str.append(mmds[i].getName());
+        }
+
+        return prepareIdentifierNameForUse(str.toString(), SchemaComponent.COLUMN);
     }
 
     /* (non-Javadoc)

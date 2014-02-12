@@ -99,7 +99,14 @@ public interface NamingFactory
      */
     String getColumnName(AbstractMemberMetaData mmd, ColumnType type, int position);
 
-    // TODO Support columnName for embedded fields. What to pass in to the method?
+    /**
+     * Method to return the name of the column for the position of the specified EMBEDDED field, within the specified owner field.
+     * @param ownerMmd Metadata for owner field that embeds the field(s) being considered here.
+     * @param mmds MetaData for the field(s) with the column. If this is a nested embedded then there will be multiple values here
+     * @param position The position of the column (where this field has multiple columns)
+     * @return The column name
+     */
+    String getColumnName(AbstractMemberMetaData ownerMmd, AbstractMemberMetaData[] mmds, int position);
 
     /**
      * Method to return the name of an index specified at class level.
