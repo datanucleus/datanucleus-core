@@ -146,10 +146,23 @@ public abstract class AbstractNamingFactory implements NamingFactory
     {
         if (!StringUtils.isWhitespace(idxmd.getName()))
         {
-            return idxmd.getName();
+            String idxName = idxmd.getName();
+
+            int maxLength = getMaximumLengthForComponent(SchemaComponent.CONSTRAINT);
+            if (maxLength > 0 && idxName.length() > maxLength)
+            {
+                idxName = truncate(idxName, maxLength);
+            }
+            return getNameInRequiredCase(idxName);
         }
 
-        return cmd.getName() + wordSeparator + position + wordSeparator + "IDX";
+        String idxName = cmd.getName() + wordSeparator + position + wordSeparator + "IDX";
+        int maxLength = getMaximumLengthForComponent(SchemaComponent.CONSTRAINT);
+        if (maxLength > 0 && idxName.length() > maxLength)
+        {
+            idxName = truncate(idxName, maxLength);
+        }
+        return getNameInRequiredCase(idxName);
     }
 
     /* (non-Javadoc)
@@ -160,10 +173,23 @@ public abstract class AbstractNamingFactory implements NamingFactory
     {
         if (!StringUtils.isWhitespace(idxmd.getName()))
         {
-            return idxmd.getName();
+            String idxName = idxmd.getName();
+
+            int maxLength = getMaximumLengthForComponent(SchemaComponent.CONSTRAINT);
+            if (maxLength > 0 && idxName.length() > maxLength)
+            {
+                idxName = truncate(idxName, maxLength);
+            }
+            return getNameInRequiredCase(idxName);
         }
 
-        return mmd.getClassName(false) + wordSeparator + mmd.getName() + wordSeparator + "IDX";
+        String idxName = mmd.getClassName(false) + wordSeparator + mmd.getName() + wordSeparator + "IDX";
+        int maxLength = getMaximumLengthForComponent(SchemaComponent.CONSTRAINT);
+        if (maxLength > 0 && idxName.length() > maxLength)
+        {
+            idxName = truncate(idxName, maxLength);
+        }
+        return getNameInRequiredCase(idxName);
     }
 
     /** The number of characters used to build the hash. */

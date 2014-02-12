@@ -39,6 +39,7 @@ import org.datanucleus.metadata.VersionMetaData;
  * <li>Index field columns will, by default, be called "IDX"</li>
  * <li>Version field columns will, by default, be called "VERSION"</li>
  * <li>Adapter index field columns will, by default, be called "IDX"</li>
+ * <li>Index names will, by default, be called "{class}_{field}_IDX" or "{class}_{position}_IDX"</li>
  * </ul>
  */
 public class DN2NamingFactory extends AbstractNamingFactory
