@@ -79,17 +79,8 @@ public class DN2NamingFactory extends AbstractNamingFactory
             name = ownerClass + wordSeparator + mmd.getName();
         }
 
-        // Apply any truncation necessary
-        int maxLength = getMaximumLengthForComponent(SchemaComponent.TABLE);
-        if (maxLength > 0 && name.length() > maxLength)
-        {
-            name = truncate(name, maxLength);
-        }
-
-        // Apply any case and quoting
-        name = getNameInRequiredCase(name);
-
-        return name;
+        // Apply any truncation/casing necessary
+        return prepareIdentifierNameForUse(name, SchemaComponent.TABLE);
     }
 
     /* (non-Javadoc)
@@ -153,7 +144,7 @@ public class DN2NamingFactory extends AbstractNamingFactory
             throw new NucleusException("This method does not support columns of type " + type);
         }
 
-        return prepareColumnNameForUse(name);
+        return prepareIdentifierNameForUse(name, SchemaComponent.COLUMN);
     }
 
     /* (non-Javadoc)
@@ -234,6 +225,6 @@ public class DN2NamingFactory extends AbstractNamingFactory
             throw new NucleusException("This method does not support columns of type " + type);
         }
 
-        return prepareColumnNameForUse(name);
+        return prepareIdentifierNameForUse(name, SchemaComponent.COLUMN);
     }
 }

@@ -118,16 +118,7 @@ public abstract class AbstractNamingFactory implements NamingFactory
         }
 
         // Apply any truncation necessary
-        int maxLength = getMaximumLengthForComponent(SchemaComponent.TABLE);
-        if (name != null && maxLength > 0 && name.length() > maxLength)
-        {
-            name = truncate(name, maxLength);
-        }
-
-        // Apply any case and quoting
-        name = getNameInRequiredCase(name);
-
-        return name;
+        return prepareIdentifierNameForUse(name, SchemaComponent.TABLE);
     }
 
     /* (non-Javadoc)
@@ -146,23 +137,11 @@ public abstract class AbstractNamingFactory implements NamingFactory
     {
         if (!StringUtils.isWhitespace(idxmd.getName()))
         {
-            String idxName = idxmd.getName();
-
-            int maxLength = getMaximumLengthForComponent(SchemaComponent.CONSTRAINT);
-            if (maxLength > 0 && idxName.length() > maxLength)
-            {
-                idxName = truncate(idxName, maxLength);
-            }
-            return getNameInRequiredCase(idxName);
+            return prepareIdentifierNameForUse(idxmd.getName(), SchemaComponent.CONSTRAINT);
         }
 
         String idxName = cmd.getName() + wordSeparator + position + wordSeparator + "IDX";
-        int maxLength = getMaximumLengthForComponent(SchemaComponent.CONSTRAINT);
-        if (maxLength > 0 && idxName.length() > maxLength)
-        {
-            idxName = truncate(idxName, maxLength);
-        }
-        return getNameInRequiredCase(idxName);
+        return prepareIdentifierNameForUse(idxName, SchemaComponent.CONSTRAINT);
     }
 
     /* (non-Javadoc)
@@ -173,23 +152,11 @@ public abstract class AbstractNamingFactory implements NamingFactory
     {
         if (!StringUtils.isWhitespace(idxmd.getName()))
         {
-            String idxName = idxmd.getName();
-
-            int maxLength = getMaximumLengthForComponent(SchemaComponent.CONSTRAINT);
-            if (maxLength > 0 && idxName.length() > maxLength)
-            {
-                idxName = truncate(idxName, maxLength);
-            }
-            return getNameInRequiredCase(idxName);
+            return prepareIdentifierNameForUse(idxmd.getName(), SchemaComponent.CONSTRAINT);
         }
 
         String idxName = mmd.getClassName(false) + wordSeparator + mmd.getName() + wordSeparator + "IDX";
-        int maxLength = getMaximumLengthForComponent(SchemaComponent.CONSTRAINT);
-        if (maxLength > 0 && idxName.length() > maxLength)
-        {
-            idxName = truncate(idxName, maxLength);
-        }
-        return getNameInRequiredCase(idxName);
+        return prepareIdentifierNameForUse(idxName, SchemaComponent.CONSTRAINT);
     }
 
     /** The number of characters used to build the hash. */
@@ -315,13 +282,23 @@ public abstract class AbstractNamingFactory implements NamingFactory
         return id.toString();
     }
 
-
-    protected String prepareColumnNameForUse(String name)
+    /**
+     * Convenience method that will truncate the provided name if it is longer than the longest possible for the specified schema component,
+     * and then convert it into the required case.
+     * @param name The name
+     * @param cmpt The schema component that it is for
+     * @return The prepared identifier name
+     */
+    protected String prepareIdentifierNameForUse(String name, SchemaComponent cmpt)
     {
+        if (name == null)
+        {
+            return name;
+        }
         String preparedName = name;
 
         // Apply any truncation necessary
-        int maxLength = getMaximumLengthForComponent(SchemaComponent.COLUMN);
+        int maxLength = getMaximumLengthForComponent(cmpt);
         if (preparedName != null && maxLength > 0 && preparedName.length() > maxLength)
         {
             preparedName = truncate(preparedName, maxLength);
