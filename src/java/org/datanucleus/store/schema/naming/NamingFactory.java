@@ -20,6 +20,7 @@ package org.datanucleus.store.schema.naming;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IndexMetaData;
+import org.datanucleus.metadata.SequenceMetaData;
 
 /**
  * Representation of a naming factory for schema components (tables, columns, etc).
@@ -98,6 +99,8 @@ public interface NamingFactory
      */
     String getColumnName(AbstractMemberMetaData mmd, ColumnType type, int position);
 
+    // TODO Support columnName for embedded fields. What to pass in to the method?
+
     /**
      * Method to return the name of an index specified at class level.
      * @param cmd Metadata for the class
@@ -114,4 +117,13 @@ public interface NamingFactory
      * @return Name of the index
      */
     String getIndexName(AbstractMemberMetaData mmd, IndexMetaData idxmd);
+
+    // TODO Support foreign-key naming
+
+    /**
+     * Method to return the name of sequence.
+     * @param seqmd Metadata for the sequence
+     * @return Name of the sequence
+     */
+    String getSequenceName(SequenceMetaData seqmd);
 }

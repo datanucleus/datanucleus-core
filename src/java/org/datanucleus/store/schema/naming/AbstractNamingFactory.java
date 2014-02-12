@@ -25,6 +25,7 @@ import org.datanucleus.NucleusContext;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IndexMetaData;
+import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -157,6 +158,21 @@ public abstract class AbstractNamingFactory implements NamingFactory
 
         String idxName = mmd.getClassName(false) + wordSeparator + mmd.getName() + wordSeparator + "IDX";
         return prepareIdentifierNameForUse(idxName, SchemaComponent.CONSTRAINT);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.naming.NamingFactory#getSequenceName(org.datanucleus.metadata.SequenceMetaData)
+     */
+    @Override
+    public String getSequenceName(SequenceMetaData seqmd)
+    {
+        if (!StringUtils.isWhitespace(seqmd.getDatastoreSequence()))
+        {
+            return prepareIdentifierNameForUse(seqmd.getDatastoreSequence(), SchemaComponent.SEQUENCE);
+        }
+
+        String name = seqmd.getName() + wordSeparator + "SEQ";
+        return prepareIdentifierNameForUse(name, SchemaComponent.SEQUENCE);
     }
 
     /** The number of characters used to build the hash. */

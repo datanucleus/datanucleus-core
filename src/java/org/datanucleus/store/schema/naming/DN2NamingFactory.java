@@ -40,6 +40,13 @@ import org.datanucleus.metadata.VersionMetaData;
  * <li>Version field columns will, by default, be called "VERSION"</li>
  * <li>Adapter index field columns will, by default, be called "IDX"</li>
  * <li>Index names will, by default, be called "{class}_{field}_IDX" or "{class}_{position}_IDX"</li>
+ * <li>Sequence names will default to being called "{seqName}_SEQ" where seqName is the 'name' of the SequenceMetaData</li>
+ * </ul>
+ * <p>
+ * Note that in addition to the above rules, 
+ * <ul>
+ * <li>if there are limitations on length of name for a particular component then the name will be truncated.</li>
+ * <li>the name will be changed to match any specified "case" (see setNamingCase)</li>
  * </ul>
  */
 public class DN2NamingFactory extends AbstractNamingFactory
