@@ -133,16 +133,16 @@ public abstract class AbstractNamingFactory implements NamingFactory
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.naming.NamingFactory#getColumnName(org.datanucleus.metadata.AbstractMemberMetaData, org.datanucleus.metadata.AbstractMemberMetaData[], int)
+     * @see org.datanucleus.store.schema.naming.NamingFactory#getColumnName(org.datanucleus.metadata.AbstractMemberMetaData[], int)
      */
     @Override
-    public String getColumnName(AbstractMemberMetaData ownerMmd, AbstractMemberMetaData[] mmds, int position)
+    public String getColumnName(AbstractMemberMetaData[] mmds, int position)
     {
-        EmbeddedMetaData embmd = ownerMmd.getEmbeddedMetaData();
+        EmbeddedMetaData embmd = mmds[0].getEmbeddedMetaData();
         if (embmd != null)
         {
             boolean checked = false;
-            int mmdNo = 0;
+            int mmdNo = 1;
             while (!checked)
             {
                 AbstractMemberMetaData[] embMmds = embmd.getMemberMetaData();
@@ -187,8 +187,8 @@ public abstract class AbstractNamingFactory implements NamingFactory
         }
 
         // EmbeddedMetaData doesn't specify this members column, so generate one based on the names of the member(s).
-        StringBuilder str = new StringBuilder(ownerMmd.getName());
-        for (int i=0;i<mmds.length;i++)
+        StringBuilder str = new StringBuilder(mmds[0].getName());
+        for (int i=1;i<mmds.length;i++)
         {
             str.append(wordSeparator);
             str.append(mmds[i].getName());
