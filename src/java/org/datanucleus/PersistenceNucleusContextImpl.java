@@ -227,8 +227,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_VALUEGEN_INCREMENT_ALLOCSIZE, null, 10, false, false);
 
         // Bean Validation
-        conf.addDefaultProperty(PropertyNames.PROPERTY_VALIDATION_MODE, null, "auto", 
-            CorePropertyValidator.class.getName(), false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_VALIDATION_MODE, null, "auto", CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_VALIDATION_GROUP_PREPERSIST, null, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_VALIDATION_GROUP_PREUPDATE, null, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_VALIDATION_GROUP_PREREMOVE, null, null, null, false, false);
@@ -236,8 +235,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
 
         // Auto-Start Mechanism
         conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM, null, "None", null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_MODE, null, "Quiet", 
-            CorePropertyValidator.class.getName(), true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_MODE, null, "Quiet", CorePropertyValidator.class.getName(), true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_XMLFILE, null, "datanucleusAutoStart.xml", null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_CLASSNAMES, null, null, null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_METADATAFILES, null, null, null, true, false);
@@ -247,27 +245,36 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_MODE, null, "none",
             CorePropertyValidator.class.getName(), false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_TARGET, null, "datanucleus-schema-create.ddl", 
-            null, false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_TARGET, null, "datanucleus-schema-drop.ddl", 
-            null, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_TARGET, null, "datanucleus-schema-create.ddl", null, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_TARGET, null, "datanucleus-schema-drop.ddl", null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_SOURCE, null, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_SOURCE, null, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_LOAD_SOURCE, null, null, null, false, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_SCHEMA, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_TABLES, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_COLUMNS, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_CONSTRAINTS, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_VALIDATE_SCHEMA, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_VALIDATE_TABLES, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_VALIDATE_COLUMNS, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_VALIDATE_CONSTRAINTS, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_WARNONERROR, null, false, true, false);
+
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL, null, false, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, null, false, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, null, false, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, null, false, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_WARNONERROR, null, false, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_ALL, null, false, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES, null, false, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS, null, false, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS, null, false, true, false);
+
+        // Legacy properties from earlier DataNucleus (< 3.9), mapped onto new named properties
+        conf.addDefaultBooleanProperty("datanucleus.autoCreateSchema", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL, false, true, false); // TODO Drop in future release
+        conf.addDefaultBooleanProperty("datanucleus.autoCreateTables", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, false, true, false); // TODO Drop in future release
+        conf.addDefaultBooleanProperty("datanucleus.autoCreateColumns", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, false, true, false); // TODO Drop in future release
+        conf.addDefaultBooleanProperty("datanucleus.autoCreateConstraints", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, false, true, false); // TODO Drop in future release
+        conf.addDefaultBooleanProperty("datanucleus.validateSchema", PropertyNames.PROPERTY_SCHEMA_VALIDATE_ALL, false, true, false); // TODO Drop in future release
+        conf.addDefaultBooleanProperty("datanucleus.validateTables", PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES, false, true, false); // TODO Drop in future release
+        conf.addDefaultBooleanProperty("datanucleus.validateColumns", PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS, false, true, false); // TODO Drop in future release
+        conf.addDefaultBooleanProperty("datanucleus.validateConstraints", PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS, false, true, false); // TODO Drop in future release
+        conf.addDefaultBooleanProperty("datanucleus.autoCreateWarnOnError", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_WARNONERROR, false, true, false); // TODO Drop in future release
 
         // Schema identifier naming
         conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_NAMING_FACTORY, null, "datanucleus2", null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_CASE, null, null,
-            CorePropertyValidator.class.getName(), true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_CASE, null, null, CorePropertyValidator.class.getName(), true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_TABLE_PREFIX, null, null, null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_TABLE_SUFFIX, null, null, null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_WORD_SEPARATOR, null, null, null, true, false);
@@ -275,15 +282,13 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
 
         // Datastore
         conf.addDefaultProperty(PropertyNames.PROPERTY_STORE_MANAGER_TYPE, null, null, null, false, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_STORE_ALLOW_REFS_WITHOUT_IMPLS, null, false, false, true);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_DATASTORE_FIXED, null, false, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION, null, "EXCEPTION", 
-            CorePropertyValidator.class.getName(), true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION, null, "EXCEPTION", CorePropertyValidator.class.getName(), true, false);
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_DATASTORE_READ_TIMEOUT, null, null, true, true);
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_DATASTORE_WRITE_TIMEOUT, null, null, true, true);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING, null, null, 
-            StringPropertyValidator.class.getName(), true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_STORE_ALLOW_REFS_WITHOUT_IMPLS, null, false, false, true);
+
+        conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING, null, null, StringPropertyValidator.class.getName(), true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_CATALOG, null, null, null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_SCHEMA, null, null, null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID, null, null, null, true, false);
@@ -322,10 +327,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY2_NAME, null, null, null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY, null, null, null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY2, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE, null, null, 
-            CorePropertyValidator.class.getName(), true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE2, null, null,
-            CorePropertyValidator.class.getName(), true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE, null, null, CorePropertyValidator.class.getName(), true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE2, null, null, CorePropertyValidator.class.getName(), true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_POOLINGTYPE, null, null, null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_POOLINGTYPE2, null, null, null, true, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CONNECTION_NONTX_RELEASE_AFTER_USE, null, true, true, false);
@@ -396,25 +399,21 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             generateSchema = true;
 
             // Add any properties that are needed by schema generation (before we create StoreManager)
-            if (!config.getBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_SCHEMA))
+            if (!config.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL))
             {
-                config.setProperty(PropertyNames.PROPERTY_AUTOCREATE_SCHEMA, "true");
+                config.setProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL, "true");
             }
-            if (!config.getBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_TABLES))
+            if (!config.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES))
             {
-                config.setProperty(PropertyNames.PROPERTY_AUTOCREATE_TABLES, "true");
+                config.setProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, "true");
             }
-            if (!config.getBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_COLUMNS))
+            if (!config.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS))
             {
-                config.setProperty(PropertyNames.PROPERTY_AUTOCREATE_COLUMNS, "true");
+                config.setProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, "true");
             }
-            if (!config.getBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_CONSTRAINTS))
+            if (!config.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS))
             {
-                config.setProperty(PropertyNames.PROPERTY_AUTOCREATE_CONSTRAINTS, "true");
-            }
-            if (!config.getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_FIXED))
-            {
-                config.setProperty(PropertyNames.PROPERTY_DATASTORE_FIXED, "false");
+                config.setProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, "true");
             }
             if (!config.getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY))
             {

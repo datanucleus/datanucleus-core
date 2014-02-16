@@ -154,12 +154,12 @@ public class PropertyNames
     public static final String PROPERTY_IDENTIFIER_FACTORY = "datanucleus.identifierFactory"; // TODO Drop this when RDBMS uses NamingFactory
 
     public static final String PROPERTY_STORE_MANAGER_TYPE = "datanucleus.storeManagerType";
-    public static final String PROPERTY_STORE_ALLOW_REFS_WITHOUT_IMPLS = "datanucleus.store.allowReferencesWithNoImplementations";
     public static final String PROPERTY_DATASTORE_READ_TIMEOUT = "datanucleus.datastoreReadTimeout";
     public static final String PROPERTY_DATASTORE_WRITE_TIMEOUT = "datanucleus.datastoreWriteTimeout";
     public static final String PROPERTY_DATASTORE_READONLY = "datanucleus.readOnlyDatastore";
-    public static final String PROPERTY_DATASTORE_FIXED = "datanucleus.fixedDatastore";
     public static final String PROPERTY_DATASTORE_READONLY_ACTION = "datanucleus.readOnlyDatastoreAction";
+
+    public static final String PROPERTY_STORE_ALLOW_REFS_WITHOUT_IMPLS = "datanucleus.store.allowReferencesWithNoImplementations";
 
     public static final String PROPERTY_SCHEMA_GENERATE_DATABASE_MODE = "datanucleus.generateSchema.database.mode";
     public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_MODE = "datanucleus.generateSchema.scripts.mode";
@@ -171,15 +171,16 @@ public class PropertyNames
     public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_ORDER = "datanucleus.generateSchema.scripts.drop.order";
     public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_LOAD_SOURCE = "datanucleus.generateSchema.scripts.load";
 
-    public static final String PROPERTY_AUTOCREATE_SCHEMA = "datanucleus.autoCreateSchema";
-    public static final String PROPERTY_AUTOCREATE_TABLES = "datanucleus.autoCreateTables";
-    public static final String PROPERTY_AUTOCREATE_COLUMNS = "datanucleus.autoCreateColumns";
-    public static final String PROPERTY_AUTOCREATE_CONSTRAINTS = "datanucleus.autoCreateConstraints";
-    public static final String PROPERTY_AUTOCREATE_WARNONERROR = "datanucleus.autoCreateWarnOnError";
-    public static final String PROPERTY_VALIDATE_SCHEMA = "datanucleus.validateSchema";
-    public static final String PROPERTY_VALIDATE_TABLES = "datanucleus.validateTables";
-    public static final String PROPERTY_VALIDATE_COLUMNS = "datanucleus.validateColumns";
-    public static final String PROPERTY_VALIDATE_CONSTRAINTS = "datanucleus.validateConstraints";
+    public static final String PROPERTY_SCHEMA_AUTOCREATE_ALL = "datanucleus.schema.autoCreateAll";
+    public static final String PROPERTY_SCHEMA_AUTOCREATE_TABLES = "datanucleus.schema.autoCreateTables";
+    public static final String PROPERTY_SCHEMA_AUTOCREATE_COLUMNS = "datanucleus.schema.autoCreateColumns";
+    public static final String PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS = "datanucleus.schema.autoCreateConstraints";
+    public static final String PROPERTY_SCHEMA_AUTOCREATE_WARNONERROR = "datanucleus.schema.autoCreateWarnOnError";
+    public static final String PROPERTY_SCHEMA_AUTODELETE_COLUMNS = "datanucleus.schema.autoDeleteColumns";
+    public static final String PROPERTY_SCHEMA_VALIDATE_ALL = "datanucleus.schema.validateAll";
+    public static final String PROPERTY_SCHEMA_VALIDATE_TABLES = "datanucleus.schema.validateTables";
+    public static final String PROPERTY_SCHEMA_VALIDATE_COLUMNS = "datanucleus.schema.validateColumns";
+    public static final String PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS = "datanucleus.schema.validateConstraints";
 
     public static final String PROPERTY_VALIDATION_MODE = "datanucleus.validation.mode";
     public static final String PROPERTY_VALIDATION_GROUP_PREPERSIST = "datanucleus.validation.group.pre-persist";

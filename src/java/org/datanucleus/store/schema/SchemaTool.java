@@ -39,6 +39,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PersistenceNucleusContextImpl;
 import org.datanucleus.Configuration;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.StoreNucleusContext;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -607,7 +608,7 @@ public class SchemaTool
                 props.put(propNames[i].toLowerCase(Locale.ENGLISH), System.getProperty(propNames[i]));
             }
         }
-        props.put("datanucleus.autostartmechanism", "None"); // Interferes with usage
+        props.put(PropertyNames.PROPERTY_AUTOSTART_MECHANISM.toLowerCase(), "None"); // Interferes with usage
 
         // Tag on the mandatory props that we must have for each mode
         if (mode == Mode.CREATE)
@@ -615,67 +616,64 @@ public class SchemaTool
             if (ddlFile != null)
             {
                 // the tables must not be created in the DB, so do not validate (DDL is being output to a file)
-                props.put("datanucleus.validateconstraints", "false");
-                props.put("datanucleus.validatecolumns", "false");
-                props.put("datanucleus.validatetables", "false");
+                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES.toLowerCase(), "false");
+                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS.toLowerCase(), "false");
+                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS.toLowerCase(), "false");
             }
-            props.remove("datanucleus.autocreateschema"); // use tables/columns/constraints settings
-            if (!props.containsKey("datanucleus.autocreatetables"))
+            props.remove(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL.toLowerCase()); // use tables/columns/constraints settings
+            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES.toLowerCase()))
             {
-                props.put("datanucleus.autocreatetables", "true");
+                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES.toLowerCase(), "true");
             }
-            if (!props.containsKey("datanucleus.autocreatecolumns"))
+            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS.toLowerCase()))
             {
-                props.put("datanucleus.autocreatecolumns", "true");
+                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS.toLowerCase(), "true");
             }
-            if (!props.containsKey("datanucleus.autocreateconstraints"))
+            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS.toLowerCase()))
             {
-                props.put("datanucleus.autocreateconstraints", "true");
+                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS.toLowerCase(), "true");
             }
-            props.put("datanucleus.fixeddatastore", "false");
-            props.put("datanucleus.readonlydatastore", "false");
+            props.put(PropertyNames.PROPERTY_DATASTORE_READONLY.toLowerCase(), "false");
             props.put("datanucleus.rdbms.checkexisttablesorviews", "true");
         }
         else if (mode == Mode.DELETE)
         {
-            props.put("datanucleus.fixeddatastore", "false");
-            props.put("datanucleus.readonlydatastore", "false");
+            props.put(PropertyNames.PROPERTY_DATASTORE_READONLY.toLowerCase(), "false");
         }
         else if (mode == Mode.DELETE_CREATE)
         {
             if (ddlFile != null)
             {
                 // the tables must not be created in the DB, so do not validate (DDL is being output to a file)
-                props.put("datanucleus.validateconstraints", "false");
-                props.put("datanucleus.validatecolumns", "false");
-                props.put("datanucleus.validatetables", "false");
+                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES.toLowerCase(), "false");
+                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS.toLowerCase(), "false");
+                props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS.toLowerCase(), "false");
             }
-            props.remove("datanucleus.autocreateschema"); // use tables/columns/constraints settings
-            if (!props.containsKey("datanucleus.autocreatetables"))
+            props.remove(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL.toLowerCase()); // use tables/columns/constraints settings
+            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES.toLowerCase()))
             {
-                props.put("datanucleus.autocreatetables", "true");
+                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES.toLowerCase(), "true");
             }
-            if (!props.containsKey("datanucleus.autocreatecolumns"))
+            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS.toLowerCase()))
             {
-                props.put("datanucleus.autocreatecolumns", "true");
+                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS.toLowerCase(), "true");
             }
-            if (!props.containsKey("datanucleus.autocreateconstraints"))
+            if (!props.containsKey(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS.toLowerCase()))
             {
-                props.put("datanucleus.autocreateconstraints", "true");
+                props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS.toLowerCase(), "true");
             }
-            props.put("datanucleus.fixeddatastore", "false");
-            props.put("datanucleus.readonlydatastore", "false");
+            props.put(PropertyNames.PROPERTY_DATASTORE_READONLY.toLowerCase(), "false");
             props.put("datanucleus.rdbms.checkexisttablesorviews", "true");
         }
         else if (mode == Mode.VALIDATE)
         {
-            props.put("datanucleus.autocreateschema", "false");
-            props.put("datanucleus.autocreatetables", "false");
-            props.put("datanucleus.autocreateconstraints", "false");
-            props.put("datanucleus.autocreatecolumns", "false");
-            props.put("datanucleus.validatetables", "true");
-            props.put("datanucleus.validatecolumns", "true");
-            props.put("datanucleus.validateconstraints", "true");
+            props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL.toLowerCase(), "false");
+            props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES.toLowerCase(), "false");
+            props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS.toLowerCase(), "false");
+            props.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS.toLowerCase(), "false");
+            props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES.toLowerCase(), "true");
+            props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS.toLowerCase(), "true");
+            props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS.toLowerCase(), "true");
         }
 
         // Apply remaining persistence properties

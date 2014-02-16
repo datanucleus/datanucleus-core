@@ -100,15 +100,13 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     protected static final Localiser LOCALISER = Localiser.getInstance(
         "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
-    /** Key for this StoreManager e.g "rdbms", "db4o" */
+    /** Key for this StoreManager e.g "rdbms", "neo4j" */
     protected final String storeManagerKey;
 
     /** Whether this datastore is read only. */
     protected final boolean readOnlyDatastore;
 
-    /** Whether this datastore is fixed (no mods to table structure allowed). */
-    protected final boolean fixedDatastore;
-
+    // TODO Rename these properties since all are for the schema so naming should reflect this
     /** Whether to auto create any tables. */
     protected final boolean autoCreateTables;
 
@@ -188,8 +186,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
 
         // Set up schema controls
         this.readOnlyDatastore = getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY);
-        this.fixedDatastore = getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_FIXED);
-        if (readOnlyDatastore || fixedDatastore)
+        if (readOnlyDatastore)
         {
             autoCreateTables = false;
             autoCreateColumns = false;
@@ -197,8 +194,8 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
         else
         {
-            boolean autoCreateSchema = getBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_SCHEMA);
-            if (autoCreateSchema)
+            boolean autoCreateAll = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL);
+            if (autoCreateAll)
             {
                 autoCreateTables = true;
                 autoCreateColumns = true;
@@ -206,15 +203,15 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             }
             else
             {
-                autoCreateTables = getBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_TABLES);
-                autoCreateColumns = getBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_COLUMNS);
-                autoCreateConstraints = getBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_CONSTRAINTS);
+                autoCreateTables = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES);
+                autoCreateColumns = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS);
+                autoCreateConstraints = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS);
             }
         }
-        autoCreateWarnOnError = getBooleanProperty(PropertyNames.PROPERTY_AUTOCREATE_WARNONERROR);
+        autoCreateWarnOnError = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_WARNONERROR);
 
-        boolean validateSchema = getBooleanProperty(PropertyNames.PROPERTY_VALIDATE_SCHEMA);
-        if (validateSchema)
+        boolean validateAll = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_ALL);
+        if (validateAll)
         {
             validateTables = true;
             validateColumns = true;
@@ -222,16 +219,16 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
         else
         {
-            validateTables = getBooleanProperty(PropertyNames.PROPERTY_VALIDATE_TABLES);
+            validateTables = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES);
             if (!validateTables)
             {
                 validateColumns = false;
             }
             else
             {
-                validateColumns = getBooleanProperty(PropertyNames.PROPERTY_VALIDATE_COLUMNS);
+                validateColumns = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS);
             }
-            validateConstraints = getBooleanProperty(PropertyNames.PROPERTY_VALIDATE_CONSTRAINTS);
+            validateConstraints = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS);
         }
 
         // Set up connection handling
@@ -851,7 +848,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             NucleusLogger.DATASTORE.debug("StoreManager : \"" + storeManagerKey + "\" (" + getClass().getName() + ")");
 
             NucleusLogger.DATASTORE.debug("Datastore : " +
-                (readOnlyDatastore ? "read-only" : "read-write") + (fixedDatastore ? ", fixed" : "") +
+                (readOnlyDatastore ? "read-only" : "read-write") + 
                 (getBooleanProperty(PropertyNames.PROPERTY_SERIALIZE_READ) ? ", useLocking" : ""));
 
             // Schema : Auto-Create/Validate
@@ -941,8 +938,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     {
         if (category.equalsIgnoreCase("DATASTORE"))
         {
-            ps.println(LOCALISER.msg("032020", storeManagerKey, getConnectionURL(),
-                (readOnlyDatastore ? "read-only" : "read-write"), (fixedDatastore ? ", fixed" : "")));
+            ps.println(LOCALISER.msg("032020", storeManagerKey, getConnectionURL(), (readOnlyDatastore ? "read-only" : "read-write")));
         }
     }
 

@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.FileMetaData;
 import org.datanucleus.metadata.PackageMetaData;
@@ -50,7 +51,7 @@ public class MetaDataAutoStarter extends AbstractAutoStartMechanism
      */
     public MetaDataAutoStarter(StoreManager storeMgr, ClassLoaderResolver clr) 
     {
-        metaDataFiles = storeMgr.getStringProperty("datanucleus.autoStartMetaDataFiles");
+        metaDataFiles = storeMgr.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_METADATAFILES);
         this.storeMgr = storeMgr;
         this.clr = clr;
     }

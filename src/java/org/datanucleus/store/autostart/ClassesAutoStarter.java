@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.StringTokenizer;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.exceptions.DatastoreInitialisationException;
@@ -42,7 +43,7 @@ public class ClassesAutoStarter extends AbstractAutoStartMechanism
      */
     public ClassesAutoStarter(StoreManager storeMgr, ClassLoaderResolver clr)
     {
-        this.classNames = storeMgr.getStringProperty("datanucleus.autoStartClassNames");
+        this.classNames = storeMgr.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_CLASSNAMES);
     }
 
     /**
