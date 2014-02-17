@@ -163,8 +163,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             }
         }
 
-        // Set up schema controls
-        // TODO Remove this when schemaHandler is fully enabled, and remove accessor methods below
         this.readOnlyDatastore = getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY);
 
         // Set up connection handling
