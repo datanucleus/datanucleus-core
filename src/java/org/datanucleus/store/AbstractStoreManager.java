@@ -337,9 +337,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      */
     public ManagedConnection getConnection(ExecutionContext ec, Map options)
     {
-        // TODO See NUCRDBMS-190 Arguably we ought to always return a connection from primary DataSource here.
-        // When used in non-tx persistence ops it is not enlisted in the txn anyway so ought to work 
-        // (definitely ok in JavaSE, but need someone to check JavaEE)
         ConnectionFactory connFactory;
         if (ec.getTransaction().isActive())
         {
@@ -347,7 +344,13 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
         else
         {
-            if (secondaryConnectionFactoryName != null)
+            Boolean usePrimary = getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_NONTX_USE_PRIMARY);
+            if (usePrimary)
+            {
+                // User has requested to use the primary connection factory for nontx connections
+                connFactory = connectionMgr.lookupConnectionFactory(primaryConnectionFactoryName);
+            }
+            else if (secondaryConnectionFactoryName != null)
             {
                 connFactory = connectionMgr.lookupConnectionFactory(secondaryConnectionFactoryName);
             }

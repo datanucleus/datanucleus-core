@@ -586,11 +586,11 @@ public class SchemaTool
         // Finally add/override with system properties (only support particular ones, and in correct case)
         String[] propNames = 
         {
-                "datanucleus.ConnectionURL",
-                "datanucleus.ConnectionDriverName",
-                "datanucleus.ConnectionUserName",
-                "datanucleus.ConnectionPassword",
-                "datanucleus.Mapping",
+                PropertyNames.PROPERTY_CONNECTION_URL,
+                PropertyNames.PROPERTY_CONNECTION_DRIVER_NAME,
+                PropertyNames.PROPERTY_CONNECTION_USER_NAME,
+                PropertyNames.PROPERTY_CONNECTION_PASSWORD,
+                PropertyNames.PROPERTY_MAPPING,
                 "javax.jdo.option.ConnectionURL",
                 "javax.jdo.option.ConnectionDriverName",
                 "javax.jdo.option.ConnectionUserName",
@@ -710,7 +710,7 @@ public class SchemaTool
                 {
                     display = false;
                 }
-                else if (key.equals("datanucleus.connectionpassword"))
+                else if (key.equals(PropertyNames.PROPERTY_CONNECTION_PASSWORD.toLowerCase()))
                 {
                     // Don't show passwords
                     display = false;

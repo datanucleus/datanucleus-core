@@ -172,7 +172,7 @@ public class NucleusContextHelper
         if (storeMgr == null)
         {
             // Try using the URL of the data source
-            String url = (String) props.get("datanucleus.connectionurl");
+            String url = (String) props.get(PropertyNames.PROPERTY_CONNECTION_URL.toLowerCase());
             if (url != null)
             {
                 int idx = url.indexOf(':');
