@@ -29,23 +29,23 @@ public class TransactionUtils
      */
     public static String getNameForTransactionIsolationLevel(int isolation)
     {
-        if (isolation == TransactionIsolation.TRANSACTION_NONE)
+        if (isolation == TransactionIsolation.NONE)
         {
             return "none";
         }
-        else if (isolation == TransactionIsolation.TRANSACTION_READ_COMMITTED)
+        else if (isolation == TransactionIsolation.READ_COMMITTED)
         {
             return "read-committed";
         }
-        else if (isolation == TransactionIsolation.TRANSACTION_READ_UNCOMMITTED)
+        else if (isolation == TransactionIsolation.READ_UNCOMMITTED)
         {
             return "read-uncommitted";
         }
-        else if (isolation == TransactionIsolation.TRANSACTION_REPEATABLE_READ)
+        else if (isolation == TransactionIsolation.REPEATABLE_READ)
         {
             return "repeatable-read";
         }
-        else if (isolation == TransactionIsolation.TRANSACTION_SERIALIZABLE)
+        else if (isolation == TransactionIsolation.SERIALIZABLE)
         {
             return "serializable";
         }
@@ -65,23 +65,23 @@ public class TransactionUtils
     {
         if (isolationName.equalsIgnoreCase("none"))
         {
-            return TransactionIsolation.TRANSACTION_NONE;
+            return TransactionIsolation.NONE;
         }
         else if (isolationName.equalsIgnoreCase("read-committed"))
         {
-            return TransactionIsolation.TRANSACTION_READ_COMMITTED;
+            return TransactionIsolation.READ_COMMITTED;
         }
         else if (isolationName.equalsIgnoreCase("read-uncommitted"))
         {
-            return TransactionIsolation.TRANSACTION_READ_UNCOMMITTED;
+            return TransactionIsolation.READ_UNCOMMITTED;
         }
         else if (isolationName.equalsIgnoreCase("repeatable-read"))
         {
-            return TransactionIsolation.TRANSACTION_REPEATABLE_READ;
+            return TransactionIsolation.REPEATABLE_READ;
         }
         else if (isolationName.equalsIgnoreCase("serializable"))
         {
-            return TransactionIsolation.TRANSACTION_SERIALIZABLE;
+            return TransactionIsolation.SERIALIZABLE;
         }
         else
         {

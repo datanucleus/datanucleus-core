@@ -25,7 +25,7 @@ public interface TransactionIsolation
     /**
      * A constant indicating that transactions are not supported. 
      */
-    int TRANSACTION_NONE = 0;
+    int NONE = 0;
 
     /**
      * A constant indicating that
@@ -35,7 +35,7 @@ public interface TransactionIsolation
      * committed (a "dirty read").  If any of the changes are rolled back, 
      * the second transaction will have retrieved an invalid row.
      */
-    int TRANSACTION_READ_UNCOMMITTED = 1;
+    int READ_UNCOMMITTED = 1;
 
     /**
      * A constant indicating that
@@ -43,7 +43,7 @@ public interface TransactionIsolation
      * reads can occur.  This level only prohibits a transaction
      * from reading a row with uncommitted changes in it.
      */
-    int TRANSACTION_READ_COMMITTED = 2;
+    int READ_COMMITTED = 2;
 
     /**
      * A constant indicating that
@@ -55,7 +55,7 @@ public interface TransactionIsolation
      * rereads the row, getting different values the second time
      * (a "non-repeatable read").
      */
-    int TRANSACTION_REPEATABLE_READ = 4;
+    int REPEATABLE_READ = 4;
 
     /**
      * A constant indicating that
@@ -68,5 +68,5 @@ public interface TransactionIsolation
      * rereads for the same condition, retrieving the additional
      * "phantom" row in the second read.
      */
-    int TRANSACTION_SERIALIZABLE = 8;
+    int SERIALIZABLE = 8;
 }
