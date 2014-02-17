@@ -107,27 +107,8 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     /** Whether this datastore is read only. */
     protected final boolean readOnlyDatastore;
 
-    // TODO Rename these properties since all are for the schema so naming should reflect this
-    /** Whether to auto create any tables. */
-    protected final boolean autoCreateTables;
-
-    /** Whether to auto create any columns that are missing. */
-    protected final boolean autoCreateColumns;
-
-    /** Whether to auto create any constraints */
-    protected final boolean autoCreateConstraints;
-
     /** Whether to warn only when any errors occur on auto-create. */
     protected final boolean autoCreateWarnOnError;
-
-    /** Whether to validate any tables */
-    protected final boolean validateTables;
-
-    /** Whether to validate any columns */
-    protected final boolean validateColumns;
-
-    /** Whether to validate any constraints */
-    protected final boolean validateConstraints;
 
     /** Nucleus Context. */
     protected final PersistenceNucleusContext nucleusContext;
@@ -188,50 +169,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         // Set up schema controls
         // TODO Remove this when schemaHandler is fully enabled, and remove accessor methods below
         this.readOnlyDatastore = getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY);
-        if (readOnlyDatastore)
-        {
-            autoCreateTables = false;
-            autoCreateColumns = false;
-            autoCreateConstraints = false;
-        }
-        else
-        {
-            boolean autoCreateAll = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL);
-            if (autoCreateAll)
-            {
-                autoCreateTables = true;
-                autoCreateColumns = true;
-                autoCreateConstraints = true;
-            }
-            else
-            {
-                autoCreateTables = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES);
-                autoCreateColumns = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS);
-                autoCreateConstraints = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS);
-            }
-        }
         autoCreateWarnOnError = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_WARNONERROR);
-
-        boolean validateAll = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_ALL);
-        if (validateAll)
-        {
-            validateTables = true;
-            validateColumns = true;
-            validateConstraints = true;
-        }
-        else
-        {
-            validateTables = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES);
-            if (!validateTables)
-            {
-                validateColumns = false;
-            }
-            else
-            {
-                validateColumns = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS);
-            }
-            validateConstraints = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS);
-        }
 
         // Set up connection handling
         registerConnectionMgr();
@@ -553,30 +491,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         return getStringProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY2_NAME);
     }
 
-    // TODO Drop this and use schemaHandler instead
-    public boolean isAutoCreateTables()
-    {
-        return autoCreateTables;
-    }
-
-    // TODO Drop this and use schemaHandler instead
-    public boolean isAutoCreateColumns()
-    {
-        return autoCreateColumns;
-    }
-
-    // TODO Drop this and use schemaHandler instead
-    public boolean isValidateTables()
-    {
-        return validateTables;
-    }
-
-    // TODO Drop this and use schemaHandler instead
-    public boolean isValidateColumns()
-    {
-        return validateColumns;
-    }
-
 	/* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#isJdbcStore()
      */
@@ -853,11 +767,11 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
 
             // Schema : Auto-Create/Validate
             StringBuilder autoCreateOptions = null;
-            if (autoCreateTables || autoCreateColumns || autoCreateConstraints)
+            if (getSchemaHandler().isAutoCreateTables() || getSchemaHandler().isAutoCreateColumns() || getSchemaHandler().isAutoCreateConstraints())
             {
                 autoCreateOptions = new StringBuilder();
                 boolean first = true;
-                if (autoCreateTables)
+                if (getSchemaHandler().isAutoCreateTables())
                 {
                     if (!first)
                     {
@@ -866,7 +780,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                     autoCreateOptions.append("Tables");
                     first = false;
                 }
-                if (autoCreateColumns)
+                if (getSchemaHandler().isAutoCreateColumns())
                 {
                     if (!first)
                     {
@@ -875,7 +789,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                     autoCreateOptions.append("Columns");
                     first = false;
                 }
-                if (autoCreateConstraints)
+                if (getSchemaHandler().isAutoCreateConstraints())
                 {
                     if (!first)
                     {
@@ -886,16 +800,16 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 }
             }
             StringBuilder validateOptions = null;
-            if (validateTables || validateColumns || validateConstraints)
+            if (getSchemaHandler().isValidateTables() || getSchemaHandler().isValidateColumns() || getSchemaHandler().isValidateConstraints())
             {
                 validateOptions = new StringBuilder();
                 boolean first = true;
-                if (validateTables)
+                if (getSchemaHandler().isValidateTables())
                 {
                     validateOptions.append("Tables");
                     first = false;
                 }
-                if (validateColumns)
+                if (getSchemaHandler().isValidateColumns())
                 {
                     if (!first)
                     {
@@ -904,7 +818,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                     validateOptions.append("Columns");
                     first = false;
                 }
-                if (validateConstraints)
+                if (getSchemaHandler().isValidateConstraints())
                 {
                     if (!first)
                     {

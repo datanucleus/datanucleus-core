@@ -541,22 +541,6 @@ public class FederatedStoreManager implements StoreManager
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#isAutoCreateTables()
-     */
-    public boolean isAutoCreateTables()
-    {
-        return primaryStoreMgr.isAutoCreateTables();
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#isAutoCreateColumns()
-     */
-    public boolean isAutoCreateColumns()
-    {
-        return primaryStoreMgr.isAutoCreateColumns();
-    }
-
-    /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#useBackedSCOWrapperForMember(org.datanucleus.metadata.AbstractMemberMetaData, org.datanucleus.store.ExecutionContext)
      */
     public boolean useBackedSCOWrapperForMember(AbstractMemberMetaData mmd, ExecutionContext ec)

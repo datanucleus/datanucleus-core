@@ -406,8 +406,5 @@ public interface StoreManager
      */
     void transactionRolledBack(ExecutionContext ec);
 
-    boolean isAutoCreateTables(); // TODO Drop this when using schemaHandler
-    boolean isAutoCreateColumns(); // TODO Drop this when using schemaHandler
-
     String getDefaultObjectProviderClassName();
 }
