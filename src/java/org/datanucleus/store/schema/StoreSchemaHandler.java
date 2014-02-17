@@ -32,6 +32,9 @@ public interface StoreSchemaHandler
     boolean isAutoCreateTables();
     boolean isAutoCreateConstraints();
     boolean isAutoCreateColumns();
+
+    boolean isAutoCreateWarnOnError();
+
     boolean isValidateTables();
     boolean isValidateColumns();
     boolean isValidateConstraints();

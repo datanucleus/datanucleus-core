@@ -107,9 +107,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     /** Whether this datastore is read only. */
     protected final boolean readOnlyDatastore;
 
-    /** Whether to warn only when any errors occur on auto-create. */
-    protected final boolean autoCreateWarnOnError;
-
     /** Nucleus Context. */
     protected final PersistenceNucleusContext nucleusContext;
 
@@ -169,7 +166,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         // Set up schema controls
         // TODO Remove this when schemaHandler is fully enabled, and remove accessor methods below
         this.readOnlyDatastore = getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY);
-        autoCreateWarnOnError = getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_WARNONERROR);
 
         // Set up connection handling
         registerConnectionMgr();

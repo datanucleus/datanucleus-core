@@ -126,6 +126,11 @@ public abstract class AbstractStoreSchemaHandler implements StoreSchemaHandler
         return autoCreateConstraints;
     }
 
+    public boolean isAutoCreateWarnOnError()
+    {
+        return autoCreateWarnOnError;
+    }
+
     public boolean isValidateTables()
     {
         return validateTables;
