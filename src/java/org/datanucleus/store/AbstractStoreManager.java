@@ -66,6 +66,7 @@ import org.datanucleus.store.encryption.ConnectionEncryptionProvider;
 import org.datanucleus.store.exceptions.NoExtentException;
 import org.datanucleus.store.federation.FederatedStoreManager;
 import org.datanucleus.store.query.QueryManager;
+import org.datanucleus.store.schema.DefaultStoreSchemaHandler;
 import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.store.schema.naming.NamingCase;
 import org.datanucleus.store.schema.naming.NamingFactory;
@@ -623,6 +624,10 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      */
     public StoreSchemaHandler getSchemaHandler()
     {
+        if (schemaHandler == null)
+        {
+            schemaHandler = new DefaultStoreSchemaHandler(this);
+        }
         return schemaHandler;
     }
 
