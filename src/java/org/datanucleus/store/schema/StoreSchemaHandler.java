@@ -17,6 +17,9 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.schema;
 
+import java.util.Properties;
+import java.util.Set;
+
 import org.datanucleus.store.StoreManager;
 
 /**
@@ -24,38 +27,67 @@ import org.datanucleus.store.StoreManager;
  */
 public interface StoreSchemaHandler
 {
+    StoreManager getStoreManager();
+
+    boolean isAutoCreateTables();
+    boolean isAutoCreateConstraints();
+    boolean isAutoCreateColumns();
+    boolean isValidateTables();
+    boolean isValidateColumns();
+    boolean isValidateConstraints();
+
     /**
      * Method to clear out any cached schema information.
      */
-    public void clear();
+    void clear();
 
     /**
      * Method to create the specified schema.
-     * @param conn Connection to the datastore
      * @param schemaName Name of the schema
+     * @param props Any properties controlling the schema generation
+     * @param connection Connection to use (null implies this will obtain its own connection)
      */
-    public void createSchema(Object conn, String schemaName);
+    void createSchema(String schemaName, Properties props, Object connection);
 
     /**
      * Method to delete the specified schema.
-     * @param conn Connection to the datastore
      * @param schemaName Name of the schema
+     * @param props Any properties controlling the schema deletion
+     * @param connection Connection to use (null implies this will obtain its own connection)
      */
-    public void deleteSchema(Object conn, String schemaName);
+    void deleteSchema(String schemaName, Properties props, Object connection);
+
+    /**
+     * Method to generate the required schema for the supplied classes.
+     * @param classNames Names of the classes we want the schema generating for.
+     * @param props Any properties controlling the schema generation
+     * @param connection Connection to use (null implies this will obtain its own connection)
+     */
+    void createSchemaForClasses(Set<String> classNames, Properties props, Object connection);
+
+    /**
+     * Method to delete the schema for the supplied classes.
+     * @param classNames Names of the classes we want the schema deleting for.
+     * @param props Any properties controlling the schema deletion
+     * @param connection Connection to use (null implies this will obtain its own connection)
+     */
+    void deleteSchemaForClasses(Set<String> classNames, Properties props, Object connection);
+
+    /**
+     * Method to validate the schema for the supplied classes.
+     * @param classNames Names of classes
+     * @param props Any properties controlling schema validation
+     * @param connection Connection to use (null implies this will obtain its own connection)
+     */
+    void validateSchema(Set<String> classNames, Properties props, Object connection);
 
     /**
      * Accessor for schema data store under the provided name and defined by the specified values.
      * The supported types of values is particular to the implementation.
-     * @param conn Connection to the datastore
+     * @param connection Connection to the datastore
      * @param name Name of the schema component to return.
      * @param values Value(s) to use as qualifier(s) for selecting the schema component
      * @return Schema data definition for this name
      */
-    public StoreSchemaData getSchemaData(Object conn, String name, Object[] values);
-
-    /**
-     * Accessor for the StoreManager.
-     * @return StoreManager
-     */
-    public StoreManager getStoreManager();
+    StoreSchemaData getSchemaData(Object connection, String name, Object[] values);
 }

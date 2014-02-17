@@ -38,6 +38,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.flush.FlushProcess;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.state.ReferentialJDOStateManager;
 import org.datanucleus.store.Extent;
@@ -142,6 +143,15 @@ public class FederatedStoreManager implements StoreManager
     public NucleusContext getNucleusContext()
     {
         return nucleusContext;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.StoreManager#getMetaDataManager()
+     */
+    @Override
+    public MetaDataManager getMetaDataManager()
+    {
+        return nucleusContext.getMetaDataManager();
     }
 
     /* (non-Javadoc)
@@ -380,6 +390,11 @@ public class FederatedStoreManager implements StoreManager
     {
         return primaryStoreMgr.getConnection(ec, options);
     }
+
+    public ManagedConnection getConnection(int isolation_level)
+    {
+        return primaryStoreMgr.getConnection(isolation_level);
+    }
     
     /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#getConnectionDriverName()
@@ -531,14 +546,6 @@ public class FederatedStoreManager implements StoreManager
     public boolean isAutoCreateTables()
     {
         return primaryStoreMgr.isAutoCreateTables();
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#isAutoCreateConstraints()
-     */
-    public boolean isAutoCreateConstraints()
-    {
-        return primaryStoreMgr.isAutoCreateConstraints();
     }
 
     /* (non-Javadoc)

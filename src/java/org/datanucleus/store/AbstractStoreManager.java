@@ -185,6 +185,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
 
         // Set up schema controls
+        // TODO Remove this when schemaHandler is fully enabled, and remove accessor methods below
         this.readOnlyDatastore = getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY);
         if (readOnlyDatastore)
         {
@@ -551,34 +552,28 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         return getStringProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY2_NAME);
     }
 
+    // TODO Drop this and use schemaHandler instead
     public boolean isAutoCreateTables()
     {
         return autoCreateTables;
     }
 
+    // TODO Drop this and use schemaHandler instead
     public boolean isAutoCreateColumns()
     {
         return autoCreateColumns;
     }
 
-    public boolean isAutoCreateConstraints()
-    {
-        return autoCreateConstraints;
-    }
-
+    // TODO Drop this and use schemaHandler instead
     public boolean isValidateTables()
     {
         return validateTables;
     }
 
+    // TODO Drop this and use schemaHandler instead
     public boolean isValidateColumns()
     {
         return validateColumns;
-    }
-
-    public boolean isValidateConstraints()
-    {
-        return validateConstraints;
     }
 
 	/* (non-Javadoc)

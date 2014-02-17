@@ -34,6 +34,7 @@ import org.datanucleus.identity.OID;
 import org.datanucleus.identity.SCOID;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.store.connection.ConnectionManager;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -72,6 +73,8 @@ public interface StoreManager
      * Release of resources.
      */
     void close();
+
+    MetaDataManager getMetaDataManager();
 
     /**
      * Accessor for the store persistence handler.
@@ -147,6 +150,14 @@ public interface StoreManager
      * @throws NucleusException Thrown if an error occurs getting the connection
      */
     ManagedConnection getConnection(ExecutionContext ec, Map options);
+
+    /**
+     * Accessor for a connection for the specified transaction isolation level.
+     * @param isolation_level Isolation level
+     * @return The Connection
+     * @throws NucleusException Thrown if an error occurs getting the connection
+     */
+    ManagedConnection getConnection(int isolation_level);
 
     /**
      * Convenience accessor for the URL for the connection.
@@ -395,9 +406,8 @@ public interface StoreManager
      */
     void transactionRolledBack(ExecutionContext ec);
 
-    boolean isAutoCreateTables();
-    boolean isAutoCreateConstraints();
-    boolean isAutoCreateColumns();
+    boolean isAutoCreateTables(); // TODO Drop this when using schemaHandler
+    boolean isAutoCreateColumns(); // TODO Drop this when using schemaHandler
 
     String getDefaultObjectProviderClassName();
 }
