@@ -408,6 +408,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                     }
                     public void transactionCommitted()
                     {
+                        // TODO Allow possibility of leaving txn open for use in non-tx context or for subsequent txn
                         try
                         {
                             mconn.close();
