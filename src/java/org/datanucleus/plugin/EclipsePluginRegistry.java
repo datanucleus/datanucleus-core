@@ -40,6 +40,7 @@ import org.eclipse.osgi.service.resolver.VersionRange;
 
 /**
  * Manages the registry of Extensions and Extension Points.
+ * TODO Drop this and use OSGiPluginRegistry, and also remove all Eclipse deps from pom.xml
  */
 public class EclipsePluginRegistry implements PluginRegistry
 {
