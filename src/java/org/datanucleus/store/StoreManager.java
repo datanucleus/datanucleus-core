@@ -129,10 +129,10 @@ public interface StoreManager
     ConnectionManager getConnectionManager();
 
     /**
-     * Accessor for a connection for the specified ExecutionContext.<p>
-     * If there is an active transaction, a connection from the transactional
-     * connection factory will be returned. If there is no active transaction,
-     * a connection from the nontransactional connection factory will be returned.
+     * Accessor for a connection for the specified ExecutionContext (PM/EM).
+     * If there is an active transaction, a connection from the primary connection factory will be returned. 
+     * If there is no active transaction, a connection from the secondary connection factory will be returned (unless
+     * the user has specified to just use the primary).
      * @param ec execution context
      * @return The Connection
      * @throws NucleusException Thrown if an error occurs getting the connection
@@ -140,12 +140,12 @@ public interface StoreManager
     ManagedConnection getConnection(ExecutionContext ec);
 
     /**
-     * Accessor for a connection for the specified ExecutionContext.<p>
-     * If there is an active transaction, a connection from the transactional
-     * connection factory will be returned. If there is no active transaction,
-     * a connection from the nontransactional connection factory will be returned.
+     * Accessor for a connection for the specified ExecutionContext (PM/EM).
+     * If there is an active transaction, a connection from the primary connection factory will be returned. 
+     * If there is no active transaction, a connection from the secondary connection factory will be returned (unless
+     * the user has specified to just use the primary).
      * @param ec execution context
-     * @param options connetion options
+     * @param options connection options
      * @return The Connection
      * @throws NucleusException Thrown if an error occurs getting the connection
      */
@@ -153,56 +153,57 @@ public interface StoreManager
 
     /**
      * Accessor for a connection for the specified transaction isolation level.
-     * @param isolation_level Isolation level
+     * This is used for schema and sequence access operations.
+     * @param isolation_level Isolation level (-1 implies use the default for the datastore).
      * @return The Connection
      * @throws NucleusException Thrown if an error occurs getting the connection
      */
     ManagedConnection getConnection(int isolation_level);
 
     /**
-     * Convenience accessor for the URL for the connection.
+     * Convenience accessor for the URL for the connections.
      * @return connection URL
      */
     String getConnectionURL();
 
     /**
-     * Convenience accessor for the driver name to use for the connection (where supported).
-     * @return driver name
-     */
-    String getConnectionDriverName();
-
-    /**
-     * Convenience accessor for the user name to use for the connection (where required).
+     * Convenience accessor for the user name to use for the connections (where required).
      * @return user name
      */
     String getConnectionUserName();
 
     /**
-     * Convenience accessor for the password to use for the connection (where required).
+     * Convenience accessor for the password to use for the connections (where required).
      * @return Password
      */
     String getConnectionPassword();
 
     /**
-     * Convenience accessor for the primary connection factory.
+     * Convenience accessor for the driver name to use for the connections (where supported).
+     * @return driver name
+     */
+    String getConnectionDriverName();
+
+    /**
+     * Convenience accessor for the primary connection factory (when a factory was provided by the user).
      * @return Connection Factory (primary)
      */
     Object getConnectionFactory();
 
     /**
-     * Convenience accessor for the factory name for the primary connection factory.
+     * Convenience accessor for the factory (JNDI) name for the primary connection factory (when provided by the user).
      * @return Connection Factory name (primary)
      */
     String getConnectionFactoryName();
 
     /**
-     * Convenience accessor for the secondary connection factory.
+     * Convenience accessor for the secondary connection factory (when a factory was provided by the user).
      * @return Connection Factory (secondary)
      */
     Object getConnectionFactory2();
 
     /**
-     * Convenience accessor for the factory name for the secondary connection factory.
+     * Convenience accessor for the factory (JNDI) name for the secondary connection factory (when provided by the user).
      * @return Connection Factory name (secondary)
      */
     String getConnectionFactory2Name();
