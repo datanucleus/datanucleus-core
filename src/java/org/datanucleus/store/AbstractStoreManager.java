@@ -344,10 +344,10 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
         else
         {
-            Boolean usePrimary = getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_NONTX_USE_PRIMARY);
-            if (usePrimary)
+            Boolean singleConnection = getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_SINGLE_CONNECTION);
+            if (singleConnection)
             {
-                // User has requested to use the primary connection factory for nontx connections
+                // Take from the primary
                 connFactory = connectionMgr.lookupConnectionFactory(primaryConnectionFactoryName);
             }
             else if (secondaryConnectionFactoryName != null)

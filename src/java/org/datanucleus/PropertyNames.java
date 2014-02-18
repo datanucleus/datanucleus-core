@@ -115,7 +115,7 @@ public class PropertyNames
     public static final String PROPERTY_CONNECTION_POOLINGTYPE = "datanucleus.connectionPoolingType";
     public static final String PROPERTY_CONNECTION_POOLINGTYPE2 = "datanucleus.connectionPoolingType.nontx";
     public static final String PROPERTY_CONNECTION_NONTX_RELEASE_AFTER_USE = "datanucleus.connection.nontx.releaseAfterUse";
-    public static final String PROPERTY_CONNECTION_NONTX_USE_PRIMARY = "datanucleus.connection.nontx.usePrimaryFactory";
+    public static final String PROPERTY_CONNECTION_SINGLE_CONNECTION = "datanucleus.connection.singleConnectionPerExecutionContext";
 
     public static final String PROPERTY_CACHE_L1_TYPE = "datanucleus.cache.level1.type";
     public static final String PROPERTY_CACHE_L2_TYPE = "datanucleus.cache.level2.type";
