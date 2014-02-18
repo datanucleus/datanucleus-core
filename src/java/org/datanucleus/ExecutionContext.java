@@ -277,15 +277,6 @@ public interface ExecutionContext
     ObjectProvider newObjectProviderForPersistentClean(Object id, Object pc);
 
     /**
-     * Constructs an ObjectProvider to manage a hollow (or pclean) instance having the given FieldValues.
-     * This constructor is used for creating new instances of existing persistent objects using application identity.
-     * @param pcClass the class of the new instance to be created.
-     * @param fv the initial field values of the object.
-     * @deprecated Use newForHollowPopulated instead
-     */
-    ObjectProvider newObjectProviderForHollowPopulatedAppId(Class pcClass, final FieldValues fv);
-
-    /**
      * Constructs an ObjectProvider to manage a persistable instance that will
      * be EMBEDDED/SERIALISED into another persistable object. The instance will not be
      * assigned an identity in the process since it is a SCO.
