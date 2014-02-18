@@ -20,8 +20,10 @@ package org.datanucleus.store.connection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.datanucleus.ClassConstants;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -29,6 +31,9 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class AbstractConnectionFactory implements ConnectionFactory
 {
+    /** Localisation of messages. */
+    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", ClassConstants.NUCLEUS_CONTEXT_LOADER);
+
     protected StoreManager storeMgr;
 
     protected Map options = null;

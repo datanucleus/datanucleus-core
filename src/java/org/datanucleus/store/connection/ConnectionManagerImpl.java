@@ -226,8 +226,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                 // Already registered enlisted connection present so return it
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
-                    NucleusLogger.CONNECTION.debug("Connection found in the pool : " + mconnFromPool + 
-                        " for key=" + ec + " in factory=" + factory + " but owner object closing so closing connection");
+                    NucleusLogger.CONNECTION.debug(LOCALISER.msg("009005", mconnFromPool, ec, factory));
                 }
                 mconnFromPool.close();
             }
@@ -254,8 +253,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                 // Already registered enlisted connection present so return it
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
-                    NucleusLogger.CONNECTION.debug("Connection found in the pool : " + mconnFromPool + 
-                        " for key=" + ec + " in factory=" + factory);
+                    NucleusLogger.CONNECTION.debug(LOCALISER.msg("009004", mconnFromPool, ec, factory));
                 }
 
                 if (!mconnFromPool.closeAfterTransactionEnd())
@@ -355,8 +353,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                     {
                         if (NucleusLogger.CONNECTION.isDebugEnabled())
                         {
-                            NucleusLogger.CONNECTION.debug("Connection removed from the pool : " + mconn +
-                                " for key=" + ec + " in factory=" + factory);
+                            NucleusLogger.CONNECTION.debug(LOCALISER.msg("009006", mconn, ec, factory));
                         }
                         connectionPool.removeManagedConnection(factory, ec); // Connection closed so remove
 
@@ -369,8 +366,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                 // Register this connection against the ExecutionContext - connection is valid
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
-                    NucleusLogger.CONNECTION.debug("Connection added to the pool : " + mconn + 
-                        " for key=" + ec + " in factory=" + factory);
+                    NucleusLogger.CONNECTION.debug(LOCALISER.msg("009007", mconn, ec, factory));
                 }
                 connectionPool.putManagedConnection(factory, ec, mconn);
             }
