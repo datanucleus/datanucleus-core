@@ -139,7 +139,7 @@ public abstract class AbstractNamingFactory implements NamingFactory
     public String getColumnName(AbstractMemberMetaData[] mmds, int position)
     {
         EmbeddedMetaData embmd = mmds[0].getEmbeddedMetaData();
-        if (embmd != null)
+        if (embmd != null && mmds.length > 1)
         {
             boolean checked = false;
             int mmdNo = 1;
