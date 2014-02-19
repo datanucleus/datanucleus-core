@@ -250,7 +250,7 @@ public class ConnectionManagerImpl implements ConnectionManager
             ManagedConnection mconnFromPool = connectionPool.getManagedConnection(factory, ec);
             if (mconnFromPool != null)
             {
-                // Already registered enlisted connection present so return it
+                // Factory already has a ManagedConnection
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
                     NucleusLogger.CONNECTION.debug(LOCALISER.msg("009004", mconnFromPool, ec, factory));
@@ -260,7 +260,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                 {
                     if (transaction.isActive())
                     {
-                        // Transactional : make sure it is not commit-on-release
+                        // ManagedConnection that is not closed after commit, so make sure it is enlisted
                         if (mconnFromPool.commitOnRelease())
                         {
                             mconnFromPool.setCommitOnRelease(false);
@@ -324,7 +324,7 @@ public class ConnectionManagerImpl implements ConnectionManager
 
                 // Enlist the connection resource if has enlistable resource
                 XAResource res = mconn.getXAResource();
-                if (res != null)
+                if (res != null && !tx.isEnlisted(res))
                 {
                     boolean enlistInLocalTM = true;
                     if (options != null && options.get(ConnectionFactory.RESOURCE_TYPE_OPTION) != null &&
