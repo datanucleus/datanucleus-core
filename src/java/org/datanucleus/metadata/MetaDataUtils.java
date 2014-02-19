@@ -1025,6 +1025,7 @@ public class MetaDataUtils
     /**
      * Convenience method to return if the specified member is embedded.
      * Only applies to relation fields, since all other fields are always "embedded".
+     * TODO Likely ought to change last arg to List<AbstractMemberMetaData> for multilevel of embedded
      * @param mmd Metadata for the member we are interested in
      * @param relationType Relation type of the member we are interested in
      * @param ownerMmd Optional metadata for the owner member (for nested embeddeds only. Set to null if not relevant to the member in question).
