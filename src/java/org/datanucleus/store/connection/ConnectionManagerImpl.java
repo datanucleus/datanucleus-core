@@ -35,14 +35,16 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * Manager of connections for a datastore, allowing ManagedConnection pooling, enlistment in transaction.
- * The pool caches one connection per ExecutionContext.
+ * The pool caches one connection per ExecutionContext per factory, consequently there will be 0-2 connections pooled per ExecutionContext
+ * (0 if none in use, 1 if just primary factory, 1 if primary+secondary factory).
  * The "allocateConnection" method can create connections and enlist them (like most normal persistence operations need)
- * or create a connection and return it without enlisting it into a transaction, for example the connections used to
- * generate object identity, create the database schema or obtaining the schema metadata.
- * 
+ * or create a connection and return it without enlisting it into a transaction, for example on a read-only operation, or when
+ * running non-transactional, or to get schema information.
+ * <p>
  * Connections can be locked per ExecutionContext basis. Locking of connections is used to
  * handle the connection over to the user application. A locked connection denies any further
  * access to the datastore, until the user application unlock it.
+ * </p>
  */
 public class ConnectionManagerImpl implements ConnectionManager
 {
