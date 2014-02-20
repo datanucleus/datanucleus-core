@@ -890,26 +890,17 @@ public class MetaDataMerger
         if (primaryFmd.foreignKeyMetaData == null && annotFmd.foreignKeyMetaData != null)
         {
             primaryFmd.foreignKeyMetaData = annotFmd.foreignKeyMetaData;
-            if (primaryFmd.foreignKeyMetaData != null)
-            {
-                primaryFmd.foreignKeyMetaData.parent = primaryFmd;
-            }
+            primaryFmd.foreignKeyMetaData.parent = primaryFmd;
         }
         if (primaryFmd.indexMetaData == null && annotFmd.indexMetaData != null)
         {
             primaryFmd.indexMetaData = annotFmd.indexMetaData;
-            if (primaryFmd.indexMetaData != null)
-            {
-                primaryFmd.indexMetaData.parent = primaryFmd;
-            }
+            primaryFmd.indexMetaData.parent = primaryFmd;
         }
         if (primaryFmd.uniqueMetaData == null && annotFmd.uniqueMetaData != null)
         {
             primaryFmd.uniqueMetaData = annotFmd.uniqueMetaData;
-            if (primaryFmd.uniqueMetaData != null)
-            {
-                primaryFmd.uniqueMetaData.parent = primaryFmd;
-            }
+            primaryFmd.uniqueMetaData.parent = primaryFmd;
         }
 
         if (primaryFmd.columns.size() == 0 && annotFmd.columns.size() > 0)

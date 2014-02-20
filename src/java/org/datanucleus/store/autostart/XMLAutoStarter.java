@@ -21,6 +21,7 @@ Contributors:
 package org.datanucleus.store.autostart;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -260,22 +261,30 @@ public class XMLAutoStarter extends AbstractAutoStartMechanism
     private synchronized void writeToFile()
     {
         // Write the DOM back to file
+        FileOutputStream os = null;
         try
         {
-            TransformerFactory tf = TransformerFactory.newInstance();
-            Transformer m = tf.newTransformer();
-            DOMSource source = new DOMSource(doc);
-            FileOutputStream os = new FileOutputStream(fileUrl.getFile());
+            os = new FileOutputStream(fileUrl.getFile());
             StreamResult result = new StreamResult(os);
+
+            Transformer m = TransformerFactory.newInstance().newTransformer();
             m.setOutputProperty(OutputKeys.INDENT, "yes");
             m.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, XMLAutoStarterEntityResolver.PUBLIC_ID_KEY);
-            m.transform(source, result);
+            m.transform(new DOMSource(doc), result);
             os.close();
         }
         catch (Exception e)
         {
-            e.printStackTrace();
             NucleusLogger.PERSISTENCE.error(LOCALISER.msg("034203", fileUrl.getFile(), e.getMessage()));
+        }
+        finally
+        {
+            try
+            {
+                os.close();
+            }
+            catch (IOException ioe)
+            {}
         }
     }
 }

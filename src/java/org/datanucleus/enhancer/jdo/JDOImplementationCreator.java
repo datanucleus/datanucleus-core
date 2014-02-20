@@ -94,10 +94,6 @@ public class JDOImplementationCreator implements Serializable, ImplementationCre
                     }
 
                     Object obj = newInstance(cmd, clr);
-                    if (obj == null)
-                    {
-                        throw new JDOFatalException(LOCALISER.msg("ImplementationCreator.InstanceCreateFailed", cls.getName()));
-                    }
                     if (!metaDataMgr.hasMetaDataForClass(obj.getClass().getName()))
                     {
                         // No metadata yet present for the implementation so register it
@@ -121,10 +117,6 @@ public class JDOImplementationCreator implements Serializable, ImplementationCre
                 }
 
                 Object obj = newInstance(imd, clr);
-                if (obj == null)
-                {
-                    throw new JDOFatalException(LOCALISER.msg("ImplementationCreator.InstanceCreateFailed", cls.getName()));
-                }
                 if (!metaDataMgr.hasMetaDataForClass(obj.getClass().getName()))
                 {
                     // No metadata yet present for the implementation so register it

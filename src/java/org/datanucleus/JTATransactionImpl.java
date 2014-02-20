@@ -186,8 +186,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
                             }
                             catch (Exception e)
                             {
-                                e.printStackTrace();
-                                throw new NucleusTransactionException("Cannot register Synchronization to a valid JTA Transaction");
+                                throw new NucleusTransactionException("Cannot register Synchronization to a valid JTA Transaction", e);
                             }
                             joinStatus = JoinStatus.JOINED;
                         }

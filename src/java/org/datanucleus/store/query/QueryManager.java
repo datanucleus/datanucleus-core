@@ -80,14 +80,6 @@ public class QueryManager
         this.nucleusCtx = nucleusContext;
         this.storeMgr = storeMgr;
 
-        initialiseQueryCaches();
-    }
-
-    /**
-     * Method to find and initialise the query cache, for caching query compilations.
-     */
-    protected void initialiseQueryCaches()
-    {
         // Instantiate the query compilation cache (generic)
         Configuration conf = nucleusCtx.getConfiguration();
         String cacheType = conf.getStringProperty("datanucleus.cache.queryCompilation.type");
@@ -315,7 +307,7 @@ public class QueryManager
      * Accessor for the generic compilation cache.
      * @return The cache of generic compilations
      */
-    public QueryCompilationCache getQueryCompilationCache()
+    public synchronized QueryCompilationCache getQueryCompilationCache()
     {
         return queryCompilationCache;
     }
@@ -363,7 +355,7 @@ public class QueryManager
      * Accessor for the datastore compilation cache.
      * @return The cache of datastore compilations
      */
-    public QueryDatastoreCompilationCache getQueryDatastoreCompilationCache()
+    public synchronized QueryDatastoreCompilationCache getQueryDatastoreCompilationCache()
     {
         return queryCompilationCacheDatastore;
     }
@@ -425,12 +417,12 @@ public class QueryManager
         return null;
     }
 
-    public QueryResultsCache getQueryResultsCache()
+    public synchronized QueryResultsCache getQueryResultsCache()
     {
         return queryResultsCache;
     }
 
-    public void evictQueryResultsForType(Class cls)
+    public synchronized void evictQueryResultsForType(Class cls)
     {
         if (queryResultsCache != null)
         {

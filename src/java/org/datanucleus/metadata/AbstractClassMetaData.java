@@ -1428,7 +1428,7 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             needsObjectidClass = true;
         }
-        else if (persistableSuperclass != null && getSuperclassManagingTable() == null)
+        else if (getSuperclassManagingTable() == null)
         {
             needsObjectidClass = true;
         }

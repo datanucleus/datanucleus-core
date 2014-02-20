@@ -54,11 +54,11 @@ public class Transaction
     protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
         org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
-    /** this id of this instance **/
-    private static final int nodeId = NucleusContextHelper.random.nextInt();
+    /** id of this instance **/
+    private static final int NODE_ID = NucleusContextHelper.random.nextInt();
 
     /** sequence number for global transactions **/
-    private static int nextGlobalTransactionId = 1;
+    private static int NEXT_GLOBAL_TRANSACTION_ID = 1;
 
     /** number for next branch **/
     private int nextBranchId = 1;
@@ -89,7 +89,7 @@ public class Transaction
 
     Transaction()
     {
-        xid = new XidImpl(nodeId,0,nextGlobalTransactionId++);
+        xid = new XidImpl(NODE_ID, 0, NEXT_GLOBAL_TRANSACTION_ID++);
     	if (NucleusLogger.TRANSACTION.isDebugEnabled())
     	{
     		NucleusLogger.TRANSACTION.debug("Transaction created "+toString());
