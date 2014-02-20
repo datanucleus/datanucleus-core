@@ -326,7 +326,7 @@ public class ConnectionManagerImpl implements ConnectionManager
 
                 // Enlist the connection resource if has enlistable resource
                 XAResource res = mconn.getXAResource();
-                if (res != null && !tx.isEnlisted(res))
+                if (res != null && tx != null && !tx.isEnlisted(res))
                 {
                     boolean enlistInLocalTM = true;
                     if (options != null && options.get(ConnectionFactory.RESOURCE_TYPE_OPTION) != null &&
