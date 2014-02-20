@@ -21,13 +21,11 @@ import java.io.Serializable;
 
 /**
  * Simple identity being a reference to the object itself.
- *
  */
 public class IdentityReference implements Serializable
 {
-    
     private static final long serialVersionUID = 2472281096825989665L;
-    
+
     /** The object we are the identity for. */
     protected Object client;
 
@@ -45,16 +43,11 @@ public class IdentityReference implements Serializable
     {
         if (o instanceof IdentityReference)
         {
-            return equals((IdentityReference) o);
+            return client == ((IdentityReference)o).client;
         }
         else
         {
             return false;
         }
-    }
-
-    public boolean equals(IdentityReference o)
-    {
-        return client == o.client;
     }
 }
