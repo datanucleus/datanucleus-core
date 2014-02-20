@@ -40,11 +40,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
@@ -205,29 +203,38 @@ public class NonManagedPluginRegistry implements PluginRegistry
 
         // parse the plugin files
         DocumentBuilder docBuilder = PluginParser.getDocumentBuilder();
-        Iterator<URL> it = getPluginURLs().iterator();
-        while (it.hasNext())
+        try
         {
-            URL pluginURL = it.next();
-            URL manifest = getManifestURL(pluginURL);
-            if (manifest == null)
+            // Search and retrieve the URL for the "/plugin.xml" files located in the classpath.
+            Enumeration<URL> paths = clr.getResources(PLUGIN_DIR + "plugin.xml", ClassConstants.NUCLEUS_CONTEXT_LOADER);
+            while (paths.hasMoreElements())
             {
-                // No MANIFEST.MF for this plugin.xml so ignore it
-                continue;
-            }
+                URL pluginURL = paths.nextElement();
+                URL manifest = getManifestURL(pluginURL);
+                if (manifest == null)
+                {
+                    // No MANIFEST.MF for this plugin.xml so ignore it
+                    continue;
+                }
 
-            Bundle bundle = registerBundle(manifest);
-            if (bundle == null)
-            {
-                // No MANIFEST.MF for this plugin.xml so ignore it
-                continue;
-            }
+                Bundle bundle = registerBundle(manifest);
+                if (bundle == null)
+                {
+                    // No MANIFEST.MF for this plugin.xml so ignore it
+                    continue;
+                }
 
-            List[] elements =
-                PluginParser.parsePluginElements(docBuilder, this, pluginURL, bundle, clr);
-            registerExtensionPointsForPluginInternal(elements[0], false);
-            registeringExtensions.addAll(elements[1]);
+                List[] elements =
+                    PluginParser.parsePluginElements(docBuilder, this, pluginURL, bundle, clr);
+                registerExtensionPointsForPluginInternal(elements[0], false);
+                registeringExtensions.addAll(elements[1]);
+            }
         }
+        catch (IOException e)
+        {
+            throw new NucleusException("Error loading resource", e).setFatal();
+        }
+
         extensionPoints = extensionPointsByUniqueId.values().toArray(
             new ExtensionPoint[extensionPointsByUniqueId.values().size()]);
 
@@ -309,29 +316,6 @@ public class NonManagedPluginRegistry implements PluginRegistry
             extensionPoints = extensionPointsByUniqueId.values().toArray(
                 new ExtensionPoint[extensionPointsByUniqueId.values().size()]);
         }
-    }
-
-    /**
-     * Search and retrieve the URL for the "/plugin.xml" files located in the classpath.
-     * @return a set of {@link URL}
-     */
-    private Set<URL> getPluginURLs()
-    {
-        Set<URL> set = new HashSet();
-        try
-        {
-            Enumeration<URL> paths = 
-                clr.getResources(PLUGIN_DIR + "plugin.xml", ClassConstants.NUCLEUS_CONTEXT_LOADER);
-            while (paths.hasMoreElements())
-            {
-                set.add(paths.nextElement());
-            }
-        }
-        catch (IOException e)
-        {
-            throw new NucleusException("Error loading resource", e).setFatal();
-        }
-        return set;
     }
 
     /**

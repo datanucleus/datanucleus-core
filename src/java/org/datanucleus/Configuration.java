@@ -587,20 +587,15 @@ public class Configuration extends PropertyStore implements Serializable
         }
     }
 
-    /**
-     * Equality operator.
-     * @param obj Object to compare against.
-     * @return Whether the objects are equal.
-     */
     public synchronized boolean equals(Object obj)
     {
+        if (obj == null || !(obj instanceof Configuration))
+        {
+            return false;
+        }
         if (obj == this)
         {
             return true;
-        }
-        if (!(obj instanceof Configuration))
-        {
-            return false;
         }
 
         Configuration config = (Configuration)obj;
@@ -629,5 +624,10 @@ public class Configuration extends PropertyStore implements Serializable
         }
 
         return true;
+    }
+
+    public int hashCode()
+    {
+        return (properties != null ? properties.hashCode() : 0) ^ (defaultProperties!=null ? defaultProperties.hashCode() : 0);
     }
 }
