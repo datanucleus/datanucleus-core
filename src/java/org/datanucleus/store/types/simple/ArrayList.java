@@ -272,6 +272,15 @@ public class ArrayList extends java.util.ArrayList implements SCOList, Cloneable
         return delegate.get(index);
     }
 
+    /* (non-Javadoc)
+     * @see java.util.AbstractList#hashCode()
+     */
+    @Override
+    public int hashCode()
+    {
+        return delegate.hashCode();
+    }
+
     /**
      * Method to the position of an element.
      * @param element The element.

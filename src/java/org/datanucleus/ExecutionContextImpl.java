@@ -3643,7 +3643,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             // User requests validation of the instance so go to the datastore to validate it
             // loading any fetchplan fields that are needed in the process.
-            if (op != null && !fromCache)
+            if (!fromCache)
             {
                 // Cache the object in case we have bidirectional relations that would need to find this
                 putObjectIntoLevel1Cache(op);

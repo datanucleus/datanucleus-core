@@ -3299,6 +3299,15 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         return super.toString(prefix, indent);
     }
 
+    public boolean equals(Object o)
+    {
+        if (o == null)
+        {
+            return false;
+        }
+        return compareTo(o) == 0;
+    }
+
     /**
      * Comparator method. This allows the ClassMetaData to search for a
      * FieldMetaData with a particular name.

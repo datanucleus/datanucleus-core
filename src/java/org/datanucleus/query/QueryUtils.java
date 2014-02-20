@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -620,16 +621,17 @@ public class QueryUtils
             return null;
         }
 
-        Iterator paramKeyIter = parameterValues.keySet().iterator();
-        while (paramKeyIter.hasNext())
+        Iterator paramEntryIter = parameterValues.entrySet().iterator();
+        while (paramEntryIter.hasNext())
         {
-            Object key = paramKeyIter.next();
+            Entry entry = (Entry) paramEntryIter.next();
+            Object key = entry.getKey();
             if (key instanceof Integer)
             {
                 // Positional parameter
                 if (((Integer) key).intValue() == paramExpr.getPosition())
                 {
-                    return parameterValues.get(key);
+                    return entry.getValue();
                 }
             }
             else if (key instanceof String)
@@ -637,7 +639,7 @@ public class QueryUtils
                 // Named parameter
                 if (((String)key).equals(paramExpr.getId()))
                 {
-                    return parameterValues.get(key);
+                    return entry.getValue();
                 }
             }
         }
