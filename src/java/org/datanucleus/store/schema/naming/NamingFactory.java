@@ -17,6 +17,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.schema.naming;
 
+import java.util.List;
+
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IndexMetaData;
@@ -108,7 +110,7 @@ public interface NamingFactory
      * @param position The position of the column (where this field has multiple columns)
      * @return The column name
      */
-    String getColumnName(AbstractMemberMetaData[] mmds, int position);
+    String getColumnName(List<AbstractMemberMetaData> mmds, int position);
 
     /**
      * Method to return the name of an index specified at class level.

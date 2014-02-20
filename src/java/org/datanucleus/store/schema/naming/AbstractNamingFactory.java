@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.schema.naming;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -133,13 +134,12 @@ public abstract class AbstractNamingFactory implements NamingFactory
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.naming.NamingFactory#getColumnName(org.datanucleus.metadata.AbstractMemberMetaData[], int)
+     * @see org.datanucleus.store.schema.naming.NamingFactory#getColumnName(java.util.List, int)
      */
-    @Override
-    public String getColumnName(AbstractMemberMetaData[] mmds, int position)
+    public String getColumnName(List<AbstractMemberMetaData> mmds, int position)
     {
-        EmbeddedMetaData embmd = mmds[0].getEmbeddedMetaData();
-        if (embmd != null && mmds.length > 1)
+        EmbeddedMetaData embmd = mmds.get(0).getEmbeddedMetaData();
+        if (embmd != null && mmds.size() > 1)
         {
             boolean checked = false;
             int mmdNo = 1;
@@ -151,9 +151,9 @@ public abstract class AbstractNamingFactory implements NamingFactory
                     boolean checkedEmbmd = false;
                     for (int i=0;i<embMmds.length;i++)
                     {
-                        if (embMmds[i].getFullFieldName().equals(mmds[mmdNo].getFullFieldName()))
+                        if (embMmds[i].getFullFieldName().equals(mmds.get(mmdNo).getFullFieldName()))
                         {
-                            if (mmds.length == mmdNo+1)
+                            if (mmds.size() == mmdNo+1)
                             {
                                 // Found last embedded field, so use column data if present
                                 checked = true;
@@ -187,11 +187,11 @@ public abstract class AbstractNamingFactory implements NamingFactory
         }
 
         // EmbeddedMetaData doesn't specify this members column, so generate one based on the names of the member(s).
-        StringBuilder str = new StringBuilder(mmds[0].getName());
-        for (int i=1;i<mmds.length;i++)
+        StringBuilder str = new StringBuilder(mmds.get(0).getName());
+        for (int i=1;i<mmds.size();i++)
         {
             str.append(wordSeparator);
-            str.append(mmds[i].getName());
+            str.append(mmds.get(i).getName());
         }
 
         return prepareIdentifierNameForUse(str.toString(), SchemaComponent.COLUMN);

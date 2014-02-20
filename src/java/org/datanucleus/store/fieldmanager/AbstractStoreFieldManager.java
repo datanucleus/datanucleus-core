@@ -37,6 +37,13 @@ public abstract class AbstractStoreFieldManager extends AbstractFieldManager
 
     protected boolean insert;
 
+    public AbstractStoreFieldManager(ExecutionContext ec, AbstractClassMetaData cmd, boolean insert)
+    {
+        this.ec = ec;
+        this.cmd = cmd;
+        this.insert = insert;
+    }
+
     public AbstractStoreFieldManager(ObjectProvider op, boolean insert)
     {
         this.ec = op.getExecutionContext();
