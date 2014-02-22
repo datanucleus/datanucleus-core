@@ -22,6 +22,7 @@ import org.datanucleus.ClassNameConstants;
 import org.datanucleus.asm.MethodVisitor;
 import org.datanucleus.asm.Opcodes;
 import org.datanucleus.asm.Type;
+import org.datanucleus.util.JavaUtils;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -429,5 +430,15 @@ public final class EnhanceUtils
         {
             return ACN_Object;
         }
+    }
+
+    public static int getAsmVersionForJRE()
+    {
+        // TODO Cater for JRE1,8 when ASM v5 is available
+        if (JavaUtils.isJRE1_7OrAbove())
+        {
+            return Opcodes.V1_7;
+        }
+        return Opcodes.V1_6;
     }
 }
