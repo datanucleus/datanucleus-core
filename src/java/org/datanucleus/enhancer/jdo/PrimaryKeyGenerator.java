@@ -35,6 +35,7 @@ import org.datanucleus.enhancer.EnhanceUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
+import org.datanucleus.util.JavaUtils;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -89,7 +90,7 @@ public class PrimaryKeyGenerator
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 
         // TODO Parameterise the first argument to allow any JDK
-        cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, className_ASM, null,
+        cw.visit(EnhanceUtils.getAsmVersionForJRE(), Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, className_ASM, null,
             "java/lang/Object", new String[] {"java/io/Serializable"});
 
         // Add fields
@@ -373,15 +374,19 @@ public class PrimaryKeyGenerator
         }
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "toString", "()Ljava/lang/String;", null, null);
         mv.visitCode();
-
         Label startLabel = new Label();
         mv.visitLabel(startLabel);
 
+        // "StringBuilder str = new StringBuilder();"
         mv.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
         mv.visitInsn(Opcodes.DUP);
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V");
+        mv.visitVarInsn(Opcodes.ASTORE, 1);
+        Label l1 = new Label();
+        mv.visitLabel(l1);
 
-        // Generates a String like "field1:field2:field3"
+        // "str.append(field1).append(":").append(field2) ..." etc
+        mv.visitVarInsn(Opcodes.ALOAD, 1);
         int[] pkPositions = cmd.getPKMemberPositions();
         for (int i=0;i<pkPositions.length;i++)
         {
@@ -399,9 +404,6 @@ public class PrimaryKeyGenerator
             }
             else if (mmd.getType() == char.class)
             {
-                mv.visitVarInsn(Opcodes.ALOAD, 0);
-                mv.visitFieldInsn(Opcodes.GETFIELD, className_ASM, mmd.getName(),
-                    EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()));
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
                     "(" + EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()) + ")Ljava/lang/StringBuilder;");
             }
@@ -448,14 +450,18 @@ public class PrimaryKeyGenerator
                     "(Ljava/lang/String;)Ljava/lang/StringBuilder;");
             }
         }
+        mv.visitInsn(Opcodes.POP);
 
+        // "return str.toString();"
+        mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;");
         mv.visitInsn(Opcodes.ARETURN);
 
         Label endLabel = new Label();
         mv.visitLabel(endLabel);
         mv.visitLocalVariable("this", className_DescName, null, startLabel, endLabel, 0);
-        mv.visitMaxs(3, 1);
+        mv.visitLocalVariable("str", "Ljava/lang/StringBuilder;", null, l1, endLabel, 1);
+        mv.visitMaxs(pkPositions.length, 2);
         mv.visitEnd();
     }
 
@@ -485,6 +491,10 @@ public class PrimaryKeyGenerator
         mv.visitLabel(l1);
 
         // if (!(obj instanceof ThePK)) {return false;}
+        if (JavaUtils.useStackMapFrames())
+        {
+            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+        }
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitTypeInsn(Opcodes.INSTANCEOF, className_ASM);
         Label l3 = new Label();
@@ -494,6 +504,10 @@ public class PrimaryKeyGenerator
         mv.visitLabel(l3);
 
         // ThePK other = (ThePK)obj;
+        if (JavaUtils.useStackMapFrames())
+        {
+            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+        }
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitTypeInsn(Opcodes.CHECKCAST, className_ASM);
         mv.visitVarInsn(Opcodes.ASTORE, 2);
@@ -560,19 +574,21 @@ public class PrimaryKeyGenerator
         }
 
         mv.visitInsn(Opcodes.ICONST_1);
-        Label compareEndLabel = new Label();
-        mv.visitJumpInsn(Opcodes.GOTO, compareEndLabel);
-        mv.visitLabel(compareSepLabel);
-        mv.visitInsn(Opcodes.ICONST_0);
-        mv.visitLabel(compareEndLabel);
         mv.visitInsn(Opcodes.IRETURN);
+        mv.visitLabel(compareSepLabel);
+        if (JavaUtils.useStackMapFrames())
+        {
+            mv.visitFrame(Opcodes.F_APPEND, 1, new Object[] {className_ASM}, 0, null);
+        }
 
+        mv.visitInsn(Opcodes.ICONST_0);
+        mv.visitInsn(Opcodes.IRETURN);
         Label endLabel = new Label();
         mv.visitLabel(endLabel);
         mv.visitLocalVariable("this", className_DescName, null, startLabel, endLabel, 0);
         mv.visitLocalVariable("obj", "Ljava/lang/Object;", null, startLabel, endLabel, 1);
         mv.visitLocalVariable("other", className_DescName, null, compareStartLabel, endLabel, 2);
-        mv.visitMaxs(4, 3);
+        mv.visitMaxs(4, 3); // TODO Can be (2, 3) in some situations, e.g if char is one of PK fields?
         mv.visitEnd();
     }
 
