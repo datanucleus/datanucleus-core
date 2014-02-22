@@ -156,7 +156,7 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
         AbstractClassMetaData cmd = mmd.getAbstractClassMetaData();
         if ((mmd.getPersistenceFlags() & PersistenceFlags.MEDIATE_READ) == PersistenceFlags.MEDIATE_READ)
         {
-            // MEDIATE_READ
+            // MEDIATE_READ - see method JdoGetViaMediate
             Label startLabel = new Label();
             mv.visitLabel(startLabel);
 
@@ -209,13 +209,18 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
             EnhanceUtils.addReturnForType(mv, mmd.getType());
 
             mv.visitLabel(l1);
+            if (includeFrames)
+            {
+                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+            }
 
-            Label l4 = new Label();
             if (cmd.isDetachable())
             {
                 // "if (objPC.aaaIsDetached() != false && ((BitSet) objPC.aaaDetachedState[2]).get(5) != true)"
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getIsDetachedMethodName(), "()Z");
+
+                Label l4 = new Label();
                 mv.visitJumpInsn(Opcodes.IFEQ, l4);
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName,
@@ -265,13 +270,14 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
                         "<init>", "(Ljava/lang/String;)V");
                     mv.visitInsn(Opcodes.ATHROW);
                 }
+
+                mv.visitLabel(l4);
+                if (includeFrames)
+                {
+                    mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+                }
             }
 
-            mv.visitLabel(l4);
-            if (includeFrames)
-            {
-                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, 
                 namer.getGetMethodPrefixMethodName() + mmd.getName(), "()" + fieldTypeDesc);
@@ -284,7 +290,7 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
         }
         else if ((mmd.getPersistenceFlags() & PersistenceFlags.CHECK_READ) == PersistenceFlags.CHECK_READ)
         {
-            // CHECK_READ
+            // CHECK_READ - see method JdoGetViaCheck
             Label startLabel = new Label();
             mv.visitLabel(startLabel);
 
@@ -338,14 +344,14 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
             }
             EnhanceUtils.addReturnForType(mv, mmd.getType());
             mv.visitLabel(l1);
+            if (includeFrames)
+            {
+                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+            }
 
             if (cmd.isDetachable())
             {
                 // "if (objPC.aaaIsDetached() != false && ((BitSet) objPC.aaaDetachedState[2]).get(5) != true)"
-                if (includeFrames)
-                {
-                    mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                }
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getIsDetachedMethodName(), "()Z");
                 Label l4 = new Label();
@@ -367,8 +373,8 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
                 mv.visitJumpInsn(Opcodes.IFNE, l4);
 
                 if (detachListener)
-                {				
-                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, namer.getDetachListenerAsmClassName(), "getInstance", 
+                {
+                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, namer.getDetachListenerAsmClassName(), "getInstance",
                         "()L" + namer.getDetachListenerAsmClassName() + ";");
                     mv.visitVarInsn(Opcodes.ALOAD, 0);
                     mv.visitLdcInsn(mmd.getName());
@@ -384,14 +390,15 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
                     mv.visitMethodInsn(Opcodes.INVOKESPECIAL, namer.getDetachedFieldAccessExceptionAsmClassName(), 
                         "<init>", "(Ljava/lang/String;)V");
                     mv.visitInsn(Opcodes.ATHROW);
-                    mv.visitLabel(l4);
+                }
+
+                mv.visitLabel(l4);
+                if (includeFrames)
+                {
+                    mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
                 }
             }
 
-            if (includeFrames)
-            {
-                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, 
                 namer.getGetMethodPrefixMethodName() + mmd.getName(), "()" + fieldTypeDesc);
@@ -404,7 +411,7 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
         }
         else
         {
-            // NORMAL
+            // NORMAL - see method JdoGetNormal
             Label startLabel = new Label();
             mv.visitLabel(startLabel);
 

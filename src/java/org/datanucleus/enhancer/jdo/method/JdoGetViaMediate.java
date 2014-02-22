@@ -25,6 +25,7 @@ import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.util.JavaUtils;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Method to generate the method "jdoGetZZZ" using ASM for MEDIATE_READ fields.
@@ -70,6 +71,7 @@ public class JdoGetViaMediate extends ClassMethod
      */
     public void execute()
     {
+        NucleusLogger.GENERAL.info(">> GetViaMediate " + fmd.getFullFieldName());
         visitor.visitCode();
 
         String fieldTypeDesc = Type.getDescriptor(fmd.getType());
@@ -132,13 +134,14 @@ public class JdoGetViaMediate extends ClassMethod
             visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
         }
 
-        Label l4 = new Label();
         if (enhancer.getClassMetaData().isDetachable())
         {
             // "if (objPC.jdoIsDetached() != false && ((BitSet) objPC.jdoDetachedState[2]).get(5) != true)"
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
             visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
                 getNamer().getIsDetachedMethodName(), "()Z");
+
+            Label l4 = new Label();
             visitor.visitJumpInsn(Opcodes.IFEQ, l4);
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
             visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
@@ -190,12 +193,12 @@ public class JdoGetViaMediate extends ClassMethod
                     "<init>", "(Ljava/lang/String;)V");
                 visitor.visitInsn(Opcodes.ATHROW);
             }
-        }
 
-        visitor.visitLabel(l4);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+            visitor.visitLabel(l4);
+            if (JavaUtils.useStackMapFrames())
+            {
+                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+            }
         }
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);

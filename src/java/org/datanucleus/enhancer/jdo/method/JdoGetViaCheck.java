@@ -133,13 +133,14 @@ public class JdoGetViaCheck extends ClassMethod
             visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
         }
 
-        Label l4 = new Label();
         if (enhancer.getClassMetaData().isDetachable())
         {
             // "if (objPC.jdoIsDetached() != false && ((BitSet) objPC.jdoDetachedState[2]).get(5) != true)"
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
             visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(),
                 getNamer().getIsDetachedMethodName(), "()Z");
+
+            Label l4 = new Label();
             visitor.visitJumpInsn(Opcodes.IFEQ, l4);
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
             visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
@@ -177,12 +178,12 @@ public class JdoGetViaCheck extends ClassMethod
                     "<init>", "(Ljava/lang/String;)V");
                 visitor.visitInsn(Opcodes.ATHROW);
             }
-        }
 
-        visitor.visitLabel(l4);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+            visitor.visitLabel(l4);
+            if (JavaUtils.useStackMapFrames())
+            {
+                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+            }
         }
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);

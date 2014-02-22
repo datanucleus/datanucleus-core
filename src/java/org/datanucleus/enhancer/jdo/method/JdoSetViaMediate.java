@@ -150,6 +150,7 @@ public class JdoSetViaMediate extends ClassMethod
             }
             visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "set", "(I)V");
             visitor.visitLabel(l6);
+
             if (JavaUtils.useStackMapFrames())
             {
                 visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);

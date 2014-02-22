@@ -45,6 +45,7 @@ import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.InterfaceMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.JavaUtils;
 
 /**
  * Implementation generator using ASM bytecode manipulation library.
@@ -107,7 +108,7 @@ public class JDOImplementationGenerator
 
         // Start the class
         writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-        writer.visit(Opcodes.V1_3, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, fullClassName.replace('.', '/'),
+        writer.visit(EnhanceUtils.getAsmVersionForJRE(), Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, fullClassName.replace('.', '/'),
             null, fullSuperclassName.replace('.', '/'),
             interfaces.toArray(new String[interfaces.size()]));
 
@@ -140,7 +141,7 @@ public class JDOImplementationGenerator
 
         // Start the class
         writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-        writer.visit(Opcodes.V1_3, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, fullClassName.replace('.', '/'),
+        writer.visit(EnhanceUtils.getAsmVersionForJRE(), Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, fullClassName.replace('.', '/'),
             null, fullSuperclassName.replace('.', '/'), null);
 
         // Create fields, default ctor, and methods
@@ -354,7 +355,7 @@ public class JDOImplementationGenerator
                 (mmd.isPrivate() ? Opcodes.ACC_PRIVATE : 0);
             MethodVisitor getVisitor = writer.visitMethod(getAccess, getterName, "()" + fieldDesc, null, null);
             JDOPropertyGetterAdapter.generateGetXXXMethod(getVisitor, mmd, asmClassName, asmTypeDescriptor, false, 
-                false, namer);
+                JavaUtils.useStackMapFrames(), namer);
 
             // Abstract class so generate jdoGetXXX
             int access = (mmd.isPublic() ? Opcodes.ACC_PUBLIC : 0) | 
@@ -412,7 +413,7 @@ public class JDOImplementationGenerator
                 (mmd.isPrivate() ? Opcodes.ACC_PRIVATE : 0);
             MethodVisitor setVisitor = writer.visitMethod(setAccess, setterName, "(" + fieldDesc + ")V", null, null);
             JDOPropertySetterAdapter.generateSetXXXMethod(setVisitor, mmd, asmClassName, asmTypeDescriptor, 
-                false, namer);
+                JavaUtils.useStackMapFrames(), namer);
 
             // Abstract class so generate jdoSetXXX
             int access = (mmd.isPublic() ? Opcodes.ACC_PUBLIC : 0) | 

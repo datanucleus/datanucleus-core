@@ -155,7 +155,7 @@ public class JDOPropertySetterAdapter extends MethodVisitor
         AbstractClassMetaData cmd = mmd.getAbstractClassMetaData();
         if ((mmd.getPersistenceFlags() & PersistenceFlags.MEDIATE_WRITE) == PersistenceFlags.MEDIATE_WRITE)
         {
-            // MEDIATE_WRITE
+            // MEDIATE_WRITE - see method JdoSetViaMediate
             Label startLabel = new Label();
             mv.visitLabel(startLabel);
 
@@ -200,15 +200,15 @@ public class JDOPropertySetterAdapter extends MethodVisitor
             }
             mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, namer.getStateManagerAsmClassName(),
                 methodName, "(L" + namer.getPersistableAsmClassName() + ";I" + argTypeDesc + argTypeDesc + ")V");
+
             mv.visitLabel(l3);
+            if (includeFrames)
+            {
+                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+            }
 
             if (cmd.isDetachable())
             {
-                if (includeFrames)
-                {
-                    mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                }
-
                 // "if (objPC.aaaIsDetached() == true)"
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName,
@@ -231,13 +231,14 @@ public class JDOPropertySetterAdapter extends MethodVisitor
                     mv.visitInsn(Opcodes.IADD);
                 }
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "set", "(I)V");
+
                 mv.visitLabel(l6);
+                if (includeFrames)
+                {
+                    mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+                }
             }
 
-            if (includeFrames)
-            {
-                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
             mv.visitInsn(Opcodes.RETURN);
             Label endLabel = new Label();
             mv.visitLabel(endLabel);
@@ -247,7 +248,7 @@ public class JDOPropertySetterAdapter extends MethodVisitor
         }
         else if ((mmd.getPersistenceFlags() & PersistenceFlags.CHECK_WRITE) == PersistenceFlags.CHECK_WRITE)
         {
-            // CHECK_WRITE
+            // CHECK_WRITE - see method JdoSetViaCheck
             Label startLabel = new Label();
             mv.visitLabel(startLabel);
 
@@ -337,7 +338,7 @@ public class JDOPropertySetterAdapter extends MethodVisitor
         }
         else
         {
-            // NORMAL
+            // NORMAL - see method JdoSetNormal
             Label startLabel = new Label();
             mv.visitLabel(startLabel);
 
