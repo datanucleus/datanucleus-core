@@ -358,6 +358,19 @@ public class FederatedStoreManager implements StoreManager
         }
     }
 
+    public void unmanageClass(ClassLoaderResolver clr, String className, boolean removeFromDatastore)
+    {
+        primaryStoreMgr.unmanageClass(clr, className, removeFromDatastore);
+        if (secondaryStoreMgrMap != null)
+        {
+            Collection<StoreManager> secStoreMgrs = secondaryStoreMgrMap.values();
+            for (StoreManager storeMgr : secStoreMgrs)
+            {
+                storeMgr.unmanageClass(clr, className, removeFromDatastore);
+            }
+        }
+    }
+
     public boolean supportsQueryLanguage(String language)
     {
         return primaryStoreMgr.supportsQueryLanguage(language);

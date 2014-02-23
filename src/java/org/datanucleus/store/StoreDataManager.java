@@ -54,7 +54,12 @@ public class StoreDataManager
 
         storeDataByClass.clear();
     }
-    
+
+    public void deregisterClass(String className)
+    {
+        storeDataByClass.remove(className);
+    }
+
     /**
      * Method to register some data with the store.
      * @param data The StoreData to add

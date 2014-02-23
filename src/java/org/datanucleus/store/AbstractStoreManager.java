@@ -912,6 +912,26 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     }
 
     /* (non-Javadoc)
+     * @see org.datanucleus.store.StoreManager#unmanageClass(org.datanucleus.ClassLoaderResolver, java.lang.String, boolean)
+     */
+    @Override
+    public void unmanageClass(ClassLoaderResolver clr, String className, boolean removeFromDatastore)
+    {
+        AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
+        if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
+        {
+            if (removeFromDatastore)
+            {
+                // TODO Handle this
+            }
+
+            // Remove our knowledge of this class
+            // TODO Remove any fields that are registered in their own right (join tables)
+            storeDataMgr.deregisterClass(className);
+        }
+    }
+
+    /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#manageClassForIdentity(java.lang.Object, org.datanucleus.ClassLoaderResolver)
      */
     public String manageClassForIdentity(Object id, ClassLoaderResolver clr)

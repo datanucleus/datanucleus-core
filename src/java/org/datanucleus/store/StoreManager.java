@@ -289,6 +289,15 @@ public interface StoreManager
     void manageClasses(ClassLoaderResolver clr, String... classNames);
 
     /**
+     * Method to remove knowledge of the specified class from this StoreManager.
+     * This can optionally also remove it from the datastore.
+     * @param clr ClassLoader resolver
+     * @param className Name of the class
+     * @param removeFromDatastore Whether to also remove it from the datastore (otherwise just from the StoreManager)
+     */
+    void unmanageClass(ClassLoaderResolver clr, String className, boolean removeFromDatastore);
+
+    /**
      * Remove all classes from the persistence model for the datastore.
      * This empties the datastore of all datastore objects managed by us.
      * All objects of types not managed are left untouched.
