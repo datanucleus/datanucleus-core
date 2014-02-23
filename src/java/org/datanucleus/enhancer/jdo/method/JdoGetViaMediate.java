@@ -25,7 +25,6 @@ import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.util.JavaUtils;
-import org.datanucleus.util.NucleusLogger;
 
 /**
  * Method to generate the method "jdoGetZZZ" using ASM for MEDIATE_READ fields.
@@ -71,7 +70,6 @@ public class JdoGetViaMediate extends ClassMethod
      */
     public void execute()
     {
-        NucleusLogger.GENERAL.info(">> GetViaMediate " + fmd.getFullFieldName());
         visitor.visitCode();
 
         String fieldTypeDesc = Type.getDescriptor(fmd.getType());
