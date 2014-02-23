@@ -1109,7 +1109,8 @@ public class MetaDataUtils
                         {
                             if (embMmds[i].getName().equals(mmd.getName()))
                             {
-                                return true;
+                                // Does it have an <embedded> block?
+                                return embMmds[i].getEmbeddedMetaData() != null;
                             }
                         }
                     }
