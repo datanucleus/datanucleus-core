@@ -229,6 +229,7 @@ public class CompleteClassTable implements Table
     protected void processEmbeddedMember(List<BasicColumn> cols, AbstractMemberMetaData ownerMmd,
             ClassLoaderResolver clr)
     {
+        // TODO This needs updating to work like the Cassandra plugin SchemaHandler does, since it makes a more complete job
         EmbeddedMetaData emd = ownerMmd.getEmbeddedMetaData();
         AbstractClassMetaData embCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(ownerMmd.getType(), clr);
         AbstractMemberMetaData[] embMmds = emd.getMemberMetaData();
