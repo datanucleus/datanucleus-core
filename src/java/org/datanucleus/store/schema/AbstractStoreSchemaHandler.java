@@ -45,6 +45,9 @@ public abstract class AbstractStoreSchemaHandler implements StoreSchemaHandler
     /** Whether to warn only when any errors occur on auto-create. */
     protected final boolean autoCreateWarnOnError;
 
+    /** Whether to auto delete any columns that are present but not in the metadata. */
+    protected final boolean autoDeleteColumns;
+
     /** Whether to validate any tables */
     protected final boolean validateTables;
 
@@ -85,8 +88,9 @@ public abstract class AbstractStoreSchemaHandler implements StoreSchemaHandler
             }
         }
         autoCreateWarnOnError = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_WARNONERROR);
+    	autoDeleteColumns = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTODELETE_COLUMNS);
 
-        boolean validateAll = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_ALL);
+    	boolean validateAll = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_ALL);
         if (validateAll)
         {
             validateTables = true;
@@ -140,6 +144,11 @@ public abstract class AbstractStoreSchemaHandler implements StoreSchemaHandler
     public boolean isAutoCreateWarnOnError()
     {
         return autoCreateWarnOnError;
+    }
+
+    public boolean isAutoDeleteColumns()
+    {
+        return autoDeleteColumns;
     }
 
     public boolean isValidateTables()
