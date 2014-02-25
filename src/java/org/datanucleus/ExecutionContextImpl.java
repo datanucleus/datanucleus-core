@@ -273,26 +273,16 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             this.lock = new ReentrantLock();
         }
+
         initialise(owner, options);
 
         // Set up the Level 1 Cache
         initialiseLevel1Cache();
-
-        if (getReachabilityAtCommit())
-        {
-            // Create temporary storage to handle PBR at commit
-            reachabilityPersistedIds = new HashSet();
-            reachabilityDeletedIds = new HashSet();
-            reachabilityFlushedNewIds = new HashSet();
-            reachabilityEnlistedIds = new HashSet();
-        }
-
-        setLevel2Cache(true); // Enable it if the NucleusContext has it enabled
     }
 
     public void initialise(Object owner, Map<String, Object> options)
     {
-        // TODO Make use of the username+password (for JDO). How? need new StoreManager maybe?
+    	// TODO Make use of the username+password (for JDO). How? need new StoreManager maybe?
         /*String userName = (String)options.get(ExecutionContext.OPTION_USERNAME);
         String password = (String)options.get(ExecutionContext.OPTION_PASSWORD);*/
         this.owner = owner;
@@ -382,6 +372,17 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 return new ThreadContextInfo();
             }
         };
+
+        if (getReachabilityAtCommit())
+        {
+            // Create temporary storage to handle PBR at commit
+            reachabilityPersistedIds = new HashSet();
+            reachabilityDeletedIds = new HashSet();
+            reachabilityFlushedNewIds = new HashSet();
+            reachabilityEnlistedIds = new HashSet();
+        }
+
+        setLevel2Cache(true);
     }
 
     /**
@@ -3520,7 +3521,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
             if (numConcrete == 1)
             {
-                NucleusLogger.GENERAL.info(">> findById " + id + " has single concrete class applicable = " + concreteClassName); // TODO Remove this debug (NUCCORE-1113)
                 // Single possible concrete class, so return it
                 return concreteClassName;
             }
