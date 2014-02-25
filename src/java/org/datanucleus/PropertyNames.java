@@ -173,6 +173,7 @@ public class PropertyNames
     public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_LOAD_SOURCE = "datanucleus.generateSchema.scripts.load";
 
     public static final String PROPERTY_SCHEMA_AUTOCREATE_ALL = "datanucleus.schema.autoCreateAll";
+    public static final String PROPERTY_SCHEMA_AUTOCREATE_SCHEMA = "datanucleus.schema.autoCreateSchema";
     public static final String PROPERTY_SCHEMA_AUTOCREATE_TABLES = "datanucleus.schema.autoCreateTables";
     public static final String PROPERTY_SCHEMA_AUTOCREATE_COLUMNS = "datanucleus.schema.autoCreateColumns";
     public static final String PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS = "datanucleus.schema.autoCreateConstraints";
