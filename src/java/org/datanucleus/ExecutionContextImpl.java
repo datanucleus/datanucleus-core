@@ -382,6 +382,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 return new ThreadContextInfo();
             }
         };
+        setLevel2Cache(true);
     }
 
     /**
