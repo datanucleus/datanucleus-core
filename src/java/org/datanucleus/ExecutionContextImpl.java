@@ -277,17 +277,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         // Set up the Level 1 Cache
         initialiseLevel1Cache();
-
-        if (getReachabilityAtCommit())
-        {
-            // Create temporary storage to handle PBR at commit
-            reachabilityPersistedIds = new HashSet();
-            reachabilityDeletedIds = new HashSet();
-            reachabilityFlushedNewIds = new HashSet();
-            reachabilityEnlistedIds = new HashSet();
-        }
-
-        setLevel2Cache(true); // Enable it if the NucleusContext has it enabled
     }
 
     public void initialise(Object owner, Map<String, Object> options)
@@ -382,6 +371,17 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 return new ThreadContextInfo();
             }
         };
+
+        if (getReachabilityAtCommit())
+        {
+            // Create temporary storage to handle PBR at commit
+            reachabilityPersistedIds = new HashSet();
+            reachabilityDeletedIds = new HashSet();
+            reachabilityFlushedNewIds = new HashSet();
+            reachabilityEnlistedIds = new HashSet();
+        }
+
+        setLevel2Cache(true); // Enable it if the NucleusContext has it enabled
     }
 
     /**
