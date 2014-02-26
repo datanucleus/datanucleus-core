@@ -258,6 +258,8 @@ Contributors:
 
     <!-- TYPE CONVERTERS -->
     <extension point="org.datanucleus.type_converter">
+        <type-converter name="dn.character-string" member-type="java.lang.Character" datastore-type="java.lang.String"
+            converter-class="org.datanucleus.store.types.converters.CharacterStringConverter"/>
         <type-converter name="dn.bigdecimal-string" member-type="java.math.BigDecimal" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.BigDecimalStringConverter"/>
         <type-converter name="dn.bigdecimal-double" member-type="java.math.BigDecimal" datastore-type="java.lang.Double"
