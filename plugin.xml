@@ -260,8 +260,12 @@ Contributors:
     <extension point="org.datanucleus.type_converter">
         <type-converter name="dn.bigdecimal-string" member-type="java.math.BigDecimal" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.BigDecimalStringConverter"/>
+        <type-converter name="dn.bigdecimal-double" member-type="java.math.BigDecimal" datastore-type="java.lang.Double"
+            converter-class="org.datanucleus.store.types.converters.BigDecimalDoubleConverter"/>
         <type-converter name="dn.biginteger-string" member-type="java.math.BigInteger" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.BigIntegerStringConverter"/>
+        <type-converter name="dn.biginteger-long" member-type="java.math.BigInteger" datastore-type="java.lang.Long"
+            converter-class="org.datanucleus.store.types.converters.BigIntegerLongConverter"/>
         <type-converter name="dn.bitset-string" member-type="java.util.BitSet" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.BitSetStringConverter"/>
         <type-converter name="dn.calendar-string" member-type="java.util.Calendar" datastore-type="java.lang.String"
