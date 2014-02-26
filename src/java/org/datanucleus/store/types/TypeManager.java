@@ -434,7 +434,7 @@ public class TypeManager implements Serializable
         registerConverter(name, converter, false, null);
     }
 
-    public TypeConverter getAutoApplyTypeConverterFortype(Class memberType)
+    public TypeConverter getAutoApplyTypeConverterForType(Class memberType)
     {
         if (autoApplyConvertersByType == null)
         {
