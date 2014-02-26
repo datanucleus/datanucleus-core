@@ -270,6 +270,8 @@ Contributors:
             converter-class="org.datanucleus.store.types.converters.BitSetStringConverter"/>
         <type-converter name="dn.calendar-string" member-type="java.util.Calendar" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.CalendarStringConverter"/>
+        <type-converter name="dn.calendar-date" member-type="java.util.Calendar" datastore-type="java.util.Date"
+            converter-class="org.datanucleus.store.types.converters.CalendarDateConverter"/>
         <type-converter name="dn.class-string" member-type="java.lang.Class" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.ClassStringConverter"/>
         <type-converter name="dn.color-string" member-type="java.awt.Color" datastore-type="java.lang.String"
