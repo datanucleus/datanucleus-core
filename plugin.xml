@@ -290,12 +290,18 @@ Contributors:
             converter-class="org.datanucleus.store.types.converters.SqlDateLongConverter"/>
         <type-converter name="dn.sqldate-string" member-type="java.sql.Date" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.SqlDateStringConverter"/>
+        <type-converter name="dn.sqldate-date" member-type="java.sql.Date" datastore-type="java.util.Date"
+            converter-class="org.datanucleus.store.types.converters.SqlDateDateConverter"/>
         <type-converter name="dn.sqltime-long" member-type="java.sql.Time" datastore-type="java.lang.Long"
             converter-class="org.datanucleus.store.types.converters.SqlTimeLongConverter"/>
         <type-converter name="dn.sqltime-string" member-type="java.sql.Time" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.SqlTimeStringConverter"/>
+        <type-converter name="dn.sqltime-date" member-type="java.sql.Time" datastore-type="java.util.Date"
+            converter-class="org.datanucleus.store.types.converters.SqlTimeDateConverter"/>
         <type-converter name="dn.sqltimestamp-long" member-type="java.sql.Timestamp" datastore-type="java.lang.Long"
             converter-class="org.datanucleus.store.types.converters.SqlTimestampLongConverter"/>
+        <type-converter name="dn.sqltimestamp-date" member-type="java.sql.Timestamp" datastore-type="java.util.Date"
+            converter-class="org.datanucleus.store.types.converters.SqlTimestampDateConverter"/>
         <type-converter name="dn.stringbuffer-string" member-type="java.lang.StringBuffer" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.StringBufferStringConverter"/>
         <type-converter name="dn.stringbuilder-string" member-type="java.lang.StringBuilder" datastore-type="java.lang.String"
