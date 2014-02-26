@@ -387,16 +387,13 @@ public class TypeManager implements Serializable
 
     /**
      * Accessor for the type converter with the provided name.
+     * This is used when the user has specified metadata for a field to use a particular named converter.
      * @param converterName Name of the converter
      * @return The converter
      */
     public TypeConverter getTypeConverterForName(String converterName)
     {
-        if (convertersByName == null)
-        {
-            return null;
-        }
-        return convertersByName.get(converterName);
+        return convertersByName == null ? null : convertersByName.get(converterName);
     }
 
     /**
@@ -434,13 +431,15 @@ public class TypeManager implements Serializable
         registerConverter(name, converter, false, null);
     }
 
+    /**
+     * Method to return a TypeConverter that should be applied by default for the specified java (member) type.
+     * Will return null if the java type has no autoApply type defined for it (the default).
+     * @param memberType The java (member) type
+     * @return The converter to use by default
+     */
     public TypeConverter getAutoApplyTypeConverterForType(Class memberType)
     {
-        if (autoApplyConvertersByType == null)
-        {
-            return null;
-        }
-        return autoApplyConvertersByType.get(memberType.getName());
+        return autoApplyConvertersByType == null ? null : autoApplyConvertersByType.get(memberType.getName());
     }
 
     /**
@@ -486,8 +485,7 @@ public class TypeManager implements Serializable
 
     /**
      * Convenience method to return the JavaType for the specified class. If this class has a defined
-     * JavaType then returns it. If not then tries to find a superclass that is castable to the specified
-     * type.
+     * JavaType then returns it. If not then tries to find a superclass that is castable to the specified type.
      * @param cls The class required
      * @return The JavaType
      */
