@@ -19,12 +19,12 @@ package org.datanucleus.store.schema.table;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
-import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
  * Representation of a column in a table.
  */
-public class BasicColumn implements Column
+public class ColumnImpl implements Column
 {
     Table table;
 
@@ -32,24 +32,24 @@ public class BasicColumn implements Column
 
     String identifier;
 
-    /** Optional member metadata. Will be null when this is for datastore-id, or version etc. */
+    String type; // TODO Provide way of setting this
+
+    TypeConverter typeConverter = null;
+
+    int position = -1;
+
+    /** Member metadata when this column is for a field/property. Will be null when this is for datastore-id, or version etc. */
     AbstractMemberMetaData mmd;
 
-    public BasicColumn(Table tbl, StoreManager storeMgr, ColumnMetaData colmd)
+    public ColumnImpl(Table tbl, String identifier)
     {
         this.table = tbl;
-        this.colmd = colmd;
-        this.identifier = colmd.getName();
+        this.identifier = identifier;
     }
 
     public Table getTable()
     {
         return table;
-    }
-
-    public ColumnMetaData getColumnMetaData()
-    {
-        return colmd;
     }
 
     public AbstractMemberMetaData getMemberMetaData()
@@ -65,6 +65,31 @@ public class BasicColumn implements Column
     public String getIdentifier()
     {
         return identifier;
+    }
+
+    public String getType()
+    {
+        return type;
+    }
+
+    public void setTypeConverter(TypeConverter conv)
+    {
+        this.typeConverter = conv;
+    }
+
+    public TypeConverter getTypeConverter()
+    {
+        return typeConverter;
+    }
+
+    public void setPosition(int pos)
+    {
+        this.position = pos;
+    }
+
+    public int getPosition()
+    {
+        return position;
     }
 
     public String toString()

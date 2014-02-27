@@ -18,10 +18,10 @@ Contributors:
 package org.datanucleus.store.schema.table;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.ColumnMetaData;
+import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
- * Representation of a column in a table.
+ * Interface representing a column in a table.
  */
 public interface Column
 {
@@ -30,12 +30,6 @@ public interface Column
      * @return The table
      */
     Table getTable();
-
-    /**
-     * Accessor for the metadata for this column.
-     * @return Metadata for the column
-     */
-    ColumnMetaData getColumnMetaData();
 
     /**
      * Accessor for the metadata for the member (if for a member).
@@ -48,4 +42,22 @@ public interface Column
      * @return The column identifier
      */
     String getIdentifier();
+
+    /**
+     * Access for the type for this column.
+     * @return The "type" in the datastore
+     */
+    String getType();
+
+    /**
+     * Access to a TypeConverter to use when converting between field value and column value (optional).
+     * @return The TypeConverter
+     */
+    TypeConverter getTypeConverter();
+
+    /**
+     * Accessor for the position of this column in the table (if specified).
+     * @return The position, or -1 if not specified
+     */
+    int getPosition();
 }

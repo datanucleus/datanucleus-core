@@ -17,14 +17,19 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.schema.table;
 
+import java.util.List;
+
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.store.StoreManager;
 
 /**
  * Representation of a table for a class.
  */
 public interface Table
 {
+    StoreManager getStoreManager();
+
     /**
      * Accessor for the identifier for this table (its "name).
      * @return The table identifier
@@ -43,17 +48,35 @@ public interface Table
      */
     int getNumberOfColumns();
 
+    List<Column> getColumns();
+
+    Column getDatastoreIdColumn();
+
+    Column getVersionColumn();
+
+    Column getDiscriminatorColumn();
+
+    Column getMultitenancyColumn();
+
     /**
      * Accessor for the column for the specified member.
-     * @param mmd Metadata for the member
+     * If this is an embedded or nested embedded member then provide the mmds to navigate to the member in question
+     * @param mmds Metadata for the member(s)
      * @return The column (or null if invalid member)
      */
-    BasicColumn getColumnForMember(AbstractMemberMetaData mmd);
+    Column getColumnForMember(AbstractMemberMetaData mmds);
+
+    /**
+     * Accessor for the column for the specified embedded member.
+     * @param mmds Metadata for the member(s) to navigate to the required member
+     * @return The column (or null if invalid member)
+     */
+    Column getColumnForEmbeddedMember(List<AbstractMemberMetaData> mmds);
 
     /**
      * Accessor for the column at the specified position (numbered from 0 to numcols-1).
      * @param pos Position of the column
      * @return The column at this position (or null if invalid position)
      */
-    BasicColumn getColumnForPosition(int pos);
+    Column getColumnForPosition(int pos);
 }

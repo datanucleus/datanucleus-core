@@ -19,7 +19,6 @@ package org.datanucleus.store.schema.table;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -31,11 +30,16 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.EmbeddedMetaData;
+import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.IdentityType;
+import org.datanucleus.metadata.MetaDataManager;
+import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.schema.naming.ColumnType;
+import org.datanucleus.store.schema.naming.NamingFactory;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Representation of a table for a class where the class is stored in "complete-table" inheritance (or in JPA "TablePerClass")
@@ -51,16 +55,32 @@ public class CompleteClassTable implements Table
 
     String identifier;
 
-    /** Map of DatastoreColumn, keyed by the member of the class. TODO Support multiple columns per member. */
-    Map<AbstractMemberMetaData, BasicColumn> columnByMember = new HashMap<AbstractMemberMetaData, BasicColumn>();
+    List<Column> columns = null;
+
+    Column versionColumn;
+
+    Column discriminatorColumn;
+
+    Column datastoreIdColumn;
+
+    Column multitenancyColumn;
+
+    /** Map of column, keyed by the metadata for the member. */
+    Map<AbstractMemberMetaData, Column> columnByMember = new HashMap<AbstractMemberMetaData, Column>();
+
+    /** Map of column, keyed by the metadata for the member(s) required to navigate to it. */
+    Map<List<AbstractMemberMetaData>, Column> columnByEmbeddedMember = new HashMap<List<AbstractMemberMetaData>, Column>();
 
     /** Map of DatastoreColumn, keyed by the position (starting at 0 and increasing). */
-    Map<Integer, BasicColumn> columnByPosition = new HashMap<Integer, BasicColumn>();
+    Map<Integer, Column> columnByPosition = new HashMap<Integer, Column>();
 
-    public CompleteClassTable(StoreManager storeMgr, AbstractClassMetaData cmd)
+    ColumnAttributer columnAttributer;
+
+    public CompleteClassTable(StoreManager storeMgr, AbstractClassMetaData cmd, ColumnAttributer colAttr)
     {
         this.storeMgr = storeMgr;
         this.cmd = cmd;
+        this.columnAttributer = colAttr;
 
         if (cmd.getTable() != null)
         {
@@ -71,66 +91,106 @@ public class CompleteClassTable implements Table
             this.identifier = storeMgr.getNamingFactory().getTableName(cmd);
         }
 
-        List<BasicColumn> columns = new ArrayList<BasicColumn>();
+        columns = new ArrayList<Column>();
         ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
         int numMembers = cmd.getAllMemberPositions().length;
         for (int i=0;i<numMembers;i++)
         {
             AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(i);
+            if (mmd.getPersistenceModifier() != FieldPersistenceModifier.PERSISTENT)
+            {
+                // Don't need column if not persistent
+                continue;
+            }
+
             RelationType relationType = mmd.getRelationType(clr);
             if (relationType == RelationType.NONE)
             {
-                processBasicMember(columns, mmd);
+                ColumnMetaData[] colmds = mmd.getColumnMetaData();
+                if (colmds != null && colmds.length > 1)
+                {
+                    // TODO Handle member with multiple columns
+                    throw new NucleusUserException("Dont currently support member having more than 1 column");
+                }
+                String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
+                ColumnImpl col = addColumn(columns, mmd, colName);
+                if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                {
+                    col.setPosition(colmds[0].getPosition());
+                }
             }
-            else if (mmd.isEmbedded())
+            else if (MetaDataUtils.getInstance().isMemberEmbedded(storeMgr.getMetaDataManager(), clr, mmd, relationType, null))
             {
-                processEmbeddedMember(columns, mmd, clr);
+                if (RelationType.isRelationSingleValued(relationType))
+                {
+                    // Embedded PC field, so add columns for all fields of the embedded
+                    List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>();
+                    embMmds.add(mmd);
+                    processEmbeddedMember(columns, embMmds, clr);
+                }
+                else if (RelationType.isRelationMultiValued(relationType))
+                {
+                    // Embedded Collection/Map/array field. TODO How can we embed this?
+                    NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not supported so ignoring");
+                    continue;
+                }
             }
             else
             {
-                processBasicMember(columns, mmd);
+                ColumnMetaData[] colmds = mmd.getColumnMetaData();
+                if (colmds != null && colmds.length > 1)
+                {
+                    // TODO Handle member with multiple columns
+                    throw new NucleusUserException("Dont currently support member having more than 1 column");
+                }
+                String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
+                ColumnImpl col = addColumn(columns, mmd, colName);
+                if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                {
+                    col.setPosition(colmds[0].getPosition());
+                }
             }
         }
 
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
-            // Add datastore-identity column
-            ColumnMetaData colmd = cmd.getIdentityMetaData().getColumnMetaData();
-            if (colmd == null || colmd.getName() == null)
+            // Add surrogate datastore-identity column
+            String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.DATASTOREID_COLUMN);
+            ColumnImpl col = addColumn(columns, null, colName);
+            if (cmd.getIdentityMetaData() != null && cmd.getIdentityMetaData().getColumnMetaData() != null && cmd.getIdentityMetaData().getColumnMetaData().getPosition() != null)
             {
-                colmd = (colmd != null ? new ColumnMetaData(colmd) : new ColumnMetaData());                    
-                colmd.setName(storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.DATASTOREID_COLUMN));
+                col.setPosition(cmd.getIdentityMetaData().getColumnMetaData().getPosition());
             }
-            BasicColumn col = new BasicColumn(this, storeMgr, colmd);
-            columns.add(col);
+            this.datastoreIdColumn = col;
         }
 
         if (cmd.isVersioned())
         {
-            // Add version column
+            // Add surrogate version column
             VersionMetaData vermd = cmd.getVersionMetaDataForClass();
-            ColumnMetaData colmd = vermd.getColumnMetaData();
-            if (colmd == null || colmd.getName() == null)
+            if (vermd != null && vermd.getFieldName() == null)
             {
-                colmd = (colmd != null ? new ColumnMetaData(colmd) : new ColumnMetaData());
-                colmd.setName(storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.VERSION_COLUMN));
+                String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.VERSION_COLUMN);
+                ColumnImpl col = addColumn(columns, null, colName);
+                if (vermd.getColumnMetaData() != null && vermd.getColumnMetaData().getPosition() != null)
+                {
+                    col.setPosition(vermd.getColumnMetaData().getPosition());
+                }
+                this.versionColumn = col;
             }
-            BasicColumn col = new BasicColumn(this, storeMgr, colmd);
-            columns.add(col);
         }
 
         if (cmd.hasDiscriminatorStrategy())
         {
             // Add discriminator column
-            DiscriminatorMetaData dismd = cmd.getDiscriminatorMetaDataRoot();
-            ColumnMetaData colmd = dismd.getColumnMetaData();
-            if (colmd == null || cmd.getDiscriminatorColumnName() == null)
+            String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.DISCRIMINATOR_COLUMN);
+            ColumnImpl col = addColumn(columns, null, colName);
+            DiscriminatorMetaData dismd = cmd.getDiscriminatorMetaDataForTable();
+            if (dismd != null && dismd.getColumnMetaData() != null && dismd.getColumnMetaData().getPosition() != null)
             {
-                colmd = (colmd != null ? new ColumnMetaData(colmd) : new ColumnMetaData());
-                colmd.setName(storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.DISCRIMINATOR_COLUMN));
+                col.setPosition(dismd.getColumnMetaData().getPosition());
             }
-            BasicColumn col = new BasicColumn(this, storeMgr, colmd);
-            columns.add(col);
+            this.discriminatorColumn = col;
         }
 
         if (storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID) != null)
@@ -142,27 +202,25 @@ public class CompleteClassTable implements Table
             }
             else
             {
-                ColumnMetaData colmd = new ColumnMetaData();
-                colmd.setName(storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.MULTITENANCY_COLUMN));
-                BasicColumn col = new BasicColumn(this, storeMgr, colmd);
-                columns.add(col);
+                String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.MULTITENANCY_COLUMN);
+                Column col = addColumn(columns, null, colName); // TODO Support column position
+                this.multitenancyColumn = col;
             }
         }
 
-        int numCols = columns.size();
-
+        // TODO Generate lookup table by position (assumes that position is specified, otherwise we impose own positioning).
         // First pass to populate those with column position defined
-        Iterator<BasicColumn> colIter = columns.iterator();
+        /*Iterator<ColumnImpl> colIter = columns.iterator();
         while (colIter.hasNext())
         {
-            BasicColumn col = colIter.next();
+            ColumnImpl col = colIter.next();
             ColumnMetaData colmd = col.getColumnMetaData();
             Integer pos = colmd.getPosition();
             if (pos != null)
             {
                 if (columnByPosition.containsKey(pos))
                 {
-                    BasicColumn col2 = columnByPosition.get(pos);
+                    ColumnImpl col2 = columnByPosition.get(pos);
                     throw new NucleusUserException("Table " + identifier + " has column " + col.getIdentifier() +
                         " specified to have column position " + pos +
                         " yet that position is also defined for column " + col2.identifier);
@@ -181,7 +239,7 @@ public class CompleteClassTable implements Table
         if (!columns.isEmpty())
         {
             int pos = 0;
-            for (BasicColumn col : columns)
+            for (ColumnImpl col : columns)
             {
                 // Find the next position available
                 while (true)
@@ -194,73 +252,94 @@ public class CompleteClassTable implements Table
                 }
                 columnByPosition.put(pos, col);
             }
-        }
+        }*/
     }
 
-    protected void processBasicMember(List<BasicColumn> cols, AbstractMemberMetaData mmd)
+    protected void processEmbeddedMember(List<Column> columns, List<AbstractMemberMetaData> mmds, ClassLoaderResolver clr)
     {
-        ColumnMetaData colmd = null;
-
-        ColumnMetaData[] colmds = mmd.getColumnMetaData();
-        if (colmds == null || colmds.length == 0)
+        AbstractMemberMetaData lastMmd = mmds.get(mmds.size()-1);
+        EmbeddedMetaData embmd = mmds.get(0).getEmbeddedMetaData();
+        MetaDataManager mmgr = storeMgr.getMetaDataManager();
+        NamingFactory namingFactory = storeMgr.getNamingFactory();
+        AbstractClassMetaData embCmd = mmgr.getMetaDataForClass(lastMmd.getType(), clr);
+        int[] memberPositions = embCmd.getAllMemberPositions();
+        for (int i=0;i<memberPositions.length;i++)
         {
-            colmd = new ColumnMetaData();
-        }
-        else if (colmds.length > 1)
-        {
-            // TODO Handle member with multiple columns
-            throw new NucleusUserException("Dont currently support member having more than 1 column");
-        }
-        else
-        {
-            colmd = colmds[0];
-        }
-        if (colmd.getName() == null)
-        {
-            colmd.setName(storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0));
-        }
-
-        BasicColumn col = new BasicColumn(this, storeMgr, colmd);
-        col.setMemberMetaData(mmd);
-        cols.add(col);
-        columnByMember.put(mmd, col);
-    }
-
-    protected void processEmbeddedMember(List<BasicColumn> cols, AbstractMemberMetaData ownerMmd,
-            ClassLoaderResolver clr)
-    {
-        // TODO This needs updating to work like the Cassandra plugin SchemaHandler does, since it makes a more complete job
-        EmbeddedMetaData emd = ownerMmd.getEmbeddedMetaData();
-        AbstractClassMetaData embCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(ownerMmd.getType(), clr);
-        AbstractMemberMetaData[] embMmds = emd.getMemberMetaData();
-        for (int i=0;i<embMmds.length;i++)
-        {
-            AbstractMemberMetaData mmd = embCmd.getMetaDataForMember(embMmds[i].getName());
-            if (embMmds[i].getEmbeddedMetaData() == null)
+            AbstractMemberMetaData mmd = embCmd.getMetaDataForManagedMemberAtAbsolutePosition(memberPositions[i]);
+            if (mmd.getPersistenceModifier() != FieldPersistenceModifier.PERSISTENT)
             {
-                // Non-embedded field so process
-                processBasicMember(cols, embMmds[i]);
+                // Don't need column if not persistent
+                continue;
             }
-            else
+
+            RelationType relationType = mmd.getRelationType(clr);
+            if (relationType != RelationType.NONE && MetaDataUtils.getInstance().isMemberEmbedded(mmgr, clr, mmd, relationType, lastMmd))
             {
-                // Nested embedded field
-                RelationType relationType = mmd.getRelationType(clr);
                 if (RelationType.isRelationSingleValued(relationType))
                 {
-                    processEmbeddedMember(cols, mmd, clr);
+                    if (mmds.size() == 1 && embmd != null && embmd.getOwnerMember() != null && embmd.getOwnerMember().equals(mmd.getName()))
+                    {
+                        // Special case of this being a link back to the owner. TODO Repeat this for nested and their owners
+                    }
+                    else
+                    {
+                        // Nested embedded PC, so recurse
+                        List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
+                        embMmds.add(mmd);
+                        processEmbeddedMember(columns, embMmds, clr);
+                    }
                 }
                 else
                 {
-                    // TODO Handle embedded collections/maps
-                    throw new NucleusUserException("Dont currently support embedded collections for this datastore");
+                    // Don't support embedded collections/maps
+                    NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not supported so ignoring");
                 }
             }
+            else
+            {
+                List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
+                embMmds.add(mmd);
+                String colName = namingFactory.getColumnName(embMmds, 0);
+                addEmbeddedColumn(columns, embMmds, colName); // TODO Support column position
+            }
         }
+    }
+
+    protected ColumnImpl addColumn(List<Column> cols, AbstractMemberMetaData mmd, String colName)
+    {
+        ColumnImpl col = new ColumnImpl(this, colName);
+        if (mmd != null)
+        {
+            col.setMemberMetaData(mmd);
+        }
+        cols.add(col);
+        columnAttributer.attributeColumn(col, mmd);
+        columnByMember.put(mmd, col);
+        return col;
+    }
+
+    protected ColumnImpl addEmbeddedColumn(List<Column> cols, List<AbstractMemberMetaData> mmds, String colName)
+    {
+        ColumnImpl col = new ColumnImpl(this, colName);
+        if (mmds != null && mmds.size() > 0)
+        {
+            col.setMemberMetaData(mmds.get(mmds.size()-1));
+        }
+        cols.add(col);
+        AbstractMemberMetaData[] mmdsArr = new AbstractMemberMetaData[mmds.size()];
+        columnAttributer.attributeColumn(col, mmdsArr);
+        columnByEmbeddedMember.put(mmds, col);
+        return col;
     }
 
     public AbstractClassMetaData getClassMetaData()
     {
         return cmd;
+    }
+
+    public StoreManager getStoreManager()
+    {
+        return storeMgr;
     }
 
     public String getIdentifier()
@@ -270,16 +349,46 @@ public class CompleteClassTable implements Table
 
     public int getNumberOfColumns()
     {
-        return columnByPosition.size();
+        return columns.size();
     }
 
-    public BasicColumn getColumnForPosition(int pos)
+    public List<Column> getColumns()
+    {
+        return columns;
+    }
+
+    public Column getDatastoreIdColumn()
+    {
+        return datastoreIdColumn;
+    }
+
+    public Column getVersionColumn()
+    {
+        return versionColumn;
+    }
+
+    public Column getDiscriminatorColumn()
+    {
+        return discriminatorColumn;
+    }
+
+    public Column getMultitenancyColumn()
+    {
+        return multitenancyColumn;
+    }
+
+    public Column getColumnForPosition(int pos)
     {
         return columnByPosition.get(pos);
     }
 
-    public BasicColumn getColumnForMember(AbstractMemberMetaData mmd)
+    public Column getColumnForMember(AbstractMemberMetaData mmd)
     {
         return columnByMember.get(mmd);
+    }
+
+    public Column getColumnForEmbeddedMember(List<AbstractMemberMetaData> mmds)
+    {
+        return columnByEmbeddedMember.get(mmds);
     }
 }
