@@ -53,6 +53,10 @@ public class CompleteClassTable implements Table
 
     AbstractClassMetaData cmd;
 
+    String catalogName;
+
+    String schemaName;
+
     String identifier;
 
     List<Column> columns = null;
@@ -156,7 +160,7 @@ public class CompleteClassTable implements Table
         {
             // Add surrogate datastore-identity column
             String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.DATASTOREID_COLUMN);
-            ColumnImpl col = addColumn(columns, null, colName);
+            ColumnImpl col = addColumn(columns, null, colName, ColumnType.DATASTOREID_COLUMN);
             if (cmd.getIdentityMetaData() != null && cmd.getIdentityMetaData().getColumnMetaData() != null && cmd.getIdentityMetaData().getColumnMetaData().getPosition() != null)
             {
                 col.setPosition(cmd.getIdentityMetaData().getColumnMetaData().getPosition());
@@ -171,7 +175,7 @@ public class CompleteClassTable implements Table
             if (vermd != null && vermd.getFieldName() == null)
             {
                 String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.VERSION_COLUMN);
-                ColumnImpl col = addColumn(columns, null, colName);
+                ColumnImpl col = addColumn(columns, null, colName, ColumnType.VERSION_COLUMN);
                 if (vermd.getColumnMetaData() != null && vermd.getColumnMetaData().getPosition() != null)
                 {
                     col.setPosition(vermd.getColumnMetaData().getPosition());
@@ -184,7 +188,7 @@ public class CompleteClassTable implements Table
         {
             // Add discriminator column
             String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.DISCRIMINATOR_COLUMN);
-            ColumnImpl col = addColumn(columns, null, colName);
+            ColumnImpl col = addColumn(columns, null, colName, ColumnType.DISCRIMINATOR_COLUMN);
             DiscriminatorMetaData dismd = cmd.getDiscriminatorMetaDataForTable();
             if (dismd != null && dismd.getColumnMetaData() != null && dismd.getColumnMetaData().getPosition() != null)
             {
@@ -203,7 +207,7 @@ public class CompleteClassTable implements Table
             else
             {
                 String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.MULTITENANCY_COLUMN);
-                Column col = addColumn(columns, null, colName); // TODO Support column position
+                Column col = addColumn(columns, null, colName, ColumnType.MULTITENANCY_COLUMN); // TODO Support column position
                 this.multitenancyColumn = col;
             }
         }
@@ -271,23 +275,21 @@ public class CompleteClassTable implements Table
                 // Don't need column if not persistent
                 continue;
             }
+            if (mmds.size() == 1 && embmd != null && embmd.getOwnerMember() != null && embmd.getOwnerMember().equals(mmd.getName()))
+            {
+                // Special case of this being a link back to the owner. TODO Repeat this for nested and their owners
+                continue;
+            }
 
             RelationType relationType = mmd.getRelationType(clr);
             if (relationType != RelationType.NONE && MetaDataUtils.getInstance().isMemberEmbedded(mmgr, clr, mmd, relationType, lastMmd))
             {
                 if (RelationType.isRelationSingleValued(relationType))
                 {
-                    if (mmds.size() == 1 && embmd != null && embmd.getOwnerMember() != null && embmd.getOwnerMember().equals(mmd.getName()))
-                    {
-                        // Special case of this being a link back to the owner. TODO Repeat this for nested and their owners
-                    }
-                    else
-                    {
-                        // Nested embedded PC, so recurse
-                        List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
-                        embMmds.add(mmd);
-                        processEmbeddedMember(columns, embMmds, clr);
-                    }
+                    // Nested embedded PC, so recurse
+                    List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
+                    embMmds.add(mmd);
+                    processEmbeddedMember(columns, embMmds, clr);
                 }
                 else
                 {
@@ -307,26 +309,35 @@ public class CompleteClassTable implements Table
 
     protected ColumnImpl addColumn(List<Column> cols, AbstractMemberMetaData mmd, String colName)
     {
-        ColumnImpl col = new ColumnImpl(this, colName);
+        return addColumn(cols, mmd, colName, ColumnType.COLUMN);
+    }
+
+    protected ColumnImpl addColumn(List<Column> cols, AbstractMemberMetaData mmd, String colName, ColumnType colType)
+    {
+        ColumnImpl col = new ColumnImpl(this, colName, colType);
         if (mmd != null)
         {
             col.setMemberMetaData(mmd);
+            columnByMember.put(mmd, col);
+            columnAttributer.attributeColumn(col, mmd);
+        }
+        else
+        {
+            columnAttributer.attributeColumn(col, null);
         }
         cols.add(col);
-        columnAttributer.attributeColumn(col, mmd);
-        columnByMember.put(mmd, col);
         return col;
     }
 
     protected ColumnImpl addEmbeddedColumn(List<Column> cols, List<AbstractMemberMetaData> mmds, String colName)
     {
-        ColumnImpl col = new ColumnImpl(this, colName);
+        ColumnImpl col = new ColumnImpl(this, colName, ColumnType.COLUMN);
         if (mmds != null && mmds.size() > 0)
         {
             col.setMemberMetaData(mmds.get(mmds.size()-1));
         }
         cols.add(col);
-        AbstractMemberMetaData[] mmdsArr = new AbstractMemberMetaData[mmds.size()];
+        AbstractMemberMetaData[] mmdsArr = mmds.toArray(new AbstractMemberMetaData[mmds.size()]);
         columnAttributer.attributeColumn(col, mmdsArr);
         columnByEmbeddedMember.put(mmds, col);
         return col;
@@ -390,5 +401,10 @@ public class CompleteClassTable implements Table
     public Column getColumnForEmbeddedMember(List<AbstractMemberMetaData> mmds)
     {
         return columnByEmbeddedMember.get(mmds);
+    }
+
+    public String toString()
+    {
+        return "Table: " + identifier;
     }
 }

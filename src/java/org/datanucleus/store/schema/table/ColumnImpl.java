@@ -18,7 +18,7 @@ Contributors:
 package org.datanucleus.store.schema.table;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.ColumnMetaData;
+import org.datanucleus.store.schema.naming.ColumnType;
 import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
@@ -28,11 +28,11 @@ public class ColumnImpl implements Column
 {
     Table table;
 
-    ColumnMetaData colmd;
+    ColumnType columnType = ColumnType.COLUMN;
 
     String identifier;
 
-    String type; // TODO Provide way of setting this
+    String typeName;
 
     TypeConverter typeConverter = null;
 
@@ -41,10 +41,11 @@ public class ColumnImpl implements Column
     /** Member metadata when this column is for a field/property. Will be null when this is for datastore-id, or version etc. */
     AbstractMemberMetaData mmd;
 
-    public ColumnImpl(Table tbl, String identifier)
+    public ColumnImpl(Table tbl, String identifier, ColumnType colType)
     {
         this.table = tbl;
         this.identifier = identifier;
+        this.columnType = colType;
     }
 
     public Table getTable()
@@ -67,16 +68,24 @@ public class ColumnImpl implements Column
         return identifier;
     }
 
-    public String getType()
+    public ColumnType getColumnType()
     {
-        return type;
+        return columnType;
+    }
+
+    public void setTypeName(String type)
+    {
+        this.typeName = type;
+    }
+    public String getTypeName()
+    {
+        return typeName;
     }
 
     public void setTypeConverter(TypeConverter conv)
     {
         this.typeConverter = conv;
     }
-
     public TypeConverter getTypeConverter()
     {
         return typeConverter;
@@ -86,7 +95,6 @@ public class ColumnImpl implements Column
     {
         this.position = pos;
     }
-
     public int getPosition()
     {
         return position;
@@ -94,6 +102,10 @@ public class ColumnImpl implements Column
 
     public String toString()
     {
-        return "Column " + identifier;
+        if (mmd != null)
+        {
+            return "Column: " + identifier + " member=" + mmd.getFullFieldName();
+        }
+        return "Column : " + identifier + " type=" + columnType;
     }
 }

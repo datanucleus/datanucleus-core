@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.schema.table;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.store.schema.naming.ColumnType;
 import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
@@ -43,11 +44,17 @@ public interface Column
      */
     String getIdentifier();
 
+    ColumnType getColumnType();
+
+    void setTypeName(String type);
+
     /**
      * Access for the type for this column.
      * @return The "type" in the datastore
      */
-    String getType();
+    String getTypeName();
+
+    void setTypeConverter(TypeConverter conv);
 
     /**
      * Access to a TypeConverter to use when converting between field value and column value (optional).
