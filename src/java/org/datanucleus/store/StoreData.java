@@ -149,6 +149,11 @@ public class StoreData
         properties.put(key, value);
     }
 
+    public Object getProperty(String key)
+    {
+        return properties.get(key);
+    }
+
     /**
      * Accessor for extension props, if utilised by the store manager.
      * @return Extension props
