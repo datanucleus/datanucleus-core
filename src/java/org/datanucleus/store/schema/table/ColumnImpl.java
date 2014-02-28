@@ -32,6 +32,8 @@ public class ColumnImpl implements Column
 
     String identifier;
 
+    boolean primaryKey;
+
     String typeName;
 
     TypeConverter typeConverter = null;
@@ -66,6 +68,16 @@ public class ColumnImpl implements Column
     public String getIdentifier()
     {
         return identifier;
+    }
+
+    public boolean isPrimaryKey()
+    {
+        return primaryKey;
+    }
+
+    public void setPrimaryKey()
+    {
+        this.primaryKey = true;
     }
 
     public ColumnType getColumnType()
@@ -104,8 +116,8 @@ public class ColumnImpl implements Column
     {
         if (mmd != null)
         {
-            return "Column: " + identifier + " member=" + mmd.getFullFieldName();
+            return "Column: " + identifier + " member=" + mmd.getFullFieldName() + (primaryKey ? " (PK)" : "");
         }
-        return "Column : " + identifier + " type=" + columnType;
+        return "Column : " + identifier + " type=" + columnType + (primaryKey ? " (PK)" : "");
     }
 }

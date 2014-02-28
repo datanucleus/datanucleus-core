@@ -44,6 +44,8 @@ public interface Column
      */
     String getIdentifier();
 
+    boolean isPrimaryKey();
+
     ColumnType getColumnType();
 
     void setTypeName(String type);

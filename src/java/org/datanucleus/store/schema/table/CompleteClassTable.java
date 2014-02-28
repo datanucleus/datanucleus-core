@@ -318,11 +318,19 @@ public class CompleteClassTable implements Table
         if (mmd != null)
         {
             col.setMemberMetaData(mmd);
+            if (mmd.isPrimaryKey())
+            {
+                col.setPrimaryKey();
+            }
             columnByMember.put(mmd, col);
             columnAttributer.attributeColumn(col, mmd);
         }
         else
         {
+            if (colType == ColumnType.DATASTOREID_COLUMN)
+            {
+                col.setPrimaryKey();
+            }
             columnAttributer.attributeColumn(col, null);
         }
         cols.add(col);
