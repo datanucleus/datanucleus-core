@@ -72,7 +72,7 @@ public class CompleteClassTable implements Table
     /** Map of column, keyed by the metadata for the member. */
     Map<AbstractMemberMetaData, Column> columnByMember = new HashMap<AbstractMemberMetaData, Column>();
 
-    /** Map of column, keyed by the metadata for the member(s) required to navigate to it. */
+    /** Map of column, keyed by the metadata for the member(s) required to navigate to it. */ // TODO Key by the expanded name perhaps to give reliable access
     Map<List<AbstractMemberMetaData>, Column> columnByEmbeddedMember = new HashMap<List<AbstractMemberMetaData>, Column>();
 
     /** Map of DatastoreColumn, keyed by the position (starting at 0 and increasing). */

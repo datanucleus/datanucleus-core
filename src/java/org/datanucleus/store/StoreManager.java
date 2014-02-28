@@ -69,6 +69,11 @@ public interface StoreManager
     public static final String OPTION_DATASTORE_ID = "DatastoreId";
     public static final String OPTION_NONDURABLE_ID = "NonDurableId";
     public static final String OPTION_ORM = "ORM";
+    public static final String OPTION_ORM_EMBEDDED_PC = "ORM.EmbeddedPC";
+    public static final String OPTION_ORM_EMBEDDED_COLLECTION = "ORM.EmbeddedCollection";
+    public static final String OPTION_ORM_EMBEDDED_MAP = "ORM.EmbeddedMap";
+    public static final String OPTION_ORM_EMBEDDED_ARRAY = "ORM.EmbeddedArray";
+    public static final String OPTION_ORM_SECONDARY_TABLE = "ORM.SecondaryTable";
     public static final String OPTION_TXN_ISOLATION_READ_COMMITTED = "TransactionIsolationLevel.read-committed";
     public static final String OPTION_TXN_ISOLATION_READ_UNCOMMITTED = "TransactionIsolationLevel.read-uncommitted";
     public static final String OPTION_TXN_ISOLATION_REPEATABLE_READ = "TransactionIsolationLevel.repeatable-read";
