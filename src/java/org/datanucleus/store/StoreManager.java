@@ -118,6 +118,8 @@ public interface StoreManager
      */
     StoreSchemaHandler getSchemaHandler();
 
+    StoreData getStoreDataForClass(String className);
+
     /**
      * Method to return a datastore sequence for this datastore matching the passed sequence MetaData.
      * @param ec execution context

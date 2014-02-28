@@ -44,6 +44,7 @@ import org.datanucleus.state.ReferentialJDOStateManager;
 import org.datanucleus.store.Extent;
 import org.datanucleus.store.NucleusConnection;
 import org.datanucleus.store.NucleusSequence;
+import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.StorePersistenceHandler;
 import org.datanucleus.store.connection.ConnectionManager;
@@ -279,6 +280,12 @@ public class FederatedStoreManager implements StoreManager
     public StoreSchemaHandler getSchemaHandler()
     {
         return primaryStoreMgr.getSchemaHandler();
+    }
+
+    public StoreData getStoreDataForClass(String className)
+    {
+        // TODO If not present in primary store, try secondary stores
+        return primaryStoreMgr.getStoreDataForClass(className);
     }
 
     public StorePersistenceHandler getPersistenceHandler()

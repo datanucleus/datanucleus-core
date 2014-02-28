@@ -703,6 +703,11 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
 
     // -------------------------------- Management of Classes --------------------------------
 
+    public StoreData getStoreDataForClass(String className)
+    {
+        return storeDataMgr.get(className);
+    }
+
     /**
      * Method to register some data with the store.
      * This will also register the data with the starter process.
