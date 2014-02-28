@@ -85,15 +85,7 @@ public class CompleteClassTable implements Table
         this.storeMgr = storeMgr;
         this.cmd = cmd;
         this.columnAttributer = colAttr;
-
-        if (cmd.getTable() != null)
-        {
-            this.identifier = cmd.getTable();
-        }
-        else
-        {
-            this.identifier = storeMgr.getNamingFactory().getTableName(cmd);
-        }
+        this.identifier = storeMgr.getNamingFactory().getTableName(cmd);
 
         columns = new ArrayList<Column>();
         ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
