@@ -64,6 +64,18 @@ import org.datanucleus.store.valuegenerator.ValueGenerationManager;
  */
 public interface StoreManager
 {
+    // TODO Categorise all other optional features here so they can be made available for use by store plugins
+    public static final String OPTION_APPLICATION_ID = "ApplicationId";
+    public static final String OPTION_DATASTORE_ID = "DatastoreId";
+    public static final String OPTION_NONDURABLE_ID = "NonDurableId";
+    public static final String OPTION_ORM = "ORM";
+    public static final String OPTION_TXN_ISOLATION_READ_COMMITTED = "TransactionIsolationLevel.read-committed";
+    public static final String OPTION_TXN_ISOLATION_READ_UNCOMMITTED = "TransactionIsolationLevel.read-uncommitted";
+    public static final String OPTION_TXN_ISOLATION_REPEATABLE_READ = "TransactionIsolationLevel.repeatable-read";
+    public static final String OPTION_TXN_ISOLATION_SERIALIZABLE = "TransactionIsolationLevel.serializable";
+    public static final String OPTION_QUERY_CANCEL = "Query.Cancel";
+    public static final String OPTION_DATASTORE_TIMEOUT = "Datastore.Timeout";
+
     /**
      * Accessor for the supported options in string form
      */
