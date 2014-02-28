@@ -1356,7 +1356,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     {
         if (storeMgr != null)
         {
-            return storeMgr.getSupportedOptions().contains("ORM");
+            return storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM);
         }
         return true;
     }

@@ -63,33 +63,33 @@ public class NucleusContextHelper
                 // Requested transaction isolation isn't supported by datastore so check for higher
                 if (transactionIsolation.equals("read-uncommitted"))
                 {
-                    if (srmOptions.contains("TransactionIsolationLevel.read-committed"))
+                    if (srmOptions.contains(StoreManager.OPTION_TXN_ISOLATION_READ_COMMITTED))
                     {
                         return "read-committed";
                     }
-                    else if (srmOptions.contains("TransactionIsolationLevel.repeatable-read"))
+                    else if (srmOptions.contains(StoreManager.OPTION_TXN_ISOLATION_REPEATABLE_READ))
                     {
                         return "repeatable-read";
                     }
-                    else if (srmOptions.contains("TransactionIsolationLevel.serializable"))
+                    else if (srmOptions.contains(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE))
                     {
                         return "serializable";
                     }
                 }
                 else if (transactionIsolation.equals("read-committed"))
                 {
-                    if (srmOptions.contains("TransactionIsolationLevel.repeatable-read"))
+                    if (srmOptions.contains(StoreManager.OPTION_TXN_ISOLATION_REPEATABLE_READ))
                     {
                         return "repeatable-read";
                     }
-                    else if (srmOptions.contains("TransactionIsolationLevel.serializable"))
+                    else if (srmOptions.contains(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE))
                     {
                         return "serializable";
                     }
                 }
                 else if (transactionIsolation.equals("repeatable-read"))
                 {
-                    if (srmOptions.contains("TransactionIsolationLevel.serializable"))
+                    if (srmOptions.contains(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE))
                     {
                         return "serializable";
                     }
