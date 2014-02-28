@@ -17,6 +17,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.schema.table;
 
+import java.util.List;
+
 import org.datanucleus.metadata.AbstractMemberMetaData;
 
 /**
@@ -24,5 +26,17 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
  */
 public interface ColumnAttributer
 {
-    void attributeColumn(Column col, AbstractMemberMetaData... mmds);
+    /**
+     * Method called when the specified Column has been created, for the 
+     * @param col The column
+     * @param mmd The member metadata that this relates to, or null if this is a column for a surrogate (datastore id, version etc).
+     */
+    void attributeColumn(Column col, AbstractMemberMetaData mmd);
+
+    /**
+     * Method called when the specified Column has been created for the specified embedded member.
+     * @param col The column
+     * @param mmds The member metadata that this column is for, allowing navigation
+     */
+    void attributeEmbeddedColumn(Column col, List<AbstractMemberMetaData> mmds);
 }

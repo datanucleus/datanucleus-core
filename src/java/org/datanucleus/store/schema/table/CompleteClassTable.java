@@ -337,8 +337,7 @@ public class CompleteClassTable implements Table
             col.setMemberMetaData(mmds.get(mmds.size()-1));
         }
         cols.add(col);
-        AbstractMemberMetaData[] mmdsArr = mmds.toArray(new AbstractMemberMetaData[mmds.size()]);
-        columnAttributer.attributeColumn(col, mmdsArr);
+        columnAttributer.attributeEmbeddedColumn(col, mmds);
         columnByEmbeddedMember.put(mmds, col);
         return col;
     }
