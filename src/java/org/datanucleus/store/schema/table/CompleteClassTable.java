@@ -85,6 +85,23 @@ public class CompleteClassTable implements Table
         this.storeMgr = storeMgr;
         this.cmd = cmd;
         this.columnAttributer = colAttr;
+
+        if (cmd.getSchema() != null)
+        {
+            schemaName = cmd.getSchema();
+        }
+        else
+        {
+            schemaName = storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_SCHEMA);
+        }
+        if (cmd.getCatalog() != null)
+        {
+            catalogName = cmd.getCatalog();
+        }
+        else
+        {
+            catalogName = storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_CATALOG);
+        }
         this.identifier = storeMgr.getNamingFactory().getTableName(cmd);
 
         columns = new ArrayList<Column>();
@@ -350,6 +367,16 @@ public class CompleteClassTable implements Table
     public StoreManager getStoreManager()
     {
         return storeMgr;
+    }
+
+    public String getSchemaName()
+    {
+        return schemaName;
+    }
+
+    public String getCatalogName()
+    {
+        return catalogName;
     }
 
     public String getIdentifier()

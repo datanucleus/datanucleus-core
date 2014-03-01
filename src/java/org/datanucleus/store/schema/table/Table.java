@@ -30,8 +30,12 @@ public interface Table
 {
     StoreManager getStoreManager();
 
+    String getSchemaName();
+
+    String getCatalogName();
+
     /**
-     * Accessor for the identifier for this table (its "name).
+     * Accessor for the identifier for this table (its "name").
      * @return The table identifier
      */
     String getIdentifier();
