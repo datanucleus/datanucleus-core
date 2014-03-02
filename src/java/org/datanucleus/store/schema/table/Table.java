@@ -64,11 +64,10 @@ public interface Table
 
     /**
      * Accessor for the column for the specified member.
-     * If this is an embedded or nested embedded member then provide the mmds to navigate to the member in question
-     * @param mmds Metadata for the member(s)
+     * @param mmd Metadata for the member
      * @return The column (or null if invalid member)
      */
-    Column getColumnForMember(AbstractMemberMetaData mmds);
+    Column getColumnForMember(AbstractMemberMetaData mmd);
 
     /**
      * Accessor for the column for the specified embedded member.
