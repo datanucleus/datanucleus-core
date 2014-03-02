@@ -19,6 +19,7 @@ package org.datanucleus.store.schema.table;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -72,8 +73,8 @@ public class CompleteClassTable implements Table
     /** Map of column, keyed by the metadata for the member. */
     Map<AbstractMemberMetaData, Column> columnByMember = new HashMap<AbstractMemberMetaData, Column>();
 
-    /** Map of column, keyed by the metadata for the member(s) required to navigate to it. */ // TODO Key by the expanded name perhaps to give reliable access
-    Map<List<AbstractMemberMetaData>, Column> columnByEmbeddedMember = new HashMap<List<AbstractMemberMetaData>, Column>();
+    /** Map of column, keyed by the navigated path of embedded members. */
+    Map<String, Column> columnByEmbeddedMember = new HashMap<String, Column>();
 
     /** Map of DatastoreColumn, keyed by the position (starting at 0 and increasing). */
     Map<Integer, Column> columnByPosition = new HashMap<Integer, Column>();
@@ -355,8 +356,19 @@ public class CompleteClassTable implements Table
         }
         cols.add(col);
         columnAttributer.attributeEmbeddedColumn(col, mmds);
-        columnByEmbeddedMember.put(mmds, col);
+        columnByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(mmds), col);
         return col;
+    }
+
+    private String getEmbeddedMemberNavigatedPath(List<AbstractMemberMetaData> mmds)
+    {
+        Iterator<AbstractMemberMetaData> mmdIter = mmds.iterator();
+        StringBuilder strBldr = new StringBuilder(mmdIter.next().getFullFieldName());
+        while (mmdIter.hasNext())
+        {
+            strBldr.append('.').append(mmdIter.next().getName());
+        }
+        return strBldr.toString();
     }
 
     public AbstractClassMetaData getClassMetaData()
@@ -416,7 +428,8 @@ public class CompleteClassTable implements Table
 
     public Column getColumnForPosition(int pos)
     {
-        return columnByPosition.get(pos);
+        throw new UnsupportedOperationException("This class doesnt yet support accessing columns by position");
+//        return columnByPosition.get(pos);
     }
 
     public Column getColumnForMember(AbstractMemberMetaData mmd)
@@ -426,7 +439,7 @@ public class CompleteClassTable implements Table
 
     public Column getColumnForEmbeddedMember(List<AbstractMemberMetaData> mmds)
     {
-        return columnByEmbeddedMember.get(mmds);
+        return columnByEmbeddedMember.get(getEmbeddedMemberNavigatedPath(mmds));
     }
 
     public String toString()
