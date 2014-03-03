@@ -75,6 +75,19 @@ public class SchemaTool
 
     public static final NucleusLogger LOGGER = NucleusLogger.getLoggerInstance("DataNucleus.SchemaTool");
 
+    public static final String OPTION_CREATE_SCHEMA = "createSchema";
+    public static final String OPTION_DELETE_SCHEMA = "deleteSchema";
+    public static final String OPTION_CREATE_TABLES_FOR_CLASSES = "create";
+    public static final String OPTION_DELETE_TABLES_FOR_CLASSES = "delete";
+    public static final String OPTION_DELETE_CREATE_TABLES_FOR_CLASSES = "deletecreate";
+    public static final String OPTION_VALIDATE_TABLES_FOR_CLASSES = "validate";
+    public static final String OPTION_DBINFO = "dbinfo";
+    public static final String OPTION_SCHEMAINFO = "schemainfo";
+    public static final String OPTION_DDL_FILE = "ddlFile";
+    public static final String OPTION_COMPLETE_DDL = "completeDdl";
+    public static final String OPTION_INCLUDE_AUTO_START = "includeAutoStart";
+    public static final String OPTION_API = "api";
+
     public enum Mode
     {
         CREATE_SCHEMA,
@@ -115,22 +128,22 @@ public class SchemaTool
         SchemaTool tool = new SchemaTool();
 
         CommandLine cmd = new CommandLine();
-        cmd.addOption("createSchema", "createSchema", "createSchema", LOCALISER.msg(false, "014024"));
-        cmd.addOption("deleteSchema", "deleteSchema", "deleteSchema", LOCALISER.msg(false, "014025"));
+        cmd.addOption(OPTION_CREATE_SCHEMA, OPTION_CREATE_SCHEMA, OPTION_CREATE_SCHEMA, LOCALISER.msg(false, "014024"));
+        cmd.addOption(OPTION_DELETE_SCHEMA, OPTION_DELETE_SCHEMA, OPTION_DELETE_SCHEMA, LOCALISER.msg(false, "014025"));
 
-        cmd.addOption("create", "create", null, LOCALISER.msg(false, "014026"));
-        cmd.addOption("delete", "delete", null, LOCALISER.msg(false, "014027"));
-        cmd.addOption("deletecreate", "deletecreate", null, LOCALISER.msg(false, "014044"));
-        cmd.addOption("validate", "validate", null, LOCALISER.msg(false, "014028"));
+        cmd.addOption(OPTION_CREATE_TABLES_FOR_CLASSES, OPTION_CREATE_TABLES_FOR_CLASSES, null, LOCALISER.msg(false, "014026"));
+        cmd.addOption(OPTION_DELETE_TABLES_FOR_CLASSES, OPTION_DELETE_TABLES_FOR_CLASSES, null, LOCALISER.msg(false, "014027"));
+        cmd.addOption(OPTION_DELETE_CREATE_TABLES_FOR_CLASSES, OPTION_DELETE_CREATE_TABLES_FOR_CLASSES, null, LOCALISER.msg(false, "014044"));
+        cmd.addOption(OPTION_VALIDATE_TABLES_FOR_CLASSES, OPTION_VALIDATE_TABLES_FOR_CLASSES, null, LOCALISER.msg(false, "014028"));
 
-        cmd.addOption("dbinfo", "dbinfo", null, LOCALISER.msg(false, "014029"));
-        cmd.addOption("schemainfo", "schemainfo", null, LOCALISER.msg(false, "014030"));
+        cmd.addOption(OPTION_DBINFO, OPTION_DBINFO, null, LOCALISER.msg(false, "014029"));
+        cmd.addOption(OPTION_SCHEMAINFO, OPTION_SCHEMAINFO, null, LOCALISER.msg(false, "014030"));
         cmd.addOption("help", "help", null, LOCALISER.msg(false, "014033"));
 
-        cmd.addOption("ddlFile", "ddlFile", "ddlFile", LOCALISER.msg(false, "014031"));
-        cmd.addOption("completeDdl", "completeDdl", null, LOCALISER.msg(false, "014032"));
-        cmd.addOption("includeAutoStart", "includeAutoStart", null, "Include Auto-Start Mechanisms");
-        cmd.addOption("api", "api", "api", "API Adapter (JDO, JPA, etc)");
+        cmd.addOption(OPTION_DDL_FILE, OPTION_DDL_FILE, "ddlFile", LOCALISER.msg(false, "014031"));
+        cmd.addOption(OPTION_COMPLETE_DDL, OPTION_COMPLETE_DDL, null, LOCALISER.msg(false, "014032"));
+        cmd.addOption(OPTION_INCLUDE_AUTO_START, OPTION_INCLUDE_AUTO_START, null, "Include Auto-Start Mechanisms");
+        cmd.addOption(OPTION_API, OPTION_API, "api", "API Adapter (JDO, JPA, etc)");
         cmd.addOption("v", "verbose", null, "verbose output");
         cmd.addOption("pu", "persistenceUnit", "<persistence-unit>", "name of the persistence unit to handle the schema for");
         cmd.addOption("props", "properties", "props", "path to a properties file");
@@ -148,50 +161,44 @@ public class SchemaTool
         // Determine the mode of operation required
         String msg = null;
         Mode mode = Mode.CREATE;
-        if (cmd.hasOption("create"))
+        if (cmd.hasOption(OPTION_CREATE_TABLES_FOR_CLASSES))
         {
             mode = Mode.CREATE;
             msg = LOCALISER.msg(false, "014000");
         }
-        else if (cmd.hasOption("delete"))
+        else if (cmd.hasOption(OPTION_DELETE_TABLES_FOR_CLASSES))
         {
             mode = Mode.DELETE;
             msg = LOCALISER.msg(false, "014001");
         }
-        else if (cmd.hasOption("deletecreate"))
+        else if (cmd.hasOption(OPTION_DELETE_CREATE_TABLES_FOR_CLASSES))
         {
             mode = Mode.DELETE_CREATE;
             msg = LOCALISER.msg(false, "014045");
         }
-        else if (cmd.hasOption("validate"))
+        else if (cmd.hasOption(OPTION_VALIDATE_TABLES_FOR_CLASSES))
         {
             mode = Mode.VALIDATE;
             msg = LOCALISER.msg(false, "014002");
         }
-        else if (cmd.hasOption("createSchema"))
+        else if (cmd.hasOption(OPTION_CREATE_SCHEMA))
         {
             mode = Mode.CREATE_SCHEMA;
-            if (cmd.hasOption("deleteSchema"))
-            {
-                tool.setSchemaName(cmd.getOptionArg("createSchema"));
-            }
+            tool.setSchemaName(cmd.getOptionArg(OPTION_CREATE_SCHEMA));
             msg = LOCALISER.msg(false, "014034", tool.getSchemaName());
         }
-        else if (cmd.hasOption("deleteSchema"))
+        else if (cmd.hasOption(OPTION_DELETE_SCHEMA))
         {
             mode = Mode.DELETE_SCHEMA;
-            if (cmd.hasOption("deleteSchema"))
-            {
-                tool.setSchemaName(cmd.getOptionArg("deleteSchema"));
-            }
+            tool.setSchemaName(cmd.getOptionArg(OPTION_DELETE_SCHEMA));
             msg = LOCALISER.msg(false, "014035", tool.getSchemaName());
         }
-        else if (cmd.hasOption("dbinfo"))
+        else if (cmd.hasOption(OPTION_DBINFO))
         {
             mode = Mode.DATABASE_INFO;
             msg = LOCALISER.msg(false, "014003");
         }
-        else if (cmd.hasOption("schemainfo"))
+        else if (cmd.hasOption(OPTION_SCHEMAINFO))
         {
             mode = Mode.SCHEMA_INFO;
             msg = LOCALISER.msg(false, "014004");
@@ -207,15 +214,15 @@ public class SchemaTool
         // Extract the selected options
         String propsFileName = null;
         String persistenceUnitName = null;
-        if (cmd.hasOption("ddlFile"))
+        if (cmd.hasOption(OPTION_DDL_FILE))
         {
-            tool.setDdlFile(cmd.getOptionArg("ddlFile"));
+            tool.setDdlFile(cmd.getOptionArg(OPTION_DDL_FILE));
         }
-        if (cmd.hasOption("completeDdl"))
+        if (cmd.hasOption(OPTION_COMPLETE_DDL))
         {
             tool.setCompleteDdl(true);
         }
-        if (cmd.hasOption("includeAutoStart"))
+        if (cmd.hasOption(OPTION_INCLUDE_AUTO_START))
         {
             tool.setIncludeAutoStart(true);
         }
@@ -739,7 +746,7 @@ public class SchemaTool
     }
 
     /**
-     * Acessor for the metadata API (JDO, JPA) in use (metadata definition)
+     * Accessor for the metadata API (JDO, JPA) in use (metadata definition)
      * @return the API
      */
     public String getApi()
