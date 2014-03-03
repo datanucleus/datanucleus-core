@@ -330,6 +330,8 @@ Contributors:
             converter-class="org.datanucleus.store.types.converters.SerializableStringConverter"/>
         <type-converter name="dn.serializable-bytearray" member-type="java.io.Serializable" datastore-type="[B"
             converter-class="org.datanucleus.store.types.converters.SerializableByteArrayConverter"/>
+        <type-converter name="dn.serializable-bytebuffer" member-type="java.io.Serializable" datastore-type="java.nio.ByteBuffer"
+            converter-class="org.datanucleus.store.types.converters.SerializableByteBufferConverter"/>
     </extension>
 
     <!-- VALUE GENERATORS -->
