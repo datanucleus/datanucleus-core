@@ -357,10 +357,13 @@ public class OrderMetaData extends MetaData implements ColumnMetaDataContainer
         sb.append(">\n");
 
         // Add columns
-        for (int i=0; i<columns.size(); i++)
+        if (columns != null)
         {
-            ColumnMetaData c = columns.get(i);
-            sb.append(c.toString(prefix + indent,indent));
+            for (int i=0; i<columns.size(); i++)
+            {
+                ColumnMetaData c = columns.get(i);
+                sb.append(c.toString(prefix + indent,indent));
+            }
         }
 
         // Add index
