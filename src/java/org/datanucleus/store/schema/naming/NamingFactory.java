@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.schema.naming;
 
 import java.util.List;
+import java.util.Set;
 
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -29,6 +30,13 @@ import org.datanucleus.metadata.SequenceMetaData;
  */
 public interface NamingFactory
 {
+    /**
+     * Method to set the provided list of keywords as names that identifiers have to surround by quotes to use.
+     * @param keywords The keywords
+     * @return This naming factory
+     */
+    NamingFactory setReservedKeywords(Set<String> keywords);
+
     /**
      * Method to set the maximum length of the name of the specified schema component.
      * @param cmpt The component

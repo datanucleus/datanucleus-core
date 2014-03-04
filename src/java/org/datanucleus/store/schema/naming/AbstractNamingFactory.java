@@ -18,8 +18,10 @@ Contributors:
 package org.datanucleus.store.schema.naming;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
@@ -36,6 +38,8 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class AbstractNamingFactory implements NamingFactory
 {
+    protected Set<String> reservedWords = new HashSet<String>();
+
     /** Separator to use for words in the identifiers. */
     protected String wordSeparator = "_";
 
@@ -55,6 +59,15 @@ public abstract class AbstractNamingFactory implements NamingFactory
     {
         this.nucCtx = nucCtx;
         this.clr = nucCtx.getClassLoaderResolver(null);
+    }
+
+    public NamingFactory setReservedKeywords(Set<String> keywords)
+    {
+        if (keywords != null)
+        {
+            reservedWords.addAll(keywords);
+        }
+        return this;
     }
 
     public NamingFactory setQuoteString(String quote)
@@ -388,6 +401,15 @@ public abstract class AbstractNamingFactory implements NamingFactory
         }
 
         // Apply any case and quoting
-        return getNameInRequiredCase(preparedName);
+        String casedName = getNameInRequiredCase(preparedName);
+
+        if (!casedName.startsWith(quoteString))
+        {
+            if (reservedWords.contains(casedName.toUpperCase()))
+            {
+                casedName = quoteString + casedName + quoteString;
+            }
+        }
+        return casedName;
     }
 }
