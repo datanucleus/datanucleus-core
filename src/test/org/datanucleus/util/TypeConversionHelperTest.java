@@ -85,7 +85,7 @@ public class TypeConversionHelperTest extends TestCase
         a[4] = new BigDecimal("2007908.54548");
         a[5] = new BigDecimal("64564645656.78657");        
         byte[] b = TypeConversionHelper.getByteArrayFromBigDecimalArray(a);
-        BigDecimal c[] = (BigDecimal[]) TypeConversionHelper.getBigDecimalArrayFromByteArray(b);
+        BigDecimal c[] = TypeConversionHelper.getBigDecimalArrayFromByteArray(b);
         assertEquals(a[0],c[0]);
         assertEquals(a[1],c[1]);
         assertEquals(a[2],c[2]);
@@ -103,7 +103,7 @@ public class TypeConversionHelperTest extends TestCase
         a[0] = new BigInteger(""+Long.MAX_VALUE);
         a[1] = new BigInteger(""+Long.MIN_VALUE);
         byte[] b = TypeConversionHelper.getByteArrayFromBigIntegerArray(a);
-        BigInteger c[] = (BigInteger[]) TypeConversionHelper.getBigIntegerArrayFromByteArray(b);
+        BigInteger c[] = TypeConversionHelper.getBigIntegerArrayFromByteArray(b);
         assertEquals(a[0],c[0]);
         assertEquals(a[1],c[1]);
     }    

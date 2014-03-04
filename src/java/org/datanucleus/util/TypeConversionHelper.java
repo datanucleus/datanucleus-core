@@ -45,9 +45,7 @@ public class TypeConversionHelper
     
     /**
      * Convert an instance of our value class into a boolean[].
-     *
      * @param value Object to be converted
-     *
      * @return converted boolean array
      */
     public static boolean[] getBooleanArrayFromBitSet(BitSet value)
@@ -88,12 +86,10 @@ public class TypeConversionHelper
     
     /**
      * Convert a byte[] into an instance of our value class.
-     *
      * @param buf byte array to be converted
-     *
      * @return converted boolean array as object
      */
-    public static Object getBooleanArrayFromByteArray(byte[] buf)
+    public static boolean[] getBooleanArrayFromByteArray(byte[] buf)
     {
         int n = buf.length;
         boolean[] a = new boolean[n];
@@ -134,12 +130,10 @@ public class TypeConversionHelper
 
     /**
      * Convert a byte[] into an instance of our value class.
-     *
      * @param buf byte array to be converted
-     *
      * @return converted char array as object
      */
-    public static Object getCharArrayFromByteArray(byte[] buf)
+    public static char[] getCharArrayFromByteArray(byte[] buf)
     {
         int n = buf.length / 2;
         char[] a = new char[n];
@@ -186,12 +180,10 @@ public class TypeConversionHelper
 
     /**
      * Convert a byte[] into an instance of our value class.
-     *
      * @param buf byte array to be converted
-     *
      * @return converted double array as object
      */
-    public static Object getDoubleArrayFromByteArray(byte[] buf)
+    public static double[] getDoubleArrayFromByteArray(byte[] buf)
     {
         int n = buf.length / 8;
         double[] a = new double[n];
@@ -244,12 +236,10 @@ public class TypeConversionHelper
 
     /**
      * Convert a byte[] into an instance of our value class.
-     *
      * @param buf byte array to be converted
-     *
      * @return converted float array as object
      */
-    public static Object getFloatArrayFromByteArray(byte[] buf)
+    public static float[] getFloatArrayFromByteArray(byte[] buf)
     {
         int n = buf.length / 4;
         float[] a = new float[n];
@@ -303,7 +293,7 @@ public class TypeConversionHelper
      *
      * @return converted int array as object
      */
-    public static Object getIntArrayFromByteArray(byte[] buf)
+    public static int[] getIntArrayFromByteArray(byte[] buf)
     {
         int n = buf.length / 4;
         int[] a = new int[n];
@@ -352,12 +342,10 @@ public class TypeConversionHelper
 
     /**
      * Convert a byte[] into an instance of our value class.
-     *
      * @param buf byte array to be converted
-     *
      * @return converted long array as object
      */
-    public static Object getLongArrayFromByteArray(byte[] buf)
+    public static long[] getLongArrayFromByteArray(byte[] buf)
     {
         int n = buf.length / 8;
         long[] a = new long[n];
@@ -415,7 +403,7 @@ public class TypeConversionHelper
      *
      * @return converted short array as object
      */
-    public static Object getShortArrayFromByteArray(byte[] buf)
+    public static short[] getShortArrayFromByteArray(byte[] buf)
     {
         int n = buf.length / 2;
         short[] a = new short[n];
@@ -504,7 +492,7 @@ public class TypeConversionHelper
      *
      * @return converted BigDecimal array as object
      */
-    public static Object getBigDecimalArrayFromByteArray(byte[] buf)
+    public static BigDecimal[] getBigDecimalArrayFromByteArray(byte[] buf)
     {        
         BigDecimal[] a = new BigDecimal[buf.length/TOTAL_BYTES];
         
@@ -525,7 +513,7 @@ public class TypeConversionHelper
             //get scale
             byte[] s = new byte[4];           
             System.arraycopy(buf,index,s,0,NR_SCALE_BYTES);            
-            int[] scale = (int[]) getIntArrayFromByteArray(s);
+            int[] scale = getIntArrayFromByteArray(s);
             a[i] = new BigDecimal(integer,scale[0]);
             index += NR_SCALE_BYTES;
         }
@@ -564,9 +552,9 @@ public class TypeConversionHelper
      *
      * @return converted short array as object
      */
-    public static Object getBigIntegerArrayFromByteArray(byte[] buf)
+    public static BigInteger[] getBigIntegerArrayFromByteArray(byte[] buf)
     {
-        long[] d = (long[]) getLongArrayFromByteArray(buf);
+        long[] d = getLongArrayFromByteArray(buf);
         BigInteger[] a = new BigInteger[d.length];
         for (int i=0; i < a.length; i++)
         {
@@ -602,9 +590,9 @@ public class TypeConversionHelper
      * @param buf byte array to be converted
      * @return converted Boolean array as object
      */
-    public static Object getBooleanObjectArrayFromByteArray(byte[] buf)
+    public static Boolean[] getBooleanObjectArrayFromByteArray(byte[] buf)
     {
-        boolean[] d = (boolean[]) getBooleanArrayFromByteArray(buf);
+        boolean[] d = getBooleanArrayFromByteArray(buf);
         Boolean[] a = new Boolean[d.length];
         for (int i=0; i < a.length; i++)
         {
@@ -640,7 +628,7 @@ public class TypeConversionHelper
      * @param buf byte array to be converted
      * @return converted Byte array as object
      */
-    public static Object getByteObjectArrayFromByteArray(byte[] buf)
+    public static Byte[] getByteObjectArrayFromByteArray(byte[] buf)
     {
         if (buf == null)
         {
@@ -682,9 +670,9 @@ public class TypeConversionHelper
      * @param buf byte array to be converted
      * @return converted Character array as object
      */
-    public static Object getCharObjectArrayFromByteArray(byte[] buf)
+    public static Character[] getCharObjectArrayFromByteArray(byte[] buf)
     {
-        char[] d = (char[]) getCharArrayFromByteArray(buf);
+        char[] d = getCharArrayFromByteArray(buf);
         Character[] a = new Character[d.length];
         for (int i=0; i < a.length; i++)
         {
@@ -720,9 +708,9 @@ public class TypeConversionHelper
      * @param buf byte array to be converted
      * @return converted Double array as object
      */
-    public static Object getDoubleObjectArrayFromByteArray(byte[] buf)
+    public static Double[] getDoubleObjectArrayFromByteArray(byte[] buf)
     {
-        double[] d = (double[]) getDoubleArrayFromByteArray(buf);
+        double[] d = getDoubleArrayFromByteArray(buf);
         Double[] a = new Double[d.length];
         for (int i=0; i < a.length; i++)
         {
@@ -758,9 +746,9 @@ public class TypeConversionHelper
      * @param buf byte array to be converted
      * @return converted Float array as object
      */
-    public static Object getFloatObjectArrayFromByteArray(byte[] buf)
+    public static Float[] getFloatObjectArrayFromByteArray(byte[] buf)
     {
-        float[] d = (float[]) getFloatArrayFromByteArray(buf);
+        float[] d = getFloatArrayFromByteArray(buf);
         Float[] a = new Float[d.length];
         for (int i=0; i < a.length; i++)
         {
@@ -796,9 +784,9 @@ public class TypeConversionHelper
      * @param buf byte array to be converted
      * @return converted Integer array as object
      */
-    public static Object getIntObjectArrayFromByteArray(byte[] buf)
+    public static Integer[] getIntObjectArrayFromByteArray(byte[] buf)
     {
-        int[] d = (int[]) getIntArrayFromByteArray(buf);
+        int[] d = getIntArrayFromByteArray(buf);
         Integer[] a = new Integer[d.length];
         for (int i=0; i < a.length; i++)
         {
@@ -834,9 +822,9 @@ public class TypeConversionHelper
      * @param buf byte array to be converted
      * @return converted Long array as object
      */
-    public static Object getLongObjectArrayFromByteArray(byte[] buf)
+    public static Long[] getLongObjectArrayFromByteArray(byte[] buf)
     {
-        long[] d = (long[]) getLongArrayFromByteArray(buf);
+        long[] d = getLongArrayFromByteArray(buf);
         Long[] a = new Long[d.length];
         for (int i=0; i < a.length; i++)
         {
@@ -872,9 +860,9 @@ public class TypeConversionHelper
      * @param buf byte array to be converted
      * @return converted Short array as object
      */
-    public static Object getShortObjectArrayFromByteArray(byte[] buf)
+    public static Short[] getShortObjectArrayFromByteArray(byte[] buf)
     {
-        short[] d = (short[]) getShortArrayFromByteArray(buf);
+        short[] d = getShortArrayFromByteArray(buf);
         Short[] a = new Short[d.length];
         for (int i=0; i < a.length; i++)
         {

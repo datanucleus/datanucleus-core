@@ -332,6 +332,27 @@ Contributors:
             converter-class="org.datanucleus.store.types.converters.SerializableByteArrayConverter"/>
         <type-converter name="dn.serializable-bytebuffer" member-type="java.io.Serializable" datastore-type="java.nio.ByteBuffer"
             converter-class="org.datanucleus.store.types.converters.SerializableByteBufferConverter"/>
+
+        <type-converter name="dn.bytearray-bytebuffer" member-type="[B" datastore-type="java.nio.ByteBuffer"
+            converter-class="org.datanucleus.store.types.converters.ByteArrayByteBufferConverter"/>
+        <type-converter name="dn.booleanarray-bytebuffer" member-type="[Z" datastore-type="java.nio.ByteBuffer"
+            converter-class="org.datanucleus.store.types.converters.BooleanArrayByteBufferConverter"/>
+        <type-converter name="dn.chararray-bytebuffer" member-type="[C" datastore-type="java.nio.ByteBuffer"
+            converter-class="org.datanucleus.store.types.converters.CharArrayByteBufferConverter"/>
+        <type-converter name="dn.doublearray-bytebuffer" member-type="[D" datastore-type="java.nio.ByteBuffer"
+            converter-class="org.datanucleus.store.types.converters.DoubleArrayByteBufferConverter"/>
+        <type-converter name="dn.floatarray-bytebuffer" member-type="[F" datastore-type="java.nio.ByteBuffer"
+            converter-class="org.datanucleus.store.types.converters.FloatArrayByteBufferConverter"/>
+        <type-converter name="dn.intarray-bytebuffer" member-type="[I" datastore-type="java.nio.ByteBuffer"
+            converter-class="org.datanucleus.store.types.converters.IntArrayByteBufferConverter"/>
+        <type-converter name="dn.longarray-bytebuffer" member-type="[J" datastore-type="java.nio.ByteBuffer"
+            converter-class="org.datanucleus.store.types.converters.LongArrayByteBufferConverter"/>
+        <type-converter name="dn.shortarray-bytebuffer" member-type="[S" datastore-type="java.nio.ByteBuffer"
+            converter-class="org.datanucleus.store.types.converters.ShortArrayByteBufferConverter"/>
+        <type-converter name="dn.bigintegerarray-bytebuffer" member-type="java.math.BigInteger" datastore-type="java.nio.ByteBuffer"
+            converter-class="org.datanucleus.store.types.converters.BigIntegerArrayByteBufferConverter"/>
+        <type-converter name="dn.bigdecimalarray-bytebuffer" member-type="java.math.BigDecimal" datastore-type="java.nio.ByteBuffer"
+            converter-class="org.datanucleus.store.types.converters.BigDecimalArrayByteBufferConverter"/>
     </extension>
 
     <!-- VALUE GENERATORS -->
