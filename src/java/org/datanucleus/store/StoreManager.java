@@ -66,6 +66,7 @@ public interface StoreManager
 {
     // TODO Categorise all other optional features here so they can be made available for use by store plugins
     public static final String OPTION_APPLICATION_ID = "ApplicationId";
+    public static final String OPTION_APPLICATION_COMPOSITE_ID = "ApplicationCompositeId";
     public static final String OPTION_DATASTORE_ID = "DatastoreId";
     public static final String OPTION_NONDURABLE_ID = "NonDurableId";
     public static final String OPTION_ORM = "ORM";
