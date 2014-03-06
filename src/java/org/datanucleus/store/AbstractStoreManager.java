@@ -104,14 +104,11 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     /** Key for this StoreManager e.g "rdbms", "neo4j" */
     protected final String storeManagerKey;
 
-    /** Whether this datastore is read only. */
-    protected final boolean readOnlyDatastore;
-
     /** Nucleus Context. */
     protected final PersistenceNucleusContext nucleusContext;
 
     /** Manager for value generation. Lazy initialised, so use getValueGenerationManager() to access. */
-    private ValueGenerationManager valueGenerationMgr;
+    protected ValueGenerationManager valueGenerationMgr;
 
     /** Manager for the data definition in the datastore. */
     protected StoreDataManager storeDataMgr = new StoreDataManager();
@@ -123,7 +120,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     protected FlushProcess flushProcess = null;
 
     /** Query Manager. Lazy initialised, so use getQueryManager() to access. */
-    private QueryManager queryMgr = null;
+    protected QueryManager queryMgr = null;
 
     /** Schema handler. */
     protected StoreSchemaHandler schemaHandler = null;
@@ -162,8 +159,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 setPropertyInternal(entry.getKey(), entry.getValue());
             }
         }
-
-        this.readOnlyDatastore = getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY);
 
         // Set up connection handling
         registerConnectionMgr();
@@ -764,7 +759,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             NucleusLogger.DATASTORE.debug("StoreManager : \"" + storeManagerKey + "\" (" + getClass().getName() + ")");
 
             NucleusLogger.DATASTORE.debug("Datastore : " +
-                (readOnlyDatastore ? "read-only" : "read-write") + 
+                (getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY) ? "read-only" : "read-write") + 
                 (getBooleanProperty(PropertyNames.PROPERTY_SERIALIZE_READ) ? ", useLocking" : ""));
 
             // Schema : Auto-Create/Validate
@@ -854,7 +849,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     {
         if (category.equalsIgnoreCase("DATASTORE"))
         {
-            ps.println(LOCALISER.msg("032020", storeManagerKey, getConnectionURL(), (readOnlyDatastore ? "read-only" : "read-write")));
+            ps.println(LOCALISER.msg("032020", storeManagerKey, getConnectionURL(), (getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY) ? "read-only" : "read-write")));
         }
     }
 

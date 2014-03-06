@@ -142,7 +142,7 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
      */
     public void assertReadOnlyForUpdateOfObject(ObjectProvider op)
     {
-        if (storeMgr.getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY))
+        if (op.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY))
         {
             if (storeMgr.getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
             {
