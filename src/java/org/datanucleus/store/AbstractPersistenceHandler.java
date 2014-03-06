@@ -144,7 +144,7 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
     {
         if (op.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY))
         {
-            if (storeMgr.getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
+            if (op.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
             {
                 throw new DatastoreReadOnlyException(LOCALISER.msg("032004",
                     op.getObjectAsPrintable()), op.getExecutionContext().getClassLoaderResolver());
@@ -169,7 +169,7 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
                     boolean readonly = Boolean.valueOf(value).booleanValue();
                     if (readonly)
                     {
-                        if (storeMgr.getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
+                        if (op.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
                         {
                             throw new DatastoreReadOnlyException(LOCALISER.msg("032006",
                                 op.getObjectAsPrintable()), op.getExecutionContext().getClassLoaderResolver());
