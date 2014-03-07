@@ -107,7 +107,7 @@ public class CorePropertyValidator implements PropertyValidator
                 String strVal = (String)value;
                 if (strVal.equalsIgnoreCase("UPPERCASE") ||
                     strVal.equalsIgnoreCase("lowercase") ||
-                    strVal.equalsIgnoreCase("PreserveCase"))
+                    strVal.equalsIgnoreCase("MixedCase"))
                 {
                     return true;
                 }
