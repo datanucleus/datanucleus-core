@@ -829,6 +829,10 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 "AutoCreate(" + (autoCreateOptions != null ? autoCreateOptions.toString() : "None") + ")" +
                 ", Validate(" + (validateOptions != null ? validateOptions.toString() : "None") + ")");
 
+            String namingFactoryName = getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_NAMING_FACTORY);
+            String namingCase = getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_CASE);
+            NucleusLogger.DATASTORE.debug("Schema : NamingFactory=" + namingFactoryName + " identifierCase=" + namingCase);
+
             String[] queryLanguages = nucleusContext.getPluginManager().getAttributeValuesForExtension(
                 "org.datanucleus.store_query_query", "datastore", storeManagerKey, "name");
             NucleusLogger.DATASTORE.debug("Query Languages : " + 
