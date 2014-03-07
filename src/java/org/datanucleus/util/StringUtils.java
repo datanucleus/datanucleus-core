@@ -30,9 +30,11 @@ import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.JarFile;
 
@@ -312,6 +314,24 @@ public class StringUtils
             values = null;
         }
         return values;
+    }
+
+    /**
+     * Converts the input comma-separated string into a Set of the individual strings, with each string trimmed and converted to UPPERCASE.
+     * @param str The input string
+     * @return Set of the comma-separated strings that it is comprised of
+     */
+    public static Set<String> convertCommaSeparatedStringToSet(String str)
+    {
+        HashSet set = new HashSet();
+
+        StringTokenizer tokens = new StringTokenizer(str, ",");
+        while (tokens.hasMoreTokens())
+        {
+            set.add(tokens.nextToken().trim().toUpperCase());
+        }
+
+        return set;
     }
 
     /**
