@@ -67,7 +67,8 @@ public class Properties extends java.util.Properties implements SCOMap, Cloneabl
         java.util.Map m = (java.util.Map)o;
         if (m != null)
         {
-            delegate = new java.util.Properties((java.util.Properties) m); // Make copy of container rather than using same memory
+            delegate = new java.util.Properties();
+            delegate.putAll(m);
         }
         else
         {
