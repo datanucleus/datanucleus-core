@@ -155,7 +155,7 @@ public class CompleteClassTable implements Table
                 if (colmds != null && colmds.length > 1)
                 {
                     // TODO Handle member with multiple columns
-                    throw new NucleusUserException("Dont currently support member having more than 1 column");
+                    throw new NucleusUserException("Dont currently support member having more than 1 column (member=" + mmd.getFullFieldName() + ")");
                 }
                 String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
                 ColumnImpl col = addColumn(columns, mmd, colName);
