@@ -24,6 +24,7 @@ import java.lang.reflect.Modifier;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -97,6 +98,10 @@ public class IdentityUtils
     {
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
         Object id = null;
+        if (cmd == null)
+        {
+            throw new NucleusException("Cannot get object from id=" + persistableId + " since class name was not supplied!");
+        }
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
             id = OIDFactory.getInstance(ec.getNucleusContext(), persistableId);
