@@ -47,6 +47,7 @@ import org.datanucleus.query.compiler.JPQLCompiler;
 import org.datanucleus.query.compiler.JavaQueryCompiler;
 import org.datanucleus.query.compiler.QueryCompilation;
 import org.datanucleus.query.evaluator.memory.InMemoryExpressionEvaluator;
+import org.datanucleus.query.evaluator.memory.InMemoryFailure;
 import org.datanucleus.query.expression.DyadicExpression;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.expression.InvokeExpression;
@@ -1391,6 +1392,11 @@ public class QueryUtils
                     state.put(candidateAlias, obj2);
                     Object b = ordering[i].evaluate(
                         new InMemoryExpressionEvaluator(ec, parameterValues, state, imports, clr, candidateAlias, queryLanguage));
+
+                    if (a instanceof InMemoryFailure || b instanceof InMemoryFailure)
+                    {
+                        throw new NucleusException("Error encountered in in-memory evaluation of ordering. Consult the log for details");
+                    }
 
                     OrderExpression orderExpr = (OrderExpression) ordering[i];
                     // Put any null values at the end

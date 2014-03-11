@@ -18,7 +18,6 @@ Contributors:
 package org.datanucleus.query.evaluator.memory;
 
 import java.lang.reflect.Array;
-import java.util.Collection;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.QueryUtils;
@@ -80,7 +79,7 @@ public class ArrayContainsMethodEvaluator implements InvocationEvaluator
             catch (VariableNotSetException vnse)
             {
                 // Throw an exception with the possible values
-                throw new VariableNotSetException(varExpr, ((Collection)invokedValue).toArray());
+                throw new VariableNotSetException(varExpr, (Object[]) invokedValue);
             }
         }
         else

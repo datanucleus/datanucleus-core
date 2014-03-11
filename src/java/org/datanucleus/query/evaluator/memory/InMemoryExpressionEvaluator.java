@@ -528,8 +528,15 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
     protected Object processNotExpression(Expression expr)
     {
         // Logical complement - only for boolean values
-        Boolean left = (Boolean)stack.pop();
-        Boolean result = (left.booleanValue() ? Boolean.FALSE : Boolean.TRUE);
+        Object left = stack.pop();
+        if (left instanceof InMemoryFailure)
+        {
+            stack.push(Boolean.FALSE);
+            return stack.peek();
+        }
+
+        Boolean leftExpr = (Boolean)left;
+        Boolean result = (leftExpr.booleanValue() ? Boolean.FALSE : Boolean.TRUE);
         stack.push(result);
         return stack.peek();
     }
