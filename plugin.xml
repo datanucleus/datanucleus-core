@@ -521,6 +521,8 @@ Contributors:
             evaluator="org.datanucleus.query.evaluator.memory.MapContainsKeyMethodEvaluator"/>
         <query-method-evaluator class="java.util.Map" method="containsValue" 
             evaluator="org.datanucleus.query.evaluator.memory.MapContainsValueMethodEvaluator"/>
+        <query-method-evaluator class="java.util.Map" method="containsEntry" 
+            evaluator="org.datanucleus.query.evaluator.memory.MapContainsEntryMethodEvaluator"/>
         <query-method-evaluator class="java.util.Map" method="get" 
             evaluator="org.datanucleus.query.evaluator.memory.MapGetMethodEvaluator"/>
 
