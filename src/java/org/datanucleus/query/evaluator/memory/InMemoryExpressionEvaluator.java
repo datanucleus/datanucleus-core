@@ -692,7 +692,15 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                     Collection processable = new HashSet(coll); // No dups in HashSet
                     coll = processable;
                 }
-                return setexpr.count(paramExpr, this);
+
+                int stackSizeOrig = stack.size();
+                Object returnVal = setexpr.count(paramExpr, this);
+                while (stack.size() > stackSizeOrig)
+                {
+                    // Remove any expressions put on the stack while evaluating the aggregate
+                    stack.pop();
+                }
+                return returnVal;
             }
             else if (method.toLowerCase().equals("sum"))
             {
@@ -704,7 +712,15 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                     Collection processable = new HashSet(coll); // No dups in HashSet
                     coll = processable;
                 }
-                return setexpr.sum(paramExpr, this, state);
+
+                int stackSizeOrig = stack.size();
+                Object returnVal = setexpr.sum(paramExpr, this, state);
+                while (stack.size() > stackSizeOrig)
+                {
+                    // Remove any expressions put on the stack while evaluating the aggregate
+                    stack.pop();
+                }
+                return returnVal;
             }
             else if (method.toLowerCase().equals("avg"))
             {
@@ -716,7 +732,15 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                     Collection processable = new HashSet(coll); // No dups in HashSet
                     coll = processable;
                 }
-                return setexpr.avg(paramExpr, this, state);
+
+                int stackSizeOrig = stack.size();
+                Object returnVal = setexpr.avg(paramExpr, this, state);
+                while (stack.size() > stackSizeOrig)
+                {
+                    // Remove any expressions put on the stack while evaluating the aggregate
+                    stack.pop();
+                }
+                return returnVal;
             }
             else if (method.toLowerCase().equals("min"))
             {
@@ -728,7 +752,15 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                     Collection processable = new HashSet(coll); // No dups in HashSet
                     coll = processable;
                 }
-                return setexpr.min(paramExpr, this, state);
+
+                int stackSizeOrig = stack.size();
+                Object returnVal = setexpr.min(paramExpr, this, state);
+                while (stack.size() > stackSizeOrig)
+                {
+                    // Remove any expressions put on the stack while evaluating the aggregate
+                    stack.pop();
+                }
+                return returnVal;
             }
             else if (method.toLowerCase().equals("max"))
             {
@@ -740,7 +772,15 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                     Collection processable = new HashSet(coll); // No dups in HashSet
                     coll = processable;
                 }
-                return setexpr.max(paramExpr, this, state);
+
+                int stackSizeOrig = stack.size();
+                Object returnVal = setexpr.max(paramExpr, this, state);
+                while (stack.size() > stackSizeOrig)
+                {
+                    // Remove any expressions put on the stack while evaluating the aggregate
+                    stack.pop();
+                }
+                return returnVal;
             }
             else
             {
@@ -1070,20 +1110,20 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                 if (ec.getApiAdapter().isPersistent(value))
                 {
                     // Make sure this field is loaded
-                    ObjectProvider valueSM = ec.findObjectProvider(value);
-                    if (valueSM != null)
+                    ObjectProvider valueOP = ec.findObjectProvider(value);
+                    if (valueOP != null)
                     {
-                        AbstractMemberMetaData mmd = valueSM.getClassMetaData().getMetaDataForMember(fieldName);
+                        AbstractMemberMetaData mmd = valueOP.getClassMetaData().getMetaDataForMember(fieldName);
                         if (mmd == null)
                         {
-                            NucleusLogger.QUERY.error("Cannot find " + fieldName + " member of " + valueSM.getClassMetaData().getFullClassName());
+                            NucleusLogger.QUERY.error("Cannot find " + fieldName + " member of " + valueOP.getClassMetaData().getFullClassName());
                             return new InMemoryFailure();
                         }
                         if (mmd.getAbsoluteFieldNumber() >= 0)
                         {
                             // Field is managed so make sure it is loaded, and get its value
-                            valueSM.isLoaded(mmd.getAbsoluteFieldNumber());
-                            value = valueSM.provideField(mmd.getAbsoluteFieldNumber());
+                            valueOP.isLoaded(mmd.getAbsoluteFieldNumber());
+                            value = valueOP.provideField(mmd.getAbsoluteFieldNumber());
                             getValueByReflection = false;
                         }
                     }

@@ -72,7 +72,14 @@ public class SetExpression
     {
         if (itemIterator == null)
         {
-            return 0;
+            if (paramExpr.getSymbol() != null && Number.class.isAssignableFrom(paramExpr.getSymbol().getValueType()))
+            {
+                return 0;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         int i=0;
@@ -141,7 +148,14 @@ public class SetExpression
     {
         if (itemIterator == null)
         {
-            return 0;
+            if (paramExpr.getSymbol() != null && Number.class.isAssignableFrom(paramExpr.getSymbol().getValueType()))
+            {
+                return 0;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         int i=0;
@@ -210,7 +224,14 @@ public class SetExpression
     {
         if (itemIterator == null)
         {
-            return 0;
+            if (paramExpr.getSymbol() != null && Number.class.isAssignableFrom(paramExpr.getSymbol().getValueType()))
+            {
+                return 0;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         Object val = null;
@@ -297,7 +318,14 @@ public class SetExpression
     {
         if (itemIterator == null)
         {
-            return 0.0d;
+            if (paramExpr.getSymbol() != null && Number.class.isAssignableFrom(paramExpr.getSymbol().getValueType()))
+            {
+                return 0;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         // TODO This is based around JDOQL - return double/BigDecimal based on the type being averaged

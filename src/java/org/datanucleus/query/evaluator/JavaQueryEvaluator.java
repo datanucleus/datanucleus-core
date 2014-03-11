@@ -302,7 +302,10 @@ public abstract class JavaQueryEvaluator
         {
             return set;
         }
-    
+
+        // Store current results in case we have an aggregate in the filter
+        state.put(RESULTS_SET, set);
+
         List result = new ArrayList();
         Iterator it = set.iterator();
         if (NucleusLogger.QUERY.isDebugEnabled())
