@@ -98,6 +98,6 @@ public class OrderExpression extends Expression
         String nullOrderString = (this.nullOrder!=null ? 
                 ((this.nullOrder==NullOrderingType.NULLS_FIRST) ? "NULLS FIRST" : "NULLS LAST") : null);
         return "OrderExpression{" + left + " " + sortOrder + 
-                (nullOrderString != null ? " [" + nullOrderString + "]" : null) + "}";
+                (nullOrderString != null ? (" [" + nullOrderString + "]") : "") + "}";
     }
 }
