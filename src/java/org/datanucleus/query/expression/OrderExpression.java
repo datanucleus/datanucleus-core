@@ -90,7 +90,7 @@ public class OrderExpression extends Expression
 
     public Object evaluate(ExpressionEvaluator eval)
     {
-        return eval.evaluate(left);
+        return left.evaluate(eval);
     }
 
     public String toString()

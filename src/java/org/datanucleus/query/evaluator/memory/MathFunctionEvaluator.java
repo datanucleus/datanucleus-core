@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.QueryUtils;
+import org.datanucleus.query.expression.DyadicExpression;
 import org.datanucleus.query.expression.InvokeExpression;
 import org.datanucleus.query.expression.Literal;
 import org.datanucleus.query.expression.ParameterExpression;
@@ -62,6 +63,11 @@ public abstract class MathFunctionEvaluator implements InvocationEvaluator
         else if (param instanceof Literal)
         {
             paramValue = ((Literal)param).getLiteral();
+        }
+        else if (param instanceof DyadicExpression)
+        {
+            DyadicExpression dyExpr = (DyadicExpression)param;
+            paramValue = dyExpr.evaluate(eval);
         }
         else
         {
