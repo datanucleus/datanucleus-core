@@ -130,6 +130,10 @@ public class SetExpression
             {
                 memexpr = new StringAggregateExpression((String)result);
             }
+            else if (result instanceof InMemoryFailure)
+            {
+                return result;
+            }
             else
             {
                 throw new NucleusException("Evaluation of min() on object of type " + 
@@ -205,6 +209,10 @@ public class SetExpression
             else if (result instanceof String)
             {
                 memexpr = new StringAggregateExpression((String)result);
+            }
+            else if (result instanceof InMemoryFailure)
+            {
+                return result;
             }
             else
             {
@@ -304,6 +312,10 @@ public class SetExpression
                 }
                 memexpr = new BigDecimalAggregateExpression((BigDecimal)result);
             }
+            else if (result instanceof InMemoryFailure)
+            {
+                return result;
+            }
             else
             {
                 throw new NucleusException("Evaluation of sum() on object of type " + 
@@ -392,6 +404,10 @@ public class SetExpression
                     val = BigDecimal.ZERO;
                 }
                 memexpr = new BigDecimalAggregateExpression((BigDecimal)result);
+            }
+            else if (result instanceof InMemoryFailure)
+            {
+                return result;
             }
             else
             {
