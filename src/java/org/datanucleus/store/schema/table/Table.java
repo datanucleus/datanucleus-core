@@ -62,7 +62,7 @@ public interface Table
 
     Column getMultitenancyColumn();
 
-    // TODO Support getColumnsForMember to handle fields mapped to multiple columns, perhaps adding "ColumnMapping" that can hold multiple Columns and a single TypeConverter
+    // TODO Support getMemberColumnMapping to handle fields mapped to multiple columns
 
     /**
      * Accessor for the column for the specified member.
