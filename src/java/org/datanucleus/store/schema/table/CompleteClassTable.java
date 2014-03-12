@@ -118,29 +118,14 @@ public class CompleteClassTable implements Table
             }
 
             RelationType relationType = mmd.getRelationType(clr);
-            if (relationType == RelationType.NONE)
-            {
-                ColumnMetaData[] colmds = mmd.getColumnMetaData();
-                if (colmds != null && colmds.length > 1)
-                {
-                    // TODO Handle member with multiple columns
-                    throw new NucleusUserException("Dont currently support member having more than 1 column");
-                }
-                String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
-                ColumnImpl col = addColumn(columns, mmd, colName);
-                if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
-                {
-                    col.setPosition(colmds[0].getPosition());
-                }
-            }
-            else if (MetaDataUtils.getInstance().isMemberEmbedded(storeMgr.getMetaDataManager(), clr, mmd, relationType, null))
+            if (relationType != RelationType.NONE && MetaDataUtils.getInstance().isMemberEmbedded(storeMgr.getMetaDataManager(), clr, mmd, relationType, null))
             {
                 if (RelationType.isRelationSingleValued(relationType))
                 {
                     // Embedded PC field, so add columns for all fields of the embedded
                     List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>();
                     embMmds.add(mmd);
-                    processEmbeddedMember(columns, embMmds, clr);
+                    processEmbeddedMember(embMmds, clr);
                 }
                 else if (RelationType.isRelationMultiValued(relationType))
                 {
@@ -155,10 +140,10 @@ public class CompleteClassTable implements Table
                 if (colmds != null && colmds.length > 1)
                 {
                     // TODO Handle member with multiple columns
-                    throw new NucleusUserException("Dont currently support member having more than 1 column (member=" + mmd.getFullFieldName() + ")");
+                    throw new NucleusUserException("Dont currently support member having more than 1 column");
                 }
                 String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
-                ColumnImpl col = addColumn(columns, mmd, colName);
+                ColumnImpl col = addColumn(mmd, colName);
                 if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
                 {
                     col.setPosition(colmds[0].getPosition());
@@ -170,7 +155,7 @@ public class CompleteClassTable implements Table
         {
             // Add surrogate datastore-identity column
             String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.DATASTOREID_COLUMN);
-            ColumnImpl col = addColumn(columns, null, colName, ColumnType.DATASTOREID_COLUMN);
+            ColumnImpl col = addColumn(null, colName, ColumnType.DATASTOREID_COLUMN);
             if (cmd.getIdentityMetaData() != null && cmd.getIdentityMetaData().getColumnMetaData() != null && cmd.getIdentityMetaData().getColumnMetaData().getPosition() != null)
             {
                 col.setPosition(cmd.getIdentityMetaData().getColumnMetaData().getPosition());
@@ -185,7 +170,7 @@ public class CompleteClassTable implements Table
             if (vermd != null && vermd.getFieldName() == null)
             {
                 String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.VERSION_COLUMN);
-                ColumnImpl col = addColumn(columns, null, colName, ColumnType.VERSION_COLUMN);
+                ColumnImpl col = addColumn(null, colName, ColumnType.VERSION_COLUMN);
                 if (vermd.getColumnMetaData() != null && vermd.getColumnMetaData().getPosition() != null)
                 {
                     col.setPosition(vermd.getColumnMetaData().getPosition());
@@ -198,7 +183,7 @@ public class CompleteClassTable implements Table
         {
             // Add discriminator column
             String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.DISCRIMINATOR_COLUMN);
-            ColumnImpl col = addColumn(columns, null, colName, ColumnType.DISCRIMINATOR_COLUMN);
+            ColumnImpl col = addColumn(null, colName, ColumnType.DISCRIMINATOR_COLUMN);
             DiscriminatorMetaData dismd = cmd.getDiscriminatorMetaDataForTable();
             if (dismd != null && dismd.getColumnMetaData() != null && dismd.getColumnMetaData().getPosition() != null)
             {
@@ -217,7 +202,7 @@ public class CompleteClassTable implements Table
             else
             {
                 String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.MULTITENANCY_COLUMN);
-                Column col = addColumn(columns, null, colName, ColumnType.MULTITENANCY_COLUMN); // TODO Support column position
+                Column col = addColumn(null, colName, ColumnType.MULTITENANCY_COLUMN); // TODO Support column position
                 this.multitenancyColumn = col;
             }
         }
@@ -269,7 +254,7 @@ public class CompleteClassTable implements Table
         }*/
     }
 
-    protected void processEmbeddedMember(List<Column> columns, List<AbstractMemberMetaData> mmds, ClassLoaderResolver clr)
+    protected void processEmbeddedMember(List<AbstractMemberMetaData> mmds, ClassLoaderResolver clr)
     {
         AbstractMemberMetaData lastMmd = mmds.get(mmds.size()-1);
         EmbeddedMetaData embmd = mmds.get(0).getEmbeddedMetaData();
@@ -299,7 +284,7 @@ public class CompleteClassTable implements Table
                     // Nested embedded PC, so recurse
                     List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
                     embMmds.add(mmd);
-                    processEmbeddedMember(columns, embMmds, clr);
+                    processEmbeddedMember(embMmds, clr);
                 }
                 else
                 {
@@ -312,17 +297,17 @@ public class CompleteClassTable implements Table
                 List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
                 embMmds.add(mmd);
                 String colName = namingFactory.getColumnName(embMmds, 0);
-                addEmbeddedColumn(columns, embMmds, colName); // TODO Support column position
+                addEmbeddedColumn(embMmds, colName); // TODO Support column position
             }
         }
     }
 
-    protected ColumnImpl addColumn(List<Column> cols, AbstractMemberMetaData mmd, String colName)
+    protected ColumnImpl addColumn(AbstractMemberMetaData mmd, String colName)
     {
-        return addColumn(cols, mmd, colName, ColumnType.COLUMN);
+        return addColumn(mmd, colName, ColumnType.COLUMN);
     }
 
-    protected ColumnImpl addColumn(List<Column> cols, AbstractMemberMetaData mmd, String colName, ColumnType colType)
+    protected ColumnImpl addColumn(AbstractMemberMetaData mmd, String colName, ColumnType colType)
     {
         ColumnImpl col = new ColumnImpl(this, colName, colType);
         if (mmd != null)
@@ -343,18 +328,18 @@ public class CompleteClassTable implements Table
             }
             columnAttributer.attributeColumn(col, null);
         }
-        cols.add(col);
+        columns.add(col);
         return col;
     }
 
-    protected ColumnImpl addEmbeddedColumn(List<Column> cols, List<AbstractMemberMetaData> mmds, String colName)
+    protected ColumnImpl addEmbeddedColumn(List<AbstractMemberMetaData> mmds, String colName)
     {
         ColumnImpl col = new ColumnImpl(this, colName, ColumnType.COLUMN);
         if (mmds != null && mmds.size() > 0)
         {
             col.setMemberMetaData(mmds.get(mmds.size()-1));
         }
-        cols.add(col);
+        columns.add(col);
         columnAttributer.attributeEmbeddedColumn(col, mmds);
         columnByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(mmds), col);
         return col;
