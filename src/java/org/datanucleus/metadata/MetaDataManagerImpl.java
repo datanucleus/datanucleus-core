@@ -742,7 +742,12 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                                 fileMetaData.add(filemd);
                             }
                         }
-                        catch (Exception e)
+                        catch (ClassNotResolvedException e)
+                        {
+                            // log and ignore this exception
+                            NucleusLogger.METADATA.error(StringUtils.getStringFromStackTrace(e));
+                        }
+                        catch (Throwable e)
                         {
                             exceptions.add(e);
                         }
@@ -836,7 +841,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             }
 
             ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(loader);
-            HashSet exceptions = new HashSet();
+            Set<Throwable> exceptions = new HashSet();
             ArrayList fileMetaData = new ArrayList();
 
             // Generate list of XML files
@@ -1066,7 +1071,12 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                                         pumd.getName() + " but not annotated, so ignoring");
                             }
                         }
-                        catch (Exception e)
+                        catch (ClassNotResolvedException e)
+                        {
+                            // log and ignore this exception
+                            NucleusLogger.METADATA.error(StringUtils.getStringFromStackTrace(e));
+                        }
+                        catch (Throwable e)
                         {
                             exceptions.add(e);
                         }
@@ -1079,8 +1089,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             }
             if (exceptions.size() > 0)
             {
-                throw new NucleusUserException(LOCALISER.msg("044023", pumd.getName()),
-                    (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
+                throw new NucleusUserException(LOCALISER.msg("044023", pumd.getName()), exceptions.toArray(new Throwable[exceptions.size()]));
             }
 
             if (fileMetaData.size() > 0)
