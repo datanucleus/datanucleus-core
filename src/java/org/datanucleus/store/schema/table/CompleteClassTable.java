@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.PropertyNames;
-import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
@@ -136,11 +135,13 @@ public class CompleteClassTable implements Table
             }
             else
             {
+                // TODO Get TypeConverter to be used and extract from that the number of columns (in case user hasn't specified metadata)
                 ColumnMetaData[] colmds = mmd.getColumnMetaData();
                 if (colmds != null && colmds.length > 1)
                 {
                     // TODO Handle member with multiple columns
-                    throw new NucleusUserException("Dont currently support member having more than 1 column");
+                    NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is requested as having multiple columns. This is not yet supported. Using single column");
+//                    throw new NucleusUserException("Dont currently support member having more than 1 column");
                 }
                 String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
                 ColumnImpl col = addColumn(mmd, colName);
