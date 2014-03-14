@@ -1069,7 +1069,21 @@ public class TypeConversionHelper
         int nanos = 0;
         if (numbers.length > 6)
         {
-            nanos = numbers[6];
+            String zeroedNanos = "" + numbers[6];
+            if (zeroedNanos.length() < 9)
+            {
+                // Add trailing zeros
+                int numZerosToAdd = 9-zeroedNanos.length();
+                for (int i=0;i<numZerosToAdd;i++)
+                {
+                    zeroedNanos += "0";
+                }
+                nanos = Integer.valueOf(zeroedNanos);
+            }
+            else
+            {
+                nanos = numbers[6];
+            }
         }
 
         Calendar thecal = cal;
@@ -1120,6 +1134,10 @@ public class TypeConversionHelper
                     list.add(Integer.valueOf(str.substring(start, i)));
                     start = -1;
                 }
+            }
+            if (i == str.length()-1 && start >= 0)
+            {
+                list.add(Integer.valueOf(str.substring(start)));
             }
         }
 
