@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.types.simple;
 
 import java.io.ObjectStreamException;
+import java.sql.Timestamp;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.FetchPlanState;
@@ -69,7 +70,9 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO
      */
     public Object getValue()
     {
-        return new java.sql.Timestamp(getTime());
+        Timestamp ts = new java.sql.Timestamp(getTime());
+        ts.setNanos(getNanos());
+        return ts;
     }
 
     /**
@@ -121,7 +124,9 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO
      */
     public Object detachCopy(FetchPlanState state)
     {
-        return new java.sql.Timestamp(getTime());
+        Timestamp ts = new java.sql.Timestamp(getTime());
+        ts.setNanos(getNanos());
+        return ts;
     }
 
     /**
@@ -304,6 +309,8 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO
      */
 	protected Object writeReplace() throws ObjectStreamException
 	{
-		return new java.sql.Timestamp(this.getTime());
+        Timestamp ts = new java.sql.Timestamp(getTime());
+        ts.setNanos(getNanos());
+        return ts;
 	}     
 }
