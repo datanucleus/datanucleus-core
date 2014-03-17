@@ -39,7 +39,7 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Registry of java type support.
+ * Implementation of registry of java type support.
  * Provides information applicable to all datastores for how a field of a class is treated; 
  * whether it is by default persistent, whether it is by default embedded, whether it is in the DFG, 
  * and if it has a wrapper for SCO operations. Also stores whether the type can be converted to/from
@@ -683,9 +683,13 @@ public class TypeManagerImpl implements TypeManager, Serializable
                             }
                         }
 
-                        JavaType type = new JavaType(cls, genericType, embedded, dfg, wrapperClass, 
-                            wrapperClassBacked, typeConverterName);
-                        addJavaType(type);
+                        String typeName = cls.getName();
+                        if (genericType != null)
+                        {
+                            // "Collection<String>"
+                            typeName += "<" + genericType.getName() + ">";
+                        }
+                        javaTypes.put(typeName, new JavaType(cls, genericType, embedded, dfg, wrapperClass, wrapperClassBacked, typeConverterName));
                     }
                 }
                 catch (ClassNotResolvedException cnre)
@@ -702,17 +706,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
         {
             NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("016006", StringUtils.collectionToString(javaTypes.keySet())));
         }
-    }
-
-    protected void addJavaType(JavaType type)
-    {
-        String typeName = type.cls.getName();
-        if (type.genericType != null)
-        {
-            // "Collection<String>"
-            typeName += "<" + type.genericType.getName() + ">";
-        }
-        javaTypes.put(typeName, type);
     }
 
     /**

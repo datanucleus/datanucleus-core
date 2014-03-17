@@ -1,32 +1,56 @@
+/**********************************************************************
+Copyright (c) 2014 Andy Jefferson and others. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Contributors:
+    ...
+**********************************************************************/
 package org.datanucleus.store.types;
 
 import java.util.Set;
 
 import org.datanucleus.store.types.converters.TypeConverter;
 
+/**
+ * Registry of java type support.
+ * Provides information applicable to all datastores for how a field of a class is treated; 
+ * whether it is by default persistent, whether it is by default embedded, whether it is in the DFG, 
+ * and if it has a wrapper for SCO operations. Also stores whether the type can be converted to/from
+ * a String (for datastores that don't provide storage natively).
+ * Uses the plugin mechanism extension-point "org.datanucleus.java_type".
+ */
 public interface TypeManager
 {
-
     /**
      * Accessor for the supported second-class Types.
      * This may or may not be a complete list, just that it provides the principal ones.
      * @return Set of supported types (fully qualified class names).
      **/
-    public abstract Set<String> getSupportedSecondClassTypes();
+    Set<String> getSupportedSecondClassTypes();
 
     /**
      * Accessor for whether a class is supported as being second class.
      * @param className The class name
      * @return Whether the class is supported (to some degree)
      */
-    public abstract boolean isSupportedSecondClassType(String className);
+    boolean isSupportedSecondClassType(String className);
 
     /**
      * Convenience method to filter out any supported classes from a list.
      * @param inputClassNames Names of the classes
      * @return Names of the classes (omitting supported types)
      */
-    public abstract String[] filterOutSupportedSecondClassNames(String[] inputClassNames);
+    String[] filterOutSupportedSecondClassNames(String[] inputClassNames);
 
     /**
      * Accessor for whether the type is by default persistent.
@@ -34,14 +58,14 @@ public interface TypeManager
      * @param c The type
      * @return Whether persistent
      */
-    public abstract boolean isDefaultPersistent(Class c);
+    boolean isDefaultPersistent(Class c);
 
     /**
      * Accessor for whether the type is by default in the DFG.
      * @param c The type
      * @return Whether in the DFG
      */
-    public abstract boolean isDefaultFetchGroup(Class c);
+    boolean isDefaultFetchGroup(Class c);
 
     /**
      * Accessor for whether the generic collection type is by default in the DFG.
@@ -49,28 +73,28 @@ public interface TypeManager
      * @param genericType The element generic type
      * @return Whether in the DFG
      */
-    public abstract boolean isDefaultFetchGroupForCollection(Class c, Class genericType);
+    boolean isDefaultFetchGroupForCollection(Class c, Class genericType);
 
     /**
      * Accessor for whether the type is by default embedded.
      * @param c The type
      * @return Whether embedded
      */
-    public abstract boolean isDefaultEmbeddedType(Class c);
+    boolean isDefaultEmbeddedType(Class c);
 
     /**
      * Accessor for whether the type is SCO mutable.
      * @param className The type
      * @return Whether SCO mutable
      */
-    public abstract boolean isSecondClassMutableType(String className);
+    boolean isSecondClassMutableType(String className);
 
     /**
      * Accessor for the SCO wrapper for the type
      * @param className The type
      * @return SCO wrapper
      */
-    public abstract Class getWrapperTypeForType(String className);
+    Class getWrapperTypeForType(String className);
 
     /**
      * Accessor for the backing-store Second Class Wrapper class for the supplied class.
@@ -79,14 +103,14 @@ public interface TypeManager
      * @param className The class name
      * @return The second class wrapper
      */
-    public abstract Class getWrappedTypeBackedForType(String className);
+    Class getWrappedTypeBackedForType(String className);
 
     /**
      * Accessor for whether the type is a SCO wrapper itself.
      * @param className The type
      * @return Whether is SCO wrapper
      */
-    public abstract boolean isSecondClassWrapper(String className);
+    boolean isSecondClassWrapper(String className);
 
     /**
      * Accessor for a java type that the supplied class is a SCO wrapper for.
@@ -94,7 +118,7 @@ public interface TypeManager
      * @param className Name of the class
      * @return The java class that this is a wrapper for (or null)
      */
-    public abstract Class getTypeForSecondClassWrapper(String className);
+    Class getTypeForSecondClassWrapper(String className);
 
     /**
      * Accessor for the type converter with the provided name.
@@ -102,7 +126,7 @@ public interface TypeManager
      * @param converterName Name of the converter
      * @return The converter
      */
-    public abstract TypeConverter getTypeConverterForName(String converterName);
+    TypeConverter getTypeConverterForName(String converterName);
 
     /**
      * Register a TypeConverter with the TypeManager process.
@@ -110,7 +134,7 @@ public interface TypeManager
      * @param converter The converter
      * @param autoApply Whether this should be used as an auto-apply converter
      */
-    public abstract void registerConverter(String name, TypeConverter converter, boolean autoApply, String autoApplyType);
+    void registerConverter(String name, TypeConverter converter, boolean autoApply, String autoApplyType);
 
     /**
      * TypeConverters are registered either from the contents of "plugin.xml" (i.e the builtin types) where the
@@ -119,7 +143,7 @@ public interface TypeManager
      * @param name The name to register the converter under
      * @param converter The converter
      */
-    public abstract void registerConverter(String name, TypeConverter converter);
+    void registerConverter(String name, TypeConverter converter);
 
     /**
      * Method to return a TypeConverter that should be applied by default for the specified java (member) type.
@@ -127,14 +151,14 @@ public interface TypeManager
      * @param memberType The java (member) type
      * @return The converter to use by default
      */
-    public abstract TypeConverter getAutoApplyTypeConverterForType(Class memberType);
+    TypeConverter getAutoApplyTypeConverterForType(Class memberType);
 
     /**
      * Accessor for the default type converter for the provided Java type.
      * @param memberType Java type for the member
      * @return The default converter (if any)
      */
-    public abstract TypeConverter getDefaultTypeConverterForType(Class memberType);
+    TypeConverter getDefaultTypeConverterForType(Class memberType);
 
     /**
      * Accessor for the type converter for the provided Java type and its datastore type.
@@ -142,6 +166,5 @@ public interface TypeManager
      * @param datastoreType Java type for the datastore
      * @return The converter (if any)
      */
-    public abstract TypeConverter getTypeConverterForType(Class memberType, Class datastoreType);
-
+    TypeConverter getTypeConverterForType(Class memberType, Class datastoreType);
 }
