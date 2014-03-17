@@ -37,7 +37,6 @@ import org.datanucleus.ClassLoaderResolverImpl;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.PersistenceNucleusContextImpl;
 import org.datanucleus.plugin.PluginManager;
-import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.store.types.converters.TypeConverterHelper;
 

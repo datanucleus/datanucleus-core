@@ -30,6 +30,7 @@ import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.properties.CorePropertyValidator;
 import org.datanucleus.store.types.TypeManager;
+import org.datanucleus.store.types.TypeManagerImpl;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -208,7 +209,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
     {
         if (typeManager == null)
         {
-            this.typeManager = new TypeManager(this);
+            this.typeManager = new TypeManagerImpl(this);
         }
         return typeManager;
     }
