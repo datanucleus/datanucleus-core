@@ -267,8 +267,7 @@ public interface ExecutionContext
      * @param ownerOP Owner ObjectProvider
      * @param ownerFieldNumber Field number in owner object where this is stored
      */
-    ObjectProvider newObjectProviderForEmbedded(Object pc, boolean copyPc, 
-            ObjectProvider ownerOP, int ownerFieldNumber);
+    ObjectProvider newObjectProviderForEmbedded(Object pc, boolean copyPc, ObjectProvider ownerOP, int ownerFieldNumber);
 
     /**
      * Constructs an ObjectProvider for an object of the specified type, creating the PC object to hold the values
@@ -278,16 +277,7 @@ public interface ExecutionContext
      * @param ownerOP Owner ObjectProvider
      * @param ownerFieldNumber Field number in owner object where this is stored
      */
-    ObjectProvider newObjectProviderForEmbedded(AbstractClassMetaData cmd, 
-            ObjectProvider ownerOP, int ownerFieldNumber);
-
-    /**
-     * Constructor for creating ObjectProvider instances to manage persistable objects in detached state.
-     * @param pc the detached object
-     * @param id the identity of the object.
-     * @param version the detached version
-     */
-    ObjectProvider newObjectProviderForDetached(Object pc, Object id, Object version);
+    ObjectProvider newObjectProviderForEmbedded(AbstractClassMetaData cmd, ObjectProvider ownerOP, int ownerFieldNumber);
 
     /**
      * Method to add the object managed by the specified ObjectProvider to the cache.

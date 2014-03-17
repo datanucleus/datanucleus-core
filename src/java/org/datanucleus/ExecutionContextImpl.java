@@ -1287,17 +1287,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Constructor for creating ObjectProvider instances to manage persistable objects in detached state.
-     * @param pc the detached object
-     * @param id the identity of the object.
-     * @param version the detached version
-     */
-    public ObjectProvider newObjectProviderForDetached(Object pc, Object id, Object version)
-    {
-        return nucCtx.getObjectProviderFactory().newForDetached(this, pc, id, version);
-    }
-
-    /**
      * Method to add the ObjectProvider for an object to this context's list.
      * @param op The ObjectProvider
      * @param pc The object managed by the ObjectProvider
@@ -2536,7 +2525,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("010016", StringUtils.toJVMIDString(pc)));
             }
-            ObjectProvider op = newObjectProviderForDetached(pc, id, api.getVersionForObject(pc));
+            ObjectProvider op = nucCtx.getObjectProviderFactory().newForDetached(this, pc, id, api.getVersionForObject(pc));
             op.attach(sco);
         }
         else
