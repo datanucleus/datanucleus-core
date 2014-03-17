@@ -39,6 +39,7 @@ import org.datanucleus.PersistenceNucleusContextImpl;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.store.types.converters.TypeConverterHelper;
 
 /**
  * Component tests for the TypeManager class.
@@ -241,11 +242,11 @@ public class TypeManagerTest extends TestCase
     public void testGetDatastoreTypeForTypeConverter()
     {
         TypeConverter conv1 = typeMgr.getTypeConverterForType(URL.class, String.class);
-        Class cls1 = TypeManager.getDatastoreTypeForTypeConverter(conv1, URL.class);
+        Class cls1 = TypeConverterHelper.getDatastoreTypeForTypeConverter(conv1, URL.class);
         assertEquals(String.class, cls1);
 
         TypeConverter conv2 = typeMgr.getTypeConverterForName("dn.date-long");
-        Class cls2 = TypeManager.getDatastoreTypeForTypeConverter(conv2, Date.class);
+        Class cls2 = TypeConverterHelper.getDatastoreTypeForTypeConverter(conv2, Date.class);
         assertEquals(Long.class, cls2);
     }
 
