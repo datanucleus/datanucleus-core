@@ -1240,7 +1240,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * Constructs an ObjectProvider to manage a hollow instance having the given object ID.
      * This constructor is used for creating new instances of existing persistent objects.
      * @param pcClass the class of the new instance to be created.
-     * @param id the JDO identity of the object.
+     * @param id the identity of the object.
      */
     public ObjectProvider newObjectProviderForHollow(Class pcClass, Object id)
     {
@@ -1248,32 +1248,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Constructs an ObjectProvider to manage a hollow instance having the given object ID.
-     * The instance is already supplied.
-     * @param id the JDO identity of the object.
-     * @param pc The object that is hollow that we are going to manage
-     */
-    public ObjectProvider newObjectProviderForHollowPreConstructed(Object id, Object pc)
-    {
-        return nucCtx.getObjectProviderFactory().newForHollowPreConstructed(this, id, pc);
-    }
-
-    /**
-     * Constructs an ObjectProvider to manage a recently populated hollow instance having the
-     * given object ID and the given field values. This constructor is used for
-     * creating new instances of persistent objects obtained e.g. via a Query or backed by a view.
-     * @param pcClass the class of the new instance to be created.
-     * @param id the JDO identity of the object.
-     * @param fv the initial field values of the object.
-     */
-    public ObjectProvider newObjectProviderForHollowPopulated(Class pcClass, Object id, FieldValues fv)
-    {
-        return nucCtx.getObjectProviderFactory().newForHollow(this, pcClass, id, fv);
-    }
-
-    /**
      * Constructs an ObjectProvider to manage the specified persistent instance having the given object ID.
-     * @param id the JDO identity of the object.
+     * @param id the identity of the object.
      * @param pc The object that is persistent that we are going to manage
      */
     public ObjectProvider newObjectProviderForPersistentClean(Object id, Object pc)
@@ -1311,63 +1287,14 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Constructs an ObjectProvider to manage a transient instance that is becoming newly persistent.
-     * A new object ID for the instance is obtained from the store manager and the object is inserted
-     * in the data store. This constructor is used for assigning ObjectProviders to existing
-     * instances that are transitioning to a persistent state.
-     * @param pc the instance being make persistent.
-     * @param preInsertChanges Any changes to make before inserting
-     */
-    public ObjectProvider newObjectProviderForPersistentNew(Object pc, FieldValues preInsertChanges)
-    {
-        return nucCtx.getObjectProviderFactory().newForPersistentNew(this, pc, preInsertChanges);
-    }
-
-    /**
-     * Constructs an ObjectProvider to manage a Transactional-Transient instance.
-     * A new object ID for the instance is obtained from the store manager and
-     * the object is inserted in the data store.
-     * This constructor is used for assigning state managers to Transient
-     * instances that are transitioning to a transient clean state.
-     * @param pc the instance being make persistent.
-     */
-    public ObjectProvider newObjectProviderForTransactionalTransient(Object pc)
-    {
-        return nucCtx.getObjectProviderFactory().newForTransactionalTransient(this, pc);
-    }
-
-    /**
      * Constructor for creating ObjectProvider instances to manage persistable objects in detached state.
      * @param pc the detached object
-     * @param id the JDO identity of the object.
+     * @param id the identity of the object.
      * @param version the detached version
      */
     public ObjectProvider newObjectProviderForDetached(Object pc, Object id, Object version)
     {
         return nucCtx.getObjectProviderFactory().newForDetached(this, pc, id, version);
-    }
-
-    /**
-     * Constructor for creating ObjectProvider instances to manage persistable objects that are not persistent yet
-     * are about to be deleted. Consequently the initial lifecycle state will be P_NEW, but will soon
-     * move to P_NEW_DELETED.
-     * @param pc the object being deleted from persistence
-     */
-    public ObjectProvider newObjectProviderForPNewToBeDeleted(Object pc)
-    {
-        return nucCtx.getObjectProviderFactory().newForPNewToBeDeleted(this, pc);
-    }
-
-    /**
-     * Constructor to create a ObjectProvider for an object taken from the L2 cache with the specified id.
-     * Creates an object that the cached object represents, assigns a ObjectProvider to it, and copies across the 
-     * fields that were cached, and assigns a version (if available).
-     * @param id Id to assign to the persistable object
-     * @param cachedPC CachedPC object from the L2 cache
-     */
-    protected ObjectProvider newObjectProviderForCachedPC(Object id, CachedPC cachedPC)
-    {
-        return nucCtx.getObjectProviderFactory().newForCachedPC(this, id, cachedPC);
     }
 
     /**
@@ -2124,7 +2051,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         else
                         {
                             // FCO object
-                            op = newObjectProviderForPersistentNew(obj, preInsertChanges);
+                            op = nucCtx.getObjectProviderFactory().newForPersistentNew(this, obj, preInsertChanges);
                             op.makePersistent();
                             id = op.getInternalObjectId();
                         }
@@ -2440,7 +2367,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 }
 
                 // Put ObjectProvider around object so it is P_NEW (unpersisted), then P_NEW_DELETED soon after
-                op = newObjectProviderForPNewToBeDeleted(pc);
+                op = nucCtx.getObjectProviderFactory().newForPNewToBeDeleted(this, pc);
             }
 
             if (l2CacheTxIds != null && nucCtx.isClassCacheable(op.getClassMetaData()))
@@ -2519,7 +2446,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             ObjectProvider op = findObjectProvider(obj);
             if (op == null)
             {
-                op = newObjectProviderForTransactionalTransient(obj);
+                op = nucCtx.getObjectProviderFactory().newForTransactionalTransient(this, obj);
             }
             op.makeTransactional();
         }
@@ -3112,7 +3039,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 }
 
                 createdHollow = true;
-                op = newObjectProviderForHollowPopulated(cls, id, fv);
+                op = nucCtx.getObjectProviderFactory().newForHollow(this, cls, id, fv);
                 pc = op.getObject();
                 putObjectIntoLevel1Cache(op);
                 putObjectIntoLevel2Cache(op, false);
@@ -5276,7 +5203,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             if (cachedPC != null)
             {
                 // Create active version of cached object with ObjectProvider connected and same id
-                ObjectProvider op = newObjectProviderForCachedPC(id, cachedPC);
+                ObjectProvider op = nucCtx.getObjectProviderFactory().newForCachedPC(this, id, cachedPC);
                 pc = op.getObject(); // Object in P_CLEAN state
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
@@ -5333,7 +5260,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 if (cachedPC != null)
                 {
                     // Create active version of cached object with ObjectProvider connected and same id
-                    ObjectProvider op = newObjectProviderForCachedPC(id, cachedPC);
+                    ObjectProvider op = nucCtx.getObjectProviderFactory().newForCachedPC(this, id, cachedPC);
                     Object pc = op.getObject(); // Object in P_CLEAN state
                     if (NucleusLogger.CACHE.isDebugEnabled())
                     {
@@ -6007,5 +5934,18 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return opAssociatedValuesMapByOP.get(op).containsKey(key);
         }
         return false;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.ExecutionContext#clearObjectProviderAssociatedValues(org.datanucleus.state.ObjectProvider)
+     */
+    @Override
+    public void clearObjectProviderAssociatedValues(ObjectProvider op)
+    {
+        if (opAssociatedValuesMapByOP != null)
+        {
+            opAssociatedValuesMapByOP.remove(op);
+        }
+        
     }
 }

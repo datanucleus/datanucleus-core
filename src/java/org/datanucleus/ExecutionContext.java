@@ -247,31 +247,13 @@ public interface ExecutionContext
      * Constructs an ObjectProvider to manage a hollow instance having the given object ID.
      * This constructor is used for creating new instances of existing persistent objects.
      * @param pcClass the class of the new instance to be created.
-     * @param id the JDO identity of the object.
+     * @param id the identity of the object.
      */
     ObjectProvider newObjectProviderForHollow(Class pcClass, Object id);
 
     /**
-     * Constructs an ObjectProvider to manage a hollow instance having the given object ID.
-     * The instance is already supplied.
-     * @param id the JDO identity of the object.
-     * @param pc The object that is hollow that we are going to manage
-     */
-    ObjectProvider newObjectProviderForHollowPreConstructed(Object id, Object pc);
-
-    /**
-     * Constructs an ObjectProvider to manage a recently populated hollow instance having the
-     * given object ID and the given field values. This constructor is used for
-     * creating new instances of persistent objects obtained e.g. via a Query or backed by a view.
-     * @param pcClass the class of the new instance to be created.
-     * @param id the JDO identity of the object.
-     * @param fv the initial field values of the object.
-     */
-    ObjectProvider newObjectProviderForHollowPopulated(Class pcClass, Object id, FieldValues fv);
-
-    /**
      * Constructs an ObjectProvider to manage the specified persistent instance having the given object ID.
-     * @param id the JDO identity of the object.
+     * @param id the identity of the object.
      * @param pc The object that is persistent that we are going to manage
      */
     ObjectProvider newObjectProviderForPersistentClean(Object id, Object pc);
@@ -300,42 +282,12 @@ public interface ExecutionContext
             ObjectProvider ownerOP, int ownerFieldNumber);
 
     /**
-     * Constructs an ObjectProvider to manage a transient instance that is 
-     * becoming newly persistent.  A new object ID for the
-     * instance is obtained from the store manager and the object is inserted
-     * in the data store.
-     * This constructor is used for assigning state managers to existing
-     * instances that are transitioning to a persistent state.
-     * @param pc the instance being make persistent.
-     * @param fv Any changes to make before inserting
-     */
-    ObjectProvider newObjectProviderForPersistentNew(Object pc, FieldValues fv);
-
-    /**
-     * Constructs an ObjectProvider to manage a Transactional Transient instance.
-     * A new object ID for the instance is obtained from the store manager and
-     * the object is inserted in the data store.
-     * This constructor is used for assigning state managers to Transient
-     * instances that are transitioning to a transient clean state.
-     * @param pc the instance being make persistent.
-     */
-    ObjectProvider newObjectProviderForTransactionalTransient(Object pc);
-
-    /**
      * Constructor for creating ObjectProvider instances to manage persistable objects in detached state.
      * @param pc the detached object
-     * @param id the JDO identity of the object.
+     * @param id the identity of the object.
      * @param version the detached version
      */
     ObjectProvider newObjectProviderForDetached(Object pc, Object id, Object version);
-
-    /**
-     * Constructor for creating ObjectProvider instances to manage persistable objects that are not persistent yet
-     * are about to be deleted. Consequently the initial lifecycle state will be P_NEW, but will soon
-     * move to P_NEW_DELETED.
-     * @param pc the object being deleted from persistence
-     */
-    ObjectProvider newObjectProviderForPNewToBeDeleted(Object pc);
 
     /**
      * Method to add the object managed by the specified ObjectProvider to the cache.
@@ -812,6 +764,12 @@ public interface ExecutionContext
     void flushOperationsForBackingStore(Store backingStore, ObjectProvider op);
 
     /**
+     * Convenience method to inspect the list of objects with outstanding changes to flush.
+     * @return ObjectProviders for the objects to be flushed.
+     */
+    List<ObjectProvider> getObjectsToBeFlushed();
+
+    /**
      * Accessor for whether this context is multithreaded.
      * @return Whether multithreaded (and hence needing locking)
      */
@@ -835,12 +793,6 @@ public interface ExecutionContext
      * @return Whether in the process of managing relations
      */
     boolean isManagingRelations();
-
-    /**
-     * Convenience method to inspect the list of objects with outstanding changes to flush.
-     * @return ObjectProviders for the objects to be flushed.
-     */
-    List<ObjectProvider> getObjectsToBeFlushed();
 
     /**
      * Retrieve the callback handler for this PM
@@ -1001,4 +953,5 @@ public interface ExecutionContext
     Object getObjectProviderAssociatedValue(ObjectProvider op, Object key);
     void removeObjectProviderAssociatedValue(ObjectProvider op, Object key);
     boolean containsObjectProviderAssociatedValue(ObjectProvider op, Object key);
+    void clearObjectProviderAssociatedValues(ObjectProvider op);
 }

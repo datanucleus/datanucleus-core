@@ -203,6 +203,7 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
             provideFields(fieldNumbers, new UnsetOwnerFieldManager());
         }
 
+        myEC.clearObjectProviderAssociatedValues(this);
         myEC.removeObjectProvider(this);
         persistenceFlags = PersistenceFlags.READ_WRITE_OK;
         myPC.jdoReplaceFlags();
