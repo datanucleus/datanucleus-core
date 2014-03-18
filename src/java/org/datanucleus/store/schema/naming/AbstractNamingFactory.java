@@ -221,7 +221,11 @@ public abstract class AbstractNamingFactory implements NamingFactory
             return prepareIdentifierNameForUse(idxmd.getName(), SchemaComponent.CONSTRAINT);
         }
 
-        String idxName = cmd.getName() + wordSeparator + position + wordSeparator + "IDX";
+        String idxName = idxmd.getName();
+        if (idxName == null)
+        {
+            idxName = cmd.getName() + wordSeparator + position + wordSeparator + "IDX";
+        }
         return prepareIdentifierNameForUse(idxName, SchemaComponent.CONSTRAINT);
     }
 
@@ -236,7 +240,41 @@ public abstract class AbstractNamingFactory implements NamingFactory
             return prepareIdentifierNameForUse(idxmd.getName(), SchemaComponent.CONSTRAINT);
         }
 
-        String idxName = mmd.getClassName(false) + wordSeparator + mmd.getName() + wordSeparator + "IDX";
+        String idxName = idxmd.getName();
+        if (idxName == null)
+        {
+            idxName = mmd.getClassName(false) + wordSeparator + mmd.getName() + wordSeparator + "IDX";
+        }
+        return prepareIdentifierNameForUse(idxName, SchemaComponent.CONSTRAINT);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.naming.NamingFactory#getIndexName(org.datanucleus.metadata.AbstractClassMetaData, org.datanucleus.metadata.IndexMetaData, org.datanucleus.store.schema.naming.ColumnType)
+     */
+    @Override
+    public String getIndexName(AbstractClassMetaData cmd, IndexMetaData idxmd, ColumnType type)
+    {
+        if (!StringUtils.isWhitespace(idxmd.getName()))
+        {
+            return prepareIdentifierNameForUse(idxmd.getName(), SchemaComponent.CONSTRAINT);
+        }
+
+        String idxName = idxmd.getName();
+        if (idxName == null)
+        {
+            if (type == ColumnType.DATASTOREID_COLUMN)
+            {
+                idxName = cmd.getName() + wordSeparator + "DATASTORE" + wordSeparator + "IDX";
+            }
+            else if (type == ColumnType.VERSION_COLUMN)
+            {
+                idxName = cmd.getName() + wordSeparator + "VERSION" + wordSeparator + "IDX";
+            }
+            else if (type == ColumnType.MULTITENANCY_COLUMN)
+            {
+                idxName = cmd.getName() + wordSeparator + "TENANT" + wordSeparator + "IDX";
+            }
+        }
         return prepareIdentifierNameForUse(idxName, SchemaComponent.CONSTRAINT);
     }
 

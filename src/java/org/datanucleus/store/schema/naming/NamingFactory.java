@@ -137,6 +137,15 @@ public interface NamingFactory
      */
     String getIndexName(AbstractMemberMetaData mmd, IndexMetaData idxmd);
 
+    /**
+     * Method to return the name of the index for the specified class (version, datastore-id, discriminator etc).
+     * @param cmd Metadata for the class
+     * @param idxmd The index metadata
+     * @param type Column type
+     * @return Name of the index
+     */
+    String getIndexName(AbstractClassMetaData cmd, IndexMetaData idxmd, ColumnType type);
+
     // TODO Support foreign-key naming
 
     /**
