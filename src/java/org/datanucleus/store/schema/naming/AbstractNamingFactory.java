@@ -216,16 +216,12 @@ public abstract class AbstractNamingFactory implements NamingFactory
     @Override
     public String getIndexName(AbstractClassMetaData cmd, IndexMetaData idxmd, int position)
     {
-        if (!StringUtils.isWhitespace(idxmd.getName()))
+        if (idxmd != null && !StringUtils.isWhitespace(idxmd.getName()))
         {
             return prepareIdentifierNameForUse(idxmd.getName(), SchemaComponent.CONSTRAINT);
         }
 
-        String idxName = idxmd.getName();
-        if (idxName == null)
-        {
-            idxName = cmd.getName() + wordSeparator + position + wordSeparator + "IDX";
-        }
+        String idxName = cmd.getName() + wordSeparator + position + wordSeparator + "IDX";
         return prepareIdentifierNameForUse(idxName, SchemaComponent.CONSTRAINT);
     }
 
@@ -235,16 +231,12 @@ public abstract class AbstractNamingFactory implements NamingFactory
     @Override
     public String getIndexName(AbstractMemberMetaData mmd, IndexMetaData idxmd)
     {
-        if (!StringUtils.isWhitespace(idxmd.getName()))
+        if (idxmd != null && !StringUtils.isWhitespace(idxmd.getName()))
         {
             return prepareIdentifierNameForUse(idxmd.getName(), SchemaComponent.CONSTRAINT);
         }
 
-        String idxName = idxmd.getName();
-        if (idxName == null)
-        {
-            idxName = mmd.getClassName(false) + wordSeparator + mmd.getName() + wordSeparator + "IDX";
-        }
+        String idxName = mmd.getClassName(false) + wordSeparator + mmd.getName() + wordSeparator + "IDX";
         return prepareIdentifierNameForUse(idxName, SchemaComponent.CONSTRAINT);
     }
 
@@ -254,26 +246,27 @@ public abstract class AbstractNamingFactory implements NamingFactory
     @Override
     public String getIndexName(AbstractClassMetaData cmd, IndexMetaData idxmd, ColumnType type)
     {
-        if (!StringUtils.isWhitespace(idxmd.getName()))
+        if (idxmd != null && !StringUtils.isWhitespace(idxmd.getName()))
         {
             return prepareIdentifierNameForUse(idxmd.getName(), SchemaComponent.CONSTRAINT);
         }
 
-        String idxName = idxmd.getName();
-        if (idxName == null)
+        String idxName = null;
+        if (type == ColumnType.DATASTOREID_COLUMN)
         {
-            if (type == ColumnType.DATASTOREID_COLUMN)
-            {
-                idxName = cmd.getName() + wordSeparator + "DATASTORE" + wordSeparator + "IDX";
-            }
-            else if (type == ColumnType.VERSION_COLUMN)
-            {
-                idxName = cmd.getName() + wordSeparator + "VERSION" + wordSeparator + "IDX";
-            }
-            else if (type == ColumnType.MULTITENANCY_COLUMN)
-            {
-                idxName = cmd.getName() + wordSeparator + "TENANT" + wordSeparator + "IDX";
-            }
+            idxName = cmd.getName() + wordSeparator + "DATASTORE" + wordSeparator + "IDX";
+        }
+        else if (type == ColumnType.VERSION_COLUMN)
+        {
+            idxName = cmd.getName() + wordSeparator + "VERSION" + wordSeparator + "IDX";
+        }
+        else if (type == ColumnType.MULTITENANCY_COLUMN)
+        {
+            idxName = cmd.getName() + wordSeparator + "TENANT" + wordSeparator + "IDX";
+        }
+        else
+        {
+            idxName = "IDX";
         }
         return prepareIdentifierNameForUse(idxName, SchemaComponent.CONSTRAINT);
     }
