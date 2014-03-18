@@ -571,6 +571,14 @@ Contributors:
        <entityresolver url="/org/datanucleus/metadata/persistence_2_0.xsd"/>
     </extension>
 
+    <!-- EXTENSION ANNOTATIONS -->
+    <extension point="org.datanucleus.member_annotation_handler">
+        <member-annotation-handler annotation-class="javax.validation.constraints.NotNull" 
+            handler="org.datanucleus.metadata.annotations.ValidationNotNullAnnotationHandler"/>
+        <member-annotation-handler annotation-class="javax.validation.constraints.Size" 
+            handler="org.datanucleus.metadata.annotations.ValidationSizeAnnotationHandler"/>
+    </extension>
+
     <!-- JMX SERVERS -->
     <extension point="org.datanucleus.management_server">
         <management-server class="org.datanucleus.management.jmx.PlatformManagementServer" name="default"/>
