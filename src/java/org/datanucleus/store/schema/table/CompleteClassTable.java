@@ -164,10 +164,10 @@ public class CompleteClassTable implements Table
             this.datastoreIdColumn = col;
         }
 
-        if (cmd.isVersioned())
+        VersionMetaData vermd = cmd.getVersionMetaDataForClass();
+        if (vermd != null)
         {
             // Add surrogate version column
-            VersionMetaData vermd = cmd.getVersionMetaDataForClass();
             if (vermd != null && vermd.getFieldName() == null)
             {
                 String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.VERSION_COLUMN);
