@@ -29,9 +29,6 @@
  */
 package org.datanucleus.asm;
 
-import org.datanucleus.asm.Handler;
-import org.datanucleus.asm.Label;
-
 /**
  * Information about an exception handler block.
  * 

@@ -29,12 +29,6 @@
  */
 package org.datanucleus.asm;
 
-import org.datanucleus.asm.Attribute;
-import org.datanucleus.asm.ByteVector;
-import org.datanucleus.asm.ClassReader;
-import org.datanucleus.asm.ClassWriter;
-import org.datanucleus.asm.Label;
-
 /**
  * A non standard class, field, method or code attribute.
  * 

@@ -29,9 +29,6 @@
  */
 package org.datanucleus.asm;
 
-import org.datanucleus.asm.ClassWriter;
-import org.datanucleus.asm.Item;
-
 /**
  * A constant pool item. Constant pool items can be created with the 'newXXX'
  * methods in the {@link ClassWriter} class.

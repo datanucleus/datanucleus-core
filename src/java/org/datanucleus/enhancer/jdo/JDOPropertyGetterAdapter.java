@@ -20,10 +20,12 @@ package org.datanucleus.enhancer.jdo;
 import org.datanucleus.asm.AnnotationVisitor;
 import org.datanucleus.asm.Attribute;
 import org.datanucleus.asm.ClassVisitor;
+import org.datanucleus.asm.Handle;
 import org.datanucleus.asm.Label;
 import org.datanucleus.asm.MethodVisitor;
 import org.datanucleus.asm.Opcodes;
 import org.datanucleus.asm.Type;
+import org.datanucleus.asm.TypePath;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.DataNucleusEnhancer;
@@ -429,6 +431,8 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
         mv.visitEnd();
     }
 
+    // IMPORTANT : BELOW HERE WE MUST INTERCEPT ALL OTHER METHODS AND RELAY TO "visitor"
+
     public AnnotationVisitor visitAnnotation(String arg0, boolean arg1)
     {
         // Keep any annotations on the getXXX method
@@ -438,6 +442,42 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
     public AnnotationVisitor visitAnnotationDefault()
     {
         return visitor.visitAnnotationDefault();
+    }
+
+    public void visitParameter(String name, int access)
+    {
+        visitor.visitParameter(name, access);
+    }
+
+    public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
+    {
+        return visitor.visitTypeAnnotation(typeRef, typePath, desc, visible);
+    }
+
+    public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf)
+    {
+        visitor.visitMethodInsn(opcode, owner, name, desc, itf);
+    }
+
+    public void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs)
+    {
+        visitor.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+    }
+
+    public AnnotationVisitor visitInsnAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
+    {
+        return visitor.visitInsnAnnotation(typeRef, typePath, desc, visible);
+    }
+
+    public AnnotationVisitor visitTryCatchAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
+    {
+        return visitor.visitTryCatchAnnotation(typeRef, typePath, desc, visible);
+    }
+
+    public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index,
+            String desc, boolean visible)
+    {
+        return visitor.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, desc, visible);
     }
 
     public void visitAttribute(Attribute arg0)

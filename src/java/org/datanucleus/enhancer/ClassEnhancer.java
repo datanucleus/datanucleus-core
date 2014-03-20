@@ -32,7 +32,7 @@ import org.datanucleus.metadata.MetaDataManager;
 public interface ClassEnhancer
 {
     /** Version of the ASM API to use (introduced in ASM v4 to aid backward compatibility). */
-    public static final int ASM_API_VERSION = Opcodes.ASM4;
+    public static final int ASM_API_VERSION = Opcodes.ASM5;
 
     /** Option for generating the default constructor. */
     public static final String OPTION_GENERATE_DEFAULT_CONSTRUCTOR = "generate-default-constructor";

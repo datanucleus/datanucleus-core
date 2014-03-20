@@ -29,10 +29,6 @@
  */
 package org.datanucleus.asm;
 
-import org.datanucleus.asm.ClassWriter;
-import org.datanucleus.asm.Edge;
-import org.datanucleus.asm.Label;
-
 /**
  * An edge in the control flow graph of a method body. See {@link Label Label}.
  * 

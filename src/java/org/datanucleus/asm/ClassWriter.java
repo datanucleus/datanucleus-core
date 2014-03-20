@@ -29,22 +29,6 @@
  */
 package org.datanucleus.asm;
 
-import org.datanucleus.asm.AnnotationVisitor;
-import org.datanucleus.asm.AnnotationWriter;
-import org.datanucleus.asm.Attribute;
-import org.datanucleus.asm.ByteVector;
-import org.datanucleus.asm.ClassReader;
-import org.datanucleus.asm.ClassVisitor;
-import org.datanucleus.asm.ClassWriter;
-import org.datanucleus.asm.FieldVisitor;
-import org.datanucleus.asm.FieldWriter;
-import org.datanucleus.asm.Handle;
-import org.datanucleus.asm.Item;
-import org.datanucleus.asm.MethodVisitor;
-import org.datanucleus.asm.MethodWriter;
-import org.datanucleus.asm.Opcodes;
-import org.datanucleus.asm.Type;
-
 /**
  * A {@link ClassVisitor} that generates classes in bytecode form. More
  * precisely this visitor generates a byte array conforming to the Java class
@@ -433,6 +417,16 @@ public class ClassWriter extends ClassVisitor {
     private AnnotationWriter ianns;
 
     /**
+     * The runtime visible type annotations of this class.
+     */
+    private AnnotationWriter tanns;
+
+    /**
+     * The runtime invisible type annotations of this class.
+     */
+    private AnnotationWriter itanns;
+
+    /**
      * The non standard attributes of this class.
      */
     private Attribute attrs;
@@ -493,12 +487,12 @@ public class ClassWriter extends ClassVisitor {
      * <tt>true</tt> if the maximum stack size and number of local variables
      * must be automatically computed.
      */
-    private final boolean computeMaxs;
+    private boolean computeMaxs;
 
     /**
      * <tt>true</tt> if the stack map frames must be recomputed from scratch.
      */
-    private final boolean computeFrames;
+    private boolean computeFrames;
 
     /**
      * <tt>true</tt> if the stack map tables of this class are invalid. The
@@ -611,7 +605,7 @@ public class ClassWriter extends ClassVisitor {
      *            {@link #COMPUTE_FRAMES}.
      */
     public ClassWriter(final int flags) {
-        super(Opcodes.ASM4);
+        super(Opcodes.ASM5);
         index = 1;
         pool = new ByteVector();
         items = new Item[256];
@@ -693,7 +687,8 @@ public class ClassWriter extends ClassVisitor {
             sourceFile = newUTF8(file);
         }
         if (debug != null) {
-            sourceDebug = new ByteVector().putUTF8(debug);
+            sourceDebug = new ByteVector().encodeUTF8(debug, 0,
+                    Integer.MAX_VALUE);
         }
     }
 
@@ -722,6 +717,29 @@ public class ClassWriter extends ClassVisitor {
         } else {
             aw.next = ianns;
             ianns = aw;
+        }
+        return aw;
+    }
+
+    @Override
+    public final AnnotationVisitor visitTypeAnnotation(int typeRef,
+            TypePath typePath, final String desc, final boolean visible) {
+        if (!ClassReader.ANNOTATIONS) {
+            return null;
+        }
+        ByteVector bv = new ByteVector();
+        // write target_type and target_info
+        AnnotationWriter.putTarget(typeRef, typePath, bv);
+        // write type, and reserve space for values count
+        bv.putShort(newUTF8(desc)).putShort(0);
+        AnnotationWriter aw = new AnnotationWriter(this, true, bv, bv,
+                bv.length - 2);
+        if (visible) {
+            aw.next = tanns;
+            tanns = aw;
+        } else {
+            aw.next = itanns;
+            itanns = aw;
         }
         return aw;
     }
@@ -811,7 +829,7 @@ public class ClassWriter extends ClassVisitor {
         }
         if (sourceDebug != null) {
             ++attributeCount;
-            size += sourceDebug.length + 4;
+            size += sourceDebug.length + 6;
             newUTF8("SourceDebugExtension");
         }
         if (enclosingMethodOwner != 0) {
@@ -846,6 +864,16 @@ public class ClassWriter extends ClassVisitor {
             ++attributeCount;
             size += 8 + ianns.getSize();
             newUTF8("RuntimeInvisibleAnnotations");
+        }
+        if (ClassReader.ANNOTATIONS && tanns != null) {
+            ++attributeCount;
+            size += 8 + tanns.getSize();
+            newUTF8("RuntimeVisibleTypeAnnotations");
+        }
+        if (ClassReader.ANNOTATIONS && itanns != null) {
+            ++attributeCount;
+            size += 8 + itanns.getSize();
+            newUTF8("RuntimeInvisibleTypeAnnotations");
         }
         if (attrs != null) {
             attributeCount += attrs.getCount();
@@ -890,9 +918,9 @@ public class ClassWriter extends ClassVisitor {
             out.putShort(newUTF8("SourceFile")).putInt(2).putShort(sourceFile);
         }
         if (sourceDebug != null) {
-            int len = sourceDebug.length - 2;
+            int len = sourceDebug.length;
             out.putShort(newUTF8("SourceDebugExtension")).putInt(len);
-            out.putByteArray(sourceDebug.data, 2, len);
+            out.putByteArray(sourceDebug.data, 0, len);
         }
         if (enclosingMethodOwner != 0) {
             out.putShort(newUTF8("EnclosingMethod")).putInt(4);
@@ -920,13 +948,34 @@ public class ClassWriter extends ClassVisitor {
             out.putShort(newUTF8("RuntimeInvisibleAnnotations"));
             ianns.put(out);
         }
+        if (ClassReader.ANNOTATIONS && tanns != null) {
+            out.putShort(newUTF8("RuntimeVisibleTypeAnnotations"));
+            tanns.put(out);
+        }
+        if (ClassReader.ANNOTATIONS && itanns != null) {
+            out.putShort(newUTF8("RuntimeInvisibleTypeAnnotations"));
+            itanns.put(out);
+        }
         if (attrs != null) {
             attrs.put(this, null, 0, -1, -1, out);
         }
         if (invalidFrames) {
-            ClassWriter cw = new ClassWriter(COMPUTE_FRAMES);
-            new ClassReader(out.data).accept(cw, ClassReader.SKIP_FRAMES);
-            return cw.toByteArray();
+            anns = null;
+            ianns = null;
+            attrs = null;
+            innerClassesCount = 0;
+            innerClasses = null;
+            bootstrapMethodsCount = 0;
+            bootstrapMethods = null;
+            firstField = null;
+            lastField = null;
+            firstMethod = null;
+            lastMethod = null;
+            computeMaxs = false;
+            computeFrames = true;
+            invalidFrames = false;
+            new ClassReader(out.data).accept(this, ClassReader.SKIP_FRAMES);
+            return toByteArray();
         }
         return out.data;
     }
@@ -1593,7 +1642,7 @@ public class ClassWriter extends ClassVisitor {
 
     /**
      * Returns the common super type of the two given types. The default
-     * implementation of this method <i>loads<i> the two given classes and uses
+     * implementation of this method <i>loads</i> the two given classes and uses
      * the java.lang.Class methods to find the common super class. It can be
      * overridden to compute this common super type in other ways, in particular
      * without actually loading any class, or to take into account the class

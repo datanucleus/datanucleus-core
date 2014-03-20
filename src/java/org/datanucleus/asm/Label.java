@@ -29,16 +29,6 @@
  */
 package org.datanucleus.asm;
 
-import org.datanucleus.asm.Attribute;
-import org.datanucleus.asm.ByteVector;
-import org.datanucleus.asm.ClassReader;
-import org.datanucleus.asm.ClassWriter;
-import org.datanucleus.asm.Edge;
-import org.datanucleus.asm.Frame;
-import org.datanucleus.asm.Label;
-import org.datanucleus.asm.MethodWriter;
-import org.datanucleus.asm.Opcodes;
-
 /**
  * A label represents a position in the bytecode of a method. Labels are used
  * for jump, goto, and switch instructions, and for try catch blocks. A label
@@ -120,7 +110,8 @@ public class Label {
     /**
      * Field used to associate user information to a label. Warning: this field
      * is used by the ASM tree package. In order to use it with the ASM tree
-     * package you must override the org.datanucleus.asm.tree.MethodNode#getLabelNode method.
+     * package you must override the
+     * {@link org.objectweb.asm.tree.MethodNode#getLabelNode} method.
      */
     public Object info;
 
