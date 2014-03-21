@@ -503,39 +503,7 @@ public class StringUtils
         }
         else if (cls.isArray() && cls.getComponentType().isPrimitive())
         {
-            Class componentCls = cls.getComponentType();
-            if (componentCls == boolean.class)
-            {
-                return "boolean[]";
-            }
-            else if (componentCls == byte.class)
-            {
-                return "byte[]";
-            }
-            else if (componentCls == char.class)
-            {
-                return "char[]";
-            }
-            else if (componentCls == double.class)
-            {
-                return "double[]";
-            }
-            else if (componentCls == float.class)
-            {
-                return "float[]";
-            }
-            else if (componentCls == int.class)
-            {
-                return "int[]";
-            }
-            else if (componentCls == long.class)
-            {
-                return "long[]";
-            }
-            else if (componentCls == short.class)
-            {
-                return "short[]";
-            }
+            return getNameOfClass(cls.getComponentType()) + "[]";
         }
 
         return cls.getName();
