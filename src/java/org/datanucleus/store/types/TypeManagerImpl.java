@@ -750,11 +750,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
                         typeConverterMap.put(memberType, convertersForMember);
                     }
                     convertersForMember.put(datastoreType, conv);
-                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                    {
-                        NucleusLogger.PERSISTENCE.debug("Added converter for " + memberTypeName + "<->" + datastoreTypeName +
-                            " using " + converterClsName);
-                    }
                 }
                 catch (Exception e)
                 {
@@ -778,6 +773,26 @@ public class TypeManagerImpl implements TypeManager, Serializable
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("016008"));
+            if (typeConverterMap != null)
+            {
+                Iterator<Map.Entry<Class, Map<Class, TypeConverter>>> converterIter = typeConverterMap.entrySet().iterator();
+                while (converterIter.hasNext())
+                {
+                    Map.Entry<Class, Map<Class, TypeConverter>> entry = converterIter.next();
+                    Class cls = entry.getKey();
+                    Set<Class> datastoreTypes = entry.getValue().keySet();
+                    StringBuilder str = new StringBuilder();
+                    for (Class datastoreCls : datastoreTypes)
+                    {
+                        if (str.length() > 0)
+                        {
+                            str.append(',');
+                        }
+                        str.append(StringUtils.getNameOfClass(datastoreCls));
+                    }
+                    NucleusLogger.PERSISTENCE.debug("TypeConverter(s) available for " + StringUtils.getNameOfClass(cls) + " to : " + str.toString());
+                }
+            }
         }
     }
 }

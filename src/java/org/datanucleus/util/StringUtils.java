@@ -464,6 +464,83 @@ public class StringUtils
         }
     }
 
+    public static String getNameOfClass(Class cls)
+    {
+        if (cls.isPrimitive())
+        {
+            if (cls == boolean.class)
+            {
+                return "boolean";
+            }
+            else if (cls == byte.class)
+            {
+                return "byte";
+            }
+            else if (cls == char.class)
+            {
+                return "char";
+            }
+            else if (cls == double.class)
+            {
+                return "double";
+            }
+            else if (cls == float.class)
+            {
+                return "float";
+            }
+            else if (cls == int.class)
+            {
+                return "int";
+            }
+            else if (cls == long.class)
+            {
+                return "long";
+            }
+            else if (cls == short.class)
+            {
+                return "short";
+            }
+        }
+        else if (cls.isArray() && cls.getComponentType().isPrimitive())
+        {
+            Class componentCls = cls.getComponentType();
+            if (componentCls == boolean.class)
+            {
+                return "boolean[]";
+            }
+            else if (componentCls == byte.class)
+            {
+                return "byte[]";
+            }
+            else if (componentCls == char.class)
+            {
+                return "char[]";
+            }
+            else if (componentCls == double.class)
+            {
+                return "double[]";
+            }
+            else if (componentCls == float.class)
+            {
+                return "float[]";
+            }
+            else if (componentCls == int.class)
+            {
+                return "int[]";
+            }
+            else if (componentCls == long.class)
+            {
+                return "long[]";
+            }
+            else if (componentCls == short.class)
+            {
+                return "short[]";
+            }
+        }
+
+        return cls.getName();
+    }
+
     /**
      * Converts the given map of objects to string as a comma-separated list.
      * If the map is empty the string "&lt;none&gt;" is returned.
