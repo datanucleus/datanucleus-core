@@ -131,14 +131,14 @@ public class MultiMap extends HashMap
     }
 
     /**
-     * Removes a specific value from map.
+     * Removes a specific key,value pairing from map.
      * The item is removed from the collection mapped to the specified key.
      * 
      * @param key  the key to remove from
      * @param item  the value to remove
      * @return the value removed (which was passed in)
      */
-    public Object remove(Object key, Object item)
+    public Object removeKeyValue(Object key, Object item)
     {
         Collection valuesForKey=(Collection)super.get(key);
         if (valuesForKey == null)
