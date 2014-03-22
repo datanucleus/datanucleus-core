@@ -278,6 +278,8 @@ Contributors:
             converter-class="org.datanucleus.store.types.converters.ClassStringConverter"/>
         <type-converter name="dn.color-string" member-type="java.awt.Color" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.ColorStringConverter"/>
+        <type-converter name="dn.color-components" member-type="java.awt.Color" datastore-type="[I"
+            converter-class="org.datanucleus.store.types.converters.ColorComponentsConverter"/>
         <type-converter name="dn.integer-string" member-type="java.lang.Integer" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.IntegerStringConverter"/>
         <type-converter name="dn.long-string" member-type="java.lang.Long" datastore-type="java.lang.String"

@@ -30,8 +30,7 @@ import org.datanucleus.util.Localiser;
 public interface TypeConverter<X, Y> extends Serializable
 {
     /** Localiser for messages */
-    static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
+    static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
     /**
      * Method to convert the passed member value to the datastore type.
