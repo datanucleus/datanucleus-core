@@ -23,8 +23,17 @@ import org.datanucleus.util.I18nUtils;
 
 /**
  * Class to handle the conversion between java.util.Locale and a String form.
+ * Locale should be stored in colums from 2 to 20 characters. Normaly, we will have a string no longer than
+ * 5 characters, but variants, in general, are vendor specific and can be longer than expected. 
+ * The Variant codes are vendor and browser-specific. For example, use WIN for Windows, MAC for Macintosh,
+ * and POSIX for POSIX. Where there are two variants, separate them with an underscore, and put the most
+ * important one first. For example, a Traditional Spanish collation might construct a locale with
+ * parameters for language, country and variant as: "es", "ES", "Traditional_WIN".  
+ * language_country_variant
+ * Examples: "en", "de_DE", "_GB", "en_US_WIN", "de__POSIX", "fr_MAC"
+ * @see java.util.Locale
  */
-public class LocaleStringConverter implements TypeConverter<Locale, String>
+public class LocaleStringConverter implements TypeConverter<Locale, String>, ColumnLengthDefiningTypeConverter
 {
     public Locale toMemberType(String str)
     {
@@ -39,5 +48,15 @@ public class LocaleStringConverter implements TypeConverter<Locale, String>
     public String toDatastoreType(Locale loc)
     {
         return loc != null ? loc.toString() : null;
+    }
+
+    public int getDefaultColumnLength(int columnPosition)
+    {
+        if (columnPosition != 0)
+        {
+            return -1;
+        }
+        // Locales require 20 characters.
+        return 20;
     }
 }

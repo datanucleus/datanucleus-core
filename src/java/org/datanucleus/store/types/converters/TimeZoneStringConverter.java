@@ -22,7 +22,7 @@ import java.util.TimeZone;
 /**
  * Class to handle the conversion between java.util.TimeZone and a String form.
  */
-public class TimeZoneStringConverter implements TypeConverter<TimeZone, String>
+public class TimeZoneStringConverter implements TypeConverter<TimeZone, String>, ColumnLengthDefiningTypeConverter
 {
     public TimeZone toMemberType(String str)
     {
@@ -37,5 +37,15 @@ public class TimeZoneStringConverter implements TypeConverter<TimeZone, String>
     public String toDatastoreType(TimeZone tz)
     {
         return tz != null ? tz.getID() : null;
+    }
+
+    public int getDefaultColumnLength(int columnPosition)
+    {
+        if (columnPosition != 0)
+        {
+            return -1;
+        }
+        // Timezones require 30 chars.
+        return 30;
     }
 }

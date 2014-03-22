@@ -22,7 +22,7 @@ import java.util.Currency;
 /**
  * Class to handle the conversion between java.util.Currency and a String form.
  */
-public class CurrencyStringConverter implements TypeConverter<Currency, String>
+public class CurrencyStringConverter implements TypeConverter<Currency, String>, ColumnLengthDefiningTypeConverter
 {
     public Currency toMemberType(String str)
     {
@@ -37,5 +37,15 @@ public class CurrencyStringConverter implements TypeConverter<Currency, String>
     public String toDatastoreType(Currency curr)
     {
         return curr != null ? curr.toString() : null;
+    }
+
+    public int getDefaultColumnLength(int columnPosition)
+    {
+        if (columnPosition != 0)
+        {
+            return -1;
+        }
+        // ISO4217 currencies use 3 character codes, so return 3.
+        return 3;
     }
 }
