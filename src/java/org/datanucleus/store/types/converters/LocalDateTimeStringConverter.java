@@ -22,7 +22,7 @@ import javax.time.calendar.LocalDateTime;
 /**
  * Class to handle the conversion between javax.time.calendar.LocalDateTime and a String form.
  */
-public class LocalDateTimeStringConverter implements TypeConverter<LocalDateTime, String>
+public class LocalDateTimeStringConverter implements TypeConverter<LocalDateTime, String>, ColumnLengthDefiningTypeConverter
 {
     public LocalDateTime toMemberType(String str)
     {
@@ -37,5 +37,16 @@ public class LocalDateTimeStringConverter implements TypeConverter<LocalDateTime
     public String toDatastoreType(LocalDateTime date)
     {
         return date != null ? date.toString() : null;
+    }
+
+    public int getDefaultColumnLength(int columnPosition)
+    {
+        if (columnPosition != 0)
+        {
+            return -1;
+        }
+        // Persist as "yyyy-MM-ddThh:mm:ss" when stored as string
+        // TODO What if toString() gives "yyyy-MM-dd'T'HH:mm:ssfnnnnnnnnn" ?
+        return 19;
     }
 }

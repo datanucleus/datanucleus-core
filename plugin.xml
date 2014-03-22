@@ -324,12 +324,18 @@ Contributors:
             converter-class="org.datanucleus.store.types.converters.UUIDStringConverter"/>
         <type-converter name="dn.localdate-string" member-type="javax.time.calendar.LocalDate" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.LocalDateStringConverter"/>
+        <type-converter name="dn.localdate-sqldate" member-type="javax.time.calendar.LocalDate" datastore-type="java.sql.Date"
+            converter-class="org.datanucleus.store.types.converters.LocalDateSqlDateConverter"/>
         <type-converter name="dn.localtime-string" member-type="javax.time.calendar.LocalTime" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.LocalTimeStringConverter"/>
         <type-converter name="dn.localtime-long" member-type="javax.time.calendar.LocalTime" datastore-type="java.lang.Long"
             converter-class="org.datanucleus.store.types.converters.LocalTimeLongConverter"/>
+        <type-converter name="dn.localtime-sqltime" member-type="javax.time.calendar.LocalTime" datastore-type="java.sql.Time"
+            converter-class="org.datanucleus.store.types.converters.LocalTimeSqlTimeConverter"/>
         <type-converter name="dn.localdatetime-string" member-type="javax.time.calendar.LocalDateTime" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.LocalDateTimeStringConverter"/>
+        <type-converter name="dn.localdatetime-timestamp" member-type="javax.time.calendar.LocalDateTime" datastore-type="java.sql.timestamp"
+            converter-class="org.datanucleus.store.types.converters.LocalDateTimeTimestampConverter"/>
         <type-converter name="dn.serializable-string" member-type="java.io.Serializable" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.SerializableStringConverter"/>
         <type-converter name="dn.serializable-bytearray" member-type="java.io.Serializable" datastore-type="[B"
