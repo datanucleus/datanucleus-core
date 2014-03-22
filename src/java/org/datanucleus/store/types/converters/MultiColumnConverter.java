@@ -24,15 +24,8 @@ package org.datanucleus.store.types.converters;
 public interface MultiColumnConverter
 {
     /**
-     * Accessor for the number of columns the member is stored into.
-     * @return Number of columns
+     * Accessor for the java types of the datastore columns.
+     * @return The java types of the columns
      */
-    int getNumberOfColumns();
-
-    /**
-     * Accessor for the java type of the datastore column for the specified position.
-     * @param position The position (0=first, 1=second, etc)
-     * @return The java type of the column value
-     */
-    Class getDatastoreColumnType(int position);
+    Class[] getDatastoreColumnTypes();
 }

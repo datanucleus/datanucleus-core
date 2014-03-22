@@ -39,13 +39,8 @@ public class ColorComponentsConverter implements TypeConverter<Color, int[]>, Mu
         return new Color(datastoreValue[0], datastoreValue[1], datastoreValue[2], datastoreValue[3]);
     }
 
-    public int getNumberOfColumns()
+    public Class[] getDatastoreColumnTypes()
     {
-        return 4;
-    }
-
-    public Class getDatastoreColumnType(int position)
-    {
-        return int.class;
+        return new Class[]{int.class, int.class, int.class, int.class};
     }
 }
