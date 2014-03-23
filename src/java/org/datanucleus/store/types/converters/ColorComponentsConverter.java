@@ -26,6 +26,10 @@ public class ColorComponentsConverter implements TypeConverter<Color, int[]>, Mu
 {
     public int[] toDatastoreType(Color memberValue)
     {
+        if (memberValue == null)
+        {
+            return null;
+        }
         return new int[] {memberValue.getRed(), memberValue.getGreen(), memberValue.getBlue(), memberValue.getAlpha()};
     }
 
