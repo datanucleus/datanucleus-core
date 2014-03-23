@@ -20,10 +20,14 @@ Contributors:
 package org.datanucleus.store.types;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -775,12 +779,11 @@ public class TypeManagerImpl implements TypeManager, Serializable
             NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("016008"));
             if (typeConverterMap != null)
             {
-                Iterator<Map.Entry<Class, Map<Class, TypeConverter>>> converterIter = typeConverterMap.entrySet().iterator();
-                while (converterIter.hasNext())
+                List<Class> typesList = new ArrayList<Class>(typeConverterMap.keySet());
+                Collections.sort(typesList, ALPHABETICAL_ORDER);
+                for (Class javaType : typesList)
                 {
-                    Map.Entry<Class, Map<Class, TypeConverter>> entry = converterIter.next();
-                    Class cls = entry.getKey();
-                    Set<Class> datastoreTypes = entry.getValue().keySet();
+                    Set<Class> datastoreTypes = typeConverterMap.get(javaType).keySet();
                     StringBuilder str = new StringBuilder();
                     for (Class datastoreCls : datastoreTypes)
                     {
@@ -790,9 +793,21 @@ public class TypeManagerImpl implements TypeManager, Serializable
                         }
                         str.append(StringUtils.getNameOfClass(datastoreCls));
                     }
-                    NucleusLogger.PERSISTENCE.debug("TypeConverter(s) available for " + StringUtils.getNameOfClass(cls) + " to : " + str.toString());
+                    NucleusLogger.PERSISTENCE.debug("TypeConverter(s) available for " + StringUtils.getNameOfClass(javaType) + " to : " + str.toString());
                 }
             }
         }
     }
+
+    private static Comparator<Class> ALPHABETICAL_ORDER = new Comparator<Class>() 
+    {
+        public int compare(Class cls1, Class cls2) {
+            int res = String.CASE_INSENSITIVE_ORDER.compare(cls1.getName(), cls2.getName());
+            if (res == 0) 
+            {
+                res = cls1.getName().compareTo(cls2.getName());
+            }
+            return res;
+        }
+    };
 }
