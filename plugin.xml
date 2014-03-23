@@ -142,16 +142,12 @@ Contributors:
         <java-type name="java.awt.Color" embedded="true" converter-name="dn.color-string"/>
 
         <!-- "java.math" types -->
-        <java-type name="java.math.BigDecimal" dfg="true" embedded="true"
-            converter-name="dn.bigdecimal-string"/>
-        <java-type name="java.math.BigInteger" dfg="true" embedded="true" 
-            converter-name="dn.biginteger-string"/>
+        <java-type name="java.math.BigDecimal" dfg="true" embedded="true" converter-name="dn.bigdecimal-string"/>
+        <java-type name="java.math.BigInteger" dfg="true" embedded="true" converter-name="dn.biginteger-string"/>
 
         <!-- "java.net" types -->
-        <java-type name="java.net.URL" dfg="true" embedded="true" 
-            converter-name="dn.url-string"/>
-        <java-type name="java.net.URI" dfg="true" embedded="true"
-            converter-name="dn.uri-string"/>
+        <java-type name="java.net.URL" dfg="true" embedded="true" converter-name="dn.url-string"/>
+        <java-type name="java.net.URI" dfg="true" embedded="true" converter-name="dn.uri-string"/>
 
         <!-- "java.sql" types -->
         <java-type name="java.sql.Date" dfg="true" embedded="true" 
@@ -162,28 +158,21 @@ Contributors:
             wrapper-type="org.datanucleus.store.types.simple.SqlTimestamp" converter-name="dn.sqltimestamp-long"/>
 
         <!-- "javax.time" types -->
-        <java-type name="javax.time.calendar.LocalDate" dfg="true" embedded="true" 
-            converter-name="dn.localdate-string"/>
-        <java-type name="javax.time.calendar.LocalDateTime" dfg="true" embedded="true" 
-            converter-name="dn.localdatetime-string"/>
-        <java-type name="javax.time.calendar.LocalTime" dfg="true" embedded="true" 
-            converter-name="dn.localtime-string"/>
+        <java-type name="javax.time.calendar.LocalDate" dfg="true" embedded="true" converter-name="dn.localdate-sqldate"/>
+        <java-type name="javax.time.calendar.LocalDateTime" dfg="true" embedded="true" converter-name="dn.localdatetime-timestamp"/>
+        <java-type name="javax.time.calendar.LocalTime" dfg="true" embedded="true" converter-name="dn.localtime-sqltime"/>
 
         <!-- "java.util" types -->
         <java-type name="java.util.Date" dfg="true" embedded="true" 
             wrapper-type="org.datanucleus.store.types.simple.Date" converter-name="dn.date-string"/>
-        <java-type name="java.util.Locale" dfg="true" embedded="true" 
-            converter-name="dn.locale-string"/>
-        <java-type name="java.util.Currency" dfg="true" embedded="true" 
-            converter-name="dn.currency-string"/>
+        <java-type name="java.util.Locale" dfg="true" embedded="true" converter-name="dn.locale-string"/>
+        <java-type name="java.util.Currency" dfg="true" embedded="true" converter-name="dn.currency-string"/>
         <java-type name="java.util.Calendar" dfg="true" embedded="true"
             wrapper-type="org.datanucleus.store.types.simple.GregorianCalendar" converter-name="dn.calendar-string"/>
         <java-type name="java.util.GregorianCalendar" dfg="true" embedded="true"
             wrapper-type="org.datanucleus.store.types.simple.GregorianCalendar" converter-name="dn.calendar-string"/>
-        <java-type name="java.util.UUID" dfg="true" embedded="true"
-            converter-name="dn.uuid-string"/>
-        <java-type name="java.util.TimeZone" dfg="true" embedded="true"
-            converter-name="dn.timezone-string"/>
+        <java-type name="java.util.UUID" dfg="true" embedded="true" converter-name="dn.uuid-string"/>
+        <java-type name="java.util.TimeZone" dfg="true" embedded="true" converter-name="dn.timezone-string"/>
 
         <java-type name="java.util.ArrayList" wrapper-type="org.datanucleus.store.types.simple.ArrayList"
             wrapper-type-backed="org.datanucleus.store.types.backed.ArrayList"/>
