@@ -157,7 +157,7 @@ Contributors:
         <java-type name="java.sql.Timestamp" dfg="true" embedded="true" 
             wrapper-type="org.datanucleus.store.types.simple.SqlTimestamp" converter-name="dn.sqltimestamp-long"/>
 
-        <!-- "javax.time" types -->
+        <!-- "javax.time" types TODO Remove these since support is in datanucleus-java8 plugin. -->
         <java-type name="javax.time.calendar.LocalDate" dfg="true" embedded="true" converter-name="dn.localdate-sqldate"/>
         <java-type name="javax.time.calendar.LocalDateTime" dfg="true" embedded="true" converter-name="dn.localdatetime-timestamp"/>
         <java-type name="javax.time.calendar.LocalTime" dfg="true" embedded="true" converter-name="dn.localtime-sqltime"/>
@@ -312,6 +312,7 @@ Contributors:
         <type-converter name="dn.uuid-string" member-type="java.util.UUID" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.UUIDStringConverter"/>
 
+        <!-- TODO Remove these since now in "datanucleus-java8" plugin. -->
         <type-converter name="dn.localdate-string" member-type="javax.time.calendar.LocalDate" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.LocalDateStringConverter"/>
         <type-converter name="dn.localdate-sqldate" member-type="javax.time.calendar.LocalDate" datastore-type="java.sql.Date"
