@@ -457,6 +457,25 @@ public class TypeManagerImpl implements TypeManager, Serializable
         return convertersForMember.get(datastoreType);
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.types.TypeManager#getTypeConvertersForType(java.lang.Class)
+     */
+    @Override
+    public Collection<TypeConverter> getTypeConvertersForType(Class memberType)
+    {
+        if (typeConverterMap == null)
+        {
+            return null;
+        }
+
+        Map<Class, TypeConverter> convertersForMember = typeConverterMap.get(memberType);
+        if (convertersForMember == null)
+        {
+            return null;
+        }
+        return convertersForMember.values();
+    }
+
     /**
      * Convenience method to return the JavaType for the specified class. If this class has a defined
      * JavaType then returns it. If not then tries to find a superclass that is castable to the specified type.

@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.datanucleus.store.types.converters.TypeConverter;
@@ -167,4 +168,11 @@ public interface TypeManager
      * @return The converter (if any)
      */
     TypeConverter getTypeConverterForType(Class memberType, Class datastoreType);
+
+    /**
+     * Accessor for the available type converters for the provided Java type.
+     * @param memberType The java type
+     * @return The available Type Converters
+     */
+    Collection<TypeConverter> getTypeConvertersForType(Class memberType);
 }
