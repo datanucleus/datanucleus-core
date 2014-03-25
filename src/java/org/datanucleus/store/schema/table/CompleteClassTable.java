@@ -17,7 +17,11 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.schema.table;
 
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -39,7 +43,11 @@ import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.schema.naming.ColumnType;
 import org.datanucleus.store.schema.naming.NamingFactory;
+import org.datanucleus.store.types.TypeManager;
+import org.datanucleus.store.types.converters.MultiColumnConverter;
+import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Representation of a table for a class where the class is stored in "complete-table" inheritance (or in JPA "TablePerClass")
@@ -78,9 +86,12 @@ public class CompleteClassTable implements Table
     /** Map of DatastoreColumn, keyed by the position (starting at 0 and increasing). */
     Map<Integer, Column> columnByPosition = new HashMap<Integer, Column>();
 
+    // TODO Drop this
     ColumnAttributer columnAttributer;
 
-    public CompleteClassTable(StoreManager storeMgr, AbstractClassMetaData cmd, ColumnAttributer colAttr)
+    MemberColumnAttributer memberColAttributer;
+
+    public CompleteClassTable(StoreManager storeMgr, AbstractClassMetaData cmd, ColumnAttributer colAttr) // TODO Pass in MemberColumnAttributer
     {
         this.storeMgr = storeMgr;
         this.cmd = cmd;
@@ -105,6 +116,8 @@ public class CompleteClassTable implements Table
         this.identifier = storeMgr.getNamingFactory().getTableName(cmd);
 
         columns = new ArrayList<Column>();
+
+        TypeManager typeMgr = storeMgr.getNucleusContext().getTypeManager();
         ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
         int numMembers = cmd.getAllMemberPositions().length;
         for (int i=0;i<numMembers;i++)
@@ -121,6 +134,7 @@ public class CompleteClassTable implements Table
             {
                 if (RelationType.isRelationSingleValued(relationType))
                 {
+                    NucleusLogger.GENERAL.info(">> CCT mmd=" + mmd.getFullFieldName() + " embedded 1-1");
                     // Embedded PC field, so add columns for all fields of the embedded
                     List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>();
                     embMmds.add(mmd);
@@ -135,19 +149,57 @@ public class CompleteClassTable implements Table
             }
             else
             {
-                // TODO Get TypeConverter to be used and extract from that the number of columns (in case user hasn't specified metadata)
                 ColumnMetaData[] colmds = mmd.getColumnMetaData();
-                if (colmds != null && colmds.length > 1)
+                if (relationType != RelationType.NONE)
                 {
-                    // TODO Handle member with multiple columns
-                    NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is requested as having multiple columns. This is not yet supported. Using single column");
-//                    throw new NucleusUserException("Dont currently support member having more than 1 column");
+                    // 1-1/N-1 stored as single column with persistable-id
+                    // 1-N/M-N stored as single column with collection<persistable-id>
+                    String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
+                    ColumnImpl col = addColumn(mmd, colName);
+                    if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                    {
+                        col.setPosition(colmds[0].getPosition());
+                    }
                 }
-                String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
-                ColumnImpl col = addColumn(mmd, colName);
-                if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                else
                 {
-                    col.setPosition(colmds[0].getPosition());
+                    TypeConverter typeConv = getTypeConverterForMember(mmd, colmds, typeMgr);
+                    if (typeConv != null)
+                    {
+                        // Create column(s) for this TypeConverter
+                        if (typeConv instanceof MultiColumnConverter)
+                        {
+                            Class[] colJavaTypes = ((MultiColumnConverter)typeConv).getDatastoreColumnTypes();
+                            for (int j=0;j<colJavaTypes.length;j++)
+                            {
+                                String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, j);
+                                ColumnImpl col = addColumn(mmd, colName);
+                                if (colmds != null && colmds.length == 1 && colmds[j].getPosition() != null)
+                                {
+                                    col.setPosition(colmds[j].getPosition());
+                                }
+                            }
+                        }
+                        else
+                        {
+                            String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
+                            ColumnImpl col = addColumn(mmd, colName);
+                            if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                            {
+                                col.setPosition(colmds[0].getPosition());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Create column for basic type
+                        String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
+                        ColumnImpl col = addColumn(mmd, colName);
+                        if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                        {
+                            col.setPosition(colmds[0].getPosition());
+                        }
+                    }
                 }
             }
         }
@@ -255,10 +307,89 @@ public class CompleteClassTable implements Table
         }*/
     }
 
+    protected TypeConverter getTypeConverterForMember(AbstractMemberMetaData mmd, ColumnMetaData[] colmds, TypeManager typeMgr)
+    {
+        TypeConverter typeConv = null;
+        String typeConvName = mmd.getTypeConverterName();
+        if (typeConvName != null)
+        {
+            // User has specified the TypeConverter
+            typeConv = typeMgr.getTypeConverterForName(typeConvName);
+        }
+        else
+        {
+            // No explicit TypeConverter so maybe there is an auto-apply converter for this member type
+            typeConv = typeMgr.getAutoApplyTypeConverterForType(mmd.getType());
+        }
+
+        if (typeConv == null)
+        {
+            // Try to find a TypeConverter matching any column JDBC type definition
+            if (colmds != null && colmds.length > 1)
+            {
+                // Multiple columns, so try to find a converter with the right number of columns (note we could, in future, check the types of columns also)
+                Collection<TypeConverter> converters = typeMgr.getTypeConvertersForType(mmd.getType());
+                if (converters != null && !converters.isEmpty())
+                {
+                    for (TypeConverter conv : converters)
+                    {
+                        if (conv instanceof MultiColumnConverter && ((MultiColumnConverter)conv).getDatastoreColumnTypes().length == colmds.length)
+                        {
+                            typeConv = conv;
+                            break;
+                        }
+                    }
+                }
+                if (typeConv == null)
+                {
+                    // TODO Throw exception since user column specification leaves no possible converter
+                }
+            }
+            else
+            {
+                // Single column, so try to match the JDBC type if provided
+                String jdbcType = (colmds != null && colmds.length > 0 ? colmds[0].getJdbcType() : null);
+                if (!StringUtils.isWhitespace(jdbcType))
+                {
+                    // JDBC type specified so don't just take the default
+                    if (jdbcType.equalsIgnoreCase("varchar") || jdbcType.equalsIgnoreCase("char"))
+                    {
+                        typeConv = typeMgr.getTypeConverterForType(mmd.getType(), String.class);
+                    }
+                    else if (jdbcType.equalsIgnoreCase("integer"))
+                    {
+                        typeConv = typeMgr.getTypeConverterForType(mmd.getType(), Long.class);
+                    }
+                    else if (jdbcType.equalsIgnoreCase("timestamp"))
+                    {
+                        typeConv = typeMgr.getTypeConverterForType(mmd.getType(), Timestamp.class);
+                    }
+                    else if (jdbcType.equalsIgnoreCase("time"))
+                    {
+                        typeConv = typeMgr.getTypeConverterForType(mmd.getType(), Time.class);
+                    }
+                    else if (jdbcType.equalsIgnoreCase("date"))
+                    {
+                        typeConv = typeMgr.getTypeConverterForType(mmd.getType(), Date.class);
+                    }
+                    // TODO Support other JDBC types
+                }
+                else
+                {
+                    // Fallback to default type converter for this member type
+                    typeConv = typeMgr.getDefaultTypeConverterForType(mmd.getType());
+                }
+            }
+            // TODO Check that this TypeConverter is supported by the store plugin and throw exception or swap it for some other if not acceptable
+        }
+        return typeConv;
+    }
+
     protected void processEmbeddedMember(List<AbstractMemberMetaData> mmds, ClassLoaderResolver clr)
     {
         AbstractMemberMetaData lastMmd = mmds.get(mmds.size()-1);
         EmbeddedMetaData embmd = mmds.get(0).getEmbeddedMetaData();
+        TypeManager typeMgr = storeMgr.getNucleusContext().getTypeManager();
         MetaDataManager mmgr = storeMgr.getMetaDataManager();
         NamingFactory namingFactory = storeMgr.getNamingFactory();
         AbstractClassMetaData embCmd = mmgr.getMetaDataForClass(lastMmd.getType(), clr);
@@ -276,6 +407,7 @@ public class CompleteClassTable implements Table
                 // Special case of this being a link back to the owner. TODO Repeat this for nested and their owners
                 continue;
             }
+            NucleusLogger.GENERAL.info(">> CCT embedded mmd=" + mmd.getFullFieldName() + " field of embedded type=" + mmd.getType());
 
             RelationType relationType = mmd.getRelationType(clr);
             if (relationType != RelationType.NONE && MetaDataUtils.getInstance().isMemberEmbedded(mmgr, clr, mmd, relationType, lastMmd))
@@ -297,8 +429,60 @@ public class CompleteClassTable implements Table
             {
                 List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
                 embMmds.add(mmd);
-                String colName = namingFactory.getColumnName(embMmds, 0);
-                addEmbeddedColumn(embMmds, colName); // TODO Support column position
+                ColumnMetaData[] colmds = mmd.getColumnMetaData(); // TODO Is there an embedded definition? we only need jdbc type so not critical
+
+                if (relationType != RelationType.NONE)
+                {
+                    // 1-1/N-1 stored as single column with persistable-id
+                    // 1-N/M-N stored as single column with collection<persistable-id>
+                    // Create column for basic type
+                    String colName = namingFactory.getColumnName(embMmds, 0);
+                    ColumnImpl col = addEmbeddedColumn(embMmds, colName);
+                    if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                    {
+                        col.setPosition(colmds[0].getPosition());
+                    }
+                }
+                else
+                {
+                    TypeConverter typeConv = getTypeConverterForMember(mmd, colmds, typeMgr);
+                    if (typeConv != null)
+                    {
+                        // Create column(s) for this TypeConverter
+                        if (typeConv instanceof MultiColumnConverter)
+                        {
+                            Class[] colJavaTypes = ((MultiColumnConverter)typeConv).getDatastoreColumnTypes();
+                            for (int j=0;j<colJavaTypes.length;j++)
+                            {
+                                String colName = namingFactory.getColumnName(embMmds, j);
+                                ColumnImpl col = addEmbeddedColumn(embMmds, colName);
+                                if (colmds != null && colmds.length == 1 && colmds[j].getPosition() != null)
+                                {
+                                    col.setPosition(colmds[j].getPosition());
+                                }
+                            }
+                        }
+                        else
+                        {
+                            String colName = namingFactory.getColumnName(embMmds, 0);
+                            ColumnImpl col = addEmbeddedColumn(embMmds, colName);
+                            if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                            {
+                                col.setPosition(colmds[0].getPosition());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Create column for basic type
+                        String colName = namingFactory.getColumnName(embMmds, 0);
+                        ColumnImpl col = addEmbeddedColumn(embMmds, colName);
+                        if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                        {
+                            col.setPosition(colmds[0].getPosition());
+                        }
+                    }
+                }
             }
         }
     }
@@ -333,16 +517,17 @@ public class CompleteClassTable implements Table
         return col;
     }
 
-    protected ColumnImpl addEmbeddedColumn(List<AbstractMemberMetaData> mmds, String colName)
+    protected ColumnImpl addEmbeddedColumn(List<AbstractMemberMetaData> embMmds, String colName)
     {
+        NucleusLogger.GENERAL.info(">> addEmbeddedCol name=" + colName + " embMmds=" + StringUtils.collectionToString(embMmds), new Exception());
         ColumnImpl col = new ColumnImpl(this, colName, ColumnType.COLUMN);
-        if (mmds != null && mmds.size() > 0)
+        if (embMmds != null && embMmds.size() > 0)
         {
-            col.setMemberMetaData(mmds.get(mmds.size()-1));
+            col.setMemberMetaData(embMmds.get(embMmds.size()-1));
         }
         columns.add(col);
-        columnAttributer.attributeEmbeddedColumn(col, mmds);
-        columnByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(mmds), col);
+        columnAttributer.attributeEmbeddedColumn(col, embMmds);
+        columnByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(embMmds), col);
         return col;
     }
 
