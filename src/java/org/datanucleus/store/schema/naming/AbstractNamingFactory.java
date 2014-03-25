@@ -171,7 +171,7 @@ public abstract class AbstractNamingFactory implements NamingFactory
                                 // Found last embedded field, so use column data if present
                                 checked = true;
                                 ColumnMetaData[] colmds = embMmds[i].getColumnMetaData();
-                                if (colmds != null && colmds.length > position)
+                                if (colmds != null && colmds.length > position && !StringUtils.isWhitespace(colmds[position].getName()))
                                 {
                                     String colName = colmds[position].getName();
                                     return prepareIdentifierNameForUse(colName, SchemaComponent.COLUMN);
