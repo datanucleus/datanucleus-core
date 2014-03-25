@@ -62,21 +62,19 @@ public interface Table
 
     Column getMultitenancyColumn();
 
-    // TODO Support getMemberColumnMapping to handle fields mapped to multiple columns
-
     /**
-     * Accessor for the column for the specified member.
+     * Method to return the member-column mapping for the specified member.
      * @param mmd Metadata for the member
-     * @return The column (or null if invalid member)
+     * @return The member-column mapping
      */
-    Column getColumnForMember(AbstractMemberMetaData mmd);
+    MemberColumnMapping getMemberColumnMappingForMember(AbstractMemberMetaData mmd);
 
     /**
-     * Accessor for the column for the specified embedded member.
+     * Method to return the member-column mapping for the specified embedded member.
      * @param mmds Metadata for the member(s) to navigate to the required member
-     * @return The column (or null if invalid member)
+     * @return The member-column mapping
      */
-    Column getColumnForEmbeddedMember(List<AbstractMemberMetaData> mmds);
+    MemberColumnMapping getMemberColumnMappingForEmbeddedMember(List<AbstractMemberMetaData> mmds);
 
     /**
      * Accessor for the column at the specified position (numbered from 0 to numcols-1).

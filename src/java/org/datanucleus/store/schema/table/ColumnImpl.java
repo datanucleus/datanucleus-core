@@ -94,15 +94,6 @@ public class ColumnImpl implements Column
         return typeName;
     }
 
-    public void setTypeConverter(TypeConverter conv)
-    {
-        this.typeConverter = conv;
-    }
-    public TypeConverter getTypeConverter()
-    {
-        return typeConverter;
-    }
-
     public void setPosition(int pos)
     {
         this.position = pos;

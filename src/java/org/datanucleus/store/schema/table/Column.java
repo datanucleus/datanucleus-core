@@ -19,7 +19,6 @@ package org.datanucleus.store.schema.table;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.schema.naming.ColumnType;
-import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
  * Interface representing a column in a table.
@@ -55,14 +54,6 @@ public interface Column
      * @return The "type" in the datastore
      */
     String getTypeName();
-
-    void setTypeConverter(TypeConverter conv);
-
-    /**
-     * Access to a TypeConverter to use when converting between field value and column value (optional).
-     * @return The TypeConverter
-     */
-    TypeConverter getTypeConverter();
 
     /**
      * Accessor for the position of this column in the table (if specified).
