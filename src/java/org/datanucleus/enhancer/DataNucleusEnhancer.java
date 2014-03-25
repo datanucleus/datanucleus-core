@@ -32,11 +32,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
-import org.datanucleus.PropertyNames;
 import org.datanucleus.enhancer.jdo.JDOClassEnhancer;
 import org.datanucleus.enhancer.jdo.JPAEnhancementNamer;
 import org.datanucleus.exceptions.ClassNotResolvedException;
@@ -49,10 +47,9 @@ import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.PackageMetaData;
 import org.datanucleus.metadata.PersistenceUnitMetaData;
 import org.datanucleus.util.ClassUtils;
-import org.datanucleus.util.CommandLine;
 import org.datanucleus.util.JavaUtils;
-import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -62,7 +59,7 @@ import org.datanucleus.util.StringUtils;
  * <p>
  * You can use the DataNucleusEnhancer in two ways :-
  * <ul>
- * <li>Via the command line, entering via the main method. This creates a DataNucleusEnhancer object, 
+ * <li>Via the command line, entering via the main method. This creates a DataNucleusEnhancer object,
  * sets the options necessary and calls the execute method.</li>
  * <li>Programmatically, creating the DataNucleusEnhancer object settings options and running etc.</li>
  * </ul>
@@ -109,7 +106,7 @@ public class DataNucleusEnhancer
 
     /** Whether to allow generation of the default constructor when needed. */
     private boolean generateConstructor = true;
-    
+
     /** Whether to use Detach Listener */
     private boolean detachListener = false;
 
@@ -122,14 +119,14 @@ public class DataNucleusEnhancer
     /** Map storing input bytes of any classes to enhance, keyed by the class name (if specified using bytes). */
     private Map<String, byte[]> bytesForClassesToEnhanceByClassName = null;
 
-    /** 
-     * Map of the enhanced bytes of all classes just enhanced, keyed by the class name. 
+    /**
+     * Map of the enhanced bytes of all classes just enhanced, keyed by the class name.
      * Only populated after call of enhance().
      */
     private Map<String, byte[]> enhancedBytesByClassName = null;
 
-    /** 
-     * Map of the bytes of the PK classes created, keyed by the class name. 
+    /**
+     * Map of the bytes of the PK classes created, keyed by the class name.
      * Only populated after call of enhance().
      */
     private Map<String, byte[]> pkClassBytesByClassName = null;
@@ -143,7 +140,7 @@ public class DataNucleusEnhancer
     {
         this.apiName = apiName;
 
-        // Create NucleusContext for enhancement 
+        // Create NucleusContext for enhancement
         // TODO Aim to separate MetaDataManager from NucleusContext so we can just have MetaDataManager here
         NucleusContext nucleusContext = new EnhancementNucleusContextImpl(apiName, props);
         if (props != null)
@@ -162,7 +159,7 @@ public class DataNucleusEnhancer
     private void init()
     {
     }
-    
+
     static class EnhanceComponent
     {
         public final static int CLASS = 0;
@@ -314,7 +311,7 @@ public class DataNucleusEnhancer
         return this;
     }
 
-    
+
     /**
      * Method to add the specified class (and its input bytes) to the list of classes to enhance.
      * @param className Name of the class (in the format "mydomain.MyClass")
@@ -395,7 +392,7 @@ public class DataNucleusEnhancer
 
         if (names.size() > 0)
         {
-            componentsToEnhance.add(new EnhanceComponent(EnhanceComponent.CLASS, 
+            componentsToEnhance.add(new EnhanceComponent(EnhanceComponent.CLASS,
                 names.toArray(new String[names.size()])));
         }
         return this;
@@ -497,7 +494,7 @@ public class DataNucleusEnhancer
     {
         if (LOGGER.isDebugEnabled())
         {
-            LOGGER.debug("Enhancing classes for JRE=" + JavaUtils.getJREMajorVersion() + "." + JavaUtils.getJREMinorVersion() + 
+            LOGGER.debug("Enhancing classes for JRE=" + JavaUtils.getJREMajorVersion() + "." + JavaUtils.getJREMinorVersion() +
                 " with stackmap-frames=" + JavaUtils.useStackMapFrames());
         }
 
@@ -533,7 +530,7 @@ public class DataNucleusEnhancer
                     }
 
                     classNames.add(cmd.getFullClassName());
-                    byte[] bytes = bytesForClassesToEnhanceByClassName != null ? 
+                    byte[] bytes = bytesForClassesToEnhanceByClassName != null ?
                             bytesForClassesToEnhanceByClassName.get(cmd.getFullClassName()) : null;
                     ClassEnhancer classEnhancer = getClassEnhancer(cmd, bytes);
                     // Enhance, but don't store if based on input bytes
@@ -556,7 +553,7 @@ public class DataNucleusEnhancer
         String msg = null;
         if (verbose)
         {
-            msg = LOCALISER.msg("Enhancer.Success", classNames.size(), "" + (inputTime-startTime), 
+            msg = LOCALISER.msg("Enhancer.Success", classNames.size(), "" + (inputTime-startTime),
                 "" + (enhanceTime-inputTime), "" + (enhanceTime-startTime));
         }
         else
@@ -612,7 +609,7 @@ public class DataNucleusEnhancer
                     }
 
                     classNames.add(cmd.getFullClassName());
-                    byte[] bytes = bytesForClassesToEnhanceByClassName != null ? 
+                    byte[] bytes = bytesForClassesToEnhanceByClassName != null ?
                             bytesForClassesToEnhanceByClassName.get(cmd.getFullClassName()) : null;
                     ClassEnhancer classEnhancer = getClassEnhancer(cmd, bytes);
                     validateClass(cmd, classEnhancer);
@@ -625,7 +622,7 @@ public class DataNucleusEnhancer
         String msg = null;
         if (verbose)
         {
-            msg = LOCALISER.msg("Enhancer.Success", classNames.size(), "" + (inputTime-startTime), 
+            msg = LOCALISER.msg("Enhancer.Success", classNames.size(), "" + (inputTime-startTime),
                 "" + (enhanceTime-inputTime), "" + (enhanceTime-startTime));
         }
         else
@@ -681,7 +678,7 @@ public class DataNucleusEnhancer
                         }
                         else
                         {
-                            filemds = metadataMgr.loadClasses(new String[] {(String)comp.getValue()}, 
+                            filemds = metadataMgr.loadClasses(new String[] {(String)comp.getValue()},
                                 userClassLoader);
                         }
                     }
@@ -734,7 +731,7 @@ public class DataNucleusEnhancer
                                 classNames.add(className);
                             }
                         }
-                        filemds = metadataMgr.loadClasses(classNames.toArray(new String[classNames.size()]), 
+                        filemds = metadataMgr.loadClasses(classNames.toArray(new String[classNames.size()]),
                             userClassLoader);
                     }
                     break;
@@ -743,7 +740,7 @@ public class DataNucleusEnhancer
                     if (comp.getValue() instanceof String)
                     {
                         // Single mapping file
-                        filemds = metadataMgr.loadMetadataFiles(new String[] {(String)comp.getValue()}, 
+                        filemds = metadataMgr.loadMetadataFiles(new String[] {(String)comp.getValue()},
                             userClassLoader);
                     }
                     else
@@ -1107,6 +1104,10 @@ public class DataNucleusEnhancer
         return props;
     }
 
+    public String getEnhancerVersion() {
+        return enhancerVersion;
+    }
+
     /**
      * Entry point for command line enhancer.
      * @param args Command line arguments
@@ -1116,130 +1117,14 @@ public class DataNucleusEnhancer
     throws Exception
     {
         // Create the enhancer, and set the various options
-        CommandLine cl = new CommandLine();
-        cl.addOption("pu", "persistenceUnit", "<name-of-persistence-unit>", "name of the persistence unit to enhance");
-        cl.addOption("dir", "directory", "<name-of-directory>", "name of the directory containing things to enhance");
-
-        cl.addOption("d", "dest", "<directory>", "output directory");
-        cl.addOption("checkonly", "checkonly", null, "only check if the class is enhanced");
-        cl.addOption("q", "quiet", null, "no output");
-        cl.addOption("v", "verbose", null, "verbose output");
-        cl.addOption("api", "api", "<api-name>", "API Name (JDO, JPA, etc)");
-
-        cl.addOption("alwaysDetachable", "alwaysDetachable", null, "Always detachable?");
-
-        cl.addOption("generatePK", "generatePK", "<generate-pk>", "Generate PK class where needed?");
-        cl.addOption("generateConstructor", "generateConstructor", "<generate-constructor>", 
-            "Generate default constructor where needed?");
-        cl.addOption("detachListener", "detachListener", "<detach-listener>", "Use Detach Listener?");
-        cl.parse(args);
-
-        // Create the DataNucleusEnhancer to the required API/enhancer
-        String apiName = cl.hasOption("api") ? cl.getOptionArg("api") : "JDO";
-
-        // TODO Add a way of defining input properties for startup
-        Properties props = new Properties();
-        props.setProperty("datanucleus.plugin.allowUserBundles", "true");
-        if (cl.hasOption("alwaysDetachable"))
-        {
-            props.setProperty(PropertyNames.PROPERTY_METADATA_ALWAYS_DETACHABLE, "true");
-        }
-        DataNucleusEnhancer enhancer = new DataNucleusEnhancer(apiName, props);
-
-        boolean quiet = false;
-        if (cl.hasOption("q"))
-        {
-            quiet = true;
-        }
-        else if (cl.hasOption("v")) // Verbose only recognised when not quiet
-        {
-            enhancer.setVerbose(true);
-        }
-        if (!quiet)
-        {
-            enhancer.setSystemOut(true);
-        }
-
-        String msg = LOCALISER.msg("Enhancer.ClassEnhancer", enhancer.enhancerVersion, apiName,
-            JavaUtils.getJREMajorVersion() + "." + JavaUtils.getJREMinorVersion());
-        LOGGER.info(msg);
-        if (!quiet)
-        {
-            System.out.println(msg);
-        }
-
-        if (cl.hasOption("d"))
-        {
-            String destination = cl.getOptionArg("d");
-            File tmp = new File(destination);
-            if (tmp.exists())
-            {
-                if (!tmp.isDirectory())
-                {
-                    System.out.println(destination + " is not directory. please set directory.");
-                    System.exit(1);
-                }
-            }
-            else
-            {
-                tmp.mkdirs();
-            }
-            enhancer.setOutputDirectory(destination);
-        }
-        if (cl.hasOption("generateConstructor"))
-        {
-            String val = cl.getOptionArg("generateConstructor");
-            if (val.equalsIgnoreCase("false"))
-            {
-                enhancer.setGenerateConstructor(false);
-            }
-        }
-        if (cl.hasOption("generatePK"))
-        {
-            String val = cl.getOptionArg("generatePK");
-            if (val.equalsIgnoreCase("false"))
-            {
-                enhancer.setGeneratePK(false);
-            }
-        }
-        if (cl.hasOption("detachListener"))
-        {
-            String val = cl.getOptionArg("detachListener");
-            if (val.equalsIgnoreCase("true"))
-            {
-                enhancer.setDetachListener(true);
-            }
-        }
-        boolean validating = cl.hasOption("checkonly") ? true : false;
-
-        // Debug Info : CLASSPATH
-        LOGGER.debug(LOCALISER.msg("Enhancer.Classpath"));
-        if (enhancer.isVerbose())
-        {
-            System.out.println(LOCALISER.msg("Enhancer.Classpath"));
-        }
-        StringTokenizer tokeniser = new StringTokenizer(System.getProperty("java.class.path"), File.pathSeparator);
-        while (tokeniser.hasMoreTokens())
-        {
-            String entry = LOCALISER.msg("Enhancer.Classpath.Entry", tokeniser.nextToken());
-            if (LOGGER.isDebugEnabled())
-            {
-                LOGGER.debug(entry);
-            }
-            if (enhancer.isVerbose())
-            {
-                System.out.println(entry);
-            }
-        }
-        if (enhancer.isVerbose())
-        {
-            System.out.flush();
-        }
+        final CommandLineHelper clh = new CommandLineHelper(args);
+        final boolean quiet = clh.isQuiet();
+        final DataNucleusEnhancer enhancer = clh.createDataNucleusEnhancer();
 
         // Perform the enhancement/validation using the specified input
-        String persistenceUnitName = cl.hasOption("pu") ? cl.getOptionArg("pu") : null;
-        String directoryName = cl.hasOption("dir") ? cl.getOptionArg("dir") : null;
-        String[] filenames = cl.getDefaultArgs();
+        final String persistenceUnitName = clh.getPersistenceUnitName();
+        final String directoryName = clh.getDirectory();
+        final String[] filenames = clh.getFiles();
         int numClasses = 0;
         try
         {
@@ -1272,7 +1157,7 @@ public class DataNucleusEnhancer
                 enhancer.addFiles(filenames);
             }
 
-            if (validating)
+            if (clh.isValidating())
             {
                 numClasses = enhancer.validate();
             }
@@ -1284,7 +1169,7 @@ public class DataNucleusEnhancer
         catch (NucleusException jpe)
         {
             System.out.println(jpe.getMessage());
-            msg = LOCALISER.msg("Enhancer.Failure");
+            String msg = LOCALISER.msg("Enhancer.Failure");
             LOGGER.error(msg, jpe);
             if (!quiet)
             {
@@ -1295,7 +1180,7 @@ public class DataNucleusEnhancer
 
         if (numClasses == 0)
         {
-            msg = LOCALISER.msg("Enhancer.NoClassesEnhanced");
+            String msg = LOCALISER.msg("Enhancer.NoClassesEnhanced");
             LOGGER.info(msg);
             if (!quiet)
             {
@@ -1303,4 +1188,5 @@ public class DataNucleusEnhancer
             }
         }
     }
+
 }
