@@ -151,11 +151,6 @@ Contributors:
         <java-type name="java.sql.Time" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.simple.SqlTime"/>
         <java-type name="java.sql.Timestamp" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.simple.SqlTimestamp"/>
 
-        <!-- "javax.time" types TODO Remove these since support is in datanucleus-java8 plugin. -->
-        <java-type name="javax.time.calendar.LocalDate" dfg="true" embedded="true" converter-name="dn.localdate-sqldate"/>
-        <java-type name="javax.time.calendar.LocalDateTime" dfg="true" embedded="true" converter-name="dn.localdatetime-timestamp"/>
-        <java-type name="javax.time.calendar.LocalTime" dfg="true" embedded="true" converter-name="dn.localtime-sqltime"/>
-
         <!-- "java.util" types -->
         <java-type name="java.util.Date" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.simple.Date"/>
         <java-type name="java.util.Locale" dfg="true" embedded="true" converter-name="dn.locale-string"/>
@@ -310,22 +305,6 @@ Contributors:
             converter-class="org.datanucleus.store.types.converters.SqlTimestampDateConverter"/>
         <type-converter name="dn.sqltimestamp-string" member-type="java.sql.Timestamp" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.SqlTimestampStringConverter"/>
-
-        <!-- TODO Remove these since now in "datanucleus-java8" plugin. -->
-        <type-converter name="dn.localdate-string" member-type="javax.time.calendar.LocalDate" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.LocalDateStringConverter"/>
-        <type-converter name="dn.localdate-sqldate" member-type="javax.time.calendar.LocalDate" datastore-type="java.sql.Date"
-            converter-class="org.datanucleus.store.types.converters.LocalDateSqlDateConverter"/>
-        <type-converter name="dn.localtime-string" member-type="javax.time.calendar.LocalTime" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.LocalTimeStringConverter"/>
-        <type-converter name="dn.localtime-long" member-type="javax.time.calendar.LocalTime" datastore-type="java.lang.Long"
-            converter-class="org.datanucleus.store.types.converters.LocalTimeLongConverter"/>
-        <type-converter name="dn.localtime-sqltime" member-type="javax.time.calendar.LocalTime" datastore-type="java.sql.Time"
-            converter-class="org.datanucleus.store.types.converters.LocalTimeSqlTimeConverter"/>
-        <type-converter name="dn.localdatetime-string" member-type="javax.time.calendar.LocalDateTime" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.LocalDateTimeStringConverter"/>
-        <type-converter name="dn.localdatetime-timestamp" member-type="javax.time.calendar.LocalDateTime" datastore-type="java.sql.Timestamp"
-            converter-class="org.datanucleus.store.types.converters.LocalDateTimeTimestampConverter"/>
 
         <type-converter name="dn.serializable-string" member-type="java.io.Serializable" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.SerializableStringConverter"/>
