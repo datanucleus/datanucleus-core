@@ -367,6 +367,7 @@ public class CompleteClassTable implements Table
                 String jdbcType = (colmds != null && colmds.length > 0 ? colmds[0].getJdbcType() : null);
                 if (!StringUtils.isWhitespace(jdbcType))
                 {
+                    // TODO Create Enum or static final of the JDBC types to avoid hardcoding names
                     // JDBC type specified so don't just take the default
                     if (jdbcType.equalsIgnoreCase("varchar") || jdbcType.equalsIgnoreCase("char"))
                     {
