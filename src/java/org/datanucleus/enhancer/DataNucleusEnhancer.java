@@ -131,35 +131,6 @@ public class DataNucleusEnhancer
      */
     private Map<String, byte[]> pkClassBytesByClassName = null;
 
-    /**
-     * Constructor for an enhancer specifying the API and class enhancer and optional properties.
-     * @param apiName Name of the API to use; defines which MetaDataManager to utilise.
-     * @param props properties controlling enhancement
-     */
-    public DataNucleusEnhancer(String apiName, Properties props)
-    {
-        this.apiName = apiName;
-
-        // Create NucleusContext for enhancement
-        // TODO Aim to separate MetaDataManager from NucleusContext so we can just have MetaDataManager here
-        NucleusContext nucleusContext = new EnhancementNucleusContextImpl(apiName, props);
-        if (props != null)
-        {
-            // Superimpose any user-provided properties
-            nucleusContext.getConfiguration().setPersistenceProperties(props);
-        }
-        this.metadataMgr = nucleusContext.getMetaDataManager();
-        this.clr = nucleusContext.getClassLoaderResolver(null);
-        this.enhancerVersion = nucleusContext.getPluginManager().getVersionForBundle("org.datanucleus");
-    }
-
-    /**
-     * Initialise the enhancer plugin.
-     */
-    private void init()
-    {
-    }
-
     static class EnhanceComponent
     {
         public final static int CLASS = 0;
@@ -182,6 +153,28 @@ public class DataNucleusEnhancer
         {
             return type;
         }
+    }
+
+    /**
+     * Constructor for an enhancer specifying the API and class enhancer and optional properties.
+     * @param apiName Name of the API to use; defines which MetaDataManager to utilise.
+     * @param props properties controlling enhancement
+     */
+    public DataNucleusEnhancer(String apiName, Properties props)
+    {
+        this.apiName = apiName;
+
+        // Create NucleusContext for enhancement
+        // TODO Aim to separate MetaDataManager from NucleusContext so we can just have MetaDataManager here
+        NucleusContext nucleusContext = new EnhancementNucleusContextImpl(apiName, props);
+        if (props != null)
+        {
+            // Superimpose any user-provided properties
+            nucleusContext.getConfiguration().setPersistenceProperties(props);
+        }
+        this.metadataMgr = nucleusContext.getMetaDataManager();
+        this.clr = nucleusContext.getClassLoaderResolver(null);
+        this.enhancerVersion = nucleusContext.getPluginManager().getVersionForBundle("org.datanucleus");
     }
 
     /**
@@ -320,7 +313,6 @@ public class DataNucleusEnhancer
      */
     public DataNucleusEnhancer addClass(String className, byte[] bytes)
     {
-        init();
         if (className == null)
         {
             return this;
@@ -344,7 +336,6 @@ public class DataNucleusEnhancer
     @SuppressWarnings("unchecked")
     public DataNucleusEnhancer addClasses(String... classNames)
     {
-        init();
         if (classNames == null)
         {
             return this;
@@ -405,7 +396,6 @@ public class DataNucleusEnhancer
      */
     public DataNucleusEnhancer addFiles(String... filenames)
     {
-        init();
         if (filenames == null)
         {
             return this;
@@ -457,7 +447,6 @@ public class DataNucleusEnhancer
      */
     public DataNucleusEnhancer addJar(String jarFileName)
     {
-        init();
         if (jarFileName == null)
         {
             return this;
@@ -475,7 +464,6 @@ public class DataNucleusEnhancer
      */
     public DataNucleusEnhancer addPersistenceUnit(String persistenceUnitName)
     {
-        init();
         if (persistenceUnitName == null)
         {
             return this;
@@ -497,8 +485,6 @@ public class DataNucleusEnhancer
             LOGGER.debug("Enhancing classes for JRE=" + JavaUtils.getJREMajorVersion() + "." + JavaUtils.getJREMinorVersion() +
                 " with stackmap-frames=" + JavaUtils.useStackMapFrames());
         }
-
-        init();
 
         if (componentsToEnhance.isEmpty())
         {
@@ -579,7 +565,6 @@ public class DataNucleusEnhancer
      */
     public int validate()
     {
-        init();
         if (componentsToEnhance.isEmpty())
         {
             return 0; // Nothing to validate
@@ -1104,7 +1089,8 @@ public class DataNucleusEnhancer
         return props;
     }
 
-    public String getEnhancerVersion() {
+    public String getEnhancerVersion()
+    {
         return enhancerVersion;
     }
 
@@ -1166,11 +1152,11 @@ public class DataNucleusEnhancer
                 numClasses = enhancer.enhance();
             }
         }
-        catch (NucleusException jpe)
+        catch (NucleusException ne)
         {
-            System.out.println(jpe.getMessage());
+            System.out.println(ne.getMessage());
             String msg = LOCALISER.msg("Enhancer.Failure");
-            LOGGER.error(msg, jpe);
+            LOGGER.error(msg, ne);
             if (!quiet)
             {
                 System.out.println(msg);
@@ -1188,5 +1174,4 @@ public class DataNucleusEnhancer
             }
         }
     }
-
 }

@@ -1,3 +1,21 @@
+/**********************************************************************
+Copyright (c) 2014 Marco Schulze and others. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Contributors:
+2005 Andy Jefferson - initial code embodied in DataNucleusEnhancer
+    ...
+**********************************************************************/
 package org.datanucleus.enhancer;
 
 import java.io.BufferedReader;
@@ -20,28 +38,32 @@ import org.datanucleus.util.NucleusLogger;
 /**
  * Helper used by {@link DataNucleusEnhancer#main(String[])} to process the command line arguments.
  * <p>
- * <b>Important:</b> This class uses {@link System#exit(int)} in case of failures. It must therefore not be used
- * anywhere else than a <code>main(...)</code> method!
+ * <b>Important:</b> This class uses {@link System#exit(int)} in case of failures. It must therefore not be
+ * used anywhere else than a <code>main(...)</code> method!
  * @author Marco หงุ่ยตระกูล-Schulze - marco at codewizards dot co
  */
-class CommandLineHelper {
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-            "org.datanucleus.Localisation", ClassEnhancer.class.getClassLoader());
+class CommandLineHelper
+{
+    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", ClassEnhancer.class.getClassLoader());
 
     /** Logger for enhancing. */
     public static final NucleusLogger LOGGER = NucleusLogger.getLoggerInstance("DataNucleus.Enhancer");
 
     private final CommandLine cl;
+
     private String[] files;
 
-    public CommandLineHelper(String[] args) {
+    public CommandLineHelper(String[] args)
+    {
         cl = createCommandLine();
         cl.parse(args);
     }
 
-    private static CommandLine createCommandLine() {
+    private static CommandLine createCommandLine()
+    {
         final CommandLine cl = new CommandLine();
-        cl.addOption("flf", "fileListFile", "<file-with-list-of-files>", "relative or absolute path to a file containing a list of classes and other files (usually *.jdo) to enhance (one per line) - file is DELETED when read");
+        cl.addOption("flf", "fileListFile", "<file-with-list-of-files>",
+            "relative or absolute path to a file containing a list of classes and other files (usually *.jdo) to enhance (one per line) - file is DELETED when read");
         cl.addOption("pu", "persistenceUnit", "<name-of-persistence-unit>", "name of the persistence unit to enhance");
         cl.addOption("dir", "directory", "<name-of-directory>", "name of the directory containing things to enhance");
 
@@ -54,44 +76,51 @@ class CommandLineHelper {
         cl.addOption("alwaysDetachable", "alwaysDetachable", null, "Always detachable?");
 
         cl.addOption("generatePK", "generatePK", "<generate-pk>", "Generate PK class where needed?");
-        cl.addOption("generateConstructor", "generateConstructor", "<generate-constructor>",
-            "Generate default constructor where needed?");
+        cl.addOption("generateConstructor", "generateConstructor", "<generate-constructor>", "Generate default constructor where needed?");
         cl.addOption("detachListener", "detachListener", "<detach-listener>", "Use Detach Listener?");
         return cl;
     }
 
-    public boolean isQuiet() {
+    public boolean isQuiet()
+    {
         return cl.hasOption("q");
     }
 
-    public boolean isVerbose() {
+    public boolean isVerbose()
+    {
         return cl.hasOption("v");
     }
 
-    public boolean isValidating() {
+    public boolean isValidating()
+    {
         return cl.hasOption("checkonly") ? true : false;
     }
 
-    public String getPersistenceUnitName() {
+    public String getPersistenceUnitName()
+    {
         return cl.hasOption("pu") ? cl.getOptionArg("pu") : null;
     }
 
-    public String getDirectory() {
+    public String getDirectory()
+    {
         return cl.hasOption("dir") ? cl.getOptionArg("dir") : null;
     }
 
     /**
      * Gets the files to be enhanced.
      * <p>
-     * This is either the list of default arguments (i.e. program arguments without a "-"-prefix)
-     * or the contents of the file-list-file passed as "-flf" argument. If a file-list-file was
-     * specified, the default arguments are ignored.
+     * This is either the list of default arguments (i.e. program arguments without a "-"-prefix) or the
+     * contents of the file-list-file passed as "-flf" argument. If a file-list-file was specified, the
+     * default arguments are ignored.
      * @return the files to be enhanced. Never <code>null</code>.
      */
-    public String[] getFiles() {
-        if (files == null) {
+    public String[] getFiles()
+    {
+        if (files == null)
+        {
             final String fileListFile = getFileListFile();
-            if (fileListFile != null && !fileListFile.isEmpty()) {
+            if (fileListFile != null && !fileListFile.isEmpty())
+            {
                 final List<String> fileList = readAndDeleteFileListFile();
                 files = fileList.toArray(new String[fileList.size()]);
             }
@@ -101,11 +130,13 @@ class CommandLineHelper {
         return files;
     }
 
-    protected String getFileListFile() {
+    protected String getFileListFile()
+    {
         return cl.hasOption("flf") ? cl.getOptionArg("flf") : null;
     }
 
-    public DataNucleusEnhancer createDataNucleusEnhancer() {
+    public DataNucleusEnhancer createDataNucleusEnhancer()
+    {
         // Create the DataNucleusEnhancer to the required API/enhancer
         String apiName = cl.hasOption("api") ? cl.getOptionArg("api") : "JDO";
 
@@ -131,7 +162,8 @@ class CommandLineHelper {
         return enhancer;
     }
 
-    private void configureQuietAndVerbose(DataNucleusEnhancer enhancer) {
+    private void configureQuietAndVerbose(DataNucleusEnhancer enhancer)
+    {
         if (!isQuiet())
         {
             if (isVerbose()) // Verbose only recognised when not quiet
@@ -142,7 +174,8 @@ class CommandLineHelper {
         }
     }
 
-    private void configureDestination(DataNucleusEnhancer enhancer) {
+    private void configureDestination(DataNucleusEnhancer enhancer)
+    {
         if (cl.hasOption("d"))
         {
             String destination = cl.getOptionArg("d");
@@ -163,7 +196,8 @@ class CommandLineHelper {
         }
     }
 
-    private void configureGenerateConstructor(DataNucleusEnhancer enhancer) {
+    private void configureGenerateConstructor(DataNucleusEnhancer enhancer)
+    {
         if (cl.hasOption("generateConstructor"))
         {
             String val = cl.getOptionArg("generateConstructor");
@@ -174,7 +208,8 @@ class CommandLineHelper {
         }
     }
 
-    private void configureGeneratePK(DataNucleusEnhancer enhancer) {
+    private void configureGeneratePK(DataNucleusEnhancer enhancer)
+    {
         if (cl.hasOption("generatePK"))
         {
             String val = cl.getOptionArg("generatePK");
@@ -185,7 +220,8 @@ class CommandLineHelper {
         }
     }
 
-    private void configureDetachListener(DataNucleusEnhancer enhancer) {
+    private void configureDetachListener(DataNucleusEnhancer enhancer)
+    {
         if (cl.hasOption("detachListener"))
         {
             String val = cl.getOptionArg("detachListener");
@@ -196,9 +232,10 @@ class CommandLineHelper {
         }
     }
 
-    private void logEnhancerVersion(DataNucleusEnhancer enhancer, String apiName) {
+    private void logEnhancerVersion(DataNucleusEnhancer enhancer, String apiName)
+    {
         String msg = LOCALISER.msg("Enhancer.ClassEnhancer", enhancer.getEnhancerVersion(), apiName,
-                JavaUtils.getJREMajorVersion() + "." + JavaUtils.getJREMinorVersion());
+            JavaUtils.getJREMajorVersion() + "." + JavaUtils.getJREMinorVersion());
         LOGGER.info(msg);
         if (!isQuiet())
         {
@@ -206,8 +243,9 @@ class CommandLineHelper {
         }
     }
 
-    private void logClasspath(DataNucleusEnhancer enhancer) {
-     // Debug Info : CLASSPATH
+    private void logClasspath(DataNucleusEnhancer enhancer)
+    {
+        // Debug Info : CLASSPATH
         LOGGER.debug(LOCALISER.msg("Enhancer.Classpath"));
         if (enhancer.isVerbose())
         {
@@ -239,10 +277,11 @@ class CommandLineHelper {
      * to the enhancer as program arguments. It must be UTF-8-encoded and it must contain one file per line.
      * <p>
      * See: <a href="http://www.datanucleus.org/servlet/jira/browse/NUCACCECLIPSE-11">NUCACCECLIPSE-11</a>
-     * @return the contents of the file-list-file. Never <code>null</code>. Empty lines and comments
-     * are filtered out.
+     * @return the contents of the file-list-file. Never <code>null</code>. Empty lines and comments are
+     * filtered out.
      */
-    private List<String> readAndDeleteFileListFile() {
+    private List<String> readAndDeleteFileListFile()
+    {
         final String fileListFile = getFileListFile();
         if (isVerbose())
             System.out.println("Reading fileListFile: " + fileListFile);
@@ -257,22 +296,29 @@ class CommandLineHelper {
             System.exit(2);
         }
         List<String> result = new ArrayList<String>();
-        try {
+        try
+        {
             InputStream in = new FileInputStream(flf);
-            try {
+            try
+            {
                 BufferedReader r = new BufferedReader(new InputStreamReader(in, "UTF-8"));
                 String line;
-                while (null != (line = r.readLine())) {
+                while (null != (line = r.readLine()))
+                {
                     line = line.trim();
                     if (!line.isEmpty() && !line.startsWith("#"))
                         result.add(line);
                 }
                 r.close();
-            } finally {
+            }
+            finally
+            {
                 in.close();
             }
             flf.delete();
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             System.err.println(fileListFile + " could not be read: " + e);
             e.printStackTrace();
             System.exit(3);
