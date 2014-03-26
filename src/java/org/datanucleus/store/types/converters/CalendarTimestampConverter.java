@@ -17,28 +17,32 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.converters;
 
+import java.sql.Timestamp;
 import java.util.Calendar;
-import java.util.Date;
 
 /**
- * Class to handle the conversion between java.util.Calendar and a java.util.Date form.
+ * Class to handle the conversion between java.util.Calendar and a java.sql.Timestamp.
  */
-public class CalendarDateConverter implements TypeConverter<Calendar, Date>
+public class CalendarTimestampConverter implements TypeConverter<Calendar, Timestamp>
 {
-    public Calendar toMemberType(Date date)
+    public Calendar toMemberType(Timestamp ts)
     {
-        if (date == null)
+        if (ts == null)
         {
         	return null;
         }
 
         Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
+        cal.setTime(ts);
         return cal;
     }
 
-    public Date toDatastoreType(Calendar cal)
+    public Timestamp toDatastoreType(Calendar cal)
     {
-        return cal != null ? cal.getTime() : null;
+        if (cal == null)
+        {
+            return null;
+        }
+        return new Timestamp(cal.getTimeInMillis());
     }
 }
