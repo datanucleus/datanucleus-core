@@ -130,32 +130,26 @@ Contributors:
         <java-type name="java.lang.Number" dfg="true" embedded="true"/>
         <java-type name="java.lang.String" dfg="true" embedded="true"/>
         <java-type name="java.lang.Enum" dfg="true" embedded="true"/>
-        <java-type name="java.lang.StringBuffer" dfg="true" embedded="true" 
-            converter-name="dn.stringbuffer-string"/>
-        <java-type name="java.lang.StringBuilder" dfg="true" embedded="true" 
-            converter-name="dn.stringbuilder-string"/>
-        <java-type name="java.lang.Class" dfg="true" embedded="true" 
-            converter-name="dn.class-string"/>
+        <java-type name="java.lang.StringBuffer" dfg="true" embedded="true" converter-name="dn.stringbuffer-string"/>
+        <java-type name="java.lang.StringBuilder" dfg="true" embedded="true" converter-name="dn.stringbuilder-string"/>
+        <java-type name="java.lang.Class" dfg="true" embedded="true" converter-name="dn.class-string"/>
 
         <!-- "java.awt" types -->
         <java-type name="java.awt.image.BufferedImage" embedded="true"/>
         <java-type name="java.awt.Color" embedded="true" converter-name="dn.color-string"/>
 
         <!-- "java.math" types -->
-        <java-type name="java.math.BigDecimal" dfg="true" embedded="true" converter-name="dn.bigdecimal-string"/>
-        <java-type name="java.math.BigInteger" dfg="true" embedded="true" converter-name="dn.biginteger-string"/>
+        <java-type name="java.math.BigDecimal" dfg="true" embedded="true"/>
+        <java-type name="java.math.BigInteger" dfg="true" embedded="true"/>
 
         <!-- "java.net" types -->
         <java-type name="java.net.URL" dfg="true" embedded="true" converter-name="dn.url-string"/>
         <java-type name="java.net.URI" dfg="true" embedded="true" converter-name="dn.uri-string"/>
 
         <!-- "java.sql" types -->
-        <java-type name="java.sql.Date" dfg="true" embedded="true" 
-            wrapper-type="org.datanucleus.store.types.simple.SqlDate" converter-name="dn.sqldate-string"/>
-        <java-type name="java.sql.Time" dfg="true" embedded="true" 
-            wrapper-type="org.datanucleus.store.types.simple.SqlTime" converter-name="dn.sqltime-string"/>
-        <java-type name="java.sql.Timestamp" dfg="true" embedded="true" 
-            wrapper-type="org.datanucleus.store.types.simple.SqlTimestamp" converter-name="dn.sqltimestamp-long"/>
+        <java-type name="java.sql.Date" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.simple.SqlDate"/>
+        <java-type name="java.sql.Time" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.simple.SqlTime"/>
+        <java-type name="java.sql.Timestamp" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.simple.SqlTimestamp"/>
 
         <!-- "javax.time" types TODO Remove these since support is in datanucleus-java8 plugin. -->
         <java-type name="javax.time.calendar.LocalDate" dfg="true" embedded="true" converter-name="dn.localdate-sqldate"/>
@@ -163,8 +157,7 @@ Contributors:
         <java-type name="javax.time.calendar.LocalTime" dfg="true" embedded="true" converter-name="dn.localtime-sqltime"/>
 
         <!-- "java.util" types -->
-        <java-type name="java.util.Date" dfg="true" embedded="true" 
-            wrapper-type="org.datanucleus.store.types.simple.Date" converter-name="dn.date-string"/>
+        <java-type name="java.util.Date" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.simple.Date"/>
         <java-type name="java.util.Locale" dfg="true" embedded="true" converter-name="dn.locale-string"/>
         <java-type name="java.util.Currency" dfg="true" embedded="true" converter-name="dn.currency-string"/>
         <java-type name="java.util.Calendar" dfg="true" embedded="true"
@@ -178,8 +171,7 @@ Contributors:
             wrapper-type-backed="org.datanucleus.store.types.backed.ArrayList"/>
         <java-type name="java.util.Arrays$ArrayList" wrapper-type="org.datanucleus.store.types.simple.List"
             wrapper-type-backed="org.datanucleus.store.types.backed.List"/>
-        <java-type name="java.util.BitSet" wrapper-type="org.datanucleus.store.types.simple.BitSet"
-            converter-name="dn.bitset-string"/>
+        <java-type name="java.util.BitSet" wrapper-type="org.datanucleus.store.types.simple.BitSet" converter-name="dn.bitset-string"/>
         <java-type name="java.util.Collection" wrapper-type="org.datanucleus.store.types.simple.Collection"
             wrapper-type-backed="org.datanucleus.store.types.backed.Collection"/>
         <java-type name="java.util.HashMap" wrapper-type="org.datanucleus.store.types.simple.HashMap"
