@@ -104,8 +104,8 @@ public class ColumnImpl implements Column
     {
         if (mmd != null)
         {
-            return "Column: " + identifier + " member=" + mmd.getFullFieldName() + (primaryKey ? " (PK)" : "");
+            return "Column: " + identifier + " member=" + mmd.getFullFieldName() + (primaryKey ? " (PK)" : "") + (position >= 0 ? (" [" + position + "]") : "");
         }
-        return "Column : " + identifier + " type=" + columnType + (primaryKey ? " (PK)" : "");
+        return "Column : " + identifier + " type=" + columnType + (primaryKey ? " (PK)" : "") + (position >= 0 ? (" [" + position + "]") : "");
     }
 }

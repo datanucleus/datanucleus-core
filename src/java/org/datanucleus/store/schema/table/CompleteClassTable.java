@@ -300,6 +300,10 @@ public class CompleteClassTable implements Table
                     cols[col.getPosition()] = col;
                 }
             }
+            else
+            {
+                unorderedCols.add(col);
+            }
         }
         if (!unorderedCols.isEmpty())
         {
