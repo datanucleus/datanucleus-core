@@ -134,7 +134,7 @@ public class CompleteClassTable implements Table
                     // Embedded PC field, so add columns for all fields of the embedded
                     List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>();
                     embMmds.add(mmd);
-                    processEmbeddedMember(embMmds, clr);
+                    processEmbeddedMember(embMmds, clr, mmd.getEmbeddedMetaData());
                 }
                 else if (RelationType.isRelationMultiValued(relationType))
                 {
@@ -405,10 +405,9 @@ public class CompleteClassTable implements Table
         return typeConv;
     }
 
-    protected void processEmbeddedMember(List<AbstractMemberMetaData> mmds, ClassLoaderResolver clr)
+    protected void processEmbeddedMember(List<AbstractMemberMetaData> mmds, ClassLoaderResolver clr, EmbeddedMetaData embmd)
     {
         AbstractMemberMetaData lastMmd = mmds.get(mmds.size()-1);
-        EmbeddedMetaData embmd = mmds.get(0).getEmbeddedMetaData();
         TypeManager typeMgr = storeMgr.getNucleusContext().getTypeManager();
         MetaDataManager mmgr = storeMgr.getMetaDataManager();
         NamingFactory namingFactory = storeMgr.getNamingFactory();
@@ -427,6 +426,22 @@ public class CompleteClassTable implements Table
                 // Special case of this being a link back to the owner. TODO Repeat this for nested and their owners
                 continue;
             }
+            AbstractMemberMetaData embmdMmd = null;
+            if (embmd != null)
+            {
+                AbstractMemberMetaData[] embmdMmds = embmd.getMemberMetaData();
+                if (embmdMmds != null)
+                {
+                    for (AbstractMemberMetaData thisMmd : embmdMmds)
+                    {
+                        if (thisMmd.getName().equals(mmd.getName()))
+                        {
+                            embmdMmd = thisMmd;
+                            break;
+                        }
+                    }
+                }
+            }
 
             RelationType relationType = mmd.getRelationType(clr);
             if (relationType != RelationType.NONE && MetaDataUtils.getInstance().isMemberEmbedded(mmgr, clr, mmd, relationType, lastMmd))
@@ -436,7 +451,7 @@ public class CompleteClassTable implements Table
                     // Nested embedded PC, so recurse
                     List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
                     embMmds.add(mmd);
-                    processEmbeddedMember(embMmds, clr);
+                    processEmbeddedMember(embMmds, clr, (embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null));
                 }
                 else
                 {
@@ -448,7 +463,7 @@ public class CompleteClassTable implements Table
             {
                 List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
                 embMmds.add(mmd);
-                ColumnMetaData[] colmds = mmd.getColumnMetaData(); // TODO Is there an embedded definition? we only need jdbc type so not critical
+                ColumnMetaData[] colmds = mmd.getColumnMetaData();
 
                 if (relationType != RelationType.NONE)
                 {
@@ -457,7 +472,11 @@ public class CompleteClassTable implements Table
                     // Create column for basic type
                     String colName = namingFactory.getColumnName(embMmds, 0);
                     ColumnImpl col = addEmbeddedColumn(embMmds, colName, null);
-                    if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                    if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getPosition() != null)
+                    {
+                        col.setPosition(embmdMmd.getColumnMetaData()[0].getPosition());
+                    }
+                    else if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
                     {
                         col.setPosition(colmds[0].getPosition());
                     }
@@ -467,7 +486,7 @@ public class CompleteClassTable implements Table
                 }
                 else
                 {
-                    TypeConverter typeConv = getTypeConverterForMember(mmd, colmds, typeMgr);
+                    TypeConverter typeConv = getTypeConverterForMember(mmd, colmds, typeMgr); // TODO Pass in embedded colmds if they have jdbcType info?
                     if (typeConv != null)
                     {
                         // Create column(s) for this TypeConverter
@@ -479,7 +498,11 @@ public class CompleteClassTable implements Table
                             {
                                 String colName = namingFactory.getColumnName(embMmds, j);
                                 ColumnImpl col = addEmbeddedColumn(embMmds, colName, typeConv);
-                                if (colmds != null && colmds.length == 1 && colmds[j].getPosition() != null)
+                                if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == colJavaTypes.length && embmdMmd.getColumnMetaData()[j].getPosition() != null)
+                                {
+                                    col.setPosition(embmdMmd.getColumnMetaData()[j].getPosition());
+                                }
+                                else if (colmds != null && colmds.length == colJavaTypes.length && colmds[j].getPosition() != null)
                                 {
                                     col.setPosition(colmds[j].getPosition());
                                 }
@@ -493,7 +516,11 @@ public class CompleteClassTable implements Table
                         {
                             String colName = namingFactory.getColumnName(embMmds, 0);
                             ColumnImpl col = addEmbeddedColumn(embMmds, colName, typeConv);
-                            if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                            if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getPosition() != null)
+                            {
+                                col.setPosition(embmdMmd.getColumnMetaData()[0].getPosition());
+                            }
+                            else if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
                             {
                                 col.setPosition(colmds[0].getPosition());
                             }
@@ -508,7 +535,11 @@ public class CompleteClassTable implements Table
                         // Create column for basic type
                         String colName = namingFactory.getColumnName(embMmds, 0);
                         ColumnImpl col = addEmbeddedColumn(embMmds, colName, typeConv);
-                        if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                        if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getPosition() != null)
+                        {
+                            col.setPosition(embmdMmd.getColumnMetaData()[0].getPosition());
+                        }
+                        else if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
                         {
                             col.setPosition(colmds[0].getPosition());
                         }
