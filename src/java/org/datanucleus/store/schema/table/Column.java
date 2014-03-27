@@ -55,6 +55,8 @@ public interface Column
      */
     String getTypeName();
 
+    void setPosition(int pos);
+
     /**
      * Accessor for the position of this column in the table (if specified).
      * @return The position, or -1 if not specified

@@ -308,6 +308,7 @@ public class CompleteClassTable implements Table
                 if (cols[i] == null)
                 {
                      cols[i] = unorderedCols.get(0);
+                     cols[i].setPosition(i);
                      unorderedCols.remove(0);
                 }
             }

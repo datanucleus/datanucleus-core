@@ -19,7 +19,6 @@ package org.datanucleus.store.schema.table;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.schema.naming.ColumnType;
-import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
  * Representation of a column in a table.
@@ -35,8 +34,6 @@ public class ColumnImpl implements Column
     boolean primaryKey;
 
     String typeName;
-
-    TypeConverter typeConverter = null;
 
     int position = -1;
 
