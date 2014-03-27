@@ -54,6 +54,13 @@ public interface Table
 
     List<Column> getColumns();
 
+    /**
+     * Accessor for the column at the specified position (numbered from 0 to numcols-1).
+     * @param pos Position of the column
+     * @return The column at this position (or null if invalid position)
+     */
+    Column getColumnForPosition(int pos);
+
     Column getDatastoreIdColumn();
 
     Column getVersionColumn();
@@ -75,11 +82,4 @@ public interface Table
      * @return The member-column mapping
      */
     MemberColumnMapping getMemberColumnMappingForEmbeddedMember(List<AbstractMemberMetaData> mmds);
-
-    /**
-     * Accessor for the column at the specified position (numbered from 0 to numcols-1).
-     * @param pos Position of the column
-     * @return The column at this position (or null if invalid position)
-     */
-    Column getColumnForPosition(int pos);
 }

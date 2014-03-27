@@ -276,51 +276,47 @@ public class CompleteClassTable implements Table
             }
         }
 
-        // TODO Generate lookup table by position (assumes that position is specified, otherwise we impose own positioning).
-        // First pass to populate those with column position defined
-        /*Iterator<ColumnImpl> colIter = columns.iterator();
-        while (colIter.hasNext())
+        // Reorder all columns to respect column positioning information. Note this assumes the user has provided complete information
+        List<Column> unorderedCols = new ArrayList();
+        Column[] cols = new Column[columns.size()];
+        for (Column col : columns)
         {
-            ColumnImpl col = colIter.next();
-            ColumnMetaData colmd = col.getColumnMetaData();
-            Integer pos = colmd.getPosition();
-            if (pos != null)
+            if (col.getPosition() >= columns.size())
             {
-                if (columnByPosition.containsKey(pos))
+                NucleusLogger.DATASTORE_SCHEMA.warn("Column with name " + col.getIdentifier() + " is specified with position=" + col.getPosition() + " which is invalid." +
+                   " This table has " + columns.size() + " columns");
+                unorderedCols.add(col);
+            }
+            else if (col.getPosition() >= 0)
+            {
+                if (cols[col.getPosition()] != null)
                 {
-                    ColumnImpl col2 = columnByPosition.get(pos);
-                    throw new NucleusUserException("Table " + identifier + " has column " + col.getIdentifier() +
-                        " specified to have column position " + pos +
-                        " yet that position is also defined for column " + col2.identifier);
+                    NucleusLogger.DATASTORE_SCHEMA.warn("Column with name " + col.getIdentifier() + " defined for position=" + col.getPosition() + " yet there is also " +
+                        cols[col.getPosition()].getIdentifier() + " at that position! Ignoring");
+                    unorderedCols.add(col);
                 }
-                else if (pos >= numCols)
+                else
                 {
-                    throw new NucleusUserException("Table " + identifier + " has column " + col.getIdentifier() +
-                        " specified to have position " + pos +
-                        " yet the number of columns is " + numCols + "." +
-                    " Column positions should be from 0 and have no gaps");
+                    cols[col.getPosition()] = col;
                 }
-                columnByPosition.put(colmd.getPosition(), col);
-                colIter.remove();
             }
         }
-        if (!columns.isEmpty())
+        if (!unorderedCols.isEmpty())
         {
-            int pos = 0;
-            for (ColumnImpl col : columns)
+            for (int i=0;i<cols.length;i++)
             {
-                // Find the next position available
-                while (true)
+                if (cols[i] == null)
                 {
-                    if (!columnByPosition.containsKey(pos))
-                    {
-                        break;
-                    }
-                    pos++;
+                     cols[i] = unorderedCols.get(0);
+                     unorderedCols.remove(0);
                 }
-                columnByPosition.put(pos, col);
             }
-        }*/
+        }
+        columns = new ArrayList<Column>();
+        for (Column col : cols)
+        {
+            columns.add(col);
+        }
     }
 
     protected TypeConverter getTypeConverterForMember(AbstractMemberMetaData mmd, ColumnMetaData[] colmds, TypeManager typeMgr)
@@ -393,7 +389,7 @@ public class CompleteClassTable implements Table
                 }
                 else
                 {
-                    // Fallback to default type converter for this member type
+                    // Fallback to default type converter for this member type (if any)
                     typeConv = typeMgr.getDefaultTypeConverterForType(mmd.getType());
                 }
             }
@@ -605,6 +601,15 @@ public class CompleteClassTable implements Table
         return columns;
     }
 
+    public Column getColumnForPosition(int pos)
+    {
+        if (pos < 0 || pos >= columns.size())
+        {
+            throw new ArrayIndexOutOfBoundsException("There are " + columns.size() + " columns, so specify a value between 0 and " + (columns.size()-1));
+        }
+        return columns.get(pos);
+    }
+
     public Column getDatastoreIdColumn()
     {
         return datastoreIdColumn;
@@ -623,12 +628,6 @@ public class CompleteClassTable implements Table
     public Column getMultitenancyColumn()
     {
         return multitenancyColumn;
-    }
-
-    public Column getColumnForPosition(int pos)
-    {
-        throw new UnsupportedOperationException("This class doesnt yet support accessing columns by position");
-//        return columnByPosition.get(pos);
     }
 
     public MemberColumnMapping getMemberColumnMappingForMember(AbstractMemberMetaData mmd)
