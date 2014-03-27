@@ -19,6 +19,7 @@ package org.datanucleus.store.schema.table;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Mapping definition for a member (field/property) representing the column(s) that it maps to.
@@ -101,5 +102,10 @@ public class MemberColumnMappingImpl implements MemberColumnMapping
     public TypeConverter getTypeConverter()
     {
         return typeConverter;
+    }
+
+    public String toString()
+    {
+        return "Member: " + mmd.getFullFieldName() + " converter=" + typeConverter + " columns=" + StringUtils.objectArrayToString(columns);
     }
 }
