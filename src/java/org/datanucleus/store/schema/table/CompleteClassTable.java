@@ -152,9 +152,16 @@ public class CompleteClassTable implements Table
                     // 1-N/M-N stored as single column with collection<persistable-id>
                     String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
                     ColumnImpl col = addColumn(mmd, colName, null);
-                    if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                    if (colmds != null && colmds.length == 1)
                     {
-                        col.setPosition(colmds[0].getPosition());
+                        if (colmds[0].getPosition() != null)
+                        {
+                            col.setPosition(colmds[0].getPosition());
+                        }
+                        if (colmds[0].getJdbcType() != null)
+                        {
+                            col.setJdbcType(colmds[0].getJdbcType());
+                        }
                     }
                     MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
                     if (schemaVerifier != null)
@@ -177,9 +184,16 @@ public class CompleteClassTable implements Table
                             {
                                 String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, j);
                                 ColumnImpl col = addColumn(mmd, colName, typeConv);
-                                if (colmds != null && colmds.length == 1 && colmds[j].getPosition() != null)
+                                if (colmds != null && colmds.length == 1)
                                 {
-                                    col.setPosition(colmds[j].getPosition());
+                                    if (colmds[j].getPosition() != null)
+                                    {
+                                        col.setPosition(colmds[j].getPosition());
+                                    }
+                                    if (colmds[j].getJdbcType() != null)
+                                    {
+                                        col.setJdbcType(colmds[j].getJdbcType());
+                                    }
                                 }
                                 cols[j] = col;
                             }
@@ -194,9 +208,16 @@ public class CompleteClassTable implements Table
                         {
                             String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
                             ColumnImpl col = addColumn(mmd, colName, typeConv);
-                            if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                            if (colmds != null && colmds.length == 1)
                             {
-                                col.setPosition(colmds[0].getPosition());
+                                if (colmds[0].getPosition() != null)
+                                {
+                                    col.setPosition(colmds[0].getPosition());
+                                }
+                                if (colmds[0].getJdbcType() != null)
+                                {
+                                    col.setJdbcType(colmds[0].getJdbcType());
+                                }
                             }
                             MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
                             mapping.setTypeConverter(typeConv);
@@ -212,9 +233,16 @@ public class CompleteClassTable implements Table
                         // Create column for basic type
                         String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
                         ColumnImpl col = addColumn(mmd, colName, typeConv);
-                        if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                        if (colmds != null && colmds.length == 1)
                         {
-                            col.setPosition(colmds[0].getPosition());
+                            if (colmds[0].getPosition() != null)
+                            {
+                                col.setPosition(colmds[0].getPosition());
+                            }
+                            if (colmds[0].getJdbcType() != null)
+                            {
+                                col.setJdbcType(colmds[0].getJdbcType());
+                            }
                         }
                         MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
                         mapping.setTypeConverter(typeConv);
@@ -237,9 +265,16 @@ public class CompleteClassTable implements Table
             {
                 schemaVerifier.attributeMember(new MemberColumnMappingImpl(null, col));
             }
-            if (cmd.getIdentityMetaData() != null && cmd.getIdentityMetaData().getColumnMetaData() != null && cmd.getIdentityMetaData().getColumnMetaData().getPosition() != null)
+            if (cmd.getIdentityMetaData() != null && cmd.getIdentityMetaData().getColumnMetaData() != null)
             {
-                col.setPosition(cmd.getIdentityMetaData().getColumnMetaData().getPosition());
+                if (cmd.getIdentityMetaData().getColumnMetaData().getPosition() != null)
+                {
+                    col.setPosition(cmd.getIdentityMetaData().getColumnMetaData().getPosition());
+                }
+                if (cmd.getIdentityMetaData().getColumnMetaData().getJdbcType() != null)
+                {
+                    col.setJdbcType(cmd.getIdentityMetaData().getColumnMetaData().getJdbcType());
+                }
             }
             this.datastoreIdColumn = col;
         }
@@ -256,9 +291,16 @@ public class CompleteClassTable implements Table
                 {
                     schemaVerifier.attributeMember(new MemberColumnMappingImpl(null, col));
                 }
-                if (vermd.getColumnMetaData() != null && vermd.getColumnMetaData().getPosition() != null)
+                if (vermd.getColumnMetaData() != null)
                 {
-                    col.setPosition(vermd.getColumnMetaData().getPosition());
+                    if (vermd.getColumnMetaData().getPosition() != null)
+                    {
+                        col.setPosition(vermd.getColumnMetaData().getPosition());
+                    }
+                    if (vermd.getColumnMetaData().getJdbcType() != null)
+                    {
+                        col.setJdbcType(vermd.getColumnMetaData().getJdbcType());
+                    }
                 }
                 this.versionColumn = col;
             }
@@ -274,9 +316,16 @@ public class CompleteClassTable implements Table
                 schemaVerifier.attributeMember(new MemberColumnMappingImpl(null, col));
             }
             DiscriminatorMetaData dismd = cmd.getDiscriminatorMetaDataForTable();
-            if (dismd != null && dismd.getColumnMetaData() != null && dismd.getColumnMetaData().getPosition() != null)
+            if (dismd != null && dismd.getColumnMetaData() != null)
             {
-                col.setPosition(dismd.getColumnMetaData().getPosition());
+                if (dismd.getColumnMetaData().getPosition() != null)
+                {
+                    col.setPosition(dismd.getColumnMetaData().getPosition());
+                }
+                if (dismd.getColumnMetaData().getJdbcType() != null)
+                {
+                    col.setJdbcType(dismd.getColumnMetaData().getJdbcType());
+                }
             }
             this.discriminatorColumn = col;
         }
@@ -292,6 +341,7 @@ public class CompleteClassTable implements Table
             {
                 String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.MULTITENANCY_COLUMN);
                 Column col = addColumn(null, colName, ColumnType.MULTITENANCY_COLUMN, null); // TODO Support column position
+                col.setJdbcType("varchar");
                 if (schemaVerifier != null)
                 {
                     schemaVerifier.attributeMember(new MemberColumnMappingImpl(null, col));
@@ -507,6 +557,14 @@ public class CompleteClassTable implements Table
                     {
                         col.setPosition(colmds[0].getPosition());
                     }
+                    if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getJdbcType() != null)
+                    {
+                        col.setJdbcType(embmdMmd.getColumnMetaData()[0].getJdbcType());
+                    }
+                    else if (colmds != null && colmds.length == 1 && colmds[0].getJdbcType() != null)
+                    {
+                        col.setJdbcType(colmds[0].getJdbcType());
+                    }
                     MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
                     if (schemaVerifier != null)
                     {
@@ -536,6 +594,14 @@ public class CompleteClassTable implements Table
                                 {
                                     col.setPosition(colmds[j].getPosition());
                                 }
+                                if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == colJavaTypes.length && embmdMmd.getColumnMetaData()[j].getJdbcType() != null)
+                                {
+                                    col.setJdbcType(embmdMmd.getColumnMetaData()[j].getJdbcType());
+                                }
+                                else if (colmds != null && colmds.length == colJavaTypes.length && colmds[j].getJdbcType() != null)
+                                {
+                                    col.setJdbcType(colmds[j].getJdbcType());
+                                }
                                 cols[j] = col;
                             }
                             MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, cols, typeConv);
@@ -556,6 +622,14 @@ public class CompleteClassTable implements Table
                             else if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
                             {
                                 col.setPosition(colmds[0].getPosition());
+                            }
+                            if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getJdbcType() != null)
+                            {
+                                col.setJdbcType(embmdMmd.getColumnMetaData()[0].getJdbcType());
+                            }
+                            else if (colmds != null && colmds.length == 1 && colmds[0].getJdbcType() != null)
+                            {
+                                col.setJdbcType(colmds[0].getJdbcType());
                             }
                             MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
                             mapping.setTypeConverter(typeConv);
@@ -578,6 +652,14 @@ public class CompleteClassTable implements Table
                         else if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
                         {
                             col.setPosition(colmds[0].getPosition());
+                        }
+                        if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getJdbcType() != null)
+                        {
+                            col.setJdbcType(embmdMmd.getColumnMetaData()[0].getJdbcType());
+                        }
+                        else if (colmds != null && colmds.length == 1 && colmds[0].getJdbcType() != null)
+                        {
+                            col.setJdbcType(colmds[0].getJdbcType());
                         }
                         MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
                         mapping.setTypeConverter(typeConv);

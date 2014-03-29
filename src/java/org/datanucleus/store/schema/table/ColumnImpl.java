@@ -33,6 +33,8 @@ public class ColumnImpl implements Column
 
     boolean primaryKey;
 
+    String jdbcType;
+
     String typeName;
 
     int position = -1;
@@ -80,6 +82,15 @@ public class ColumnImpl implements Column
     public ColumnType getColumnType()
     {
         return columnType;
+    }
+
+    public void setJdbcType(String type)
+    {
+        this.jdbcType = type;
+    }
+    public String getJdbcType()
+    {
+        return jdbcType;
     }
 
     public void setTypeName(String type)

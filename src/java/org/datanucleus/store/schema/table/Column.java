@@ -47,12 +47,12 @@ public interface Column
 
     ColumnType getColumnType();
 
+    void setJdbcType(String jdbcType);
+
+    String getJdbcType();
+
     void setTypeName(String type);
 
-    /**
-     * Access for the type for this column.
-     * @return The "type" in the datastore
-     */
     String getTypeName();
 
     void setPosition(int pos);
