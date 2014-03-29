@@ -2135,9 +2135,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 if (dismd.getColumnMetaData() != null)
                 {
                     ColumnMetaData colmd = dismd.getColumnMetaData();
-                    if ("integer".equalsIgnoreCase(colmd.getJdbcType()) || 
-                        "tinyint".equalsIgnoreCase(colmd.getJdbcType()) ||
-                        "smallint".equalsIgnoreCase(colmd.getJdbcType()))
+                    if (MetaDataUtils.isJdbcTypeNumeric(colmd.getJdbcType()))
                     {
                         // Split out integer-based types. Probably not worth splitting out any other types (floating point?)
                         value = Long.parseLong((String)value);

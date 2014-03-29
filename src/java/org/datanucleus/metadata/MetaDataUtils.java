@@ -652,15 +652,31 @@ public class MetaDataUtils
      * @param jdbcType The type string
      * @return Whether it is numeric
      */
-    public static boolean isJdbcTypeNumeric(String jdbcType)
+    public static boolean isJdbcTypeNumeric(JdbcType jdbcType)
     {
         if (jdbcType == null)
         {
             return false;
         }
-        if (jdbcType.equalsIgnoreCase("INTEGER") || jdbcType.equalsIgnoreCase("SMALLINT") ||
-            jdbcType.equalsIgnoreCase("TINYINT") || jdbcType.equalsIgnoreCase("NUMERIC") ||
-            jdbcType.equalsIgnoreCase("BIGINT"))
+        if (jdbcType == JdbcType.INTEGER || jdbcType == JdbcType.SMALLINT || jdbcType == JdbcType.TINYINT || jdbcType == JdbcType.NUMERIC || jdbcType == JdbcType.BIGINT)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Convenience method to return if a jdbc-type is floating point based.
+     * @param jdbcType The type string
+     * @return Whether it is floating point ased
+     */
+    public static boolean isJdbcTypeFloatingPoint(JdbcType jdbcType)
+    {
+        if (jdbcType == null)
+        {
+            return false;
+        }
+        if (jdbcType == JdbcType.DECIMAL || jdbcType == JdbcType.FLOAT || jdbcType == JdbcType.REAL || jdbcType == JdbcType.DECIMAL)
         {
             return true;
         }
@@ -672,14 +688,14 @@ public class MetaDataUtils
      * @param jdbcType The type string
      * @return Whether it is character based
      */
-    public static boolean isJdbcTypeString(String jdbcType)
+    public static boolean isJdbcTypeString(JdbcType jdbcType)
     {
         if (jdbcType == null)
         {
             return false;
         }
-        if (jdbcType.equalsIgnoreCase("VARCHAR") || jdbcType.equalsIgnoreCase("CHAR") || 
-            jdbcType.equalsIgnoreCase("LONGVARCHAR"))
+        if (jdbcType == JdbcType.CHAR || jdbcType == JdbcType.VARCHAR || jdbcType == JdbcType.CLOB || jdbcType == JdbcType.LONGVARCHAR ||
+            jdbcType == JdbcType.NCHAR || jdbcType == JdbcType.NVARCHAR || jdbcType == JdbcType.LONGNVARCHAR)
         {
             return true;
         }
@@ -919,8 +935,7 @@ public class MetaDataUtils
     public static boolean persistColumnAsNumeric(ColumnMetaData colmd)
     {
         boolean useLong = false;
-        String jdbc = (colmd != null ? colmd.getJdbcType() : null);
-        if (jdbc != null && (jdbc.equalsIgnoreCase("int") || jdbc.equalsIgnoreCase("integer")))
+        if (colmd != null && MetaDataUtils.isJdbcTypeNumeric(colmd.getJdbcType()))
         {
             useLong = true;
         }
@@ -936,8 +951,7 @@ public class MetaDataUtils
     public static boolean persistColumnAsString(ColumnMetaData colmd)
     {
         boolean useString = false;
-        String jdbc = (colmd != null ? colmd.getJdbcType() : null);
-        if (jdbc != null && (jdbc.equalsIgnoreCase("varchar") || jdbc.equalsIgnoreCase("char")))
+        if (colmd != null && MetaDataUtils.isJdbcTypeString(colmd.getJdbcType()))
         {
             useString = true;
         }

@@ -36,6 +36,7 @@ import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.EmbeddedMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.IdentityType;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
@@ -47,7 +48,6 @@ import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.store.types.converters.MultiColumnConverter;
 import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.util.NucleusLogger;
-import org.datanucleus.util.StringUtils;
 
 /**
  * Representation of a table for a class where the class is stored in "complete-table" inheritance (or in JPA "TablePerClass")
@@ -341,7 +341,7 @@ public class CompleteClassTable implements Table
             {
                 String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.MULTITENANCY_COLUMN);
                 Column col = addColumn(null, colName, ColumnType.MULTITENANCY_COLUMN, null); // TODO Support column position
-                col.setJdbcType("varchar");
+                col.setJdbcType(JdbcType.VARCHAR);
                 if (schemaVerifier != null)
                 {
                     schemaVerifier.attributeMember(new MemberColumnMappingImpl(null, col));
@@ -439,28 +439,28 @@ public class CompleteClassTable implements Table
             else
             {
                 // Single column, so try to match the JDBC type if provided
-                String jdbcType = (colmds != null && colmds.length > 0 ? colmds[0].getJdbcType() : null);
-                if (!StringUtils.isWhitespace(jdbcType))
+                JdbcType jdbcType = (colmds != null && colmds.length > 0 ? colmds[0].getJdbcType() : null);
+                if (jdbcType != null)
                 {
                     // TODO Create Enum or static final of the JDBC types to avoid hardcoding names
                     // JDBC type specified so don't just take the default
-                    if (jdbcType.equalsIgnoreCase("varchar") || jdbcType.equalsIgnoreCase("char"))
+                    if (jdbcType == JdbcType.VARCHAR || jdbcType == JdbcType.CHAR) // TODO Support other char based types
                     {
                         typeConv = typeMgr.getTypeConverterForType(mmd.getType(), String.class);
                     }
-                    else if (jdbcType.equalsIgnoreCase("integer"))
+                    else if (jdbcType == JdbcType.INTEGER || jdbcType == JdbcType.SMALLINT || jdbcType == JdbcType.TINYINT)
                     {
                         typeConv = typeMgr.getTypeConverterForType(mmd.getType(), Long.class);
                     }
-                    else if (jdbcType.equalsIgnoreCase("timestamp"))
+                    else if (jdbcType == JdbcType.TIMESTAMP)
                     {
                         typeConv = typeMgr.getTypeConverterForType(mmd.getType(), Timestamp.class);
                     }
-                    else if (jdbcType.equalsIgnoreCase("time"))
+                    else if (jdbcType == JdbcType.TIME)
                     {
                         typeConv = typeMgr.getTypeConverterForType(mmd.getType(), Time.class);
                     }
-                    else if (jdbcType.equalsIgnoreCase("date"))
+                    else if (jdbcType == JdbcType.DATE)
                     {
                         typeConv = typeMgr.getTypeConverterForType(mmd.getType(), Date.class);
                     }

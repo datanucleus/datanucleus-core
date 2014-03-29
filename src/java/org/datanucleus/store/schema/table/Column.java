@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.schema.table;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.schema.naming.ColumnType;
 
 /**
@@ -47,9 +48,9 @@ public interface Column
 
     ColumnType getColumnType();
 
-    void setJdbcType(String jdbcType);
+    void setJdbcType(JdbcType jdbcType);
 
-    String getJdbcType();
+    JdbcType getJdbcType();
 
     void setTypeName(String type);
 

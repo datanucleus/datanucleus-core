@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.schema.table;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.schema.naming.ColumnType;
 
 /**
@@ -33,7 +34,7 @@ public class ColumnImpl implements Column
 
     boolean primaryKey;
 
-    String jdbcType;
+    JdbcType jdbcType;
 
     String typeName;
 
@@ -84,11 +85,11 @@ public class ColumnImpl implements Column
         return columnType;
     }
 
-    public void setJdbcType(String type)
+    public void setJdbcType(JdbcType type)
     {
         this.jdbcType = type;
     }
-    public String getJdbcType()
+    public JdbcType getJdbcType()
     {
         return jdbcType;
     }

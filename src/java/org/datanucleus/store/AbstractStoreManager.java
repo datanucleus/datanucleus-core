@@ -1394,8 +1394,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             IdentityMetaData idmd = cmd.getBaseIdentityMetaData();
             if (idmd != null && idmd.getColumnMetaData() != null)
             {
-                String jdbcType = idmd.getColumnMetaData().getJdbcType();
-                if (MetaDataUtils.isJdbcTypeString(jdbcType))
+                if (MetaDataUtils.isJdbcTypeString(idmd.getColumnMetaData().getJdbcType()))
                 {
                     return "uuid-hex";
                 }

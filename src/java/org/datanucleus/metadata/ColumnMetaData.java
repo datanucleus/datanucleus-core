@@ -18,9 +18,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.metadata;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -29,39 +26,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class ColumnMetaData extends MetaData
 {
-    /** Set of valid JDBC types, for validation. */
-    private static Set<String> VALID_JDBC_TYPES = new HashSet<String>();
-    static
-    {
-        VALID_JDBC_TYPES.add("BIGINT");
-        VALID_JDBC_TYPES.add("BINARY");
-        VALID_JDBC_TYPES.add("BIT");
-        VALID_JDBC_TYPES.add("BLOB");
-        VALID_JDBC_TYPES.add("BOOLEAN");
-        VALID_JDBC_TYPES.add("CHAR");
-        VALID_JDBC_TYPES.add("CLOB");
-        VALID_JDBC_TYPES.add("DATALINK");
-        VALID_JDBC_TYPES.add("DATE");
-        VALID_JDBC_TYPES.add("DECIMAL");
-        VALID_JDBC_TYPES.add("DOUBLE");
-        VALID_JDBC_TYPES.add("FLOAT");
-        VALID_JDBC_TYPES.add("INTEGER");
-        VALID_JDBC_TYPES.add("LONGVARBINARY");
-        VALID_JDBC_TYPES.add("LONGVARCHAR");
-        VALID_JDBC_TYPES.add("NUMERIC");
-        VALID_JDBC_TYPES.add("REAL");
-        VALID_JDBC_TYPES.add("SMALLINT");
-        VALID_JDBC_TYPES.add("TIME");
-        VALID_JDBC_TYPES.add("TIMESTAMP");
-        VALID_JDBC_TYPES.add("TINYINT");
-        VALID_JDBC_TYPES.add("VARBINARY");
-        VALID_JDBC_TYPES.add("VARCHAR");
-        VALID_JDBC_TYPES.add("LONGNVARCHAR");
-        VALID_JDBC_TYPES.add("NVARCHAR");
-        VALID_JDBC_TYPES.add("NCHAR");
-        VALID_JDBC_TYPES.add("NCLOB");
-    }
-
     /** column name. */
     protected String name;
 
@@ -72,7 +36,7 @@ public class ColumnMetaData extends MetaData
     protected String targetMember;
 
     /** jdbc-type to use (if any). */
-    protected String jdbcType;
+    protected JdbcType jdbcType;
 
     /** sql-type to use (if any). Takes priority over jdbc-type. */
     protected String sqlType;
@@ -117,7 +81,7 @@ public class ColumnMetaData extends MetaData
         name = colmd.getName();
         target = colmd.getTarget();
         targetMember = colmd.getTargetMember();
-        setJdbcType(colmd.getJdbcType());
+        jdbcType = colmd.getJdbcType();
         sqlType = colmd.getSqlType();
         length = colmd.getLength();
         scale = colmd.getScale();
@@ -189,68 +153,36 @@ public class ColumnMetaData extends MetaData
         return this;
     }
 
-    public String getJdbcType()
+    public JdbcType getJdbcType()
     {
         return jdbcType;
     }
 
-    public ColumnMetaData setJdbcType(String jdbcType)
+    public String getJdbcTypeName()
     {
-        if (StringUtils.isWhitespace(jdbcType))
+        return jdbcType != null ? jdbcType.toString() : null;
+    }
+    public ColumnMetaData setJdbcType(JdbcType type)
+    {
+        this.jdbcType = type;
+        return this;
+    }
+
+    public ColumnMetaData setJdbcType(String jdbcTypeName)
+    {
+        if (StringUtils.isWhitespace(jdbcTypeName))
         {
-            this.jdbcType = null;
+            jdbcType = null;
         }
         else
         {
-            if (VALID_JDBC_TYPES.contains(jdbcType.toUpperCase()))
-            {
-                this.jdbcType = jdbcType;
-            }
-            else
+            jdbcType = Enum.valueOf(JdbcType.class, jdbcTypeName.toUpperCase());
+            if (jdbcType == null && !StringUtils.isWhitespace(jdbcTypeName))
             {
                 NucleusLogger.METADATA.warn("Metadata has jdbc-type of " + jdbcType + " yet this is not valid. Ignored");
             }
         }
         return this;
-    }
-
-    public Boolean isIntegralBased()
-    {
-        if (jdbcType != null)
-        {
-            if (jdbcType.equalsIgnoreCase("INTEGER") || jdbcType.equalsIgnoreCase("TINYINT") || 
-                jdbcType.equalsIgnoreCase("SMALLINT"))
-            {
-                return true;
-            }
-        }
-        return null;
-    }
-
-    public Boolean isFloatingPointBased()
-    {
-        if (jdbcType != null)
-        {
-            if (jdbcType.equalsIgnoreCase("DECIMAL") || jdbcType.equalsIgnoreCase("FLOAT") || 
-                jdbcType.equalsIgnoreCase("REAL") || jdbcType.equalsIgnoreCase("NUMERIC"))
-            {
-                return true;
-            }
-        }
-        return null;
-    }
-
-    public Boolean isStringBased()
-    {
-        if (jdbcType != null)
-        {
-            if (jdbcType.equalsIgnoreCase("CHAR") || jdbcType.equalsIgnoreCase("VARCHAR") || 
-                jdbcType.equalsIgnoreCase("CLOB") || jdbcType.equalsIgnoreCase("LONGVARCHAR"))
-            {
-                return true;
-            }
-        }
-        return null;
     }
 
     public Integer getLength()
