@@ -442,13 +442,12 @@ public class CompleteClassTable implements Table
                 JdbcType jdbcType = (colmds != null && colmds.length > 0 ? colmds[0].getJdbcType() : null);
                 if (jdbcType != null)
                 {
-                    // TODO Create Enum or static final of the JDBC types to avoid hardcoding names
                     // JDBC type specified so don't just take the default
-                    if (jdbcType == JdbcType.VARCHAR || jdbcType == JdbcType.CHAR) // TODO Support other char based types
+                    if (MetaDataUtils.isJdbcTypeString(jdbcType))
                     {
                         typeConv = typeMgr.getTypeConverterForType(mmd.getType(), String.class);
                     }
-                    else if (jdbcType == JdbcType.INTEGER || jdbcType == JdbcType.SMALLINT || jdbcType == JdbcType.TINYINT)
+                    else if (MetaDataUtils.isJdbcTypeNumeric(jdbcType))
                     {
                         typeConv = typeMgr.getTypeConverterForType(mmd.getType(), Long.class);
                     }
