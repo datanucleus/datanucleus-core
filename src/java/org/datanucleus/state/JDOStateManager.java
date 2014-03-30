@@ -2934,21 +2934,17 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
         loadSpecifiedFields(new int[]{fieldNumber});
     }
 
-    /**
-     * Fetch from the database all fields that are not currently loaded regardless of whether
-     * they are in the current fetch group or not. Called by lifecycle transitions.
-     */
-    public void loadUnloadedFields()
+    public void loadUnloadedRelationFields()
     {
-        int[] fieldNumbers = ClassUtils.getFlagsSetTo(loadedFields, cmd.getAllMemberPositions(), false);
+        int[] fieldsConsidered = cmd.getRelationMemberPositions(myEC.getClassLoaderResolver(), myEC.getMetaDataManager());
+        int[] fieldNumbers = ClassUtils.getFlagsSetTo(loadedFields, fieldsConsidered, false);
         if (fieldNumbers == null || fieldNumbers.length == 0)
         {
             // All loaded so return
             return;
         }
 
-        if (preDeleteLoadedFields != null &&
-            ((myLC.isDeleted() && myEC.isFlushing()) || activity == ActivityState.DELETING))
+        if (preDeleteLoadedFields != null && ((myLC.isDeleted() && myEC.isFlushing()) || activity == ActivityState.DELETING))
         {
             // During deletion process so we know what is really loaded so only load if necessary
             fieldNumbers = ClassUtils.getFlagsSetTo(preDeleteLoadedFields, fieldNumbers, false);
@@ -2964,8 +2960,60 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
             }
 
             int[] secondClassMutableFieldNumbers = cmd.getSCOMutableMemberPositions();
+            for (int i=0;i<secondClassMutableFieldNumbers.length;i++)
+            {
+                // Make sure all SCO lazy-loaded relation fields have contents loaded
+                AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(secondClassMutableFieldNumbers[i]);
+                if (mmd.getRelationType(myEC.getClassLoaderResolver()) != RelationType.NONE)
+                {
+                    SingleValueFieldManager sfv = new SingleValueFieldManager();
+                    provideFields(new int[]{secondClassMutableFieldNumbers[i]}, sfv);
+                    Object value = sfv.fetchObjectField(i);
+                    if (value instanceof SCOContainer)
+                    {
+                        ((SCOContainer)value).load();
+                    }
+                }
+            }
 
-            // Make sure all SCO lazy-loaded fields have been loaded
+            updateLevel2CacheForFields(fieldNumbers);
+            if (callPostLoad)
+            {
+                postLoad();
+            }
+        }
+    }
+
+    /**
+     * Fetch from the database all fields that are not currently loaded regardless of whether
+     * they are in the current fetch group or not. Called by lifecycle transitions.
+     */
+    public void loadUnloadedFields()
+    {
+        int[] fieldNumbers = ClassUtils.getFlagsSetTo(loadedFields, cmd.getAllMemberPositions(), false);
+        if (fieldNumbers == null || fieldNumbers.length == 0)
+        {
+            // All loaded so return
+            return;
+        }
+
+        if (preDeleteLoadedFields != null && ((myLC.isDeleted() && myEC.isFlushing()) || activity == ActivityState.DELETING))
+        {
+            // During deletion process so we know what is really loaded so only load if necessary
+            fieldNumbers = ClassUtils.getFlagsSetTo(preDeleteLoadedFields, fieldNumbers, false);
+        }
+
+        if (fieldNumbers != null && fieldNumbers.length > 0)
+        {
+            boolean callPostLoad = myFP.isToCallPostLoadFetchPlan(this.loadedFields);
+            int[] unloadedFieldNumbers = loadFieldsFromLevel2Cache(fieldNumbers);
+            if (unloadedFieldNumbers != null)
+            {
+                loadFieldsFromDatastore(unloadedFieldNumbers);
+            }
+
+            // Make sure all SCO lazy-loaded fields have contents loaded
+            int[] secondClassMutableFieldNumbers = cmd.getSCOMutableMemberPositions();
             for (int i=0;i<secondClassMutableFieldNumbers.length;i++)
             {
                 SingleValueFieldManager sfv = new SingleValueFieldManager();
@@ -3661,7 +3709,7 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
             // This object was enlisted so make sure all of its fields are loaded before continuing
             if (myEC.isEnlistedInTransaction(getInternalObjectId()))
             {
-                loadUnloadedFields();
+                loadUnloadedRelationFields();
             }
 
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
@@ -4624,7 +4672,7 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
                     myLC.stateType() == LifeCycleState.P_NONTRANS_DIRTY)
                 {
                     // Make sure all fields are loaded so we can perform reachability
-                    loadUnloadedFields();
+                    loadUnloadedRelationFields();
                 }
                 setBecomingDeleted(true);
 
