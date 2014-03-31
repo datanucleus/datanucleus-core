@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.schema.table;
 
 import java.util.List;
+import java.util.Set;
 
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -82,4 +83,6 @@ public interface Table
      * @return The member-column mapping
      */
     MemberColumnMapping getMemberColumnMappingForEmbeddedMember(List<AbstractMemberMetaData> mmds);
+
+    Set<MemberColumnMapping> getMemberColumnMappings();
 }

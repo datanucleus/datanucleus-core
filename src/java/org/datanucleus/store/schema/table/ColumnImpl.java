@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.schema.table;
 
-import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.schema.naming.ColumnType;
 
@@ -40,8 +39,7 @@ public class ColumnImpl implements Column
 
     int position = -1;
 
-    /** Member metadata when this column is for a field/property. Will be null when this is for datastore-id, or version etc. */
-    AbstractMemberMetaData mmd;
+    MemberColumnMapping mapping = null;
 
     public ColumnImpl(Table tbl, String identifier, ColumnType colType)
     {
@@ -55,14 +53,14 @@ public class ColumnImpl implements Column
         return table;
     }
 
-    public AbstractMemberMetaData getMemberMetaData()
+    public MemberColumnMapping getMemberColumnMapping()
     {
-        return mmd;
+        return mapping;
     }
 
-    public void setMemberMetaData(AbstractMemberMetaData mmd)
+    public void setMemberColumnMapping(MemberColumnMapping mapping)
     {
-        this.mmd = mmd;
+        this.mapping = mapping;
     }
 
     public String getIdentifier()
@@ -114,9 +112,9 @@ public class ColumnImpl implements Column
 
     public String toString()
     {
-        if (mmd != null)
+        if (mapping != null)
         {
-            return "Column: " + identifier + " member=" + mmd.getFullFieldName() + (primaryKey ? " (PK)" : "") + (position >= 0 ? (" [" + position + "]") : "");
+            return "Column: " + identifier + " member=" + mapping.getMemberMetaData().getFullFieldName() + (primaryKey ? " (PK)" : "") + (position >= 0 ? (" [" + position + "]") : "");
         }
         return "Column : " + identifier + " type=" + columnType + (primaryKey ? " (PK)" : "") + (position >= 0 ? (" [" + position + "]") : "");
     }

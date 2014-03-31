@@ -23,9 +23,11 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.PropertyNames;
@@ -53,7 +55,8 @@ import org.datanucleus.util.NucleusLogger;
  * Representation of a table for a class where the class is stored in "complete-table" inheritance (or in JPA "TablePerClass")
  * whereby all members (in this class and superclasses) are handled in this table. Also assumes that any persistable fields
  * and collection/map fields are stored in this table (i.e not usable where you have foreign keys in the datastore).
- * Currently assumes one column per basic member.
+ * Allows for each member to have potentially multiple columns (using MemberColumnMapping).
+ * Each column generated will have its position set (origin = 0) and respects "ColumnMetaData.position".
  */
 public class CompleteClassTable implements Table
 {
@@ -164,6 +167,7 @@ public class CompleteClassTable implements Table
                         }
                     }
                     MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
+                    col.setMemberColumnMapping(mapping);
                     if (schemaVerifier != null)
                     {
                         schemaVerifier.attributeMember(mapping, mmd);
@@ -198,6 +202,10 @@ public class CompleteClassTable implements Table
                                 cols[j] = col;
                             }
                             MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, cols, typeConv);
+                            for (int j=0;j<colJavaTypes.length;j++)
+                            {
+                                ((ColumnImpl)cols[j]).setMemberColumnMapping(mapping);
+                            }
                             if (schemaVerifier != null)
                             {
                                 schemaVerifier.attributeMember(mapping, mmd);
@@ -220,6 +228,7 @@ public class CompleteClassTable implements Table
                                 }
                             }
                             MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
+                            col.setMemberColumnMapping(mapping);
                             mapping.setTypeConverter(typeConv);
                             if (schemaVerifier != null)
                             {
@@ -245,6 +254,7 @@ public class CompleteClassTable implements Table
                             }
                         }
                         MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
+                        col.setMemberColumnMapping(mapping);
                         mapping.setTypeConverter(typeConv);
                         if (schemaVerifier != null)
                         {
@@ -547,7 +557,7 @@ public class CompleteClassTable implements Table
                     // 1-N/M-N stored as single column with collection<persistable-id>
                     // Create column for basic type
                     String colName = namingFactory.getColumnName(embMmds, 0);
-                    ColumnImpl col = addEmbeddedColumn(embMmds, colName, null);
+                    ColumnImpl col = addEmbeddedColumn(colName, null);
                     if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getPosition() != null)
                     {
                         col.setPosition(embmdMmd.getColumnMetaData()[0].getPosition());
@@ -565,6 +575,7 @@ public class CompleteClassTable implements Table
                         col.setJdbcType(colmds[0].getJdbcType());
                     }
                     MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
+                    col.setMemberColumnMapping(mapping);
                     if (schemaVerifier != null)
                     {
                         schemaVerifier.attributeEmbeddedMember(mapping, embMmds);
@@ -584,7 +595,7 @@ public class CompleteClassTable implements Table
                             for (int j=0;j<colJavaTypes.length;j++)
                             {
                                 String colName = namingFactory.getColumnName(embMmds, j);
-                                ColumnImpl col = addEmbeddedColumn(embMmds, colName, typeConv);
+                                ColumnImpl col = addEmbeddedColumn(colName, typeConv);
                                 if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == colJavaTypes.length && embmdMmd.getColumnMetaData()[j].getPosition() != null)
                                 {
                                     col.setPosition(embmdMmd.getColumnMetaData()[j].getPosition());
@@ -604,6 +615,10 @@ public class CompleteClassTable implements Table
                                 cols[j] = col;
                             }
                             MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, cols, typeConv);
+                            for (int j=0;j<colJavaTypes.length;j++)
+                            {
+                                ((ColumnImpl)cols[j]).setMemberColumnMapping(mapping);
+                            }
                             if (schemaVerifier != null)
                             {
                                 schemaVerifier.attributeEmbeddedMember(mapping, embMmds);
@@ -613,7 +628,7 @@ public class CompleteClassTable implements Table
                         else
                         {
                             String colName = namingFactory.getColumnName(embMmds, 0);
-                            ColumnImpl col = addEmbeddedColumn(embMmds, colName, typeConv);
+                            ColumnImpl col = addEmbeddedColumn(colName, typeConv);
                             if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getPosition() != null)
                             {
                                 col.setPosition(embmdMmd.getColumnMetaData()[0].getPosition());
@@ -631,6 +646,7 @@ public class CompleteClassTable implements Table
                                 col.setJdbcType(colmds[0].getJdbcType());
                             }
                             MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
+                            col.setMemberColumnMapping(mapping);
                             mapping.setTypeConverter(typeConv);
                             if (schemaVerifier != null)
                             {
@@ -643,7 +659,7 @@ public class CompleteClassTable implements Table
                     {
                         // Create column for basic type
                         String colName = namingFactory.getColumnName(embMmds, 0);
-                        ColumnImpl col = addEmbeddedColumn(embMmds, colName, typeConv);
+                        ColumnImpl col = addEmbeddedColumn(colName, typeConv);
                         if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getPosition() != null)
                         {
                             col.setPosition(embmdMmd.getColumnMetaData()[0].getPosition());
@@ -661,6 +677,7 @@ public class CompleteClassTable implements Table
                             col.setJdbcType(colmds[0].getJdbcType());
                         }
                         MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
+                        col.setMemberColumnMapping(mapping);
                         mapping.setTypeConverter(typeConv);
                         if (schemaVerifier != null)
                         {
@@ -683,7 +700,6 @@ public class CompleteClassTable implements Table
         ColumnImpl col = new ColumnImpl(this, colName, colType);
         if (mmd != null)
         {
-            col.setMemberMetaData(mmd);
             if (mmd.isPrimaryKey())
             {
                 col.setPrimaryKey();
@@ -700,13 +716,9 @@ public class CompleteClassTable implements Table
         return col;
     }
 
-    protected ColumnImpl addEmbeddedColumn(List<AbstractMemberMetaData> embMmds, String colName, TypeConverter typeConv)
+    protected ColumnImpl addEmbeddedColumn(String colName, TypeConverter typeConv)
     {
         ColumnImpl col = new ColumnImpl(this, colName, ColumnType.COLUMN);
-        if (embMmds != null && embMmds.size() > 0)
-        {
-            col.setMemberMetaData(embMmds.get(embMmds.size()-1));
-        }
         columns.add(col);
         return col;
     }
@@ -794,6 +806,13 @@ public class CompleteClassTable implements Table
     public MemberColumnMapping getMemberColumnMappingForEmbeddedMember(List<AbstractMemberMetaData> mmds)
     {
         return mappingByEmbeddedMember.get(getEmbeddedMemberNavigatedPath(mmds));
+    }
+
+    public Set<MemberColumnMapping> getMemberColumnMappings()
+    {
+        Set<MemberColumnMapping> mappings = new HashSet(mappingByMember.values());
+        mappings.addAll(mappingByEmbeddedMember.values());
+        return mappings;
     }
 
     public String toString()

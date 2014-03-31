@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.schema.table;
 
-import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.schema.naming.ColumnType;
 
@@ -33,10 +32,10 @@ public interface Column
     Table getTable();
 
     /**
-     * Accessor for the metadata for the member (if for a member).
-     * @return Member metadata
+     * Accessor for the mapping (and hence member) that owns this column.
+     * @return The associated mapping (or null if this is a surrogate column)
      */
-    AbstractMemberMetaData getMemberMetaData();
+    MemberColumnMapping getMemberColumnMapping();
 
     /**
      * Accessor for the identifier for this column (its "name).
