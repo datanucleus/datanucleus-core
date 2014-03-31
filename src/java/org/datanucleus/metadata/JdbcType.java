@@ -46,9 +46,11 @@ public enum JdbcType
     OTHER,
     REAL,
     SMALLINT,
+    SQLXML,
     TIME,
     TIMESTAMP,
     TINYINT,
     VARBINARY,
-    VARCHAR;
+    VARCHAR,
+    XMLTYPE; // TODO This is not strictly speaking a JDBC type (actually an SQL type for Oracle)
 }
