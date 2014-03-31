@@ -29,6 +29,7 @@ import java.util.Map;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.expression.ExpressionEvaluator;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Expression for the aggregation of a set of object values.
@@ -455,6 +456,12 @@ public class SetExpression
             divisor = BigDecimal.valueOf(i);
         }
 
+        if (memexpr == null)
+        {
+            NucleusLogger.QUERY.error("In-memory failure in attempt to get avg of null. Not supported. Perhaps something went wrong earlier in the query evaluation?");
+            // TODO Cater for this
+            return new InMemoryFailure();
+        }
         return memexpr.div(divisor);
     }
 }
