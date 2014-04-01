@@ -81,17 +81,25 @@ public abstract class AbstractManagedConnection implements ManagedConnection
 
     public void transactionFlushed()
     {
-        for (int i=0; i<listeners.size(); i++)
+        if (!listeners.isEmpty())
         {
-            listeners.get(i).transactionFlushed();
+            ManagedConnectionResourceListener[] mcrls = listeners.toArray(new ManagedConnectionResourceListener[listeners.size()]);
+            for (int i=0; i<mcrls.length; i++)
+            {
+                mcrls[i].transactionFlushed();
+            }
         }
     }
 
     public void transactionPreClose()
     {
-        for (int i=0; i<listeners.size(); i++)
+        if (!listeners.isEmpty())
         {
-            listeners.get(i).transactionPreClose();
+            ManagedConnectionResourceListener[] mcrls = listeners.toArray(new ManagedConnectionResourceListener[listeners.size()]);
+            for (int i=0; i<mcrls.length; i++)
+            {
+                mcrls[i].transactionPreClose();
+            }
         }
     }
 

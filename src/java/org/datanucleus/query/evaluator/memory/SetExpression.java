@@ -329,11 +329,11 @@ public class SetExpression
 
     public Object avg(Expression paramExpr, ExpressionEvaluator eval, Map<String, Object> state)
     {
-        if (itemIterator == null)
+        if (itemIterator == null || !itemIterator.hasNext())
         {
             if (paramExpr.getSymbol() != null && Number.class.isAssignableFrom(paramExpr.getSymbol().getValueType()))
             {
-                return 0;
+                return 0.0d;
             }
             else
             {
@@ -341,8 +341,7 @@ public class SetExpression
             }
         }
 
-        // TODO This is based around JDOQL - return double/BigDecimal based on the type being averaged
-        // Should also allow for JPQL, where we just return double
+        // This is based around the JDOQL/JPQL definition of "avg" which should return "double"
         int i = 0;
         Object val = null;
         AggregateExpression memexpr = null;
@@ -356,7 +355,7 @@ public class SetExpression
                 {
                     val = new Double(0);
                 }
-                memexpr = new DoubleAggregateExpression(new Double(((Float)result).doubleValue()));
+                memexpr = new DoubleAggregateExpression(((Float)result).doubleValue());
             }
             else if (result instanceof Double)
             {
@@ -372,7 +371,7 @@ public class SetExpression
                 {
                     val = Double.valueOf(0);
                 }
-                memexpr = new DoubleAggregateExpression(new Double(((Long)result).doubleValue()));
+                memexpr = new DoubleAggregateExpression(((Long)result).doubleValue());
             }
             else if (result instanceof Integer)
             {
@@ -380,7 +379,7 @@ public class SetExpression
                 {
                     val = Double.valueOf(0);
                 }
-                memexpr = new DoubleAggregateExpression(new Double(((Integer)result).doubleValue()));
+                memexpr = new DoubleAggregateExpression(((Integer)result).doubleValue());
             }
             else if (result instanceof Short)
             {
@@ -388,23 +387,23 @@ public class SetExpression
                 {
                     val = Double.valueOf(0);
                 }
-                memexpr = new DoubleAggregateExpression(new Double(((Short)result).doubleValue()));
+                memexpr = new DoubleAggregateExpression(((Short)result).doubleValue());
             }
             else if (result instanceof BigInteger)
             {
                 if (val == null)
                 {
-                    val = BigDecimal.ZERO;
+                    val = Double.valueOf(0);
                 }
-                memexpr = new BigDecimalAggregateExpression(new BigDecimal((BigInteger)result));
+                memexpr = new DoubleAggregateExpression(((BigInteger)result).doubleValue());
             }
             else if (result instanceof BigDecimal)
             {
                 if (val == null)
                 {
-                    val = BigDecimal.ZERO;
+                    val = Double.valueOf(0);
                 }
-                memexpr = new BigDecimalAggregateExpression((BigDecimal)result);
+                memexpr = new DoubleAggregateExpression(((BigDecimal)result).doubleValue());
             }
             else if (result instanceof InMemoryFailure)
             {
@@ -412,8 +411,7 @@ public class SetExpression
             }
             else
             {
-                throw new NucleusException("Evaluation of avg() on object of type " + 
-                    result.getClass().getName() + " - not supported");
+                throw new NucleusException("Evaluation of avg() on object of type " + result.getClass().getName() + " - not supported");
             }
             val = memexpr.add(val);
             i++;
