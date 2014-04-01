@@ -915,7 +915,7 @@ public class Queue extends org.datanucleus.store.types.simple.Queue implements B
      * resolved will result in an object of a type that is compatible with all
      * references to the object.
      * @return the replaced object
-     * @throws ObjectStreamException
+     * @throws ObjectStreamException if an error occurs
      */
     protected Object writeReplace() throws ObjectStreamException
     {

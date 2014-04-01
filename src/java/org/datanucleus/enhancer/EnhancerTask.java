@@ -306,11 +306,7 @@ public class EnhancerTask extends Java
         v.copyInto(files);
         return files;
     }
-    
-    /**
-     * Executes this task only if the property is set
-     * @param ifpropertyset
-     */
+
     public void setIf(String ifpropertyset)
     {
         this.ifpropertyset = ifpropertyset;

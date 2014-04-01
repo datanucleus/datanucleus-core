@@ -2831,7 +2831,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
     /**
      * Method called (by AbstractClassMetaData.initialise()) when a class has its metadata initialised.
-     * @param acmd Metadata that has been initialised
+     * @param cmd Metadata that has been initialised
      */
     public void abstractClassMetaDataInitialised(AbstractClassMetaData cmd)
     {

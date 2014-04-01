@@ -495,6 +495,7 @@ public class FetchPlan implements Serializable
      * -1 implies no restriction on the fetch depth and
      * 0 is invalid and throws a JDOUserException.
      * @param max The maximum fetch depth to fetch to
+     * @return The FetchPlan
      */
     public synchronized FetchPlan setMaxFetchDepth(int max)
     {

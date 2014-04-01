@@ -55,6 +55,8 @@ public interface ObjectProvider
 
     /**
      * Method to (re)connect this provider to the specified ExecutionContext and object type.
+     * @param ec ExecutionContext to connect to
+     * @param cmd Metadata for this class
      */
     void connect(ExecutionContext ec, AbstractClassMetaData cmd);
 
@@ -363,6 +365,7 @@ public interface ObjectProvider
      * Convenience method to update our object with the field values from the passed object.
      * Objects need to be of the same type, and the other object should not have a ObjectProvider.
      * @param pc The object that we should copy fields from
+     * @param fieldNumbers Numbers of fields to copy
      */
     void copyFieldsFromObject(Object pc, int[] fieldNumbers);
 

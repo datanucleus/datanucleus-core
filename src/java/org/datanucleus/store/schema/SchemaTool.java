@@ -121,7 +121,7 @@ public class SchemaTool
     /**
      * Entry method when invoked from the command line.
      * @param args List of options for processing by the available methods in this class.
-     * @throws Exception
+     * @throws Exception If an error occurs in operation
      */
     public static void main(String[] args) throws Exception
     {

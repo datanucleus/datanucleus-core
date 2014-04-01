@@ -573,7 +573,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
      * Method to initialise the auto-start mechanism, loading up the classes
      * from its store into memory so that we start from what is required to be loaded.
      * @param clr The ClassLoaderResolver
-     * @throws DatastoreInitialisationException
+     * @throws DatastoreInitialisationException if an error occurs
      */
     protected void initialiseAutoStart(ClassLoaderResolver clr)
     throws DatastoreInitialisationException
@@ -869,6 +869,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
      * Will generate the schema for all classes that have had their metadata loaded at this point, which
      * typically means the persistence-unit.
      * @param generateModeStr Generate "mode"
+     * @param generateScripts Whether to generate
      */
     protected void initialiseSchema(String generateModeStr, boolean generateScripts)
     {

@@ -49,8 +49,9 @@ public class AbstractExpressionEvaluator implements org.datanucleus.query.expres
     /**
      * This method deals with the OR/AND conditions.
      * A condition specifies a combination of one or more expressions and
-     * logical (Boolean) operators and returns a value of TRUE, FALSE, or 
-     * unknown
+     * logical (Boolean) operators and returns a value of TRUE, FALSE, or unknown
+     * @param expr The other expression to or/and with
+     * @return The updated expression
      */
     protected Object compileOrAndExpression(Expression expr)
     {

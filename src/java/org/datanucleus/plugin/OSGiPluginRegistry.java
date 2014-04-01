@@ -227,12 +227,12 @@ public class OSGiPluginRegistry implements PluginRegistry {
      * @param confElm the configuration element
      * @param name the attribute name
      * @return the Class
-     * @throws NoSuchMethodException
-     * @throws SecurityException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     * @throws InstantiationException
-     * @throws IllegalArgumentException
+     * @throws NoSuchMethodException if an error occurs
+     * @throws SecurityException if an error occurs
+     * @throws InvocationTargetException if an error occurs
+     * @throws IllegalAccessException if an error occurs
+     * @throws InstantiationException if an error occurs
+     * @throws IllegalArgumentException if an error occurs
      */
     public Object createExecutableExtension(ConfigurationElement confElm, String name, Class[] argsClass, Object[] args)
         throws ClassNotFoundException,
@@ -280,7 +280,7 @@ public class OSGiPluginRegistry implements PluginRegistry {
      * @param pluginId the plugin id
      * @param className the class name
      * @return the Class
-     * @throws ClassNotFoundException
+     * @throws ClassNotFoundException if there is a problem in loading
      */
     public Class loadClass(String pluginId, String className) throws ClassNotFoundException
     {

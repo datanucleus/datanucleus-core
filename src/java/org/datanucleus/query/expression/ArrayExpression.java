@@ -47,6 +47,7 @@ public class ArrayExpression extends Expression
 
     /**
      * Accessor for an element of the array.
+     * @param index The index of the element in the array
      * @return Element
      */
     public Expression getElement(int index)

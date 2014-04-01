@@ -244,7 +244,7 @@ public class CandidateIdsQueryResult extends AbstractQueryResult implements java
      * Handle serialisation by returning a java.util.ArrayList of all of the results for this query
      * after disconnecting the query which has the consequence of enforcing the load of all objects.
      * @return The object to serialise
-     * @throws ObjectStreamException
+     * @throws ObjectStreamException if an error occurs
      */
     protected Object writeReplace() throws ObjectStreamException
     {

@@ -86,6 +86,7 @@ public class JDOClassAdapter extends ClassVisitor
      * Constructor.
      * If the writer is null it means we just have to check the enhancement status
      * @param cv The writer visitor
+     * @param enhancer ClassEnhancer
      */
     public JDOClassAdapter(ClassVisitor cv, ClassEnhancer enhancer)
     {

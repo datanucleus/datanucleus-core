@@ -52,7 +52,7 @@ public class Extension
     
     /**
      * Assign the ExtensionPoint to this Extension
-     * @param point
+     * @param point The extension point
      */
     public void setExtensionPoint(ExtensionPoint point)
     {

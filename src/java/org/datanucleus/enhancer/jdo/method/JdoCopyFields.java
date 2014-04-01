@@ -40,10 +40,10 @@ import org.datanucleus.util.JavaUtils;
  *     if (jdoStateManager != other.jdoStateManager)
  *         throw new IllegalArgumentException("state managers do not match");
  *     int i = fieldNumbers.length - 1;
- *     if (i >= 0) {
+ *     if (i &ge; 0) {
  *         do
  *             jdoCopyField(other, fieldNumbers[i]);
- *         while (--i >= 0);
+ *         while (--i &ge; 0);
  *     }
  * }
  * </pre>

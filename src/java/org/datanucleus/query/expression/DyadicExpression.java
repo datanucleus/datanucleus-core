@@ -26,7 +26,7 @@ import org.datanucleus.query.symbol.SymbolTable;
 
 /**
  * Expression between two other expressions and an operation.
- * For example, "this.myField < myValue" will become
+ * For example, "this.myField &lt; myValue" will become
  * left = PrimaryExpression, right = Literal, op = Expression.OP_LT.
  * A special case is where we have an expression like "!(condition)". In this case we become
  * left = expression, right = null, op = Expression.OP_NOT.

@@ -73,6 +73,7 @@ public class PropertyMetaData extends AbstractMemberMetaData
     /**
      * Method to set the field name that this property wraps (persistent interface implementation)
      * @param name Field name
+     * @return This metadata
      */
     public PropertyMetaData setFieldName(String name)
     {

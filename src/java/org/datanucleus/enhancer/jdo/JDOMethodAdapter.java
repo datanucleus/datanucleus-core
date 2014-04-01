@@ -58,6 +58,8 @@ public class JDOMethodAdapter extends MethodVisitor
      * Constructor for the method adapter.
      * @param mv MethodVisitor
      * @param enhancer ClassEnhancer for the class with the method
+     * @param methodName Name of the method
+     * @param methodDesc descriptor for the method
      */
     public JDOMethodAdapter(MethodVisitor mv, ClassEnhancer enhancer, String methodName, String methodDesc)
     {

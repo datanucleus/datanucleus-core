@@ -108,6 +108,7 @@ public class NucleusContextHelper
      * @param props The overall persistence properties
      * @param datastoreProps Persistence properties to apply to the datastore
      * @param clr ClassLoader resolver
+     * @param nucCtx NucleusContext
      * @return The StoreManager
      * @throws NucleusUserException if impossible to create the StoreManager (not in CLASSPATH?, invalid definition?)
      */

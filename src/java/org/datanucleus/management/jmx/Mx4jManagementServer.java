@@ -168,9 +168,6 @@ public class Mx4jManagementServer implements ManagementServer
         }
     }
 
-    /**
-     * Acessor for underlying Management Server
-     */
     public Object getMBeanServer()
     {
         return server;

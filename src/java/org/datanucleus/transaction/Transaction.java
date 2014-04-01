@@ -35,7 +35,7 @@ import org.omg.CORBA.SystemException;
 
 /**
  * Transaction.
- * The Global Transaction ID is formed as: TX-<final static random int>-<static seq>-<current time millis>
+ * The Global Transaction ID is formed as: TX-{final static random int}-{static seq}-{current time millis}
  */
 public class Transaction
 {

@@ -1134,7 +1134,7 @@ public class ArrayList extends org.datanucleus.store.types.simple.ArrayList impl
      * references to the object.
      * 
      * @return the replaced object
-     * @throws ObjectStreamException
+     * @throws ObjectStreamException if an error occurs
      */
     protected Object writeReplace() throws ObjectStreamException
     {

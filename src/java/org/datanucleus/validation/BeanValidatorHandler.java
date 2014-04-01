@@ -45,6 +45,7 @@ public class BeanValidatorHandler implements CallbackHandler
     /**
      * Constructor for a validation handler.
      * @param ec ExecutionContext that we are persisting in
+     * @param factory Validation factory
      */
     public BeanValidatorHandler(ExecutionContext ec, ValidatorFactory factory)
     {
@@ -57,6 +58,7 @@ public class BeanValidatorHandler implements CallbackHandler
     /**
      * Validate the constraints of an object
      * @param pc the object
+     * @param callbackName Name of the callback
      * @param groups the validation groups
      */
     public void validate(Object pc, String callbackName, Class<?>[] groups)

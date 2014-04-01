@@ -46,9 +46,6 @@ import java.util.Properties;
  */
 public class AUIDGenerator extends AbstractUIDGenerator
 {
-    /**
-     * Constructor.
-     */
     public AUIDGenerator(String name, Properties props)
     {
         super(name, props);

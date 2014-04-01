@@ -33,7 +33,6 @@ import java.util.Set;
 
 /**
  * Resource Bundle manager, providing simplified means of using MessageFormat to localise the system.
- * 
  * <p>
  * The DataNucleus system is internationalisable hence messages (to log files or exceptions) can
  * be displayed in multiple languages. Currently DataNucleus contains localisation files in the 
@@ -41,33 +40,29 @@ import java.util.Set;
  * such as Spanish, French, etc. The internationalisation operates around the 
  * <i>org.datanucleus.util.Localiser</i> class that is responsible for generating the 
  * messages in the specified locale. Each class needs to instantiate a Localiser
- * <source>private static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.store.Localisation", MyClass.class);</source>
+ * <pre>private static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.store.Localisation", MyClass.class);</pre>
  * and then output messages via
- * <source>LOCALISER.msg("012345", schemaName, autoStartMechanism)</source>
+ * <pre>LOCALISER.msg("012345", schemaName, autoStartMechanism)</pre>
  * The messages themselves are contained in a file for each package. For example, with the above example,
  * we have org.datanucleus.store.Localisation.properties. This contains entries such as
- * <source>012345=Initialising Schema "{0}" using "{1}" auto-start option</source>
+ * <pre>012345=Initialising Schema "{0}" using "{1}" auto-start option</pre>
  * So the 2 parameters specified in the LOCALISER.msg call are inserted into the message. The 
  * language-specific parts are always contained in the Localisation.properties file.
  * To extend the current system to internationalise in, for example, Spanish you would add a file 
  * org.datanucleus.store.Localisation_es.properties and add an entry such as
- * <source>012345=Inicializando la esquema "{0}" con la opción de empezar "{1}"</source>
+ * <pre>012345=Inicializando la esquema "{0}" con la opción de empezar "{1}"</pre>
  * With this file installed, anybody running an application where the JDK is running in Spanish as 
  * default locale would see the above Spanish message. It is intended to include such files in a 
  * future release.
- * </p>
  * <p>
  * If you want to extend this to another language and contribute the files for your language
  * you need to find all files "Localisation.properties" and provide an alternative variant.
- * </p>
  * <p>
  * <b>Note that the second argument used in constructing the Localiser is important for OSGi. It has
  * to be a class in the same OSGi bundle as the Localisation.properties file</b>
- * </p>
  * <p>
  * You will find alternates in Spanish already present named "Localisation_es.properties", so if
  * you wanted to create a French localisation then provide "Localisation_fr.properties".
- * </p>
  */
 public class Localiser
 {

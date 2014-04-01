@@ -31,10 +31,10 @@ import org.datanucleus.util.JavaUtils;
  * <pre>
  * static YYY jdoGetZZZ(MyClass objPC)
  * {
- *     if (objPC.jdoStateManager != null && !objPC.jdoStateManager.isLoaded(objPC, 0))
+ *     if (objPC.jdoStateManager != null &amp;&amp; !objPC.jdoStateManager.isLoaded(objPC, 0))
  *         return (YYY) objPC.jdoStateManager.getObjectField(objPC, 0, objPC.ZZZ);
- *     if (objPC.jdoIsDetached() != false &&
- *         ((BitSet) objPC.jdoDetachedState[2]).get(0) != true &&
+ *     if (objPC.jdoIsDetached() != false &amp;&amp;
+ *         ((BitSet) objPC.jdoDetachedState[2]).get(0) != true &amp;&amp;
  *         ((BitSet) objPC.jdoDetachedState[3]).get(0) != true)
  *         throw new JDODetachedFieldAccessException(...);
  *     return objPC.ZZZ;

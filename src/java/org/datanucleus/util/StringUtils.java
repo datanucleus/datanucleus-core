@@ -94,6 +94,7 @@ public class StringUtils
      * Caters for URL-encoded characters in the filename (treatment of spaces on Windows etc)
      * @param filename Name of file
      * @return The JarFile
+     * @throws IOException if there is a problem opening the JarFile
      */
     public static JarFile getJarFileForFilename(String filename)
     throws IOException
@@ -512,7 +513,7 @@ public class StringUtils
     /**
      * Converts the given map of objects to string as a comma-separated list.
      * If the map is empty the string "&lt;none&gt;" is returned.
-     * @param map Map of <key,value> to be converted
+     * @param map Map to be converted
      * @return  A string containing each object in the given map, converted toString() and separated by commas.
      */
     public static String mapToString(Map map)
@@ -579,7 +580,7 @@ public class StringUtils
     }
 
     /**
-     * check string isnot null and length > 0.
+     * check string is not null and length &gt; 0.
      * @param s check string 
      * @return return true if string isnot null and length greater than 0. return false other case.
      */

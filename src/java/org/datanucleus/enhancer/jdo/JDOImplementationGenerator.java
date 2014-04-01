@@ -212,7 +212,7 @@ public class JDOImplementationGenerator
 
     /**
      * Convenience method to dump the generated class to the specified file.
-     * @param filename
+     * @param filename Name of the file to dump to
      */
     public void dumpToFile(String filename)
     {

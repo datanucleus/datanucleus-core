@@ -140,7 +140,7 @@ public class Imports
      * @param clr ClassLoaderResolver
      * @param primaryClassLoader The primary ClassLoader for the class 
      * @return The class 
-     * @throws ClassNotResolvedException
+     * @throws ClassNotResolvedException If there is a problem loading the class
      * @throws NucleusUserException if a type is duplicately defined
      **/
     public Class resolveClassDeclaration(String classDecl, ClassLoaderResolver clr, ClassLoader primaryClassLoader)

@@ -73,7 +73,7 @@ public class XMLAutoStarter extends AbstractAutoStartMechanism
      * Constructor, taking the XML file URL.
      * @param storeMgr The StoreManager managing the store that we are auto-starting.
      * @param clr The ClassLoaderResolver
-     * @throws MalformedURLException 
+     * @throws MalformedURLException if an error occurs processing the URL
      */
     public XMLAutoStarter(StoreManager storeMgr, ClassLoaderResolver clr) throws MalformedURLException
     {
@@ -117,7 +117,7 @@ public class XMLAutoStarter extends AbstractAutoStartMechanism
     /**
      * Accessor for all auto start data for this starter.
      * @return The class auto start data. Collection of StoreData elements
-     * @throws DatastoreInitialisationException
+     * @throws DatastoreInitialisationException If an error occurs in datastore init
      */
     public Collection getAllClassData()
     throws DatastoreInitialisationException

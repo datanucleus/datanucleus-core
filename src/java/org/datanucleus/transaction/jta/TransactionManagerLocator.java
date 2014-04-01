@@ -28,6 +28,7 @@ public interface TransactionManagerLocator
 {
     /**
      * Method to return the TransactionManager.
+     * @param clr ClassLoader resolver
      * @return The TransactionManager
      */
     TransactionManager getTransactionManager(ClassLoaderResolver clr);

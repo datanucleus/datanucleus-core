@@ -63,7 +63,6 @@ import org.datanucleus.util.StringUtils;
  * sets the options necessary and calls the execute method.</li>
  * <li>Programmatically, creating the DataNucleusEnhancer object settings options and running etc.</li>
  * </ul>
- * </p>
  * <p>
  * The programmatic way would be something like this :-
  * <pre>
@@ -72,7 +71,6 @@ import org.datanucleus.util.StringUtils;
  * enhancer.enhancePersistenceUnit("myPersistenceUnit");
  * </pre>
  * enhancing all classes specified by the persistence unit.
- * </p>
  */
 public class DataNucleusEnhancer
 {

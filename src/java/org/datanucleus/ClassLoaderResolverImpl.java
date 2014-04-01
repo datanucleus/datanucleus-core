@@ -39,19 +39,19 @@ import org.datanucleus.util.WeakValueMap;
  * A ClassLoaderResolver provides a series of methods for resolving classes from their names. 
  * It supports up to 3 class loaders, based loosely on JDO Spec section 12.5.
  * The class loaders will be used in this order:
- * <OL>
- *   <LI>The loader that loaded the class or instance referred to in the API that caused this class to be loaded.</LI>
- *   <UL>
- *     <LI>In case of query, this is the loader of the candidate class, or the loader of the object passed to the newQuery</LI>
- *     <LI>In case of navigation from a persistent instance, this is the loader of the class of the instance.</LI>
- *     <LI>In the case of getExtent with subclasses, this is the loader of the candidate class.</LI>
- *     <LI>In the case of getObjectById, this is the loader of the object id instance.</LI>
- *     <LI>Other cases do not have an explicit loader.</LI>
- *   </UL>
- *   <LI>The loader returned in the current context by Thread.getContextClassLoader().</LI>
- *   <LI>The loader returned by Thread.getContextClassLoader() at the time of creating an ExecutionContext.</LI>
- *   <LI>The loader registered for dynamically creating and loading classes at runtime.</LI>
- * </OL>
+ * <ul>
+ *   <li>The loader that loaded the class or instance referred to in the API that caused this class to be loaded.
+ *   <ul>
+ *     <li>In case of query, this is the loader of the candidate class, or the loader of the object passed to the newQuery</li>
+ *     <LI>In case of navigation from a persistent instance, this is the loader of the class of the instance.</li>
+ *     <LI>In the case of getExtent with subclasses, this is the loader of the candidate class.</li>
+ *     <LI>In the case of getObjectById, this is the loader of the object id instance.</li>
+ *     <LI>Other cases do not have an explicit loader.</li>
+ *   </ul></li>
+ *   <li>The loader returned in the current context by Thread.getContextClassLoader().</li>
+ *   <li>The loader returned by Thread.getContextClassLoader() at the time of creating an ExecutionContext.</li>
+ *   <li>The loader registered for dynamically creating and loading classes at runtime.</li>
+ * </ul>
  * TODO Provide a way of flushing a classname from the cached classes so we can reload a class
  */
 public class ClassLoaderResolverImpl implements ClassLoaderResolver
@@ -685,8 +685,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
      *     If <code>resourceName</code> starts with "/", remove it before searching.
      * @param primary the primary ClassLoader to use (or null)
      * @return A URL object for reading the resource, or null if the resource could not be found or the invoker 
-     *     doesn't have adequate privileges to get the resource. 
-     * @throws IOException If I/O errors occur
+     *     doesn't have adequate privileges to get the resource.
      * @see ClassLoader#getResource(java.lang.String)
      */
     public URL getResource(final String resourceName, final ClassLoader primary)

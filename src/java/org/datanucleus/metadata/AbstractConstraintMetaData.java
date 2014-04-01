@@ -46,6 +46,7 @@ public class AbstractConstraintMetaData extends MetaData
 
     /**
      * Copy constructor.
+     * @param acmd Metadata to copy
      */
     public AbstractConstraintMetaData(AbstractConstraintMetaData acmd)
     {

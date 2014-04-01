@@ -24,9 +24,6 @@ import org.datanucleus.exceptions.NucleusUserException;
  */
 public class QueryCompilerSyntaxException extends NucleusUserException
 {
-    /**
-     * Constructor
-     */
     public QueryCompilerSyntaxException(String msg, int position, String stringToCompile)
     {
         super(msg + " at character " + (position + 1) + " in \"" + stringToCompile + '"');

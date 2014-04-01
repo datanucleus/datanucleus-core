@@ -48,7 +48,7 @@ import org.datanucleus.util.Localiser;
  * <pre>
  * void setZZZ(YYY zzz)
  * {
- *     if (aaaFlags != 0 && aaaStateManager != null)
+ *     if (aaaFlags != 0 &amp;&amp; aaaStateManager != null)
  *         aaaStateManager.setStringField(this, 2, aaaGetZZZ(), zzz);
  *     else
  *     {
@@ -62,7 +62,7 @@ import org.datanucleus.util.Localiser;
  * <pre>
  * void setZZZ(YYY zzz)
  * {
- *     if (aFlags > 0 && aaaStateManager != null)
+ *     if (aFlags &gt; 0 &amp;&amp; aaaStateManager != null)
  *         aaaStateManager.setObjectField(this, 2, aaaGetZZZ(), zzz);
  *     aaaSetXXX(zzz);
  * }
@@ -145,6 +145,8 @@ public class JDOPropertySetterAdapter extends MethodVisitor
      * @param mmd MetaData for the property
      * @param asmClassName ASM class name for the owning class
      * @param asmClassDesc ASM descriptor for the owning class
+     * @param includeFrames Whether to include stack map frames
+     * @param namer Namer for methods etc
      */
     public static void generateSetXXXMethod(MethodVisitor mv, AbstractMemberMetaData mmd,
             String asmClassName, String asmClassDesc, boolean includeFrames, EnhancementNamer namer)

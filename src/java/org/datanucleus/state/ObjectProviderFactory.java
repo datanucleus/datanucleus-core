@@ -44,6 +44,7 @@ public interface ObjectProviderFactory
      * @param ec the ExecutionContext
      * @param pcClass the class of the new instance to be created.
      * @param id the JDO identity of the object.
+     * @return The ObjectProvider
      */
     ObjectProvider newForHollow(ExecutionContext ec, Class pcClass, Object id);
 
@@ -53,6 +54,7 @@ public interface ObjectProviderFactory
      * @param ec ExecutionContext
      * @param id the JDO identity of the object.
      * @param pc The object that is hollow that we are going to manage
+     * @return The ObjectProvider
      */
     ObjectProvider newForHollowPreConstructed(ExecutionContext ec, Object id, Object pc);
 
@@ -64,6 +66,7 @@ public interface ObjectProviderFactory
      * @param pcClass the class of the new instance to be created.
      * @param id the JDO identity of the object.
      * @param fv the initial field values of the object.
+     * @return The ObjectProvider
      */
     ObjectProvider newForHollow(ExecutionContext ec, Class pcClass, Object id, FieldValues fv);
 
@@ -72,6 +75,7 @@ public interface ObjectProviderFactory
      * @param ec the execution context controlling this state manager.
      * @param id the JDO identity of the object.
      * @param pc The object that is persistent that we are going to manage
+     * @return The ObjectProvider
      */
     ObjectProvider newForPersistentClean(ExecutionContext ec, Object id, Object pc);
 
@@ -81,6 +85,7 @@ public interface ObjectProviderFactory
      * @param ec ExecutionContext
      * @param pcClass the class of the new instance to be created.
      * @param fv the initial field values of the object.
+     * @return The ObjectProvider
      * @deprecated Use newForHollowPopulated instead
      */
     ObjectProvider newForHollowPopulatedAppId(ExecutionContext ec, Class pcClass, final FieldValues fv);
@@ -94,9 +99,9 @@ public interface ObjectProviderFactory
      * @param copyPc Whether the SM should manage a copy of the passed PC or that one
      * @param ownerOP Owner ObjectProvider
      * @param ownerFieldNumber Field number in owner object where this is stored
+     * @return The ObjectProvider
      */
-    ObjectProvider newForEmbedded(ExecutionContext ec, Object pc, boolean copyPc, 
-            ObjectProvider ownerOP, int ownerFieldNumber);
+    ObjectProvider newForEmbedded(ExecutionContext ec, Object pc, boolean copyPc, ObjectProvider ownerOP, int ownerFieldNumber);
 
     /**
      * Constructs an ObjectProvider for an object of the specified type, creating the PC object to hold the values
@@ -106,9 +111,9 @@ public interface ObjectProviderFactory
      * @param cmd Meta-data for the class that this is an instance of.
      * @param ownerOP Owner ObjectProvider
      * @param ownerFieldNumber Field number in owner object where this is stored
+     * @return The ObjectProvider
      */
-    ObjectProvider newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, 
-            ObjectProvider ownerOP, int ownerFieldNumber);
+    ObjectProvider newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, ObjectProvider ownerOP, int ownerFieldNumber);
 
     /**
      * Constructs an ObjectProvider to manage a transient instance that is  becoming newly persistent.
@@ -118,6 +123,7 @@ public interface ObjectProviderFactory
      * @param ec ExecutionContext
      * @param pc the instance being make persistent.
      * @param fv Any changes to make before inserting
+     * @return The ObjectProvider
      */
     ObjectProvider newForPersistentNew(ExecutionContext ec, Object pc, FieldValues fv);
 
@@ -128,6 +134,7 @@ public interface ObjectProviderFactory
      * instances that are transitioning to a transient clean state.
      * @param ec ExecutionContext
      * @param pc the instance being make persistent.
+     * @return The ObjectProvider
      */
     ObjectProvider newForTransactionalTransient(ExecutionContext ec, Object pc);
 
@@ -137,6 +144,7 @@ public interface ObjectProviderFactory
      * @param pc the detached object
      * @param id the JDO identity of the object.
      * @param version the detached version
+     * @return The ObjectProvider
      */
     ObjectProvider newForDetached(ExecutionContext ec, Object pc, Object id, Object version);
 
@@ -146,6 +154,7 @@ public interface ObjectProviderFactory
      * move to P_NEW_DELETED.
      * @param ec Execution Context
      * @param pc the object being deleted from persistence
+     * @return The ObjectProvider
      */
     ObjectProvider newForPNewToBeDeleted(ExecutionContext ec, Object pc);
 
@@ -156,6 +165,7 @@ public interface ObjectProviderFactory
      * @param ec ExecutionContext
      * @param id Id to assign to the persistable object
      * @param cachedPC CachedPC object from the L2 cache
+     * @return The ObjectProvider
      */
     ObjectProvider newForCachedPC(ExecutionContext ec, Object id, CachedPC cachedPC);
 }

@@ -31,11 +31,11 @@ import org.datanucleus.util.JavaUtils;
  *     if (fieldIds == null)
  *         throw new IllegalArgumentException("argment is null");
  *     int i = fieldIds.length - 1;
- *     if (i >= 0)
+ *     if (i &ge; 0)
  *     {
  *         do
  *             jdoProvideField(fieldIds[i]);
- *         while (--i >= 0);
+ *         while (--i &ge; 0);
  *     }
  * }
  * </pre>

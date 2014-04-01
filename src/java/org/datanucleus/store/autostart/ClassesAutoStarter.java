@@ -49,7 +49,7 @@ public class ClassesAutoStarter extends AbstractAutoStartMechanism
     /**
      * Accessor for all auto start data for this starter.
      * @return The class auto start data. Collection of StoreData elements
-     * @throws DatastoreInitialisationException
+     * @throws DatastoreInitialisationException If an error occurs in datastore init
      */
     public Collection getAllClassData()
     throws DatastoreInitialisationException

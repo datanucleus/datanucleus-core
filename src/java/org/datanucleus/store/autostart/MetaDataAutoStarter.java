@@ -59,7 +59,7 @@ public class MetaDataAutoStarter extends AbstractAutoStartMechanism
     /**
      * Accessor for all auto start data for this starter.
      * @return The class auto start data. Collection of StoreData elements
-     * @throws org.datanucleus.store.exceptions.DatastoreInitialisationException
+     * @throws org.datanucleus.store.exceptions.DatastoreInitialisationException If an error occurs in datastore init
      */
     public Collection getAllClassData()
     throws DatastoreInitialisationException 

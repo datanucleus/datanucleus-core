@@ -48,29 +48,17 @@ public class IdentityMetaData extends MetaData
     {
     }
 
-    /**
-     * Accessor for column MetaData.
-     * @return Returns the column MetaData.
-     */
     public ColumnMetaData getColumnMetaData()
     {
         return columnMetaData;
     }
 
-    /**
-     * Mutator for column MetaData.
-     * @param columnMetaData The column MetaData to set.
-     */
     public void setColumnMetaData(ColumnMetaData columnMetaData)
     {
         this.columnMetaData = columnMetaData;
         this.columnMetaData.parent = this;
     }
 
-    /**
-     * Method to create a new ColumnMetaData, add it, and return it.
-     * @return The Column metadata
-     */
     public ColumnMetaData newColumnMetaData()
     {
         ColumnMetaData colmd = new ColumnMetaData();
@@ -78,18 +66,11 @@ public class IdentityMetaData extends MetaData
         return colmd;
     }
 
-    /**
-     * Accessor for the column name.
-     * @return column name
-     */
     public String getColumnName()
     {
         return columnName;
     }
 
-    /**
-     * @param columnName the columnName to set
-     */
     public IdentityMetaData setColumnName(String columnName)
     {
         if (!StringUtils.isWhitespace(columnName))
@@ -113,36 +94,22 @@ public class IdentityMetaData extends MetaData
         return this;
     }
 
-    /**
-     * Accessor for the strategy tag value
-     * @return strategy tag value
-     */
     public IdentityStrategy getValueStrategy()
     {
         return strategy;
     }
 
-    /**
-     * @param strategy the strategy to set
-     */
     public IdentityMetaData setValueStrategy(IdentityStrategy strategy)
     {
         this.strategy = strategy;
         return this;
     }
 
-    /**
-     * Accessor for the sequence name
-     * @return sequence name
-     */
     public String getSequence()
     {
         return sequence;
     }
 
-    /**
-     * @param sequence the sequence to set
-     */
     public IdentityMetaData setSequence(String sequence)
     {
         this.sequence = (StringUtils.isWhitespace(sequence) ? null : sequence);
@@ -154,19 +121,11 @@ public class IdentityMetaData extends MetaData
         return this;
     }
 
-    /**
-     * Name of a (user-provided) value generator to override the default generator for this strategy.
-     * @return Name of user provided value generator
-     */
     public String getValueGeneratorName()
     {
         return valueGeneratorName;
     }
 
-    /**
-     * Mutator for the name of the value generator to use for this strategy.
-     * @param generator Name of value generator
-     */
     public IdentityMetaData setValueGeneratorName(String generator)
     {
         this.valueGeneratorName = (StringUtils.isWhitespace(generator) ? null : generator);

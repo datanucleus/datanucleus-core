@@ -61,7 +61,6 @@ import org.datanucleus.util.NucleusLogger;
  * When any accessor method is invoked, it typically checks whether the container has been loaded from its
  * "backing store" (where present) and does this as necessary. Some methods (<B>size()</B>) just check if 
  * everything is loaded and use the delegate if possible, otherwise going direct to the datastore.
- * </P>
  */
 public class Stack extends org.datanucleus.store.types.simple.Stack implements BackedSCO
 {
@@ -1264,7 +1263,7 @@ public class Stack extends org.datanucleus.store.types.simple.Stack implements B
      * references to the object.
      * 
      * @return the replaced object
-     * @throws ObjectStreamException
+     * @throws ObjectStreamException if an error occurs
      */
     protected Object writeReplace() throws ObjectStreamException
     {

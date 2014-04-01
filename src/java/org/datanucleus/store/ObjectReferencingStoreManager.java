@@ -44,6 +44,7 @@ public interface ObjectReferencingStoreManager
      * be overwritten by an authorative copy.
      *
      * This method marks the main memory copy of the object (on the Java heap) to be outdated in that sense.
+     * @param op The ObjectProvider managing the object
      */
-    void notifyObjectIsOutdated(ObjectProvider sm);
+    void notifyObjectIsOutdated(ObjectProvider op);
 }

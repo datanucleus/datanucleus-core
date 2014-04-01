@@ -547,6 +547,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
      * JavaType then returns it. If not then tries to find a superclass that is castable to the specified
      * type.
      * @param cls The class required
+     * @param genericType Any generic type specified for the element
      * @return The JavaType
      */
     protected JavaType findJavaTypeForCollectionClass(Class cls, Class genericType)

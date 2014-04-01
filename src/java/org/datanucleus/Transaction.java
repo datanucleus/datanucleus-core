@@ -29,19 +29,19 @@ import org.datanucleus.exceptions.NucleusUserException;
  * Representation of a transaction within DataNucleus. This interface is not user application visible.
  * 
  * Handling of transactions in DataNucleus is split into 4 layers:
- * <li>
- * <ul>API - The User Visible Transaction API</ul>
- * <ul>ExecutionContext Transaction - The Transaction assigned to an ExecutionContext</ul>
- * <ul>X/Open/JTA - The Transaction Manager associated to the underlying datastore transaction</ul>
- * <ul>Resource - The Transaction handled by the datastore</ul>
- * </li>
+ * <ul>
+ * <li>API - The User Visible Transaction API</li>
+ * <li>ExecutionContext Transaction - The Transaction assigned to an ExecutionContext</li>
+ * <li>X/Open/JTA - The Transaction Manager associated to the underlying datastore transaction</li>
+ * <li>Resource - The Transaction handled by the datastore</li>
+ * </ul>
  *
  * In the the API layer, there are interfaces provided to the user application, as such:
- * <li>
- * <ul>javax.jdo.Transaction - the JDO API interface</ul>
- * <ul>javax.persistence.EntityTransaction - the JPA API interface</ul>
- * <ul>{@link javax.transaction.UserTransaction} - the JTA API interface</ul>
- * </li>
+ * <ul>
+ * <li>javax.jdo.Transaction - the JDO API interface</li>
+ * <li>javax.persistence.EntityTransaction - the JPA API interface</li>
+ * <li>{@link javax.transaction.UserTransaction} - the JTA API interface</li>
+ * </ul>
  *
  * In the ExecutionContext layer, the {@link org.datanucleus.Transaction} interface defines the contract
  * for handling transactions for the ExecutionContext.
@@ -298,19 +298,19 @@ public interface Transaction
 
     /**
      * Adds a transaction listener. After commit or rollback, listeners are cleared
-     * @param listener
+     * @param listener The listener to add
      */
     void addTransactionEventListener(TransactionEventListener listener);
 
     /**
      * Removes the specified listener.
-     * @param listener Listener
+     * @param listener Listener to remove
      */
     void removeTransactionEventListener(TransactionEventListener listener);
 
     /**
      * Listeners that are never cleared, and invoked for all transactions
-     * @param listener
+     * @param listener listener to bind
      */
     void bindTransactionEventListener(TransactionEventListener listener);
 

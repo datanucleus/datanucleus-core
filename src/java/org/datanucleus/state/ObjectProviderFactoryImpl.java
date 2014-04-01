@@ -50,7 +50,7 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
 
     public static Class[] OBJECT_PROVIDER_CTR_ARG_CLASSES = new Class[] {ExecutionContext.class, AbstractClassMetaData.class};
 
-    /** Single pool of all ObjectProvider objects. TODO Consider having one pool per object type. */
+    // Single pool of all ObjectProvider objects. TODO Consider having one pool per object type.
 //    ObjectProviderPool opPool = null;
 
     public ObjectProviderFactoryImpl(PersistenceNucleusContext nucCtx)

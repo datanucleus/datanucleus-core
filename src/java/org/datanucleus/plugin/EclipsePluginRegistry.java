@@ -172,7 +172,7 @@ public class EclipsePluginRegistry implements PluginRegistry
      * Converts a URL that uses a user-defined protocol into a URL that uses the file protocol.
      * @param url the url to be converted
      * @return the converted URL
-     * @throws IOException
+     * @throws IOException If an error occurs in processing the URL
      */
     public URL resolveURLAsFileURL(URL url) throws IOException
     {
@@ -184,12 +184,12 @@ public class EclipsePluginRegistry implements PluginRegistry
      * @param confElm the configuration element
      * @param name the attribute name
      * @return the Class
-     * @throws NoSuchMethodException 
-     * @throws SecurityException 
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
-     * @throws InstantiationException 
-     * @throws IllegalArgumentException 
+     * @throws NoSuchMethodException If an error occurs
+     * @throws SecurityException  If an error occurs
+     * @throws InvocationTargetException  If an error occurs
+     * @throws IllegalAccessException  If an error occurs
+     * @throws InstantiationException  If an error occurs
+     * @throws IllegalArgumentException  If an error occurs
      */
     public Object createExecutableExtension(ConfigurationElement confElm, String name, Class[] argsClass, Object[] args) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
@@ -203,7 +203,7 @@ public class EclipsePluginRegistry implements PluginRegistry
      * @param pluginId the plugin id
      * @param className the class name
      * @return the Class
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException  If an error occurs
      */
     public Class loadClass(String pluginId, String className) throws ClassNotFoundException
     {

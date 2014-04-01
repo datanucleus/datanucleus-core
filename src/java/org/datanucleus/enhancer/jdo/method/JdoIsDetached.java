@@ -28,7 +28,7 @@ import org.datanucleus.util.JavaUtils;
  * <pre>
  * public boolean jdoIsDetached()
  * {
- *     if (jdoStateManager == null && jdoDetachedState != null) 
+ *     if (jdoStateManager == null &amp;&amp; jdoDetachedState != null) 
  *     {
  *         return true;
  *     }

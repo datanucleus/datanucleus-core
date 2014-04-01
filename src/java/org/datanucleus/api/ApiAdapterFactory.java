@@ -79,6 +79,7 @@ public class ApiAdapterFactory
      * If the API adapter doesn't yet exist will try to initialise it from the plugin information
      * defined under extension-point "org.datanucleus.api_adapter".
      * @param name the adapter name
+     * @param pluginMgr Plugin Manager
      * @return The ApiAdapter
      * @throws NucleusUserException when requested API not found in CLASSPATH
      */

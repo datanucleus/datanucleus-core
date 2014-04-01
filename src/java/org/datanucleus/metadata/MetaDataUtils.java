@@ -866,8 +866,10 @@ public class MetaDataUtils
     /**
      * Method to parse the available "persistence.xml" files returning the metadata for all found.
      * Searches for all files "META-INF/persistence.xml" in the CLASSPATH of the current thread.
+     * @param pluginMgr PluginManager
      * @param persistenceFilename Name of persistence file (if null will use "persistence.xml")
      * @param validate Whether to validate the persistence file
+     * @param clr ClassLoader resolver
      * @return The metadata for all "persistence.xml" files
      */
     public static PersistenceFileMetaData[] parsePersistenceFiles(PluginManager pluginMgr, String persistenceFilename,
@@ -1039,7 +1041,9 @@ public class MetaDataUtils
     /**
      * Convenience method to return if the specified member is embedded.
      * Only applies to relation fields, since all other fields are always "embedded".
-     * TODO Likely ought to change last arg to List<AbstractMemberMetaData> for multilevel of embedded
+     * TODO Likely ought to change last arg to List&lt;AbstractMemberMetaData&gt; for multilevel of embedded
+     * @param mmgr Metadata manager
+     * @param clr ClassLoader resolver
      * @param mmd Metadata for the member we are interested in
      * @param relationType Relation type of the member we are interested in
      * @param ownerMmd Optional metadata for the owner member (for nested embeddeds only. Set to null if not relevant to the member in question).

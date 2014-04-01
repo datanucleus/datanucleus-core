@@ -1469,10 +1469,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         this.sequence = (StringUtils.isWhitespace(sequence) ? null : sequence);
     }
 
-    /**
-     * Accessor for the cacheable tag value.
-     * @return cacheable tag value
-     */
     public boolean isCacheable()
     {
         if (hasExtension("cacheable"))
@@ -1483,9 +1479,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         return cacheable;
     }
 
-    /**
-     * Convenience method to set the cacheability of this class.
-     */
     public void setCacheable(boolean cache)
     {
         cacheable = cache;
@@ -3199,6 +3192,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      *  Calculate wether this field should be a second class mutable field.
      *  This calculation is a bit expensive.
      *  Please note that this data will be cached in {@link AbstractClassMetaData#scoMutableMemberFlags}.
+     *  @param mmgr MetaData manager
      *  @return wether this field should be a second class mutable field.
      */
     public boolean calcIsSecondClassMutable(MetaDataManager mmgr)

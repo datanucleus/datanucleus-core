@@ -32,7 +32,7 @@ package org.datanucleus.util;
 
 /**
  * A Base64 Encoder/Decoder.
- * <p>This class is used to encode and decode data in Base64 format as described in RFC 1521.<p>
+ * <p>This class is used to encode and decode data in Base64 format as described in RFC 1521.
  */
 public class Base64
 {

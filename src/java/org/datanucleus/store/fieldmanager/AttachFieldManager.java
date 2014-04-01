@@ -80,6 +80,7 @@ public class AttachFieldManager extends AbstractFieldManager
      * @param dirtyFields Flags for whether the field(s) are dirty
      * @param persistent whether the object being "attached" is persistent (yet)
      * @param cascadeAttach Whether to cascade any attach calls to related fields
+     * @param copy Whether to attach copy
      */
     public AttachFieldManager(ObjectProvider attachedOP, boolean[] secondClassMutableFields, 
             boolean[] dirtyFields, boolean persistent, boolean cascadeAttach, boolean copy)

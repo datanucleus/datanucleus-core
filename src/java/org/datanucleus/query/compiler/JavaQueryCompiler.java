@@ -194,6 +194,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
 
     /**
      * Method to compile the "from" clause (if present for the query language).
+     * @return The compiled from expression(s)
      */
     protected Expression[] compileFrom()
     {
@@ -550,6 +551,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
     /**
      * Convenience method that takes the input node if it is a parameter node swaps the node to be 
      * @param node The node to process
+     * @return The Node with the swap
      */
     protected Node swapSubqueryParameters(Node node)
     {

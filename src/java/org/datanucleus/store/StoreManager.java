@@ -83,46 +83,20 @@ public interface StoreManager
     public static final String OPTION_QUERY_CANCEL = "Query.Cancel";
     public static final String OPTION_DATASTORE_TIMEOUT = "Datastore.Timeout";
 
-    /**
-     * Accessor for the supported options in string form
-     */
     Collection getSupportedOptions();
 
-    /**
-     * Release of resources.
-     */
     void close();
 
     MetaDataManager getMetaDataManager();
 
-    /**
-     * Accessor for the store persistence handler.
-     * @return Store persistence handler.
-     */
     StorePersistenceHandler getPersistenceHandler();
 
-    /**
-     * Accessor for the flush process to use with this datastore.
-     * @return The flush process
-     */
     FlushProcess getFlushProcess();
 
-    /**
-     * Accessor for the schema naming factory.
-     * @return Naming factory.
-     */
     NamingFactory getNamingFactory();
 
-    /**
-     * Accessor for the query manager for this datastore.
-     * @return Query Manager for this store
-     */
     QueryManager getQueryManager();
 
-    /**
-     * Accessor for the store schema handler (if this datastore supports the concept of a schema).
-     * @return Store schema handler.
-     */
     StoreSchemaHandler getSchemaHandler();
 
     StoreData getStoreDataForClass(String className);

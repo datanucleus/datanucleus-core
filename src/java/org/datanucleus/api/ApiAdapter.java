@@ -51,6 +51,7 @@ public interface ApiAdapter extends Serializable
 
     /**
      * Whether the provided object is currently managed (has an ExecutionContext).
+     * @param pc The persistable object
      * @return Whether it is managed
      */
     boolean isManaged(Object pc);
@@ -180,12 +181,14 @@ public interface ApiAdapter extends Serializable
 
     /**
      * Accessor for whether the passed identity is a valid single-field application-identity for this API.
+     * @param id The identity
      * @return Whether it is valid
      */
     boolean isSingleFieldIdentity(Object id);
 
     /**
      * Accessor for whether the passed identity is a valid datastore-identity for this API.
+     * @param id The identity
      * @return Whether it is valid
      */
     boolean isDatastoreIdentity(Object id);

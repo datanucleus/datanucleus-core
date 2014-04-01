@@ -63,6 +63,7 @@ public interface ConnectionManager
      * Allocate a connection using the specified factory (unless we already have one cached for the ExecutionContext).
      * @param factory The ConnectionFactory to create any new connection with
      * @param ec ExecutionContext that binds the connection during its lifetime (key in the pool)
+     * @param tx The transaction
      * @param options Any options for allocating the connection (e.g isolation)
      * @return The ManagedConnection
      */

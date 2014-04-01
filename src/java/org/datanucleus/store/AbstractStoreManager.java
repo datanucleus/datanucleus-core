@@ -901,6 +901,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      * Override this method if you want to instantiate a subclass of StoreData.
      * @param cmd MetaData for the class
      * @param clr ClassLoader resolver
+     * @return The StoreData
      */
     protected StoreData newStoreData(ClassMetaData cmd, ClassLoaderResolver clr) 
     {

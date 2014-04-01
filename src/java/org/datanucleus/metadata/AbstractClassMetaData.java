@@ -1586,6 +1586,7 @@ public abstract class AbstractClassMetaData extends MetaData
     /**
      * Method to initialise all convenience information about member positions and what role
      * each position performs.
+     * @param mmgr MetaDataManager
      */
     protected void initialiseMemberPositionInformation(MetaDataManager mmgr)
     {
@@ -3316,6 +3317,8 @@ public abstract class AbstractClassMetaData extends MetaData
 
     /**
      * Convenience method to return if the class has relations to other objects. Includes superclasses.
+     * @param clr ClassLoader resolver
+     * @param mmgr MetaData manager
      * @return Whether the class has any relations (that it knows about)
      */
     public boolean hasRelations(ClassLoaderResolver clr, MetaDataManager mmgr)

@@ -527,7 +527,7 @@ public class Collection extends AbstractCollection implements SCOCollection, SCO
      * resolved will result in an object of a type that is compatible with all
      * references to the object.
      * @return the replaced object
-     * @throws ObjectStreamException
+     * @throws ObjectStreamException If an error occurs
      */
     protected Object writeReplace() throws ObjectStreamException
     {

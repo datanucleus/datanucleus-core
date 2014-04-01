@@ -446,7 +446,7 @@ public class Hashtable extends java.util.Hashtable implements SCOMap, Cloneable
      * references to the object.
      * 
      * @return the replaced object
-     * @throws ObjectStreamException
+     * @throws ObjectStreamException if an error occurs
      */
     protected Object writeReplace() throws ObjectStreamException
     {

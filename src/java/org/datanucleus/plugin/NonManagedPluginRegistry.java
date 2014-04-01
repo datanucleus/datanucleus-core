@@ -620,7 +620,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
      * @param pluginId the plugin id
      * @param className the class name
      * @return the Class
-     * @throws ClassNotFoundException
+     * @throws ClassNotFoundException if an error occurs in loading
      */
     public Class loadClass(String pluginId, String className) throws ClassNotFoundException
     {
@@ -631,7 +631,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
      * Converts a URL that uses a user-defined protocol into a URL that uses the file protocol.
      * @param url the url to be converted
      * @return the converted URL
-     * @throws IOException
+     * @throws IOException if an error occurs
      */
     public URL resolveURLAsFileURL(URL url) throws IOException
     {

@@ -31,22 +31,21 @@ import org.datanucleus.util.JavaUtils;
  * {
  *     if (jdoStateManager != null)
  *         jdoStateManager.makeDirty(this, fieldName);
- *     if (jdoIsDetached() && fieldName != null) 
+ *     if (jdoIsDetached() &amp;&amp; fieldName != null) 
  *     {
  *         String fldName = null;
- *         if (fieldName.indexOf('.') >= 0)
+ *         if (fieldName.indexOf('.') &ge; 0)
  *             fldName = fieldName.substring(fieldName.lastIndexOf('.') + 1);
  *         else
  *             fldName = fieldName;
- *         for (int i = 0; i < jdoFieldNames.length; i++) 
+ *         for (int i = 0; i &lt; jdoFieldNames.length; i++) 
  *         {
  *             if (jdoFieldNames[i].equals(fldName)) 
  *             {
  *                 if (((BitSet) jdoDetachedState[2]).get(i + jdoInheritedFieldCount))
  *                     ((BitSet) jdoDetachedState[3]).set(i + jdoInheritedFieldCount);
  *                 else
- *                     throw new JDODetachedFieldAccessException
- *                               ("You have just attempted to access a field/property");
+ *                     throw new JDODetachedFieldAccessException("You have just attempted to access a field/property");
  *                 break;
  *             }
  *         }

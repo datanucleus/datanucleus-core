@@ -234,6 +234,7 @@ public interface MetaDataManager
      * be used in initialisation processes.
      * To be implemented by the implementing class.
      * @param c The class to find MetaData for
+     * @param clr ClassLoader resolver
      * @return The ClassMetaData for this class (or null if not found)
      **/
     AbstractClassMetaData getMetaDataForClassInternal(Class c, ClassLoaderResolver clr);
@@ -391,6 +392,7 @@ public interface MetaDataManager
      * Note : this is only public to allow enhancer tests to load up metadata manually.
      * @param fileURLString URL of the metadata file
      * @param filemd The File MetaData
+     * @param clr ClassLoader resolver
      */
     void registerFile(String fileURLString, FileMetaData filemd, ClassLoaderResolver clr);
 

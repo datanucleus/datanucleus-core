@@ -52,7 +52,7 @@ public abstract class Expression implements Serializable
 
         /**
          * Operator
-         * @param symbol the source text or symbol of an operator. e.g  =, ==, +, /, >, <, etc
+         * @param symbol the source text or symbol of an operator. e.g  =, ==, +, /, &gt;, &lt;, etc
          * @param precedence the order of precedence where the expression is compiled 
          */
         public Operator(String symbol, int precedence)
@@ -79,7 +79,7 @@ public abstract class Expression implements Serializable
     {
         /**
          * Monodiac operator
-         * @param symbol the source text or symbol of an operator. e.g  =, ==, +, /, >, <, etc
+         * @param symbol the source text or symbol of an operator. e.g  =, ==, +, /, &gt;, &lt;, etc
          * @param precedence the order of precedence where the expression is compiled 
          */
         public MonadicOperator(String symbol, int precedence)
@@ -118,7 +118,7 @@ public abstract class Expression implements Serializable
 
         /**
          * Dyadic operator
-         * @param symbol the source text or symbol of an operator. e.g  =, ==, +, /, >, <, etc
+         * @param symbol the source text or symbol of an operator. e.g  =, ==, +, /, &gt;, &lt;, etc
          * @param precedence the order of precedence where the expression is compiled 
          * @param isAssociative true if associative operator. An associative operator is one for which 
          *     parentheses can be inserted and removed without changing the meaning of the expression 

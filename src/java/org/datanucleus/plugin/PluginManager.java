@@ -286,7 +286,16 @@ public class PluginManager
      * @param discrimAttrName Attribute on the extension to use as discriminator
      * @param discrimAttrValue Value for discriminator attribute
      * @param attributeName Name of the attribute whose value we want
+     * @param argsClass Classes of the arguments
+     * @param args The arguments
      * @return The value of the attribute
+     * @throws ClassNotFoundException if an error occurs
+     * @throws SecurityException if an error occurs
+     * @throws NoSuchMethodException if an error occurs
+     * @throws IllegalArgumentException if an error occurs
+     * @throws InstantiationException if an error occurs
+     * @throws IllegalAccessException if an error occurs
+     * @throws InvocationTargetException if an error occurs
      */
     public Object createExecutableExtension(String extensionPoint,
                                             String discrimAttrName, 
@@ -309,7 +318,16 @@ public class PluginManager
      * @param discrimAttrName First attribute on the extension to use as discriminator
      * @param discrimAttrValue Value for first discriminator attribute
      * @param attributeName Name of the attribute whose value we want
+     * @param argsClass Classes of the arguments
+     * @param args The arguments
      * @return The value of the attribute
+     * @throws ClassNotFoundException if an error occurs
+     * @throws SecurityException if an error occurs
+     * @throws NoSuchMethodException if an error occurs
+     * @throws IllegalArgumentException if an error occurs
+     * @throws InstantiationException if an error occurs
+     * @throws IllegalAccessException if an error occurs
+     * @throws InvocationTargetException if an error occurs
      */
     public Object createExecutableExtension(String extensionPoint,
                                             String[] discrimAttrName,
@@ -332,7 +350,7 @@ public class PluginManager
      * @param pluginId the plugin id
      * @param className the class name
      * @return the Class
-     * @throws ClassNotResolvedException 
+     * @throws ClassNotResolvedException if an error occurs
      */
     public Class loadClass(String pluginId, String className) throws ClassNotResolvedException
     {
@@ -350,7 +368,7 @@ public class PluginManager
      * Converts a URL that uses a user-defined protocol into a URL that uses the file protocol.
      * @param url the url to be converted
      * @return the converted URL
-     * @throws IOException
+     * @throws IOException if an error occurs
      */
     public URL resolveURLAsFileURL(URL url) throws IOException
     {

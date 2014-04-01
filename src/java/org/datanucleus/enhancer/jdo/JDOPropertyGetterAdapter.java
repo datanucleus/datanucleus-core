@@ -48,9 +48,9 @@ import org.datanucleus.util.Localiser;
  * <pre>
  * YYY aaaGetZZZ()
  * {
- *     if (aaaFlags > 0 && aaaStateManager != null && !aaaStateManager.isLoaded(this, 0))
+ *     if (aaaFlags &gt; 0 &amp;&amp; aaaStateManager != null &amp;&amp; !aaaStateManager.isLoaded(this, 0))
  *         return (Integer) aaaStateManager.getObjectField(this, 0, aaaGetXXX());
- *     if (aaaIsDetached() && !((BitSet) aaaDetachedState[2]).get(0))
+ *     if (aaaIsDetached() &amp;&amp; !((BitSet) aaaDetachedState[2]).get(0))
  *         throw new DetachedFieldAccessException
  *             ("You have just attempted to access property \"id\" yet this field was not detached ...");
  *     return aaaGetXXX();
@@ -60,7 +60,7 @@ import org.datanucleus.util.Localiser;
  * <pre>
  * YYY aaaGetZZZ()
  * {
- *     if (aaaFlags > 0 && aaaStateManager != null && !aaaStateManager.isLoaded(this, 0))
+ *     if (aaaFlags &gt; 0 &amp;&amp; aaaStateManager != null &amp;&amp; !aaaStateManager.isLoaded(this, 0))
  *         return (Integer) aaaStateManager.getObjectField(this, 0, aaaGetXXX());
  *     return aaaGetXXX();
  * }
@@ -145,6 +145,8 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
      * @param asmClassName ASM class name for the owning class
      * @param asmClassDesc ASM descriptor for the owning class
      * @param detachListener true if the generate code must support DetachListener
+     * @param includeFrames Whether to include stack map frames
+     * @param namer Namer for methods etc
      */
     public static void generateGetXXXMethod(MethodVisitor mv, AbstractMemberMetaData mmd,
             String asmClassName, String asmClassDesc, boolean detachListener, boolean includeFrames,

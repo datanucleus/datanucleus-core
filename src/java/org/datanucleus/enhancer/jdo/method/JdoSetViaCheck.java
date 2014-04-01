@@ -31,7 +31,7 @@ import org.datanucleus.util.JavaUtils;
  * <pre>
  * static void jdoSetZZZ(MyClass objPC, YYY zzz)
  * {
- *     if (objPC.jdoFlags != 0 && objPC.jdoStateManager != null)
+ *     if (objPC.jdoFlags != 0 &amp;&amp; objPC.jdoStateManager != null)
  *         objPC.jdoStateManager.setStringField(objPC, 2, objPC.ZZZ, zzz);
  *     else
  *     {

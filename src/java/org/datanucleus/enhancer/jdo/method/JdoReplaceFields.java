@@ -31,12 +31,12 @@ import org.datanucleus.util.JavaUtils;
  *     if (fieldIds == null)
  *         throw new IllegalArgumentException("argument is null");
  *     int i = fieldIds.length;
- *     if (i > 0)
+ *     if (i &gt; 0)
  *     {
  *         int j = 0;
  *         do
  *             jdoReplaceField(fieldIds[j]);
- *         while (++j < i);
+ *         while (++j &lt; i);
  *     }
  * }
  * </pre>

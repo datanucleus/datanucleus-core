@@ -31,9 +31,9 @@ import org.datanucleus.util.JavaUtils;
  * <pre>
  * static YYY jdoGetZZZ(MyClass objPC)
  * {
- *     if (objPC.jdoFlags > 0 && objPC.jdoStateManager != null && !objPC.jdoStateManager.isLoaded(objPC, 2))
+ *     if (objPC.jdoFlags &gt; 0 &amp;&amp; objPC.jdoStateManager != null &amp;&amp; !objPC.jdoStateManager.isLoaded(objPC, 2))
  *         return objPC.jdoStateManager.getStringField(objPC, 2, objPC.ZZZ);
- *     if (objPC.jdoIsDetached() != false && ((BitSet)objPC.jdoDetachedState[2]).get(2) != true)
+ *     if (objPC.jdoIsDetached() != false &amp;&amp; ((BitSet)objPC.jdoDetachedState[2]).get(2) != true)
  *         throw new JDODetachedFieldAccessException
  *             ("You have just attempted to access field \"ZZZ\" yet this field was not detached ... ");
  *     return objPC.ZZZ;

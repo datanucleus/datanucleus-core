@@ -1968,7 +1968,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
     /**
      * Method to perform the cancellation of a query task.
      * This implementation does nothing. Override if you
-     * @param obj
+     * @param obj The task
      * @return Whether the task was cancelled
      */
     protected boolean cancelTaskObject(Object obj)

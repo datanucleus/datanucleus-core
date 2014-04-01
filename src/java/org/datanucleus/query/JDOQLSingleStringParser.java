@@ -33,29 +33,29 @@ import org.datanucleus.util.NucleusLogger;
  * the JDOQLQuery accordingly with the result that after calling the parse() method the JDOQLQuery
  * is populated.
  * <pre>
- * select [unique] [ <result> ] [into <result-class-name>]
- *                              [from <candidate-class-name> [exclude subclasses] ]
- *                              [where <filter>]
- *                              [variables <variables-clause> ]
- *                              [parameters <parameters-clause>]
- *                              [<imports-clause>]
- *                              [group by <grouping-clause> ]
- *                              [order by <ordering-clause>]
- *                              [range <from-range> ,<to-range>]                                       
+ * select [unique] [{result}] [into {result-class-name}]
+ *                              [from {candidate-class-name} [exclude subclasses] ]
+ *                              [where {filter}]
+ *                              [variables {variables-clause} ]
+ *                              [parameters {parameters-clause} ]
+ *                              [{imports-clause}]
+ *                              [group by {grouping-clause} ]
+ *                              [order by {ordering-clause} ]
+ *                              [range {from-range} ,{to-range}]                                       
  * </pre>
  * or
  * <pre>
- * UPDATE <candidate-class-name> SET fld1 = val[, fld2 = val2] WHERE {filter}
+ * UPDATE {candidate-class-name} SET fld1 = val[, fld2 = val2] WHERE {filter}
  * </pre>
  * or
  * <pre>
- * DELETE FROM <candidate-class-name> [exclude-subclasses] WHERE {filter}
+ * DELETE FROM {candidate-class-name} [exclude-subclasses] WHERE {filter}
  * </pre>
  * Note that {filter} can contain subqueries, hence containing keywords
  * <pre>
- * SELECT c FROM Customer c WHERE timeAvailable < (SELECT avg(hours) FROM Employee e)
+ * SELECT c FROM Customer c WHERE timeAvailable &lt; (SELECT avg(hours) FROM Employee e)
  * </pre>
- * So the "filter" for the outer query is "timeAvailable < (SELECT avg(hours) FROM Employee e)"
+ * So the "filter" for the outer query is "timeAvailable &lt; (SELECT avg(hours) FROM Employee e)"
  */
 public class JDOQLSingleStringParser
 {    

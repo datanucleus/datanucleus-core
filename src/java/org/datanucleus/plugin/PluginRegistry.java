@@ -60,7 +60,16 @@ public interface PluginRegistry
      * Loads a class (do not initialize) from an attribute of {@link ConfigurationElement}
      * @param confElm the configuration element
      * @param name the attribute name
+     * @param argsClass Classes of the args
+     * @param args The arguments
      * @return the Class
+     * @throws ClassNotFoundException If an error occurs
+     * @throws NoSuchMethodException If an error occurs
+     * @throws SecurityException  If an error occurs
+     * @throws InvocationTargetException  If an error occurs
+     * @throws IllegalAccessException  If an error occurs
+     * @throws InstantiationException  If an error occurs
+     * @throws IllegalArgumentException  If an error occurs
      */
     Object createExecutableExtension(ConfigurationElement confElm, String name, Class[] argsClass, Object[] args)
         throws ClassNotFoundException,
@@ -76,7 +85,7 @@ public interface PluginRegistry
      * @param pluginId the plugin id
      * @param className the class name
      * @return the Class
-     * @throws ClassNotFoundException
+     * @throws ClassNotFoundException if an error occurs in loading
      */
     Class loadClass(String pluginId, String className) throws ClassNotFoundException;
 
@@ -84,7 +93,7 @@ public interface PluginRegistry
      * Converts a URL that uses a user-defined protocol into a URL that uses the file protocol.
      * @param url the url to be converted
      * @return the converted URL
-     * @throws IOException
+     * @throws IOException if an error occurs
      */
     URL resolveURLAsFileURL(URL url) throws IOException;
     

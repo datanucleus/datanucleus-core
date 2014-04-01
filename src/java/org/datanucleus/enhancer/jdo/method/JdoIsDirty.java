@@ -33,7 +33,7 @@ import org.datanucleus.util.JavaUtils;
  *         return jdoStateManager.isDirty(this);
  *     if (this.jdoIsDetached() != true)
  *         return false;
- *     if (((BitSet) jdoDetachedState[3]).length() <= 0)
+ *     if (((BitSet) jdoDetachedState[3]).length() &le; 0)
  *         return false;
  *     return true;
  * }

@@ -52,6 +52,7 @@ public class JdoSuperClone extends ClassMethod
      * @param returnType Return type
      * @param argTypes Argument types
      * @param argNames Argument names
+     * @param exceptions Any exceptions thrown
      */
     public JdoSuperClone(ClassEnhancer enhancer, String name, int access, 
         Object returnType, Object[] argTypes, String[] argNames, String[] exceptions)

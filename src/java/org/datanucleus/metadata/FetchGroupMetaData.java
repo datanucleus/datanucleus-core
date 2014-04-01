@@ -136,6 +136,7 @@ public class FetchGroupMetaData extends MetaData
 
     /**
      * Method to create a new member, add it, and return it.
+     * @param name The name of the fetch group
      * @return The field metadata
      */
     public FetchGroupMemberMetaData newMemberMetaData(String name)

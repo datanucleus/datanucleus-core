@@ -40,22 +40,22 @@ import java.util.Enumeration;
 public interface ClassLoaderResolver
 {
     /**
-     * Class loading method, allowing specification of a primary loader. This method does not initialize the class
+     * Class loading method, allowing specification of a primary loader. This method does not initialize the class.
+     * Will throw ClassNotResolvedException if the class can't be found in the classpath.
      * @param name Name of the Class to be loaded
      * @param primary the primary ClassLoader to use (or null)
      * @return The Class given the name, using the specified ClassLoader
-     * @throws ClassNotResolvedException if the class can't be found in the classpath
      */
     public Class classForName(String name, ClassLoader primary);
 
     /**
      * Class loading method, allowing specification of a primary loader
      * and whether the class should be initialised or not.
+     * Will throw ClassNotResolvedException if the class can't be found in the classpath.
      * @param name Name of the Class to be loaded
      * @param primary the primary ClassLoader to use (or null)
      * @param initialize whether to initialize the class or not.
      * @return The Class given the name, using the specified ClassLoader
-     * @throws ClassNotResolvedException if the class can't be found in the classpath
      */
     public Class classForName(String name, ClassLoader primary, boolean initialize);
 
@@ -117,7 +117,6 @@ public interface ClassLoaderResolver
      * @param resourceName the path to resource name relative to the classloader root path. If <code>resourceName</code> starts with "/", remove it.   
      * @param primary the primary ClassLoader to use (or null)
      * @return A URL object for reading the resource, or null if the resource could not be found or the invoker doesn't have adequate privileges to get the resource. 
-     * @throws IOException If I/O errors occur
      * @see ClassLoader#getResource(java.lang.String)
      */
     public URL getResource(String resourceName, ClassLoader primary);

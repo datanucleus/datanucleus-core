@@ -521,7 +521,7 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
      * references to the object.
      * 
      * @return the replaced object
-     * @throws ObjectStreamException
+     * @throws ObjectStreamException if an error occurs
      */
     protected Object writeReplace() throws ObjectStreamException
     {

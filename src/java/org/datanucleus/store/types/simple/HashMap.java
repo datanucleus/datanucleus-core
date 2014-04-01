@@ -447,7 +447,7 @@ public class HashMap extends java.util.HashMap implements SCOMap, Cloneable
      * references to the object.
      * 
      * @return the replaced object
-     * @throws ObjectStreamException
+     * @throws ObjectStreamException if an error occurs
      */
     protected Object writeReplace() throws ObjectStreamException
     {

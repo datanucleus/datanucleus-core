@@ -991,7 +991,7 @@ public class SCOUtils
      * Returns <tt>true</tt> if this collection contains the specified
      * element.  More formally, returns <tt>true</tt> if and only if this
      * collection contains at least one element <tt>it</tt> such that
-     * <tt>(o==null ? it==null : o.equals(it))</tt>.<p>
+     * <tt>(o==null ? it==null : o.equals(it))</tt>.
      * <p>
      * This implementation iterates over the elements in the collection,
      * checking each element in turn for equality with the specified element.
@@ -1413,6 +1413,7 @@ public class SCOUtils
 
     /**
      * Return whether the supplied type (collection) is list based.
+     * @param type Type to check
      * @return Whether it needs list ordering
      */
     public static boolean isListBased(Class type)

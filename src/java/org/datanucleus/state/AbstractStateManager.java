@@ -1126,6 +1126,7 @@ public abstract class AbstractStateManager implements ObjectProvider
      * Convenience accessor to return the field numbers for the input loaded and dirty field arrays.
      * @param loadedFields Fields that were detached with the object
      * @param dirtyFields Fields that have been modified while detached
+     * @return The field numbers of loaded or dirty fields
      */
     protected int[] getFieldNumbersOfLoadedOrDirtyFields(boolean[] loadedFields, boolean[] dirtyFields)
     {

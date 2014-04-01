@@ -30,7 +30,7 @@ import org.datanucleus.store.exceptions.DatastoreInitialisationException;
 /**
  * Interface defining an Auto-Start Mechanism.
  * An Auto-Start Mechanism is a means of auto-populating the classes supported by a StoreManager.
- * <P>
+ * <p>
  * If the user changes their persistence definition a problem can occur when starting up DataNucleus. 
  * DataNucleus loads up its existing data from a repository (e.g the table "NUCLEUS_TABLES" for 
  * SchemaTableAutoStarter) and finds that a table/class required by the repository data no longer exists. 
@@ -41,8 +41,7 @@ import org.datanucleus.store.exceptions.DatastoreInitialisationException;
  * <li>Quiet (the default) will simply remove the entry from the repository and continue without exception.</li>
  * <li>Ignored will simply continue without doing anything.</li>
  * </ul>
- * </P>
- * 
+ * <p>
  * Implementations must have a public constructor taking the arguments {@link StoreManager} and 
  * {@link ClassLoaderResolver}
  */
@@ -71,7 +70,7 @@ public interface AutoStartMechanism
     /**
      * Accessor for the data for the classes that are currently auto started.
      * @return Collection of {@link StoreData} elements
-     * @throws DatastoreInitialisationException
+     * @throws DatastoreInitialisationException If there is an error initialising the datastore
      */
     Collection getAllClassData() throws DatastoreInitialisationException;
 

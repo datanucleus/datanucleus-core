@@ -192,6 +192,8 @@ public interface PersistenceNucleusContext extends StoreNucleusContext
     /**
      * Convenience method to return if objects of this type are cached for this NucleusContext.
      * Uses the "cacheable" flag of the class, and the cache-mode to determine whether to cache
+     * @param cmd MetaData for the class
+     * @return Whether it is cacheable
      */
     boolean isClassCacheable(AbstractClassMetaData cmd);
 }

@@ -248,6 +248,7 @@ public interface ExecutionContext
      * This constructor is used for creating new instances of existing persistent objects.
      * @param pcClass the class of the new instance to be created.
      * @param id the identity of the object.
+     * @return Object Provider
      */
     ObjectProvider newObjectProviderForHollow(Class pcClass, Object id);
 
@@ -255,6 +256,7 @@ public interface ExecutionContext
      * Constructs an ObjectProvider to manage the specified persistent instance having the given object ID.
      * @param id the identity of the object.
      * @param pc The object that is persistent that we are going to manage
+     * @return Object Provider
      */
     ObjectProvider newObjectProviderForPersistentClean(Object id, Object pc);
 
@@ -266,6 +268,7 @@ public interface ExecutionContext
      * @param copyPc Whether the SM should manage a copy of the passed PC or that one
      * @param ownerOP Owner ObjectProvider
      * @param ownerFieldNumber Field number in owner object where this is stored
+     * @return Object Provider
      */
     ObjectProvider newObjectProviderForEmbedded(Object pc, boolean copyPc, ObjectProvider ownerOP, int ownerFieldNumber);
 
@@ -276,6 +279,7 @@ public interface ExecutionContext
      * @param cmd Meta-data for the class that this is an instance of.
      * @param ownerOP Owner ObjectProvider
      * @param ownerFieldNumber Field number in owner object where this is stored
+     * @return Object Provider
      */
     ObjectProvider newObjectProviderForEmbedded(AbstractClassMetaData cmd, ObjectProvider ownerOP, int ownerFieldNumber);
 

@@ -102,6 +102,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
      * @param imports Any imports
      * @param clr ClassLoader resolver 
      * @param candidateAlias Alias for the candidate class. With JDOQL this is "this".
+     * @param queryLang Query language (JDOQL, JPQL etc)
      */
     public InMemoryExpressionEvaluator(ExecutionContext ec, Map params, Map<String, Object> state, 
             Imports imports, ClassLoaderResolver clr, String candidateAlias, String queryLang)

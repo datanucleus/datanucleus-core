@@ -403,7 +403,7 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
     /**
      * Recursively compile the subqueries
      * @param subqueryMap The subquery definition map
-     * @param parentCompilation 
+     * @param parentCompilation Parent compilation
      * @param parentCompiler The parent compiler
      * @param parameterValues The parameters map
      */

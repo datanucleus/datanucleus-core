@@ -203,6 +203,7 @@ public class ClassUtils
      * @param cls the class to find the declared fields and populate the map
      * @param methodName the method name to find
      * @param argType the argument type
+     * @return The Method
      */
     public static Method getMethodWithArgument(Class cls, String methodName, Class argType)
     {
@@ -1696,6 +1697,7 @@ public class ClassUtils
      * Helper method to return the value returned by a method on an object using reflection.
      * @param object The object
      * @param methodName Name of the method
+     * @param args The arguments
      * @return The value
      */
     public static Object getValueOfMethodByReflection(Object object, String methodName, Object... args)
@@ -1998,7 +2000,7 @@ public class ClassUtils
 
     /**
      * Utility to clear the supplied flags.
-     * @param flags
+     * @param flags The flags array to clear
      */
     public static void clearFlags(boolean[] flags)
     {
@@ -2010,7 +2012,7 @@ public class ClassUtils
 
     /**
      * Utility to clear the supplied flags.
-     * @param flags
+     * @param flags Flags to clear
      * @param fields fields numbers where the flags will be cleared
      */
     public static void clearFlags(boolean[] flags, int[] fields)
@@ -2055,8 +2057,11 @@ public class ClassUtils
 
     /**
      * Returns an array of integers containing the indices of all elements in
-     * <tt>flags</tt> whose index occurs in <tt>indices</tt> and whose value is
-     * <tt>state</tt>.
+     * <tt>flags</tt> whose index occurs in <tt>indices</tt> and whose value is <tt>state</tt>.
+     * @param flags the boolean array
+     * @param indices The positions in the array
+     * @param state The state that we want to match
+     * @return The positions of flags that are set to this state
      */
     public static int[] getFlagsSetTo(boolean[] flags, int[] indices, boolean state)
     {

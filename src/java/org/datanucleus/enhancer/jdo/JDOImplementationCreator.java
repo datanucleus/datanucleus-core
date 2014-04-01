@@ -144,9 +144,9 @@ public class JDOImplementationCreator implements Serializable, ImplementationCre
      * @param imd The MetaData for the interface
      * @param clr The ClassLoader
      * @return The instance implementing the interface
-     * @throws ClassNotFoundException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
+     * @throws ClassNotFoundException If an error occurs
+     * @throws InstantiationException If an error occurs
+     * @throws IllegalAccessException If an error occurs
      */    
     protected PersistenceCapable newInstance(InterfaceMetaData imd, ClassLoaderResolver clr) 
     throws ClassNotFoundException, InstantiationException, IllegalAccessException
@@ -230,9 +230,9 @@ public class JDOImplementationCreator implements Serializable, ImplementationCre
      * @param cmd The MetaData for the abstract class
      * @param clr The ClassLoader
      * @return The instance implementing the abstract class.
-     * @throws ClassNotFoundException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
+     * @throws ClassNotFoundException if an error occurs
+     * @throws InstantiationException if an error occurs
+     * @throws IllegalAccessException if an error occurs
      */    
     protected PersistenceCapable newInstance(ClassMetaData cmd, ClassLoaderResolver clr) 
     throws ClassNotFoundException, InstantiationException, IllegalAccessException

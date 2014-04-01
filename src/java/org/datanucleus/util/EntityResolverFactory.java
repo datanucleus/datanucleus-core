@@ -45,13 +45,13 @@ public class EntityResolverFactory
      * @param pluginManager the pluginManager
      * @param handlerName the handler name
      * @return The EntityResolver instance for this handler name
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
-     * @throws InstantiationException 
-     * @throws NoSuchMethodException 
-     * @throws ClassNotFoundException 
-     * @throws IllegalArgumentException 
-     * @throws SecurityException 
+     * @throws InvocationTargetException if an error occurs
+     * @throws IllegalAccessException if an error occurs
+     * @throws InstantiationException if an error occurs
+     * @throws NoSuchMethodException if an error occurs
+     * @throws ClassNotFoundException if an error occurs
+     * @throws IllegalArgumentException if an error occurs
+     * @throws SecurityException if an error occurs
      */
     public static EntityResolver getInstance(PluginManager pluginManager, String handlerName) 
     throws SecurityException, IllegalArgumentException, ClassNotFoundException, NoSuchMethodException, 

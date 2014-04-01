@@ -38,6 +38,7 @@ public class VariableNotSetException extends RuntimeException
 
     /**
      * Constructor when we know the possible variable values.
+     * @param varExpr The variable expression
      * @param values The values
      */
     public VariableNotSetException(VariableExpression varExpr, Object[] values)

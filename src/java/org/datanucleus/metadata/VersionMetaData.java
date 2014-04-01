@@ -41,7 +41,6 @@ import org.datanucleus.util.StringUtils;
  * <li>The JDO method of adding a surrogate column, using the column/columns/index info in this class</li>
  * <li>The JPA method of using an existing field/method. This uses the "fieldName" info only</li>
  * </ul>
- * </p>
  */
 public class VersionMetaData extends MetaData
 {

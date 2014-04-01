@@ -44,6 +44,7 @@ public interface ConnectionFactory
      * Obtain a connection from the Factory. The connection will be enlisted within the transaction
      * associated to the ExecutionContext if enlist set to true.
      * @param ec ExecutionContext that the connection is bound to during its lifecycle (or null)
+     * @param transaction The transaction to enlist with
      * @param options Any options for then creating the connection
      * @return the {@link org.datanucleus.store.connection.ManagedConnection}
      */

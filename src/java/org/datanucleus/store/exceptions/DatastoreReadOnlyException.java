@@ -28,10 +28,6 @@ public class DatastoreReadOnlyException extends NucleusUserException
 {
     ClassLoaderResolver clr;
 
-    /**
-     * Constructor for an exception with a specified message.
-     * @param msg the detail message
-     */
     public DatastoreReadOnlyException(String msg, ClassLoaderResolver clr)
     {
         super(msg);

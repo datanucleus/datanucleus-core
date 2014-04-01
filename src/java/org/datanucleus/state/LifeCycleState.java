@@ -193,8 +193,9 @@ public abstract class LifeCycleState
      * Method to transition to transient state.
      * @param op ObjectProvider.
      * @param useFetchPlan to make transient the fields in the fetch plan
+     * @param detachAllOnCommit Whether to detach on commit
      * @return new LifeCycle state.
-     **/
+     */
     public LifeCycleState transitionMakeTransient(ObjectProvider op, boolean useFetchPlan, boolean detachAllOnCommit)
     {
         return this;

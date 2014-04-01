@@ -52,7 +52,7 @@ public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManage
     /**
      * Constructor for a field manager for fetch plan processing.
      * @param op the ObjectProvider of the instance being processed.
-     * @param secondClassMutableFields
+     * @param secondClassMutableFields SCO field flags
      * @param fpClass Fetch Plan for the class of this instance
      * @param state Object containing the state of the fetch process
      */

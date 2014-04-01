@@ -182,6 +182,7 @@ public class QueryUtils
 
     /**
      * Convenience method to return whether the query should return a single row.
+     * @param query The query
      * @return Whether it represents a unique row
      */
     public static boolean queryReturnsSingleRow(Query query)
@@ -708,7 +709,7 @@ public class QueryUtils
 
     /**
      * Convenience method to compare two expression values against the specified operator.
-     * Returns true if "left {operator} right" is true. The operator can be <, >, <=, <=, ==, !=.
+     * Returns true if "left {operator} right" is true. The operator can be &lt;, &gt;, &ge;, &le;, ==, !=.
      * @param left Left object
      * @param right Right object
      * @param op Operator
@@ -1366,6 +1367,7 @@ public class QueryUtils
      * @param clr ClassLoader resolver
      * @param parameterValues Any parameter values (maybe used by the ordering clause)
      * @param imports Imports for the query
+     * @param queryLanguage The language of this query (JDOQL, JPQL etc)
      * @return The ordered List of candidates
      */
     public static List orderCandidates(List candidates, final Expression[] ordering, final Map state,

@@ -23,9 +23,6 @@ package org.datanucleus.util;
  */
 public class NullLogger extends NucleusLogger
 {
-    /**
-     * Constructor for a NucleusLogger that does nothing
-     */
     public NullLogger(String logName)
     {
     }

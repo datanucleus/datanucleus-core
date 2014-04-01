@@ -71,7 +71,6 @@ import org.datanucleus.util.NucleusLogger;
  * datanucleus.datastore.ThirdStore=thirdstore.properties
  * </pre>
  * where these properties files have the properties for the secondary stores with names "SecondStore", "ThirdStore".
- * </p>
  */
 public class FederatedStoreManager implements StoreManager
 {

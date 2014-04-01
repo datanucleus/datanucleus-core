@@ -25,22 +25,12 @@ public class ParameterNode extends Node
 {
     int position;
 
-    /**
-     * Constructor for parameter node without a defined value.
-     * @param nodeType
-     * @param position Position
-     */
     public ParameterNode(NodeType nodeType, int position)
     {
         super(nodeType);
         this.position = position;
     }
 
-    /**
-     * @param nodeType
-     * @param nodeValue
-     * @param position 
-     */
     public ParameterNode(NodeType nodeType, Object nodeValue, int position)
     {
         super(nodeType, nodeValue);

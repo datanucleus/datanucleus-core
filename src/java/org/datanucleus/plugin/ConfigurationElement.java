@@ -40,8 +40,10 @@ public class ConfigurationElement
     private String text;
     /** the Extension **/
     private Extension extension;
+ 
     /**
      * Constructor
+     * @param extension The extension
      * @param name the element's name
      * @param parent the parent. null if there is no parent
      */

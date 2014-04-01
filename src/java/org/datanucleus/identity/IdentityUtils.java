@@ -128,6 +128,7 @@ public class IdentityUtils
      * Convenience method to return the identity as a String.
      * Typically outputs the toString() form of the identity object however with SingleFieldIdentity
      * it outputs the class+key since SingleFieldIdentity just return the key.
+     * @param api The API
      * @param id The id
      * @return String form
      */
