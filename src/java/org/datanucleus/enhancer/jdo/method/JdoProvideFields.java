@@ -21,7 +21,6 @@ import org.datanucleus.asm.Label;
 import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Method to generate the method "jdoProvideFields" using ASM.
@@ -84,10 +83,7 @@ public class JdoProvideFields extends ClassMethod
         visitor.visitInsn(Opcodes.ATHROW);
 
         visitor.visitLabel(l1);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
         visitor.visitInsn(Opcodes.ARRAYLENGTH);
@@ -101,10 +97,7 @@ public class JdoProvideFields extends ClassMethod
         visitor.visitJumpInsn(Opcodes.IFLT, l4);
         Label l5 = new Label();
         visitor.visitLabel(l5);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_APPEND,1, new Object[] {Opcodes.INTEGER}, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_APPEND,1, new Object[] {Opcodes.INTEGER}, 0, null);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
@@ -116,10 +109,7 @@ public class JdoProvideFields extends ClassMethod
         visitor.visitVarInsn(Opcodes.ILOAD, 2);
         visitor.visitJumpInsn(Opcodes.IFGE, l5);
         visitor.visitLabel(l4);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         visitor.visitInsn(Opcodes.RETURN);
 

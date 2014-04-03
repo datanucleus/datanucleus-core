@@ -25,7 +25,6 @@ import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.PropertyMetaData;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Method to generate the method "jdoProvideField" using ASM.
@@ -116,10 +115,7 @@ public class JdoProvideField extends ClassMethod
                 visitor.visitInsn(Opcodes.ATHROW);
 
                 visitor.visitLabel(l1);
-                if (JavaUtils.useStackMapFrames())
-                {
-                    visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                }
+                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
                 visitor.visitVarInsn(Opcodes.ILOAD, 1);
                 visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(),
@@ -140,10 +136,7 @@ public class JdoProvideField extends ClassMethod
                 for (int i=0;i<fields.length;i++)
                 {
                     visitor.visitLabel(fieldOptions[i]);
-                    if (JavaUtils.useStackMapFrames())
-                    {
-                        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                    }
+                    visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
                     visitor.visitVarInsn(Opcodes.ALOAD, 0);
                     visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
@@ -171,10 +164,7 @@ public class JdoProvideField extends ClassMethod
 
                 // default:
                 visitor.visitLabel(defaultLabel);
-                if (JavaUtils.useStackMapFrames())
-                {
-                    visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                }
+                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                 visitor.visitVarInsn(Opcodes.ILOAD, 1);
@@ -183,10 +173,7 @@ public class JdoProvideField extends ClassMethod
 
                 // End of switch
                 visitor.visitLabel(endSwitchLabel);
-                if (JavaUtils.useStackMapFrames())
-                {
-                    visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                }
+                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
                 visitor.visitInsn(Opcodes.RETURN);
 
                 Label endLabel = new Label();
@@ -227,10 +214,7 @@ public class JdoProvideField extends ClassMethod
                 visitor.visitInsn(Opcodes.ATHROW);
 
                 visitor.visitLabel(l1);
-                if (JavaUtils.useStackMapFrames())
-                {
-                    visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                }
+                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
                 visitor.visitVarInsn(Opcodes.ILOAD, 1);
 
@@ -248,10 +232,7 @@ public class JdoProvideField extends ClassMethod
                 for (int i=0;i<fields.length;i++)
                 {
                     visitor.visitLabel(fieldOptions[i]);
-                    if (JavaUtils.useStackMapFrames())
-                    {
-                        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                    }
+                    visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
                     visitor.visitVarInsn(Opcodes.ALOAD, 0);
                     visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
@@ -279,10 +260,7 @@ public class JdoProvideField extends ClassMethod
 
                 // default:
                 visitor.visitLabel(defaultLabel);
-                if (JavaUtils.useStackMapFrames())
-                {
-                    visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                }
+                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
                 visitor.visitTypeInsn(Opcodes.NEW, "java/lang/IllegalArgumentException");
                 visitor.visitInsn(Opcodes.DUP);
@@ -298,10 +276,7 @@ public class JdoProvideField extends ClassMethod
 
                 // End of switch
                 visitor.visitLabel(endSwitchLabel);
-                if (JavaUtils.useStackMapFrames())
-                {
-                    visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                }
+                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
                 visitor.visitInsn(Opcodes.RETURN);
 
                 Label l7 = new Label();

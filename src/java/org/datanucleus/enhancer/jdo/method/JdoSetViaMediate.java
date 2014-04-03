@@ -24,7 +24,6 @@ import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Method to generate the method "jdoSetZZZ" using ASM for MEDIATE_WRITE fields.
@@ -91,10 +90,7 @@ public class JdoSetViaMediate extends ClassMethod
 
         // "else objPC.jdoStateManager.setYYYField(objPC, 0, objPC.ZZZ, zzz);"
         visitor.visitLabel(l1);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
@@ -120,10 +116,7 @@ public class JdoSetViaMediate extends ClassMethod
         visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
             jdoMethodName, "(L" + getNamer().getPersistableAsmClassName() + ";I" + argTypeDesc + argTypeDesc + ")V");
         visitor.visitLabel(l3);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         if (enhancer.getClassMetaData().isDetachable())
         {
@@ -151,10 +144,7 @@ public class JdoSetViaMediate extends ClassMethod
             visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "set", "(I)V");
             visitor.visitLabel(l6);
 
-            if (JavaUtils.useStackMapFrames())
-            {
-                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
+            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
         }
         visitor.visitInsn(Opcodes.RETURN);
 

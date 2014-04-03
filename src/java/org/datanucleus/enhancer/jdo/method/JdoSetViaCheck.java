@@ -24,7 +24,6 @@ import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Method to generate the method "setZZZ" using ASM for CHECK_WRITE fields.
@@ -117,10 +116,7 @@ public class JdoSetViaCheck extends ClassMethod
 
         // "objPC.text = val;"
         visitor.visitLabel(l1);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         EnhanceUtils.addLoadForType(visitor, fmd.getType(), 1);
@@ -151,10 +147,7 @@ public class JdoSetViaCheck extends ClassMethod
         }
 
         visitor.visitLabel(l3);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
         visitor.visitInsn(Opcodes.RETURN);
 
         Label endLabel = new Label();

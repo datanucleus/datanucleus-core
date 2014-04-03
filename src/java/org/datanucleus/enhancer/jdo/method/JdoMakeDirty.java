@@ -22,7 +22,6 @@ import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Method to generate the method "jdoMakeDirty" using ASM.
@@ -113,10 +112,7 @@ public class JdoMakeDirty extends ClassMethod
             "makeDirty", "(" + getNamer().getPersistableDescriptor() + "Ljava/lang/String;" + ")V");
         visitor.visitLabel(l1);
 
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         if (cmd.isDetachable())
         {
@@ -152,18 +148,12 @@ public class JdoMakeDirty extends ClassMethod
             visitor.visitJumpInsn(Opcodes.GOTO, l8);
             visitor.visitLabel(l6);
 
-            if (JavaUtils.useStackMapFrames())
-            {
-                visitor.visitFrame(Opcodes.F_APPEND,1, new Object[] {"java/lang/String"}, 0, null);
-            }
+            visitor.visitFrame(Opcodes.F_APPEND,1, new Object[] {"java/lang/String"}, 0, null);
             visitor.visitVarInsn(Opcodes.ALOAD, 1);
             visitor.visitVarInsn(Opcodes.ASTORE, 2);
             visitor.visitLabel(l8);
 
-            if (JavaUtils.useStackMapFrames())
-            {
-                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
+            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             visitor.visitInsn(Opcodes.ICONST_0);
             visitor.visitVarInsn(Opcodes.ISTORE, 3);
             Label l9 = new Label();
@@ -173,10 +163,7 @@ public class JdoMakeDirty extends ClassMethod
             Label l11 = new Label();
             visitor.visitLabel(l11);
 
-            if (JavaUtils.useStackMapFrames())
-            {
-                visitor.visitFrame(Opcodes.F_APPEND,1, new Object[] {Opcodes.INTEGER}, 0, null);
-            }
+            visitor.visitFrame(Opcodes.F_APPEND,1, new Object[] {Opcodes.INTEGER}, 0, null);
             visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), 
                 getNamer().getFieldNamesFieldName(), "[Ljava/lang/String;");
             visitor.visitVarInsn(Opcodes.ILOAD, 3);
@@ -215,10 +202,7 @@ public class JdoMakeDirty extends ClassMethod
             visitor.visitInsn(Opcodes.RETURN);
             visitor.visitLabel(l14);
 
-            if (JavaUtils.useStackMapFrames())
-            {
-                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
+            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             if (enhancer.hasOption(ClassEnhancer.OPTION_GENERATE_DETACH_LISTENER))
             {
                 // TODO Check this bytecode
@@ -240,16 +224,10 @@ public class JdoMakeDirty extends ClassMethod
             }
             visitor.visitLabel(l12);
 
-            if (JavaUtils.useStackMapFrames())
-            {
-                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
+            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             visitor.visitIincInsn(3, 1);
             visitor.visitLabel(l10);
-            if (JavaUtils.useStackMapFrames())
-            {
-                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
+            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             visitor.visitVarInsn(Opcodes.ILOAD, 3);
             visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), 
                 getNamer().getFieldNamesFieldName(), "[Ljava/lang/String;");
@@ -257,10 +235,7 @@ public class JdoMakeDirty extends ClassMethod
             visitor.visitJumpInsn(Opcodes.IF_ICMPLT, l11);
             visitor.visitLabel(l3);
 
-            if (JavaUtils.useStackMapFrames())
-            {
-                visitor.visitFrame(Opcodes.F_CHOP,2, null, 0, null);
-            }
+            visitor.visitFrame(Opcodes.F_CHOP,2, null, 0, null);
             if (pcSuperclassName != null)
             {
                 // Relay to the superclass to see if it has this field
@@ -281,10 +256,7 @@ public class JdoMakeDirty extends ClassMethod
         }
         else
         {
-            if (JavaUtils.useStackMapFrames())
-            {
-                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
+            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             visitor.visitInsn(Opcodes.RETURN);
             Label endLabel = new Label();
             visitor.visitLabel(endLabel);

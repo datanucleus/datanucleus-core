@@ -21,7 +21,6 @@ import org.datanucleus.asm.Label;
 import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Method to generate the method "loadClass" using ASM.
@@ -68,10 +67,7 @@ public class LoadClass extends ClassMethod
         visitor.visitLabel(l1);
         visitor.visitInsn(Opcodes.ARETURN);
         visitor.visitLabel(l2);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] {"java/lang/ClassNotFoundException"});
-        }
+        visitor.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] {"java/lang/ClassNotFoundException"});
 
         visitor.visitVarInsn(Opcodes.ASTORE, 1);
         Label l3 = new Label();

@@ -34,7 +34,6 @@ import org.datanucleus.enhancer.EnhancementNamer;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.PersistenceFlags;
-import org.datanucleus.util.JavaUtils;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -132,8 +131,7 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
         if (!mmd.isAbstract())
         {
             // Property is not abstract so generate the getXXX method to use the aaaGetXXX we just added
-            generateGetXXXMethod(mv, mmd, enhancer.getASMClassName(), enhancer.getClassDescriptor(), false, 
-                JavaUtils.useStackMapFrames(), enhancer.getNamer());
+            generateGetXXXMethod(mv, mmd, enhancer.getASMClassName(), enhancer.getClassDescriptor(), false, enhancer.getNamer());
         }
     }
 
@@ -149,8 +147,7 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
      * @param namer Namer for methods etc
      */
     public static void generateGetXXXMethod(MethodVisitor mv, AbstractMemberMetaData mmd,
-            String asmClassName, String asmClassDesc, boolean detachListener, boolean includeFrames,
-            EnhancementNamer namer)
+            String asmClassName, String asmClassDesc, boolean detachListener, EnhancementNamer namer)
     {
         String[] argNames = new String[] {"this"};
         String fieldTypeDesc = Type.getDescriptor(mmd.getType());
@@ -213,10 +210,7 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
             EnhanceUtils.addReturnForType(mv, mmd.getType());
 
             mv.visitLabel(l1);
-            if (includeFrames)
-            {
-                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
+            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
             if (cmd.isDetachable())
             {
@@ -276,10 +270,7 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
                 }
 
                 mv.visitLabel(l4);
-                if (includeFrames)
-                {
-                    mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                }
+                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             }
 
             mv.visitVarInsn(Opcodes.ALOAD, 0);
@@ -348,10 +339,7 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
             }
             EnhanceUtils.addReturnForType(mv, mmd.getType());
             mv.visitLabel(l1);
-            if (includeFrames)
-            {
-                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
+            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
             if (cmd.isDetachable())
             {
@@ -397,10 +385,7 @@ public class JDOPropertyGetterAdapter extends MethodVisitor
                 }
 
                 mv.visitLabel(l4);
-                if (includeFrames)
-                {
-                    mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                }
+                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             }
 
             mv.visitVarInsn(Opcodes.ALOAD, 0);

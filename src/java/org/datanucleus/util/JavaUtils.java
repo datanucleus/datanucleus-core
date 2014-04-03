@@ -30,44 +30,21 @@ public class JavaUtils
     private static int minorVersion=0;
 
     /**
-     * Accessor for whether the JRE is 1.5 (or above).
-     * @return Whether the JRE is 1.5 or above
-     */
-    public static boolean isJRE1_5OrAbove()
-    {
-        return !(getJREMajorVersion() == 1 && getJREMinorVersion() < 5);
-    }
-
-    /**
-     * Accessor for whether the JRE is 1.6 (or above).
-     * @return Whether the JRE is 1.6 or above
-     */
-    public static boolean isJRE1_6OrAbove()
-    {
-        return !(getJREMajorVersion() == 1 && getJREMinorVersion() < 6);
-    }
-
-    public static boolean useStackMapFrames()
-    {
-        return !isJRE1_6OrBelow();
-    }
-
-    /**
-     * Accessor for whether the JRE is 1.6 or below.
-     * @return Whether the JRE is 1.6 or below
-     */
-    public static boolean isJRE1_6OrBelow()
-    {
-        return getJREMajorVersion() == 1 && getJREMinorVersion() <= 6;
-    }
-
-    /**
      * Accessor for whether the JRE is 1.7 (or above).
      * @return Whether the JRE is 1.7 or above
      */
     public static boolean isJRE1_7OrAbove()
     {
         return !(getJREMajorVersion() == 1 && getJREMinorVersion() < 7);
+    }
+
+    /**
+     * Accessor for whether the JRE is 1.8 (or above).
+     * @return Whether the JRE is 1.8 or above
+     */
+    public static boolean isJRE1_8OrAbove()
+    {
+        return !(getJREMajorVersion() == 1 && getJREMinorVersion() < 8);
     }
 
     /**

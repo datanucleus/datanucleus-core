@@ -31,7 +31,6 @@ import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.PropertyMetaData;
 import org.datanucleus.util.ClassUtils;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Method to generate the method "jdoCopyKeyFieldsToObjectId" using ASM.
@@ -169,10 +168,7 @@ public class JdoCopyKeyFieldsToObjectId2 extends ClassMethod
                     visitor.visitInsn(Opcodes.ATHROW);
 
                     visitor.visitLabel(l4);
-                    if (JavaUtils.useStackMapFrames())
-                    {
-                        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                    }
+                    visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
                     visitor.visitVarInsn(Opcodes.ALOAD, 2);
                     visitor.visitTypeInsn(Opcodes.INSTANCEOF, ACN_objectIdClass);
@@ -186,10 +182,7 @@ public class JdoCopyKeyFieldsToObjectId2 extends ClassMethod
                     visitor.visitInsn(Opcodes.ATHROW);
 
                     visitor.visitLabel(l5);
-                    if (JavaUtils.useStackMapFrames())
-                    {
-                        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                    }
+                    visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
                     visitor.visitVarInsn(Opcodes.ALOAD, 2);
                     visitor.visitTypeInsn(Opcodes.CHECKCAST, ACN_objectIdClass);
@@ -374,20 +367,14 @@ public class JdoCopyKeyFieldsToObjectId2 extends ClassMethod
                     Label l20 = new Label();
                     visitor.visitJumpInsn(Opcodes.GOTO, l20);
                     visitor.visitLabel(l2);
-                    if (JavaUtils.useStackMapFrames())
-                    {
-                        visitor.visitFrame(Opcodes.F_FULL, 4, 
-                            new Object[] {getClassEnhancer().getASMClassName(), 
-                                getClassEnhancer().getNamer().getObjectIdFieldSupplierAsmClassName(),
-                                "java/lang/Object", ACN_objectIdClass}, 1, new Object[] {"java/lang/Exception"});
-                    }
+                    visitor.visitFrame(Opcodes.F_FULL, 4, 
+                        new Object[] {getClassEnhancer().getASMClassName(), 
+                            getClassEnhancer().getNamer().getObjectIdFieldSupplierAsmClassName(),
+                            "java/lang/Object", ACN_objectIdClass}, 1, new Object[] {"java/lang/Exception"});
 
                     visitor.visitVarInsn(Opcodes.ASTORE, 4);
                     visitor.visitLabel(l20);
-                    if (JavaUtils.useStackMapFrames())
-                    {
-                        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                    }
+                    visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
                     visitor.visitInsn(Opcodes.RETURN);
 

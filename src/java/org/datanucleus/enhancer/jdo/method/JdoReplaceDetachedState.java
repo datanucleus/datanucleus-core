@@ -22,7 +22,6 @@ import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Method to generate the method "jdoReplaceDetachedState" using ASM.
@@ -81,10 +80,7 @@ public class JdoReplaceDetachedState extends ClassMethod
         visitor.visitInsn(Opcodes.ATHROW);
 
         visitor.visitLabel(l1);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);

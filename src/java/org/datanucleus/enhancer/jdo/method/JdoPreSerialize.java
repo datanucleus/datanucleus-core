@@ -21,7 +21,6 @@ import org.datanucleus.asm.Label;
 import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Method to generate the method "jdoPreSerialize" using ASM.
@@ -77,10 +76,7 @@ public class JdoPreSerialize extends ClassMethod
         visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(), 
             "preSerialize", "(" + getNamer().getPersistableDescriptor()+ ")V");
         visitor.visitLabel(l1);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         visitor.visitInsn(Opcodes.RETURN);
 

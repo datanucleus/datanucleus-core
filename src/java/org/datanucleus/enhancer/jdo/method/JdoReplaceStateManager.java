@@ -21,7 +21,6 @@ import org.datanucleus.asm.Label;
 import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Method to generate the method "jdoReplaceStateManager" using ASM.
@@ -95,10 +94,7 @@ public class JdoReplaceStateManager extends ClassMethod
         visitor.visitJumpInsn(Opcodes.GOTO, l3);
 
         visitor.visitLabel(l1);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
         visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getImplHelperAsmClassName(), 
@@ -111,10 +107,7 @@ public class JdoReplaceStateManager extends ClassMethod
         visitor.visitInsn(Opcodes.ICONST_1);
         visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(), getNamer().getFlagsFieldName(), "B");
         visitor.visitLabel(l3);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         visitor.visitInsn(Opcodes.RETURN);
 

@@ -480,8 +480,7 @@ public class DataNucleusEnhancer
     {
         if (LOGGER.isDebugEnabled())
         {
-            LOGGER.debug("Enhancing classes for JRE=" + JavaUtils.getJREMajorVersion() + "." + JavaUtils.getJREMinorVersion() +
-                " with stackmap-frames=" + JavaUtils.useStackMapFrames());
+            LOGGER.debug("Enhancing classes for JRE=" + JavaUtils.getJREMajorVersion() + "." + JavaUtils.getJREMinorVersion());
         }
 
         if (componentsToEnhance.isEmpty())

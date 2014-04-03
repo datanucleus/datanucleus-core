@@ -21,7 +21,6 @@ import org.datanucleus.asm.Label;
 import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Method to generate the method "jdoReplaceFields" using ASM.
@@ -85,10 +84,7 @@ public class JdoReplaceFields extends ClassMethod
         visitor.visitInsn(Opcodes.ATHROW);
 
         visitor.visitLabel(l1);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
         visitor.visitInsn(Opcodes.ARRAYLENGTH);
@@ -102,10 +98,7 @@ public class JdoReplaceFields extends ClassMethod
         visitor.visitVarInsn(Opcodes.ISTORE, 3);
         Label l6 = new Label();
         visitor.visitLabel(l6);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_APPEND,2, new Object[] {Opcodes.INTEGER, Opcodes.INTEGER}, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_APPEND,2, new Object[] {Opcodes.INTEGER, Opcodes.INTEGER}, 0, null);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
@@ -118,10 +111,7 @@ public class JdoReplaceFields extends ClassMethod
         visitor.visitVarInsn(Opcodes.ILOAD, 2);
         visitor.visitJumpInsn(Opcodes.IF_ICMPLT, l6);
         visitor.visitLabel(l4);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_CHOP,1, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_CHOP,1, null, 0, null);
         visitor.visitInsn(Opcodes.RETURN);
 
         Label l8 = new Label();

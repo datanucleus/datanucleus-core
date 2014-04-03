@@ -26,7 +26,6 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.util.ClassUtils;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Method to generate the method "jdoNewObjectIdInstance" using ASM.
@@ -131,10 +130,7 @@ public class JdoNewObjectIdInstance2 extends ClassMethod
 
                         // Object constructor : "if (key instanceof String != true) return new XXXIdentity(this.getClass(), key);"
                         visitor.visitLabel(l1);
-                        if (JavaUtils.useStackMapFrames())
-                        {
-                            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                        }
+                        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
                         visitor.visitVarInsn(Opcodes.ALOAD, 1);
                         visitor.visitTypeInsn(Opcodes.INSTANCEOF, "java/lang/String");
@@ -164,10 +160,7 @@ public class JdoNewObjectIdInstance2 extends ClassMethod
 
                         // String constructor : "return new XXXIdentity(this.getClass(), (String) key);"
                         visitor.visitLabel(l3);
-                        if (JavaUtils.useStackMapFrames())
-                        {
-                            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                        }
+                        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
                         visitor.visitTypeInsn(Opcodes.NEW, ACN_objectIdClass);
                         visitor.visitInsn(Opcodes.DUP);

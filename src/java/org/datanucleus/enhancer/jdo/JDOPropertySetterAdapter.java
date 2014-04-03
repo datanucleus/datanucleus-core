@@ -34,7 +34,6 @@ import org.datanucleus.enhancer.EnhancementNamer;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.PersistenceFlags;
-import org.datanucleus.util.JavaUtils;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -133,8 +132,7 @@ public class JDOPropertySetterAdapter extends MethodVisitor
         if (!mmd.isAbstract())
         {
             // Property is not abstract so generate the setXXX method to use the aaaSetXXX we just added
-            generateSetXXXMethod(mv, mmd, enhancer.getASMClassName(), enhancer.getClassDescriptor(), 
-                JavaUtils.useStackMapFrames(), enhancer.getNamer());
+            generateSetXXXMethod(mv, mmd, enhancer.getASMClassName(), enhancer.getClassDescriptor(), enhancer.getNamer());
         }
     }
 
@@ -145,11 +143,10 @@ public class JDOPropertySetterAdapter extends MethodVisitor
      * @param mmd MetaData for the property
      * @param asmClassName ASM class name for the owning class
      * @param asmClassDesc ASM descriptor for the owning class
-     * @param includeFrames Whether to include stack map frames
      * @param namer Namer for methods etc
      */
     public static void generateSetXXXMethod(MethodVisitor mv, AbstractMemberMetaData mmd,
-            String asmClassName, String asmClassDesc, boolean includeFrames, EnhancementNamer namer)
+            String asmClassName, String asmClassDesc, EnhancementNamer namer)
     {
         String[] argNames = new String[] {"this", "val"};
         String fieldTypeDesc = Type.getDescriptor(mmd.getType());
@@ -178,10 +175,7 @@ public class JDOPropertySetterAdapter extends MethodVisitor
             mv.visitLabel(l1);
 
             // "else objPC.aaaStateManager.setYYYField(objPC, 0, objPC.ZZZ, zzz);"
-            if (includeFrames)
-            {
-                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
+            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName,
                 namer.getStateManagerFieldName(), "L" + namer.getStateManagerAsmClassName() + ";");
@@ -206,10 +200,7 @@ public class JDOPropertySetterAdapter extends MethodVisitor
                 methodName, "(L" + namer.getPersistableAsmClassName() + ";I" + argTypeDesc + argTypeDesc + ")V");
 
             mv.visitLabel(l3);
-            if (includeFrames)
-            {
-                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
+            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
             if (cmd.isDetachable())
             {
@@ -237,10 +228,7 @@ public class JDOPropertySetterAdapter extends MethodVisitor
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "set", "(I)V");
 
                 mv.visitLabel(l6);
-                if (includeFrames)
-                {
-                    mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                }
+                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             }
 
             mv.visitInsn(Opcodes.RETURN);
@@ -295,10 +283,7 @@ public class JDOPropertySetterAdapter extends MethodVisitor
             mv.visitLabel(l1);
 
             // "objPC.text = val;"
-            if (includeFrames)
-            {
-                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
+            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             EnhanceUtils.addLoadForType(mv, mmd.getType(), 1);
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName,
@@ -328,10 +313,7 @@ public class JDOPropertySetterAdapter extends MethodVisitor
             }
 
             mv.visitLabel(l3);
-            if (includeFrames)
-            {
-                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
+            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             mv.visitInsn(Opcodes.RETURN);
 
             Label endLabel = new Label();

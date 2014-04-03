@@ -45,7 +45,6 @@ import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.InterfaceMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.util.ClassUtils;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Implementation generator using ASM bytecode manipulation library.
@@ -354,8 +353,7 @@ public class JDOImplementationGenerator
                 (mmd.isProtected() ? Opcodes.ACC_PROTECTED : 0) |
                 (mmd.isPrivate() ? Opcodes.ACC_PRIVATE : 0);
             MethodVisitor getVisitor = writer.visitMethod(getAccess, getterName, "()" + fieldDesc, null, null);
-            JDOPropertyGetterAdapter.generateGetXXXMethod(getVisitor, mmd, asmClassName, asmTypeDescriptor, false, 
-                JavaUtils.useStackMapFrames(), namer);
+            JDOPropertyGetterAdapter.generateGetXXXMethod(getVisitor, mmd, asmClassName, asmTypeDescriptor, false, namer);
 
             // Abstract class so generate jdoGetXXX
             int access = (mmd.isPublic() ? Opcodes.ACC_PUBLIC : 0) | 
@@ -412,8 +410,7 @@ public class JDOImplementationGenerator
                 (mmd.isProtected() ? Opcodes.ACC_PROTECTED : 0) |
                 (mmd.isPrivate() ? Opcodes.ACC_PRIVATE : 0);
             MethodVisitor setVisitor = writer.visitMethod(setAccess, setterName, "(" + fieldDesc + ")V", null, null);
-            JDOPropertySetterAdapter.generateSetXXXMethod(setVisitor, mmd, asmClassName, asmTypeDescriptor, 
-                JavaUtils.useStackMapFrames(), namer);
+            JDOPropertySetterAdapter.generateSetXXXMethod(setVisitor, mmd, asmClassName, asmTypeDescriptor, namer);
 
             // Abstract class so generate jdoSetXXX
             int access = (mmd.isPublic() ? Opcodes.ACC_PUBLIC : 0) | 

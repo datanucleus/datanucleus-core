@@ -35,7 +35,6 @@ import org.datanucleus.enhancer.EnhanceUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
-import org.datanucleus.util.JavaUtils;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -491,10 +490,7 @@ public class PrimaryKeyGenerator
         mv.visitLabel(l1);
 
         // if (!(obj instanceof ThePK)) {return false;}
-        if (JavaUtils.useStackMapFrames())
-        {
-            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitTypeInsn(Opcodes.INSTANCEOF, className_ASM);
         Label l3 = new Label();
@@ -504,10 +500,7 @@ public class PrimaryKeyGenerator
         mv.visitLabel(l3);
 
         // ThePK other = (ThePK)obj;
-        if (JavaUtils.useStackMapFrames())
-        {
-            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitTypeInsn(Opcodes.CHECKCAST, className_ASM);
         mv.visitVarInsn(Opcodes.ASTORE, 2);
@@ -576,10 +569,7 @@ public class PrimaryKeyGenerator
         mv.visitInsn(Opcodes.ICONST_1);
         mv.visitInsn(Opcodes.IRETURN);
         mv.visitLabel(compareSepLabel);
-        if (JavaUtils.useStackMapFrames())
-        {
-            mv.visitFrame(Opcodes.F_APPEND, 1, new Object[] {className_ASM}, 0, null);
-        }
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[] {className_ASM}, 0, null);
 
         mv.visitInsn(Opcodes.ICONST_0);
         mv.visitInsn(Opcodes.IRETURN);

@@ -22,7 +22,6 @@ import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Method to generate the method "jdoGetTransactionalObjectId" using ASM.
@@ -80,17 +79,11 @@ public class JdoGetTransactionalObjectId extends ClassMethod
         Label l2 = new Label();
         visitor.visitJumpInsn(Opcodes.GOTO, l2);
         visitor.visitLabel(l1);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         visitor.visitInsn(Opcodes.ACONST_NULL);
         visitor.visitLabel(l2);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] {"java/lang/Object"});
-        }
+        visitor.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] {"java/lang/Object"});
 
         visitor.visitInsn(Opcodes.ARETURN);
 

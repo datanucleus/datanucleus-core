@@ -24,7 +24,6 @@ import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Method to generate the method "jdoGetZZZ" using ASM for CHECK_READ fields.
@@ -128,10 +127,7 @@ public class JdoGetViaCheck extends ClassMethod
         EnhanceUtils.addReturnForType(visitor, fmd.getType());
 
         visitor.visitLabel(l1);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         if (enhancer.getClassMetaData().isDetachable())
         {
@@ -180,10 +176,7 @@ public class JdoGetViaCheck extends ClassMethod
             }
 
             visitor.visitLabel(l4);
-            if (JavaUtils.useStackMapFrames())
-            {
-                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
+            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
         }
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);

@@ -22,7 +22,6 @@ import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Method to generate the method "jdoIsDirty" using ASM.
@@ -98,10 +97,7 @@ public class JdoIsDirty extends ClassMethod
             "isDirty", "(" + getNamer().getPersistableDescriptor() + ")Z");
         visitor.visitInsn(Opcodes.IRETURN);
         visitor.visitLabel(l1);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         if (!detachable)
         {
@@ -118,10 +114,7 @@ public class JdoIsDirty extends ClassMethod
             visitor.visitInsn(Opcodes.ICONST_0);
             visitor.visitInsn(Opcodes.IRETURN);
             visitor.visitLabel(l3);
-            if (JavaUtils.useStackMapFrames())
-            {
-                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
+            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
             visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
@@ -136,10 +129,7 @@ public class JdoIsDirty extends ClassMethod
             visitor.visitInsn(Opcodes.IRETURN);
 
             visitor.visitLabel(l5);
-            if (JavaUtils.useStackMapFrames())
-            {
-                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
+            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
             visitor.visitInsn(Opcodes.ICONST_1);
             visitor.visitInsn(Opcodes.IRETURN);

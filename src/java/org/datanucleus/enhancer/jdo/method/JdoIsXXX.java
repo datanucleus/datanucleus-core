@@ -21,7 +21,6 @@ import org.datanucleus.asm.Label;
 import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Base method to use for jdoIsXXX methods providing the majority of the enhancement.
@@ -76,17 +75,11 @@ public abstract class JdoIsXXX extends ClassMethod
         Label l2 = new Label();
         visitor.visitJumpInsn(Opcodes.GOTO, l2);
         visitor.visitLabel(l1);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         visitor.visitInsn(Opcodes.ICONST_0);
         visitor.visitLabel(l2);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] {Opcodes.INTEGER});
-        }
+        visitor.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] {Opcodes.INTEGER});
 
         visitor.visitInsn(Opcodes.IRETURN);
 

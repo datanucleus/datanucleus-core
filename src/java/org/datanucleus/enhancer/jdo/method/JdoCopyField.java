@@ -24,7 +24,6 @@ import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.PropertyMetaData;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Method to generate the method "jdoCopyField" using ASM.
@@ -122,10 +121,7 @@ public class JdoCopyField extends ClassMethod
                 for (int i=0;i<fields.length;i++)
                 {
                     visitor.visitLabel(fieldOptions[i]);
-                    if (JavaUtils.useStackMapFrames())
-                    {
-                        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                    }
+                    visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
                     visitor.visitVarInsn(Opcodes.ALOAD, 0);
                     visitor.visitVarInsn(Opcodes.ALOAD, 1);
@@ -150,10 +146,7 @@ public class JdoCopyField extends ClassMethod
 
                 // default :
                 visitor.visitLabel(defaultLabel);
-                if (JavaUtils.useStackMapFrames())
-                {
-                    visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                }
+                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
                 // super.jdoCopyField(obj, index);
                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
@@ -164,10 +157,7 @@ public class JdoCopyField extends ClassMethod
 
                 // End of switch
                 visitor.visitLabel(endSwitchLabel);
-                if (JavaUtils.useStackMapFrames())
-                {
-                    visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                }
+                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
                 visitor.visitInsn(Opcodes.RETURN);
             }
             else
@@ -201,10 +191,7 @@ public class JdoCopyField extends ClassMethod
                 for (int i=0;i<fields.length;i++)
                 {
                     visitor.visitLabel(fieldOptions[i]);
-                    if (JavaUtils.useStackMapFrames())
-                    {
-                        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                    }
+                    visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
                     visitor.visitVarInsn(Opcodes.ALOAD, 0);
                     visitor.visitVarInsn(Opcodes.ALOAD, 1);
@@ -229,10 +216,7 @@ public class JdoCopyField extends ClassMethod
 
                 // default:
                 visitor.visitLabel(defaultLabel);
-                if (JavaUtils.useStackMapFrames())
-                {
-                    visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                }
+                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
                 // throw new IllegalArgumentException("out of field index :" + index);
                 visitor.visitTypeInsn(Opcodes.NEW, "java/lang/IllegalArgumentException");
@@ -249,10 +233,7 @@ public class JdoCopyField extends ClassMethod
 
                 // End of switch
                 visitor.visitLabel(endSwitchLabel);
-                if (JavaUtils.useStackMapFrames())
-                {
-                    visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                }
+                visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
                 visitor.visitInsn(Opcodes.RETURN);
             }

@@ -22,7 +22,6 @@ import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
-import org.datanucleus.util.JavaUtils;
 
 /**
  * Method to generate the method "jdoCopyFields" using ASM.
@@ -94,10 +93,7 @@ public class JdoCopyFields extends ClassMethod
         visitor.visitInsn(Opcodes.ATHROW);
 
         visitor.visitLabel(l1);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 2);
         Label l3 = new Label();
@@ -110,10 +106,7 @@ public class JdoCopyFields extends ClassMethod
         visitor.visitInsn(Opcodes.ATHROW);
 
         visitor.visitLabel(l3);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
         visitor.visitTypeInsn(Opcodes.INSTANCEOF, getClassEnhancer().getASMClassName());
@@ -127,10 +120,7 @@ public class JdoCopyFields extends ClassMethod
         visitor.visitInsn(Opcodes.ATHROW);
 
         visitor.visitLabel(l5);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
         visitor.visitTypeInsn(Opcodes.CHECKCAST, getClassEnhancer().getASMClassName());
@@ -155,10 +145,7 @@ public class JdoCopyFields extends ClassMethod
         visitor.visitInsn(Opcodes.ATHROW);
 
         visitor.visitLabel(l10);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_APPEND,1, new Object[] {getClassEnhancer().getASMClassName()}, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_APPEND,1, new Object[] {getClassEnhancer().getASMClassName()}, 0, null);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 2);
         visitor.visitInsn(Opcodes.ARRAYLENGTH);
@@ -172,10 +159,7 @@ public class JdoCopyFields extends ClassMethod
         visitor.visitJumpInsn(Opcodes.IFLT, l13);
         Label l14 = new Label();
         visitor.visitLabel(l14);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_APPEND,1, new Object[] {Opcodes.INTEGER}, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_APPEND,1, new Object[] {Opcodes.INTEGER}, 0, null);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitVarInsn(Opcodes.ALOAD, 3);
@@ -188,10 +172,7 @@ public class JdoCopyFields extends ClassMethod
         visitor.visitVarInsn(Opcodes.ILOAD, 4);
         visitor.visitJumpInsn(Opcodes.IFGE, l14);
         visitor.visitLabel(l13);
-        if (JavaUtils.useStackMapFrames())
-        {
-            visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-        }
+        visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         visitor.visitInsn(Opcodes.RETURN);
 
