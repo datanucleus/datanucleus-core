@@ -728,7 +728,9 @@ public class TypeManagerImpl implements TypeManager, Serializable
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("016006", StringUtils.collectionToString(javaTypes.keySet())));
+            List<String> typesList = new ArrayList<String>(javaTypes.keySet());
+            Collections.sort(typesList, ALPHABETICAL_ORDER_STRING);
+            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("016006", StringUtils.collectionToString(typesList)));
         }
     }
 
@@ -826,6 +828,18 @@ public class TypeManagerImpl implements TypeManager, Serializable
             if (res == 0) 
             {
                 res = cls1.getName().compareTo(cls2.getName());
+            }
+            return res;
+        }
+    };
+
+    private static Comparator<String> ALPHABETICAL_ORDER_STRING = new Comparator<String>() 
+    {
+        public int compare(String cls1, String cls2) {
+            int res = String.CASE_INSENSITIVE_ORDER.compare(cls1, cls2);
+            if (res == 0) 
+            {
+                res = cls1.compareTo(cls2);
             }
             return res;
         }
