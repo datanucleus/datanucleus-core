@@ -147,64 +147,64 @@ Contributors:
         <java-type name="java.net.URI" dfg="true" embedded="true" converter-name="dn.uri-string"/>
 
         <!-- "java.sql" types -->
-        <java-type name="java.sql.Date" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.simple.SqlDate"/>
-        <java-type name="java.sql.Time" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.simple.SqlTime"/>
-        <java-type name="java.sql.Timestamp" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.simple.SqlTimestamp"/>
+        <java-type name="java.sql.Date" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.wrapper.SqlDate"/>
+        <java-type name="java.sql.Time" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.wrapper.SqlTime"/>
+        <java-type name="java.sql.Timestamp" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.wrapper.SqlTimestamp"/>
 
         <!-- "java.util" types -->
-        <java-type name="java.util.Date" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.simple.Date"/>
+        <java-type name="java.util.Date" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.wrapper.Date"/>
         <java-type name="java.util.Locale" dfg="true" embedded="true" converter-name="dn.locale-string"/>
         <java-type name="java.util.Currency" dfg="true" embedded="true" converter-name="dn.currency-string"/>
         <java-type name="java.util.Calendar" dfg="true" embedded="true"
-            wrapper-type="org.datanucleus.store.types.simple.GregorianCalendar" converter-name="dn.calendar-string"/>
+            wrapper-type="org.datanucleus.store.types.wrapper.GregorianCalendar" converter-name="dn.calendar-string"/>
         <java-type name="java.util.GregorianCalendar" dfg="true" embedded="true"
-            wrapper-type="org.datanucleus.store.types.simple.GregorianCalendar" converter-name="dn.calendar-string"/>
+            wrapper-type="org.datanucleus.store.types.wrapper.GregorianCalendar" converter-name="dn.calendar-string"/>
         <java-type name="java.util.UUID" dfg="true" embedded="true" converter-name="dn.uuid-string"/>
         <java-type name="java.util.TimeZone" dfg="true" embedded="true" converter-name="dn.timezone-string"/>
 
-        <java-type name="java.util.ArrayList" wrapper-type="org.datanucleus.store.types.simple.ArrayList"
-            wrapper-type-backed="org.datanucleus.store.types.backed.ArrayList"/>
-        <java-type name="java.util.Arrays$ArrayList" wrapper-type="org.datanucleus.store.types.simple.List"
-            wrapper-type-backed="org.datanucleus.store.types.backed.List"/>
-        <java-type name="java.util.BitSet" wrapper-type="org.datanucleus.store.types.simple.BitSet" converter-name="dn.bitset-string"/>
-        <java-type name="java.util.Collection" wrapper-type="org.datanucleus.store.types.simple.Collection"
-            wrapper-type-backed="org.datanucleus.store.types.backed.Collection"/>
-        <java-type name="java.util.HashMap" wrapper-type="org.datanucleus.store.types.simple.HashMap"
-            wrapper-type-backed="org.datanucleus.store.types.backed.HashMap"/>
-        <java-type name="java.util.HashSet" wrapper-type="org.datanucleus.store.types.simple.HashSet"
-            wrapper-type-backed="org.datanucleus.store.types.backed.HashSet"/>
-        <java-type name="java.util.Hashtable" wrapper-type="org.datanucleus.store.types.simple.Hashtable"
-            wrapper-type-backed="org.datanucleus.store.types.backed.Hashtable"/>
-        <java-type name="java.util.LinkedHashMap" wrapper-type="org.datanucleus.store.types.simple.LinkedHashMap"
-            wrapper-type-backed="org.datanucleus.store.types.backed.LinkedHashMap"/>
-        <java-type name="java.util.LinkedHashSet" wrapper-type="org.datanucleus.store.types.simple.LinkedHashSet"
-            wrapper-type-backed="org.datanucleus.store.types.backed.LinkedHashSet"/>
-        <java-type name="java.util.LinkedList" wrapper-type="org.datanucleus.store.types.simple.LinkedList"
-            wrapper-type-backed="org.datanucleus.store.types.backed.LinkedList"/>
-        <java-type name="java.util.List" wrapper-type="org.datanucleus.store.types.simple.List"
-            wrapper-type-backed="org.datanucleus.store.types.backed.List"/>
-        <java-type name="java.util.Map" wrapper-type="org.datanucleus.store.types.simple.Map"
-            wrapper-type-backed="org.datanucleus.store.types.backed.Map"/>
-        <java-type name="java.util.PriorityQueue" wrapper-type="org.datanucleus.store.types.simple.PriorityQueue"
-            wrapper-type-backed="org.datanucleus.store.types.backed.PriorityQueue"/>
-        <java-type name="java.util.Properties" wrapper-type="org.datanucleus.store.types.simple.Properties"
-            wrapper-type-backed="org.datanucleus.store.types.backed.Properties"/>
-        <java-type name="java.util.Queue" wrapper-type="org.datanucleus.store.types.simple.Queue"
-            wrapper-type-backed="org.datanucleus.store.types.backed.Queue"/>
-        <java-type name="java.util.Set" wrapper-type="org.datanucleus.store.types.simple.Set"
-            wrapper-type-backed="org.datanucleus.store.types.backed.Set"/>
-        <java-type name="java.util.SortedSet" wrapper-type="org.datanucleus.store.types.simple.SortedSet"
-            wrapper-type-backed="org.datanucleus.store.types.backed.SortedSet"/>
-        <java-type name="java.util.SortedMap" wrapper-type="org.datanucleus.store.types.simple.SortedMap"
-            wrapper-type-backed="org.datanucleus.store.types.backed.SortedMap"/>
-        <java-type name="java.util.Stack" wrapper-type="org.datanucleus.store.types.simple.Stack"
-            wrapper-type-backed="org.datanucleus.store.types.backed.Stack"/>
-        <java-type name="java.util.TreeMap" wrapper-type="org.datanucleus.store.types.simple.TreeMap"
-            wrapper-type-backed="org.datanucleus.store.types.backed.TreeMap"/>
-        <java-type name="java.util.TreeSet" wrapper-type="org.datanucleus.store.types.simple.TreeSet"
-            wrapper-type-backed="org.datanucleus.store.types.backed.TreeSet"/>
-        <java-type name="java.util.Vector" wrapper-type="org.datanucleus.store.types.simple.Vector"
-            wrapper-type-backed="org.datanucleus.store.types.backed.Vector"/>
+        <java-type name="java.util.ArrayList" wrapper-type="org.datanucleus.store.types.wrapper.ArrayList"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.ArrayList"/>
+        <java-type name="java.util.Arrays$ArrayList" wrapper-type="org.datanucleus.store.types.wrapper.List"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.List"/>
+        <java-type name="java.util.BitSet" wrapper-type="org.datanucleus.store.types.wrapper.BitSet" converter-name="dn.bitset-string"/>
+        <java-type name="java.util.Collection" wrapper-type="org.datanucleus.store.types.wrapper.Collection"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.Collection"/>
+        <java-type name="java.util.HashMap" wrapper-type="org.datanucleus.store.types.wrapper.HashMap"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.HashMap"/>
+        <java-type name="java.util.HashSet" wrapper-type="org.datanucleus.store.types.wrapper.HashSet"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.HashSet"/>
+        <java-type name="java.util.Hashtable" wrapper-type="org.datanucleus.store.types.wrapper.Hashtable"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.Hashtable"/>
+        <java-type name="java.util.LinkedHashMap" wrapper-type="org.datanucleus.store.types.wrapper.LinkedHashMap"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.LinkedHashMap"/>
+        <java-type name="java.util.LinkedHashSet" wrapper-type="org.datanucleus.store.types.wrapper.LinkedHashSet"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.LinkedHashSet"/>
+        <java-type name="java.util.LinkedList" wrapper-type="org.datanucleus.store.types.wrapper.LinkedList"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.LinkedList"/>
+        <java-type name="java.util.List" wrapper-type="org.datanucleus.store.types.wrapper.List"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.List"/>
+        <java-type name="java.util.Map" wrapper-type="org.datanucleus.store.types.wrapper.Map"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.Map"/>
+        <java-type name="java.util.PriorityQueue" wrapper-type="org.datanucleus.store.types.wrapper.PriorityQueue"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.PriorityQueue"/>
+        <java-type name="java.util.Properties" wrapper-type="org.datanucleus.store.types.wrapper.Properties"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.Properties"/>
+        <java-type name="java.util.Queue" wrapper-type="org.datanucleus.store.types.wrapper.Queue"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.Queue"/>
+        <java-type name="java.util.Set" wrapper-type="org.datanucleus.store.types.wrapper.Set"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.Set"/>
+        <java-type name="java.util.SortedSet" wrapper-type="org.datanucleus.store.types.wrapper.SortedSet"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.SortedSet"/>
+        <java-type name="java.util.SortedMap" wrapper-type="org.datanucleus.store.types.wrapper.SortedMap"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.SortedMap"/>
+        <java-type name="java.util.Stack" wrapper-type="org.datanucleus.store.types.wrapper.Stack"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.Stack"/>
+        <java-type name="java.util.TreeMap" wrapper-type="org.datanucleus.store.types.wrapper.TreeMap"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.TreeMap"/>
+        <java-type name="java.util.TreeSet" wrapper-type="org.datanucleus.store.types.wrapper.TreeSet"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.TreeSet"/>
+        <java-type name="java.util.Vector" wrapper-type="org.datanucleus.store.types.wrapper.Vector"
+            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.Vector"/>
 
         <!-- array types -->
         <java-type name="[B" embedded="true"/>
