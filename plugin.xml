@@ -234,6 +234,11 @@ Contributors:
 
     <!-- TYPE CONVERTERS -->
     <extension point="org.datanucleus.type_converter">
+        <type-converter name="dn.boolean-yn" member-type="java.lang.Boolean" datastore-type="java.lang.Character"
+            converter-class="org.datanucleus.store.types.converters.BooleanYNConverter"/>
+        <type-converter name="dn.boolean-integer" member-type="java.lang.Boolean" datastore-type="java.lang.Integer"
+            converter-class="org.datanucleus.store.types.converters.BooleanIntegerConverter"/>
+
         <type-converter name="dn.character-string" member-type="java.lang.Character" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.CharacterStringConverter"/>
         <type-converter name="dn.bigdecimal-string" member-type="java.math.BigDecimal" datastore-type="java.lang.String"
