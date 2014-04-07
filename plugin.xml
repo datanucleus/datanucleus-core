@@ -147,64 +147,64 @@ Contributors:
         <java-type name="java.net.URI" dfg="true" embedded="true" converter-name="dn.uri-string"/>
 
         <!-- "java.sql" types -->
-        <java-type name="java.sql.Date" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.wrapper.SqlDate"/>
-        <java-type name="java.sql.Time" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.wrapper.SqlTime"/>
-        <java-type name="java.sql.Timestamp" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.wrapper.SqlTimestamp"/>
+        <java-type name="java.sql.Date" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.wrappers.SqlDate"/>
+        <java-type name="java.sql.Time" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.wrappers.SqlTime"/>
+        <java-type name="java.sql.Timestamp" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.wrappers.SqlTimestamp"/>
 
         <!-- "java.util" types -->
-        <java-type name="java.util.Date" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.wrapper.Date"/>
+        <java-type name="java.util.Date" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.wrappers.Date"/>
         <java-type name="java.util.Locale" dfg="true" embedded="true" converter-name="dn.locale-string"/>
         <java-type name="java.util.Currency" dfg="true" embedded="true" converter-name="dn.currency-string"/>
         <java-type name="java.util.Calendar" dfg="true" embedded="true"
-            wrapper-type="org.datanucleus.store.types.wrapper.GregorianCalendar" converter-name="dn.calendar-string"/>
+            wrapper-type="org.datanucleus.store.types.wrappers.GregorianCalendar" converter-name="dn.calendar-string"/>
         <java-type name="java.util.GregorianCalendar" dfg="true" embedded="true"
-            wrapper-type="org.datanucleus.store.types.wrapper.GregorianCalendar" converter-name="dn.calendar-string"/>
+            wrapper-type="org.datanucleus.store.types.wrappers.GregorianCalendar" converter-name="dn.calendar-string"/>
         <java-type name="java.util.UUID" dfg="true" embedded="true" converter-name="dn.uuid-string"/>
         <java-type name="java.util.TimeZone" dfg="true" embedded="true" converter-name="dn.timezone-string"/>
 
-        <java-type name="java.util.ArrayList" wrapper-type="org.datanucleus.store.types.wrapper.ArrayList"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.ArrayList"/>
-        <java-type name="java.util.Arrays$ArrayList" wrapper-type="org.datanucleus.store.types.wrapper.List"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.List"/>
-        <java-type name="java.util.BitSet" wrapper-type="org.datanucleus.store.types.wrapper.BitSet" converter-name="dn.bitset-string"/>
-        <java-type name="java.util.Collection" wrapper-type="org.datanucleus.store.types.wrapper.Collection"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.Collection"/>
-        <java-type name="java.util.HashMap" wrapper-type="org.datanucleus.store.types.wrapper.HashMap"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.HashMap"/>
-        <java-type name="java.util.HashSet" wrapper-type="org.datanucleus.store.types.wrapper.HashSet"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.HashSet"/>
-        <java-type name="java.util.Hashtable" wrapper-type="org.datanucleus.store.types.wrapper.Hashtable"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.Hashtable"/>
-        <java-type name="java.util.LinkedHashMap" wrapper-type="org.datanucleus.store.types.wrapper.LinkedHashMap"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.LinkedHashMap"/>
-        <java-type name="java.util.LinkedHashSet" wrapper-type="org.datanucleus.store.types.wrapper.LinkedHashSet"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.LinkedHashSet"/>
-        <java-type name="java.util.LinkedList" wrapper-type="org.datanucleus.store.types.wrapper.LinkedList"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.LinkedList"/>
-        <java-type name="java.util.List" wrapper-type="org.datanucleus.store.types.wrapper.List"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.List"/>
-        <java-type name="java.util.Map" wrapper-type="org.datanucleus.store.types.wrapper.Map"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.Map"/>
-        <java-type name="java.util.PriorityQueue" wrapper-type="org.datanucleus.store.types.wrapper.PriorityQueue"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.PriorityQueue"/>
-        <java-type name="java.util.Properties" wrapper-type="org.datanucleus.store.types.wrapper.Properties"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.Properties"/>
-        <java-type name="java.util.Queue" wrapper-type="org.datanucleus.store.types.wrapper.Queue"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.Queue"/>
-        <java-type name="java.util.Set" wrapper-type="org.datanucleus.store.types.wrapper.Set"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.Set"/>
-        <java-type name="java.util.SortedSet" wrapper-type="org.datanucleus.store.types.wrapper.SortedSet"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.SortedSet"/>
-        <java-type name="java.util.SortedMap" wrapper-type="org.datanucleus.store.types.wrapper.SortedMap"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.SortedMap"/>
-        <java-type name="java.util.Stack" wrapper-type="org.datanucleus.store.types.wrapper.Stack"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.Stack"/>
-        <java-type name="java.util.TreeMap" wrapper-type="org.datanucleus.store.types.wrapper.TreeMap"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.TreeMap"/>
-        <java-type name="java.util.TreeSet" wrapper-type="org.datanucleus.store.types.wrapper.TreeSet"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.TreeSet"/>
-        <java-type name="java.util.Vector" wrapper-type="org.datanucleus.store.types.wrapper.Vector"
-            wrapper-type-backed="org.datanucleus.store.types.wrapper.backed.Vector"/>
+        <java-type name="java.util.ArrayList" wrapper-type="org.datanucleus.store.types.wrappers.ArrayList"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.ArrayList"/>
+        <java-type name="java.util.Arrays$ArrayList" wrapper-type="org.datanucleus.store.types.wrappers.List"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.List"/>
+        <java-type name="java.util.BitSet" wrapper-type="org.datanucleus.store.types.wrappers.BitSet" converter-name="dn.bitset-string"/>
+        <java-type name="java.util.Collection" wrapper-type="org.datanucleus.store.types.wrappers.Collection"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Collection"/>
+        <java-type name="java.util.HashMap" wrapper-type="org.datanucleus.store.types.wrappers.HashMap"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.HashMap"/>
+        <java-type name="java.util.HashSet" wrapper-type="org.datanucleus.store.types.wrappers.HashSet"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.HashSet"/>
+        <java-type name="java.util.Hashtable" wrapper-type="org.datanucleus.store.types.wrappers.Hashtable"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Hashtable"/>
+        <java-type name="java.util.LinkedHashMap" wrapper-type="org.datanucleus.store.types.wrappers.LinkedHashMap"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.LinkedHashMap"/>
+        <java-type name="java.util.LinkedHashSet" wrapper-type="org.datanucleus.store.types.wrappers.LinkedHashSet"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.LinkedHashSet"/>
+        <java-type name="java.util.LinkedList" wrapper-type="org.datanucleus.store.types.wrappers.LinkedList"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.LinkedList"/>
+        <java-type name="java.util.List" wrapper-type="org.datanucleus.store.types.wrappers.List"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.List"/>
+        <java-type name="java.util.Map" wrapper-type="org.datanucleus.store.types.wrappers.Map"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Map"/>
+        <java-type name="java.util.PriorityQueue" wrapper-type="org.datanucleus.store.types.wrappers.PriorityQueue"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.PriorityQueue"/>
+        <java-type name="java.util.Properties" wrapper-type="org.datanucleus.store.types.wrappers.Properties"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Properties"/>
+        <java-type name="java.util.Queue" wrapper-type="org.datanucleus.store.types.wrappers.Queue"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Queue"/>
+        <java-type name="java.util.Set" wrapper-type="org.datanucleus.store.types.wrappers.Set"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Set"/>
+        <java-type name="java.util.SortedSet" wrapper-type="org.datanucleus.store.types.wrappers.SortedSet"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.SortedSet"/>
+        <java-type name="java.util.SortedMap" wrapper-type="org.datanucleus.store.types.wrappers.SortedMap"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.SortedMap"/>
+        <java-type name="java.util.Stack" wrapper-type="org.datanucleus.store.types.wrappers.Stack"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Stack"/>
+        <java-type name="java.util.TreeMap" wrapper-type="org.datanucleus.store.types.wrappers.TreeMap"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.TreeMap"/>
+        <java-type name="java.util.TreeSet" wrapper-type="org.datanucleus.store.types.wrappers.TreeSet"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.TreeSet"/>
+        <java-type name="java.util.Vector" wrapper-type="org.datanucleus.store.types.wrappers.Vector"
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Vector"/>
 
         <!-- array types -->
         <java-type name="[B" embedded="true"/>
@@ -387,146 +387,146 @@ Contributors:
     <!-- QUERY METHODS (IN-MEMORY) -->
     <extension point="org.datanucleus.query_method_evaluators">
         <query-method-evaluator method="JDOHelper.getObjectId" 
-            evaluator="org.datanucleus.query.evaluator.memory.JDOHelperGetObjectIdFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.JDOHelperGetObjectIdFunctionEvaluator"/>
         <query-method-evaluator method="JDOHelper.getVersion" 
-            evaluator="org.datanucleus.query.evaluator.memory.JDOHelperGetVersionFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.JDOHelperGetVersionFunctionEvaluator"/>
         <query-method-evaluator method="Math.abs"
-            evaluator="org.datanucleus.query.evaluator.memory.AbsFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.AbsFunctionEvaluator"/>
         <query-method-evaluator method="Math.sqrt"
-            evaluator="org.datanucleus.query.evaluator.memory.SqrtFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.SqrtFunctionEvaluator"/>
         <query-method-evaluator method="CURRENT_DATE"
-            evaluator="org.datanucleus.query.evaluator.memory.CurrentDateFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.CurrentDateFunctionEvaluator"/>
         <query-method-evaluator method="CURRENT_TIME"
-            evaluator="org.datanucleus.query.evaluator.memory.CurrentTimeFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.CurrentTimeFunctionEvaluator"/>
         <query-method-evaluator method="CURRENT_TIMESTAMP"
-            evaluator="org.datanucleus.query.evaluator.memory.CurrentTimestampFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.CurrentTimestampFunctionEvaluator"/>
         <query-method-evaluator method="ABS" 
-            evaluator="org.datanucleus.query.evaluator.memory.AbsFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.AbsFunctionEvaluator"/>
         <query-method-evaluator method="SQRT" 
-            evaluator="org.datanucleus.query.evaluator.memory.SqrtFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.SqrtFunctionEvaluator"/>
         <query-method-evaluator method="MOD" 
-            evaluator="org.datanucleus.query.evaluator.memory.ModFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.ModFunctionEvaluator"/>
         <query-method-evaluator method="COALESCE" 
-            evaluator="org.datanucleus.query.evaluator.memory.CoalesceFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.CoalesceFunctionEvaluator"/>
         <query-method-evaluator method="COS" 
-            evaluator="org.datanucleus.query.evaluator.memory.CosineFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.CosineFunctionEvaluator"/>
         <query-method-evaluator method="SIN" 
-            evaluator="org.datanucleus.query.evaluator.memory.SineFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.SineFunctionEvaluator"/>
         <query-method-evaluator method="TAN" 
-            evaluator="org.datanucleus.query.evaluator.memory.TangentFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.TangentFunctionEvaluator"/>
         <query-method-evaluator method="ACOS" 
-            evaluator="org.datanucleus.query.evaluator.memory.ArcCosineFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.ArcCosineFunctionEvaluator"/>
         <query-method-evaluator method="ASIN" 
-            evaluator="org.datanucleus.query.evaluator.memory.ArcSineFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.ArcSineFunctionEvaluator"/>
         <query-method-evaluator method="ATAN" 
-            evaluator="org.datanucleus.query.evaluator.memory.ArcTangentFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.ArcTangentFunctionEvaluator"/>
         <query-method-evaluator method="CEIL" 
-            evaluator="org.datanucleus.query.evaluator.memory.CeilFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.CeilFunctionEvaluator"/>
         <query-method-evaluator method="FLOOR" 
-            evaluator="org.datanucleus.query.evaluator.memory.FloorFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.FloorFunctionEvaluator"/>
         <query-method-evaluator method="LOG" 
-            evaluator="org.datanucleus.query.evaluator.memory.LogFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.LogFunctionEvaluator"/>
         <query-method-evaluator method="EXP" 
-            evaluator="org.datanucleus.query.evaluator.memory.ExpFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.ExpFunctionEvaluator"/>
         <query-method-evaluator method="NULLIF" 
-            evaluator="org.datanucleus.query.evaluator.memory.NullIfFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.NullIfFunctionEvaluator"/>
         <query-method-evaluator method="SIZE" 
-            evaluator="org.datanucleus.query.evaluator.memory.SizeFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.SizeFunctionEvaluator"/>
         <query-method-evaluator method="UPPER" 
-            evaluator="org.datanucleus.query.evaluator.memory.UpperFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.UpperFunctionEvaluator"/>
         <query-method-evaluator method="LOWER" 
-            evaluator="org.datanucleus.query.evaluator.memory.LowerFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.LowerFunctionEvaluator"/>
         <query-method-evaluator method="LENGTH" 
-            evaluator="org.datanucleus.query.evaluator.memory.LengthFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.LengthFunctionEvaluator"/>
         <query-method-evaluator method="CONCAT"
-            evaluator="org.datanucleus.query.evaluator.memory.ConcatFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.ConcatFunctionEvaluator"/>
         <query-method-evaluator method="SUBSTRING"
-            evaluator="org.datanucleus.query.evaluator.memory.SubstringFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.SubstringFunctionEvaluator"/>
         <query-method-evaluator method="LOCATE" 
-            evaluator="org.datanucleus.query.evaluator.memory.LocateFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.LocateFunctionEvaluator"/>
         <query-method-evaluator method="TRIM" 
-            evaluator="org.datanucleus.query.evaluator.memory.TrimFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.TrimFunctionEvaluator"/>
         <query-method-evaluator method="TRIM_LEADING" 
-            evaluator="org.datanucleus.query.evaluator.memory.TrimFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.TrimFunctionEvaluator"/>
         <query-method-evaluator method="TRIM_TRAILING" 
-            evaluator="org.datanucleus.query.evaluator.memory.TrimFunctionEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.TrimFunctionEvaluator"/>
 
         <query-method-evaluator class="java.lang.Enum" method="matches"
-            evaluator="org.datanucleus.query.evaluator.memory.EnumMatchesMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.EnumMatchesMethodEvaluator"/>
         <query-method-evaluator class="java.lang.Enum" method="toString"
-            evaluator="org.datanucleus.query.evaluator.memory.EnumToStringMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.EnumToStringMethodEvaluator"/>
         <query-method-evaluator class="java.lang.Enum" method="ordinal"
-            evaluator="org.datanucleus.query.evaluator.memory.EnumOrdinalMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.EnumOrdinalMethodEvaluator"/>
 
         <query-method-evaluator class="java.lang.Object" method="getClass"
-            evaluator="org.datanucleus.query.evaluator.memory.GetClassMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.GetClassMethodEvaluator"/>
 
         <query-method-evaluator class="java.lang.String" method="charAt"
-            evaluator="org.datanucleus.query.evaluator.memory.StringCharAtMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.StringCharAtMethodEvaluator"/>
         <query-method-evaluator class="java.lang.String" method="concat"
-            evaluator="org.datanucleus.query.evaluator.memory.StringConcatMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.StringConcatMethodEvaluator"/>
         <query-method-evaluator class="java.lang.String" method="endsWith"
-            evaluator="org.datanucleus.query.evaluator.memory.StringEndsWithMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.StringEndsWithMethodEvaluator"/>
         <query-method-evaluator class="java.lang.String" method="equals"
-            evaluator="org.datanucleus.query.evaluator.memory.StringEqualsMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.StringEqualsMethodEvaluator"/>
         <query-method-evaluator class="java.lang.String" method="equalsIgnoreCase"
-            evaluator="org.datanucleus.query.evaluator.memory.StringEqualsIgnoreCaseMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.StringEqualsIgnoreCaseMethodEvaluator"/>
         <query-method-evaluator class="java.lang.String" method="indexOf"
-            evaluator="org.datanucleus.query.evaluator.memory.StringIndexOfMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.StringIndexOfMethodEvaluator"/>
         <query-method-evaluator class="java.lang.String" method="length" 
-            evaluator="org.datanucleus.query.evaluator.memory.StringLengthMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.StringLengthMethodEvaluator"/>
         <query-method-evaluator class="java.lang.String" method="matches" 
-            evaluator="org.datanucleus.query.evaluator.memory.StringMatchesMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.StringMatchesMethodEvaluator"/>
         <query-method-evaluator class="java.lang.String" method="startsWith" 
-            evaluator="org.datanucleus.query.evaluator.memory.StringStartsWithMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.StringStartsWithMethodEvaluator"/>
         <query-method-evaluator class="java.lang.String" method="substring" 
-            evaluator="org.datanucleus.query.evaluator.memory.StringSubstringMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.StringSubstringMethodEvaluator"/>
         <query-method-evaluator class="java.lang.String" method="toUpperCase" 
-            evaluator="org.datanucleus.query.evaluator.memory.StringToUpperCaseMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.StringToUpperCaseMethodEvaluator"/>
         <query-method-evaluator class="java.lang.String" method="toLowerCase" 
-            evaluator="org.datanucleus.query.evaluator.memory.StringToLowerCaseMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.StringToLowerCaseMethodEvaluator"/>
         <query-method-evaluator class="java.lang.String" method="trim" 
-            evaluator="org.datanucleus.query.evaluator.memory.StringTrimMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.StringTrimMethodEvaluator"/>
         <query-method-evaluator class="java.lang.String" method="trimLeft" 
-            evaluator="org.datanucleus.query.evaluator.memory.StringTrimLeftMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.StringTrimLeftMethodEvaluator"/>
         <query-method-evaluator class="java.lang.String" method="trimRight" 
-            evaluator="org.datanucleus.query.evaluator.memory.StringTrimRightMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.StringTrimRightMethodEvaluator"/>
 
         <query-method-evaluator class="java.util.Collection" method="size" 
-            evaluator="org.datanucleus.query.evaluator.memory.ContainerSizeMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.ContainerSizeMethodEvaluator"/>
         <query-method-evaluator class="java.util.Collection" method="isEmpty" 
-            evaluator="org.datanucleus.query.evaluator.memory.ContainerIsEmptyMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.ContainerIsEmptyMethodEvaluator"/>
         <query-method-evaluator class="java.util.Collection" method="contains" 
-            evaluator="org.datanucleus.query.evaluator.memory.CollectionContainsMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.CollectionContainsMethodEvaluator"/>
         <query-method-evaluator class="java.util.Map" method="size" 
-            evaluator="org.datanucleus.query.evaluator.memory.ContainerSizeMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.ContainerSizeMethodEvaluator"/>
         <query-method-evaluator class="java.util.Map" method="isEmpty" 
-            evaluator="org.datanucleus.query.evaluator.memory.ContainerIsEmptyMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.ContainerIsEmptyMethodEvaluator"/>
         <query-method-evaluator class="java.util.Map" method="containsKey" 
-            evaluator="org.datanucleus.query.evaluator.memory.MapContainsKeyMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.MapContainsKeyMethodEvaluator"/>
         <query-method-evaluator class="java.util.Map" method="containsValue" 
-            evaluator="org.datanucleus.query.evaluator.memory.MapContainsValueMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.MapContainsValueMethodEvaluator"/>
         <query-method-evaluator class="java.util.Map" method="containsEntry" 
-            evaluator="org.datanucleus.query.evaluator.memory.MapContainsEntryMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.MapContainsEntryMethodEvaluator"/>
         <query-method-evaluator class="java.util.Map" method="get" 
-            evaluator="org.datanucleus.query.evaluator.memory.MapGetMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.MapGetMethodEvaluator"/>
 
         <query-method-evaluator class="java.util.Date" method="getTime" 
-            evaluator="org.datanucleus.query.evaluator.memory.DateGetTimeMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.DateGetTimeMethodEvaluator"/>
         <query-method-evaluator class="java.util.Date" method="getDay" 
-            evaluator="org.datanucleus.query.evaluator.memory.DateGetDayMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.DateGetDayMethodEvaluator"/>
         <query-method-evaluator class="java.util.Date" method="getDate" 
-            evaluator="org.datanucleus.query.evaluator.memory.DateGetDayMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.DateGetDayMethodEvaluator"/>
         <query-method-evaluator class="java.util.Date" method="getMonth" 
-            evaluator="org.datanucleus.query.evaluator.memory.DateGetMonthMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.DateGetMonthMethodEvaluator"/>
         <query-method-evaluator class="java.util.Date" method="getYear" 
-            evaluator="org.datanucleus.query.evaluator.memory.DateGetYearMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.DateGetYearMethodEvaluator"/>
         <query-method-evaluator class="java.util.Date" method="getHour" 
-            evaluator="org.datanucleus.query.evaluator.memory.DateGetHoursMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.DateGetHoursMethodEvaluator"/>
         <query-method-evaluator class="java.util.Date" method="getMinute" 
-            evaluator="org.datanucleus.query.evaluator.memory.DateGetMinutesMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.DateGetMinutesMethodEvaluator"/>
         <query-method-evaluator class="java.util.Date" method="getSecond" 
-            evaluator="org.datanucleus.query.evaluator.memory.DateGetSecondsMethodEvaluator"/>
+            evaluator="org.datanucleus.query.inmemory.DateGetSecondsMethodEvaluator"/>
     </extension>
 
     <!-- QUERY METHODS -->
