@@ -39,8 +39,8 @@ import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.query.QueryUtils;
 import org.datanucleus.query.cache.QueryCompilationCache;
 import org.datanucleus.query.compiler.QueryCompilation;
-import org.datanucleus.query.inmemory.ArrayContainsMethodEvaluator;
-import org.datanucleus.query.inmemory.ArraySizeMethodEvaluator;
+import org.datanucleus.query.inmemory.ArrayContainsMethod;
+import org.datanucleus.query.inmemory.ArraySizeMethod;
 import org.datanucleus.query.inmemory.InvocationEvaluator;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.query.cache.QueryDatastoreCompilationCache;
@@ -488,11 +488,11 @@ public class QueryManager
             // TODO Cache these
             if (methodName.equals("size") || methodName.equals("length"))
             {
-                return new ArraySizeMethodEvaluator();
+                return new ArraySizeMethod();
             }
             else if (methodName.equals("contains"))
             {
-                return new ArrayContainsMethodEvaluator();
+                return new ArrayContainsMethod();
             }
         }
 

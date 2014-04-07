@@ -386,147 +386,79 @@ Contributors:
 
     <!-- QUERY METHODS (IN-MEMORY) -->
     <extension point="org.datanucleus.query_method_evaluators">
-        <query-method-evaluator method="JDOHelper.getObjectId" 
-            evaluator="org.datanucleus.query.inmemory.JDOHelperGetObjectIdFunctionEvaluator"/>
-        <query-method-evaluator method="JDOHelper.getVersion" 
-            evaluator="org.datanucleus.query.inmemory.JDOHelperGetVersionFunctionEvaluator"/>
-        <query-method-evaluator method="Math.abs"
-            evaluator="org.datanucleus.query.inmemory.AbsFunctionEvaluator"/>
-        <query-method-evaluator method="Math.sqrt"
-            evaluator="org.datanucleus.query.inmemory.SqrtFunctionEvaluator"/>
-        <query-method-evaluator method="CURRENT_DATE"
-            evaluator="org.datanucleus.query.inmemory.CurrentDateFunctionEvaluator"/>
-        <query-method-evaluator method="CURRENT_TIME"
-            evaluator="org.datanucleus.query.inmemory.CurrentTimeFunctionEvaluator"/>
-        <query-method-evaluator method="CURRENT_TIMESTAMP"
-            evaluator="org.datanucleus.query.inmemory.CurrentTimestampFunctionEvaluator"/>
-        <query-method-evaluator method="ABS" 
-            evaluator="org.datanucleus.query.inmemory.AbsFunctionEvaluator"/>
-        <query-method-evaluator method="SQRT" 
-            evaluator="org.datanucleus.query.inmemory.SqrtFunctionEvaluator"/>
-        <query-method-evaluator method="MOD" 
-            evaluator="org.datanucleus.query.inmemory.ModFunctionEvaluator"/>
-        <query-method-evaluator method="COALESCE" 
-            evaluator="org.datanucleus.query.inmemory.CoalesceFunctionEvaluator"/>
-        <query-method-evaluator method="COS" 
-            evaluator="org.datanucleus.query.inmemory.CosineFunctionEvaluator"/>
-        <query-method-evaluator method="SIN" 
-            evaluator="org.datanucleus.query.inmemory.SineFunctionEvaluator"/>
-        <query-method-evaluator method="TAN" 
-            evaluator="org.datanucleus.query.inmemory.TangentFunctionEvaluator"/>
-        <query-method-evaluator method="ACOS" 
-            evaluator="org.datanucleus.query.inmemory.ArcCosineFunctionEvaluator"/>
-        <query-method-evaluator method="ASIN" 
-            evaluator="org.datanucleus.query.inmemory.ArcSineFunctionEvaluator"/>
-        <query-method-evaluator method="ATAN" 
-            evaluator="org.datanucleus.query.inmemory.ArcTangentFunctionEvaluator"/>
-        <query-method-evaluator method="CEIL" 
-            evaluator="org.datanucleus.query.inmemory.CeilFunctionEvaluator"/>
-        <query-method-evaluator method="FLOOR" 
-            evaluator="org.datanucleus.query.inmemory.FloorFunctionEvaluator"/>
-        <query-method-evaluator method="LOG" 
-            evaluator="org.datanucleus.query.inmemory.LogFunctionEvaluator"/>
-        <query-method-evaluator method="EXP" 
-            evaluator="org.datanucleus.query.inmemory.ExpFunctionEvaluator"/>
-        <query-method-evaluator method="NULLIF" 
-            evaluator="org.datanucleus.query.inmemory.NullIfFunctionEvaluator"/>
-        <query-method-evaluator method="SIZE" 
-            evaluator="org.datanucleus.query.inmemory.SizeFunctionEvaluator"/>
-        <query-method-evaluator method="UPPER" 
-            evaluator="org.datanucleus.query.inmemory.UpperFunctionEvaluator"/>
-        <query-method-evaluator method="LOWER" 
-            evaluator="org.datanucleus.query.inmemory.LowerFunctionEvaluator"/>
-        <query-method-evaluator method="LENGTH" 
-            evaluator="org.datanucleus.query.inmemory.LengthFunctionEvaluator"/>
-        <query-method-evaluator method="CONCAT"
-            evaluator="org.datanucleus.query.inmemory.ConcatFunctionEvaluator"/>
-        <query-method-evaluator method="SUBSTRING"
-            evaluator="org.datanucleus.query.inmemory.SubstringFunctionEvaluator"/>
-        <query-method-evaluator method="LOCATE" 
-            evaluator="org.datanucleus.query.inmemory.LocateFunctionEvaluator"/>
-        <query-method-evaluator method="TRIM" 
-            evaluator="org.datanucleus.query.inmemory.TrimFunctionEvaluator"/>
-        <query-method-evaluator method="TRIM_LEADING" 
-            evaluator="org.datanucleus.query.inmemory.TrimFunctionEvaluator"/>
-        <query-method-evaluator method="TRIM_TRAILING" 
-            evaluator="org.datanucleus.query.inmemory.TrimFunctionEvaluator"/>
+        <query-method-evaluator method="JDOHelper.getObjectId" evaluator="org.datanucleus.query.inmemory.JDOHelperGetObjectIdFunction"/>
+        <query-method-evaluator method="JDOHelper.getVersion" evaluator="org.datanucleus.query.inmemory.JDOHelperGetVersionFunction"/>
+        <query-method-evaluator method="Math.abs" evaluator="org.datanucleus.query.inmemory.AbsFunction"/>
+        <query-method-evaluator method="Math.sqrt" evaluator="org.datanucleus.query.inmemory.SqrtFunction"/>
+        <query-method-evaluator method="CURRENT_DATE" evaluator="org.datanucleus.query.inmemory.CurrentDateFunction"/>
+        <query-method-evaluator method="CURRENT_TIME" evaluator="org.datanucleus.query.inmemory.CurrentTimeFunction"/>
+        <query-method-evaluator method="CURRENT_TIMESTAMP" evaluator="org.datanucleus.query.inmemory.CurrentTimestampFunction"/>
+        <query-method-evaluator method="ABS" evaluator="org.datanucleus.query.inmemory.AbsFunction"/>
+        <query-method-evaluator method="SQRT" evaluator="org.datanucleus.query.inmemory.SqrtFunction"/>
+        <query-method-evaluator method="MOD" evaluator="org.datanucleus.query.inmemory.ModFunction"/>
+        <query-method-evaluator method="COALESCE" evaluator="org.datanucleus.query.inmemory.CoalesceFunction"/>
+        <query-method-evaluator method="COS" evaluator="org.datanucleus.query.inmemory.CosineFunction"/>
+        <query-method-evaluator method="SIN" evaluator="org.datanucleus.query.inmemory.SineFunction"/>
+        <query-method-evaluator method="TAN" evaluator="org.datanucleus.query.inmemory.TangentFunction"/>
+        <query-method-evaluator method="ACOS" evaluator="org.datanucleus.query.inmemory.ArcCosineFunction"/>
+        <query-method-evaluator method="ASIN" evaluator="org.datanucleus.query.inmemory.ArcSineFunction"/>
+        <query-method-evaluator method="ATAN" evaluator="org.datanucleus.query.inmemory.ArcTangentFunction"/>
+        <query-method-evaluator method="CEIL" evaluator="org.datanucleus.query.inmemory.CeilFunction"/>
+        <query-method-evaluator method="FLOOR" evaluator="org.datanucleus.query.inmemory.FloorFunction"/>
+        <query-method-evaluator method="LOG" evaluator="org.datanucleus.query.inmemory.LogFunction"/>
+        <query-method-evaluator method="EXP" evaluator="org.datanucleus.query.inmemory.ExpFunction"/>
+        <query-method-evaluator method="NULLIF" evaluator="org.datanucleus.query.inmemory.NullIfFunction"/>
+        <query-method-evaluator method="SIZE" evaluator="org.datanucleus.query.inmemory.SizeFunction"/>
+        <query-method-evaluator method="UPPER" evaluator="org.datanucleus.query.inmemory.UpperFunction"/>
+        <query-method-evaluator method="LOWER" evaluator="org.datanucleus.query.inmemory.LowerFunction"/>
+        <query-method-evaluator method="LENGTH" evaluator="org.datanucleus.query.inmemory.LengthFunction"/>
+        <query-method-evaluator method="CONCAT" evaluator="org.datanucleus.query.inmemory.ConcatFunction"/>
+        <query-method-evaluator method="SUBSTRING" evaluator="org.datanucleus.query.inmemory.SubstringFunction"/>
+        <query-method-evaluator method="LOCATE" evaluator="org.datanucleus.query.inmemory.LocateFunction"/>
+        <query-method-evaluator method="TRIM" evaluator="org.datanucleus.query.inmemory.TrimFunction"/>
+        <query-method-evaluator method="TRIM_LEADING" evaluator="org.datanucleus.query.inmemory.TrimFunction"/>
+        <query-method-evaluator method="TRIM_TRAILING" evaluator="org.datanucleus.query.inmemory.TrimFunction"/>
 
-        <query-method-evaluator class="java.lang.Enum" method="matches"
-            evaluator="org.datanucleus.query.inmemory.EnumMatchesMethodEvaluator"/>
-        <query-method-evaluator class="java.lang.Enum" method="toString"
-            evaluator="org.datanucleus.query.inmemory.EnumToStringMethodEvaluator"/>
-        <query-method-evaluator class="java.lang.Enum" method="ordinal"
-            evaluator="org.datanucleus.query.inmemory.EnumOrdinalMethodEvaluator"/>
+        <query-method-evaluator class="java.lang.Enum" method="matches" evaluator="org.datanucleus.query.inmemory.EnumMatchesMethod"/>
+        <query-method-evaluator class="java.lang.Enum" method="toString" evaluator="org.datanucleus.query.inmemory.EnumToStringMethod"/>
+        <query-method-evaluator class="java.lang.Enum" method="ordinal" evaluator="org.datanucleus.query.inmemory.EnumOrdinalMethod"/>
 
-        <query-method-evaluator class="java.lang.Object" method="getClass"
-            evaluator="org.datanucleus.query.inmemory.GetClassMethodEvaluator"/>
+        <query-method-evaluator class="java.lang.Object" method="getClass" evaluator="org.datanucleus.query.inmemory.ObjectGetClassMethod"/>
 
-        <query-method-evaluator class="java.lang.String" method="charAt"
-            evaluator="org.datanucleus.query.inmemory.StringCharAtMethodEvaluator"/>
-        <query-method-evaluator class="java.lang.String" method="concat"
-            evaluator="org.datanucleus.query.inmemory.StringConcatMethodEvaluator"/>
-        <query-method-evaluator class="java.lang.String" method="endsWith"
-            evaluator="org.datanucleus.query.inmemory.StringEndsWithMethodEvaluator"/>
-        <query-method-evaluator class="java.lang.String" method="equals"
-            evaluator="org.datanucleus.query.inmemory.StringEqualsMethodEvaluator"/>
-        <query-method-evaluator class="java.lang.String" method="equalsIgnoreCase"
-            evaluator="org.datanucleus.query.inmemory.StringEqualsIgnoreCaseMethodEvaluator"/>
-        <query-method-evaluator class="java.lang.String" method="indexOf"
-            evaluator="org.datanucleus.query.inmemory.StringIndexOfMethodEvaluator"/>
-        <query-method-evaluator class="java.lang.String" method="length" 
-            evaluator="org.datanucleus.query.inmemory.StringLengthMethodEvaluator"/>
-        <query-method-evaluator class="java.lang.String" method="matches" 
-            evaluator="org.datanucleus.query.inmemory.StringMatchesMethodEvaluator"/>
-        <query-method-evaluator class="java.lang.String" method="startsWith" 
-            evaluator="org.datanucleus.query.inmemory.StringStartsWithMethodEvaluator"/>
-        <query-method-evaluator class="java.lang.String" method="substring" 
-            evaluator="org.datanucleus.query.inmemory.StringSubstringMethodEvaluator"/>
-        <query-method-evaluator class="java.lang.String" method="toUpperCase" 
-            evaluator="org.datanucleus.query.inmemory.StringToUpperCaseMethodEvaluator"/>
-        <query-method-evaluator class="java.lang.String" method="toLowerCase" 
-            evaluator="org.datanucleus.query.inmemory.StringToLowerCaseMethodEvaluator"/>
-        <query-method-evaluator class="java.lang.String" method="trim" 
-            evaluator="org.datanucleus.query.inmemory.StringTrimMethodEvaluator"/>
-        <query-method-evaluator class="java.lang.String" method="trimLeft" 
-            evaluator="org.datanucleus.query.inmemory.StringTrimLeftMethodEvaluator"/>
-        <query-method-evaluator class="java.lang.String" method="trimRight" 
-            evaluator="org.datanucleus.query.inmemory.StringTrimRightMethodEvaluator"/>
+        <query-method-evaluator class="java.lang.String" method="charAt" evaluator="org.datanucleus.query.inmemory.StringCharAtMethod"/>
+        <query-method-evaluator class="java.lang.String" method="concat" evaluator="org.datanucleus.query.inmemory.StringConcatMethod"/>
+        <query-method-evaluator class="java.lang.String" method="endsWith" evaluator="org.datanucleus.query.inmemory.StringEndsWithMethod"/>
+        <query-method-evaluator class="java.lang.String" method="equals" evaluator="org.datanucleus.query.inmemory.StringEqualsMethod"/>
+        <query-method-evaluator class="java.lang.String" method="equalsIgnoreCase" evaluator="org.datanucleus.query.inmemory.StringEqualsIgnoreCaseMethod"/>
+        <query-method-evaluator class="java.lang.String" method="indexOf" evaluator="org.datanucleus.query.inmemory.StringIndexOfMethod"/>
+        <query-method-evaluator class="java.lang.String" method="length" evaluator="org.datanucleus.query.inmemory.StringLengthMethod"/>
+        <query-method-evaluator class="java.lang.String" method="matches" evaluator="org.datanucleus.query.inmemory.StringMatchesMethod"/>
+        <query-method-evaluator class="java.lang.String" method="startsWith" evaluator="org.datanucleus.query.inmemory.StringStartsWithMethod"/>
+        <query-method-evaluator class="java.lang.String" method="substring" evaluator="org.datanucleus.query.inmemory.StringSubstringMethod"/>
+        <query-method-evaluator class="java.lang.String" method="toUpperCase" evaluator="org.datanucleus.query.inmemory.StringToUpperCaseMethod"/>
+        <query-method-evaluator class="java.lang.String" method="toLowerCase" evaluator="org.datanucleus.query.inmemory.StringToLowerCaseMethod"/>
+        <query-method-evaluator class="java.lang.String" method="trim" evaluator="org.datanucleus.query.inmemory.StringTrimMethod"/>
+        <query-method-evaluator class="java.lang.String" method="trimLeft" evaluator="org.datanucleus.query.inmemory.StringTrimLeftMethod"/>
+        <query-method-evaluator class="java.lang.String" method="trimRight" evaluator="org.datanucleus.query.inmemory.StringTrimRightMethod"/>
 
-        <query-method-evaluator class="java.util.Collection" method="size" 
-            evaluator="org.datanucleus.query.inmemory.ContainerSizeMethodEvaluator"/>
-        <query-method-evaluator class="java.util.Collection" method="isEmpty" 
-            evaluator="org.datanucleus.query.inmemory.ContainerIsEmptyMethodEvaluator"/>
-        <query-method-evaluator class="java.util.Collection" method="contains" 
-            evaluator="org.datanucleus.query.inmemory.CollectionContainsMethodEvaluator"/>
-        <query-method-evaluator class="java.util.Map" method="size" 
-            evaluator="org.datanucleus.query.inmemory.ContainerSizeMethodEvaluator"/>
-        <query-method-evaluator class="java.util.Map" method="isEmpty" 
-            evaluator="org.datanucleus.query.inmemory.ContainerIsEmptyMethodEvaluator"/>
-        <query-method-evaluator class="java.util.Map" method="containsKey" 
-            evaluator="org.datanucleus.query.inmemory.MapContainsKeyMethodEvaluator"/>
-        <query-method-evaluator class="java.util.Map" method="containsValue" 
-            evaluator="org.datanucleus.query.inmemory.MapContainsValueMethodEvaluator"/>
-        <query-method-evaluator class="java.util.Map" method="containsEntry" 
-            evaluator="org.datanucleus.query.inmemory.MapContainsEntryMethodEvaluator"/>
-        <query-method-evaluator class="java.util.Map" method="get" 
-            evaluator="org.datanucleus.query.inmemory.MapGetMethodEvaluator"/>
+        <query-method-evaluator class="java.util.Collection" method="size" evaluator="org.datanucleus.query.inmemory.ContainerSizeMethod"/>
+        <query-method-evaluator class="java.util.Collection" method="isEmpty" evaluator="org.datanucleus.query.inmemory.ContainerIsEmptyMethod"/>
+        <query-method-evaluator class="java.util.Collection" method="contains" evaluator="org.datanucleus.query.inmemory.CollectionContainsMethod"/>
+        <query-method-evaluator class="java.util.Map" method="size" evaluator="org.datanucleus.query.inmemory.ContainerSizeMethod"/>
+        <query-method-evaluator class="java.util.Map" method="isEmpty" evaluator="org.datanucleus.query.inmemory.ContainerIsEmptyMethod"/>
+        <query-method-evaluator class="java.util.Map" method="containsKey" evaluator="org.datanucleus.query.inmemory.MapContainsKeyMethod"/>
+        <query-method-evaluator class="java.util.Map" method="containsValue" evaluator="org.datanucleus.query.inmemory.MapContainsValueMethod"/>
+        <query-method-evaluator class="java.util.Map" method="containsEntry" evaluator="org.datanucleus.query.inmemory.MapContainsEntryMethod"/>
+        <query-method-evaluator class="java.util.Map" method="get" evaluator="org.datanucleus.query.inmemory.MapGetMethod"/>
 
-        <query-method-evaluator class="java.util.Date" method="getTime" 
-            evaluator="org.datanucleus.query.inmemory.DateGetTimeMethodEvaluator"/>
-        <query-method-evaluator class="java.util.Date" method="getDay" 
-            evaluator="org.datanucleus.query.inmemory.DateGetDayMethodEvaluator"/>
-        <query-method-evaluator class="java.util.Date" method="getDate" 
-            evaluator="org.datanucleus.query.inmemory.DateGetDayMethodEvaluator"/>
-        <query-method-evaluator class="java.util.Date" method="getMonth" 
-            evaluator="org.datanucleus.query.inmemory.DateGetMonthMethodEvaluator"/>
-        <query-method-evaluator class="java.util.Date" method="getYear" 
-            evaluator="org.datanucleus.query.inmemory.DateGetYearMethodEvaluator"/>
-        <query-method-evaluator class="java.util.Date" method="getHour" 
-            evaluator="org.datanucleus.query.inmemory.DateGetHoursMethodEvaluator"/>
-        <query-method-evaluator class="java.util.Date" method="getMinute" 
-            evaluator="org.datanucleus.query.inmemory.DateGetMinutesMethodEvaluator"/>
-        <query-method-evaluator class="java.util.Date" method="getSecond" 
-            evaluator="org.datanucleus.query.inmemory.DateGetSecondsMethodEvaluator"/>
+        <query-method-evaluator class="java.util.Date" method="getTime" evaluator="org.datanucleus.query.inmemory.DateGetTimeMethod"/>
+        <query-method-evaluator class="java.util.Date" method="getDay" evaluator="org.datanucleus.query.inmemory.DateGetDayMethod"/>
+        <query-method-evaluator class="java.util.Date" method="getDate" evaluator="org.datanucleus.query.inmemory.DateGetDayMethod"/>
+        <query-method-evaluator class="java.util.Date" method="getMonth" evaluator="org.datanucleus.query.inmemory.DateGetMonthMethod"/>
+        <query-method-evaluator class="java.util.Date" method="getYear" evaluator="org.datanucleus.query.inmemory.DateGetYearMethod"/>
+        <query-method-evaluator class="java.util.Date" method="getHour" evaluator="org.datanucleus.query.inmemory.DateGetHoursMethod"/>
+        <query-method-evaluator class="java.util.Date" method="getMinute" evaluator="org.datanucleus.query.inmemory.DateGetMinutesMethod"/>
+        <query-method-evaluator class="java.util.Date" method="getSecond" evaluator="org.datanucleus.query.inmemory.DateGetSecondsMethod"/>
     </extension>
 
     <!-- QUERY METHODS -->

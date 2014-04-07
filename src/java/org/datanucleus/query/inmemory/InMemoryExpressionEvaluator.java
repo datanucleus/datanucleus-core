@@ -117,6 +117,11 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
         this.queryLanguage = queryLang;
     }
 
+    public Localiser getLocaliser()
+    {
+        return LOCALISER;
+    }
+
     public Map getParameterValues()
     {
         return parameterValues;
