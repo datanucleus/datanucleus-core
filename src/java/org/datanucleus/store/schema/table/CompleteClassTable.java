@@ -134,14 +134,31 @@ public class CompleteClassTable implements Table
             {
                 if (RelationType.isRelationSingleValued(relationType))
                 {
-                    // Embedded PC field, so add columns for all fields of the embedded
-                    List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>();
-                    embMmds.add(mmd);
-                    processEmbeddedMember(embMmds, clr, mmd.getEmbeddedMetaData());
+                    // Embedded PC field
+                    boolean nested = false;
+                    String nestedStr = mmd.getValueForExtension("nested");
+                    if (nestedStr != null && nestedStr.equalsIgnoreCase("true"))
+                    {
+                        nested = true;
+                    }
+
+                    if (nested)
+                    {
+                        // TODO Create mapping for the column owning the related member info, and then the related member info
+                        List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>();
+                        embMmds.add(mmd);
+                        processEmbeddedMember(embMmds, clr, mmd.getEmbeddedMetaData());
+                    }
+                    else
+                    {
+                        List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>();
+                        embMmds.add(mmd);
+                        processEmbeddedMember(embMmds, clr, mmd.getEmbeddedMetaData());
+                    }
                 }
                 else if (RelationType.isRelationMultiValued(relationType))
                 {
-                    // Embedded Collection/Map/array field. TODO How can we embed this?
+                    // Embedded Collection/Map/array field. TODO Create related member information
                     NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not supported so ignoring");
                     continue;
                 }
@@ -535,14 +552,31 @@ public class CompleteClassTable implements Table
                 if (RelationType.isRelationSingleValued(relationType))
                 {
                     // Nested embedded PC, so recurse
-                    List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
-                    embMmds.add(mmd);
-                    processEmbeddedMember(embMmds, clr, (embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null));
+                    boolean nested = false;
+                    String nestedStr = mmd.getValueForExtension("nested");
+                    if (nestedStr != null && nestedStr.equalsIgnoreCase("true"))
+                    {
+                        nested = true;
+                    }
+
+                    if (nested)
+                    {
+                        // TODO Create mapping for the column owning the related member info, and then the related member info
+                        List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
+                        embMmds.add(mmd);
+                        processEmbeddedMember(embMmds, clr, (embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null));
+                    }
+                    else
+                    {
+                        List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
+                        embMmds.add(mmd);
+                        processEmbeddedMember(embMmds, clr, (embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null));
+                    }
                 }
                 else
                 {
-                    // Don't support embedded collections/maps
-                    NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not supported so ignoring");
+                    // Embedded collection element, array element, map key/value TODO Add related member info for the embedded element/key/value etc
+                    NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection/array element or map key/value. Not supported so ignoring");
                 }
             }
             else
