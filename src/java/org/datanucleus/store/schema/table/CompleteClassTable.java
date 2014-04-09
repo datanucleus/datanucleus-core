@@ -181,9 +181,34 @@ public class CompleteClassTable implements Table
                 }
                 else if (RelationType.isRelationMultiValued(relationType))
                 {
-                    // Embedded Collection/Map/array field. TODO Create related member information
-                    NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not supported so ignoring");
-                    continue;
+                    if (mmd.hasCollection())
+                    {
+                        if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_COLLECTION_NESTED))
+                        {
+                            // TODO Support nested embedded collection element
+                        }
+                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not yet supported. Ignoring");
+                        continue;
+                    }
+                    else if (mmd.hasMap())
+                    {
+                        if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_MAP_NESTED))
+                        {
+                            // TODO Support nested embedded map key/value
+                        }
+                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not yet supported. Ignoring");
+                        continue;
+                        
+                    }
+                    else if (mmd.hasArray())
+                    {
+                        if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_ARRAY_NESTED))
+                        {
+                            // TODO Support nested embedded array element
+                        }
+                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded array. Not yet supported. Ignoring");
+                        continue;
+                    }
                 }
             }
             else
@@ -626,8 +651,34 @@ public class CompleteClassTable implements Table
                 }
                 else
                 {
-                    // Embedded collection element, array element, map key/value TODO Add related member info for the embedded element/key/value etc
-                    NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection/array element or map key/value. Not supported so ignoring");
+                    if (mmd.hasCollection())
+                    {
+                        if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_COLLECTION_NESTED))
+                        {
+                            // TODO Support nested embedded collection element
+                        }
+                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not yet supported. Ignoring");
+                        continue;
+                    }
+                    else if (mmd.hasMap())
+                    {
+                        if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_MAP_NESTED))
+                        {
+                            // TODO Support nested embedded map key/value
+                        }
+                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not yet supported. Ignoring");
+                        continue;
+                        
+                    }
+                    else if (mmd.hasArray())
+                    {
+                        if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_ARRAY_NESTED))
+                        {
+                            // TODO Support nested embedded array element
+                        }
+                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded array. Not yet supported. Ignoring");
+                        continue;
+                    }
                 }
             }
             else

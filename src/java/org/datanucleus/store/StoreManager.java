@@ -75,6 +75,9 @@ public interface StoreManager
     public static final String OPTION_ORM_EMBEDDED_MAP = "ORM.EmbeddedMap";
     public static final String OPTION_ORM_EMBEDDED_ARRAY = "ORM.EmbeddedArray";
     public static final String OPTION_ORM_EMBEDDED_PC_NESTED = "ORM.EmbeddedPC.Nested"; // Whether the embedded object is storable nested like in JSON (default is flat embedding)
+    public static final String OPTION_ORM_EMBEDDED_COLLECTION_NESTED = "ORM.EmbeddedCollection.Nested"; // Whether the embedded element is storable nested like in JSON (default is in separate table)
+    public static final String OPTION_ORM_EMBEDDED_MAP_NESTED = "ORM.EmbeddedMap.Nested"; // Whether the embedded element is storable nested like in JSON (default is in separate table)
+    public static final String OPTION_ORM_EMBEDDED_ARRAY_NESTED = "ORM.EmbeddedArray.Nested"; // Whether the embedded key/value is storable nested like in JSON (default is in separate table)
     public static final String OPTION_ORM_SECONDARY_TABLE = "ORM.SecondaryTable";
     public static final String OPTION_ORM_FOREIGN_KEYS = "ORM.ForeignKeys";
     public static final String OPTION_TXN_ISOLATION_READ_COMMITTED = "TransactionIsolationLevel.read-committed";
