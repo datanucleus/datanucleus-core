@@ -149,11 +149,26 @@ public abstract class AbstractNamingFactory implements NamingFactory
     /* (non-Javadoc)
      * @see org.datanucleus.store.schema.naming.NamingFactory#getColumnName(java.util.List, int)
      */
-    public String getColumnName(List<AbstractMemberMetaData> mmds, int position)
+    public String getColumnName(List<AbstractMemberMetaData> mmds, int colPosition)
     {
-        EmbeddedMetaData embmd = mmds.get(0).getEmbeddedMetaData();
+        EmbeddedMetaData embmd = null;
+        AbstractMemberMetaData rootMmd = mmds.get(0);
+        if (rootMmd.hasCollection() || rootMmd.hasArray())
+        {
+            if (rootMmd.getElementMetaData() != null)
+            {
+                embmd = rootMmd.getElementMetaData().getEmbeddedMetaData();
+            }
+        }
+        // TODO Allow for map key/value embedded
+        else
+        {
+            embmd = mmds.get(0).getEmbeddedMetaData();
+        }
+
         if (embmd != null && mmds.size() > 1)
         {
+            // try to find a user-provided column name in <embedded> metadata
             boolean checked = false;
             int mmdNo = 1;
             while (!checked)
@@ -171,9 +186,9 @@ public abstract class AbstractNamingFactory implements NamingFactory
                                 // Found last embedded field, so use column data if present
                                 checked = true;
                                 ColumnMetaData[] colmds = embMmds[i].getColumnMetaData();
-                                if (colmds != null && colmds.length > position && !StringUtils.isWhitespace(colmds[position].getName()))
+                                if (colmds != null && colmds.length > colPosition && !StringUtils.isWhitespace(colmds[colPosition].getName()))
                                 {
-                                    String colName = colmds[position].getName();
+                                    String colName = colmds[colPosition].getName();
                                     return prepareIdentifierNameForUse(colName, SchemaComponent.COLUMN);
                                 }
                             }
@@ -182,7 +197,18 @@ public abstract class AbstractNamingFactory implements NamingFactory
                                 // Go to next level in embMmds if present
                                 checkedEmbmd = true;
                                 mmdNo++;
-                                embmd = embMmds[i].getEmbeddedMetaData();
+                                embmd = null;
+                                if (embMmds[i].hasCollection() || embMmds[i].hasArray())
+                                {
+                                    if (embMmds[i].getElementMetaData() != null)
+                                    {
+                                        embmd = embMmds[i].getElementMetaData().getEmbeddedMetaData();
+                                    }
+                                }
+                                else
+                                {
+                                    embmd = embMmds[i].getEmbeddedMetaData();
+                                }
                                 if (embmd == null)
                                 {
                                     // No more info specified so drop out here
