@@ -142,17 +142,40 @@ public class CompleteClassTable implements Table
                         nested = true;
                     }
 
+                    List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>();
+                    embMmds.add(mmd);
                     if (nested)
                     {
-                        // TODO Create mapping for the column owning the related member info, and then the related member info
-                        List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>();
-                        embMmds.add(mmd);
+                        // Embedded object stored as nested under this in the owner table (where the datastore supports that) TODO Add flag on storeMgr to say if supported
+                        // Create column for the embedded owner field (that holds the nested embedded object), typically for the column name only
+                        ColumnMetaData[] colmds = mmd.getColumnMetaData();
+                        String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
+                        ColumnImpl col = addColumn(mmd, colName, null);
+                        if (colmds != null && colmds.length == 1)
+                        {
+                            if (colmds[0].getPosition() != null)
+                            {
+                                col.setPosition(colmds[0].getPosition());
+                            }
+                            if (colmds[0].getJdbcType() != null)
+                            {
+                                col.setJdbcType(colmds[0].getJdbcType());
+                            }
+                        }
+                        MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
+                        col.setMemberColumnMapping(mapping);
+                        if (schemaVerifier != null)
+                        {
+                            schemaVerifier.attributeMember(mapping, mmd);
+                        }
+                        mappingByMember.put(mmd, mapping);
+
+                        // TODO Consider adding the embedded info under the above column as related information
                         processEmbeddedMember(embMmds, clr, mmd.getEmbeddedMetaData());
                     }
                     else
                     {
-                        List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>();
-                        embMmds.add(mmd);
+                        // Embedded object stored flat into this table, with columns at same level as owner columns
                         processEmbeddedMember(embMmds, clr, mmd.getEmbeddedMetaData());
                     }
                 }
@@ -559,17 +582,45 @@ public class CompleteClassTable implements Table
                         nested = true;
                     }
 
+                    List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
+                    embMmds.add(mmd);
                     if (nested)
                     {
-                        // TODO Create mapping for the column owning the related member info, and then the related member info
-                        List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
-                        embMmds.add(mmd);
+                        // Embedded object stored as nested under this in the owner table (where the datastore supports that) TODO Add flag on storeMgr to say if supported
+                        // Add column for the owner of the embedded object, typically for the column name only
+                        ColumnMetaData[] colmds = mmd.getColumnMetaData();
+                        String colName = namingFactory.getColumnName(embMmds, 0);
+                        ColumnImpl col = addEmbeddedColumn(colName, null);
+                        if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getPosition() != null)
+                        {
+                            col.setPosition(embmdMmd.getColumnMetaData()[0].getPosition());
+                        }
+                        else if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                        {
+                            col.setPosition(colmds[0].getPosition());
+                        }
+                        if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getJdbcType() != null)
+                        {
+                            col.setJdbcType(embmdMmd.getColumnMetaData()[0].getJdbcType());
+                        }
+                        else if (colmds != null && colmds.length == 1 && colmds[0].getJdbcType() != null)
+                        {
+                            col.setJdbcType(colmds[0].getJdbcType());
+                        }
+                        MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
+                        col.setMemberColumnMapping(mapping);
+                        if (schemaVerifier != null)
+                        {
+                            schemaVerifier.attributeEmbeddedMember(mapping, embMmds);
+                        }
+                        mappingByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(embMmds), mapping);
+
+                        // TODO Create mapping for the related info under the above column
                         processEmbeddedMember(embMmds, clr, (embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null));
                     }
                     else
                     {
-                        List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
-                        embMmds.add(mmd);
+                        // Embedded object stored flat into this table, with columns at same level as owner columns
                         processEmbeddedMember(embMmds, clr, (embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null));
                     }
                 }
