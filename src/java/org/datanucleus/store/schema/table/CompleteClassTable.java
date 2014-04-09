@@ -137,7 +137,7 @@ public class CompleteClassTable implements Table
                     // Embedded PC field
                     boolean nested = false;
                     String nestedStr = mmd.getValueForExtension("nested");
-                    if (nestedStr != null && nestedStr.equalsIgnoreCase("true"))
+                    if (nestedStr != null && nestedStr.equalsIgnoreCase("true") && storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_PC_NESTED))
                     {
                         nested = true;
                     }
@@ -146,7 +146,7 @@ public class CompleteClassTable implements Table
                     embMmds.add(mmd);
                     if (nested)
                     {
-                        // Embedded object stored as nested under this in the owner table (where the datastore supports that) TODO Add flag on storeMgr to say if supported
+                        // Embedded object stored as nested under this in the owner table (where the datastore supports that)
                         // Create column for the embedded owner field (that holds the nested embedded object), typically for the column name only
                         ColumnMetaData[] colmds = mmd.getColumnMetaData();
                         String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
@@ -577,7 +577,7 @@ public class CompleteClassTable implements Table
                     // Nested embedded PC, so recurse
                     boolean nested = false;
                     String nestedStr = mmd.getValueForExtension("nested");
-                    if (nestedStr != null && nestedStr.equalsIgnoreCase("true"))
+                    if (nestedStr != null && nestedStr.equalsIgnoreCase("true") && storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_PC_NESTED))
                     {
                         nested = true;
                     }
@@ -586,7 +586,7 @@ public class CompleteClassTable implements Table
                     embMmds.add(mmd);
                     if (nested)
                     {
-                        // Embedded object stored as nested under this in the owner table (where the datastore supports that) TODO Add flag on storeMgr to say if supported
+                        // Embedded object stored as nested under this in the owner table (where the datastore supports that)
                         // Add column for the owner of the embedded object, typically for the column name only
                         ColumnMetaData[] colmds = mmd.getColumnMetaData();
                         String colName = namingFactory.getColumnName(embMmds, 0);
