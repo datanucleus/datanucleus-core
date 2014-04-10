@@ -167,6 +167,25 @@ public class JDOQLCompiler extends JavaQueryCompiler implements SymbolResolver
                     " Should contain only aggregates, or grouping expressions");
             }
         }
+        if (exprResult != null)
+        {
+            for (int i=0;i<exprResult.length;i++)
+            {
+                if (exprResult[i] instanceof InvokeExpression)
+                {
+                    InvokeExpression invokeExpr = (InvokeExpression) exprResult[i];
+                    if (isMethodNameAggregate(invokeExpr.getOperation()))
+                    {
+                        // Make sure these have 1 argument
+                        List<Expression> args = invokeExpr.getArguments();
+                        if (args == null || args.size() != 1)
+                        {
+                            throw new NucleusUserException("JDOQL query has result clause using aggregate (" + invokeExpr.getOperation() + ") but this needs 1 argument");
+                        }
+                    }
+                }
+            }
+        }
 
         QueryCompilation compilation = new QueryCompilation(candidateClass, candidateAlias, symtbl,
             exprResult, exprFrom, exprFilter, exprGrouping, exprHaving, exprOrdering, exprUpdate);
@@ -275,6 +294,19 @@ public class JDOQLCompiler extends JavaQueryCompiler implements SymbolResolver
         return false;
     }
 
+    private static boolean isMethodNameAggregate(String methodName)
+    {
+        if (methodName.equals("avg") || methodName.equals("AVG") ||
+            methodName.equals("count") || methodName.equals("COUNT") ||
+            methodName.equals("sum") || methodName.equals("SUM") ||
+            methodName.equals("min") || methodName.equals("MIN") ||
+            methodName.equals("max") || methodName.equals("MAX"))
+        {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Convenience method to check of the provided expression is either an aggregate expression or
      * is a grouping expression (or literal, parameter, or variable).
@@ -291,11 +323,7 @@ public class JDOQLCompiler extends JavaQueryCompiler implements SymbolResolver
             {
                 // Aggregate method
                 String methodName = invExpr.getOperation();
-                if (methodName.equals("avg") || methodName.equals("AVG") ||
-                    methodName.equals("count") || methodName.equals("COUNT") ||
-                    methodName.equals("sum") || methodName.equals("SUM") ||
-                    methodName.equals("min") || methodName.equals("MIN") ||
-                    methodName.equals("max") || methodName.equals("MAX"))
+                if (isMethodNameAggregate(methodName))
                 {
                     return true;
                 }

@@ -19,12 +19,15 @@ package org.datanucleus.query.compiler;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.query.JPQLQueryHelper;
 import org.datanucleus.query.expression.Expression;
+import org.datanucleus.query.expression.InvokeExpression;
 import org.datanucleus.query.expression.PrimaryExpression;
 import org.datanucleus.query.symbol.PropertySymbol;
 import org.datanucleus.query.symbol.Symbol;
@@ -94,6 +97,25 @@ public class JPQLCompiler extends JavaQueryCompiler
                 exprResult = null;
             }
         }
+        if (exprResult != null)
+        {
+            for (int i=0;i<exprResult.length;i++)
+            {
+                if (exprResult[i] instanceof InvokeExpression)
+                {
+                    InvokeExpression invokeExpr = (InvokeExpression) exprResult[i];
+                    if (isMethodNameAggregate(invokeExpr.getOperation()))
+                    {
+                        // Make sure these have 1 argument
+                        List<Expression> args = invokeExpr.getArguments();
+                        if (args == null || args.size() != 1)
+                        {
+                            throw new NucleusUserException("JPQL query has result clause using aggregate (" + invokeExpr.getOperation() + ") but this needs 1 argument");
+                        }
+                    }
+                }
+            }
+        }
 
         QueryCompilation compilation = new QueryCompilation(candidateClass, candidateAlias, symtbl,
             exprResult, exprFrom, exprFilter, exprGrouping, exprHaving, exprOrdering, exprUpdate);
@@ -137,5 +159,15 @@ public class JPQLCompiler extends JavaQueryCompiler
     protected boolean isKeyword(String name)
     {
         return JPQLQueryHelper.isKeyword(name);
+    }
+
+    private static boolean isMethodNameAggregate(String methodName)
+    {
+        if (methodName.equalsIgnoreCase("avg") || methodName.equalsIgnoreCase("count") || methodName.equalsIgnoreCase("sum") || 
+            methodName.equalsIgnoreCase("min") || methodName.equalsIgnoreCase("max"))
+        {
+            return true;
+        }
+        return false;
     }
 }
