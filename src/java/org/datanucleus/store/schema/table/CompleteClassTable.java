@@ -132,6 +132,8 @@ public class CompleteClassTable implements Table
             RelationType relationType = mmd.getRelationType(clr);
             if (relationType != RelationType.NONE && MetaDataUtils.getInstance().isMemberEmbedded(storeMgr.getMetaDataManager(), clr, mmd, relationType, null))
             {
+                List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>();
+                embMmds.add(mmd);
                 if (RelationType.isRelationSingleValued(relationType))
                 {
                     // Embedded PC field
@@ -142,8 +144,6 @@ public class CompleteClassTable implements Table
                         nested = true;
                     }
 
-                    List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>();
-                    embMmds.add(mmd);
                     if (nested)
                     {
                         // Embedded object stored as nested under this in the owner table (where the datastore supports that)
@@ -185,10 +185,39 @@ public class CompleteClassTable implements Table
                     {
                         if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_COLLECTION_NESTED))
                         {
-                            // TODO Support nested embedded collection element
+                            // Embedded collection element (nested into owner table where supported)
+                            // Add column for the collection (since the store needs a name to reference it by)
+                            ColumnMetaData[] colmds = mmd.getColumnMetaData();
+                            String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
+                            ColumnImpl col = addColumn(mmd, colName, null);
+                            if (colmds != null && colmds.length == 1)
+                            {
+                                if (colmds[0].getPosition() != null)
+                                {
+                                    col.setPosition(colmds[0].getPosition());
+                                }
+                                if (colmds[0].getJdbcType() != null)
+                                {
+                                    col.setJdbcType(colmds[0].getJdbcType());
+                                }
+                            }
+                            MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
+                            col.setMemberColumnMapping(mapping);
+                            if (schemaVerifier != null)
+                            {
+                                schemaVerifier.attributeMember(mapping, mmd);
+                            }
+                            mappingByMember.put(mmd, mapping);
+
+                            // TODO Consider adding the embedded info under the above column as related information
+                            EmbeddedMetaData embmd = (mmd.getElementMetaData() != null ? mmd.getElementMetaData().getEmbeddedMetaData() : null);
+                            processEmbeddedMember(embMmds, clr, embmd);
                         }
-                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not yet supported. Ignoring");
-                        continue;
+                        else
+                        {
+                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not yet supported. Ignoring");
+                            continue;
+                        }
                     }
                     else if (mmd.hasMap())
                     {
@@ -558,11 +587,28 @@ public class CompleteClassTable implements Table
 
     protected void processEmbeddedMember(List<AbstractMemberMetaData> mmds, ClassLoaderResolver clr, EmbeddedMetaData embmd)
     {
-        AbstractMemberMetaData lastMmd = mmds.get(mmds.size()-1);
         TypeManager typeMgr = storeMgr.getNucleusContext().getTypeManager();
         MetaDataManager mmgr = storeMgr.getMetaDataManager();
         NamingFactory namingFactory = storeMgr.getNamingFactory();
-        AbstractClassMetaData embCmd = mmgr.getMetaDataForClass(lastMmd.getType(), clr);
+        AbstractMemberMetaData lastMmd = mmds.get(mmds.size()-1);
+        AbstractClassMetaData embCmd = null;
+        if (lastMmd.hasCollection())
+        {
+            // Embedded collection element
+            embCmd = mmgr.getMetaDataForClass(lastMmd.getCollection().getElementType(), clr);
+        }
+        else if (lastMmd.hasArray())
+        {
+            // Embedded array element
+            embCmd = mmgr.getMetaDataForClass(lastMmd.getArray().getElementType(), clr);
+        }
+        else
+        {
+            // Embedded 1-1
+            embCmd = mmgr.getMetaDataForClass(lastMmd.getType(), clr);
+        }
+
+        // Go through all members of the embedded class
         int[] memberPositions = embCmd.getAllMemberPositions();
         for (int i=0;i<memberPositions.length;i++)
         {
