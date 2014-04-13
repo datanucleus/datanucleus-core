@@ -142,13 +142,6 @@
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
-        <dependency> <!-- TODO Remove this when we adopt "datanucleus-java8" -->
-            <groupId>javax.time</groupId>
-            <artifactId>time-api</artifactId>
-            <version>[0.6, )</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
         <dependency>
             <groupId>javax.cache</groupId>
             <artifactId>cache-api</artifactId>
