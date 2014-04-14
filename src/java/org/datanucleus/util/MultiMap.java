@@ -138,7 +138,7 @@ public class MultiMap extends HashMap
      * @param item  the value to remove
      * @return the value removed (which was passed in)
      */
-    public Object remove(Object key, Object item)
+    public Object removeKeyValue(Object key, Object item)
     {
         Collection valuesForKey=(Collection)super.get(key);
         if (valuesForKey == null)
