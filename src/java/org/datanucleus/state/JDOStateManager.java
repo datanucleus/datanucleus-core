@@ -81,7 +81,6 @@ import org.datanucleus.store.fieldmanager.DeleteFieldManager;
 import org.datanucleus.store.fieldmanager.DetachFieldManager;
 import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.fieldmanager.MakeTransientFieldManager;
-import org.datanucleus.store.fieldmanager.NullifyRelationFieldManager;
 import org.datanucleus.store.fieldmanager.PersistFieldManager;
 import org.datanucleus.store.fieldmanager.SingleValueFieldManager;
 import org.datanucleus.store.fieldmanager.UnsetOwnerFieldManager;
@@ -4693,19 +4692,6 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
                 // Call any lifecycle listeners waiting for this event.
                 getCallbackHandler().postDelete(myPC);
             }
-        }
-    }
-
-    /**
-     * Nullify fields with reference to PersistenceCapable or SCO instances 
-     */
-    public void nullifyFields()
-    {
-        if (!myLC.isDeleted() && !myEC.getApiAdapter().isDetached(myPC))
-        {
-            // Update any relationships for fields of this object that aren't dependent
-            replaceFields(cmd.getNonPKMemberPositions(), new NullifyRelationFieldManager(this));
-            flush();
         }
     }
 

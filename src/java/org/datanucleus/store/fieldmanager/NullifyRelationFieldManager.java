@@ -26,6 +26,7 @@ import org.datanucleus.state.ObjectProvider;
 
 /**
  * Manager that nullifies any Collection/Map/PC fields of the object.
+ * Used by "persistence by reachability at commit" functionality.
  */
 public class NullifyRelationFieldManager extends AbstractFieldManager
 {

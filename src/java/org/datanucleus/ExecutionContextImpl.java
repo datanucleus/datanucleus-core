@@ -89,6 +89,7 @@ import org.datanucleus.store.Extent;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.PersistenceBatchType;
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.fieldmanager.NullifyRelationFieldManager;
 import org.datanucleus.store.fieldmanager.ReachabilityFieldManager;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.scostore.Store;
@@ -4359,7 +4360,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         if (!objectNotFound.contains(nonReachableIds[i]))
                         {
                             ObjectProvider op = findObjectProvider(findObject(nonReachableIds[i], true, true, null));
-                            op.nullifyFields();
+
+                            if (!op.getLifecycleState().isDeleted() && !getApiAdapter().isDetached(op.getObject()))
+                            {
+                                // Null any relationships for relation fields of this object
+                                op.replaceFields(op.getClassMetaData().getNonPKMemberPositions(), new NullifyRelationFieldManager(op));
+                                flush();
+                            }
                         }
                     }
                     catch (NucleusObjectNotFoundException ex)

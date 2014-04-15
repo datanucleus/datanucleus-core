@@ -579,11 +579,6 @@ public interface ObjectProvider
      */
     void unloadField(String fieldName);
 
-    /**
-     * Nullify fields with reference to persistable or SCO instances 
-     */
-    void nullifyFields();
-
     boolean[] getLoadedFields();
 
     /**
