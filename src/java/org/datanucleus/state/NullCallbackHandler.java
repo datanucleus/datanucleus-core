@@ -15,9 +15,8 @@ limitations under the License.
 Contributors:
    ...
 **********************************************************************/
-package org.datanucleus;
+package org.datanucleus.state;
 
-import org.datanucleus.state.CallbackHandler;
 
 /**
  * Callback handler that does nothing. Provided for the case where the user wants to do bulk operations

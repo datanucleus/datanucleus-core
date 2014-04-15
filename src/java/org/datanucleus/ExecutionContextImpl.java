@@ -81,6 +81,7 @@ import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.LifeCycleState;
 import org.datanucleus.state.LockManager;
 import org.datanucleus.state.LockManagerImpl;
+import org.datanucleus.state.NullCallbackHandler;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.state.RelationshipManagerImpl;
