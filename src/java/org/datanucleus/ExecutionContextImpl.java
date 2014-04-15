@@ -88,6 +88,7 @@ import org.datanucleus.store.Extent;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.PersistenceBatchType;
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.fieldmanager.ReachabilityFieldManager;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.scostore.Store;
 import org.datanucleus.store.types.TypeManager;
@@ -4304,7 +4305,27 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     try
                     {
                         ObjectProvider op = findObjectProvider(findObject(ids[i], true, true, null));
-                        op.runReachability(currentReachables);
+
+                        if (!op.isDeleted() && !currentReachables.contains(ids[i]))
+                        {
+                            // Make sure all of its relation fields are loaded before continuing. Is this necessary, since its enlisted?
+                            op.loadUnloadedRelationFields();
+
+                            // Add this object id since not yet reached
+                            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                            {
+                                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007000", StringUtils.toJVMIDString(op.getObject()), ids[i], op.getLifecycleState()));
+                            }
+                            currentReachables.add(ids[i]);
+
+                            // Go through all relation fields using ReachabilityFieldManager
+                            ReachabilityFieldManager pcFM = new ReachabilityFieldManager(op, currentReachables);
+                            int[] relationFieldNums = op.getClassMetaData().getRelationMemberPositions(getClassLoaderResolver(), getMetaDataManager());
+                            if (relationFieldNums != null && relationFieldNums.length > 0)
+                            {
+                                op.provideFields(relationFieldNums, pcFM);
+                            }
+                        }
                     }
                     catch (NucleusObjectNotFoundException ex)
                     {

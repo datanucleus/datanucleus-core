@@ -22,22 +22,25 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Field manager that runs reachability on all PC objects referenced from the source object.
- * Whenever a PC object is encountered "runReachability" is performed on the ObjectProvider of the object.
+ * Whenever a PC object is encountered it recurses to that object, and so on.
+ * Provides the basis for the JDO feature "persistence-by-reachability-at-commit".
  */
 public class ReachabilityFieldManager extends AbstractFieldManager
 {
     /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
+    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
     /** ObjectProvider for the owning object. */
     private final ObjectProvider op;
@@ -63,17 +66,41 @@ public class ReachabilityFieldManager extends AbstractFieldManager
      */
     protected void processPersistable(Object obj, AbstractMemberMetaData mmd)
     {
-        ObjectProvider objOP = this.op.getExecutionContext().findObjectProvider(obj);
+        ExecutionContext ec = op.getExecutionContext();
+        ObjectProvider objOP = ec.findObjectProvider(obj);
         if (objOP != null)
         {
-            objOP.runReachability(reachables);
+            Object objID = objOP.getInternalObjectId();
+            if (!reachables.contains(objID) && !objOP.isDeleted())
+            {
+                if (ec.isEnlistedInTransaction(objID))
+                {
+                    // This object was enlisted so make sure all of its fields are loaded before continuing
+                    objOP.loadUnloadedRelationFields();
+                }
+
+                // Add this object id since not yet reached
+                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                {
+                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007000", StringUtils.toJVMIDString(obj), objID, objOP.getLifecycleState()));
+                }
+                reachables.add(objID);
+
+                // Recurse through relation fields of this object
+                ReachabilityFieldManager pcFM = new ReachabilityFieldManager(objOP, reachables);
+                int[] relationFieldNums = objOP.getClassMetaData().getRelationMemberPositions(ec.getClassLoaderResolver(), ec.getMetaDataManager());
+                int[] loadedFieldNumbers = ClassUtils.getFlagsSetTo(objOP.getLoadedFields(), relationFieldNums, true);
+                if (loadedFieldNumbers != null && loadedFieldNumbers.length > 0)
+                {
+                    objOP.provideFields(loadedFieldNumbers, pcFM);
+                }
+            }
         }
         else
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007005", 
-                    op.getExecutionContext().getApiAdapter().getIdForObject(obj), mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007005", op.getExecutionContext().getApiAdapter().getIdForObject(obj), mmd.getFullFieldName()));
             }
         }
     }

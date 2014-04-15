@@ -41,7 +41,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.jdo.JDOFatalInternalException;
 import javax.jdo.JDOFatalUserException;
@@ -84,7 +83,6 @@ import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.fieldmanager.MakeTransientFieldManager;
 import org.datanucleus.store.fieldmanager.NullifyRelationFieldManager;
 import org.datanucleus.store.fieldmanager.PersistFieldManager;
-import org.datanucleus.store.fieldmanager.ReachabilityFieldManager;
 import org.datanucleus.store.fieldmanager.SingleValueFieldManager;
 import org.datanucleus.store.fieldmanager.UnsetOwnerFieldManager;
 import org.datanucleus.store.fieldmanager.AbstractFetchDepthFieldManager.EndOfFetchPlanGraphException;
@@ -983,6 +981,11 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
         {
             return myLC.isNew();
         }
+    }
+
+    public boolean isDeleted()
+    {
+        return isDeleted(myPC);
     }
 
     /**
@@ -3682,52 +3685,6 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
     }
 
     // ------------------------- Lifecycle Methods -----------------------------
-
-    /**
-     * Method to mark an object for reachability.
-     * Provides the basis for "persistence-by-reachability", but run at commit time only.
-     * The reachability algorithm is also run at makePersistent, but directly via InsertRequest.
-     * @param reachables List of object ids currently logged as reachable
-     */
-    public void runReachability(Set reachables)
-    {
-        if (reachables == null)
-        {
-            return;
-        }
-        if (!reachables.contains(getInternalObjectId()))
-        {
-            // Make sure all changes are persisted
-            flush();
-
-            if (isDeleted(myPC))
-            {
-                // This object is deleted so nothing further will be reachable
-                return;
-            }
-
-            // This object was enlisted so make sure all of its fields are loaded before continuing
-            if (myEC.isEnlistedInTransaction(getInternalObjectId()))
-            {
-                loadUnloadedRelationFields();
-            }
-
-            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-            {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007000", 
-                    StringUtils.toJVMIDString(myPC), getInternalObjectId(), myLC));
-            }
-            // Add this object id since not yet reached
-            reachables.add(getInternalObjectId());
-
-            // Go through all (loaded FetchPlan) fields for reachability using ReachabilityFieldManager
-            int[] loadedFieldNumbers = ClassUtils.getFlagsSetTo(loadedFields, cmd.getAllMemberPositions(), true);
-            if (loadedFieldNumbers != null && loadedFieldNumbers.length > 0)
-            {
-                provideFields(loadedFieldNumbers, new ReachabilityFieldManager(this, reachables));
-            }
-        }
-    }
 
     /**
      * Method to make the object persistent.

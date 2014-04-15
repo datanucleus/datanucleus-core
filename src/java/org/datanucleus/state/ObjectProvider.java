@@ -18,8 +18,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.state;
 
-import java.util.Set;
-
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.Transaction;
@@ -370,12 +368,6 @@ public interface ObjectProvider
     void copyFieldsFromObject(Object pc, int[] fieldNumbers);
 
     /**
-     * Method to run reachability from this ObjectProvider.
-     * @param reachables List of reachable ObjectProviders so far
-     */
-    void runReachability(Set reachables);
-
-    /**
      * Method to set this ObjectProvider as managing an embedded/serialised object.
      * @param type The type of object being managed
      */
@@ -456,6 +448,13 @@ public interface ObjectProvider
     boolean becomingDeleted();
 
     /**
+     * Tests whether this object has been deleted.
+     * Instances that have been deleted in the current transaction return true. Transient instances return false.
+     * @return true if this instance was deleted in the current transaction.
+     */
+    boolean isDeleted();
+
+    /**
      * Convenience method to load the passed field values.
      * Loads the fields using any required fetch plan and calls jdoPostLoad() as appropriate.
      * @param fv Field Values to load (including any fetch plan to use when loading)
@@ -495,17 +494,20 @@ public interface ObjectProvider
     void loadFieldFromDatastore(int fieldNumber);
 
     /**
-     * Fetchs from the database all fields that are not currently loaded and that are in the current
-     * fetch group. Called by lifecycle transitions.
+     * Loads (from the database) all unloaded fields that are in the current FetchPlan.
      */
     void loadUnloadedFieldsInFetchPlan();
 
     /**
-     * Loads all unloaded fields of the managed class that are in the current FetchPlan.
-     * Called by life-cycle transitions.
+     * Loads (from the database) all unloaded fields of the managed class that are in the specified FetchPlan.
      * @param fetchPlan The FetchPlan
      */
     void loadUnloadedFieldsOfClassInFetchPlan(FetchPlan fetchPlan);
+
+    /**
+     * Loads (from the database) all unloaded fields that store relations.
+     */
+    void loadUnloadedRelationFields();
 
     /**
      * Fetch from the database all fields that are not currently loaded regardless of whether
