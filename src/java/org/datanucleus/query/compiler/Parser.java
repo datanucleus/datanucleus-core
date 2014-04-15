@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.query.compiler;
 
-import org.datanucleus.query.node.Node;
 
 /**
  * Interface for a parser of a query.

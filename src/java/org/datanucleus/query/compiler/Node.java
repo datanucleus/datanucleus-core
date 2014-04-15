@@ -16,7 +16,7 @@ Contributors:
 2008 Andy Jefferson - add properties. Add CLASS, PARAMETER types. Javadocs
     ...
 **********************************************************************/
-package org.datanucleus.query.node;
+package org.datanucleus.query.compiler;
 
 import java.util.ArrayList;
 import java.util.List;

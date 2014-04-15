@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.query.node;
+package org.datanucleus.query.compiler;
 
 /**
  * Node representing a parameter. 

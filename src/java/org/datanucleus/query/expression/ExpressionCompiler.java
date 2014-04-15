@@ -30,10 +30,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.datanucleus.query.compiler.Node;
+import org.datanucleus.query.compiler.NodeType;
+import org.datanucleus.query.compiler.ParameterNode;
 import org.datanucleus.query.expression.JoinExpression.JoinType;
-import org.datanucleus.query.node.Node;
-import org.datanucleus.query.node.NodeType;
-import org.datanucleus.query.node.ParameterNode;
 import org.datanucleus.query.symbol.Symbol;
 import org.datanucleus.query.symbol.SymbolTable;
 import org.datanucleus.store.query.QueryCompilerSyntaxException;

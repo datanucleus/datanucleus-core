@@ -27,9 +27,6 @@ import java.util.Stack;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.query.node.Node;
-import org.datanucleus.query.node.NodeType;
-import org.datanucleus.query.node.ParameterNode;
 import org.datanucleus.store.query.QueryCompilerSyntaxException;
 
 /**
