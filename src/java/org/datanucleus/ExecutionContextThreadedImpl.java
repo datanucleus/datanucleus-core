@@ -29,8 +29,9 @@ import org.datanucleus.store.query.Query;
 /**
  * ExecutionContext to attempt to handle multi-threaded PM/EM cases.
  * Locks various methods in an attempt to prevent conflicting thread updates.
- * Note we could have just put this code in ExecutionContextImpl but better to split it out since
- * the majority use-case is to have a non-thread-safe PM/EM.
+ * Note we could have just put this code in ExecutionContextImpl but better to split it out since the majority use-case is to have a non-thread-safe PM/EM.
+ * Note also that having thread-safe ExecutionContext usage depends on much more than having this class, since SCO wrappers would need to coordinate
+ * with such locks, as would the Transaction for the ExecutionContext.
  * TODO Evaluate all of the places we currently lock (when multithreaded) to find corner cases not caught.
  */
 public class ExecutionContextThreadedImpl extends ExecutionContextImpl
