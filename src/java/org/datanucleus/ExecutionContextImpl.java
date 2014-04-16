@@ -1934,8 +1934,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @return The persisted object
      * @throws NucleusUserException if the object is managed by a different manager
      */
-    public Object persistObjectInternal(Object obj, FieldValues preInsertChanges, 
-            ObjectProvider ownerOP, int ownerFieldNum, int objectType)
+    public <T> T persistObjectInternal(T obj, FieldValues preInsertChanges, ObjectProvider ownerOP, int ownerFieldNum, int objectType)
     {
         if (obj == null)
         {
@@ -1957,7 +1956,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
 
             boolean cacheable = false;
-            Object persistedPc = obj; // Persisted object is the passed in pc (unless being attached as a copy)
+            T persistedPc = obj; // Persisted object is the passed in pc (unless being attached as a copy)
             if (api.isDetached(obj))
             {
                 // Detached : attach it
@@ -2005,7 +2004,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
                             Object transientId = api.getNewApplicationIdentityObjectId(obj, cmd);
-                            Object existingObj = findObject(transientId, true, true, cmd.getFullClassName());
+                            T existingObj = (T)findObject(transientId, true, true, cmd.getFullClassName());
                             ObjectProvider existingOP = findObjectProvider(existingObj);
                             existingOP.attach(obj);
                             id = transientId;
@@ -2026,7 +2025,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
                 if (!merged)
                 {
-                    ObjectProvider op = findObjectProvider(obj);
+                    ObjectProvider<T> op = findObjectProvider(obj);
                     if (op == null)
                     {
                         if ((objectType == ObjectProvider.EMBEDDED_COLLECTION_ELEMENT_PC || 
@@ -2130,7 +2129,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param objectType Type of object (see org.datanucleus.ObjectProvider, e.g ObjectProvider.PC)
      * @return The persisted object
      */
-    public Object persistObjectInternal(Object pc, ObjectProvider ownerOP, int ownerFieldNum, int objectType)
+    public <T> T persistObjectInternal(T pc, ObjectProvider ownerOP, int ownerFieldNum, int objectType)
     {
         if (ownerOP != null)
         {
@@ -2143,7 +2142,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    public Object persistObjectInternal(Object pc, final FieldValues preInsertChanges, int objectType)
+    public <T> T persistObjectInternal(T pc, final FieldValues preInsertChanges, int objectType)
     {
         return persistObjectInternal(pc, preInsertChanges, null, -1, objectType);
     }
@@ -2546,7 +2545,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param sco Whether it has no identity (second-class object)
      * @return The attached object
      */
-    public Object attachObjectCopy(ObjectProvider ownerOP, Object pc, boolean sco)
+    public <T> T attachObjectCopy(ObjectProvider ownerOP, T pc, boolean sco)
     {
         assertClassPersistable(pc.getClass());
         assertDetachable(pc);
@@ -2577,12 +2576,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         // Object should exist in this datastore now
-        Object pcTarget = null;
+        T pcTarget = null;
         if (sco)
         {
             // SCO PC (embedded/serialised)
             boolean detached = getApiAdapter().isDetached(pc);
-            ObjectProvider targetOP = newObjectProviderForEmbedded(pc, true, null, -1);
+            ObjectProvider<T> targetOP = newObjectProviderForEmbedded(pc, true, null, -1);
             pcTarget = targetOP.getObject();
             if (detached)
             {
@@ -2600,14 +2599,14 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             // FCO PC
             boolean detached = getApiAdapter().isDetached(pc);
-            pcTarget = findObject(id, false, false, pc.getClass().getName());
+            pcTarget = (T)findObject(id, false, false, pc.getClass().getName());
             if (detached)
             {
-                Object obj = null;
+                T obj = null;
                 Map attachedPCById = getThreadContextInfo().attachedPCById; // For the current thread
                 if (attachedPCById != null) // Only used by persistObject process
                 {
-                    obj = attachedPCById.get(getApiAdapter().getIdForObject(pc));
+                    obj = (T) attachedPCById.get(getApiAdapter().getIdForObject(pc));
                 }
                 if (obj != null)
                 {
@@ -2621,7 +2620,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("010018", 
                             StringUtils.toJVMIDString(pc), StringUtils.toJVMIDString(pcTarget)));
                     }
-                    pcTarget = findObjectProvider(pcTarget).attachCopy(pc, sco);
+                    pcTarget = (T) findObjectProvider(pcTarget).attachCopy(pc, sco);
 
                     // Save the detached-attached PCs for later reference
                     if (attachedPCById != null) // Only used by persistObject process
@@ -2688,9 +2687,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param state State for the detachment process
      * @return The detached object
      */
-    public Object detachObjectCopy(Object pc, FetchPlanState state)
+    public <T> T detachObjectCopy(T pc, FetchPlanState state)
     {
-        Object thePC = pc;
+        T thePC = pc;
         try
         {
             clr.setPrimary(pc.getClass().getClassLoader());
@@ -2713,10 +2712,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             if (getApiAdapter().isDetached(thePC))
             {
                 // Passing in a detached (dirty or clean) instance, so get a persistent copy to detach
-                thePC = findObject(getApiAdapter().getIdForObject(thePC), false, true, null);
+                thePC = (T)findObject(getApiAdapter().getIdForObject(thePC), false, true, null);
             }
 
-            ObjectProvider op = findObjectProvider(thePC);
+            ObjectProvider<T> op = findObjectProvider(thePC);
             if (op == null)
             {
                 throw new NucleusUserException(LOCALISER.msg("010007", getApiAdapter().getIdForObject(thePC)));
@@ -2787,7 +2786,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param cls The class of the interface or abstract class, or concrete class defined in MetaData
      * @return The instance of this type
      */
-    public Object newInstance(Class cls)
+    public <T> T newInstance(Class<T> cls)
     {
         if (getApiAdapter().isPersistable(cls) && !Modifier.isAbstract(cls.getModifiers()))
         {
@@ -5447,7 +5446,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * parameter class, and if the subclasses flag is true, all of the instances
      * of the parameter class and its subclasses.
      */
-    public Extent getExtent(Class pcClass, boolean subclasses)
+    public <T> Extent<T> getExtent(Class<T> pcClass, boolean subclasses)
     {
         try
         {

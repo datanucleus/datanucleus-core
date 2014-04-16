@@ -32,7 +32,7 @@ public interface ImplementationCreator
      * @param loader The ClassLoaderResolver for the interface
      * @return The instance implementing the interface
      */
-    Object newInstance(Class pc, ClassLoaderResolver loader);
+    <T> T newInstance(Class<T> pc, ClassLoaderResolver loader);
 
     /**
      * Accessor for the ClassLoader loading classes created at runtime

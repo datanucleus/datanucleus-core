@@ -1818,7 +1818,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         if (currentValue != null && currentValue != newValue && currentValue instanceof PersistenceCapable)
         {
             // Where the object is embedded, remove the owner from its old value since it is no longer managed by this StateManager
-            JDOStateManager currentSM = (JDOStateManager)myEC.findObjectProvider(currentValue);
+            ObjectProvider<?> currentSM = myEC.findObjectProvider(currentValue);
             if (currentSM != null && currentSM.isEmbedded())
             {
                 myEC.removeEmbeddedOwnerRelation(this, fieldNumber, currentSM);

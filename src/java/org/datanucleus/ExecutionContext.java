@@ -326,7 +326,7 @@ public interface ExecutionContext
      * @param merging Whether this object (and dependents) is being merged
      * @return The persisted object
      */
-    Object persistObject(Object pc, boolean merging);
+    <T> T persistObject(T pc, boolean merging);
 
     /**
      * Method to persist the passed object(s).
@@ -344,8 +344,7 @@ public interface ExecutionContext
      * @param objectType Type of object (see org.datanucleus.store.ObjectProvider, e.g ObjectProvider.PC)
      * @return The persisted object
      */
-    Object persistObjectInternal(Object pc, FieldValues preInsertChanges, ObjectProvider ownerOP, int ownerFieldNum, 
-            int objectType);
+    <T> T persistObjectInternal(T pc, FieldValues preInsertChanges, ObjectProvider ownerOP, int ownerFieldNum, int objectType);
 
     /**
      * Method to persist the passed object (internally).
@@ -355,7 +354,7 @@ public interface ExecutionContext
      * @param objectType Type of object (see org.datanucleus.state.ObjectProvider, e.g ObjectProvider.PC)
      * @return The persisted object
      */
-    Object persistObjectInternal(Object pc, ObjectProvider ownerOP, int ownerFieldNum, int objectType);
+    <T> T persistObjectInternal(T pc, ObjectProvider ownerOP, int ownerFieldNum, int objectType);
 
     /**
      * Method to persist the passed object (internally).
@@ -364,7 +363,7 @@ public interface ExecutionContext
      * @param objectType Type of object (see org.datanucleus.state.ObjectProvider, e.g ObjectProvider.PC)
      * @return The persisted object
      */
-    Object persistObjectInternal(Object pc, FieldValues preInsertChanges, int objectType);
+    <T> T persistObjectInternal(T pc, FieldValues preInsertChanges, int objectType);
 
     /**
      * Method to make transient the passed object.
@@ -455,7 +454,7 @@ public interface ExecutionContext
      * @param state State for the detachment process
      * @return The detached copy of the object
      */
-    Object detachObjectCopy(Object pc, FetchPlanState state);
+    <T> T detachObjectCopy(T pc, FetchPlanState state);
 
     /**
      * Method to detach all managed objects.
@@ -478,7 +477,7 @@ public interface ExecutionContext
      * @param sco Whether it has no identity (second-class object)
      * @return The attached copy of the input object
      */
-    Object attachObjectCopy(ObjectProvider op, Object pc, boolean sco);
+    <T> T attachObjectCopy(ObjectProvider op, T pc, boolean sco);
 
     /**
      * Convenience method to return the attached object for the specified id if one exists.
@@ -592,7 +591,7 @@ public interface ExecutionContext
      * @param includeSubclasses Whether to include subclasses
      * @return The Extent
      */
-    Extent getExtent(Class candidateClass, boolean includeSubclasses);
+    <T> Extent<T> getExtent(Class<T> candidateClass, boolean includeSubclasses);
 
     /**
      * Accessor for a new Query.
@@ -853,7 +852,7 @@ public interface ExecutionContext
      * @param cls The class of the interface or abstract class, or concrete class defined in MetaData
      * @return The instance of this type
      */
-    Object newInstance(Class cls);
+    <T> T newInstance(Class<T> cls);
 
     /**
      * Accessor for whether the object with this identity is modified in the current transaction.
