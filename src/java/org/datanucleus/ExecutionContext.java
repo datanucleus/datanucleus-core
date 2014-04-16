@@ -250,7 +250,7 @@ public interface ExecutionContext
      * @param id the identity of the object.
      * @return Object Provider
      */
-    ObjectProvider newObjectProviderForHollow(Class pcClass, Object id);
+    <T> ObjectProvider<T> newObjectProviderForHollow(Class<T> pcClass, Object id);
 
     /**
      * Constructs an ObjectProvider to manage the specified persistent instance having the given object ID.
@@ -258,7 +258,7 @@ public interface ExecutionContext
      * @param pc The object that is persistent that we are going to manage
      * @return Object Provider
      */
-    ObjectProvider newObjectProviderForPersistentClean(Object id, Object pc);
+    <T> ObjectProvider<T> newObjectProviderForPersistentClean(Object id, T pc);
 
     /**
      * Constructs an ObjectProvider to manage a persistable instance that will
@@ -270,7 +270,7 @@ public interface ExecutionContext
      * @param ownerFieldNumber Field number in owner object where this is stored
      * @return Object Provider
      */
-    ObjectProvider newObjectProviderForEmbedded(Object pc, boolean copyPc, ObjectProvider ownerOP, int ownerFieldNumber);
+    <T> ObjectProvider<T> newObjectProviderForEmbedded(T pc, boolean copyPc, ObjectProvider ownerOP, int ownerFieldNumber);
 
     /**
      * Constructs an ObjectProvider for an object of the specified type, creating the PC object to hold the values

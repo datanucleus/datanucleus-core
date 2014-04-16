@@ -1245,7 +1245,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param pcClass the class of the new instance to be created.
      * @param id the identity of the object.
      */
-    public ObjectProvider newObjectProviderForHollow(Class pcClass, Object id)
+    public <T> ObjectProvider<T> newObjectProviderForHollow(Class<T> pcClass, Object id)
     {
         return nucCtx.getObjectProviderFactory().newForHollow(this, pcClass, id);
     }
@@ -1255,7 +1255,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param id the identity of the object.
      * @param pc The object that is persistent that we are going to manage
      */
-    public ObjectProvider newObjectProviderForPersistentClean(Object id, Object pc)
+    public <T> ObjectProvider<T> newObjectProviderForPersistentClean(Object id, T pc)
     {
         return nucCtx.getObjectProviderFactory().newForPersistentClean(this, id, pc);
     }
@@ -1269,8 +1269,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param ownerOP Owner ObjectProvider
      * @param ownerFieldNumber Field number in owner object where this is stored
      */
-    public ObjectProvider newObjectProviderForEmbedded(Object pc, boolean copyPc, 
-            ObjectProvider ownerOP, int ownerFieldNumber)
+    public <T> ObjectProvider<T> newObjectProviderForEmbedded(T pc, boolean copyPc, ObjectProvider ownerOP, int ownerFieldNumber)
     {
         return nucCtx.getObjectProviderFactory().newForEmbedded(this, pc, copyPc, ownerOP, ownerFieldNumber);
     }
@@ -1283,8 +1282,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param ownerOP Owner ObjectProvider
      * @param ownerFieldNumber Field number in owner object where this is stored
      */
-    public ObjectProvider newObjectProviderForEmbedded(AbstractClassMetaData cmd, 
-            ObjectProvider ownerOP, int ownerFieldNumber)
+    public ObjectProvider newObjectProviderForEmbedded(AbstractClassMetaData cmd, ObjectProvider ownerOP, int ownerFieldNumber)
     {
         return nucCtx.getObjectProviderFactory().newForEmbedded(this, cmd, ownerOP, ownerFieldNumber);
     }
