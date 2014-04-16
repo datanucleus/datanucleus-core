@@ -31,7 +31,7 @@ import org.datanucleus.store.query.QueryResult;
 /**
  * Extent that does a simple JDOQL query for the candidate with/without subclasses.
  */
-public class DefaultCandidateExtent extends AbstractExtent
+public class DefaultCandidateExtent<T> extends AbstractExtent<T>
 {
     /** FetchPlan for use with this Extent. */
     private FetchPlan fetchPlan = null;
@@ -49,7 +49,7 @@ public class DefaultCandidateExtent extends AbstractExtent
      * @param subclasses Whether to include subclasses
      * @param cmd MetaData for the candidate class
      */
-    public DefaultCandidateExtent(ExecutionContext ec, Class cls, boolean subclasses, AbstractClassMetaData cmd)
+    public DefaultCandidateExtent(ExecutionContext ec, Class<T> cls, boolean subclasses, AbstractClassMetaData cmd)
     {
         super(ec, cls, subclasses, cmd);
 
@@ -59,7 +59,7 @@ public class DefaultCandidateExtent extends AbstractExtent
         query.setSubclasses(subclasses);
     }
 
-    public Iterator iterator()
+    public Iterator<T> iterator()
     {
         Object results = query.execute();
         Iterator iter = null;
@@ -101,7 +101,7 @@ public class DefaultCandidateExtent extends AbstractExtent
         fetchPlan.clearGroups().addGroup(FetchPlan.DEFAULT);
     }
 
-    public void close(Iterator iterator)
+    public void close(Iterator<T> iterator)
     {
         QueryResult qr = queryResultsByIterator.remove(iterator);
         if (qr != null)

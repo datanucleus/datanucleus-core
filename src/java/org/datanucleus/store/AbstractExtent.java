@@ -26,7 +26,7 @@ import org.datanucleus.util.Localiser;
  * Abstract representation of a JDO Extent.
  * Suitable for use with all datastores.
  */
-public abstract class AbstractExtent implements org.datanucleus.store.Extent
+public abstract class AbstractExtent<T> implements org.datanucleus.store.Extent<T>
 {
     /** Localised messages source */
     protected static final Localiser LOCALISER = Localiser.getInstance(
@@ -51,7 +51,7 @@ public abstract class AbstractExtent implements org.datanucleus.store.Extent
      * @param subclasses Whether to include subclasses
      * @param cmd MetaData for the candidate class
      */
-    public AbstractExtent(ExecutionContext ec, Class cls, boolean subclasses, AbstractClassMetaData cmd)
+    public AbstractExtent(ExecutionContext ec, Class<T> cls, boolean subclasses, AbstractClassMetaData cmd)
     {
         if (cls == null)
         {
@@ -83,7 +83,7 @@ public abstract class AbstractExtent implements org.datanucleus.store.Extent
      * Accessor for the class of instances in this Extent.
      * @return the Class of instances of this Extent
      */
-    public Class getCandidateClass()
+    public Class<T> getCandidateClass()
     {
         return candidateClass;
     }

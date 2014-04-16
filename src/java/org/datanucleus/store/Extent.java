@@ -25,14 +25,15 @@ import org.datanucleus.FetchPlan;
 /**
  * Extent of objects within DataNucleus.
  * Represents objects of a type, optionally including the subclasses of that type.
+ * @param <T> The type of the candidate
  */
-public interface Extent
+public interface Extent<T>
 {
     /**
      * Accessor for candidate class of the extent.
      * @return Candidate class
      */
-    Class getCandidateClass();
+    Class<T> getCandidateClass();
 
     /**
      * Accessor for whether this extent includes subclasses.
@@ -48,7 +49,7 @@ public interface Extent
      * Accessor for an iterator over the extent.
      * @return The iterator
      */
-    Iterator iterator();
+    Iterator<T> iterator();
 
     /**
      * Close all iterators and all resources for this extent.
@@ -59,5 +60,5 @@ public interface Extent
      * Close the specified iterator.
      * @param iterator The iterator
      */
-    void close(Iterator iterator);
+    void close(Iterator<T> iterator);
 }
