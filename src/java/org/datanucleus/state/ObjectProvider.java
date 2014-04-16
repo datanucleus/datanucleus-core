@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 Contributors:
-2011 Andy Jefferson - all javadocs, many methods added during merge with StateManager
+2011 Andy Jefferson - all javadocs, many methods added during merge with ObjectProvider
     ...
 **********************************************************************/
 package org.datanucleus.state;
@@ -32,7 +32,7 @@ import org.datanucleus.store.fieldmanager.FieldManager;
  * A JDO StateManager is one possible implementation of an ObjectProvider, using bytecode enhancement in that case.
  * Another possible implementation would use Java reflection to obtain and set field values in the object.
  */
-public interface ObjectProvider
+public interface ObjectProvider<T>
 {
     /**
      * Key prefix under which the original value of a field is stored in the entity (nondurable objects).
@@ -92,27 +92,27 @@ public interface ObjectProvider
      * @param id the identity of the object.
      * @param pc the object to be managed.
      */
-    void initialiseForHollowPreConstructed(Object id, Object pc);
+    void initialiseForHollowPreConstructed(Object id, T pc);
 
     /**
      * Initialises a state manager to manage the passed persistent instance having the given object ID.
      * Used where we have retrieved a PC object from a datastore directly (not field-by-field), for example on
-     * an object datastore. This initialiser will not add StateManagers to all related PCs. This must be done by
-     * any calling process. This simply adds the StateManager to the specified object and records the id, setting
+     * an object datastore. This initialiser will not add ObjectProviders to all related PCs. This must be done by
+     * any calling process. This simply adds the ObjectProvider to the specified object and records the id, setting
      * all fields of the object as loaded.
      * @param id the identity of the object.
      * @param pc The object to be managed
      */
-    void initialiseForPersistentClean(Object id, Object pc);
+    void initialiseForPersistentClean(Object id, T pc);
 
     /**
      * Initialises a state manager to manage a persistable instance that will be EMBEDDED/SERIALISED 
      * into another persistable object. The instance will not be assigned an identity in the process 
      * since it is a SCO.
      * @param pc The persistable to manage (see copyPc also)
-     * @param copyPc Whether the SM should manage a copy of the passed PC or that one
+     * @param copyPc Whether the ObjectProvider should manage a copy of the passed PC or that one
      */
-    void initialiseForEmbedded(Object pc, boolean copyPc);
+    void initialiseForEmbedded(T pc, boolean copyPc);
 
     /**
      * Initialises a state manager to manage a transient instance that is becoming newly persistent.
@@ -123,7 +123,7 @@ public interface ObjectProvider
      * @param pc the instance being make persistent.
      * @param preInsertChanges Any changes to make before inserting
      */
-    void initialiseForPersistentNew(Object pc, FieldValues preInsertChanges);
+    void initialiseForPersistentNew(T pc, FieldValues preInsertChanges);
 
     /**
      * Initialises a state manager to manage a Transactional Transient instance.
@@ -133,22 +133,22 @@ public interface ObjectProvider
      * instances that are transitioning to a transient clean state.
      * @param pc the instance being make persistent.
      */
-    void initialiseForTransactionalTransient(Object pc);
+    void initialiseForTransactionalTransient(T pc);
 
     /**
-     * Initialises the StateManager to manage a persistable object in detached state.
+     * Initialises the ObjectProvider to manage a persistable object in detached state.
      * @param pc the detach object.
      * @param id the identity of the object.
      * @param version the detached version
      */
-    void initialiseForDetached(Object pc, Object id, Object version);
+    void initialiseForDetached(T pc, Object id, Object version);
 
     /**
-     * Initialises the StateManager to manage a persistable object that is not persistent but is
+     * Initialises the ObjectProvider to manage a persistable object that is not persistent but is
      * about to be deleted.
      * @param pc the object to delete
      */
-    void initialiseForPNewToBeDeleted(Object pc);
+    void initialiseForPNewToBeDeleted(T pc);
 
     /**
      * Initialise the ObjectProvider, assigning the specified id to the object. 
@@ -178,7 +178,7 @@ public interface ObjectProvider
      * will not be able objects from any language
      * @return the object being persisted, or a virtual object containing properties to be persisted
      */
-    Object getObject();
+    T getObject();
 
     /**
      * Returns a printable form of the managed object.
@@ -469,7 +469,7 @@ public interface ObjectProvider
      * When detaching and this is the attached object this returns the newly detached object.
      * @return The referenced object (or null).
      */
-    Object getReferencedPC();
+    T getReferencedPC();
 
     /**
      * Convenience method to load the specified field if not loaded.
@@ -631,7 +631,7 @@ public interface ObjectProvider
      * generated object. Makes no change to what fields are loaded/dirty etc, just swaps the managed object.
      * @param pc The persistable object to use
      */
-    void replaceManagedPC(Object pc);
+    void replaceManagedPC(T pc);
 
     /**
      * Sets the value for the version column in a transaction not yet committed
@@ -717,19 +717,19 @@ public interface ObjectProvider
      * @param embedded Whether it is embedded
      * @return The attached copy
      */
-    Object attachCopy(Object detachedPC, boolean embedded);
+    T attachCopy(T detachedPC, boolean embedded);
 
     /**
-     * Method to attach the object managed by this StateManager.
+     * Method to attach the object managed by this ObjectProvider.
      * @param embedded Whether it is embedded
      */
     void attach(boolean embedded);
 
     /**
-     * Method to attach the provided transient into the managed instance.
-     * @param trans Transient object
+     * Method to attach the provided detached object into the managed instance.
+     * @param detachedPC Detached object
      */
-    void attach(Object trans);
+    void attach(T detachedPC);
 
     /**
      * Method to make detached copy of this instance

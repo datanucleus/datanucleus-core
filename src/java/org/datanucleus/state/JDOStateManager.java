@@ -123,7 +123,7 @@ import org.datanucleus.util.TypeConversionHelper;
  * features. In addition we want to have a JPAStateManager using an internal enhancement contract. This means
  * we'll need various things generalising into a superclass
  */
-public class JDOStateManager extends AbstractStateManager implements StateManager, ObjectProvider
+public class JDOStateManager extends AbstractStateManager<PersistenceCapable> implements StateManager, ObjectProvider<PersistenceCapable>
 {
     /** The PersistenceCapable instance managed by this StateManager */
     protected PersistenceCapable myPC;
@@ -333,12 +333,12 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
      * @param id the identity of the object.
      * @param pc the object to be managed.
      */
-    public void initialiseForHollowPreConstructed(Object id, Object pc)
+    public void initialiseForHollowPreConstructed(Object id, PersistenceCapable pc)
     {
         myID = id;
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.HOLLOW);
         persistenceFlags = PersistenceFlags.LOAD_REQUIRED;
-        myPC = (PersistenceCapable)pc;
+        myPC = pc;
 
         replaceStateManager(myPC, this); // Assign this StateManager to the PC
         myPC.jdoReplaceFlags();
@@ -355,12 +355,12 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
      * @param id the identity of the object.
      * @param pc The object to be managed
      */
-    public void initialiseForPersistentClean(Object id, Object pc)
+    public void initialiseForPersistentClean(Object id, PersistenceCapable pc)
     {
         myID = id;
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.P_CLEAN);
         persistenceFlags = PersistenceFlags.LOAD_REQUIRED;
-        myPC = (PersistenceCapable)pc;
+        myPC = pc;
 
         replaceStateManager(myPC, this); // Assign this StateManager to the PC
         myPC.jdoReplaceFlags();
@@ -382,14 +382,14 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
      * @param pc The PersistenceCapable to manage (see copyPc also)
      * @param copyPc Whether the SM should manage a copy of the passed PC or that one
      */
-    public void initialiseForEmbedded(Object pc, boolean copyPc)
+    public void initialiseForEmbedded(PersistenceCapable pc, boolean copyPc)
     {
         objectType = ObjectProvider.EMBEDDED_PC; // Default to an embedded PC object
         myID = null; // It is embedded at this point so dont need an ID since we're not persisting it
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.P_CLEAN);
         persistenceFlags = PersistenceFlags.LOAD_REQUIRED;
 
-        myPC = (PersistenceCapable)pc;
+        myPC = pc;
         replaceStateManager(myPC, this); // Set SM for embedded PC to be this
         if (copyPc)
         {
@@ -400,7 +400,7 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
             // Swap the managed PC to be the copy and not the input
             replaceStateManager(pcCopy, this);
             myPC = pcCopy;
-            disconnectClone((PersistenceCapable)pc);
+            disconnectClone(pc);
         }
 
         // Mark all fields as loaded since we are using the passed PersistenceCapable
@@ -419,9 +419,9 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
      * @param pc the instance being make persistent.
      * @param preInsertChanges Any changes to make before inserting
      */
-    public void initialiseForPersistentNew(Object pc, FieldValues preInsertChanges)
+    public void initialiseForPersistentNew(PersistenceCapable pc, FieldValues preInsertChanges)
     {
-        myPC = (PersistenceCapable)pc;
+        myPC = pc;
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.P_NEW);
         persistenceFlags = PersistenceFlags.READ_OK;
         for (int i=0; i<loadedFields.length; ++i)
@@ -551,9 +551,9 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
      * instances that are transitioning to a transient clean state.
      * @param pc the instance being make persistent.
      */
-    public void initialiseForTransactionalTransient(Object pc)
+    public void initialiseForTransactionalTransient(PersistenceCapable pc)
     {
-        myPC = (PersistenceCapable)pc;
+        myPC = pc;
         myLC = null;
         persistenceFlags = PersistenceFlags.READ_OK;
         for (int i=0; i<loadedFields.length; ++i)
@@ -582,10 +582,10 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
      * @param id the identity of the object.
      * @param version the detached version
      */
-    public void initialiseForDetached(Object pc, Object id, Object version)
+    public void initialiseForDetached(PersistenceCapable pc, Object id, Object version)
     {
         this.myID = id;
-        this.myPC = (PersistenceCapable)pc;
+        this.myPC = pc;
         setVersion(version);
 
         // This lifecycle state is not always correct. It is certainly "detached"
@@ -602,10 +602,10 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
      * about to be deleted.
      * @param pc the object to delete
      */
-    public void initialiseForPNewToBeDeleted(Object pc)
+    public void initialiseForPNewToBeDeleted(PersistenceCapable pc)
     {
         this.myID = null;
-        this.myPC = (PersistenceCapable)pc;
+        this.myPC = pc;
         this.myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.P_NEW);
         for (int i=0; i<loadedFields.length; ++i) // Mark all fields as loaded
         {
@@ -678,7 +678,7 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
      * Accessor for the Persistent Capable object.
      * @return The PersistentCapable object
      */
-    public Object getObject()
+    public PersistenceCapable getObject()
     {
         return myPC;
     }
@@ -844,7 +844,7 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
      * against the datastore. This validation can pull in a new object graph from the datastore (e.g for DB4O)
      * @param pc The PersistenceCapable to use
      */
-    public void replaceManagedPC(Object pc)
+    public void replaceManagedPC(PersistenceCapable pc)
     {
         if (pc == null)
         {
@@ -852,11 +852,11 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
         }
 
         // Swap the StateManager on the objects
-        replaceStateManager((PersistenceCapable)pc, this);
+        replaceStateManager(pc, this);
         replaceStateManager(myPC, null);
 
         // Swap our object
-        myPC = (PersistenceCapable) pc;
+        myPC = pc;
 
         // Put it in the cache in case the previous object was stored
         myEC.putObjectIntoLevel1Cache(this);
@@ -4279,23 +4279,10 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
         }
     }
 
-    /**
-     * Accessor for the referenced PC object when we are attaching or detaching.
-     * When attaching and this is the detached object this returns the newly attached object.
-     * When attaching and this is the newly attached object this returns the detached object.
-     * When detaching and this is the newly detached object this returns the attached object.
-     * When detaching and this is the attached object this returns the newly detached object.
-     * @return The referenced object (or null).
-     */
-    public Object getReferencedPC()
-    {
-        return myEC.getAttachDetachReferencedObject(this);
-    }
-
     /* (non-Javadoc)
      * @see org.datanucleus.state.StateManager#attach(java.lang.Object)
      */
-    public void attach(Object trans)
+    public void attach(PersistenceCapable detachedPC)
     {
         if (isAttaching())
         {
@@ -4310,7 +4297,7 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
 
             // Connect the transient object to a StateManager so we can get its values
             JDOStateManager detachedSM = new JDOStateManager(myEC, cmd);
-            detachedSM.initialiseForDetached(trans, myID, null);
+            detachedSM.initialiseForDetached(detachedPC, myID, null);
 
             // Make sure the attached object is in the cache
             myEC.putObjectIntoLevel1Cache(this);
@@ -4322,12 +4309,11 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
                 NucleusLogger.GENERAL.debug("Attaching id=" + getInternalObjectId() +
                     " fields=" + StringUtils.intArrayToString(nonPKFieldNumbers));
                 detachedSM.provideFields(nonPKFieldNumbers,
-                    new AttachFieldManager(this, cmd.getSCOMutableMemberFlags(), cmd.getNonPKMemberFlags(),
-                        true, true, false));
+                    new AttachFieldManager(this, cmd.getSCOMutableMemberFlags(), cmd.getNonPKMemberFlags(), true, true, false));
             }
 
             // Disconnect the transient object
-            replaceStateManager((PersistenceCapable) trans, null);
+            replaceStateManager(detachedPC, null);
 
             // Call any "post-attach" listeners
             getCallbackHandler().postAttach(myPC, myPC);
@@ -4422,11 +4408,11 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
 
     /**
      * Method to attach a copy of the detached persistable instance and return the (attached) copy.
-     * @param obj the detached persistable instance to be attached
+     * @param detachedPC the detached persistable instance to be attached
      * @param embedded Whether the object is stored embedded/serialised in another object
      * @return The attached copy
      */
-    public Object attachCopy(Object obj, boolean embedded)
+    public PersistenceCapable attachCopy(PersistenceCapable detachedPC, boolean embedded)
     {
         if (isAttaching())
         {
@@ -4434,7 +4420,6 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
         }
 
         setAttaching(true);
-        PersistenceCapable detachedPC = (PersistenceCapable)obj;
         try
         {
             // Check if the object is already persisted
@@ -4539,15 +4524,13 @@ public class JDOStateManager extends AbstractStateManager implements StateManage
 
                 // Object is not yet persisted so make it persistent
                 // Make sure all field values in the attach object are ready for inserts (but dont trigger any cascade attaches)
-                internalAttachCopy(smDetachedPC, smDetachedPC.loadedFields, smDetachedPC.dirtyFields, persistent, 
-                    smDetachedPC.myVersion, false);
+                internalAttachCopy(smDetachedPC, smDetachedPC.loadedFields, smDetachedPC.dirtyFields, persistent, smDetachedPC.myVersion, false);
 
                 makePersistent();
             }
 
             // Go through all related fields and attach them (including relationships)
-            internalAttachCopy(smDetachedPC, smDetachedPC.loadedFields, smDetachedPC.dirtyFields, persistent, 
-                smDetachedPC.myVersion, true);
+            internalAttachCopy(smDetachedPC, smDetachedPC.loadedFields, smDetachedPC.dirtyFields, persistent, smDetachedPC.myVersion, true);
 
             // Remove the state manager from the detached PC
             replaceStateManager(detachedPC, null);

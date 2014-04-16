@@ -48,7 +48,7 @@ import org.datanucleus.util.StringUtils;
  * Abstract representation of an implementation of a bytecode enhancement-based StateManager.
  * This class should have no reference to any JDO class, so it can be reused by a JPAStateManager too (in the future).
  */
-public abstract class AbstractStateManager implements ObjectProvider
+public abstract class AbstractStateManager<T> implements ObjectProvider<T>
 {
     protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
         org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
@@ -226,7 +226,7 @@ public abstract class AbstractStateManager implements ObjectProvider
      * Accessor for the persistable object being managed.
      * @return The persistable object
      */
-    public abstract Object getObject();
+    public abstract T getObject();
 
     public String getObjectAsPrintable()
     {
@@ -838,6 +838,19 @@ public abstract class AbstractStateManager implements ObjectProvider
     {
         // Validate the object existence
         myEC.getStoreManager().getPersistenceHandler().locateObject(this);
+    }
+
+    /**
+     * Accessor for the referenced PC object when we are attaching or detaching.
+     * When attaching and this is the detached object this returns the newly attached object.
+     * When attaching and this is the newly attached object this returns the detached object.
+     * When detaching and this is the newly detached object this returns the attached object.
+     * When detaching and this is the attached object this returns the newly detached object.
+     * @return The referenced object (or null).
+     */
+    public T getReferencedPC()
+    {
+        return (T) myEC.getAttachDetachReferencedObject(this);
     }
 
     /**
