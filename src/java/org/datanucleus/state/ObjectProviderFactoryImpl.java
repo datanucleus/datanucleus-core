@@ -43,8 +43,7 @@ import org.datanucleus.util.StringUtils;
 public class ObjectProviderFactoryImpl implements ObjectProviderFactory
 {
     /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
+    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
     Class opClass = null;
 
@@ -91,11 +90,10 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
      * @param pcClass the class of the new instance to be created.
      * @param id the identity of the object.
      */
-    public ObjectProvider newForHollow(ExecutionContext ec, Class pcClass, Object id)
+    public <T> ObjectProvider<T> newForHollow(ExecutionContext ec, Class<T> pcClass, Object id)
     {
         Class cls = getInitialisedClassForClass(pcClass, ec.getClassLoaderResolver());
-        AbstractClassMetaData cmd =
-            ec.getMetaDataManager().getMetaDataForClass(pcClass, ec.getClassLoaderResolver());
+        AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pcClass, ec.getClassLoaderResolver());
         ObjectProvider op = getObjectProvider(ec, cmd);
         op.initialiseForHollow(id, null, cls);
         return op;
@@ -110,11 +108,10 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
      * @param id the identity of the object.
      * @param fv the initial field values of the object.
      */
-    public ObjectProvider newForHollow(ExecutionContext ec, Class pcClass, Object id, FieldValues fv)
+    public <T> ObjectProvider<T> newForHollow(ExecutionContext ec, Class<T> pcClass, Object id, FieldValues fv)
     {
         Class cls = getInitialisedClassForClass(pcClass, ec.getClassLoaderResolver());
-        AbstractClassMetaData cmd =
-            ec.getMetaDataManager().getMetaDataForClass(pcClass, ec.getClassLoaderResolver());
+        AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pcClass, ec.getClassLoaderResolver());
         ObjectProvider op = getObjectProvider(ec, cmd);
         op.initialiseForHollow(id, fv, cls);
         return op;
@@ -127,10 +124,9 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
      * @param id the identity of the object.
      * @param pc The object that is hollow that we are going to manage
      */
-    public ObjectProvider newForHollowPreConstructed(ExecutionContext ec, Object id, Object pc)
+    public <T> ObjectProvider<T> newForHollowPreConstructed(ExecutionContext ec, Object id, T pc)
     {
-        AbstractClassMetaData cmd = 
-            ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
+        AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
         ObjectProvider op = getObjectProvider(ec, cmd);
         op.initialiseForHollowPreConstructed(id, pc);
         return op;
@@ -144,11 +140,10 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
      * @param fv the initial field values of the object.
      * @deprecated Use newForHollowPopulated instead
      */
-    public ObjectProvider newForHollowPopulatedAppId(ExecutionContext ec, Class pcClass, final FieldValues fv)
+    public <T> ObjectProvider<T> newForHollowPopulatedAppId(ExecutionContext ec, Class<T> pcClass, final FieldValues fv)
     {
         Class cls = getInitialisedClassForClass(pcClass, ec.getClassLoaderResolver());
-        AbstractClassMetaData cmd =
-            ec.getMetaDataManager().getMetaDataForClass(pcClass, ec.getClassLoaderResolver());
+        AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pcClass, ec.getClassLoaderResolver());
         ObjectProvider op = getObjectProvider(ec, cmd);
         op.initialiseForHollowAppId(fv, cls);
         return op;
@@ -160,10 +155,9 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
      * @param id the identity of the object.
      * @param pc The object that is persistent that we are going to manage
      */
-    public ObjectProvider newForPersistentClean(ExecutionContext ec, Object id, Object pc)
+    public <T> ObjectProvider<T> newForPersistentClean(ExecutionContext ec, Object id, T pc)
     {
-        AbstractClassMetaData cmd = 
-            ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
+        AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
         ObjectProvider op = getObjectProvider(ec, cmd);
         op.initialiseForPersistentClean(id, pc);
         return op;
@@ -179,11 +173,9 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
      * @param ownerOP Owner ObjectProvider
      * @param ownerFieldNumber Field number in owner object where this is stored
      */
-    public ObjectProvider newForEmbedded(ExecutionContext ec, Object pc, boolean copyPc, 
-            ObjectProvider ownerOP, int ownerFieldNumber)
+    public <T> ObjectProvider<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, ObjectProvider ownerOP, int ownerFieldNumber)
     {
-        AbstractClassMetaData cmd = 
-            ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
+        AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
         ObjectProvider op = getObjectProvider(ec, cmd);
         op.initialiseForEmbedded(pc, copyPc);
         if (ownerOP != null)
@@ -202,8 +194,7 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
      * @param ownerOP Owner ObjectProvider
      * @param ownerFieldNumber Field number in owner object where this is stored
      */
-    public ObjectProvider newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, 
-            ObjectProvider ownerOP, int ownerFieldNumber)
+    public ObjectProvider newForEmbedded(ExecutionContext ec, AbstractClassMetaData cmd, ObjectProvider ownerOP, int ownerFieldNumber)
     {
         Class pcClass = ec.getClassLoaderResolver().classForName(cmd.getFullClassName());
         ObjectProvider op = newForHollow(ec, pcClass, null);
@@ -224,10 +215,9 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
      * @param pc the instance being make persistent.
      * @param preInsertChanges Any changes to make before inserting
      */
-    public ObjectProvider newForPersistentNew(ExecutionContext ec, Object pc, FieldValues preInsertChanges)
+    public <T> ObjectProvider<T> newForPersistentNew(ExecutionContext ec, T pc, FieldValues preInsertChanges)
     {
-        AbstractClassMetaData cmd = 
-            ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
+        AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
         ObjectProvider op = getObjectProvider(ec, cmd);
         op.initialiseForPersistentNew(pc, preInsertChanges);
         return op;
@@ -241,10 +231,9 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
      * @param ec ExecutionContext
      * @param pc the instance being make persistent.
      */
-    public ObjectProvider newForTransactionalTransient(ExecutionContext ec, Object pc)
+    public <T> ObjectProvider<T> newForTransactionalTransient(ExecutionContext ec, T pc)
     {
-        AbstractClassMetaData cmd = 
-            ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
+        AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
         ObjectProvider op = getObjectProvider(ec, cmd);
         op.initialiseForTransactionalTransient(pc);
         return op;
@@ -257,10 +246,9 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
      * @param id the identity of the object.
      * @param version the detached version
      */
-    public ObjectProvider newForDetached(ExecutionContext ec, Object pc, Object id, Object version)
+    public <T> ObjectProvider<T> newForDetached(ExecutionContext ec, T pc, Object id, Object version)
     {
-        AbstractClassMetaData cmd = 
-            ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
+        AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
         ObjectProvider op = getObjectProvider(ec, cmd);
         op.initialiseForDetached(pc, id, version);
         return op;
@@ -273,10 +261,9 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
      * @param ec Execution Context
      * @param pc the object being deleted from persistence
      */
-    public ObjectProvider newForPNewToBeDeleted(ExecutionContext ec, Object pc)
+    public <T> ObjectProvider<T> newForPNewToBeDeleted(ExecutionContext ec, T pc)
     {
-        AbstractClassMetaData cmd = 
-            ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
+        AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(pc.getClass(), ec.getClassLoaderResolver());
         ObjectProvider op = getObjectProvider(ec, cmd);
         op.initialiseForPNewToBeDeleted(pc);
         return op;

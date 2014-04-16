@@ -31,6 +31,8 @@ import org.datanucleus.store.fieldmanager.FieldManager;
  * Provider of field information for a managed object.
  * A JDO StateManager is one possible implementation of an ObjectProvider, using bytecode enhancement in that case.
  * Another possible implementation would use Java reflection to obtain and set field values in the object.
+ * 
+ * @param <T> Type of the object being managed
  */
 public interface ObjectProvider<T>
 {

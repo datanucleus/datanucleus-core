@@ -46,7 +46,7 @@ public interface ObjectProviderFactory
      * @param id the JDO identity of the object.
      * @return The ObjectProvider
      */
-    ObjectProvider newForHollow(ExecutionContext ec, Class pcClass, Object id);
+    <T> ObjectProvider<T> newForHollow(ExecutionContext ec, Class<T> pcClass, Object id);
 
     /**
      * Constructs an ObjectProvider to manage a hollow instance having the given object ID.
@@ -56,7 +56,7 @@ public interface ObjectProviderFactory
      * @param pc The object that is hollow that we are going to manage
      * @return The ObjectProvider
      */
-    ObjectProvider newForHollowPreConstructed(ExecutionContext ec, Object id, Object pc);
+    <T> ObjectProvider<T> newForHollowPreConstructed(ExecutionContext ec, Object id, T pc);
 
     /**
      * Constructs an ObjectProvider to manage a recently populated hollow instance having the
@@ -68,7 +68,7 @@ public interface ObjectProviderFactory
      * @param fv the initial field values of the object.
      * @return The ObjectProvider
      */
-    ObjectProvider newForHollow(ExecutionContext ec, Class pcClass, Object id, FieldValues fv);
+    <T> ObjectProvider<T> newForHollow(ExecutionContext ec, Class<T> pcClass, Object id, FieldValues fv);
 
     /**
      * Constructs an ObjectProvider to manage the specified persistent instance having the given object ID.
@@ -77,7 +77,7 @@ public interface ObjectProviderFactory
      * @param pc The object that is persistent that we are going to manage
      * @return The ObjectProvider
      */
-    ObjectProvider newForPersistentClean(ExecutionContext ec, Object id, Object pc);
+    <T> ObjectProvider<T> newForPersistentClean(ExecutionContext ec, Object id, T pc);
 
     /**
      * Constructs an ObjectProvider to manage a hollow (or pclean) instance having the given FieldValues.
@@ -88,7 +88,7 @@ public interface ObjectProviderFactory
      * @return The ObjectProvider
      * @deprecated Use newForHollowPopulated instead
      */
-    ObjectProvider newForHollowPopulatedAppId(ExecutionContext ec, Class pcClass, final FieldValues fv);
+    <T> ObjectProvider<T> newForHollowPopulatedAppId(ExecutionContext ec, Class<T> pcClass, final FieldValues fv);
 
     /**
      * Constructs an ObjectProvider to manage a persistable instance that will
@@ -101,7 +101,7 @@ public interface ObjectProviderFactory
      * @param ownerFieldNumber Field number in owner object where this is stored
      * @return The ObjectProvider
      */
-    ObjectProvider newForEmbedded(ExecutionContext ec, Object pc, boolean copyPc, ObjectProvider ownerOP, int ownerFieldNumber);
+    <T> ObjectProvider<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, ObjectProvider ownerOP, int ownerFieldNumber);
 
     /**
      * Constructs an ObjectProvider for an object of the specified type, creating the PC object to hold the values
@@ -125,7 +125,7 @@ public interface ObjectProviderFactory
      * @param fv Any changes to make before inserting
      * @return The ObjectProvider
      */
-    ObjectProvider newForPersistentNew(ExecutionContext ec, Object pc, FieldValues fv);
+    <T> ObjectProvider<T> newForPersistentNew(ExecutionContext ec, T pc, FieldValues fv);
 
     /**
      * Constructs an ObjectProvider to manage a transactional-transient instance.
@@ -136,7 +136,7 @@ public interface ObjectProviderFactory
      * @param pc the instance being make persistent.
      * @return The ObjectProvider
      */
-    ObjectProvider newForTransactionalTransient(ExecutionContext ec, Object pc);
+    <T> ObjectProvider<T> newForTransactionalTransient(ExecutionContext ec, T pc);
 
     /**
      * Constructor for creating ObjectProvider instances to manage persistable objects in detached state.
@@ -146,7 +146,7 @@ public interface ObjectProviderFactory
      * @param version the detached version
      * @return The ObjectProvider
      */
-    ObjectProvider newForDetached(ExecutionContext ec, Object pc, Object id, Object version);
+    <T> ObjectProvider<T> newForDetached(ExecutionContext ec, T pc, Object id, Object version);
 
     /**
      * Constructor for creating ObjectProvider instances to manage persistable objects that are not persistent yet
@@ -156,7 +156,7 @@ public interface ObjectProviderFactory
      * @param pc the object being deleted from persistence
      * @return The ObjectProvider
      */
-    ObjectProvider newForPNewToBeDeleted(ExecutionContext ec, Object pc);
+    <T> ObjectProvider<T> newForPNewToBeDeleted(ExecutionContext ec, T pc);
 
     /**
      * Constructor to create an ObjectProvider for an object taken from the L2 cache with the specified id.
