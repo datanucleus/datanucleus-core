@@ -72,7 +72,7 @@ public interface ObjectProvider<T>
      * @param fv the initial field values of the object (optional)
      * @param pcClass Class of the object that this will manage the state for
      */
-    void initialiseForHollow(Object id, FieldValues fv, Class pcClass);
+    void initialiseForHollow(Object id, FieldValues fv, Class<T> pcClass);
 
     /**
      * Initialises a state manager to manage a HOLLOW / P_CLEAN instance having the given FieldValues.
@@ -83,7 +83,7 @@ public interface ObjectProvider<T>
      * @param pcClass Class of the object that this will manage the state for
      * @deprecated Remove use of this and use initialiseForHollow
      */
-    void initialiseForHollowAppId(FieldValues fv, Class pcClass);
+    void initialiseForHollowAppId(FieldValues fv, Class<T> pcClass);
 
     /**
      * Initialises a state manager to manage the given hollow instance having the given object ID.
@@ -736,7 +736,7 @@ public interface ObjectProvider<T>
      * @param state State for the detachment process
      * @return the detached persistable instance
      */
-    Object detachCopy(FetchPlanState state);
+    T detachCopy(FetchPlanState state);
 
     /**
      * Method to detach the persistable object.

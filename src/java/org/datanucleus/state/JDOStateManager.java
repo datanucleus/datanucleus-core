@@ -4071,7 +4071,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @param state State for the detachment process
      * @return the detached PersistenceCapable instance
      */
-    public Object detachCopy(FetchPlanState state)
+    public PersistenceCapable detachCopy(FetchPlanState state)
     {
         if (myLC.isDeleted())
         {
