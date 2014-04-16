@@ -981,7 +981,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
         Level2Cache l2cache = myEC.getNucleusContext().getLevel2Cache();
         if (l2cache != null && myEC.getNucleusContext().isClassCacheable(cmd) && !myEC.isObjectModifiedInTransaction(myID))
         {
-            CachedPC cachedPC = l2cache.get(myID);
+            CachedPC<T> cachedPC = l2cache.get(myID);
             if (cachedPC != null)
             {
                 int[] cacheFieldsToLoad = ClassUtils.getFlagsSetTo(cachedPC.getLoadedFields(), fieldNumbers, false);
@@ -1026,7 +1026,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
         Level2Cache l2cache = myEC.getNucleusContext().getLevel2Cache();
         if (l2cache != null && myEC.getNucleusContext().isClassCacheable(cmd))
         {
-            CachedPC cachedPC = l2cache.get(myID);
+            CachedPC<T> cachedPC = l2cache.get(myID);
             if (cachedPC != null)
             {
                 int[] cacheFieldsToLoad = ClassUtils.getFlagsSetTo(cachedPC.getLoadedFields(), fieldNumbers, true);

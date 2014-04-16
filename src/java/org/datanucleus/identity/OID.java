@@ -32,26 +32,26 @@ public interface OID
      * Provides the OID in a form that can be used by the database as a key.
      * @return The key value
      */
-    public abstract Object getKeyValue();
+    Object getKeyValue();
 
     /**
      * Accessor for the PC class name 
      * @return the PC Class
      */
-    public abstract String getPcClass();
+    String getPcClass();
 
     /**
      * Equality operator.
      * @param obj Object to compare against
      * @return Whether they are equal
      */
-    public abstract boolean equals(Object obj);
+    boolean equals(Object obj);
 
     /**
      * Accessor for the hashcode
      * @return Hashcode for this object
      */
-    public abstract int hashCode();
+    int hashCode();
 
     /**
      * Returns the string representation of the OID.
@@ -59,5 +59,5 @@ public interface OID
      * to create the OID.
      * @return the string representation of the OID.
      */
-    public abstract String toString();
+    String toString();
 }

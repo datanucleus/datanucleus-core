@@ -167,5 +167,5 @@ public interface ObjectProviderFactory
      * @param cachedPC CachedPC object from the L2 cache
      * @return The ObjectProvider
      */
-    ObjectProvider newForCachedPC(ExecutionContext ec, Object id, CachedPC cachedPC);
+    <T> ObjectProvider<T> newForCachedPC(ExecutionContext ec, Object id, CachedPC<T> cachedPC);
 }

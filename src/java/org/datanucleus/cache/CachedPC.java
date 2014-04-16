@@ -33,10 +33,10 @@ import org.datanucleus.util.StringUtils;
  * object. This is used when regenerating the object, and recreating its relations. Note that the "id" is the OID
  * or SingleFieldIdentity where applicable otherwise is CachedId
  */
-public class CachedPC implements Serializable
+public class CachedPC<T> implements Serializable
 {
     /** Class of the object being cached. */
-    private Class cls;
+    private Class<T> cls;
 
     /** Values for the fields, keyed by the abs field number. Any relation fields store the id of the related object. */
     private Map<Integer, Object> fieldValues = null;
@@ -53,7 +53,7 @@ public class CachedPC implements Serializable
      * @param loadedFields The loaded fields
      * @param vers The version (optional)
      */
-    public CachedPC(Class cls, boolean[] loadedFields, Object vers)
+    public CachedPC(Class<T> cls, boolean[] loadedFields, Object vers)
     {
         this.cls = cls;
         this.loadedFields = new boolean[loadedFields.length];
@@ -64,7 +64,7 @@ public class CachedPC implements Serializable
         this.version = vers;
     }
 
-    public Class getObjectClass()
+    public Class<T> getObjectClass()
     {
         return cls;
     }
@@ -117,9 +117,9 @@ public class CachedPC implements Serializable
     	loadedFields[fieldNumber] = loaded;
     }
 
-    public synchronized CachedPC getCopy()
+    public synchronized CachedPC<T> getCopy()
     {
-    	CachedPC copy = new CachedPC(cls, loadedFields, version);
+    	CachedPC<T> copy = new CachedPC(cls, loadedFields, version);
     	if (fieldValues != null)
     	{
     	    // TODO Some (mutable) field values may need copying

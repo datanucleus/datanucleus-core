@@ -621,7 +621,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @param cachedPC The cached PC object
      * @param id Id to assign to the PersistenceCapable object
      */
-    public void initialiseForCachedPC(CachedPC cachedPC, Object id)
+    public void initialiseForCachedPC(CachedPC<PersistenceCapable> cachedPC, Object id)
     {
         // Create a new copy of the input object type, performing the majority of the initialisation
         initialiseForHollow(id, null, cachedPC.getObjectClass());
