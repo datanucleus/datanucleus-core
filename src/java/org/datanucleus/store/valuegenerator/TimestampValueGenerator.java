@@ -24,7 +24,7 @@ import java.util.Properties;
  * Value generator for timestamp values (millisecs).
  * The "timestamps" are the number of milliseconds (since Jan 1 1970).
  */
-public class TimestampValueGenerator extends AbstractGenerator
+public class TimestampValueGenerator extends AbstractGenerator<Long>
 {
     /**
      * Constructor.
@@ -42,7 +42,7 @@ public class TimestampValueGenerator extends AbstractGenerator
      * @param size Number of elements to reserve.
      * @return The block.
      */
-    protected ValueGenerationBlock reserveBlock(long size)
+    protected ValueGenerationBlock<Long> reserveBlock(long size)
     {
         Calendar cal = Calendar.getInstance();
         Long[] ids = new Long[1];

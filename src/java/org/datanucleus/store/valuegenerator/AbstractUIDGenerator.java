@@ -26,7 +26,7 @@ import org.datanucleus.util.NucleusLogger;
  * Value generator for a UID format. 
  * To be extended by implementations giving the UID in particular forms.
  */
-public abstract class AbstractUIDGenerator extends AbstractGenerator
+public abstract class AbstractUIDGenerator extends AbstractGenerator<String>
 {
     /**
      * Constructor.
@@ -53,7 +53,7 @@ public abstract class AbstractUIDGenerator extends AbstractGenerator
      * @param size The block size
      * @return The reserved block
      */
-    protected ValueGenerationBlock reserveBlock(long size)
+    protected ValueGenerationBlock<String> reserveBlock(long size)
     {
         Object[] ids = new Object[(int) size];
         for (int i = 0; i < size; i++)

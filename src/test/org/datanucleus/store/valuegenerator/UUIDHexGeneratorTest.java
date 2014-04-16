@@ -29,7 +29,7 @@ public class UUIDHexGeneratorTest extends TestCase
 {
     /**
      * Test for the length of the generated "uuid-hex" string.
-     * Should be 32 characters as per the JDO2 spec.
+     * Should be 32 characters as per the JDO spec.
      */
     public void testStringLength()
     {
@@ -51,7 +51,7 @@ public class UUIDHexGeneratorTest extends TestCase
         UUIDHexGenerator gen = new UUIDHexGenerator("Test", null);
         for (int i=0;i<ids.length;i++)
         {
-            ids[i] = (String)gen.next();
+            ids[i] = gen.next();
         }
 
         // Check for equality of any of them

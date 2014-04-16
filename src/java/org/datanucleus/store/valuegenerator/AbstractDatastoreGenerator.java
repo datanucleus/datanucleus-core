@@ -27,7 +27,7 @@ import org.datanucleus.store.StoreManager;
  * Builds on the base AbstractValueGenerator, and providing datastore connection 
  * and StoreManager information.
  */
-public abstract class AbstractDatastoreGenerator extends AbstractGenerator
+public abstract class AbstractDatastoreGenerator<T> extends AbstractGenerator<T>
 {
     /** Manager for the datastore. */
     protected StoreManager storeMgr;

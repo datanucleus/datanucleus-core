@@ -27,7 +27,7 @@ import org.datanucleus.util.NucleusLogger;
 /**
  * Abstract value generator.
  */
-public abstract class AbstractGenerator implements ValueGenerator
+public abstract class AbstractGenerator<T> implements ValueGenerator<T>
 {
     /** Localisation of messages */
     protected static final Localiser LOCALISER = Localiser.getInstance(
@@ -46,7 +46,7 @@ public abstract class AbstractGenerator implements ValueGenerator
     protected int initialValue = 0;
 
     /** The current block of values that have been reserved. */
-    protected ValueGenerationBlock block;
+    protected ValueGenerationBlock<T> block;
 
     /** Flag for whether we know that the repository exists. Only applies if repository is required. */
     protected boolean repositoryExists = false;
@@ -76,6 +76,7 @@ public abstract class AbstractGenerator implements ValueGenerator
 
     /**
      * Accessor for the storage class for values generated with this generator.
+     * TODO Drop this method now that we use generics
      * @return Storage class (e.g Long.class)
      */
     public static Class getStorageClass()
@@ -96,7 +97,7 @@ public abstract class AbstractGenerator implements ValueGenerator
      * Get next value from the reserved block of values.
      * @return The next value
      */
-    public synchronized Object next()
+    public synchronized T next()
     {
         // If the current block of ids is null or empty get a new one
         if (block == null || !block.hasNext())
@@ -113,7 +114,7 @@ public abstract class AbstractGenerator implements ValueGenerator
      * Returns null if none are allocated
      * @return The current value
      */
-    public synchronized Object current()
+    public synchronized T current()
     {
         if (block == null)
         {
@@ -191,7 +192,7 @@ public abstract class AbstractGenerator implements ValueGenerator
      * Get a new block with the default number of ids.
      * @return the block
      */
-    protected ValueGenerationBlock obtainGenerationBlock()
+    protected ValueGenerationBlock<T> obtainGenerationBlock()
     {
         // -1 here implies just use the default reserveBlock on the generator
         return obtainGenerationBlock(-1);

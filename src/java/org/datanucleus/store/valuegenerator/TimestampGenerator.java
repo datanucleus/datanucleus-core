@@ -24,7 +24,7 @@ import java.util.Properties;
 /**
  * Value generator for timestamps.
  */
-public class TimestampGenerator extends AbstractGenerator
+public class TimestampGenerator extends AbstractGenerator<Timestamp>
 {
     /**
      * Constructor.
@@ -42,7 +42,7 @@ public class TimestampGenerator extends AbstractGenerator
      * @param size Number of elements to reserve.
      * @return The block.
      */
-    protected ValueGenerationBlock reserveBlock(long size)
+    protected ValueGenerationBlock<Timestamp> reserveBlock(long size)
     {
         Calendar cal = Calendar.getInstance();
         Timestamp[] ts = new Timestamp[1];

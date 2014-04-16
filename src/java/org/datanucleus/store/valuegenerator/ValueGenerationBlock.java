@@ -30,19 +30,19 @@ import org.datanucleus.util.StringUtils;
 /**
  * Representation of a block of values.
  */
-public class ValueGenerationBlock implements Serializable
+public class ValueGenerationBlock<T> implements Serializable
 {
     /** The next id position. */
     private int nextIndex = 0;
 
     /** The list of values in this block. */
-    private final List valueList;
+    private final List<T> valueList;
 
     /**
      * Constructor.
      * @param values The block of objects that will be considered the "values"
      */
-    public ValueGenerationBlock(Object[] values)
+    public ValueGenerationBlock(T[] values)
     {
         valueList = Arrays.asList(values);
     }
@@ -51,7 +51,7 @@ public class ValueGenerationBlock implements Serializable
      * Constructor.
      * @param oid The list of objects that will be considered the "values"
      */
-    public ValueGenerationBlock(List oid)
+    public ValueGenerationBlock(List<T> oid)
     {
         valueList = new ArrayList(oid);
     }
@@ -61,7 +61,7 @@ public class ValueGenerationBlock implements Serializable
      * @return The current value
      * @throws NoSuchElementException Thrown if no current value
      */
-    public ValueGeneration current()
+    public ValueGeneration<T> current()
     {
         if (nextIndex == 0 || (nextIndex-1) >= valueList.size())
         {
@@ -74,7 +74,7 @@ public class ValueGenerationBlock implements Serializable
      * Accessor for the next value, or null if block values exhausted
      * @return The next value
      */
-    public ValueGeneration next()
+    public ValueGeneration<T> next()
     {
         if (nextIndex >= valueList.size())
         {
@@ -95,11 +95,10 @@ public class ValueGenerationBlock implements Serializable
 
     /**
      * Method to append a block onto this block.
-     * This is used where we have some values left, and we want to allocate more
-     * to go into this block.
+     * This is used where we have some values left, and we want to allocate more to go into this block.
      * @param block The other block
      */
-    public void addBlock(ValueGenerationBlock block)
+    public void addBlock(ValueGenerationBlock<T> block)
     {
         if (block == null)
         {
@@ -108,7 +107,7 @@ public class ValueGenerationBlock implements Serializable
 
         while (block.hasNext())
         {
-            valueList.add(block.next());
+            valueList.add(block.next().getValue());
         }
     }
 

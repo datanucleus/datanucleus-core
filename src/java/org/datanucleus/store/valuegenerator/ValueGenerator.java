@@ -23,7 +23,7 @@ package org.datanucleus.store.valuegenerator;
  * Generator interface for values.
  * Uses the same methods as in the javax.jdo.datastore.Sequence interface
  */
-public interface ValueGenerator
+public interface ValueGenerator<T>
 {
     /**
      * Returns the fully qualified name of the <code>Sequence</code>.
@@ -36,7 +36,7 @@ public interface ValueGenerator
      * sequence value is not available, throw NucleusDataStoreException.
      * @return the next value
      */
-    Object next ();
+    T next();
 
     /**
      * Provides a hint to the implementation that the application
@@ -46,7 +46,7 @@ public interface ValueGenerator
      * the algorithm of obtaining additional sequence value objects.
      * @param additional the number of additional values to allocate
      */
-    void allocate (int additional);
+    void allocate(int additional);
 
     /**
      * Returns the current sequence value object if it is available. 
@@ -54,7 +54,7 @@ public interface ValueGenerator
      * If the current sequence value is not available, throw NucleusDataStoreException.
      * @return the current value
      */
-    Object current ();
+    T current();
 
     /**
      * Returns the next sequence value as a long. 

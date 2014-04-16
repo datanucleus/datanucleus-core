@@ -24,16 +24,16 @@ import java.io.Serializable;
 /**
  * Generated value. The value can be of any kind : String, Long, Date, Application ID, etc.
  */
-class ValueGeneration implements Serializable
+class ValueGeneration<T> implements Serializable
 {
     /** the value. */
-    private Object value;
+    private T value;
  
     /**
      * Constructor for the value.
      * @param val The value
      */
-    ValueGeneration(Object val)
+    ValueGeneration(T val)
     {
         this.value = val;
     }
@@ -42,7 +42,7 @@ class ValueGeneration implements Serializable
      * Returns the value.
      * @return The Value
      */
-    public Object getValue()
+    public T getValue()
     {
         return value;
     }
@@ -51,7 +51,7 @@ class ValueGeneration implements Serializable
      * Sets the value.
      * @param val The value to set
      */
-    public void setValue(Object val)
+    public void setValue(T val)
     {
         this.value = val;
     }
