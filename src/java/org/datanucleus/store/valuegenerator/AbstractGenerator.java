@@ -106,7 +106,7 @@ public abstract class AbstractGenerator<T> implements ValueGenerator<T>
             block = obtainGenerationBlock();
         }
 
-        return block.next().getValue();
+        return block.next();
     }
 
     /**
@@ -120,7 +120,7 @@ public abstract class AbstractGenerator<T> implements ValueGenerator<T>
         {
             return null;
         }
-        return block.current().getValue();
+        return block.current();
     }
 
     /**

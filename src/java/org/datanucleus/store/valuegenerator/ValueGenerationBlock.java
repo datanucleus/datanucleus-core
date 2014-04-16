@@ -29,6 +29,8 @@ import org.datanucleus.util.StringUtils;
 
 /**
  * Representation of a block of values.
+ * 
+ * @param <T> Type of the value (String, Long etc)
  */
 public class ValueGenerationBlock<T> implements Serializable
 {
@@ -61,27 +63,27 @@ public class ValueGenerationBlock<T> implements Serializable
      * @return The current value
      * @throws NoSuchElementException Thrown if no current value
      */
-    public ValueGeneration<T> current()
+    public T current()
     {
         if (nextIndex == 0 || (nextIndex-1) >= valueList.size())
         {
             throw new NoSuchElementException();
         }
-        return new ValueGeneration(valueList.get(nextIndex-1));
+        return valueList.get(nextIndex-1);
     }
 
     /**
      * Accessor for the next value, or null if block values exhausted
      * @return The next value
      */
-    public ValueGeneration<T> next()
+    public T next()
     {
         if (nextIndex >= valueList.size())
         {
             throw new NoSuchElementException();
         }
 
-        return new ValueGeneration(valueList.get(nextIndex++));
+        return valueList.get(nextIndex++);
     }
 
     /**
@@ -107,7 +109,7 @@ public class ValueGenerationBlock<T> implements Serializable
 
         while (block.hasNext())
         {
-            valueList.add(block.next().getValue());
+            valueList.add(block.next());
         }
     }
 
