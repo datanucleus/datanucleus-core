@@ -125,9 +125,6 @@ import org.datanucleus.util.TypeConversionHelper;
  */
 public class JDOStateManager extends AbstractStateManager<PersistenceCapable> implements StateManager, ObjectProvider<PersistenceCapable>
 {
-    /** The PersistenceCapable instance managed by this StateManager */
-    protected PersistenceCapable myPC;
-
     /** Image of the PersistenceCapable instance when the instance is enlisted in the transaction. */
     protected PersistenceCapable savedImage = null;
 
@@ -650,7 +647,6 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
                     loadedFields[fieldsNotLoaded[i]] = false;
                 }
             }
-
         }
 
         if (cachedPC.getVersion() != null)
@@ -1138,138 +1134,6 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         {
             return persistenceFlags;
         }
-    }
-
-    // -------------------------- providedXXXField Methods ----------------------------
-
-    /**
-     * This method is called from the associated persistable when its
-     * PersistenceCapable.jdoProvideFields() method is invoked. Its purpose is
-     * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
-     * @param fieldNumber the field number
-     * @param currentValue the current value of the field
-     */
-    public void providedBooleanField(PersistenceCapable pc, int fieldNumber, boolean currentValue)
-    {
-        currFM.storeBooleanField(fieldNumber, currentValue);
-    }
-
-    /**
-     * This method is called from the associated persistable when its
-     * PersistenceCapable.jdoProvideFields() method is invoked. Its purpose is
-     * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
-     * @param fieldNumber the field number
-     * @param currentValue the current value of the field
-     */
-    public void providedByteField(PersistenceCapable pc, int fieldNumber, byte currentValue)
-    {
-        currFM.storeByteField(fieldNumber, currentValue);
-    }
-
-    /**
-     * This method is called from the associated PersistenceCapable when its
-     * PersistenceCapable.jdoProvideFields() method is invoked. Its purpose is
-     * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
-     * @param fieldNumber the field number
-     * @param currentValue the current value of the field
-     */
-    public void providedCharField(PersistenceCapable pc, int fieldNumber, char currentValue)
-    {
-        currFM.storeCharField(fieldNumber, currentValue);
-    }
-
-    /**
-     * This method is called from the associated PersistenceCapable when its
-     * PersistenceCapable.jdoProvideFields() method is invoked. Its purpose is
-     * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
-     * @param fieldNumber the field number
-     * @param currentValue the current value of the field
-     */
-    public void providedDoubleField(PersistenceCapable pc, int fieldNumber, double currentValue)
-    {
-        currFM.storeDoubleField(fieldNumber, currentValue);
-    }
-
-    /**
-     * This method is called from the associated PersistenceCapable when its
-     * PersistenceCapable.jdoProvideFields() method is invoked. Its purpose is
-     * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
-     * @param fieldNumber the field number
-     * @param currentValue the current value of the field
-     */
-    public void providedFloatField(PersistenceCapable pc, int fieldNumber, float currentValue)
-    {
-        currFM.storeFloatField(fieldNumber, currentValue);
-    }
-
-    /**
-     * This method is called from the associated PersistenceCapable when its
-     * PersistenceCapable.jdoProvideFields() method is invoked. Its purpose is
-     * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
-     * @param fieldNumber the field number
-     * @param currentValue the current value of the field
-     */
-    public void providedIntField(PersistenceCapable pc, int fieldNumber, int currentValue)
-    {
-        currFM.storeIntField(fieldNumber, currentValue);
-    }
-
-    /**
-     * This method is called from the associated PersistenceCapable when its
-     * PersistenceCapable.jdoProvideFields() method is invoked. Its purpose is
-     * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
-     * @param fieldNumber the field number
-     * @param currentValue the current value of the field
-     */
-    public void providedLongField(PersistenceCapable pc, int fieldNumber, long currentValue)
-    {
-        currFM.storeLongField(fieldNumber, currentValue);
-    }
-
-    /**
-     * This method is called from the associated PersistenceCapable when its
-     * PersistenceCapable.jdoProvideFields() method is invoked. Its purpose is
-     * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
-     * @param fieldNumber the field number
-     * @param currentValue the current value of the field
-     */
-    public void providedShortField(PersistenceCapable pc, int fieldNumber, short currentValue)
-    {
-        currFM.storeShortField(fieldNumber, currentValue);
-    }
-
-    /**
-     * This method is called from the associated persistable when its
-     * PersistenceCapable.jdoProvideFields() method is invoked. Its purpose is
-     * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
-     * @param fieldNumber the field number
-     * @param currentValue the current value of the field
-     */
-    public void providedStringField(PersistenceCapable pc, int fieldNumber, String currentValue)
-    {
-        currFM.storeStringField(fieldNumber, currentValue);
-    }
-
-    /**
-     * This method is called from the associated persistable when its
-     * PersistenceCapable.jdoProvideFields() method is invoked. Its purpose is
-     * to provide the value of the specified field to the StateManager.
-     * @param pc the calling PersistenceCapable instance
-     * @param fieldNumber the field number
-     * @param currentValue the current value of the field
-     */
-    public void providedObjectField(PersistenceCapable pc, int fieldNumber, Object currentValue)
-    {
-        currFM.storeObjectField(fieldNumber, currentValue);
     }
 
     /**
@@ -2032,154 +1896,6 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         {
             // Not during flush, and not transactional-transient, and not inserting - so mark as dirty
             myEC.markDirty(this, true);
-        }
-    }
-
-    /**
-     * This method is invoked by the PersistenceCapable object's
-     * jdoReplaceField() method to refresh the value of a boolean field.
-     * @param pc the calling persistable instance
-     * @param fieldNumber the field number
-     * @return the new value for the field
-     */
-    public boolean replacingBooleanField(PersistenceCapable pc, int fieldNumber)
-    {
-        boolean value = currFM.fetchBooleanField(fieldNumber);
-        loadedFields[fieldNumber] = true;
-        return value;
-    }
-
-    /**
-     * This method is invoked by the PersistenceCapable object's
-     * jdoReplaceField() method to refresh the value of a byte field.
-     * @param obj the calling persistable instance
-     * @param fieldNumber the field number
-     * @return the new value for the field
-     */
-    public byte replacingByteField(PersistenceCapable obj, int fieldNumber)
-    {
-        byte value = currFM.fetchByteField(fieldNumber);
-        loadedFields[fieldNumber] = true;
-        return value;
-    }
-
-    /**
-     * This method is invoked by the PersistenceCapable object's
-     * jdoReplaceField() method to refresh the value of a char field.
-     * @param obj the calling persistable instance
-     * @param fieldNumber the field number
-     * @return the new value for the field
-     */
-    public char replacingCharField(PersistenceCapable obj, int fieldNumber)
-    {
-        char value = currFM.fetchCharField(fieldNumber);
-        loadedFields[fieldNumber] = true;
-        return value;
-    }
-
-    /**
-     * This method is invoked by the PersistenceCapable object's
-     * jdoReplaceField() method to refresh the value of a double field.
-     * @param obj the calling PersistenceCapable instance
-     * @param fieldNumber the field number
-     * @return the new value for the field
-     */
-    public double replacingDoubleField(PersistenceCapable obj, int fieldNumber)
-    {
-        double value = currFM.fetchDoubleField(fieldNumber);
-        loadedFields[fieldNumber] = true;
-        return value;
-    }
-
-    /**
-     * This method is invoked by the PersistenceCapable object's
-     * jdoReplaceField() method to refresh the value of a float field.
-     * @param obj the calling PersistenceCapable instance
-     * @param fieldNumber the field number
-     * @return the new value for the field
-     */
-    public float replacingFloatField(PersistenceCapable obj, int fieldNumber)
-    {
-        float value = currFM.fetchFloatField(fieldNumber);
-        loadedFields[fieldNumber] = true;
-        return value;
-    }
-
-    /**
-     * This method is invoked by the persistable object's
-     * jdoReplaceField() method to refresh the value of a int field.
-     * @param obj the calling persistable instance
-     * @param fieldNumber the field number
-     * @return the new value for the field
-     */
-    public int replacingIntField(PersistenceCapable obj, int fieldNumber)
-    {
-        int value = currFM.fetchIntField(fieldNumber);
-        loadedFields[fieldNumber] = true;
-        return value;
-    }
-
-    /**
-     * This method is invoked by the persistable object's
-     * jdoReplaceField() method to refresh the value of a long field.
-     * @param obj the calling persistable instance
-     * @param fieldNumber the field number
-     * @return the new value for the field
-     */
-    public long replacingLongField(PersistenceCapable obj, int fieldNumber)
-    {
-        long value = currFM.fetchLongField(fieldNumber);
-        loadedFields[fieldNumber] = true;
-        return value;
-    }
-
-    /**
-     * This method is invoked by the persistable object's
-     * jdoReplaceField() method to refresh the value of a short field.
-     * @param obj the calling persistable instance
-     * @param fieldNumber the field number
-     * @return the new value for the field
-     */
-    public short replacingShortField(PersistenceCapable obj, int fieldNumber)
-    {
-        short value = currFM.fetchShortField(fieldNumber);
-        loadedFields[fieldNumber] = true;
-        return value;
-    }
-
-    /**
-     * This method is invoked by the persistable object's
-     * jdoReplaceField() method to refresh the value of a String field.
-     * @param obj the calling persistable instance
-     * @param fieldNumber the field number
-     * @return the new value for the field
-     */
-    public String replacingStringField(PersistenceCapable obj, int fieldNumber)
-    {
-        String value = currFM.fetchStringField(fieldNumber);
-        loadedFields[fieldNumber] = true;
-        return value;
-    }
-
-    /**
-     * This method is invoked by the persistable object's
-     * jdoReplaceField() method to refresh the value of an Object field.
-     * @param obj the calling persistable instance
-     * @param fieldNumber the field number
-     * @return the new value for the field
-     */
-    public Object replacingObjectField(PersistenceCapable obj, int fieldNumber)
-    {
-        try
-        {
-            Object value = currFM.fetchObjectField(fieldNumber);
-            loadedFields[fieldNumber] = true;
-            return value;
-        }
-        catch (EndOfFetchPlanGraphException eodge)
-        {
-            // Beyond the scope of the fetch-depth when detaching
-            return null;
         }
     }
 
@@ -3633,8 +3349,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @param replaceFieldIfChanged Whether to replace the field in the object if wrapping the value
      * @return The wrapper (or original value if not wrappable)
      */
-    public Object wrapSCOField(int fieldNumber, Object value, 
-            boolean forInsert, boolean forUpdate, boolean replaceFieldIfChanged)
+    public Object wrapSCOField(int fieldNumber, Object value, boolean forInsert, boolean forUpdate, boolean replaceFieldIfChanged)
     {
         if (value == null)
         {
@@ -5015,14 +4730,6 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
                 setFlushing(false);
             }
         }
-    }
-
-    /**
-     * Registers the pc class in the cache
-     */
-    public void registerTransactional()
-    {
-        myEC.addObjectProvider(this);
     }
 
     // ------------------------------ Helper Methods ---------------------------

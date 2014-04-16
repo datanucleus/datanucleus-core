@@ -38,6 +38,7 @@ import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.fieldmanager.LoadFieldManager;
 import org.datanucleus.store.fieldmanager.SingleTypeFieldManager;
+import org.datanucleus.store.fieldmanager.AbstractFetchDepthFieldManager.EndOfFetchPlanGraphException;
 import org.datanucleus.store.objectvaluegenerator.ObjectValueGenerator;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
@@ -82,6 +83,9 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     protected static final int FLAG_FLUSHING = (2<<1);
     /** Flag for {@link #flags} whether we are in the process of disconnecting the object. */
     protected static final int FLAG_DISCONNECTING = (2<<0);
+
+    /** The persistable instance managed by this ObjectProvider. */
+    protected T myPC;
 
     /** Bit-packed flags for operational settings (packed into "int" for memory benefit). */
     protected int flags;
@@ -1326,6 +1330,266 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
         return objectType > 0;
     }
 
+    // -------------------------- providedXXXField Methods ----------------------------
+
+    /**
+     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * to provide the value of the specified field to the StateManager.
+     * @param pc the calling persistable instance
+     * @param fieldNumber the field number
+     * @param currentValue the current value of the field
+     */
+    public void providedBooleanField(T pc, int fieldNumber, boolean currentValue)
+    {
+        currFM.storeBooleanField(fieldNumber, currentValue);
+    }
+
+    /**
+     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * to provide the value of the specified field to the StateManager.
+     * @param pc the calling persistable instance
+     * @param fieldNumber the field number
+     * @param currentValue the current value of the field
+     */
+    public void providedByteField(T pc, int fieldNumber, byte currentValue)
+    {
+        currFM.storeByteField(fieldNumber, currentValue);
+    }
+
+    /**
+     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * to provide the value of the specified field to the StateManager.
+     * @param pc the calling persistable instance
+     * @param fieldNumber the field number
+     * @param currentValue the current value of the field
+     */
+    public void providedCharField(T pc, int fieldNumber, char currentValue)
+    {
+        currFM.storeCharField(fieldNumber, currentValue);
+    }
+
+    /**
+     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * to provide the value of the specified field to the StateManager.
+     * @param pc the calling persistable instance
+     * @param fieldNumber the field number
+     * @param currentValue the current value of the field
+     */
+    public void providedDoubleField(T pc, int fieldNumber, double currentValue)
+    {
+        currFM.storeDoubleField(fieldNumber, currentValue);
+    }
+
+    /**
+     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * to provide the value of the specified field to the StateManager.
+     * @param pc the calling persistable instance
+     * @param fieldNumber the field number
+     * @param currentValue the current value of the field
+     */
+    public void providedFloatField(T pc, int fieldNumber, float currentValue)
+    {
+        currFM.storeFloatField(fieldNumber, currentValue);
+    }
+
+    /**
+     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * to provide the value of the specified field to the StateManager.
+     * @param pc the calling persistable instance
+     * @param fieldNumber the field number
+     * @param currentValue the current value of the field
+     */
+    public void providedIntField(T pc, int fieldNumber, int currentValue)
+    {
+        currFM.storeIntField(fieldNumber, currentValue);
+    }
+
+    /**
+     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * to provide the value of the specified field to the StateManager.
+     * @param pc the calling persistable instance
+     * @param fieldNumber the field number
+     * @param currentValue the current value of the field
+     */
+    public void providedLongField(T pc, int fieldNumber, long currentValue)
+    {
+        currFM.storeLongField(fieldNumber, currentValue);
+    }
+
+    /**
+     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * to provide the value of the specified field to the StateManager.
+     * @param pc the calling persistable instance
+     * @param fieldNumber the field number
+     * @param currentValue the current value of the field
+     */
+    public void providedShortField(T pc, int fieldNumber, short currentValue)
+    {
+        currFM.storeShortField(fieldNumber, currentValue);
+    }
+
+    /**
+     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * to provide the value of the specified field to the StateManager.
+     * @param pc the calling persistable instance
+     * @param fieldNumber the field number
+     * @param currentValue the current value of the field
+     */
+    public void providedStringField(T pc, int fieldNumber, String currentValue)
+    {
+        currFM.storeStringField(fieldNumber, currentValue);
+    }
+
+    /**
+     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * to provide the value of the specified field to the StateManager.
+     * @param pc the calling persistable instance
+     * @param fieldNumber the field number
+     * @param currentValue the current value of the field
+     */
+    public void providedObjectField(T pc, int fieldNumber, Object currentValue)
+    {
+        currFM.storeObjectField(fieldNumber, currentValue);
+    }
+
+    /**
+     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a boolean field.
+     * @param pc the calling persistable instance
+     * @param fieldNumber the field number
+     * @return the new value for the field
+     */
+    public boolean replacingBooleanField(T pc, int fieldNumber)
+    {
+        boolean value = currFM.fetchBooleanField(fieldNumber);
+        loadedFields[fieldNumber] = true;
+        return value;
+    }
+
+    /**
+     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a byte field.
+     * @param obj the calling persistable instance
+     * @param fieldNumber the field number
+     * @return the new value for the field
+     */
+    public byte replacingByteField(T obj, int fieldNumber)
+    {
+        byte value = currFM.fetchByteField(fieldNumber);
+        loadedFields[fieldNumber] = true;
+        return value;
+    }
+
+    /**
+     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a char field.
+     * @param obj the calling persistable instance
+     * @param fieldNumber the field number
+     * @return the new value for the field
+     */
+    public char replacingCharField(T obj, int fieldNumber)
+    {
+        char value = currFM.fetchCharField(fieldNumber);
+        loadedFields[fieldNumber] = true;
+        return value;
+    }
+
+    /**
+     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a double field.
+     * @param obj the calling persistable instance
+     * @param fieldNumber the field number
+     * @return the new value for the field
+     */
+    public double replacingDoubleField(T obj, int fieldNumber)
+    {
+        double value = currFM.fetchDoubleField(fieldNumber);
+        loadedFields[fieldNumber] = true;
+        return value;
+    }
+
+    /**
+     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a float field.
+     * @param obj the calling persistable instance
+     * @param fieldNumber the field number
+     * @return the new value for the field
+     */
+    public float replacingFloatField(T obj, int fieldNumber)
+    {
+        float value = currFM.fetchFloatField(fieldNumber);
+        loadedFields[fieldNumber] = true;
+        return value;
+    }
+
+    /**
+     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a int field.
+     * @param obj the calling persistable instance
+     * @param fieldNumber the field number
+     * @return the new value for the field
+     */
+    public int replacingIntField(T obj, int fieldNumber)
+    {
+        int value = currFM.fetchIntField(fieldNumber);
+        loadedFields[fieldNumber] = true;
+        return value;
+    }
+
+    /**
+     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a long field.
+     * @param obj the calling persistable instance
+     * @param fieldNumber the field number
+     * @return the new value for the field
+     */
+    public long replacingLongField(T obj, int fieldNumber)
+    {
+        long value = currFM.fetchLongField(fieldNumber);
+        loadedFields[fieldNumber] = true;
+        return value;
+    }
+
+    /**
+     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a short field.
+     * @param obj the calling persistable instance
+     * @param fieldNumber the field number
+     * @return the new value for the field
+     */
+    public short replacingShortField(T obj, int fieldNumber)
+    {
+        short value = currFM.fetchShortField(fieldNumber);
+        loadedFields[fieldNumber] = true;
+        return value;
+    }
+
+    /**
+     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a String field.
+     * @param obj the calling persistable instance
+     * @param fieldNumber the field number
+     * @return the new value for the field
+     */
+    public String replacingStringField(T obj, int fieldNumber)
+    {
+        String value = currFM.fetchStringField(fieldNumber);
+        loadedFields[fieldNumber] = true;
+        return value;
+    }
+
+    /**
+     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of an Object field.
+     * @param obj the calling persistable instance
+     * @param fieldNumber the field number
+     * @return the new value for the field
+     */
+    public Object replacingObjectField(T obj, int fieldNumber)
+    {
+        try
+        {
+            Object value = currFM.fetchObjectField(fieldNumber);
+            loadedFields[fieldNumber] = true;
+            return value;
+        }
+        catch (EndOfFetchPlanGraphException eodge)
+        {
+            // Beyond the scope of the fetch-depth when detaching
+            return null;
+        }
+    }
+
     /**
      * Method to set this StateManager as managing an embedded/serialised object.
      * @param objType The type of object being managed
@@ -1348,6 +1612,14 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     public short getLockMode()
     {
         return lockMode;
+    }
+
+    /**
+     * Registers the pc class in the cache
+     */
+    public void registerTransactional()
+    {
+        myEC.addObjectProvider(this);
     }
 
     /**
