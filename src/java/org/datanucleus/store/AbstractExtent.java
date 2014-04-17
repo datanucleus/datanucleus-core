@@ -36,7 +36,7 @@ public abstract class AbstractExtent<T> implements org.datanucleus.store.Extent<
     protected final ExecutionContext ec;
 
     /** The candidate class. We store the class since we need to retain it for class loading. */
-    protected final Class candidateClass;
+    protected final Class<T> candidateClass;
 
     /** Whether to include subclasses. */
     protected final boolean subclasses;
