@@ -30,8 +30,7 @@ import org.datanucleus.util.NucleusLogger;
 public abstract class AbstractGenerator<T> implements ValueGenerator<T>
 {
     /** Localisation of messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
+    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
     /** Symbolic name for the sequence. */
     protected String name;
@@ -203,9 +202,9 @@ public abstract class AbstractGenerator<T> implements ValueGenerator<T>
      * @param number The number of additional ids required
      * @return the block
      */
-    protected ValueGenerationBlock obtainGenerationBlock(int number)
+    protected ValueGenerationBlock<T> obtainGenerationBlock(int number)
     {
-        ValueGenerationBlock block = null;
+        ValueGenerationBlock<T> block = null;
 
         // Try getting the block
         boolean repository_exists=true; // TODO Ultimately this can be removed when "repositoryExists()" is implemented
@@ -301,7 +300,7 @@ public abstract class AbstractGenerator<T> implements ValueGenerator<T>
      * Method to reserve a default sized block of values.
      * @return The reserved block
      */
-    protected ValueGenerationBlock reserveBlock()
+    protected ValueGenerationBlock<T> reserveBlock()
     {
         return reserveBlock(allocationSize);
     }
@@ -311,7 +310,7 @@ public abstract class AbstractGenerator<T> implements ValueGenerator<T>
      * @param size Number of values to reserve
      * @return The allocated block
      */
-    protected abstract ValueGenerationBlock reserveBlock(long size);
+    protected abstract ValueGenerationBlock<T> reserveBlock(long size);
 
     /**
      * Indicator for whether the generator requires its own repository.
