@@ -30,8 +30,10 @@ import java.util.Collection;
  *     its results available internally</li>
  * <li><b>Closed, Disconnected</b> - the query has been run, txn committed, query results closed.</li>
  * </ul>
+ * 
+ * @param <E> Type of the element of the query result
  */
-public interface QueryResult extends Collection
+public interface QueryResult<E> extends Collection<E>
 {
     /**
      * Method to close the results, making them unusable thereafter.

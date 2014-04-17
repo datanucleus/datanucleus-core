@@ -46,11 +46,10 @@ import org.datanucleus.util.Localiser;
  * Has no effect if caching is not used.</li>
  * </ul>
  */
-public abstract class AbstractQueryResult extends AbstractList implements QueryResult, Serializable
+public abstract class AbstractQueryResult<E> extends AbstractList<E> implements QueryResult<E>, Serializable
 {
     /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
+    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
     /** Whether the results are close. */
     protected boolean closed = false;
@@ -198,7 +197,7 @@ public abstract class AbstractQueryResult extends AbstractList implements QueryR
      * @param index The position to add
      * @param element The results to add
      */
-    public void add(int index, Object element)
+    public void add(int index, E element)
     {
         throw new UnsupportedOperationException(LOCALISER.msg("052603"));
     }
@@ -208,7 +207,7 @@ public abstract class AbstractQueryResult extends AbstractList implements QueryR
      * @param o The result to add
      * @return true if added successfully
      */
-    public boolean add(Object o)
+    public boolean add(E o)
     {
         throw new UnsupportedOperationException(LOCALISER.msg("052603"));
     }
@@ -266,7 +265,7 @@ public abstract class AbstractQueryResult extends AbstractList implements QueryR
      * @param index The index of the element
      * @return The element at index
      */
-    public abstract Object get(int index);
+    public abstract E get(int index);
 
     /**
      * Accessor for the hashcode of this object
@@ -308,7 +307,7 @@ public abstract class AbstractQueryResult extends AbstractList implements QueryR
      * Accessor for an iterator for the results.
      * @return The iterator
      */
-    public abstract Iterator iterator();
+    public abstract Iterator<E> iterator();
 
     /**
      * Method to check the last index of a result. Not supported.
@@ -324,14 +323,14 @@ public abstract class AbstractQueryResult extends AbstractList implements QueryR
      * Accessor for a list iterator for the results.
      * @return a ListIterator with the query results
      */
-    public abstract ListIterator listIterator();
+    public abstract ListIterator<E> listIterator();
 
     /**
      * Method to remove a result. Not supported.
      * @param index The position of the result.
      * @return The removed object.
      */
-    public Object remove(int index)
+    public E remove(int index)
     {
         throw new UnsupportedOperationException(LOCALISER.msg("052603"));
     }
@@ -342,7 +341,7 @@ public abstract class AbstractQueryResult extends AbstractList implements QueryR
      * @param element The result
      * @return The element
      */
-    public Object set(int index, Object element)
+    public E set(int index, E element)
     {
         throw new UnsupportedOperationException(LOCALISER.msg("052603"));
     }
@@ -371,7 +370,7 @@ public abstract class AbstractQueryResult extends AbstractList implements QueryR
      * @param toIndex end position (exclusive)
      * @return The list of results
      */
-    public List subList(int fromIndex, int toIndex)
+    public List<E> subList(int fromIndex, int toIndex)
     {
         int subListLength = toIndex - fromIndex;
         ArrayList subList = new ArrayList(subListLength);

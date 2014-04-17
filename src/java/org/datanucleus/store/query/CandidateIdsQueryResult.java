@@ -39,12 +39,12 @@ import org.datanucleus.util.WeakValueMap;
  * User can also define whether the returned objects are validated against the datastore upon retrieval
  * using the query extension "datanucleus.query.resultCache.validateObjects" (default=true)
  */
-public class CandidateIdsQueryResult extends AbstractQueryResult implements java.io.Serializable
+public class CandidateIdsQueryResult<E> extends AbstractQueryResult<E> implements java.io.Serializable
 {
     /** List of identities of the candidate objects. */
     final List<Object> ids;
 
-    Map<Integer, Object> results = null;
+    Map<Integer, E> results = null;
 
     /** Whether to validate the objects if getting from the cache. */
     boolean validateObjects = true;
@@ -80,12 +80,12 @@ public class CandidateIdsQueryResult extends AbstractQueryResult implements java
             }
             else
             {
-                results = new HashMap<Integer, Object>();
+                results = new HashMap<Integer, E>();
             }
         }
         else
         {
-            results = new HashMap<Integer, Object>();
+            results = new HashMap<Integer, E>();
         }
     }
 
@@ -120,8 +120,7 @@ public class CandidateIdsQueryResult extends AbstractQueryResult implements java
         return StringUtils.toJVMIDString(other).equals(StringUtils.toJVMIDString(this));
     }
 
-    @Override
-    public Object get(int index)
+    public E get(int index)
     {
         if (index < 0 || index >= size)
         {
@@ -147,7 +146,7 @@ public class CandidateIdsQueryResult extends AbstractQueryResult implements java
      * @param index The index
      * @return The object
      */
-    protected Object getObjectForIndex(int index)
+    protected E getObjectForIndex(int index)
     {
         if (ids == null)
         {
@@ -157,7 +156,7 @@ public class CandidateIdsQueryResult extends AbstractQueryResult implements java
 
         if (results != null)
         {
-            Object obj = results.get(index);
+            E obj = results.get(index);
             if (obj != null)
             {
                 return obj;
@@ -175,7 +174,7 @@ public class CandidateIdsQueryResult extends AbstractQueryResult implements java
         else
         {
             ExecutionContext ec = query.getExecutionContext();
-            Object obj = ec.findObject(id, validateObjects, false, null);
+            E obj = (E) ec.findObject(id, validateObjects, false, null);
             if (results != null)
             {
                 results.put(index, obj);
