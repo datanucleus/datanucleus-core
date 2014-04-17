@@ -323,7 +323,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                                 AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(
                                     valueCachedPC.getObjectClass(), ec.getClassLoaderResolver());
                                 int[] fieldsToLoad = ClassUtils.getFlagsSetTo(valueCachedPC.getLoadedFields(), cmd.getAllMemberPositions(), true);
-                                ObjectProvider valueOP = ec.newObjectProviderForEmbedded(cmd, op, mmd.getAbsoluteFieldNumber());
+                                ObjectProvider valueOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, cmd, op, mmd.getAbsoluteFieldNumber());
                                 valueOP.replaceFields(fieldsToLoad, new L2CacheRetrieveFieldManager(valueOP, valueCachedPC));
                                 return valueOP.getObject();
                             }

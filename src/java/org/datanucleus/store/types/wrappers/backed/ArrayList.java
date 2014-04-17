@@ -124,7 +124,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
                     ObjectProvider objOP = ec.findObjectProvider(pc);
                     if (objOP == null)
                     {
-                        objOP = ec.newObjectProviderForEmbedded(pc, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                        objOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, pc, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
                     }
                 }
             }

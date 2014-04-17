@@ -180,7 +180,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
                     ObjectProvider objOP = ec.findObjectProvider(pc);
                     if (objOP == null)
                     {
-                        objOP = ec.newObjectProviderForEmbedded(pc, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                        objOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, pc, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
                     }
                 }
             }

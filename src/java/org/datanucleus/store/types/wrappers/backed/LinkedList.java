@@ -124,7 +124,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
                     ObjectProvider objSM = ec.findObjectProvider(pc);
                     if (objSM == null)
                     {
-                        objSM = ec.newObjectProviderForEmbedded(pc, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                        objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, pc, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
                     }
                 }
             }

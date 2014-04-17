@@ -1210,7 +1210,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (embeddedOP == null)
         {
             // Assign an ObjectProvider to manage our embedded object
-            embeddedOP = newObjectProviderForEmbedded(value, false, owner,
+            embeddedOP = nucCtx.getObjectProviderFactory().newForEmbedded(this, value, false, owner,
                 owner.getClassMetaData().getMetaDataForMember(mmd.getName()).getAbsoluteFieldNumber());
         }
         if (embeddedOP.getEmbeddedOwners() == null || embeddedOP.getEmbeddedOwners().length == 0)
@@ -1237,54 +1237,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             releaseThreadContextInfo();
         }
-    }
-
-    /**
-     * Constructs an ObjectProvider to manage a hollow instance having the given object ID.
-     * This constructor is used for creating new instances of existing persistent objects.
-     * @param pcClass the class of the new instance to be created.
-     * @param id the identity of the object.
-     */
-    public <T> ObjectProvider<T> newObjectProviderForHollow(Class<T> pcClass, Object id)
-    {
-        return nucCtx.getObjectProviderFactory().newForHollow(this, pcClass, id);
-    }
-
-    /**
-     * Constructs an ObjectProvider to manage the specified persistent instance having the given object ID.
-     * @param id the identity of the object.
-     * @param pc The object that is persistent that we are going to manage
-     */
-    public <T> ObjectProvider<T> newObjectProviderForPersistentClean(Object id, T pc)
-    {
-        return nucCtx.getObjectProviderFactory().newForPersistentClean(this, id, pc);
-    }
-
-    /**
-     * Constructs an ObjectProvider to manage a persistable instance that will
-     * be EMBEDDED/SERIALISED into another persistable object. The instance will not be
-     * assigned an identity in the process since it is a SCO.
-     * @param pc The persistable to manage (see copyPc also)
-     * @param copyPc Whether the ObjectProvider should manage a copy of the passed PC or that one
-     * @param ownerOP Owner ObjectProvider
-     * @param ownerFieldNumber Field number in owner object where this is stored
-     */
-    public <T> ObjectProvider<T> newObjectProviderForEmbedded(T pc, boolean copyPc, ObjectProvider ownerOP, int ownerFieldNumber)
-    {
-        return nucCtx.getObjectProviderFactory().newForEmbedded(this, pc, copyPc, ownerOP, ownerFieldNumber);
-    }
-
-    /**
-     * Constructs an ObjectProvider for an object of the specified type, creating the PC object to hold the values
-     * where this object will be EMBEDDED/SERIALISED into another persistable object. The instance will not be
-     * assigned an identity in the process since it is a SCO.
-     * @param cmd Meta-data for the class that this is an instance of.
-     * @param ownerOP Owner ObjectProvider
-     * @param ownerFieldNumber Field number in owner object where this is stored
-     */
-    public ObjectProvider newObjectProviderForEmbedded(AbstractClassMetaData cmd, ObjectProvider ownerOP, int ownerFieldNumber)
-    {
-        return nucCtx.getObjectProviderFactory().newForEmbedded(this, cmd, ownerOP, ownerFieldNumber);
     }
 
     /**
@@ -2032,7 +1984,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                              objectType == ObjectProvider.EMBEDDED_PC) && ownerOP != null)
                         {
                             // SCO object
-                            op = newObjectProviderForEmbedded(obj, false, ownerOP, ownerFieldNum);
+                            op = nucCtx.getObjectProviderFactory().newForEmbedded(this, obj, false, ownerOP, ownerFieldNum);
                             op.setPcObjectType((short) objectType);
                             op.makePersistent();
                             id = op.getInternalObjectId();
@@ -2579,7 +2531,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             // SCO PC (embedded/serialised)
             boolean detached = getApiAdapter().isDetached(pc);
-            ObjectProvider<T> targetOP = newObjectProviderForEmbedded(pc, true, null, -1);
+            ObjectProvider<T> targetOP = nucCtx.getObjectProviderFactory().newForEmbedded(this, pc, true, null, -1);
             pcTarget = targetOP.getObject();
             if (detached)
             {
@@ -3214,7 +3166,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                                 IdentityUtils.getIdentityAsString(getApiAdapter(), id), className));
                         }
 
-                        op = newObjectProviderForHollow(pcClass, id);
+                        op = nucCtx.getObjectProviderFactory().newForHollow(this, pcClass, id);
                         pc = op.getObject();
                         if (!validate)
                         {
@@ -3531,7 +3483,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                                 IdentityUtils.getIdentityAsString(getApiAdapter(), id), className));
                         }
 
-                        op = newObjectProviderForHollow(pcClass, id);
+                        op = nucCtx.getObjectProviderFactory().newForHollow(this, pcClass, id);
                         pc = op.getObject();
                         if (!checkInheritance && !validate)
                         {

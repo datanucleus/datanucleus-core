@@ -121,7 +121,7 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
                     ObjectProvider objSM = ec.findObjectProvider(pc);
                     if (objSM == null)
                     {
-                        objSM = ec.newObjectProviderForEmbedded(pc, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                        objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, pc, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
                     }
                 }
             }

@@ -105,7 +105,7 @@ public class Hashtable extends org.datanucleus.store.types.wrappers.Hashtable im
                         ObjectProvider objSM = ec.findObjectProvider(key);
                         if (objSM == null)
                         {
-                            objSM = ec.newObjectProviderForEmbedded(key, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                            objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
                         }
                     }
                     if (ownerMmd.getMap().valueIsPersistent())
@@ -113,7 +113,7 @@ public class Hashtable extends org.datanucleus.store.types.wrappers.Hashtable im
                         ObjectProvider objSM = ec.findObjectProvider(value);
                         if (objSM == null)
                         {
-                            objSM = ec.newObjectProviderForEmbedded(value, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                            objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
                         }
                     }
                 }

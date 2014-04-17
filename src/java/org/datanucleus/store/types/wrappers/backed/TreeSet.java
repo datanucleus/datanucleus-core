@@ -132,7 +132,7 @@ public class TreeSet extends org.datanucleus.store.types.wrappers.TreeSet implem
                     ObjectProvider objSM = ec.findObjectProvider(pc);
                     if (objSM == null)
                     {
-                        objSM = ec.newObjectProviderForEmbedded(pc, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                        objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, pc, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
                     }
                 }
             }

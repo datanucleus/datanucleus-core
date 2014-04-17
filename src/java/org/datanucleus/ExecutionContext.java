@@ -30,7 +30,6 @@ import org.datanucleus.exceptions.NucleusOptimisticException;
 import org.datanucleus.flush.Operation;
 import org.datanucleus.flush.OperationQueue;
 import org.datanucleus.management.ManagerStatistics;
-import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.state.CallbackHandler;
@@ -242,46 +241,6 @@ public interface ExecutionContext
      * @param pc The object managed by the ObjectProvider
      */
     void hereIsObjectProvider(ObjectProvider op, Object pc);
-
-    /**
-     * Constructs an ObjectProvider to manage a hollow instance having the given object ID.
-     * This constructor is used for creating new instances of existing persistent objects.
-     * @param pcClass the class of the new instance to be created.
-     * @param id the identity of the object.
-     * @return Object Provider
-     */
-    <T> ObjectProvider<T> newObjectProviderForHollow(Class<T> pcClass, Object id);
-
-    /**
-     * Constructs an ObjectProvider to manage the specified persistent instance having the given object ID.
-     * @param id the identity of the object.
-     * @param pc The object that is persistent that we are going to manage
-     * @return Object Provider
-     */
-    <T> ObjectProvider<T> newObjectProviderForPersistentClean(Object id, T pc);
-
-    /**
-     * Constructs an ObjectProvider to manage a persistable instance that will
-     * be EMBEDDED/SERIALISED into another persistable object. The instance will not be
-     * assigned an identity in the process since it is a SCO.
-     * @param pc The persistable to manage (see copyPc also)
-     * @param copyPc Whether the SM should manage a copy of the passed PC or that one
-     * @param ownerOP Owner ObjectProvider
-     * @param ownerFieldNumber Field number in owner object where this is stored
-     * @return Object Provider
-     */
-    <T> ObjectProvider<T> newObjectProviderForEmbedded(T pc, boolean copyPc, ObjectProvider ownerOP, int ownerFieldNumber);
-
-    /**
-     * Constructs an ObjectProvider for an object of the specified type, creating the PC object to hold the values
-     * where this object will be EMBEDDED/SERIALISED into another persistable object. The instance will not be
-     * assigned an identity in the process since it is a SCO.
-     * @param cmd Meta-data for the class that this is an instance of.
-     * @param ownerOP Owner ObjectProvider
-     * @param ownerFieldNumber Field number in owner object where this is stored
-     * @return Object Provider
-     */
-    ObjectProvider newObjectProviderForEmbedded(AbstractClassMetaData cmd, ObjectProvider ownerOP, int ownerFieldNumber);
 
     /**
      * Method to add the object managed by the specified ObjectProvider to the cache.
