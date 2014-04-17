@@ -77,17 +77,12 @@ class AUID implements Comparable
         private int variant;
         /** A random generator to be use for random initialization of fields. */
         private Random random;
-        /**
-         * A flag indicating if security attributes should be included in time
-         * low field.
-         */
+        /** A flag indicating if security attributes should be included in time low field. */
         private boolean includeSecurityAttributes;
 
         /**
          * Sets the last time stamp used to create an AUID.
-         * 
-         * @param lastTime
-         *            the last time stamp used to create an AUID.
+         * @param lastTime the last time stamp used to create an AUID.
          */
         public void setLastTime(long lastTime)
         {
@@ -96,7 +91,6 @@ class AUID implements Comparable
 
         /**
          * Returns the last time stamp used to create an AUID.
-         * 
          * @return the last time stamp used to create an AUID.
          */
         public long getLastTime()
@@ -105,12 +99,8 @@ class AUID implements Comparable
         }
 
         /**
-         * Sets the time adjustment to be added to the last time stamp to create
-         * the next AUID.
-         * 
-         * @param adjustTime
-         *            The time adjustment to be added to the last time stamp to
-         *            create the next AUID.
+         * Sets the time adjustment to be added to the last time stamp to create the next AUID.
+         * @param adjustTime The time adjustment to be added to the last time stamp to create the next AUID.
          */
         public void setAdjustTime(long adjustTime)
         {
@@ -118,11 +108,8 @@ class AUID implements Comparable
         }
 
         /**
-         * Returns the time adjustment to be added to the last time stamp to
-         * create the next AUID.
-         * 
-         * @return The time adjustment to be added to the last time stamp to
-         *         create the next AUID.
+         * Returns the time adjustment to be added to the last time stamp to create the next AUID.
+         * @return The time adjustment to be added to the last time stamp to create the next AUID.
          */
         public long getAdjustTime()
         {
@@ -130,11 +117,8 @@ class AUID implements Comparable
         }
 
         /**
-         * Returns the time adjustment to be added to the last time stamp to
-         * create the next AUID and increments it.
-         * 
-         * @return The time adjustment to be added to the last time stamp to
-         *         create the next AUID before incrementation.
+         * Returns the time adjustment to be added to the last time stamp to create the next AUID and increments it.
+         * @return The time adjustment to be added to the last time stamp to create the next AUID before incrementation.
          */
         public long incrementAdjustTime()
         {
@@ -143,9 +127,7 @@ class AUID implements Comparable
 
         /**
          * Sets the current clock sequence.
-         * 
-         * @param clockSequence
-         *            the current clock sequence.
+         * @param clockSequence the current clock sequence.
          */
         public void setClockSequence(int clockSequence)
         {
@@ -154,7 +136,6 @@ class AUID implements Comparable
 
         /**
          * Returns the current clock sequence.
-         * 
          * @return the current clock sequence.
          */
         public int getClockSequence()
@@ -164,9 +145,7 @@ class AUID implements Comparable
 
         /**
          * Set the node value.
-         * 
-         * @param node
-         *            the node value.
+         * @param node the node value.
          */
         public void setNode(long node)
         {
@@ -175,7 +154,6 @@ class AUID implements Comparable
 
         /**
          * Returns the node value.
-         * 
          * @return the node value.
          */
         public long getNode()
@@ -185,9 +163,7 @@ class AUID implements Comparable
 
         /**
          * Sets the version to use when constructing new AUIDs.
-         * 
-         * @param version
-         *            the version to use when constructing new AUIDs.
+         * @param version the version to use when constructing new AUIDs.
          */
         public void setVersion(int version)
         {
@@ -196,7 +172,6 @@ class AUID implements Comparable
 
         /**
          * Returns the version to use when constructing new AUIDs.
-         * 
          * @return the version to use when constructing new AUIDs.
          */
         public int getVersion()
@@ -206,9 +181,7 @@ class AUID implements Comparable
 
         /**
          * Sets the variant to use when constructing new AUIDs.
-         * 
-         * @param variant
-         *            the variant to use when constructing new AUIDs.
+         * @param variant the variant to use when constructing new AUIDs.
          */
         public void setVariant(int variant)
         {
@@ -217,7 +190,6 @@ class AUID implements Comparable
 
         /**
          * Returns the variant to use when constructing new AUIDs.
-         * 
          * @return the variant to use when constructing new AUIDs.
          */
         public int getVariant()
@@ -227,9 +199,7 @@ class AUID implements Comparable
 
         /**
          * Sets the random generator used for initialization of fields.
-         * 
-         * @param random
-         *            the random generator to use for initialization of fields.
+         * @param random the random generator to use for initialization of fields.
          */
         public void setRandom(Random random)
         {
@@ -238,7 +208,6 @@ class AUID implements Comparable
 
         /**
          * Returns the random generator used for initialization of fields.
-         * 
          * @return the random generator used for initialization of fields.
          */
         public Random getRandom()
@@ -248,21 +217,16 @@ class AUID implements Comparable
 
         /**
          * Sets if security attributes have to be included in time low field.
-         * 
-         * @param includeSecurityAttributes
-         *            if <code>true</code> security attributes will included.
+         * @param includeSecurityAttributes if <code>true</code> security attributes will included.
          */
-        public void setIncludeSecurityAttributes(
-                boolean includeSecurityAttributes)
+        public void setIncludeSecurityAttributes(boolean includeSecurityAttributes)
         {
             this.includeSecurityAttributes = includeSecurityAttributes;
         }
 
         /**
          * Returns wether security attribute have to be included.
-         * 
-         * @return <code>true</code> if security attributes have to be
-         *         included.
+         * @return <code>true</code> if security attributes have to be included.
          */
         public boolean getIncludeSecurityAttributes()
         {
@@ -292,36 +256,23 @@ class AUID implements Comparable
 
     /**
      * The offset between UTC and the AUID timestamps in 100-nanosecond
-     * intervals since 00:00:00.00, 15 October 1582 (the date of Gregorian
-     * reform to the Christian Calendar).
+     * intervals since 00:00:00.00, 15 October 1582 (the date of Gregorian reform to the Christian Calendar).
      */
-    private static final long UTC_OFFSET = new GregorianCalendar()
-            .getGregorianChange().getTime()
-            * TIME_SCALE;
-    /**
-     * An array of chars for Hex conversion.
-     */
-    private static final char[] HEX_CHARS = {'0', '1', '2', '3', '4', '5', '6',
-            '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    private static final long UTC_OFFSET = new GregorianCalendar().getGregorianChange().getTime() * TIME_SCALE;
 
-    /**
-     * The state of the AUID generator.
-     */
+    /** An array of chars for Hex conversion. */
+    private static final char[] HEX_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+    /** The state of the AUID generator. */
     private static State auidState = null;
 
-    /**
-     * The first 64 bits of the uuid value.
-     */
+    /** The first 64 bits of the uuid value. */
     private long firstHalf;
 
-    /**
-     * The last 64 bits of the uuid value.
-     */
+    /** The last 64 bits of the uuid value. */
     private long secondHalf;
 
-    /**
-     * Constructs an AUID with new values.
-     */
+    /** Constructs an AUID with new values. */
     public AUID()
     {
         makeUnique(0, false);
@@ -330,9 +281,7 @@ class AUID implements Comparable
     /**
      * Constructs an AUID with new values and the specified security attributes.
      * The subclass which calls this constructor MUST set the state accordingly.
-     * 
-     * @param securityAttributes
-     *            the security attributes to include in the new AUID.
+     * @param securityAttributes the security attributes to include in the new AUID.
      */
     protected AUID(int securityAttributes)
     {
@@ -342,17 +291,11 @@ class AUID implements Comparable
     /**
      * Constructs an AUID from the specified values. This constructor is for
      * subclasses only and should not be made available to API users.
-     * 
-     * @param time
-     *            the time field of the new AUID
-     * @param version
-     *            the version of the new AUID
-     * @param clockSeq
-     *            the clock sequence of the new AUID
-     * @param variant
-     *            the variant of the new AUID
-     * @param node
-     *            the node of the new AUID
+     * @param time the time field of the new AUID
+     * @param version the version of the new AUID
+     * @param clockSeq the clock sequence of the new AUID
+     * @param variant the variant of the new AUID
+     * @param node the node of the new AUID
      */
     protected AUID(long time, int version, int clockSeq, int variant, long node)
     {
@@ -362,22 +305,14 @@ class AUID implements Comparable
 
     /**
      * Constructs an AUID from the specified original DCE field values. This
-     * constructor is for subclasses only and should not be made available to
-     * API users.
+     * constructor is for subclasses only and should not be made available to API users.
      * 
-     * @param timeLow
-     *            the time low field of the new AUID
-     * @param timeMid
-     *            the time mid field of the new AUID
-     * @param timeHiAndVersion
-     *            the packed time high and version field of the new AUID
-     * @param clockSeqHiAndVariant
-     *            the packed clock sequence high and variant field of the new
-     *            AUID
-     * @param clockSeqLow
-     *            the clock sequence low field of the new AUID
-     * @param node
-     *            the node field of the new AUID
+     * @param timeLow the time low field of the new AUID
+     * @param timeMid the time mid field of the new AUID
+     * @param timeHiAndVersion the packed time high and version field of the new AUID
+     * @param clockSeqHiAndVariant the packed clock sequence high and variant field of the new AUID
+     * @param clockSeqLow the clock sequence low field of the new AUID
+     * @param node the node field of the new AUID
      */
     protected AUID(long timeLow, long timeMid, long timeHiAndVersion,
             int clockSeqHiAndVariant, int clockSeqLow, long node)
@@ -388,9 +323,7 @@ class AUID implements Comparable
 
     /**
      * Constructs an AUID with the same values as the specified AUID.
-     * 
-     * @param auid
-     *            the AUID to clone
+     * @param auid the AUID to clone
      */
     protected AUID(AUID auid)
     {
@@ -427,11 +360,9 @@ class AUID implements Comparable
     }
 
     /**
-     * Constructs an AUID from the specified string representation in
-     * CharSequence.
+     * Constructs an AUID from the specified string representation in CharSequence.
      * 
-     * @param auid
-     *            a string representation of an AUID
+     * @param auid a string representation of an AUID
      * @throws NumberFormatException
      *             if <code>auid</code> does not match the pattern
      *             "LLLLLLLL-MMMM-HHHH-CCCC-NNNNNNNNNNNN" where 'L', 'M', 'H',
@@ -460,8 +391,7 @@ class AUID implements Comparable
      * in the same format as returned by <code>getBytes(dst, dstBegin)</code>.
      * This constructor is equal to <code>AUID(bytes, 0)</code>.
      * 
-     * @param bytes
-     *            a byte array representation of an AUID
+     * @param bytes a byte array representation of an AUID
      */
     public AUID(byte[] bytes)
     {
@@ -472,11 +402,8 @@ class AUID implements Comparable
      * Constructs an AUID from the specified byte array representation, which is
      * in the same format as returned by <code>getBytes(dst, dstBegin)</code>.
      * 
-     * @param bytes
-     *            a byte array representation of an AUID
-     * @param offset
-     *            the offset at which the byte array representation is located
-     *            in the byte array.
+     * @param bytes a byte array representation of an AUID
+     * @param offset the offset at which the byte array representation is located in the byte array.
      */
     public AUID(byte[] bytes, int offset)
     {
@@ -491,17 +418,12 @@ class AUID implements Comparable
     }
 
     /**
-     * Parse a String representation of an AUID. Equal to
-     * <code>new AUID(auid)</code>.
-     * 
-     * @param auid
-     *            a string representation of an AUID
+     * Parse a String representation of an AUID. Equal to <code>new AUID(auid)</code>.
+     * @param auid a string representation of an AUID
      * @return the AUID represented by <code>auid</code>.
-     * @throws NumberFormatException
-     *             if <code>auid</code> does not match the pattern
-     *             "LLLLLLLL-MMMM-HHHH-CCCC-NNNNNNNNNNNN" where 'L', 'M', 'H',
-     *             'C' and 'N' are time low, mid, high, clock sequence and node
-     *             fields respectively.
+     * @throws NumberFormatException if <code>auid</code> does not match the pattern
+     * "LLLLLLLL-MMMM-HHHH-CCCC-NNNNNNNNNNNN" where 'L', 'M', 'H', 'C' and 'N' are time low, mid, high, clock
+     * sequence and node fields respectively.
      */
     public static AUID parse(String auid)
     {
@@ -509,17 +431,12 @@ class AUID implements Comparable
     }
 
     /**
-     * Parse a String representation of an AUID. Equal to
-     * <code>new AUID(auid)</code>.
-     * 
+     * Parse a String representation of an AUID. Equal to <code>new AUID(auid)</code>.
      * @param auid string in the format "LLLLLLLL-MMMM-HHHH-CCCC-NNNNNNNNNNNN"
      * @return the AUID represented by <code>auid</code>.
-     * @throws NumberFormatException
-     *             if <code>auid</code> does not match the pattern
-     *             "LLLLLLLL-MMMM-HHHH-CCCC-NNNNNNNNNNNN" where 'L', 'M', 'H',
-     *             'C' and 'N' are time low, mid, high, clock sequence and node
-     *             fields respectively.
-     *            a string representation of an AUID
+     * @throws NumberFormatException if <code>auid</code> does not match the pattern
+     * "LLLLLLLL-MMMM-HHHH-CCCC-NNNNNNNNNNNN" where 'L', 'M', 'H', 'C' and 'N' are time low, mid, high, clock
+     * sequence and node fields respectively. a string representation of an AUID
      */
     public static AUID parse(CharSequence auid)
     {
@@ -527,17 +444,12 @@ class AUID implements Comparable
     }
 
     /**
-     * Identifies the variant from the combined clock sequence and variant
-     * value, as it is returned by <code>getClockSeqAndVariant()</code>.
-     * 
-     * May be overridden to support new variants.
-     * 
-     * @param clockSeqAndVariant
-     *            the combined clock sequence and variant value, as it is
-     *            returned by <code>getClockSeqAndVariant()</code>.
+     * Identifies the variant from the combined clock sequence and variant value, as it is returned by
+     * <code>getClockSeqAndVariant()</code>. May be overridden to support new variants.
+     * @param clockSeqAndVariant the combined clock sequence and variant value, as it is returned by
+     * <code>getClockSeqAndVariant()</code>.
      * @return the variant identified in the specified combined value.
-     * @throws IllegalArgumentException
-     *             if variant could not be identified.
+     * @throws IllegalArgumentException if variant could not be identified.
      */
     protected int identifyVariant(int clockSeqAndVariant)
     {
@@ -562,13 +474,9 @@ class AUID implements Comparable
     }
 
     /**
-     * This returns the bit mask to be applied to a clock sequence before it is
-     * ORed with the variant value.
-     * 
+     * This returns the bit mask to be applied to a clock sequence before it is ORed with the variant value.
      * May be overridden to support new variants.
-     * 
-     * @param variant
-     *            the variant for which the mask shall be returned.
+     * @param variant the variant for which the mask shall be returned.
      * @return the mask to apply to a sequence when combining values.
      */
     public int getClockSeqMaskForVariant(int variant)
@@ -589,10 +497,8 @@ class AUID implements Comparable
     }
 
     /**
-     * Returns the current time as 100-nanosecond intervals since 00:00:00.00,
-     * 15 October 1582 (the date of Gregorian reform to the Christian Calendar).
-     * This may be overridden to support high resolution time devices.
-     * 
+     * Returns the current time as 100-nanosecond intervals since 00:00:00.00, 15 October 1582 (the date of
+     * Gregorian reform to the Christian Calendar). This may be overridden to support high resolution time devices.
      * @return a time stamp for use in an AUID
      */
     protected long getCurrentTime()
@@ -601,12 +507,9 @@ class AUID implements Comparable
     }
 
     /**
-     * Loads the generator state from non-volatile storage into the provided
-     * State object or creates a new one if <code>null</code>.
-     * 
-     * Overriding this method allows to actually add persistent storage
-     * facilities for the generator state and may also support non-random node
-     * that have been retrieved from the hardware. <br />
+     * Loads the generator state from non-volatile storage into the provided State object or creates a new one
+     * if <code>null</code>. Overriding this method allows to actually add persistent storage facilities for
+     * the generator state and may also support non-random node that have been retrieved from the hardware. <br />
      * To override this method follow this pattern:
      * 
      * <pre>
@@ -636,7 +539,7 @@ class AUID implements Comparable
      *         // load clock sequence only if node value is retrieved from hardware that
      *         // cannot be moved to another system and is guaranteed to be unique between
      *         // different systems
-     *         // Do not modify the above values if loading failed (for example due to 
+     *         // Do not modify the above values if loading failed (for example due to
      *         // I/O failure).
      *         // YOUR CODE TO LOAD CLOCK RELATED VALUES GOES HERE (REQUIRED)
      *         // Set node, version, variant and security attribute inclusion as required.
@@ -645,9 +548,7 @@ class AUID implements Comparable
      *     return state;
      * }
      * </pre>
-     * 
-     * @param state
-     *            the State object into which the state has to be loaded.
+     * @param state the State object into which the state has to be loaded.
      * @return an initialized State object
      */
     protected State loadState(State state)
@@ -666,10 +567,9 @@ class AUID implements Comparable
             if (loadInto.getRandom() == null)
             {
                 // set random generator
-                //loadInto.setRandom(new Random(System.currentTimeMillis()));
-                //loadInto.setRandom(new Random(EntropicSeed.calculate(32)));
-                loadInto.setRandom(new Random(entropicSeed(32, System
-                        .currentTimeMillis())));
+                // loadInto.setRandom(new Random(System.currentTimeMillis()));
+                // loadInto.setRandom(new Random(EntropicSeed.calculate(32)));
+                loadInto.setRandom(new Random(entropicSeed(32, System.currentTimeMillis())));
             }
             // no super implementation to call
             // initialize clock related
@@ -677,8 +577,7 @@ class AUID implements Comparable
             loadInto.setAdjustTime(0);
             loadInto.setClockSequence(loadInto.getRandom().nextInt());
             // initialize attribute fields
-            loadInto
-                    .setNode(loadInto.getRandom().nextLong() & 0x0000ffffffffffffL);
+            loadInto.setNode(loadInto.getRandom().nextLong() & 0x0000ffffffffffffL);
             loadInto.setVersion(VERSION_RANDOM_NODE);
             loadInto.setVariant(VARIANT_DCE);
             loadInto.setIncludeSecurityAttributes(false);
@@ -687,34 +586,23 @@ class AUID implements Comparable
     }
 
     /**
-     * Can be overridden together with <code>loadState</code> to provide
-     * persistent storage for the auid generator state. The default
-     * implementation does nothing.
-     * 
-     * @param state
-     *            the State object to persist.
+     * Can be overridden together with <code>loadState</code> to provide persistent storage for the auid
+     * generator state. The default implementation does nothing.
+     * @param state the State object to persist.
      */
     protected void saveState(State state)
     {
     }
 
     /**
-     * This is the implementation of <code>getBytes(dst, dstBegin)</code>,
-     * however, the endianess can be specified through the boolean argument.
-     * Subclasses can use this to provide little endian byte array
-     * representations. If this is done, there should also be a constructor
-     * using this byte array order. If this method is overridden to provide a
-     * different field order, the new field order will also be used by the
-     * <code>getBytes(dst, dstBegin)</code> method.
-     * 
-     * @param dst
-     *            the destination byte array, if <code>null</code> a new array
-     *            will be created
-     * @param dstBegin
-     *            the offset to use when writing into the destination byte
-     *            array, ignored if dst is <code>null</code>
-     * @param bigendian
-     *            if <code>true</code> big endian byte order is used
+     * This is the implementation of <code>getBytes(dst, dstBegin)</code>, however, the endianess can be
+     * specified through the boolean argument. Subclasses can use this to provide little endian byte array
+     * representations. If this is done, there should also be a constructor using this byte array order. If
+     * this method is overridden to provide a different field order, the new field order will also be used by
+     * the <code>getBytes(dst, dstBegin)</code> method.
+     * @param dst the destination byte array, if <code>null</code> a new array will be created
+     * @param dstBegin the offset to use when writing into the destination byte array, ignored if dst is null
+     * @param bigendian if <code>true</code> big endian byte order is used
      * @return a byte array
      */
     protected byte[] getBytes(byte[] dst, int dstBegin, boolean bigendian)
@@ -734,13 +622,12 @@ class AUID implements Comparable
     }
 
     /**
-     * Returns the AUID value as byte array. The array will be filled with the
-     * original DCE fields in big endian order, that is each field starts with
-     * the most significant byte:
+     * Returns the AUID value as byte array. The array will be filled with the original DCE fields in big
+     * endian order, that is each field starts with the most significant byte:
      * 
      * <pre>
      * 
-     *  
+     * 
      *   +---------------------------+---------+---+---+-------+-------+
      *   ! FIELD DESCRIPTION         ! OCTETS  !    LENGTH in bits     !
      *   +---------------------------+---------+---------------+-------+
@@ -756,19 +643,14 @@ class AUID implements Comparable
      *   +---------------------------+---------+---+-------------------+
      *   ! node                      ! 10 - 15 !           48          !
      *   +---------------------------+---------+-----------------------+
-     *   
-     *  
+     * 
+     * 
      * </pre>
      * 
-     * This implementation just returns
-     * <code>getBytes(dst, dstBegin, true)</code>.
-     * @param dst
-     *            the destination byte array, if <code>null</code> a new array
-     *            will be created
-     * @param dstBegin
-     *            the offset to use when writing into the destination byte
-     *            array, ignored if dst is <code>null</code>
-     * @return a byte array     
+     * This implementation just returns <code>getBytes(dst, dstBegin, true)</code>.
+     * @param dst the destination byte array, if <code>null</code> a new array will be created
+     * @param dstBegin the offset to use when writing into the destination byte array, ignored if dst is null
+     * @return a byte array
      */
     public byte[] getBytes(byte[] dst, int dstBegin)
     {
@@ -776,15 +658,11 @@ class AUID implements Comparable
     }
 
     /**
-     * Appends the String representation of this AUID to the specified
-     * StringBuilder or if null to a new created StringBuilder and returns the
-     * StringBuilder. This method is called by <code>toString</code>,
-     * therefore it is sufficient to override this method together with
-     * providing new parse methods to create a new string representation of an
-     * AUID.
-     * 
-     * @param sb
-     *            the StringBuilder to use
+     * Appends the String representation of this AUID to the specified StringBuilder or if null to a new
+     * created StringBuilder and returns the StringBuilder. This method is called by <code>toString</code>,
+     * therefore it is sufficient to override this method together with providing new parse methods to create
+     * a new string representation of an AUID.
+     * @param sb the StringBuilder to use
      * @return a StringBuilder to which this AUID has been appended
      */
     public StringBuilder toStringBuilder(StringBuilder sb)
@@ -814,18 +692,15 @@ class AUID implements Comparable
     }
 
     /**
-     * Packs the original DCE fields time low, mid and hiAndVersion into the
-     * first 64 bits (octets 0-7).
+     * Packs the original DCE fields time low, mid and hiAndVersion into the first 64 bits (octets 0-7).
      */
-    private void packDCEFieldsFirstHalf(long timeLow, long timeMid,
-            long timeHiAndVersion)
+    private void packDCEFieldsFirstHalf(long timeLow, long timeMid, long timeHiAndVersion)
     {
         firstHalf = (timeHiAndVersion << 48) | (timeMid << 32) | timeLow;
     }
 
     /**
-     * Packs clock sequence, variant and node into the second 64 bits (octets
-     * 8-15).
+     * Packs clock sequence, variant and node into the second 64 bits (octets 8-15).
      */
     private void packSecondHalf(int clockSeq, int variant, long node)
     {
@@ -836,11 +711,10 @@ class AUID implements Comparable
     }
 
     /**
-     * Packs the original DCE fields clockSeqHiAndVariant, clockSeqLow and node
-     * into the second 64 bits (octets 8-15).
+     * Packs the original DCE fields clockSeqHiAndVariant, clockSeqLow and node into the second 64 bits
+     * (octets 8-15).
      */
-    private void packDCEFieldsSecondHalf(int clockSeqHiAndVariant,
-            int clockSeqLow, long node)
+    private void packDCEFieldsSecondHalf(int clockSeqHiAndVariant, int clockSeqLow, long node)
     {
         secondHalf = (node << 16) | (clockSeqLow << 8) | clockSeqHiAndVariant;
     }
@@ -848,8 +722,7 @@ class AUID implements Comparable
     /**
      * Contains the algorithm to create an AUID.
      */
-    private void makeUnique(int securityAttributes,
-            boolean hasSecurityAttributes)
+    private void makeUnique(int securityAttributes, boolean hasSecurityAttributes)
     {
         synchronized (AUID.class)
         {
@@ -884,31 +757,27 @@ class AUID implements Comparable
                 }
                 else
                 {
-                    throw new IllegalArgumentException(
-                            "Required to include security attributes as declared in state.");
+                    throw new IllegalArgumentException("Required to include security attributes as declared in state.");
                 }
             }
             else
             {
                 if (hasSecurityAttributes)
                 {
-                    throw new IllegalArgumentException(
-                            "Cannot include security attributes if not declared in state.");
+                    throw new IllegalArgumentException("Cannot include security attributes if not declared in state.");
                 }
             }
             // 2b., 3., 4., 5. set time low, mid high and version fields
             packFirstHalf(now, state.getVersion());
             // 6., 7., 8. set clock sequence and variant fields
-            packSecondHalf(state.getClockSequence(), state.getVariant(), state
-                    .getNode());
+            packSecondHalf(state.getClockSequence(), state.getVariant(), state.getNode());
             saveState(state);
         }
     }
 
     /**
-     * Converts <code>nibbles</code> least significant nibbles of
-     * <code>value</code> into a hex representation and appends it to
-     * <code>result</code>.
+     * Converts <code>nibbles</code> least significant nibbles of <code>value</code> into a hex representation
+     * and appends it to <code>result</code>.
      */
     private void toHex(StringBuilder result, long value, int nibbles)
     {
@@ -921,10 +790,8 @@ class AUID implements Comparable
 
     /**
      * Converts a hex character into the corresponding nibble value.
-     * 
      * @return the nibble value.
-     * @throws NumberFormatException
-     *             if <code>c</code> is not a valid hex character.
+     * @throws NumberFormatException if <code>c</code> is not a valid hex character.
      */
     private long parseNibble(char c)
     {
@@ -975,9 +842,7 @@ class AUID implements Comparable
 
     /**
      * Tests wether <code>c</code> is a hyphen '-' character.
-     * 
-     * @throws NumberFormatException
-     *             if <code>c</code> is not a hyphen '-' character.
+     * @throws NumberFormatException if <code>c</code> is not a hyphen '-' character.
      */
     private void parseHyphen(char c)
     {
@@ -988,11 +853,8 @@ class AUID implements Comparable
     }
 
     /**
-     * Parses the character sequence <code>cs</code> from begin to end as hex
-     * string.
-     * 
-     * @throws NumberFormatException
-     *             if <code>cs</code> contains non-hex characters.
+     * Parses the character sequence <code>cs</code> from begin to end as hex string.
+     * @throws NumberFormatException if <code>cs</code> contains non-hex characters.
      */
     private long parseHex(CharSequence cs)
     {
@@ -1005,14 +867,11 @@ class AUID implements Comparable
     }
 
     /**
-     * Parses the character sequence <code>cs</code> from begin to end as the
-     * first 18 charcters of a string representation of an AUID.
-     * 
+     * Parses the character sequence <code>cs</code> from begin to end as the first 18 charcters of a string
+     * representation of an AUID.
      * @return the first 64 bits represented by <code>cs</code>.
-     * @throws NumberFormatException
-     *             if <code>cs</code> does no match the pattern
-     *             "LLLLLLLL-MMMM-HHHH" where 'L', 'M', 'H' are time low, mid
-     *             and high fields respectively.
+     * @throws NumberFormatException if <code>cs</code> does no match the pattern "LLLLLLLL-MMMM-HHHH" where
+     * 'L', 'M', 'H' are time low, mid and high fields respectively.
      */
     private long parseFirstHalf(CharSequence charSequence)
     {
@@ -1025,14 +884,11 @@ class AUID implements Comparable
     }
 
     /**
-     * Parses the character sequence <code>cs</code> from begin to end as the
-     * second 18 charcters of a string representation of an AUID.
-     * 
+     * Parses the character sequence <code>cs</code> from begin to end as the second 18 charcters of a string
+     * representation of an AUID.
      * @return the second 64 bits represented by <code>cs</code>.
-     * @throws NumberFormatException
-     *             if <code>cs</code> does no match the pattern
-     *             "-CCCC-NNNNNNNNNNNN" where 'C', 'N' are clock sequence and
-     *             node fields respectively.
+     * @throws NumberFormatException if <code>cs</code> does no match the pattern "-CCCC-NNNNNNNNNNNN" where
+     * 'C', 'N' are clock sequence and node fields respectively.
      */
     private long parseSecondHalf(CharSequence charSequence)
     {
@@ -1044,33 +900,24 @@ class AUID implements Comparable
     }
 
     /**
-     * Gets a value from the specified byte array starting at begin with the
-     * specified number of octets and endianess.
-     * @param octets
-     *            the number of octets
-     * @param bytes
-     *            the array to get the value from
-     * @param begin
-     *            the offset to use when writing into the destination byte
-     *            array, ignored if dst is <code>null</code>
-     * @param bigendian
-     *            if <code>true</code> big endian byte order is used
+     * Gets a value from the specified byte array starting at begin with the specified number of octets and endianess.
+     * @param octets the number of octets
+     * @param bytes the array to get the value from
+     * @param begin the offset to use when writing into the destination byte array, ignored if dst is null
+     * @param bigendian if <code>true</code> big endian byte order is used
      * @return the octet
      */
-    protected static final long getOctets(int octets, byte[] bytes, int begin,
-            boolean bigendian)
+    protected static final long getOctets(int octets, byte[] bytes, int begin, boolean bigendian)
     {
         if (octets > 1)
         {
             if (bigendian)
             {
-                return ((bytes[begin] & 0xffL) << (8 * (octets - 1)))
-                        | getOctets(octets - 1, bytes, begin + 1, bigendian);
+                return ((bytes[begin] & 0xffL) << (8 * (octets - 1))) | getOctets(octets - 1, bytes, begin + 1, bigendian);
             }
             else
             {
-                return getOctets(octets - 1, bytes, begin, bigendian)
-                        | ((bytes[begin + octets - 1] & 0xffL) << (8 * (octets - 1)));
+                return getOctets(octets - 1, bytes, begin, bigendian) | ((bytes[begin + octets - 1] & 0xffL) << (8 * (octets - 1)));
             }
         }
         else
@@ -1081,20 +928,13 @@ class AUID implements Comparable
 
     /**
      * Puts the specified value into the byte array in the specified endianess.
-     * @param value
-     *            the value
-     * @param octets
-     *            the number of octets
-     * @param dst
-     *            the destination array
-     * @param dstBegin
-     *            the offset to use when writing into the destination byte
-     *            array, ignored if dst is <code>null</code>
-     * @param bigendian
-     *            if <code>true</code> big endian byte order is used
+     * @param value the value
+     * @param octets the number of octets
+     * @param dst the destination array
+     * @param dstBegin the offset to use when writing into the destination byte array, ignored if dst is null
+     * @param bigendian if <code>true</code> big endian byte order is used
      */
-    protected static final void putOctets(long value, int octets, byte[] dst,
-            int dstBegin, boolean bigendian)
+    protected static final void putOctets(long value, int octets, byte[] dst, int dstBegin, boolean bigendian)
     {
         if (bigendian)
         {
@@ -1116,7 +956,6 @@ class AUID implements Comparable
 
     /**
      * Returns time low octets 0-3 (unsigned) int in a signed long.
-     * 
      * @return the time low field (original DCE field).
      */
     public final long getTimeLow()
@@ -1126,7 +965,6 @@ class AUID implements Comparable
 
     /**
      * Returns time mid octets 4-5 (unsigned) int in a signed long.
-     * 
      * @return the time mid field (original DCE field).
      */
     public final long getTimeMid()
@@ -1136,7 +974,6 @@ class AUID implements Comparable
 
     /**
      * Returns time high octets 6-7 (unsigned) int in a signed long.
-     * 
      * @return the time high field with version masked out.
      */
     public final long getTimeHigh()
@@ -1146,7 +983,6 @@ class AUID implements Comparable
 
     /**
      * Returns octets 6-7 (unsigned) int in a signed long.
-     * 
      * @return the time high and version field (original DCE field).
      */
     public final long getTimeHighAndVersion()
@@ -1156,7 +992,6 @@ class AUID implements Comparable
 
     /**
      * Returns octets 0-7 time only.
-     * 
      * @return the complete time value.
      */
     public final long getTime()
@@ -1165,13 +1000,10 @@ class AUID implements Comparable
     }
 
     /**
-     * Returns the time of the AUID as Date. This is a narrowing conversion
-     * because Date only supports a granularity of milliseconds, while the time
-     * value represents 100 nanosecond intervals. Use <code>getNanos</code> to
-     * retrieve the truncated nanoseconds.
-     * 
-     * @return the complete time value as Date truncated to the next
-     *         millisecond.
+     * Returns the time of the AUID as Date. This is a narrowing conversion because Date only supports a
+     * granularity of milliseconds, while the time value represents 100 nanosecond intervals. Use
+     * <code>getNanos</code> to retrieve the truncated nanoseconds.
+     * @return the complete time value as Date truncated to the next millisecond.
      */
     public final Date getDate()
     {
@@ -1179,11 +1011,8 @@ class AUID implements Comparable
     }
 
     /**
-     * Returns the nanoseconds truncated from the time of the AUID by
-     * <code>getDate</code>.
-     * 
-     * @return the nanoseconds truncated from the time of the AUID by
-     *         <code>getDate</code>.
+     * Returns the nanoseconds truncated from the time of the AUID by <code>getDate</code>.
+     * @return the nanoseconds truncated from the time of the AUID by <code>getDate</code>.
      */
     public final long getNanos()
     {
@@ -1192,7 +1021,6 @@ class AUID implements Comparable
 
     /**
      * Returns octets 6-7 version only.
-     * 
      * @return the version field.
      */
     public final int getVersion()
@@ -1201,11 +1029,8 @@ class AUID implements Comparable
     }
 
     /**
-     * Returns clock sequence high and variant octet 8 (unsigned) small in a
-     * signed int.
-     * 
-     * @return the clock seq hi and reserved (variant) field (original DCE
-     *         field).
+     * Returns clock sequence high and variant octet 8 (unsigned) small in a signed int.
+     * @return the clock seq hi and reserved (variant) field (original DCE field).
      */
     public final int getClockSeqHighAndVariant()
     {
@@ -1214,7 +1039,6 @@ class AUID implements Comparable
 
     /**
      * Returns clock sequence low octet 9 (unsigned) small in a signed int.
-     * 
      * @return the clock seq low field (original DCE field).
      */
     public final int getClockSeqLow()
@@ -1223,9 +1047,7 @@ class AUID implements Comparable
     }
 
     /**
-     * Returns clock sequence and variant octets 8-9 (unsigned) short in a
-     * signed int.
-     * 
+     * Returns clock sequence and variant octets 8-9 (unsigned) short in a signed int.
      * @return the clock sequence and variant field.
      */
     public final int getClockSeqAndVariant()
@@ -1235,7 +1057,6 @@ class AUID implements Comparable
 
     /**
      * Returns clock sequence.
-     * 
      * @return the clock sequence field.
      */
     public final int getClockSeq()
@@ -1246,7 +1067,6 @@ class AUID implements Comparable
 
     /**
      * Returns the variant.
-     * 
      * @return the variant field.
      */
     public final int getVariant()
@@ -1256,7 +1076,6 @@ class AUID implements Comparable
 
     /**
      * Returns node value octets 10-15 (unsigned) 48-bit in a signed long.
-     * 
      * @return the node field (original DCE field).
      */
     public final long getNode()
@@ -1266,7 +1085,6 @@ class AUID implements Comparable
 
     /**
      * Conveniance method just returns <code>getBytes(null, 0)</code>.
-     * 
      * @return <code>getBytes(null, 0)</code>.
      */
     public final byte[] getBytes()
@@ -1282,8 +1100,7 @@ class AUID implements Comparable
         if (obj instanceof AUID)
         {
             AUID other = (AUID) obj;
-            return (firstHalf == other.firstHalf)
-                    && (secondHalf == other.secondHalf);
+            return (firstHalf == other.firstHalf) && (secondHalf == other.secondHalf);
         }
         return false;
     }
@@ -1313,8 +1130,7 @@ class AUID implements Comparable
                 cmp = getTimeHighAndVersion() - other.getTimeHighAndVersion();
                 if (cmp != 0)
                 {
-                    cmp = getClockSeqHighAndVariant()
-                            - other.getClockSeqHighAndVariant();
+                    cmp = getClockSeqHighAndVariant() - other.getClockSeqHighAndVariant();
                     if (cmp != 0)
                     {
                         cmp = getClockSeqLow() - other.getClockSeqLow();
@@ -1432,7 +1248,7 @@ class AUID implements Comparable
         long seed = 0;
         for (int i = 0; i < bits; i++)
         {
-            //seed = (seed << 1) + (randoms[i].nextLong() & 1);
+            // seed = (seed << 1) + (randoms[i].nextLong() & 1);
             seed += randoms[i].nextLong();
         }
         return seed;
