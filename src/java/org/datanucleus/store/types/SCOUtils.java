@@ -1320,7 +1320,7 @@ public class SCOUtils
                 boolean exists = false;
                 if (api.isDetached(object))
                 {
-                    if (ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE))
+                    if (ec.getBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE))
                     {
                         // Assume that it is detached from this datastore
                         exists = true;
@@ -1486,7 +1486,7 @@ public class SCOUtils
      */
     public static boolean detachAsWrapped(ObjectProvider ownerOP)
     {
-        return ownerOP.getExecutionContext().getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_DETACH_AS_WRAPPED);
+        return ownerOP.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_DETACH_AS_WRAPPED);
     }
 
     /**

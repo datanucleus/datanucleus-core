@@ -4061,7 +4061,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             }
             else
             {
-                if (!myEC.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE))
+                if (!myEC.getBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE))
                 {
                     // We cant assume that this object was detached from this datastore so we check it
                     try
@@ -4145,7 +4145,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             }
             else
             {
-                if (!myEC.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE))
+                if (!myEC.getBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE))
                 {
                     // We cant assume that this object was detached from this datastore so we check it
                     try

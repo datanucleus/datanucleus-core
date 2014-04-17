@@ -233,12 +233,10 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultProperty(PropertyNames.PROPERTY_VALIDATION_GROUP_PREREMOVE, null, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_VALIDATION_FACTORY, null, null, null, false, false);
 
-        // Auto-Start Mechanism
-        conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM, null, "None", null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_MODE, null, "Quiet", CorePropertyValidator.class.getName(), true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_XMLFILE, null, "datanucleusAutoStart.xml", null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_CLASSNAMES, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_METADATAFILES, null, null, null, true, false);
+        // Store Definition
+        conf.addDefaultProperty(PropertyNames.PROPERTY_STORE_MANAGER_TYPE, null, null, null, false, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY, null, false, false, true);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION, null, "EXCEPTION", CorePropertyValidator.class.getName(), false, true);
 
         // Schema Generation
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_MODE, null, "none",
@@ -250,90 +248,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_SOURCE, null, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_SOURCE, null, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_LOAD_SOURCE, null, null, null, false, false);
-
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_SCHEMA, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_WARNONERROR, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_ALL, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS, null, false, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS, null, false, true, false);
-
-        // Legacy properties from earlier DataNucleus (< 3.9), mapped onto new named properties
-        conf.addDefaultBooleanProperty("datanucleus.autoCreateSchema", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL, false, true, false); // TODO Drop in future release
-        conf.addDefaultBooleanProperty("datanucleus.autoCreateTables", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, false, true, false); // TODO Drop in future release
-        conf.addDefaultBooleanProperty("datanucleus.autoCreateColumns", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, false, true, false); // TODO Drop in future release
-        conf.addDefaultBooleanProperty("datanucleus.autoCreateConstraints", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, false, true, false); // TODO Drop in future release
-        conf.addDefaultBooleanProperty("datanucleus.validateSchema", PropertyNames.PROPERTY_SCHEMA_VALIDATE_ALL, false, true, false); // TODO Drop in future release
-        conf.addDefaultBooleanProperty("datanucleus.validateTables", PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES, false, true, false); // TODO Drop in future release
-        conf.addDefaultBooleanProperty("datanucleus.validateColumns", PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS, false, true, false); // TODO Drop in future release
-        conf.addDefaultBooleanProperty("datanucleus.validateConstraints", PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS, false, true, false); // TODO Drop in future release
-        conf.addDefaultBooleanProperty("datanucleus.autoCreateWarnOnError", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_WARNONERROR, false, true, false); // TODO Drop in future release
-
-        // Schema identifier naming
-        conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_NAMING_FACTORY, null, "datanucleus2", null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_CASE, null, null, CorePropertyValidator.class.getName(), true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_TABLE_PREFIX, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_TABLE_SUFFIX, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_WORD_SEPARATOR, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_FACTORY, null, "datanucleus2", null, true, false); // TODO Migrate RDBMS to use NamingFactory and drop this
-
-        // Datastore
-        conf.addDefaultProperty(PropertyNames.PROPERTY_STORE_MANAGER_TYPE, null, null, null, false, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY, null, false, false, true);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION, null, "EXCEPTION", CorePropertyValidator.class.getName(), false, true);
-        conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_DATASTORE_READ_TIMEOUT, null, null, true, true);
-        conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_DATASTORE_WRITE_TIMEOUT, null, null, true, true);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_STORE_ALLOW_REFS_WITHOUT_IMPLS, null, false, false, true);
-
-        conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING, null, null, StringPropertyValidator.class.getName(), true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_CATALOG, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_SCHEMA, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID, null, null, null, true, false);
-
-        // ExecutionContext level features
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_PERSISTENCE_BY_REACHABILITY_AT_COMMIT, null, true, false, true);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS, null, true, false, true);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS_CHECKS, null, true, false, true);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SERIALIZE_READ, null, false, false, true);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_DELETION_POLICY, null, "JDO2", 
-            CorePropertyValidator.class.getName(), false, true);
-        // TODO Would be nice to set the default here to "false" but JDO TCK "instanceCallbacks" fails
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED, null, true, false, true);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_TYPE_CONVERSION, null, true, false, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_ALLOW_CALLBACKS, null, true, false, true);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_COMMIT, null, false, false, true);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_ROLLBACK, null, false, false, true);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_DETACH_ON_CLOSE, null, false, false, true);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_COPY_ON_ATTACH, null, true, false, true);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE, null, true, false, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_ALLOW_ATTACH_OF_TRANSIENT, null, false, false, true);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_DETACH_AS_WRAPPED, null, false, false, true);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_DETACH_DETACHMENT_FIELDS, null, "load-fields", 
-            CorePropertyValidator.class.getName(), false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_DETACH_DETACHED_STATE, null, "fetch-groups", 
-            CorePropertyValidator.class.getName(), false, false);
-        conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_MAX_FETCH_DEPTH, null, 1, false, true);
-
-        // Connection
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_URL, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_DRIVER_NAME, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_USER_NAME, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_PASSWORD, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_PASSWORD_DECRYPTER, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY_NAME, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY2_NAME, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY2, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE, null, null, CorePropertyValidator.class.getName(), true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE2, null, null, CorePropertyValidator.class.getName(), true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_POOLINGTYPE, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_POOLINGTYPE2, null, null, null, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CONNECTION_NONTX_RELEASE_AFTER_USE, null, true, true, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CONNECTION_SINGLE_CONNECTION, null, false, true, false);
 
         // Cache
         conf.addDefaultProperty(PropertyNames.PROPERTY_CACHE_L1_TYPE, null, "soft", null, false, false);
@@ -380,6 +294,96 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_RESULTCACHE_VALIDATEOBJECTS, null, true, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_QUERY_RESULT_SIZE_METHOD, null, "last", null, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_COMPILE_NAMED_QUERIES_AT_STARTUP, null, false, false, false);
+
+        // Other properties
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_PERSISTENCE_BY_REACHABILITY_AT_COMMIT, null, true, false, true);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS, null, true, false, true);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS_CHECKS, null, true, false, true);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SERIALIZE_READ, null, false, false, true);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_DELETION_POLICY, null, "JDO2", 
+            CorePropertyValidator.class.getName(), false, true);
+        // TODO Would be nice to set the default here to "false" but JDO TCK "instanceCallbacks" fails
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED, null, true, false, true);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_TYPE_CONVERSION, null, true, false, false); // TODO Change last arg to true
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_ALLOW_CALLBACKS, null, true, false, true);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_COMMIT, null, false, false, true);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_ROLLBACK, null, false, false, true);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_DETACH_ON_CLOSE, null, false, false, true);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_COPY_ON_ATTACH, null, true, false, true);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE, null, true, false, true);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_ALLOW_ATTACH_OF_TRANSIENT, null, false, false, true);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_DETACH_AS_WRAPPED, null, false, false, true);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_DETACH_DETACHMENT_FIELDS, null, "load-fields", 
+            CorePropertyValidator.class.getName(), false, false); // TODO Change last arg to true
+        conf.addDefaultProperty(PropertyNames.PROPERTY_DETACH_DETACHED_STATE, null, "fetch-groups", 
+            CorePropertyValidator.class.getName(), false, false); // TODO Change last arg to true
+        conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_MAX_FETCH_DEPTH, null, 1, false, true);
+
+        // ========================= Generally all properties below here are specified at the StoreManager level =============================
+
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL, null, false, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_SCHEMA, null, false, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, null, false, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, null, false, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, null, false, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_WARNONERROR, null, false, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_ALL, null, false, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES, null, false, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS, null, false, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS, null, false, true, false);
+
+        // Legacy properties from earlier DataNucleus (< 3.9), mapped onto new named properties
+        conf.addDefaultBooleanProperty("datanucleus.autoCreateSchema", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL, false, true, false); // TODO Drop in future release
+        conf.addDefaultBooleanProperty("datanucleus.autoCreateTables", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, false, true, false); // TODO Drop in future release
+        conf.addDefaultBooleanProperty("datanucleus.autoCreateColumns", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, false, true, false); // TODO Drop in future release
+        conf.addDefaultBooleanProperty("datanucleus.autoCreateConstraints", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, false, true, false); // TODO Drop in future release
+        conf.addDefaultBooleanProperty("datanucleus.validateSchema", PropertyNames.PROPERTY_SCHEMA_VALIDATE_ALL, false, true, false); // TODO Drop in future release
+        conf.addDefaultBooleanProperty("datanucleus.validateTables", PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES, false, true, false); // TODO Drop in future release
+        conf.addDefaultBooleanProperty("datanucleus.validateColumns", PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS, false, true, false); // TODO Drop in future release
+        conf.addDefaultBooleanProperty("datanucleus.validateConstraints", PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS, false, true, false); // TODO Drop in future release
+        conf.addDefaultBooleanProperty("datanucleus.autoCreateWarnOnError", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_WARNONERROR, false, true, false); // TODO Drop in future release
+
+        // Schema identifier naming
+        conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_NAMING_FACTORY, null, "datanucleus2", null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_CASE, null, null, CorePropertyValidator.class.getName(), true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_TABLE_PREFIX, null, null, null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_TABLE_SUFFIX, null, null, null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_WORD_SEPARATOR, null, null, null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_FACTORY, null, "datanucleus2", null, true, false); // TODO Migrate RDBMS to use NamingFactory and drop this
+
+        // Datastore
+        conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_DATASTORE_READ_TIMEOUT, null, null, true, true);
+        conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_DATASTORE_WRITE_TIMEOUT, null, null, true, true);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_STORE_ALLOW_REFS_WITHOUT_IMPLS, null, false, false, true);
+
+        conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING, null, null, StringPropertyValidator.class.getName(), true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_CATALOG, null, null, null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_SCHEMA, null, null, null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID, null, null, null, true, false);
+
+        // Auto-Start Mechanism
+        conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM, null, "None", null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_MODE, null, "Quiet", CorePropertyValidator.class.getName(), true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_XMLFILE, null, "datanucleusAutoStart.xml", null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_CLASSNAMES, null, null, null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_METADATAFILES, null, null, null, true, false);
+
+        // Connection
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_URL, null, null, null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_DRIVER_NAME, null, null, null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_USER_NAME, null, null, null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_PASSWORD, null, null, null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_PASSWORD_DECRYPTER, null, null, null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY_NAME, null, null, null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY2_NAME, null, null, null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY, null, null, null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY2, null, null, null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE, null, null, CorePropertyValidator.class.getName(), true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_RESOURCETYPE2, null, null, CorePropertyValidator.class.getName(), true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_POOLINGTYPE, null, null, null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CONNECTION_POOLINGTYPE2, null, null, null, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CONNECTION_NONTX_RELEASE_AFTER_USE, null, true, true, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CONNECTION_SINGLE_CONNECTION, null, false, true, false);
     }
 
     public synchronized void initialise()
