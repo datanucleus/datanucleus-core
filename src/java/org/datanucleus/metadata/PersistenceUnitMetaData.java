@@ -68,7 +68,7 @@ public class PersistenceUnitMetaData extends MetaData
     Properties properties = null;
 
     /** Whether to exclude unlisted classes. */
-    boolean excludeUnlistedClasses = false;
+    boolean excludeUnlistedClasses = false; // TODO Default to true
 
     /** Caching policy for persistable objects. */
     String caching = "UNSPECIFIED";
@@ -181,9 +181,15 @@ public class PersistenceUnitMetaData extends MetaData
         return validationMode;
     }
 
+    // TODO Remove this when we change calls to use setExcludeUnlistedClasses(boolean)
     public void setExcludeUnlistedClasses()
     {
         excludeUnlistedClasses = true;
+    }
+
+    public void setExcludeUnlistedClasses(boolean flag)
+    {
+        excludeUnlistedClasses = flag;
     }
 
     public boolean getExcludeUnlistedClasses()

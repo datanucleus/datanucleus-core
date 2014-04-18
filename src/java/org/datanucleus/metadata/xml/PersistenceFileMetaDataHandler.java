@@ -23,12 +23,12 @@ import java.net.URISyntaxException;
 import org.xml.sax.Attributes;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.SAXException;
-
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.PersistenceFileMetaData;
 import org.datanucleus.metadata.PersistenceUnitMetaData;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Parser handler for "persistence.xml" files to convert them into a PersistenceFileMetaData.
@@ -166,8 +166,7 @@ public class PersistenceFileMetaDataHandler extends AbstractMetaDataHandler
             }
             else if (localName.equals("exclude-unlisted-classes"))
             {
-                PersistenceUnitMetaData pumd = (PersistenceUnitMetaData)getStack();
-                pumd.setExcludeUnlistedClasses();
+                // Processed elsewhere
             }
             else
             {
@@ -245,6 +244,18 @@ public class PersistenceFileMetaDataHandler extends AbstractMetaDataHandler
             else if (localName.equals("validation-mode"))
             {
                 ((PersistenceUnitMetaData)md).setValidationMode(currentString);
+            }
+            else if (localName.equals("exclude-unlisted-classes"))
+            {
+                if (StringUtils.isWhitespace(currentString))
+                {
+                    currentString = "true";
+                }
+                Boolean val = Boolean.valueOf(currentString);
+                if (val != null)
+                {
+                    ((PersistenceUnitMetaData)md).setExcludeUnlistedClasses(val.booleanValue());
+                }
             }
         }
 
