@@ -549,62 +549,6 @@ public class JDOEnhancementNamer implements EnhancementNamer
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getByteIdentityDescriptor()
-     */
-    public String getByteIdentityDescriptor()
-    {
-        return CD_ByteIdentity;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getCharIdentityDescriptor()
-     */
-    public String getCharIdentityDescriptor()
-    {
-        return CD_CharIdentity;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getIntIdentityDescriptor()
-     */
-    public String getIntIdentityDescriptor()
-    {
-        return CD_IntIdentity;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getLongIdentityDescriptor()
-     */
-    public String getLongIdentityDescriptor()
-    {
-        return CD_LongIdentity;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getShortIdentityDescriptor()
-     */
-    public String getShortIdentityDescriptor()
-    {
-        return CD_ShortIdentity;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getStringIdentityDescriptor()
-     */
-    public String getStringIdentityDescriptor()
-    {
-        return CD_StringIdentity;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getObjectIdentityDescriptor()
-     */
-    public String getObjectIdentityDescriptor()
-    {
-        return CD_ObjectIdentity;
-    }
-
-    /* (non-Javadoc)
      * @see org.datanucleus.enhancer.ClassEnhancer#getStateManagerDescriptor()
      */
     public String getStateManagerDescriptor()

@@ -136,20 +136,6 @@ public interface EnhancementNamer
 
     String getImplHelperAsmClassName();
 
-    String getByteIdentityDescriptor();
-
-    String getCharIdentityDescriptor();
-
-    String getIntIdentityDescriptor();
-
-    String getLongIdentityDescriptor();
-
-    String getShortIdentityDescriptor();
-
-    String getStringIdentityDescriptor();
-
-    String getObjectIdentityDescriptor();
-
     /**
      * Accessor for the descriptor for a SingleFieldIdentity type.
      * @param oidClassName Name of the SingleFieldIdentity class
