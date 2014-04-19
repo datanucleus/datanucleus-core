@@ -855,17 +855,14 @@ public class DataNucleusEnhancer
     {
         // Obtain the required ClassEnhancer to do the work
         ClassEnhancer classEnhancer = null;
+        EnhancementNamer namer = (apiName.equalsIgnoreCase("jpa") ? JPAEnhancementNamer.getInstance() : JDOEnhancementNamer.getInstance());
         if (bytes != null)
         {
-            classEnhancer = new ClassEnhancerImpl(cmd, clr, metadataMgr, bytes);
+            classEnhancer = new ClassEnhancerImpl(cmd, clr, metadataMgr, namer, bytes);
         }
         else
         {
-            classEnhancer = new ClassEnhancerImpl(cmd, clr, metadataMgr);
-        }
-        if (apiName.equalsIgnoreCase("jpa"))
-        {
-            classEnhancer.setNamer(JPAEnhancementNamer.getInstance());
+            classEnhancer = new ClassEnhancerImpl(cmd, clr, metadataMgr, namer);
         }
 
         Collection<String> options = new HashSet<String>();

@@ -196,7 +196,8 @@ public class RuntimeEnhancer
 
             // Create a ClassEnhancer to enhance this class
             ClassEnhancer classEnhancer = new ClassEnhancerImpl((ClassMetaData)acmd, clr, 
-                nucleusContext.getMetaDataManager(), classdefinition);
+                nucleusContext.getMetaDataManager(), JDOEnhancementNamer.getInstance(), classdefinition);
+            // TODO Allow use of JPAEnhancementNamer?
             classEnhancer.setOptions(classEnhancerOptions);
             classEnhancer.enhance();
             return classEnhancer.getClassBytes();

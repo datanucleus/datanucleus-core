@@ -107,7 +107,7 @@ public class SetViaMediate extends ClassMethod
         visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
             fmd.getName(), fieldTypeDesc);
         EnhanceUtils.addLoadForType(visitor, fmd.getType(), 1);
-        String jdoMethodName = "set" + EnhanceUtils.getTypeNameForJDOMethod(fmd.getType()) + "Field";
+        String jdoMethodName = "set" + EnhanceUtils.getTypeNameForPersistableMethod(fmd.getType()) + "Field";
         String argTypeDesc = fieldTypeDesc;
         if (jdoMethodName.equals("setObjectField"))
         {

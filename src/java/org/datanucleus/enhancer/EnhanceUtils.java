@@ -209,7 +209,7 @@ public final class EnhanceUtils
 
     /**
      * Convenience method to give the JDO method name given the type.
-     * This is for the assorted methods on the JDO StateManager called things like "replacingStringField",
+     * This is for the assorted methods on the StateManager called things like "replacingStringField",
      * "replacingObjectField", "providedIntField", etc. Just returns the "type" part of the name.
      * <ul>
      * <li>Boolean, bool : returns "Boolean"</li>
@@ -226,7 +226,7 @@ public final class EnhanceUtils
      * @param cls The type of the field
      * @return Name for the method
      */
-    public static String getTypeNameForJDOMethod(Class cls)
+    public static String getTypeNameForPersistableMethod(Class cls)
     {
         if (cls == null)
         {

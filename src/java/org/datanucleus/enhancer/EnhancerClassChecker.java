@@ -31,7 +31,7 @@ import org.datanucleus.util.Localiser;
 
 /**
  * Visitor used to check the enhancement state of a class.
- * Checks the methods/fields present against what is required for JDO enhancement.
+ * Checks the methods/fields present against what is required for enhancement.
  */
 public class EnhancerClassChecker extends ClassVisitor
 {
@@ -42,10 +42,10 @@ public class EnhancerClassChecker extends ClassVisitor
     /** Enhancer for the class. */
     protected ClassEnhancer enhancer;
 
-    /** Set of fields required to be present for JDO. */
+    /** Set of fields required to be present. */
     protected HashSet<ClassField> fieldsRequired = new HashSet<ClassField>();
 
-    /** Set of methods required to be present for JDO. */
+    /** Set of methods required to be present. */
     protected HashSet<ClassMethod> methodsRequired = new HashSet<ClassMethod>();
 
     /** Flag for whether the class is enhanced. Set in the visit process. */

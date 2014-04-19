@@ -160,7 +160,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
             opcode == Opcodes.INVOKESPECIAL && name.equals("clone") && desc.equals("()Ljava/lang/Object;"))
         {
             // clone() method calls super.clone() so change to use JdoSuperClone()
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, enhancer.getASMClassName(), "jdoSuperClone", "()Ljava/lang/Object;");
+            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, enhancer.getASMClassName(), enhancer.getNamer().getSuperCloneMethodName(), "()Ljava/lang/Object;");
             return;
         }
 

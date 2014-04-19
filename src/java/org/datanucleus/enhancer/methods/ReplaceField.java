@@ -148,7 +148,7 @@ public class ReplaceField extends ClassMethod
                         getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
                     visitor.visitVarInsn(Opcodes.ALOAD, 0);
                     visitor.visitVarInsn(Opcodes.ILOAD, 1);
-                    String methodNameType = EnhanceUtils.getTypeNameForJDOMethod(fields[i].getType());
+                    String methodNameType = EnhanceUtils.getTypeNameForPersistableMethod(fields[i].getType());
                     visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
                         "replacing" + methodNameType + "Field",
                         "(" + getNamer().getPersistableDescriptor() + "I)" + EnhanceUtils.getTypeDescriptorForJDOMethod(fields[i].getType()));
@@ -250,7 +250,7 @@ public class ReplaceField extends ClassMethod
                         getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
                     visitor.visitVarInsn(Opcodes.ALOAD, 0);
                     visitor.visitVarInsn(Opcodes.ILOAD, 1);
-                    String methodNameType = EnhanceUtils.getTypeNameForJDOMethod(fields[i].getType());
+                    String methodNameType = EnhanceUtils.getTypeNameForPersistableMethod(fields[i].getType());
                     visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
                         "replacing" + methodNameType + "Field",
                         "(" + getNamer().getPersistableDescriptor() + "I)" + EnhanceUtils.getTypeDescriptorForJDOMethod(fields[i].getType()));

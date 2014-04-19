@@ -155,7 +155,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
         for (int i=0;i<methods.length;i++)
         {
             String methodName = methods[i].getName();
-            if (!methodName.startsWith("jdo"))
+            if (!methodName.startsWith("jdo")) // TODO Change this when we change bytecode enhancement contract
             {
                 String propertyName = methodName;
                 if (methodName.startsWith("set"))

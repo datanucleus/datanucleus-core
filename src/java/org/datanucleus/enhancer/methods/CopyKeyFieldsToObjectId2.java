@@ -197,7 +197,7 @@ public class CopyKeyFieldsToObjectId2 extends ClassMethod
                     {
                         AbstractMemberMetaData fmd = enhancer.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(pkFieldNums[i]);
                         String fieldTypeDesc = Type.getDescriptor(fmd.getType());
-                        String typeMethodName = EnhanceUtils.getTypeNameForJDOMethod(fmd.getType());
+                        String typeMethodName = EnhanceUtils.getTypeNameForPersistableMethod(fmd.getType());
                         int pkFieldModifiers = ClassUtils.getModifiersForFieldOfClass(enhancer.getClassLoaderResolver(), 
                             objectIdClass, fmd.getName());
 

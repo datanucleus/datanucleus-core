@@ -111,7 +111,7 @@ public class GetViaCheck extends ClassMethod
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
             fmd.getName(), fieldTypeDesc);
-        String jdoMethodName = "get" + EnhanceUtils.getTypeNameForJDOMethod(fmd.getType()) + "Field";
+        String jdoMethodName = "get" + EnhanceUtils.getTypeNameForPersistableMethod(fmd.getType()) + "Field";
         String argTypeDesc = fieldTypeDesc;
         if (jdoMethodName.equals("getObjectField"))
         {

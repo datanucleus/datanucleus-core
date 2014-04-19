@@ -32,7 +32,7 @@ import org.datanucleus.metadata.PersistenceFlags;
 import org.datanucleus.util.Localiser;
 
 /**
- * Adapter for property setter methods in JDO-enabled classes.
+ * Adapter for property setter methods in persistence-enabled classes.
  * This adapter processes the setXXX method and
  * <ul>
  * <li>Creates aaaSetXXX with the same code as was present in setXXX</li>
@@ -185,7 +185,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, 
                 namer.getGetMethodPrefixMethodName() + mmd.getName(), "()" + fieldTypeDesc);
             EnhanceUtils.addLoadForType(mv, mmd.getType(), 1);
-            String methodName = "set" + EnhanceUtils.getTypeNameForJDOMethod(mmd.getType()) + "Field";
+            String methodName = "set" + EnhanceUtils.getTypeNameForPersistableMethod(mmd.getType()) + "Field";
             String argTypeDesc = fieldTypeDesc;
             if (methodName.equals("setObjectField"))
             {
@@ -265,7 +265,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, 
                 namer.getGetMethodPrefixMethodName() + mmd.getName(), "()" + fieldTypeDesc);
             EnhanceUtils.addLoadForType(mv, mmd.getType(), 1);
-            String methodName = "set" + EnhanceUtils.getTypeNameForJDOMethod(mmd.getType()) + "Field";
+            String methodName = "set" + EnhanceUtils.getTypeNameForPersistableMethod(mmd.getType()) + "Field";
             String argTypeDesc = fieldTypeDesc;
             if (methodName.equals("setObjectField"))
             {

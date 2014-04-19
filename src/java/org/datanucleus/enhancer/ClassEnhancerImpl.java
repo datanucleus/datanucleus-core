@@ -89,22 +89,20 @@ import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Class enhancer using ASM (http://asm.objectweb.org).
- * Assumes that the version of ASM is 3.0 or above.
+ * Class enhancer using ASM (see http://asm.objectweb.org but included in DataNucleus core repackaged).
  * ASM operates using a SAXParser-like "visitor-pattern". We utilise this as follows :-
  * <ul>
- * <li><b>enhance</b> : start with a ClassReader for the class to be enhanced, and create a JdoClassAdapter
+ * <li><b>enhance</b> : start with a ClassReader for the class to be enhanced, and create a EnhancerClassAdapter
  * (attached to a ClassWriter) that will perform the modifications, and use that as a visitor for the reader
- * so that the reader sends its events to the adapter. Within the JdoClassAdapter we also make use of a
- * JdoMethodAdapter to update individual methods</li>
- * <li><b>check</b> : take a ClassReader, and create a JdoClassChecker that performs the checks. We then set
+ * so that the reader sends its events to the adapter. Within the EnhancerClassAdapter we also make use of a
+ * EnhancerMethodAdapter to update individual methods</li>
+ * <li><b>check</b> : take a ClassReader, and create a EnhancerClassChecker that performs the checks. We then set
  * the checker as a visitor for the reader so that the reader sends its events to the checker.</li>
  * </ul>
  */
 public class ClassEnhancerImpl implements ClassEnhancer
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", ClassConstants.NUCLEUS_CONTEXT_LOADER);
+    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
     /** Class Loader Resolver to use for any loading issues. */
     protected final ClassLoaderResolver clr;
@@ -161,14 +159,15 @@ public class ClassEnhancerImpl implements ClassEnhancer
      * @param cmd MetaData for the class to be enhanced
      * @param clr ClassLoader resolver
      * @param mmgr MetaData manager
+     * @param namer The namer
      */
-    public ClassEnhancerImpl(ClassMetaData cmd, ClassLoaderResolver clr, MetaDataManager mmgr)
+    public ClassEnhancerImpl(ClassMetaData cmd, ClassLoaderResolver clr, MetaDataManager mmgr, EnhancementNamer namer)
     {
         this.clr = clr;
         this.cmd = cmd;
         this.className = cmd.getFullClassName();
         this.metaDataMgr = mmgr;
-        this.namer = JDOEnhancementNamer.getInstance();
+        this.namer = namer;
         this.cls = clr.classForName(cmd.getFullClassName());
         this.asmClassName = cmd.getFullClassName().replace('.', '/');
         this.classDescriptor = Type.getDescriptor(cls);
@@ -180,15 +179,16 @@ public class ClassEnhancerImpl implements ClassEnhancer
      * @param cmd MetaData for the class to be enhanced
      * @param clr ClassLoader resolver
      * @param mmgr MetaData manager
+     * @param namer The namer
      * @param classBytes Bytes of the class to enhance
      */
-    public ClassEnhancerImpl(ClassMetaData cmd, ClassLoaderResolver clr, MetaDataManager mmgr, byte[] classBytes)
+    public ClassEnhancerImpl(ClassMetaData cmd, ClassLoaderResolver clr, MetaDataManager mmgr, EnhancementNamer namer, byte[] classBytes)
     {
         this.clr = clr;
         this.cmd = cmd;
         this.className = cmd.getFullClassName();
         this.metaDataMgr = mmgr;
-        this.namer = JDOEnhancementNamer.getInstance();
+        this.namer = namer;
         this.cls = clr.classForName(cmd.getFullClassName());
         this.asmClassName = cmd.getFullClassName().replace('.', '/');
         this.classDescriptor = Type.getDescriptor(cls);

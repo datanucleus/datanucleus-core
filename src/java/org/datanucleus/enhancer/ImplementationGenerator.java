@@ -270,7 +270,7 @@ public class ImplementationGenerator
         });
 
         // enhance the class and update the byte definition
-        ClassEnhancer gen = new ClassEnhancerImpl(implementationCmd, genclr, metaDataMgr, getBytes());
+        ClassEnhancer gen = new ClassEnhancerImpl(implementationCmd, genclr, metaDataMgr, JDOEnhancementNamer.getInstance(), getBytes());
         gen.enhance();
         bytes = gen.getClassBytes();
     }

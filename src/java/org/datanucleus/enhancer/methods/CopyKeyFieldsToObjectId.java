@@ -130,7 +130,7 @@ public class CopyKeyFieldsToObjectId extends ClassMethod
 
                     visitor.visitTypeInsn(Opcodes.NEW, getNamer().getFatalInternalExceptionAsmClassName());
                     visitor.visitInsn(Opcodes.DUP);
-                    visitor.visitLdcInsn("It's illegal to call jdoCopyKeyFieldsToObjectId for a class with SingleFieldIdentity.");
+                    visitor.visitLdcInsn("It's illegal to call jdoCopyKeyFieldsToObjectId for a class with single-field identity.");
                     visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, getNamer().getFatalInternalExceptionAsmClassName(), "<init>", "(Ljava/lang/String;)V");
                     visitor.visitInsn(Opcodes.ATHROW);
 
@@ -194,7 +194,7 @@ public class CopyKeyFieldsToObjectId extends ClassMethod
                                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                                 visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
                                     getNamer().getGetMethodPrefixMethodName() + fmd.getName(), "()" + Type.getDescriptor(fmd.getType()));
-                                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getHelperAsmClassName(),
+                                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getHelperAsmClassName(), // TODO Remove this and call pc.jdoGetObjectId
                                     "getObjectId", "(Ljava/lang/Object;)Ljava/lang/Object;");
                                 visitor.visitTypeInsn(Opcodes.CHECKCAST, acmd.getObjectidClass().replace('.', '/'));
                                 // TODO Use properties here
@@ -208,7 +208,7 @@ public class CopyKeyFieldsToObjectId extends ClassMethod
                                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                                 visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), 
                                     fmd.getName(), fieldTypeDesc);
-                                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getHelperAsmClassName(),
+                                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getHelperAsmClassName(), // TODO Remove this and call pc.jdoGetObjectId
                                     "getObjectId", "(Ljava/lang/Object;)Ljava/lang/Object;");
                                 visitor.visitTypeInsn(Opcodes.CHECKCAST, acmd.getObjectidClass().replace('.', '/'));
                                 visitor.visitFieldInsn(Opcodes.PUTFIELD, ACN_objectIdClass,
@@ -222,7 +222,7 @@ public class CopyKeyFieldsToObjectId extends ClassMethod
                                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                                 visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), 
                                     fmd.getName(), fieldTypeDesc);
-                                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getHelperAsmClassName(),
+                                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getHelperAsmClassName(), // TODO Remove this and call pc.jdoGetObjectId
                                     "getObjectId", "(Ljava/lang/Object;)Ljava/lang/Object;");
                                 visitor.visitTypeInsn(Opcodes.CHECKCAST, acmd.getObjectidClass().replace('.', '/'));
                                 // TODO Use reflection here

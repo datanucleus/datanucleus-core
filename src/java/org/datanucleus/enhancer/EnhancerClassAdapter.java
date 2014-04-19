@@ -69,8 +69,8 @@ public class EnhancerClassAdapter extends ClassVisitor
     /** Whether the field serialVersionUID is present. Set if found, and processed in visitEnd. */
     protected boolean hasSerialVersionUID = false;
 
-    /** Whether the field jdoDetachedState is present. Set if found, and processed in visitEnd. */
-    protected boolean hasJdoDetachedState = false;
+    /** Whether the field xxxDetachedState is present. Set if found, and processed in visitEnd. */
+    protected boolean hasDetachedState = false;
 
     /** Whether the method writeObject(ObjectOutputStream) is present. Set if found, and processed in visitEnd. */
     protected boolean hasWriteObject = false;
@@ -192,8 +192,8 @@ public class EnhancerClassAdapter extends ClassVisitor
         }
         else if (name.equals(enhancer.getNamer().getDetachedStateFieldName()))
         {
-            // Has jdoDetachedState field
-            hasJdoDetachedState = true;
+            // Has xxxDetachedState field
+            hasDetachedState = true;
         }
         return super.visitField(access, name, desc, signature, value);
     }
@@ -281,7 +281,7 @@ public class EnhancerClassAdapter extends ClassVisitor
             while (fieldsIter.hasNext())
             {
                 ClassField field = (ClassField)fieldsIter.next();
-                if (field.getName().equals(enhancer.getNamer().getDetachedStateFieldName()) && hasJdoDetachedState)
+                if (field.getName().equals(enhancer.getNamer().getDetachedStateFieldName()) && hasDetachedState)
                 {
                     // No need to add this field since exists
                     continue;

@@ -32,7 +32,7 @@ import org.datanucleus.metadata.PersistenceFlags;
 import org.datanucleus.util.Localiser;
 
 /**
- * Adapter for property getter methods in JDO-enabled classes.
+ * Adapter for property getter methods in persistence-enabled classes.
  * This adapter processes the getXXX method and
  * <ul>
  * <li>Creates aaaGetXXX with the same code as was present in getXXX</li>
@@ -188,7 +188,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, 
                 namer.getGetMethodPrefixMethodName() + mmd.getName(), "()" + fieldTypeDesc);
-            String methodName = "get" + EnhanceUtils.getTypeNameForJDOMethod(mmd.getType()) + "Field";
+            String methodName = "get" + EnhanceUtils.getTypeNameForPersistableMethod(mmd.getType()) + "Field";
             String argTypeDesc = fieldTypeDesc;
             if (methodName.equals("getObjectField"))
             {
@@ -318,7 +318,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
             }
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getGetMethodPrefixMethodName() + mmd.getName(), "()" + fieldTypeDesc);
-            String methodName = "get" + EnhanceUtils.getTypeNameForJDOMethod(mmd.getType()) + "Field";
+            String methodName = "get" + EnhanceUtils.getTypeNameForPersistableMethod(mmd.getType()) + "Field";
             String argTypeDesc = fieldTypeDesc;
             if (methodName.equals("getObjectField"))
             {
