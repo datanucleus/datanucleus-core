@@ -36,7 +36,7 @@ import javax.validation.ValidatorFactory;
 
 import org.datanucleus.cache.Level2Cache;
 import org.datanucleus.cache.NullLevel2Cache;
-import org.datanucleus.enhancer.jdo.JDOImplementationCreator;
+import org.datanucleus.enhancer.ImplementationCreatorImpl;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.DatastoreUniqueOID;
@@ -1278,7 +1278,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             boolean useImplCreator = config.getBooleanProperty(PropertyNames.PROPERTY_USE_IMPLEMENTATION_CREATOR);
             if (useImplCreator)
             {
-                implCreator = new JDOImplementationCreator(getMetaDataManager());
+                implCreator = new ImplementationCreatorImpl(getMetaDataManager());
             }
         }
         return implCreator;

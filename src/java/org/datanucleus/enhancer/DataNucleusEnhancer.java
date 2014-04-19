@@ -35,8 +35,6 @@ import java.util.Properties;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
-import org.datanucleus.enhancer.jdo.JDOClassEnhancer;
-import org.datanucleus.enhancer.jdo.JPAEnhancementNamer;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -356,7 +354,7 @@ public class DataNucleusEnhancer
                 else
                 {
                     // Extra the name of the class from the name of the file
-                    name = JDOClassEnhancer.getClassNameForFileName(classNames[i]);
+                    name = ClassEnhancerImpl.getClassNameForFileName(classNames[i]);
                 }
                 if (name != null)
                 {
@@ -684,7 +682,7 @@ public class DataNucleusEnhancer
                         }
                         else
                         {
-                            className = JDOClassEnhancer.getClassNameForFileName(classFilename);
+                            className = ClassEnhancerImpl.getClassNameForFileName(classFilename);
                         }
                         if (className != null)
                         {
@@ -706,7 +704,7 @@ public class DataNucleusEnhancer
                             }
                             else
                             {
-                                className = JDOClassEnhancer.getClassNameForFileName(classFilenames[i]);
+                                className = ClassEnhancerImpl.getClassNameForFileName(classFilenames[i]);
                             }
                             if (className != null)
                             {
@@ -859,11 +857,11 @@ public class DataNucleusEnhancer
         ClassEnhancer classEnhancer = null;
         if (bytes != null)
         {
-            classEnhancer = new JDOClassEnhancer(cmd, clr, metadataMgr, bytes);
+            classEnhancer = new ClassEnhancerImpl(cmd, clr, metadataMgr, bytes);
         }
         else
         {
-            classEnhancer = new JDOClassEnhancer(cmd, clr, metadataMgr);
+            classEnhancer = new ClassEnhancerImpl(cmd, clr, metadataMgr);
         }
         if (apiName.equalsIgnoreCase("jpa"))
         {

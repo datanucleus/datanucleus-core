@@ -30,7 +30,6 @@ import java.util.Map;
 import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
-import org.datanucleus.enhancer.jdo.JDOClassEnhancer;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.ClassMetaData;
@@ -196,7 +195,7 @@ public class RuntimeEnhancer
             }
 
             // Create a ClassEnhancer to enhance this class
-            ClassEnhancer classEnhancer = new JDOClassEnhancer((ClassMetaData)acmd, clr, 
+            ClassEnhancer classEnhancer = new ClassEnhancerImpl((ClassMetaData)acmd, clr, 
                 nucleusContext.getMetaDataManager(), classdefinition);
             classEnhancer.setOptions(classEnhancerOptions);
             classEnhancer.enhance();
