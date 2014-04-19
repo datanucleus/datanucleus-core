@@ -104,25 +104,10 @@ public abstract class SingleFieldId implements Externalizable, Comparable
     }
 
     /**
-     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded
-     * environments.
+     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded environments.
      * @return the key as an Object.
-     * @since 2.0
      */
-    public synchronized Object getKeyAsObject()
-    {
-        if (keyAsObject == null)
-        {
-            keyAsObject = createKeyAsObject();
-        }
-        return keyAsObject;
-    }
-
-    /**
-     * Create the key as an Object.
-     * @return the key as an Object;
-     */
-    protected abstract Object createKeyAsObject();
+    public abstract Object getKeyAsObject();
 
     /**
      * Check the class and class name and object type. If restored from serialization, class will be null so
@@ -144,7 +129,9 @@ public abstract class SingleFieldId implements Externalizable, Comparable
         {
             SingleFieldId other = (SingleFieldId) obj;
             if (targetClass != null && targetClass == other.targetClass)
+            {
                 return true;
+            }
             return targetClassName.equals(other.targetClassName);
         }
     }
@@ -152,7 +139,6 @@ public abstract class SingleFieldId implements Externalizable, Comparable
     /**
      * Return the hash code of the class name.
      * @return the hash code of the class name
-     * @since 2.0
      */
     protected int hashClassName()
     {

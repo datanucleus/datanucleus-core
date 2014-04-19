@@ -44,6 +44,7 @@ public interface ObjectProviderFactory
      * @param ec the ExecutionContext
      * @param pcClass the class of the new instance to be created.
      * @param id the JDO identity of the object.
+     * @param <T> Type of the persistable class
      * @return The ObjectProvider
      */
     <T> ObjectProvider<T> newForHollow(ExecutionContext ec, Class<T> pcClass, Object id);
@@ -54,6 +55,7 @@ public interface ObjectProviderFactory
      * @param ec ExecutionContext
      * @param id the JDO identity of the object.
      * @param pc The object that is hollow that we are going to manage
+     * @param <T> Type of the persistable class
      * @return The ObjectProvider
      */
     <T> ObjectProvider<T> newForHollowPreConstructed(ExecutionContext ec, Object id, T pc);
@@ -66,6 +68,7 @@ public interface ObjectProviderFactory
      * @param pcClass the class of the new instance to be created.
      * @param id the JDO identity of the object.
      * @param fv the initial field values of the object.
+     * @param <T> Type of the persistable class
      * @return The ObjectProvider
      */
     <T> ObjectProvider<T> newForHollow(ExecutionContext ec, Class<T> pcClass, Object id, FieldValues fv);
@@ -75,6 +78,7 @@ public interface ObjectProviderFactory
      * @param ec the execution context controlling this state manager.
      * @param id the JDO identity of the object.
      * @param pc The object that is persistent that we are going to manage
+     * @param <T> Type of the persistable class
      * @return The ObjectProvider
      */
     <T> ObjectProvider<T> newForPersistentClean(ExecutionContext ec, Object id, T pc);
@@ -85,6 +89,7 @@ public interface ObjectProviderFactory
      * @param ec ExecutionContext
      * @param pcClass the class of the new instance to be created.
      * @param fv the initial field values of the object.
+     * @param <T> Type of the persistable class
      * @return The ObjectProvider
      * @deprecated Use newForHollowPopulated instead
      */
@@ -99,6 +104,7 @@ public interface ObjectProviderFactory
      * @param copyPc Whether the SM should manage a copy of the passed PC or that one
      * @param ownerOP Owner ObjectProvider
      * @param ownerFieldNumber Field number in owner object where this is stored
+     * @param <T> Type of the persistable class
      * @return The ObjectProvider
      */
     <T> ObjectProvider<T> newForEmbedded(ExecutionContext ec, T pc, boolean copyPc, ObjectProvider ownerOP, int ownerFieldNumber);
@@ -123,6 +129,7 @@ public interface ObjectProviderFactory
      * @param ec ExecutionContext
      * @param pc the instance being make persistent.
      * @param fv Any changes to make before inserting
+     * @param <T> Type of the persistable class
      * @return The ObjectProvider
      */
     <T> ObjectProvider<T> newForPersistentNew(ExecutionContext ec, T pc, FieldValues fv);
@@ -134,6 +141,7 @@ public interface ObjectProviderFactory
      * instances that are transitioning to a transient clean state.
      * @param ec ExecutionContext
      * @param pc the instance being make persistent.
+     * @param <T> Type of the persistable class
      * @return The ObjectProvider
      */
     <T> ObjectProvider<T> newForTransactionalTransient(ExecutionContext ec, T pc);
@@ -144,6 +152,7 @@ public interface ObjectProviderFactory
      * @param pc the detached object
      * @param id the JDO identity of the object.
      * @param version the detached version
+     * @param <T> Type of the persistable class
      * @return The ObjectProvider
      */
     <T> ObjectProvider<T> newForDetached(ExecutionContext ec, T pc, Object id, Object version);
@@ -154,6 +163,7 @@ public interface ObjectProviderFactory
      * move to P_NEW_DELETED.
      * @param ec Execution Context
      * @param pc the object being deleted from persistence
+     * @param <T> Type of the persistable class
      * @return The ObjectProvider
      */
     <T> ObjectProvider<T> newForPNewToBeDeleted(ExecutionContext ec, T pc);
@@ -165,6 +175,7 @@ public interface ObjectProviderFactory
      * @param ec ExecutionContext
      * @param id Id to assign to the persistable object
      * @param cachedPC CachedPC object from the L2 cache
+     * @param <T> Type of the persistable class
      * @return The ObjectProvider
      */
     <T> ObjectProvider<T> newForCachedPC(ExecutionContext ec, Object id, CachedPC<T> cachedPC);

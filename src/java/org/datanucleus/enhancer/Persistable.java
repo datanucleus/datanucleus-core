@@ -106,39 +106,34 @@ public interface Persistable
      * @param sm The StateManager which will own this instance, or null to reset the instance to transient
      * state
      * @throws SecurityException if the caller does not have JDOPermission
-     * @see JDOPermission
      */
     void jdoReplaceStateManager(StateManager sm) throws SecurityException;
 
     /**
      * The owning StateManager uses this method to ask the instance to provide the value of the single field
      * identified by fieldNumber.
-     * @param fieldNumber the field whose value is to be provided by a callback to the StateManager's
-     * providedXXXField method
+     * @param fieldNumber the field whose value is to be provided by a callback to the StateManager's providedXXXField method
      */
     void jdoProvideField(int fieldNumber);
 
     /**
      * The owning StateManager uses this method to ask the instance to provide the values of the multiple
      * fields identified by fieldNumbers.
-     * @param fieldNumbers the fields whose values are to be provided by multiple callbacks to the
-     * StateManager's providedXXXField method
+     * @param fieldNumbers the fields whose values are to be provided by multiple callbacks to the StateManager's providedXXXField method
      */
     void jdoProvideFields(int[] fieldNumbers);
 
     /**
      * The owning StateManager uses this method to ask the instance to replace the value of the single field
      * identified by number.
-     * @param fieldNumber the field whose value is to be replaced by a callback to the StateManager's
-     * replacingXXXField method
+     * @param fieldNumber the field whose value is to be replaced by a callback to the StateManager's replacingXXXField method
      */
     void jdoReplaceField(int fieldNumber);
 
     /**
      * The owning StateManager uses this method to ask the instance to replace the values of the multiple
      * fields identified by number.
-     * @param fieldNumbers the fields whose values are to be replaced by multiple callbacks to the
-     * StateManager's replacingXXXField method
+     * @param fieldNumbers the fields whose values are to be replaced by multiple callbacks to the StateManager's replacingXXXField method
      */
     void jdoReplaceFields(int[] fieldNumbers);
 
@@ -287,9 +282,8 @@ public interface Persistable
      * <P>
      * This method is used as a performance optimization as an alternative to using reflection to construct a
      * new instance. It is used by the JDOImplHelper class method newInstance.
-     * @return a new instance of this class.
-     * @see JDOImplHelper#newInstance(Class pcClass, StateManager sm)
      * @param sm the StateManager that will own the new instance.
+     * @return a new instance of this class.
      */
     Persistable jdoNewInstance(StateManager sm);
 
@@ -300,10 +294,9 @@ public interface Persistable
      * This method is used as a performance optimization as an alternative to using reflection to construct a
      * new instance of a class that uses application identity. It is used by the JDOImplHelper class method
      * newInstance.
-     * @return a new instance of this class.
-     * @see JDOImplHelper#newInstance(Class pcClass, StateManager sm)
      * @param sm the StateManager that will own the new instance.
      * @param oid an instance of the object id class (application identity).
+     * @return a new instance of this class.
      */
     Persistable jdoNewInstance(StateManager sm, Object oid);
 
@@ -357,13 +350,13 @@ public interface Persistable
      * <code>PersistenceCapable</code> class to generate a call to the field manager for each key field in the
      * ObjectId. For example, an ObjectId class that has three key fields <code>(int id,
      * String name, and Float salary)</code> would have the method generated: <code>
-     * <P>void jdoCopyKeyFieldsToObjectId
-     * <P>(ObjectIdFieldSupplier fm, Object objectId) {
-     * <P>EmployeeKey oid = (EmployeeKey)objectId;
-     * <P>oid.id = fm.fetchIntField (0);
-     * <P>oid.name = fm.fetchStringField (1);
-     * <P>oid.salary = fm.fetchObjectField (2);
-     * <P>}
+     * void jdoCopyKeyFieldsToObjectId
+     * (ObjectIdFieldSupplier fm, Object objectId) {
+     * EmployeeKey oid = (EmployeeKey)objectId;
+     * oid.id = fm.fetchIntField (0);
+     * oid.name = fm.fetchStringField (1);
+     * oid.salary = fm.fetchObjectField (2);
+     * }
      * </code>
      * <P>
      * The implementation is responsible for implementing the <code>ObjectIdFieldSupplier</code> to produce
@@ -380,13 +373,13 @@ public interface Persistable
      * <code>PersistenceCapable</code> class to generate a call to the field manager for each key field in the
      * ObjectId. For example, an ObjectId class that has three key fields <code>(int id,
      * String name, and Float salary)</code> would have the method generated: <code>
-     * <P>void copyKeyFieldsFromObjectId
-     * <P>        (ObjectIdFieldConsumer fm, Object objectId) {
-     * <P>     EmployeeKey oid = (EmployeeKey)objectId;
-     * <P>     fm.storeIntField (0, oid.id);
-     * <P>     fm.storeStringField (1, oid.name);
-     * <P>     fm.storeObjectField (2, oid.salary);
-     * <P>}
+     * void copyKeyFieldsFromObjectId
+     *         (ObjectIdFieldConsumer fm, Object objectId) {
+     *      EmployeeKey oid = (EmployeeKey)objectId;
+     *      fm.storeIntField (0, oid.id);
+     *      fm.storeStringField (1, oid.name);
+     *      fm.storeObjectField (2, oid.salary);
+     * }
      * </code>
      * <P>
      * The implementation is responsible for implementing the <code>ObjectIdFieldConsumer</code> to store the

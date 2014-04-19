@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import javax.jdo.JDOFatalInternalException;
-
 /**
  * This class is for identity with a single String field.
  */
@@ -57,12 +55,12 @@ public class StringId extends SingleFieldId
     }
 
     /**
-     * Create the key as an Object.
-     * @return the key as an Object;
+     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded environments.
+     * @return the key as an Object.
      */
-    protected Object createKeyAsObject()
+    public synchronized Object getKeyAsObject()
     {
-        throw new JDOFatalInternalException("StringId.createKeyAsObject should never be called. Report this");
+        return keyAsObject;
     }
 
     /**

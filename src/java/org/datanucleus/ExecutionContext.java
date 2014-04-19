@@ -283,6 +283,7 @@ public interface ExecutionContext
      * Method to persist the passed object.
      * @param pc The object
      * @param merging Whether this object (and dependents) is being merged
+     * @param <T> Type of the persistable object
      * @return The persisted object
      */
     <T> T persistObject(T pc, boolean merging);
@@ -301,6 +302,7 @@ public interface ExecutionContext
      * @param ownerOP ObjectProvider of the owner when embedded
      * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
      * @param objectType Type of object (see org.datanucleus.store.ObjectProvider, e.g ObjectProvider.PC)
+     * @param <T> Type of the persistable object
      * @return The persisted object
      */
     <T> T persistObjectInternal(T pc, FieldValues preInsertChanges, ObjectProvider ownerOP, int ownerFieldNum, int objectType);
@@ -311,6 +313,7 @@ public interface ExecutionContext
      * @param ownerOP ObjectProvider of the owner when embedded
      * @param ownerFieldNum Field number in the owner where this is embedded (or -1 if not embedded)
      * @param objectType Type of object (see org.datanucleus.state.ObjectProvider, e.g ObjectProvider.PC)
+     * @param <T> Type of the persistable object
      * @return The persisted object
      */
     <T> T persistObjectInternal(T pc, ObjectProvider ownerOP, int ownerFieldNum, int objectType);
@@ -320,6 +323,7 @@ public interface ExecutionContext
      * @param pc The object
      * @param preInsertChanges Changes to be made before inserting
      * @param objectType Type of object (see org.datanucleus.state.ObjectProvider, e.g ObjectProvider.PC)
+     * @param <T> Type of the persistable object
      * @return The persisted object
      */
     <T> T persistObjectInternal(T pc, FieldValues preInsertChanges, int objectType);
@@ -411,6 +415,7 @@ public interface ExecutionContext
      * Method to detach a copy of the passed object using the provided state.
      * @param pc The object
      * @param state State for the detachment process
+     * @param <T> Type of the persistable object
      * @return The detached copy of the object
      */
     <T> T detachObjectCopy(T pc, FetchPlanState state);
@@ -434,6 +439,7 @@ public interface ExecutionContext
      * @param op ObjectProvider of the owning object that has this in a field causing its attach
      * @param pc The object
      * @param sco Whether it has no identity (second-class object)
+     * @param <T> Type of the persistable object
      * @return The attached copy of the input object
      */
     <T> T attachObjectCopy(ObjectProvider op, T pc, boolean sco);
@@ -548,6 +554,7 @@ public interface ExecutionContext
      * Accessor for the Extent for a class (and optionally its subclasses).
      * @param candidateClass The class
      * @param includeSubclasses Whether to include subclasses
+     * @param <T> Type of the persistable object
      * @return The Extent
      */
     <T> Extent<T> getExtent(Class<T> candidateClass, boolean includeSubclasses);
@@ -809,6 +816,7 @@ public interface ExecutionContext
     /**
      * Method to generate an instance of an interface, abstract class, or concrete PC class.
      * @param cls The class of the interface or abstract class, or concrete class defined in MetaData
+     * @param <T> Type of the persistable object
      * @return The instance of this type
      */
     <T> T newInstance(Class<T> cls);

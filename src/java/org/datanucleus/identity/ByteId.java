@@ -147,12 +147,16 @@ public class ByteId extends SingleFieldId
     }
 
     /**
-     * Create the key as an Object.
-     * @return the key as an Object
+     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded environments.
+     * @return the key as an Object.
      */
-    protected Object createKeyAsObject()
+    public synchronized Object getKeyAsObject()
     {
-        return new Byte(key);
+        if (keyAsObject == null)
+        {
+            keyAsObject = new Byte(key);
+        }
+        return keyAsObject;
     }
 
     /**

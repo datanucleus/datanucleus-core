@@ -138,7 +138,6 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
      * @param asmClassName ASM class name for the owning class
      * @param asmClassDesc ASM descriptor for the owning class
      * @param detachListener true if the generate code must support DetachListener
-     * @param includeFrames Whether to include stack map frames
      * @param namer Namer for methods etc
      */
     public static void generateGetXXXMethod(MethodVisitor mv, AbstractMemberMetaData mmd,

@@ -30,6 +30,7 @@ public interface ImplementationCreator
      * Constructs an implementation for an interface and instantiates it
      * @param pc The class of the interface or abstract class, or concrete class defined in MetaData
      * @param loader The ClassLoaderResolver for the interface
+     * @param <T> Type of persistable object
      * @return The instance implementing the interface
      */
     <T> T newInstance(Class<T> pc, ClassLoaderResolver loader);
