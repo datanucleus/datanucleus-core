@@ -21,77 +21,52 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import javax.jdo.spi.I18NHelper;
-
 /**
  * This class is for identity with a single character field.
  */
 public class CharId extends SingleFieldId
 {
-    /**
-     * The Internationalization message helper. TODO Remove this
-     */
-    private static I18NHelper msg = I18NHelper.getInstance("javax.jdo.Bundle"); // NOI18N
-
     private char key;
 
-    private void construct(char key)
-    {
-        this.key = key;
-        hashCode = hashClassName() ^ key;
-    }
-
-    /**
-     * Constructor with class and key.
-     * @param pcClass the target class
-     * @param key the key
-     */
     public CharId(Class pcClass, char key)
     {
         super(pcClass);
-        construct(key);
+        this.key = key;
+        this.hashCode = hashClassName() ^ key;
     }
 
-    /**
-     * Constructor with class and key.
-     * @param pcClass the target class
-     * @param key the key
-     */
     public CharId(Class pcClass, Character key)
     {
-        super(pcClass);
+        this(pcClass, key.charValue());
         setKeyAsObject(key);
-        construct(key.charValue());
     }
 
-    /**
-     * Constructor with class and key. The String must have exactly one character.
-     * @param pcClass the target class
-     * @param str the key
-     */
     public CharId(Class pcClass, String str)
     {
-        super(pcClass);
+        this(pcClass, str.charAt(0));
         assertKeyNotNull(str);
         if (str.length() != 1)
-            throw new IllegalArgumentException(msg.msg("EXC_StringWrongLength")); // NOI18N
-        construct(str.charAt(0));
+        {
+            throw new IllegalArgumentException("Cannot have a char as id when string is of length " + str.length());
+        }
     }
 
-    /**
-     * Constructor only for Externalizable.
-     */
     public CharId()
     {
     }
 
-    /**
-     * Return the key.
-     * @return the key
-     */
     public char getKey()
     {
         return key;
+    }
+
+    /**
+     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded environments.
+     * @return the key as an Object.
+     */
+    public synchronized Object getKeyAsObject()
+    {
+        return (keyAsObject != null ? keyAsObject : Character.valueOf(key));
     }
 
     /**
@@ -103,11 +78,6 @@ public class CharId extends SingleFieldId
         return String.valueOf(key);
     }
 
-    /**
-     * Determine if the other object represents the same object id.
-     * @param obj the other object
-     * @return true if both objects represent the same object id
-     */
     public boolean equals(Object obj)
     {
         if (this == obj)
@@ -125,11 +95,6 @@ public class CharId extends SingleFieldId
         }
     }
 
-    /**
-     * Determine the ordering of identity objects.
-     * @param o Other identity
-     * @return The relative ordering between the objects
-     */
     public int compareTo(Object o)
     {
         if (o instanceof CharId)
@@ -150,19 +115,6 @@ public class CharId extends SingleFieldId
             throw new ClassCastException("object is null");
         }
         throw new ClassCastException(this.getClass().getName() + " != " + o.getClass().getName());
-    }
-
-    /**
-     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded environments.
-     * @return the key as an Object.
-     */
-    public synchronized Object getKeyAsObject()
-    {
-        if (keyAsObject == null)
-        {
-            keyAsObject = new Character(key);
-        }
-        return keyAsObject;
     }
 
     /**

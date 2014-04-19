@@ -71,27 +71,16 @@ public class ObjectId extends SingleFieldId
         hashCode = hashClassName() ^ keyAsObject.hashCode();
     }
 
-    /**
-     * Constructor only for Externalizable.
-     */
     public ObjectId()
     {
     }
 
-    /**
-     * Return the key.
-     * @return the key
-     */
     public Object getKey()
     {
         return keyAsObject;
     }
 
-    /**
-     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded environments.
-     * @return the key as an Object.
-     */
-    public synchronized Object getKeyAsObject()
+    public Object getKeyAsObject()
     {
         return keyAsObject;
     }
@@ -109,12 +98,6 @@ public class ObjectId extends SingleFieldId
         return keyAsObject.getClass().getName() + STRING_DELIMITER + keyAsObject.toString();
     }
 
-    /**
-     * Determine if the other object represents the same object id.
-     * @param obj the other object
-     * @return true if both objects represent the same object id
-     */
-    @Override
     public boolean equals(Object obj)
     {
         if (this == obj)
@@ -132,21 +115,6 @@ public class ObjectId extends SingleFieldId
         }
     }
 
-    /**
-     * Provide the hash code for this instance. The hash code is the hash code of the contained key.
-     * @return the hash code
-     */
-    @Override
-    public int hashCode()
-    {
-        return keyAsObject.hashCode();
-    }
-
-    /**
-     * Determine the ordering of identity objects.
-     * @param o Other identity
-     * @return The relative ordering between the objects
-     */
     public int compareTo(Object o)
     {
         if (o instanceof ObjectId)

@@ -28,61 +28,41 @@ public class ShortId extends SingleFieldId
 {
     private short key;
 
-    private void construct(short key)
-    {
-        this.key = key;
-        hashCode = hashClassName() ^ key;
-    }
-
-    /**
-     * Constructor with class and key.
-     * @param pcClass the class
-     * @param key the key
-     */
     public ShortId(Class pcClass, short key)
     {
         super(pcClass);
-        construct(key);
+        this.key = key;
+        this.hashCode = hashClassName() ^ key;
     }
 
-    /**
-     * Constructor with class and key.
-     * @param pcClass the class
-     * @param key the key
-     */
     public ShortId(Class pcClass, Short key)
     {
-        super(pcClass);
+        this(pcClass, key.shortValue());
         setKeyAsObject(key);
-        construct(key.shortValue());
     }
 
-    /**
-     * Constructor with class and key.
-     * @param pcClass the class
-     * @param str the key
-     */
     public ShortId(Class pcClass, String str)
     {
-        super(pcClass);
+        this(pcClass, Short.parseShort(str));
         assertKeyNotNull(str);
-        construct(Short.parseShort(str));
     }
 
-    /**
-     * Constructor only for Externalizable.
-     */
     public ShortId()
     {
     }
 
-    /**
-     * Return the key.
-     * @return the key
-     */
     public short getKey()
     {
         return key;
+    }
+
+    /**
+     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded environments.
+     * @return the key as an Object.
+     */
+    public synchronized Object getKeyAsObject()
+    {
+        return (keyAsObject != null ? keyAsObject : Short.valueOf(key));
     }
 
     /**
@@ -94,11 +74,6 @@ public class ShortId extends SingleFieldId
         return Short.toString(key);
     }
 
-    /**
-     * Determine if the other object represents the same object id.
-     * @param obj the other object
-     * @return true if both objects represent the same object id
-     */
     public boolean equals(Object obj)
     {
         if (this == obj)
@@ -116,11 +91,6 @@ public class ShortId extends SingleFieldId
         }
     }
 
-    /**
-     * Determine the ordering of identity objects.
-     * @param o Other identity
-     * @return The relative ordering between the objects
-     */
     public int compareTo(Object o)
     {
         if (o instanceof ShortId)
@@ -141,19 +111,6 @@ public class ShortId extends SingleFieldId
             throw new ClassCastException("object is null");
         }
         throw new ClassCastException(this.getClass().getName() + " != " + o.getClass().getName());
-    }
-
-    /**
-     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded environments.
-     * @return the key as an Object.
-     */
-    public synchronized Object getKeyAsObject()
-    {
-        if (keyAsObject == null)
-        {
-            keyAsObject = new Short(key);
-        }
-        return keyAsObject;
     }
 
     /**

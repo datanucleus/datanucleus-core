@@ -28,64 +28,41 @@ public class ByteId extends SingleFieldId
 {
     private byte key;
 
-    /**
-     * Construct this instance with the key value.
-     */
-    private void construct(byte key)
-    {
-        this.key = key;
-        hashCode = super.hashClassName() ^ key;
-    }
-
-    /**
-     * Constructor with class and key.
-     * @param pcClass the target class
-     * @param key the key
-     */
     public ByteId(Class pcClass, byte key)
     {
         super(pcClass);
-        construct(key);
+        this.key = key;
+        this.hashCode = super.hashClassName() ^ key;
     }
 
-    /**
-     * Constructor with class and key.
-     * @param pcClass the target class
-     * @param key the key
-     */
     public ByteId(Class pcClass, Byte key)
     {
-        super(pcClass);
+        this(pcClass, key.byteValue());
         setKeyAsObject(key);
-        construct(key.byteValue());
     }
 
-    /**
-     * Constructor with class and key.
-     * @param pcClass the target class
-     * @param str the key
-     */
     public ByteId(Class pcClass, String str)
     {
-        super(pcClass);
+        this(pcClass, Byte.parseByte(str));
         assertKeyNotNull(str);
-        construct(Byte.parseByte(str));
     }
 
-    /**
-     * Constructor only for Externalizable.
-     */
     public ByteId()
     {
     }
 
-    /**
-     * Return the key.
-     * @return the key
-     */
     public byte getKey()
     {
         return key;
+    }
+
+    /**
+     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded environments.
+     * @return the key as an Object.
+     */
+    public synchronized Object getKeyAsObject()
+    {
+        return (keyAsObject != null ? keyAsObject : Byte.valueOf(key));
     }
 
     /**
@@ -97,11 +74,6 @@ public class ByteId extends SingleFieldId
         return Byte.toString(key);
     }
 
-    /**
-     * Determine if the other object represents the same object id.
-     * @param obj the other object
-     * @return true if both objects represent the same object id
-     */
     public boolean equals(Object obj)
     {
         if (this == obj)
@@ -119,11 +91,6 @@ public class ByteId extends SingleFieldId
         }
     }
 
-    /**
-     * Determine the ordering of identity objects.
-     * @param o Other identity
-     * @return The relative ordering between the objects
-     */
     public int compareTo(Object o)
     {
         if (o instanceof ByteId)
@@ -144,19 +111,6 @@ public class ByteId extends SingleFieldId
             throw new ClassCastException("object is null");
         }
         throw new ClassCastException(this.getClass().getName() + " != " + o.getClass().getName());
-    }
-
-    /**
-     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded environments.
-     * @return the key as an Object.
-     */
-    public synchronized Object getKeyAsObject()
-    {
-        if (keyAsObject == null)
-        {
-            keyAsObject = new Byte(key);
-        }
-        return keyAsObject;
     }
 
     /**

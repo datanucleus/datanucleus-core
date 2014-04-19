@@ -26,11 +26,6 @@ import java.io.ObjectOutput;
  */
 public class StringId extends SingleFieldId
 {
-    /**
-     * Constructor with class and key.
-     * @param pcClass the class
-     * @param key the key
-     */
     public StringId(Class pcClass, String key)
     {
         super(pcClass);
@@ -38,27 +33,16 @@ public class StringId extends SingleFieldId
         hashCode = hashClassName() ^ key.hashCode();
     }
 
-    /**
-     * Constructor only for Externalizable.
-     */
     public StringId()
     {
     }
 
-    /**
-     * Return the key.
-     * @return the key
-     */
     public String getKey()
     {
         return (String) keyAsObject;
     }
 
-    /**
-     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded environments.
-     * @return the key as an Object.
-     */
-    public synchronized Object getKeyAsObject()
+    public Object getKeyAsObject()
     {
         return keyAsObject;
     }
@@ -72,11 +56,6 @@ public class StringId extends SingleFieldId
         return (String) keyAsObject;
     }
 
-    /**
-     * Determine if the other object represents the same object id.
-     * @param obj the other object
-     * @return true if both objects represent the same object id
-     */
     public boolean equals(Object obj)
     {
         if (this == obj)
@@ -94,11 +73,6 @@ public class StringId extends SingleFieldId
         }
     }
 
-    /**
-     * Determine the ordering of identity objects.
-     * @param o Other identity
-     * @return The relative ordering between the objects
-     */
     public int compareTo(Object o)
     {
         if (o instanceof StringId)

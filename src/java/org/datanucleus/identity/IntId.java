@@ -28,61 +28,41 @@ public class IntId extends SingleFieldId
 {
     private int key;
 
-    private void construct(int key)
-    {
-        this.key = key;
-        hashCode = hashClassName() ^ key;
-    }
-
-    /**
-     * Constructor with class and key.
-     * @param pcClass the class
-     * @param key the key
-     */
     public IntId(Class pcClass, int key)
     {
         super(pcClass);
-        construct(key);
+        this.key = key;
+        this.hashCode = hashClassName() ^ key;
     }
 
-    /**
-     * Constructor with class and key.
-     * @param pcClass the class
-     * @param key the key
-     */
     public IntId(Class pcClass, Integer key)
     {
-        super(pcClass);
+        this(pcClass, key.intValue());
         setKeyAsObject(key);
-        construct(key.intValue());
     }
 
-    /**
-     * Constructor with class and key.
-     * @param pcClass the class
-     * @param str the key
-     */
     public IntId(Class pcClass, String str)
     {
-        super(pcClass);
+        this(pcClass, Integer.parseInt(str));
         assertKeyNotNull(str);
-        construct(Integer.parseInt(str));
     }
 
-    /**
-     * Constructor only for Externalizable.
-     */
     public IntId()
     {
     }
 
-    /**
-     * Return the key.
-     * @return the key
-     */
     public int getKey()
     {
         return key;
+    }
+
+    /**
+     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded environments.
+     * @return the key as an Object.
+     */
+    public synchronized Object getKeyAsObject()
+    {
+        return (keyAsObject != null ? keyAsObject : Integer.valueOf(key));
     }
 
     /**
@@ -94,11 +74,6 @@ public class IntId extends SingleFieldId
         return Integer.toString(key);
     }
 
-    /**
-     * Determine if the other object represents the same object id.
-     * @param obj the other object
-     * @return true if both objects represent the same object id
-     */
     public boolean equals(Object obj)
     {
         if (this == obj)
@@ -116,11 +91,6 @@ public class IntId extends SingleFieldId
         }
     }
 
-    /**
-     * Determine the ordering of identity objects.
-     * @param o Other identity
-     * @return The relative ordering between the objects
-     */
     public int compareTo(Object o)
     {
         if (o instanceof IntId)
@@ -141,19 +111,6 @@ public class IntId extends SingleFieldId
             throw new ClassCastException("object is null");
         }
         throw new ClassCastException(this.getClass().getName() + " != " + o.getClass().getName());
-    }
-
-    /**
-     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded environments.
-     * @return the key as an Object.
-     */
-    public synchronized Object getKeyAsObject()
-    {
-        if (keyAsObject == null)
-        {
-            keyAsObject = new Integer(key);
-        }
-        return keyAsObject;
     }
 
     /**

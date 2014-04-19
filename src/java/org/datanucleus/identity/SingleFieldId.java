@@ -43,21 +43,16 @@ public abstract class SingleFieldId implements Externalizable, Comparable
     /** The key as an Object. */
     protected Object keyAsObject;
 
-    /**
-     * Constructor with target class.
-     * @param pcClass the class of the target
-     */
     protected SingleFieldId(Class pcClass)
     {
         if (pcClass == null)
+        {
             throw new NullPointerException();
+        }
         targetClass = pcClass;
         targetClassName = pcClass.getName();
     }
 
-    /**
-     * Constructor only for Externalizable.
-     */
     public SingleFieldId()
     {
     }
@@ -103,15 +98,10 @@ public abstract class SingleFieldId implements Externalizable, Comparable
         return targetClassName;
     }
 
-    /**
-     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded environments.
-     * @return the key as an Object.
-     */
     public abstract Object getKeyAsObject();
 
     /**
-     * Check the class and class name and object type. If restored from serialization, class will be null so
-     * compare class name.
+     * Check the class and class name and object type. If restored from serialization, class will be null so compare class name.
      * @param obj the other object
      * @return true if the class or class name is the same
      */
@@ -145,10 +135,6 @@ public abstract class SingleFieldId implements Externalizable, Comparable
         return targetClassName.hashCode();
     }
 
-    /**
-     * Return the cached hash code.
-     * @return the cached hash code.
-     */
     public int hashCode()
     {
         return hashCode;
