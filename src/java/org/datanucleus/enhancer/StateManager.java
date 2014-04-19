@@ -126,20 +126,20 @@ public interface StateManager
     void makeDirty(Persistable pc, String fieldName);
 
     /**
-     * Return the object representing the JDO identity of the calling instance. If the JDO identity is being
+     * Return the object representing the identity of the calling instance. If the identity is being
      * changed in the current transaction, this method returns the identity as of the beginning of the
      * transaction.
      * @param pc the calling <code>Persistable</code> instance
-     * @return the object representing the JDO identity of the calling instance
+     * @return the object representing the identity of the calling instance
      */
     Object getObjectId(Persistable pc);
 
     /**
-     * Return the object representing the JDO identity of the calling instance. If the JDO identity is being
+     * Return the object representing the identity of the calling instance. If the identity is being
      * changed in the current transaction, this method returns the current identity as changed in the
      * transaction.
      * @param pc the calling <code>Persistable</code> instance
-     * @return the object representing the JDO identity of the calling instance
+     * @return the object representing the identity of the calling instance
      */
     Object getTransactionalObjectId(Persistable pc);
 
@@ -147,7 +147,6 @@ public interface StateManager
      * Return the object representing the version of the calling instance.
      * @param pc the calling <code>Persistable</code> instance
      * @return the object representing the version of the calling instance
-     * @since 2.0
      */
     Object getVersion(Persistable pc);
 

@@ -20,15 +20,15 @@ package org.datanucleus.enhancer;
 import org.datanucleus.ExecutionContext;
 
 /**
- * A class that can be managed by a binary-compatible JDO implementation must implement this interface.
+ * A class that can be managed by DataNucleus must implement this interface.
  * <P>
  * This interface defines methods that allow the implementation to manage the instances. It also defines
- * methods that allow a JDO aware application to examine the runtime state of instances. For example, an
+ * methods that allow a DataNucleus aware application to examine the runtime state of instances. For example, an
  * application can discover whether the instance is persistent, transactional, dirty, new, deleted, or
- * detached; and to get its associated PersistenceManager, object identity, and version if it has one.
+ * detached; and to get its associated ExecutionContext, object identity, and version if it has one.
  * <P>
  * The Persistable interface is designed to avoid name conflicts in the scope of user-defined classes.
- * All of its declared method names are prefixed with 'jdo'.
+ * All of its declared method names are prefixed with 'jdo'. TODO Change this to "dn" maybe
  */
 public interface Persistable
 {
@@ -78,29 +78,25 @@ public interface Persistable
     void jdoReplaceStateManager(StateManager sm) throws SecurityException;
 
     /**
-     * The owning StateManager uses this method to ask the instance to provide the value of the single field
-     * identified by fieldNumber.
+     * The owning StateManager uses this method to ask the instance to provide the value of the single field identified by fieldNumber.
      * @param fieldNumber the field whose value is to be provided by a callback to the StateManager's providedXXXField method
      */
     void jdoProvideField(int fieldNumber);
 
     /**
-     * The owning StateManager uses this method to ask the instance to provide the values of the multiple
-     * fields identified by fieldNumbers.
+     * The owning StateManager uses this method to ask the instance to provide the values of the multiple fields identified by fieldNumbers.
      * @param fieldNumbers the fields whose values are to be provided by multiple callbacks to the StateManager's providedXXXField method
      */
     void jdoProvideFields(int[] fieldNumbers);
 
     /**
-     * The owning StateManager uses this method to ask the instance to replace the value of the single field
-     * identified by number.
+     * The owning StateManager uses this method to ask the instance to replace the value of the single field identified by number.
      * @param fieldNumber the field whose value is to be replaced by a callback to the StateManager's replacingXXXField method
      */
     void jdoReplaceField(int fieldNumber);
 
     /**
-     * The owning StateManager uses this method to ask the instance to replace the values of the multiple
-     * fields identified by number.
+     * The owning StateManager uses this method to ask the instance to replace the values of the multiple fields identified by number.
      * @param fieldNumbers the fields whose values are to be replaced by multiple callbacks to the StateManager's replacingXXXField method
      */
     void jdoReplaceFields(int[] fieldNumbers);
@@ -122,7 +118,7 @@ public interface Persistable
     void jdoCopyFields(Object other, int[] fieldNumbers);
 
     /**
-     * Explicitly mark this instance and this field dirty. Normally, PersistenceCapable classes are able to
+     * Explicitly mark this instance and this field dirty. Normally, Persistable classes are able to
      * detect changes made to their fields. However, if a reference to an array is given to a method outside
      * the class, and the array is modified, then the persistent instance is not aware of the change. This API
      * allows the application to notify the instance that a change was made to a field.
@@ -139,33 +135,33 @@ public interface Persistable
     void jdoMakeDirty(String fieldName);
 
     /**
-     * Return a copy of the JDO identity associated with this instance.
+     * Return a copy of the identity associated with this instance.
      * <P>
-     * Persistent instances of PersistenceCapable classes have a JDO identity managed by the
-     * PersistenceManager. This method returns a copy of the ObjectId that represents the JDO identity.
+     * Persistent instances of Persistable classes have an identity managed by the ExecutionContext. 
+     * This method returns a copy of the ObjectId that represents the identity.
      * <P>
      * Transient instances return null.
      * <P>
-     * The ObjectId may be serialized and later restored, and used with a PersistenceManager from the same JDO
-     * implementation to locate a persistent instance with the same data store identity.
+     * The ObjectId may be serialized and later restored, and used with a ExecutionContext from the same 
+     * DataNucleus instance to locate a persistent instance with the same data store identity.
      * <P>
-     * If the JDO identity is managed by the application, then the ObjectId may be used with a
-     * PersistenceManager from any JDO implementation that supports the PersistenceCapable class.
+     * If the identity is managed by the application, then the ObjectId may be used with a
+     * ExecutionContext from DataNucleus that supports the Persistable class.
      * <P>
-     * If the JDO identity is not managed by the application or the data store, then the ObjectId returned is
+     * If the identity is not managed by the application or the data store, then the ObjectId returned is
      * only valid within the current transaction.
      * <P>
-     * If the JDO identity is being changed in the transaction, this method returns the object id as of the
+     * If the identity is being changed in the transaction, this method returns the object id as of the
      * beginning of the current transaction.
      * @return a copy of the ObjectId of this instance as of the beginning of the transaction.
      */
     Object jdoGetObjectId();
 
     /**
-     * Return a copy of the JDO identity associated with this instance. This method is the same as
+     * Return a copy of the identity associated with this instance. This method is the same as
      * jdoGetObjectId if the identity of the instance has not changed in the current transaction.
      * <P>
-     * If the JDO identity is being changed in the transaction, this method returns the current object id as
+     * If the identity is being changed in the transaction, this method returns the current object id as
      * modified in the current transaction.
      * @see #jdoGetObjectId()
      * @return a copy of the ObjectId of this instance as modified in the transaction.
@@ -183,68 +179,46 @@ public interface Persistable
      * persistent in the current transaction return true.
      * <P>
      * Transient instances return false.
-     * <P>
-     * @see javax.jdo.JDOHelper#isDirty(Object pc)
-     * @see javax.jdo.JDOHelper#makeDirty(Object pc, String fieldName)
-     * @see #jdoMakeDirty(String fieldName)
      * @return true if this instance has been modified in the current transaction.
      */
     boolean jdoIsDirty();
 
     /**
-     * Tests whether this object is transactional. Instances whose state is associated with the current
-     * transaction return true.
-     * <P>
+     * Tests whether this object is transactional. Instances whose state is associated with the current transaction return true.
      * Transient instances return false.
-     * <P>
-     * @see javax.jdo.JDOHelper#isTransactional(Object pc)
      * @return true if this instance is transactional.
      */
     boolean jdoIsTransactional();
 
     /**
-     * Tests whether this object is persistent. Instances that represent persistent objects in the data store
-     * return true.
-     * @see javax.jdo.JDOHelper#isPersistent(Object pc)
+     * Tests whether this object is persistent. Instances that represent persistent objects in the data store return true.
      * @return true if this instance is persistent.
      */
     boolean jdoIsPersistent();
 
     /**
      * Tests whether this object has been newly made persistent. Instances that have been made persistent in
-     * the current transaction return true.
-     * <P>
-     * Transient instances return false.
-     * <P>
-     * @see javax.jdo.JDOHelper#isNew(Object pc)
+     * the current transaction return true. Transient instances return false.
      * @return true if this instance was made persistent in the current transaction.
      */
     boolean jdoIsNew();
 
     /**
-     * Tests whether this object has been deleted. Instances that have been deleted in the current transaction
-     * return true.
-     * <P>
+     * Tests whether this object has been deleted. Instances that have been deleted in the current transaction return true.
      * Transient instances return false.
-     * <P>
-     * @see javax.jdo.JDOHelper#isDeleted(Object pc)
      * @return true if this instance was deleted in the current transaction.
      */
     boolean jdoIsDeleted();
 
     /**
      * Tests whether this object has been detached. Instances that have been detached return true.
-     * <P>
      * Transient instances return false.
-     * <P>
-     * @see javax.jdo.JDOHelper#isDetached(Object pc)
      * @return true if this instance is detached.
      */
     boolean jdoIsDetached();
 
     /**
-     * Return a new instance of this class, with the jdoStateManager set to the parameter, and jdoFlags set to
-     * LOAD_REQUIRED.
+     * Return a new instance of this class, with the StateManager set to the parameter, and jdoFlags set to LOAD_REQUIRED.
      * <P>
      * This method is used as a performance optimization as an alternative to using reflection to construct a
      * new instance. It is used by the JDOImplHelper class method newInstance.
@@ -267,9 +241,9 @@ public interface Persistable
     Persistable jdoNewInstance(StateManager sm, Object oid);
 
     /**
-     * Create a new instance of the ObjectId class for this PersistenceCapable class and initialize the key
+     * Create a new instance of the ObjectId class for this Persistable class and initialize the key
      * fields from the instance on which this method is called. This method creates a new instance of the
-     * class used for JDO identity. It is intended only for application identity. If the class has been
+     * class used for identity. It is intended only for application identity. If the class has been
      * enhanced for datastore identity, or if the class is abstract, null is returned.
      * <P>
      * For classes using single field identity, this method must be called on an instance of a
@@ -283,7 +257,7 @@ public interface Persistable
     Object jdoNewObjectIdInstance();
 
     /**
-     * Create a new instance of the class used for JDO identity, using the key constructor of the object id
+     * Create a new instance of the class used for identity, using the key constructor of the object id
      * class. It is intended for single field identity. The identity instance returned has no relationship
      * with the values of the primary key fields of the persistence-capable instance on which the method is
      * called. If the key is the wrong class for the object id class, null is returned.
@@ -304,7 +278,7 @@ public interface Persistable
     Object jdoNewObjectIdInstance(Object o);
 
     /**
-     * Copy fields from this PersistenceCapable instance to the Object Id instance. For classes using single
+     * Copy fields from this Persistable instance to the Object Id instance. For classes using single
      * field identity, this method always throws <code>JDOUserException</code>.
      * @param oid the ObjectId target of the key fields
      */
@@ -312,7 +286,7 @@ public interface Persistable
 
     /**
      * Copy fields from an outside source to the key fields in the ObjectId. This method is generated in the
-     * <code>PersistenceCapable</code> class to generate a call to the field manager for each key field in the
+     * <code>Persistable</code> class to generate a call to the field manager for each key field in the
      * ObjectId. For example, an ObjectId class that has three key fields <code>(int id,
      * String name, and Float salary)</code> would have the method generated: <code>
      * void jdoCopyKeyFieldsToObjectId
@@ -335,11 +309,11 @@ public interface Persistable
 
     /**
      * Copy fields to an outside consumer from the key fields in the ObjectId. This method is generated in the
-     * <code>PersistenceCapable</code> class to generate a call to the field manager for each key field in the
+     * <code>Persistable</code> class to generate a call to the field manager for each key field in the
      * ObjectId. For example, an ObjectId class that has three key fields <code>(int id,
      * String name, and Float salary)</code> would have the method generated: <code>
-     * void copyKeyFieldsFromObjectId
-     *         (ObjectIdFieldConsumer fm, Object objectId) {
+     * void copyKeyFieldsFromObjectId(ObjectIdFieldConsumer fm, Object objectId) 
+     * {
      *      EmployeeKey oid = (EmployeeKey)objectId;
      *      fm.storeIntField (0, oid.id);
      *      fm.storeStringField (1, oid.name);
