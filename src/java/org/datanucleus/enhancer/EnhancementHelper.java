@@ -44,7 +44,6 @@ import javax.jdo.JDOFatalInternalException;
 import javax.jdo.JDOFatalUserException;
 import javax.jdo.JDOUserException;
 import javax.jdo.spi.JDOPermission;
-import javax.jdo.spi.StateInterrogation;
 
 /**
  * Helper class for the DN bytecode enhancement contract. It contains methods to register metadata for
@@ -75,11 +74,6 @@ public class EnhancementHelper extends java.lang.Object
      * This list contains the registered listeners for <code>RegisterClassEvent</code>s.
      */
     private static final List<RegisterClassListener> listeners = new ArrayList<RegisterClassListener>();
-
-    /**
-     * The list of registered StateInterrogation instances
-     */
-    private static List<StateInterrogation> stateInterrogations = new ArrayList<StateInterrogation>();
 
     /** The DateFormat pattern. */
     private static String dateFormatPattern;
@@ -911,153 +905,5 @@ public class EnhancementHelper extends java.lang.Object
         {
             return "Meta-" + pc.getClass().getName(); // NOI18N
         }
-    }
-
-    /**
-     * Add a StateInterrogation to the list. Create a new list in case there is an iterator open on the
-     * original list.
-     * @param si the StateInterrogation to add
-     */
-    public synchronized void addStateInterrogation(StateInterrogation si)
-    {
-        List<StateInterrogation> newList = new ArrayList<StateInterrogation>(stateInterrogations);
-        newList.add(si);
-        stateInterrogations = newList;
-    }
-
-    /**
-     * Remove a StateInterrogation from the list. Create a new list in case there is an iterator open on the
-     * original list.
-     * @param si the StateInterrogation to remove
-     */
-    public synchronized void removeStateInterrogation(StateInterrogation si)
-    {
-        List<StateInterrogation> newList = new ArrayList<StateInterrogation>(stateInterrogations);
-        newList.remove(si);
-        stateInterrogations = newList;
-    }
-
-    /**
-     * Return an Iterator over all StateInterrogation instances. Synchronize to avoid add/remove/iterate
-     * conflicts.
-     * @return an Iterator over all StateInterrogation instances.
-     */
-    private synchronized Iterator getStateInterrogationIterator()
-    {
-        return stateInterrogations.iterator();
-    }
-
-    /**
-     * Mark a non-binary-compatible instance dirty. Delegate to all registered StateInterrogation instances
-     * until one of them handles the call.
-     * @param pc the instance to mark dirty
-     * @param fieldName the field to mark dirty
-     */
-    public void nonBinaryCompatibleMakeDirty(Object pc, String fieldName)
-    {
-        Iterator sit = getStateInterrogationIterator();
-        while (sit.hasNext())
-        {
-            StateInterrogation si = (StateInterrogation) sit.next();
-            try
-            {
-                if (si.makeDirty(pc, fieldName))
-                    return;
-            }
-            catch (Throwable t)
-            {
-                continue; // ignore exceptions from errant StateInterrogations
-            }
-        }
-    }
-
-    /**
-     * Determine the state of a non-binary-compatible instance. Delegate to all registered StateInterrogation
-     * instances until one of them handles the call (returns a non-null Boolean with the answer). The caller
-     * provides the stateless "method object" that does the actual call to the StateInterrogation instance.
-     * @param pc the instance to be checked
-     * @param sibr the method object that delegates to the non-binary-compatible implementation
-     * @return Boolean.TRUE if the instance satisfies the state interrogation; Boolean.FALSE if the instance
-     * does not satisfy the interrogation; or null if the implementation does not manage the class of the
-     * instance
-     */
-    public boolean nonBinaryCompatibleIs(Object pc, StateInterrogationBooleanReturn sibr)
-    {
-        Iterator sit = getStateInterrogationIterator();
-        while (sit.hasNext())
-        {
-            StateInterrogation si = (StateInterrogation) sit.next();
-            Boolean result;
-            try
-            {
-                result = sibr.is(pc, si);
-            }
-            catch (Throwable t)
-            {
-                continue; // ignore exceptions from errant StateInterrogations
-            }
-            if (result != null)
-                return result.booleanValue();
-        }
-        return false;
-    }
-
-    /**
-     * Return an object associated with a non-binary-compatible instance. Delegate to all registered
-     * StateInterrogation instances until one of them handles the call (returns a non-null answer). The caller
-     * provides the stateless "method object" that does the actual call to the StateInterrogation instance.
-     * @param pc the instance whose associated object is needed
-     * @param sibr the method object that delegates to the non-binary-compatible implementation
-     * @return the associated object or null if the implementation does not manage the class of the instance
-     */
-    public Object nonBinaryCompatibleGet(Object pc, StateInterrogationObjectReturn sibr)
-    {
-        Iterator sit = getStateInterrogationIterator();
-        while (sit.hasNext())
-        {
-            StateInterrogation si = (StateInterrogation) sit.next();
-            Object result;
-            try
-            {
-                result = sibr.get(pc, si);
-            }
-            catch (Throwable t)
-            {
-                continue; // ignore exceptions from errant StateInterrogations
-            }
-            if (result != null)
-                return result;
-        }
-        return null;
-    }
-
-    /**
-     * This is an interface used to interrogate the state of an instance that does not implement Persistable.
-     * It is used for the methods that return a boolean value.
-     */
-    public static interface StateInterrogationBooleanReturn
-    {
-        /**
-         * Interrogate the state of the instance
-         * @param pc the instance
-         * @param si the method object
-         * @return the state of the instance or null
-         */
-        public Boolean is(Object pc, StateInterrogation si);
-    }
-
-    /**
-     * This is an interface used to interrogate the state of an instance that does not implement Persistable.
-     * It is used for the methods that return an Object value.
-     */
-    public static interface StateInterrogationObjectReturn
-    {
-        /**
-         * Return the associated instance.
-         * @param pc the instance
-         * @param si the method object
-         * @return the associated object or null
-         */
-        public Object get(Object pc, StateInterrogation si);
     }
 }

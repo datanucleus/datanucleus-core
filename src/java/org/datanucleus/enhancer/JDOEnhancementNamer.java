@@ -19,7 +19,6 @@ package org.datanucleus.enhancer;
 
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOFatalInternalException;
-import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.identity.ByteIdentity;
 import javax.jdo.identity.CharIdentity;
@@ -73,7 +72,6 @@ public class JDOEnhancementNamer implements EnhancementNamer
     private final static String ACN_ObjectIdFieldSupplier = CL_ObjectIdFieldSupplier.getName().replace('.', '/');
     private final static String ACN_DetachedFieldAccessException = JDODetachedFieldAccessException.class.getName().replace('.', '/');
     private final static String ACN_FatalInternalException = JDOFatalInternalException.class.getName().replace('.', '/');
-    private final static String ACN_Helper = JDOHelper.class.getName().replace('.', '/');
     private final static String ACN_ImplHelper = JDOImplHelper.class.getName().replace('.', '/');
 
     private final static String CD_ByteIdentity = Type.getDescriptor(ByteIdentity.class);
@@ -530,14 +528,6 @@ public class JDOEnhancementNamer implements EnhancementNamer
     public String getFatalInternalExceptionAsmClassName()
     {
         return ACN_FatalInternalException;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getHelperAsmClassName()
-     */
-    public String getHelperAsmClassName()
-    {
-        return ACN_Helper;
     }
 
     /* (non-Javadoc)

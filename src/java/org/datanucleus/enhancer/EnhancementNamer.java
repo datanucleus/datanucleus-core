@@ -132,8 +132,6 @@ public interface EnhancementNamer
 
     String getFatalInternalExceptionAsmClassName();
 
-    String getHelperAsmClassName();
-
     String getImplHelperAsmClassName();
 
     /**
