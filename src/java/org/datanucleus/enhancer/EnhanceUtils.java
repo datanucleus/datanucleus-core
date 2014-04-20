@@ -22,7 +22,6 @@ import org.datanucleus.ClassNameConstants;
 import org.datanucleus.asm.MethodVisitor;
 import org.datanucleus.asm.Opcodes;
 import org.datanucleus.asm.Type;
-import org.datanucleus.util.Localiser;
 
 /**
  * Utility class for bytecode enhancement using ASM.
@@ -36,10 +35,6 @@ import org.datanucleus.util.Localiser;
  */
 public final class EnhanceUtils
 {
-    /** Localiser for messages. */
-    protected static Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** ASM class name for boolean. */
     public final static String ACN_boolean = ClassNameConstants.BOOLEAN;
 

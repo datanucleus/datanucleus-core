@@ -25,12 +25,12 @@ package org.datanucleus.enhancer;
  * <P>
  * The detached state is stored as a field in each instance of Detachable. The field is serialized so as to
  * maintain the state of the instance while detached. While detached, only the BitSet of modified fields will
- * be modified. The structure of the Object[] jdoDetachedState is as follows:
+ * be modified. The structure of the Object[] dnDetachedState is as follows:
  * <ul>
- * <li>jdoDetachedState[0]: the Object Id of the instance</li>
- * <li>jdoDetachedState[1]: the Version of the instance</li>
- * <li>jdoDetachedState[2]: a BitSet of loaded fields</li>
- * <li>jdoDetachedState[3]: a BitSet of modified fields</li>
+ * <li>dnDetachedState[0]: the Object Id of the instance</li>
+ * <li>dnDetachedState[1]: the Version of the instance</li>
+ * <li>dnDetachedState[2]: a BitSet of loaded fields</li>
+ * <li>dnDetachedState[3]: a BitSet of modified fields</li>
  * </ul>
  */
 public interface Detachable
@@ -39,5 +39,5 @@ public interface Detachable
      * This method calls the StateManager with the current detached state instance as a parameter and replaces
      * the current detached state instance with the value provided by the StateManager.
      */
-    public void jdoReplaceDetachedState();
+    public void dnReplaceDetachedState();
 }

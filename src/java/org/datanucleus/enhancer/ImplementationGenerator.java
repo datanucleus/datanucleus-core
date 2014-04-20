@@ -103,8 +103,7 @@ public class ImplementationGenerator
         // Start the class
         writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         writer.visit(EnhanceUtils.getAsmVersionForJRE(), Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, fullClassName.replace('.', '/'),
-            null, fullSuperclassName.replace('.', '/'),
-            interfaces.toArray(new String[interfaces.size()]));
+            null, fullSuperclassName.replace('.', '/'), interfaces.toArray(new String[interfaces.size()]));
 
         // Create fields, default ctor, and methods
         createPropertyFields();
@@ -289,8 +288,7 @@ public class ImplementationGenerator
         AbstractMemberMetaData[] propertyMetaData = acmd.getManagedMembers();
         for (int i=0; i<propertyMetaData.length; i++)
         {
-            writer.visitField(Opcodes.ACC_PRIVATE, propertyMetaData[i].getName(), 
-                Type.getDescriptor(propertyMetaData[i].getType()), null, null).visitEnd();
+            writer.visitField(Opcodes.ACC_PRIVATE, propertyMetaData[i].getName(), Type.getDescriptor(propertyMetaData[i].getType()), null, null).visitEnd();
         }
     }
 
@@ -381,8 +379,7 @@ public class ImplementationGenerator
         {
             // Interface so generate setXXX
             String fieldDesc = Type.getDescriptor(mmd.getType());
-            MethodVisitor visitor = writer.visitMethod(Opcodes.ACC_PUBLIC, setterName, 
-                "(" + fieldDesc + ")V", null, null);
+            MethodVisitor visitor = writer.visitMethod(Opcodes.ACC_PUBLIC, setterName, "(" + fieldDesc + ")V", null, null);
             visitor.visitCode();
             Label l0 = new Label();
             visitor.visitLabel(l0);

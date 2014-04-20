@@ -36,8 +36,7 @@ import org.datanucleus.util.Localiser;
 public class EnhancerClassChecker extends ClassVisitor
 {
     /** Message resource */
-    protected static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.Localisation",
-        ClassEnhancer.class.getClassLoader());
+    protected static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.Localisation", ClassEnhancer.class.getClassLoader());
 
     /** Enhancer for the class. */
     protected ClassEnhancer enhancer;
@@ -124,16 +123,14 @@ public class EnhancerClassChecker extends ClassVisitor
 
             if (!hasInterface(interfaces, enhancer.getNamer().getPersistableAsmClassName()))
             {
-                reportError(LOCALISER.msg("Enhancer.Check.InterfaceMissing", enhancer.getClassName(), 
-                    enhancer.getNamer().getPersistableClass().getName()));
+                reportError(LOCALISER.msg("Enhancer.Check.InterfaceMissing", enhancer.getClassName(), enhancer.getNamer().getPersistableClass().getName()));
             }
 
             if (enhancer.getClassMetaData().isDetachable())
             {
                 if (!hasInterface(interfaces, enhancer.getNamer().getDetachableAsmClassName()))
                 {
-                    reportError(LOCALISER.msg("Enhancer.Check.InterfaceMissing", enhancer.getClassName(), 
-                        enhancer.getNamer().getDetachableClass().getName()));
+                    reportError(LOCALISER.msg("Enhancer.Check.InterfaceMissing", enhancer.getClassName(), enhancer.getNamer().getDetachableClass().getName()));
                 }
             }
         }

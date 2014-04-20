@@ -40,8 +40,7 @@ import org.datanucleus.util.Localiser;
 public class EnhancerMethodAdapter extends MethodVisitor
 {
     /** Localisation of messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        ClassEnhancer.class.getClassLoader());
+    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", ClassEnhancer.class.getClassLoader());
 
     /** The enhancer for this class. */
     protected ClassEnhancer enhancer;
@@ -89,8 +88,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
             else
             {
                 fieldInThisClass = false;
-                cmd = enhancer.getMetaDataManager().getMetaDataForClass(ownerName,
-                    enhancer.getClassLoaderResolver());
+                cmd = enhancer.getMetaDataManager().getMetaDataForClass(ownerName, enhancer.getClassLoaderResolver());
             }
 
             // If the field access is in this class and this is the constructor then don't enhance it.
@@ -110,8 +108,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
                     if (opcode == Opcodes.GETFIELD)
                     {
                         // Read of a field of a PC class, so replace with jdoGetXXX() call
-                        mv.visitMethodInsn(Opcodes.INVOKESTATIC, fieldOwner, enhancer.getNamer().getGetMethodPrefixMethodName() + name,
-                            "(L" + fieldOwner + ";)" + desc);
+                        mv.visitMethodInsn(Opcodes.INVOKESTATIC, fieldOwner, enhancer.getNamer().getGetMethodPrefixMethodName() + name, "(L" + fieldOwner + ";)" + desc);
                         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
                         {
                             DataNucleusEnhancer.LOGGER.debug(LOCALISER.msg("Enhancer.EnhanceOriginalMethodField",
@@ -123,8 +120,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
                     else if (opcode == Opcodes.PUTFIELD)
                     {
                         // Write of a field of a PC class, so replace with jdoSetXXX() call
-                        mv.visitMethodInsn(Opcodes.INVOKESTATIC, fieldOwner, enhancer.getNamer().getSetMethodPrefixMethodName() + name,
-                            "(L" + fieldOwner + ";" + desc + ")V");
+                        mv.visitMethodInsn(Opcodes.INVOKESTATIC, fieldOwner, enhancer.getNamer().getSetMethodPrefixMethodName() + name, "(L" + fieldOwner + ";" + desc + ")V");
                         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
                         {
                             DataNucleusEnhancer.LOGGER.debug(LOCALISER.msg("Enhancer.EnhanceOriginalMethodField",
@@ -138,8 +134,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
             else
             {
                 DataNucleusEnhancer.LOGGER.debug(LOCALISER.msg("Enhancer.EnhanceOriginalMethodFieldOmit",
-                    enhancer.getClassName() + "." + methodName, (opcode == Opcodes.GETFIELD ? "get" : "set"),
-                    (ownerName + "." + name)));
+                    enhancer.getClassName() + "." + methodName, (opcode == Opcodes.GETFIELD ? "get" : "set"), (ownerName + "." + name)));
             }
         }
 

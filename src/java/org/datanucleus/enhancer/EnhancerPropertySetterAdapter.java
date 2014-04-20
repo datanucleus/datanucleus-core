@@ -66,8 +66,7 @@ import org.datanucleus.util.Localiser;
 public class EnhancerPropertySetterAdapter extends MethodVisitor
 {
     /** Localisation of messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", 
-        ClassEnhancer.class.getClassLoader());
+    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", ClassEnhancer.class.getClassLoader());
 
     /** The enhancer for this class. */
     protected ClassEnhancer enhancer;
