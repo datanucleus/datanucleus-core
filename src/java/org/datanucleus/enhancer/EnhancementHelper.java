@@ -157,9 +157,8 @@ public class EnhancementHelper extends java.lang.Object
     }
 
     /**
-     * Create a new instance of the class and assign its <code>jdoStateManager</code>. The new instance has
-     * its <code>jdoFlags</code> set to <code>LOAD_REQUIRED</code>.
-     * @see Persistable#jdoNewInstance(StateManager sm)
+     * Create a new instance of the class and assign its StateManager. The new instance has its <code>dnFlags</code> set to <code>LOAD_REQUIRED</code>.
+     * @see Persistable#dnNewInstance(StateManager sm)
      * @param pcClass the <code>Persistable</code> class.
      * @param sm the <code>StateManager</code> which will own the new instance.
      * @return the new instance, or <code>null</code> if the class is not registered.
@@ -168,14 +167,14 @@ public class EnhancementHelper extends java.lang.Object
     {
         Meta meta = getMeta(pcClass);
         Persistable pcInstance = meta.getPC();
-        return pcInstance == null ? null : pcInstance.jdoNewInstance(sm);
+        return pcInstance == null ? null : pcInstance.dnNewInstance(sm);
     }
 
     /**
-     * Create a new instance of the class and assign its <code>jdoStateManager</code> and key values from the
+     * Create a new instance of the class and assign its StateManager and key values from the
      * ObjectId. If the oid parameter is <code>null</code>, no key values are copied. The new instance has its
-     * <code>jdoFlags</code> set to <code>LOAD_REQUIRED</code>.
-     * @see Persistable#jdoNewInstance(StateManager sm, Object oid)
+     * <code>dnFlags</code> set to <code>LOAD_REQUIRED</code>.
+     * @see Persistable#dnNewInstance(StateManager sm, Object oid)
      * @param pcClass the <code>Persistable</code> class.
      * @param sm the <code>StateManager</code> which will own the new instance.
      * @return the new instance, or <code>null</code> if the class is not registered.
@@ -185,7 +184,7 @@ public class EnhancementHelper extends java.lang.Object
     {
         Meta meta = getMeta(pcClass);
         Persistable pcInstance = meta.getPC();
-        return pcInstance == null ? null : pcInstance.jdoNewInstance(sm, oid);
+        return pcInstance == null ? null : pcInstance.dnNewInstance(sm, oid);
     }
 
     /**
@@ -200,7 +199,7 @@ public class EnhancementHelper extends java.lang.Object
     {
         Meta meta = getMeta(pcClass);
         Persistable pcInstance = meta.getPC();
-        return pcInstance == null ? null : pcInstance.jdoNewObjectIdInstance();
+        return pcInstance == null ? null : pcInstance.dnNewObjectIdInstance();
     }
 
     /**
@@ -228,7 +227,7 @@ public class EnhancementHelper extends java.lang.Object
     {
         Meta meta = getMeta(pcClass);
         Persistable pcInstance = meta.getPC();
-        return (pcInstance == null) ? null : pcInstance.jdoNewObjectIdInstance(obj);
+        return (pcInstance == null) ? null : pcInstance.dnNewObjectIdInstance(obj);
     }
 
     /**
@@ -239,7 +238,7 @@ public class EnhancementHelper extends java.lang.Object
      * For example, an ObjectId class that has three key fields (<code>int id</code>, <code>String name</code>
      * , and <code>Float salary</code>) would have the method generated:
      * <code>
-     * void jdoCopyKeyFieldsToObjectId (Object oid, ObjectIdFieldSupplier fm) 
+     * void dnCopyKeyFieldsToObjectId (Object oid, ObjectIdFieldSupplier fm) 
      * {
      *     oid.id = fm.fetchIntField (0);
      *     oid.name = fm.fetchStringField (1);
@@ -260,7 +259,7 @@ public class EnhancementHelper extends java.lang.Object
         {
             throw new JDOFatalInternalException("Class " + pcClass.getName() + " has no identity!");
         }
-        pcInstance.jdoCopyKeyFieldsToObjectId(fm, oid);
+        pcInstance.dnCopyKeyFieldsToObjectId(fm, oid);
     }
 
     /**
@@ -268,7 +267,7 @@ public class EnhancementHelper extends java.lang.Object
      * <code>Persistable</code> class to generate a call to the field manager for each key field in the
      * ObjectId. For example, an ObjectId class that has three key fields (<code>int id</code>,
      * <code>String name</code>, and <code>Float salary</code>) would have the method generated:
-     * <code>void jdoCopyKeyFieldsFromObjectId(Persistable oid, ObjectIdFieldConsumer fm)
+     * <code>void dnCopyKeyFieldsFromObjectId(Persistable oid, ObjectIdFieldConsumer fm)
      * {
      *     fm.storeIntField (0, oid.id);
      *     fm.storeStringField (1, oid.name);
@@ -289,7 +288,7 @@ public class EnhancementHelper extends java.lang.Object
         {
             throw new JDOFatalInternalException("Class " + pcClass.getName() + " has no identity!");
         }
-        pcInstance.jdoCopyKeyFieldsFromObjectId(fm, oid);
+        pcInstance.dnCopyKeyFieldsFromObjectId(fm, oid);
     }
 
     public static interface RegisterClassListener extends EventListener

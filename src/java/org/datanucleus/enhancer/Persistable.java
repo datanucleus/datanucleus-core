@@ -28,32 +28,32 @@ import org.datanucleus.ExecutionContext;
  * detached; and to get its associated ExecutionContext, object identity, and version if it has one.
  * <P>
  * The Persistable interface is designed to avoid name conflicts in the scope of user-defined classes.
- * All of its declared method names are prefixed with 'jdo'. TODO Change this to "dn" maybe
+ * All of its declared method names are prefixed with 'dn'.
  */
 public interface Persistable
 {
-    /** jdoFlags == READ_WRITE_OK, then the fields in the default fetch group can be accessed for read or write without notifying the StateManager. */
+    /** dnFlags == READ_WRITE_OK, then the fields in the default fetch group can be accessed for read or write without notifying the StateManager. */
     static final byte READ_WRITE_OK = 0;
 
-    /** jdoFlags == LOAD_REQUIRED, then the fields in the default fetch group cannot be accessed for read or write without notifying the StateManager. */
+    /** dnFlags == LOAD_REQUIRED, then the fields in the default fetch group cannot be accessed for read or write without notifying the StateManager. */
     static final byte LOAD_REQUIRED = 1;
 
-    /** jdoFlags == READ_OK, then the fields in the default fetch group can be accessed for read without notifying the StateManager */
+    /** dnFlags == READ_OK, then the fields in the default fetch group can be accessed for read without notifying the StateManager */
     static final byte READ_OK = -1;
 
-    /** jdoFieldFlags for a field includes CHECK_READ, then the field has been enhanced to call the StateManager on read if the jdoFlags setting is not READ_OK or READ_WRITE_OK */
+    /** dnFieldFlags for a field includes CHECK_READ, then the field has been enhanced to call the StateManager on read if the dnFlags setting is not READ_OK or READ_WRITE_OK */
     static final byte CHECK_READ = 1;
 
-    /** jdoFieldFlags for a field includes MEDIATE_READ, then the field has been enhanced to always call the StateManager on all reads */
+    /** dnFieldFlags for a field includes MEDIATE_READ, then the field has been enhanced to always call the StateManager on all reads */
     static final byte MEDIATE_READ = 2;
 
-    /** jdoFieldFlags for a field includes CHECK_WRITE, then the field has been enhanced to call the StateManager on write if the jdoFlags setting is not READ_WRITE_OK */
+    /** dnFieldFlags for a field includes CHECK_WRITE, then the field has been enhanced to call the StateManager on write if the dnFlags setting is not READ_WRITE_OK */
     static final byte CHECK_WRITE = 4;
 
-    /** jdoFieldFlags for a field includes MEDIATE_WRITE, then the field has been enhanced to always call the StateManager on all writes */
+    /** dnFieldFlags for a field includes MEDIATE_WRITE, then the field has been enhanced to always call the StateManager on all writes */
     static final byte MEDIATE_WRITE = 8;
 
-    /** jdoFieldFlags for a field includes SERIALIZABLE, then the field is not declared as TRANSIENT. */
+    /** dnFieldFlags for a field includes SERIALIZABLE, then the field is not declared as TRANSIENT. */
     static final byte SERIALIZABLE = 16;
 
     /**
@@ -63,49 +63,49 @@ public interface Persistable
      * This method always delegates to the StateManager if it is non-null.
      * @return the ExecutionContext associated with this instance.
      */
-    ExecutionContext jdoGetExecutionContext();
+    ExecutionContext dnGetExecutionContext();
 
     /**
      * This method sets the StateManager instance that manages the state of this instance. This method is
      * normally used by the StateManager during the process of making an instance persistent, transient, or
      * transactional. The caller of this method must have JDOPermission for the instance, if the instance is
      * not already owned by a StateManager. If the parameter is null, and the StateManager approves the
-     * change, then the jdoFlags field will be reset to READ_WRITE_OK. If the parameter is not null, and the
-     * security manager approves the change, then the jdoFlags field will be reset to LOAD_REQUIRED.
+     * change, then the dnFlags field will be reset to READ_WRITE_OK. If the parameter is not null, and the
+     * security manager approves the change, then the dnFlags field will be reset to LOAD_REQUIRED.
      * @param sm The StateManager which will own this instance, or null to reset the instance to transient state
      * @throws SecurityException if the caller does not have JDOPermission
      */
-    void jdoReplaceStateManager(StateManager sm) throws SecurityException;
+    void dnReplaceStateManager(StateManager sm) throws SecurityException;
 
     /**
      * The owning StateManager uses this method to ask the instance to provide the value of the single field identified by fieldNumber.
      * @param fieldNumber the field whose value is to be provided by a callback to the StateManager's providedXXXField method
      */
-    void jdoProvideField(int fieldNumber);
+    void dnProvideField(int fieldNumber);
 
     /**
      * The owning StateManager uses this method to ask the instance to provide the values of the multiple fields identified by fieldNumbers.
      * @param fieldNumbers the fields whose values are to be provided by multiple callbacks to the StateManager's providedXXXField method
      */
-    void jdoProvideFields(int[] fieldNumbers);
+    void dnProvideFields(int[] fieldNumbers);
 
     /**
      * The owning StateManager uses this method to ask the instance to replace the value of the single field identified by number.
      * @param fieldNumber the field whose value is to be replaced by a callback to the StateManager's replacingXXXField method
      */
-    void jdoReplaceField(int fieldNumber);
+    void dnReplaceField(int fieldNumber);
 
     /**
      * The owning StateManager uses this method to ask the instance to replace the values of the multiple fields identified by number.
      * @param fieldNumbers the fields whose values are to be replaced by multiple callbacks to the StateManager's replacingXXXField method
      */
-    void jdoReplaceFields(int[] fieldNumbers);
+    void dnReplaceFields(int[] fieldNumbers);
 
     /**
      * The owning StateManager uses this method to ask the instance to replace the value of the flags by
      * calling back the StateManager replacingFlags method.
      */
-    void jdoReplaceFlags();
+    void dnReplaceFlags();
 
     /**
      * Copy field values from another instance of the same class to this instance.
@@ -115,7 +115,7 @@ public interface Persistable
      * @param other the PC instance from which field values are to be copied
      * @param fieldNumbers the field numbers to be copied into this instance
      */
-    void jdoCopyFields(Object other, int[] fieldNumbers);
+    void dnCopyFields(Object other, int[] fieldNumbers);
 
     /**
      * Explicitly mark this instance and this field dirty. Normally, Persistable classes are able to
@@ -132,7 +132,7 @@ public interface Persistable
      * <P>
      * @param fieldName the name of the field to be marked dirty.
      */
-    void jdoMakeDirty(String fieldName);
+    void dnMakeDirty(String fieldName);
 
     /**
      * Return a copy of the identity associated with this instance.
@@ -155,24 +155,24 @@ public interface Persistable
      * beginning of the current transaction.
      * @return a copy of the ObjectId of this instance as of the beginning of the transaction.
      */
-    Object jdoGetObjectId();
+    Object dnGetObjectId();
 
     /**
      * Return a copy of the identity associated with this instance. This method is the same as
-     * jdoGetObjectId if the identity of the instance has not changed in the current transaction.
+     * dnGetObjectId if the identity of the instance has not changed in the current transaction.
      * <P>
      * If the identity is being changed in the transaction, this method returns the current object id as
      * modified in the current transaction.
-     * @see #jdoGetObjectId()
+     * @see #dnGetObjectId()
      * @return a copy of the ObjectId of this instance as modified in the transaction.
      */
-    Object jdoGetTransactionalObjectId();
+    Object dnGetTransactionalObjectId();
 
     /**
      * Return the version of this instance.
      * @return the version
      */
-    Object jdoGetVersion();
+    Object dnGetVersion();
 
     /**
      * Tests whether this object is dirty. Instances that have been modified, deleted, or newly made
@@ -181,55 +181,55 @@ public interface Persistable
      * Transient instances return false.
      * @return true if this instance has been modified in the current transaction.
      */
-    boolean jdoIsDirty();
+    boolean dnIsDirty();
 
     /**
      * Tests whether this object is transactional. Instances whose state is associated with the current transaction return true.
      * Transient instances return false.
      * @return true if this instance is transactional.
      */
-    boolean jdoIsTransactional();
+    boolean dnIsTransactional();
 
     /**
      * Tests whether this object is persistent. Instances that represent persistent objects in the data store return true.
      * @return true if this instance is persistent.
      */
-    boolean jdoIsPersistent();
+    boolean dnIsPersistent();
 
     /**
      * Tests whether this object has been newly made persistent. Instances that have been made persistent in
      * the current transaction return true. Transient instances return false.
      * @return true if this instance was made persistent in the current transaction.
      */
-    boolean jdoIsNew();
+    boolean dnIsNew();
 
     /**
      * Tests whether this object has been deleted. Instances that have been deleted in the current transaction return true.
      * Transient instances return false.
      * @return true if this instance was deleted in the current transaction.
      */
-    boolean jdoIsDeleted();
+    boolean dnIsDeleted();
 
     /**
      * Tests whether this object has been detached. Instances that have been detached return true.
      * Transient instances return false.
      * @return true if this instance is detached.
      */
-    boolean jdoIsDetached();
+    boolean dnIsDetached();
 
     /**
-     * Return a new instance of this class, with the StateManager set to the parameter, and jdoFlags set to LOAD_REQUIRED.
+     * Return a new instance of this class, with the StateManager set to the parameter, and dnFlags set to LOAD_REQUIRED.
      * <P>
      * This method is used as a performance optimization as an alternative to using reflection to construct a
      * new instance. It is used by the JDOImplHelper class method newInstance.
      * @param sm the StateManager that will own the new instance.
      * @return a new instance of this class.
      */
-    Persistable jdoNewInstance(StateManager sm);
+    Persistable dnNewInstance(StateManager sm);
 
     /**
-     * Return a new instance of this class, with the jdoStateManager set to the parameter, key fields
-     * initialized to the values in the oid, and jdoFlags set to LOAD_REQUIRED.
+     * Return a new instance of this class, with the StateManager set to the parameter, key fields
+     * initialized to the values in the oid, and dnFlags set to LOAD_REQUIRED.
      * <P>
      * This method is used as a performance optimization as an alternative to using reflection to construct a
      * new instance of a class that uses application identity. It is used by the JDOImplHelper class method
@@ -238,7 +238,7 @@ public interface Persistable
      * @param oid an instance of the object id class (application identity).
      * @return a new instance of this class.
      */
-    Persistable jdoNewInstance(StateManager sm, Object oid);
+    Persistable dnNewInstance(StateManager sm, Object oid);
 
     /**
      * Create a new instance of the ObjectId class for this Persistable class and initialize the key
@@ -254,7 +254,7 @@ public interface Persistable
      * which the method is called.
      * @return the new instance created.
      */
-    Object jdoNewObjectIdInstance();
+    Object dnNewObjectIdInstance();
 
     /**
      * Create a new instance of the class used for identity, using the key constructor of the object id
@@ -275,26 +275,26 @@ public interface Persistable
      * @return the new instance created.
      * @param o the object identity constructor parameter
      */
-    Object jdoNewObjectIdInstance(Object o);
+    Object dnNewObjectIdInstance(Object o);
 
     /**
      * Copy fields from this Persistable instance to the Object Id instance. For classes using single
      * field identity, this method always throws <code>JDOUserException</code>.
      * @param oid the ObjectId target of the key fields
      */
-    void jdoCopyKeyFieldsToObjectId(Object oid);
+    void dnCopyKeyFieldsToObjectId(Object oid);
 
     /**
      * Copy fields from an outside source to the key fields in the ObjectId. This method is generated in the
      * <code>Persistable</code> class to generate a call to the field manager for each key field in the
      * ObjectId. For example, an ObjectId class that has three key fields <code>(int id,
      * String name, and Float salary)</code> would have the method generated: <code>
-     * void jdoCopyKeyFieldsToObjectId
-     * (ObjectIdFieldSupplier fm, Object objectId) {
-     * EmployeeKey oid = (EmployeeKey)objectId;
-     * oid.id = fm.fetchIntField (0);
-     * oid.name = fm.fetchStringField (1);
-     * oid.salary = fm.fetchObjectField (2);
+     * void dnCopyKeyFieldsToObjectId(ObjectIdFieldSupplier fm, Object objectId) 
+     * {
+     *     EmployeeKey oid = (EmployeeKey)objectId;
+     *     oid.id = fm.fetchIntField (0);
+     *     oid.name = fm.fetchStringField (1);
+     *     oid.salary = fm.fetchObjectField (2);
      * }
      * </code>
      * <P>
@@ -305,7 +305,7 @@ public interface Persistable
      * @param oid the ObjectId target of the copy.
      * @param fm the field supplier that supplies the field values.
      */
-    void jdoCopyKeyFieldsToObjectId(ObjectIdFieldSupplier fm, Object oid);
+    void dnCopyKeyFieldsToObjectId(ObjectIdFieldSupplier fm, Object oid);
 
     /**
      * Copy fields to an outside consumer from the key fields in the ObjectId. This method is generated in the
@@ -326,7 +326,7 @@ public interface Persistable
      * @param oid the ObjectId source of the copy.
      * @param fm the field manager that receives the field values.
      */
-    void jdoCopyKeyFieldsFromObjectId(ObjectIdFieldConsumer fm, Object oid);
+    void dnCopyKeyFieldsFromObjectId(ObjectIdFieldConsumer fm, Object oid);
 
     /**
      * This interface is a convenience interface that allows an instance to implement both
