@@ -20,6 +20,7 @@ package org.datanucleus.store.fieldmanager;
 /**
  * Interface providing methods for consuming field values from a persistable object.
  * Based on the JDO interface PersistenceCapable.ObjectIdFieldConsumer.
+ * TODO Drop this when Persistable is used
  */
 public interface FieldConsumer
 {

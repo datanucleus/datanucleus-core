@@ -103,10 +103,10 @@ public class EnhancerClassAdapter extends ClassVisitor
     {
         if (enhancer.getClassMetaData().getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
         {
-            // Check if the class already implements PersistenceCapable/Detachable interfaces
-            boolean alreadyPersistenceCapable = false;
+            // Check if the class already implements required interfaces
+            boolean alreadyPersistable = false;
             boolean alreadyDetachable = false;
-            boolean needsPersistenceCapable = false;
+            boolean needsPersistable = false;
             boolean needsDetachable = false;
             int numInterfaces = 0;
             if (interfaces != null && interfaces.length > 0)
@@ -120,7 +120,7 @@ public class EnhancerClassAdapter extends ClassVisitor
                     }
                     if (interfaces[i].equals(enhancer.getNamer().getPersistableAsmClassName()))
                     {
-                        alreadyPersistenceCapable = true;
+                        alreadyPersistable = true;
                     }
                 }
             }
@@ -129,14 +129,14 @@ public class EnhancerClassAdapter extends ClassVisitor
                 numInterfaces++;
                 needsDetachable = true;
             }
-            if (!alreadyPersistenceCapable)
+            if (!alreadyPersistable)
             {
                 numInterfaces++;
-                needsPersistenceCapable = true;
+                needsPersistable = true;
             }
 
             String[] intfs = interfaces;
-            if (needsDetachable || needsPersistenceCapable)
+            if (needsDetachable || needsPersistable)
             {
                 // Allocate updated array of interfaces
                 intfs = new String[numInterfaces];
@@ -157,7 +157,7 @@ public class EnhancerClassAdapter extends ClassVisitor
                         DataNucleusEnhancer.LOGGER.debug(LOCALISER.msg("Enhancer.AddInterface", enhancer.getNamer().getDetachableClass().getName()));
                     }
                 }
-                if (needsPersistenceCapable)
+                if (needsPersistable)
                 {
                     intfs[position++] = enhancer.getNamer().getPersistableAsmClassName();
                     if (DataNucleusEnhancer.LOGGER.isDebugEnabled())

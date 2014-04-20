@@ -142,10 +142,10 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     /** The current lock mode for this object. */
     protected short lockMode = 0;
 
-    /** Flags of the PersistenceCapable instance when the instance is enlisted in the transaction. */
+    /** Flags of the persistable instance when the instance is enlisted in the transaction. */
     protected byte savedFlags;
 
-    /** Loaded fields of the PersistenceCapable instance when the instance is enlisted in the transaction. */
+    /** Loaded fields of the persistable instance when the instance is enlisted in the transaction. */
     protected boolean[] savedLoadedFields = null;
 
     /** state for transitions of activities. */
@@ -859,7 +859,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
 
     /**
      * Called from the StoreManager after StoreManager.update() is called to obtain updated values 
-     * from the PersistenceCapable associated with this StateManager.
+     * from the persistable associated with this StateManager.
      * @param fieldNumbers An array of field numbers to be updated by the Store
      * @param fm The updated values are stored in this object. This object is only valid
      *   for the duration of this call.

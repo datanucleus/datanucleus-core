@@ -288,10 +288,9 @@ public class ClassEnhancerImpl implements ClassEnhancer
      */
     public boolean isPersistable(String className)
     {
-        if (className.equals(this.className) && 
-            (cmd.getPersistenceModifier() != ClassPersistenceModifier.PERSISTENCE_AWARE))
+        if (className.equals(this.className) && (cmd.getPersistenceModifier() != ClassPersistenceModifier.PERSISTENCE_AWARE))
         {
-            // This is our class so yes it will be PersistenceCapable
+            // This is our class so yes it will be persistable
             return true;
         }
 
@@ -299,7 +298,6 @@ public class ClassEnhancerImpl implements ClassEnhancer
         Class cls = clr.classForName(className, new EnhancerClassLoader(clr)); // Allow for Enhancer classLoader
         if (nucleusCtx.getApiAdapter().isPersistable(cls))
         {
-            // The specified class is already PersistenceCapable
             return true;
         }
 

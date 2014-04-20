@@ -48,7 +48,7 @@ public enum ClassPersistenceModifier
     {
         if (value == null)
         {
-            // Default to PersistenceCapable since old files won't have this.
+            // Default to persistable since old files won't have this.
             return ClassPersistenceModifier.PERSISTENCE_CAPABLE;
         }
         else if (ClassPersistenceModifier.PERSISTENCE_CAPABLE.toString().equalsIgnoreCase(value))

@@ -21,12 +21,11 @@ import org.datanucleus.util.Localiser;
 
 /**
  * An exception thrown when an operation is invoked that requires a persistable object yet the object passed in 
- * is not suitable. This usually means that it doesnt implement "javax.jdo.PersistenceCapable"
+ * is not suitable. This usually means that it hasn't been enhanced.
  */
 public class ClassNotPersistableException extends NucleusUserException
 {
-    private static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
+    private static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
     /**
      * Constructs a class-not-persistable exception with the specified detail message.

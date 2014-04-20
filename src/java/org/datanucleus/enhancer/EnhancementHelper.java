@@ -312,16 +312,16 @@ public class EnhancementHelper extends java.lang.Object
         /** The flags of managed fields of the persistence-capable class */
         protected byte[] fieldFlags;
 
-        protected Class persistenceCapableSuperclass; 
+        protected Class persistableSuperclass; 
 
-        public RegisterClassEvent(EnhancementHelper helper, Class registeredClass, String[] fieldNames, Class[] fieldTypes, byte[] fieldFlags, Class persistenceCapableSuperclass)
+        public RegisterClassEvent(EnhancementHelper helper, Class registeredClass, String[] fieldNames, Class[] fieldTypes, byte[] fieldFlags, Class persistableSuperclass)
         {
             super(helper);
             this.pcClass = registeredClass;
             this.fieldNames = fieldNames;
             this.fieldTypes = fieldTypes;
             this.fieldFlags = fieldFlags;
-            this.persistenceCapableSuperclass = persistenceCapableSuperclass;
+            this.persistableSuperclass = persistableSuperclass;
         }
 
         public Class getRegisteredClass()
@@ -340,9 +340,9 @@ public class EnhancementHelper extends java.lang.Object
         {
             return fieldFlags;
         }
-        public Class getPersistenceCapableSuperclass()
+        public Class getPersistableSuperclass()
         {
-            return persistenceCapableSuperclass;
+            return persistableSuperclass;
         }
     }
 
@@ -355,22 +355,22 @@ public class EnhancementHelper extends java.lang.Object
      * @param fieldTypes an array of <code>Class</code> field types
      * @param fieldFlags the Field Flags for persistent and transactional fields
      * @param pc an instance of the <code>Persistable</code> class
-     * @param persistenceCapableSuperclass the most immediate superclass that is <code>Persistable</code>
+     * @param persistableSuperclass the most immediate superclass that is <code>Persistable</code>
      */
-    public static void registerClass(Class pcClass, String[] fieldNames, Class[] fieldTypes, byte[] fieldFlags, Class persistenceCapableSuperclass, Persistable pc)
+    public static void registerClass(Class pcClass, String[] fieldNames, Class[] fieldTypes, byte[] fieldFlags, Class persistableSuperclass, Persistable pc)
     {
         if (pcClass == null)
         {
             throw new NullPointerException("Attempt to register class with null class type");
         }
-        Meta meta = new Meta(fieldNames, fieldTypes, fieldFlags, persistenceCapableSuperclass, pc);
+        Meta meta = new Meta(fieldNames, fieldTypes, fieldFlags, persistableSuperclass, pc);
         registeredClasses.put(pcClass, meta);
 
         synchronized (listeners)
         {
             if (!listeners.isEmpty())
             {
-                RegisterClassEvent event = new RegisterClassEvent(singletonHelper, pcClass, fieldNames, fieldTypes, fieldFlags, persistenceCapableSuperclass);
+                RegisterClassEvent event = new RegisterClassEvent(singletonHelper, pcClass, fieldNames, fieldTypes, fieldFlags, persistableSuperclass);
                 for (Iterator i = listeners.iterator(); i.hasNext();)
                 {
                     RegisterClassListener crl = (RegisterClassListener) i.next();
@@ -839,62 +839,54 @@ public class EnhancementHelper extends java.lang.Object
      */
     static class Meta
     {
+        /** Instance of <code>Persistable</code>, used at runtime to create new instances. */
+        Persistable pc;
+
+        /** This is an array of field names used for the Model at runtime. The field is passed by the static class initialization. */
+        String[] fieldNames;
+
+        /** This is an array of field types used for the Model at runtime. The field is passed by the static class initialization. */
+        Class[] fieldTypes;
+
+        /** This is an array of field flags used for the Model at runtime. The field is passed by the static class initialization. */
+        byte[] fieldFlags;
+
+        /** This is the <code>Class</code> instance of the <code>Persistable</code> superclass. */
+        Class persistableSuperclass;
+
         /**
          * Construct an instance of <code>Meta</code>.
          * @param fieldNames An array of <code>String</code>
          * @param fieldTypes An array of <code>Class</code>
          * @param fieldFlags an array of <code>int</code>
-         * @param persistenceCapableSuperclass the most immediate <code>Persistable</code> superclass
+         * @param persistableSuperclass the most immediate <code>Persistable</code> superclass
          * @param pc An instance of the <code>Persistable</code> class
          */
-        Meta(String[] fieldNames, Class[] fieldTypes, byte[] fieldFlags, Class persistenceCapableSuperclass, Persistable pc)
+        Meta(String[] fieldNames, Class[] fieldTypes, byte[] fieldFlags, Class persistableSuperclass, Persistable pc)
         {
             this.fieldNames = fieldNames;
             this.fieldTypes = fieldTypes;
             this.fieldFlags = fieldFlags;
-            this.persistenceCapableSuperclass = persistenceCapableSuperclass;
+            this.persistableSuperclass = persistableSuperclass;
             this.pc = pc;
         }
-
-        /** This is an array of field names used for the Model at runtime. The field is passed by the static class initialization. */
-        String[] fieldNames;
 
         String[] getFieldNames()
         {
             return fieldNames;
         }
-
-        /** This is an array of field types used for the Model at runtime. The field is passed by the static class initialization. */
-        Class[] fieldTypes;
-
         Class[] getFieldTypes()
         {
             return fieldTypes;
         }
-
-        /** This is an array of field flags used for the Model at runtime. The field is passed by the static class initialization. */
-        byte[] fieldFlags;
-
-        /**
-         * Get the field types from the metadata.
-         * @return the array of field types.
-         */
         byte[] getFieldFlags()
         {
             return fieldFlags;
         }
-
-        /** This is the <code>Class</code> instance of the <code>Persistable</code> superclass. */
-        Class persistenceCapableSuperclass;
-
         Class getPersistableSuperclass()
         {
-            return persistenceCapableSuperclass;
+            return persistableSuperclass;
         }
-
-        /** This is an instance of <code>Persistable</code>, used at runtime to create new instances. */
-        Persistable pc;
-
         Persistable getPC()
         {
             return pc;

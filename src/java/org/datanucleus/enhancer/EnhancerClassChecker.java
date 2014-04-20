@@ -188,7 +188,7 @@ public class EnhancerClassChecker extends ClassVisitor
     {
         if (enhancer.getClassMetaData().getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
         {
-            // Check for required PersistenceCapable fields/methods
+            // Check for required fields/methods
             Iterator fieldsIter = fieldsRequired.iterator();
             while (fieldsIter.hasNext())
             {

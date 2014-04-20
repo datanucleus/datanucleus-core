@@ -39,13 +39,10 @@ public class FetchGroupMetaData extends MetaData
     boolean postLoad = false;
 
     /**
-     * The name attribute on a field element contained within a fetch-group
-     * element is the name of field in the enclosing class or a dot-separated
-     * expression identifying a field reachable from the class by navigating a
-     * reference, collection or map. For maps of persistencecapable classes
-     * "#key" or "#value" may be appended to the name of the map field to
-     * navigate the key or value respectively (e.g. to include a field of the
-     * key class or value class in the fetch group).
+     * The name attribute on a field element contained within a fetch-group element is the name of field in the enclosing class 
+     * or a dot-separated expression identifying a field reachable from the class by navigating a reference, collection or map. 
+     * For maps of persistable classes "#key" or "#value" may be appended to the name of the map field to navigate the key or value
+     * respectively (e.g. to include a field of the key class or value class in the fetch group).
      * 
      * For collection and arrays of persistence-capable classes, "#element" may
      * be appended to the name of the field to navigate the element. This is

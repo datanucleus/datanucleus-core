@@ -59,8 +59,8 @@ public class DetachState extends FetchPlanState
     }
 
     /**
-     * Get any existing detached copy object for the passed in PersistenceCapable
-     * @param pc the PersistenceCapable of the object searched
+     * Get any existing detached copy object for the passed in persistable
+     * @param pc the persistable object
      * @return the Detached PC
      */
     public Entry getDetachedCopyEntry(Object pc)

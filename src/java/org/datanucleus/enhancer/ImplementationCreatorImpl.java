@@ -199,7 +199,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
         }
         else
         {
-            // Generated instance is not PersistenceCapable for some reason so generate a suitable exception
+            // Generated instance is not persistable for some reason so generate a suitable exception
             Class interfaces[] = instance.getClass().getInterfaces();
             StringBuilder implementedInterfacesMsg = new StringBuilder("[");
             String classLoaderPCMsg = "";
@@ -285,7 +285,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
         }
         else
         {
-            // Generated instance is not PersistenceCapable for some reason so generate a suitable exception
+            // Generated instance is not persistable for some reason so generate a suitable exception
             // TODO Correct this message for abstract classes
             Class interfaces[] = instance.getClass().getInterfaces();
             StringBuilder implementedInterfacesMsg = new StringBuilder("[");
