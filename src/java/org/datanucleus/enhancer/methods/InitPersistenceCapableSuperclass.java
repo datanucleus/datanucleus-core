@@ -68,7 +68,7 @@ public class InitPersistenceCapableSuperclass extends ClassMethod
     {
         visitor.visitCode();
 
-        String pcSuperclassName = enhancer.getClassMetaData().getPersistenceCapableSuperclass();
+        String pcSuperclassName = enhancer.getClassMetaData().getPersistableSuperclass();
         if (pcSuperclassName != null)
         {
             visitor.visitLdcInsn(pcSuperclassName);

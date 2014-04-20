@@ -91,7 +91,7 @@ public class ProvideField extends ClassMethod
     {
 
         AbstractMemberMetaData fields[] = enhancer.getClassMetaData().getManagedMembers();
-        String pcSuperclassName = enhancer.getClassMetaData().getPersistenceCapableSuperclass();
+        String pcSuperclassName = enhancer.getClassMetaData().getPersistableSuperclass();
 
         visitor.visitCode();
 

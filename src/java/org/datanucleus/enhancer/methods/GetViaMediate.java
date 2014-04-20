@@ -86,7 +86,7 @@ public class GetViaMediate extends ClassMethod
             getNamer().getStateManagerFieldName(), "L" + getNamer().getStateManagerAsmClassName() + ";");
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         EnhanceUtils.addBIPUSHToMethod(visitor, fmd.getFieldId());
-        if (enhancer.getClassMetaData().getPersistenceCapableSuperclass() != null)
+        if (enhancer.getClassMetaData().getPersistableSuperclass() != null)
         {
             visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), 
                 getNamer().getInheritedFieldCountFieldName(), "I");
@@ -101,7 +101,7 @@ public class GetViaMediate extends ClassMethod
             getNamer().getStateManagerFieldName(), "L" + getNamer().getStateManagerAsmClassName() + ";");
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         EnhanceUtils.addBIPUSHToMethod(visitor, fmd.getFieldId());
-        if (enhancer.getClassMetaData().getPersistenceCapableSuperclass() != null)
+        if (enhancer.getClassMetaData().getPersistableSuperclass() != null)
         {
             visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), 
                 getNamer().getInheritedFieldCountFieldName(), "I");
@@ -144,7 +144,7 @@ public class GetViaMediate extends ClassMethod
             visitor.visitInsn(Opcodes.AALOAD);
             visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/util/BitSet");
             EnhanceUtils.addBIPUSHToMethod(visitor, fmd.getFieldId());
-            if (enhancer.getClassMetaData().getPersistenceCapableSuperclass() != null)
+            if (enhancer.getClassMetaData().getPersistableSuperclass() != null)
             {
                 visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), 
                     getNamer().getInheritedFieldCountFieldName(), "I");
@@ -159,7 +159,7 @@ public class GetViaMediate extends ClassMethod
             visitor.visitInsn(Opcodes.AALOAD);
             visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/util/BitSet");
             EnhanceUtils.addBIPUSHToMethod(visitor, fmd.getFieldId());
-            if (enhancer.getClassMetaData().getPersistenceCapableSuperclass() != null)
+            if (enhancer.getClassMetaData().getPersistableSuperclass() != null)
             {
                 visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), 
                     getNamer().getInheritedFieldCountFieldName(), "I");

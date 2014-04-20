@@ -262,7 +262,7 @@ public class ClassEnhancerImpl implements ClassEnhancer
     protected boolean requiresDetachable()
     {
         boolean isDetachable = cmd.isDetachable();
-        boolean hasPcsc = (cmd.getPersistenceCapableSuperclass() != null);
+        boolean hasPcsc = (cmd.getPersistableSuperclass() != null);
 
         if (!hasPcsc && isDetachable)
         {
@@ -525,7 +525,7 @@ public class ClassEnhancerImpl implements ClassEnhancer
      */
     protected void initialiseMethodsList()
     {
-        if (cmd.getPersistenceCapableSuperclass() == null)
+        if (cmd.getPersistableSuperclass() == null)
         {
             // Root persistent class methods
             methodsToAdd.add(CopyKeyFieldsFromObjectId.getInstance(this));
@@ -550,7 +550,7 @@ public class ClassEnhancerImpl implements ClassEnhancer
             methodsToAdd.add(ReplaceFlags.getInstance(this));
             methodsToAdd.add(ReplaceStateManager.getInstance(this));
         }
-        if (cmd.getPersistenceCapableSuperclass() != null && cmd.isRootInstantiableClass())
+        if (cmd.getPersistableSuperclass() != null && cmd.isRootInstantiableClass())
         {
             // This class is not the root in the inheritance tree, but is the root in terms of being instantiable
             // hence it owns the "identity", so we need real implementations of the identity enhancement methods
@@ -566,7 +566,7 @@ public class ClassEnhancerImpl implements ClassEnhancer
         {
             methodsToAdd.add(ReplaceDetachedState.getInstance(this));
         }
-        if (cmd.isDetachable() && cmd.getPersistenceCapableSuperclass() != null)
+        if (cmd.isDetachable() && cmd.getPersistableSuperclass() != null)
         {
             methodsToAdd.add(MakeDirty.getInstance(this));
         }
@@ -593,7 +593,7 @@ public class ClassEnhancerImpl implements ClassEnhancer
      */
     protected void initialiseFieldsList()
     {
-        if (cmd.getPersistenceCapableSuperclass() == null)
+        if (cmd.getPersistableSuperclass() == null)
         {
             // Root persistent class fields
             fieldsToAdd.add(new ClassField(this, namer.getStateManagerFieldName(), 

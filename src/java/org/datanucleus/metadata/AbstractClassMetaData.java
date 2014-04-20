@@ -1516,7 +1516,7 @@ public abstract class AbstractClassMetaData extends MetaData
      */
     protected void validateObjectIdClass(ClassLoaderResolver clr, MetaDataManager mmgr)
     {
-        if (getPersistenceCapableSuperclass() == null)
+        if (getPersistableSuperclass() == null)
         {
             // Only check root persistable class PK
             if (objectidClass != null)
@@ -2514,7 +2514,7 @@ public abstract class AbstractClassMetaData extends MetaData
         return this;
     }
 
-    public String getPersistenceCapableSuperclass()
+    public String getPersistableSuperclass()
     {
         return persistableSuperclass;
     }

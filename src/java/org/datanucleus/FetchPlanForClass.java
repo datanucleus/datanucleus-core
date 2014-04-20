@@ -239,7 +239,7 @@ public class FetchPlanForClass
     {
         FetchPlanForClass fpc = plan.getFetchPlanForClass(cmd);
         BitSet bitSet = fpc.getMemberNumbersForFetchGroups(cmd.getFetchGroupMetaData());
-        if (cmd.getPersistenceCapableSuperclass() != null)
+        if (cmd.getPersistableSuperclass() != null)
         {
             // Recurse to superclass
             AbstractClassMetaData superCmd = cmd.getSuperAbstractClassMetaData();

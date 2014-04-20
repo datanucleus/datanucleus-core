@@ -341,12 +341,8 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
  
     /**
      * Clone operator to return a copy of this object.
-     * <p>
-     * Mutable second-class Objects are required to provide a public
-     * clone method in order to allow for copying PersistenceCapable
-     * objects. In contrast to Object.clone(), this method must not throw a
-     * CloneNotSupportedException.
-     * </p>
+     * <P>Mutable second-class Objects are required to provide a public clone method in order to allow for copying persistable objects.
+     * In contrast to Object.clone(), this method must not throw a CloneNotSupportedException.
      * @return The cloned object
      */
     public Object clone()

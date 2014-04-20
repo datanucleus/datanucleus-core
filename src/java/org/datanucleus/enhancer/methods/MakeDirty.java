@@ -90,7 +90,7 @@ public class MakeDirty extends ClassMethod
     public void execute()
     {
         AbstractClassMetaData cmd = getClassEnhancer().getClassMetaData();
-        String pcSuperclassName = cmd.getPersistenceCapableSuperclass();
+        String pcSuperclassName = cmd.getPersistableSuperclass();
 
         visitor.visitCode();
 

@@ -61,7 +61,7 @@ public class GetManagedFieldCount extends ClassMethod
     public void execute()
     {
         ClassMetaData cmd = enhancer.getClassMetaData();
-        String persistenceCapableSuperclass = cmd.getPersistenceCapableSuperclass();
+        String persistenceCapableSuperclass = cmd.getPersistableSuperclass();
 
         visitor.visitCode();
 

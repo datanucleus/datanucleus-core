@@ -156,7 +156,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
     public void visitMethodInsn(int opcode, String owner, String name, String desc)
     {
         if (methodName.equals("clone") && methodDescriptor.equals("()Ljava/lang/Object;") &&
-            enhancer.getClassMetaData().getPersistenceCapableSuperclass() == null &&
+            enhancer.getClassMetaData().getPersistableSuperclass() == null &&
             opcode == Opcodes.INVOKESPECIAL && name.equals("clone") && desc.equals("()Ljava/lang/Object;"))
         {
             // clone() method calls super.clone() so change to use JdoSuperClone()

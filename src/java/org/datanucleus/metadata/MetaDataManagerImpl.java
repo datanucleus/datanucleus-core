@@ -2843,14 +2843,14 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
         if (cmd instanceof ClassMetaData)
         {
-            if (cmd.getPersistenceCapableSuperclass() != null)
+            if (cmd.getPersistableSuperclass() != null)
             {
                 // Add to direct subclasses for the superclass
-                Set<String> directSubclasses = directSubclassesByClass.get(cmd.getPersistenceCapableSuperclass());
+                Set<String> directSubclasses = directSubclassesByClass.get(cmd.getPersistableSuperclass());
                 if (directSubclasses == null)
                 {
                     directSubclasses = new HashSet<String>();
-                    directSubclassesByClass.put(cmd.getPersistenceCapableSuperclass(), directSubclasses);
+                    directSubclassesByClass.put(cmd.getPersistableSuperclass(), directSubclasses);
                 }
                 directSubclasses.add(cmd.getFullClassName());
 
@@ -2858,7 +2858,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 {
                     // Concrete class, so add to cache of concrete subclasses for all superclasses
                     AbstractClassMetaData theCmd = cmd;
-                    while (theCmd.getPersistenceCapableSuperclass() != null)
+                    while (theCmd.getPersistableSuperclass() != null)
                     {
                         theCmd = theCmd.getSuperAbstractClassMetaData();
                         Set<String> subclassNames = concreteSubclassNamesByClassName.get(theCmd.getFullClassName());

@@ -165,7 +165,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
                 namer.getStateManagerFieldName(), "L" + namer.getStateManagerAsmClassName() + ";");
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             EnhanceUtils.addBIPUSHToMethod(mv, mmd.getFieldId());
-            if (cmd.getPersistenceCapableSuperclass() != null)
+            if (cmd.getPersistableSuperclass() != null)
             {
                 mv.visitFieldInsn(Opcodes.GETSTATIC, asmClassName, namer.getInheritedFieldCountFieldName(), "I");
                 mv.visitInsn(Opcodes.IADD);
@@ -179,7 +179,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
                 namer.getStateManagerFieldName(), "L" + namer.getStateManagerAsmClassName() + ";");
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             EnhanceUtils.addBIPUSHToMethod(mv, mmd.getFieldId());
-            if (cmd.getPersistenceCapableSuperclass() != null)
+            if (cmd.getPersistableSuperclass() != null)
             {
                 mv.visitFieldInsn(Opcodes.GETSTATIC, asmClassName, namer.getInheritedFieldCountFieldName(), "I");
                 mv.visitInsn(Opcodes.IADD);
@@ -221,7 +221,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
                 mv.visitInsn(Opcodes.AALOAD);
                 mv.visitTypeInsn(Opcodes.CHECKCAST, "java/util/BitSet");
                 EnhanceUtils.addBIPUSHToMethod(mv, mmd.getFieldId());
-                if (cmd.getPersistenceCapableSuperclass() != null)
+                if (cmd.getPersistableSuperclass() != null)
                 {
                     mv.visitFieldInsn(Opcodes.GETSTATIC, asmClassName, namer.getInheritedFieldCountFieldName(), "I");
                     mv.visitInsn(Opcodes.IADD);
@@ -235,7 +235,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
                 mv.visitInsn(Opcodes.AALOAD);
                 mv.visitTypeInsn(Opcodes.CHECKCAST, "java/util/BitSet");
                 EnhanceUtils.addBIPUSHToMethod(mv, mmd.getFieldId());
-                if (cmd.getPersistenceCapableSuperclass() != null)
+                if (cmd.getPersistableSuperclass() != null)
                 {
                     mv.visitFieldInsn(Opcodes.GETSTATIC, asmClassName, namer.getInheritedFieldCountFieldName(), "I");
                     mv.visitInsn(Opcodes.IADD);
@@ -296,7 +296,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
                 namer.getStateManagerFieldName(), "L" + namer.getStateManagerAsmClassName() + ";");
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             EnhanceUtils.addBIPUSHToMethod(mv, mmd.getFieldId());
-            if (cmd.getPersistenceCapableSuperclass() != null)
+            if (cmd.getPersistableSuperclass() != null)
             {
                 mv.visitFieldInsn(Opcodes.GETSTATIC, asmClassName,
                     namer.getInheritedFieldCountFieldName(), "I");
@@ -311,7 +311,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
                 namer.getStateManagerFieldName(), "L" + namer.getStateManagerAsmClassName() + ";");
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             EnhanceUtils.addBIPUSHToMethod(mv, mmd.getFieldId());
-            if (cmd.getPersistenceCapableSuperclass() != null)
+            if (cmd.getPersistableSuperclass() != null)
             {
                 mv.visitFieldInsn(Opcodes.GETSTATIC, asmClassName, namer.getInheritedFieldCountFieldName(), "I");
                 mv.visitInsn(Opcodes.IADD);
@@ -349,7 +349,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
                 mv.visitInsn(Opcodes.AALOAD);
                 mv.visitTypeInsn(Opcodes.CHECKCAST, "java/util/BitSet");
                 EnhanceUtils.addBIPUSHToMethod(mv, mmd.getFieldId());
-                if (cmd.getPersistenceCapableSuperclass() != null)
+                if (cmd.getPersistableSuperclass() != null)
                 {
                     mv.visitFieldInsn(Opcodes.GETSTATIC, asmClassName,
                         namer.getInheritedFieldCountFieldName(), "I");

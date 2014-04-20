@@ -245,11 +245,8 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
  
     /**
      * Creates and returns a copy of this object.
-     *
-     * <P>Mutable second-class Objects are required to provide a public
-     * clone method in order to allow for copying PersistenceCapable
-     * objects. In contrast to Object.clone(), this method must not throw a
-     * CloneNotSupportedException.
+     * <P>Mutable second-class Objects are required to provide a public clone method in order to allow for copying persistable objects.
+     * In contrast to Object.clone(), this method must not throw a CloneNotSupportedException.
      * @return The cloned object
      */
     public Object clone()

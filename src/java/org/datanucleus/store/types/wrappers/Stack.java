@@ -219,11 +219,8 @@ public class Stack extends java.util.Stack implements SCOList, Cloneable
  
     /**
      * Clone operator to return a copy of this object.
-     * <p>
-     * Mutable second-class Objects are required to provide a public
-     * clone method in order to allow for copying PersistenceCapable
-     * objects. In contrast to Object.clone(), this method must not throw a
-     * CloneNotSupportedException.
+     * <P>Mutable second-class Objects are required to provide a public clone method in order to allow for copying persistable objects.
+     * In contrast to Object.clone(), this method must not throw a CloneNotSupportedException.
      * </p>
      *
      * @return The cloned object
