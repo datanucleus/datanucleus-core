@@ -443,7 +443,7 @@ public abstract class AbstractClassMetaData extends MetaData
         setPersistenceModifier(ClassPersistenceModifier.PERSISTENCE_CAPABLE);
         setEmbeddedOnly(cmd.embeddedOnly);
         setIdentityType(cmd.identityType);
-        setPersistenceCapableSuperclass(cmd.getFullClassName());
+        setPersistableSuperclass(cmd.getFullClassName());
 
         implementationOfPersistentDefinition = true;
 
@@ -2519,7 +2519,7 @@ public abstract class AbstractClassMetaData extends MetaData
         return persistableSuperclass;
     }
 
-    public synchronized void setPersistenceCapableSuperclass(String pcSuperclassName)
+    public synchronized void setPersistableSuperclass(String pcSuperclassName)
     {
         checkNotYetPopulated();
 
