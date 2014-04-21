@@ -22,26 +22,26 @@ import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 
 /**
- * Method to generate the method "__dnPersistenceCapableSuperclassInit" using ASM.
+ * Method to generate the method "__dnPersistableSuperclassInit" using ASM.
  * <pre>
- * private static Class __dnPersistenceCapableSuperclassInit()
+ * private static Class __dnPersistableSuperclassInit()
  * {
  *     return null;
  * }
  * </pre>
  * or, where the class has a (persistent) superclass
  * <pre>
- * private static Class __dnPersistenceCapableSuperclassInit()
+ * private static Class __dnPersistableSuperclassInit()
  * {
  *     return ___dn$loadClass(pcSuperclassName);
  * }
  * </pre>
  */
-public class InitPersistenceCapableSuperclass extends ClassMethod
+public class InitPersistableSuperclass extends ClassMethod
 {
-    public static InitPersistenceCapableSuperclass getInstance(ClassEnhancer enhancer)
+    public static InitPersistableSuperclass getInstance(ClassEnhancer enhancer)
     {
-        return new InitPersistenceCapableSuperclass(enhancer, enhancer.getNamer().getPersistableSuperclassInitMethodName(),
+        return new InitPersistableSuperclass(enhancer, enhancer.getNamer().getPersistableSuperclassInitMethodName(),
             Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC,
             Class.class, null, null);
     }
@@ -55,7 +55,7 @@ public class InitPersistenceCapableSuperclass extends ClassMethod
      * @param argTypes Argument types
      * @param argNames Argument names
      */
-    public InitPersistenceCapableSuperclass(ClassEnhancer enhancer, String name, int access, 
+    public InitPersistableSuperclass(ClassEnhancer enhancer, String name, int access, 
         Object returnType, Object[] argTypes, String[] argNames)
     {
         super(enhancer, name, access, returnType, argTypes, argNames);

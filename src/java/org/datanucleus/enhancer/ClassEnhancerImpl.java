@@ -45,7 +45,7 @@ import org.datanucleus.enhancer.EnhancerClassChecker;
 import org.datanucleus.enhancer.methods.InitFieldFlags;
 import org.datanucleus.enhancer.methods.InitFieldNames;
 import org.datanucleus.enhancer.methods.InitFieldTypes;
-import org.datanucleus.enhancer.methods.InitPersistenceCapableSuperclass;
+import org.datanucleus.enhancer.methods.InitPersistableSuperclass;
 import org.datanucleus.enhancer.methods.CopyField;
 import org.datanucleus.enhancer.methods.CopyFields;
 import org.datanucleus.enhancer.methods.CopyKeyFieldsFromObjectId;
@@ -581,7 +581,7 @@ public class ClassEnhancerImpl implements ClassEnhancer
         methodsToAdd.add(InitFieldFlags.getInstance(this));
         methodsToAdd.add(GetInheritedFieldCount.getInstance(this));
         methodsToAdd.add(GetManagedFieldCount.getInstance(this));
-        methodsToAdd.add(InitPersistenceCapableSuperclass.getInstance(this));
+        methodsToAdd.add(InitPersistableSuperclass.getInstance(this));
         methodsToAdd.add(LoadClass.getInstance(this));
         methodsToAdd.add(SuperClone.getInstance(this));
     }

@@ -71,7 +71,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
     private final static String CD_ObjectIdentity = Type.getDescriptor(ClassConstants.IDENTITY_SINGLEFIELD_OBJECT);
     private final static String CD_StateManager = Type.getDescriptor(ClassConstants.STATE_MANAGER);
     private final static String CD_ExecutionContext = Type.getDescriptor(ClassConstants.EXECUTION_CONTEXT);
-    private final static String CD_PersistenceCapable = Type.getDescriptor(ClassConstants.PERSISTABLE);
+    private final static String CD_Persistable = Type.getDescriptor(ClassConstants.PERSISTABLE);
     private final static String CD_Detachable = Type.getDescriptor(CL_Detachable);
     private final static String CD_ObjectIdFieldConsumer = Type.getDescriptor(Persistable.ObjectIdFieldConsumer.class);
     private final static String CD_ObjectIdFieldSupplier = Type.getDescriptor(Persistable.ObjectIdFieldSupplier.class);
@@ -123,7 +123,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getPersistableSuperclassFieldName()
     {
-        return "dnPersistenceCapableSuperclass";
+        return "dnPersistableSuperclass";
     }
 
     /* (non-Javadoc)
@@ -299,7 +299,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getPersistableSuperclassInitMethodName()
     {
-        return "__dnPersistenceCapableSuperclassInit";
+        return "__dnPersistableSuperclassInit";
     }
 
     /* (non-Javadoc)
@@ -547,7 +547,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getPersistableDescriptor()
     {
-        return CD_PersistenceCapable;
+        return CD_Persistable;
     }
 
     /* (non-Javadoc)
