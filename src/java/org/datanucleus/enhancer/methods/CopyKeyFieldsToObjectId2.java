@@ -33,24 +33,24 @@ import org.datanucleus.metadata.PropertyMetaData;
 import org.datanucleus.util.ClassUtils;
 
 /**
- * Method to generate the method "jdoCopyKeyFieldsToObjectId" using ASM.
+ * Method to generate the method "dnCopyKeyFieldsToObjectId" using ASM.
  * For datastore/nondurable identity
  * <pre>
- * public void jdoCopyKeyFieldsToObjectId(PersistenceCapable.ObjectIdFieldSupplier objectidfieldsupplier,
+ * public void dnCopyKeyFieldsToObjectId(PersistenceCapable.ObjectIdFieldSupplier objectidfieldsupplier,
  *        Object object)
  * {
  * }
  * </pre>
  * and for SingleFieldIdentity
  * <pre>
- * public void jdoCopyKeyFieldsToObjectId(PersistenceCapable.ObjectIdFieldSupplier fs, Object oid)
+ * public void dnCopyKeyFieldsToObjectId(PersistenceCapable.ObjectIdFieldSupplier fs, Object oid)
  * {
  *     throw new JDOFatalInternalException("It's illegal to call ...");
  * }
  * </pre>
  * and for user-supplied app identity
  * <pre>
- * public void jdoCopyKeyFieldsToObjectId(PersistenceCapable.ObjectIdFieldSupplier fs, Object oid)
+ * public void dnCopyKeyFieldsToObjectId(PersistenceCapable.ObjectIdFieldSupplier fs, Object oid)
  * {
  *     if (fs == null)
  *         throw new IllegalArgumentException("ObjectIdFieldSupplier is null");
@@ -63,7 +63,7 @@ import org.datanucleus.util.ClassUtils;
  * </pre>
  * and for CompoundIdentity
  * <pre>
- * public void jdoCopyKeyFieldsToObjectId(PersistenceCapable.ObjectIdFieldSupplier fs, Object oid)
+ * public void dnCopyKeyFieldsToObjectId(PersistenceCapable.ObjectIdFieldSupplier fs, Object oid)
  * {
  *     if (fs == null)
  *         throw new IllegalArgumentException("ObjectIdFieldSupplier is null");
@@ -213,7 +213,7 @@ public class CopyKeyFieldsToObjectId2 extends ClassMethod
                                 visitor.visitTypeInsn(Opcodes.CHECKCAST, fmd.getTypeName().replace('.', '/'));
                             }
 
-                            // Note that we swap JDOHelper.getObjectId(obj) for ((PersistenceCapable)obj).jdoGetObjectId())
+                            // Note that we swap JDOHelper.getObjectId(obj) for ((PersistenceCapable)obj).dnGetObjectId())
                             visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getPersistableAsmClassName(), getNamer().getGetObjectIdMethodName(), "()Ljava/lang/Object;", true);
 //                            visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getHelperAsmClassName(), "getObjectId", "(Ljava/lang/Object;)Ljava/lang/Object;");
 

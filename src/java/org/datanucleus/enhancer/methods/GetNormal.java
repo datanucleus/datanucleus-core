@@ -26,9 +26,9 @@ import org.datanucleus.enhancer.EnhanceUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 
 /**
- * Method to generate the method "jdoGetZZZ" using ASM for NORMAL_GET fields.
+ * Method to generate the method "dnGetZZZ" using ASM for NORMAL_GET fields.
  * <pre>
- * static YYY jdoGetZZZ(MyClass objPC)
+ * static YYY dnGetZZZ(MyClass objPC)
  * {
  *     return objPC.ZZZ;
  * }
@@ -36,7 +36,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
  */
 public class GetNormal extends ClassMethod
 {
-    /** Field that this jdoGetXXX is for. */
+    /** Field that this dnGetXXX is for. */
     protected AbstractMemberMetaData fmd;
 
     /**

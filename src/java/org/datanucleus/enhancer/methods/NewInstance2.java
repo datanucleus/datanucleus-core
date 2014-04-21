@@ -24,14 +24,14 @@ import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
 
 /**
- * Method to generate the method "jdoNewInstance" using ASM.
+ * Method to generate the method "dnNewInstance" using ASM.
  * <pre>
- * public PersistenceCapable jdoNewInstance(StateManager sm, Object o)
+ * public PersistenceCapable dnNewInstance(StateManager sm, Object o)
  * {
  *     Answer result = new Answer();
- *     result.jdoFlags = (byte) 1;
- *     result.jdoStateManager = sm;
- *     result.jdoCopyKeyFieldsFromObjectId(o);
+ *     result.dnFlags = (byte) 1;
+ *     result.dnStateManager = sm;
+ *     result.dnCopyKeyFieldsFromObjectId(o);
  *     return result;
  * }
  * </pre>

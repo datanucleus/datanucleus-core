@@ -24,9 +24,9 @@ import org.datanucleus.enhancer.EnhanceUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 
 /**
- * Method to generate the method "__jdoFieldFlagsInit" using ASM.
+ * Method to generate the method "__dnFieldFlagsInit" using ASM.
  * <pre>
- * private static final byte[] __jdoFieldFlagsInit()
+ * private static final byte[] __dnFieldFlagsInit()
  * {
  *     return new byte[] { 10, 24, 21 };
  * }

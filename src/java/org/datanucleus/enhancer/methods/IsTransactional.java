@@ -21,7 +21,7 @@ import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 
 /**
- * Method to generate the method "jdoIsTransactional" using ASM.
+ * Method to generate the method "dnIsTransactional" using ASM.
  */
 public class IsTransactional extends IsXXX
 {

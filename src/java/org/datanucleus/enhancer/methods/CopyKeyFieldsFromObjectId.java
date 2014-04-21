@@ -33,16 +33,16 @@ import org.datanucleus.metadata.PropertyMetaData;
 import org.datanucleus.util.ClassUtils;
 
 /**
- * Method to generate the method "jdoCopyKeyFieldsFromObjectId" using ASM.
+ * Method to generate the method "dnCopyKeyFieldsFromObjectId" using ASM.
  * For datastore/nondurable identity this is
  * <pre>
- * public void jdoCopyKeyFieldsFromObjectId(PersistenceCapable.ObjectIdFieldConsumer fc, Object oid)
+ * public void dnCopyKeyFieldsFromObjectId(PersistenceCapable.ObjectIdFieldConsumer fc, Object oid)
  * {
  * }
  * </pre>
  * and for SingleFieldIdentity it is
  * <pre>
- * public void jdoCopyKeyFieldsFromObjectId(PersistenceCapable.ObjectIdFieldConsumer fc, Object oid)
+ * public void dnCopyKeyFieldsFromObjectId(PersistenceCapable.ObjectIdFieldConsumer fc, Object oid)
  * {
  *     if (fc == null)
  *         throw new IllegalArgumentException("ObjectIdFieldConsumer is null");
@@ -54,7 +54,7 @@ import org.datanucleus.util.ClassUtils;
  * </pre>
  * and for user-defined primary keys
  * <pre>
- * public void jdoCopyKeyFieldsFromObjectId(PersistenceCapable.ObjectIdFieldConsumer fc, Object oid)
+ * public void dnCopyKeyFieldsFromObjectId(PersistenceCapable.ObjectIdFieldConsumer fc, Object oid)
  * {
  *     if (fc == null)
  *         throw new IllegalArgumentException("ObjectIdFieldConsumer is null");
@@ -71,7 +71,7 @@ import org.datanucleus.util.ClassUtils;
  * </pre>
  * and for CompoundIdentity
  * <pre>
- * public void jdoCopyKeyFieldsFromObjectId(PersistenceCapable.ObjectIdFieldConsumer fc, Object oid)
+ * public void dnCopyKeyFieldsFromObjectId(PersistenceCapable.ObjectIdFieldConsumer fc, Object oid)
  * {
  *     if (fc == null)
  *         throw new IllegalArgumentException("ObjectIdFieldConsumer is null");
@@ -81,7 +81,7 @@ import org.datanucleus.util.ClassUtils;
  *     try
  *     {
  *         fc.storeYYYField(1, o.id);
- *         fc.storeZZZField(2, jdoGetPersistenceManager().getObjectById(o.zzz, false));
+ *         fc.storeZZZField(2, dnGetPersistenceManager().getObjectById(o.zzz, false));
  *     }
  *     catch (Exception e) {}
  * }

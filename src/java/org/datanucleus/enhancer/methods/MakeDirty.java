@@ -24,25 +24,25 @@ import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.metadata.AbstractClassMetaData;
 
 /**
- * Method to generate the method "jdoMakeDirty" using ASM.
+ * Method to generate the method "dnMakeDirty" using ASM.
  * <pre>
- * public void jdoMakeDirty(String fieldName)
+ * public void dnMakeDirty(String fieldName)
  * {
- *     if (jdoStateManager != null)
- *         jdoStateManager.makeDirty(this, fieldName);
- *     if (jdoIsDetached() &amp;&amp; fieldName != null) 
+ *     if (dnStateManager != null)
+ *         dnStateManager.makeDirty(this, fieldName);
+ *     if (dnIsDetached() &amp;&amp; fieldName != null) 
  *     {
  *         String fldName = null;
  *         if (fieldName.indexOf('.') &ge; 0)
  *             fldName = fieldName.substring(fieldName.lastIndexOf('.') + 1);
  *         else
  *             fldName = fieldName;
- *         for (int i = 0; i &lt; jdoFieldNames.length; i++) 
+ *         for (int i = 0; i &lt; dnFieldNames.length; i++) 
  *         {
- *             if (jdoFieldNames[i].equals(fldName)) 
+ *             if (dnFieldNames[i].equals(fldName)) 
  *             {
- *                 if (((BitSet) jdoDetachedState[2]).get(i + jdoInheritedFieldCount))
- *                     ((BitSet) jdoDetachedState[3]).set(i + jdoInheritedFieldCount);
+ *                 if (((BitSet) dnDetachedState[2]).get(i + dnInheritedFieldCount))
+ *                     ((BitSet) dnDetachedState[3]).set(i + dnInheritedFieldCount);
  *                 else
  *                     throw new JDODetachedFieldAccessException("You have just attempted to access a field/property");
  *                 break;
@@ -52,10 +52,10 @@ import org.datanucleus.metadata.AbstractClassMetaData;
  * }
  * </pre>
  * and if not detachable
- * <pre>public void jdoMakeDirty(String fieldName)
+ * <pre>public void dnMakeDirty(String fieldName)
  * {
- *     if (jdoStateManager != null)
- *         jdoStateManager.makeDirty(this, fieldName);
+ *     if (dnStateManager != null)
+ *         dnStateManager.makeDirty(this, fieldName);
  * }
  * </pre>
  * TODO This currently doesnt cater for a fully-qualified field where the class name part
@@ -116,7 +116,7 @@ public class MakeDirty extends ClassMethod
 
         if (cmd.isDetachable())
         {
-            // if (jdoIsDetached())
+            // if (dnIsDetached())
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
             visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
                 getNamer().getIsDetachedMethodName(), "()Z");

@@ -27,16 +27,16 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.PropertyMetaData;
 
 /**
- * Method to generate the method "jdoProvideField" using ASM.
+ * Method to generate the method "dnProvideField" using ASM.
  * <pre>
- * public void jdoProvideField(int fieldIndex)
+ * public void dnProvideField(int fieldIndex)
  * {
- *     if (jdoStateManager == null)
+ *     if (dnStateManager == null)
  *         throw new IllegalStateException("state manager is null");
  *     switch (fieldIndex)
  *     {
  *         case 0:
- *             jdoStateManager.providedObjectField(this, fieldIndex, question);
+ *             dnStateManager.providedObjectField(this, fieldIndex, question);
  *             break;
  *         default:
  *             throw new IllegalArgumentException("out of field index :" + fieldIndex);
@@ -45,17 +45,17 @@ import org.datanucleus.metadata.PropertyMetaData;
  * </pre>
  * and with a superclass
  * <pre>
- * public void jdoProvideField(int fieldIndex)
+ * public void dnProvideField(int fieldIndex)
  * {
- *     if (jdoStateManager == null)
+ *     if (dnStateManager == null)
  *         throw new IllegalStateException("state manager is null");
- *     switch (fieldIndex - jdoInheritedFieldCount)
+ *     switch (fieldIndex - dnInheritedFieldCount)
  *     {
  *         case 0:
- *             jdoStateManager.providedStringField(this, fieldIndex, extraInfo);
+ *             dnStateManager.providedStringField(this, fieldIndex, extraInfo);
  *             break;
  *         default:
- *             super.jdoProvideField(fieldIndex);
+ *             super.dnProvideField(fieldIndex);
  *     }
  * }
  * </pre>
@@ -146,7 +146,7 @@ public class ProvideField extends ClassMethod
                     visitor.visitVarInsn(Opcodes.ALOAD, 0);
                     if (fields[i] instanceof PropertyMetaData)
                     {
-                        // Persistent property so use jdoGetXXX()
+                        // Persistent property so use dnGetXXX()
                         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
                             getNamer().getGetMethodPrefixMethodName() + fields[i].getName(), "()" + Type.getDescriptor(fields[i].getType()));
                     }
@@ -242,7 +242,7 @@ public class ProvideField extends ClassMethod
                     visitor.visitVarInsn(Opcodes.ALOAD, 0);
                     if (fields[i] instanceof PropertyMetaData)
                     {
-                        // Persistent property so use jdoGetXXX()
+                        // Persistent property so use dnGetXXX()
                         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
                             getNamer().getGetMethodPrefixMethodName() + fields[i].getName(), "()" + Type.getDescriptor(fields[i].getType()));
                     }

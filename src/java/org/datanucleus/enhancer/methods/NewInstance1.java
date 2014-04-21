@@ -23,13 +23,13 @@ import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 
 /**
- * Method to generate the method "jdoNewInstance" using ASM.
+ * Method to generate the method "dnNewInstance" using ASM.
  * <pre>
- * public PersistenceCapable jdoNewInstance(StateManager sm)
+ * public PersistenceCapable dnNewInstance(StateManager sm)
  * {
  *     MyClass result = new MyClass();
- *     result.jdoFlags = (byte) 1;
- *     result.jdoStateManager = sm;
+ *     result.dnFlags = (byte) 1;
+ *     result.dnStateManager = sm;
  *     return result;
  * }
  * </pre>

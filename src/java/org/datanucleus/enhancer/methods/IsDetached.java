@@ -23,11 +23,11 @@ import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 
 /**
- * Method to generate the method "jdoIsDetached" using ASM.
+ * Method to generate the method "dnIsDetached" using ASM.
  * <pre>
- * public boolean jdoIsDetached()
+ * public boolean dnIsDetached()
  * {
- *     if (jdoStateManager == null &amp;&amp; jdoDetachedState != null) 
+ *     if (dnStateManager == null &amp;&amp; dnDetachedState != null) 
  *     {
  *         return true;
  *     }
@@ -36,7 +36,7 @@ import org.datanucleus.enhancer.ClassMethod;
  * </pre>
  * and if not detachable will get
  * <pre>
- * public boolean jdoIsDetached()
+ * public boolean dnIsDetached()
  * {
  *     return false;
  * }

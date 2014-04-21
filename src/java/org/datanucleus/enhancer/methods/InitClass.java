@@ -27,14 +27,14 @@ import org.datanucleus.enhancer.ClassMethod;
  * <pre>
  * static
  * {
- *     jdoFieldNames = __jdoFieldNamesInit();
- *     jdoFieldTypes = __jdoFieldTypesInit();
- *     jdoFieldFlags = __jdoFieldFlagsInit();
- *     jdoInheritedFieldCount = __jdoGetInheritedFieldCount();
- *     jdoPersistenceCapableSuperclass = __jdoPersistenceCapableSuperclassInit();
- *     JDOImplHelper.registerClass(___jdo$loadClass("mydomain.MyClass"),
- *         jdoFieldNames, jdoFieldTypes, jdoFieldFlags,
- *         jdoPersistenceCapableSuperclass, new MyClass());
+ *     dnFieldNames = __dnFieldNamesInit();
+ *     dnFieldTypes = __dnFieldTypesInit();
+ *     dnFieldFlags = __dnFieldFlagsInit();
+ *     dnInheritedFieldCount = __dnGetInheritedFieldCount();
+ *     dnPersistenceCapableSuperclass = __dnPersistenceCapableSuperclassInit();
+ *     JDOImplHelper.registerClass(___dn$loadClass("mydomain.MyClass"),
+ *         dnFieldNames, dnFieldTypes, dnFieldFlags,
+ *         dnPersistenceCapableSuperclass, new MyClass());
  * }
  * </pre>
  */

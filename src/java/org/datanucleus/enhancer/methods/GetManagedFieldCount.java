@@ -24,7 +24,7 @@ import org.datanucleus.enhancer.EnhanceUtils;
 import org.datanucleus.metadata.ClassMetaData;
 
 /**
- * Method to generate the method "jdoGetManagedFieldCount" using ASM.
+ * Method to generate the method "dnGetManagedFieldCount" using ASM.
  */
 public class GetManagedFieldCount extends ClassMethod
 {
@@ -54,9 +54,9 @@ public class GetManagedFieldCount extends ClassMethod
      * Method to add the contents of the class method.
      * 
      * Usually this method should generate bytecode as:
-     * <code>return jdoFieldNames.length + superClass.jdoGetManagedFieldCount();</code>
+     * <code>return dnFieldNames.length + superClass.dnGetManagedFieldCount();</code>
      * but due to initializing issues [ENHANCER-58], we use constants instead, e.g.:
-     * <code>return {number of managed fields}+superClass.jdoGetManagedFieldCount();</code>
+     * <code>return {number of managed fields}+superClass.dnGetManagedFieldCount();</code>
      */
     public void execute()
     {

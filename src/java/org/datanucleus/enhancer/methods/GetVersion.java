@@ -24,23 +24,23 @@ import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
 
 /**
- * Method to generate the method "jdoGetVersion" using ASM.
+ * Method to generate the method "dnGetVersion" using ASM.
  * <pre>
- * public final Object jdoGetVersion()
+ * public final Object dnGetVersion()
  * {
- *     if (jdoStateManager != null)
- *         return jdoStateManager.getVersion(this);
- *     if (this.jdoIsDetached() != true)
+ *     if (dnStateManager != null)
+ *         return dnStateManager.getVersion(this);
+ *     if (this.dnIsDetached() != true)
  *         return null;
- *     return jdoDetachedState[1];
+ *     return dnDetachedState[1];
  * }
  * </pre>
  * or (when not Detachable)
  * <pre>
- * public final Object jdoGetVersion()
+ * public final Object dnGetVersion()
  * {
- *     if (jdoStateManager != null)
- *         return jdoStateManager.getVersion(this);
+ *     if (dnStateManager != null)
+ *         return dnStateManager.getVersion(this);
  *     return null;
  * }
  * </pre>

@@ -26,9 +26,9 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.PropertyMetaData;
 
 /**
- * Method to generate the method "jdoCopyField" using ASM.
+ * Method to generate the method "dnCopyField" using ASM.
  * <pre>
- * protected final void jdoCopyField(Answer obj, int index)
+ * protected final void dnCopyField(Answer obj, int index)
  * {
  *     switch (index)
  *     {
@@ -42,9 +42,9 @@ import org.datanucleus.metadata.PropertyMetaData;
  * </pre>
  * or with superclass
  * <pre>
- * protected final void jdoCopyField(ComplexAnswer obj, int index)
+ * protected final void dnCopyField(ComplexAnswer obj, int index)
  * {
- *     switch (index - jdoInheritedFieldCount)
+ *     switch (index - dnInheritedFieldCount)
  *     {
  *         case 0:
  *             param1 = obj.param1;
@@ -53,7 +53,7 @@ import org.datanucleus.metadata.PropertyMetaData;
  *             param2 = obj.param2;
  *             break;
  *         default:
- *             super.jdoCopyField(obj, index);
+ *             super.dnCopyField(obj, index);
  *     }
  * }
  * </pre>
@@ -127,7 +127,7 @@ public class CopyField extends ClassMethod
                     visitor.visitVarInsn(Opcodes.ALOAD, 1);
                     if (fields[i] instanceof PropertyMetaData)
                     {
-                        // Persistent property so use jdoSetXXX(obj.jdoGetXXX())
+                        // Persistent property so use dnSetXXX(obj.dnGetXXX())
                         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
                             getNamer().getGetMethodPrefixMethodName() + fields[i].getName(), "()" + Type.getDescriptor(fields[i].getType()));
                         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
@@ -148,7 +148,7 @@ public class CopyField extends ClassMethod
                 visitor.visitLabel(defaultLabel);
                 visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
-                // super.jdoCopyField(obj, index);
+                // super.dnCopyField(obj, index);
                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                 visitor.visitVarInsn(Opcodes.ALOAD, 1);
                 visitor.visitVarInsn(Opcodes.ILOAD, 2);
@@ -162,7 +162,7 @@ public class CopyField extends ClassMethod
             }
             else
             {
-                // super.jdoCopyField(obj, index);
+                // super.dnCopyField(obj, index);
                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                 visitor.visitVarInsn(Opcodes.ALOAD, 1);
                 visitor.visitVarInsn(Opcodes.ILOAD, 2);
@@ -197,7 +197,7 @@ public class CopyField extends ClassMethod
                     visitor.visitVarInsn(Opcodes.ALOAD, 1);
                     if (fields[i] instanceof PropertyMetaData)
                     {
-                        // Persistent property so use jdoSetXXX(obj.jdoGetXXX())
+                        // Persistent property so use dnSetXXX(obj.dnGetXXX())
                         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
                             getNamer().getGetMethodPrefixMethodName() + fields[i].getName(), "()" + Type.getDescriptor(fields[i].getType()));
                         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 

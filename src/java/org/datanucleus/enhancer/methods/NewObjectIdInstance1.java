@@ -29,24 +29,24 @@ import org.datanucleus.metadata.PropertyMetaData;
 import org.datanucleus.util.ClassUtils;
 
 /**
- * Method to generate the method "jdoNewObjectIdInstance" using ASM.
+ * Method to generate the method "dnNewObjectIdInstance" using ASM.
  * For datastore/nondurable identity this is
  * <pre>
- * public Object jdoNewObjectIdInstance()
+ * public Object dnNewObjectIdInstance()
  * {
  *     return null;
  * }
  * </pre>
  * and for SingleFieldIdentity
  * <pre>
- * public Object jdoNewObjectIdInstance()
+ * public Object dnNewObjectIdInstance()
  * {
  *     return new YYYIdentity(getClass(), id);
  * }
  * </pre>
  * and for user-supplied object identity class
  * <pre>
- * public Object jdoNewObjectIdInstance()
+ * public Object dnNewObjectIdInstance()
  * {
  *     return new UserPrimaryKey();
  * }
@@ -121,7 +121,7 @@ public class NewObjectIdInstance1 extends ClassMethod
                     visitor.visitVarInsn(Opcodes.ALOAD, 0);
                     if (fmd instanceof PropertyMetaData)
                     {
-                        // Persistent property so use jdoGetXXX()
+                        // Persistent property so use dnGetXXX()
                         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
                             getNamer().getGetMethodPrefixMethodName() + fmd.getName(), "()" + Type.getDescriptor(fmd.getType()));
                     }

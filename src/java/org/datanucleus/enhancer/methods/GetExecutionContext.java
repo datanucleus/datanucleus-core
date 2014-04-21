@@ -23,9 +23,9 @@ import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 
 /**
- * Method to generate the method "jdoGetExecutionContext" using ASM.
+ * Method to generate the method "dnGetExecutionContext" using ASM.
  * <pre>
- * public final ExecutionContext jdoGetExecutionContext()
+ * public final ExecutionContext dnGetExecutionContext()
  * {
  *     return (dnStateManager != null ? dnStateManager.getExecutionContext(this) : null);
  * }

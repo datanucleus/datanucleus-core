@@ -23,13 +23,13 @@ import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 
 /**
- * Method to generate the method "jdoReplaceFlags" using ASM.
+ * Method to generate the method "dnReplaceFlags" using ASM.
  * <pre>
- * public final void jdoReplaceFlags()
+ * public final void dnReplaceFlags()
  * {
- *     if (jdoStateManager != null)
+ *     if (dnStateManager != null)
  *     {
- *         this.jdoFlags = this.jdoStateManager.replacingFlags(this);
+ *         this.dnFlags = this.dnStateManager.replacingFlags(this);
  *     }
  * }
  * </pre>

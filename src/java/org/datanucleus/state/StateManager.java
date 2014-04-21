@@ -64,7 +64,7 @@ public interface StateManager
      * <P>
      * Transient nontransactional instances return <code>false</code>.
      * <P>
-     * @see Persistable#jdoMakeDirty(String fieldName)
+     * @see Persistable#dnMakeDirty(String fieldName)
      * @param pc the calling <code>Persistable</code> instance
      * @return <code>true</code> if this instance has been modified in the current transaction.
      */

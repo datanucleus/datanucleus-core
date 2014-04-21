@@ -26,23 +26,23 @@ import org.datanucleus.enhancer.EnhanceUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 
 /**
- * Method to generate the method "jdoSetZZZ" using ASM for MEDIATE_WRITE fields.
+ * Method to generate the method "dnSetZZZ" using ASM for MEDIATE_WRITE fields.
  * <pre>
- * static void jdoSetZZZ(MyClass objPC, YYY zzz)
+ * static void dnSetZZZ(MyClass objPC, YYY zzz)
  * {
- *     if (objPC.jdoStateManager == null)
+ *     if (objPC.dnStateManager == null)
  *         objPC.ZZZ = zzz;
  *     else
- *         objPC.jdoStateManager.setObjectField(objPC, 0, objPC.ZZZ, zzz);
- *     if (objPC.jdoIsDetached() == true)
- *         ((BitSet) objPC.jdoDetachedState[3]).set(0);
+ *         objPC.dnStateManager.setObjectField(objPC, 0, objPC.ZZZ, zzz);
+ *     if (objPC.dnIsDetached() == true)
+ *         ((BitSet) objPC.dnDetachedState[3]).set(0);
  * }
  * </pre>
  * with the last part only applying when the class is Detachable
  */
 public class SetViaMediate extends ClassMethod
 {
-    /** Field that this jdoSetZZZ is for. */
+    /** Field that this dnSetZZZ is for. */
     protected AbstractMemberMetaData fmd;
 
     /**
@@ -75,7 +75,7 @@ public class SetViaMediate extends ClassMethod
         Label startLabel = new Label();
         visitor.visitLabel(startLabel);
 
-        // "if (objPC.jdoStateManager == null) objPC.ZZZ = zzz;"
+        // "if (objPC.dnStateManager == null) objPC.ZZZ = zzz;"
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
             getNamer().getStateManagerFieldName(), "L" + getNamer().getStateManagerAsmClassName() + ";");
@@ -88,7 +88,7 @@ public class SetViaMediate extends ClassMethod
         Label l3 = new Label();
         visitor.visitJumpInsn(Opcodes.GOTO, l3);
 
-        // "else objPC.jdoStateManager.setYYYField(objPC, 0, objPC.ZZZ, zzz);"
+        // "else objPC.dnStateManager.setYYYField(objPC, 0, objPC.ZZZ, zzz);"
         visitor.visitLabel(l1);
         visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
@@ -107,27 +107,27 @@ public class SetViaMediate extends ClassMethod
         visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
             fmd.getName(), fieldTypeDesc);
         EnhanceUtils.addLoadForType(visitor, fmd.getType(), 1);
-        String jdoMethodName = "set" + EnhanceUtils.getTypeNameForPersistableMethod(fmd.getType()) + "Field";
+        String dnMethodName = "set" + EnhanceUtils.getTypeNameForPersistableMethod(fmd.getType()) + "Field";
         String argTypeDesc = fieldTypeDesc;
-        if (jdoMethodName.equals("setObjectField"))
+        if (dnMethodName.equals("setObjectField"))
         {
             argTypeDesc = EnhanceUtils.CD_Object;
         }
         visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
-            jdoMethodName, "(L" + getNamer().getPersistableAsmClassName() + ";I" + argTypeDesc + argTypeDesc + ")V");
+            dnMethodName, "(L" + getNamer().getPersistableAsmClassName() + ";I" + argTypeDesc + argTypeDesc + ")V");
         visitor.visitLabel(l3);
         visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         if (enhancer.getClassMetaData().isDetachable())
         {
-            // "if (objPC.jdoIsDetached() == true)"
+            // "if (objPC.dnIsDetached() == true)"
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
             visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(),
                 getNamer().getIsDetachedMethodName(), "()Z");
             Label l6 = new Label();
             visitor.visitJumpInsn(Opcodes.IFEQ, l6);
 
-            // "((BitSet) objPC.jdoDetachedState[3]).set(0);"
+            // "((BitSet) objPC.dnDetachedState[3]).set(0);"
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
             visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
                 getNamer().getDetachedStateFieldName(), "[Ljava/lang/Object;");

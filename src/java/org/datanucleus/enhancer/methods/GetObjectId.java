@@ -24,23 +24,23 @@ import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
 
 /**
- * Method to generate the method "jdoGetObjectId" using ASM.
+ * Method to generate the method "dnGetObjectId" using ASM.
  * <pre>
- * public final Object jdoGetObjectId()
+ * public final Object dnGetObjectId()
  * {
- *     if (jdoStateManager != null)
- *         return jdoStateManager.getObjectId(this);
- *     if (this.jdoIsDetached() != true)
+ *     if (dnStateManager != null)
+ *         return dnStateManager.getObjectId(this);
+ *     if (this.dnIsDetached() != true)
  *         return null;
- *     return jdoDetachedState[0];
+ *     return dnDetachedState[0];
  * }
  * </pre>
  * or (when not Detachable)
  * <pre>
- * public final Object jdoGetObjectId()
+ * public final Object dnGetObjectId()
  * {
- *     if (jdoStateManager != null)
- *         return jdoStateManager.getObjectId(this);
+ *     if (dnStateManager != null)
+ *         return dnStateManager.getObjectId(this);
  *     return null;
  * }
  * </pre>

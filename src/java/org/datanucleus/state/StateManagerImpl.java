@@ -881,7 +881,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
      * Instances that have been modified, deleted, or newly
      * made persistent in the current transaction return true.
      * <P>Transient nontransactional instances return false (JDO spec).
-     * @see Persistable#jdoMakeDirty(String fieldName)
+     * @see Persistable#dnMakeDirty(String fieldName)
      * @param pc the calling persistable instance
      * @return true if this instance has been modified in current transaction.
      */

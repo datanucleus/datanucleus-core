@@ -23,9 +23,9 @@ import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 
 /**
- * Method to generate the method "jdoProvideFields" using ASM.
+ * Method to generate the method "dnProvideFields" using ASM.
  * <pre>
- * public final void jdoProvideFields(int[] fieldIds)
+ * public final void dnProvideFields(int[] fieldIds)
  * {
  *     if (fieldIds == null)
  *         throw new IllegalArgumentException("argment is null");
@@ -33,7 +33,7 @@ import org.datanucleus.enhancer.ClassMethod;
  *     if (i &ge; 0)
  *     {
  *         do
- *             jdoProvideField(fieldIds[i]);
+ *             dnProvideField(fieldIds[i]);
  *         while (--i &ge; 0);
  *     }
  * }

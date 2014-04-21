@@ -33,16 +33,16 @@ import org.datanucleus.metadata.PropertyMetaData;
 import org.datanucleus.util.ClassUtils;
 
 /**
- * Method to generate the method "jdoCopyKeyFieldsFromObjectId" using ASM.
+ * Method to generate the method "dnCopyKeyFieldsFromObjectId" using ASM.
  * For datastore/nondurable identity
  * <pre>
- * protected void jdoCopyKeyFieldsFromObjectId(Object object)
+ * protected void dnCopyKeyFieldsFromObjectId(Object object)
  * {
  * }
  * </pre>
  * and for SingleFieldIdentity
  * <pre>
- * protected void jdoCopyKeyFieldsFromObjectId(Object oid)
+ * protected void dnCopyKeyFieldsFromObjectId(Object oid)
  * {
  *     if (!(oid instanceof YYYIdentity))
  *         throw new ClassCastException("key class is not YYYIdentity or null");
@@ -52,7 +52,7 @@ import org.datanucleus.util.ClassUtils;
  * </pre>
  * and for user-supplied app identity
  * <pre>
- * protected void jdoCopyKeyFieldsFromObjectId(Object oid)
+ * protected void dnCopyKeyFieldsFromObjectId(Object oid)
  * {
  *     if (!(oid instanceof UserPrimaryKey))
  *         throw new ClassCastException("key class is not mydomain.UserPrimarKey or null");
@@ -67,7 +67,7 @@ import org.datanucleus.util.ClassUtils;
  * </pre>
  * and for CompoundIdentity
  * <pre>
- * protected void jdoCopyKeyFieldsFromObjectId(Object oid)
+ * protected void dnCopyKeyFieldsFromObjectId(Object oid)
  * {
  *     if (!(oid instanceof UserPrimaryKey))
  *         throw new ClassCastException("key class is not mydomain.UserPrimarKey or null");
@@ -75,7 +75,7 @@ import org.datanucleus.util.ClassUtils;
  *     try
  *     {
  *         zzz1 = o.zzz1;
- *         zzz2 = (ZZZ) this.jdoGetPersistenceManager().getObjectById(o.zzz, false);
+ *         zzz2 = (ZZZ) this.dnGetPersistenceManager().getObjectById(o.zzz, false);
  *     }
  *     catch (Exception e) {}
  * }
@@ -194,7 +194,7 @@ public class CopyKeyFieldsFromObjectId2 extends ClassMethod
                     }
                     if (fmd instanceof PropertyMetaData)
                     {
-                        // Persistent property so use jdoSetXXX(...)
+                        // Persistent property so use dnSetXXX(...)
                         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
                             getNamer().getSetMethodPrefixMethodName() + fmd.getName(), "(" + Type.getDescriptor(fmd.getType()) + ")V");
                     }
@@ -277,7 +277,7 @@ public class CopyKeyFieldsFromObjectId2 extends ClassMethod
                             visitor.visitTypeInsn(Opcodes.CHECKCAST, fieldTypeName);
                             if (fmd instanceof PropertyMetaData)
                             {
-                                // Persistent property so use jdoSetXXX(...)
+                                // Persistent property so use dnSetXXX(...)
                                 visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
                                     getNamer().getSetMethodPrefixMethodName() + fmd.getName(), "(" + Type.getDescriptor(fmd.getType()) + ")V");
                             }

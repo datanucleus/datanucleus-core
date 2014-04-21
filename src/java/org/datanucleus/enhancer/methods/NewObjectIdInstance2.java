@@ -28,17 +28,17 @@ import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.util.ClassUtils;
 
 /**
- * Method to generate the method "jdoNewObjectIdInstance" using ASM.
+ * Method to generate the method "dnNewObjectIdInstance" using ASM.
  * For datastore/nondurable identity this is
  * <pre>
- * public Object jdoNewObjectIdInstance(Object key)
+ * public Object dnNewObjectIdInstance(Object key)
  * {
  *     return null;
  * }
  * </pre>
  * and for SingleFieldIdentity
  * <pre>
- * public Object jdoNewObjectIdInstance(Object key)
+ * public Object dnNewObjectIdInstance(Object key)
  * {
  *     if (key == null)
  *         throw new IllegalArgumentException("key is null");
@@ -49,7 +49,7 @@ import org.datanucleus.util.ClassUtils;
  * </pre>
  * and for user-supplied object ids
  * <pre>
- * public Object jdoNewObjectIdInstance(Object key)
+ * public Object dnNewObjectIdInstance(Object key)
  * {
  *     return new UserPrimaryKey((String) key);
  * }

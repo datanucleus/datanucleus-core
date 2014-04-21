@@ -25,12 +25,12 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.util.ClassUtils;
 
 /**
- * Method to generate the method "__jdoFieldTypesInit" using ASM.
+ * Method to generate the method "__dnFieldTypesInit" using ASM.
  * <pre>
- * private static final Class[] __jdoFieldTypesInit()
+ * private static final Class[] __dnFieldTypesInit()
  * {
- *     return new Class[] { ___jdo$loadClass("org.apache.jdo.test.B"), Long.TYPE,
- *              ___jdo$loadClass("java.lang.String") };
+ *     return new Class[] { ___dn$loadClass("org.apache.dn.test.B"), Long.TYPE,
+ *              ___dn$loadClass("java.lang.String") };
  * }
  * </pre>
  */

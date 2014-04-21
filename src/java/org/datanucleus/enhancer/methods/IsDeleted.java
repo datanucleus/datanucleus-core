@@ -21,7 +21,7 @@ import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 
 /**
- * Method to generate the method "jdoIsDeleted" using ASM.
+ * Method to generate the method "dnIsDeleted" using ASM.
  */
 public class IsDeleted extends IsXXX
 {

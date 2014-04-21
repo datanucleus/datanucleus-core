@@ -31,7 +31,7 @@ import org.datanucleus.enhancer.ClassMethod;
  * private void writeObject(ObjectOutputStream out)
  * throws IOException
  * {
- *     jdoPreSerialize();
+ *     dnPreSerialize();
  *     out.defaultWriteObject();
  * }
  * </pre>

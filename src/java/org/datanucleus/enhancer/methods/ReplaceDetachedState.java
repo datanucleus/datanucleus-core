@@ -24,13 +24,13 @@ import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
 
 /**
- * Method to generate the method "jdoReplaceDetachedState" using ASM.
+ * Method to generate the method "dnReplaceDetachedState" using ASM.
  * <pre>
- * public final synchronized void jdoReplaceDetachedState()
+ * public final synchronized void dnReplaceDetachedState()
  * {
- *     if (jdoStateManager == null)
+ *     if (dnStateManager == null)
  *         throw new IllegalStateException("state manager is null");
- *     this.jdoDetachedState = this.jdoStateManager.replacingDetachedState(this, jdoDetachedState);
+ *     this.dnDetachedState = this.dnStateManager.replacingDetachedState(this, dnDetachedState);
  * }
  * </pre>
  */

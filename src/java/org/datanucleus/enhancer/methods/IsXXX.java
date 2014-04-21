@@ -23,7 +23,7 @@ import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 
 /**
- * Base method to use for jdoIsXXX methods providing the majority of the enhancement.
+ * Base method to use for dnIsXXX methods providing the majority of the enhancement.
  */
 public abstract class IsXXX extends ClassMethod
 {
@@ -51,7 +51,7 @@ public abstract class IsXXX extends ClassMethod
      * Method to add the contents of the class method.
      * Creates the method as follows
      * <pre>
-     * return jdoStateManager != null ? jdoStateManager.isXXX(this) : false;
+     * return dnStateManager != null ? dnStateManager.isXXX(this) : false;
      * </pre>
      * where "isXXX" is replaced by the output of "getStateManagerIsMethod"
      */

@@ -23,7 +23,7 @@ import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.metadata.ClassMetaData;
 
 /**
- * Method to generate the method "__jdoGetInheritedFieldCount" using ASM.
+ * Method to generate the method "__dnGetInheritedFieldCount" using ASM.
  */
 public class GetInheritedFieldCount extends ClassMethod
 {

@@ -33,23 +33,23 @@ import org.datanucleus.metadata.PropertyMetaData;
 import org.datanucleus.util.ClassUtils;
 
 /**
- * Method to generate the method "jdoCopyKeyFieldsToObjectId" using ASM.
+ * Method to generate the method "dnCopyKeyFieldsToObjectId" using ASM.
  * For datastore/nondurable identity
  * <pre>
- * public void jdoCopyKeyFieldsToObjectId(Object oid)
+ * public void dnCopyKeyFieldsToObjectId(Object oid)
  * {
  * }
  * </pre>
  * and for SingleFieldIdentity
  * <pre>
- * public void jdoCopyKeyFieldsToObjectId(Object oid)
+ * public void dnCopyKeyFieldsToObjectId(Object oid)
  * {
  *     throw new JDOFatalInternalException("It's illegal to call ...");
  * }
  * </pre>
  * and for user-supplied app identity
  * <pre>
- * public void jdoCopyKeyFieldsToObjectId(Object oid)
+ * public void dnCopyKeyFieldsToObjectId(Object oid)
  * {
  *     if (!(oid instanceof UserPrimaryKey))
  *         throw new ClassCastException("key class is not mydomain.UserPrimaryKey or null");
@@ -60,7 +60,7 @@ import org.datanucleus.util.ClassUtils;
  * </pre>
  * and for Compound Identity
  * <pre>
- * public void jdoCopyKeyFieldsToObjectId(Object oid)
+ * public void dnCopyKeyFieldsToObjectId(Object oid)
  * {
  *     if (!(oid instanceof UserPrimaryKey))
  *         throw new ClassCastException("key class is not mydomain.UserPrimaryKey or null");
@@ -186,13 +186,13 @@ public class CopyKeyFieldsToObjectId extends ClassMethod
                             // CompoundIdentity, this field of the PK is a PC
                             if (fmd instanceof PropertyMetaData)
                             {
-                                // Persistent Property so use o.setXXX((XXX.Key)JDOHelper.getObjectId(jdoGetXXX()))
+                                // Persistent Property so use o.setXXX((XXX.Key)JDOHelper.getObjectId(dnGetXXX()))
                                 visitor.visitVarInsn(Opcodes.ALOAD, 2);
                                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                                 visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
                                     getNamer().getGetMethodPrefixMethodName() + fmd.getName(), "()" + Type.getDescriptor(fmd.getType()));
 
-                                // Note that we swap JDOHelper.getObjectId(obj) for ((PersistenceCapable)obj).jdoGetObjectId())
+                                // Note that we swap JDOHelper.getObjectId(obj) for ((PersistenceCapable)obj).dnGetObjectId())
                                 visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getPersistableAsmClassName(), getNamer().getGetObjectIdMethodName(), "()Ljava/lang/Object;", true);
 //                                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getHelperAsmClassName(), "getObjectId", "(Ljava/lang/Object;)Ljava/lang/Object;");
 
@@ -207,7 +207,7 @@ public class CopyKeyFieldsToObjectId extends ClassMethod
                                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                                 visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), fmd.getName(), fieldTypeDesc);
 
-                                // Note that we swap JDOHelper.getObjectId(obj) for ((PersistenceCapable)obj).jdoGetObjectId())
+                                // Note that we swap JDOHelper.getObjectId(obj) for ((PersistenceCapable)obj).dnGetObjectId())
                                 visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getPersistableAsmClassName(), getNamer().getGetObjectIdMethodName(), "()Ljava/lang/Object;", true);
 //                                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getHelperAsmClassName(), "getObjectId", "(Ljava/lang/Object;)Ljava/lang/Object;");
 
@@ -222,7 +222,7 @@ public class CopyKeyFieldsToObjectId extends ClassMethod
                                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                                 visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), fmd.getName(), fieldTypeDesc);
 
-                                // Note that we swap JDOHelper.getObjectId(obj) for ((PersistenceCapable)obj).jdoGetObjectId())
+                                // Note that we swap JDOHelper.getObjectId(obj) for ((PersistenceCapable)obj).dnGetObjectId())
                                 visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getPersistableAsmClassName(), getNamer().getGetObjectIdMethodName(), "()Ljava/lang/Object;", true);
 //                                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getHelperAsmClassName(), "getObjectId", "(Ljava/lang/Object;)Ljava/lang/Object;");
 
@@ -237,7 +237,7 @@ public class CopyKeyFieldsToObjectId extends ClassMethod
                             // Standard application-identity field
                             if (fmd instanceof PropertyMetaData)
                             {
-                                // Persistent Property so use o.setXXX(jdoGetXXX())
+                                // Persistent Property so use o.setXXX(dnGetXXX())
                                 visitor.visitVarInsn(Opcodes.ALOAD, 2);
                                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                                 visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 

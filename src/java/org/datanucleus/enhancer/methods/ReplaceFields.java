@@ -23,9 +23,9 @@ import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 
 /**
- * Method to generate the method "jdoReplaceFields" using ASM.
+ * Method to generate the method "dnReplaceFields" using ASM.
  * <pre>
- * public final void jdoReplaceFields(int[] fieldIds)
+ * public final void dnReplaceFields(int[] fieldIds)
  * {
  *     if (fieldIds == null)
  *         throw new IllegalArgumentException("argument is null");
@@ -34,7 +34,7 @@ import org.datanucleus.enhancer.ClassMethod;
  *     {
  *         int j = 0;
  *         do
- *             jdoReplaceField(fieldIds[j]);
+ *             dnReplaceField(fieldIds[j]);
  *         while (++j &lt; i);
  *     }
  * }

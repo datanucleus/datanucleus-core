@@ -21,7 +21,7 @@ import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 
 /**
- * Method to generate the method "jdoIsPersistent" using ASM.
+ * Method to generate the method "dnIsPersistent" using ASM.
  */
 public class IsPersistent extends IsXXX
 {

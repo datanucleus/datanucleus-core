@@ -22,18 +22,18 @@ import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 
 /**
- * Method to generate the method "__jdoPersistenceCapableSuperclassInit" using ASM.
+ * Method to generate the method "__dnPersistenceCapableSuperclassInit" using ASM.
  * <pre>
- * private static Class __jdoPersistenceCapableSuperclassInit()
+ * private static Class __dnPersistenceCapableSuperclassInit()
  * {
  *     return null;
  * }
  * </pre>
  * or, where the class has a (persistent) superclass
  * <pre>
- * private static Class __jdoPersistenceCapableSuperclassInit()
+ * private static Class __dnPersistenceCapableSuperclassInit()
  * {
- *     return ___jdo$loadClass(pcSuperclassName);
+ *     return ___dn$loadClass(pcSuperclassName);
  * }
  * </pre>
  */

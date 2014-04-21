@@ -24,9 +24,9 @@ import org.datanucleus.enhancer.EnhanceUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 
 /**
- * Method to generate the method "__jdoFieldNamesInit" using ASM.
+ * Method to generate the method "__dnFieldNamesInit" using ASM.
  * <pre>
- * private static final String[] __jdoFieldNamesInit()
+ * private static final String[] __dnFieldNamesInit()
  * {
  *    return new String[] { "b", "id", "name" };
  * }

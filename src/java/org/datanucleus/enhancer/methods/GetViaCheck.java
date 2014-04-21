@@ -26,13 +26,13 @@ import org.datanucleus.enhancer.EnhanceUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 
 /**
- * Method to generate the method "jdoGetZZZ" using ASM for CHECK_READ fields.
+ * Method to generate the method "dnGetZZZ" using ASM for CHECK_READ fields.
  * <pre>
- * static YYY jdoGetZZZ(MyClass objPC)
+ * static YYY dnGetZZZ(MyClass objPC)
  * {
- *     if (objPC.jdoFlags &gt; 0 &amp;&amp; objPC.jdoStateManager != null &amp;&amp; !objPC.jdoStateManager.isLoaded(objPC, 2))
- *         return objPC.jdoStateManager.getStringField(objPC, 2, objPC.ZZZ);
- *     if (objPC.jdoIsDetached() != false &amp;&amp; ((BitSet)objPC.jdoDetachedState[2]).get(2) != true)
+ *     if (objPC.dnFlags &gt; 0 &amp;&amp; objPC.dnStateManager != null &amp;&amp; !objPC.dnStateManager.isLoaded(objPC, 2))
+ *         return objPC.dnStateManager.getStringField(objPC, 2, objPC.ZZZ);
+ *     if (objPC.dnIsDetached() != false &amp;&amp; ((BitSet)objPC.dnDetachedState[2]).get(2) != true)
  *         throw new JDODetachedFieldAccessException
  *             ("You have just attempted to access field \"ZZZ\" yet this field was not detached ... ");
  *     return objPC.ZZZ;
@@ -42,7 +42,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
  */
 public class GetViaCheck extends ClassMethod
 {
-    /** Field that this jdoGetXXX is for. */
+    /** Field that this dnGetXXX is for. */
     protected AbstractMemberMetaData fmd;
 
     /**
@@ -111,15 +111,15 @@ public class GetViaCheck extends ClassMethod
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
             fmd.getName(), fieldTypeDesc);
-        String jdoMethodName = "get" + EnhanceUtils.getTypeNameForPersistableMethod(fmd.getType()) + "Field";
+        String dnMethodName = "get" + EnhanceUtils.getTypeNameForPersistableMethod(fmd.getType()) + "Field";
         String argTypeDesc = fieldTypeDesc;
-        if (jdoMethodName.equals("getObjectField"))
+        if (dnMethodName.equals("getObjectField"))
         {
             argTypeDesc = EnhanceUtils.CD_Object;
         }
         visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
-            jdoMethodName, "(L" + getNamer().getPersistableAsmClassName() + ";I" + argTypeDesc + ")" + argTypeDesc);
-        if (jdoMethodName.equals("getObjectField"))
+            dnMethodName, "(L" + getNamer().getPersistableAsmClassName() + ";I" + argTypeDesc + ")" + argTypeDesc);
+        if (dnMethodName.equals("getObjectField"))
         {
             // Cast any object fields to the correct type
             visitor.visitTypeInsn(Opcodes.CHECKCAST, fmd.getTypeName().replace('.', '/'));
@@ -131,7 +131,7 @@ public class GetViaCheck extends ClassMethod
 
         if (enhancer.getClassMetaData().isDetachable())
         {
-            // "if (objPC.jdoIsDetached() != false && ((BitSet) objPC.jdoDetachedState[2]).get(5) != true)"
+            // "if (objPC.dnIsDetached() != false && ((BitSet) objPC.dnDetachedState[2]).get(5) != true)"
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
             visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(),
                 getNamer().getIsDetachedMethodName(), "()Z");

@@ -23,12 +23,12 @@ import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 
 /**
- * Method to generate the method "jdoPreSerialize" using ASM.
+ * Method to generate the method "dnPreSerialize" using ASM.
  * <pre>
- * protected final void jdoPreSerialize()
+ * protected final void dnPreSerialize()
  * {
- *     if (jdoStateManager != null)
- *         jdoStateManager.preSerialize(this);
+ *     if (dnStateManager != null)
+ *         dnStateManager.preSerialize(this);
  * }
  * </pre>
  */

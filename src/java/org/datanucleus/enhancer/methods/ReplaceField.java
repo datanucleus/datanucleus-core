@@ -27,18 +27,18 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.PropertyMetaData;
 
 /**
- * Method to generate the method "jdoReplaceField" using ASM.
+ * Method to generate the method "dnReplaceField" using ASM.
  * <pre>
- * public void jdoReplaceField(int fieldIndex)
+ * public void dnReplaceField(int fieldIndex)
  * {
- *     if (jdoStateManager == null)
+ *     if (dnStateManager == null)
  *         throw new IllegalStateException("state manager is null");
  *     switch (fieldIndex)
  *     {
  *         case 0:
  *         {
  *             MyClass ref = this;
- *             ref.param1 = (MyOtherClass) ref.jdoStateManager.replacingObjectField(this, fieldIndex);
+ *             ref.param1 = (MyOtherClass) ref.dnStateManager.replacingObjectField(this, fieldIndex);
  *             break;
  *         }
  *         default:
@@ -48,20 +48,20 @@ import org.datanucleus.metadata.PropertyMetaData;
  * </pre>
  * or with superclass
  * <pre>
- * public void jdoReplaceField(int fieldIndex)
+ * public void dnReplaceField(int fieldIndex)
  * {
- *     if (jdoStateManager == null)
+ *     if (dnStateManager == null)
  *         throw new IllegalStateException("state manager is null");
- *     switch (fieldIndex - jdoInheritedFieldCount)
+ *     switch (fieldIndex - dnInheritedFieldCount)
  *     {
  *         case 0:
  *         {
  *             MyClass ref = this;
- *             ref.param1 = (MyOtherClass)ref.jdoStateManager.replacingStringField(this, fieldIndex);
+ *             ref.param1 = (MyOtherClass)ref.dnStateManager.replacingStringField(this, fieldIndex);
  *             break;
  *         }
  *         default:
- *             super.jdoReplaceField(fieldIndex);
+ *             super.dnReplaceField(fieldIndex);
  *     }
  * }
  * </pre>
@@ -159,7 +159,7 @@ public class ReplaceField extends ClassMethod
                     }
                     if (fields[i] instanceof PropertyMetaData)
                     {
-                        // Persistent properties so use jdoSetXXX(...)
+                        // Persistent properties so use dnSetXXX(...)
                         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
                             getNamer().getSetMethodPrefixMethodName() + fields[i].getName(), "(" + Type.getDescriptor(fields[i].getType()) + ")V");
                     }
@@ -261,7 +261,7 @@ public class ReplaceField extends ClassMethod
                     }
                     if (fields[i] instanceof PropertyMetaData)
                     {
-                        // Persistent properties so use jdoSetXXX(...)
+                        // Persistent properties so use dnSetXXX(...)
                         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
                             getNamer().getSetMethodPrefixMethodName() + fields[i].getName(), "(" + Type.getDescriptor(fields[i].getType()) + ")V");
                     }

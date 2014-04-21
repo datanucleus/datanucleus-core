@@ -24,25 +24,25 @@ import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
 
 /**
- * Method to generate the method "jdoIsDirty" using ASM.
+ * Method to generate the method "dnIsDirty" using ASM.
  * <pre>
- * public final boolean jdoIsDirty()
+ * public final boolean dnIsDirty()
  * {
- *     if (jdoStateManager != null)
- *         return jdoStateManager.isDirty(this);
- *     if (this.jdoIsDetached() != true)
+ *     if (dnStateManager != null)
+ *         return dnStateManager.isDirty(this);
+ *     if (this.dnIsDetached() != true)
  *         return false;
- *     if (((BitSet) jdoDetachedState[3]).length() &le; 0)
+ *     if (((BitSet) dnDetachedState[3]).length() &le; 0)
  *         return false;
  *     return true;
  * }
  * </pre>
  * or if not detachable
  * <pre>
- * public final boolean jdoIsDirty()
+ * public final boolean dnIsDirty()
  * {
- *     if (jdoStateManager != null)
- *         return jdoStateManager.isDirty(this);
+ *     if (dnStateManager != null)
+ *         return dnStateManager.isDirty(this);
  *     return true;
  * }
  * </pre>

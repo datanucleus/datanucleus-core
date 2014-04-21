@@ -24,13 +24,13 @@ import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
 
 /**
- * Method to generate the method "jdoSuperClone" using ASM.
+ * Method to generate the method "dnSuperClone" using ASM.
  * <pre>
- * private Object jdoSuperClone() throws CloneNotSupportedException
+ * private Object dnSuperClone() throws CloneNotSupportedException
  * {
  *     MyClass o = (MyClass) super.clone();
- *     o.jdoFlags = (byte) 0;
- *     o.jdoStateManager = null;
+ *     o.dnFlags = (byte) 0;
+ *     o.dnStateManager = null;
  *     return o;
  * }
  * </pre>

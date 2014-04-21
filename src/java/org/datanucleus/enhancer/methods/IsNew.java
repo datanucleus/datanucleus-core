@@ -21,7 +21,7 @@ import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 
 /**
- * Method to generate the method "jdoIsNew" using ASM.
+ * Method to generate the method "dnIsNew" using ASM.
  */
 public class IsNew extends IsXXX
 {

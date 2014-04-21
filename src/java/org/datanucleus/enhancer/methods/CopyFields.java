@@ -24,11 +24,11 @@ import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
 
 /**
- * Method to generate the method "jdoCopyFields" using ASM.
+ * Method to generate the method "dnCopyFields" using ASM.
  * <pre>
- * public void jdoCopyFields(Object obj, int[] fieldNumbers)
+ * public void dnCopyFields(Object obj, int[] fieldNumbers)
  * {
- *     if (jdoStateManager == null)
+ *     if (dnStateManager == null)
  *         throw new IllegalStateException("state manager is null");
  *     if (fieldNumbers == null)
  *         throw new IllegalStateException("fieldNumbers is null");
@@ -36,12 +36,12 @@ import org.datanucleus.enhancer.EnhanceUtils;
  *         throw new IllegalArgumentException
  *                   ("object is not an object of type mydomain.MyClass");
  *     MyClass other = (MyClass) obj;
- *     if (jdoStateManager != other.jdoStateManager)
+ *     if (dnStateManager != other.dnStateManager)
  *         throw new IllegalArgumentException("state managers do not match");
  *     int i = fieldNumbers.length - 1;
  *     if (i &ge; 0) {
  *         do
- *             jdoCopyField(other, fieldNumbers[i]);
+ *             dnCopyField(other, fieldNumbers[i]);
  *         while (--i &ge; 0);
  *     }
  * }

@@ -23,19 +23,19 @@ import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 
 /**
- * Method to generate the method "jdoReplaceStateManager" using ASM.
+ * Method to generate the method "dnReplaceStateManager" using ASM.
  * <pre>
- * public final synchronized void jdoReplaceStateManager(StateManager stateManager)
+ * public final synchronized void dnReplaceStateManager(StateManager stateManager)
  * {
- *     if (jdoStateManager != null)
+ *     if (dnStateManager != null)
  *     {
- *         jdoStateManager = jdoStateManager.replacingStateManager(this, stateManager);
+ *         dnStateManager = dnStateManager.replacingStateManager(this, stateManager);
  *     }
  *     else
  *     {
  *         JDOImplHelper.checkAuthorizedStateManager(sm);
- *         jdoStateManager = stateManager;
- *         jdoFlags = (byte) 1;
+ *         dnStateManager = stateManager;
+ *         dnFlags = (byte) 1;
  *     }
  * }
  * </pre>

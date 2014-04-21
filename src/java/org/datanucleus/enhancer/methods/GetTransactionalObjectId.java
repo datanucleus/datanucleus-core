@@ -24,11 +24,11 @@ import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
 
 /**
- * Method to generate the method "jdoGetTransactionalObjectId" using ASM.
+ * Method to generate the method "dnGetTransactionalObjectId" using ASM.
  * <pre>
- * public final Object jdoGetTransactionalObjectId()
+ * public final Object dnGetTransactionalObjectId()
  * {
- *     return (jdoStateManager != null ? jdoStateManager.getTransactionalObjectId(this) : null);
+ *     return (dnStateManager != null ? dnStateManager.getTransactionalObjectId(this) : null);
  * }
  * </pre>
  */

@@ -28,15 +28,15 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 /**
  * Method to generate the method "setZZZ" using ASM for CHECK_WRITE fields.
  * <pre>
- * static void jdoSetZZZ(MyClass objPC, YYY zzz)
+ * static void dnSetZZZ(MyClass objPC, YYY zzz)
  * {
- *     if (objPC.jdoFlags != 0 &amp;&amp; objPC.jdoStateManager != null)
- *         objPC.jdoStateManager.setStringField(objPC, 2, objPC.ZZZ, zzz);
+ *     if (objPC.dnFlags != 0 &amp;&amp; objPC.dnStateManager != null)
+ *         objPC.dnStateManager.setStringField(objPC, 2, objPC.ZZZ, zzz);
  *     else
  *     {
  *         objPC.ZZZ = zzz;
- *         if (objPC.jdoIsDetached() == true)
- *             ((BitSet) objPC.jdoDetachedState[3]).set(2);
+ *         if (objPC.dnIsDetached() == true)
+ *             ((BitSet) objPC.dnDetachedState[3]).set(2);
  *     }
  * }
  * </pre>
@@ -44,7 +44,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
  */
 public class SetViaCheck extends ClassMethod
 {
-    /** Field that this jdoSetZZZ is for. */
+    /** Field that this dnSetZZZ is for. */
     protected AbstractMemberMetaData fmd;
 
     /**
@@ -77,7 +77,7 @@ public class SetViaCheck extends ClassMethod
         Label startLabel = new Label();
         visitor.visitLabel(startLabel);
 
-        // "if (objPC.jdoFlags != 0 && objPC.jdoStateManager != null)"
+        // "if (objPC.dnFlags != 0 && objPC.dnStateManager != null)"
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getFlagsFieldName(), "B");
         Label l1 = new Label();
@@ -87,7 +87,7 @@ public class SetViaCheck extends ClassMethod
             getNamer().getStateManagerFieldName(), "L" + getNamer().getStateManagerAsmClassName() + ";");
         visitor.visitJumpInsn(Opcodes.IFNULL, l1);
 
-        // "objPC.jdoStateManager.setYYYField(objPC, 8, objPC.ZZZ, val);"
+        // "objPC.dnStateManager.setYYYField(objPC, 8, objPC.ZZZ, val);"
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
             getNamer().getStateManagerFieldName(), "L" + getNamer().getStateManagerAsmClassName() + ";");
@@ -103,14 +103,14 @@ public class SetViaCheck extends ClassMethod
         visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
             fmd.getName(), fieldTypeDesc);
         EnhanceUtils.addLoadForType(visitor, fmd.getType(), 1);
-        String jdoMethodName = "set" + EnhanceUtils.getTypeNameForPersistableMethod(fmd.getType()) + "Field";
+        String dnMethodName = "set" + EnhanceUtils.getTypeNameForPersistableMethod(fmd.getType()) + "Field";
         String argTypeDesc = fieldTypeDesc;
-        if (jdoMethodName.equals("setObjectField"))
+        if (dnMethodName.equals("setObjectField"))
         {
             argTypeDesc = EnhanceUtils.CD_Object;
         }
         visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
-            jdoMethodName, "(L" + getNamer().getPersistableAsmClassName() + ";I" + argTypeDesc + argTypeDesc + ")V");
+            dnMethodName, "(L" + getNamer().getPersistableAsmClassName() + ";I" + argTypeDesc + argTypeDesc + ")V");
         Label l3 = new Label();
         visitor.visitJumpInsn(Opcodes.GOTO, l3);
 
@@ -125,7 +125,7 @@ public class SetViaCheck extends ClassMethod
 
         if (enhancer.getClassMetaData().isDetachable())
         {
-            // "if (objPC.jdoIsDetached() == true)  ((BitSet) objPC.jdoDetachedState[3]).set(8);"
+            // "if (objPC.dnIsDetached() == true)  ((BitSet) objPC.dnDetachedState[3]).set(8);"
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
             visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(),
                 getNamer().getIsDetachedMethodName(), "()Z");
