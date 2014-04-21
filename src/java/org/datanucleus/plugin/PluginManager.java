@@ -35,11 +35,10 @@ import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 
 /**
- * Manages the registry of Extensions and Extension Points.
+ * Manages the registry of Extensions and Extension Points for the plugin mechanism.
  */
 public class PluginManager
 {
-    /** plugin registry **/
     private PluginRegistry registry;
 
     /**
@@ -58,8 +57,7 @@ public class PluginManager
         String allowUserBundles = props.getProperty("allow-user-bundles");
         boolean userBundles = (allowUserBundles != null ? Boolean.valueOf(allowUserBundles) : true);
 
-        registry =
-            PluginRegistryFactory.newPluginRegistry(registryClassName, bundleCheckAction, userBundles, clr);
+        registry = PluginRegistryFactory.newPluginRegistry(registryClassName, bundleCheckAction, userBundles, clr);
 
         // Register extension points declared in "/plugin.xml", and then register the extensions of these
         registry.registerExtensionPoints();
@@ -225,8 +223,7 @@ public class PluginManager
      * @param attributeName Name of the attribute whose value we want
      * @return The value of the attribute
      */
-    public String getAttributeValueForExtension(String extensionPoint,
-            String discrimAttrName, String discrimAttrValue, String attributeName)
+    public String getAttributeValueForExtension(String extensionPoint, String discrimAttrName, String discrimAttrValue, String attributeName)
     {
         ConfigurationElement elem = getConfigurationElementForExtension(extensionPoint, discrimAttrName, discrimAttrValue);
         if (elem != null)
@@ -244,8 +241,7 @@ public class PluginManager
      * @param attributeName Name of the attribute whose value we want
      * @return The value(s) of the attribute
      */
-    public String[] getAttributeValuesForExtension(String extensionPoint,
-            String discrimAttrName, String discrimAttrValue, String attributeName)
+    public String[] getAttributeValuesForExtension(String extensionPoint, String discrimAttrName, String discrimAttrValue, String attributeName)
     {
         ConfigurationElement[] elems = getConfigurationElementsForExtension(extensionPoint, discrimAttrName, discrimAttrValue);
         if (elems != null)
@@ -268,8 +264,7 @@ public class PluginManager
      * @param attributeName Name of the attribute whose value we want
      * @return The value of the attribute
      */
-    public String getAttributeValueForExtension(String extensionPoint,
-            String[] discrimAttrName, String[] discrimAttrValue, String attributeName)
+    public String getAttributeValueForExtension(String extensionPoint, String[] discrimAttrName, String[] discrimAttrValue, String attributeName)
     {
         ConfigurationElement elem = getConfigurationElementForExtension(extensionPoint, 
             discrimAttrName, discrimAttrValue);
@@ -297,12 +292,8 @@ public class PluginManager
      * @throws IllegalAccessException if an error occurs
      * @throws InvocationTargetException if an error occurs
      */
-    public Object createExecutableExtension(String extensionPoint,
-                                            String discrimAttrName, 
-                                            String discrimAttrValue, 
-                                            String attributeName, 
-                                            Class[] argsClass, 
-                                            Object[] args) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException
+    public Object createExecutableExtension(String extensionPoint, String discrimAttrName, String discrimAttrValue, String attributeName, Class[] argsClass, Object[] args) 
+    throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
         ConfigurationElement elem = getConfigurationElementForExtension(extensionPoint, discrimAttrName, discrimAttrValue);
         if (elem != null)
@@ -329,12 +320,8 @@ public class PluginManager
      * @throws IllegalAccessException if an error occurs
      * @throws InvocationTargetException if an error occurs
      */
-    public Object createExecutableExtension(String extensionPoint,
-                                            String[] discrimAttrName,
-                                            String[] discrimAttrValue,
-                                            String attributeName, 
-                                            Class[] argsClass, 
-                                            Object[] args) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException
+    public Object createExecutableExtension(String extensionPoint, String[] discrimAttrName, String[] discrimAttrValue, String attributeName, Class[] argsClass, Object[] args) 
+    throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
         ConfigurationElement elem = getConfigurationElementForExtension(extensionPoint, 
             discrimAttrName, discrimAttrValue);
@@ -352,7 +339,8 @@ public class PluginManager
      * @return the Class
      * @throws ClassNotResolvedException if an error occurs
      */
-    public Class loadClass(String pluginId, String className) throws ClassNotResolvedException
+    public Class loadClass(String pluginId, String className) 
+    throws ClassNotResolvedException
     {
         try
         {
@@ -428,18 +416,15 @@ public class PluginManager
 
             if (props.containsKey(PropertyNames.PROPERTY_PLUGIN_REGISTRYBUNDLECHECK))
             {
-                pluginProps.setProperty("bundle-check-action",
-                    (String)props.get(PropertyNames.PROPERTY_PLUGIN_REGISTRYBUNDLECHECK));
+                pluginProps.setProperty("bundle-check-action", (String)props.get(PropertyNames.PROPERTY_PLUGIN_REGISTRYBUNDLECHECK));
             }
             if (props.containsKey(PropertyNames.PROPERTY_PLUGIN_ALLOW_USER_BUNDLES))
             {
-                pluginProps.setProperty("allow-user-bundles",
-                    (String)props.get(PropertyNames.PROPERTY_PLUGIN_ALLOW_USER_BUNDLES));
+                pluginProps.setProperty("allow-user-bundles", (String)props.get(PropertyNames.PROPERTY_PLUGIN_ALLOW_USER_BUNDLES));
             }
             if (props.containsKey(PropertyNames.PROPERTY_PLUGIN_VALIDATEPLUGINS))
             {
-                pluginProps.setProperty("validate-plugins",
-                    (String)props.get(PropertyNames.PROPERTY_PLUGIN_VALIDATEPLUGINS));
+                pluginProps.setProperty("validate-plugins", (String)props.get(PropertyNames.PROPERTY_PLUGIN_VALIDATEPLUGINS));
             }
         }
         return new PluginManager(registryClassName, clr, pluginProps);

@@ -110,10 +110,11 @@ public class OSGiPluginRegistry implements PluginRegistry {
             URL pluginURL = osgiBundle.getEntry("plugin.xml");
 
             if (pluginURL == null)
+            {
                 continue;
+            }
 
             Bundle bundle = registerBundle(osgiBundle);
-
             if (bundle == null)
             {
                 // No MANIFEST.MF for this plugin.xml so ignore it
@@ -153,10 +154,6 @@ public class OSGiPluginRegistry implements PluginRegistry {
      */
     protected static class ExtensionSorter implements Comparator<Extension>, Serializable
     {
-        /*
-         * (non-Javadoc)
-         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-         */
         public int compare(Extension o1, Extension o2)
         {
             String name1 = o1.getPlugin().getSymbolicName();

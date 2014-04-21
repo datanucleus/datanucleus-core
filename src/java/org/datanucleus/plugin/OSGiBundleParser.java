@@ -46,8 +46,7 @@ import org.xml.sax.InputSource;
 
 public class OSGiBundleParser
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        ClassConstants.NUCLEUS_CONTEXT_LOADER);
+    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
     public static Bundle parseManifest(org.osgi.framework.Bundle osgiBundle)
     {
