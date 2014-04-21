@@ -31,7 +31,6 @@ import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.PropertyMetaData;
 import org.datanucleus.util.ClassUtils;
-import org.datanucleus.util.NucleusLogger;
 
 /**
  * Method to generate the method "jdoCopyKeyFieldsToObjectId" using ASM.
@@ -131,7 +130,7 @@ public class CopyKeyFieldsToObjectId extends ClassMethod
 
                     visitor.visitTypeInsn(Opcodes.NEW, getNamer().getFatalInternalExceptionAsmClassName());
                     visitor.visitInsn(Opcodes.DUP);
-                    visitor.visitLdcInsn("It's illegal to call jdoCopyKeyFieldsToObjectId for a class with single-field identity.");
+                    visitor.visitLdcInsn("It's illegal to call dnCopyKeyFieldsToObjectId for a class with single-field identity.");
                     visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, getNamer().getFatalInternalExceptionAsmClassName(), "<init>", "(Ljava/lang/String;)V");
                     visitor.visitInsn(Opcodes.ATHROW);
 
@@ -184,7 +183,6 @@ public class CopyKeyFieldsToObjectId extends ClassMethod
                         // Check if the PK field type is a PC (CompoundIdentity)
                         if (acmd != null && acmd.getIdentityType() != IdentityType.NONDURABLE)
                         {
-                            NucleusLogger.GENERAL.info(">> copyKeyFieldsToObjectId fmd=" + fmd.getFullFieldName());
                             // CompoundIdentity, this field of the PK is a PC
                             if (fmd instanceof PropertyMetaData)
                             {

@@ -55,7 +55,7 @@ import org.datanucleus.enhancer.methods.CopyKeyFieldsToObjectId2;
 import org.datanucleus.enhancer.methods.GetInheritedFieldCount;
 import org.datanucleus.enhancer.methods.GetManagedFieldCount;
 import org.datanucleus.enhancer.methods.GetObjectId;
-import org.datanucleus.enhancer.methods.GetPersistenceManager;
+import org.datanucleus.enhancer.methods.GetExecutionContext;
 import org.datanucleus.enhancer.methods.GetTransactionalObjectId;
 import org.datanucleus.enhancer.methods.GetVersion;
 import org.datanucleus.enhancer.methods.IsDeleted;
@@ -533,7 +533,7 @@ public class ClassEnhancerImpl implements ClassEnhancer
             methodsToAdd.add(GetObjectId.getInstance(this));
             methodsToAdd.add(GetVersion.getInstance(this));
             methodsToAdd.add(PreSerialize.getInstance(this));
-            methodsToAdd.add(GetPersistenceManager.getInstance(this));
+            methodsToAdd.add(GetExecutionContext.getInstance(this));
             methodsToAdd.add(GetTransactionalObjectId.getInstance(this));
             methodsToAdd.add(IsDeleted.getInstance(this));
             methodsToAdd.add(IsDirty.getInstance(this));

@@ -17,10 +17,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.state;
 
-import javax.jdo.spi.PersistenceCapable;
-import javax.jdo.spi.PersistenceCapable.ObjectIdFieldConsumer;
-
 import org.datanucleus.api.ApiAdapter;
+import org.datanucleus.enhancer.Persistable;
 import org.datanucleus.store.fieldmanager.FieldManager;
 
 /**
@@ -28,7 +26,7 @@ import org.datanucleus.store.fieldmanager.FieldManager;
  * Uses the supplied FieldManager to put the values into the object.
  * Handles PC fields that are part of the PK, cascading to (PK) fields of that object.
  */
-public class AppIdObjectIdFieldConsumer implements FieldManager, ObjectIdFieldConsumer
+public class AppIdObjectIdFieldConsumer implements FieldManager, Persistable.ObjectIdFieldConsumer
 {
     ApiAdapter api;
     FieldManager fm;
@@ -89,8 +87,8 @@ public class AppIdObjectIdFieldConsumer implements FieldManager, ObjectIdFieldCo
         if (api.isPersistable(value))
         {
             // Embedded PC, so cascade down its PK fields
-            PersistenceCapable pc = (PersistenceCapable)value;
-            pc.jdoCopyKeyFieldsFromObjectId(this, pc.jdoGetObjectId());
+            Persistable pc = (Persistable)value;
+            pc.dnCopyKeyFieldsFromObjectId(this, pc.dnGetObjectId());
             return;
         }
 

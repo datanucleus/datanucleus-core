@@ -20,8 +20,17 @@ package org.datanucleus;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import org.datanucleus.enhancer.Persistable;
+import org.datanucleus.identity.ByteId;
+import org.datanucleus.identity.CharId;
+import org.datanucleus.identity.IntId;
+import org.datanucleus.identity.LongId;
 import org.datanucleus.identity.OIDImpl;
+import org.datanucleus.identity.ObjectId;
+import org.datanucleus.identity.ShortId;
+import org.datanucleus.identity.StringId;
 import org.datanucleus.metadata.MetaDataManager;
+import org.datanucleus.state.StateManager;
 import org.datanucleus.store.StoreManager;
 
 /**
@@ -63,7 +72,19 @@ public class ClassConstants
     public static final Class NUCLEUS_CONTEXT = NucleusContext.class;
     public static final Class CLASS_LOADER_RESOLVER = ClassLoaderResolver.class;
     public static final Class STORE_MANAGER = StoreManager.class;
-    public static final Class OID_IMPL = OIDImpl.class;
     public static final Class METADATA_MANAGER = MetaDataManager.class;
     public static final Class EXECUTION_CONTEXT = ExecutionContext.class;
+
+    public static final Class PERSISTABLE = Persistable.class;
+    public static final Class STATE_MANAGER = StateManager.class;
+
+    // Identity classes
+    public static final Class IDENTITY_SINGLEFIELD_LONG = LongId.class;
+    public static final Class IDENTITY_SINGLEFIELD_INT = IntId.class;
+    public static final Class IDENTITY_SINGLEFIELD_STRING = StringId.class;
+    public static final Class IDENTITY_SINGLEFIELD_CHAR = CharId.class;
+    public static final Class IDENTITY_SINGLEFIELD_BYTE = ByteId.class;
+    public static final Class IDENTITY_SINGLEFIELD_OBJECT = ObjectId.class;
+    public static final Class IDENTITY_SINGLEFIELD_SHORT = ShortId.class;
+    public static final Class IDENTITY_OID_IMPL = OIDImpl.class;
 }

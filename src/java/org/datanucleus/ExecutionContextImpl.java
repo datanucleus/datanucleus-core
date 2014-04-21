@@ -2909,6 +2909,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return objs;
     }
 
+    public Object findObject(Object id, boolean validate)
+    {
+        return findObject(id, validate, validate, null);
+    }
+
     /**
      * Accessor for an object given the object id and a set of field values to apply to it.
      * This is intended for use where we have done a query and have the id from the results, and we want to

@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import javax.jdo.JDOUserException;
-import javax.jdo.spi.JDOImplHelper;
+import org.datanucleus.enhancer.EnhancementHelper;
+import org.datanucleus.exceptions.NucleusUserException;
 
 /**
  * This class is for identity with a single Object type field.
@@ -50,19 +50,16 @@ public class ObjectId extends SingleFieldId
             paramString = (String) param;
             if (paramString.length() < 3)
             {
-                // TODO Remove this JDO class usage
-                throw new JDOUserException("ObjectId constructor from String was expecting a longer string than " + paramString);
+                throw new NucleusUserException("ObjectId constructor from String was expecting a longer string than " + paramString);
             }
             int indexOfDelimiter = paramString.indexOf(STRING_DELIMITER);
             if (indexOfDelimiter < 0)
             {
-                // TODO Remove this JDO class usage
-                throw new JDOUserException("ObjectId constructor from String was expecting a delimiter of " + STRING_DELIMITER + " but not present!");
+                throw new NucleusUserException("ObjectId constructor from String was expecting a delimiter of " + STRING_DELIMITER + " but not present!");
             }
             keyString = paramString.substring(indexOfDelimiter + 1);
             className = paramString.substring(0, indexOfDelimiter);
-            // TODO Remove this JDO class usage; change to DN variant
-            keyAsObject = JDOImplHelper.construct(className, keyString);
+            keyAsObject = EnhancementHelper.construct(className, keyString);
         }
         else
         {

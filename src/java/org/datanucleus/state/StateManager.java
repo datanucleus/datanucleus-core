@@ -15,9 +15,11 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.enhancer;
+package org.datanucleus.state;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.enhancer.Detachable;
+import org.datanucleus.enhancer.Persistable;
 
 /**
  * This interface is the point of contact between managed instances of <code>Persistable</code> classes and DataNucleus.

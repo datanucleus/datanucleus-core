@@ -66,7 +66,7 @@ public interface EnhancementNamer
 
     String getIsTransactionalMethodName();
 
-    String getGetPersistenceManagerMethodName();
+    String getGetExecutionContextMethodName();
 
     String getPreSerializeMethodName();
 
@@ -118,7 +118,7 @@ public interface EnhancementNamer
 
     String getStateManagerAsmClassName();
 
-    String getPersistenceManagerAsmClassName();
+    String getExecutionContextAsmClassName();
 
     String getPersistableAsmClassName();
 
@@ -167,7 +167,7 @@ public interface EnhancementNamer
 
     String getStateManagerDescriptor();
 
-    String getPersistenceManagerDescriptor();
+    String getExecutionContextDescriptor();
 
     String getPersistableDescriptor();
 
@@ -177,7 +177,7 @@ public interface EnhancementNamer
 
     String getObjectIdFieldSupplierDescriptor();
 
-    Class getPersistenceManagerClass();
+    Class getExecutionContextClass();
 
     Class getStateManagerClass();
 

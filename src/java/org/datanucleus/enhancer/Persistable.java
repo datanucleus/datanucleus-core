@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.enhancer;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.state.StateManager;
 
 /**
  * A class that can be managed by DataNucleus must implement this interface.
@@ -247,8 +248,7 @@ public interface Persistable
      * enhanced for datastore identity, or if the class is abstract, null is returned.
      * <P>
      * For classes using single field identity, this method must be called on an instance of a
-     * persistence-capable class with its primary key field initialized (not null), or a
-     * <code>JDONullIdentityException</code> is thrown.
+     * persistence-capable class with its primary key field initialized (not null), or an exception is thrown.
      * <P>
      * The instance returned is initialized with the value(s) of the primary key field(s) of the instance on
      * which the method is called.

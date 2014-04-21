@@ -38,12 +38,17 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+
+
 // TODO Remove all of these
 import javax.jdo.JDOException;
 import javax.jdo.JDOFatalInternalException;
 import javax.jdo.JDOFatalUserException;
 import javax.jdo.JDOUserException;
 import javax.jdo.spi.JDOPermission;
+
+import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.state.StateManager;
 
 /**
  * Helper class for the DN bytecode enhancement contract. It contains methods to register metadata for
@@ -778,11 +783,8 @@ public class EnhancementHelper extends java.lang.Object
         }
         catch (Exception ex)
         {
-            /*
-             * ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
-             * InvocationTargetException
-             */
-            throw new JDOUserException("Exception in Object identity String constructor", ex);
+            // ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+            throw new NucleusUserException("Exception in Object identity String constructor", ex);
         }
     }
 

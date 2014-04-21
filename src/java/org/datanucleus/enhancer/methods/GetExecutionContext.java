@@ -23,21 +23,21 @@ import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 
 /**
- * Method to generate the method "jdoGetPersistenceManager" using ASM.
+ * Method to generate the method "jdoGetExecutionContext" using ASM.
  * <pre>
- * public final PersistenceManager jdoGetPersistenceManager()
+ * public final ExecutionContext jdoGetExecutionContext()
  * {
- *     return (jdoStateManager != null ? jdoStateManager.getPersistenceManager(this) : null);
+ *     return (dnStateManager != null ? dnStateManager.getExecutionContext(this) : null);
  * }
  * </pre>
  */
-public class GetPersistenceManager extends ClassMethod
+public class GetExecutionContext extends ClassMethod
 {
-    public static GetPersistenceManager getInstance(ClassEnhancer enhancer)
+    public static GetExecutionContext getInstance(ClassEnhancer enhancer)
     {
-        return new GetPersistenceManager(enhancer, enhancer.getNamer().getGetPersistenceManagerMethodName(), 
+        return new GetExecutionContext(enhancer, enhancer.getNamer().getGetExecutionContextMethodName(), 
             Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL,
-            enhancer.getNamer().getPersistenceManagerClass(), null, null);
+            enhancer.getNamer().getExecutionContextClass(), null, null);
     }
 
     /**
@@ -49,7 +49,7 @@ public class GetPersistenceManager extends ClassMethod
      * @param argTypes Argument types
      * @param argNames Argument names
      */
-    public GetPersistenceManager(ClassEnhancer enhancer, String name, int access, 
+    public GetExecutionContext(ClassEnhancer enhancer, String name, int access, 
         Object returnType, Object[] argTypes, String[] argNames)
     {
         super(enhancer, name, access, returnType, argTypes, argNames);
@@ -74,8 +74,8 @@ public class GetPersistenceManager extends ClassMethod
             getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
-            "getPersistenceManager", 
-            "(" + getNamer().getPersistableDescriptor() + ")" + getNamer().getPersistenceManagerDescriptor());
+            "getExecutionContext", // TODO Put this in namer
+            "(" + getNamer().getPersistableDescriptor() + ")" + getNamer().getExecutionContextDescriptor());
         Label l2 = new Label();
         visitor.visitJumpInsn(Opcodes.GOTO, l2);
         visitor.visitLabel(l1);
@@ -83,8 +83,7 @@ public class GetPersistenceManager extends ClassMethod
 
         visitor.visitInsn(Opcodes.ACONST_NULL);
         visitor.visitLabel(l2);
-        visitor.visitFrame(Opcodes.F_SAME1, 0, null, 1, 
-            new Object[] {getClassEnhancer().getNamer().getPersistenceManagerAsmClassName()});
+        visitor.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] {getClassEnhancer().getNamer().getExecutionContextAsmClassName()});
 
         visitor.visitInsn(Opcodes.ARETURN);
         Label l3 = new Label();

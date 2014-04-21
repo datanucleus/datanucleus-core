@@ -230,7 +230,7 @@ public class EmbeddedMetaData extends MetaData
                 // Limit to fields in this class, that aren't enhanced fields
                 // that aren't inner class fields, and that aren't static
                 if (cls_fields[i].getDeclaringClass().getName().equals(embeddedType) &&
-                    !cls_fields[i].getName().startsWith("jdo") &&
+                    !cls_fields[i].getName().startsWith("dn") &&
                     !ClassUtils.isInnerClass(cls_fields[i].getName()) &&
                     !Modifier.isStatic(cls_fields[i].getModifiers()))
                 {

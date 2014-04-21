@@ -40,7 +40,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.SequenceMetaData;
-import org.datanucleus.state.ReferentialJDOStateManager;
+import org.datanucleus.state.ReferentialStateManagerImpl;
 import org.datanucleus.store.Extent;
 import org.datanucleus.store.NucleusConnection;
 import org.datanucleus.store.NucleusSequence;
@@ -572,6 +572,6 @@ public class FederatedStoreManager implements StoreManager
      */
     public String getDefaultObjectProviderClassName()
     {
-        return ReferentialJDOStateManager.class.getName();
+        return ReferentialStateManagerImpl.class.getName();
     }
 }

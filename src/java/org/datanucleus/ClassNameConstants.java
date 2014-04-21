@@ -19,7 +19,8 @@ package org.datanucleus;
 
 import java.io.Serializable;
 
-import org.datanucleus.identity.OIDImpl;
+import org.datanucleus.enhancer.Persistable;
+import org.datanucleus.state.StateManager;
 
 /**
  * Constants with classes names (created to reduce overhead on calling Class.class.getName()), namely performance.
@@ -74,5 +75,16 @@ public class ClassNameConstants
     public static final String JAVA_LANG_LONG_ARRAY = Long[].class.getName();
     public static final String JAVA_LANG_SHORT_ARRAY = Short[].class.getName();
 
-    public static final String OIDImpl = OIDImpl.class.getName();
+    // Identity classes
+    public static final String IDENTITY_SINGLEFIELD_LONG = ClassConstants.IDENTITY_SINGLEFIELD_LONG.getName();
+    public static final String IDENTITY_SINGLEFIELD_INT = ClassConstants.IDENTITY_SINGLEFIELD_INT.getName();
+    public static final String IDENTITY_SINGLEFIELD_STRING = ClassConstants.IDENTITY_SINGLEFIELD_STRING.getName();
+    public static final String IDENTITY_SINGLEFIELD_CHAR = ClassConstants.IDENTITY_SINGLEFIELD_CHAR.getName();
+    public static final String IDENTITY_SINGLEFIELD_BYTE = ClassConstants.IDENTITY_SINGLEFIELD_BYTE.getName();
+    public static final String IDENTITY_SINGLEFIELD_OBJECT = ClassConstants.IDENTITY_SINGLEFIELD_OBJECT.getName();
+    public static final String IDENTITY_SINGLEFIELD_SHORT = ClassConstants.IDENTITY_SINGLEFIELD_SHORT.getName();
+    public static final String IDENTITY_OID_IMPL = ClassConstants.IDENTITY_OID_IMPL.getName();
+
+    public static final String PERSISTABLE = Persistable.class.getName();
+    public static final String STATE_MANAGER = StateManager.class.getName();
 }

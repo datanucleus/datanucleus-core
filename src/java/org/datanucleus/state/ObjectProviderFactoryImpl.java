@@ -20,14 +20,13 @@ package org.datanucleus.state;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import javax.jdo.spi.JDOImplHelper;
-
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.Configuration;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.cache.CachedPC;
+import org.datanucleus.enhancer.EnhancementHelper;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -63,12 +62,12 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
         }
         opClass = nucCtx.getClassLoaderResolver(null).classForName(opClassName);
 
-        // Register the StateManager class with JDOImplHelper for security
+        // Register the StateManager class with EnhancementHelper for security
         AccessController.doPrivileged(new PrivilegedAction() 
         {
             public Object run()
             {
-                JDOImplHelper.registerAuthorizedStateManagerClass(opClass);
+                EnhancementHelper.registerAuthorizedStateManagerClass(opClass);
                 return null;
             }
         });

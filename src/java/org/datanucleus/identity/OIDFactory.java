@@ -45,7 +45,7 @@ public class OIDFactory
         Class oidClass = nucleusCtx.getDatastoreIdentityClass();
 
         OID oid;
-        if (oidClass == ClassConstants.OID_IMPL)
+        if (oidClass == ClassConstants.IDENTITY_OID_IMPL)
         {
             //we hard code OIDImpl to improve performance
             oid = new OIDImpl(className, value);
@@ -98,7 +98,7 @@ public class OIDFactory
         Class oidClass = nucleusCtx.getDatastoreIdentityClass();
 
         OID oid;
-        if (oidClass == ClassConstants.OID_IMPL)
+        if (oidClass == ClassConstants.IDENTITY_OID_IMPL)
         {
             //we hard code OIDImpl to improve performance
             oid = new OIDImpl(oidString);

@@ -135,7 +135,7 @@ public class CopyKeyFieldsToObjectId2 extends ClassMethod
 
                     visitor.visitTypeInsn(Opcodes.NEW, getNamer().getFatalInternalExceptionAsmClassName());
                     visitor.visitInsn(Opcodes.DUP);
-                    visitor.visitLdcInsn("It's illegal to call jdoCopyKeyFieldsToObjectId for a class with SingleFieldIdentity.");
+                    visitor.visitLdcInsn("It's illegal to call dnCopyKeyFieldsToObjectId for a class with single-field identity.");
                     visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, getNamer().getFatalInternalExceptionAsmClassName(), "<init>", "(Ljava/lang/String;)V");
                     visitor.visitInsn(Opcodes.ATHROW);
 

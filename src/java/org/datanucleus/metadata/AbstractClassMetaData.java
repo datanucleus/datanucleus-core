@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.ClassNameConstants;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.ClassNotResolvedException;
@@ -1413,8 +1414,7 @@ public abstract class AbstractClassMetaData extends MetaData
             }
         }
 
-        if (no_of_pk_fields == 0 && inheritanceMetaData.getStrategy() == InheritanceStrategy.SUBCLASS_TABLE && 
-            getSuperclassManagingTable() == null)
+        if (no_of_pk_fields == 0 && inheritanceMetaData.getStrategy() == InheritanceStrategy.SUBCLASS_TABLE && getSuperclassManagingTable() == null)
         {
             // Case where we have no table for this class (abstract) and no superclass with a table, and no pk fields
             // TODO Localise this message
@@ -1436,7 +1436,6 @@ public abstract class AbstractClassMetaData extends MetaData
         if (needsObjectidClass)
         {
             // Update "objectid-class" if required yet not specified
-            ApiAdapter api = mmgr.getApiAdapter();
             if (no_of_pk_fields == 0)
             {
                 NucleusLogger.METADATA.error(LOCALISER.msg("044065", fullName, "" + no_of_pk_fields));
@@ -1457,38 +1456,33 @@ public abstract class AbstractClassMetaData extends MetaData
             {
                 // Assign associated SingleField identity class
                 Class pk_type = mmd_pk.getType();
-                if (Byte.class.isAssignableFrom(pk_type) ||
-                        byte.class.isAssignableFrom(pk_type))
+                if (Byte.class.isAssignableFrom(pk_type) || byte.class.isAssignableFrom(pk_type))
                 {
-                    objectidClass = api.getSingleFieldIdentityClassNameForByte();
+                    objectidClass = ClassNameConstants.IDENTITY_SINGLEFIELD_BYTE;
                 }
-                else if (Character.class.isAssignableFrom(pk_type) ||
-                        char.class.isAssignableFrom(pk_type))
+                else if (Character.class.isAssignableFrom(pk_type) || char.class.isAssignableFrom(pk_type))
                 {
-                    objectidClass = api.getSingleFieldIdentityClassNameForChar();
+                    objectidClass = ClassNameConstants.IDENTITY_SINGLEFIELD_CHAR;
                 }
-                else if (Integer.class.isAssignableFrom(pk_type) ||
-                        int.class.isAssignableFrom(pk_type))
+                else if (Integer.class.isAssignableFrom(pk_type) || int.class.isAssignableFrom(pk_type))
                 {
-                    objectidClass = api.getSingleFieldIdentityClassNameForInt();
+                    objectidClass = ClassNameConstants.IDENTITY_SINGLEFIELD_INT;
                 }
-                else if (Long.class.isAssignableFrom(pk_type) ||
-                        long.class.isAssignableFrom(pk_type))
+                else if (Long.class.isAssignableFrom(pk_type) || long.class.isAssignableFrom(pk_type))
                 {
-                    objectidClass = api.getSingleFieldIdentityClassNameForLong();
+                    objectidClass = ClassNameConstants.IDENTITY_SINGLEFIELD_LONG;
                 }
-                else if (Short.class.isAssignableFrom(pk_type) ||
-                        short.class.isAssignableFrom(pk_type))
+                else if (Short.class.isAssignableFrom(pk_type) || short.class.isAssignableFrom(pk_type))
                 {
-                    objectidClass = api.getSingleFieldIdentityClassNameForShort();
+                    objectidClass = ClassNameConstants.IDENTITY_SINGLEFIELD_SHORT;
                 }
                 else if (String.class.isAssignableFrom(pk_type))
                 {
-                    objectidClass = api.getSingleFieldIdentityClassNameForString();
+                    objectidClass = ClassNameConstants.IDENTITY_SINGLEFIELD_STRING;
                 }
                 else if (Object.class.isAssignableFrom(pk_type))
                 {
-                    objectidClass = api.getSingleFieldIdentityClassNameForObject();
+                    objectidClass = ClassNameConstants.IDENTITY_SINGLEFIELD_OBJECT;
                 }
                 else
                 {

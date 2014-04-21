@@ -17,27 +17,15 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.enhancer;
 
-import javax.jdo.JDODetachedFieldAccessException;
-import javax.jdo.JDOFatalInternalException;
-import javax.jdo.PersistenceManager;
-import javax.jdo.identity.ByteIdentity;
-import javax.jdo.identity.CharIdentity;
-import javax.jdo.identity.IntIdentity;
-import javax.jdo.identity.LongIdentity;
-import javax.jdo.identity.ObjectIdentity;
-import javax.jdo.identity.ShortIdentity;
-import javax.jdo.identity.StringIdentity;
-import javax.jdo.spi.Detachable;
-import javax.jdo.spi.JDOImplHelper;
-import javax.jdo.spi.PersistenceCapable;
-import javax.jdo.spi.StateManager;
-
+import org.datanucleus.ClassConstants;
+import org.datanucleus.ClassNameConstants;
 import org.datanucleus.asm.Type;
 import org.datanucleus.util.DetachListener;
 
 /**
- * Definition of enhancement naming for use with the JDO API.
- * All field/class names match those in the JDO spec.
+ * Definition of enhancement naming, for use with the JDO API.
+ * Note that this does not provide "binary compatibility" since we need to provide something that works for JDO and JPA and cannot rely
+ * on having jdo-api.jar present.
  */
 public class JDOEnhancementNamer implements EnhancementNamer
 {
@@ -57,36 +45,36 @@ public class JDOEnhancementNamer implements EnhancementNamer
     }
 
     private static final Class CL_Detachable = Detachable.class;
-    private static final Class CL_Persistable = PersistenceCapable.class;
-    private static final Class CL_ObjectIdFieldConsumer = PersistenceCapable.ObjectIdFieldConsumer.class;
-    private static final Class CL_ObjectIdFieldSupplier = PersistenceCapable.ObjectIdFieldSupplier.class;
-    private static final Class CL_PersistenceManager = PersistenceManager.class;
-    private static final Class CL_StateManager = StateManager.class;
+    private static final Class CL_Persistable = ClassConstants.PERSISTABLE;
+    private static final Class CL_ObjectIdFieldConsumer = Persistable.ObjectIdFieldConsumer.class;
+    private static final Class CL_ObjectIdFieldSupplier = Persistable.ObjectIdFieldSupplier.class;
+    private static final Class CL_ExecutionContext = ClassConstants.EXECUTION_CONTEXT;
+    private static final Class CL_StateManager = ClassConstants.STATE_MANAGER;
 
     private final static String ACN_DetachListener = DetachListener.class.getName().replace('.', '/');
     private final static String ACN_StateManager = CL_StateManager.getName().replace('.', '/');
-    private final static String ACN_PersistenceManager = CL_PersistenceManager.getName().replace('.', '/');
+    private final static String ACN_ExecutionContext = CL_ExecutionContext.getName().replace('.', '/');
     private final static String ACN_Persistable = CL_Persistable.getName().replace('.', '/');
     private final static String ACN_Detachable = CL_Detachable.getName().replace('.', '/');
     private final static String ACN_ObjectIdFieldConsumer = CL_ObjectIdFieldConsumer.getName().replace('.', '/');
     private final static String ACN_ObjectIdFieldSupplier = CL_ObjectIdFieldSupplier.getName().replace('.', '/');
-    private final static String ACN_DetachedFieldAccessException = JDODetachedFieldAccessException.class.getName().replace('.', '/');
-    private final static String ACN_FatalInternalException = JDOFatalInternalException.class.getName().replace('.', '/');
-    private final static String ACN_ImplHelper = JDOImplHelper.class.getName().replace('.', '/');
+    private final static String ACN_DetachedFieldAccessException = "javax/jdo/JDODetachedFieldAccessException";
+    private final static String ACN_FatalInternalException = "javax/jdo/JDOFatalInternalException";
+    private final static String ACN_ImplHelper = EnhancementHelper.class.getName().replace('.', '/');
 
-    private final static String CD_ByteIdentity = Type.getDescriptor(ByteIdentity.class);
-    private final static String CD_CharIdentity = Type.getDescriptor(CharIdentity.class);
-    private final static String CD_IntIdentity = Type.getDescriptor(IntIdentity.class);
-    private final static String CD_LongIdentity = Type.getDescriptor(LongIdentity.class);
-    private final static String CD_ShortIdentity = Type.getDescriptor(ShortIdentity.class);
-    private final static String CD_StringIdentity = Type.getDescriptor(StringIdentity.class);
-    private final static String CD_ObjectIdentity = Type.getDescriptor(ObjectIdentity.class);
-    private final static String CD_StateManager = Type.getDescriptor(StateManager.class);
-    private final static String CD_PersistenceManager = Type.getDescriptor(PersistenceManager.class);
-    private final static String CD_PersistenceCapable = Type.getDescriptor(PersistenceCapable.class);
+    private final static String CD_ByteIdentity = Type.getDescriptor(ClassConstants.IDENTITY_SINGLEFIELD_BYTE);
+    private final static String CD_CharIdentity = Type.getDescriptor(ClassConstants.IDENTITY_SINGLEFIELD_CHAR);
+    private final static String CD_IntIdentity = Type.getDescriptor(ClassConstants.IDENTITY_SINGLEFIELD_INT);
+    private final static String CD_LongIdentity = Type.getDescriptor(ClassConstants.IDENTITY_SINGLEFIELD_LONG);
+    private final static String CD_ShortIdentity = Type.getDescriptor(ClassConstants.IDENTITY_SINGLEFIELD_SHORT);
+    private final static String CD_StringIdentity = Type.getDescriptor(ClassConstants.IDENTITY_SINGLEFIELD_STRING);
+    private final static String CD_ObjectIdentity = Type.getDescriptor(ClassConstants.IDENTITY_SINGLEFIELD_OBJECT);
+    private final static String CD_StateManager = Type.getDescriptor(ClassConstants.STATE_MANAGER);
+    private final static String CD_ExecutionContext = Type.getDescriptor(ClassConstants.EXECUTION_CONTEXT);
+    private final static String CD_PersistenceCapable = Type.getDescriptor(ClassConstants.PERSISTABLE);
     private final static String CD_Detachable = Type.getDescriptor(CL_Detachable);
-    private final static String CD_ObjectIdFieldConsumer = Type.getDescriptor(PersistenceCapable.ObjectIdFieldConsumer.class);
-    private final static String CD_ObjectIdFieldSupplier = Type.getDescriptor(PersistenceCapable.ObjectIdFieldSupplier.class);
+    private final static String CD_ObjectIdFieldConsumer = Type.getDescriptor(Persistable.ObjectIdFieldConsumer.class);
+    private final static String CD_ObjectIdFieldSupplier = Type.getDescriptor(Persistable.ObjectIdFieldSupplier.class);
     private final static String CD_String = Type.getDescriptor(String.class);
     private final static String CD_Object = Type.getDescriptor(Object.class);
 
@@ -95,7 +83,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getStateManagerFieldName()
     {
-        return "jdoStateManager";
+        return "dnStateManager";
     }
 
     /* (non-Javadoc)
@@ -103,7 +91,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getFlagsFieldName()
     {
-        return "jdoFlags";
+        return "dnFlags";
     }
 
     /* (non-Javadoc)
@@ -111,7 +99,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getFieldNamesFieldName()
     {
-        return "jdoFieldNames";
+        return "dnFieldNames";
     }
 
     /* (non-Javadoc)
@@ -119,7 +107,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getFieldTypesFieldName()
     {
-        return "jdoFieldTypes";
+        return "dnFieldTypes";
     }
 
     /* (non-Javadoc)
@@ -127,7 +115,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getFieldFlagsFieldName()
     {
-        return "jdoFieldFlags";
+        return "dnFieldFlags";
     }
 
     /* (non-Javadoc)
@@ -135,7 +123,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getPersistableSuperclassFieldName()
     {
-        return "jdoPersistenceCapableSuperclass";
+        return "dnPersistenceCapableSuperclass";
     }
 
     /* (non-Javadoc)
@@ -143,7 +131,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getInheritedFieldCountFieldName()
     {
-        return "jdoInheritedFieldCount";
+        return "dnInheritedFieldCount";
     }
 
     /* (non-Javadoc)
@@ -151,7 +139,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getDetachedStateFieldName()
     {
-        return "jdoDetachedState";
+        return "dnDetachedState";
     }
 
     /* (non-Javadoc)
@@ -167,7 +155,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getFieldNamesInitMethodName()
     {
-        return "__jdoFieldNamesInit";
+        return "__dnFieldNamesInit";
     }
 
     /* (non-Javadoc)
@@ -175,7 +163,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getFieldTypesInitMethodName()
     {
-        return "__jdoFieldTypesInit";
+        return "__dnFieldTypesInit";
     }
 
     /* (non-Javadoc)
@@ -183,7 +171,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getFieldFlagsInitMethodName()
     {
-        return "__jdoFieldFlagsInit";
+        return "__dnFieldFlagsInit";
     }
 
     /* (non-Javadoc)
@@ -191,7 +179,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getGetObjectIdMethodName()
     {
-        return "jdoGetObjectId";
+        return "dnGetObjectId";
     }
 
     /* (non-Javadoc)
@@ -199,7 +187,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getGetTransactionalObjectIdMethodName()
     {
-        return "jdoGetTransactionalObjectId";
+        return "dnGetTransactionalObjectId";
     }
 
     /* (non-Javadoc)
@@ -207,7 +195,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getGetVersionMethodName()
     {
-        return "jdoGetVersion";
+        return "dnGetVersion";
     }
 
     /* (non-Javadoc)
@@ -215,7 +203,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getIsDetachedMethodName()
     {
-        return "jdoIsDetached";
+        return "dnIsDetached";
     }
 
     /* (non-Javadoc)
@@ -223,7 +211,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getIsDetachedInternalMethodName()
     {
-        return "jdoIsDetachedInternal";
+        return "dnIsDetachedInternal";
     }
 
     /* (non-Javadoc)
@@ -231,7 +219,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getIsDeletedMethodName()
     {
-        return "jdoIsDeleted";
+        return "dnIsDeleted";
     }
 
     /* (non-Javadoc)
@@ -239,7 +227,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getIsDirtyMethodName()
     {
-        return "jdoIsDirty";
+        return "dnIsDirty";
     }
 
     /* (non-Javadoc)
@@ -247,7 +235,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getIsNewMethodName()
     {
-        return "jdoIsNew";
+        return "dnIsNew";
     }
 
     /* (non-Javadoc)
@@ -255,7 +243,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getIsPersistentMethodName()
     {
-        return "jdoIsPersistent";
+        return "dnIsPersistent";
     }
 
     /* (non-Javadoc)
@@ -263,15 +251,15 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getIsTransactionalMethodName()
     {
-        return "jdoIsTransactional";
+        return "dnIsTransactional";
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getGetPersistenceManagerMethodName()
+     * @see org.datanucleus.enhancer.ClassEnhancer#getGetExecutionContextMethodName()
      */
-    public String getGetPersistenceManagerMethodName()
+    public String getGetExecutionContextMethodName()
     {
-        return "jdoGetPersistenceManager";
+        return "dnGetExecutionContext";
     }
 
     /* (non-Javadoc)
@@ -279,7 +267,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getPreSerializeMethodName()
     {
-        return "jdoPreSerialize";
+        return "dnPreSerialize";
     }
 
     /* (non-Javadoc)
@@ -287,7 +275,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getGetInheritedFieldCountMethodName()
     {
-        return "__jdoGetInheritedFieldCount";
+        return "__dnGetInheritedFieldCount";
     }
 
     /* (non-Javadoc)
@@ -295,7 +283,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getSuperCloneMethodName()
     {
-        return "jdoSuperClone";
+        return "dnSuperClone";
     }
 
     /* (non-Javadoc)
@@ -303,7 +291,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getGetManagedFieldCountMethodName()
     {
-        return "jdoGetManagedFieldCount";
+        return "dnGetManagedFieldCount";
     }
 
     /* (non-Javadoc)
@@ -311,7 +299,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getPersistableSuperclassInitMethodName()
     {
-        return "__jdoPersistenceCapableSuperclassInit";
+        return "__dnPersistenceCapableSuperclassInit";
     }
 
     /* (non-Javadoc)
@@ -319,7 +307,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getLoadClassMethodName()
     {
-        return "___jdo$loadClass";
+        return "___dn$loadClass";
     }
 
     /* (non-Javadoc)
@@ -327,7 +315,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getCopyFieldMethodName()
     {
-        return "jdoCopyField";
+        return "dnCopyField";
     }
 
     /* (non-Javadoc)
@@ -335,7 +323,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getCopyFieldsMethodName()
     {
-        return "jdoCopyFields";
+        return "dnCopyFields";
     }
 
     /* (non-Javadoc)
@@ -343,7 +331,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getCopyKeyFieldsFromObjectIdMethodName()
     {
-        return "jdoCopyKeyFieldsFromObjectId";
+        return "dnCopyKeyFieldsFromObjectId";
     }
 
     /* (non-Javadoc)
@@ -351,7 +339,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getCopyKeyFieldsToObjectIdMethodName()
     {
-        return "jdoCopyKeyFieldsToObjectId";
+        return "dnCopyKeyFieldsToObjectId";
     }
 
     /* (non-Javadoc)
@@ -359,7 +347,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getProvideFieldMethodName()
     {
-        return "jdoProvideField";
+        return "dnProvideField";
     }
 
     /* (non-Javadoc)
@@ -367,7 +355,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getProvideFieldsMethodName()
     {
-        return "jdoProvideFields";
+        return "dnProvideFields";
     }
 
     /* (non-Javadoc)
@@ -375,7 +363,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getReplaceFieldMethodName()
     {
-        return "jdoReplaceField";
+        return "dnReplaceField";
     }
 
     /* (non-Javadoc)
@@ -383,7 +371,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getReplaceFieldsMethodName()
     {
-        return "jdoReplaceFields";
+        return "dnReplaceFields";
     }
 
     /* (non-Javadoc)
@@ -391,7 +379,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getReplaceFlagsMethodName()
     {
-        return "jdoReplaceFlags";
+        return "dnReplaceFlags";
     }
 
     /* (non-Javadoc)
@@ -399,7 +387,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getReplaceStateManagerMethodName()
     {
-        return "jdoReplaceStateManager";
+        return "dnReplaceStateManager";
     }
 
     /* (non-Javadoc)
@@ -407,7 +395,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getReplaceDetachedStateMethodName()
     {
-        return "jdoReplaceDetachedState";
+        return "dnReplaceDetachedState";
     }
 
     /* (non-Javadoc)
@@ -415,7 +403,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getMakeDirtyMethodName()
     {
-        return "jdoMakeDirty";
+        return "dnMakeDirty";
     }
 
     /* (non-Javadoc)
@@ -423,7 +411,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getMakeDirtyDetachedMethodName()
     {
-        return "jdoMakeDirtyDetached";
+        return "dnMakeDirtyDetached";
     }
 
     /* (non-Javadoc)
@@ -431,7 +419,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getNewInstanceMethodName()
     {
-        return "jdoNewInstance";
+        return "dnNewInstance";
     }
 
     /* (non-Javadoc)
@@ -439,7 +427,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getNewObjectIdInstanceMethodName()
     {
-        return "jdoNewObjectIdInstance";
+        return "dnNewObjectIdInstance";
     }
 
     /* (non-Javadoc)
@@ -447,7 +435,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getGetMethodPrefixMethodName()
     {
-        return "jdoGet";
+        return "dnGet";
     }
 
     /* (non-Javadoc)
@@ -455,7 +443,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getSetMethodPrefixMethodName()
     {
-        return "jdoSet";
+        return "dnSet";
     }
 
     /* (non-Javadoc)
@@ -475,11 +463,11 @@ public class JDOEnhancementNamer implements EnhancementNamer
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getPersistenceManagerAsmClassName()
+     * @see org.datanucleus.enhancer.ClassEnhancer#getExecutionContextAsmClassName()
      */
-    public String getPersistenceManagerAsmClassName()
+    public String getExecutionContextAsmClassName()
     {
-        return ACN_PersistenceManager;
+        return ACN_ExecutionContext;
     }
 
     /* (non-Javadoc)
@@ -547,11 +535,11 @@ public class JDOEnhancementNamer implements EnhancementNamer
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getPersistenceManagerDescriptor()
+     * @see org.datanucleus.enhancer.ClassEnhancer#getExecutionContextDescriptor()
      */
-    public String getPersistenceManagerDescriptor()
+    public String getExecutionContextDescriptor()
     {
-        return CD_PersistenceManager;
+        return CD_ExecutionContext;
     }
 
     /* (non-Javadoc)
@@ -577,31 +565,31 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getSingleFieldIdentityDescriptor(String oidClassName)
     {
-        if (oidClassName.equals(LongIdentity.class.getName()))
+        if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_LONG))
         {
             return CD_LongIdentity;
         }
-        else if (oidClassName.equals(IntIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_INT))
         {
             return CD_IntIdentity;
         }
-        else if (oidClassName.equals(StringIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_STRING))
         {
             return CD_StringIdentity;
         }
-        else if (oidClassName.equals(ShortIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_SHORT))
         {
             return CD_ShortIdentity;
         }
-        else if (oidClassName.equals(CharIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_CHAR))
         {
             return CD_CharIdentity;
         }
-        else if (oidClassName.equals(ByteIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_BYTE))
         {
             return CD_ByteIdentity;
         }
-        else if (oidClassName.equals(ObjectIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_OBJECT))
         {
             return CD_ObjectIdentity;
         }
@@ -613,31 +601,31 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getTypeDescriptorForSingleFieldIdentityGetKey(String oidClassName)
     {
-        if (oidClassName.equals(LongIdentity.class.getName()))
+        if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_LONG))
         {
             return Type.LONG_TYPE.getDescriptor();
         }
-        else if (oidClassName.equals(IntIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_INT))
         {
             return Type.INT_TYPE.getDescriptor();
         }
-        else if (oidClassName.equals(ShortIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_SHORT))
         {
             return Type.SHORT_TYPE.getDescriptor();
         }
-        else if (oidClassName.equals(CharIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_CHAR))
         {
             return Type.CHAR_TYPE.getDescriptor();
         }
-        else if (oidClassName.equals(ByteIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_BYTE))
         {
             return Type.BYTE_TYPE.getDescriptor();
         }
-        else if (oidClassName.equals(StringIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_STRING))
         {
             return CD_String;
         }
-        else if (oidClassName.equals(ObjectIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_OBJECT))
         {
             return CD_Object;
         }
@@ -653,27 +641,27 @@ public class JDOEnhancementNamer implements EnhancementNamer
         {
             return null;
         }
-        else if (oidClassName.equals(ByteIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_BYTE))
         {
             return "Byte";
         }
-        else if (oidClassName.equals(CharIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_CHAR))
         {
             return "Char";
         }
-        else if (oidClassName.equals(IntIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_INT))
         {
             return "Int";
         }
-        else if (oidClassName.equals(LongIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_LONG))
         {
             return "Long";
         }
-        else if (oidClassName.equals(ShortIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_SHORT))
         {
             return "Short";
         }
-        else if (oidClassName.equals(StringIdentity.class.getName()))
+        else if (oidClassName.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_STRING))
         {
             return "String";
         }
@@ -697,11 +685,11 @@ public class JDOEnhancementNamer implements EnhancementNamer
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getPersistenceManagerClass()
+     * @see org.datanucleus.enhancer.ClassEnhancer#getExecutionContextClass()
      */
-    public Class getPersistenceManagerClass()
+    public Class getExecutionContextClass()
     {
-        return CL_PersistenceManager;
+        return CL_ExecutionContext;
     }
 
     /* (non-Javadoc)
@@ -749,6 +737,6 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public Class getObjectIdentityClass()
     {
-        return ObjectIdentity.class;
+        return ClassConstants.IDENTITY_SINGLEFIELD_OBJECT;
     }
 }

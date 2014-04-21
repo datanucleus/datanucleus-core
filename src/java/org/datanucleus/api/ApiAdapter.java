@@ -201,48 +201,6 @@ public interface ApiAdapter extends Serializable
     boolean isSingleFieldIdentityClass(String className);
 
     /**
-     * Accessor for the class name to use for identities when there is a single Long/long field.
-     * @return Class name of identity class
-     */
-    String getSingleFieldIdentityClassNameForLong();
-
-    /**
-     * Accessor for the class name to use for identities when there is a single Integer/int field.
-     * @return Class name of identity class
-     */
-    String getSingleFieldIdentityClassNameForInt();
-
-    /**
-     * Accessor for the class name to use for identities when there is a single Short/short field.
-     * @return Class name of identity class
-     */
-    String getSingleFieldIdentityClassNameForShort();
-
-    /**
-     * Accessor for the class name to use for identities when there is a single Byte/byte field.
-     * @return Class name of identity class
-     */
-    String getSingleFieldIdentityClassNameForByte();
-
-    /**
-     * Accessor for the class name to use for identities when there is a single Character/char field.
-     * @return Class name of identity class
-     */
-    String getSingleFieldIdentityClassNameForChar();
-
-    /**
-     * Accessor for the class name to use for identities when there is a single String field.
-     * @return Class name of identity class
-     */
-    String getSingleFieldIdentityClassNameForString();
-
-    /**
-     * Accessor for the class name to use for identities when there is a single Object field.
-     * @return Class name of identity class
-     */
-    String getSingleFieldIdentityClassNameForObject();
-
-    /**
      * Accessor for the target class for the specified single field identity.
      * @param id The identity
      * @return The target class

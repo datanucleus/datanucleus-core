@@ -42,14 +42,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.jdo.JDOFatalInternalException;
-import javax.jdo.JDOFatalUserException;
-import javax.jdo.PersistenceManager;
-import javax.jdo.spi.Detachable;
-import javax.jdo.spi.JDOImplHelper;
-import javax.jdo.spi.PersistenceCapable;
-import javax.jdo.spi.StateManager;
-
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.ExecutionContext.EmbeddedOwnerRelation;
@@ -60,6 +52,9 @@ import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.cache.CachedPC;
 import org.datanucleus.cache.L2CacheRetrieveFieldManager;
+import org.datanucleus.enhancer.Detachable;
+import org.datanucleus.enhancer.EnhancementHelper;
+import org.datanucleus.enhancer.Persistable;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
@@ -97,10 +92,10 @@ import org.datanucleus.util.StringUtils;
 import org.datanucleus.util.TypeConversionHelper;
 
 /**
- * Implementation of a JDO StateManager, supporting the bytecode enhancement contract of JDO.
+ * Implementation of a StateManager, supporting the bytecode enhancement contract of DataNucleus.
  * Implemented here as one StateManager per Object so adds on functionality particular 
- * to each object. All PersistenceCapable objects will have a StateManager when they 
- * have had communication with the PersistenceManager. They will typically always have
+ * to each object. All Persistable objects will have a StateManager when they 
+ * have had communication with the ExecutionContext. They will typically always have
  * an identity also. The exception to that is for embedded/serialised objects.
  * 
  * <H3>Embedded/Serialised Objects</H3>
@@ -119,29 +114,27 @@ import org.datanucleus.util.TypeConversionHelper;
  * for applications using such small objects can be critical. For this reason the StateManager should always
  * be minimal in memory consumption.
  * 
- * TODO The future aim is to have different types of StateManagers (ObjectProviders) that have particular
- * features. In addition we want to have a JPAStateManager using an internal enhancement contract. This means
- * we'll need various things generalising into a superclass
+ * TODO The future aim is to have different types of StateManagers (ObjectProviders) that have particular features.
  */
-public class JDOStateManager extends AbstractStateManager<PersistenceCapable> implements StateManager, ObjectProvider<PersistenceCapable>
+public class StateManagerImpl extends AbstractStateManager<Persistable> implements StateManager, ObjectProvider<Persistable>
 {
-    /** Image of the PersistenceCapable instance when the instance is enlisted in the transaction. */
-    protected PersistenceCapable savedImage = null;
+    /** Image of the Persistable instance when the instance is enlisted in the transaction. */
+    protected Persistable savedImage = null;
 
-    private static final JDOImplHelper HELPER;
+    private static final EnhancementHelper HELPER;
     static
     {
-        HELPER = (JDOImplHelper) AccessController.doPrivileged(new PrivilegedAction()
+        HELPER = (EnhancementHelper) AccessController.doPrivileged(new PrivilegedAction()
         {
             public Object run()
             {
                 try
                 {
-                    return JDOImplHelper.getInstance();
+                    return EnhancementHelper.getInstance();
                 }
                 catch (SecurityException e)
                 {
-                    throw new JDOFatalUserException(LOCALISER.msg("026000"), e);
+                    throw new NucleusUserException(LOCALISER.msg("026000"), e).setFatal();
                 }
             }
         });
@@ -152,7 +145,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @param ec ExecutionContext
      * @param cmd the metadata for the class.
      */
-    public JDOStateManager(ExecutionContext ec, AbstractClassMetaData cmd)
+    public StateManagerImpl(ExecutionContext ec, AbstractClassMetaData cmd)
     {
         super(ec, cmd);
     }
@@ -200,7 +193,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         myEC.clearObjectProviderAssociatedValues(this);
         myEC.removeObjectProvider(this);
         persistenceFlags = PersistenceFlags.READ_WRITE_OK;
-        myPC.jdoReplaceFlags();
+        myPC.dnReplaceFlags();
 
         setDisconnecting(true);
         try
@@ -316,10 +309,10 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         loadFieldValues(fv); // as a minimum the PK fields are loaded here
 
         // Create the ID now that we have the PK fields loaded
-        myID = myPC.jdoNewObjectIdInstance();
+        myID = myPC.dnNewObjectIdInstance();
         if (!cmd.usesSingleFieldIdentityClass())
         {
-            myPC.jdoCopyKeyFieldsToObjectId(myID);
+            myPC.dnCopyKeyFieldsToObjectId(myID);
         }
     }
 
@@ -330,7 +323,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @param id the identity of the object.
      * @param pc the object to be managed.
      */
-    public void initialiseForHollowPreConstructed(Object id, PersistenceCapable pc)
+    public void initialiseForHollowPreConstructed(Object id, Persistable pc)
     {
         myID = id;
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.HOLLOW);
@@ -338,7 +331,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         myPC = pc;
 
         replaceStateManager(myPC, this); // Assign this StateManager to the PC
-        myPC.jdoReplaceFlags();
+        myPC.dnReplaceFlags();
 
         // TODO Add to the cache
     }
@@ -352,7 +345,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @param id the identity of the object.
      * @param pc The object to be managed
      */
-    public void initialiseForPersistentClean(Object id, PersistenceCapable pc)
+    public void initialiseForPersistentClean(Object id, Persistable pc)
     {
         myID = id;
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.P_CLEAN);
@@ -360,7 +353,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         myPC = pc;
 
         replaceStateManager(myPC, this); // Assign this StateManager to the PC
-        myPC.jdoReplaceFlags();
+        myPC.dnReplaceFlags();
 
         // Mark all fields as loaded
         for (int i=0; i<loadedFields.length; ++i)
@@ -373,13 +366,13 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     }
 
     /**
-     * Initialises a state manager to manage a PersistenceCapable instance that will be EMBEDDED/SERIALISED 
-     * into another PersistenceCapable object. The instance will not be assigned an identity in the process 
+     * Initialises a state manager to manage a Persistable instance that will be EMBEDDED/SERIALISED 
+     * into another Persistable object. The instance will not be assigned an identity in the process 
      * since it is a SCO.
-     * @param pc The PersistenceCapable to manage (see copyPc also)
+     * @param pc The Persistable to manage (see copyPc also)
      * @param copyPc Whether the SM should manage a copy of the passed PC or that one
      */
-    public void initialiseForEmbedded(PersistenceCapable pc, boolean copyPc)
+    public void initialiseForEmbedded(Persistable pc, boolean copyPc)
     {
         objectType = ObjectProvider.EMBEDDED_PC; // Default to an embedded PC object
         myID = null; // It is embedded at this point so dont need an ID since we're not persisting it
@@ -391,8 +384,8 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         if (copyPc)
         {
             // Create a new PC with the same field values
-            PersistenceCapable pcCopy = myPC.jdoNewInstance(this);
-            pcCopy.jdoCopyFields(myPC, cmd.getAllMemberPositions());
+            Persistable pcCopy = myPC.dnNewInstance(this);
+            pcCopy.dnCopyFields(myPC, cmd.getAllMemberPositions());
 
             // Swap the managed PC to be the copy and not the input
             replaceStateManager(pcCopy, this);
@@ -400,7 +393,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             disconnectClone(pc);
         }
 
-        // Mark all fields as loaded since we are using the passed PersistenceCapable
+        // Mark all fields as loaded since we are using the passed Persistable
         for (int i=0;i<loadedFields.length;i++)
         {
             loadedFields[i] = true;
@@ -416,7 +409,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @param pc the instance being make persistent.
      * @param preInsertChanges Any changes to make before inserting
      */
-    public void initialiseForPersistentNew(PersistenceCapable pc, FieldValues preInsertChanges)
+    public void initialiseForPersistentNew(Persistable pc, FieldValues preInsertChanges)
     {
         myPC = pc;
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.P_NEW);
@@ -427,7 +420,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         }
 
         replaceStateManager(myPC, this); // Assign this StateManager to the PC
-        myPC.jdoReplaceFlags();
+        myPC.dnReplaceFlags();
 
         saveFields();
 
@@ -444,7 +437,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         {
             //load key fields from Application Id instance to PC instance
 
-            //if a primary key field is of type PersistenceCapable, it must first be persistent
+            //if a primary key field is of type Persistable, it must first be persistent
             int totalNumFields = cmd.getAllMemberPositions().length;
             for (int fieldNumber = 0; fieldNumber < totalNumFields; fieldNumber++)
             {
@@ -465,20 +458,17 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
                             try
                             {
                                 currFM = new SingleValueFieldManager();
-                                myPC.jdoProvideField(fieldNumber);
-                                PersistenceCapable pkFieldPC = 
-                                    (PersistenceCapable) ((SingleValueFieldManager) currFM).fetchObjectField(fieldNumber);
+                                myPC.dnProvideField(fieldNumber);
+                                Persistable pkFieldPC = (Persistable) ((SingleValueFieldManager) currFM).fetchObjectField(fieldNumber);
                                 if (pkFieldPC == null)
                                 {
-                                    throw new NucleusUserException(
-                                        LOCALISER.msg("026016", fmd.getFullFieldName()));
+                                    throw new NucleusUserException(LOCALISER.msg("026016", fmd.getFullFieldName()));
                                 }
                                 if (!myEC.getApiAdapter().isPersistent(pkFieldPC))
                                 {
                                     // Make sure the PC field is persistent - can cause the insert of our object 
                                     // being managed by this SM via flush() when bidir relation
-                                    Object persistedFieldPC = myEC.persistObjectInternal(pkFieldPC, null, null, -1, 
-                                        ObjectProvider.PC);
+                                    Object persistedFieldPC = myEC.persistObjectInternal(pkFieldPC, null, null, -1, ObjectProvider.PC);
                                     replaceField(myPC, fieldNumber, persistedFieldPC, false);
                                 }
                             }
@@ -548,7 +538,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * instances that are transitioning to a transient clean state.
      * @param pc the instance being make persistent.
      */
-    public void initialiseForTransactionalTransient(PersistenceCapable pc)
+    public void initialiseForTransactionalTransient(Persistable pc)
     {
         myPC = pc;
         myLC = null;
@@ -557,7 +547,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         {
             loadedFields[i] = true;
         }
-        myPC.jdoReplaceFlags();
+        myPC.dnReplaceFlags();
 
         // Populate all fields that have "value-strategy" and are not datastore populated
         populateStrategyFields();
@@ -574,12 +564,12 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     }
 
     /**
-     * Initialises the StateManager to manage a PersistenceCapable object in detached state.
+     * Initialises the StateManager to manage a Persistable object in detached state.
      * @param pc the detach object.
      * @param id the identity of the object.
      * @param version the detached version
      */
-    public void initialiseForDetached(PersistenceCapable pc, Object id, Object version)
+    public void initialiseForDetached(Persistable pc, Object id, Object version)
     {
         this.myID = id;
         this.myPC = pc;
@@ -590,16 +580,16 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         // have a lifecycle state and other methods e.g isPersistent() depend on it.
         this.myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.DETACHED_CLEAN);
 
-        this.myPC.jdoReplaceFlags();
+        this.myPC.dnReplaceFlags();
         replaceStateManager(myPC, this);
     }
 
     /**
-     * Initialises the StateManager to manage a PersistenceCapable object that is not persistent but is
+     * Initialises the StateManager to manage a Persistable object that is not persistent but is
      * about to be deleted.
      * @param pc the object to delete
      */
-    public void initialiseForPNewToBeDeleted(PersistenceCapable pc)
+    public void initialiseForPNewToBeDeleted(Persistable pc)
     {
         this.myID = null;
         this.myPC = pc;
@@ -616,9 +606,9 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * This is used when getting objects out of the L2 Cache, where they have no ObjectProvider 
      * assigned, and returning them as associated with a particular ExecutionContext.
      * @param cachedPC The cached PC object
-     * @param id Id to assign to the PersistenceCapable object
+     * @param id Id to assign to the Persistable object
      */
-    public void initialiseForCachedPC(CachedPC<PersistenceCapable> cachedPC, Object id)
+    public void initialiseForCachedPC(CachedPC<Persistable> cachedPC, Object id)
     {
         // Create a new copy of the input object type, performing the majority of the initialisation
         initialiseForHollow(id, null, cachedPC.getObjectClass());
@@ -674,7 +664,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * Accessor for the Persistent Capable object.
      * @return The PersistentCapable object
      */
-    public PersistenceCapable getObject()
+    public Persistable getObject()
     {
         return myPC;
     }
@@ -684,8 +674,8 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      */
     public void saveFields()
     {
-        savedImage = myPC.jdoNewInstance(this);
-        savedImage.jdoCopyFields(myPC, cmd.getAllMemberPositions());
+        savedImage = myPC.dnNewInstance(this);
+        savedImage.dnCopyFields(myPC, cmd.getAllMemberPositions());
         savedFlags = persistenceFlags;
         savedLoadedFields = loadedFields.clone();
     }
@@ -709,8 +699,8 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         {
             loadedFields = savedLoadedFields;
             persistenceFlags = savedFlags;
-            myPC.jdoReplaceFlags();
-            myPC.jdoCopyFields(savedImage, cmd.getAllMemberPositions());
+            myPC.dnReplaceFlags();
+            myPC.dnCopyFields(savedImage, cmd.getAllMemberPositions());
 
             clearDirtyFlags();
             clearSavedFields();
@@ -734,7 +724,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             // Note that this is the DFG and NOT the current FetchPlan since in the enhancement of classes
             // all DFG fields are set to check jdoFlags before relaying back to the StateManager
             persistenceFlags = PersistenceFlags.READ_OK;
-            myPC.jdoReplaceFlags();
+            myPC.dnReplaceFlags();
         }
     }
 
@@ -745,12 +735,9 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     {
         myEC.evictFromTransaction(this);
 
-        /*
-         * A non-transactional object needs to contact us on any field read no
-         * matter what fields are loaded.
-         */
+        // A non-transactional object needs to contact us on any field read no matter what fields are loaded.
         persistenceFlags = PersistenceFlags.LOAD_REQUIRED;
-        myPC.jdoReplaceFlags();
+        myPC.dnReplaceFlags();
     }
 
     /**
@@ -758,7 +745,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @param pc The object to update
      * @param sm The new state manager
      */
-    protected void replaceStateManager(final PersistenceCapable pc, final StateManager sm)
+    protected void replaceStateManager(final Persistable pc, final StateManager sm)
     {
         try
         {
@@ -767,32 +754,32 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             {
                 public Object run() 
                 {
-                    pc.jdoReplaceStateManager(sm);
+                    pc.dnReplaceStateManager(sm);
                     return null;
                 }
             });
         }
         catch (SecurityException e)
         {
-            throw new JDOFatalUserException(LOCALISER.msg("026000"), e);
+            throw new NucleusUserException(LOCALISER.msg("026000"), e).setFatal();
         }
     }
 
     /**
      * Replace the current value of jdoStateManager.
-     * <P>This method is called by the PersistenceCapable whenever jdoReplaceStateManager is called and 
+     * <P>This method is called by the Persistable whenever jdoReplaceStateManager is called and 
      * there is already an owning StateManager. This is a security precaution to ensure that the owning 
-     * StateManager is the only source of any change to its reference in the PersistenceCapable.</p>
+     * StateManager is the only source of any change to its reference in the Persistable.</p>
      *
      * @return the new value for the jdoStateManager
-     * @param pc the calling PersistenceCapable instance
+     * @param pc the calling Persistable instance
      * @param sm the proposed new value for the jdoStateManager
      */
-    public StateManager replacingStateManager(PersistenceCapable pc, StateManager sm)
+    public StateManager replacingStateManager(Persistable pc, StateManager sm)
     {
         if (myLC == null)
         {
-            throw new JDOFatalInternalException("Null LifeCycleState");
+            throw new NucleusException("Null LifeCycleState").setFatal();
         }
         else if (myLC.stateType() == LifeCycleState.DETACHED_CLEAN)
         {
@@ -810,7 +797,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
                 return this;
             }
 
-            if (myEC == ((JDOStateManager)sm).getExecutionContext())
+            if (myEC == ((StateManagerImpl)sm).getExecutionContext())
             {
                 NucleusLogger.PERSISTENCE.debug(">> SM.replacingStateManager this=" + this + " sm=" + sm + " with same EC");
                 // This is a race condition when makePersistent or
@@ -818,7 +805,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
                 // same PM. It has been already set to this SM - just 
                 // disconnect the other one. Return this SM so it won't be
                 // replaced.
-                ((JDOStateManager)sm).disconnect();
+                ((StateManagerImpl)sm).disconnect();
                 return this;
             }
 
@@ -838,9 +825,9 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * Method that replaces the PC managed by this StateManager to be the supplied object.
      * This happens when we want to get an object for an id and create a Hollow object, and then validate
      * against the datastore. This validation can pull in a new object graph from the datastore (e.g for DB4O)
-     * @param pc The PersistenceCapable to use
+     * @param pc The Persistable to use
      */
-    public void replaceManagedPC(PersistenceCapable pc)
+    public void replaceManagedPC(Persistable pc)
     {
         if (pc == null)
         {
@@ -859,11 +846,11 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     }
 
     /**
-     * Accessor for the PersistenceManager that owns this instance.
-     * @param pc The PersistenceCapable instance
-     * @return The PersistenceManager that owns this instance
+     * Accessor for the ExecutionContext that owns this instance.
+     * @param pc The Persistable instance
+     * @return The ExecutionContext that owns this instance
      */
-    public javax.jdo.PersistenceManager getPersistenceManager(PersistenceCapable pc)
+    public ExecutionContext getExecutionContext(Persistable pc)
     {
         //in identifying relationships, jdoCopyKeyFieldsFromId will call
         //this method, and at this moment, myPC in statemanager is null
@@ -882,7 +869,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         else
         {
             myEC.hereIsObjectProvider(this, myPC);
-            return (PersistenceManager) myEC.getOwner();
+            return myEC;
         }
     }
 
@@ -894,11 +881,11 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * Instances that have been modified, deleted, or newly
      * made persistent in the current transaction return true.
      * <P>Transient nontransactional instances return false (JDO spec).
-     * @see PersistenceCapable#jdoMakeDirty(String fieldName)
+     * @see Persistable#jdoMakeDirty(String fieldName)
      * @param pc the calling persistable instance
      * @return true if this instance has been modified in current transaction.
      */
-    public boolean isDirty(PersistenceCapable pc)
+    public boolean isDirty(Persistable pc)
     {
         if (disconnectClone(pc))
         {
@@ -925,7 +912,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @param pc the calling persistable instance
      * @return true if this instance is transactional.
      */
-    public boolean isTransactional(PersistenceCapable pc)
+    public boolean isTransactional(Persistable pc)
     {
         if (disconnectClone(pc))
         {
@@ -944,7 +931,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @param pc the calling persistable instance
      * @return true if this instance is persistent.
      */
-    public boolean isPersistent(PersistenceCapable pc)
+    public boolean isPersistent(Persistable pc)
     {
         if (disconnectClone(pc))
         {
@@ -966,7 +953,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @return true if this instance was made persistent
      * in the current transaction.
      */
-    public boolean isNew(PersistenceCapable pc)
+    public boolean isNew(Persistable pc)
     {
         if (disconnectClone(pc))
         {
@@ -990,7 +977,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @param pc the calling persistable instance
      * @return true if this instance was deleted in the current transaction.
      */
-    public boolean isDeleted(PersistenceCapable pc)
+    public boolean isDeleted(Persistable pc)
     {
         if (disconnectClone(pc))
         {
@@ -1010,7 +997,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @return the object representing the version of the calling instance
      * @since JDO 2.0
      */    
-    public Object getVersion(PersistenceCapable pc)
+    public Object getVersion(Persistable pc)
     {
         if (pc == myPC)
         {
@@ -1063,7 +1050,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
                 ((ObjectReferencingStoreManager)myEC.getStoreManager()).notifyObjectIsOutdated(this);
             }
             persistenceFlags = PersistenceFlags.LOAD_REQUIRED;
-            myPC.jdoReplaceFlags();
+            myPC.dnReplaceFlags();
 
             getCallbackHandler().postClear(myPC);
         }
@@ -1091,7 +1078,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             }
 
             persistenceFlags = PersistenceFlags.LOAD_REQUIRED;
-            myPC.jdoReplaceFlags();
+            myPC.dnReplaceFlags();
 
             getCallbackHandler().postClear(myPC);
         }
@@ -1113,17 +1100,17 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         }
 
         persistenceFlags = PersistenceFlags.LOAD_REQUIRED;
-        myPC.jdoReplaceFlags();
+        myPC.dnReplaceFlags();
         ClassUtils.clearFlags(loadedFields);
     }
 
     /**
      * The StateManager uses this method to supply the value of jdoFlags to the
-     * associated PersistenceCapable instance.
-     * @param pc the calling PersistenceCapable instance
-     * @return the value of jdoFlags to be stored in the PersistenceCapable instance
+     * associated Persistable instance.
+     * @param pc the calling Persistable instance
+     * @return the value of jdoFlags to be stored in the Persistable instance
      */
-    public byte replacingFlags(PersistenceCapable pc)
+    public byte replacingFlags(Persistable pc)
     {
         // If this is a clone, return READ_WRITE_OK.
         if (pc != myPC)
@@ -1153,7 +1140,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @param fieldNumber Number of field
      * @return The value of the field
      */
-    protected Object provideField(PersistenceCapable pc, int fieldNumber)
+    protected Object provideField(Persistable pc, int fieldNumber)
     {
         Object obj;
         try
@@ -1168,7 +1155,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             currFM = new SingleValueFieldManager();
             try
             {
-                pc.jdoProvideField(fieldNumber);
+                pc.dnProvideField(fieldNumber);
                 obj = currFM.fetchObjectField(fieldNumber);
             }
             finally
@@ -1190,7 +1177,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
 
     /**
      * Called from the StoreManager after StoreManager.update() is called to obtain updated values 
-     * from the PersistenceCapable associated with this StateManager.
+     * from the Persistable associated with this StateManager.
      * @param fieldNumbers An array of field numbers to be updated by the Store
      * @param fm The updated values are stored in this object. This object is only valid
      *   for the duration of this call.
@@ -1210,7 +1197,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             try
             {
                 // This will respond by calling this.providedXXXFields() with the value of the field
-                myPC.jdoProvideFields(fieldNumbers);
+                myPC.dnProvideFields(fieldNumbers);
             }
             finally
             {
@@ -1230,15 +1217,15 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     // -------------------------- replacingXXXField Methods ----------------------------
 
     /**
-     * This method is called by the associated PersistenceCapable when the
-     * corresponding mutator method (setXXX()) is called on the PersistenceCapable.
+     * This method is called by the associated Persistable when the
+     * corresponding mutator method (setXXX()) is called on the Persistable.
      *
-     * @param pc the calling PersistenceCapable instance
+     * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      * @param newValue the new value for the field
      */
-    public void setBooleanField(PersistenceCapable pc, int fieldNumber, boolean currentValue, boolean newValue)
+    public void setBooleanField(Persistable pc, int fieldNumber, boolean currentValue, boolean newValue)
     {
         if (pc != myPC)
         {
@@ -1279,15 +1266,15 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     }
 
     /**
-     * This method is called by the associated PersistenceCapable when the
-     * corresponding mutator method (setXXX()) is called on the PersistenceCapable.
+     * This method is called by the associated Persistable when the
+     * corresponding mutator method (setXXX()) is called on the Persistable.
      *
-     * @param pc the calling PersistenceCapable instance
+     * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      * @param newValue the new value for the field
      */
-    public void setByteField(PersistenceCapable pc, int fieldNumber, byte currentValue, byte newValue)
+    public void setByteField(Persistable pc, int fieldNumber, byte currentValue, byte newValue)
     {
         if (pc != myPC)
         {
@@ -1328,15 +1315,15 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     }
 
     /**
-     * This method is called by the associated PersistenceCapable when the
-     * corresponding mutator method (setXXX()) is called on the PersistenceCapable.
+     * This method is called by the associated Persistable when the
+     * corresponding mutator method (setXXX()) is called on the Persistable.
      *
-     * @param pc the calling PersistenceCapable instance
+     * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      * @param newValue the new value for the field
      */
-    public void setCharField(PersistenceCapable pc, int fieldNumber, char currentValue, char newValue)
+    public void setCharField(Persistable pc, int fieldNumber, char currentValue, char newValue)
     {
         if (pc != myPC)
         {
@@ -1377,15 +1364,15 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     }
 
     /**
-     * This method is called by the associated PersistenceCapable when the
-     * corresponding mutator method (setXXX()) is called on the PersistenceCapable.
+     * This method is called by the associated Persistable when the
+     * corresponding mutator method (setXXX()) is called on the Persistable.
      *
-     * @param pc the calling PersistenceCapable instance
+     * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      * @param newValue the new value for the field
      */
-    public void setDoubleField(PersistenceCapable pc, int fieldNumber, double currentValue, double newValue)
+    public void setDoubleField(Persistable pc, int fieldNumber, double currentValue, double newValue)
     {
         if (pc != myPC)
         {
@@ -1426,15 +1413,15 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     }
 
     /**
-     * This method is called by the associated PersistenceCapable when the
-     * corresponding mutator method (setXXX()) is called on the PersistenceCapable.
+     * This method is called by the associated Persistable when the
+     * corresponding mutator method (setXXX()) is called on the Persistable.
      *
-     * @param pc the calling PersistenceCapable instance
+     * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      * @param newValue the new value for the field
      */
-    public void setFloatField(PersistenceCapable pc, int fieldNumber, float currentValue, float newValue)
+    public void setFloatField(Persistable pc, int fieldNumber, float currentValue, float newValue)
     {
         if (pc != myPC)
         {
@@ -1475,15 +1462,15 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     }
 
     /**
-     * This method is called by the associated PersistenceCapable when the
-     * corresponding mutator method (setXXX()) is called on the PersistenceCapable.
+     * This method is called by the associated Persistable when the
+     * corresponding mutator method (setXXX()) is called on the Persistable.
      *
-     * @param pc the calling PersistenceCapable instance
+     * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      * @param newValue the new value for the field
      */
-    public void setIntField(PersistenceCapable pc, int fieldNumber, int currentValue, int newValue)
+    public void setIntField(Persistable pc, int fieldNumber, int currentValue, int newValue)
     {
         if (pc != myPC)
         {
@@ -1524,15 +1511,15 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     }
 
     /**
-     * This method is called by the associated PersistenceCapable when the
-     * corresponding mutator method (setXXX()) is called on the PersistenceCapable.
+     * This method is called by the associated Persistable when the
+     * corresponding mutator method (setXXX()) is called on the Persistable.
      *
-     * @param pc the calling PersistenceCapable instance
+     * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      * @param newValue the new value for the field
      */
-    public void setLongField(PersistenceCapable pc, int fieldNumber, long currentValue, long newValue)
+    public void setLongField(Persistable pc, int fieldNumber, long currentValue, long newValue)
     {
         if (pc != myPC)
         {
@@ -1573,14 +1560,14 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     }
 
     /**
-     * This method is called by the associated PersistenceCapable when the
-     * corresponding mutator method (setXXX()) is called on the PersistenceCapable.
-     * @param pc the calling PersistenceCapable instance
+     * This method is called by the associated Persistable when the
+     * corresponding mutator method (setXXX()) is called on the Persistable.
+     * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      * @param newValue the new value for the field
      */
-    public void setShortField(PersistenceCapable pc, int fieldNumber, short currentValue, short newValue)
+    public void setShortField(Persistable pc, int fieldNumber, short currentValue, short newValue)
     {
         if (pc != myPC)
         {
@@ -1621,14 +1608,14 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     }
 
     /**
-     * This method is called by the associated PersistenceCapable when the
-     * corresponding mutator method (setXXX()) is called on the PersistenceCapable.
-     * @param pc the calling PersistenceCapable instance
+     * This method is called by the associated Persistable when the
+     * corresponding mutator method (setXXX()) is called on the Persistable.
+     * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      * @param newValue the new value for the field
      */
-    public void setStringField(PersistenceCapable pc, int fieldNumber, String currentValue, String newValue)
+    public void setStringField(Persistable pc, int fieldNumber, String currentValue, String newValue)
     {
         if (pc != myPC)
         {
@@ -1670,16 +1657,16 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     }
 
     /**
-     * This method is called by the associated PersistenceCapable when the
-     * corresponding mutator method (setXXX()) is called on the PersistenceCapable.
-     * @param pc the calling PersistenceCapable instance
+     * This method is called by the associated Persistable when the
+     * corresponding mutator method (setXXX()) is called on the Persistable.
+     * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      * @param newValue the new value for the field
      */
-    public void setObjectField(PersistenceCapable pc, int fieldNumber, Object currentValue, Object newValue)
+    public void setObjectField(Persistable pc, int fieldNumber, Object currentValue, Object newValue)
     {
-        if (currentValue != null && currentValue != newValue && currentValue instanceof PersistenceCapable)
+        if (currentValue != null && currentValue != newValue && currentValue instanceof Persistable)
         {
             // Where the object is embedded, remove the owner from its old value since it is no longer managed by this StateManager
             ObjectProvider<?> currentSM = myEC.findObjectProvider(currentValue);
@@ -1743,7 +1730,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             }
             else if (oldValue != null && newValue != null)
             {
-                if (oldValue instanceof PersistenceCapable)
+                if (oldValue instanceof Persistable)
                 {
                     // PC object field so compare object equality
                     // See JDO2 [5.4] "The JDO implementation must not use the application's hashCode and equals methods 
@@ -1825,7 +1812,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
                 newValue = wrapSCOField(fieldNumber, newValue, false, true, true);
             }
 
-            if (oldValue != null && newValue == null && oldValue instanceof PersistenceCapable)
+            if (oldValue != null && newValue == null && oldValue instanceof Persistable)
             {
                 if (mmd.isDependent() || mmd.isCascadeRemoveOrphans())
                 {
@@ -1856,7 +1843,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @param fieldNumber The field number
      * @param value The new value
      */
-    protected void updateField(PersistenceCapable pc, int fieldNumber, Object value)
+    protected void updateField(Persistable pc, int fieldNumber, Object value)
     {
         boolean wasDirty = dirty;
 
@@ -1905,7 +1892,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @param fieldNumber Number of field
      * @param value The new value of the field
      */
-    protected void replaceField(PersistenceCapable pc, int fieldNumber, Object value)
+    protected void replaceField(Persistable pc, int fieldNumber, Object value)
     {
         try
         {
@@ -1922,7 +1909,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             try
             {
                 currFM.storeObjectField(fieldNumber, value);
-                pc.jdoReplaceField(fieldNumber);
+                pc.dnReplaceField(fieldNumber);
             }
             finally
             {
@@ -1941,10 +1928,10 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
 
     /**
      * Method to disconnect any cloned persistence capable objects from their StateManager.
-     * @param pc The PersistenceCapable object
+     * @param pc The Persistable object
      * @return Whether the object was disconnected.
      */
-    protected boolean disconnectClone(PersistenceCapable pc)
+    protected boolean disconnectClone(Persistable pc)
     {
         if (isDetaching())
         {
@@ -1959,7 +1946,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
 
             // Reset jdoFlags in the clone to PersistenceFlags.READ_WRITE_OK 
             // and clear its state manager.
-            pc.jdoReplaceFlags();
+            pc.dnReplaceFlags();
             replaceStateManager(pc, null);
             return true;
         }
@@ -1978,7 +1965,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         if (op.getObject() instanceof Detachable)
         {
             ((AbstractStateManager)op).setRetrievingDetachedState(true);
-            ((Detachable)op.getObject()).jdoReplaceDetachedState();
+            ((Detachable)op.getObject()).dnReplaceDetachedState();
             ((AbstractStateManager)op).setRetrievingDetachedState(false);
         }
     }
@@ -1993,7 +1980,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             setResettingDetachedState(true);
             try
             {
-                ((Detachable)getObject()).jdoReplaceDetachedState();
+                ((Detachable)getObject()).dnReplaceDetachedState();
             }
             finally
             {
@@ -2005,7 +1992,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     /**
      * Method to update the "detached state" in the detached object to obtain the "detached state" 
      * from the detached object, or to reset it (to null).
-     * @param pc The PersistenceCapable beind updated
+     * @param pc The Persistable beind updated
      * @param currentState The current state values
      * @return The detached state to assign to the object
      */
@@ -2077,43 +2064,43 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     // -------------------------- getXXXField Methods ----------------------------
     // Note that isLoaded() will always load the field if not loaded so these methods are never called
 
-    public boolean getBooleanField(PersistenceCapable pc, int fieldNumber, boolean currentValue)
+    public boolean getBooleanField(Persistable pc, int fieldNumber, boolean currentValue)
     {
         throw new NucleusException(LOCALISER.msg("026006"));
     }
-    public byte getByteField(PersistenceCapable pc, int fieldNumber, byte currentValue)
+    public byte getByteField(Persistable pc, int fieldNumber, byte currentValue)
     {
         throw new NucleusException(LOCALISER.msg("026006"));
     }
-    public char getCharField(PersistenceCapable pc, int fieldNumber, char currentValue)
+    public char getCharField(Persistable pc, int fieldNumber, char currentValue)
     {
         throw new NucleusException(LOCALISER.msg("026006"));
     }
-    public double getDoubleField(PersistenceCapable pc, int fieldNumber, double currentValue)
+    public double getDoubleField(Persistable pc, int fieldNumber, double currentValue)
     {
         throw new NucleusException(LOCALISER.msg("026006"));
     }
-    public float getFloatField(PersistenceCapable pc, int fieldNumber, float currentValue)
+    public float getFloatField(Persistable pc, int fieldNumber, float currentValue)
     {
         throw new NucleusException(LOCALISER.msg("026006"));
     }
-    public int getIntField(PersistenceCapable pc, int fieldNumber, int currentValue)
+    public int getIntField(Persistable pc, int fieldNumber, int currentValue)
     {
         throw new NucleusException(LOCALISER.msg("026006"));
     }
-    public long getLongField(PersistenceCapable pc, int fieldNumber, long currentValue)
+    public long getLongField(Persistable pc, int fieldNumber, long currentValue)
     {
         throw new NucleusException(LOCALISER.msg("026006"));
     }
-    public short getShortField(PersistenceCapable pc, int fieldNumber, short currentValue)
+    public short getShortField(Persistable pc, int fieldNumber, short currentValue)
     {
         throw new NucleusException(LOCALISER.msg("026006"));
     }
-    public String getStringField(PersistenceCapable pc, int fieldNumber, String currentValue)
+    public String getStringField(Persistable pc, int fieldNumber, String currentValue)
     {
         throw new NucleusException(LOCALISER.msg("026006"));
     }
-    public Object getObjectField(PersistenceCapable pc, int fieldNumber, Object currentValue)
+    public Object getObjectField(Persistable pc, int fieldNumber, Object currentValue)
     {
         throw new NucleusException(LOCALISER.msg("026006"));
     }
@@ -2179,10 +2166,10 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             loadFieldValues(fv);
 
             // Create the id for the new PC
-            myID = myPC.jdoNewObjectIdInstance();
+            myID = myPC.dnNewObjectIdInstance();
             if (!cmd.usesSingleFieldIdentityClass())
             {
-                myPC.jdoCopyKeyFieldsToObjectId(myID);
+                myPC.dnCopyKeyFieldsToObjectId(myID);
             }
         }
     }
@@ -2268,7 +2255,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     }
 
     /**
-     * Utility to set the identity for the PersistenceCapable object.
+     * Utility to set the identity for the Persistable object.
      * Creates the identity instance if the required PK field(s) are all already set (by the user, or by
      * a value-strategy). If the identity is set in the datastore (sequence, autoassign, etc) then this
      * will not set the identity.
@@ -2361,15 +2348,15 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         {
             return;
         }
-        if (!(obj instanceof PersistenceCapable))
+        if (!(obj instanceof Persistable))
         {
-            throw new NucleusUserException("Must be PersistenceCapable");
+            throw new NucleusUserException("Must be Persistable");
         }
-        PersistenceCapable pc = (PersistenceCapable)obj;
+        Persistable pc = (Persistable)obj;
 
         // Assign the new object to this StateManager temporarily so that we can copy its fields
         replaceStateManager(pc, this);
-        myPC.jdoCopyFields(pc, fieldNumbers);
+        myPC.dnCopyFields(pc, fieldNumbers);
 
         // Remove the StateManager from the other object
         replaceStateManager(pc, null);
@@ -2417,11 +2404,11 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     }
 
     /**
-     * Mark the associated PersistenceCapable field dirty.
-     * @param pc the calling PersistenceCapable instance
+     * Mark the associated Persistable field dirty.
+     * @param pc the calling Persistable instance
      * @param fieldName the name of the field
      */
-    public void makeDirty(PersistenceCapable pc, String fieldName)
+    public void makeDirty(Persistable pc, String fieldName)
     {
         if (!disconnectClone(pc))
         {
@@ -2442,10 +2429,10 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * Return the object representing the JDO identity of the calling instance.
      * According to the JDO specification, if the JDO identity is being changed in the current transaction, 
      * this method returns the JDO identify as of the beginning of the transaction.
-     * @param pc the calling PersistenceCapable instance
+     * @param pc the calling Persistable instance
      * @return the object representing the JDO identity of the calling instance
      */
-    public Object getObjectId(PersistenceCapable pc)
+    public Object getObjectId(Persistable pc)
     {
         if (disconnectClone(pc))
         {
@@ -2469,12 +2456,12 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * Return the object representing the JDO identity of the calling instance.  
      * If the JDO identity is being changed in the current transaction, this method returns the 
      * current identity as changed in the transaction. In this implementation we don't allow
-     * change of identity so this is always the same as the result of getObjectId(PersistenceCapable).
+     * change of identity so this is always the same as the result of getObjectId(Persistable).
      *
-     * @param pc the calling PersistenceCapable instance
+     * @param pc the calling Persistable instance
      * @return the object representing the JDO identity of the calling instance
      */
-    public Object getTransactionalObjectId(PersistenceCapable pc)
+    public Object getTransactionalObjectId(Persistable pc)
     {
         return getObjectId(pc);
     }
@@ -2537,7 +2524,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
 
     /**
      * Return an object id that the user can use.
-     * @param obj the PersistenceCapable object
+     * @param obj the Persistable object
      * @return the object id
      */
     protected Object getExternalObjectId(Object obj)
@@ -2874,7 +2861,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
                                 // TODO This should replace the SCO wrapper with a new one, or reload the wrapper
                                 SCOUtils.refreshFetchPlanFieldsForMap(this, ((Map)value).entrySet());
                             }
-                            else if (value instanceof PersistenceCapable)
+                            else if (value instanceof Persistable)
                             {
                                 // Refresh any PC fields
                                 myEC.refreshObject(value);
@@ -2918,7 +2905,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
 
     /**
      * Returns the loaded setting for the field of the managed object.
-     * Refer to the javadoc of isLoaded(PersistenceCapable, int);
+     * Refer to the javadoc of isLoaded(Persistable, int);
      * @param fieldNumber the absolute field number
      * @return always returns true (this implementation)
      */
@@ -2934,11 +2921,11 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * call to this method. If it is in the default fetch group,
      * the default fetch group, including this field, will be loaded.
      *
-     * @param pc the calling PersistenceCapable instance
+     * @param pc the calling Persistable instance
      * @param fieldNumber the absolute field number
      * @return always returns true (this implementation)
      */
-    public boolean isLoaded(PersistenceCapable pc, int fieldNumber)
+    public boolean isLoaded(Persistable pc, int fieldNumber)
     {
         try
         {
@@ -3048,7 +3035,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @param value The new value of the field
      * @param makeDirty Whether to make the field dirty while replacing its value (in embedded owners)
      */
-    protected void replaceField(PersistenceCapable pc, int fieldNumber, Object value, boolean makeDirty)
+    protected void replaceField(Persistable pc, int fieldNumber, Object value, boolean makeDirty)
     {
         List<EmbeddedOwnerRelation> embeddedOwners = myEC.getOwnerInformationForEmbedded(this);
         if (embeddedOwners != null)
@@ -3129,7 +3116,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     }
 
     /**
-     * Called from the StoreManager to refresh data in the PersistenceCapable
+     * Called from the StoreManager to refresh data in the Persistable
      * object associated with this StateManager.
      * @param fieldNumbers An array of field numbers to be refreshed by the Store
      * @param fm The updated values are stored in this object. This object is only valid
@@ -3182,7 +3169,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
 
                 if (fieldsToReplace != null)
                 {
-                    myPC.jdoReplaceFields(fieldsToReplace);
+                    myPC.dnReplaceFields(fieldsToReplace);
                 }
             }
             finally
@@ -3201,7 +3188,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     }
 
     /**
-     * Called from the StoreManager to refresh data in the PersistenceCapable
+     * Called from the StoreManager to refresh data in the Persistable
      * object associated with this StateManager.
      * @param fieldNumbers An array of field numbers to be refreshed by the Store
      * @param fm The updated values are stored in this object. This object is only valid
@@ -3213,7 +3200,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     }
 
     /**
-     * Called from the StoreManager to refresh data in the PersistenceCapable
+     * Called from the StoreManager to refresh data in the Persistable
      * object associated with this StateManager. Only not loaded fields are refreshed
      *
      * @param fieldNumbers An array of field numbers to be refreshed by the Store
@@ -3239,7 +3226,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
                 int[] fieldsToReplace = ClassUtils.getFlagsSetTo(loadedFields, fieldNumbers, false);
                 if (fieldsToReplace != null && fieldsToReplace.length > 0)
                 {
-                    myPC.jdoReplaceFields(fieldsToReplace);
+                    myPC.dnReplaceFields(fieldsToReplace);
                 }
             }
             finally
@@ -3357,7 +3344,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             return value;
         }
 
-        if (value instanceof PersistenceCapable)
+        if (value instanceof Persistable)
         {
             // Special case of SCO that we should split into a separate method for clarity, nothing to do with wrapping
             AbstractMemberMetaData fmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
@@ -3539,7 +3526,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             if (myLC == null)
             {
                 // Initialise the StateManager in T_CLEAN state
-                final JDOStateManager thisSM = this;
+                final StateManagerImpl thisSM = this;
                 myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.T_CLEAN);
 
                 try
@@ -3695,8 +3682,8 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
                     int[] unloadedFields = ClassUtils.getFlagsSetTo(loadedFields, cmd.getAllMemberPositions(), false);
                     if (unloadedFields != null && unloadedFields.length > 0)
                     {
-                        PersistenceCapable dummyPC = myPC.jdoNewInstance(this);
-                        myPC.jdoCopyFields(dummyPC, unloadedFields);
+                        Persistable dummyPC = myPC.dnNewInstance(this);
+                        myPC.dnCopyFields(dummyPC, unloadedFields);
                         replaceStateManager(dummyPC, null);
                     }
                 }
@@ -3720,7 +3707,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
                         if (api.isPersistable(value))
                         {
                             // PC field beyond end of graph
-                            org.datanucleus.state.JDOStateManager valueSM = (JDOStateManager) myEC.findObjectProvider(value);
+                            org.datanucleus.state.StateManagerImpl valueSM = (StateManagerImpl) myEC.findObjectProvider(value);
                             if (!api.isDetached(value) && !(valueSM != null && valueSM.isDetaching()))
                             {
                                 // Field value is not detached or being detached so unload it
@@ -3747,17 +3734,17 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
                 myLC = myLC.transitionDetach(this);
 
                 // Update the object with its detached state
-                myPC.jdoReplaceFlags();
-                ((Detachable)myPC).jdoReplaceDetachedState();
+                myPC.dnReplaceFlags();
+                ((Detachable)myPC).dnReplaceDetachedState();
 
                 // Call any "post-detach" listeners
                 getCallbackHandler().postDetach(myPC, myPC); // there is no copy, so give the same object
 
-                PersistenceCapable toCheckPC = myPC;
+                Persistable toCheckPC = myPC;
                 Object toCheckID = myID;
                 disconnect();
 
-                if (!toCheckPC.jdoIsDetached())
+                if (!toCheckPC.dnIsDetached())
                 {
                     // Sanity check on the objects detached state
                     throw new NucleusUserException(LOCALISER.msg("026025", toCheckPC.getClass().getName(), toCheckID));
@@ -3784,9 +3771,9 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * If the object is detachable then the copy will be migrated to DETACHED state, otherwise will migrate
      * the copy to TRANSIENT. Used by "ExecutionContext.detachObjectCopy()".
      * @param state State for the detachment process
-     * @return the detached PersistenceCapable instance
+     * @return the detached Persistable instance
      */
-    public PersistenceCapable detachCopy(FetchPlanState state)
+    public Persistable detachCopy(FetchPlanState state)
     {
         if (myLC.isDeleted())
         {
@@ -3812,17 +3799,17 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
         DetachState detachState = (DetachState) state;
         DetachState.Entry existingDetached = detachState.getDetachedCopyEntry(myPC);
 
-        PersistenceCapable detachedPC;
+        Persistable detachedPC;
         if (existingDetached == null)
         {
             // No existing detached copy - create new one
-            detachedPC = myPC.jdoNewInstance(this);
+            detachedPC = myPC.dnNewInstance(this);
             detachState.setDetachedCopyEntry(myPC, detachedPC);
         }
         else
         {
             // Found one - if it's sufficient for current FetchPlanState, return it immediately
-            detachedPC = (PersistenceCapable) existingDetached.getDetachedCopyObject();
+            detachedPC = (Persistable) existingDetached.getDetachedCopyObject();
             if (existingDetached.checkCurrentState())
             {
                 return detachedPC;
@@ -3879,7 +3866,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
                 }
 
                 // Create a SM for our copy object
-                JDOStateManager smDetachedPC = new JDOStateManager(myEC, cmd);
+                StateManagerImpl smDetachedPC = new StateManagerImpl(myEC, cmd);
                 smDetachedPC.initialiseForDetached(detachedPC, getExternalObjectId(myPC), getVersion(myPC));
                 myEC.setAttachDetachReferencedObject(smDetachedPC, myPC);
 
@@ -3896,8 +3883,8 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
                 if (detachable)
                 {
                     // Update the object with its detached state - not to be confused with the "state" object above
-                    detachedPC.jdoReplaceFlags();
-                    ((Detachable)detachedPC).jdoReplaceDetachedState();
+                    detachedPC.dnReplaceFlags();
+                    ((Detachable)detachedPC).dnReplaceDetachedState();
                 }
                 else
                 {
@@ -3997,7 +3984,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     /* (non-Javadoc)
      * @see org.datanucleus.state.StateManager#attach(java.lang.Object)
      */
-    public void attach(PersistenceCapable detachedPC)
+    public void attach(Persistable detachedPC)
     {
         if (isAttaching())
         {
@@ -4011,7 +3998,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             getCallbackHandler().preAttach(myPC);
 
             // Connect the transient object to a StateManager so we can get its values
-            JDOStateManager detachedSM = new JDOStateManager(myEC, cmd);
+            StateManagerImpl detachedSM = new StateManagerImpl(myEC, cmd);
             detachedSM.initialiseForDetached(detachedPC, myID, null);
 
             // Make sure the attached object is in the cache
@@ -4127,7 +4114,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
      * @param embedded Whether the object is stored embedded/serialised in another object
      * @return The attached copy
      */
-    public PersistenceCapable attachCopy(PersistenceCapable detachedPC, boolean embedded)
+    public Persistable attachCopy(Persistable detachedPC, boolean embedded)
     {
         if (isAttaching())
         {
@@ -4183,7 +4170,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
                 myLC = myLC.transitionMakeTransactional(this, persistent);
             }
 
-            JDOStateManager smDetachedPC = null;
+            StateManagerImpl smDetachedPC = null;
             if (persistent)
             {
                 // Attaching object that was detached from this datastore, so perform as update
@@ -4207,7 +4194,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
                 }
 
                 // Add a state manager to the detached PC so that we can retrieve its detached state
-                smDetachedPC = new JDOStateManager(myEC, cmd);
+                smDetachedPC = new StateManagerImpl(myEC, cmd);
                 smDetachedPC.initialiseForDetached(detachedPC, getExternalObjectId(detachedPC), null);
 
                 // Cross-reference the attached and detached objects for the attach process
@@ -4223,11 +4210,11 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
 
                 // Copy field values from detached to attached so we know what value will need inserting
                 replaceStateManager(detachedPC, this);
-                myPC.jdoCopyFields(detachedPC, cmd.getAllMemberPositions());
+                myPC.dnCopyFields(detachedPC, cmd.getAllMemberPositions());
                 replaceStateManager(detachedPC, null);
 
                 // Add a state manager to the detached PC so that we can retrieve its detached state
-                smDetachedPC = new JDOStateManager(myEC, cmd);
+                smDetachedPC = new StateManagerImpl(myEC, cmd);
                 smDetachedPC.initialiseForDetached(detachedPC, getExternalObjectId(detachedPC), null);
 
                 // Cross-reference the attached and detached objects for the attach process
@@ -4569,7 +4556,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             if (persistenceFlags == PersistenceFlags.LOAD_REQUIRED && myLC.isTransactional())
             {
                 persistenceFlags = PersistenceFlags.READ_OK;
-                myPC.jdoReplaceFlags();
+                myPC.dnReplaceFlags();
             }
 
             getCallbackHandler().postLoad(myPC);
@@ -4579,9 +4566,9 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
     /**
      * Guarantee that the serializable transactional and persistent fields are loaded into the instance. 
      * This method is called by the generated jdoPreSerialize method prior to serialization of the instance.
-     * @param pc the calling PersistenceCapable instance
+     * @param pc the calling Persistable instance
      */
-    public void preSerialize(PersistenceCapable pc)
+    public void preSerialize(Persistable pc)
     {
         if (disconnectClone(pc))
         {
@@ -4605,7 +4592,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
                 // Normal PC Detachable object being serialised so load up the detached state into the instance
                 // JDO2 spec "For Detachable classes, the jdoPreSerialize method must also initialize the jdoDetachedState
                 // instance so that the detached state is serialized along with the instance."
-                ((Detachable)pc).jdoReplaceDetachedState();
+                ((Detachable)pc).dnReplaceDetachedState();
             }
         }
     }
@@ -4748,9 +4735,9 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             return;
         }
 
-        out.print("jdoStateManager = " + peekField(pc, "jdoStateManager"));
-        out.print("jdoFlags = ");
-        Object flagsObj = peekField(pc, "jdoFlags");
+        out.print("dnStateManager = " + peekField(pc, "dnStateManager"));
+        out.print("dnFlags = ");
+        Object flagsObj = peekField(pc, "dnFlags");
         if (flagsObj instanceof Byte)
         {
             out.println(PersistenceFlags.persistenceFlagsToString(((Byte) flagsObj).byteValue()));
@@ -4772,7 +4759,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
             }
             c = c.getSuperclass();
         }
-        while (c != null && PersistenceCapable.class.isAssignableFrom(c));
+        while (c != null && Persistable.class.isAssignableFrom(c));
     }
 
     /**
@@ -4826,7 +4813,7 @@ public class JDOStateManager extends AbstractStateManager<PersistenceCapable> im
              * the provideField machinery.
              */
             Object value = obj.getClass().getDeclaredField(fieldName).get(obj);
-            if (value instanceof PersistenceCapable)
+            if (value instanceof Persistable)
             {
                 return StringUtils.toJVMIDString(value);
             }

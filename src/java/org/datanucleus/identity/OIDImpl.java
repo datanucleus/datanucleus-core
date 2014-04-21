@@ -156,7 +156,7 @@ public class OIDImpl implements java.io.Serializable, OID, Comparable
         {
             return true;
         }
-        if (!(obj.getClass().getName().equals(ClassNameConstants.OIDImpl)))
+        if (!(obj.getClass().getName().equals(ClassNameConstants.IDENTITY_OID_IMPL)))
         {
             return false;
         }

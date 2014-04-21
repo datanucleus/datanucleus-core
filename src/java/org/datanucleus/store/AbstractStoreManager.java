@@ -56,7 +56,7 @@ import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.metadata.TableGeneratorMetaData;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.properties.PropertyStore;
-import org.datanucleus.state.JDOStateManager;
+import org.datanucleus.state.StateManagerImpl;
 import org.datanucleus.store.autostart.AutoStartMechanism;
 import org.datanucleus.store.connection.ConnectionFactory;
 import org.datanucleus.store.connection.ConnectionManager;
@@ -1792,6 +1792,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      */
     public String getDefaultObjectProviderClassName()
     {
-        return JDOStateManager.class.getName();
+        return StateManagerImpl.class.getName();
     }
 }

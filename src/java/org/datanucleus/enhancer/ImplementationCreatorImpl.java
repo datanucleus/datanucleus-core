@@ -21,10 +21,9 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import javax.jdo.JDOException;
-import javax.jdo.JDOFatalException;
-import javax.jdo.JDOUserException;
-import javax.jdo.spi.PersistenceCapable;
+import javax.jdo.JDOException; // TODO Remove this
+import javax.jdo.JDOFatalException; // TODO Remove this
+import javax.jdo.JDOUserException; // TODO Remove this
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ImplementationCreator;
@@ -80,7 +79,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
     {
         try
         {
-            if (PersistenceCapable.class.isAssignableFrom(cls))
+            if (Persistable.class.isAssignableFrom(cls))
             {
                 if (Modifier.isAbstract(cls.getModifiers()))
                 {
@@ -146,7 +145,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
      * @throws InstantiationException If an error occurs
      * @throws IllegalAccessException If an error occurs
      */    
-    protected PersistenceCapable newInstance(InterfaceMetaData imd, ClassLoaderResolver clr) 
+    protected Persistable newInstance(InterfaceMetaData imd, ClassLoaderResolver clr) 
     throws ClassNotFoundException, InstantiationException, IllegalAccessException
     {
         // Check that all methods of the interface are declared as persistent properties
@@ -155,7 +154,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
         for (int i=0;i<methods.length;i++)
         {
             String methodName = methods[i].getName();
-            if (!methodName.startsWith("jdo")) // TODO Change this when we change bytecode enhancement contract
+            if (!methodName.startsWith("dn"))
             {
                 String propertyName = methodName;
                 if (methodName.startsWith("set"))
@@ -193,9 +192,9 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
 
         // Create an instance of the class using default constructor
         Object instance = this.loader.loadClass(implFullClassName).newInstance();
-        if (instance instanceof PersistenceCapable)
+        if (instance instanceof Persistable)
         {
-            return (PersistenceCapable) instance;
+            return (Persistable) instance;
         }
         else
         {
@@ -210,10 +209,10 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
                 {
                     implementedInterfacesMsg.append(",");    
                 }
-                if (interfaces[i].getName().equals(PersistenceCapable.class.getName()))
+                if (interfaces[i].getName().equals(Persistable.class.getName()))
                 {
                     classLoaderPCMsg = LOCALISER.msg("ImplementationCreator.DifferentClassLoader", 
-                        interfaces[i].getClassLoader(), PersistenceCapable.class.getClassLoader());
+                        interfaces[i].getClassLoader(), Persistable.class.getClassLoader());
                 }
             }
             implementedInterfacesMsg.append("]");
@@ -232,7 +231,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
      * @throws InstantiationException if an error occurs
      * @throws IllegalAccessException if an error occurs
      */    
-    protected PersistenceCapable newInstance(ClassMetaData cmd, ClassLoaderResolver clr) 
+    protected Persistable newInstance(ClassMetaData cmd, ClassLoaderResolver clr) 
     throws ClassNotFoundException, InstantiationException, IllegalAccessException
     {
         // Check that all abstract methods of the class are declared as persistent properties
@@ -241,7 +240,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
         for (int i=0;i<methods.length;i++)
         {
             String methodName = methods[i].getName();
-            if (Modifier.isAbstract(methods[i].getModifiers()) && !methodName.startsWith("jdo"))
+            if (Modifier.isAbstract(methods[i].getModifiers()) && !methodName.startsWith("dn"))
             {
                 String propertyName = methodName;
                 if (methodName.startsWith("set"))
@@ -279,9 +278,9 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
 
         // Create an instance of the class using default constructor
         Object instance = this.loader.loadClass(implFullClassName).newInstance();
-        if (instance instanceof PersistenceCapable)
+        if (instance instanceof Persistable)
         {
-            return (PersistenceCapable) instance;
+            return (Persistable) instance;
         }
         else
         {
@@ -297,10 +296,10 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
                 {
                     implementedInterfacesMsg.append(",");    
                 }
-                if (interfaces[i].getName().equals(PersistenceCapable.class.getName()))
+                if (interfaces[i].getName().equals(Persistable.class.getName()))
                 {
                     classLoaderPCMsg = LOCALISER.msg("ImplementationCreator.DifferentClassLoader", 
-                        interfaces[i].getClassLoader(), PersistenceCapable.class.getClassLoader());
+                        interfaces[i].getClassLoader(), Persistable.class.getClassLoader());
                 }
             }
             implementedInterfacesMsg.append("]");

@@ -264,7 +264,7 @@ public class CopyKeyFieldsFromObjectId2 extends ClassMethod
                             visitor.visitVarInsn(Opcodes.ALOAD, 0);
                             visitor.visitVarInsn(Opcodes.ALOAD, 0);
                             visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(),
-                                getNamer().getGetPersistenceManagerMethodName(), "()L" + getNamer().getPersistenceManagerAsmClassName() + ";");
+                                getNamer().getGetExecutionContextMethodName(), "()L" + getNamer().getExecutionContextAsmClassName() + ";");
                             visitor.visitVarInsn(Opcodes.ALOAD, 2);
 
                             // TODO Cater for property/private field cases
@@ -272,8 +272,8 @@ public class CopyKeyFieldsFromObjectId2 extends ClassMethod
                                 fmd.getName(), "L" + acmd.getObjectidClass().replace('.', '/') + ";");
 
                             visitor.visitInsn(Opcodes.ICONST_0);
-                            visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getPersistenceManagerAsmClassName(),
-                                "getObjectById", "(Ljava/lang/Object;Z)Ljava/lang/Object;");
+                            visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getExecutionContextAsmClassName(),
+                                "findObject", "(Ljava/lang/Object;Z)Ljava/lang/Object;");
                             visitor.visitTypeInsn(Opcodes.CHECKCAST, fieldTypeName);
                             if (fmd instanceof PropertyMetaData)
                             {

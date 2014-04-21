@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import javax.jdo.JDONullIdentityException;
+import org.datanucleus.exceptions.NucleusUserException;
 
 /**
  * This class is the abstract base class for all single field identity classes. A common case of application
@@ -68,15 +68,14 @@ public abstract class SingleFieldId implements Externalizable, Comparable
     }
 
     /**
-     * Assert that the key is not null. Throw a JDONullIdentityException if the given key is null.
+     * Assert that the key is not null. Throw a NucleusUserException if the given key is null.
      * @param key The key
      */
     protected void assertKeyNotNull(Object key)
     {
         if (key == null)
         {
-            // TODO Remove this JDO class
-            throw new JDONullIdentityException("Cannot have an identity with null key");
+            throw new NucleusUserException("Cannot have an identity with null key");
         }
     }
 

@@ -386,8 +386,6 @@ Contributors:
 
     <!-- QUERY METHODS (IN-MEMORY) -->
     <extension point="org.datanucleus.query_method_evaluators">
-        <query-method-evaluator method="JDOHelper.getObjectId" evaluator="org.datanucleus.query.inmemory.JDOHelperGetObjectIdFunction"/>
-        <query-method-evaluator method="JDOHelper.getVersion" evaluator="org.datanucleus.query.inmemory.JDOHelperGetVersionFunction"/>
         <query-method-evaluator method="Math.abs" evaluator="org.datanucleus.query.inmemory.AbsFunction"/>
         <query-method-evaluator method="Math.sqrt" evaluator="org.datanucleus.query.inmemory.SqrtFunction"/>
         <query-method-evaluator method="CURRENT_DATE" evaluator="org.datanucleus.query.inmemory.CurrentDateFunction"/>

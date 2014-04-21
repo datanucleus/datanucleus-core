@@ -517,6 +517,14 @@ public interface ExecutionContext
     void processNontransactionalUpdate();
 
     /**
+     * Shortcut to calling "findObject(id, validate, validate, null)".
+     * @param id The id of the object
+     * @param validate Whether to validate the id
+     * @return The object
+     */
+    Object findObject(Object id, boolean validate);
+
+    /**
      * Accessor for an object given the object id.
      * @param id Id of the object.
      * @param validate Whether to validate the object state

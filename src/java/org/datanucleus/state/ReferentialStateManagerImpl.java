@@ -35,14 +35,14 @@ import org.datanucleus.util.StringUtils;
  * Implementation of a JDO StateManager for use where insertion ordering is important (such as RDBMS).
  * Adds on simple handling to be run after an object is inserted.
  */
-public class ReferentialJDOStateManager extends JDOStateManager
+public class ReferentialStateManagerImpl extends StateManagerImpl
 {
     /**
      * Constructor for object of specified type managed by the provided ExecutionContext.
      * @param ec ExecutionContext
      * @param cmd the metadata for the class.
      */
-    public ReferentialJDOStateManager(ExecutionContext ec, AbstractClassMetaData cmd)
+    public ReferentialStateManagerImpl(ExecutionContext ec, AbstractClassMetaData cmd)
     {
         super(ec, cmd);
     }
@@ -69,10 +69,10 @@ public class ReferentialJDOStateManager extends JDOStateManager
     }
 
     /** List of StateManagers that we must notify when we have completed inserting our record. */
-    private List<ReferentialJDOStateManager> insertionNotifyList = null;
+    private List<ReferentialStateManagerImpl> insertionNotifyList = null;
 
     /** Fields of this object that we must update when notified of the insertion of the related objects. */
-    private Map<ReferentialJDOStateManager, FieldContainer> fieldsToBeUpdatedAfterObjectInsertion = null;
+    private Map<ReferentialStateManagerImpl, FieldContainer> fieldsToBeUpdatedAfterObjectInsertion = null;
 
     /**
      * Change the activity state to a particular state.
@@ -86,10 +86,10 @@ public class ReferentialJDOStateManager extends JDOStateManager
             // Full insertion has just completed so notify all interested parties
             synchronized (insertionNotifyList)
             {
-                Iterator<ReferentialJDOStateManager> notifyIter = insertionNotifyList.iterator();
+                Iterator<ReferentialStateManagerImpl> notifyIter = insertionNotifyList.iterator();
                 while (notifyIter.hasNext())
                 {
-                    ReferentialJDOStateManager notifySM = notifyIter.next();
+                    ReferentialStateManagerImpl notifySM = notifyIter.next();
                     notifySM.insertionCompleted(this);
                 }
             }
@@ -105,7 +105,7 @@ public class ReferentialJDOStateManager extends JDOStateManager
      */
     public void updateFieldAfterInsert(Object pc, int fieldNumber)
     {
-        ReferentialJDOStateManager otherSM = (ReferentialJDOStateManager) myEC.findObjectProvider(pc);
+        ReferentialStateManagerImpl otherSM = (ReferentialStateManagerImpl) myEC.findObjectProvider(pc);
 
         // Register the other SM to update us when it is inserted
         if (otherSM.insertionNotifyList == null)
@@ -143,7 +143,7 @@ public class ReferentialJDOStateManager extends JDOStateManager
      * when the other object has been inserted.
      * @param op ObjectProvider of the other object that has just been inserted
      */
-    void insertionCompleted(ReferentialJDOStateManager op)
+    void insertionCompleted(ReferentialStateManagerImpl op)
     {
         if (fieldsToBeUpdatedAfterObjectInsertion == null)
         {
