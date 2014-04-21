@@ -1,5 +1,5 @@
 /**********************************************************************
-Copyright (c) 26-Oct-2004 Andy Jefferson and others.
+Copyright (c) 2004 Andy Jefferson and others. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -11,8 +11,6 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
- 
 
 Contributors:
     ...
@@ -28,14 +26,13 @@ import java.util.List;
 import java.util.RandomAccess;
 import java.util.Set;
 
-import javax.jdo.PersistenceManager;
-import javax.jdo.spi.PersistenceCapable;
-import javax.jdo.spi.StateManager;
-
 import junit.framework.TestCase;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ClassLoaderResolverImpl;
+import org.datanucleus.ExecutionContext;
+import org.datanucleus.enhancer.Persistable;
+import org.datanucleus.state.StateManager;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.ClassUtilsTest.MyBaseClass;
 
@@ -369,120 +366,119 @@ public class ClassUtilsTest extends TestCase
         assertEquals("Incorrect setter method", "setTwo", ClassUtils.getSetterMethodForClass(MyDerivedClass.class, "two", Object.class).getName());
     }
 
-    public class MyPCClass implements PersistenceCapable
+    public class MyPCClass implements Persistable
     {
-
-        public PersistenceManager jdoGetPersistenceManager()
+        public ExecutionContext dnGetExecutionContext()
         {
             return null;
         }
 
-        public void jdoReplaceStateManager(StateManager arg0) throws SecurityException
+        public void dnReplaceStateManager(StateManager arg0) throws SecurityException
         {
         }
 
-        public void jdoProvideField(int arg0)
+        public void dnProvideField(int arg0)
         {
         }
 
-        public void jdoProvideFields(int[] arg0)
+        public void dnProvideFields(int[] arg0)
         {
         }
 
-        public void jdoReplaceField(int arg0)
+        public void dnReplaceField(int arg0)
         {
         }
 
-        public void jdoReplaceFields(int[] arg0)
+        public void dnReplaceFields(int[] arg0)
         {
         }
 
-        public void jdoReplaceFlags()
+        public void dnReplaceFlags()
         {
         }
 
-        public void jdoCopyFields(Object arg0, int[] arg1)
+        public void dnCopyFields(Object arg0, int[] arg1)
         {
         }
 
-        public void jdoMakeDirty(String arg0)
+        public void dnMakeDirty(String arg0)
         {
         }
 
-        public Object jdoGetObjectId()
-        {
-            return null;
-        }
-
-        public Object jdoGetTransactionalObjectId()
+        public Object dnGetObjectId()
         {
             return null;
         }
 
-        public Object jdoGetVersion()
+        public Object dnGetTransactionalObjectId()
         {
             return null;
         }
 
-        public boolean jdoIsDirty()
+        public Object dnGetVersion()
+        {
+            return null;
+        }
+
+        public boolean dnIsDirty()
         {
             return false;
         }
 
-        public boolean jdoIsTransactional()
+        public boolean dnIsTransactional()
         {
             return false;
         }
 
-        public boolean jdoIsPersistent()
+        public boolean dnIsPersistent()
         {
             return false;
         }
 
-        public boolean jdoIsNew()
+        public boolean dnIsNew()
         {
             return false;
         }
 
-        public boolean jdoIsDeleted()
+        public boolean dnIsDeleted()
         {
             return false;
         }
 
-        public boolean jdoIsDetached()
+        public boolean dnIsDetached()
         {
             return false;
         }
 
-        public PersistenceCapable jdoNewInstance(StateManager arg0)
+        public Persistable dnNewInstance(StateManager arg0)
         {
             return null;
         }
 
-        public PersistenceCapable jdoNewInstance(StateManager arg0, Object arg1)
+        public Persistable dnNewInstance(StateManager arg0, Object arg1)
         {
             return null;
         }
 
-        public Object jdoNewObjectIdInstance()
+        public Object dnNewObjectIdInstance()
         {
             return null;
         }
 
-        public Object jdoNewObjectIdInstance(Object arg0)
+        public Object dnNewObjectIdInstance(Object arg0)
         {
             return null;
         }
 
-        public void jdoCopyKeyFieldsToObjectId(Object arg0)
+        public void dnCopyKeyFieldsToObjectId(Object arg0)
         {
         }
 
-        public void jdoCopyKeyFieldsToObjectId(ObjectIdFieldSupplier arg0, Object arg1)
+        public void dnCopyKeyFieldsToObjectId(ObjectIdFieldSupplier arg0, Object arg1)
         {
         }
 
-        public void jdoCopyKeyFieldsFromObjectId(ObjectIdFieldConsumer arg0, Object arg1)
+        public void dnCopyKeyFieldsFromObjectId(ObjectIdFieldConsumer arg0, Object arg1)
         {
         }
     }
