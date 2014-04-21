@@ -21,13 +21,10 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import javax.jdo.JDOException; // TODO Remove this
-import javax.jdo.JDOFatalException; // TODO Remove this
-import javax.jdo.JDOUserException; // TODO Remove this
-
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ImplementationCreator;
 import org.datanucleus.enhancer.ImplementationGenerator;
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.ClassMetaData;
@@ -87,7 +84,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
                     ClassMetaData cmd = (ClassMetaData)metaDataMgr.getMetaDataForClass(cls, clr);
                     if (cmd == null)
                     {
-                        throw new JDOFatalException("Could not find metadata for class " + cls.getName());
+                        throw new NucleusException("Could not find metadata for class " + cls.getName()).setFatal();
                     }
 
                     Object obj = newInstance(cmd, clr);
@@ -110,7 +107,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
                 InterfaceMetaData imd = metaDataMgr.getMetaDataForInterface(cls, clr);
                 if (imd == null)
                 {
-                    throw new JDOFatalException("Could not find metadata for class/interface "+cls.getName());
+                    throw new NucleusException("Could not find metadata for class/interface "+cls.getName()).setFatal();
                 }
 
                 Object obj = newInstance(imd, clr);
@@ -124,15 +121,15 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
         }
         catch (ClassNotFoundException e)
         {
-            throw new JDOUserException(e.toString(),e);
+            throw new NucleusUserException(e.toString(),e);
         }
         catch (InstantiationException e)
         {
-            throw new JDOUserException(e.toString(),e);
+            throw new NucleusUserException(e.toString(),e);
         }
         catch (IllegalAccessException e)
         {
-            throw new JDOUserException(e.toString(),e);
+            throw new NucleusUserException(e.toString(),e);
         }
     }
 
@@ -217,7 +214,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
             }
             implementedInterfacesMsg.append("]");
 
-            throw new JDOException(LOCALISER.msg("ImplementationCreator.NotPCProblem", implFullClassName, 
+            throw new NucleusException(LOCALISER.msg("ImplementationCreator.NotPCProblem", implFullClassName, 
                 classLoaderPCMsg, implementedInterfacesMsg.toString()));
         }
     }
@@ -304,7 +301,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
             }
             implementedInterfacesMsg.append("]");
 
-            throw new JDOException(LOCALISER.msg("ImplementationCreator.NotPCProblem", implFullClassName, 
+            throw new NucleusException(LOCALISER.msg("ImplementationCreator.NotPCProblem", implFullClassName, 
                 classLoaderPCMsg, implementedInterfacesMsg.toString()));
         }
     }

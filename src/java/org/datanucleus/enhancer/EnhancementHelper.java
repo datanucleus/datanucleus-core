@@ -38,15 +38,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-
-
-// TODO Remove all of these
-import javax.jdo.JDOException;
-import javax.jdo.JDOFatalInternalException;
-import javax.jdo.JDOFatalUserException;
-import javax.jdo.JDOUserException;
-import javax.jdo.spi.JDOPermission;
-
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.state.StateManager;
 
@@ -91,25 +83,18 @@ public class EnhancementHelper extends java.lang.Object
         singletonHelper.registerDateFormat(getDateTimeInstance());
     }
 
-    /** Creates new JDOImplHelper */
     private EnhancementHelper()
     {
     }
 
-    /**
-     * Get an instance of <code>JDOImplHelper</code>. This method checks that the caller is authorized for
-     * <code>JDOPermission("getMetadata")</code>, and if not, throws <code>SecurityException</code>.
-     * @return an instance of <code>JDOImplHelper</code>.
-     * @throws SecurityException if the caller is not authorized for JDOPermission("getMetadata").
-     */
-    public static EnhancementHelper getInstance() throws SecurityException
+    public static EnhancementHelper getInstance()/* throws SecurityException*/
     {
-        SecurityManager sec = System.getSecurityManager();
+        /*SecurityManager sec = System.getSecurityManager();
         if (sec != null)
         {
             // throws exception if caller is not authorized
             sec.checkPermission(JDOPermission.GET_METADATA);
-        }
+        }*/
         return singletonHelper;
     }
 
@@ -262,7 +247,7 @@ public class EnhancementHelper extends java.lang.Object
         Persistable pcInstance = meta.getPC();
         if (pcInstance == null)
         {
-            throw new JDOFatalInternalException("Class " + pcClass.getName() + " has no identity!");
+            throw new NucleusException("Class " + pcClass.getName() + " has no identity!").setFatal();
         }
         pcInstance.dnCopyKeyFieldsToObjectId(fm, oid);
     }
@@ -291,7 +276,7 @@ public class EnhancementHelper extends java.lang.Object
         Persistable pcInstance = meta.getPC();
         if (pcInstance == null)
         {
-            throw new JDOFatalInternalException("Class " + pcClass.getName() + " has no identity!");
+            throw new NucleusException("Class " + pcClass.getName() + " has no identity!").setFatal();
         }
         pcInstance.dnCopyKeyFieldsFromObjectId(fm, oid);
     }
@@ -352,7 +337,7 @@ public class EnhancementHelper extends java.lang.Object
     }
 
     /**
-     * Register metadata by class. The registration will be done in the class named <code>JDOImplHelper</code>
+     * Register metadata by class. The registration will be done in the class named EnhancementHelper
      * loaded by the same or an ancestor class loader as the <code>Persistable</code> class performing the
      * registration.
      * @param pcClass the <code>Persistable</code> class used as the key for lookup.
@@ -396,24 +381,19 @@ public class EnhancementHelper extends java.lang.Object
      */
     public void unregisterClasses(ClassLoader cl)
     {
-        SecurityManager sec = System.getSecurityManager();
+        /*SecurityManager sec = System.getSecurityManager();
         if (sec != null)
         {
             // throws exception if caller is not authorized
             sec.checkPermission(JDOPermission.MANAGE_METADATA);
-        }
+        }*/
         synchronized (registeredClasses)
         {
             for (Iterator i = registeredClasses.keySet().iterator(); i.hasNext();)
             {
                 Class pcClass = (Class) i.next();
-                // Note, the pc class was registered by calling the static
-                // method JDOImplHelper.registerClass. This means the
-                // JDOImplHelper class loader is the same as or an ancestor
-                // of the class loader of the pc class. In this case method
-                // getClassLoader does not perform a security check for
-                // RuntimePermission("getClassLoader") and thus we do not
-                // need a privileged block for the getClassLoader call.
+                // Note, the pc class was registered by calling the static method EnhancementHelper.registerClass. 
+                // This means the EnhancementHelper class loader is the same as or an ancestor of the class loader of the pc class. 
                 if ((pcClass != null) && (pcClass.getClassLoader() == cl))
                 {
                     // unregister pc class, if its class loader is the specified one.
@@ -434,12 +414,12 @@ public class EnhancementHelper extends java.lang.Object
         {
             throw new NullPointerException("Cannot unregisterClass on null");
         }
-        SecurityManager sec = System.getSecurityManager();
+        /*SecurityManager sec = System.getSecurityManager();
         if (sec != null)
         {
             // throws exception if caller is not authorized
             sec.checkPermission(JDOPermission.MANAGE_METADATA);
-        }
+        }*/
         registeredClasses.remove(pcClass);
     }
 
@@ -503,30 +483,27 @@ public class EnhancementHelper extends java.lang.Object
         Meta ret = registeredClasses.get(pcClass);
         if (ret == null)
         {
-            throw new JDOFatalUserException("Cannot lookup meta info for " + pcClass + " - nothing found");
+            throw new NucleusUserException("Cannot lookup meta info for " + pcClass + " - nothing found").setFatal();
         }
         return ret;
     }
 
     /**
-     * Register a class authorized to replaceStateManager. The caller of this method must be authorized for
-     * JDOPermission("setStateManager"). During replaceStateManager, a persistence-capable class will call the
-     * corresponding checkAuthorizedStateManager and the class of the instance of the parameter must have been
-     * registered.
+     * Register a class authorized to replaceStateManager. During replaceStateManager, a persistence-capable class will call the
+     * corresponding checkAuthorizedStateManager and the class of the instance of the parameter must have been registered.
      * @param smClass a Class that is authorized for JDOPermission("setStateManager").
-     * @throws SecurityException if the caller is not authorized for JDOPermission("setStateManager").
      */
-    public static void registerAuthorizedStateManagerClass(Class smClass) throws SecurityException
+    public static void registerAuthorizedStateManagerClass(Class smClass) /*throws SecurityException*/
     {
         if (smClass == null)
         {
             throw new NullPointerException("Cannot register StateManager class with null input!");
         }
-        SecurityManager sm = System.getSecurityManager();
+        /*SecurityManager sm = System.getSecurityManager();
         if (sm != null)
         {
             sm.checkPermission(JDOPermission.SET_STATE_MANAGER);
-        }
+        }*/
         synchronized (authorizedStateManagerClasses)
         {
             authorizedStateManagerClasses.put(smClass, null);
@@ -534,19 +511,16 @@ public class EnhancementHelper extends java.lang.Object
     }
 
     /**
-     * Register classes authorized to replaceStateManager. The caller of this method must be authorized for
-     * JDOPermission("setStateManager"). During replaceStateManager, a persistence-capable class will call the
-     * corresponding checkAuthorizedStateManager and the class of the instance of the parameter must have been
-     * registered.
-     * @param smClasses a Collection of Classes that are authorized for JDOPermission("setStateManager").
-     * @throws SecurityException if the caller is not authorized for JDOPermission("setStateManager").
+     * Register classes authorized to replaceStateManager. During replaceStateManager, a persistence-capable class will call the
+     * corresponding checkAuthorizedStateManager and the class of the instance of the parameter must have been registered.
+     * @param smClasses a Collection of Classes
      */
-    public static void registerAuthorizedStateManagerClasses(Collection smClasses) throws SecurityException
+    public static void registerAuthorizedStateManagerClasses(Collection smClasses) /*throws SecurityException*/
     {
-        SecurityManager sm = System.getSecurityManager();
+        /*SecurityManager sm = System.getSecurityManager();
         if (sm != null)
         {
-            sm.checkPermission(JDOPermission.SET_STATE_MANAGER);
+            sm.checkPermission(JDOPermission.SET_STATE_MANAGER);*/
             synchronized (authorizedStateManagerClasses)
             {
                 for (Iterator it = smClasses.iterator(); it.hasNext();)
@@ -559,7 +533,7 @@ public class EnhancementHelper extends java.lang.Object
                     registerAuthorizedStateManagerClass((Class) it.next());
                 }
             }
-        }
+        /*}*/
     }
 
     /**
@@ -584,12 +558,12 @@ public class EnhancementHelper extends java.lang.Object
      */
     public static void checkAuthorizedStateManagerClass(Class smClass)
     {
-        final SecurityManager scm = System.getSecurityManager();
+        /*final SecurityManager scm = System.getSecurityManager();
         if (scm == null)
         {
             // if no security manager, no checking.
             return;
-        }
+        }*/
         synchronized (authorizedStateManagerClasses)
         {
             if (authorizedStateManagerClasses.containsKey(smClass))
@@ -598,7 +572,7 @@ public class EnhancementHelper extends java.lang.Object
             }
         }
         // if not already authorized, perform "long" security checking.
-        scm.checkPermission(JDOPermission.SET_STATE_MANAGER);
+        /*scm.checkPermission(JDOPermission.SET_STATE_MANAGER);*/
     }
 
     /**
@@ -643,6 +617,7 @@ public class EnhancementHelper extends java.lang.Object
      */
     static
     {
+        // TODO Add other possible types
         if (isClassLoadable("java.util.Currency"))
         {
             singletonHelper.registerStringConstructor(Currency.class, new StringConstructor()
@@ -653,13 +628,9 @@ public class EnhancementHelper extends java.lang.Object
                     {
                         return Currency.getInstance(s);
                     }
-                    catch (IllegalArgumentException ex)
-                    {
-                        throw new javax.jdo.JDOUserException("Illegal argument to Currency string constructor : " + s);
-                    }
                     catch (Exception ex)
                     {
-                        throw new JDOUserException("Exception in Currency identity String constructor", ex);
+                        throw new NucleusUserException("Exception in Currency identity String constructor", ex);
                     }
                 }
             });
@@ -674,7 +645,7 @@ public class EnhancementHelper extends java.lang.Object
                 }
                 catch (Exception ex)
                 {
-                    throw new JDOUserException("Exception in Locale identity String constructor", ex);
+                    throw new NucleusUserException("Exception in Locale identity String constructor", ex);
                 }
             }
         });
@@ -694,7 +665,7 @@ public class EnhancementHelper extends java.lang.Object
                     Date result = dateFormat.parse(s, pp);
                     if (result == null)
                     {
-                        throw new JDOUserException("Exception in Date identity String constructor", 
+                        throw new NucleusUserException("Exception in Date identity String constructor", 
                             new Object[] {s, new Integer(pp.getErrorIndex()), dateFormatPattern});
                     }
                     return result;
@@ -777,10 +748,6 @@ public class EnhancementHelper extends java.lang.Object
                 return keyConstructor.newInstance(new Object[]{keyString});
             }
         }
-        catch (JDOException ex)
-        {
-            throw ex;
-        }
         catch (Exception ex)
         {
             // ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
@@ -790,7 +757,7 @@ public class EnhancementHelper extends java.lang.Object
 
     /**
      * Get the DateFormat instance for the default locale from the VM. This requires the following privileges
-     * for JDOImplHelper in the security permissions file: permission java.util.PropertyPermission
+     * for EnhancementHelper in the security permissions file: permission java.util.PropertyPermission
      * "user.country", "read"; permission java.util.PropertyPermission "user.timezone", "read,write";
      * permission java.util.PropertyPermission "java.home", "read"; If these permissions are not present, or
      * there is some other problem getting the default date format, a simple formatter is returned.

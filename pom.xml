@@ -23,7 +23,6 @@
     </scm>
 
     <properties>
-        <jdo.version>3.0</jdo.version>
     </properties>
 
     <repositories>
@@ -58,7 +57,6 @@
                     <instructions>
                         <Bundle-SymbolicName>org.datanucleus;singleton:=true</Bundle-SymbolicName>
                         <Import-Package>
-                            javax.jdo*;version="${jdo.version}",
                             *;resolution:=optional
                         </Import-Package>
                         <Premain-Class>org.datanucleus.enhancer.DataNucleusClassFileTransformer</Premain-Class>
@@ -69,13 +67,6 @@
     </build>
     
     <dependencies>
-        <!-- Required for JDO bytecode enhancement contract -->
-        <dependency>
-            <groupId>javax.jdo</groupId>
-            <artifactId>jdo-api</artifactId>
-            <version>[${jdo.version}, )</version>
-            <scope>provided</scope>
-        </dependency>
         <!-- JTA transactions -->
         <dependency>
             <groupId>javax.transaction</groupId> 

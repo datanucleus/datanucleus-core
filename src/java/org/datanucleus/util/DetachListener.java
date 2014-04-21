@@ -17,12 +17,11 @@ Contributors:
 *****************************************************************/
 package org.datanucleus.util;
 
-import javax.jdo.JDODetachedFieldAccessException;
+import org.datanucleus.exceptions.NucleusUserException;
 
 /**
- * Listener hook for detachment events, as an alternative to the JDO standard process of throwing a
- * JDODetachedFieldAccessException. Call setInstance() with your DetachListener and you will pick up all events.
- * See org.datanucleus.enhancer.jdo.JDOEnhancementNamer also
+ * Listener hook for detachment events, as an alternative to the JDO standard process of throwing a NucleusUserException.
+ * Call setInstance() with your DetachListener and you will pick up all events.
  */
 public abstract class DetachListener
 {
@@ -42,8 +41,7 @@ public abstract class DetachListener
                         @Override
                         public void undetachedFieldAccess(Object instance, String fieldName)
                         {
-                            throw new JDODetachedFieldAccessException("You have just attempted to access field \"" + 
-                                fieldName + 
+                            throw new NucleusUserException("You have just attempted to access field \"" + fieldName + 
                                 "\" yet this field was not detached when you detached the object." +
                                 " Either dont access this field, or detach it when detaching the object.");
                         }
