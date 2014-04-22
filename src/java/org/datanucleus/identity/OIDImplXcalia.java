@@ -124,7 +124,7 @@ public class OIDImplXcalia implements java.io.Serializable, OID, Comparable
      * Accessor for the persistable class name.
      * @return persistable class name
      */
-    public String getPcClass()
+    public String getTargetClassName()
     {
         return pcClass;
     }

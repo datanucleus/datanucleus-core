@@ -81,7 +81,7 @@ public class DatastoreUniqueOID implements java.io.Serializable, OID, Comparable
      * Accessor for the persistable class name.
      * @return persistable class name
      */
-    public String getPcClass()
+    public String getTargetClassName()
     {
         // We do not need a class name.
         throw new UnsupportedOperationException();

@@ -19,7 +19,7 @@ package org.datanucleus.identity;
 
 /**
  * Interface for a datastore-identity class to implement.
- * Please refer to the JDO2 specification 5.4.3 for precise requirements of such a class. These include
+ * Please refer to the JDO specification 5.4.3 for precise requirements of such a class. These include
  * <ul>
  * <li>Has to implement Serializable</li>
  * <li>Serializable fields have to be public</li>
@@ -29,7 +29,7 @@ package org.datanucleus.identity;
 public interface OID
 {
     /**
-     * Provides the OID in a form that can be used by the database as a key.
+     * Provides the identity in a form that can be used by the database as a key.
      * @return The key value
      */
     Object getKeyValue();
@@ -38,26 +38,16 @@ public interface OID
      * Accessor for the PC class name 
      * @return the PC Class
      */
-    String getPcClass();
+    String getTargetClassName();
 
-    /**
-     * Equality operator.
-     * @param obj Object to compare against
-     * @return Whether they are equal
-     */
     boolean equals(Object obj);
 
-    /**
-     * Accessor for the hashcode
-     * @return Hashcode for this object
-     */
     int hashCode();
 
     /**
-     * Returns the string representation of the OID.
-     * The string representation should contain enough information to be usable as input to a String constructor
-     * to create the OID.
-     * @return the string representation of the OID.
+     * Returns the string representation of the identity.
+     * The string representation should contain enough information to be usable as input to a String constructor to create the identity.
+     * @return the string representation of the identity.
      */
     String toString();
 }

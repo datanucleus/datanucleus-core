@@ -32,6 +32,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.cache.CachedPC.CachedId;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.MetaDataUtils;
@@ -635,11 +636,11 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
             return null;
         }
         Object id = api.getIdForObject(pc);
-        if (api.isDatastoreIdentity(id))
+        if (IdentityUtils.isDatastoreIdentity(id))
         {
             return id;
         }
-        else if (api.isSingleFieldIdentity(id))
+        else if (IdentityUtils.isSingleFieldIdentity(id))
         {
             return id;
         }

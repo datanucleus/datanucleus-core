@@ -40,8 +40,10 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.flush.FlushNonReferential;
 import org.datanucleus.flush.FlushProcess;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.identity.OID;
 import org.datanucleus.identity.SCOID;
+import org.datanucleus.identity.SingleFieldId;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
@@ -945,16 +947,16 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         if (id instanceof OID)
         {
             // Check that the implied class is managed
-            className = ((OID)id).getPcClass();
+            className = ((OID)id).getTargetClassName();
             AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
             if (cmd.getIdentityType() != IdentityType.DATASTORE)
             {
                 throw new NucleusUserException(LOCALISER.msg("038001", id, cmd.getFullClassName()));
             }
         }
-        else if (getApiAdapter().isSingleFieldIdentity(id))
+        else if (IdentityUtils.isSingleFieldIdentity(id))
         {
-            className = getApiAdapter().getTargetClassNameForSingleFieldIdentity(id);
+            className = ((SingleFieldId)id).getTargetClassName();
             AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
             if (cmd.getIdentityType() != IdentityType.APPLICATION || !cmd.getObjectidClass().equals(id.getClass().getName()))
             {
@@ -1065,12 +1067,12 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         else if (id instanceof OID)
         {
             // Object is an OID
-            return ((OID)id).getPcClass();
+            return ((OID)id).getTargetClassName();
         }
-        else if (getApiAdapter().isSingleFieldIdentity(id))
+        else if (IdentityUtils.isSingleFieldIdentity(id))
         {
             // Using SingleFieldIdentity so can assume that object is of the target class
-            return getApiAdapter().getTargetClassNameForSingleFieldIdentity(id);
+            return ((SingleFieldId)id).getTargetClassName();
         }
         else
         {

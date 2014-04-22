@@ -25,6 +25,7 @@ import org.datanucleus.asm.Type;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
@@ -122,7 +123,7 @@ public class CopyKeyFieldsToObjectId extends ClassMethod
             {
                 String objectIdClass = cmd.getObjectidClass();
                 String ACN_objectIdClass = objectIdClass.replace('.', '/');
-                if (enhancer.getMetaDataManager().getApiAdapter().isSingleFieldIdentityClass(objectIdClass))
+                if (IdentityUtils.isSingleFieldIdentityClass(objectIdClass))
                 {
                     // SingleFieldIdentity
                     Label startLabel = new Label();

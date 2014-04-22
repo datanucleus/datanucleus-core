@@ -42,7 +42,9 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.DatastoreUniqueOID;
 import org.datanucleus.identity.IdentityKeyTranslator;
 import org.datanucleus.identity.IdentityStringTranslator;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.identity.OID;
+import org.datanucleus.identity.SingleFieldId;
 import org.datanucleus.management.FactoryStatistics;
 import org.datanucleus.management.jmx.ManagementManager;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -1627,11 +1629,11 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 // This doesn't have the class name so can't get metadata
                 return false;
             }
-            cmd = getMetaDataManager().getMetaDataForClass(((OID)id).getPcClass(), getClassLoaderResolver(id.getClass().getClassLoader()));
+            cmd = getMetaDataManager().getMetaDataForClass(((OID)id).getTargetClassName(), getClassLoaderResolver(id.getClass().getClassLoader()));
         }
-        else if (getApiAdapter().isSingleFieldIdentity(id))
+        else if (IdentityUtils.isSingleFieldIdentity(id))
         {
-            cmd = getMetaDataManager().getMetaDataForClass(getApiAdapter().getTargetClassNameForSingleFieldIdentity(id), getClassLoaderResolver(id.getClass().getClassLoader()));
+            cmd = getMetaDataManager().getMetaDataForClass(((SingleFieldId)id).getTargetClassName(), getClassLoaderResolver(id.getClass().getClassLoader()));
         }
         else
         {

@@ -29,6 +29,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.NucleusLogger;
 
@@ -215,7 +216,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
 
             if (identityType == IdentityType.APPLICATION)
             {
-                usesSingleFieldIdentityClass = mmgr.getApiAdapter().isSingleFieldIdentityClass(getObjectidClass());
+                usesSingleFieldIdentityClass = IdentityUtils.isSingleFieldIdentityClass(getObjectidClass());
             }
 
             // Clear out the collections that we used when loading the MetaData

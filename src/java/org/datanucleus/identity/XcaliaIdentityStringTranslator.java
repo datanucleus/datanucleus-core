@@ -86,7 +86,7 @@ public class XcaliaIdentityStringTranslator implements IdentityStringTranslator
                 else if (acmd.getIdentityType() == IdentityType.APPLICATION)
                 {
                     // "idKey" assumed to be the toString() output of the application-identity
-                    id = ec.getApiAdapter().getNewApplicationIdentityObjectId(clr, acmd, idKey);
+                    id = IdentityUtils.getNewApplicationIdentityObjectId(clr, acmd, idKey);
                 }
             }
         }

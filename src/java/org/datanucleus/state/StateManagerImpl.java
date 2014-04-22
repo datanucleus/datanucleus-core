@@ -2122,7 +2122,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         {
             // className is null when id class exists, and object has been validated and doesn't exist.
             throw new NucleusObjectNotFoundException(LOCALISER.msg("026013", 
-                IdentityUtils.getIdentityAsString(myEC.getApiAdapter(), myID)), myID);
+                IdentityUtils.getPersistableIdentityForId(myEC.getApiAdapter(), myID)), myID);
         }
         else if (!cmd.getFullClassName().equals(className))
         {
@@ -2136,9 +2136,9 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             catch (ClassNotResolvedException e)
             {
                 NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("026014",
-                    IdentityUtils.getIdentityAsString(myEC.getApiAdapter(), myID)));
+                    IdentityUtils.getPersistableIdentityForId(myEC.getApiAdapter(), myID)));
                 throw new NucleusUserException(LOCALISER.msg("026014",
-                    IdentityUtils.getIdentityAsString(myEC.getApiAdapter(), myID)), e);
+                    IdentityUtils.getPersistableIdentityForId(myEC.getApiAdapter(), myID)), e);
             }
             if (cmd == null)
             {
@@ -2509,7 +2509,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             }
             finally
             {
-                myID = myEC.getApiAdapter().getNewApplicationIdentityObjectId(getObject(), cmd);
+                myID = IdentityUtils.getNewApplicationIdentityObjectId(getObject(), cmd);
             }
         }
 
@@ -2584,7 +2584,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 //but this is not allowed by the JDO spec
                 return myID;
             }
-            return myEC.getApiAdapter().getNewApplicationIdentityObjectId(myPC, cmd);
+            return IdentityUtils.getNewApplicationIdentityObjectId(myPC, cmd);
         }
 
         return myID;
@@ -3317,7 +3317,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 {
                     NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("026030",
                         StringUtils.toJVMIDString(myPC),
-                        IdentityUtils.getIdentityAsString(myEC.getApiAdapter(), myID), fmd.getName()));
+                        IdentityUtils.getPersistableIdentityForId(myEC.getApiAdapter(), myID), fmd.getName()));
                 }
                 replaceField(myPC, fieldNumber, unwrappedValue, false);
             }
@@ -3374,7 +3374,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                     {
                         NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("026029", 
                             StringUtils.toJVMIDString(myPC), 
-                            myEC != null ? IdentityUtils.getIdentityAsString(myEC.getApiAdapter(), myID) : myID, fmd.getName()));
+                            myEC != null ? IdentityUtils.getPersistableIdentityForId(myEC.getApiAdapter(), myID) : myID, fmd.getName()));
                     }
                 }
                 return SCOUtils.newSCOInstance(this, fmd, fmd.getType(), 
@@ -3716,7 +3716,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                                 {
                                     NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("026032", 
                                         StringUtils.toJVMIDString(myPC), 
-                                        IdentityUtils.getIdentityAsString(myEC.getApiAdapter(), myID), fieldName));
+                                        IdentityUtils.getPersistableIdentityForId(myEC.getApiAdapter(), myID), fieldName));
                                 }
                                 unloadField(fieldName);
                             }
@@ -3754,7 +3754,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             {
                 // Warn the user since they selected detachAllOnCommit
                 NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("026031", myPC.getClass().getName(), 
-                    IdentityUtils.getIdentityAsString(myEC.getApiAdapter(), myID)));
+                    IdentityUtils.getPersistableIdentityForId(myEC.getApiAdapter(), myID)));
 
                 // Make the object transient
                 makeTransient(null);

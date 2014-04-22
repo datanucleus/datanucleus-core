@@ -1037,7 +1037,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             NucleusLogger.TRANSACTION.debug(LOCALISER.msg("015019", 
                 StringUtils.toJVMIDString(op.getObject()),
-                IdentityUtils.getIdentityAsString(getApiAdapter(), op.getInternalObjectId())));
+                IdentityUtils.getPersistableIdentityForId(getApiAdapter(), op.getInternalObjectId())));
         }
 
         if (enlistedOPCache.remove(op.getInternalObjectId()) == null)
@@ -1047,7 +1047,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 NucleusLogger.TRANSACTION.debug(LOCALISER.msg("010023", 
                     StringUtils.toJVMIDString(op.getObject()), 
-                    IdentityUtils.getIdentityAsString(getApiAdapter(), op.getInternalObjectId())));
+                    IdentityUtils.getPersistableIdentityForId(getApiAdapter(), op.getInternalObjectId())));
             }
         }
     }
@@ -1953,7 +1953,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(obj.getClass(), clr);
                         if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
-                            Object transientId = api.getNewApplicationIdentityObjectId(obj, cmd);
+                            Object transientId = IdentityUtils.getNewApplicationIdentityObjectId(obj, cmd);
                             T existingObj = (T)findObject(transientId, true, true, cmd.getFullClassName());
                             ObjectProvider existingOP = findObjectProvider(existingObj);
                             existingOP.attach(obj);
@@ -2978,7 +2978,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     catch (ClassNotResolvedException e)
                     {
                         String msg = LOCALISER.msg("010027", 
-                            IdentityUtils.getIdentityAsString(getApiAdapter(), id));
+                            IdentityUtils.getPersistableIdentityForId(getApiAdapter(), id));
                         NucleusLogger.PERSISTENCE.warn(msg);
                         throw new NucleusUserException(msg, e);
                     }
@@ -3168,7 +3168,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         {
                             // This class is abstract so impossible to have an instance of this type
                             throw new NucleusObjectNotFoundException(LOCALISER.msg("010027", 
-                                IdentityUtils.getIdentityAsString(getApiAdapter(), id), className));
+                                IdentityUtils.getPersistableIdentityForId(getApiAdapter(), id), className));
                         }
 
                         op = nucCtx.getObjectProviderFactory().newForHollow(this, pcClass, id);
@@ -3184,9 +3184,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     catch (ClassNotResolvedException e)
                     {
                         NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("010027", 
-                            IdentityUtils.getIdentityAsString(getApiAdapter(), id)));
+                            IdentityUtils.getPersistableIdentityForId(getApiAdapter(), id)));
                         throw new NucleusUserException(LOCALISER.msg("010027", 
-                            IdentityUtils.getIdentityAsString(getApiAdapter(), id)), e);
+                            IdentityUtils.getPersistableIdentityForId(getApiAdapter(), id)), e);
                     }
 
                     if (validate)
@@ -3258,8 +3258,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     private ClassDetailsForId getClassDetailsForId(Object id, String objectClassName, boolean checkInheritance)
     {
-        ApiAdapter api = getApiAdapter();
-
         // Object not found yet, so work out class name
         String className = null;
         String originalClassName = null;
@@ -3278,7 +3276,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Object class name specified so use that directly
             originalClassName = objectClassName;
         }
-        else if (api.isDatastoreIdentity(id) || api.isSingleFieldIdentity(id))
+        else if (IdentityUtils.isDatastoreIdentity(id) || IdentityUtils.isSingleFieldIdentity(id))
         {
             // OID or SingleFieldIdentity, so check that the implied class is managed
             originalClassName = getStoreManager().manageClassForIdentity(id, clr);
@@ -3303,7 +3301,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             if (!checkedClassName)
             {
                 // Check if this id for any known subclasses is in the cache to save searching
-                if (api.isDatastoreIdentity(id) || api.isSingleFieldIdentity(id))
+                if (IdentityUtils.isDatastoreIdentity(id) || IdentityUtils.isSingleFieldIdentity(id))
                 {
                     String[] subclasses = getMetaDataManager().getSubclassesForClass(className, true);
                     if (subclasses != null)
@@ -3311,15 +3309,14 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         for (int i=0;i<subclasses.length;i++)
                         {
                             Object oid = null;
-                            if (api.isDatastoreIdentity(id))
+                            if (IdentityUtils.isDatastoreIdentity(id))
                             {
                                 oid = OIDFactory.getInstance(nucCtx, subclasses[i], ((OID)id).getKeyValue());
                             }
-                            else if (api.isSingleFieldIdentity(id))
+                            else if (IdentityUtils.isSingleFieldIdentity(id))
                             {
-                                oid = api.getNewSingleFieldIdentity(id.getClass(),
-                                    getClassLoaderResolver().classForName(subclasses[i]), 
-                                    api.getTargetKeyForSingleFieldIdentity(id));
+                                oid = IdentityUtils.getNewSingleFieldIdentity(id.getClass(), getClassLoaderResolver().classForName(subclasses[i]), 
+                                    IdentityUtils.getTargetKeyForSingleFieldIdentity(id));
                             }
                             pc = getObjectFromCache(oid);
                             if (pc != null)
@@ -3335,17 +3332,16 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             if (pc == null && originalClassName != null && !originalClassName.equals(className))
             {
                 // Inheritance check implies different inheritance level, so retry
-                if (api.isDatastoreIdentity(id))
+                if (IdentityUtils.isDatastoreIdentity(id))
                 {
                     // Create new OID using correct target class, and recheck cache
                     id = OIDFactory.getInstance(getNucleusContext(), className, ((OID)id).getKeyValue());
                     pc = getObjectFromCache(id);
                 }
-                else if (api.isSingleFieldIdentity(id))
+                else if (IdentityUtils.isSingleFieldIdentity(id))
                 {
                     // Create new SingleFieldIdentity using correct targetClass, and recheck cache
-                    id = api.getNewSingleFieldIdentity(id.getClass(), clr.classForName(className), 
-                        api.getTargetKeyForSingleFieldIdentity(id));
+                    id = IdentityUtils.getNewSingleFieldIdentity(id.getClass(), clr.classForName(className), IdentityUtils.getTargetKeyForSingleFieldIdentity(id));
                     pc = getObjectFromCache(id);
                 }
             }
@@ -3360,8 +3356,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     protected String getClassNameForObjectId(Object id)
     {
         String className = null;
-        ApiAdapter api = getApiAdapter();
-        if (api.isDatastoreIdentity(id) || api.isSingleFieldIdentity(id))
+        if (IdentityUtils.isDatastoreIdentity(id) || IdentityUtils.isSingleFieldIdentity(id))
         {
             // OID or SingleFieldIdentity, so check that the implied class is managed
             className = getStoreManager().manageClassForIdentity(id, clr);
@@ -3485,7 +3480,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         {
                             // This class is abstract so impossible to have an instance of this type
                             throw new NucleusObjectNotFoundException(LOCALISER.msg("010027",
-                                IdentityUtils.getIdentityAsString(getApiAdapter(), id), className));
+                                IdentityUtils.getPersistableIdentityForId(getApiAdapter(), id), className));
                         }
 
                         op = nucCtx.getObjectProviderFactory().newForHollow(this, pcClass, id);
@@ -3502,9 +3497,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     catch (ClassNotResolvedException e)
                     {
                         NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("010027", 
-                            IdentityUtils.getIdentityAsString(getApiAdapter(), id)));
+                            IdentityUtils.getPersistableIdentityForId(getApiAdapter(), id)));
                         throw new NucleusUserException(LOCALISER.msg("010027",
-                            IdentityUtils.getIdentityAsString(getApiAdapter(), id)), e);
+                            IdentityUtils.getPersistableIdentityForId(getApiAdapter(), id)), e);
                     }
                 }
             }
@@ -3595,7 +3590,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             // Single Field Identity
             Class idType = clr.classForName(cmd.getObjectidClass());
-            id = getApiAdapter().getNewSingleFieldIdentity(idType, pcClass, key);
+            id = IdentityUtils.getNewSingleFieldIdentity(idType, pcClass, key);
         }
         else if (key instanceof java.lang.String)
         {
@@ -3621,7 +3616,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 else
                 {
                     clr.classForName(pcClass.getName(), true);
-                    id = getApiAdapter().getNewApplicationIdentityObjectId(pcClass, key);
+                    id = IdentityUtils.getNewApplicationIdentityObjectId(pcClass, key);
                 }
             }
             else
@@ -3656,7 +3651,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
         {
-            return getApiAdapter().getNewApplicationIdentityObjectId(pc, cmd); // All values will have been populated before arriving here
+            return IdentityUtils.getNewApplicationIdentityObjectId(pc, cmd); // All values will have been populated before arriving here
         }
         else
         {
@@ -4801,7 +4796,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     NucleusLogger.CACHE.debug(LOCALISER.msg("003004", 
                         StringUtils.toJVMIDString(op.getObject()), 
-                        IdentityUtils.getIdentityAsString(getApiAdapter(), id),
+                        IdentityUtils.getPersistableIdentityForId(getApiAdapter(), id),
                         StringUtils.booleanArrayToString(op.getLoadedFields())));
                 }
             }
@@ -4988,14 +4983,14 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             if (NucleusLogger.CACHE.isDebugEnabled())
             {
                 NucleusLogger.CACHE.debug(LOCALISER.msg("003009", 
-                    IdentityUtils.getIdentityAsString(getApiAdapter(), id), String.valueOf(cache.size())));
+                    IdentityUtils.getPersistableIdentityForId(getApiAdapter(), id), String.valueOf(cache.size())));
             }
             Object pcRemoved = cache.remove(id);
             if (pcRemoved == null && NucleusLogger.CACHE.isDebugEnabled())
             {
                 // For some reason the object isn't in the L1 cache - garbage collected maybe ?
                 NucleusLogger.CACHE.debug(LOCALISER.msg("003010", 
-                    IdentityUtils.getIdentityAsString(getApiAdapter(), id)));
+                    IdentityUtils.getPersistableIdentityForId(getApiAdapter(), id)));
             }
         }
     }
@@ -5124,7 +5119,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
                     NucleusLogger.CACHE.debug(LOCALISER.msg("003008", StringUtils.toJVMIDString(pc), 
-                        IdentityUtils.getIdentityAsString(getApiAdapter(), id), 
+                        IdentityUtils.getPersistableIdentityForId(getApiAdapter(), id), 
                         StringUtils.booleanArrayToString(op.getLoadedFields()),
                         "" + cache.size()));
                 }
@@ -5139,7 +5134,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
                     NucleusLogger.CACHE.debug(LOCALISER.msg("003007", 
-                        IdentityUtils.getIdentityAsString(getApiAdapter(), id), "" + cache.size()));
+                        IdentityUtils.getPersistableIdentityForId(getApiAdapter(), id), "" + cache.size()));
                 }
             }
         }
@@ -5180,7 +5175,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
                     NucleusLogger.CACHE.debug(LOCALISER.msg("004006",
-                        IdentityUtils.getIdentityAsString(getApiAdapter(), id),
+                        IdentityUtils.getPersistableIdentityForId(getApiAdapter(), id),
                         StringUtils.intArrayToString(cachedPC.getLoadedFieldNumbers()), cachedPC.getVersion(),
                         StringUtils.toJVMIDString(pc)));
                 }
@@ -5203,7 +5198,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
                     NucleusLogger.CACHE.debug(LOCALISER.msg("004005",
-                        IdentityUtils.getIdentityAsString(getApiAdapter(), id)));
+                        IdentityUtils.getPersistableIdentityForId(getApiAdapter(), id)));
                 }
             }
         }
@@ -5237,7 +5232,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     if (NucleusLogger.CACHE.isDebugEnabled())
                     {
                         NucleusLogger.CACHE.debug(LOCALISER.msg("004006",
-                            IdentityUtils.getIdentityAsString(getApiAdapter(), id),
+                            IdentityUtils.getPersistableIdentityForId(getApiAdapter(), id),
                             StringUtils.intArrayToString(cachedPC.getLoadedFieldNumbers()), cachedPC.getVersion(),
                             StringUtils.toJVMIDString(pc)));
                     }
@@ -5260,7 +5255,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     if (NucleusLogger.CACHE.isDebugEnabled())
                     {
                         NucleusLogger.CACHE.debug(LOCALISER.msg("004005",
-                            IdentityUtils.getIdentityAsString(getApiAdapter(), id)));
+                            IdentityUtils.getPersistableIdentityForId(getApiAdapter(), id)));
                     }
                 }
             }
@@ -5298,8 +5293,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
                     NucleusLogger.CACHE.debug(LOCALISER.msg("003012", StringUtils.toJVMIDString(pc), 
-                        IdentityUtils.getIdentityAsString(getApiAdapter(), oldID), 
-                        IdentityUtils.getIdentityAsString(getApiAdapter(), newID)));
+                        IdentityUtils.getPersistableIdentityForId(getApiAdapter(), oldID), 
+                        IdentityUtils.getPersistableIdentityForId(getApiAdapter(), newID)));
                 }
                 cache.remove(oldID);
             }
@@ -5320,8 +5315,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     NucleusLogger.TRANSACTION.debug(LOCALISER.msg("015018",
                         StringUtils.toJVMIDString(pc),
-                        IdentityUtils.getIdentityAsString(getApiAdapter(), oldID),
-                        IdentityUtils.getIdentityAsString(getApiAdapter(), newID)));
+                        IdentityUtils.getPersistableIdentityForId(getApiAdapter(), oldID),
+                        IdentityUtils.getPersistableIdentityForId(getApiAdapter(), newID)));
                 }
             }
         }

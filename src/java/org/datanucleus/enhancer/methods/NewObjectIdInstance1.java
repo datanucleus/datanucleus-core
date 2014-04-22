@@ -22,6 +22,7 @@ import org.datanucleus.asm.Opcodes;
 import org.datanucleus.asm.Type;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.IdentityType;
@@ -108,7 +109,7 @@ public class NewObjectIdInstance1 extends ClassMethod
             {
                 String objectIdClass = cmd.getObjectidClass();
                 int[] pkFieldNums = cmd.getPKMemberPositions();
-                if (enhancer.getMetaDataManager().getApiAdapter().isSingleFieldIdentityClass(objectIdClass))
+                if (IdentityUtils.isSingleFieldIdentityClass(objectIdClass))
                 {
                     // SingleFieldIdentity
                     String ACN_objectIdClass = objectIdClass.replace('.', '/');

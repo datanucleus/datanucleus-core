@@ -17,15 +17,21 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.identity;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.ClassNameConstants;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
+import org.datanucleus.enhancer.EnhancementHelper;
+import org.datanucleus.enhancer.Persistable;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldMetaData;
@@ -34,34 +40,353 @@ import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Series of utilities for handling identities of objects.
  */
 public class IdentityUtils
 {
+    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
+
     /**
-     * Simple method to return the class name that the provided id represents. 
+     * Checks whether the passed class name is valid for a single field application-identity.
+     * @param className the identity class name
+     * @return Whether it is a single field class
+     */
+    public static boolean isSingleFieldIdentityClass(String className)
+    {
+        if (className == null || className.length() < 1)
+        {
+            return false;
+        }
+        return (className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_BYTE) || 
+                className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_CHAR) || 
+                className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_INT) ||
+                className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_LONG) || 
+                className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_OBJECT) || 
+                className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_SHORT) ||
+                className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_STRING));
+    }
+
+    /**
+     * Simple method to return the class name that the provided id represents.
      * If this is a datastore identity (OID) or single-field identity then returns the class name.
      * Otherwise returns null. Does no inheritance checking.
-     * @param api The API adapter
      * @param id The identity
      * @return Class name for the identity if easily determinable
      */
-    public static String getClassNameForIdentitySimple(ApiAdapter api, Object id)
+    public static String getClassNameForIdentitySimple(Object id)
     {
         if (id instanceof OID)
         {
             // Object is an OID
-            return ((OID)id).getPcClass();
+            return ((OID)id).getTargetClassName();
         }
-        else if (api.isSingleFieldIdentity(id))
+        else if (id instanceof SingleFieldId)
         {
             // Using SingleFieldIdentity so can assume that object is of the target class
-            return api.getTargetClassNameForSingleFieldIdentity(id);
+            return ((SingleFieldId)id).getTargetClassName();
         }
+
         // Must be user-specified identity so just return
         return null;
+    }
+
+    /**
+     * Accessor for whether the passed identity is a valid single-field application-identity for this API.
+     * @return Whether it is valid
+     */
+    public static boolean isSingleFieldIdentity(Object id)
+    {
+        return (id instanceof SingleFieldId);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.api.ApiAdapter#isDatastoreIdentity(java.lang.Object)
+     */
+    public static boolean isDatastoreIdentity(Object id)
+    {
+        return (id != null && id instanceof OID);
+    }
+
+    /**
+     * Accessor for the key object for the specified single field application-identity.
+     * @param id The identity
+     * @return The key object
+     */
+    public static Object getTargetKeyForSingleFieldIdentity(Object id)
+    {
+        if (id instanceof SingleFieldId)
+        {
+            return ((SingleFieldId)id).getKeyAsObject();
+        }
+        return null;
+    }
+
+    /**
+     * Accessor for the type of the single field application-identity key given the single field identity type.
+     * @param idType Single field identity type
+     * @return key type
+     */
+    public static Class getKeyTypeForSingleFieldIdentityType(Class idType)
+    {
+        if (idType == null)
+        {
+            return null;
+        }
+        if (!IdentityUtils.isSingleFieldIdentityClass(idType.getName()))
+        {
+            return null;
+        }
+
+        if (ClassConstants.IDENTITY_SINGLEFIELD_LONG.isAssignableFrom(idType))
+        {
+            return Long.class;
+        }
+        else if (ClassConstants.IDENTITY_SINGLEFIELD_INT.isAssignableFrom(idType))
+        {
+            return Integer.class;
+        }
+        else if (ClassConstants.IDENTITY_SINGLEFIELD_SHORT.isAssignableFrom(idType))
+        {
+            return Short.class;
+        }
+        else if (ClassConstants.IDENTITY_SINGLEFIELD_BYTE.isAssignableFrom(idType))
+        {
+            return Byte.class;
+        }
+        else if (ClassConstants.IDENTITY_SINGLEFIELD_CHAR.isAssignableFrom(idType))
+        {
+            return Character.class;
+        }
+        else if (ClassConstants.IDENTITY_SINGLEFIELD_STRING.isAssignableFrom(idType))
+        {
+            return String.class;
+        }
+        else if (ClassConstants.IDENTITY_SINGLEFIELD_OBJECT.isAssignableFrom(idType))
+        {
+            return Object.class;
+        }
+        return null;
+    }
+
+    /**
+     * Utility to create a new SingleFieldIdentity using reflection when you know the
+     * type of the Persistable, and also which SingleFieldIdentity, and the value of the key.
+     * @param idType Type of SingleFieldIdentity
+     * @param pcType Type of the Persistable
+     * @param value The value for the identity (the Long, or Int, or ... etc).
+     * @return Single field identity
+     * @throws NucleusException if invalid input is received
+     */
+    public static Object getNewSingleFieldIdentity(Class idType, Class pcType, Object value)
+    {
+        if (idType == null)
+        {
+            throw new NucleusException(LOCALISER.msg("029001", pcType)).setFatal();
+        }
+        if (pcType == null)
+        {
+            throw new NucleusException(LOCALISER.msg("029000", idType)).setFatal();
+        }
+        if (value == null)
+        {
+            throw new NucleusException(LOCALISER.msg("029003", idType, pcType)).setFatal();
+        }
+        if (!SingleFieldId.class.isAssignableFrom(idType))
+        {
+            throw new NucleusException(LOCALISER.msg("029002", idType.getName(), pcType.getName())).setFatal();
+        }
+
+        SingleFieldId id = null;
+        Class keyType = null;
+        if (idType == ClassConstants.IDENTITY_SINGLEFIELD_LONG)
+        {
+            keyType = Long.class;
+            if (!(value instanceof Long))
+            {
+                throw new NucleusException(LOCALISER.msg("029004", idType.getName(), 
+                    pcType.getName(), value.getClass().getName(), "Long")).setFatal();
+            }
+        }
+        else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_INT)
+        {
+            keyType = Integer.class;
+            if (!(value instanceof Integer))
+            {
+                throw new NucleusException(LOCALISER.msg("029004", idType.getName(), 
+                    pcType.getName(), value.getClass().getName(), "Integer")).setFatal();
+            }
+        }
+        else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_STRING)
+        {
+            keyType = String.class;
+            if (!(value instanceof String))
+            {
+                throw new NucleusException(LOCALISER.msg("029004", idType.getName(), 
+                    pcType.getName(), value.getClass().getName(), "String")).setFatal();
+            }
+        }
+        else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_BYTE)
+        {
+            keyType = Byte.class;
+            if (!(value instanceof Byte))
+            {
+                throw new NucleusException(LOCALISER.msg("029004", idType.getName(), 
+                    pcType.getName(), value.getClass().getName(), "Byte")).setFatal();
+            }
+        }
+        else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_SHORT)
+        {
+            keyType = Short.class;
+            if (!(value instanceof Short))
+            {
+                throw new NucleusException(LOCALISER.msg("029004", idType.getName(), 
+                    pcType.getName(), value.getClass().getName(), "Short")).setFatal();
+            }
+        }
+        else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_CHAR)
+        {
+            keyType = Character.class;
+            if (!(value instanceof Character))
+            {
+                throw new NucleusException(LOCALISER.msg("029004", idType.getName(), 
+                    pcType.getName(), value.getClass().getName(), "Character")).setFatal();
+            }
+        }
+        else
+        {
+            // ObjectIdentity
+            keyType = Object.class;
+        }
+
+        try
+        {
+            Class[] ctrArgs = new Class[] {Class.class, keyType};
+            Object[] args = new Object[] {pcType, value};
+            id = (SingleFieldId)idType.getConstructor(ctrArgs).newInstance(args);
+        }
+        catch (Exception e)
+        {
+            NucleusLogger.PERSISTENCE.error("Error encountered while creating SingleFieldIdentity instance of type \"" + idType.getName() + "\"");
+            NucleusLogger.PERSISTENCE.error(e);
+
+            return null;
+        }
+
+        return id;
+    }
+
+    /**
+     * Utility to create a new application identity when you know the metadata for the target class,
+     * and the toString() output of the identity.
+     * @param clr ClassLoader resolver
+     * @param acmd MetaData for the target class
+     * @param value String form of the key
+     * @return The identity
+     * @throws NucleusException if invalid input is received
+     */
+    public static Object getNewApplicationIdentityObjectId(ClassLoaderResolver clr, AbstractClassMetaData acmd, String value)
+    {
+        if (acmd.getIdentityType() != IdentityType.APPLICATION)
+        {
+            // TODO Localise this
+            throw new NucleusException("This class (" + acmd.getFullClassName() + ") doesn't use application-identity!");
+        }
+
+        Class targetClass = clr.classForName(acmd.getFullClassName());
+        Class idType = clr.classForName(acmd.getObjectidClass());
+        Object id = null;
+        if (acmd.usesSingleFieldIdentityClass())
+        {
+            try
+            {
+                Class[] ctrArgs;
+                if (ClassConstants.IDENTITY_SINGLEFIELD_OBJECT.isAssignableFrom(idType))
+                {
+                    ctrArgs = new Class[] {Class.class, Object.class};
+                }
+                else
+                {
+                    ctrArgs = new Class[] {Class.class, String.class};
+                }
+                Object[] args = new Object[] {targetClass, value};
+                id = idType.getConstructor(ctrArgs).newInstance(args);
+            }
+            catch (Exception e)
+            {
+                // TODO Localise this
+                throw new NucleusException("Error encountered while creating single-field identity instance with key \"" + value + "\"", e);
+            }
+        }
+        else
+        {
+            if (Modifier.isAbstract(targetClass.getModifiers()) && acmd.getObjectidClass() != null) 
+            {
+                try
+                {
+                    Constructor c = clr.classForName(acmd.getObjectidClass()).getDeclaredConstructor(new Class[] {java.lang.String.class});
+                    id = c.newInstance(new Object[] {value});
+                }
+                catch (Exception e) 
+                {
+                    String msg = LOCALISER.msg("010030", acmd.getObjectidClass(), acmd.getFullClassName());
+                    NucleusLogger.PERSISTENCE.error(msg);
+                    NucleusLogger.PERSISTENCE.error(e);
+
+                    throw new NucleusUserException(msg);
+                }
+            }
+            else
+            {
+                clr.classForName(targetClass.getName(), true);
+                id = EnhancementHelper.getInstance().newObjectIdInstance(targetClass, value);
+            }
+        }
+
+        return id;
+    }
+
+    /**
+     * Method to create a new object identity for the passed object with the supplied MetaData.
+     * Only applies to application-identity cases.
+     * @param pc The persistable object
+     * @param cmd Its metadata
+     * @return The new identity object
+     */
+    public static Object getNewApplicationIdentityObjectId(Object pc, AbstractClassMetaData cmd)
+    {
+        if (pc == null || cmd == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            Object id = ((Persistable)pc).dnNewObjectIdInstance();
+            if (!cmd.usesSingleFieldIdentityClass())
+            {
+                ((Persistable)pc).dnCopyKeyFieldsToObjectId(id);
+            }
+            return id;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
+    /**
+     * Method to return a new object identity for the specified class, and key (possibly toString() output).
+     * @param cls Persistable class
+     * @param key form of the object id
+     * @return The object identity
+     */
+    public static Object getNewApplicationIdentityObjectId(Class cls, Object key)
+    {
+        return EnhancementHelper.getInstance().newObjectIdInstance(cls, key);
     }
 
     /**
@@ -77,9 +402,9 @@ public class IdentityUtils
         {
             return null;
         }
-        if (api.isSingleFieldIdentity(id))
+        if (IdentityUtils.isSingleFieldIdentity(id))
         {
-            return api.getTargetClassNameForSingleFieldIdentity(id) + ":" + api.getTargetKeyForSingleFieldIdentity(id);
+            return ((SingleFieldId)id).getTargetClassName() + ":" + ((SingleFieldId)id).getKeyAsObject();
         }
         else
         {
@@ -113,7 +438,7 @@ public class IdentityUtils
                 String className = persistableId.substring(0, persistableId.indexOf(':'));
                 cmd = ec.getMetaDataManager().getMetaDataForClass(className, clr);
                 String idStr = persistableId.substring(persistableId.indexOf(':')+1);
-                id = ec.getApiAdapter().getNewApplicationIdentityObjectId(clr, cmd, idStr);
+                id = IdentityUtils.getNewApplicationIdentityObjectId(clr, cmd, idStr);
             }
             else
             {
@@ -122,31 +447,6 @@ public class IdentityUtils
             }
         }
         return ec.findObject(id, true, false, null);
-    }
-
-    /**
-     * Convenience method to return the identity as a String.
-     * Typically outputs the toString() form of the identity object however with SingleFieldIdentity
-     * it outputs the class+key since SingleFieldIdentity just return the key.
-     * @param api The API
-     * @param id The id
-     * @return String form
-     */
-    public static String getIdentityAsString(ApiAdapter api, Object id)
-    {
-        if (id == null)
-        {
-            return null;
-        }
-        if (api.isSingleFieldIdentity(id))
-        {
-            return api.getTargetClassNameForSingleFieldIdentity(id) + ":" +
-                api.getTargetKeyForSingleFieldIdentity(id);
-        }
-        else
-        {
-            return id.toString();
-        }
     }
 
     /**
@@ -220,7 +520,7 @@ public class IdentityUtils
             if (cmd.usesSingleFieldIdentityClass())
             {
                 // Create SingleField identity with query key value
-                Object id = api.getNewSingleFieldIdentity(idClass, pcClass, pkFieldValues[0]);
+                Object id = IdentityUtils.getNewSingleFieldIdentity(idClass, pcClass, pkFieldValues[0]);
                 if (inheritanceCheck)
                 {
                     // Check if this identity exists in the cache(s)
@@ -235,9 +535,8 @@ public class IdentityUtils
                     {
                         for (int i=0;i<subclasses.length;i++)
                         {
-                            Object subid = api.getNewSingleFieldIdentity(idClass, 
-                                ec.getClassLoaderResolver().classForName(subclasses[i]), 
-                                api.getTargetKeyForSingleFieldIdentity(id));
+                            Object subid = IdentityUtils.getNewSingleFieldIdentity(idClass, 
+                                ec.getClassLoaderResolver().classForName(subclasses[i]), IdentityUtils.getTargetKeyForSingleFieldIdentity(id));
                             if (ec.hasIdentityInCache(subid))
                             {
                                 return subid;
@@ -247,8 +546,7 @@ public class IdentityUtils
 
                     // Check the inheritance with the store manager (may involve a trip to the datastore)
                     String className = ec.getStoreManager().getClassNameForObjectID(id, ec.getClassLoaderResolver(), ec);
-                    return api.getNewSingleFieldIdentity(idClass, 
-                        ec.getClassLoaderResolver().classForName(className), pkFieldValues[0]);
+                    return IdentityUtils.getNewSingleFieldIdentity(idClass, ec.getClassLoaderResolver().classForName(className), pkFieldValues[0]);
                 }
                 return id;
             }
@@ -358,7 +656,7 @@ public class IdentityUtils
         {
             if (cmd.usesSingleFieldIdentityClass())
             {
-                id = ec.getApiAdapter().getNewApplicationIdentityObjectId(clr, cmd, idStr);
+                id = IdentityUtils.getNewApplicationIdentityObjectId(clr, cmd, idStr);
             }
             else
             {
@@ -411,7 +709,7 @@ public class IdentityUtils
 
                     if (cmd.usesSingleFieldIdentityClass())
                     {
-                        id = ec.getApiAdapter().getNewApplicationIdentityObjectId(clr, cmd, idStr);
+                        id = IdentityUtils.getNewApplicationIdentityObjectId(clr, cmd, idStr);
                     }
                     else
                     {
@@ -483,7 +781,7 @@ public class IdentityUtils
                         }
                     }
 
-                    id = ec.getApiAdapter().getNewApplicationIdentityObjectId(clr, cmd, idStr);
+                    id = IdentityUtils.getNewApplicationIdentityObjectId(clr, cmd, idStr);
                 }
                 else
                 {

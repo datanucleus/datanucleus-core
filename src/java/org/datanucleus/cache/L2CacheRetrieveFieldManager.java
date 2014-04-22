@@ -401,7 +401,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         else
         {
             pcId = cachedId;
-            pcClassName = IdentityUtils.getClassNameForIdentitySimple(ec.getApiAdapter(), pcId);
+            pcClassName = IdentityUtils.getClassNameForIdentitySimple(pcId);
         }
         Class pcCls = ec.getClassLoaderResolver().classForName(pcClassName);
         return ec.findObject(pcId, null, pcCls, false, false);
