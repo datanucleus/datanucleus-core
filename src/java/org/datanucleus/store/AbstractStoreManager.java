@@ -41,9 +41,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.flush.FlushNonReferential;
 import org.datanucleus.flush.FlushProcess;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OID;
 import org.datanucleus.identity.SCOID;
-import org.datanucleus.identity.SingleFieldId;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
@@ -944,10 +942,10 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     public String manageClassForIdentity(Object id, ClassLoaderResolver clr)
     {
         String className = null;
-        if (id instanceof OID)
+        if (IdentityUtils.isDatastoreIdentity(id))
         {
             // Check that the implied class is managed
-            className = ((OID)id).getTargetClassName();
+            className = IdentityUtils.getTargetClassNameForIdentitySimple(id);
             AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
             if (cmd.getIdentityType() != IdentityType.DATASTORE)
             {
@@ -956,7 +954,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
         else if (IdentityUtils.isSingleFieldIdentity(id))
         {
-            className = ((SingleFieldId)id).getTargetClassName();
+            className = IdentityUtils.getTargetClassNameForIdentitySimple(id);
             AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
             if (cmd.getIdentityType() != IdentityType.APPLICATION || !cmd.getObjectidClass().equals(id.getClass().getName()))
             {
@@ -1011,10 +1009,8 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
 
         // Find if datastore=storeManagerKey has an extension for name="{language}"
         String name = 
-            getNucleusContext().getPluginManager().getAttributeValueForExtension(
-                "org.datanucleus.store_query_query",
-                new String[] {"name", "datastore"},
-                new String[]{language, storeManagerKey}, "name");
+            getNucleusContext().getPluginManager().getAttributeValueForExtension("org.datanucleus.store_query_query",
+                new String[] {"name", "datastore"}, new String[]{language, storeManagerKey}, "name");
         return (name != null);
     }
 
@@ -1026,10 +1022,8 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     public boolean supportsValueStrategy(String strategy)
     {
         ConfigurationElement elem =
-            nucleusContext.getPluginManager().getConfigurationElementForExtension(
-                "org.datanucleus.store_valuegenerator",
-                new String[]{"name", "unique"}, 
-                new String[] {strategy, "true"});
+            nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
+                new String[]{"name", "unique"}, new String[] {strategy, "true"});
         if (elem != null)
         {
             // Unique strategy so supported for all datastores
@@ -1037,10 +1031,8 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
         else
         {
-            elem = nucleusContext.getPluginManager().getConfigurationElementForExtension(
-                "org.datanucleus.store_valuegenerator",
-                new String[]{"name", "datastore"},
-                new String[] {strategy, storeManagerKey});
+            elem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
+                new String[]{"name", "datastore"}, new String[] {strategy, storeManagerKey});
             if (elem != null)
             {
                 return true;
@@ -1064,15 +1056,10 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             // Object is a SCOID
             return ((SCOID) id).getSCOClass();
         }
-        else if (id instanceof OID)
+        else if (IdentityUtils.isDatastoreIdentity(id) || IdentityUtils.isSingleFieldIdentity(id))
         {
-            // Object is an OID
-            return ((OID)id).getTargetClassName();
-        }
-        else if (IdentityUtils.isSingleFieldIdentity(id))
-        {
-            // Using SingleFieldIdentity so can assume that object is of the target class
-            return ((SingleFieldId)id).getTargetClassName();
+            // Object is an OID or single-field id
+            return IdentityUtils.getTargetClassNameForIdentitySimple(id);
         }
         else
         {

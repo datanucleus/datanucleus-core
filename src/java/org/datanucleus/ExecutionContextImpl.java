@@ -3311,7 +3311,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                             Object oid = null;
                             if (IdentityUtils.isDatastoreIdentity(id))
                             {
-                                oid = OIDFactory.getInstance(nucCtx, subclasses[i], ((OID)id).getKeyValue());
+                                oid = OIDFactory.getInstance(nucCtx, subclasses[i], IdentityUtils.getTargetKeyForDatastoreIdentity(id));
                             }
                             else if (IdentityUtils.isSingleFieldIdentity(id))
                             {

@@ -71,13 +71,13 @@ public class IdentityUtils
     }
 
     /**
-     * Simple method to return the class name that the provided id represents.
+     * Simple method to return the target class name of the persistable object that the provided id represents.
      * If this is a datastore identity (OID) or single-field identity then returns the class name.
      * Otherwise returns null. Does no inheritance checking.
      * @param id The identity
      * @return Class name for the identity if easily determinable
      */
-    public static String getClassNameForIdentitySimple(Object id)
+    public static String getTargetClassNameForIdentitySimple(Object id)
     {
         if (id instanceof OID)
         {
@@ -118,11 +118,17 @@ public class IdentityUtils
      */
     public static Object getTargetKeyForSingleFieldIdentity(Object id)
     {
-        if (id instanceof SingleFieldId)
-        {
-            return ((SingleFieldId)id).getKeyAsObject();
-        }
-        return null;
+        return (id instanceof SingleFieldId ? ((SingleFieldId)id).getKeyAsObject() : null);
+    }
+
+    /**
+     * Accessor for the key object for the specified datastore-identity.
+     * @param id The identity
+     * @return The key object
+     */
+    public static Object getTargetKeyForDatastoreIdentity(Object id)
+    {
+        return (id instanceof OID ? ((OID)id).getKeyValue() : null);
     }
 
     /**

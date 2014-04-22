@@ -43,8 +43,6 @@ import org.datanucleus.identity.DatastoreUniqueOID;
 import org.datanucleus.identity.IdentityKeyTranslator;
 import org.datanucleus.identity.IdentityStringTranslator;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OID;
-import org.datanucleus.identity.SingleFieldId;
 import org.datanucleus.management.FactoryStatistics;
 import org.datanucleus.management.jmx.ManagementManager;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -1622,18 +1620,15 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             return false;
         }
         AbstractClassMetaData cmd = null;
-        if (id instanceof OID)
+        if (id instanceof DatastoreUniqueOID)
         {
-            if (id instanceof DatastoreUniqueOID)
-            {
-                // This doesn't have the class name so can't get metadata
-                return false;
-            }
-            cmd = getMetaDataManager().getMetaDataForClass(((OID)id).getTargetClassName(), getClassLoaderResolver(id.getClass().getClassLoader()));
+            // This doesn't have the class name so can't get metadata
+            return false;
         }
-        else if (IdentityUtils.isSingleFieldIdentity(id))
+        else if (IdentityUtils.isDatastoreIdentity(id) || IdentityUtils.isSingleFieldIdentity(id))
         {
-            cmd = getMetaDataManager().getMetaDataForClass(((SingleFieldId)id).getTargetClassName(), getClassLoaderResolver(id.getClass().getClassLoader()));
+            // Datastore id, or application single-field id
+            cmd = getMetaDataManager().getMetaDataForClass(IdentityUtils.getTargetClassNameForIdentitySimple(id), getClassLoaderResolver(id.getClass().getClassLoader()));
         }
         else
         {
