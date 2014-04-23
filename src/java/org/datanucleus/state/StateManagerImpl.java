@@ -60,7 +60,6 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OID;
 import org.datanucleus.identity.OIDFactory;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -249,7 +248,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         myID = id;
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.HOLLOW);
         persistenceFlags = PersistenceFlags.LOAD_REQUIRED;
-        if (id instanceof OID || id == null)
+        if (IdentityUtils.isDatastoreIdentity(id) || id == null)
         {
             // Create new PC
             myPC = HELPER.newInstance(pcClass, this);
@@ -2475,7 +2474,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     {
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
-            if (id instanceof OID)
+            if (IdentityUtils.isDatastoreIdentity(id))
             {
                 // Provided an OID direct
                 myID = id;

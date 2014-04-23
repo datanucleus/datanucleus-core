@@ -30,8 +30,6 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.flush.FlushProcess;
-import org.datanucleus.identity.OID;
-import org.datanucleus.identity.SCOID;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
@@ -340,8 +338,8 @@ public interface StoreManager
 
     /**
      * Returns the class corresponding to the given object identity. 
-     * If the object is an OID (datastore-identity), return the PC class specified in the identity.
-     * If the object is SingleFieldIdentity, return the PC class specified in the identity
+     * If the object is datastore-identity, return the PC class specified in the identity.
+     * If the object is single-field identity, return the PC class specified in the identity
      * If the object is an AppID PK, return the PC class that uses it.
      * If the object is a SCOID, return the SCO class. 
      * If the object is a persistable class, return the class. 
@@ -351,8 +349,7 @@ public interface StoreManager
      * @return For datastore identity, return the class of the corresponding
      * object. For application identity, return the class of the corresponding
      * object or null if object does not exist.
-     * @exception ClassCastException If the type of ID is not recognized ({@link OID}
-     * or {@link SCOID}).
+     * @exception ClassCastException If the type of ID is not recognized
      */
     String getClassNameForObjectID(Object id, ClassLoaderResolver clr, ExecutionContext ec);
 
