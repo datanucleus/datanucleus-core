@@ -636,11 +636,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
             return null;
         }
         Object id = api.getIdForObject(pc);
-        if (IdentityUtils.isDatastoreIdentity(id))
-        {
-            return id;
-        }
-        else if (IdentityUtils.isSingleFieldIdentity(id))
+        if (IdentityUtils.isDatastoreIdentity(id) || IdentityUtils.isSingleFieldIdentity(id))
         {
             return id;
         }
