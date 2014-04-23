@@ -99,7 +99,7 @@ public abstract class LifeCycleState
         {
             NucleusLogger.LIFECYCLE.debug(LOCALISER.msg("027016", 
                 StringUtils.toJVMIDString(op.getObject()), 
-                IdentityUtils.getPersistableIdentityForId(op.getExecutionContext().getApiAdapter(), op.getInternalObjectId()), 
+                IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
                 this, newState));
         }
 

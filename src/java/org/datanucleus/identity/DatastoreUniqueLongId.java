@@ -22,7 +22,7 @@ package org.datanucleus.identity;
  * Identity for use with datastore-identity where the datastore provides a unique "identity" long key per object
  * and hence doesn't need the class name. The behaviour of this class is governed by JDO spec 5.4.3.
  */
-public class DatastoreUniqueLongId implements java.io.Serializable, OID, Comparable
+public class DatastoreUniqueLongId implements java.io.Serializable, DatastoreId, Comparable
 {
     // JDO spec 5.4.3 says: all serializable fields of ObjectID classes are required to be public.
 

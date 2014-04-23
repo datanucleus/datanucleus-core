@@ -26,7 +26,7 @@ package org.datanucleus.identity;
  * <li>Has to have a constructor taking a String (the same String that toString() returns)</li>
  * </ul>
  */
-public interface OID
+public interface DatastoreId
 {
     /**
      * Provides the identity in a form that can be used by the database as a key.

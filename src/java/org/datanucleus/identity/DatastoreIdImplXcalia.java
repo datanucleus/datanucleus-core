@@ -23,16 +23,13 @@ import org.datanucleus.util.Localiser;
  * Object identifier, typically used for datastore identity.
  * The behaviour of this class is governed by JDO spec 5.4.3.
  * Utilises a String form of the style "mydomain.MyClass:3258".
- * This is a form similar to Xcalia.
- * Note : Xcalia also allows "{alias}:3258" but this isn't catered for here
+ * This is a form similar to Xcalia. Note : Xcalia also allows "{alias}:3258" but this isn't catered for here
  */
-public class OIDImplXcalia implements java.io.Serializable, OID, Comparable
+public class DatastoreIdImplXcalia implements java.io.Serializable, DatastoreId, Comparable
 {
-    protected static final transient Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
+    protected static final transient Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
-    /** Separator to use between fields. */
-    private transient static final String oidSeparator = ":";
+    protected static final transient String STRING_DELIMITER = ":";
 
     // JDO spec 5.4.3 says: all serializable fields of ObjectID classes are required to be public.
 
@@ -46,7 +43,7 @@ public class OIDImplXcalia implements java.io.Serializable, OID, Comparable
     /** pre-created hasCode to improve performance **/ 
     public final int hashCode;
 
-    public OIDImplXcalia()
+    public DatastoreIdImplXcalia()
     {
         keyAsObject = null;
         targetClassName = null; 
@@ -54,14 +51,14 @@ public class OIDImplXcalia implements java.io.Serializable, OID, Comparable
         hashCode = -1;
     }
 
-    public OIDImplXcalia(String pcClass, Object object)
+    public DatastoreIdImplXcalia(String pcClass, Object object)
     {
         this.targetClassName = pcClass;
         this.keyAsObject = object;
 
         StringBuilder s = new StringBuilder();
         s.append(this.targetClassName);
-        s.append(oidSeparator);
+        s.append(STRING_DELIMITER);
         s.append(this.keyAsObject.toString());
         toString = s.toString();
         hashCode = toString.hashCode();        
@@ -73,7 +70,7 @@ public class OIDImplXcalia implements java.io.Serializable, OID, Comparable
      * @exception IllegalArgumentException if the given string representation is not valid.
      * @see #toString
      */
-    public OIDImplXcalia(String str)
+    public DatastoreIdImplXcalia(String str)
     throws IllegalArgumentException
     {
         if (str.length() < 2)
@@ -81,7 +78,7 @@ public class OIDImplXcalia implements java.io.Serializable, OID, Comparable
             throw new IllegalArgumentException(LOCALISER.msg("038000",str));
         }
 
-        int separatorPosition = str.indexOf(oidSeparator);
+        int separatorPosition = str.indexOf(STRING_DELIMITER);
         this.targetClassName = str.substring(0, separatorPosition);
         String oidStr = str.substring(separatorPosition+1);
         Object oidValue = null;
@@ -120,7 +117,7 @@ public class OIDImplXcalia implements java.io.Serializable, OID, Comparable
         {
             return true;
         }
-        if (!(obj.getClass().getName().equals(OIDImplXcalia.class.getName())))
+        if (!(obj.getClass().getName().equals(DatastoreIdImplXcalia.class.getName())))
         {
             return false;
         }
@@ -128,7 +125,7 @@ public class OIDImplXcalia implements java.io.Serializable, OID, Comparable
         {
             return false;
         }
-        if (!((OID)obj).toString().equals(toString))
+        if (!((DatastoreId)obj).toString().equals(toString))
         {
             // Hashcodes are the same but the values aren't
             return false;
@@ -138,9 +135,9 @@ public class OIDImplXcalia implements java.io.Serializable, OID, Comparable
 
     public int compareTo(Object o)
     {
-        if (o instanceof OIDImplXcalia)
+        if (o instanceof DatastoreIdImplXcalia)
         {
-            OIDImplXcalia c = (OIDImplXcalia)o;
+            DatastoreIdImplXcalia c = (DatastoreIdImplXcalia)o;
             return this.toString.compareTo(c.toString);
         }
         else if (o == null)

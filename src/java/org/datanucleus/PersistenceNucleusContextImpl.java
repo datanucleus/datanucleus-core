@@ -40,6 +40,8 @@ import org.datanucleus.enhancer.ImplementationCreatorImpl;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.DatastoreUniqueLongId;
+import org.datanucleus.identity.IdentityManager;
+import org.datanucleus.identity.IdentityManagerImpl;
 import org.datanucleus.identity.IdentityKeyTranslator;
 import org.datanucleus.identity.IdentityStringTranslator;
 import org.datanucleus.identity.IdentityUtils;
@@ -115,8 +117,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     /** Statistics gathering object. */
     transient FactoryStatistics statistics = null;
 
-    /** Class to use for datastore-identity. */
-    protected Class datastoreIdentityClass = null;
+    /** Manager for object identities. */
+    protected IdentityManager identityManager;
 
     /** Identity string translator (if any). */
     private IdentityStringTranslator idStringTranslator = null;
@@ -570,7 +572,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         {
             typeManager = null;
         }
-        datastoreIdentityClass = null;
+
+        identityManager = null;
     }
 
     /**
@@ -1128,32 +1131,13 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return getExecutionContextPool().checkOut(owner, options);
     }
 
-    public synchronized Class getDatastoreIdentityClass()
+    public IdentityManager getIdentityManager()
     {
-        if (datastoreIdentityClass == null)
+        if (identityManager == null)
         {
-            String dsidName = config.getStringProperty(PropertyNames.PROPERTY_DATASTORE_IDENTITY_TYPE);
-            String datastoreIdentityClassName = pluginManager.getAttributeValueForExtension(
-                "org.datanucleus.store_datastoreidentity", "name", dsidName, "class-name");
-            if (datastoreIdentityClassName == null)
-            {
-                // User has specified a datastore_identity plugin that has not registered
-                throw new NucleusUserException(LOCALISER.msg("002001", dsidName)).setFatal();
-            }
-    
-            // Try to load the class
-            ClassLoaderResolver clr = getClassLoaderResolver(null);
-            try
-            {
-                datastoreIdentityClass = clr.classForName(datastoreIdentityClassName, org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-            }
-            catch (ClassNotResolvedException cnre)
-            {
-                throw new NucleusUserException(LOCALISER.msg("002002", dsidName, 
-                    datastoreIdentityClassName)).setFatal();
-            }
+            identityManager = new IdentityManagerImpl(this);
         }
-        return datastoreIdentityClass;
+        return identityManager;
     }
 
     /* (non-Javadoc)

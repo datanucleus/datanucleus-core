@@ -1,5 +1,5 @@
 /**********************************************************************
-Copyright (c) 2002 Kelly Grizzle (TJDO) and others. All rights reserved.
+Copyright (c) 2008 Andy Jefferson and others. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -10,35 +10,26 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
-limitations under the License. 
- 
+limitations under the License.
 
 Contributors:
-2003 Erik Bengtson - Refactored OID
-2003 Andy Jefferson - fixed OID(String)
-2003 Andy Jefferson - coding standards
-2004 Andy Jefferson - fixes to allow full use of long or String OIDs
-2005 Erik Bengtson - removed oidType
     ...
 **********************************************************************/
 package org.datanucleus.identity;
 
-import org.datanucleus.ClassNameConstants;
 import org.datanucleus.util.Localiser;
 
 /**
- * An object identifier, typically used for datastore identity.
+ * Object identifier, typically used for datastore identity.
  * The behaviour of this class is governed by JDO spec 5.4.3.
- * Utilises a String form of the style "3258[OID]mydomain.MyClass".
+ * Utilises a String form of the style "mydomain.MyClass-3258".
+ * This is a form similar to OpenJPA/Kodo.
  */
-public class OIDImpl implements java.io.Serializable, OID, Comparable
+public class DatastoreIdImplKodo implements java.io.Serializable, DatastoreId, Comparable
 {
-    /** Localiser for messages. */
-    protected static final transient Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
+    protected static final transient Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
-    /** Separator to use between fields. */
-    private transient static final String oidSeparator = "[OID]";
+    protected static final transient String STRING_DELIMITER = "-";
 
     // JDO spec 5.4.3 says: all serializable fields of ObjectID classes are required to be public.
 
@@ -52,7 +43,7 @@ public class OIDImpl implements java.io.Serializable, OID, Comparable
     /** pre-created hasCode to improve performance **/ 
     public final int hashCode;
 
-    public OIDImpl()
+    public DatastoreIdImplKodo()
     {
         keyAsObject = null;
         targetClassName = null; 
@@ -60,40 +51,36 @@ public class OIDImpl implements java.io.Serializable, OID, Comparable
         hashCode = -1;
     }
 
-    public OIDImpl(String pcClass, Object object)
+    public DatastoreIdImplKodo(String pcClass, Object object)
     {
         this.targetClassName = pcClass;
         this.keyAsObject = object;
 
         StringBuilder s = new StringBuilder();
-        s.append(this.keyAsObject.toString());
-        s.append(oidSeparator);
         s.append(this.targetClassName);
+        s.append(STRING_DELIMITER);
+        s.append(this.keyAsObject.toString());
         toString = s.toString();
         hashCode = toString.hashCode();        
     }
 
     /**
-     * Constructs an identity from its string representation that is consistent with the output of toString().
+     * Constructs an OID from its string representation that is consistent with the output of toString().
      * @param str the string representation of an OID
      * @exception IllegalArgumentException if the given string representation is not valid.
      * @see #toString
      */
-    public OIDImpl(String str)
+    public DatastoreIdImplKodo(String str)
     throws IllegalArgumentException
     {
         if (str.length() < 2)
         {
-            throw new IllegalArgumentException(LOCALISER.msg("038000", str));
-        }
-        else if (str.indexOf(oidSeparator) < 0)
-        {
-            throw new IllegalArgumentException(LOCALISER.msg("038000", str));
+            throw new IllegalArgumentException(LOCALISER.msg("038000",str));
         }
 
-        int start = 0;
-        int end = str.indexOf(oidSeparator, start);
-        String oidStr = str.substring(start, end);
+        int separatorPosition = str.indexOf(STRING_DELIMITER);
+        this.targetClassName = str.substring(0, separatorPosition);
+        String oidStr = str.substring(separatorPosition+1);
         Object oidValue = null;
         try
         {
@@ -105,9 +92,6 @@ public class OIDImpl implements java.io.Serializable, OID, Comparable
             oidValue = oidStr;
         }
         keyAsObject = oidValue;
-
-        start = end + oidSeparator.length();
-        this.targetClassName = str.substring(start, str.length());
         
         toString = str;
         hashCode = toString.hashCode();
@@ -133,7 +117,7 @@ public class OIDImpl implements java.io.Serializable, OID, Comparable
         {
             return true;
         }
-        if (!(obj.getClass().getName().equals(ClassNameConstants.IDENTITY_OID_IMPL)))
+        if (!(obj.getClass().getName().equals(DatastoreIdImplKodo.class.getName())))
         {
             return false;
         }
@@ -141,7 +125,7 @@ public class OIDImpl implements java.io.Serializable, OID, Comparable
         {
             return false;
         }
-        if (!((OID)obj).toString().equals(toString))
+        if (!((DatastoreId)obj).toString().equals(toString))
         {
             // Hashcodes are the same but the values aren't
             return false;
@@ -151,9 +135,9 @@ public class OIDImpl implements java.io.Serializable, OID, Comparable
 
     public int compareTo(Object o)
     {
-        if (o instanceof OIDImpl)
+        if (o instanceof DatastoreIdImplKodo)
         {
-            OIDImpl c = (OIDImpl)o;
+            DatastoreIdImplKodo c = (DatastoreIdImplKodo)o;
             return this.toString.compareTo(c.toString);
         }
         else if (o == null)
@@ -170,7 +154,7 @@ public class OIDImpl implements java.io.Serializable, OID, Comparable
 
     /**
      * Creates a String representation of the datastore identity, formed from the target class name and the key value. This will be something like
-     * <pre>3254[OID]mydomain.MyClass</pre>
+     * <pre>mydomain.MyClass-3254</pre>
      * @return The String form of the identity
      */
     public String toString()

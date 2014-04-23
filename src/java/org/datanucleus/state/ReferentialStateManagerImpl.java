@@ -162,7 +162,7 @@ public class ReferentialStateManagerImpl extends StateManagerImpl
                 {
                     NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("026022", 
                         cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldsToUpdate[i]).getFullFieldName(), 
-                        IdentityUtils.getPersistableIdentityForId(myEC.getApiAdapter(), myID),
+                        IdentityUtils.getPersistableIdentityForId(myID),
                         StringUtils.toJVMIDString(op.getObject())));
                 }
                 dirtyFields[fieldsToUpdate[i]] = true;

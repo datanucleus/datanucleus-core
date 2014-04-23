@@ -30,7 +30,6 @@ import org.datanucleus.exceptions.NucleusUserException;
  */
 public abstract class SingleFieldId<T> implements Externalizable, Comparable
 {
-    /** The delimiter for String constructor. */
     protected static final String STRING_DELIMITER = ":";
 
     /** The class of the target object. TODO Would like to drop this to save space, but is needed to convert to JDO-specific ids. */

@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.datanucleus.cache.Level2Cache;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.identity.IdentityManager;
 import org.datanucleus.identity.IdentityKeyTranslator;
 import org.datanucleus.identity.IdentityStringTranslator;
 import org.datanucleus.management.FactoryStatistics;
@@ -47,17 +48,17 @@ public interface PersistenceNucleusContext extends StoreNucleusContext
 
     /**
      * Method to return an ExecutionContext for use in persistence.
-     * @param owner The owner object for the context. A PM for example
+     * @param owner The owner object for the context. PersistenceManager/EntityManager typically.
      * @param options Any options affecting startup
      * @return The ExecutionContext
      */
     ExecutionContext getExecutionContext(Object owner, Map<String, Object> options);
 
     /**
-     * Accessor for the class to use for datastore identity.
-     * @return Class for datastore-identity
+     * Accessor for a manager for identities.
+     * @return The identity manager to use
      */
-    Class getDatastoreIdentityClass();
+    IdentityManager getIdentityManager();
 
     /**
      * Accessor for the current identity string translator to use (if any).

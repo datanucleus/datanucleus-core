@@ -75,18 +75,18 @@ public class XcaliaIdentityStringTranslator implements IdentityStringTranslator
                     try
                     {
                         Long keyLong = Long.valueOf(idKey);
-                        id = OIDFactory.getInstance(ec.getNucleusContext(), acmd.getFullClassName(), keyLong);
+                        id = ec.getNucleusContext().getIdentityManager().getDatastoreId(acmd.getFullClassName(), keyLong);
                     }
                     catch (NumberFormatException nfe)
                     {
                         // Maybe is String based
-                        id = OIDFactory.getInstance(ec.getNucleusContext(), acmd.getFullClassName(), idKey);
+                        id = ec.getNucleusContext().getIdentityManager().getDatastoreId(acmd.getFullClassName(), idKey);
                     }
                 }
                 else if (acmd.getIdentityType() == IdentityType.APPLICATION)
                 {
                     // "idKey" assumed to be the toString() output of the application-identity
-                    id = IdentityUtils.getNewApplicationIdentityObjectId(clr, acmd, idKey);
+                    id = ec.getNucleusContext().getIdentityManager().getApplicationId(clr, acmd, idKey);
                 }
             }
         }

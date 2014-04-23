@@ -25,7 +25,7 @@ import org.datanucleus.identity.ByteId;
 import org.datanucleus.identity.CharId;
 import org.datanucleus.identity.IntId;
 import org.datanucleus.identity.LongId;
-import org.datanucleus.identity.OIDImpl;
+import org.datanucleus.identity.DatastoreIdImpl;
 import org.datanucleus.identity.ObjectId;
 import org.datanucleus.identity.ShortId;
 import org.datanucleus.identity.StringId;
@@ -86,5 +86,5 @@ public class ClassConstants
     public static final Class IDENTITY_SINGLEFIELD_BYTE = ByteId.class;
     public static final Class IDENTITY_SINGLEFIELD_OBJECT = ObjectId.class;
     public static final Class IDENTITY_SINGLEFIELD_SHORT = ShortId.class;
-    public static final Class IDENTITY_OID_IMPL = OIDImpl.class;
+    public static final Class IDENTITY_OID_IMPL = DatastoreIdImpl.class;
 }

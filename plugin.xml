@@ -89,10 +89,10 @@ Contributors:
 
     <!-- DATASTORE IDENTITY -->
     <extension point="org.datanucleus.store_datastoreidentity">
-        <datastoreidentity name="datanucleus" class-name="org.datanucleus.identity.OIDImpl"/>
-        <datastoreidentity name="kodo" class-name="org.datanucleus.identity.OIDImplKodo"/>
-        <datastoreidentity name="xcalia" class-name="org.datanucleus.identity.OIDImplXcalia"/>
-        <datastoreidentity name="unique" class-name="org.datanucleus.identity.DatastoreUniqueOID"/>
+        <datastoreidentity name="datanucleus" class-name="org.datanucleus.identity.DatastoreIdImpl"/>
+        <datastoreidentity name="kodo" class-name="org.datanucleus.identity.DatastoreIdImplKodo"/>
+        <datastoreidentity name="xcalia" class-name="org.datanucleus.identity.DatastoreIdImplXcalia"/>
+        <datastoreidentity name="unique" class-name="org.datanucleus.identity.DatastoreUniqueLongId"/>
     </extension>
 
     <!-- IDENTITY STRING TRANSLATOR -->
