@@ -290,11 +290,11 @@ public class IdentityUtils
      * and the toString() output of the identity.
      * @param clr ClassLoader resolver
      * @param acmd MetaData for the target class
-     * @param value String form of the key
+     * @param keyToString String form of the key
      * @return The identity
      * @throws NucleusException if invalid input is received
      */
-    public static Object getNewApplicationIdentityObjectId(ClassLoaderResolver clr, AbstractClassMetaData acmd, String value)
+    public static Object getNewApplicationIdentityObjectId(ClassLoaderResolver clr, AbstractClassMetaData acmd, String keyToString)
     {
         if (acmd.getIdentityType() != IdentityType.APPLICATION)
         {
@@ -318,13 +318,13 @@ public class IdentityUtils
                 {
                     ctrArgs = new Class[] {Class.class, String.class};
                 }
-                Object[] args = new Object[] {targetClass, value};
+                Object[] args = new Object[] {targetClass, keyToString};
                 id = idType.getConstructor(ctrArgs).newInstance(args);
             }
             catch (Exception e)
             {
                 // TODO Localise this
-                throw new NucleusException("Error encountered while creating single-field identity instance with key \"" + value + "\"", e);
+                throw new NucleusException("Error encountered while creating single-field identity instance with key \"" + keyToString + "\"", e);
             }
         }
         else
@@ -334,7 +334,7 @@ public class IdentityUtils
                 try
                 {
                     Constructor c = clr.classForName(acmd.getObjectidClass()).getDeclaredConstructor(new Class[] {java.lang.String.class});
-                    id = c.newInstance(new Object[] {value});
+                    id = c.newInstance(new Object[] {keyToString});
                 }
                 catch (Exception e) 
                 {
@@ -348,7 +348,7 @@ public class IdentityUtils
             else
             {
                 clr.classForName(targetClass.getName(), true);
-                id = EnhancementHelper.getInstance().newObjectIdInstance(targetClass, value);
+                id = EnhancementHelper.getInstance().newObjectIdInstance(targetClass, keyToString);
             }
         }
 

@@ -29,9 +29,6 @@ import org.datanucleus.exceptions.NucleusUserException;
  */
 public class ObjectId extends SingleFieldId
 {
-    /** The delimiter for String constructor. */
-    private static final String STRING_DELIMITER = ":";
-
     private Object key;
 
     /**
@@ -109,8 +106,7 @@ public class ObjectId extends SingleFieldId
         }
         else
         {
-            ObjectId other = (ObjectId) obj;
-            return key.equals(other.key);
+            return key.equals(((ObjectId)obj).key);
         }
     }
 

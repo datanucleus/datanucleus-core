@@ -26,10 +26,14 @@ import org.datanucleus.exceptions.NucleusUserException;
 
 /**
  * This class is the abstract base class for all single field identity classes.
+ * TODO All subclasses should implement the same rules as applies to all identity classes, namely String constructor taking output of toString(), etc.
  */
 public abstract class SingleFieldId<T> implements Externalizable, Comparable
 {
-    /** The class of the target object. TODO Drop this since we have the name, to save space. */
+    /** The delimiter for String constructor. */
+    protected static final String STRING_DELIMITER = ":";
+
+    /** The class of the target object. TODO Would like to drop this to save space, but is needed to convert to JDO-specific ids. */
     transient private Class targetClass;
 
     /** The name of the class of the target object. */
@@ -131,8 +135,7 @@ public abstract class SingleFieldId<T> implements Externalizable, Comparable
     }
 
     /**
-     * Determine the ordering of identity objects. Only the class name is compared. This method is only used
-     * by subclasses.
+     * Determine the ordering of identity objects. Only the class name is compared. This method is only used by subclasses.
      * @param o Other identity
      * @return The relative ordering between the objects
      */
