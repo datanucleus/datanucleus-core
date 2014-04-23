@@ -59,7 +59,7 @@ import org.datanucleus.exceptions.TransactionNotActiveException;
 import org.datanucleus.flush.FlushProcess;
 import org.datanucleus.flush.Operation;
 import org.datanucleus.flush.OperationQueue;
-import org.datanucleus.identity.DatastoreUniqueOID;
+import org.datanucleus.identity.DatastoreUniqueLongId;
 import org.datanucleus.identity.IdentityKeyTranslator;
 import org.datanucleus.identity.IdentityReference;
 import org.datanucleus.identity.IdentityStringTranslator;
@@ -3266,7 +3266,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             throw new NucleusUserException(LOCALISER.msg("010006"));
         }
-        else if (id instanceof DatastoreUniqueOID)
+        else if (id instanceof DatastoreUniqueLongId)
         {
             // Should have been found using "persistenceHandler.findObject()"
             throw new NucleusObjectNotFoundException(LOCALISER.msg("010026"), id);

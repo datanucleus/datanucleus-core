@@ -39,7 +39,7 @@ import org.datanucleus.cache.NullLevel2Cache;
 import org.datanucleus.enhancer.ImplementationCreatorImpl;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.identity.DatastoreUniqueOID;
+import org.datanucleus.identity.DatastoreUniqueLongId;
 import org.datanucleus.identity.IdentityKeyTranslator;
 import org.datanucleus.identity.IdentityStringTranslator;
 import org.datanucleus.identity.IdentityUtils;
@@ -1620,7 +1620,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             return false;
         }
         AbstractClassMetaData cmd = null;
-        if (id instanceof DatastoreUniqueOID)
+        if (id instanceof DatastoreUniqueLongId)
         {
             // This doesn't have the class name so can't get metadata
             return false;

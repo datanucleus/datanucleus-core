@@ -72,10 +72,10 @@ public class OIDFactory
         Class oidClass = nucleusCtx.getDatastoreIdentityClass();
 
         OID oid;
-        if (oidClass == DatastoreUniqueOID.class)
+        if (oidClass == DatastoreUniqueLongId.class)
         {
             //we hard code DatastoreUniqueOID to improve performance
-            oid = new DatastoreUniqueOID(value);
+            oid = new DatastoreUniqueLongId(value);
         }
         else
         {

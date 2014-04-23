@@ -19,30 +19,21 @@ Contributors:
 package org.datanucleus.identity;
 
 /**
- * Identity for use with datastore-identity where the datastore provides a unique "identity" key per object
+ * Identity for use with datastore-identity where the datastore provides a unique "identity" long key per object
  * and hence doesn't need the class name. The behaviour of this class is governed by JDO spec 5.4.3.
- * Main benefit over OIDImpl is size.
  */
-public class DatastoreUniqueOID implements java.io.Serializable, OID, Comparable
+public class DatastoreUniqueLongId implements java.io.Serializable, OID, Comparable
 {
     // JDO spec 5.4.3 says: all serializable fields of ObjectID classes are required to be public.
 
-    /** The key value. */
     public final long key;
 
-    /**
-    * Creates an OID with no value. Required by the JDO spec.
-    */
-    public DatastoreUniqueOID()
+    public DatastoreUniqueLongId()
     {
         this.key = -1;
     }
 
-    /**
-     * Constructor taking the long form of the key.
-     * @param key The key
-     */
-    public DatastoreUniqueOID(long key)
+    public DatastoreUniqueLongId(long key)
     {
         this.key = key;
     }
@@ -53,45 +44,28 @@ public class DatastoreUniqueOID implements java.io.Serializable, OID, Comparable
      * @exception IllegalArgumentException if the given string representation is not valid.
      * @see #toString
      */
-    public DatastoreUniqueOID(String str)
+    public DatastoreUniqueLongId(String str)
     throws IllegalArgumentException
     {
         this.key = Long.parseLong(str);
     }
 
-    /**
-     * Accessor for the key value.
-     * @return The key value
-     */
     public Object getKeyValue()
     {
         return Long.valueOf(key);
     }
 
-    /**
-     * Convenience accessor for the long form of the key.
-     * @return long primitive form of the key
-     */
     public long getKey()
     {
         return key;
     }
 
-    /**
-     * Accessor for the persistable class name.
-     * @return persistable class name
-     */
     public String getTargetClassName()
     {
         // We do not need a class name.
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * Equality operator.
-     * @param obj Object to compare against
-     * @return Whether they are equal
-     */
     public boolean equals(Object obj)
     {
         if (obj == this)
@@ -106,19 +80,14 @@ public class DatastoreUniqueOID implements java.io.Serializable, OID, Comparable
         {
             return false;
         }
-        return key == ((DatastoreUniqueOID)obj).key;
+        return key == ((DatastoreUniqueLongId)obj).key;
     }
 
-    /**
-     * Comparator method.
-     * @param o The object to compare against
-     * @return The comparison result
-     */ 
     public int compareTo(Object o)
     {
-        if (o instanceof DatastoreUniqueOID)
+        if (o instanceof DatastoreUniqueLongId)
         {
-            DatastoreUniqueOID c = (DatastoreUniqueOID)o;
+            DatastoreUniqueLongId c = (DatastoreUniqueLongId)o;
             return (int)(this.key - c.key);
         }
         else if (o == null)
@@ -128,10 +97,6 @@ public class DatastoreUniqueOID implements java.io.Serializable, OID, Comparable
         throw new ClassCastException(this.getClass().getName() + " != " + o.getClass().getName());
     }
 
-    /**
-     * Accessor for the hashcode
-     * @return Hashcode for this object
-     */
     public int hashCode()
     {
         // Assume that we wont overflow the int range
