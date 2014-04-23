@@ -46,7 +46,7 @@ import org.datanucleus.state.StateManager;
  * Helper class for the DN bytecode enhancement contract. It contains methods to register metadata for
  * persistable classes and to perform common operations needed by implementations, not by end users.
  * <P>
- * It allows construction of instances of persistence-capable classes without using reflection.
+ * It allows construction of instances of persistable classes without using reflection.
  * <P>
  * Persistable classes register themselves via a static method at class load time. There is no security restriction on this access. 
  */
@@ -465,8 +465,8 @@ public class EnhancementHelper extends java.lang.Object
     }
 
     /**
-     * Returns a collection of class objects of the registered persistence-capable classes.
-     * @return registered persistence-capable classes
+     * Returns a collection of class objects of the registered persistable classes.
+     * @return registered persistable classes
      */
     public Collection<Class> getRegisteredClasses()
     {
@@ -489,7 +489,7 @@ public class EnhancementHelper extends java.lang.Object
     }
 
     /**
-     * Register a class authorized to replaceStateManager. During replaceStateManager, a persistence-capable class will call the
+     * Register a class authorized to replaceStateManager. During replaceStateManager, a persistable class will call the
      * corresponding checkAuthorizedStateManager and the class of the instance of the parameter must have been registered.
      * @param smClass a Class that is authorized for JDOPermission("setStateManager").
      */
@@ -511,7 +511,7 @@ public class EnhancementHelper extends java.lang.Object
     }
 
     /**
-     * Register classes authorized to replaceStateManager. During replaceStateManager, a persistence-capable class will call the
+     * Register classes authorized to replaceStateManager. During replaceStateManager, a persistable class will call the
      * corresponding checkAuthorizedStateManager and the class of the instance of the parameter must have been registered.
      * @param smClasses a Collection of Classes
      */
@@ -539,7 +539,7 @@ public class EnhancementHelper extends java.lang.Object
     /**
      * Check that the parameter instance is of a class that is authorized for
      * JDOPermission("setStateManager"). This method is called by the replaceStateManager method in
-     * persistence-capable classes. A class that is passed as the parameter to replaceStateManager must be
+     * persistable classes. A class that is passed as the parameter to replaceStateManager must be
      * authorized for JDOPermission("setStateManager"). To improve performance, first the set of authorized
      * classes is checked, and if not present, a regular permission check is made. The regular permission
      * check requires that all callers on the stack, including the persistence-capable class itself, must be
@@ -618,30 +618,45 @@ public class EnhancementHelper extends java.lang.Object
     static
     {
         // TODO Add other possible types
-        if (isClassLoadable("java.util.Currency"))
+        singletonHelper.registerStringConstructor(Currency.class, new StringConstructor()
         {
-            singletonHelper.registerStringConstructor(Currency.class, new StringConstructor()
+            public Object construct(String s)
             {
-                public Object construct(String s)
+                try
                 {
-                    try
-                    {
-                        return Currency.getInstance(s);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new NucleusUserException("Exception in Currency identity String constructor", ex);
-                    }
+                    return Currency.getInstance(s);
                 }
-            });
-        }
+                catch (Exception ex)
+                {
+                    throw new NucleusUserException("Exception in Currency identity String constructor", ex);
+                }
+            }
+        });
         singletonHelper.registerStringConstructor(Locale.class, new StringConstructor()
         {
             public Object construct(String s)
             {
                 try
                 {
-                    return getLocale(s);
+                    String lang = s;
+                    int firstUnderbar = s.indexOf('_');
+                    if (firstUnderbar == -1)
+                    {
+                        // nothing but language
+                        return new Locale(lang);
+                    }
+                    lang = s.substring(0, firstUnderbar);
+                    String country;
+                    int secondUnderbar = s.indexOf('_', firstUnderbar + 1);
+                    if (secondUnderbar == -1)
+                    {
+                        // nothing but language, country
+                        country = s.substring(firstUnderbar + 1);
+                        return new Locale(lang, country);
+                    }
+                    country = s.substring(firstUnderbar + 1, secondUnderbar);
+                    String variant = s.substring(secondUnderbar + 1);
+                    return new Locale(lang, country, variant);
                 }
                 catch (Exception ex)
                 {
@@ -672,52 +687,6 @@ public class EnhancementHelper extends java.lang.Object
                 }
             }
         });
-    }
-
-    /**
-     * Parse the String to a Locale.
-     * @param s the name of the Locale
-     * @return the Locale corresponding to the name
-     */
-    private static Locale getLocale(String s)
-    {
-        String lang = s;
-        int firstUnderbar = s.indexOf('_');
-        if (firstUnderbar == -1)
-        {
-            // nothing but language
-            return new Locale(lang);
-        }
-        lang = s.substring(0, firstUnderbar);
-        String country;
-        int secondUnderbar = s.indexOf('_', firstUnderbar + 1);
-        if (secondUnderbar == -1)
-        {
-            // nothing but language, country
-            country = s.substring(firstUnderbar + 1);
-            return new Locale(lang, country);
-        }
-        country = s.substring(firstUnderbar + 1, secondUnderbar);
-        String variant = s.substring(secondUnderbar + 1);
-        return new Locale(lang, country, variant);
-    }
-
-    /**
-     * Determine if a class is loadable in the current environment.
-     * @param className the fully-qualified name of the class
-     * @return true if the class can be loaded; false otherwise
-     */
-    private static boolean isClassLoadable(String className)
-    {
-        try
-        {
-            Class.forName(className);
-            return true;
-        }
-        catch (ClassNotFoundException ex)
-        {
-            return false;
-        }
     }
 
     /**
@@ -802,9 +771,9 @@ public class EnhancementHelper extends java.lang.Object
     }
 
     /**
-     * This is a helper class to manage metadata per persistence-capable class. The information is used at
-     * runtime to provide field names and field types to the JDO Model. This is the value of the
-     * <code>HashMap</code> which relates the <code>Persistable Class</code> as a key to the metadata.
+     * This is a helper class to manage metadata per persistable class. 
+     * The information is used at runtime to provide field names and field types to the JDO Model. 
+     * This is the value of the <code>HashMap</code> which relates the <code>Persistable Class</code> as a key to the metadata.
      */
     static class Meta
     {

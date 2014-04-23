@@ -45,10 +45,10 @@ public class ObjectId extends SingleFieldId
         assertKeyNotNull(param);
         String paramString = null;
         String keyString = null;
-        String className = null;
+        String keyClassName = null;
         if (param instanceof String)
         {
-            // The paramString is of the form "<className>:<keyString>"
+            // The paramString is of the form "<keyClassName>:<keyString>"
             paramString = (String) param;
             if (paramString.length() < 3)
             {
@@ -60,8 +60,8 @@ public class ObjectId extends SingleFieldId
                 throw new NucleusUserException("ObjectId constructor from String was expecting a delimiter of " + STRING_DELIMITER + " but not present!");
             }
             keyString = paramString.substring(indexOfDelimiter + 1);
-            className = paramString.substring(0, indexOfDelimiter);
-            key = EnhancementHelper.construct(className, keyString);
+            keyClassName = paramString.substring(0, indexOfDelimiter);
+            key = EnhancementHelper.construct(keyClassName, keyString);
         }
         else
         {

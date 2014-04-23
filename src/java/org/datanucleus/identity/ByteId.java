@@ -24,7 +24,7 @@ import java.io.ObjectOutput;
 /**
  * This class is for identity with a single byte field.
  */
-public class ByteId extends SingleFieldId
+public class ByteId extends SingleFieldId<Byte>
 {
     private byte key;
 
@@ -56,7 +56,7 @@ public class ByteId extends SingleFieldId
         return key;
     }
 
-    public Object getKeyAsObject()
+    public Byte getKeyAsObject()
     {
         return Byte.valueOf(key);
     }

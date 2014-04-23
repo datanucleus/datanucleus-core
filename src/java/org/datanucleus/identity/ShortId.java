@@ -24,7 +24,7 @@ import java.io.ObjectOutput;
 /**
  * This class is for identity with a single short field.
  */
-public class ShortId extends SingleFieldId
+public class ShortId extends SingleFieldId<Short>
 {
     private short key;
 
@@ -56,7 +56,7 @@ public class ShortId extends SingleFieldId
         return key;
     }
 
-    public Object getKeyAsObject()
+    public Short getKeyAsObject()
     {
         return Short.valueOf(key);
     }

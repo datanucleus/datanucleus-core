@@ -24,7 +24,7 @@ import java.io.ObjectOutput;
 /**
  * This class is for identity with a single long field.
  */
-public class LongId extends SingleFieldId
+public class LongId extends SingleFieldId<Long>
 {
     private long key;
 
@@ -56,7 +56,7 @@ public class LongId extends SingleFieldId
         return key;
     }
 
-    public Object getKeyAsObject()
+    public Long getKeyAsObject()
     {
         return Long.valueOf(key);
     }

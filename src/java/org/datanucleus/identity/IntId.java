@@ -24,7 +24,7 @@ import java.io.ObjectOutput;
 /**
  * This class is for identity with a single int field.
  */
-public class IntId extends SingleFieldId
+public class IntId extends SingleFieldId<Integer>
 {
     private int key;
 
@@ -56,7 +56,7 @@ public class IntId extends SingleFieldId
         return key;
     }
 
-    public Object getKeyAsObject()
+    public Integer getKeyAsObject()
     {
         return Integer.valueOf(key);
     }

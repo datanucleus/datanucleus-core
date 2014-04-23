@@ -24,7 +24,7 @@ import java.io.ObjectOutput;
 /**
  * This class is for identity with a single character field.
  */
-public class CharId extends SingleFieldId
+public class CharId extends SingleFieldId<Character>
 {
     private char key;
 
@@ -60,7 +60,7 @@ public class CharId extends SingleFieldId
         return key;
     }
 
-    public synchronized Object getKeyAsObject()
+    public Character getKeyAsObject()
     {
         return Character.valueOf(key);
     }

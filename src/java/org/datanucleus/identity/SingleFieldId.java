@@ -27,9 +27,9 @@ import org.datanucleus.exceptions.NucleusUserException;
 /**
  * This class is the abstract base class for all single field identity classes.
  */
-public abstract class SingleFieldId implements Externalizable, Comparable
+public abstract class SingleFieldId<T> implements Externalizable, Comparable
 {
-    /** The class of the target object. */
+    /** The class of the target object. TODO Drop this since we have the name, to save space. */
     transient private Class targetClass;
 
     /** The name of the class of the target object. */
@@ -77,7 +77,7 @@ public abstract class SingleFieldId implements Externalizable, Comparable
         return targetClassName;
     }
 
-    public abstract Object getKeyAsObject();
+    public abstract T getKeyAsObject();
 
     /**
      * Check the class and class name and object type. If restored from serialization, class will be null so compare class name.
