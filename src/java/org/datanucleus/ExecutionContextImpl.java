@@ -3335,7 +3335,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 if (IdentityUtils.isDatastoreIdentity(id))
                 {
                     // Create new OID using correct target class, and recheck cache
-                    id = OIDFactory.getInstance(getNucleusContext(), className, ((OID)id).getKeyValue());
+                    id = OIDFactory.getInstance(getNucleusContext(), className, ((OID)id).getKeyAsObject());
                     pc = getObjectFromCache(id);
                 }
                 else if (IdentityUtils.isSingleFieldIdentity(id))

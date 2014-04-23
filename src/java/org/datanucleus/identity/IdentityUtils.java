@@ -128,7 +128,7 @@ public class IdentityUtils
      */
     public static Object getTargetKeyForDatastoreIdentity(Object id)
     {
-        return (id instanceof OID ? ((OID)id).getKeyValue() : null);
+        return (id instanceof OID ? ((OID)id).getKeyAsObject() : null);
     }
 
     /**

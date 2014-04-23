@@ -32,11 +32,11 @@ public interface OID
      * Provides the identity in a form that can be used by the database as a key.
      * @return The key value
      */
-    Object getKeyValue();
+    Object getKeyAsObject();
 
     /**
-     * Accessor for the PC class name 
-     * @return the PC Class
+     * Accessor for the target class name for the persistable object this represents.
+     * @return the class name of the persistable
      */
     String getTargetClassName();
 

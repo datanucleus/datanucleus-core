@@ -115,7 +115,7 @@ public class OIDImplXcalia implements java.io.Serializable, OID, Comparable
      * Accessor for the key value.
      * @return The key value
      */
-    public Object getKeyValue()
+    public Object getKeyAsObject()
     {
         return oid;
     }

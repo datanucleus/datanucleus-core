@@ -50,7 +50,7 @@ public class DatastoreUniqueLongId implements java.io.Serializable, OID, Compara
         this.key = Long.parseLong(str);
     }
 
-    public Object getKeyValue()
+    public Object getKeyAsObject()
     {
         return Long.valueOf(key);
     }

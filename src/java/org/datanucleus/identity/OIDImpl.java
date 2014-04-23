@@ -127,7 +127,7 @@ public class OIDImpl implements java.io.Serializable, OID, Comparable
      * Accessor for the key value.
      * @return The key value
      */
-    public Object getKeyValue()
+    public Object getKeyAsObject()
     {
         return oid;
     }
