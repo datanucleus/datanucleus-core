@@ -649,8 +649,7 @@ public class IdentityUtils
      * @param checkInheritance Whether to check the inheritance level of this object
      * @return The object
      */
-    public static Object getObjectFromIdString(String idStr, AbstractClassMetaData cmd, ExecutionContext ec,
-            boolean checkInheritance)
+    public static Object getObjectFromIdString(String idStr, AbstractClassMetaData cmd, ExecutionContext ec, boolean checkInheritance)
     {
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
         Object id = null;

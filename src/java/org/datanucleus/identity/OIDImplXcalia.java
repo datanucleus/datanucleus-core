@@ -24,11 +24,10 @@ import org.datanucleus.util.Localiser;
  * The behaviour of this class is governed by JDO spec 5.4.3.
  * Utilises a String form of the style "mydomain.MyClass:3258".
  * This is a form similar to Xcalia.
- * Note : Xcalia also allows "{alias}:3258" but this isn't catered for here yet
+ * Note : Xcalia also allows "{alias}:3258" but this isn't catered for here
  */
 public class OIDImplXcalia implements java.io.Serializable, OID, Comparable
 {
-    /** Localiser for messages. */
     protected static final transient Localiser LOCALISER = Localiser.getInstance(
         "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
@@ -37,11 +36,9 @@ public class OIDImplXcalia implements java.io.Serializable, OID, Comparable
 
     // JDO spec 5.4.3 says: all serializable fields of ObjectID classes are required to be public.
 
-    /** The key value. */
-    public final Object oid;
+    public final Object keyAsObject;
 
-    /** The persistable class name */
-    public final String pcClass;
+    public final String targetClassName;
 
     /** pre-created toString to improve performance **/ 
     public final String toString;
@@ -49,31 +46,23 @@ public class OIDImplXcalia implements java.io.Serializable, OID, Comparable
     /** pre-created hasCode to improve performance **/ 
     public final int hashCode;
 
-    /**
-    * Creates an OID with no value. Required by the JDO spec
-    */
     public OIDImplXcalia()
     {
-        oid = null;
-        pcClass = null; 
+        keyAsObject = null;
+        targetClassName = null; 
         toString = null;
         hashCode = -1;
     }
 
-    /**
-     * Create a string datastore identity.
-     * @param pcClass The persistable class that this represents
-     * @param object The value
-     */
     public OIDImplXcalia(String pcClass, Object object)
     {
-        this.pcClass = pcClass;
-        this.oid = object;
+        this.targetClassName = pcClass;
+        this.keyAsObject = object;
 
         StringBuilder s = new StringBuilder();
-        s.append(this.pcClass);
+        s.append(this.targetClassName);
         s.append(oidSeparator);
-        s.append(this.oid.toString());
+        s.append(this.keyAsObject.toString());
         toString = s.toString();
         hashCode = toString.hashCode();        
     }
@@ -93,7 +82,7 @@ public class OIDImplXcalia implements java.io.Serializable, OID, Comparable
         }
 
         int separatorPosition = str.indexOf(oidSeparator);
-        this.pcClass = str.substring(0, separatorPosition);
+        this.targetClassName = str.substring(0, separatorPosition);
         String oidStr = str.substring(separatorPosition+1);
         Object oidValue = null;
         try
@@ -105,35 +94,22 @@ public class OIDImplXcalia implements java.io.Serializable, OID, Comparable
         {
             oidValue = oidStr;
         }
-        oid = oidValue;
+        keyAsObject = oidValue;
         
         toString = str;
         hashCode = toString.hashCode();
     }
 
-    /**
-     * Accessor for the key value.
-     * @return The key value
-     */
     public Object getKeyAsObject()
     {
-        return oid;
+        return keyAsObject;
     }
 
-    /**
-     * Accessor for the persistable class name.
-     * @return persistable class name
-     */
     public String getTargetClassName()
     {
-        return pcClass;
+        return targetClassName;
     }
 
-    /**
-     * Equality operator.
-     * @param obj Object to compare against
-     * @return Whether they are equal
-     */
     public boolean equals(Object obj)
     {
         if (obj == null)
@@ -160,11 +136,6 @@ public class OIDImplXcalia implements java.io.Serializable, OID, Comparable
         return true;
     }
 
-    /**
-     * Comparator method.
-     * @param o The object to compare against
-     * @return The comparison result
-     */ 
     public int compareTo(Object o)
     {
         if (o instanceof OIDImplXcalia)
@@ -179,18 +150,13 @@ public class OIDImplXcalia implements java.io.Serializable, OID, Comparable
         throw new ClassCastException(this.getClass().getName() + " != " + o.getClass().getName());
     }
 
-    /**
-     * Accessor for the hashcode
-     * @return Hashcode for this object
-     */
     public int hashCode()
     {
         return hashCode;
     }
 
     /**
-     * Creates a String representation of the datastore identity, formed from the PC class name
-     * and the key value. This will be something like
+     * Creates a String representation of the datastore identity, formed from the target class name and the key value. This will be something like
      * <pre>mydomain.MyClass:3254</pre>
      * @return The String form of the identity
      */

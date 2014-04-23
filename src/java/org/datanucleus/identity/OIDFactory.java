@@ -53,8 +53,7 @@ public class OIDFactory
         else
         {
             //others are pluggable
-            oid = (OID)ClassUtils.newInstance(oidClass, new Class[] {String.class, Object.class}, 
-                new Object[] {className, value});
+            oid = (OID)ClassUtils.newInstance(oidClass, new Class[] {String.class, Object.class}, new Object[] {className, value});
         }
         return oid;
     }
@@ -80,8 +79,7 @@ public class OIDFactory
         else
         {
             //others are pluggable
-            oid = (OID)ClassUtils.newInstance(oidClass, new Class[] {Long.class}, 
-                new Object[] {Long.valueOf(value)});
+            oid = (OID)ClassUtils.newInstance(oidClass, new Class[] {Long.class}, new Object[] {Long.valueOf(value)});
         }
         return oid;
     }

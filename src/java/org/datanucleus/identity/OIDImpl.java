@@ -42,11 +42,9 @@ public class OIDImpl implements java.io.Serializable, OID, Comparable
 
     // JDO spec 5.4.3 says: all serializable fields of ObjectID classes are required to be public.
 
-    /** The key value. */
-    public final Object oid;
+    public final Object keyAsObject;
 
-    /** The persistable class name */
-    public final String pcClass;
+    public final String targetClassName;
 
     /** pre-created toString to improve performance **/ 
     public final String toString;
@@ -54,37 +52,29 @@ public class OIDImpl implements java.io.Serializable, OID, Comparable
     /** pre-created hasCode to improve performance **/ 
     public final int hashCode;
 
-    /**
-    * Creates an OID with no value. Required by the JDO spec
-    */
     public OIDImpl()
     {
-        oid = null;
-        pcClass = null; 
+        keyAsObject = null;
+        targetClassName = null; 
         toString = null;
         hashCode = -1;
     }
 
-    /**
-     * Create a string datastore identity.
-     * @param pcClass The persistable class that this represents
-     * @param object The value
-     */
     public OIDImpl(String pcClass, Object object)
     {
-        this.pcClass = pcClass;
-        this.oid = object;
+        this.targetClassName = pcClass;
+        this.keyAsObject = object;
 
         StringBuilder s = new StringBuilder();
-        s.append(this.oid.toString());
+        s.append(this.keyAsObject.toString());
         s.append(oidSeparator);
-        s.append(this.pcClass);
+        s.append(this.targetClassName);
         toString = s.toString();
         hashCode = toString.hashCode();        
     }
 
     /**
-     * Constructs an OID from its string representation that is consistent with the output of toString().
+     * Constructs an identity from its string representation that is consistent with the output of toString().
      * @param str the string representation of an OID
      * @exception IllegalArgumentException if the given string representation is not valid.
      * @see #toString
@@ -114,38 +104,25 @@ public class OIDImpl implements java.io.Serializable, OID, Comparable
         {
             oidValue = oidStr;
         }
-        oid = oidValue;
+        keyAsObject = oidValue;
 
         start = end + oidSeparator.length();
-        this.pcClass = str.substring(start, str.length());
+        this.targetClassName = str.substring(start, str.length());
         
         toString = str;
         hashCode = toString.hashCode();
     }
 
-    /**
-     * Accessor for the key value.
-     * @return The key value
-     */
     public Object getKeyAsObject()
     {
-        return oid;
+        return keyAsObject;
     }
 
-    /**
-     * Accessor for the persistable class name.
-     * @return persistable class name
-     */
     public String getTargetClassName()
     {
-        return pcClass;
+        return targetClassName;
     }
 
-    /**
-     * Equality operator.
-     * @param obj Object to compare against
-     * @return Whether they are equal
-     */
     public boolean equals(Object obj)
     {
         if (obj == null)
@@ -172,11 +149,6 @@ public class OIDImpl implements java.io.Serializable, OID, Comparable
         return true;
     }
 
-    /**
-     * Comparator method.
-     * @param o The object to compare against
-     * @return The comparison result
-     */ 
     public int compareTo(Object o)
     {
         if (o instanceof OIDImpl)
@@ -191,18 +163,13 @@ public class OIDImpl implements java.io.Serializable, OID, Comparable
         throw new ClassCastException(this.getClass().getName() + " != " + o.getClass().getName());
     }
 
-    /**
-     * Accessor for the hashcode
-     * @return Hashcode for this object
-     */
     public int hashCode()
     {
         return hashCode;
     }
 
     /**
-     * Creates a String representation of the datastore identity, formed from the PC class name
-     * and the key value. This will be something like
+     * Creates a String representation of the datastore identity, formed from the target class name and the key value. This will be something like
      * <pre>3254[OID]mydomain.MyClass</pre>
      * @return The String form of the identity
      */
