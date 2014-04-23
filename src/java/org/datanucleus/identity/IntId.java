@@ -32,13 +32,13 @@ public class IntId extends SingleFieldId
     {
         super(pcClass);
         this.key = key;
-        this.hashCode = hashClassName() ^ key;
+        this.hashCode = targetClassName.hashCode() ^ key;
     }
 
     public IntId(Class pcClass, Integer key)
     {
-        this(pcClass, key.intValue());
-        setKeyAsObject(key);
+        this(pcClass, key != null ? key.intValue() : -1);
+        assertKeyNotNull(key);
     }
 
     public IntId(Class pcClass, String str)
@@ -56,13 +56,9 @@ public class IntId extends SingleFieldId
         return key;
     }
 
-    /**
-     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded environments.
-     * @return the key as an Object.
-     */
-    public synchronized Object getKeyAsObject()
+    public Object getKeyAsObject()
     {
-        return (keyAsObject != null ? keyAsObject : Integer.valueOf(key));
+        return Integer.valueOf(key);
     }
 
     /**

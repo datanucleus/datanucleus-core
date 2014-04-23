@@ -32,13 +32,13 @@ public class CharId extends SingleFieldId
     {
         super(pcClass);
         this.key = key;
-        this.hashCode = hashClassName() ^ key;
+        this.hashCode = targetClassName.hashCode() ^ key;
     }
 
     public CharId(Class pcClass, Character key)
     {
-        this(pcClass, key.charValue());
-        setKeyAsObject(key);
+        this(pcClass, key != null ? key.charValue() : 0);
+        assertKeyNotNull(key);
     }
 
     public CharId(Class pcClass, String str)
@@ -60,13 +60,9 @@ public class CharId extends SingleFieldId
         return key;
     }
 
-    /**
-     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded environments.
-     * @return the key as an Object.
-     */
     public synchronized Object getKeyAsObject()
     {
-        return (keyAsObject != null ? keyAsObject : Character.valueOf(key));
+        return Character.valueOf(key);
     }
 
     /**

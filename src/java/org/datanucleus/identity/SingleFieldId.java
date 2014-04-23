@@ -25,9 +25,7 @@ import java.io.ObjectOutput;
 import org.datanucleus.exceptions.NucleusUserException;
 
 /**
- * This class is the abstract base class for all single field identity classes. A common case of application
- * identity uses exactly one persistent field in the class to represent identity. In this case, the
- * application can use a standard JDO class instead of creating a new user-defined class for the purpose.
+ * This class is the abstract base class for all single field identity classes.
  */
 public abstract class SingleFieldId implements Externalizable, Comparable
 {
@@ -35,13 +33,9 @@ public abstract class SingleFieldId implements Externalizable, Comparable
     transient private Class targetClass;
 
     /** The name of the class of the target object. */
-    private String targetClassName;
+    protected String targetClassName;
 
-    /** The hashCode. */
     protected int hashCode;
-
-    /** The key as an Object. */
-    protected Object keyAsObject;
 
     protected SingleFieldId(Class pcClass)
     {
@@ -55,16 +49,6 @@ public abstract class SingleFieldId implements Externalizable, Comparable
 
     public SingleFieldId()
     {
-    }
-
-    /**
-     * Set the given key as the key for this instance. Compute the hash code for the instance.
-     * @param key The key
-     */
-    protected void setKeyAsObject(Object key)
-    {
-        assertKeyNotNull(key);
-        keyAsObject = key;
     }
 
     /**
@@ -88,10 +72,6 @@ public abstract class SingleFieldId implements Externalizable, Comparable
         return targetClass;
     }
 
-    /**
-     * Return the target class name.
-     * @return the target class name.
-     */
     public String getTargetClassName()
     {
         return targetClassName;
@@ -123,15 +103,6 @@ public abstract class SingleFieldId implements Externalizable, Comparable
             }
             return targetClassName.equals(other.targetClassName);
         }
-    }
-
-    /**
-     * Return the hash code of the class name.
-     * @return the hash code of the class name
-     */
-    protected int hashClassName()
-    {
-        return targetClassName.hashCode();
     }
 
     public int hashCode()

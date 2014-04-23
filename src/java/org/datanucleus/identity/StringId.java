@@ -26,11 +26,13 @@ import java.io.ObjectOutput;
  */
 public class StringId extends SingleFieldId
 {
+    private String key;
+
     public StringId(Class pcClass, String key)
     {
         super(pcClass);
-        setKeyAsObject(key);
-        hashCode = hashClassName() ^ key.hashCode();
+        this.key = key;
+        this.hashCode = targetClassName.hashCode() ^ key.hashCode();
     }
 
     public StringId()
@@ -39,12 +41,12 @@ public class StringId extends SingleFieldId
 
     public String getKey()
     {
-        return (String) keyAsObject;
+        return key;
     }
 
     public Object getKeyAsObject()
     {
-        return keyAsObject;
+        return key;
     }
 
     /**
@@ -53,7 +55,7 @@ public class StringId extends SingleFieldId
      */
     public String toString()
     {
-        return (String) keyAsObject;
+        return key;
     }
 
     public boolean equals(Object obj)
@@ -69,7 +71,7 @@ public class StringId extends SingleFieldId
         else
         {
             StringId other = (StringId) obj;
-            return keyAsObject.equals(other.keyAsObject);
+            return key.equals(other.key);
         }
     }
 
@@ -81,7 +83,7 @@ public class StringId extends SingleFieldId
             int result = super.compare(other);
             if (result == 0)
             {
-                return ((String) keyAsObject).compareTo((String) other.keyAsObject);
+                return key.compareTo(other.key);
             }
             else
             {
@@ -102,7 +104,7 @@ public class StringId extends SingleFieldId
     public void writeExternal(ObjectOutput out) throws IOException
     {
         super.writeExternal(out);
-        out.writeObject(keyAsObject);
+        out.writeObject(key);
     }
 
     /**
@@ -112,6 +114,6 @@ public class StringId extends SingleFieldId
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
     {
         super.readExternal(in);
-        keyAsObject = in.readObject();
+        key = (String) in.readObject();
     }
 }

@@ -32,13 +32,13 @@ public class LongId extends SingleFieldId
     {
         super(pcClass);
         this.key = key;
-        this.hashCode = hashClassName() ^ (int) key;
+        this.hashCode = targetClassName.hashCode() ^ (int) key;
     }
 
     public LongId(Class pcClass, Long key)
     {
-        this(pcClass, key.longValue());
-        setKeyAsObject(key);
+        this(pcClass, key != null ? key.longValue() : -1);
+        assertKeyNotNull(key);
     }
 
     public LongId(Class pcClass, String str)
@@ -56,13 +56,9 @@ public class LongId extends SingleFieldId
         return key;
     }
 
-    /**
-     * Return the key as an Object. The method is synchronized to avoid race conditions in multi-threaded environments.
-     * @return the key as an Object.
-     */
-    public synchronized Object getKeyAsObject()
+    public Object getKeyAsObject()
     {
-        return (keyAsObject != null ? keyAsObject : Long.valueOf(key));
+        return Long.valueOf(key);
     }
 
     /**

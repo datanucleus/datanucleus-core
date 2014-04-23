@@ -32,6 +32,8 @@ public class ObjectId extends SingleFieldId
     /** The delimiter for String constructor. */
     private static final String STRING_DELIMITER = ":";
 
+    private Object key;
+
     /**
      * Constructor with class and key.
      * @param pcClass the class
@@ -59,13 +61,13 @@ public class ObjectId extends SingleFieldId
             }
             keyString = paramString.substring(indexOfDelimiter + 1);
             className = paramString.substring(0, indexOfDelimiter);
-            keyAsObject = EnhancementHelper.construct(className, keyString);
+            key = EnhancementHelper.construct(className, keyString);
         }
         else
         {
-            keyAsObject = param;
+            key = param;
         }
-        hashCode = hashClassName() ^ keyAsObject.hashCode();
+        hashCode = targetClassName.hashCode() ^ key.hashCode();
     }
 
     public ObjectId()
@@ -74,12 +76,12 @@ public class ObjectId extends SingleFieldId
 
     public Object getKey()
     {
-        return keyAsObject;
+        return key;
     }
 
     public Object getKeyAsObject()
     {
-        return keyAsObject;
+        return key;
     }
 
     /**
@@ -92,7 +94,7 @@ public class ObjectId extends SingleFieldId
     @Override
     public String toString()
     {
-        return keyAsObject.getClass().getName() + STRING_DELIMITER + keyAsObject.toString();
+        return key.getClass().getName() + STRING_DELIMITER + key.toString();
     }
 
     public boolean equals(Object obj)
@@ -108,7 +110,7 @@ public class ObjectId extends SingleFieldId
         else
         {
             ObjectId other = (ObjectId) obj;
-            return keyAsObject.equals(other.keyAsObject);
+            return key.equals(other.key);
         }
     }
 
@@ -120,13 +122,13 @@ public class ObjectId extends SingleFieldId
             int result = super.compare(other);
             if (result == 0)
             {
-                if (other.keyAsObject instanceof Comparable && keyAsObject instanceof Comparable)
+                if (other.key instanceof Comparable && key instanceof Comparable)
                 {
-                    return ((Comparable) keyAsObject).compareTo(other.keyAsObject);
+                    return ((Comparable) key).compareTo(other.key);
                 }
                 else
                 {
-                    throw new ClassCastException("The key class (" + keyAsObject.getClass().getName() + ") does not implement Comparable");
+                    throw new ClassCastException("The key class (" + key.getClass().getName() + ") does not implement Comparable");
                 }
             }
             else
@@ -149,7 +151,7 @@ public class ObjectId extends SingleFieldId
     public void writeExternal(ObjectOutput out) throws IOException
     {
         super.writeExternal(out);
-        out.writeObject(keyAsObject);
+        out.writeObject(key);
     }
 
     /**
@@ -160,6 +162,6 @@ public class ObjectId extends SingleFieldId
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
     {
         super.readExternal(in);
-        keyAsObject = in.readObject();
+        key = in.readObject();
     }
 }
