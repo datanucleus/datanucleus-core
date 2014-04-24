@@ -265,8 +265,12 @@ public abstract class AbstractNucleusContext implements NucleusContext
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             NucleusLogger.PERSISTENCE.debug("================= NucleusContext ===============");
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("008000", pluginManager.getVersionForBundle("org.datanucleus"), 
-                System.getProperty("java.version"), System.getProperty("os.name")));
+            String javaVersion = System.getProperty("java.version");
+            if (StringUtils.isWhitespace(javaVersion))
+            {
+                javaVersion = "unknown";
+            }
+            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("008000", pluginManager.getVersionForBundle("org.datanucleus"), javaVersion, System.getProperty("os.name")));
             NucleusLogger.PERSISTENCE.debug("Persistence API : " + getApiName());
             if (config.hasPropertyNotNull(PropertyNames.PROPERTY_PERSISTENCE_UNIT_NAME))
             {
