@@ -34,10 +34,8 @@ import org.datanucleus.util.Localiser;
  * The states represent the lifecycle of a MetaData object. The lifecycle goes as follows :
  * <OL>
  * <LI>MetaData object is created (values passed in from a parsed file, or manually generated)</LI>
- * <LI>MetaData object is populated (maybe pass in a class that it represents, creating any additional 
- * information that wasn't in the initial data).</LI>
- * <LI>MetaData object is initialised (any internal arrays are set up, and additions of data is blocked 
- * from this point).
+ * <LI>MetaData object is populated (maybe pass in a class that it represents, creating any additional information that wasn't in the initial data).</LI>
+ * <LI>MetaData object is initialised (any internal arrays are set up, and additions of data is blocked from this point).
  * <LI>MetaData object is added to with runtime information like actual column names and types in use.</LI> 
  * </OL>
  * <h3>MetaData Extensability</h3>
@@ -46,8 +44,7 @@ import org.datanucleus.util.Localiser;
  */
 public class MetaData implements Serializable
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
+    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
     /** State representing the start state of MetaData, representing the initial values passed in. */
     public static final int METADATA_CREATED_STATE = 0;
@@ -69,9 +66,6 @@ public class MetaData implements Serializable
 
     /** Vendor name (DataNucleus) used for extensions. */
     public static final String VENDOR_NAME = "datanucleus";
-
-    /** Vendor name (JPOX) used for extensions. Deprecated. TODO Remove this */
-    private static final String VENDOR_NAME_OLD = "jpox";
 
     /** List of extensions for this MetaData element. */
     protected Collection<ExtensionMetaData> extensions = null;
@@ -139,13 +133,12 @@ public class MetaData implements Serializable
 
     public MetaData addExtension(String vendor, String key, String value)
     {
-        if (vendor == null ||
-            (isSupportedVendor(vendor) && (key == null || value == null)))
+        if (vendor == null || (vendor.equalsIgnoreCase(VENDOR_NAME) && (key == null || value == null)))
         {
             throw new InvalidMetaDataException(LOCALISER, "044160", vendor, key, value);
         }
 
-        if (isSupportedVendor(vendor) && hasExtension(key))
+        if (vendor.equalsIgnoreCase(VENDOR_NAME) && hasExtension(key))
         {
             // Remove any existing value
             removeExtension(key);
@@ -174,7 +167,7 @@ public class MetaData implements Serializable
      */
     public ExtensionMetaData newExtensionMetaData(String vendor, String key, String value)
     {
-        if (vendor == null || (isSupportedVendor(vendor) && (key == null || value == null)))
+        if (vendor == null || (vendor.equalsIgnoreCase(VENDOR_NAME) && (key == null || value == null)))
         {
             throw new InvalidMetaDataException(LOCALISER, "044160", vendor, key, value);
         }
@@ -199,7 +192,7 @@ public class MetaData implements Serializable
         while (iter.hasNext())
         {
             ExtensionMetaData ex = (ExtensionMetaData)iter.next();
-            if (ex.getKey().equals(key) && isSupportedVendor(ex.getVendorName()))
+            if (ex.getKey().equals(key) && ex.getVendorName().equalsIgnoreCase(VENDOR_NAME))
             {
                 iter.remove();
                 break;
@@ -253,7 +246,7 @@ public class MetaData implements Serializable
         while (iter.hasNext())
         {
             ExtensionMetaData ex = (ExtensionMetaData)iter.next();
-            if (ex.getKey().equals(key) && isSupportedVendor(ex.getVendorName()))
+            if (ex.getKey().equals(key) && ex.getVendorName().equalsIgnoreCase(VENDOR_NAME))
             {
                 return true;
             }
@@ -277,7 +270,7 @@ public class MetaData implements Serializable
         while (iter.hasNext())
         {
             ExtensionMetaData ex = (ExtensionMetaData)iter.next();
-            if (ex.getKey().equals(key) && isSupportedVendor(ex.getVendorName()))
+            if (ex.getKey().equals(key) && ex.getVendorName().equalsIgnoreCase(VENDOR_NAME))
             {
                 return ex.getValue();
             }
@@ -303,7 +296,7 @@ public class MetaData implements Serializable
         while (iter.hasNext())
         {
             ExtensionMetaData ex = (ExtensionMetaData)iter.next();
-            if (ex.getKey().equals(key) && isSupportedVendor(ex.getVendorName()))
+            if (ex.getKey().equals(key) && ex.getVendorName().equalsIgnoreCase(VENDOR_NAME))
             {
                 return MetaDataUtils.getInstance().getValuesForCommaSeparatedAttribute(ex.getValue());
             }
@@ -343,15 +336,5 @@ public class MetaData implements Serializable
             sb.append(prefix).append(ex.toString()).append("\n");
         }
         return sb.toString();
-    }
-
-    /**
-     * Convenience method to return supported vendors. Allows us to support "datanucleus" AND "jpox" as vendors.
-     * @param vendorName Name of vendor
-     * @return Whether supported
-     */
-    private boolean isSupportedVendor(String vendorName)
-    {
-        return (vendorName.equalsIgnoreCase(VENDOR_NAME) || vendorName.equalsIgnoreCase(VENDOR_NAME_OLD));
     }
 }
