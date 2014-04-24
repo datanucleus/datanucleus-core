@@ -45,7 +45,6 @@ import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.PackageMetaData;
 import org.datanucleus.metadata.PersistenceUnitMetaData;
 import org.datanucleus.util.ClassUtils;
-import org.datanucleus.util.JavaUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -478,7 +477,7 @@ public class DataNucleusEnhancer
     {
         if (LOGGER.isDebugEnabled())
         {
-            LOGGER.debug("Enhancing classes for JRE=" + JavaUtils.getJREMajorVersion() + "." + JavaUtils.getJREMinorVersion());
+            LOGGER.debug("Enhancing classes");
         }
 
         if (componentsToEnhance.isEmpty())

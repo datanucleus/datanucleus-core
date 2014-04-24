@@ -31,7 +31,6 @@ import java.util.StringTokenizer;
 
 import org.datanucleus.PropertyNames;
 import org.datanucleus.util.CommandLine;
-import org.datanucleus.util.JavaUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -234,8 +233,7 @@ class CommandLineHelper
 
     private void logEnhancerVersion(DataNucleusEnhancer enhancer, String apiName)
     {
-        String msg = LOCALISER.msg("Enhancer.ClassEnhancer", enhancer.getEnhancerVersion(), apiName,
-            JavaUtils.getJREMajorVersion() + "." + JavaUtils.getJREMinorVersion());
+        String msg = LOCALISER.msg("Enhancer.ClassEnhancer", enhancer.getEnhancerVersion(), apiName);
         LOGGER.info(msg);
         if (!isQuiet())
         {
