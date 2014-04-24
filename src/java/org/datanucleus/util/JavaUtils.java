@@ -27,25 +27,7 @@ public class JavaUtils
 {
     private static boolean versionInitialised=false;
     private static int majorVersion=1;
-    private static int minorVersion=0;
-
-    /**
-     * Accessor for whether the JRE is 1.7 (or above).
-     * @return Whether the JRE is 1.7 or above
-     */
-    public static boolean isJRE1_7OrAbove()
-    {
-        return !(getJREMajorVersion() == 1 && getJREMinorVersion() < 7);
-    }
-
-    /**
-     * Accessor for whether the JRE is 1.8 (or above).
-     * @return Whether the JRE is 1.8 or above
-     */
-    public static boolean isJRE1_8OrAbove()
-    {
-        return !(getJREMajorVersion() == 1 && getJREMinorVersion() < 8);
-    }
+    private static int minorVersion=7;
 
     /**
      * Accessor for the major version number of the JRE.
