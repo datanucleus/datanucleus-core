@@ -42,7 +42,13 @@ public class IdentityManagerImpl implements IdentityManager
 {
     protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
-    Class datastoreIdClass = null;
+    protected Class datastoreIdClass = null;
+
+    /** Identity string translator (if any). */
+    protected IdentityStringTranslator idStringTranslator = null;
+
+    /** Identity key translator (if any). */
+    protected IdentityKeyTranslator idKeyTranslator = null;
 
     PersistenceNucleusContext nucCtx;
 
@@ -50,6 +56,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         this.nucCtx = nucCtx;
 
+        // Datastore Identity type
         String dsidName = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_DATASTORE_IDENTITY_TYPE);
         String datastoreIdentityClassName = nucCtx.getPluginManager().getAttributeValueForExtension(
             "org.datanucleus.store_datastoreidentity", "name", dsidName, "class-name");
@@ -58,8 +65,6 @@ public class IdentityManagerImpl implements IdentityManager
             // User has specified a datastore_identity plugin that has not registered
             throw new NucleusUserException(LOCALISER.msg("002001", dsidName)).setFatal();
         }
-
-        // Try to load the class
         ClassLoaderResolver clr = nucCtx.getClassLoaderResolver(null);
         try
         {
@@ -69,15 +74,53 @@ public class IdentityManagerImpl implements IdentityManager
         {
             throw new NucleusUserException(LOCALISER.msg("002002", dsidName, datastoreIdentityClassName)).setFatal();
         }
+
+        // Identity key translation
+        String keyTranslatorType = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_IDENTITY_KEY_TRANSLATOR_TYPE);
+        if (keyTranslatorType != null)
+        {
+            try
+            {
+                idKeyTranslator = (IdentityKeyTranslator)nucCtx.getPluginManager().createExecutableExtension(
+                    "org.datanucleus.identity_key_translator", "name", keyTranslatorType, "class-name", null, null);
+            }
+            catch (Exception e)
+            {
+                // User has specified a identity key translator plugin that has not registered
+                throw new NucleusUserException(LOCALISER.msg("002001", keyTranslatorType)).setFatal();
+            }
+        }
+
+        // Identity string translation
+        String stringTranslatorType = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_IDENTITY_STRING_TRANSLATOR_TYPE);
+        if (stringTranslatorType != null)
+        {
+            try
+            {
+                idStringTranslator = (IdentityStringTranslator)nucCtx.getPluginManager().createExecutableExtension(
+                    "org.datanucleus.identity_string_translator", "name", stringTranslatorType, "class-name", null, null);
+            }
+            catch (Exception e)
+            {
+                // User has specified a string identity translator plugin that has not registered
+                throw new NucleusUserException(LOCALISER.msg("002001", stringTranslatorType)).setFatal();
+            }
+        }
     }
 
-    @Override
     public Class getDatastoreIdClass()
     {
-        if (datastoreIdClass == null)
-        {
-        }
         return datastoreIdClass;
+    }
+
+    public IdentityStringTranslator getIdentityStringTranslator()
+    {
+        return idStringTranslator;
+    }
+
+    public IdentityKeyTranslator getIdentityKeyTranslator()
+    {
+        return idKeyTranslator;
     }
 
     /* (non-Javadoc)

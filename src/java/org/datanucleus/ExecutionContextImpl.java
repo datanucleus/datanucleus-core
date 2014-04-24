@@ -3038,11 +3038,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         for (int i=0;i<identities.length;i++)
         {
             // Translate the identity if required
-            if (getNucleusContext().getIdentityStringTranslator() != null && identities[i] instanceof String)
+            IdentityStringTranslator idStringTranslator = getNucleusContext().getIdentityManager().getIdentityStringTranslator();
+            if (idStringTranslator != null && identities[i] instanceof String)
             {
                 // DataNucleus extension to translate input identities into valid persistent identities.
-                IdentityStringTranslator translator = getNucleusContext().getIdentityStringTranslator();
-                ids[i] = translator.getIdentity(this, (String)identities[i]);
+                ids[i] = idStringTranslator.getIdentity(this, (String)identities[i]);
             }
             else
             {
@@ -3415,7 +3415,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             throw new NucleusUserException(LOCALISER.msg("010044"));
         }
 
-        IdentityStringTranslator translator = getNucleusContext().getIdentityStringTranslator();
+        IdentityStringTranslator translator = getNucleusContext().getIdentityManager().getIdentityStringTranslator();
         if (translator != null && id instanceof String)
         {
             // DataNucleus extension to translate input identities into valid persistent identities.
@@ -3577,7 +3577,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             getStoreManager().manageClasses(clr, cmd.getFullClassName());
         }
 
-        IdentityKeyTranslator translator = getNucleusContext().getIdentityKeyTranslator();
+        IdentityKeyTranslator translator = getNucleusContext().getIdentityManager().getIdentityKeyTranslator();
         if (translator != null)
         {
             // Use the provided translator to convert it

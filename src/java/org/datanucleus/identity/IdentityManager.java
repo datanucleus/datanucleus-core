@@ -28,6 +28,18 @@ public interface IdentityManager
     Class getDatastoreIdClass();
 
     /**
+     * Accessor for the current identity string translator to use (if any).
+     * @return Identity string translator instance (or null if persistence property not set)
+     */
+    IdentityStringTranslator getIdentityStringTranslator();
+
+    /**
+     * Accessor for the current identity key translator to use (if any).
+     * @return Identity key translator instance (or null if persistence property not set)
+     */
+    IdentityKeyTranslator getIdentityKeyTranslator();
+
+    /**
      * Method to return a datastore identity, representing the persistable object with specified class name and key value.
      * @param className The class name for the persistable
      * @param value The key value for the persistable
@@ -74,7 +86,7 @@ public interface IdentityManager
      * @param cmd Its metadata
      * @return The new identity object
      */
-    public Object getApplicationId(Object pc, AbstractClassMetaData cmd);
+    Object getApplicationId(Object pc, AbstractClassMetaData cmd);
 
     /**
      * Method to return a new object identity for the specified class, and key (possibly toString() output).
@@ -82,5 +94,5 @@ public interface IdentityManager
      * @param key form of the object id
      * @return The object identity
      */
-    public Object getApplicationId(Class cls, Object key);
+    Object getApplicationId(Class cls, Object key);
 }

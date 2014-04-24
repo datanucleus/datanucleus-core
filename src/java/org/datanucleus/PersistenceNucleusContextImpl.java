@@ -42,8 +42,6 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.DatastoreUniqueLongId;
 import org.datanucleus.identity.IdentityManager;
 import org.datanucleus.identity.IdentityManagerImpl;
-import org.datanucleus.identity.IdentityKeyTranslator;
-import org.datanucleus.identity.IdentityStringTranslator;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.management.FactoryStatistics;
 import org.datanucleus.management.jmx.ManagementManager;
@@ -119,18 +117,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
 
     /** Manager for object identities. */
     protected IdentityManager identityManager;
-
-    /** Identity string translator (if any). */
-    private IdentityStringTranslator idStringTranslator = null;
-
-    /** Flag for whether we have initialised the id string translator. */
-    private boolean idStringTranslatorInit = false;
-
-    /** Identity key translator (if any). */
-    private IdentityKeyTranslator idKeyTranslator = null;
-
-    /** Flag for whether we have initialised the id key translator. */
-    private boolean idKeyTranslatorInit = false;
 
     /** ImplementationCreator for any persistent interfaces. */
     private ImplementationCreator implCreator;
@@ -1138,68 +1124,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             identityManager = new IdentityManagerImpl(this);
         }
         return identityManager;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getIdentityStringTranslator()
-     */
-    @Override
-    public synchronized IdentityStringTranslator getIdentityStringTranslator()
-    {
-        if (idStringTranslatorInit)
-        {
-            return idStringTranslator;
-        }
-
-        // Identity translation
-        idStringTranslatorInit = true;
-        String translatorType = config.getStringProperty(PropertyNames.PROPERTY_IDENTITY_STRING_TRANSLATOR_TYPE);
-        if (translatorType != null)
-        {
-            try
-            {
-                idStringTranslator = (IdentityStringTranslator)pluginManager.createExecutableExtension(
-                    "org.datanucleus.identity_string_translator", "name", translatorType, "class-name", null, null);
-                return idStringTranslator;
-            }
-            catch (Exception e)
-            {
-                // User has specified a string identity translator plugin that has not registered
-                throw new NucleusUserException(LOCALISER.msg("002001", translatorType)).setFatal();
-            }
-        }
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getIdentityKeyTranslator()
-     */
-    @Override
-    public synchronized IdentityKeyTranslator getIdentityKeyTranslator()
-    {
-        if (idKeyTranslatorInit)
-        {
-            return idKeyTranslator;
-        }
-
-        // Identity key translation
-        idKeyTranslatorInit = true;
-        String translatorType = config.getStringProperty(PropertyNames.PROPERTY_IDENTITY_KEY_TRANSLATOR_TYPE);
-        if (translatorType != null)
-        {
-            try
-            {
-                idKeyTranslator = (IdentityKeyTranslator)pluginManager.createExecutableExtension(
-                    "org.datanucleus.identity_key_translator", "name", translatorType, "class-name", null, null);
-                return idKeyTranslator;
-            }
-            catch (Exception e)
-            {
-                // User has specified a identity key translator plugin that has not registered
-                throw new NucleusUserException(LOCALISER.msg("002001", translatorType)).setFatal();
-            }
-        }
-        return null;
     }
 
     /* (non-Javadoc)

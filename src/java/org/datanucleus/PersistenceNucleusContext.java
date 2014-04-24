@@ -23,8 +23,6 @@ import java.util.Set;
 import org.datanucleus.cache.Level2Cache;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityManager;
-import org.datanucleus.identity.IdentityKeyTranslator;
-import org.datanucleus.identity.IdentityStringTranslator;
 import org.datanucleus.management.FactoryStatistics;
 import org.datanucleus.management.jmx.ManagementManager;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -59,18 +57,6 @@ public interface PersistenceNucleusContext extends StoreNucleusContext
      * @return The identity manager to use
      */
     IdentityManager getIdentityManager();
-
-    /**
-     * Accessor for the current identity string translator to use (if any).
-     * @return Identity string translator instance (or null if persistence property not set)
-     */
-    IdentityStringTranslator getIdentityStringTranslator();
-
-    /**
-     * Accessor for the current identity key translator to use (if any).
-     * @return Identity key translator instance (or null if persistence property not set)
-     */
-    IdentityKeyTranslator getIdentityKeyTranslator();
 
     /**
      * Accessor for whether statistics gathering is enabled.
