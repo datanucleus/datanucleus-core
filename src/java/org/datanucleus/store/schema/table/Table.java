@@ -71,6 +71,13 @@ public interface Table
     Column getMultitenancyColumn();
 
     /**
+     * Accessor for the column with the supplied name (if present).
+     * @param name name of the column (the identifier)
+     * @return The column (or null if none present with that name)
+     */
+    Column getColumnForName(String name);
+
+    /**
      * Method to return the member-column mapping for the specified member.
      * @param mmd Metadata for the member
      * @return The member-column mapping

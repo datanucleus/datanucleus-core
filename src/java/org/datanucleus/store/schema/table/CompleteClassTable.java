@@ -86,8 +86,8 @@ public class CompleteClassTable implements Table
     /** Map of member-column mapping, keyed by the navigated path of embedded members. */
     Map<String, MemberColumnMapping> mappingByEmbeddedMember = new HashMap<String, MemberColumnMapping>();
 
-    /** Map of DatastoreColumn, keyed by the position (starting at 0 and increasing). */
-    Map<Integer, Column> columnByPosition = new HashMap<Integer, Column>();
+    /** Map of DatastoreColumn, keyed by the column identifier. */
+    Map<String, Column> columnByName = new HashMap<String, Column>();
 
     SchemaVerifier schemaVerifier;
 
@@ -495,10 +495,12 @@ public class CompleteClassTable implements Table
                 }
             }
         }
+
         columns = new ArrayList<Column>();
         for (Column col : cols)
         {
             columns.add(col);
+            columnByName.put(col.getIdentifier(), col);
         }
     }
 
@@ -978,6 +980,20 @@ public class CompleteClassTable implements Table
     public Column getMultitenancyColumn()
     {
         return multitenancyColumn;
+    }
+
+    public Column getColumnForName(String name)
+    {
+        Column col = columnByName.get(name);
+        if (col != null)
+        {
+            return col;
+        }
+        if (!name.startsWith("\""))
+        {
+            col = columnByName.get("\"" + name + "\"");
+        }
+        return col;
     }
 
     public MemberColumnMapping getMemberColumnMappingForMember(AbstractMemberMetaData mmd)
