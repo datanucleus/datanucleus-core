@@ -517,6 +517,15 @@ public interface ExecutionContext
     void processNontransactionalUpdate();
 
     /**
+     * Accessor for an object of the specified type with the provided id "key".
+     * With datastore id or single-field id the "key" is the key of the id, and with composite ids the "key" is the toString() of the id.
+     * @param cls Class of the persistable
+     * @param key Value of the key field for SingleFieldIdentity, or the string value of the key otherwise
+     * @return The object for this id.
+     */
+    <T> T findObject(Class<T> cls, Object key);
+
+    /**
      * Shortcut to calling "findObject(id, validate, validate, null)".
      * @param id The id of the object
      * @param validate Whether to validate the id

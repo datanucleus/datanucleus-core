@@ -96,6 +96,7 @@ import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
+import org.datanucleus.util.TypeConversionHelper;
 import org.datanucleus.util.WeakValueMap;
 
 /**
@@ -2906,6 +2907,66 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         }
         return objs;
+    }
+
+    public <T> T findObject(Class<T> cls, Object key)
+    {
+        if (cls == null || key == null)
+        {
+            // TODO Throw exception
+        }
+
+        AbstractClassMetaData acmd = getMetaDataManager().getMetaDataForClass(cls, clr);
+        if (acmd == null)
+        {
+            // TODO Throw exception
+        }
+
+        // Get the identity
+        Object id = key;
+        if (acmd.getIdentityType() == IdentityType.DATASTORE)
+        {
+            if (!IdentityUtils.isDatastoreIdentity(id))
+            {
+                // Create an OID
+                id = nucCtx.getIdentityManager().getDatastoreId(acmd.getFullClassName(), key);
+            }
+        }
+        else if (!acmd.getObjectidClass().equals(key.getClass().getName()))
+        {
+            if (acmd.usesSingleFieldIdentityClass() && nucCtx.getIdentityManager().getIdentityKeyTranslator() == null)
+            {
+                if (nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_TYPE_CONVERSION))
+                {
+                    String[] pkNames = acmd.getPrimaryKeyMemberNames();
+                    AbstractMemberMetaData mmd = acmd.getMetaDataForMember(pkNames[0]);
+                    if (key instanceof Long && mmd.getType() != Long.class)
+                    {
+                        key = TypeConversionHelper.convertTo(key, mmd.getType());
+                    }
+                    else if (key instanceof Integer && mmd.getType() != Integer.class)
+                    {
+                        key = TypeConversionHelper.convertTo(key, mmd.getType());
+                    }
+                    else if (key instanceof Short && mmd.getType() != Short.class)
+                    {
+                        key = TypeConversionHelper.convertTo(key, mmd.getType());
+                    }
+                }
+            }
+
+            // primaryKey is just the key (when using single-field identity), so create a PK object
+            try
+            {
+                id = newObjectId(cls, key);
+            }
+            catch (NucleusException ne)
+            {
+                throw new IllegalArgumentException(ne);
+            }
+        }
+
+        return (T) findObject(id, true, true, null);
     }
 
     public Object findObject(Object id, boolean validate)
