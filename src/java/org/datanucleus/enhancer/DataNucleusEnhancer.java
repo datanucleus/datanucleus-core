@@ -946,7 +946,7 @@ public class DataNucleusEnhancer
                 {
                     if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
                     {
-                        addMessage("ENHANCED (PersistenceCapable) : " + cmd.getFullClassName(), false);
+                        addMessage("ENHANCED (Persistable) : " + cmd.getFullClassName(), false);
                     }
                     else if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_AWARE)
                     {
@@ -964,7 +964,7 @@ public class DataNucleusEnhancer
                 {
                     if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
                     {
-                        addMessage("ERROR (PersistenceCapable) : " + cmd.getFullClassName(), false);
+                        addMessage("ERROR (Persistable) : " + cmd.getFullClassName(), false);
                     }
                     else if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_AWARE)
                     {
@@ -1026,7 +1026,7 @@ public class DataNucleusEnhancer
             {
                 if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
                 {
-                    addMessage("ENHANCED (PersistenceCapable) : " + cmd.getFullClassName(), false);
+                    addMessage("ENHANCED (Persistable) : " + cmd.getFullClassName(), false);
                 }
                 else if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_AWARE)
                 {
@@ -1044,7 +1044,7 @@ public class DataNucleusEnhancer
             {
                 if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
                 {
-                    addMessage("NOT ENHANCED (PersistenceCapable) : " + cmd.getFullClassName(), false);
+                    addMessage("NOT ENHANCED (Persistable) : " + cmd.getFullClassName(), false);
                 }
                 else if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_AWARE)
                 {

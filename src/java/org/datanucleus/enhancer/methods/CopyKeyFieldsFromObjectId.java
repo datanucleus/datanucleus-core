@@ -37,13 +37,13 @@ import org.datanucleus.util.ClassUtils;
  * Method to generate the method "dnCopyKeyFieldsFromObjectId" using ASM.
  * For datastore/nondurable identity this is
  * <pre>
- * public void dnCopyKeyFieldsFromObjectId(PersistenceCapable.ObjectIdFieldConsumer fc, Object oid)
+ * public void dnCopyKeyFieldsFromObjectId(Persistable.ObjectIdFieldConsumer fc, Object oid)
  * {
  * }
  * </pre>
  * and for SingleFieldIdentity it is
  * <pre>
- * public void dnCopyKeyFieldsFromObjectId(PersistenceCapable.ObjectIdFieldConsumer fc, Object oid)
+ * public void dnCopyKeyFieldsFromObjectId(PersistenceCaable.ObjectIdFieldConsumer fc, Object oid)
  * {
  *     if (fc == null)
  *         throw new IllegalArgumentException("ObjectIdFieldConsumer is null");
@@ -55,7 +55,7 @@ import org.datanucleus.util.ClassUtils;
  * </pre>
  * and for user-defined primary keys
  * <pre>
- * public void dnCopyKeyFieldsFromObjectId(PersistenceCapable.ObjectIdFieldConsumer fc, Object oid)
+ * public void dnCopyKeyFieldsFromObjectId(Persistable.ObjectIdFieldConsumer fc, Object oid)
  * {
  *     if (fc == null)
  *         throw new IllegalArgumentException("ObjectIdFieldConsumer is null");
@@ -72,7 +72,7 @@ import org.datanucleus.util.ClassUtils;
  * </pre>
  * and for CompoundIdentity
  * <pre>
- * public void dnCopyKeyFieldsFromObjectId(PersistenceCapable.ObjectIdFieldConsumer fc, Object oid)
+ * public void dnCopyKeyFieldsFromObjectId(Persistable.ObjectIdFieldConsumer fc, Object oid)
  * {
  *     if (fc == null)
  *         throw new IllegalArgumentException("ObjectIdFieldConsumer is null");

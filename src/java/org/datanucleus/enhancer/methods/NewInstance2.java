@@ -26,7 +26,7 @@ import org.datanucleus.enhancer.EnhanceUtils;
 /**
  * Method to generate the method "dnNewInstance" using ASM.
  * <pre>
- * public PersistenceCapable dnNewInstance(StateManager sm, Object o)
+ * public Persistable dnNewInstance(StateManager sm, Object o)
  * {
  *     Answer result = new Answer();
  *     result.dnFlags = (byte) 1;

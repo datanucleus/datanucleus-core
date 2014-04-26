@@ -193,7 +193,7 @@ public class CopyKeyFieldsToObjectId extends ClassMethod
                                 visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
                                     getNamer().getGetMethodPrefixMethodName() + fmd.getName(), "()" + Type.getDescriptor(fmd.getType()));
 
-                                // Note that we swap JDOHelper.getObjectId(obj) for ((PersistenceCapable)obj).dnGetObjectId())
+                                // Note that we swap JDOHelper.getObjectId(obj) for ((Persistable)obj).dnGetObjectId())
                                 visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getPersistableAsmClassName(), getNamer().getGetObjectIdMethodName(), "()Ljava/lang/Object;", true);
 //                                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getHelperAsmClassName(), "getObjectId", "(Ljava/lang/Object;)Ljava/lang/Object;");
 
@@ -208,7 +208,7 @@ public class CopyKeyFieldsToObjectId extends ClassMethod
                                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                                 visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), fmd.getName(), fieldTypeDesc);
 
-                                // Note that we swap JDOHelper.getObjectId(obj) for ((PersistenceCapable)obj).dnGetObjectId())
+                                // Note that we swap JDOHelper.getObjectId(obj) for ((Persistable)obj).dnGetObjectId())
                                 visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getPersistableAsmClassName(), getNamer().getGetObjectIdMethodName(), "()Ljava/lang/Object;", true);
 //                                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getHelperAsmClassName(), "getObjectId", "(Ljava/lang/Object;)Ljava/lang/Object;");
 
@@ -223,7 +223,7 @@ public class CopyKeyFieldsToObjectId extends ClassMethod
                                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                                 visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), fmd.getName(), fieldTypeDesc);
 
-                                // Note that we swap JDOHelper.getObjectId(obj) for ((PersistenceCapable)obj).dnGetObjectId())
+                                // Note that we swap JDOHelper.getObjectId(obj) for ((Persistable)obj).dnGetObjectId())
                                 visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getPersistableAsmClassName(), getNamer().getGetObjectIdMethodName(), "()Ljava/lang/Object;", true);
 //                                visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getHelperAsmClassName(), "getObjectId", "(Ljava/lang/Object;)Ljava/lang/Object;");
 

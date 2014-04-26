@@ -628,7 +628,7 @@ public abstract class AbstractClassMetaData extends MetaData
      * Determine the super persistable class.
      * The persistence-capable-superclass attribute is deprecated for JDO2.0. 
      * The attribute will be ignored so metadata files from previous releases can be used.
-     * The persistenceCapableSuperclass we use will be retrieved from the class itself.
+     * The persistableSuperclass we use will be retrieved from the class itself.
      * @param clr The ClassLoaderResolver
      * @param cls This class
      * @param mmgr MetaData manager
@@ -694,7 +694,7 @@ public abstract class AbstractClassMetaData extends MetaData
             }
             else
             {
-                // The defined persistenceCapableSuperclass could NOT have been a superclass
+                // The defined persistableSuperclass could NOT have been a superclass
                 // of this class, otherwise it would have been equal to the realPcSuperclassName.
                 throw new InvalidClassMetaDataException(LOCALISER, "044082", fullName, persistableSuperclass);
             }

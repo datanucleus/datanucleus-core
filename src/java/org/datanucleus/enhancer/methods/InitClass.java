@@ -31,10 +31,10 @@ import org.datanucleus.enhancer.ClassMethod;
  *     dnFieldTypes = __dnFieldTypesInit();
  *     dnFieldFlags = __dnFieldFlagsInit();
  *     dnInheritedFieldCount = __dnGetInheritedFieldCount();
- *     dnPersistenceCapableSuperclass = __dnPersistenceCapableSuperclassInit();
+ *     dnPersistableSuperclass = __dnPersistableSuperclassInit();
  *     JDOImplHelper.registerClass(___dn$loadClass("mydomain.MyClass"),
  *         dnFieldNames, dnFieldTypes, dnFieldFlags,
- *         dnPersistenceCapableSuperclass, new MyClass());
+ *         dnPersistableSuperclass, new MyClass());
  * }
  * </pre>
  */

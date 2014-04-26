@@ -61,14 +61,14 @@ public class GetManagedFieldCount extends ClassMethod
     public void execute()
     {
         ClassMetaData cmd = enhancer.getClassMetaData();
-        String persistenceCapableSuperclass = cmd.getPersistableSuperclass();
+        String persistableSuperclass = cmd.getPersistableSuperclass();
 
         visitor.visitCode();
 
-        if (persistenceCapableSuperclass != null && persistenceCapableSuperclass.length() > 0)
+        if (persistableSuperclass != null && persistableSuperclass.length() > 0)
         {
             EnhanceUtils.addBIPUSHToMethod(visitor, cmd.getNoOfManagedMembers());
-            visitor.visitMethodInsn(Opcodes.INVOKESTATIC, persistenceCapableSuperclass.replace('.', '/'),
+            visitor.visitMethodInsn(Opcodes.INVOKESTATIC, persistableSuperclass.replace('.', '/'),
                 methodName, "()I");
             visitor.visitInsn(Opcodes.IADD);
             visitor.visitInsn(Opcodes.IRETURN);
