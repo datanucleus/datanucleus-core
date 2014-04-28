@@ -1347,7 +1347,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      * @param absFieldNumber Field of the class
      * @return The strategy used when "native" is specified
      */
-    protected String getStrategyForNative(AbstractClassMetaData cmd, int absFieldNumber)
+    public String getStrategyForNative(AbstractClassMetaData cmd, int absFieldNumber)
     {
         if (absFieldNumber >= 0)
         {
