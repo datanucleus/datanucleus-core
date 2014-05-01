@@ -26,8 +26,6 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.state.LifeCycleState;
-import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.fieldmanager.FieldManager;
 
 /**
  * Adapter to allow the core runtime to expose multiple APIs to clients.
@@ -35,7 +33,7 @@ import org.datanucleus.store.fieldmanager.FieldManager;
 public interface ApiAdapter extends Serializable
 {
     /**
-     * Accessor for the name of the API.
+     * Accessor for the name of the API. JDO, JPA etc
      * @return Name of the API
      */
     String getName();
@@ -266,25 +264,4 @@ public interface ApiAdapter extends Serializable
      * @return The exception
      */
     RuntimeException getDataStoreExceptionForException(String msg, Exception e);
-
-    /**
-     * Method to return a copy of the provided object, managed by the passed ObjectProvider, copying across
-     * the specified fields.
-     * @param pc Persistable object
-     * @param op The Object Provider
-     * @param fieldNumbers Fields to copy
-     * @return The copy object
-     */
-    Object getCopyOfPersistableObject(Object pc, ObjectProvider op, int[] fieldNumbers);
-
-    /**
-     * Method to copy field values from the first persistable object across to the second persistable object.
-     * Objects are assumed to be the same type.
-     * @param pc First persistable object
-     * @param fieldNumbers Fields to copy
-     * @param pc2 Second persistable object (to have the values copied into it)
-     */
-    void copyFieldsFromPersistableObject(Object pc, int[] fieldNumbers, Object pc2);
-
-    void copyPkFieldsToPersistableObjectFromId(Object pc, Object id, FieldManager fm);
 }
