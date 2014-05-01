@@ -42,7 +42,6 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassPersistenceModifier;
 import org.datanucleus.metadata.FieldPersistenceModifier;
-import org.datanucleus.metadata.PersistenceFlags;
 import org.datanucleus.metadata.PropertyMetaData;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
@@ -380,11 +379,11 @@ public class EnhancerClassAdapter extends ClassVisitor
                 else
                 {
                     // Generate jdoGetXXX, jdoSetXXX for field
-                    if ((jdoFlag & PersistenceFlags.MEDIATE_READ) == PersistenceFlags.MEDIATE_READ)
+                    if ((jdoFlag & Persistable.MEDIATE_READ) == Persistable.MEDIATE_READ)
                     {
                         getMethod = new GetViaMediate(enhancer, fmds[i]);
                     }
-                    else if ((jdoFlag & PersistenceFlags.CHECK_READ) == PersistenceFlags.CHECK_READ)
+                    else if ((jdoFlag & Persistable.CHECK_READ) == Persistable.CHECK_READ)
                     {
                         getMethod = new GetViaCheck(enhancer, fmds[i]);
                     }
@@ -393,11 +392,11 @@ public class EnhancerClassAdapter extends ClassVisitor
                         getMethod = new GetNormal(enhancer, fmds[i]);
                     }
 
-                    if ((jdoFlag & PersistenceFlags.MEDIATE_WRITE) == PersistenceFlags.MEDIATE_WRITE)
+                    if ((jdoFlag & Persistable.MEDIATE_WRITE) == Persistable.MEDIATE_WRITE)
                     {
                         setMethod = new SetViaMediate(enhancer, fmds[i]);
                     }
-                    else if ((jdoFlag & PersistenceFlags.CHECK_WRITE) == PersistenceFlags.CHECK_WRITE)
+                    else if ((jdoFlag & Persistable.CHECK_WRITE) == Persistable.CHECK_WRITE)
                     {
                         setMethod = new SetViaCheck(enhancer, fmds[i]);
                     }

@@ -64,7 +64,6 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityStrategy;
 import org.datanucleus.metadata.IdentityType;
-import org.datanucleus.metadata.PersistenceFlags;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.ObjectReferencingStoreManager;
@@ -190,7 +189,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
 
         myEC.clearObjectProviderAssociatedValues(this);
         myEC.removeObjectProvider(this);
-        persistenceFlags = PersistenceFlags.READ_WRITE_OK;
+        persistenceFlags = Persistable.READ_WRITE_OK;
         myPC.dnReplaceFlags();
 
         setDisconnecting(true);
@@ -246,7 +245,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     {
         myID = id;
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.HOLLOW);
-        persistenceFlags = PersistenceFlags.LOAD_REQUIRED;
+        persistenceFlags = Persistable.LOAD_REQUIRED;
         if (IdentityUtils.isDatastoreIdentity(id) || id == null)
         {
             // Create new PC
@@ -286,7 +285,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         }
 
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.HOLLOW);
-        persistenceFlags = PersistenceFlags.LOAD_REQUIRED;
+        persistenceFlags = Persistable.LOAD_REQUIRED;
         myPC = HELPER.newInstance(pcClass, this); // Create new PC
         if (myPC == null)
         {
@@ -325,7 +324,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     {
         myID = id;
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.HOLLOW);
-        persistenceFlags = PersistenceFlags.LOAD_REQUIRED;
+        persistenceFlags = Persistable.LOAD_REQUIRED;
         myPC = pc;
 
         replaceStateManager(myPC, this); // Assign this StateManager to the PC
@@ -347,7 +346,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     {
         myID = id;
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.P_CLEAN);
-        persistenceFlags = PersistenceFlags.LOAD_REQUIRED;
+        persistenceFlags = Persistable.LOAD_REQUIRED;
         myPC = pc;
 
         replaceStateManager(myPC, this); // Assign this StateManager to the PC
@@ -375,7 +374,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         objectType = ObjectProvider.EMBEDDED_PC; // Default to an embedded PC object
         myID = null; // It is embedded at this point so dont need an ID since we're not persisting it
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.P_CLEAN);
-        persistenceFlags = PersistenceFlags.LOAD_REQUIRED;
+        persistenceFlags = Persistable.LOAD_REQUIRED;
 
         myPC = pc;
         replaceStateManager(myPC, this); // Set SM for embedded PC to be this
@@ -411,7 +410,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     {
         myPC = pc;
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.P_NEW);
-        persistenceFlags = PersistenceFlags.READ_OK;
+        persistenceFlags = Persistable.READ_OK;
         for (int i=0; i<loadedFields.length; ++i)
         {
             loadedFields[i] = true;
@@ -540,7 +539,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     {
         myPC = pc;
         myLC = null;
-        persistenceFlags = PersistenceFlags.READ_OK;
+        persistenceFlags = Persistable.READ_OK;
         for (int i=0; i<loadedFields.length; ++i)
         {
             loadedFields[i] = true;
@@ -612,7 +611,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         initialiseForHollow(id, null, cachedPC.getObjectClass());
 
         myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.P_CLEAN);
-        persistenceFlags = PersistenceFlags.READ_OK;
+        persistenceFlags = Persistable.READ_OK;
 
         int[] fieldsToLoad = ClassUtils.getFlagsSetTo(cachedPC.getLoadedFields(), myFP.getMemberNumbers(), true);
         if (fieldsToLoad != null)
@@ -716,12 +715,12 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         }
         myEC.enlistInTransaction(this);
 
-        if (persistenceFlags == PersistenceFlags.LOAD_REQUIRED && areFieldsLoaded(cmd.getDFGMemberPositions()))
+        if (persistenceFlags == Persistable.LOAD_REQUIRED && areFieldsLoaded(cmd.getDFGMemberPositions()))
         {
             // All DFG fields loaded and object is transactional so it doesnt need to contact us for those fields
             // Note that this is the DFG and NOT the current FetchPlan since in the enhancement of classes
             // all DFG fields are set to check jdoFlags before relaying back to the StateManager
-            persistenceFlags = PersistenceFlags.READ_OK;
+            persistenceFlags = Persistable.READ_OK;
             myPC.dnReplaceFlags();
         }
     }
@@ -734,7 +733,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         myEC.evictFromTransaction(this);
 
         // A non-transactional object needs to contact us on any field read no matter what fields are loaded.
-        persistenceFlags = PersistenceFlags.LOAD_REQUIRED;
+        persistenceFlags = Persistable.LOAD_REQUIRED;
         myPC.dnReplaceFlags();
     }
 
@@ -1047,7 +1046,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 // For datastores that manage the object reference
                 ((ObjectReferencingStoreManager)myEC.getStoreManager()).notifyObjectIsOutdated(this);
             }
-            persistenceFlags = PersistenceFlags.LOAD_REQUIRED;
+            persistenceFlags = Persistable.LOAD_REQUIRED;
             myPC.dnReplaceFlags();
 
             getCallbackHandler().postClear(myPC);
@@ -1075,7 +1074,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 ((ObjectReferencingStoreManager)myEC.getStoreManager()).notifyObjectIsOutdated(this);
             }
 
-            persistenceFlags = PersistenceFlags.LOAD_REQUIRED;
+            persistenceFlags = Persistable.LOAD_REQUIRED;
             myPC.dnReplaceFlags();
 
             getCallbackHandler().postClear(myPC);
@@ -1097,7 +1096,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             ((ObjectReferencingStoreManager)myEC.getStoreManager()).notifyObjectIsOutdated(this);
         }
 
-        persistenceFlags = PersistenceFlags.LOAD_REQUIRED;
+        persistenceFlags = Persistable.LOAD_REQUIRED;
         myPC.dnReplaceFlags();
         ClassUtils.clearFlags(loadedFields);
     }
@@ -1113,7 +1112,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         // If this is a clone, return READ_WRITE_OK.
         if (pc != myPC)
         {
-            return PersistenceFlags.READ_WRITE_OK;
+            return Persistable.READ_WRITE_OK;
         }
         else
         {
@@ -1942,7 +1941,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("026001", StringUtils.toJVMIDString(pc), this));
             }
 
-            // Reset jdoFlags in the clone to PersistenceFlags.READ_WRITE_OK 
+            // Reset jdoFlags in the clone to Persistable.READ_WRITE_OK 
             // and clear its state manager.
             pc.dnReplaceFlags();
             replaceStateManager(pc, null);
@@ -4551,9 +4550,9 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
              * so that we can decide whether or not any transition should occur,
              * so we leave the flags at LOAD_REQUIRED.
              */
-            if (persistenceFlags == PersistenceFlags.LOAD_REQUIRED && myLC.isTransactional())
+            if (persistenceFlags == Persistable.LOAD_REQUIRED && myLC.isTransactional())
             {
-                persistenceFlags = PersistenceFlags.READ_OK;
+                persistenceFlags = Persistable.READ_OK;
                 myPC.dnReplaceFlags();
             }
 
@@ -4738,7 +4737,17 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         Object flagsObj = peekField(pc, "dnFlags");
         if (flagsObj instanceof Byte)
         {
-            out.println(PersistenceFlags.persistenceFlagsToString(((Byte) flagsObj).byteValue()));
+            switch (((Byte)flagsObj).byteValue())
+            {
+                case Persistable.LOAD_REQUIRED:
+                    out.println("LOAD_REQUIRED");
+                case Persistable.READ_OK:
+                    out.println("READ_OK");
+                case Persistable.READ_WRITE_OK:
+                    out.println("READ_WRITE_OK");
+                default:
+                    out.println("???");
+            }
         }
         else
         {
@@ -4782,13 +4791,33 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         out.println("secondClassMutableFieldNumbers = " + StringUtils.intArrayToString(cmd.getSCOMutableMemberPositions()));
 
         out.println();
-        out.println("persistenceFlags = " + PersistenceFlags.persistenceFlagsToString(persistenceFlags));
+        switch (persistenceFlags)
+        {
+            case Persistable.LOAD_REQUIRED:
+                out.println("persistenceFlags = LOAD_REQUIRED");
+            case Persistable.READ_OK:
+                out.println("persistenceFlags = READ_OK");
+            case Persistable.READ_WRITE_OK:
+                out.println("persistenceFlags = READ_WRITE_OK");
+            default:
+                out.println("persistenceFlags = ???");
+        }
         out.println("loadedFields = " + StringUtils.booleanArrayToString(loadedFields));
         out.print("myPC = ");
         dumpPC(myPC, out);
 
         out.println();
-        out.println("savedFlags = " + PersistenceFlags.persistenceFlagsToString(savedFlags));
+        switch (savedFlags)
+        {
+            case Persistable.LOAD_REQUIRED:
+                out.println("savedFlags = LOAD_REQUIRED");
+            case Persistable.READ_OK:
+                out.println("savedFlags = READ_OK");
+            case Persistable.READ_WRITE_OK:
+                out.println("savedFlags = READ_WRITE_OK");
+            default:
+                out.println("savedFlags = ???");
+        }
         out.println("savedLoadedFields = " + StringUtils.booleanArrayToString(savedLoadedFields));
 
         out.print("savedImage = ");

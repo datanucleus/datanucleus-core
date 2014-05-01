@@ -28,7 +28,6 @@ import org.datanucleus.asm.Type;
 import org.datanucleus.asm.TypePath;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.PersistenceFlags;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -148,7 +147,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
         mv.visitCode();
 
         AbstractClassMetaData cmd = mmd.getAbstractClassMetaData();
-        if ((mmd.getPersistenceFlags() & PersistenceFlags.MEDIATE_READ) == PersistenceFlags.MEDIATE_READ)
+        if ((mmd.getPersistenceFlags() & Persistable.MEDIATE_READ) == Persistable.MEDIATE_READ)
         {
             // MEDIATE_READ - see method JdoGetViaMediate
             Label startLabel = new Label();
@@ -276,7 +275,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
             mv.visitLocalVariable(argNames[0], asmClassDesc, null, startLabel, endLabel, 0);
             mv.visitMaxs(4, 1);
         }
-        else if ((mmd.getPersistenceFlags() & PersistenceFlags.CHECK_READ) == PersistenceFlags.CHECK_READ)
+        else if ((mmd.getPersistenceFlags() & Persistable.CHECK_READ) == Persistable.CHECK_READ)
         {
             // CHECK_READ - see method JdoGetViaCheck
             Label startLabel = new Label();

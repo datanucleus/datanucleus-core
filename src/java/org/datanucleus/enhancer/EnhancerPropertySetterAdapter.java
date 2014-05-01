@@ -28,7 +28,6 @@ import org.datanucleus.asm.Type;
 import org.datanucleus.asm.TypePath;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.PersistenceFlags;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -148,7 +147,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
         mv.visitCode();
 
         AbstractClassMetaData cmd = mmd.getAbstractClassMetaData();
-        if ((mmd.getPersistenceFlags() & PersistenceFlags.MEDIATE_WRITE) == PersistenceFlags.MEDIATE_WRITE)
+        if ((mmd.getPersistenceFlags() & Persistable.MEDIATE_WRITE) == Persistable.MEDIATE_WRITE)
         {
             // MEDIATE_WRITE - see method JdoSetViaMediate
             Label startLabel = new Label();
@@ -232,7 +231,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
             mv.visitLocalVariable(argNames[1], fieldTypeDesc, null, startLabel, endLabel, 1);
             mv.visitMaxs(5, 2);
         }
-        else if ((mmd.getPersistenceFlags() & PersistenceFlags.CHECK_WRITE) == PersistenceFlags.CHECK_WRITE)
+        else if ((mmd.getPersistenceFlags() & Persistable.CHECK_WRITE) == Persistable.CHECK_WRITE)
         {
             // CHECK_WRITE - see method JdoSetViaCheck
             Label startLabel = new Label();

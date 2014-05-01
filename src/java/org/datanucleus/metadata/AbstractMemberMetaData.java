@@ -33,6 +33,7 @@ import java.util.Set;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.api.ApiAdapter;
+import org.datanucleus.enhancer.Persistable;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -1000,7 +1001,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         byte serializable = 0;
         if (Serializable.class.isAssignableFrom(getType()) || getType().isPrimitive())
         {
-            serializable = PersistenceFlags.SERIALIZABLE;
+            serializable = Persistable.SERIALIZABLE;
         }
 
         if (FieldPersistenceModifier.NONE.equals(persistenceModifier))
@@ -1010,19 +1011,19 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         else if (FieldPersistenceModifier.TRANSACTIONAL.equals(persistenceModifier) &&
                  Modifier.isTransient(memberRepresented.getModifiers()))
         {
-            persistenceFlags = (byte) (PersistenceFlags.CHECK_WRITE | serializable);
+            persistenceFlags = (byte) (Persistable.CHECK_WRITE | serializable);
         }
         else if (primaryKey.booleanValue())
         {
-            persistenceFlags = (byte) (PersistenceFlags.MEDIATE_WRITE | serializable);
+            persistenceFlags = (byte) (Persistable.MEDIATE_WRITE | serializable);
         }
         else if (defaultFetchGroup.booleanValue())
         {
-            persistenceFlags = (byte) (PersistenceFlags.CHECK_READ | PersistenceFlags.CHECK_WRITE | serializable);
+            persistenceFlags = (byte) (Persistable.CHECK_READ | Persistable.CHECK_WRITE | serializable);
         }
         else if (!defaultFetchGroup.booleanValue())
         {
-            persistenceFlags = (byte) (PersistenceFlags.MEDIATE_READ | PersistenceFlags.MEDIATE_WRITE | serializable);
+            persistenceFlags = (byte) (Persistable.MEDIATE_READ | Persistable.MEDIATE_WRITE | serializable);
         }
         else
         {
