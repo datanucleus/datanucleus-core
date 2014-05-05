@@ -1954,12 +1954,16 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
                             Object transientId = nucCtx.getIdentityManager().getApplicationId(obj, cmd);
-                            T existingObj = (T)findObject(transientId, true, true, cmd.getFullClassName());
-                            ObjectProvider existingOP = findObjectProvider(existingObj);
-                            existingOP.attach(obj);
-                            id = transientId;
-                            merged = true;
-                            persistedPc = existingObj;
+                            if (transientId != null)
+                            {
+                                // User has set id field(s) so find the datastore object (if exists)
+                                T existingObj = (T)findObject(transientId, true, true, cmd.getFullClassName());
+                                ObjectProvider existingOP = findObjectProvider(existingObj);
+                                existingOP.attach(obj);
+                                id = transientId;
+                                merged = true;
+                                persistedPc = existingObj;
+                            }
                         }
                         cacheable = nucCtx.isClassCacheable(cmd);
                     }
