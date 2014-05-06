@@ -40,7 +40,6 @@ import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.Extent;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.StoreManager;
-import org.datanucleus.store.query.Query;
 import org.datanucleus.store.scostore.Store;
 import org.datanucleus.store.types.TypeManager;
 
@@ -575,12 +574,6 @@ public interface ExecutionContext
      * @return The Extent
      */
     <T> Extent<T> getExtent(Class<T> candidateClass, boolean includeSubclasses);
-
-    /**
-     * Accessor for a new Query.
-     * @return The new Query
-     */
-    Query newQuery();
 
     /**
      * Method to put a Persistable object associated to the ObjectProvider into the L1 cache.

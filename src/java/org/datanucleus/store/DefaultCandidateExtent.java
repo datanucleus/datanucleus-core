@@ -53,7 +53,7 @@ public class DefaultCandidateExtent<T> extends AbstractExtent<T>
     {
         super(ec, cls, subclasses, cmd);
 
-        query = ec.newQuery();
+        query = ec.getStoreManager().getQueryManager().newQuery("JDOQL", ec, null);
         fetchPlan = query.getFetchPlan();
         query.setCandidateClass(cls);
         query.setSubclasses(subclasses);

@@ -24,7 +24,6 @@ import java.util.Map;
 import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.Extent;
-import org.datanucleus.store.query.Query;
 
 /**
  * ExecutionContext to attempt to handle multi-threaded PM/EM cases.
@@ -477,20 +476,6 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
             lock.lock();
 
             return super.getExtent(pcClass, subclasses);
-        }
-        finally
-        {
-            lock.unlock();
-        }
-    }
-
-    public Query newQuery()
-    {
-        try
-        {
-            lock.lock();
-
-            return super.newQuery();
         }
         finally
         {

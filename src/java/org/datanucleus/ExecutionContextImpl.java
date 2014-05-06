@@ -90,7 +90,6 @@ import org.datanucleus.store.PersistenceBatchType;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.fieldmanager.NullifyRelationFieldManager;
 import org.datanucleus.store.fieldmanager.ReachabilityFieldManager;
-import org.datanucleus.store.query.Query;
 import org.datanucleus.store.scostore.Store;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.util.Localiser;
@@ -5472,21 +5471,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             clr.unsetPrimary();
         }
-    }
-
-    /**
-     * Construct an empty query instance.
-     * @return The query
-     */
-    public Query newQuery()
-    {
-        Query q = getStoreManager().getQueryManager().newQuery("JDOQL", this, null);
-        if (ecListeners == null)
-        {
-            ecListeners = new HashSet();
-        }
-        ecListeners.add(q);
-        return q;
     }
 
     // ------------------------------------- Callback Listeners --------------------------------------
