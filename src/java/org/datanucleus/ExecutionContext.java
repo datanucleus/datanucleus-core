@@ -75,8 +75,8 @@ public interface ExecutionContext
 
     /**
      * Method to return the owner object.
-     * For JDO this will return the PersistenceManager that owns this object.
-     * For JPA this will return a dummy PersistenceManager related to the EntityManager owning the object.
+     * For JDO this will return the PersistenceManager in use.
+     * For JPA this will return the EntityManager in use.
      * @return The owner manager object
      */
     Object getOwner();
