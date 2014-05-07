@@ -361,7 +361,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     /**
      * Utility to return a managed connection not tied to any ExecutionContext. This would typically be used for schema operations or
      * for accessing sequences, things that we normally want to separate from any PM/EM persistence operations.
-     * This method returns a connection from the secondary connection factory (e.g. javax.jdo.option.connectionFactory2Name), if it is provided.
+     * This method returns a connection from the secondary connection factory (e.g. datanucleus.connectionFactory2Name), if it is provided.
      * @param isolation_level The transaction isolation scheme to use See org.datanucleus.transaction.TransactionIsolation 
      *     Pass in -1 if just want the default
      * @return The Connection to the datastore
