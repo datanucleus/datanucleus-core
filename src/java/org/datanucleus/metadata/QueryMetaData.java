@@ -91,18 +91,6 @@ public class QueryMetaData extends MetaData
         if (!StringUtils.isWhitespace(language))
         {
             this.language = language;
-            if (this.language.equals("javax.jdo.query.JDOQL")) // Convert to JDOQL
-            {
-                this.language = QueryLanguage.JDOQL.toString();
-            }
-            else if (this.language.equals("javax.jdo.query.SQL")) // Convert to SQL
-            {
-                this.language = QueryLanguage.SQL.toString();
-            }
-            else if (this.language.equals("javax.jdo.query.JPQL")) // Convert to JPQL
-            {
-                this.language = QueryLanguage.JPQL.toString();
-            }
         }
         return this;
     }

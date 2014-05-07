@@ -21,8 +21,6 @@ package org.datanucleus.store.valuegenerator;
 
 /**
  * Generator interface for values.
- * Uses the same methods as in the javax.jdo.datastore.Sequence interface
- * 
  * @param <T> Type of the generated value (Long, String etc)
  */
 public interface ValueGenerator<T>
