@@ -1300,13 +1300,20 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         ThreadContextInfo threadInfo = acquireThreadContextInfo();
-        if (threadInfo.nontxPersistDelete)
+        try
         {
-            // Invoked from persist/delete so ignore as we are handling it
-            return;
-        }
+            if (threadInfo.nontxPersistDelete)
+            {
+                // Invoked from persist/delete so ignore as we are handling it
+                return;
+            }
 
-        processNontransactionalAtomicChanges();
+            processNontransactionalAtomicChanges();
+        }
+        finally
+        {
+            releaseThreadContextInfo();
+        }
     }
 
     /**
@@ -2541,8 +2548,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 // If the object is detached, re-attach it
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("010018", 
-                        StringUtils.toJVMIDString(pc), StringUtils.toJVMIDString(pcTarget)));
+                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("010018", StringUtils.toJVMIDString(pc), StringUtils.toJVMIDString(pcTarget)));
                 }
 
                 targetOP.attachCopy(pc, sco);
