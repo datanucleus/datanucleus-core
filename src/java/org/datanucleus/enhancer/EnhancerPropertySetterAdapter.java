@@ -149,7 +149,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
         AbstractClassMetaData cmd = mmd.getAbstractClassMetaData();
         if ((mmd.getPersistenceFlags() & Persistable.MEDIATE_WRITE) == Persistable.MEDIATE_WRITE)
         {
-            // MEDIATE_WRITE - see method JdoSetViaMediate
+            // MEDIATE_WRITE - see method SetViaMediate
             Label startLabel = new Label();
             mv.visitLabel(startLabel);
 
@@ -233,7 +233,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
         }
         else if ((mmd.getPersistenceFlags() & Persistable.CHECK_WRITE) == Persistable.CHECK_WRITE)
         {
-            // CHECK_WRITE - see method JdoSetViaCheck
+            // CHECK_WRITE - see method SetViaCheck
             Label startLabel = new Label();
             mv.visitLabel(startLabel);
 
@@ -317,7 +317,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
         }
         else
         {
-            // NORMAL - see method JdoSetNormal
+            // NORMAL - see method SetNormal
             Label startLabel = new Label();
             mv.visitLabel(startLabel);
 

@@ -208,7 +208,7 @@ public class CopyKeyFieldsToObjectId2 extends ClassMethod
                             visitor.visitVarInsn(Opcodes.ALOAD, 1);
                             EnhanceUtils.addBIPUSHToMethod(visitor, fmd.getFieldId());
                             visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(),
-                                "fetch" + typeMethodName + "Field", "(I)" + EnhanceUtils.getTypeDescriptorForJDOMethod(fmd.getType()));
+                                "fetch" + typeMethodName + "Field", "(I)" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()));
                             if (typeMethodName.equals("Object"))
                             {
                                 visitor.visitTypeInsn(Opcodes.CHECKCAST, fmd.getTypeName().replace('.', '/'));
@@ -232,7 +232,7 @@ public class CopyKeyFieldsToObjectId2 extends ClassMethod
                                 visitor.visitVarInsn(Opcodes.ALOAD, 1);
                                 EnhanceUtils.addBIPUSHToMethod(visitor, fmd.getFieldId());
                                 visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(),
-                                    "fetch" + typeMethodName + "Field", "(I)" + EnhanceUtils.getTypeDescriptorForJDOMethod(fmd.getType()));
+                                    "fetch" + typeMethodName + "Field", "(I)" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()));
                                 if (typeMethodName.equals("Object"))
                                 {
                                     visitor.visitTypeInsn(Opcodes.CHECKCAST, fmd.getTypeName().replace('.', '/'));
@@ -247,7 +247,7 @@ public class CopyKeyFieldsToObjectId2 extends ClassMethod
                                 visitor.visitVarInsn(Opcodes.ALOAD, 1);
                                 EnhanceUtils.addBIPUSHToMethod(visitor, fmd.getFieldId());
                                 visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(),
-                                    "fetch" + typeMethodName + "Field", "(I)" + EnhanceUtils.getTypeDescriptorForJDOMethod(fmd.getType()));
+                                    "fetch" + typeMethodName + "Field", "(I)" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()));
                                 if (typeMethodName.equals("Object"))
                                 {
                                     visitor.visitTypeInsn(Opcodes.CHECKCAST, fmd.getTypeName().replace('.', '/'));

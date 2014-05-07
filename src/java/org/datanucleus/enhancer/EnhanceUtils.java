@@ -203,7 +203,7 @@ public final class EnhanceUtils
     }
 
     /**
-     * Convenience method to give the JDO method name given the type.
+     * Convenience method to give the type name given the type.
      * This is for the assorted methods on the StateManager called things like "replacingStringField",
      * "replacingObjectField", "providedIntField", etc. Just returns the "type" part of the name.
      * <ul>
@@ -320,8 +320,8 @@ public final class EnhanceUtils
         }
     }
     /**
-     * Convenience method to give the descriptor for use in a JDO "field" method.
-     * This is for the assorted methods on the JDO StateManager called things like "replacingStringField",
+     * Convenience method to give the descriptor for use in an enhanced "field" method.
+     * This is for the assorted methods on the StateManager called things like "replacingStringField",
      * "replacingObjectField", "providedIntField", etc. Returns the ASM descriptor equivalent for the method used
      * <ul>
      * <li>Boolean, bool : returns "Boolean"</li>
@@ -339,7 +339,7 @@ public final class EnhanceUtils
      * @param cls The type of the field
      * @return Name for the method
      */
-    public static String getTypeDescriptorForJDOMethod(Class cls)
+    public static String getTypeDescriptorForEnhanceMethod(Class cls)
     {
         if (cls == null)
         {

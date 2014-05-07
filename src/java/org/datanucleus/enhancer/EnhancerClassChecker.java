@@ -284,7 +284,7 @@ public class EnhancerClassChecker extends ClassVisitor
             }
         }
 
-        // TODO Check enhancement of all fields to use jdoGetXXX, jdoSetXXX
+        // TODO Check enhancement of all fields to use dnGetXXX, dnSetXXX
         return null;
     }
 

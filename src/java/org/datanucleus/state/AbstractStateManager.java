@@ -1333,7 +1333,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     // -------------------------- providedXXXField Methods ----------------------------
 
     /**
-     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
      * @param pc the calling persistable instance
      * @param fieldNumber the field number
@@ -1345,7 +1345,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
      * @param pc the calling persistable instance
      * @param fieldNumber the field number
@@ -1357,7 +1357,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
      * @param pc the calling persistable instance
      * @param fieldNumber the field number
@@ -1369,7 +1369,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
      * @param pc the calling persistable instance
      * @param fieldNumber the field number
@@ -1381,7 +1381,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
      * @param pc the calling persistable instance
      * @param fieldNumber the field number
@@ -1393,7 +1393,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
      * @param pc the calling persistable instance
      * @param fieldNumber the field number
@@ -1405,7 +1405,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
      * @param pc the calling persistable instance
      * @param fieldNumber the field number
@@ -1417,7 +1417,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
      * @param pc the calling persistable instance
      * @param fieldNumber the field number
@@ -1429,7 +1429,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
      * @param pc the calling persistable instance
      * @param fieldNumber the field number
@@ -1441,7 +1441,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is called from the associated persistable when its jdoProvideFields() method is invoked. Its purpose is
+     * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
      * @param pc the calling persistable instance
      * @param fieldNumber the field number
@@ -1453,7 +1453,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a boolean field.
+     * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a boolean field.
      * @param pc the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
@@ -1466,7 +1466,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a byte field.
+     * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a byte field.
      * @param obj the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
@@ -1479,7 +1479,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a char field.
+     * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a char field.
      * @param obj the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
@@ -1492,7 +1492,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a double field.
+     * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a double field.
      * @param obj the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
@@ -1505,7 +1505,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a float field.
+     * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a float field.
      * @param obj the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
@@ -1518,7 +1518,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a int field.
+     * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a int field.
      * @param obj the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
@@ -1531,7 +1531,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a long field.
+     * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a long field.
      * @param obj the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
@@ -1544,7 +1544,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a short field.
+     * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a short field.
      * @param obj the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
@@ -1557,7 +1557,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of a String field.
+     * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a String field.
      * @param obj the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
@@ -1570,7 +1570,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /**
-     * This method is invoked by the persistable object's jdoReplaceField() method to refresh the value of an Object field.
+     * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of an Object field.
      * @param obj the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field

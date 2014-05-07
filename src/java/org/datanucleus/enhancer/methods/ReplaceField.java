@@ -151,7 +151,7 @@ public class ReplaceField extends ClassMethod
                     String methodNameType = EnhanceUtils.getTypeNameForPersistableMethod(fields[i].getType());
                     visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
                         "replacing" + methodNameType + "Field",
-                        "(" + getNamer().getPersistableDescriptor() + "I)" + EnhanceUtils.getTypeDescriptorForJDOMethod(fields[i].getType()));
+                        "(" + getNamer().getPersistableDescriptor() + "I)" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fields[i].getType()));
                     if (methodNameType.equals("Object"))
                     {
                         // Check any Object types for casting
@@ -253,7 +253,7 @@ public class ReplaceField extends ClassMethod
                     String methodNameType = EnhanceUtils.getTypeNameForPersistableMethod(fields[i].getType());
                     visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
                         "replacing" + methodNameType + "Field",
-                        "(" + getNamer().getPersistableDescriptor() + "I)" + EnhanceUtils.getTypeDescriptorForJDOMethod(fields[i].getType()));
+                        "(" + getNamer().getPersistableDescriptor() + "I)" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fields[i].getType()));
                     if (methodNameType.equals("Object"))
                     {
                         // Check any Object types for casting

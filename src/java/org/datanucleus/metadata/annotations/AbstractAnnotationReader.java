@@ -41,7 +41,7 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.Localiser;
 
 /**
- * Abstract implementation of a metadata annotations reader for JDK 1.5.
+ * Abstract implementation of a metadata annotations reader.
  * A metadata annotation reader takes in a class and converts its annotations into internal metadata.
  * Any implementation has to implement the method "processClassAnnotations" which creates the ClassMetaData 
  * record for the class, and the method "processFieldAnnotations" which updates the ClassMetaData with its

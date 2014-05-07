@@ -43,7 +43,7 @@ public interface ObjectProviderFactory
      * This constructor is used for creating new instances of existing persistent objects.
      * @param ec the ExecutionContext
      * @param pcClass the class of the new instance to be created.
-     * @param id the JDO identity of the object.
+     * @param id the identity of the object.
      * @param <T> Type of the persistable class
      * @return The ObjectProvider
      */
@@ -53,7 +53,7 @@ public interface ObjectProviderFactory
      * Constructs an ObjectProvider to manage a hollow instance having the given object ID.
      * The instance is already supplied.
      * @param ec ExecutionContext
-     * @param id the JDO identity of the object.
+     * @param id the identity of the object.
      * @param pc The object that is hollow that we are going to manage
      * @param <T> Type of the persistable class
      * @return The ObjectProvider
@@ -66,7 +66,7 @@ public interface ObjectProviderFactory
      * creating new instances of persistent objects obtained e.g. via a Query or backed by a view.
      * @param ec ExecutionContext
      * @param pcClass the class of the new instance to be created.
-     * @param id the JDO identity of the object.
+     * @param id the identity of the object.
      * @param fv the initial field values of the object.
      * @param <T> Type of the persistable class
      * @return The ObjectProvider
@@ -76,7 +76,7 @@ public interface ObjectProviderFactory
     /**
      * Constructs an ObjectProvider to manage the specified persistent instance having the given object ID.
      * @param ec the execution context controlling this state manager.
-     * @param id the JDO identity of the object.
+     * @param id the identity of the object.
      * @param pc The object that is persistent that we are going to manage
      * @param <T> Type of the persistable class
      * @return The ObjectProvider
@@ -150,7 +150,7 @@ public interface ObjectProviderFactory
      * Constructor for creating ObjectProvider instances to manage persistable objects in detached state.
      * @param ec ExecutionContext
      * @param pc the detached object
-     * @param id the JDO identity of the object.
+     * @param id the identity of the object.
      * @param version the detached version
      * @param <T> Type of the persistable class
      * @return The ObjectProvider

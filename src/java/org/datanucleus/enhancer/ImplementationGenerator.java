@@ -319,7 +319,7 @@ public class ImplementationGenerator
     {
         boolean isBoolean = mmd.getTypeName().equals("boolean");
         String getterName = ClassUtils.getJavaBeanGetterName(mmd.getName(), isBoolean);
-        String jdoGetterName = namer.getGetMethodPrefixMethodName() + mmd.getName();
+        String dnGetterName = namer.getGetMethodPrefixMethodName() + mmd.getName();
         if (inputCmd instanceof InterfaceMetaData)
         {
             // Interface so generate getXXX
@@ -348,11 +348,11 @@ public class ImplementationGenerator
             MethodVisitor getVisitor = writer.visitMethod(getAccess, getterName, "()" + fieldDesc, null, null);
             EnhancerPropertyGetterAdapter.generateGetXXXMethod(getVisitor, mmd, asmClassName, asmTypeDescriptor, false, namer);
 
-            // Abstract class so generate jdoGetXXX
+            // Abstract class so generate dnGetXXX
             int access = (mmd.isPublic() ? Opcodes.ACC_PUBLIC : 0) | 
                 (mmd.isProtected() ? Opcodes.ACC_PROTECTED : 0) | 
                 (mmd.isPrivate() ? Opcodes.ACC_PRIVATE : 0);
-            MethodVisitor visitor = writer.visitMethod(access, jdoGetterName, "()" + fieldDesc, null, null);
+            MethodVisitor visitor = writer.visitMethod(access, dnGetterName, "()" + fieldDesc, null, null);
             visitor.visitCode();
             Label l0 = new Label();
             visitor.visitLabel(l0);
@@ -374,7 +374,7 @@ public class ImplementationGenerator
     protected void createSetter(AbstractMemberMetaData mmd)
     {
         String setterName = ClassUtils.getJavaBeanSetterName(mmd.getName());
-        String jdoSetterName = namer.getSetMethodPrefixMethodName() + mmd.getName();
+        String dnSetterName = namer.getSetMethodPrefixMethodName() + mmd.getName();
         if (inputCmd instanceof InterfaceMetaData)
         {
             // Interface so generate setXXX
@@ -404,11 +404,11 @@ public class ImplementationGenerator
             MethodVisitor setVisitor = writer.visitMethod(setAccess, setterName, "(" + fieldDesc + ")V", null, null);
             EnhancerPropertySetterAdapter.generateSetXXXMethod(setVisitor, mmd, asmClassName, asmTypeDescriptor, namer);
 
-            // Abstract class so generate jdoSetXXX
+            // Abstract class so generate dnSetXXX
             int access = (mmd.isPublic() ? Opcodes.ACC_PUBLIC : 0) | 
                 (mmd.isProtected() ? Opcodes.ACC_PROTECTED : 0) | 
                 (mmd.isPrivate() ? Opcodes.ACC_PRIVATE : 0);
-            MethodVisitor visitor = writer.visitMethod(access, jdoSetterName, "(" + fieldDesc + ")V", null, null);
+            MethodVisitor visitor = writer.visitMethod(access, dnSetterName, "(" + fieldDesc + ")V", null, null);
             visitor.visitCode();
             Label l0 = new Label();
             visitor.visitLabel(l0);

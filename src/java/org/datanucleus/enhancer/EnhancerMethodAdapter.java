@@ -107,7 +107,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
                     String fieldOwner = fmd.getClassName(true).replace('.', '/');
                     if (opcode == Opcodes.GETFIELD)
                     {
-                        // Read of a field of a PC class, so replace with jdoGetXXX() call
+                        // Read of a field of a PC class, so replace with dnGetXXX() call
                         mv.visitMethodInsn(Opcodes.INVOKESTATIC, fieldOwner, enhancer.getNamer().getGetMethodPrefixMethodName() + name, "(L" + fieldOwner + ";)" + desc);
                         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
                         {
@@ -119,7 +119,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
                     }
                     else if (opcode == Opcodes.PUTFIELD)
                     {
-                        // Write of a field of a PC class, so replace with jdoSetXXX() call
+                        // Write of a field of a PC class, so replace with dnSetXXX() call
                         mv.visitMethodInsn(Opcodes.INVOKESTATIC, fieldOwner, enhancer.getNamer().getSetMethodPrefixMethodName() + name, "(L" + fieldOwner + ";" + desc + ")V");
                         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
                         {

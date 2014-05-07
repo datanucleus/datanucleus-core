@@ -247,7 +247,7 @@ public class EnhancerClassAdapter extends ClassVisitor
             AbstractMemberMetaData mmd = enhancer.getClassMetaData().getMetaDataForMember(propGetterName);
             if (mmd != null && mmd instanceof PropertyMetaData && mmd.getPersistenceModifier() != FieldPersistenceModifier.NONE)
             {
-                // Property getter method "getXXX" - generated jdoGetXXX
+                // Property getter method "getXXX" - generated dnGetXXX
                 return new EnhancerPropertyGetterAdapter(mv, enhancer, name, desc, mmd, cv);
             }
         }
@@ -256,7 +256,7 @@ public class EnhancerClassAdapter extends ClassVisitor
             AbstractMemberMetaData mmd = enhancer.getClassMetaData().getMetaDataForMember(propSetterName);
             if (mmd != null && mmd instanceof PropertyMetaData && mmd.getPersistenceModifier() != FieldPersistenceModifier.NONE)
             {
-                // Property setter method "setXXX" - generates jdoSetXXX
+                // Property setter method "setXXX" - generates dnSetXXX
                 return new EnhancerPropertySetterAdapter(mv, enhancer, name, desc, mmd, cv);
             }
         }
@@ -359,7 +359,7 @@ public class EnhancerClassAdapter extends ClassVisitor
                 }
             }
 
-            // Add jdoGetXXX, jdoSetXXX for each of the (managed) fields/properties
+            // Add dnGetXXX, dnSetXXX for each of the (managed) fields/properties
             AbstractMemberMetaData[] fmds = cmd.getManagedMembers();
             for (int i = 0; i < fmds.length; i++)
             {
@@ -369,21 +369,21 @@ public class EnhancerClassAdapter extends ClassVisitor
                     continue;
                 }
 
-                byte jdoFlag = fmds[i].getPersistenceFlags();
+                byte persistenceFlags = fmds[i].getPersistenceFlags();
                 ClassMethod getMethod = null;
                 ClassMethod setMethod = null;
                 if (fmds[i] instanceof PropertyMetaData)
                 {
-                    // jdoGetXXX, jdoSetXXX for property are generated when processing existing getXXX, setXXX methods
+                    // dnGetXXX, dnSetXXX for property are generated when processing existing getXXX, setXXX methods
                 }
                 else
                 {
-                    // Generate jdoGetXXX, jdoSetXXX for field
-                    if ((jdoFlag & Persistable.MEDIATE_READ) == Persistable.MEDIATE_READ)
+                    // Generate dnGetXXX, dnSetXXX for field
+                    if ((persistenceFlags & Persistable.MEDIATE_READ) == Persistable.MEDIATE_READ)
                     {
                         getMethod = new GetViaMediate(enhancer, fmds[i]);
                     }
-                    else if ((jdoFlag & Persistable.CHECK_READ) == Persistable.CHECK_READ)
+                    else if ((persistenceFlags & Persistable.CHECK_READ) == Persistable.CHECK_READ)
                     {
                         getMethod = new GetViaCheck(enhancer, fmds[i]);
                     }
@@ -392,11 +392,11 @@ public class EnhancerClassAdapter extends ClassVisitor
                         getMethod = new GetNormal(enhancer, fmds[i]);
                     }
 
-                    if ((jdoFlag & Persistable.MEDIATE_WRITE) == Persistable.MEDIATE_WRITE)
+                    if ((persistenceFlags & Persistable.MEDIATE_WRITE) == Persistable.MEDIATE_WRITE)
                     {
                         setMethod = new SetViaMediate(enhancer, fmds[i]);
                     }
-                    else if ((jdoFlag & Persistable.CHECK_WRITE) == Persistable.CHECK_WRITE)
+                    else if ((persistenceFlags & Persistable.CHECK_WRITE) == Persistable.CHECK_WRITE)
                     {
                         setMethod = new SetViaCheck(enhancer, fmds[i]);
                     }

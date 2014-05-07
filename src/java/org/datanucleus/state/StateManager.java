@@ -41,20 +41,20 @@ public interface StateManager
      * The owning <code>StateManager</code> uses this method to supply the value of the flags to the
      * <code>Persistable</code> instance.
      * @param pc the calling <code>Persistable</code> instance
-     * @return the value of <code>jdoFlags</code> to be stored in the <code>Persistable</code> instance
+     * @return the value of <code>dnFlags</code> to be stored in the <code>Persistable</code> instance
      */
     byte replacingFlags(Persistable pc);
 
     /**
-     * Replace the current value of <code>jdoStateManager</code>.
+     * Replace the current value of <code>dnStateManager</code>.
      * <P>
-     * This method is called by the <code>Persistable</code> whenever <code>jdoReplaceStateManager</code> is
+     * This method is called by the <code>Persistable</code> whenever <code>dnReplaceStateManager</code> is
      * called and there is already an owning <code>StateManager</code>. This is a security precaution to
      * ensure that the owning <code>StateManager</code> is the only source of any change to its reference in
      * the <code>Persistable</code>.
-     * @return the new value for the <code>jdoStateManager</code>
+     * @return the new value for the <code>dnStateManager</code>
      * @param pc the calling <code>Persistable</code> instance
-     * @param sm the proposed new value for the <code>jdoStateManager</code>
+     * @param sm the proposed new value for the <code>dnStateManager</code>
      */
     StateManager replacingStateManager(Persistable pc, StateManager sm);
 
@@ -162,7 +162,7 @@ public interface StateManager
 
     /**
      * Guarantee that the serializable transactional and persistent fields are loaded into the instance. This
-     * method is called by the generated <code>jdoPreSerialize</code> method prior to serialization of the
+     * method is called by the generated <code>dnPreSerialize</code> method prior to serialization of the
      * instance.
      * @param pc the calling <code>Persistable</code> instance
      */

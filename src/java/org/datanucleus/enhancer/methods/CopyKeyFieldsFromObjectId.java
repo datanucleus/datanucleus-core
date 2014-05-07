@@ -322,7 +322,7 @@ public class CopyKeyFieldsFromObjectId extends ClassMethod
                                 visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE,
                                     getNamer().getObjectIdFieldConsumerAsmClassName(),
                                     "store" + typeMethodName + "Field",
-                                    "(I" + EnhanceUtils.getTypeDescriptorForJDOMethod(fmd.getType()) + ")V");
+                                    "(I" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()) + ")V");
                             }
                             else if (Modifier.isPublic(pkFieldModifiers))
                             {
@@ -335,7 +335,7 @@ public class CopyKeyFieldsFromObjectId extends ClassMethod
                                 visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE,
                                     getNamer().getObjectIdFieldConsumerAsmClassName(),
                                     "store" + typeMethodName + "Field",
-                                    "(I" + EnhanceUtils.getTypeDescriptorForJDOMethod(fmd.getType()) + ")V");
+                                    "(I" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()) + ")V");
                             }
                             else
                             {
@@ -418,7 +418,7 @@ public class CopyKeyFieldsFromObjectId extends ClassMethod
                                 visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE,
                                     getNamer().getObjectIdFieldConsumerAsmClassName(),
                                     "store" + typeMethodName + "Field",
-                                    "(I" + EnhanceUtils.getTypeDescriptorForJDOMethod(fmd.getType()) + ")V");
+                                    "(I" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()) + ")V");
                             }
                         }
                     }

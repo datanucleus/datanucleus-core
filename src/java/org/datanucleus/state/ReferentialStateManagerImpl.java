@@ -32,7 +32,7 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Implementation of a JDO StateManager for use where insertion ordering is important (such as RDBMS).
+ * Implementation of a StateManager for use where insertion ordering is important (such as RDBMS).
  * Adds on simple handling to be run after an object is inserted.
  */
 public class ReferentialStateManagerImpl extends StateManagerImpl

@@ -158,7 +158,7 @@ public class ProvideField extends ClassMethod
                     }
                     visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
                         "provided" + EnhanceUtils.getTypeNameForPersistableMethod(fields[i].getType())+ "Field",
-                        "(" + getNamer().getPersistableDescriptor() + "I" + EnhanceUtils.getTypeDescriptorForJDOMethod(fields[i].getType()) + ")V");
+                        "(" + getNamer().getPersistableDescriptor() + "I" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fields[i].getType()) + ")V");
                     visitor.visitJumpInsn(Opcodes.GOTO, endSwitchLabel);
                 }
 
@@ -254,7 +254,7 @@ public class ProvideField extends ClassMethod
                     }
                     visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
                         "provided" + EnhanceUtils.getTypeNameForPersistableMethod(fields[i].getType()) + "Field",
-                        "(" + getNamer().getPersistableDescriptor() + "I" + EnhanceUtils.getTypeDescriptorForJDOMethod(fields[i].getType()) + ")V");
+                        "(" + getNamer().getPersistableDescriptor() + "I" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fields[i].getType()) + ")V");
                     visitor.visitJumpInsn(Opcodes.GOTO, endSwitchLabel);
                 }
 
