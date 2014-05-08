@@ -993,11 +993,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     public void enlistInTransaction(ObjectProvider op)
     {
         assertActiveTransaction();
-        if (NucleusLogger.TRANSACTION.isDebugEnabled())
-        {
-            NucleusLogger.TRANSACTION.debug(LOCALISER.msg("015017", 
-                StringUtils.toJVMIDString(op.getObject()), op.getInternalObjectId().toString()));
-        }
 
         if (getReachabilityAtCommit() && tx.isActive())
         {
@@ -1023,6 +1018,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         }
 
+        if (NucleusLogger.TRANSACTION.isDebugEnabled())
+        {
+            NucleusLogger.TRANSACTION.debug(LOCALISER.msg("015017", StringUtils.toJVMIDString(op.getObject()), op.getInternalObjectId().toString()));
+        }
         enlistedOPCache.put(op.getInternalObjectId(), op);
     }
 
@@ -1032,20 +1031,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void evictFromTransaction(ObjectProvider op)
     {
-        if (NucleusLogger.TRANSACTION.isDebugEnabled())
+        if (enlistedOPCache.remove(op.getInternalObjectId()) != null)
         {
-            NucleusLogger.TRANSACTION.debug(LOCALISER.msg("015019", 
-                StringUtils.toJVMIDString(op.getObject()),
-                IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId())));
-        }
-
-        if (enlistedOPCache.remove(op.getInternalObjectId()) == null)
-        {
-            //probably because the object was garbage collected
             if (NucleusLogger.TRANSACTION.isDebugEnabled())
             {
-                NucleusLogger.TRANSACTION.debug(LOCALISER.msg("010023", 
-                    StringUtils.toJVMIDString(op.getObject()), 
+                NucleusLogger.TRANSACTION.debug(LOCALISER.msg("015019", StringUtils.toJVMIDString(op.getObject()), 
                     IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId())));
             }
         }
@@ -1344,6 +1334,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Make sure all non-tx dirty objects are enlisted so they get lifecycle changes
             for (ObjectProvider op : dirtyOPs)
             {
+                if (NucleusLogger.TRANSACTION.isDebugEnabled())
+                {
+                    NucleusLogger.TRANSACTION.debug(LOCALISER.msg("015017", StringUtils.toJVMIDString(op.getObject()), op.getInternalObjectId().toString()));
+                }
                 enlistedOPCache.put(op.getInternalObjectId(), op);
             }
 
@@ -4862,10 +4856,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 if (oldOP == null)
                 {
-                    NucleusLogger.CACHE.debug(LOCALISER.msg("003004", 
-                        StringUtils.toJVMIDString(op.getObject()), 
-                        IdentityUtils.getPersistableIdentityForId(id),
-                        StringUtils.booleanArrayToString(op.getLoadedFields())));
+                    NucleusLogger.CACHE.debug(LOCALISER.msg("003004", StringUtils.toJVMIDString(op.getObject()), 
+                        IdentityUtils.getPersistableIdentityForId(id), StringUtils.booleanArrayToString(op.getLoadedFields())));
                 }
             }
         }
@@ -5186,10 +5178,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 pc = op.getObject();
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
-                    NucleusLogger.CACHE.debug(LOCALISER.msg("003008", StringUtils.toJVMIDString(pc), 
-                        IdentityUtils.getPersistableIdentityForId(id), 
-                        StringUtils.booleanArrayToString(op.getLoadedFields()),
-                        "" + cache.size()));
+                    NucleusLogger.CACHE.debug(LOCALISER.msg("003008", StringUtils.toJVMIDString(pc), IdentityUtils.getPersistableIdentityForId(id), 
+                        StringUtils.booleanArrayToString(op.getLoadedFields()), "" + cache.size()));
                 }
 
                 // Wipe the detach state that may have been added if the object has been serialised in the meantime
@@ -5201,8 +5191,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
-                    NucleusLogger.CACHE.debug(LOCALISER.msg("003007", 
-                        IdentityUtils.getPersistableIdentityForId(id), "" + cache.size()));
+                    NucleusLogger.CACHE.debug(LOCALISER.msg("003007", IdentityUtils.getPersistableIdentityForId(id), "" + cache.size()));
                 }
             }
         }
