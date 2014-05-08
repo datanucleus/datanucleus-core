@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.datanucleus</groupId>
         <artifactId>datanucleus-maven-parent</artifactId>
-        <version>4.0.3</version>
+        <version>4.0.5-SNAPSHOT</version>
     </parent>
 
     <artifactId>datanucleus-core</artifactId>
