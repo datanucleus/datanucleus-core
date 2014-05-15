@@ -86,12 +86,10 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
         queued = ec.isDelayDatastoreOperationsEnabled();
         useCache = SCOUtils.useContainerCache(op, mmd);
 
-        if (!SCOUtils.collectionHasSerialisedElements(mmd) && 
-            mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
+        if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
             ClassLoaderResolver clr = ec.getClassLoaderResolver();
-            this.backingStore = (CollectionStore)
-                ((BackedSCOStoreManager)ec.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.Collection.class);
+            this.backingStore = (CollectionStore)((BackedSCOStoreManager)op.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.Collection.class);
         }
 
         // Set up our delegate

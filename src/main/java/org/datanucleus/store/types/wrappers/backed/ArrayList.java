@@ -87,12 +87,10 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
         queued = ec.isDelayDatastoreOperationsEnabled();
         useCache = SCOUtils.useContainerCache(op, mmd);
 
-        if (!SCOUtils.collectionHasSerialisedElements(mmd) && 
-            mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
+        if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
             ClassLoaderResolver clr = ec.getClassLoaderResolver();
-            this.backingStore = (ListStore)
-            ((BackedSCOStoreManager)ec.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.ArrayList.class);
+            this.backingStore = (ListStore)((BackedSCOStoreManager)op.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.ArrayList.class);
         }
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())

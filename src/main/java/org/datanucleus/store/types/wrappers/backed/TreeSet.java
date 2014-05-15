@@ -85,15 +85,13 @@ public class TreeSet extends org.datanucleus.store.types.wrappers.TreeSet implem
         queued = ec.isDelayDatastoreOperationsEnabled();
         useCache = SCOUtils.useContainerCache(op, mmd);
 
-        if (!SCOUtils.collectionHasSerialisedElements(mmd) && 
-            mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
+        if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
             ClassLoaderResolver clr = ec.getClassLoaderResolver();
-            this.backingStore = (SetStore)
-            ((BackedSCOStoreManager)ec.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.TreeSet.class);
+            this.backingStore = (SetStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.TreeSet.class);
         }
         // Set up our delegate, using a suitable comparator
-        Comparator comparator = SCOUtils.getComparator(mmd, op.getExecutionContext().getClassLoaderResolver());
+        Comparator comparator = SCOUtils.getComparator(mmd, ec.getClassLoaderResolver());
         if (comparator != null)
         {
             this.delegate = new java.util.TreeSet(comparator);
@@ -105,8 +103,8 @@ public class TreeSet extends org.datanucleus.store.types.wrappers.TreeSet implem
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(op, ownerMmd.getName(), this,
-                useCache, queued, allowNulls, SCOUtils.useCachedLazyLoading(op, ownerMmd)));
+            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this,
+                useCache, queued, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
         }
     }
 

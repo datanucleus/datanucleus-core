@@ -106,11 +106,10 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
         {
             this.backingStore = backingStore;
         }
-        else if (!SCOUtils.collectionHasSerialisedElements(mmd) && 
-                mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
+        else if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
             this.backingStore = (SetStore)
-            ((BackedSCOStoreManager)ec.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.Set.class);
+            ((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.Set.class);
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {

@@ -60,21 +60,19 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
     {
         super(op, mmd);
 
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = ownerOP.getExecutionContext();
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
         queued = ec.isDelayDatastoreOperationsEnabled();
-        useCache = SCOUtils.useContainerCache(op, mmd);
+        useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
-        if (!SCOUtils.mapHasSerialisedKeysAndValues(mmd) && 
-            mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
+        if (!SCOUtils.mapHasSerialisedKeysAndValues(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
             ClassLoaderResolver clr = ec.getClassLoaderResolver();
-            this.backingStore = (MapStore)
-            ((BackedSCOStoreManager)ec.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.TreeMap.class);
+            this.backingStore = (MapStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.TreeMap.class);
         }
 
         // Set up our delegate, using a comparator
-        Comparator comparator = SCOUtils.getComparator(mmd, op.getExecutionContext().getClassLoaderResolver());
+        Comparator comparator = SCOUtils.getComparator(mmd, ec.getClassLoaderResolver());
         if (comparator != null)
         {
             this.delegate = new java.util.TreeMap(comparator);

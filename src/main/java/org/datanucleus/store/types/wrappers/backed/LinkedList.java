@@ -87,12 +87,10 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
         queued = ec.isDelayDatastoreOperationsEnabled();
         useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
-        if (!SCOUtils.collectionHasSerialisedElements(mmd) && 
-            mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
+        if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
             ClassLoaderResolver clr = ec.getClassLoaderResolver();
-            this.backingStore = (ListStore)
-            ((BackedSCOStoreManager)ec.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.LinkedList.class);
+            this.backingStore = (ListStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.LinkedList.class);
         }
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())

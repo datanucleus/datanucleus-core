@@ -53,9 +53,9 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
      * @param ownerOP the owner ObjectProvider
      * @param mmd Metadata for the member
      */
-    public HashMap(ObjectProvider ownerOP, AbstractMemberMetaData mmd)
+    public HashMap(ObjectProvider op, AbstractMemberMetaData mmd)
     {
-        super(ownerOP, mmd);
+        super(op, mmd);
 
         // Set up our "delegate"
         this.delegate = new java.util.HashMap();
@@ -65,12 +65,10 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
         queued = ec.isDelayDatastoreOperationsEnabled();
         useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
-        if (!SCOUtils.mapHasSerialisedKeysAndValues(mmd) && 
-            mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
+        if (!SCOUtils.mapHasSerialisedKeysAndValues(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
             ClassLoaderResolver clr = ec.getClassLoaderResolver();
-            this.backingStore = (MapStore)
-            ((BackedSCOStoreManager)ec.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.HashMap.class);
+            this.backingStore = (MapStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.HashMap.class);
         }
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())

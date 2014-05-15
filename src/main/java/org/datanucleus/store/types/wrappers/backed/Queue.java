@@ -79,23 +79,22 @@ public class Queue extends org.datanucleus.store.types.wrappers.Queue implements
         // Set up our delegate
         this.delegate = new java.util.PriorityQueue();
 
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = ownerOP.getExecutionContext();
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
         queued = ec.isDelayDatastoreOperationsEnabled();
-        useCache = SCOUtils.useContainerCache(op, mmd);
+        useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
         if (!SCOUtils.collectionHasSerialisedElements(mmd) && 
             mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
             ClassLoaderResolver clr = ec.getClassLoaderResolver();
-            this.backingStore = (ListStore)
-            ((BackedSCOStoreManager)ec.getStoreManager()).getBackingStoreForField(clr,mmd,java.util.Queue.class);
+            this.backingStore = (ListStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr,mmd,java.util.Queue.class);
         }
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(op, ownerMmd.getName(), this,
-                useCache, queued, allowNulls, SCOUtils.useCachedLazyLoading(op, ownerMmd)));
+            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this,
+                useCache, queued, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
         }
     }
 
