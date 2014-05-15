@@ -212,13 +212,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
 
     public StoreManager getStoreManager()
     {
-        StoreManager storeMgr = myEC.getStoreManager();
-        if (storeMgr instanceof FederatedStoreManager)
-        {
-            // return the real StoreManager
-            storeMgr = ((FederatedStoreManager)storeMgr).getStoreManagerForClass(cmd);
-        }
-        return storeMgr;
+        return (myEC.getNucleusContext().isFederated() ? ((FederatedStoreManager)myEC.getStoreManager()).getStoreManagerForClass(cmd) : myEC.getStoreManager());
     }
 
     /**
@@ -833,10 +827,11 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
                 myEC.flushInternal(false);
             }
 
+            myEC.getNucleusContext();
             if (!isEmbedded())
             {
                 // Nothing to delete if embedded
-                myEC.getStoreManager().getPersistenceHandler().deleteObject(this);
+                getStoreManager().getPersistenceHandler().deleteObject(this);
             }
 
             preDeleteLoadedFields = null;
@@ -854,7 +849,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     public void locate()
     {
         // Validate the object existence
-        myEC.getStoreManager().getPersistenceHandler().locateObject(this);
+        getStoreManager().getPersistenceHandler().locateObject(this);
     }
 
     /**
@@ -1136,7 +1131,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
 
         if ((flags&FLAG_NEED_INHERITANCE_VALIDATION)!=0) // TODO Merge this into fetch object handler
         {
-            String className = myEC.getStoreManager().getClassNameForObjectID(myID, myEC.getClassLoaderResolver(), myEC);
+            String className = getStoreManager().getClassNameForObjectID(myID, myEC.getClassLoaderResolver(), myEC);
             if (!getObject().getClass().getName().equals(className))
             {
                 myEC.removeObjectFromLevel1Cache(myID);
@@ -1149,7 +1144,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
         }
 
         // TODO If the field has "loadFetchGroup" defined, then add it to the fetch plan etc
-        myEC.getStoreManager().getPersistenceHandler().fetchObject(this, fieldNumbers);
+        getStoreManager().getPersistenceHandler().fetchObject(this, fieldNumbers);
     }
 
     /**

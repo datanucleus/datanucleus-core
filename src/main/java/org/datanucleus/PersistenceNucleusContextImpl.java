@@ -91,6 +91,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     /** Manager for the datastore used by this PMF/EMF. */
     transient StoreManager storeMgr = null;
 
+    private boolean federated = false;
+
     /** Auto-Start Mechanism for loading classes into the StoreManager (if enabled). */
     private transient AutoStartMechanism starter = null;
 
@@ -439,6 +441,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         {
             NucleusLogger.DATASTORE.debug("Creating FederatedStoreManager to handle federation of primary StoreManager and " + propNamesWithDatastore.size() + " secondary datastores");
             this.storeMgr = new FederatedStoreManager(clr, this);
+            this.federated = true;
         }
         NucleusLogger.DATASTORE.debug("StoreManager now created");
 
@@ -814,6 +817,15 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 ", mode=" + config.getStringProperty(PropertyNames.PROPERTY_CACHE_L2_MODE) + ")" +
                 ", QueryResults (" + config.getStringProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_TYPE) + ")" +
                 (config.getBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS) ? ", Collections/Maps " : ""));
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.PersistenceNucleusContext#isFederated()
+     */
+    @Override
+    public boolean isFederated()
+    {
+        return federated;
     }
 
     /* (non-Javadoc)

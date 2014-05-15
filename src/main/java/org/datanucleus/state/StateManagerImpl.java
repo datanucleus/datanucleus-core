@@ -2114,7 +2114,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     {
         // Inheritance case, check the level of the instance
         ClassLoaderResolver clr = myEC.getClassLoaderResolver();
-        String className = myEC.getStoreManager().getClassNameForObjectID(myID, clr, myEC);
+        String className = getStoreManager().getClassNameForObjectID(myID, clr, myEC);
         if (className == null)
         {
             // className is null when id class exists, and object has been validated and doesn't exist.
@@ -2187,7 +2187,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             IdentityStrategy strategy = mmd.getValueStrategy();
 
             // Check for the strategy, and if it is a datastore attributed strategy
-            if (strategy != null && !myEC.getStoreManager().isStrategyDatastoreAttributed(cmd, fieldNumber))
+            if (strategy != null && !getStoreManager().isStrategyDatastoreAttributed(cmd, fieldNumber))
             {
                 // Assign the strategy value where required.
                 // Default JDO2 behaviour is to always provide a strategy value when it is marked as using a strategy
@@ -2204,7 +2204,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 if (applyStrategy)
                 {
                     // Apply a strategy value for this field
-                    Object obj = myEC.getStoreManager().getStrategyValue(myEC, cmd, fieldNumber);
+                    Object obj = getStoreManager().getStrategyValue(myEC, cmd, fieldNumber);
                     this.replaceField(fieldNumber, obj);
                 }
             }
@@ -2268,7 +2268,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
 
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
-            if (cmd.getIdentityMetaData() == null || !myEC.getStoreManager().isStrategyDatastoreAttributed(cmd, -1))
+            if (cmd.getIdentityMetaData() == null || !getStoreManager().isStrategyDatastoreAttributed(cmd, -1))
             {
                 // Assumed to be set
                 myID = myEC.newObjectId(cmd.getFullClassName(), myPC);
@@ -2283,7 +2283,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 AbstractMemberMetaData fmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
                 if (fmd.isPrimaryKey())
                 {
-                    if (myEC.getStoreManager().isStrategyDatastoreAttributed(cmd, fieldNumber))
+                    if (getStoreManager().isStrategyDatastoreAttributed(cmd, fieldNumber))
                     {
                         idSetInDatastore = true;
                         break;
@@ -2493,7 +2493,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 for (int fieldNumber = 0; fieldNumber < fieldCount; fieldNumber++)
                 {
                     AbstractMemberMetaData fmd=cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-                    if (fmd.isPrimaryKey() && myEC.getStoreManager().isStrategyDatastoreAttributed(cmd, fieldNumber))
+                    if (fmd.isPrimaryKey() && getStoreManager().isStrategyDatastoreAttributed(cmd, fieldNumber))
                     {
                         //replace the value of the id, but before convert the value to the field type if needed
                         replaceField(myPC, fieldNumber, TypeConversionHelper.convertTo(id, fmd.getType()), false);
@@ -2542,7 +2542,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                     activity != ActivityState.INSERTING && activity != ActivityState.INSERTING_CALLBACKS &&
                     myLC.stateType() == LifeCycleState.P_NEW)
                 {
-                    if (myEC.getStoreManager().isStrategyDatastoreAttributed(cmd, -1))
+                    if (getStoreManager().isStrategyDatastoreAttributed(cmd, -1))
                     {
                         flush();
                     }
@@ -2565,7 +2565,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                     int[] pkFieldNumbers = cmd.getPKMemberPositions();
                     for (int i = 0; i < pkFieldNumbers.length; i++)
                     {
-                        if (myEC.getStoreManager().isStrategyDatastoreAttributed(cmd, pkFieldNumbers[i]))
+                        if (getStoreManager().isStrategyDatastoreAttributed(cmd, pkFieldNumbers[i]))
                         {
                             flush();
                             break;
@@ -3485,7 +3485,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             //postCreate, we clear dirty flags to make sure this object will not be flushed again
             clearDirtyFlags();
 
-            myEC.getStoreManager().getPersistenceHandler().insertObject(this);
+            getStoreManager().getPersistenceHandler().insertObject(this);
             setFlushedNew(true);
 
             getCallbackHandler().postStore(myPC);
@@ -4698,7 +4698,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                         {
                             myEC.markFieldsForUpdateInLevel2Cache(getInternalObjectId(), dirtyFields);
                         }
-                        myEC.getStoreManager().getPersistenceHandler().updateObject(this, dirtyFieldNumbers);
+                        getStoreManager().getPersistenceHandler().updateObject(this, dirtyFieldNumbers);
 
                         // Update the object in the cache(s)
                         myEC.putObjectIntoLevel1Cache(this);

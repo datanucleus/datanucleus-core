@@ -183,4 +183,10 @@ public interface PersistenceNucleusContext extends StoreNucleusContext
      * @return Whether it is cacheable
      */
     boolean isClassCacheable(AbstractClassMetaData cmd);
+
+    /**
+     * Return whether we are managing a federated context (i.e a primary StoreManager, with some secondary StoreManager(s)).
+     * @return Whether this is federated
+     */
+    boolean isFederated();
 }
