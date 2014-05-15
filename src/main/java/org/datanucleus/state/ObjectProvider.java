@@ -25,6 +25,7 @@ import org.datanucleus.cache.CachedPC;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.store.FieldValues;
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.fieldmanager.FieldManager;
 
 /**
@@ -168,6 +169,8 @@ public interface ObjectProvider<T>
     AbstractClassMetaData getClassMetaData();
 
     ExecutionContext getExecutionContext();
+
+    StoreManager getStoreManager();
 
     /**
      * The object being persisted, or a virtual object containing properties to be persisted

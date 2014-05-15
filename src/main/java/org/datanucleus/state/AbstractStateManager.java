@@ -35,6 +35,8 @@ import org.datanucleus.identity.IdentityReference;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
+import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.federation.FederatedStoreManager;
 import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.fieldmanager.LoadFieldManager;
 import org.datanucleus.store.fieldmanager.SingleTypeFieldManager;
@@ -206,6 +208,17 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     public ExecutionContext getExecutionContext()
     {
         return myEC;
+    }
+
+    public StoreManager getStoreManager()
+    {
+        StoreManager storeMgr = myEC.getStoreManager();
+        if (storeMgr instanceof FederatedStoreManager)
+        {
+            // return the real StoreManager
+            storeMgr = ((FederatedStoreManager)storeMgr).getStoreManagerForClass(cmd);
+        }
+        return storeMgr;
     }
 
     /**
