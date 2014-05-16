@@ -48,7 +48,9 @@ public enum JdbcType
     SMALLINT,
     SQLXML,
     TIME,
+    TIME_WITH_TIMEZONE, // JDK 1.8+
     TIMESTAMP,
+    TIMESTAMP_WITH_TIMEZONE, // JDK 1.8+
     TINYINT,
     VARBINARY,
     VARCHAR,
