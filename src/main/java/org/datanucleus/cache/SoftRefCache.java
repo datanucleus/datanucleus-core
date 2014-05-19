@@ -65,6 +65,9 @@ public class SoftRefCache implements Level1Cache
 
 	public void clear()
 	{
+		if (isEmpty()) {
+			return;
+		}
 		softCache.clear();
 	}
     
