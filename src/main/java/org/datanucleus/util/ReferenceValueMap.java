@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,7 +39,7 @@ import java.util.Set;
  */
 public abstract class ReferenceValueMap implements Map, Cloneable
 {
-    private HashMap map;
+    private LinkedHashMap map;
     private ReferenceQueue reaped = new ReferenceQueue();
 
     /**
@@ -46,7 +47,7 @@ public abstract class ReferenceValueMap implements Map, Cloneable
      **/
     public ReferenceValueMap()
     {
-        map = new HashMap();
+        map = new LinkedHashMap();
     }
 
     /**
@@ -55,7 +56,7 @@ public abstract class ReferenceValueMap implements Map, Cloneable
      **/
     public ReferenceValueMap(int initial_capacity)
     {
-        map = new HashMap(initial_capacity);
+        map = new LinkedHashMap(initial_capacity);
     }
 
     /**
@@ -65,7 +66,7 @@ public abstract class ReferenceValueMap implements Map, Cloneable
      **/
     public ReferenceValueMap(int initial_capacity,float load_factor)
     {
-        map = new HashMap(initial_capacity, load_factor);
+        map = new LinkedHashMap(initial_capacity, load_factor);
     }
 
     /**
@@ -74,7 +75,7 @@ public abstract class ReferenceValueMap implements Map, Cloneable
      **/
     public ReferenceValueMap(Map m)
     {
-        map = new HashMap();
+        map = new LinkedHashMap();
         putAll(m);
     }
 
@@ -97,7 +98,7 @@ public abstract class ReferenceValueMap implements Map, Cloneable
             // Do nothing
         }
 
-        rvm.map = (HashMap)map.clone(); // to preserve initialCapacity, loadFactor
+        rvm.map = (LinkedHashMap)map.clone(); // to preserve initialCapacity, loadFactor
         rvm.map.clear();
         rvm.reaped = new ReferenceQueue();
         rvm.putAll(entrySet());
