@@ -553,12 +553,11 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
             {
                 try
                 {
-                    backingStore.add(ownerOP, element, (useCache ? delegate.size() : -1));
+                    backingSuccess = backingStore.add(ownerOP, element, (useCache ? delegate.size() : -1));
                 }
                 catch (NucleusDataStoreException dse)
                 {
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "add", ownerMmd.getName(), dse));
-                    backingSuccess = false;
+                    throw new IllegalArgumentException(LOCALISER.msg("023013", "add", ownerMmd.getName(), dse), dse);
                 }
             }
         }
@@ -616,8 +615,7 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
                 }
                 catch (NucleusDataStoreException dse)
                 {
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "addAll", ownerMmd.getName(), dse));
-                    backingSuccess = false;
+                    throw new IllegalArgumentException(LOCALISER.msg("023013", "addAll", ownerMmd.getName(), dse), dse);
                 }
             }
         }

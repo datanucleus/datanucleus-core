@@ -611,8 +611,7 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
                 }
                 catch (NucleusDataStoreException dse)
                 {
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "add", ownerMmd.getName(), dse));
-                    backingSuccess = false;
+                    throw new IllegalArgumentException(LOCALISER.msg("023013", "add", ownerMmd.getName(), dse), dse);
                 }
             }
         }
@@ -670,8 +669,7 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
                 }
                 catch (NucleusDataStoreException dse)
                 {
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "addAll", ownerMmd.getName(), dse));
-                    backingSuccess = false;
+                    throw new IllegalArgumentException(LOCALISER.msg("023013", "addAll", ownerMmd.getName(), dse), dse);
                 }
             }
         }

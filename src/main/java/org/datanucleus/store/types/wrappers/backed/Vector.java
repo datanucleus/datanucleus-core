@@ -768,7 +768,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
                 }
                 catch (NucleusDataStoreException dse)
                 {
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "add", ownerMmd.getName(), dse));
+                    throw new IllegalArgumentException(LOCALISER.msg("023013", "add", ownerMmd.getName(), dse), dse);
                 }
             }
         }
@@ -814,12 +814,11 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
             {
                 try
                 {
-                    backingStore.add(ownerOP,element, (useCache ? delegate.size() : -1));
+                    backingSuccess = backingStore.add(ownerOP,element, (useCache ? delegate.size() : -1));
                 }
                 catch (NucleusDataStoreException dse)
                 {
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "add", ownerMmd.getName(), dse));
-                    backingSuccess = false;
+                    throw new IllegalArgumentException(LOCALISER.msg("023013", "add", ownerMmd.getName(), dse), dse);
                 }
             }
         }
@@ -867,8 +866,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
                 }
                 catch (NucleusDataStoreException dse)
                 {
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "addAll", ownerMmd.getName(), dse));
-                    backingSuccess = false;
+                    throw new IllegalArgumentException(LOCALISER.msg("023013", "addAll", ownerMmd.getName(), dse), dse);
                 }
             }
         }
@@ -918,8 +916,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
                 }
                 catch (NucleusDataStoreException dse)
                 {
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "addAll", ownerMmd.getName(), dse));
-                    backingSuccess = false;
+                    throw new IllegalArgumentException(LOCALISER.msg("023013", "addAll", ownerMmd.getName(), dse), dse);
                 }
             }
         }

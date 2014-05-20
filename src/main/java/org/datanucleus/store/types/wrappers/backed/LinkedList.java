@@ -770,8 +770,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
                 }
                 catch (NucleusDataStoreException dse)
                 {
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "addAll", ownerMmd.getName(), dse));
-                    backingSuccess = false;
+                    throw new IllegalArgumentException(LOCALISER.msg("023013", "add", ownerMmd.getName(), dse), dse);
                 }
             }
         }
@@ -821,8 +820,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
                 }
                 catch (NucleusDataStoreException dse)
                 {
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "addAll", ownerMmd.getName(), dse));
-                    backingSuccess = false;
+                    throw new IllegalArgumentException(LOCALISER.msg("023013", "addAll", ownerMmd.getName(), dse), dse);
                 }
             }
         }

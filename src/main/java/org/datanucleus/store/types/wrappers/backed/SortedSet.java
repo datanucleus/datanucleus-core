@@ -711,12 +711,11 @@ public class SortedSet extends org.datanucleus.store.types.wrappers.SortedSet im
             {
                 try
                 {
-                    backingStore.add(ownerOP,element, (useCache ? delegate.size() : -1));
+                    backingSuccess = backingStore.add(ownerOP,element, (useCache ? delegate.size() : -1));
                 }
                 catch (NucleusDataStoreException dse)
                 {
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "add", ownerMmd.getName(), dse));
-                    backingSuccess = false;
+                    throw new IllegalArgumentException(LOCALISER.msg("023013", "add", ownerMmd.getName(), dse), dse);
                 }
             }
         }
@@ -774,8 +773,7 @@ public class SortedSet extends org.datanucleus.store.types.wrappers.SortedSet im
                 }
                 catch (NucleusDataStoreException dse)
                 {
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "addAll", ownerMmd.getName(), dse));
-                    backingSuccess = false;
+                    throw new IllegalArgumentException(LOCALISER.msg("023013", "addAll", ownerMmd.getName(), dse), dse);
                 }
             }
         }
