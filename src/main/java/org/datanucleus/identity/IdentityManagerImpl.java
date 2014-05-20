@@ -19,6 +19,8 @@ package org.datanucleus.identity;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
@@ -51,6 +53,8 @@ public class IdentityManagerImpl implements IdentityManager
     protected IdentityKeyTranslator idKeyTranslator = null;
 
     PersistenceNucleusContext nucCtx;
+
+    private Map<Class, Constructor<?>> constructorCache = new ConcurrentHashMap<Class, Constructor<?>>();
 
     public IdentityManagerImpl(PersistenceNucleusContext nucCtx)
     {
@@ -277,7 +281,13 @@ public class IdentityManagerImpl implements IdentityManager
         {
             Class[] ctrArgs = new Class[] {Class.class, keyType};
             Object[] args = new Object[] {pcType, key};
-            id = (SingleFieldId)idType.getConstructor(ctrArgs).newInstance(args);
+            Constructor ctr = constructorCache.get(idType);
+            if (ctr == null) {
+                ctr = idType.getConstructor(ctrArgs);
+                constructorCache.put(idType, ctr);
+            }
+            
+            id = (SingleFieldId)ctr.newInstance(args);
         }
         catch (Exception e)
         {
