@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -69,7 +70,9 @@ public class Configuration extends PropertyStore implements Serializable
     private Map<String, Object> defaultProperties = new HashMap<String, Object>();
 
     private Map<String, PropertyValidator> propertyValidators = new HashMap();
-
+    
+    private volatile Map<String, Object> managerOverrideableProperties;
+    
     /**
      * Convenience class wrapping the plugin property specification information.
      */
@@ -190,7 +193,12 @@ public class Configuration extends PropertyStore implements Serializable
      */
     public Map<String, Object> getManagerOverrideableProperties()
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = managerOverrideableProperties;
+        if (props != null) 
+        {
+            return props;
+        }
+        props = new LinkedHashMap<String, Object>();
         Iterator<Map.Entry<String, PropertyMapping>> propIter = propertyMappings.entrySet().iterator();
         while (propIter.hasNext())
         {
@@ -211,6 +219,8 @@ public class Configuration extends PropertyStore implements Serializable
                 }
             }
         }
+        props = Collections.unmodifiableMap(props);
+        this.managerOverrideableProperties = props;        
         return props;
     }
 
@@ -305,6 +315,8 @@ public class Configuration extends PropertyStore implements Serializable
     public void addDefaultProperty(String name, String internalName, String value, 
             String validatorName, boolean datastore, boolean managerOverrideable)
     {
+        managerOverrideableProperties = null;
+
         // Add the mapping
         propertyMappings.put(name.toLowerCase(Locale.ENGLISH), new PropertyMapping(name, internalName, validatorName,
             datastore, managerOverrideable));
