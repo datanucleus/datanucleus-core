@@ -19,6 +19,8 @@ package org.datanucleus.identity;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
@@ -50,7 +52,9 @@ public class IdentityManagerImpl implements IdentityManager
     /** Identity key translator (if any). */
     protected IdentityKeyTranslator idKeyTranslator = null;
 
-    PersistenceNucleusContext nucCtx;
+    private Map<Class, Constructor<?>> constructorCache = new ConcurrentHashMap<Class, Constructor<?>>();
+
+    protected PersistenceNucleusContext nucCtx;
 
     public IdentityManagerImpl(PersistenceNucleusContext nucCtx)
     {
@@ -152,12 +156,12 @@ public class IdentityManagerImpl implements IdentityManager
         DatastoreId oid;
         if (datastoreIdClass == DatastoreUniqueLongId.class)
         {
-            //we hard code DatastoreUniqueOID to improve performance
+            // hard code DatastoreUniqueLongId to improve performance
             oid = new DatastoreUniqueLongId(value);
         }
         else
         {
-            //others are pluggable
+            // others are pluggable
             oid = (DatastoreId)ClassUtils.newInstance(datastoreIdClass, new Class[] {Long.class}, new Object[] {Long.valueOf(value)});
         }
         return oid;
@@ -277,12 +281,17 @@ public class IdentityManagerImpl implements IdentityManager
         {
             Class[] ctrArgs = new Class[] {Class.class, keyType};
             Object[] args = new Object[] {pcType, key};
-            id = (SingleFieldId)idType.getConstructor(ctrArgs).newInstance(args);
+            Constructor ctr = constructorCache.get(idType);
+            if (ctr == null)
+            {
+                ctr = idType.getConstructor(ctrArgs);
+                constructorCache.put(idType, ctr);
+            }
+            id = (SingleFieldId)ctr.newInstance(args);
         }
         catch (Exception e)
         {
-            NucleusLogger.PERSISTENCE.error("Error encountered while creating SingleFieldIdentity instance of type \"" + idType.getName() + "\"");
-            NucleusLogger.PERSISTENCE.error(e);
+            NucleusLogger.PERSISTENCE.error("Error encountered while creating SingleFieldIdentity instance of type \"" + idType.getName() + "\"", e);
 
             return null;
         }
@@ -323,6 +332,7 @@ public class IdentityManagerImpl implements IdentityManager
                     ctrArgs = new Class[] {Class.class, String.class};
                 }
                 Object[] args = new Object[] {targetClass, keyToString};
+                // TODO Cache constructor
                 id = idType.getConstructor(ctrArgs).newInstance(args);
             }
             catch (Exception e)
@@ -337,14 +347,14 @@ public class IdentityManagerImpl implements IdentityManager
             {
                 try
                 {
+                    // TODO Cache constructor
                     Constructor c = clr.classForName(acmd.getObjectidClass()).getDeclaredConstructor(new Class[] {java.lang.String.class});
                     id = c.newInstance(new Object[] {keyToString});
                 }
                 catch (Exception e) 
                 {
                     String msg = LOCALISER.msg("010030", acmd.getObjectidClass(), acmd.getFullClassName());
-                    NucleusLogger.PERSISTENCE.error(msg);
-                    NucleusLogger.PERSISTENCE.error(e);
+                    NucleusLogger.PERSISTENCE.error(msg, e);
 
                     throw new NucleusUserException(msg);
                 }
