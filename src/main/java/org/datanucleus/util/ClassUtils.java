@@ -63,8 +63,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 public class ClassUtils
 {
     /** Localisation utility for output messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
+    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
 
     /** caching for constructors - using caching, the perf is at least doubled **/
     protected static final Map constructorsCache = new SoftValueMap();
@@ -72,6 +71,7 @@ public class ClassUtils
     /**
      * Accessor for a new instance of an object.
      * Uses reflection to generate the instance using the passed constructor parameter arguments.
+     * Caches the constructor used to improve performance for later invocation.
      * @param type Type of object (the class).
      * @param parameterTypes Classes of params for the constructor
      * @param parameters The parameters for the constructor
@@ -92,7 +92,7 @@ public class ClassUtils
                 }
             }
             Constructor ctor = (Constructor)constructorsCache.get(name.toString());
-            if (ctor ==null)
+            if (ctor == null)
             {
                 ctor = type.getConstructor(parameterTypes);
                 constructorsCache.put(name.toString(), ctor);
@@ -133,11 +133,9 @@ public class ClassUtils
 
     /**
      * Convenience method to return the constructor of the passed class that accepts the supplied
-     * argument types. Allows for primitive to primitive wrapper conversion. Typically used by
-     * the JDOQL ResultClass mapping process.
+     * argument types. Allows for primitive to primitive wrapper conversion. Typically used by the JDOQL ResultClass mapping process.
      * @param cls The class
-     * @param argTypes The constructor argument types. If we know we need a parameter yet don't know the type
-     *     then this will have a null for that argument type.
+     * @param argTypes The constructor argument types. If we know we need a parameter yet don't know the type then this will have a null for that argument type.
      * @return The constructor
      */
     public static Constructor getConstructorWithArguments(Class cls, Class[] argTypes)
@@ -247,12 +245,11 @@ public class ClassUtils
     }
 
     /**
-     * Utility to get the Class name given the file name and the file name of
-     * the root of the package structure.
+     * Utility to get the Class name given the file name and the file name of the root of the package structure.
      * @param filename The filename of the class file
      * @param rootfilename The filename of the root of the package structure
      * @return The Class name
-     **/
+     */
     public static String getClassnameForFilename(String filename, String rootfilename)
     {
         if (filename == null)

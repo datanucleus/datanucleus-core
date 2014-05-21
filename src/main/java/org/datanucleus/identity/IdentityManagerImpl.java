@@ -33,12 +33,11 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.IdentityType;
-import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
- * Factory for identity operations.
+ * Manager for identity operations.
  */
 public class IdentityManagerImpl implements IdentityManager
 {
@@ -52,7 +51,8 @@ public class IdentityManagerImpl implements IdentityManager
     /** Identity key translator (if any). */
     protected IdentityKeyTranslator idKeyTranslator = null;
 
-    private Map<Class, Constructor<?>> constructorCache = new ConcurrentHashMap<Class, Constructor<?>>();
+    /** Cache of id class Constructor, keyed by string of the type+args. */
+    private Map<String, Constructor<?>> constructorCache = new ConcurrentHashMap<String, Constructor<?>>();
 
     protected PersistenceNucleusContext nucCtx;
 
@@ -112,6 +112,19 @@ public class IdentityManagerImpl implements IdentityManager
         }
     }
 
+    protected String getConstructorNameForCache(Class type, Class[] ctrArgTypes)
+    {
+        StringBuilder name = new StringBuilder(type.getName());
+        if (ctrArgTypes != null)
+        {
+            for (int i=0;i<ctrArgTypes.length; i++)
+            {
+                name.append("-").append(ctrArgTypes[i].getName());
+            }
+        }
+        return name.toString();
+    }
+
     public Class getDatastoreIdClass()
     {
         return datastoreIdClass;
@@ -128,63 +141,111 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.identity.IdentityFactory#getDatastoreId(java.lang.String, java.lang.Object)
+     * @see org.datanucleus.identity.IdentityManager#getDatastoreId(java.lang.String, java.lang.Object)
      */
     @Override
     public DatastoreId getDatastoreId(String className, Object value)
     {
-        DatastoreId oid;
+        DatastoreId id;
         if (datastoreIdClass == ClassConstants.IDENTITY_OID_IMPL)
         {
             //we hard code OIDImpl to improve performance
-            oid = new DatastoreIdImpl(className, value);
+            id = new DatastoreIdImpl(className, value);
         }
         else
         {
             //others are pluggable
-            oid = (DatastoreId)ClassUtils.newInstance(datastoreIdClass, new Class[] {String.class, Object.class}, new Object[] {className, value});
+            try
+            {
+                Class[] ctrArgTypes = new Class[] {String.class, Object.class};
+                String ctrName = getConstructorNameForCache(datastoreIdClass, ctrArgTypes);
+                Constructor ctr = constructorCache.get(ctrName);
+                if (ctr == null)
+                {
+                    ctr = datastoreIdClass.getConstructor(ctrArgTypes);
+                    constructorCache.put(ctrName, ctr);
+                }
+                id = (DatastoreId)ctr.newInstance(new Object[] {className, value});
+            }
+            catch (Exception e)
+            {
+                // TODO Localise this
+                throw new NucleusException("Error encountered while creating datastore instance for class \"" + className + "\"", e);
+            }
         }
-        return oid;
+        return id;
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.identity.IdentityFactory#getDatastoreId(long)
+     * @see org.datanucleus.identity.IdentityManager#getDatastoreId(long)
      */
     @Override
     public DatastoreId getDatastoreId(long value)
     {
-        DatastoreId oid;
+        DatastoreId id;
         if (datastoreIdClass == DatastoreUniqueLongId.class)
         {
             // hard code DatastoreUniqueLongId to improve performance
-            oid = new DatastoreUniqueLongId(value);
+            id = new DatastoreUniqueLongId(value);
         }
         else
         {
             // others are pluggable
-            oid = (DatastoreId)ClassUtils.newInstance(datastoreIdClass, new Class[] {Long.class}, new Object[] {Long.valueOf(value)});
+            try
+            {
+                Class[] ctrArgTypes = new Class[] {Long.class};
+                String ctrName = getConstructorNameForCache(datastoreIdClass, ctrArgTypes);
+                Constructor ctr = constructorCache.get(ctrName);
+                if (ctr == null)
+                {
+                    ctr = datastoreIdClass.getConstructor(ctrArgTypes);
+                    constructorCache.put(ctrName, ctr);
+                }
+                id = (DatastoreId)ctr.newInstance(new Object[] {Long.valueOf(value)});
+            }
+            catch (Exception e)
+            {
+                // TODO Localise this
+                throw new NucleusException("Error encountered while creating datastore instance for unique value \"" + value + "\"", e);
+            }
         }
-        return oid;
+        return id;
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.identity.IdentityFactory#getDatastoreId(java.lang.String)
+     * @see org.datanucleus.identity.IdentityManager#getDatastoreId(java.lang.String)
      */
     @Override
-    public DatastoreId getDatastoreId(String oidString)
+    public DatastoreId getDatastoreId(String idString)
     {
-        DatastoreId oid;
+        DatastoreId id;
         if (datastoreIdClass == ClassConstants.IDENTITY_OID_IMPL)
         {
             //we hard code OIDImpl to improve performance
-            oid = new DatastoreIdImpl(oidString);
+            id = new DatastoreIdImpl(idString);
         }
         else
         {
             //others are pluggable
-            oid = (DatastoreId)ClassUtils.newInstance(datastoreIdClass, new Class[] {String.class}, new Object[] {oidString});
+            try
+            {
+                Class[] ctrArgTypes = new Class[] {String.class};
+                String ctrName = getConstructorNameForCache(datastoreIdClass, ctrArgTypes);
+                Constructor ctr = constructorCache.get(ctrName);
+                if (ctr == null)
+                {
+                    ctr = datastoreIdClass.getConstructor(ctrArgTypes);
+                    constructorCache.put(ctrName, ctr);
+                }
+                id = (DatastoreId)ctr.newInstance(new Object[] {idString});
+            }
+            catch (Exception e)
+            {
+                // TODO Localise this
+                throw new NucleusException("Error encountered while creating datastore instance for string \"" + idString + "\"", e);
+            }
         }
-        return oid;
+        return id;
     }
 
     /**
@@ -280,14 +341,14 @@ public class IdentityManagerImpl implements IdentityManager
         try
         {
             Class[] ctrArgs = new Class[] {Class.class, keyType};
-            Object[] args = new Object[] {pcType, key};
-            Constructor ctr = constructorCache.get(idType);
+            String ctrName = getConstructorNameForCache(idType, ctrArgs);
+            Constructor ctr = constructorCache.get(ctrName);
             if (ctr == null)
             {
                 ctr = idType.getConstructor(ctrArgs);
-                constructorCache.put(idType, ctr);
+                constructorCache.put(ctrName, ctr);
             }
-            id = (SingleFieldId)ctr.newInstance(args);
+            id = (SingleFieldId)ctr.newInstance(new Object[] {pcType, key});
         }
         catch (Exception e)
         {
@@ -322,18 +383,23 @@ public class IdentityManagerImpl implements IdentityManager
         {
             try
             {
-                Class[] ctrArgs;
+                Class[] ctrArgTypes;
                 if (ClassConstants.IDENTITY_SINGLEFIELD_OBJECT.isAssignableFrom(idType))
                 {
-                    ctrArgs = new Class[] {Class.class, Object.class};
+                    ctrArgTypes = new Class[] {Class.class, Object.class};
                 }
                 else
                 {
-                    ctrArgs = new Class[] {Class.class, String.class};
+                    ctrArgTypes = new Class[] {Class.class, String.class};
                 }
-                Object[] args = new Object[] {targetClass, keyToString};
-                // TODO Cache constructor
-                id = idType.getConstructor(ctrArgs).newInstance(args);
+                String ctrName = getConstructorNameForCache(idType, ctrArgTypes);
+                Constructor ctr = constructorCache.get(ctrName);
+                if (ctr == null)
+                {
+                    ctr = idType.getConstructor(ctrArgTypes);
+                    constructorCache.put(ctrName, ctr);
+                }
+                id = ctr.newInstance(new Object[] {targetClass, keyToString});
             }
             catch (Exception e)
             {
@@ -347,15 +413,21 @@ public class IdentityManagerImpl implements IdentityManager
             {
                 try
                 {
-                    // TODO Cache constructor
-                    Constructor c = clr.classForName(acmd.getObjectidClass()).getDeclaredConstructor(new Class[] {java.lang.String.class});
-                    id = c.newInstance(new Object[] {keyToString});
+                    Class type = clr.classForName(acmd.getObjectidClass());
+                    Class[] ctrArgTypes = new Class[] {String.class};
+                    String ctrName = getConstructorNameForCache(type, ctrArgTypes);
+                    Constructor ctr = constructorCache.get(ctrName);
+                    if (ctr == null)
+                    {
+                        ctr = type.getConstructor(ctrArgTypes);
+                        constructorCache.put(ctrName, ctr);
+                    }
+                    id = ctr.newInstance(new Object[] {keyToString});
                 }
                 catch (Exception e) 
                 {
                     String msg = LOCALISER.msg("010030", acmd.getObjectidClass(), acmd.getFullClassName());
                     NucleusLogger.PERSISTENCE.error(msg, e);
-
                     throw new NucleusUserException(msg);
                 }
             }
