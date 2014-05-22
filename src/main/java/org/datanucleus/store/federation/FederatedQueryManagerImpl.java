@@ -24,15 +24,15 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.query.Query;
-import org.datanucleus.store.query.QueryManager;
+import org.datanucleus.store.query.QueryManagerImpl;
 
 /**
  * Manager for queries for federated datastores.
  * Responsible for distributing queries across multiple datastores and federating the results.
  */
-public class FederatedQueryManager extends QueryManager
+public class FederatedQueryManagerImpl extends QueryManagerImpl
 {
-    public FederatedQueryManager(NucleusContext nucleusContext, StoreManager storeMgr)
+    public FederatedQueryManagerImpl(NucleusContext nucleusContext, StoreManager storeMgr)
     {
         super(nucleusContext, storeMgr);
     }

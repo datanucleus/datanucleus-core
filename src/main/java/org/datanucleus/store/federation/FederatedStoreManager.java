@@ -299,7 +299,7 @@ public class FederatedStoreManager implements StoreManager
     {
         if (queryMgr == null)
         {
-            queryMgr = new FederatedQueryManager(nucleusContext, this);
+            queryMgr = new FederatedQueryManagerImpl(nucleusContext, this);
         }
         return queryMgr;
     }

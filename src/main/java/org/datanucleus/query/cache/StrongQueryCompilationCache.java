@@ -17,7 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.query.cache;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.NucleusContext;
 
@@ -28,6 +28,6 @@ public class StrongQueryCompilationCache extends AbstractQueryCompilationCache i
 {
     public StrongQueryCompilationCache(NucleusContext nucleusCtx)
     {
-        cache = new HashMap();
+        cache = new ConcurrentHashMap();
     }
 }

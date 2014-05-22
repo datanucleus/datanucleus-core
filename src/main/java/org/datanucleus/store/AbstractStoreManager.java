@@ -66,6 +66,7 @@ import org.datanucleus.store.encryption.ConnectionEncryptionProvider;
 import org.datanucleus.store.exceptions.NoExtentException;
 import org.datanucleus.store.federation.FederatedStoreManager;
 import org.datanucleus.store.query.QueryManager;
+import org.datanucleus.store.query.QueryManagerImpl;
 import org.datanucleus.store.schema.DefaultStoreSchemaHandler;
 import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.store.schema.naming.NamingCase;
@@ -520,7 +521,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         if (queryMgr == null)
         {
             // Initialise support for queries
-            queryMgr = new QueryManager(nucleusContext, this);
+            queryMgr = new QueryManagerImpl(nucleusContext, this);
         }
         return queryMgr;
     }
