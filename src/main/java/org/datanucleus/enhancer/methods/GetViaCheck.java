@@ -24,6 +24,7 @@ import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.EnhanceUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method to generate the method "dnGetZZZ" using ASM for CHECK_READ fields.
@@ -169,7 +170,7 @@ public class GetViaCheck extends ClassMethod
                 // "throw new DetachedFieldAccessException(...)"
                 visitor.visitTypeInsn(Opcodes.NEW, getNamer().getDetachedFieldAccessExceptionAsmClassName());
                 visitor.visitInsn(Opcodes.DUP);
-                visitor.visitLdcInsn(LOCALISER.msg("Enhancer.DetachedFieldAccess", fmd.getName()));
+                visitor.visitLdcInsn(Localiser.msg("Enhancer.DetachedFieldAccess", fmd.getName()));
                 visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, getNamer().getDetachedFieldAccessExceptionAsmClassName(),
                     "<init>", "(Ljava/lang/String;)V");
                 visitor.visitInsn(Opcodes.ATHROW);

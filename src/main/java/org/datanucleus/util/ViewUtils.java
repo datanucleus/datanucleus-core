@@ -31,9 +31,6 @@ import org.datanucleus.exceptions.NucleusUserException;
  */
 public class ViewUtils
 {
-    protected static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Check for any circular view references between referencer and referencee.
      * If one is found, throw a NucleusUserException with the chain of references.
@@ -67,7 +64,7 @@ public class ViewUtils
                 String current_name=(String)it.next();
                 if (current_name.equals(referencer_name))
                 {
-                    StringBuilder error=new StringBuilder(LOCALISER.msg("031003"));
+                    StringBuilder error=new StringBuilder(Localiser.msg("031003"));
 
                     for (Iterator chainIter=referenceChain.iterator(); chainIter.hasNext(); )
                     {

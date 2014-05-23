@@ -38,6 +38,7 @@ import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -148,8 +149,8 @@ public class ClassMetaData extends AbstractClassMetaData
     {
         if (isInitialised() || isPopulated())
         {
-            NucleusLogger.METADATA.error(LOCALISER.msg("044068", name));
-            throw new NucleusException(LOCALISER.msg("044068", fullName)).setFatal();
+            NucleusLogger.METADATA.error(Localiser.msg("044068", name));
+            throw new NucleusException(Localiser.msg("044068", fullName)).setFatal();
         }
         if (populating)
         {
@@ -160,7 +161,7 @@ public class ClassMetaData extends AbstractClassMetaData
         {
             if (NucleusLogger.METADATA.isDebugEnabled())
             {
-                NucleusLogger.METADATA.debug(LOCALISER.msg("044075", fullName));
+                NucleusLogger.METADATA.debug(Localiser.msg("044075", fullName));
             }
             populating = true;
 
@@ -181,7 +182,7 @@ public class ClassMetaData extends AbstractClassMetaData
             if (ClassUtils.isInnerClass(fullName) && !Modifier.isStatic(cls.getModifiers()) &&
                 persistenceModifier == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
             {
-                throw new InvalidClassMetaDataException(LOCALISER, "044063", fullName);
+                throw new InvalidClassMetaDataException("044063", fullName);
             }
 
             if (entityName == null)
@@ -339,7 +340,7 @@ public class ClassMetaData extends AbstractClassMetaData
                         if (Collections.binarySearch(members, propertyName) < 0)
                         {
                             // No field/property of this name - add a default PropertyMetaData for this method
-                            NucleusLogger.METADATA.debug(LOCALISER.msg("044060", fullName, propertyName));
+                            NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, propertyName));
                             AbstractMemberMetaData mmd = new PropertyMetaData(this, propertyName);
                             members.add(mmd);
                             Collections.sort(members);
@@ -379,7 +380,7 @@ public class ClassMetaData extends AbstractClassMetaData
                         else
                         {
                             // Class has fields but field not present, so add as field
-                            NucleusLogger.METADATA.debug(LOCALISER.msg("044060", fullName, clsFields[i].getName()));
+                            NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, clsFields[i].getName()));
                             AbstractMemberMetaData mmd = new FieldMetaData(this, clsFields[i].getName());
                             members.add(mmd);
                             Collections.sort(members);
@@ -461,8 +462,8 @@ public class ClassMetaData extends AbstractClassMetaData
                         }
                         catch (ClassNotResolvedException cnre2)
                         {
-                            NucleusLogger.METADATA.error(LOCALISER.msg("044080", fieldClassName));
-                            throw new InvalidClassMetaDataException(LOCALISER, "044080", fullName, fieldClassName);
+                            NucleusLogger.METADATA.error(Localiser.msg("044080", fieldClassName));
+                            throw new InvalidClassMetaDataException("044080", fullName, fieldClassName);
                         }
                     }
                 }
@@ -494,7 +495,7 @@ public class ClassMetaData extends AbstractClassMetaData
                     if (getMethod == null && mmd.getPersistenceModifier() != FieldPersistenceModifier.NONE)
                     {
                         // Property is persistent yet no getter!
-                        throw new InvalidClassMetaDataException(LOCALISER, "044073", fullName, mmd.getName());
+                        throw new InvalidClassMetaDataException("044073", fullName, mmd.getName());
                     }
 
                     Method setMethod = null;
@@ -518,7 +519,7 @@ public class ClassMetaData extends AbstractClassMetaData
                     if (setMethod == null && mmd.getPersistenceModifier() != FieldPersistenceModifier.NONE)
                     {
                         // Property is persistent yet no setter!
-                        throw new InvalidClassMetaDataException(LOCALISER, "044074", fullName, mmd.getName());
+                        throw new InvalidClassMetaDataException("044074", fullName, mmd.getName());
                     }
 
                     // Populate the property using the getter
@@ -548,7 +549,7 @@ public class ClassMetaData extends AbstractClassMetaData
                 if (!populated)
                 {
                     // MetaData field doesn't exist in the class!
-                    throw new InvalidClassMetaDataException(LOCALISER, "044071", fullName, mmd.getFullFieldName());
+                    throw new InvalidClassMetaDataException("044071", fullName, mmd.getFullFieldName());
                 }
             }
         }
@@ -584,7 +585,7 @@ public class ClassMetaData extends AbstractClassMetaData
 
             if (NucleusLogger.METADATA.isDebugEnabled())
             {
-                NucleusLogger.METADATA.debug(LOCALISER.msg("044076",fullName));
+                NucleusLogger.METADATA.debug(Localiser.msg("044076",fullName));
             }
 
             // Validate the objectid-class
@@ -640,7 +641,7 @@ public class ClassMetaData extends AbstractClassMetaData
                         if (pcSuperclassMetaData == null)
                         {
                             // User specified override yet no superclass!
-                            throw new InvalidClassMetaDataException(LOCALISER, "044162", fullName, mmd.getFullFieldName());
+                            throw new InvalidClassMetaDataException("044162", fullName, mmd.getFullFieldName());
                         }
                         AbstractMemberMetaData superFmd = pcSuperclassMetaData.getMemberBeingOverridden(mmd.getName());
                         if (superFmd != null)

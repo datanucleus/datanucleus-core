@@ -56,10 +56,6 @@ import org.datanucleus.util.WeakValueMap;
  */
 public class ClassLoaderResolverImpl implements ClassLoaderResolver
 {
-    /** Localisation utility for output messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** ClassLoader initialised by the context (ExecutionContext). */
     protected final ClassLoader contextLoader;
 
@@ -127,7 +123,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
         if (name == null)
         {
             // Avoid the NPE and just throw a "not resolved" for null class
-            String msg = LOCALISER.msg("001000", null);
+            String msg = Localiser.msg("001000", null);
             throw new ClassNotResolvedException(msg);
         }
         if (name.equals(ClassNameConstants.BYTE))
@@ -214,7 +210,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
 
         if (cls == null)
         {
-            throw new ClassNotResolvedException(LOCALISER.msg("001000", name));
+            throw new ClassNotResolvedException(Localiser.msg("001000", name));
         }
 
         //put in unloaded cache, since it was not loaded here
@@ -237,7 +233,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
         if (name == null)
         {
             // Avoid the NPE and just throw a "not resolved"
-            String msg = LOCALISER.msg("001000", null);
+            String msg = Localiser.msg("001000", null);
             throw new ClassNotResolvedException(msg);
         }
         if (name.equals(ClassNameConstants.BYTE))
@@ -319,7 +315,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
 
         if (cls == null)
         {
-            String msg = LOCALISER.msg("001000", name);
+            String msg = Localiser.msg("001000", name);
             throw new ClassNotResolvedException(msg);
         }
         loadedClasses.put(cacheKey, cls);

@@ -57,10 +57,6 @@ import org.datanucleus.util.PersistenceUtils;
  */
 public class Configuration extends PropertyStore implements Serializable
 {
-    /** Localisation of messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     private NucleusContext nucCtx;
 
     /** Mapping for the properties of the plugins, PropertyMapping, keyed by the property name. */
@@ -521,17 +517,6 @@ public class Configuration extends PropertyStore implements Serializable
                     // Load all properties from the specified file
                     setPropertiesUsingFile((String)value);
                 }
-                else if (propertyName.equals("datanucleus.localisation.messageCodes"))
-                {
-                    // Set global log message code flag
-                    boolean included = getBooleanProperty("datanucleus.localisation.messageCodes");
-                    Localiser.setDisplayCodesInMessages(included);
-                }
-                else if (propertyName.equals("datanucleus.localisation.language"))
-                {
-                    String language = getStringProperty("datanucleus.localisation.language");
-                    Localiser.setLanguage(language);
-                }
             }
             else
             {
@@ -539,7 +524,7 @@ public class Configuration extends PropertyStore implements Serializable
                 setPropertyInternal(propertyName, value);
                 if (propertyMappings.size() > 0)
                 {
-                    NucleusLogger.PERSISTENCE.info(LOCALISER.msg("008015", propertyName));
+                    NucleusLogger.PERSISTENCE.info(Localiser.msg("008015", propertyName));
                 }
             }
         }
@@ -594,7 +579,7 @@ public class Configuration extends PropertyStore implements Serializable
             boolean validated = validator.validate(name, value);
             if (!validated)
             {
-                throw new IllegalArgumentException(LOCALISER.msg("008012", name, value));
+                throw new IllegalArgumentException(Localiser.msg("008012", name, value));
             }
         }
     }

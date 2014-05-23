@@ -35,9 +35,6 @@ import org.datanucleus.util.Localiser;
  */
 public class EnhancerClassChecker extends ClassVisitor
 {
-    /** Message resource */
-    protected static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.Localisation", ClassEnhancer.class.getClassLoader());
-
     /** Enhancer for the class. */
     protected ClassEnhancer enhancer;
 
@@ -123,14 +120,14 @@ public class EnhancerClassChecker extends ClassVisitor
 
             if (!hasInterface(interfaces, enhancer.getNamer().getPersistableAsmClassName()))
             {
-                reportError(LOCALISER.msg("Enhancer.Check.InterfaceMissing", enhancer.getClassName(), enhancer.getNamer().getPersistableClass().getName()));
+                reportError(Localiser.msg("Enhancer.Check.InterfaceMissing", enhancer.getClassName(), enhancer.getNamer().getPersistableClass().getName()));
             }
 
             if (enhancer.getClassMetaData().isDetachable())
             {
                 if (!hasInterface(interfaces, enhancer.getNamer().getDetachableAsmClassName()))
                 {
-                    reportError(LOCALISER.msg("Enhancer.Check.InterfaceMissing", enhancer.getClassName(), enhancer.getNamer().getDetachableClass().getName()));
+                    reportError(Localiser.msg("Enhancer.Check.InterfaceMissing", enhancer.getClassName(), enhancer.getNamer().getDetachableClass().getName()));
                 }
             }
         }
@@ -190,14 +187,14 @@ public class EnhancerClassChecker extends ClassVisitor
             while (fieldsIter.hasNext())
             {
                 ClassField field = (ClassField)fieldsIter.next();
-                reportError(LOCALISER.msg("Enhancer.Check.FieldMissing", enhancer.getClassName(), field.getName()));
+                reportError(Localiser.msg("Enhancer.Check.FieldMissing", enhancer.getClassName(), field.getName()));
             }
 
             Iterator methodsIter = methodsRequired.iterator();
             while (methodsIter.hasNext())
             {
                 ClassMethod method = (ClassMethod)methodsIter.next();
-                reportError(LOCALISER.msg("Enhancer.Check.MethodMissing", enhancer.getClassName(), method.getName()));
+                reportError(Localiser.msg("Enhancer.Check.MethodMissing", enhancer.getClassName(), method.getName()));
             }
         }
         else if (enhancer.getClassMetaData().getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_AWARE)
@@ -226,11 +223,11 @@ public class EnhancerClassChecker extends ClassVisitor
             {
                 if (field.getAccess() != access)
                 {
-                    reportError(LOCALISER.msg("Enhancer.Check.FieldIncorrectAccess", enhancer.getClassName(), name));
+                    reportError(Localiser.msg("Enhancer.Check.FieldIncorrectAccess", enhancer.getClassName(), name));
                 }
                 else if (!desc.equals(Type.getDescriptor((Class)field.getType())))
                 {
-                    reportError(LOCALISER.msg("Enhancer.Check.FieldIncorrectType", enhancer.getClassName(), name));
+                    reportError(Localiser.msg("Enhancer.Check.FieldIncorrectType", enhancer.getClassName(), name));
                 }
                 else
                 {
@@ -273,7 +270,7 @@ public class EnhancerClassChecker extends ClassVisitor
             {
                 if (method.getAccess() != access)
                 {
-                    reportError(LOCALISER.msg("Enhancer.Check.MethodIncorrectAccess", enhancer.getClassName(), name));
+                    reportError(Localiser.msg("Enhancer.Check.MethodIncorrectAccess", enhancer.getClassName(), name));
                 }
                 else
                 {

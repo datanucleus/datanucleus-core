@@ -20,7 +20,6 @@ package org.datanucleus.transaction.jta;
 import javax.transaction.TransactionManager;
 
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -30,10 +29,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public abstract class FactoryBasedTransactionManagerLocator implements TransactionManagerLocator
 {
-    /** Localisation utility for output messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Accessor for the factory class to use for this locator.
      * @param clr ClassLoader resolver

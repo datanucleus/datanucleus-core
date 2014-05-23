@@ -29,8 +29,6 @@ public class PropertyNames
 
     public static final String PROPERTY_CLASSLOADER_RESOLVER_NAME = "datanucleus.classLoaderResolverName";
     public static final String PROPERTY_CLASSLOADER_PRIMARY = "datanucleus.primaryClassLoader";
-    public static final String PROPERTY_LOCALISE_MESSAGECODES = "datanucleus.localisation.messageCodes";
-    public static final String PROPERTY_LOCALISE_LANGUAGE = "datanucleus.localisation.language";
 
     public static final String PROPERTY_METADATA_ALWAYS_DETACHABLE = "datanucleus.metadata.alwaysDetachable";
     public static final String PROPERTY_METADATA_XML_VALIDATE = "datanucleus.metadata.xml.validate";

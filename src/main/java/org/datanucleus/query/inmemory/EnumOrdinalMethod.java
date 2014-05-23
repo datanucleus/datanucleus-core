@@ -19,6 +19,7 @@ package org.datanucleus.query.inmemory;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.expression.InvokeExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Evaluator for the method "{enumExpr}.ordinal()".
@@ -38,7 +39,7 @@ public class EnumOrdinalMethod implements InvocationEvaluator
         }
         if (!(invokedValue instanceof Enum))
         {
-            throw new NucleusException(eval.getLocaliser().msg("021011", method, invokedValue.getClass().getName()));
+            throw new NucleusException(Localiser.msg("021011", method, invokedValue.getClass().getName()));
         }
 
         return ((Enum)invokedValue).ordinal();

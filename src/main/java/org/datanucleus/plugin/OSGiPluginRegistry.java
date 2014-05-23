@@ -31,7 +31,6 @@ import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 
-import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.plugin.Bundle;
 import org.datanucleus.plugin.ConfigurationElement;
@@ -43,10 +42,8 @@ import org.datanucleus.util.NucleusLogger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 
-public class OSGiPluginRegistry implements PluginRegistry {
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-            ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
+public class OSGiPluginRegistry implements PluginRegistry 
+{
     /** DataNucleus package to define whether to check for deps, etc. */
     private static final String DATANUCLEUS_PKG = "org.datanucleus";
 
@@ -137,7 +134,7 @@ public class OSGiPluginRegistry implements PluginRegistry {
                 if (extension.getPlugin() != null && extension.getPlugin().getSymbolicName() != null && 
                     extension.getPlugin().getSymbolicName().startsWith(DATANUCLEUS_PKG))
                 {
-                    NucleusLogger.GENERAL.warn(LOCALISER.msg("024002", extension.getExtensionPointId(), 
+                    NucleusLogger.GENERAL.warn(Localiser.msg("024002", extension.getExtensionPointId(), 
                         extension.getPlugin().getSymbolicName(), extension.getPlugin().getManifestLocation()));
                 }
             }

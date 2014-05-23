@@ -17,17 +17,11 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.enhancer;
 
-import org.datanucleus.util.Localiser;
-
 /**
  * Representation of a field that an enhanced class requires.
  */
 public class ClassField
 {
-    /** Localisation of messages */
-    protected static Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.Localisation", ClassEnhancer.class.getClassLoader());
-
     /** The parent enhancer. */
     protected ClassEnhancer enhancer;
 

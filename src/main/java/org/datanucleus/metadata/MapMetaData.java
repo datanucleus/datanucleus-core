@@ -29,6 +29,7 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -95,11 +96,11 @@ public class MapMetaData extends ContainerMetaData
         AbstractMemberMetaData mmd = (AbstractMemberMetaData)parent;
         if (!StringUtils.isWhitespace(key.type) && key.type.indexOf(',') > 0)
         {
-            throw new InvalidMemberMetaDataException(LOCALISER, "044143", mmd.getClassName(), mmd.getName());
+            throw new InvalidMemberMetaDataException("044143", mmd.getClassName(), mmd.getName());
         }
         if (!StringUtils.isWhitespace(value.type) && value.type.indexOf(',') > 0)
         {
-            throw new InvalidMemberMetaDataException(LOCALISER, "044144", mmd.getClassName(), mmd.getName());
+            throw new InvalidMemberMetaDataException("044144", mmd.getClassName(), mmd.getName());
         }
 
         ApiAdapter api = mmgr.getApiAdapter();
@@ -114,7 +115,7 @@ public class MapMetaData extends ContainerMetaData
         Class field_type = getMemberMetaData().getType();
         if (!java.util.Map.class.isAssignableFrom(field_type))
         {
-            throw new InvalidMemberMetaDataException(LOCALISER, "044145",  mmd.getClassName(), mmd.getName());
+            throw new InvalidMemberMetaDataException("044145",  mmd.getClassName(), mmd.getName());
         }
 
         if (java.util.Properties.class.isAssignableFrom(field_type))
@@ -133,7 +134,7 @@ public class MapMetaData extends ContainerMetaData
         // "key-type"
         if (key.type == null)
         {
-            throw new InvalidMemberMetaDataException(LOCALISER, "044146",  mmd.getClassName(), mmd.getName());
+            throw new InvalidMemberMetaDataException("044146",  mmd.getClassName(), mmd.getName());
         }
 
         // Check that the key type exists
@@ -152,15 +153,14 @@ public class MapMetaData extends ContainerMetaData
             }
             catch (ClassNotResolvedException cnre2)
             {
-                throw new InvalidMemberMetaDataException(LOCALISER, "044147", mmd.getClassName(), mmd.getName(),
-                    key.type);
+                throw new InvalidMemberMetaDataException("044147", mmd.getClassName(), mmd.getName(), key.type);
             }
         }
 
         if (!keyTypeClass.getName().equals(key.type))
         {
             // The value-type has been resolved from what was specified in the MetaData - update to the fully-qualified name
-            NucleusLogger.METADATA.info(LOCALISER.msg("044148", getFieldName(),
+            NucleusLogger.METADATA.info(Localiser.msg("044148", getFieldName(),
                 getMemberMetaData().getClassName(false), key.type, keyTypeClass.getName()));
             key.type = keyTypeClass.getName();
         }
@@ -204,7 +204,7 @@ public class MapMetaData extends ContainerMetaData
         // "value-type"
         if (value.type == null)
         {
-            throw new InvalidMemberMetaDataException(LOCALISER, "044149", mmd.getClassName(), mmd.getName());
+            throw new InvalidMemberMetaDataException("044149", mmd.getClassName(), mmd.getName());
         }
 
         // Check that the value-type exists
@@ -223,15 +223,14 @@ public class MapMetaData extends ContainerMetaData
             }
             catch (ClassNotResolvedException cnre2)
             {
-                throw new InvalidMemberMetaDataException(LOCALISER, "044150", mmd.getClassName(), mmd.getName(),
-                    value.type);
+                throw new InvalidMemberMetaDataException("044150", mmd.getClassName(), mmd.getName(), value.type);
             }
         }
 
         if (!valueTypeClass.getName().equals(value.type))
         {
             // The value-type has been resolved from what was specified in the MetaData - update to the fully-qualified name
-            NucleusLogger.METADATA.info(LOCALISER.msg("044151", getFieldName(),
+            NucleusLogger.METADATA.info(Localiser.msg("044151", getFieldName(),
                 getMemberMetaData().getClassName(false), value.type, valueTypeClass.getName()));
             value.type = valueTypeClass.getName();
         }

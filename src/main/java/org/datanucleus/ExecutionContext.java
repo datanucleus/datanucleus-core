@@ -521,6 +521,7 @@ public interface ExecutionContext
      * @param cls Class of the persistable
      * @param key Value of the key field for SingleFieldIdentity, or the string value of the key otherwise
      * @return The object for this id.
+     * @param <T> Type of the persistable
      */
     <T> T findObject(Class<T> cls, Object key);
 

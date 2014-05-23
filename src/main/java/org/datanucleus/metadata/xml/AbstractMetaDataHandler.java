@@ -37,10 +37,6 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class AbstractMetaDataHandler extends DefaultHandler
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Manager for the MetaData. */
     protected final MetaDataManager mgr;
 
@@ -113,13 +109,11 @@ public class AbstractMetaDataHandler extends DefaultHandler
             if (e.getColumnNumber() >= 0)
             {
                 // Give the column number if it has a value!
-                NucleusLogger.METADATA.warn(LOCALISER.msg("044039", filename, "" + e.getLineNumber(),
-                    "" + e.getColumnNumber(), e.getMessage()));
+                NucleusLogger.METADATA.warn(Localiser.msg("044039", filename, "" + e.getLineNumber(), "" + e.getColumnNumber(), e.getMessage()));
             }
             else
             {
-                NucleusLogger.METADATA.warn(LOCALISER.msg("044038", filename, "" + e.getLineNumber(),
-                    e.getMessage()));
+                NucleusLogger.METADATA.warn(Localiser.msg("044038", filename, "" + e.getLineNumber(), e.getMessage()));
             }
         }
     }

@@ -26,6 +26,7 @@ import java.util.Set;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.ClassNotResolvedException;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -71,7 +72,7 @@ public class CollectionMetaData extends ContainerMetaData
         AbstractMemberMetaData mmd = (AbstractMemberMetaData)parent;
         if (!StringUtils.isWhitespace(element.type) && element.type.indexOf(',') > 0)
         {
-            throw new InvalidMemberMetaDataException(LOCALISER, "044131", mmd.getClassName(), mmd.getName());
+            throw new InvalidMemberMetaDataException("044131", mmd.getClassName(), mmd.getName());
         }
 
         // Make sure the type in "element" is set
@@ -82,13 +83,13 @@ public class CollectionMetaData extends ContainerMetaData
         Class field_type = getMemberMetaData().getType();
         if (!java.util.Collection.class.isAssignableFrom(field_type))
         {
-            throw new InvalidMemberMetaDataException(LOCALISER, "044132", mmd.getClassName(), mmd.getName());
+            throw new InvalidMemberMetaDataException("044132", mmd.getClassName(), mmd.getName());
         }
 
         // "element-type"
         if (element.type == null)
         {
-            throw new InvalidMemberMetaDataException(LOCALISER, "044133",  mmd.getClassName(), mmd.getName());
+            throw new InvalidMemberMetaDataException("044133",  mmd.getClassName(), mmd.getName());
         }
 
         // Check that the element type exists
@@ -99,15 +100,13 @@ public class CollectionMetaData extends ContainerMetaData
         }
         catch (ClassNotResolvedException cnre)
         {
-            throw new InvalidMemberMetaDataException(LOCALISER, "044134", getMemberMetaData().getClassName(), 
-                getFieldName(), element.type);
+            throw new InvalidMemberMetaDataException("044134", getMemberMetaData().getClassName(), getFieldName(), element.type);
         }
 
         if (!elementTypeClass.getName().equals(element.type))
         {
             // The element-type has been resolved from what was specified in the MetaData - update to the fully-qualified name
-            NucleusLogger.METADATA.info(LOCALISER.msg("044135", getFieldName(), getMemberMetaData().getClassName(false), 
-                element.type, elementTypeClass.getName()));
+            NucleusLogger.METADATA.info(Localiser.msg("044135", getFieldName(), getMemberMetaData().getClassName(false), element.type, elementTypeClass.getName()));
             element.type = elementTypeClass.getName();
         }
 

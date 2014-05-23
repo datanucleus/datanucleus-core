@@ -44,10 +44,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class RelationshipManagerImpl implements RelationshipManager
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** ObjectProvider for the object we are managing the relationships for. */
     final ObjectProvider ownerOP;
 
@@ -494,7 +490,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                         // New value has had its side of the relation changed to a different value altogether!
                         if (newValueFieldValue == null)
                         {
-                            String msg = LOCALISER.msg("013003",
+                            String msg = Localiser.msg("013003",
                                 StringUtils.toJVMIDString(pc), mmd.getName(),
                                 StringUtils.toJVMIDString(newValue), relatedMmd.getName());
                             NucleusLogger.PERSISTENCE.error(msg);
@@ -502,7 +498,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                         }
                         else
                         {
-                            String msg = LOCALISER.msg("013002",
+                            String msg = Localiser.msg("013002",
                                 StringUtils.toJVMIDString(pc), mmd.getName(),
                                 StringUtils.toJVMIDString(newValue), relatedMmd.getName(),
                                 StringUtils.toJVMIDString(newValueFieldValue));
@@ -534,7 +530,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                 if (ownerOP.getExecutionContext().getApiAdapter().isDeleted(change.value))
                 {
                     // The element was added but was then the element object was deleted!
-                    throw new NucleusUserException(LOCALISER.msg("013008",
+                    throw new NucleusUserException(Localiser.msg("013008",
                         StringUtils.toJVMIDString(pc), mmd.getName(), StringUtils.toJVMIDString(change.value)));
                 }
                 else
@@ -565,7 +561,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                                         // The element has a different owner than the PC with this collection
                                         // This catches cases where the user has set the wrong owner, and also
                                         // will catch cases where the user has added it to two collections
-                                        throw new NucleusUserException(LOCALISER.msg("013009",
+                                        throw new NucleusUserException(Localiser.msg("013009",
                                             StringUtils.toJVMIDString(pc), mmd.getName(), 
                                             StringUtils.toJVMIDString(change.value), 
                                             StringUtils.toJVMIDString(newValueFieldValue)));
@@ -599,7 +595,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                                 {
                                     // The element was removed from the collection, but was updated to have its owner
                                     // set to the collection owner!
-                                    throw new NucleusUserException(LOCALISER.msg("013010",
+                                    throw new NucleusUserException(Localiser.msg("013010",
                                         StringUtils.toJVMIDString(pc), mmd.getName(),
                                         StringUtils.toJVMIDString(change.value)));
                                 }
@@ -693,7 +689,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                         // Still set to this object, so null out the other objects relation
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("013004",
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("013004",
                                     StringUtils.toJVMIDString(oldValue), relatedMmd.getFullFieldName(),
                                     StringUtils.toJVMIDString(pc), StringUtils.toJVMIDString(newValue)));
                         }
@@ -725,7 +721,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                     // Was set to null so set to our object
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("013005",
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("013005",
                                 StringUtils.toJVMIDString(newValue), relatedMmd.getFullFieldName(),
                                 StringUtils.toJVMIDString(pc)));
                     }
@@ -745,7 +741,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                         }
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("013004",
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("013004",
                                     StringUtils.toJVMIDString(newValueFieldValue), 
                                     mmd.getFullFieldName(),
                                     StringUtils.toJVMIDString(newValue), StringUtils.toJVMIDString(pc)));
@@ -755,7 +751,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                     // Update the field of the new value to our object
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("013005",
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("013005",
                                 StringUtils.toJVMIDString(newValue), relatedMmd.getFullFieldName(),
                                 StringUtils.toJVMIDString(pc)));
                     }
@@ -874,7 +870,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                         {
                             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                             {
-                                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("013006",
+                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("013006",
                                         StringUtils.toJVMIDString(pc), mmd.getFullFieldName(),
                                         relatedMmd.getFullFieldName(), StringUtils.toJVMIDString(oldValue)));
                             }
@@ -917,7 +913,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                     {
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("013007",
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("013007",
                                     StringUtils.toJVMIDString(pc), mmd.getFullFieldName(),
                                     relatedMmd.getFullFieldName(), StringUtils.toJVMIDString(newValue)));
                         }

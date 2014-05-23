@@ -62,9 +62,6 @@ import org.datanucleus.util.Localiser;
  */
 public class EnhancerPropertyGetterAdapter extends MethodVisitor
 {
-    /** Localisation of messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", ClassEnhancer.class.getClassLoader());
-
     /** The enhancer for this class. */
     protected ClassEnhancer enhancer;
 
@@ -118,7 +115,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
         {
             String msg = ClassMethod.getMethodAdditionMessage(enhancer.getNamer().getGetMethodPrefixMethodName() + mmd.getName(), 
                 mmd.getType(), null, null);
-            DataNucleusEnhancer.LOGGER.debug(LOCALISER.msg("Enhancer.AddMethod", msg));
+            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddMethod", msg));
         }
 
         if (!mmd.isAbstract())
@@ -255,7 +252,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
                     // "throw new JDODetachedFieldAccessException(...)"
                     mv.visitTypeInsn(Opcodes.NEW, namer.getDetachedFieldAccessExceptionAsmClassName());
                     mv.visitInsn(Opcodes.DUP);
-                    mv.visitLdcInsn(LOCALISER.msg("Enhancer.DetachedPropertyAccess", mmd.getName()));
+                    mv.visitLdcInsn(Localiser.msg("Enhancer.DetachedPropertyAccess", mmd.getName()));
                     mv.visitMethodInsn(Opcodes.INVOKESPECIAL, namer.getDetachedFieldAccessExceptionAsmClassName(), 
                         "<init>", "(Ljava/lang/String;)V");
                     mv.visitInsn(Opcodes.ATHROW);
@@ -370,7 +367,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
                     // "throw new JDODetachedFieldAccessException(...)"
                     mv.visitTypeInsn(Opcodes.NEW, namer.getDetachedFieldAccessExceptionAsmClassName());
                     mv.visitInsn(Opcodes.DUP);
-                    mv.visitLdcInsn(LOCALISER.msg("Enhancer.DetachedPropertyAccess", mmd.getName()));
+                    mv.visitLdcInsn(Localiser.msg("Enhancer.DetachedPropertyAccess", mmd.getName()));
                     mv.visitMethodInsn(Opcodes.INVOKESPECIAL, namer.getDetachedFieldAccessExceptionAsmClassName(), 
                         "<init>", "(Ljava/lang/String;)V");
                     mv.visitInsn(Opcodes.ATHROW);

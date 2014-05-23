@@ -18,8 +18,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.metadata;
 
-import org.datanucleus.util.Localiser;
-
 /**
  * Exception thrown when a primary key class is found to be invalid for some reason.
  * This is due to an invalid specification of MetaData, or maybe the class specified
@@ -27,34 +25,13 @@ import org.datanucleus.util.Localiser;
  */
 public class InvalidPrimaryKeyException extends InvalidClassMetaDataException
 {
-    public InvalidPrimaryKeyException(Localiser localiser, String key, String className)
+    public InvalidPrimaryKeyException(String key, String className)
     {
-        super(localiser, key, className);
+        super(key, className);
     }
 
-    public InvalidPrimaryKeyException(Localiser localiser, String key, String className,
-            Object param1)
+    public InvalidPrimaryKeyException(String key, String className, Object... params)
     {
-        super(localiser, key, className, param1);
-    }
-
-    public InvalidPrimaryKeyException(Localiser localiser, String key, String className,
-            Object param1, Object param2)
-    {
-        super(localiser, key, className, param1, param2);
-    }
-
-    public InvalidPrimaryKeyException(Localiser localiser, String key, String className,
-            Object param1, Object param2, Object param3)
-    {
-        super(localiser, key, className, param1, param2, param3);
-        this.messageKey = key;
-    }
-
-    public InvalidPrimaryKeyException(Localiser localiser, String key, String className,
-            Object param1, Object param2, Object param3, Object param4)
-    {
-        super(localiser, key, className, param1, param2, param3, param4);
-        this.messageKey = key;
+        super(key, className, params);
     }
 }

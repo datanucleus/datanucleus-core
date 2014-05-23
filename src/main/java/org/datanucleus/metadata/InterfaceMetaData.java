@@ -31,6 +31,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -80,7 +81,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
 
             if (NucleusLogger.METADATA.isDebugEnabled())
             {
-                NucleusLogger.METADATA.debug(LOCALISER.msg("044076",fullName));
+                NucleusLogger.METADATA.debug(Localiser.msg("044076",fullName));
             }
 
             // Validate the objectid-class
@@ -258,8 +259,8 @@ public class InterfaceMetaData extends AbstractClassMetaData
     {
         if (isInitialised() || isPopulated())
         {
-            NucleusLogger.METADATA.error(LOCALISER.msg("044068", name));
-            throw new NucleusException(LOCALISER.msg("044068", fullName)).setFatal();
+            NucleusLogger.METADATA.error(Localiser.msg("044068", name));
+            throw new NucleusException(Localiser.msg("044068", fullName)).setFatal();
         }
         if (populating)
         {
@@ -270,7 +271,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
         {
             if (NucleusLogger.METADATA.isDebugEnabled())
             {
-                NucleusLogger.METADATA.debug(LOCALISER.msg("044075", fullName));
+                NucleusLogger.METADATA.debug(Localiser.msg("044075", fullName));
             }
             populating = true;
 
@@ -289,7 +290,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
             if (ClassUtils.isInnerClass(fullName) && !Modifier.isStatic(cls.getModifiers()) &&
                 persistenceModifier == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
             {
-                throw new InvalidClassMetaDataException(LOCALISER, "044063", fullName);
+                throw new InvalidClassMetaDataException("044063", fullName);
             }
 
             determineSuperClassName(clr, cls, mmgr);
@@ -385,8 +386,8 @@ public class InterfaceMetaData extends AbstractClassMetaData
                         }
                         catch (ClassNotResolvedException cnre2)
                         {
-                            NucleusLogger.METADATA.error(LOCALISER.msg("044080", fieldClassName));
-                            throw new InvalidClassMetaDataException(LOCALISER, "044080", fullName, fieldClassName);
+                            NucleusLogger.METADATA.error(Localiser.msg("044080", fieldClassName));
+                            throw new InvalidClassMetaDataException("044080", fullName, fieldClassName);
                         }
                     }
                 }
@@ -405,7 +406,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
                     catch (Exception e2)
                     {
                         // MetaData method doesn't exist in the class!
-                        throw new InvalidClassMetaDataException(LOCALISER, "044072", fullName, fmd.getFullFieldName());
+                        throw new InvalidClassMetaDataException("044072", fullName, fmd.getFullFieldName());
                     }
                 }
                 fmd.populate(clr, null, cls_method, primary, mmgr);
@@ -451,7 +452,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
                             if (clsMethods[j].getName().equals(setterName))
                             {
                                 // Getter/Setter for a property but not in MetaData so add
-                                NucleusLogger.METADATA.debug(LOCALISER.msg("044060", fullName, memberName));
+                                NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, memberName));
                                 AbstractMemberMetaData mmd = newDefaultedProperty(memberName);
                                 members.add(mmd);
                                 Collections.sort(members);

@@ -24,6 +24,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
 
 /**
  * Class to handle the conversion between java.util.Calendar and a String form.
@@ -69,7 +70,7 @@ public class CalendarStringConverter implements TypeConverter<Calendar, String>
         }
         catch (ParseException pe)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("016002", str, Calendar.class.getName()), pe);
+            throw new NucleusDataStoreException(Localiser.msg("016002", str, Calendar.class.getName()), pe);
         }
     }
 

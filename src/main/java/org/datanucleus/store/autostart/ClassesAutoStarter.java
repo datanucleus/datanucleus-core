@@ -27,6 +27,7 @@ import org.datanucleus.PropertyNames;
 import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.exceptions.DatastoreInitialisationException;
+import org.datanucleus.util.Localiser;
 
 /**
  * An auto-starter mechanism that uses a defined list of classes to be loaded at start.
@@ -101,6 +102,6 @@ public class ClassesAutoStarter extends AbstractAutoStartMechanism
      */
     public String getStorageDescription()
     {
-        return LOCALISER.msg("034100");
+        return Localiser.msg("034100");
     }
 }

@@ -24,15 +24,12 @@ import org.datanucleus.util.Localiser;
  */
 public class TransactionActiveOnBeginException extends NucleusUserException
 {
-    private static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructs a transaction already active exception with the specified detail message.
      * @param failedObject ExecutionContext object that failed to close
      */
     public TransactionActiveOnBeginException(Object failedObject)
     {
-        super(LOCALISER.msg("015033"), failedObject);
+        super(Localiser.msg("015033"), failedObject);
     }
 }

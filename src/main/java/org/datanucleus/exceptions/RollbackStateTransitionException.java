@@ -27,16 +27,13 @@ import org.datanucleus.util.Localiser;
  */
 public class RollbackStateTransitionException extends NucleusException
 {
-    private static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructor.
      * @param nested The nested exceptions
      */
     public RollbackStateTransitionException(java.lang.Exception[] nested)
     {
-        super(LOCALISER.msg("015031"), nested);
+        super(Localiser.msg("015031"), nested);
         setFatal();
     }
 }

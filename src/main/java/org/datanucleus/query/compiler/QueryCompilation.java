@@ -27,7 +27,6 @@ import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.expression.ParameterExpression;
 import org.datanucleus.query.symbol.Symbol;
 import org.datanucleus.query.symbol.SymbolTable;
-import org.datanucleus.util.Localiser;
 
 /**
  * Representation of the components of a compiled java "string-based" query.
@@ -40,10 +39,6 @@ import org.datanucleus.util.Localiser;
  */
 public class QueryCompilation implements Serializable
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Query language that this is a compilation for. */
     protected String queryLanguage;
 

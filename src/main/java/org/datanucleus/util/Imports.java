@@ -34,9 +34,6 @@ import org.datanucleus.exceptions.NucleusUserException;
  */
 public class Imports
 {
-    private static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     private HashMap primitives = new HashMap();
     private HashMap importedClassesByName = new HashMap();
     private HashSet importedPackageNames = new HashSet();
@@ -107,7 +104,7 @@ public class Imports
 
             if (t2.countTokens() != 2 || !t2.nextToken().equals("import"))
             {
-                throw new NucleusUserException(LOCALISER.msg("021002",importDecl));
+                throw new NucleusUserException(Localiser.msg("021002",importDecl));
             }
 
             String importName = t2.nextToken();
@@ -118,7 +115,7 @@ public class Imports
             {
                 if (lastDot < 1)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("021003",importName));
+                    throw new NucleusUserException(Localiser.msg("021003",importName));
                 }
 
                 importedPackageNames.add(importName.substring(0, lastDot));
@@ -128,7 +125,7 @@ public class Imports
                 if (importedClassesByName.put(lastPart, importName) != null)
                 {
                     // Duplicated imports are valid (see spec 14.4 "declareImports"), so just log it for info
-                    NucleusLogger.QUERY.info(LOCALISER.msg("021004", importName));
+                    NucleusLogger.QUERY.info(Localiser.msg("021004", importName));
                 }
             }
         }
@@ -177,7 +174,7 @@ public class Imports
                         if (c != null && c1 != null)
                         {
                             // Duplicate definition of type
-                            throw new NucleusUserException(LOCALISER.msg("021008",c.getName(),c1.getName()));
+                            throw new NucleusUserException(Localiser.msg("021008",c.getName(),c1.getName()));
                         }
 
                         c = c1;
@@ -195,7 +192,7 @@ public class Imports
 
                 if (NucleusLogger.GENERAL.isDebugEnabled())
                 {
-                    NucleusLogger.GENERAL.debug(LOCALISER.msg("021010", classDecl, c.getName()));
+                    NucleusLogger.GENERAL.debug(Localiser.msg("021010", classDecl, c.getName()));
                 }
             }
         }

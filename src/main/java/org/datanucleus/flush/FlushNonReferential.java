@@ -27,6 +27,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusOptimisticException;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.StorePersistenceHandler;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -121,7 +122,7 @@ public class FlushNonReferential implements FlushProcess
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("010046", opsToDelete.size(), opsToInsert.size(), opsToFlush.size()));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("010046", opsToDelete.size(), opsToInsert.size(), opsToFlush.size()));
         }
 
         StorePersistenceHandler persistenceHandler = ec.getStoreManager().getPersistenceHandler();

@@ -25,9 +25,6 @@ import org.datanucleus.util.Localiser;
  */
 public class ClassNotDetachableException extends NucleusUserException
 {
-    private static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructs a class-not-detachable exception with the specified
      * detail message.
@@ -35,7 +32,7 @@ public class ClassNotDetachableException extends NucleusUserException
      */
     public ClassNotDetachableException(String class_name)
     {
-        super(LOCALISER.msg("018004",class_name));
+        super(Localiser.msg("018004",class_name));
     }
 
     /**
@@ -46,7 +43,7 @@ public class ClassNotDetachableException extends NucleusUserException
      */
     public ClassNotDetachableException(String class_name, Exception nested)
     {
-        super(LOCALISER.msg("018004",class_name), nested);
+        super(Localiser.msg("018004",class_name), nested);
     }
 
     /**
@@ -56,6 +53,6 @@ public class ClassNotDetachableException extends NucleusUserException
      */
     public ClassNotDetachableException(Throwable[] nested)
     {
-        super(LOCALISER.msg("018005"), nested);
+        super(Localiser.msg("018005"), nested);
     }
 }

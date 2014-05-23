@@ -50,10 +50,6 @@ public class Transaction
     public final static int STATUS_COMMITTING = 8;
     public final static int STATUS_ROLLING_BACK = 9;
 
-    /** Localisation utility for output messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** id of this instance **/
     private static final int NODE_ID = NucleusContextHelper.random.nextInt();
 
@@ -202,7 +198,7 @@ public class Transaction
 
         if (NucleusLogger.TRANSACTION.isDebugEnabled())
         {
-            NucleusLogger.TRANSACTION.debug(LOCALISER.msg("015039", "enlist", xaRes, getXAFlag(flag), toString()));
+            NucleusLogger.TRANSACTION.debug(Localiser.msg("015039", "enlist", xaRes, getXAFlag(flag), toString()));
         }
 
         try
@@ -211,7 +207,7 @@ public class Transaction
         }
         catch (XAException e)
         {
-            NucleusLogger.TRANSACTION.error(LOCALISER.msg("015038", "enlist", xaRes, getXAErrorCode(e), toString()));
+            NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "enlist", xaRes, getXAErrorCode(e), toString()));
             return false;
         }
 
@@ -249,7 +245,7 @@ public class Transaction
 
         if (NucleusLogger.TRANSACTION.isDebugEnabled())
         {
-           NucleusLogger.TRANSACTION.debug(LOCALISER.msg("015039", "delist", xaRes, getXAFlag(flag), toString()));
+           NucleusLogger.TRANSACTION.debug(Localiser.msg("015039", "delist", xaRes, getXAFlag(flag), toString()));
         }
 
         XAException exception = null;
@@ -264,7 +260,7 @@ public class Transaction
 
         if (exception != null)
         {
-            NucleusLogger.TRANSACTION.error(LOCALISER.msg("015038", "delist", xaRes, getXAErrorCode(exception), toString()));
+            NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "delist", xaRes, getXAErrorCode(exception), toString()));
             return false;
         }
 
@@ -367,7 +363,7 @@ public class Transaction
                         failures.add(e);
                         failed = true;
                         status = STATUS_MARKED_ROLLBACK;
-                        NucleusLogger.TRANSACTION.error(LOCALISER.msg("015038", "commit", resourceManager, 
+                        NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "commit", resourceManager, 
                             getXAErrorCode(e), toString()));                    
                     }
                 }
@@ -403,7 +399,7 @@ public class Transaction
                         failures.add(e);
                         failed = true;
                         status = STATUS_MARKED_ROLLBACK;
-                        NucleusLogger.TRANSACTION.error(LOCALISER.msg("015038", "prepare", resourceManager, 
+                        NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "prepare", resourceManager, 
                             getXAErrorCode(e), toString()));
                     }
                 }
@@ -431,7 +427,7 @@ public class Transaction
                         }
                         catch (Throwable e)
                         {
-                            NucleusLogger.TRANSACTION.error(LOCALISER.msg("015038", "rollback", resourceManager, 
+                            NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "rollback", resourceManager, 
                                 getXAErrorCode(e), toString()));                        
                             if (failures == null)
                             {
@@ -459,7 +455,7 @@ public class Transaction
                         }
                         catch (Throwable e)
                         {
-                            NucleusLogger.TRANSACTION.error(LOCALISER.msg("015038", "commit", resourceManager, 
+                            NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "commit", resourceManager, 
                                 getXAErrorCode(e), toString()));                     
                             if (failures == null)
                             {
@@ -555,7 +551,7 @@ public class Transaction
                         failures = new ArrayList();
                     }
                     failures.add(e);
-                    NucleusLogger.TRANSACTION.error(LOCALISER.msg("015038", "rollback", resourceManager, 
+                    NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "rollback", resourceManager, 
                         getXAErrorCode(e), toString()));
                 }
             }

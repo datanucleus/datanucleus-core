@@ -46,10 +46,6 @@ import org.datanucleus.util.Localiser;
  */
 public class SchemaToolTask extends Java
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Operating mode */
     private Mode mode = Mode.CREATE;
 
@@ -302,7 +298,7 @@ public class SchemaToolTask extends Java
         }        
         else
         {
-            System.err.println(LOCALISER.msg("014036"));
+            System.err.println(Localiser.msg("014036"));
         }
     }
 }

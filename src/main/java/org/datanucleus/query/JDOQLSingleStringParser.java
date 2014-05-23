@@ -58,11 +58,7 @@ import org.datanucleus.util.NucleusLogger;
  * So the "filter" for the outer query is "timeAvailable &lt; (SELECT avg(hours) FROM Employee e)"
  */
 public class JDOQLSingleStringParser
-{    
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
+{
     /** The JDOQL query to populate. */
     private Query query;
 
@@ -79,7 +75,7 @@ public class JDOQLSingleStringParser
      */
     public JDOQLSingleStringParser(Query query, String queryString)
     {
-        NucleusLogger.QUERY.debug(LOCALISER.msg("042010", queryString));
+        NucleusLogger.QUERY.debug(Localiser.msg("042010", queryString));
         this.query = query;
         this.queryString = queryString;
     }
@@ -123,7 +119,7 @@ public class JDOQLSingleStringParser
             if (keyword != null && JDOQLQueryHelper.isKeyword(keyword))
             {
                 // any keyword after compiling the SELECT is an error
-                throw new NucleusUserException(LOCALISER.msg("042011", keyword));
+                throw new NucleusUserException(Localiser.msg("042011", keyword));
             }
         }
 
@@ -147,7 +143,7 @@ public class JDOQLSingleStringParser
             } 
             else
             {
-                throw new NucleusUserException(LOCALISER.msg("042012"));
+                throw new NucleusUserException(Localiser.msg("042012"));
             }
 
             if (update)
@@ -228,7 +224,7 @@ public class JDOQLSingleStringParser
             if (content.length() == 0)
             {
                 // No UPDATE clause
-                throw new NucleusUserException(LOCALISER.msg("043010"));
+                throw new NucleusUserException(Localiser.msg("043010"));
             }
             query.setFrom(content);
             query.setCandidateClassName(content);
@@ -241,7 +237,7 @@ public class JDOQLSingleStringParser
             else
             {
                 // UPDATE clause has no "SET ..." !
-                throw new NucleusUserException(LOCALISER.msg("043011"));
+                throw new NucleusUserException(Localiser.msg("043011"));
             }
         }
 
@@ -251,7 +247,7 @@ public class JDOQLSingleStringParser
             if (content.length() == 0)
             {
                 // content cannot be empty
-                throw new NucleusUserException(LOCALISER.msg("042014", "INTO", "<result class>"));
+                throw new NucleusUserException(Localiser.msg("042014", "INTO", "<result class>"));
             }
 
             String resultClassName = content.trim();
@@ -264,7 +260,7 @@ public class JDOQLSingleStringParser
             if (content.length() == 0)
             {
                 // content cannot be empty
-                throw new NucleusUserException(LOCALISER.msg("042014", "FROM", "<candidate class>"));
+                throw new NucleusUserException(Localiser.msg("042014", "FROM", "<candidate class>"));
             }
 
             if (content.indexOf(' ') > 0)
@@ -282,12 +278,12 @@ public class JDOQLSingleStringParser
             {
                 if (!tokenizer.parseKeyword("SUBCLASSES") && !tokenizer.parseKeyword("subclasses"))
                 {
-                    throw new NucleusUserException(LOCALISER.msg("042015", "SUBCLASSES", "EXCLUDE"));
+                    throw new NucleusUserException(Localiser.msg("042015", "SUBCLASSES", "EXCLUDE"));
                 }
                 content = tokenizer.parseContent(false);
                 if (content.length() > 0)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("042013", "EXCLUDE SUBCLASSES", content));
+                    throw new NucleusUserException(Localiser.msg("042013", "EXCLUDE SUBCLASSES", content));
                 }
                 query.setSubclasses(false);
             }
@@ -299,7 +295,7 @@ public class JDOQLSingleStringParser
             if (content.length() == 0)
             {
                 // content cannot be empty
-                throw new NucleusUserException(LOCALISER.msg("042014", "WHERE", "<filter>"));
+                throw new NucleusUserException(Localiser.msg("042014", "WHERE", "<filter>"));
             }
 
             if (content.indexOf("SELECT ") > 0 || content.indexOf("select ") > 0)
@@ -368,7 +364,7 @@ public class JDOQLSingleStringParser
                             }
                             if (endPosition < 0)
                             {
-                                throw new NucleusUserException(LOCALISER.msg("042017"));
+                                throw new NucleusUserException(Localiser.msg("042017"));
                             }
 
                             String subqueryStr = content.substring(i+1, endPosition).trim();
@@ -397,7 +393,7 @@ public class JDOQLSingleStringParser
             if (withinLiteralDouble || withinLiteralSingle)
             {
                 // Literal wasn't closed
-                throw new NucleusUserException(LOCALISER.msg("042017"));
+                throw new NucleusUserException(Localiser.msg("042017"));
             }
 
             query.setFilter(stringContent.toString());
@@ -409,7 +405,7 @@ public class JDOQLSingleStringParser
             if (content.length() == 0)
             {
                 // content cannot be empty
-                throw new NucleusUserException(LOCALISER.msg("042014", "VARIABLES", "<variable declarations>"));
+                throw new NucleusUserException(Localiser.msg("042014", "VARIABLES", "<variable declarations>"));
             }
             query.declareExplicitVariables(content);
         }
@@ -420,7 +416,7 @@ public class JDOQLSingleStringParser
             if (content.length() == 0)
             {
                 // content cannot be empty
-                throw new NucleusUserException(LOCALISER.msg("042014", "PARAMETERS", "<parameter declarations>"));
+                throw new NucleusUserException(Localiser.msg("042014", "PARAMETERS", "<parameter declarations>"));
             }
             query.declareExplicitParameters(content);
         }
@@ -441,14 +437,14 @@ public class JDOQLSingleStringParser
             if (!tokenizer.parseKeyword("BY") && !tokenizer.parseKeyword("by"))
             {
                 // GROUP must be followed by BY
-                throw new NucleusUserException(LOCALISER.msg("042015", "BY", "GROUP"));
+                throw new NucleusUserException(Localiser.msg("042015", "BY", "GROUP"));
             }
 
             content = tokenizer.parseContent(false);
             if (content.length() == 0)
             {
                 // content cannot be empty
-                throw new NucleusUserException(LOCALISER.msg("042014", "GROUP BY", "<grouping>"));
+                throw new NucleusUserException(Localiser.msg("042014", "GROUP BY", "<grouping>"));
             }
             query.setGrouping(content);
         }
@@ -459,14 +455,14 @@ public class JDOQLSingleStringParser
             if (!tokenizer.parseKeyword("BY") && !tokenizer.parseKeyword("by"))
             {
                 // ORDER must be followed by BY
-                throw new NucleusUserException(LOCALISER.msg("042015", "BY", "ORDER"));
+                throw new NucleusUserException(Localiser.msg("042015", "BY", "ORDER"));
             }
 
             content = tokenizer.parseContent(false);
             if (content.length() == 0)
             {
                 // content cannot be empty
-                throw new NucleusUserException(LOCALISER.msg("042014", "ORDER BY", "<ordering>"));
+                throw new NucleusUserException(Localiser.msg("042014", "ORDER BY", "<ordering>"));
             }
             query.setOrdering(content);
         }
@@ -477,7 +473,7 @@ public class JDOQLSingleStringParser
             if (content.length() == 0)
             {
                 // content cannot be empty
-                throw new NucleusUserException(LOCALISER.msg("042014", "RANGE", "<range>"));
+                throw new NucleusUserException(Localiser.msg("042014", "RANGE", "<range>"));
             }
             query.setRange(content);
         }

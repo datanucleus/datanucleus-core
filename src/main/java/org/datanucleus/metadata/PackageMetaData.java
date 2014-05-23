@@ -311,7 +311,7 @@ public class PackageMetaData extends MetaData
     {
         if (StringUtils.isWhitespace(className))
         {
-            throw new InvalidClassMetaDataException(LOCALISER, "044061", name);
+            throw new InvalidClassMetaDataException("044061", name);
         }
         ClassMetaData cmd = new ClassMetaData(this, className);
         return addClass(cmd);

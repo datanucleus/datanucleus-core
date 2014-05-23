@@ -45,6 +45,7 @@ import org.datanucleus.PropertyNames;
 import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.exceptions.DatastoreInitialisationException;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -96,7 +97,7 @@ public class XMLAutoStarter extends AbstractAutoStartMechanism
             }
             catch (Exception e)
             {
-                NucleusLogger.PERSISTENCE.info(LOCALISER.msg("034201", fileUrl.getFile()));
+                NucleusLogger.PERSISTENCE.info(Localiser.msg("034201", fileUrl.getFile()));
 
                 // File doesn't exist, so create it
                 doc = db.newDocument();
@@ -108,7 +109,7 @@ public class XMLAutoStarter extends AbstractAutoStartMechanism
         }
         catch (ParserConfigurationException e1)
         {
-            NucleusLogger.PERSISTENCE.error(LOCALISER.msg("034202", fileUrl.getFile(), e1.getMessage()));
+            NucleusLogger.PERSISTENCE.error(Localiser.msg("034202", fileUrl.getFile(), e1.getMessage()));
         }
 
         version = storeMgr.getNucleusContext().getPluginManager().getVersionForBundle("org.datanucleus");
@@ -242,7 +243,7 @@ public class XMLAutoStarter extends AbstractAutoStartMechanism
         }
         catch (ParserConfigurationException e)
         {
-            NucleusLogger.PERSISTENCE.error(LOCALISER.msg("034203", fileUrl.getFile(), e.getMessage()));
+            NucleusLogger.PERSISTENCE.error(Localiser.msg("034203", fileUrl.getFile(), e.getMessage()));
         }
     }
 
@@ -252,7 +253,7 @@ public class XMLAutoStarter extends AbstractAutoStartMechanism
      */
     public String getStorageDescription()
     {
-        return LOCALISER.msg("034200");
+        return Localiser.msg("034200");
     }
 
     /**
@@ -275,7 +276,7 @@ public class XMLAutoStarter extends AbstractAutoStartMechanism
         }
         catch (Exception e)
         {
-            NucleusLogger.PERSISTENCE.error(LOCALISER.msg("034203", fileUrl.getFile(), e.getMessage()));
+            NucleusLogger.PERSISTENCE.error(Localiser.msg("034203", fileUrl.getFile(), e.getMessage()));
         }
         finally
         {

@@ -25,75 +25,83 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.datanucleus.ClassConstants;
 
 /**
- * Resource Bundle manager, providing simplified means of using MessageFormat to localise the system.
+ * Localiser for messages in the DataNucleus system.
+ * Provides access to a singleton, via the <pre>getInstance</pre> method.
+ * Any plugin that provides its own resources via a properties file should call
+ * <pre>Localiser.registerBundle(...)</pre> before the resources are required to be used.
  * <p>
  * The DataNucleus system is internationalisable hence messages (to log files or exceptions) can
  * be displayed in multiple languages. Currently DataNucleus contains localisation files in the 
- * default locale (English), but can be extended easily by adding localisationfiles in languages 
- * such as Spanish, French, etc. The internationalisation operates around the 
- * <i>org.datanucleus.util.Localiser</i> class that is responsible for generating the 
- * messages in the specified locale. Each class needs to instantiate a Localiser
- * <pre>private static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.store.Localisation", MyClass.class);</pre>
- * and then output messages via
- * <pre>LOCALISER.msg("012345", schemaName, autoStartMechanism)</pre>
+ * English and Spanish, but can be extended easily by adding localisation files in languages such as French, etc. 
+ * The internationalisation operates around a Java ResourceBundle, loading a properties file.
+ * 
+ * Messages are output via calling
+ * <pre>Localiser.getInstance().msg("012345", args);</pre>
  * The messages themselves are contained in a file for each package. For example, with the above example,
- * we have org.datanucleus.store.Localisation.properties. This contains entries such as
+ * we have "org.datanucleus.Localisation.properties". This contains entries such as
  * <pre>012345=Initialising Schema "{0}" using "{1}" auto-start option</pre>
- * So the 2 parameters specified in the LOCALISER.msg call are inserted into the message. The 
- * language-specific parts are always contained in the Localisation.properties file.
- * To extend the current system to internationalise in, for example, Spanish you would add a file 
- * org.datanucleus.store.Localisation_es.properties and add an entry such as
- * <pre>012345=Inicializando la esquema "{0}" con la opción de empezar "{1}"</pre>
- * With this file installed, anybody running an application where the JDK is running in Spanish as 
- * default locale would see the above Spanish message. It is intended to include such files in a 
- * future release.
- * <p>
+ * So the 2 parameters specified in the <pre>Localiser.getInstance().msg()</pre> call are inserted into the message. 
+ * <h3>Extending for other languages</h3>
+ * The language-specific parts are always contained in the Localisation.properties file.
+ * To extend the current system to internationalise in, for example, French you would add a file 
+ * "org.datanucleus.Localisation_fr.properties" and add entries with the required French text.
  * If you want to extend this to another language and contribute the files for your language
- * you need to find all files "Localisation.properties" and provide an alternative variant.
- * <p>
- * <b>Note that the second argument used in constructing the Localiser is important for OSGi. It has
- * to be a class in the same OSGi bundle as the Localisation.properties file</b>
- * <p>
- * You will find alternates in Spanish already present named "Localisation_es.properties", so if
- * you wanted to create a French localisation then provide "Localisation_fr.properties".
+ * you need to find all files "Localisation.properties" and provide an alternative variant, raise an issue in JIRA, and
+ * attach your patch to the issue.
  */
 public class Localiser
 {
+    private static Locale locale = null;
+
     /** Convenience flag whether to display numbers in messages. */
     private static boolean displayCodesInMessages = false;
 
-    private static Hashtable<String, Localiser> helpers = new Hashtable();
-
-    private static Locale locale = Locale.getDefault();
+    private static Map<String, String> properties = new ConcurrentHashMap<String, String>();
 
     private static Hashtable<String, MessageFormat> msgFormats = new Hashtable();
 
-    /** The underlying bundle. */
-    private ResourceBundle bundle = null;
-
-    private ClassLoader loader = null;
-
-    /**
-     * Private constructor to prevent outside instantiation. Operates on a
-     * principle of one helper per bundle.
-     * @param bundleName the name of the resource bundle
-     * @param classLoader the class loader from which to load the resource
-     * bundle
-     */
-    private Localiser(String bundleName, ClassLoader classLoader)
+    static
     {
-        // We can assume that the bundle hasn't been loaded since no helper has been found for it
+        // User can specify the language of messages for this JVM via a System property
+        String language = System.getProperty("datanucleus.localisation.language");
+        if (language == null)
+        {
+            locale = Locale.getDefault();
+        }
+        else
+        {
+            locale = new Locale(language);
+        }
+
+        // User can set whether to use messageCodes in messages for this JVM via a System property
+        String messageCodes = System.getProperty("datanucleus.localisation.messageCodes");
+        if (messageCodes != null)
+        {
+            displayCodesInMessages = Boolean.parseBoolean(messageCodes);
+        }
+
+        // Register the primary resource bundle
+        registerBundle("org.datanucleus.Localisation", ClassConstants.NUCLEUS_CONTEXT_LOADER);
+    }
+
+    public static void registerBundle(String bundleName, ClassLoader loader)
+    {
         try
         {
-            loader = classLoader;
-            bundle = ResourceBundle.getBundle(bundleName, locale, classLoader);
+            ResourceBundle bundle = ResourceBundle.getBundle(bundleName, locale, loader);
+            for (String key : bundle.keySet())
+            {
+                properties.put(key, bundle.getString(key));
+            }
         }
         catch (MissingResourceException mre)
         {
@@ -102,267 +110,46 @@ public class Localiser
     }
 
     /**
-     * Convenience method to change the language of the resource bundles used by the localisers.
-     * @param languageCode The new language code
-     */
-    public static synchronized void setLanguage(String languageCode)
-    {
-        if (languageCode == null)
-        {
-            return;
-        }
-        if (locale.getLanguage().equalsIgnoreCase(languageCode))
-        {
-            // Already in this language
-            return;
-        }
-
-        NucleusLogger.GENERAL.info("Setting localisation to " + languageCode + " from " + locale.getLanguage());
-        locale = new Locale(languageCode);
-
-        // Change language of all Localiser objects to this language
-        Set<String> bundleNames = helpers.keySet();
-        Iterator<String> bundleIter = bundleNames.iterator();
-        while (bundleIter.hasNext())
-        {
-            String bundleName = bundleIter.next();
-            Localiser localiser = helpers.get(bundleName);
-            try
-            {
-                ClassLoader loader = localiser.loader;
-                localiser.bundle = ResourceBundle.getBundle(bundleName, locale, loader);
-            }
-            catch (MissingResourceException mre)
-            {
-                NucleusLogger.GENERAL.error("ResourceBundle " + bundleName + " for locale " + locale + " was not found!");
-            }
-        }
-    }
-
-    /**
-     * Method to allow turning on/off of display of error codes in messages.
-     * @param display Whether to display codes
-     */
-    public static void setDisplayCodesInMessages(boolean display)
-    {
-        NucleusLogger.GENERAL.info("Setting localisation codes display to " + display);
-        displayCodesInMessages = display;
-    }
-
-    /**
-     * Accessor for a helper instance for a bundle.
-     * @param bundle_name the name of the bundle
-     * @param class_loader the class loader from which to load the resource
-     * bundle
-     * @return the helper instance bound to the bundle
-     */
-    public static Localiser getInstance(String bundle_name, ClassLoader class_loader)
-    {
-        Localiser localiser = helpers.get(bundle_name);
-        if (localiser != null)
-        {
-            return localiser;
-        }
-        localiser = new Localiser(bundle_name,class_loader);
-        helpers.put(bundle_name,localiser);
-
-        return localiser;
-    }
-
-    /**
      * Message formatter for an internationalised message.
-     * @param includeCode Whether to include the code in the message
      * @param messageKey the message key
      * @return the resolved message text
      */
-    public String msg(boolean includeCode, String messageKey)
+    public static String msg(String messageKey)
     {
-        return getMessage(includeCode, bundle, messageKey, null);
+        return getMessage(messageKey, null);
     }
 
     /**
      * Message formatter with one argument passed in that will be embedded in an internationalised message.
-     * @param includeCode Whether to include the code in the message
      * @param messageKey the message key
-     * @param arg the argument
+     * @param arg the long argument
      * @return the resolved message text
      */
-    public String msg(boolean includeCode, String messageKey, long arg)
+    public static String msg(String messageKey, long arg)
     {
         Object[] args = {String.valueOf(arg)};
-        return getMessage(true, bundle, messageKey, args);
+        return getMessage(messageKey, args);
     }
 
     /**
-     * Message formatter with one argument passed in that will be embedded in an internationalised message.
-     * @param includeCode Whether to include the code in the message
+     * Message formatter with arguments passed in that will be embedded in an internationalised message.
      * @param messageKey the message key
-     * @param arg1 the first argument
+     * @param args the arguments
      * @return the resolved message text
      */
-    public String msg(boolean includeCode, String messageKey, Object arg1)
+    public static String msg(String messageKey, Object... args)
     {
-        Object[] args={arg1};
-        return getMessage(includeCode, bundle, messageKey, args);
+        return getMessage(messageKey, args);
     }
 
-    /**
-     * Message formatter with a series of arguments passed in that will be embedded in an internationalised message.
-     * @param includeCode Whether to include the code in the message
-     * @param messageKey the message key
-     * @param arg1 the first argument
-     * @param arg2 the second argument
-     * @return the resolved message text
-     */
-    public String msg(boolean includeCode, String messageKey, Object arg1, Object arg2)
-    {
-        Object[] args={arg1,arg2};
-        return getMessage(includeCode, bundle, messageKey, args);
-    }
-
-    /**
-     * Message formatter with a series of arguments passed in that will be embedded in an internationalised message.
-     * @param includeCode Whether to include the code in the message
-     * @param messageKey the message key
-     * @param arg1 the first argument
-     * @param arg2 the second argument
-     * @param arg3 the third argument
-     * @return the resolved message text
-     */
-    public String msg(boolean includeCode, String messageKey, Object arg1, Object arg2, Object arg3)
-    {
-        Object[] args={arg1,arg2,arg3};
-        return getMessage(includeCode, bundle, messageKey, args);
-    }
-
-    /**
-     * Message formatter with a series of arguments passed in that will be embedded in an internationalised message.
-     * @param includeCode Whether to include the code in the message
-     * @param messageKey the message key
-     * @param arg1 the first argument
-     * @param arg2 the second argument
-     * @param arg3 the third argument
-     * @param arg4 the third argument
-     * @return the resolved message text
-     */
-    public String msg(boolean includeCode, String messageKey, Object arg1, Object arg2, Object arg3, Object arg4)
-    {
-        Object[] args={arg1,arg2,arg3,arg4};
-        return getMessage(includeCode, bundle, messageKey, args);
-    }
-
-    /**
-     * Message formatter with a series of arguments passed in that will be embedded in an internationalised message.
-     * @param includeCode Whether to include the code in the message
-     * @param messageKey the message key
-     * @param arg1 the first argument
-     * @param arg2 the second argument
-     * @param arg3 the third argument
-     * @param arg4 the third argument
-     * @param arg5 the third argument
-     * @return the resolved message text
-     */
-    public String msg(boolean includeCode, String messageKey, Object arg1, Object arg2, Object arg3, Object arg4, Object arg5)
-    {
-        Object[] args={arg1,arg2,arg3,arg4,arg5};
-        return getMessage(includeCode, bundle, messageKey, args);
-    }    
-
-    /**
-     * Message formatter for an internationalised message.
-     * @param messageKey the message key
-     * @return the resolved message text
-     */
-    public String msg(String messageKey)
-    {
-    	return msg(true, messageKey);
-    }
-
-    /**
-     * Message formatter with one argument passed in that will be embedded in an internationalised message.
-     * @param messageKey the message key
-     * @param arg1 the first argument
-     * @return the resolved message text
-     */
-    public String msg(String messageKey, Object arg1)
-    {
-        return msg(true, messageKey, arg1);
-    }
-
-    /**
-     * Message formatter with a series of arguments passed in that will be embedded in an internationalised message.
-     * @param messageKey the message key
-     * @param arg1 the first argument
-     * @param arg2 the second argument
-     * @return the resolved message text
-     */
-    public String msg(String messageKey, Object arg1, Object arg2)
-    {
-        return msg(true, messageKey, arg1, arg2);
-    }
-
-    /**
-     * Message formatter with a series of arguments passed in that will be embedded in an internationalised message.
-     * @param messageKey the message key
-     * @param arg1 the first argument
-     * @param arg2 the second argument
-     * @param arg3 the third argument
-     * @return the resolved message text
-     */
-    public String msg(String messageKey, Object arg1, Object arg2, Object arg3)
-    {
-        return msg(true, messageKey, arg1, arg2, arg3);
-    }
-
-    /**
-     * Message formatter with a series of arguments passed in that will be embedded in an internationalised message.
-     * @param messageKey the message key
-     * @param arg1 the first argument
-     * @param arg2 the second argument
-     * @param arg3 the third argument
-     * @param arg4 the third argument
-     * @return the resolved message text
-     */
-    public String msg(String messageKey, Object arg1, Object arg2, Object arg3, Object arg4)
-    {
-        return msg(true, messageKey, arg1, arg2, arg3, arg4);
-    }
-
-    /**
-     * Message formatter with a series of arguments passed in that will be embedded in an internationalised message.
-     * @param messageKey the message key
-     * @param arg1 the first argument
-     * @param arg2 the second argument
-     * @param arg3 the third argument
-     * @param arg4 the third argument
-     * @param arg5 the third argument
-     * @return the resolved message text
-     */
-    public String msg(String messageKey, Object arg1, Object arg2, Object arg3, Object arg4, Object arg5)
-    {
-        return msg(true, messageKey, arg1, arg2, arg3, arg4, arg5);
-    }
-
-    /**
-     * Message formatter with one argument passed in that will be embedded in an internationalised message.
-     * @param messageKey the message key
-     * @param arg the argument
-     * @return the resolved message text
-     */
-    public String msg(String messageKey, long arg)
-    {
-        return msg(true, messageKey, arg);
-    }
-    
     /**
      * Method to provide the MessageFormat logic. All of the msg()
      * methods are wrappers to this one.
-     * @param bundle the resource bundle
      * @param messageKey the message key
      * @param msgArgs an array of arguments to substitute into the message
      * @return the resolved message text
      */
-    final private static String getMessage(boolean includeCode, ResourceBundle bundle, String messageKey, Object msgArgs[]) 
+    private static final String getMessage(String messageKey, Object... msgArgs) 
     {
         if (messageKey == null)
         {
@@ -378,46 +165,42 @@ public class Localiser
                 {
                     msgArgs[i] = "";
                 }
-                if (Throwable.class.isAssignableFrom(msgArgs[i].getClass()))
+                else if (Throwable.class.isAssignableFrom(msgArgs[i].getClass()))
                 { 
                     msgArgs[i] = getStringFromException((Throwable)msgArgs[i]);
                 }
             }
         }
-        try
-        {
-            String stringForKey = bundle.getString(messageKey);
-            if (includeCode && displayCodesInMessages)
-            {
-                // Provide coded message "[DN-012345] ..."
-                char c = messageKey.charAt(0);
-                if (c >= '0' && c<= '9')
-                {
-                    stringForKey = "[DN-" + messageKey + "] " + stringForKey;
-                }
-            }
 
-            if (msgArgs != null)
-            {
-                MessageFormat formatter = msgFormats.get(stringForKey);
-                if (formatter == null)
-                {
-                    formatter = new MessageFormat(stringForKey);
-                    msgFormats.put(stringForKey,formatter);
-                }
-                return formatter.format(msgArgs);
-            }
-            else
-            {
-                return stringForKey;
-            }
-        }
-        catch (MissingResourceException mre)
+        String stringForKey = properties.get(messageKey);
+        if (stringForKey == null)
         {
-            NucleusLogger.GENERAL.error("Parameter " + messageKey + " doesn't exist for bundle " + bundle);
+            NucleusLogger.GENERAL.error("Message \"" + messageKey + "\" doesn't exist in any registered ResourceBundle");
+            return null;
         }
 
-        return null;
+        if (displayCodesInMessages)
+        {
+            // Provide coded message "[DN-012345] ..."
+            char c = messageKey.charAt(0);
+            if (c >= '0' && c<= '9')
+            {
+                stringForKey = "[DN-" + messageKey + "] " + stringForKey;
+            }
+        }
+
+        if (msgArgs != null)
+        {
+            // Format the message with the supplied arguments embedded
+            MessageFormat formatter = msgFormats.get(stringForKey);
+            if (formatter == null)
+            {
+                formatter = new MessageFormat(stringForKey);
+                msgFormats.put(stringForKey,formatter);
+            }
+            return formatter.format(msgArgs);
+        }
+        return stringForKey;
     }
 
     /**
@@ -445,7 +228,7 @@ public class Localiser
             msg.append(exception.getMessage());
             msg.append('\n');
             msg.append(stringWriter.toString());
-            
+
             // JDBC: SQLException
             if (exception instanceof SQLException)
             {
@@ -464,8 +247,7 @@ public class Localiser
                     msg.append(getStringFromException(((InvocationTargetException) exception).getTargetException()));
                 }
             }
-            
-            // Add more exceptions here, so we can provide a relly complete information at the log
+            // TODO Add more exceptions here, so we can provide complete information in the log
         }
         return msg.toString();
     }

@@ -33,6 +33,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.QueryResultMetaData;
 import org.datanucleus.store.Extent;
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.util.Localiser;
 
 /**
  * Base definition of a query using SQL.
@@ -80,7 +81,7 @@ public abstract class AbstractSQLQuery extends Query
 
         if (sqlText == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("059001"));
+            throw new NucleusUserException(Localiser.msg("059001"));
         }
 
         // Remove any end-of-line chars for when user dumped the query in a text file with one word per line!
@@ -124,7 +125,7 @@ public abstract class AbstractSQLQuery extends Query
                 // JDO spec [14.7] : SQL queries must start with SELECT/select
                 if (!firstToken.equals("SELECT") && !firstToken.startsWith("select"))
                 {
-                    throw new NucleusUserException(LOCALISER.msg("059002", inputSQL));
+                    throw new NucleusUserException(Localiser.msg("059002", inputSQL));
                 }
             }
         }
@@ -163,7 +164,7 @@ public abstract class AbstractSQLQuery extends Query
      */
     public void setCandidates(Extent pcs)
     {
-        throw new NucleusUserException(LOCALISER.msg("059004"));
+        throw new NucleusUserException(Localiser.msg("059004"));
     }
 
     /**
@@ -174,7 +175,7 @@ public abstract class AbstractSQLQuery extends Query
      */
     public void setCandidates(Collection pcs)
     {
-        throw new NucleusUserException(LOCALISER.msg("059005"));
+        throw new NucleusUserException(Localiser.msg("059005"));
     }
 
     /**
@@ -190,7 +191,7 @@ public abstract class AbstractSQLQuery extends Query
      */
     public void setResult(String result)
     {
-        throw new NucleusUserException(LOCALISER.msg("059006"));
+        throw new NucleusUserException(Localiser.msg("059006"));
     }
 
     /**
@@ -224,7 +225,7 @@ public abstract class AbstractSQLQuery extends Query
      */
     public void setRange(int fromIncl, int toExcl)
     {
-        throw new NucleusUserException(LOCALISER.msg("059007"));
+        throw new NucleusUserException(Localiser.msg("059007"));
     }
 
     /**
@@ -235,7 +236,7 @@ public abstract class AbstractSQLQuery extends Query
      */
     public void setSubclasses(boolean subclasses)
     {
-        throw new NucleusUserException(LOCALISER.msg("059004"));
+        throw new NucleusUserException(Localiser.msg("059004"));
     }
 
     /**
@@ -246,7 +247,7 @@ public abstract class AbstractSQLQuery extends Query
      */
     public void setFilter(String filter)
     {
-        throw new NucleusUserException(LOCALISER.msg("059008"));
+        throw new NucleusUserException(Localiser.msg("059008"));
     }
 
     /**
@@ -257,7 +258,7 @@ public abstract class AbstractSQLQuery extends Query
      */
     public void declareExplicitVariables(String variables)
     {
-        throw new NucleusUserException(LOCALISER.msg("059009"));
+        throw new NucleusUserException(Localiser.msg("059009"));
     }
 
     /**
@@ -268,7 +269,7 @@ public abstract class AbstractSQLQuery extends Query
      */
     public void declareExplicitParameters(String parameters)
     {
-        throw new NucleusUserException(LOCALISER.msg("059016"));
+        throw new NucleusUserException(Localiser.msg("059016"));
     }
 
     /**
@@ -279,7 +280,7 @@ public abstract class AbstractSQLQuery extends Query
      */
     public void declareImports(String imports)
     {
-        throw new NucleusUserException(LOCALISER.msg("059026"));
+        throw new NucleusUserException(Localiser.msg("059026"));
     }
 
     /**
@@ -290,7 +291,7 @@ public abstract class AbstractSQLQuery extends Query
      */
     public void setGrouping(String grouping)
     {
-        throw new NucleusUserException(LOCALISER.msg("059010"));
+        throw new NucleusUserException(Localiser.msg("059010"));
     }
 
     /**
@@ -301,7 +302,7 @@ public abstract class AbstractSQLQuery extends Query
      */
     public void setOrdering(String ordering)
     {
-        throw new NucleusUserException(LOCALISER.msg("059011"));
+        throw new NucleusUserException(Localiser.msg("059011"));
     }
 
     /**
@@ -311,7 +312,7 @@ public abstract class AbstractSQLQuery extends Query
      */
     protected long performDeletePersistentAll(Map parameters)
     {
-        throw new NucleusUserException(LOCALISER.msg("059000"));
+        throw new NucleusUserException(Localiser.msg("059000"));
     }
 
     /**
@@ -509,7 +510,7 @@ public abstract class AbstractSQLQuery extends Query
         if (expectedParams.size() > 0 && params.isEmpty())
         {
             // We expect some parameters yet the user gives us none!
-            throw new NucleusUserException(LOCALISER.msg("059028", inputSQL, "" + expectedParams.size()));
+            throw new NucleusUserException(Localiser.msg("059028", inputSQL, "" + expectedParams.size()));
         }
 
         // Build a Map of params with keys 1, 2, 3, etc representing the position in the runtime JDBC SQL
@@ -524,7 +525,7 @@ public abstract class AbstractSQLQuery extends Query
             if (!params.containsKey(key))
             {
                 // Expected parameter is not provided
-                throw new NucleusUserException(LOCALISER.msg("059030", inputSQL, "" + key));
+                throw new NucleusUserException(Localiser.msg("059030", inputSQL, "" + key));
             }
 
             executeMap.put(Integer.valueOf(paramPos), params.get(key));

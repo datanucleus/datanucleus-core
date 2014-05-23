@@ -28,9 +28,6 @@ import org.datanucleus.util.Localiser;
  */
 public class IncompatibleFieldTypeException extends NucleusUserException
 {
-    private static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructs an incompatible field type exception.
      * @param classAndFieldName The name of the class and SCO field.
@@ -41,6 +38,6 @@ public class IncompatibleFieldTypeException extends NucleusUserException
                                           String requiredTypeName,
                                           String requestedTypeName)
     {
-        super(LOCALISER.msg("023000", classAndFieldName, requiredTypeName, requestedTypeName));
+        super(Localiser.msg("023000", classAndFieldName, requiredTypeName, requestedTypeName));
     }
 }

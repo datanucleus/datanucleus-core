@@ -31,10 +31,6 @@ import org.datanucleus.util.Localiser;
  */
 public class StoreData
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** First class object (FCO) type */
     public static final int FCO_TYPE = 1;
 
@@ -173,16 +169,16 @@ public class StoreData
         if (metadata instanceof ClassMetaData)
         {
             ClassMetaData cmd = (ClassMetaData)metadata;
-            return LOCALISER.msg("035004", name, "(none)",
+            return Localiser.msg("035004", name, "(none)",
                 cmd.getInheritanceMetaData().getStrategy().toString());
         }
         else if (metadata instanceof AbstractMemberMetaData)
         {
-            return LOCALISER.msg("035003", name, null);
+            return Localiser.msg("035003", name, null);
         }
         else
         {
-            return LOCALISER.msg("035002", name, null);
+            return Localiser.msg("035002", name, null);
         }
     }
 }

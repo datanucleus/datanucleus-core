@@ -41,10 +41,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class JDOQLParser implements Parser
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     private static String[] jdoqlMethodNames = {"contains", "get", "containsKey", "containsValue", "isEmpty",
         "size", "toLowerCase", "toUpperCase", "indexOf", "matches", "substring", "startsWith", "endsWith",
         "getObjectId", "abs", "sqrt"
@@ -281,7 +277,7 @@ public class JDOQLParser implements Parser
             String varName = (String)nodeVariable.getNodeValue();
             if (!JDOQLQueryHelper.isValidJavaIdentifierForJDOQL(varName))
             {
-                throw new NucleusUserException(LOCALISER.msg("021105",varName));
+                throw new NucleusUserException(Localiser.msg("021105",varName));
             }
 
             Node nodeType = stack.pop();
@@ -304,7 +300,7 @@ public class JDOQLParser implements Parser
             StringTokenizer subTokeniser = new StringTokenizer(token, " ");
             if (subTokeniser.countTokens() != 2)
             {
-                throw new QueryCompilerSyntaxException(LOCALISER.msg("021101", expression));
+                throw new QueryCompilerSyntaxException(Localiser.msg("021101", expression));
             }
             String classDecl = subTokeniser.nextToken();
             String parameterName = subTokeniser.nextToken();

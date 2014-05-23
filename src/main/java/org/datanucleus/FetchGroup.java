@@ -36,10 +36,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class FetchGroup implements Serializable
 {
-    /** Localisation utility for output messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     public static final String DEFAULT = "default";
     public static final String RELATIONSHIP = "relationship";
     public static final String MULTIVALUED = "multivalued";
@@ -443,8 +439,7 @@ public class FetchGroup implements Serializable
         AbstractClassMetaData acmd = getMetaDataForClass();
         if (!acmd.hasMember(memberName))
         {
-            throw nucleusCtx.getApiAdapter().getUserExceptionForException(
-                LOCALISER.msg("006004", memberName, cls.getName()), null);
+            throw nucleusCtx.getApiAdapter().getUserExceptionForException(Localiser.msg("006004", memberName, cls.getName()), null);
         }
     }
 

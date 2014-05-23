@@ -39,10 +39,6 @@ import org.datanucleus.util.WeakValueMap;
  */
 public abstract class AbstractLazyLoadList implements List
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Map of object, keyed by the index (0, 1, etc). */
     private Map<Integer, Object> itemsByIndex = null;
 
@@ -115,7 +111,7 @@ public abstract class AbstractLazyLoadList implements List
      */
     public void add(int index, Object element)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /* (non-Javadoc)
@@ -123,7 +119,7 @@ public abstract class AbstractLazyLoadList implements List
      */
     public boolean add(Object e)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /* (non-Javadoc)
@@ -131,7 +127,7 @@ public abstract class AbstractLazyLoadList implements List
      */
     public boolean addAll(Collection c)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /* (non-Javadoc)
@@ -139,7 +135,7 @@ public abstract class AbstractLazyLoadList implements List
      */
     public boolean addAll(int index, Collection c)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /* (non-Javadoc)
@@ -147,7 +143,7 @@ public abstract class AbstractLazyLoadList implements List
      */
     public void clear()
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /* (non-Javadoc)
@@ -155,7 +151,7 @@ public abstract class AbstractLazyLoadList implements List
      */
     public boolean contains(Object o)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /* (non-Javadoc)
@@ -163,7 +159,7 @@ public abstract class AbstractLazyLoadList implements List
      */
     public boolean containsAll(Collection c)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /* (non-Javadoc)
@@ -190,7 +186,7 @@ public abstract class AbstractLazyLoadList implements List
     public int indexOf(Object o)
     {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /* (non-Javadoc)
@@ -215,7 +211,7 @@ public abstract class AbstractLazyLoadList implements List
     public int lastIndexOf(Object o)
     {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /* (non-Javadoc)
@@ -240,7 +236,7 @@ public abstract class AbstractLazyLoadList implements List
      */
     public Object remove(int index)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /* (non-Javadoc)
@@ -248,7 +244,7 @@ public abstract class AbstractLazyLoadList implements List
      */
     public boolean remove(Object o)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /* (non-Javadoc)
@@ -256,7 +252,7 @@ public abstract class AbstractLazyLoadList implements List
      */
     public boolean removeAll(Collection c)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /* (non-Javadoc)
@@ -264,7 +260,7 @@ public abstract class AbstractLazyLoadList implements List
      */
     public boolean retainAll(Collection c)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /* (non-Javadoc)
@@ -272,7 +268,7 @@ public abstract class AbstractLazyLoadList implements List
      */
     public Object set(int index, Object element)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /* (non-Javadoc)
@@ -294,7 +290,7 @@ public abstract class AbstractLazyLoadList implements List
      */
     public List subList(int fromIndex, int toIndex)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     public Object[] toArray()
@@ -389,7 +385,7 @@ public abstract class AbstractLazyLoadList implements List
                 if (!isOpen())
                 {
                     // Closed list so throw NoSuchElementException
-                    throw new NoSuchElementException(LOCALISER.msg("052600"));
+                    throw new NoSuchElementException(Localiser.msg("052600"));
                 }
 
                 if (!hasNext())
@@ -430,7 +426,7 @@ public abstract class AbstractLazyLoadList implements List
                 if (!isOpen())
                 {
                     // Closed list so throw NoSuchElementException
-                    throw new NoSuchElementException(LOCALISER.msg("052600"));
+                    throw new NoSuchElementException(Localiser.msg("052600"));
                 }
 
                 if (!hasPrevious())
@@ -470,7 +466,7 @@ public abstract class AbstractLazyLoadList implements List
          */
         public void add(Object e)
         {
-            throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+            throw new UnsupportedOperationException(Localiser.msg("052603"));
         }
 
         /* (non-Javadoc)
@@ -478,7 +474,7 @@ public abstract class AbstractLazyLoadList implements List
          */
         public void remove()
         {
-            throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+            throw new UnsupportedOperationException(Localiser.msg("052603"));
         }
 
         /* (non-Javadoc)
@@ -486,7 +482,7 @@ public abstract class AbstractLazyLoadList implements List
          */
         public void set(Object e)
         {
-            throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+            throw new UnsupportedOperationException(Localiser.msg("052603"));
         }
     }
 }

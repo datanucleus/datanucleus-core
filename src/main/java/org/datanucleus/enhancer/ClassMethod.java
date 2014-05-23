@@ -29,10 +29,6 @@ import org.datanucleus.util.Localiser;
  */
 public abstract class ClassMethod
 {
-    /** Localisation of messages */
-    protected static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.Localisation", ClassEnhancer.class.getClassLoader());
-
     /** The parent enhancer. */
     protected ClassEnhancer enhancer;
 
@@ -207,7 +203,7 @@ public abstract class ClassMethod
         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
         {
             String msg = getMethodAdditionMessage(methodName, returnType, argTypes, argNames);
-            DataNucleusEnhancer.LOGGER.debug(LOCALISER.msg("Enhancer.AddMethod", msg));
+            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddMethod", msg));
         }
     }
 

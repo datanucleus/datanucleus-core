@@ -39,9 +39,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class ReachabilityFieldManager extends AbstractFieldManager
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** ObjectProvider for the owning object. */
     private final ObjectProvider op;
 
@@ -82,7 +79,7 @@ public class ReachabilityFieldManager extends AbstractFieldManager
                 // Add this object id since not yet reached
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007000", StringUtils.toJVMIDString(obj), objID, objOP.getLifecycleState()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007000", StringUtils.toJVMIDString(obj), objID, objOP.getLifecycleState()));
                 }
                 reachables.add(objID);
 
@@ -100,7 +97,7 @@ public class ReachabilityFieldManager extends AbstractFieldManager
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007005", op.getExecutionContext().getApiAdapter().getIdForObject(obj), mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007005", op.getExecutionContext().getApiAdapter().getIdForObject(obj), mmd.getFullFieldName()));
             }
         }
     }
@@ -125,7 +122,7 @@ public class ReachabilityFieldManager extends AbstractFieldManager
                     // Process PC fields
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007004", mmd.getFullFieldName()));
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("007004", mmd.getFullFieldName()));
                     }
                     processPersistable(value, mmd);
                 }
@@ -136,7 +133,7 @@ public class ReachabilityFieldManager extends AbstractFieldManager
                         // Process all elements of the Collection that are PC
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007002", mmd.getFullFieldName()));
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007002", mmd.getFullFieldName()));
                         }
                         Collection coll = (Collection)value;
                         Iterator iter = coll.iterator();
@@ -157,7 +154,7 @@ public class ReachabilityFieldManager extends AbstractFieldManager
                         // Process any keys that are persistable
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007002", mmd.getFullFieldName()));
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007002", mmd.getFullFieldName()));
                         }
                         Set keys = map.keySet();
                         Iterator iter = keys.iterator();
@@ -187,7 +184,7 @@ public class ReachabilityFieldManager extends AbstractFieldManager
                         // Process all array elements that are PC
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007003", mmd.getFullFieldName()));
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007003", mmd.getFullFieldName()));
                         }
                         Object[] array = (Object[]) value;
                         for (int i=0;i<array.length;i++)

@@ -25,7 +25,6 @@ import java.util.Map;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.Configuration;
 import org.datanucleus.PropertyNames;
-import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -34,10 +33,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public abstract class AbstractLevel2Cache implements Level2Cache
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     protected NucleusContext nucleusCtx;
 
     /** Maximum size of cache (if supported by the plugin). */

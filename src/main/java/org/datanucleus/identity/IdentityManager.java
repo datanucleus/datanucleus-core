@@ -63,6 +63,7 @@ public interface IdentityManager
 
     /**
      * Method to return a single-field identity, for the persistable type specified, and for the idType of SingleFieldId.
+     * @param idType Type of the id
      * @param pcType Type of the Persistable
      * @param key The value for the identity (the Long, or Int, or ... etc).
      * @return Single field identity

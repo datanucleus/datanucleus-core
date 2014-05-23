@@ -32,9 +32,6 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class LifeCycleState
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** transient **/
     public static final int TRANSIENT       = 0;
     /** Persistent-New **/
@@ -97,10 +94,8 @@ public abstract class LifeCycleState
 
         if (NucleusLogger.LIFECYCLE.isDebugEnabled())
         {
-            NucleusLogger.LIFECYCLE.debug(LOCALISER.msg("027016", 
-                StringUtils.toJVMIDString(op.getObject()), 
-                IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
-                this, newState));
+            NucleusLogger.LIFECYCLE.debug(Localiser.msg("027016", StringUtils.toJVMIDString(op.getObject()), 
+                IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), this, newState));
         }
 
         if (isTransactional)

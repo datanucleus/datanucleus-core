@@ -37,39 +37,14 @@ public class InvalidMetaDataException extends NucleusFatalUserException
         this.messageKey = key;
     }
 
-    public InvalidMetaDataException(Localiser localiser, String key)
+    public InvalidMetaDataException(String key)
     {
-        this(key, localiser.msg(key));
+        this(key, Localiser.msg(key));
     }
 
-    public InvalidMetaDataException(Localiser localiser, String key,
-            Object param1)
+    public InvalidMetaDataException(String key, Object... params)
     {
-        this(key, localiser.msg(key, param1));
-    }
-
-    public InvalidMetaDataException(Localiser localiser, String key,
-            Object param1, Object param2)
-    {
-        this(key, localiser.msg(key, param1, param2));
-    }
-
-    public InvalidMetaDataException(Localiser localiser, String key,
-            Object param1, Object param2, Object param3)
-    {
-        this(key, localiser.msg(key, param1, param2, param3));
-    }
-
-    public InvalidMetaDataException(Localiser localiser, String key,
-            Object param1, Object param2, Object param3, Object param4)
-    {
-        this(key, localiser.msg(key, param1, param2, param3, param4));
-    }
-
-    public InvalidMetaDataException(Localiser localiser, String key,
-            Object param1, Object param2, Object param3, Object param4, Object param5)
-    {
-        this(key, localiser.msg(key, param1, param2, param3, param4, param5));
+        this(key, Localiser.msg(key, params));
     }
 
     /**

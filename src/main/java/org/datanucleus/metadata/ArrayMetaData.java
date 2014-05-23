@@ -27,6 +27,7 @@ import java.util.Set;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.api.ApiAdapter;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -75,7 +76,7 @@ public class ArrayMetaData extends ContainerMetaData
         AbstractMemberMetaData mmd = (AbstractMemberMetaData)parent;
         if (!StringUtils.isWhitespace(element.type) && element.type.indexOf(',') > 0)
         {
-            throw new InvalidMemberMetaDataException(LOCALISER, "044140", mmd.getClassName(), mmd.getName());
+            throw new InvalidMemberMetaDataException("044140", mmd.getClassName(), mmd.getName());
         }
 
         ApiAdapter api = mmgr.getApiAdapter();
@@ -88,7 +89,7 @@ public class ArrayMetaData extends ContainerMetaData
         Class field_type = getMemberMetaData().getType();
         if (!field_type.isArray())
         {
-            throw new InvalidMemberMetaDataException(LOCALISER, "044141", mmd.getClassName(), getFieldName());
+            throw new InvalidMemberMetaDataException("044141", mmd.getClassName(), getFieldName());
         }
 
         // "embedded-element"
@@ -153,8 +154,7 @@ public class ArrayMetaData extends ContainerMetaData
                 {
                     // Impossible to persist an array of a non-PC element without a join table or without serialising the array
                     // TODO Should this be an exception?
-                    String msg = LOCALISER.msg("044142", mmd.getClassName(), getFieldName(), 
-                        getMemberMetaData().getType().getComponentType().getName());
+                    String msg = Localiser.msg("044142", mmd.getClassName(), getFieldName(), getMemberMetaData().getType().getComponentType().getName());
                     NucleusLogger.METADATA.warn(msg);
                 }
             }

@@ -63,9 +63,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class NonManagedPluginRegistry implements PluginRegistry
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** DataNucleus package to define whether to check for deps, etc. */
     private static final String DATANUCLEUS_PKG = "org.datanucleus";
 
@@ -177,7 +174,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
             ExtensionPoint exPoint = extensionPointsByUniqueId.get(extension.getExtensionPointId());
             if (exPoint == null)
             {
-                NucleusLogger.GENERAL.warn(LOCALISER.msg("024002", extension.getExtensionPointId(), 
+                NucleusLogger.GENERAL.warn(Localiser.msg("024002", extension.getExtensionPointId(), 
                     extension.getPlugin().getSymbolicName(), extension.getPlugin().getManifestLocation().toString()));
             }
             else
@@ -248,7 +245,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
                 if (extension.getPlugin() != null && extension.getPlugin().getSymbolicName() != null &&
                     extension.getPlugin().getSymbolicName().startsWith(DATANUCLEUS_PKG))
                 {
-                    NucleusLogger.GENERAL.warn(LOCALISER.msg("024002", extension.getExtensionPointId(), 
+                    NucleusLogger.GENERAL.warn(Localiser.msg("024002", extension.getExtensionPointId(), 
                         extension.getPlugin().getSymbolicName(), extension.getPlugin().getManifestLocation().toString()));
                 }
             }
@@ -328,7 +325,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
     {
         if (manifest == null)
         {
-            throw new IllegalArgumentException(LOCALISER.msg("024007"));
+            throw new IllegalArgumentException(Localiser.msg("024007"));
         }
 
         InputStream is = null;
@@ -416,7 +413,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
         }
         catch (IOException e)
         {
-            throw new NucleusException(LOCALISER.msg("024008", manifest), e).setFatal();
+            throw new NucleusException(Localiser.msg("024008", manifest), e).setFatal();
         }
         finally
         {
@@ -471,7 +468,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
             if (bundle.getSymbolicName().startsWith(DATANUCLEUS_PKG) &&
                 !bundle.getManifestLocation().toExternalForm().equals(previousBundle.getManifestLocation().toExternalForm()))
             {
-                String msg = LOCALISER.msg("024009", bundle.getSymbolicName(),
+                String msg = Localiser.msg("024009", bundle.getSymbolicName(),
                     bundle.getManifestLocation(), previousBundle.getManifestLocation());
                 if (bundleCheckType.equalsIgnoreCase("EXCEPTION"))
                 {
@@ -521,7 +518,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
             }
             catch (MalformedURLException e)
             {
-                NucleusLogger.GENERAL.warn(LOCALISER.msg("024010", urlStr), e);
+                NucleusLogger.GENERAL.warn(Localiser.msg("024010", urlStr), e);
                 return null;
             }
         }
@@ -540,7 +537,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
             }
             catch (MalformedURLException e)
             {
-                NucleusLogger.GENERAL.warn(LOCALISER.msg("024010", urlStr), e);
+                NucleusLogger.GENERAL.warn(Localiser.msg("024010", urlStr), e);
                 return null;
             }
         }
@@ -558,7 +555,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
             }
             catch (MalformedURLException e)
             {
-                NucleusLogger.GENERAL.warn(LOCALISER.msg("024010", urlStr), e);
+                NucleusLogger.GENERAL.warn(Localiser.msg("024010", urlStr), e);
                 return null;
             }
         }
@@ -578,7 +575,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
                     }
                     catch (MalformedURLException e)
                     {
-                        NucleusLogger.GENERAL.warn(LOCALISER.msg("024011", pluginURL), e);
+                        NucleusLogger.GENERAL.warn(Localiser.msg("024011", pluginURL), e);
                         return null;
                     }
                 }
@@ -587,11 +584,11 @@ public class NonManagedPluginRegistry implements PluginRegistry
         catch (URISyntaxException use)
         {
             use.printStackTrace();
-            NucleusLogger.GENERAL.warn(LOCALISER.msg("024011", pluginURL), use);
+            NucleusLogger.GENERAL.warn(Localiser.msg("024011", pluginURL), use);
             return null;
         }
 
-        NucleusLogger.GENERAL.warn(LOCALISER.msg("024012", pluginURL));
+        NucleusLogger.GENERAL.warn(Localiser.msg("024012", pluginURL));
         return null;
     }
 
@@ -662,11 +659,11 @@ public class NonManagedPluginRegistry implements PluginRegistry
                     if (bd.getParameter("resolution") != null &&
                         bd.getParameter("resolution").equalsIgnoreCase("optional"))
                     {
-                        NucleusLogger.GENERAL.debug(LOCALISER.msg("024013", bundle.getSymbolicName(), symbolicName));
+                        NucleusLogger.GENERAL.debug(Localiser.msg("024013", bundle.getSymbolicName(), symbolicName));
                     }
                     else
                     {
-                        NucleusLogger.GENERAL.error(LOCALISER.msg("024014", bundle.getSymbolicName(), symbolicName));
+                        NucleusLogger.GENERAL.error(Localiser.msg("024014", bundle.getSymbolicName(), symbolicName));
                     }
                 }
 
@@ -675,7 +672,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
                     if (requiredBundle != null && 
                         !isVersionInInterval(requiredBundle.getVersion(), bd.getParameter("bundle-version")))
                     {
-                        NucleusLogger.GENERAL.error(LOCALISER.msg("024015", bundle.getSymbolicName(), 
+                        NucleusLogger.GENERAL.error(Localiser.msg("024015", bundle.getSymbolicName(), 
                             symbolicName, bd.getParameter("bundle-version"), bundle.getVersion()));
                     }
                 }

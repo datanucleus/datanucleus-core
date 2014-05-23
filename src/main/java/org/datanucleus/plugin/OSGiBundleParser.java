@@ -31,7 +31,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.datanucleus.ClassConstants;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.plugin.Bundle;
 import org.datanucleus.plugin.Extension;
@@ -46,8 +45,6 @@ import org.xml.sax.InputSource;
 
 public class OSGiBundleParser
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     public static Bundle parseManifest(org.osgi.framework.Bundle osgiBundle)
     {
         @SuppressWarnings("unchecked")
@@ -247,13 +244,13 @@ public class OSGiBundleParser
 
             if (NucleusLogger.GENERAL.isDebugEnabled())
             {
-                NucleusLogger.GENERAL.debug(LOCALISER.msg("024003", fileUrl.toString()));
+                NucleusLogger.GENERAL.debug(Localiser.msg("024003", fileUrl.toString()));
             }
             extensionPoints = parseExtensionPoints(rootElement, plugin, osgiBundle);
 
             if (NucleusLogger.GENERAL.isDebugEnabled())
             {
-                NucleusLogger.GENERAL.debug(LOCALISER.msg("024004", fileUrl.toString()));
+                NucleusLogger.GENERAL.debug(Localiser.msg("024004", fileUrl.toString()));
             }
             extensions = parseExtensions(rootElement, plugin, osgiBundle);
         }
@@ -263,7 +260,7 @@ public class OSGiBundleParser
         }
         catch (Exception e)
         {
-            NucleusLogger.GENERAL.error(LOCALISER.msg("024000", fileUrl.getFile()));
+            NucleusLogger.GENERAL.error(Localiser.msg("024000", fileUrl.getFile()));
         }
         finally
         {
@@ -302,7 +299,7 @@ public class OSGiBundleParser
         }
         catch (ParserConfigurationException e1)
         {
-            throw new NucleusException(LOCALISER.msg("024016", e1.getMessage()));
+            throw new NucleusException(Localiser.msg("024016", e1.getMessage()));
         }
     }
 }

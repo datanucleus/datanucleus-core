@@ -39,10 +39,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class FetchPlanForClass
 {
-    /** Localisation utility for output messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Parent FetchPlan. */
     final FetchPlan plan;
 
@@ -329,7 +325,7 @@ public class FetchPlanForClass
                 int fieldNumber = cmd.getAbsolutePositionOfMember(subFGmmd.getName());
                 if (fieldNumber == -1)
                 {
-                    String msg = LOCALISER.msg("006000", subFGmmd.getName(), fgmd.getName(), cmd.getFullClassName());
+                    String msg = Localiser.msg("006000", subFGmmd.getName(), fgmd.getName(), cmd.getFullClassName());
                     NucleusLogger.PERSISTENCE.error(msg);
                     throw new NucleusUserException(msg).setFatal();
                 }
@@ -361,7 +357,7 @@ public class FetchPlanForClass
                     FetchGroupMetaData nestedFGMD = cmd.getFetchGroupMetaData(nestedGroupName);
                     if (nestedFGMD == null)
                     {
-                        throw new NucleusUserException(LOCALISER.msg("006001", 
+                        throw new NucleusUserException(Localiser.msg("006001", 
                             subFgmd.getName(), fgmd.getName(), cmd.getFullClassName())).setFatal();
                     }
                     memberNumbers.or(getMemberNumbersForFetchGroup(nestedFGMD));

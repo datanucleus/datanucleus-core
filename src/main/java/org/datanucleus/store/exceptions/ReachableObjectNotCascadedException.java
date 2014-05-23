@@ -28,9 +28,6 @@ import org.datanucleus.util.Localiser;
  */
 public class ReachableObjectNotCascadedException extends NucleusUserException
 {
-    protected static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructs the exception.
      * @param fieldName Name of the field where the non-persisted object is stored.
@@ -38,6 +35,6 @@ public class ReachableObjectNotCascadedException extends NucleusUserException
      */
     public ReachableObjectNotCascadedException(String fieldName, Object pc)
     {
-        super(LOCALISER.msg("018008", fieldName, pc));
+        super(Localiser.msg("018008", fieldName, pc));
     }
 }

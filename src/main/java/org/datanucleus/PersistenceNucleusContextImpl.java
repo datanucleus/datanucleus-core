@@ -72,6 +72,7 @@ import org.datanucleus.transaction.TransactionManager;
 import org.datanucleus.transaction.jta.JTASyncRegistry;
 import org.datanucleus.transaction.jta.JTASyncRegistryUnavailableException;
 import org.datanucleus.transaction.jta.TransactionManagerFinder;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 import org.datanucleus.validation.BeanValidatorHandler;
@@ -550,7 +551,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             // Close the L2 Cache
             cache.close();
             cache = null;
-            NucleusLogger.CACHE.debug(LOCALISER.msg("004009"));
+            NucleusLogger.CACHE.debug(Localiser.msg("004009"));
         }
         if (classLoaderResolverMap != null)
         {
@@ -616,7 +617,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("034005", autoStartMechanism));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("034005", autoStartMechanism));
         }
         boolean illegalState = false;
         try
@@ -660,7 +661,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
 
                         if (classFound != null)
                         {
-                            NucleusLogger.PERSISTENCE.info(LOCALISER.msg("032003", data.getName()));
+                            NucleusLogger.PERSISTENCE.info(Localiser.msg("032003", data.getName()));
                             classesNeedingAdding.add(data.getName());
                             if (data.getMetaData() == null)
                             {
@@ -674,7 +675,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                                 }
                                 else
                                 {
-                                    String msg = LOCALISER.msg("034004", data.getName());
+                                    String msg = Localiser.msg("034004", data.getName());
                                     if (starter.getMode() == AutoStartMechanism.Mode.CHECKED)
                                     {
                                         NucleusLogger.PERSISTENCE.error(msg);
@@ -687,7 +688,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                                     else if (starter.getMode() == AutoStartMechanism.Mode.QUIET)
                                     {
                                         NucleusLogger.PERSISTENCE.warn(msg);
-                                        NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("034001", data.getName()));
+                                        NucleusLogger.PERSISTENCE.warn(Localiser.msg("034001", data.getName()));
                                         starter.deleteClass(data.getName());
                                     }
                                 }
@@ -695,7 +696,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                         }
                         else
                         {
-                            String msg = LOCALISER.msg("034000", data.getName());
+                            String msg = Localiser.msg("034000", data.getName());
                             if (starter.getMode() == AutoStartMechanism.Mode.CHECKED)
                             {
                                 NucleusLogger.PERSISTENCE.error(msg);
@@ -708,7 +709,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                             else if (starter.getMode() == AutoStartMechanism.Mode.QUIET)
                             {
                                 NucleusLogger.PERSISTENCE.warn(msg);
-                                NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("034001", data.getName()));
+                                NucleusLogger.PERSISTENCE.warn(Localiser.msg("034001", data.getName()));
                                 starter.deleteClass(data.getName());
                             }
                         }
@@ -730,7 +731,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 catch (Exception e)
                 {
                     // Exception while adding so some of the (referenced) classes dont exist
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("034002", e));
+                    NucleusLogger.PERSISTENCE.warn(Localiser.msg("034002", e));
                     //if an exception happens while loading AutoStart data, them we disable it, since
                     //it was unable to load the data from AutoStart. The memory state of AutoStart does
                     //not represent the database, and if we don't disable it, we could
@@ -750,12 +751,12 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             }
             if (illegalState)
             {
-                NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("034003"));
+                NucleusLogger.PERSISTENCE.warn(Localiser.msg("034003"));
                 starter = null;
             }
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("034006", autoStartMechanism));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("034006", autoStartMechanism));
             }
         }
     }
@@ -857,7 +858,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 {
                     if (NucleusLogger.QUERY.isDebugEnabled())
                     {
-                        NucleusLogger.QUERY.debug(LOCALISER.msg("008017", queryName, qmd.getQuery()));
+                        NucleusLogger.QUERY.debug(Localiser.msg("008017", queryName, qmd.getQuery()));
                     }
                     org.datanucleus.store.query.Query q = storeMgr.getQueryManager().newQuery(
                         qmd.getLanguage().toString(), ec, qmd.getQuery());
@@ -895,15 +896,15 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         {
             if (mode == Mode.CREATE)
             {
-                NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("014000"));
+                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("014000"));
             }
             else if (mode == Mode.DELETE)
             {
-                NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("014001"));
+                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("014001"));
             }
             else if (mode == Mode.DELETE_CREATE)
             {
-                NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("014045"));
+                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("014045"));
             }
         }
 
@@ -1026,13 +1027,13 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         {
             if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("008016", StringUtils.toJVMIDString(storeMgr)));
+                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("008016", StringUtils.toJVMIDString(storeMgr)));
             }
         }
 
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("014043"));
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("014043"));
         }
     }
 
@@ -1232,7 +1233,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 getClassLoaderResolver((ClassLoader)config.getProperty(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY)));
             if (jtaTxManager == null)
             {
-                throw new NucleusTransactionException(LOCALISER.msg("015030"));
+                throw new NucleusTransactionException(Localiser.msg("015030"));
             }
         }
         return jtaTxManager;
@@ -1378,7 +1379,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             if (level2ClassName == null)
             {
                 // Plugin of this name not found
-                throw new NucleusUserException(LOCALISER.msg("004000", level2Type)).setFatal();
+                throw new NucleusUserException(Localiser.msg("004000", level2Type)).setFatal();
             }
 
             try
@@ -1389,13 +1390,13 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                     new Class[]{ClassConstants.NUCLEUS_CONTEXT}, new Object[]{this});
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
-                    NucleusLogger.CACHE.debug(LOCALISER.msg("004002", level2Type));
+                    NucleusLogger.CACHE.debug(Localiser.msg("004002", level2Type));
                 }
             }
             catch (Exception e)
             {
                 // Class name for this L2 cache plugin is not found!
-                throw new NucleusUserException(LOCALISER.msg("004001", level2Type, level2ClassName), e).setFatal();
+                throw new NucleusUserException(Localiser.msg("004001", level2Type, level2ClassName), e).setFatal();
             }
         }
         return cache;

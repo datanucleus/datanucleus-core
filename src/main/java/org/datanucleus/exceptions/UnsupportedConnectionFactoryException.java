@@ -27,15 +27,12 @@ import org.datanucleus.util.Localiser;
  */
 public class UnsupportedConnectionFactoryException extends NucleusUserException
 {
-    private static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructs an unsupported connection exception.
      * @param factory The connection factory object that is not supported.
      */
     public UnsupportedConnectionFactoryException(Object factory)
     {
-        super(LOCALISER.msg("009001",factory));
+        super(Localiser.msg("009001",factory));
     }
 }

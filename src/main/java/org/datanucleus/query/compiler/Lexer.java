@@ -28,7 +28,6 @@ import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.util.Localiser;
 
 /**
  * Lexer for a Query.
@@ -40,10 +39,6 @@ import org.datanucleus.util.Localiser;
  */
 public class Lexer
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Prefixes for any parameter, in a string. JDOQL will be ":". JPQL will be ":?". */
     private final String parameterPrefixes;
 

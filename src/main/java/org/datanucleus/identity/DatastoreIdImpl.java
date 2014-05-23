@@ -33,8 +33,6 @@ import org.datanucleus.util.Localiser;
  */
 public class DatastoreIdImpl implements java.io.Serializable, DatastoreId, Comparable
 {
-    protected static final transient Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     protected static final transient String STRING_DELIMITER = "[OID]";
 
     // JDO spec 5.4.3 says: all serializable fields of ObjectID classes are required to be public.
@@ -81,11 +79,11 @@ public class DatastoreIdImpl implements java.io.Serializable, DatastoreId, Compa
     {
         if (str.length() < 2)
         {
-            throw new IllegalArgumentException(LOCALISER.msg("038000", str));
+            throw new IllegalArgumentException(Localiser.msg("038000", str));
         }
         else if (str.indexOf(STRING_DELIMITER) < 0)
         {
-            throw new IllegalArgumentException(LOCALISER.msg("038000", str));
+            throw new IllegalArgumentException(Localiser.msg("038000", str));
         }
 
         int start = 0;

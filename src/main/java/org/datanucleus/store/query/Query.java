@@ -69,10 +69,6 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class Query implements Serializable, ExecutionContextListener
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     public static final String EXTENSION_FLUSH_BEFORE_EXECUTION = PropertyNames.PROPERTY_QUERY_FLUSH_BEFORE_EXECUTE;
     public static final String EXTENSION_USE_FETCH_PLAN = PropertyNames.PROPERTY_QUERY_USE_FETCHPLAN;
     public static final String EXTENSION_RESULT_SIZE_METHOD = PropertyNames.PROPERTY_QUERY_RESULT_SIZE_METHOD;
@@ -227,7 +223,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
         if (ec == null)
         {
             // EX should always be provided so throw exception if null
-            throw new NucleusUserException(LOCALISER.msg("021012"));
+            throw new NucleusUserException(Localiser.msg("021012"));
         }
         this.clr = ec.getClassLoaderResolver();
 
@@ -918,7 +914,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
         if (!symbolFound)
         {
             // No reference to this parameter was found in the compilation, so throw exception
-            throw new QueryInvalidParametersException(LOCALISER.msg("021116", name));
+            throw new QueryInvalidParametersException(Localiser.msg("021116", name));
         }
     }
     
@@ -1403,7 +1399,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
     {
         if (unmodifiable)
         {
-            throw new NucleusUserException(LOCALISER.msg("021014"));
+            throw new NucleusUserException(Localiser.msg("021014"));
         }
     }
 
@@ -1481,7 +1477,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
     {
         if (StringUtils.isWhitespace(variableDecl))
         {
-            throw new NucleusUserException(LOCALISER.msg("021115"));
+            throw new NucleusUserException(Localiser.msg("021115"));
         }
 
         if (sub == null)
@@ -2036,27 +2032,27 @@ public abstract class Query implements Serializable, ExecutionContextListener
         // Check for specification of any illegal attributes
         if (result != null)
         {
-            throw new NucleusUserException(LOCALISER.msg("021029"));
+            throw new NucleusUserException(Localiser.msg("021029"));
         }
         if (resultClass != null)
         {
-            throw new NucleusUserException(LOCALISER.msg("021030"));
+            throw new NucleusUserException(Localiser.msg("021030"));
         }
         if (ordering != null)
         {
-            throw new NucleusUserException(LOCALISER.msg("021027"));
+            throw new NucleusUserException(Localiser.msg("021027"));
         }
         if (grouping != null)
         {
-            throw new NucleusUserException(LOCALISER.msg("021028"));
+            throw new NucleusUserException(Localiser.msg("021028"));
         }
         if (range != null)
         {
-            throw new NucleusUserException(LOCALISER.msg("021031"));
+            throw new NucleusUserException(Localiser.msg("021031"));
         }
         if (fromInclNo >= 0 && toExclNo >= 0 && (fromInclNo != 0 || toExclNo != Long.MAX_VALUE))
         {
-            throw new NucleusUserException(LOCALISER.msg("021031"));
+            throw new NucleusUserException(Localiser.msg("021031"));
         }
 
         return performDeletePersistentAll(parameters);
@@ -2097,7 +2093,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
                 int number = results.size();
                 if (requiresUnique && number > 1)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("021032"));
+                    throw new NucleusUserException(Localiser.msg("021032"));
                 }
 
                 // Instances to be deleted are flushed first (JDO2 [14.8-4])
@@ -2203,25 +2199,25 @@ public abstract class Query implements Serializable, ExecutionContextListener
                 if (t2.countTokens() != 2)
                 {
                     // Invalid spec; should be "{type_decl} {param_name}"
-                    throw new NucleusUserException(LOCALISER.msg("021101", explicitParameters));
+                    throw new NucleusUserException(Localiser.msg("021101", explicitParameters));
                 }
                 t2.nextToken(); // Parameter type declaration
                 String parameterName = t2.nextToken();
                 if (!JDOQLQueryHelper.isValidJavaIdentifierForJDOQL(parameterName))
                 {
                     // Invalid parameter name for Java
-                    throw new NucleusUserException(LOCALISER.msg("021102",parameterName));
+                    throw new NucleusUserException(Localiser.msg("021102",parameterName));
                 }
 
                 if (parameterMap.containsKey(parameterName))
                 {
                     // Duplicate definition of a parameter
-                    throw new NucleusUserException(LOCALISER.msg("021103", parameterName));
+                    throw new NucleusUserException(Localiser.msg("021103", parameterName));
                 }
                 if (parameterValues.length < position+1)
                 {
                     // Too many parameters defined and not enough values
-                    throw new NucleusUserException(LOCALISER.msg("021108", "" + (position+1), "" + parameterValues.length));
+                    throw new NucleusUserException(Localiser.msg("021108", "" + (position+1), "" + parameterValues.length));
                 }
 
                 parameterMap.put(parameterName, parameterValues[position++]);
@@ -2229,7 +2225,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
             if (parameterMap.size() != parameterValues.length)
             {
                 // Too many values and not enough parameters declared
-                throw new NucleusUserException(LOCALISER.msg("021108", "" + parameterMap.size(), "" + parameterValues.length));
+                throw new NucleusUserException(Localiser.msg("021108", "" + parameterMap.size(), "" + parameterValues.length));
             }
         }
         else
@@ -2341,7 +2337,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
                 {
                     if (checkUnusedParams)
                     {
-                        throw new QueryInvalidParametersException(LOCALISER.msg("021116", paramKey));
+                        throw new QueryInvalidParametersException(Localiser.msg("021116", paramKey));
                     }
                 }
             }
@@ -2388,7 +2384,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
                     {
                         if (!parameterValues.containsKey(symName))
                         {
-                            throw new QueryInvalidParametersException(LOCALISER.msg("021119", symName));
+                            throw new QueryInvalidParametersException(Localiser.msg("021119", symName));
                         }
                     }
                 }
@@ -2461,7 +2457,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
         }
         catch (ClassNotResolvedException e)
         {
-            throw new NucleusUserException(LOCALISER.msg("021015", classDecl));
+            throw new NucleusUserException(Localiser.msg("021015", classDecl));
         }
     }
 
@@ -2470,7 +2466,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
         if (ec == null || ec.isClosed())
         {
             // Throw exception if query is closed (e.g JDO2 [14.6.1])
-            throw new NucleusUserException(LOCALISER.msg("021013")).setFatal();
+            throw new NucleusUserException(Localiser.msg("021013")).setFatal();
         }
     }
 

@@ -46,10 +46,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class FetchPlan implements Serializable
 {
-    /** Localisation utility for output messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Constant defining the fields in the default fetch group. */
     public static final String DEFAULT = "default";
 
@@ -414,7 +410,7 @@ public class FetchPlan implements Serializable
     {
         if (detachmentRootClasses != null || detachmentRoots != null)
         {
-            throw new NucleusUserException(LOCALISER.msg("006003"));
+            throw new NucleusUserException(Localiser.msg("006003"));
         }
 
         if (roots == null)
@@ -449,7 +445,7 @@ public class FetchPlan implements Serializable
     {
         if (detachmentRootClasses != null || detachmentRoots != null)
         {
-            throw new NucleusUserException(LOCALISER.msg("006003"));
+            throw new NucleusUserException(Localiser.msg("006003"));
         }
 
         if (rootClasses == null)
@@ -501,7 +497,7 @@ public class FetchPlan implements Serializable
     {
         if (max == 0)
         {
-            throw new NucleusUserException(LOCALISER.msg("006002", max));
+            throw new NucleusUserException(Localiser.msg("006002", max));
         }
         this.maxFetchDepth = max;
         return this;

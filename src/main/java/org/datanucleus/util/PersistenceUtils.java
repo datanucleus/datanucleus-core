@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.datanucleus.ClassConstants;
 import org.datanucleus.Configuration;
 import org.datanucleus.exceptions.NucleusUserException;
 
@@ -33,10 +32,6 @@ import org.datanucleus.exceptions.NucleusUserException;
  */
 public class PersistenceUtils
 {
-    /** Localisation of messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Method to return the Persistence Properties from the specified file.
      * @param filename Name of the file containing the properties
@@ -63,11 +58,11 @@ public class PersistenceUtils
             }
             catch (FileNotFoundException e)
             {
-                throw new NucleusUserException(LOCALISER.msg("008014", filename), e).setFatal();
+                throw new NucleusUserException(Localiser.msg("008014", filename), e).setFatal();
             }
             catch (IOException e)
             {
-                throw new NucleusUserException(LOCALISER.msg("008014", filename), e).setFatal();
+                throw new NucleusUserException(Localiser.msg("008014", filename), e).setFatal();
             }
         }
         else
@@ -82,7 +77,7 @@ public class PersistenceUtils
             catch (Exception e)
             {
                 // Still not loadable so throw exception
-                throw new NucleusUserException(LOCALISER.msg("008014", filename), e).setFatal();
+                throw new NucleusUserException(Localiser.msg("008014", filename), e).setFatal();
             }
         }
 

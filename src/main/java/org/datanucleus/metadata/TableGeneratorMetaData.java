@@ -59,7 +59,7 @@ public class TableGeneratorMetaData extends MetaData
     {
         if (StringUtils.isWhitespace(name))
         {
-            throw new InvalidMetaDataException(LOCALISER, "044155");
+            throw new InvalidMetaDataException("044155");
         }
 
         this.name = name;

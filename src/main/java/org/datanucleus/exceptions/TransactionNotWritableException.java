@@ -25,15 +25,12 @@ import org.datanucleus.util.Localiser;
  */
 public class TransactionNotWritableException extends TransactionNotActiveException
 {
-    private static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructor.
      */
     public TransactionNotWritableException()
     {
-        super(LOCALISER.msg("015041"), null);
+        super(Localiser.msg("015041"), null);
     }
 
     /**

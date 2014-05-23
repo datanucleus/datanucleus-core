@@ -62,9 +62,6 @@ import org.datanucleus.exceptions.NucleusUserException;
  */
 public class ClassUtils
 {
-    /** Localisation utility for output messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** caching for constructors - using caching, the perf is at least doubled **/
     protected static final Map constructorsCache = new SoftValueMap();
 
@@ -101,16 +98,16 @@ public class ClassUtils
         }
         catch (NoSuchMethodException e)
         {
-            throw new NucleusException(LOCALISER.msg("030004", type.getName(), 
+            throw new NucleusException(Localiser.msg("030004", type.getName(), 
                 Arrays.asList(parameterTypes).toString()+" "+Arrays.asList(type.getConstructors()).toString()), new Exception[]{e}).setFatal();
         }
         catch (IllegalAccessException e)
         {
-            throw new NucleusException(LOCALISER.msg("030005", type.getName()), new Exception[]{e}).setFatal();
+            throw new NucleusException(Localiser.msg("030005", type.getName()), new Exception[]{e}).setFatal();
         }
         catch (InstantiationException e)
         {
-            throw new NucleusException(LOCALISER.msg("030006", type.getName()), new Exception[]{e}).setFatal();
+            throw new NucleusException(Localiser.msg("030006", type.getName()), new Exception[]{e}).setFatal();
         }
         catch (InvocationTargetException e)
         {
@@ -125,7 +122,7 @@ public class ClassUtils
             }
             else
             {
-                throw new NucleusException(LOCALISER.msg("030007", type.getName(), t)).setFatal();
+                throw new NucleusException(Localiser.msg("030007", type.getName(), t)).setFatal();
             }
         }
         return obj;
@@ -1655,16 +1652,16 @@ public class ClassUtils
             Class cls = clr.classForName(className);
             if (cls == null)
             {
-                throw new NucleusUserException(LOCALISER.msg("001006", className, jarName));
+                throw new NucleusUserException(Localiser.msg("001006", className, jarName));
             }
         }
         catch (Error err)
         {
-            throw new NucleusUserException(LOCALISER.msg("001006", className, jarName));
+            throw new NucleusUserException(Localiser.msg("001006", className, jarName));
         }
         catch (ClassNotResolvedException cnre)
         {
-            throw new NucleusUserException(LOCALISER.msg("001006", className, jarName));
+            throw new NucleusUserException(Localiser.msg("001006", className, jarName));
         }
     }
 

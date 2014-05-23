@@ -34,10 +34,6 @@ import java.util.Iterator;
  */
 public class TypeConversionHelper
 {
-    /** Localisation of messages */
-    private static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     private static int NR_BIGINTEGER_BYTES = 40; //not sure how big we need the array to be, so use 40
     private static int NR_SCALE_BYTES = 4;
     private static int NR_SIGNAL_BYTES = 1;
@@ -1057,7 +1053,7 @@ public class TypeConversionHelper
         int[] numbers = convertStringToIntArray(s);
         if (numbers == null || numbers.length < 6)
         {
-            throw new IllegalArgumentException(LOCALISER.msg("030003", s));
+            throw new IllegalArgumentException(Localiser.msg("030003", s));
         }
 
         int year = numbers[0];

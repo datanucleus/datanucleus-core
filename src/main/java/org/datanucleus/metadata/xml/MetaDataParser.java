@@ -64,10 +64,6 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class MetaDataParser extends DefaultHandler
 {
-    /** Localiser for messages */
-    protected static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** MetaData manager. */
     protected final MetaDataManager mgr;
 
@@ -116,7 +112,7 @@ public class MetaDataParser extends DefaultHandler
     {
         if (url == null)
         {
-            String msg = LOCALISER.msg("044031");
+            String msg = Localiser.msg("044031");
             NucleusLogger.METADATA.error(msg);
             throw new NucleusException(msg);
         }
@@ -141,8 +137,8 @@ public class MetaDataParser extends DefaultHandler
         }
         if (in == null)
         {
-            NucleusLogger.METADATA.error(LOCALISER.msg("044032", url.toString()));
-            throw new NucleusException(LOCALISER.msg("044032", url.toString()));
+            NucleusLogger.METADATA.error(Localiser.msg("044032", url.toString()));
+            throw new NucleusException(Localiser.msg("044032", url.toString()));
         }
 
         // Parse the file
@@ -180,8 +176,8 @@ public class MetaDataParser extends DefaultHandler
         }
         if (in == null)
         {
-            NucleusLogger.METADATA.error(LOCALISER.msg("044032", fileName));
-            throw new NucleusException(LOCALISER.msg("044032", fileName));
+            NucleusLogger.METADATA.error(Localiser.msg("044032", fileName));
+            throw new NucleusException(Localiser.msg("044032", fileName));
         }
 
         // Parse the file
@@ -206,7 +202,7 @@ public class MetaDataParser extends DefaultHandler
 
         if (NucleusLogger.METADATA.isDebugEnabled())
         {
-            NucleusLogger.METADATA.debug(LOCALISER.msg("044030", filename, handlerName, validate ? "true" : "false"));
+            NucleusLogger.METADATA.debug(Localiser.msg("044030", filename, handlerName, validate ? "true" : "false"));
         }
         try
         {
@@ -272,12 +268,12 @@ public class MetaDataParser extends DefaultHandler
                 if (handler == null)
                 {
                     // Plugin of this name not found
-                    throw new NucleusUserException(LOCALISER.msg("044028", handlerName)).setFatal();
+                    throw new NucleusUserException(Localiser.msg("044028", handlerName)).setFatal();
                 }
             }
             catch (Exception e)
             {
-                String msg = LOCALISER.msg("044029", handlerName, e.getMessage());
+                String msg = Localiser.msg("044029", handlerName, e.getMessage());
                 throw new NucleusException(msg, e);
             }
 
@@ -304,14 +300,14 @@ public class MetaDataParser extends DefaultHandler
             }
             cause = e.getCause() == null ? cause : e.getCause();
 
-            NucleusLogger.METADATA.error(LOCALISER.msg("044040", filename, cause));
+            NucleusLogger.METADATA.error(Localiser.msg("044040", filename, cause));
             if (cause instanceof InvalidMetaDataException)
             {
                 throw (InvalidMetaDataException)cause;
             }
             else
             {
-                String message = LOCALISER.msg("044033", e);
+                String message = Localiser.msg("044033", e);
                 throw new NucleusException(message, cause);
             }
         }

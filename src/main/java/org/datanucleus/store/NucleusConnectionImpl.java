@@ -26,10 +26,6 @@ import org.datanucleus.util.Localiser;
  */
 public class NucleusConnectionImpl implements NucleusConnection
 {
-    /** Localisation utility for output messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Native connection for this datastore. **/
     private final Object nativeConnection;
 
@@ -59,7 +55,7 @@ public class NucleusConnectionImpl implements NucleusConnection
     {
         if (!isAvailable)
         {
-            throw new NucleusUserException(LOCALISER.msg("046001"));
+            throw new NucleusUserException(Localiser.msg("046001"));
         }
         isAvailable = false;
         onClose.run();

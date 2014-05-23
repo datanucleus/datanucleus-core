@@ -29,9 +29,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public abstract class AbstractGenerator<T> implements ValueGenerator<T>
 {
-    /** Localisation of messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Symbolic name for the sequence. */
     protected String name;
 
@@ -164,7 +161,7 @@ public abstract class AbstractGenerator<T> implements ValueGenerator<T>
             return ((Short)oid).longValue();
         }
 
-        throw new NucleusDataStoreException(LOCALISER.msg("040009", name));
+        throw new NucleusDataStoreException(Localiser.msg("040009", name));
     }
 
     /**
@@ -234,7 +231,7 @@ public abstract class AbstractGenerator<T> implements ValueGenerator<T>
             }
             catch (ValueGenerationException vex)
             {
-                NucleusLogger.VALUEGENERATION.info(LOCALISER.msg("040003", vex.getMessage()));
+                NucleusLogger.VALUEGENERATION.info(Localiser.msg("040003", vex.getMessage()));
 
                 // attempt to obtain the block of unique identifiers is invalid
                 if (requiresRepository())
@@ -251,7 +248,7 @@ public abstract class AbstractGenerator<T> implements ValueGenerator<T>
                 //exceptions cached by the value should be enclosed in ValueGenerationException
                 //when the exceptions are not caught exception by value, we give a new try
                 //in creating the repository
-                NucleusLogger.VALUEGENERATION.info(LOCALISER.msg("040003", ex.getMessage()));
+                NucleusLogger.VALUEGENERATION.info(Localiser.msg("040003", ex.getMessage()));
                 // attempt to obtain the block of unique identifiers is invalid
                 if (requiresRepository())
                 {
@@ -272,10 +269,10 @@ public abstract class AbstractGenerator<T> implements ValueGenerator<T>
         {
             try
             {
-                NucleusLogger.VALUEGENERATION.info(LOCALISER.msg("040005"));
+                NucleusLogger.VALUEGENERATION.info(Localiser.msg("040005"));
                 if (!createRepository())
                 {
-                    throw new ValueGenerationException(LOCALISER.msg("040002"));
+                    throw new ValueGenerationException(Localiser.msg("040002"));
                 }
                 else
                 {

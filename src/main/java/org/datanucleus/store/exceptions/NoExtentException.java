@@ -30,9 +30,6 @@ import org.datanucleus.util.Localiser;
  */
 public class NoExtentException extends NucleusUserException
 {
-    protected static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructs a no extent exception.
      * @param className Name of the class on which the operation requiring an
@@ -40,6 +37,6 @@ public class NoExtentException extends NucleusUserException
      */
     public NoExtentException(String className)
     {
-        super(LOCALISER.msg("018007", className));
+        super(Localiser.msg("018007", className));
     }
 }

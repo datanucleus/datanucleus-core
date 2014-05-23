@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
 
 /**
  * Class to handle the conversion between java.net.URL and a String form.
@@ -41,7 +42,7 @@ public class URLStringConverter implements TypeConverter<URL, String>
         }
         catch (MalformedURLException mue)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("016002", str, URL.class.getName()), mue);
+            throw new NucleusDataStoreException(Localiser.msg("016002", str, URL.class.getName()), mue);
         }
         return url;
     }

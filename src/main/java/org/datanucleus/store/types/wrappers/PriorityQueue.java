@@ -38,9 +38,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class PriorityQueue extends java.util.PriorityQueue implements SCOCollection, SCOMtoN, Cloneable, java.io.Serializable
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", PriorityQueue.class.getClassLoader());
-
     protected ObjectProvider ownerOP;
     protected AbstractMemberMetaData ownerMmd;
 
@@ -79,7 +76,7 @@ public class PriorityQueue extends java.util.PriorityQueue implements SCOCollect
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023003", 
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", 
                 ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
                 SCOUtils.getSCOWrapperOptionsMessage(true, false, false, false)));
         }
@@ -93,7 +90,7 @@ public class PriorityQueue extends java.util.PriorityQueue implements SCOCollect
         initialiseDelegate();
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023003", 
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", 
                 ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
                 SCOUtils.getSCOWrapperOptionsMessage(true, false, false, false)));
         }

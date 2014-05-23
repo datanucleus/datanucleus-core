@@ -37,10 +37,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class NucleusSequenceImpl implements NucleusSequence
 {
-    /** Localisation of messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Store Manager where we obtain our sequence. */
     protected final StoreManager storeManager;
 
@@ -136,7 +132,7 @@ public class NucleusSequenceImpl implements NucleusSequence
 
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE.debug(LOCALISER.msg("017003", seqMetaData.getName(), valueGeneratorName));
+            NucleusLogger.DATASTORE.debug(Localiser.msg("017003", seqMetaData.getName(), valueGeneratorName));
         }
     }
 

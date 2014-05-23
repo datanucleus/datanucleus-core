@@ -31,6 +31,7 @@ import java.util.List;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -123,8 +124,8 @@ public class EmbeddedMetaData extends MetaData
             }
             if (embCmd == null)
             {
-                NucleusLogger.METADATA.error(LOCALISER.msg("044121", apmd.getFullFieldName(), apmd.getTypeName()));
-                throw new InvalidMemberMetaDataException(LOCALISER, "044121", apmd.getClassName(), apmd.getName(), 
+                NucleusLogger.METADATA.error(Localiser.msg("044121", apmd.getFullFieldName(), apmd.getTypeName()));
+                throw new InvalidMemberMetaDataException("044121", apmd.getClassName(), apmd.getName(), 
                     apmd.getTypeName());
             }
         }
@@ -145,8 +146,8 @@ public class EmbeddedMetaData extends MetaData
             }
             if (embCmd == null)
             {
-                NucleusLogger.METADATA.error(LOCALISER.msg("044122", apmd.getFullFieldName(), embeddedType));
-                throw new InvalidMemberMetaDataException(LOCALISER, "044122", apmd.getClassName(), apmd.getName(),
+                NucleusLogger.METADATA.error(Localiser.msg("044122", apmd.getFullFieldName(), embeddedType));
+                throw new InvalidMemberMetaDataException("044122", apmd.getClassName(), apmd.getName(),
                     embeddedType);
             }
         }
@@ -167,8 +168,8 @@ public class EmbeddedMetaData extends MetaData
             }
             if (embCmd == null)
             {
-                NucleusLogger.METADATA.error(LOCALISER.msg("044123", apmd.getFullFieldName(), embeddedType));
-                throw new InvalidMemberMetaDataException(LOCALISER, "044123", apmd.getClassName(), apmd.getName(), 
+                NucleusLogger.METADATA.error(Localiser.msg("044123", apmd.getFullFieldName(), embeddedType));
+                throw new InvalidMemberMetaDataException("044123", apmd.getClassName(), apmd.getName(), 
                     embeddedType);
             }
         }
@@ -189,8 +190,8 @@ public class EmbeddedMetaData extends MetaData
             }
             if (embCmd == null)
             {
-                NucleusLogger.METADATA.error(LOCALISER.msg("044124", apmd.getFullFieldName(), embeddedType));
-                throw new InvalidMemberMetaDataException(LOCALISER, "044124", apmd.getClassName(), apmd.getName(), 
+                NucleusLogger.METADATA.error(Localiser.msg("044124", apmd.getFullFieldName(), embeddedType));
+                throw new InvalidMemberMetaDataException("044124", apmd.getClassName(), apmd.getName(), 
                     embeddedType);
             }
         }
@@ -204,8 +205,7 @@ public class EmbeddedMetaData extends MetaData
             if (embCmd instanceof InterfaceMetaData && fld instanceof FieldMetaData)
             {
                 // Cannot have a field within a persistent interface
-                throw new InvalidMemberMetaDataException(LOCALISER, "044129", apmd.getClassName(), apmd.getName(),
-                    ((AbstractMemberMetaData)fld).getName());
+                throw new InvalidMemberMetaDataException("044129", apmd.getClassName(), apmd.getName(), ((AbstractMemberMetaData)fld).getName());
             }
         }
 
@@ -266,8 +266,7 @@ public class EmbeddedMetaData extends MetaData
                         }
                         if (omittedFmd != null)
                         {
-                            NucleusLogger.METADATA.debug(LOCALISER.msg("044125", apmd.getClassName(), 
-                                cls_fields[i].getName(), embeddedType));
+                            NucleusLogger.METADATA.debug(Localiser.msg("044125", apmd.getClassName(), cls_fields[i].getName(), embeddedType));
                             members.add(omittedFmd);
                             Collections.sort(members);
                         }
@@ -302,7 +301,7 @@ public class EmbeddedMetaData extends MetaData
                         if (Collections.binarySearch(members,fieldName) < 0)
                         {
                             // Add a default PropertyMetaData for this field.
-                            NucleusLogger.METADATA.debug(LOCALISER.msg("044060", apmd.getClassName(), fieldName));
+                            NucleusLogger.METADATA.debug(Localiser.msg("044060", apmd.getClassName(), fieldName));
                             PropertyMetaData pmd=new PropertyMetaData(this, fieldName);
                             members.add(pmd);
                             Collections.sort(members);
@@ -347,8 +346,7 @@ public class EmbeddedMetaData extends MetaData
                 catch (Exception e)
                 {
                     // MetaData field doesn't exist in the class!
-                    throw new InvalidMemberMetaDataException(LOCALISER, "044071", embFmdClass.getName(), 
-                        fieldFmd.getName());
+                    throw new InvalidMemberMetaDataException("044071", embFmdClass.getName(), fieldFmd.getName());
                 }
                 fieldFmd.populate(clr, cls_field, null, primary, mmgr);
             }
@@ -370,8 +368,7 @@ public class EmbeddedMetaData extends MetaData
                     catch (Exception e2)
                     {
                         // MetaData field doesn't exist in the class!
-                        throw new InvalidMemberMetaDataException(LOCALISER, "044071", embFmdClass.getName(), 
-                            fieldFmd.getName());
+                        throw new InvalidMemberMetaDataException("044071", embFmdClass.getName(), fieldFmd.getName());
                     }
                 }
                 fieldFmd.populate(clr, null, cls_method, primary, mmgr);
@@ -479,7 +476,7 @@ public class EmbeddedMetaData extends MetaData
 
         if (isInitialised())
         {
-            throw new InvalidMemberMetaDataException(LOCALISER, "044108", mmd.getClassName(), mmd.getName());
+            throw new InvalidMemberMetaDataException("044108", mmd.getClassName(), mmd.getName());
         }
         Iterator iter = members.iterator();
         while (iter.hasNext())
@@ -487,7 +484,7 @@ public class EmbeddedMetaData extends MetaData
             AbstractMemberMetaData md = (AbstractMemberMetaData)iter.next();
             if (mmd.getName().equals(md.getName()))
             {
-                throw new InvalidMemberMetaDataException(LOCALISER, "044112", mmd.getClassName(), mmd.getName());
+                throw new InvalidMemberMetaDataException("044112", mmd.getClassName(), mmd.getName());
             }
         }
         members.add(mmd);

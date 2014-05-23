@@ -98,10 +98,6 @@ import org.datanucleus.util.TypeConversionHelper;
  */
 public abstract class AbstractStoreManager extends PropertyStore implements StoreManager
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Key for this StoreManager e.g "rdbms", "neo4j" */
     protected final String storeManagerKey;
 
@@ -214,7 +210,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 connectionMgr.registerConnectionFactory(primaryConnectionFactoryName, cf);
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
-                    NucleusLogger.CONNECTION.debug(LOCALISER.msg("032018", primaryConnectionFactoryName));
+                    NucleusLogger.CONNECTION.debug(Localiser.msg("032018", primaryConnectionFactoryName));
                 }
             }
             catch (Exception e)
@@ -248,7 +244,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                     new Object[] {this, "nontx"});
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
-                    NucleusLogger.CONNECTION.debug(LOCALISER.msg("032019", secondaryConnectionFactoryName));
+                    NucleusLogger.CONNECTION.debug(Localiser.msg("032019", secondaryConnectionFactoryName));
                 }
                 connectionMgr.registerConnectionFactory(secondaryConnectionFactoryName, cf);
             }
@@ -854,7 +850,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     {
         if (category.equalsIgnoreCase("DATASTORE"))
         {
-            ps.println(LOCALISER.msg("032020", storeManagerKey, getConnectionURL(), (getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY) ? "read-only" : "read-write")));
+            ps.println(Localiser.msg("032020", storeManagerKey, getConnectionURL(), (getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY) ? "read-only" : "read-write")));
         }
     }
 
@@ -950,7 +946,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
             if (cmd.getIdentityType() != IdentityType.DATASTORE)
             {
-                throw new NucleusUserException(LOCALISER.msg("038001", id, cmd.getFullClassName()));
+                throw new NucleusUserException(Localiser.msg("038001", id, cmd.getFullClassName()));
             }
         }
         else if (IdentityUtils.isSingleFieldIdentity(id))
@@ -959,7 +955,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
             if (cmd.getIdentityType() != IdentityType.APPLICATION || !cmd.getObjectidClass().equals(id.getClass().getName()))
             {
-                throw new NucleusUserException(LOCALISER.msg("038001", id, cmd.getFullClassName()));
+                throw new NucleusUserException(Localiser.msg("038001", id, cmd.getFullClassName()));
             }
         }
         else
@@ -1201,7 +1197,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                     valueGeneratorName);
                 if (tableGeneratorMetaData == null)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("038005", fieldName, valueGeneratorName));
+                    throw new NucleusUserException(Localiser.msg("038005", fieldName, valueGeneratorName));
                 }
             }
             else if (strategy == IdentityStrategy.SEQUENCE)
@@ -1210,7 +1206,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                     valueGeneratorName);
                 if (sequenceMetaData == null)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("038006", fieldName, valueGeneratorName));
+                    throw new NucleusUserException(Localiser.msg("038006", fieldName, valueGeneratorName));
                 }
             }
         }
@@ -1282,7 +1278,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 if (generatorName == null)
                 {
                     // No available value-generator for the specified strategy for this datastore
-                    throw new NucleusUserException(LOCALISER.msg("038004", strategy));
+                    throw new NucleusUserException(Localiser.msg("038004", strategy));
                 }
 
                 // Set up the default properties available for all value generators
@@ -1317,7 +1313,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 Object convertedValue = TypeConversionHelper.convertTo(oid, mmd.getType());
                 if (convertedValue == null)
                 {
-                    throw new NucleusException(LOCALISER.msg("038003", mmd.getFullFieldName(), oid)).setFatal();
+                    throw new NucleusException(Localiser.msg("038003", mmd.getFullFieldName(), oid)).setFatal();
                 }
                 oid = convertedValue;
             }
@@ -1330,7 +1326,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
 
         if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
         {
-            NucleusLogger.VALUEGENERATION.debug(LOCALISER.msg("038002", fieldName, strategy, generator.getClass().getName(), oid));
+            NucleusLogger.VALUEGENERATION.debug(Localiser.msg("038002", fieldName, strategy, generator.getClass().getName(), oid));
         }
 
         return oid;

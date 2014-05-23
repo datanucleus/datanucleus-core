@@ -31,6 +31,7 @@ import org.datanucleus.metadata.PackageMetaData;
 import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.exceptions.DatastoreInitialisationException;
+import org.datanucleus.util.Localiser;
 
 /**
  * An auto-starter mechanism that uses a defined list of metadata files to be loaded at startup.
@@ -120,6 +121,6 @@ public class MetaDataAutoStarter extends AbstractAutoStartMechanism
      */
     public String getStorageDescription()
     {
-        return LOCALISER.msg("034150");
+        return Localiser.msg("034150");
     }
 }

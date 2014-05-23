@@ -26,7 +26,6 @@ import java.util.Iterator;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.util.Localiser;
 
 /**
  * Base class for all MetaData.
@@ -44,8 +43,6 @@ import org.datanucleus.util.Localiser;
  */
 public class MetaData implements Serializable
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** State representing the start state of MetaData, representing the initial values passed in. */
     public static final int METADATA_CREATED_STATE = 0;
 
@@ -135,7 +132,7 @@ public class MetaData implements Serializable
     {
         if (vendor == null || (vendor.equalsIgnoreCase(VENDOR_NAME) && (key == null || value == null)))
         {
-            throw new InvalidMetaDataException(LOCALISER, "044160", vendor, key, value);
+            throw new InvalidMetaDataException("044160", vendor, key, value);
         }
 
         if (vendor.equalsIgnoreCase(VENDOR_NAME) && hasExtension(key))
@@ -169,7 +166,7 @@ public class MetaData implements Serializable
     {
         if (vendor == null || (vendor.equalsIgnoreCase(VENDOR_NAME) && (key == null || value == null)))
         {
-            throw new InvalidMetaDataException(LOCALISER, "044160", vendor, key, value);
+            throw new InvalidMetaDataException("044160", vendor, key, value);
         }
 
         ExtensionMetaData extmd = new ExtensionMetaData(vendor, key, value);

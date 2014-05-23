@@ -25,15 +25,12 @@ import org.datanucleus.util.Localiser;
  */
 public class CommitStateTransitionException extends NucleusException
 {
-    private static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructor.
      * @param nested Nested exceptions
      **/
     public CommitStateTransitionException(java.lang.Exception[] nested)
     {
-        super(LOCALISER.msg("015037"),nested);
+        super(Localiser.msg("015037"),nested);
     }
 }

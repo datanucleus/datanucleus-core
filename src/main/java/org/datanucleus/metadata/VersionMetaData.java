@@ -21,6 +21,7 @@ Contributors:
 package org.datanucleus.metadata;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -159,7 +160,7 @@ public class VersionMetaData extends MetaData
     {
         if (StringUtils.isWhitespace(strategy) || VersionStrategy.getVersionStrategy(strategy) == null)
         {
-            throw new RuntimeException(LOCALISER.msg("044156"));
+            throw new RuntimeException(Localiser.msg("044156"));
         }
         this.versionStrategy = VersionStrategy.getVersionStrategy(strategy);
         return this;

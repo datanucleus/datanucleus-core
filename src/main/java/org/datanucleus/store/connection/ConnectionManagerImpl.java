@@ -48,10 +48,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class ConnectionManagerImpl implements ConnectionManager
 {
-    /** Localisation of messages. */
-    protected static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Context for this connection manager. */
     PersistenceNucleusContext nucleusContext;
 
@@ -140,7 +136,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                     if (mconn.isLocked())
                     {
                         // Enlisted connection that is locked so throw exception
-                        throw new NucleusUserException(LOCALISER.msg("009000"));
+                        throw new NucleusUserException(Localiser.msg("009000"));
                     }                        
                     // Already registered enlisted connection present so return it
                     return mconn;
@@ -228,7 +224,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                 // Already registered enlisted connection present so return it
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
-                    NucleusLogger.CONNECTION.debug(LOCALISER.msg("009005", mconnFromPool, ec, factory));
+                    NucleusLogger.CONNECTION.debug(Localiser.msg("009005", mconnFromPool, ec, factory));
                 }
                 mconnFromPool.close();
             }
@@ -255,7 +251,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                 // Factory already has a ManagedConnection
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
-                    NucleusLogger.CONNECTION.debug(LOCALISER.msg("009004", mconnFromPool, ec, factory));
+                    NucleusLogger.CONNECTION.debug(Localiser.msg("009004", mconnFromPool, ec, factory));
                 }
 
                 if (!mconnFromPool.closeAfterTransactionEnd())
@@ -355,7 +351,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                     {
                         if (NucleusLogger.CONNECTION.isDebugEnabled())
                         {
-                            NucleusLogger.CONNECTION.debug(LOCALISER.msg("009006", mconn, ec, factory));
+                            NucleusLogger.CONNECTION.debug(Localiser.msg("009006", mconn, ec, factory));
                         }
                         connectionPool.removeManagedConnection(factory, ec); // Connection closed so remove
 
@@ -368,7 +364,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                 // Register this connection against the ExecutionContext - connection is valid
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
-                    NucleusLogger.CONNECTION.debug(LOCALISER.msg("009007", mconn, ec, factory));
+                    NucleusLogger.CONNECTION.debug(Localiser.msg("009007", mconn, ec, factory));
                 }
                 connectionPool.putManagedConnection(factory, ec, mconn);
             }
@@ -431,7 +427,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                         if (mconn.isLocked())
                         {
                             // Enlisted connection that is locked so throw exception
-                            throw new NucleusUserException(LOCALISER.msg("009000"));
+                            throw new NucleusUserException(Localiser.msg("009000"));
                         }
                         mconn.transactionPreClose();
                     }
@@ -440,7 +436,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                         if (mconn.isLocked())
                         {
                             // Enlisted connection that is locked so throw exception
-                            throw new NucleusUserException(LOCALISER.msg("009000"));
+                            throw new NucleusUserException(Localiser.msg("009000"));
                         }
                         mconn.transactionPreClose();
                     }
@@ -479,7 +475,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                         if (mconn.isLocked())
                         {
                             // Enlisted connection that is locked so throw exception
-                            throw new NucleusUserException(LOCALISER.msg("009000"));
+                            throw new NucleusUserException(Localiser.msg("009000"));
                         }
                         mconn.transactionPreClose();
                     }
@@ -489,7 +485,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                         if (mconn.isLocked())
                         {
                             // Enlisted connection that is locked so throw exception
-                            throw new NucleusUserException(LOCALISER.msg("009000"));
+                            throw new NucleusUserException(Localiser.msg("009000"));
                         }
                         mconn.transactionPreClose();
                     }

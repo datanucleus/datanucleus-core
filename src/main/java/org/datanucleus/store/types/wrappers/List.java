@@ -40,9 +40,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class List extends AbstractList implements SCOList, Cloneable, java.io.Serializable
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     protected ObjectProvider ownerOP;
     protected AbstractMemberMetaData ownerMmd;
 
@@ -79,7 +76,7 @@ public class List extends AbstractList implements SCOList, Cloneable, java.io.Se
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023003", 
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", 
                 ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
                 SCOUtils.getSCOWrapperOptionsMessage(true, false, true, false)));
         }
@@ -93,7 +90,7 @@ public class List extends AbstractList implements SCOList, Cloneable, java.io.Se
         delegate = new java.util.ArrayList();
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023003", 
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", 
                 ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
                 SCOUtils.getSCOWrapperOptionsMessage(true, false, true, false)));
         }

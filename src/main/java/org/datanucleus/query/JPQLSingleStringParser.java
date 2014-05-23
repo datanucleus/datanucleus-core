@@ -64,10 +64,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class JPQLSingleStringParser
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** The JPQL query to populate. */
     private Query query;
 
@@ -83,7 +79,7 @@ public class JPQLSingleStringParser
     {
         if (NucleusLogger.QUERY.isDebugEnabled())
         {
-            NucleusLogger.QUERY.debug(LOCALISER.msg("043000", queryString));
+            NucleusLogger.QUERY.debug(Localiser.msg("043000", queryString));
         }
         this.query = query;
         this.queryString = queryString;
@@ -121,7 +117,7 @@ public class JPQLSingleStringParser
             {
                 if (JPQLQueryHelper.isKeyword(keyword))
                 {
-                    throw new NucleusUserException(LOCALISER.msg("043001", keyword));
+                    throw new NucleusUserException(Localiser.msg("043001", keyword));
                 }
                 else
                 {
@@ -150,7 +146,7 @@ public class JPQLSingleStringParser
             }
             else
             {
-                throw new NucleusUserException(LOCALISER.msg("043002"));
+                throw new NucleusUserException(Localiser.msg("043002"));
             }
 
             if (update)
@@ -174,7 +170,7 @@ public class JPQLSingleStringParser
             {
                 if (update || delete)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("043007"));
+                    throw new NucleusUserException(Localiser.msg("043007"));
                 }
                 compileGroup();
             }
@@ -182,7 +178,7 @@ public class JPQLSingleStringParser
             {
                 if (update || delete)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("043008"));
+                    throw new NucleusUserException(Localiser.msg("043008"));
                 }
                 compileHaving();
             }
@@ -190,7 +186,7 @@ public class JPQLSingleStringParser
             {
                 if (update || delete)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("043009"));
+                    throw new NucleusUserException(Localiser.msg("043009"));
                 }
                 compileOrder();
             }
@@ -212,7 +208,7 @@ public class JPQLSingleStringParser
             if (content.length() == 0)
             {
                 // No UPDATE clause
-                throw new NucleusUserException(LOCALISER.msg("043010"));
+                throw new NucleusUserException(Localiser.msg("043010"));
             }
 
             String contentUpper = content.toUpperCase();
@@ -220,7 +216,7 @@ public class JPQLSingleStringParser
             if (setIndex < 0)
             {
                 // UPDATE clause has no "SET ..." !
-                throw new NucleusUserException(LOCALISER.msg("043011"));
+                throw new NucleusUserException(Localiser.msg("043011"));
             }
             query.setFrom(content.substring(0, setIndex).trim());
             query.setUpdate(content.substring(setIndex+3).trim());
@@ -243,7 +239,7 @@ public class JPQLSingleStringParser
             if (content.length() == 0)
             {
                 // content cannot be empty
-                throw new NucleusUserException(LOCALISER.msg("043004", "WHERE", "<filter>"));
+                throw new NucleusUserException(Localiser.msg("043004", "WHERE", "<filter>"));
             }
 
             String contentUpper = content.toUpperCase();
@@ -313,7 +309,7 @@ public class JPQLSingleStringParser
                             }
                             if (endPosition < 0)
                             {
-                                throw new NucleusUserException(LOCALISER.msg("042017"));
+                                throw new NucleusUserException(Localiser.msg("042017"));
                             }
 
                             String subqueryStr = content.substring(i+1, endPosition).trim();
@@ -341,7 +337,7 @@ public class JPQLSingleStringParser
             if (withinLiteralDouble || withinLiteralSingle)
             {
                 // Literal wasn't closed
-                throw new NucleusUserException(LOCALISER.msg("042017"));
+                throw new NucleusUserException(Localiser.msg("042017"));
             }
 
             query.setFilter(stringContent.toString());
@@ -353,7 +349,7 @@ public class JPQLSingleStringParser
             if (content.length() == 0)
             {
                 // content cannot be empty
-                throw new NucleusUserException(LOCALISER.msg("043004", "GROUP BY", "<grouping>"));
+                throw new NucleusUserException(Localiser.msg("043004", "GROUP BY", "<grouping>"));
             }
             query.setGrouping(content);
         }
@@ -365,7 +361,7 @@ public class JPQLSingleStringParser
             if (content.length() == 0)
             {
                 // content cannot be empty
-                throw new NucleusUserException(LOCALISER.msg("043004", "HAVING", "<having>"));
+                throw new NucleusUserException(Localiser.msg("043004", "HAVING", "<having>"));
             }
             query.setHaving(content);
         }
@@ -376,7 +372,7 @@ public class JPQLSingleStringParser
             if (content.length() == 0)
             {
                 // content cannot be empty
-                throw new NucleusUserException(LOCALISER.msg("043004", "ORDER BY", "<ordering>"));
+                throw new NucleusUserException(Localiser.msg("043004", "ORDER BY", "<ordering>"));
             }
             query.setOrdering(content);
         }

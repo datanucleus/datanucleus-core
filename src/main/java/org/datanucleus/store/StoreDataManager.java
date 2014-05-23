@@ -33,9 +33,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class StoreDataManager
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);    
-
     /** Map of all managed store data, keyed by the class/field name. */
     protected ConcurrentHashMap<Object, StoreData> storeDataByClass = new ConcurrentHashMap<Object, StoreData>();
 
@@ -49,7 +46,7 @@ public class StoreDataManager
     {
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("032002"));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("032002"));
         }
 
         storeDataByClass.clear();
@@ -87,7 +84,7 @@ public class StoreDataManager
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("032001", data));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("032001", data));
         }
     }
 

@@ -17,8 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.metadata;
 
-import org.datanucleus.util.Localiser;
-
 /**
  * Exception thrown when meta-data specific to a member of a class is invalid.
  */
@@ -27,40 +25,23 @@ public class InvalidMemberMetaDataException extends InvalidMetaDataException
     String className;
     String memberName;
 
-    public InvalidMemberMetaDataException(Localiser localiser, String key, Object... params)
+    public InvalidMemberMetaDataException(String key, Object... params)
     {
-        super(localiser, key, params);
+        super(key, params);
         this.className = (String)params[0];
         this.memberName = (String)params[1];
     }
 
-    public InvalidMemberMetaDataException(Localiser localiser, String key, String className, String memberName)
+    public InvalidMemberMetaDataException(String key, String className, String memberName)
     {
-        super(localiser, key, className, memberName);
+        super(key, className, memberName);
         this.className = className;
         this.memberName = memberName;
     }
 
-    public InvalidMemberMetaDataException(Localiser localiser, String key, String className, String memberName,
-            Object param1)
+    public InvalidMemberMetaDataException(String key, String className, String memberName, Object... params)
     {
-        super(localiser, key, className, memberName, param1);
-        this.className = className;
-        this.memberName = memberName;
-    }
-
-    public InvalidMemberMetaDataException(Localiser localiser, String key, String className, String memberName,
-            Object param1, Object param2)
-    {
-        super(localiser, key, className, memberName, param1, param2);
-        this.className = className;
-        this.memberName = memberName;
-    }
-
-    public InvalidMemberMetaDataException(Localiser localiser, String key, String className, String memberName,
-            Object param1, Object param2, Object param3)
-    {
-        super(localiser, key, className, memberName, param1, param2, param3);
+        super(key, className, memberName, params);
         this.className = className;
         this.memberName = memberName;
     }

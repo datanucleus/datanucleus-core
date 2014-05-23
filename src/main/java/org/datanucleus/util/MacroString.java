@@ -28,9 +28,6 @@ import org.datanucleus.exceptions.NucleusUserException;
  */
 public class MacroString
 {
-    protected static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     private final String  thisClassName;
     private final Imports imports;
     private final String  macroString;
@@ -81,7 +78,7 @@ public class MacroString
 
             if ((right = macroString.indexOf('}', left + 1)) < 0)
             {
-                throw new NucleusUserException(LOCALISER.msg("031000",macroString));
+                throw new NucleusUserException(Localiser.msg("031000",macroString));
             }
 
             IdentifierMacro im = parseIdentifierMacro(macroString.substring(left + 1, right), clr);
@@ -106,7 +103,7 @@ public class MacroString
 
             if ((right = tmpString.indexOf('?', left + 1)) < 0)
             {
-                throw new NucleusUserException(LOCALISER.msg("031001",tmpString));
+                throw new NucleusUserException(Localiser.msg("031001",tmpString));
             }
 
             ParameterMacro pm = new ParameterMacro(tmpString.substring(left + 1, right));
@@ -157,7 +154,7 @@ public class MacroString
 
             if (lastDot < 0)
             {
-                throw new NucleusUserException(LOCALISER.msg("031002",unparsed));
+                throw new NucleusUserException(Localiser.msg("031002",unparsed));
             }
 
             fieldName = unparsed.substring(lastDot + 1);
@@ -171,7 +168,7 @@ public class MacroString
 
                 if (lastDot2 < 0)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("031002",unparsed));
+                    throw new NucleusUserException(Localiser.msg("031002",unparsed));
                 }
 
                 subfieldName = fieldName;
@@ -181,7 +178,7 @@ public class MacroString
 
                 if (c == null)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("031002",unparsed));
+                    throw new NucleusUserException(Localiser.msg("031002",unparsed));
                 }
             }
         }

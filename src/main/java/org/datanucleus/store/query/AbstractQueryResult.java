@@ -48,9 +48,6 @@ import org.datanucleus.util.Localiser;
  */
 public abstract class AbstractQueryResult<E> extends AbstractList<E> implements QueryResult<E>, Serializable
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Whether the results are close. */
     protected boolean closed = false;
 
@@ -186,7 +183,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
     {
         if (!isOpen())
         {
-            throw api.getUserExceptionForException(LOCALISER.msg("052600"), null);
+            throw api.getUserExceptionForException(Localiser.msg("052600"), null);
         }
     }
 
@@ -199,7 +196,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
      */
     public void add(int index, E element)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /**
@@ -209,7 +206,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
      */
     public boolean add(E o)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /**
@@ -220,7 +217,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
      */
     public boolean addAll(int index, Collection c)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /**
@@ -228,7 +225,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
      */
     public void clear()
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /**
@@ -238,7 +235,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
      */
     public boolean contains(Object o)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052604"));
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
     }
 
     /**
@@ -248,7 +245,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
      */
     public boolean containsAll(Collection c)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052604"));
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
     }
 
     /**
@@ -291,7 +288,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
      */
     public int indexOf(Object o)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052604"));
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
     }
 
     /**
@@ -316,7 +313,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
      */
     public int lastIndexOf(Object o)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052604"));
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
     }
 
     /**
@@ -332,7 +329,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
      */
     public E remove(int index)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /**
@@ -343,7 +340,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
      */
     public E set(int index, E element)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /**

@@ -29,9 +29,6 @@ import org.datanucleus.util.Localiser;
  */
 public class PluginRegistryFactory
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Instantiates a PluginRegistry.
      * If DN "core" is deployed as an eclipse plugin, uses the Eclipse OSGI Registry to find other DN plug-ins
@@ -92,7 +89,7 @@ public class PluginRegistryFactory
             {
                 if (NucleusLogger.GENERAL.isDebugEnabled())
                 {
-                    NucleusLogger.GENERAL.debug(LOCALISER.msg("024005", registryClassName));
+                    NucleusLogger.GENERAL.debug(Localiser.msg("024005", registryClassName));
                 }
             }
             return (PluginRegistry) clr.classForName(registryClassName, org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER).getConstructor(

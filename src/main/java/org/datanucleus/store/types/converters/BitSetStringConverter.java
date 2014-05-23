@@ -21,6 +21,7 @@ import java.util.BitSet;
 import java.util.StringTokenizer;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
 
 /**
  * Class to handle the conversion between java.util.BitSet and a String form.
@@ -46,7 +47,7 @@ public class BitSetStringConverter implements TypeConverter<BitSet, String>
             }
             catch (NumberFormatException nfe)
             {
-                throw new NucleusDataStoreException(LOCALISER.msg("016002", str, BitSet.class.getName()), nfe);
+                throw new NucleusDataStoreException(Localiser.msg("016002", str, BitSet.class.getName()), nfe);
             }
         }
         return set;

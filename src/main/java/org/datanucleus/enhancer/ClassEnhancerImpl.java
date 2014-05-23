@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.asm.AnnotationVisitor;
@@ -102,8 +101,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class ClassEnhancerImpl implements ClassEnhancer
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Class Loader Resolver to use for any loading issues. */
     protected final ClassLoaderResolver clr;
 
@@ -387,7 +384,7 @@ public class ClassEnhancerImpl implements ClassEnhancer
         FileOutputStream out = null;
         try
         {
-            DataNucleusEnhancer.LOGGER.info(LOCALISER.msg("Enhancer.WriteClass", classFile));
+            DataNucleusEnhancer.LOGGER.info(Localiser.msg("Enhancer.WriteClass", classFile));
             out = new FileOutputStream(classFile);
             out.write(getClassBytes());
         }
@@ -410,7 +407,7 @@ public class ClassEnhancerImpl implements ClassEnhancer
             // Write the generated PK class
             try
             {
-                DataNucleusEnhancer.LOGGER.info(LOCALISER.msg("Enhancer.WritePrimaryKeyClass", pkClassFile));
+                DataNucleusEnhancer.LOGGER.info(Localiser.msg("Enhancer.WritePrimaryKeyClass", pkClassFile));
                 out = new FileOutputStream(pkClassFile);
                 out.write(pkClassBytes);
             }
@@ -636,7 +633,7 @@ public class ClassEnhancerImpl implements ClassEnhancer
         if (checkClassIsEnhanced(false))
         {
             // Already enhanced
-            DataNucleusEnhancer.LOGGER.info(LOCALISER.msg("Enhancer.ClassIsAlreadyEnhanced", className));
+            DataNucleusEnhancer.LOGGER.info(Localiser.msg("Enhancer.ClassIsAlreadyEnhanced", className));
             return true;
         }
 
@@ -651,7 +648,7 @@ public class ClassEnhancerImpl implements ClassEnhancer
                     String pkClassName = cmd.getFullClassName() + AbstractClassMetaData.GENERATED_PK_SUFFIX;
                     if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
                     {
-                        DataNucleusEnhancer.LOGGER.debug(LOCALISER.msg("Enhancer.GeneratePrimaryKey", cmd.getFullClassName(), pkClassName));
+                        DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.GeneratePrimaryKey", cmd.getFullClassName(), pkClassName));
                     }
                     cmd.setObjectIdClass(pkClassName);
                     PrimaryKeyGenerator pkGen = new PrimaryKeyGenerator(cmd, this);
@@ -660,8 +657,7 @@ public class ClassEnhancerImpl implements ClassEnhancer
                 else
                 {
                     // Throw exception for invalid metadata
-                    throw new InvalidMetaDataException(LOCALISER, "044065", cmd.getFullClassName(),
-                        cmd.getNoOfPrimaryKeyMembers());
+                    throw new InvalidMetaDataException("044065", cmd.getFullClassName(), cmd.getNoOfPrimaryKeyMembers());
                 }
             }
 

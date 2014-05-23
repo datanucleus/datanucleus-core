@@ -84,6 +84,7 @@ import org.datanucleus.store.types.SCOContainer;
 import org.datanucleus.store.types.SCOMap;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 import org.datanucleus.util.TypeConversionHelper;
@@ -131,7 +132,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 }
                 catch (SecurityException e)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("026000"), e).setFatal();
+                    throw new NucleusUserException(Localiser.msg("026000"), e).setFatal();
                 }
             }
         });
@@ -166,7 +167,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     {
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("026011", StringUtils.toJVMIDString(myPC), this));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("026011", StringUtils.toJVMIDString(myPC), this));
         }
 
         //we are transitioning to TRANSIENT state, so if any postLoad
@@ -293,13 +294,13 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             {
                 // probably never will get here, as JDOImplHelper.newInstance() internally already throws
                 // JDOFatalUserException when class is not registered 
-                throw new NucleusUserException(LOCALISER.msg("026018", pcClass.getName())).setFatal();
+                throw new NucleusUserException(Localiser.msg("026018", pcClass.getName())).setFatal();
             }
             else
             {
                 // Provide advisory information since we can't create an instance of this class, so maybe they
                 // have an error in their data ?
-                throw new NucleusUserException(LOCALISER.msg("026019", pcClass.getName())).setFatal();
+                throw new NucleusUserException(Localiser.msg("026019", pcClass.getName())).setFatal();
             }
         }
 
@@ -459,7 +460,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                                 Persistable pkFieldPC = (Persistable) ((SingleValueFieldManager) currFM).fetchObjectField(fieldNumber);
                                 if (pkFieldPC == null)
                                 {
-                                    throw new NucleusUserException(LOCALISER.msg("026016", fmd.getFullFieldName()));
+                                    throw new NucleusUserException(Localiser.msg("026016", fmd.getFullFieldName()));
                                 }
                                 if (!myEC.getApiAdapter().isPersistent(pkFieldPC))
                                 {
@@ -758,7 +759,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         }
         catch (SecurityException e)
         {
-            throw new NucleusUserException(LOCALISER.msg("026000"), e).setFatal();
+            throw new NucleusUserException(Localiser.msg("026000"), e).setFatal();
         }
     }
 
@@ -806,7 +807,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 return this;
             }
 
-            throw myEC.getApiAdapter().getUserExceptionForException(LOCALISER.msg("026003"), null);
+            throw myEC.getApiAdapter().getUserExceptionForException(Localiser.msg("026003"), null);
         }
         else if (pc == savedImage)
         {
@@ -1779,7 +1780,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                     Object owner = sco.getOwner();
                     if (owner != null)
                     {
-                        throw myEC.getApiAdapter().getUserExceptionForException(LOCALISER.msg("026007", sco.getFieldName(), owner), null);
+                        throw myEC.getApiAdapter().getUserExceptionForException(Localiser.msg("026007", sco.getFieldName(), owner), null);
                     }
                 }
 
@@ -1816,7 +1817,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                     if (myEC.getApiAdapter().isPersistent(oldValue))
                     {
                         // PC field being nulled, so delete previous PC value
-                        NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("026026", oldValue, mmd.getFullFieldName()));
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("026026", oldValue, mmd.getFullFieldName()));
                         myEC.deleteObjectInternal(oldValue);
                     }
                 }
@@ -1938,7 +1939,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("026001", StringUtils.toJVMIDString(pc), this));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("026001", StringUtils.toJVMIDString(pc), this));
             }
 
             // Reset jdoFlags in the clone to Persistable.READ_WRITE_OK 
@@ -2063,43 +2064,43 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
 
     public boolean getBooleanField(Persistable pc, int fieldNumber, boolean currentValue)
     {
-        throw new NucleusException(LOCALISER.msg("026006"));
+        throw new NucleusException(Localiser.msg("026006"));
     }
     public byte getByteField(Persistable pc, int fieldNumber, byte currentValue)
     {
-        throw new NucleusException(LOCALISER.msg("026006"));
+        throw new NucleusException(Localiser.msg("026006"));
     }
     public char getCharField(Persistable pc, int fieldNumber, char currentValue)
     {
-        throw new NucleusException(LOCALISER.msg("026006"));
+        throw new NucleusException(Localiser.msg("026006"));
     }
     public double getDoubleField(Persistable pc, int fieldNumber, double currentValue)
     {
-        throw new NucleusException(LOCALISER.msg("026006"));
+        throw new NucleusException(Localiser.msg("026006"));
     }
     public float getFloatField(Persistable pc, int fieldNumber, float currentValue)
     {
-        throw new NucleusException(LOCALISER.msg("026006"));
+        throw new NucleusException(Localiser.msg("026006"));
     }
     public int getIntField(Persistable pc, int fieldNumber, int currentValue)
     {
-        throw new NucleusException(LOCALISER.msg("026006"));
+        throw new NucleusException(Localiser.msg("026006"));
     }
     public long getLongField(Persistable pc, int fieldNumber, long currentValue)
     {
-        throw new NucleusException(LOCALISER.msg("026006"));
+        throw new NucleusException(Localiser.msg("026006"));
     }
     public short getShortField(Persistable pc, int fieldNumber, short currentValue)
     {
-        throw new NucleusException(LOCALISER.msg("026006"));
+        throw new NucleusException(Localiser.msg("026006"));
     }
     public String getStringField(Persistable pc, int fieldNumber, String currentValue)
     {
-        throw new NucleusException(LOCALISER.msg("026006"));
+        throw new NucleusException(Localiser.msg("026006"));
     }
     public Object getObjectField(Persistable pc, int fieldNumber, Object currentValue)
     {
-        throw new NucleusException(LOCALISER.msg("026006"));
+        throw new NucleusException(Localiser.msg("026006"));
     }
 
     /**
@@ -2118,7 +2119,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         if (className == null)
         {
             // className is null when id class exists, and object has been validated and doesn't exist.
-            throw new NucleusObjectNotFoundException(LOCALISER.msg("026013", 
+            throw new NucleusObjectNotFoundException(Localiser.msg("026013", 
                 IdentityUtils.getPersistableIdentityForId(myID)), myID);
         }
         else if (!cmd.getFullClassName().equals(className))
@@ -2132,14 +2133,14 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             }
             catch (ClassNotResolvedException e)
             {
-                NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("026014",
+                NucleusLogger.PERSISTENCE.warn(Localiser.msg("026014",
                     IdentityUtils.getPersistableIdentityForId(myID)));
-                throw new NucleusUserException(LOCALISER.msg("026014",
+                throw new NucleusUserException(Localiser.msg("026014",
                     IdentityUtils.getPersistableIdentityForId(myID)), e);
             }
             if (cmd == null)
             {
-                throw new NucleusUserException(LOCALISER.msg("026012", pcClass)).setFatal();
+                throw new NucleusUserException(Localiser.msg("026012", pcClass)).setFatal();
             }
             if (cmd.getIdentityType() != IdentityType.APPLICATION)
             {
@@ -2155,7 +2156,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             myPC = HELPER.newInstance(pcClass, this);
             if (myPC == null)
             {
-                throw new NucleusUserException(LOCALISER.msg("026018", cmd.getFullClassName())).setFatal();
+                throw new NucleusUserException(Localiser.msg("026018", cmd.getFullClassName())).setFatal();
             }
 
             // Note that this will mean the fields are loaded twice (loaded earlier in this method)
@@ -2297,13 +2298,13 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                             if (afterPreStore)
                             {
                                 // Not set even after preStore, so user error
-                                throw new NucleusUserException(LOCALISER.msg("026017", cmd.getFullClassName(), 
+                                throw new NucleusUserException(Localiser.msg("026017", cmd.getFullClassName(), 
                                     fmd.getName())).setFatal();
                             }
                             else
                             {
                                 // Log that the value is not yet set for this field, maybe set later in preStore?
-                                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("026017", cmd.getFullClassName(),
+                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("026017", cmd.getFullClassName(),
                                     fmd.getName()));
                                 return;
                             }
@@ -2413,7 +2414,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             if (fieldNumber == -1)
             {
                 throw myEC.getApiAdapter().getUserExceptionForException(
-                    LOCALISER.msg("026002", fieldName, cmd.getFullClassName()), null);
+                    Localiser.msg("026002", fieldName, cmd.getFullClassName()), null);
             }
 
             makeDirty(fieldNumber);
@@ -3312,7 +3313,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 AbstractMemberMetaData fmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("026030",
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026030",
                         StringUtils.toJVMIDString(myPC),
                         IdentityUtils.getPersistableIdentityForId(myID), fmd.getName()));
                 }
@@ -3369,7 +3370,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 {
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("026029", 
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029", 
                             StringUtils.toJVMIDString(myPC), 
                             myEC != null ? IdentityUtils.getPersistableIdentityForId(myID) : myID, fmd.getName()));
                     }
@@ -3442,7 +3443,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             myEC.markDirty(this, false);
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("026028", StringUtils.toJVMIDString(myPC)));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("026028", StringUtils.toJVMIDString(myPC)));
             }
             registerTransactional();
 
@@ -3641,7 +3642,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("010009", StringUtils.toJVMIDString(myPC), 
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("010009", StringUtils.toJVMIDString(myPC), 
                     "" + state.getCurrentFetchDepth()));
             }
 
@@ -3711,7 +3712,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                                 String fieldName = cmd.getMetaDataForManagedMemberAtAbsolutePosition(i).getName();
                                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                                 {
-                                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("026032", 
+                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026032", 
                                         StringUtils.toJVMIDString(myPC), 
                                         IdentityUtils.getPersistableIdentityForId(myID), fieldName));
                                 }
@@ -3744,13 +3745,13 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 if (!toCheckPC.dnIsDetached())
                 {
                     // Sanity check on the objects detached state
-                    throw new NucleusUserException(LOCALISER.msg("026025", toCheckPC.getClass().getName(), toCheckID));
+                    throw new NucleusUserException(Localiser.msg("026025", toCheckPC.getClass().getName(), toCheckID));
                 }
             }
             else
             {
                 // Warn the user since they selected detachAllOnCommit
-                NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("026031", myPC.getClass().getName(), 
+                NucleusLogger.PERSISTENCE.warn(Localiser.msg("026031", myPC.getClass().getName(), 
                     IdentityUtils.getPersistableIdentityForId(myID)));
 
                 // Make the object transient
@@ -3775,12 +3776,12 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         if (myLC.isDeleted())
         {
             throw new NucleusUserException(
-                LOCALISER.msg("026023", myPC.getClass().getName(), myID));
+                Localiser.msg("026023", myPC.getClass().getName(), myID));
         }
         if (myEC.getApiAdapter().isDetached(myPC))
         {
             throw new NucleusUserException(
-                LOCALISER.msg("026024", myPC.getClass().getName(), myID));
+                Localiser.msg("026024", myPC.getClass().getName(), myID));
         }
         if (dirty)
         {
@@ -3834,7 +3835,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                     {
                         fieldsToLoad = ClassUtils.getFlagsSetTo(loadedFields, myFP.getMemberNumbers(), false);
                     }
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("010010", StringUtils.toJVMIDString(myPC), 
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("010010", StringUtils.toJVMIDString(myPC), 
                         "" + state.getCurrentFetchDepth(), StringUtils.toJVMIDString(detachedPC),
                         StringUtils.intArrayToString(detachFieldNums),
                         StringUtils.intArrayToString(fieldsToLoad)));
@@ -3906,7 +3907,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             if (detachable && !myEC.getApiAdapter().isDetached(detachedPC))
             {
                 // Sanity check on the objects detached state
-                throw new NucleusUserException(LOCALISER.msg("026025", detachedPC.getClass().getName(), myID));
+                throw new NucleusUserException(Localiser.msg("026025", detachedPC.getClass().getName(), myID));
             }
 
             if (detachable)
@@ -4692,7 +4693,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                         int[] dirtyFieldNumbers = ClassUtils.getFlagsSetTo(dirtyFields, true);
                         if (!isEmbedded() && dirtyFieldNumbers == null)
                         {
-                            throw new NucleusException(LOCALISER.msg("026010")).setFatal();
+                            throw new NucleusException(Localiser.msg("026010")).setFatal();
                         }
                         if (myEC.getNucleusContext().isClassCacheable(getClassMetaData()))
                         {

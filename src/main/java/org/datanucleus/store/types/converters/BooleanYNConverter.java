@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.types.converters;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
 
 /**
  * Class to handle the conversion between java.lang.Boolean and a Character ("Y", "N") form.
@@ -37,7 +38,7 @@ public class BooleanYNConverter implements TypeConverter<Boolean, Character>
         }
         catch (NumberFormatException nfe)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("016002", chr, Boolean.class.getName()), nfe);
+            throw new NucleusDataStoreException(Localiser.msg("016002", chr, Boolean.class.getName()), nfe);
         }
     }
 

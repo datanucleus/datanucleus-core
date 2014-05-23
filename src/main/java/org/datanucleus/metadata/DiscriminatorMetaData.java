@@ -20,6 +20,7 @@ Contributors:
 package org.datanucleus.metadata;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -96,7 +97,7 @@ public class DiscriminatorMetaData extends MetaData
             {
                 // Using "value-map" and no value provided so fall back to class name.
                 String className = cmd.getFullClassName();
-                NucleusLogger.METADATA.warn(LOCALISER.msg("044103", className));
+                NucleusLogger.METADATA.warn(Localiser.msg("044103", className));
                 this.value = className;
             }
         }

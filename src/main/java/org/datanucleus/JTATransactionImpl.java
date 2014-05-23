@@ -37,6 +37,7 @@ import org.datanucleus.store.connection.ConnectionFactory;
 import org.datanucleus.store.connection.ConnectionResourceType;
 import org.datanucleus.transaction.NucleusTransactionException;
 import org.datanucleus.transaction.jta.JTASyncRegistry;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -105,7 +106,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         jtaTM = ec.getNucleusContext().getJtaTransactionManager();
         if (jtaTM == null)
         {
-            throw new NucleusTransactionException(LOCALISER.msg("015030"));
+            throw new NucleusTransactionException(Localiser.msg("015030"));
         }
         jtaSyncRegistry = ec.getNucleusContext().getJtaSyncRegistry();
 
@@ -129,7 +130,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         }
         catch (SystemException se)
         {
-            throw new NucleusTransactionException(LOCALISER.msg("015026"), se);
+            throw new NucleusTransactionException(Localiser.msg("015026"), se);
         }
     }
     /**
@@ -202,7 +203,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
             }
             catch (SystemException e)
             {
-                throw new NucleusTransactionException(LOCALISER.msg("015026"), e);
+                throw new NucleusTransactionException(Localiser.msg("015026"), e);
             }
         }
     }
@@ -403,14 +404,14 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         {
             if (!success) 
             {
-                NucleusLogger.TRANSACTION.error(LOCALISER.msg("015044"), thr);
+                NucleusLogger.TRANSACTION.error(Localiser.msg("015044"), thr);
                 try
                 {
                     jtaTx.setRollbackOnly();
                 }
                 catch (Exception e)
                 {
-                    NucleusLogger.TRANSACTION.fatal(LOCALISER.msg("015045"), e);
+                    NucleusLogger.TRANSACTION.fatal(Localiser.msg("015045"), e);
                 }
             }
         }
@@ -428,7 +429,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         {
             // JavaEE container has closed the ExecutionContext (EntityManager) before calling afterCompletion on the
             // Synchronisation object we registered with it. No point cleaning anything up here. Take the consequences.
-            NucleusLogger.TRANSACTION.warn(LOCALISER.msg("015048", this));
+            NucleusLogger.TRANSACTION.warn(Localiser.msg("015048", this));
             return;
         }
 
@@ -447,7 +448,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
             else
             {
                 // this method is called after completion, so we can reasonably expect final status codes
-                NucleusLogger.TRANSACTION.fatal(LOCALISER.msg("015047", status));
+                NucleusLogger.TRANSACTION.fatal(Localiser.msg("015047", status));
             }
             success = true;
         }
@@ -463,7 +464,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
             joinStatus = JoinStatus.NO_TXN;
             if (!success)
             {
-                NucleusLogger.TRANSACTION.error(LOCALISER.msg("015046"), thr);
+                NucleusLogger.TRANSACTION.error(Localiser.msg("015046"), thr);
             }
         }
 

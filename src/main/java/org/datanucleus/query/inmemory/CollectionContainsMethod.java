@@ -26,6 +26,7 @@ import org.datanucleus.query.expression.Literal;
 import org.datanucleus.query.expression.ParameterExpression;
 import org.datanucleus.query.expression.PrimaryExpression;
 import org.datanucleus.query.expression.VariableExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Evaluator for the method "{collExpr}.contains(elemExpr)".
@@ -45,7 +46,7 @@ public class CollectionContainsMethod implements InvocationEvaluator
         }
         if (!(invokedValue instanceof Collection))
         {
-            throw new NucleusException(eval.getLocaliser().msg("021011", method, invokedValue.getClass().getName()));
+            throw new NucleusException(Localiser.msg("021011", method, invokedValue.getClass().getName()));
         }
 
         Object param = expr.getArguments().get(0);

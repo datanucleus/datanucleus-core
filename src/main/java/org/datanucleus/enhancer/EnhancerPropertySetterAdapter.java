@@ -64,9 +64,6 @@ import org.datanucleus.util.Localiser;
  */
 public class EnhancerPropertySetterAdapter extends MethodVisitor
 {
-    /** Localisation of messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", ClassEnhancer.class.getClassLoader());
-
     /** The enhancer for this class. */
     protected ClassEnhancer enhancer;
 
@@ -119,7 +116,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
         {
             String msg = ClassMethod.getMethodAdditionMessage(enhancer.getNamer().getSetMethodPrefixMethodName() + mmd.getName(), 
                 null, new Object[]{mmd.getType()}, new String[] {"val"});
-            DataNucleusEnhancer.LOGGER.debug(LOCALISER.msg("Enhancer.AddMethod", msg));
+            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddMethod", msg));
         }
 
         if (!mmd.isAbstract())

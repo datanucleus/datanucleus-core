@@ -36,15 +36,12 @@ import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.util.ClassUtils;
-import org.datanucleus.util.Localiser;
 
 /**
  * Series of utilities for handling identities of objects.
  */
 public class IdentityUtils
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Checks whether the passed class name is valid for a single field application-identity.
      * @param className the identity class name
@@ -91,6 +88,7 @@ public class IdentityUtils
 
     /**
      * Accessor for whether the passed identity is a valid single-field application-identity for this API.
+     * @param id The id
      * @return Whether it is valid
      */
     public static boolean isSingleFieldIdentity(Object id)

@@ -40,9 +40,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class Vector extends java.util.Vector implements SCOList, Cloneable
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
 
@@ -80,7 +77,7 @@ public class Vector extends java.util.Vector implements SCOList, Cloneable
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023003", 
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", 
                 ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
                 SCOUtils.getSCOWrapperOptionsMessage(true, false, true, false)));
         }
@@ -94,7 +91,7 @@ public class Vector extends java.util.Vector implements SCOList, Cloneable
         delegate = new java.util.Vector();
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023003", 
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", 
                 ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
                 SCOUtils.getSCOWrapperOptionsMessage(true, false, true, false)));
         }

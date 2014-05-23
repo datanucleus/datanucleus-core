@@ -32,10 +32,6 @@ import org.datanucleus.util.Localiser;
  */
 public abstract class JNDIBasedTransactionManagerLocator implements TransactionManagerLocator
 {
-    /** Localisation utility for output messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Accessor for the JNDI name to use.
      * @return The JNDI name where the txn manager is stored.
@@ -64,7 +60,7 @@ public abstract class JNDIBasedTransactionManagerLocator implements TransactionM
         catch (NamingException ne)
         {
             // probably NoInitialContextException, other NamingExceptions due to bad names are silently caught above
-            throw new NucleusException(LOCALISER.msg("015029"), ne);
+            throw new NucleusException(Localiser.msg("015029"), ne);
         }
     }
 }

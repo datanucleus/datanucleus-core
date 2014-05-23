@@ -22,7 +22,6 @@ import java.util.List;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusOptimisticException;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.util.Localiser;
 
 /**
  * Representation of a persistence flush process.
@@ -30,10 +29,6 @@ import org.datanucleus.util.Localiser;
  */
 public interface FlushProcess
 {
-    /** Localisation utility for output messages */
-    static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Execute the flush.
      * @param ec ExecutionContext

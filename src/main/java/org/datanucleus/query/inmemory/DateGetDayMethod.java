@@ -22,6 +22,7 @@ import java.util.Date;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.expression.InvokeExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Evaluator for the method "{dateExpr}.getDay()".
@@ -41,7 +42,7 @@ public class DateGetDayMethod implements InvocationEvaluator
         }
         if (!(invokedValue instanceof Date))
         {
-            throw new NucleusException(eval.getLocaliser().msg("021011", method, invokedValue.getClass().getName()));
+            throw new NucleusException(Localiser.msg("021011", method, invokedValue.getClass().getName()));
         }
 
         Calendar cal = Calendar.getInstance();

@@ -40,9 +40,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class AbstractResultClassMapper
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-            "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     protected Class resultClass;
 
     public AbstractResultClassMapper(Class resultClass)
@@ -130,7 +127,7 @@ public class AbstractResultClassMapper
                 }
                 else
                 {
-                    String msg = LOCALISER.msg("021202",
+                    String msg = Localiser.msg("021202",
                         resultClass.getName(), inputResult.getClass().getName());
                     NucleusLogger.QUERY.error(msg);
                     throw new NucleusUserException(msg);
@@ -138,7 +135,7 @@ public class AbstractResultClassMapper
             }
             else if (fieldNames.length > 1)
             {
-                String msg = LOCALISER.msg("021201", resultClass.getName());
+                String msg = Localiser.msg("021201", resultClass.getName());
                 NucleusLogger.QUERY.error(msg);
                 throw new NucleusUserException(msg);
             }
@@ -185,7 +182,7 @@ public class AbstractResultClassMapper
                         ctr_arg_types[i] = null;
                     }
                 }
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021206",
+                NucleusLogger.QUERY.debug(Localiser.msg("021206",
                     resultClass.getName(), StringUtils.objectArrayToString(ctr_arg_types)));
             }
     

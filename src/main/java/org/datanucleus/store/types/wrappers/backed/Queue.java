@@ -36,6 +36,7 @@ import org.datanucleus.store.scostore.ListStore;
 import org.datanucleus.store.scostore.Store;
 import org.datanucleus.store.types.SCOCollectionIterator;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -135,7 +136,7 @@ public class Queue extends org.datanucleus.store.types.wrappers.Queue implements
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023007", 
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", 
                         ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
                 }
 
@@ -160,7 +161,7 @@ public class Queue extends org.datanucleus.store.types.wrappers.Queue implements
                         }
                         catch (NucleusDataStoreException dse)
                         {
-                            NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "addAll", ownerMmd.getName(), dse));
+                            NucleusLogger.PERSISTENCE.warn(Localiser.msg("023013", "addAll", ownerMmd.getName(), dse));
                         }
                     }
                 }
@@ -171,7 +172,7 @@ public class Queue extends org.datanucleus.store.types.wrappers.Queue implements
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023008", 
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", 
                         ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
                 }
 
@@ -209,7 +210,7 @@ public class Queue extends org.datanucleus.store.types.wrappers.Queue implements
                         }
                         catch (NucleusDataStoreException dse)
                         {
-                            NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "addAll", ownerMmd.getName(), dse));
+                            NucleusLogger.PERSISTENCE.warn(Localiser.msg("023013", "addAll", ownerMmd.getName(), dse));
                         }
                     }
                 }
@@ -220,7 +221,7 @@ public class Queue extends org.datanucleus.store.types.wrappers.Queue implements
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023007", 
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", 
                         ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
                 }
                 delegate.clear();
@@ -284,7 +285,7 @@ public class Queue extends org.datanucleus.store.types.wrappers.Queue implements
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023006", 
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", 
                     ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
@@ -587,7 +588,7 @@ public class Queue extends org.datanucleus.store.types.wrappers.Queue implements
                 }
                 catch (NucleusDataStoreException dse)
                 {
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "add", ownerMmd.getName(), dse));
+                    NucleusLogger.PERSISTENCE.warn(Localiser.msg("023013", "add", ownerMmd.getName(), dse));
                     backingSuccess = false;
                 }
             }
@@ -636,7 +637,7 @@ public class Queue extends org.datanucleus.store.types.wrappers.Queue implements
                 }
                 catch (NucleusDataStoreException dse)
                 {
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "addAll", ownerMmd.getName(), dse));
+                    NucleusLogger.PERSISTENCE.warn(Localiser.msg("023013", "addAll", ownerMmd.getName(), dse));
                     backingSuccess = false;
                 }
             }
@@ -782,7 +783,7 @@ public class Queue extends org.datanucleus.store.types.wrappers.Queue implements
                 }
                 catch (NucleusDataStoreException dse)
                 {
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "remove", ownerMmd.getName(), dse));
+                    NucleusLogger.PERSISTENCE.warn(Localiser.msg("023013", "remove", ownerMmd.getName(), dse));
                     backingSuccess = false;
                 }
             }
@@ -846,7 +847,7 @@ public class Queue extends org.datanucleus.store.types.wrappers.Queue implements
                 }
                 catch (NucleusDataStoreException dse)
                 {
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023013", "removeAll", ownerMmd.getName(), dse));
+                    NucleusLogger.PERSISTENCE.warn(Localiser.msg("023013", "removeAll", ownerMmd.getName(), dse));
                     backingSuccess = false;
                 }
             }

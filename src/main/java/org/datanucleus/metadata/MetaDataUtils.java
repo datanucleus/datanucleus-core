@@ -45,9 +45,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class MetaDataUtils
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     private static MetaDataUtils instance;
 
     /**
@@ -544,7 +541,7 @@ public class MetaDataUtils
             if (implTypes == null)
             {
                 // Generate error since no implementations available
-                throw new InvalidMemberMetaDataException(LOCALISER, "044161", fmd.getClassName(), fmd.getName(), type);
+                throw new InvalidMemberMetaDataException("044161", fmd.getClassName(), fmd.getName(), type);
             }
         }
 
@@ -803,7 +800,7 @@ public class MetaDataUtils
                     }
                     catch (Exception e)
                     {
-                        msg = LOCALISER.msg(false, "014013", inputFiles[i]);
+                        msg = Localiser.msg("014013", inputFiles[i]);
                         NucleusLogger.METADATA.error(msg);
                         throw new NucleusUserException(msg);
                     }
@@ -855,7 +852,7 @@ public class MetaDataUtils
         catch (Exception e)
         {
             // Error reading input files
-            msg = LOCALISER.msg(false, "014014", e.getMessage());
+            msg = Localiser.msg("014014", e.getMessage());
             NucleusLogger.METADATA.error(msg, e);
             throw new NucleusUserException(msg, e);
         }

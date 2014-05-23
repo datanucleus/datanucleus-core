@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
 
 /**
  * Class to handle the conversion between java.util.Date and a String form.
@@ -65,7 +66,7 @@ public class DateStringConverter implements TypeConverter<Date, String>
         }
         catch (ParseException pe)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("016002", str, Date.class.getName()), pe);
+            throw new NucleusDataStoreException(Localiser.msg("016002", str, Date.class.getName()), pe);
         }
     }
 

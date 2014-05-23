@@ -37,10 +37,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class ValueGenerationManager
 {
-    /** Localisation of messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Map of ValueGenerator keyed by the symbolic name. */
     protected Map<String, ValueGenerator> generatorsByName = new HashMap();
 
@@ -92,7 +88,7 @@ public class ValueGenerationManager
         {
             if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
             {
-                NucleusLogger.VALUEGENERATION.debug(LOCALISER.msg("040001", generatorClass.getName(), name));
+                NucleusLogger.VALUEGENERATION.debug(Localiser.msg("040001", generatorClass.getName(), name));
             }
             Class[] argTypes = new Class[] {String.class, Properties.class};
             Object[] args = new Object[] {name, props};
@@ -102,7 +98,7 @@ public class ValueGenerationManager
         catch (Exception e)
         {
             NucleusLogger.VALUEGENERATION.error(e);
-            throw new ValueGenerationException(LOCALISER.msg("040000", generatorClass.getName(),e),e);
+            throw new ValueGenerationException(Localiser.msg("040000", generatorClass.getName(),e),e);
         }
 
         if (generator instanceof AbstractDatastoreGenerator && storeMgr != null)

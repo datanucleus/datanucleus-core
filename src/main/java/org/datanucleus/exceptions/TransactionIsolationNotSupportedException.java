@@ -24,15 +24,12 @@ import org.datanucleus.util.Localiser;
  */
 public class TransactionIsolationNotSupportedException extends NucleusUserException
 {
-    private static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructs a transaction already active exception with the specified detail message.
      * @param level Isolation level
      */
     public TransactionIsolationNotSupportedException(String level)
     {
-        super(LOCALISER.msg("015043", level));
+        super(Localiser.msg("015043", level));
     }
 }

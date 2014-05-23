@@ -39,9 +39,6 @@ import org.datanucleus.util.Localiser;
  */
 public class EnhancerMethodAdapter extends MethodVisitor
 {
-    /** Localisation of messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", ClassEnhancer.class.getClassLoader());
-
     /** The enhancer for this class. */
     protected ClassEnhancer enhancer;
 
@@ -111,7 +108,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
                         mv.visitMethodInsn(Opcodes.INVOKESTATIC, fieldOwner, enhancer.getNamer().getGetMethodPrefixMethodName() + name, "(L" + fieldOwner + ";)" + desc);
                         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
                         {
-                            DataNucleusEnhancer.LOGGER.debug(LOCALISER.msg("Enhancer.EnhanceOriginalMethodField",
+                            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.EnhanceOriginalMethodField",
                                 enhancer.getClassName() + "." + methodName, (fmd.getClassName(true) + "." + name), 
                                 enhancer.getNamer().getGetMethodPrefixMethodName() + name + "()"));
                         }
@@ -123,7 +120,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
                         mv.visitMethodInsn(Opcodes.INVOKESTATIC, fieldOwner, enhancer.getNamer().getSetMethodPrefixMethodName() + name, "(L" + fieldOwner + ";" + desc + ")V");
                         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
                         {
-                            DataNucleusEnhancer.LOGGER.debug(LOCALISER.msg("Enhancer.EnhanceOriginalMethodField",
+                            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.EnhanceOriginalMethodField",
                                 enhancer.getClassName() + "." + methodName, (fmd.getClassName(true) + "." + name),
                                 enhancer.getNamer().getSetMethodPrefixMethodName() + name + "()"));
                         }
@@ -133,7 +130,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
             }
             else
             {
-                DataNucleusEnhancer.LOGGER.debug(LOCALISER.msg("Enhancer.EnhanceOriginalMethodFieldOmit",
+                DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.EnhanceOriginalMethodFieldOmit",
                     enhancer.getClassName() + "." + methodName, (opcode == Opcodes.GETFIELD ? "get" : "set"), (ownerName + "." + name)));
             }
         }

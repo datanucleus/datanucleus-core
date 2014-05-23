@@ -28,10 +28,6 @@ import org.datanucleus.util.Localiser;
  */
 public abstract class AbstractExtent<T> implements org.datanucleus.store.Extent<T>
 {
-    /** Localised messages source */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** ExecutionContext */
     protected final ExecutionContext ec;
 
@@ -55,14 +51,14 @@ public abstract class AbstractExtent<T> implements org.datanucleus.store.Extent<
     {
         if (cls == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("033000")).setFatal();
+            throw new NucleusUserException(Localiser.msg("033000")).setFatal();
         }
 
         // Find the MetaData for this class
         this.cmd = cmd;
         if (cmd == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("033001", cls.getName())).setFatal();
+            throw new NucleusUserException(Localiser.msg("033001", cls.getName())).setFatal();
         }
 
         this.ec = ec;
@@ -103,6 +99,6 @@ public abstract class AbstractExtent<T> implements org.datanucleus.store.Extent<
      */
     public String toString()
     {
-        return LOCALISER.msg("033002", candidateClass.getName(), "" + subclasses);
+        return Localiser.msg("033002", candidateClass.getName(), "" + subclasses);
     }
 }

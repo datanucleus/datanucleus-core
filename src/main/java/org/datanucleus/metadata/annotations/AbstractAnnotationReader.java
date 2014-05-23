@@ -51,10 +51,6 @@ import org.datanucleus.util.Localiser;
  */
 public abstract class AbstractAnnotationReader implements AnnotationReader
 {
-    /** Localiser for messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Manager for MetaData operations */
     protected MetaDataManager mgr;
 
@@ -451,7 +447,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                 catch (Exception ex)
                 {
                     // Error in annotation specification so log a warning
-                    NucleusLogger.METADATA.warn(LOCALISER.msg("044201", clsName, 
+                    NucleusLogger.METADATA.warn(Localiser.msg("044201", clsName, 
                         annotations[i].annotationType().getName(), annMethods[j].getName()));
                 }
             }

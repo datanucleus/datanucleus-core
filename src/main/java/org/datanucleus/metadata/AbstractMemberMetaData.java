@@ -39,6 +39,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -360,7 +361,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
         if (name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("044041","name", getClassName(true), "field"));
+            throw new NucleusUserException(Localiser.msg("044041","name", getClassName(true), "field"));
         }
         if (name.indexOf('.') >= 0)
         {
@@ -423,14 +424,14 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
         if (field == null && method == null)
         {
-            NucleusLogger.METADATA.error(LOCALISER.msg("044106", getClassName(), getName()));
-            throw new InvalidMemberMetaDataException(LOCALISER, "044106", getClassName(), getName());
+            NucleusLogger.METADATA.error(Localiser.msg("044106", getClassName(), getName()));
+            throw new InvalidMemberMetaDataException("044106", getClassName(), getName());
         }
 
         // No class loader, so use System
         if (clr == null)
         {
-            NucleusLogger.METADATA.warn(LOCALISER.msg("044067",name,getClassName(true)));
+            NucleusLogger.METADATA.warn(Localiser.msg("044067",name,getClassName(true)));
             clr = mmgr.getNucleusContext().getClassLoaderResolver(null);
         }
 
@@ -482,8 +483,8 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 }
                 catch (ClassNotResolvedException cnre2)
                 {
-                    NucleusLogger.METADATA.error(LOCALISER.msg("044113", getClassName(), getName(), className));
-                    NucleusException ne = new InvalidMemberMetaDataException(LOCALISER, "044113", getClassName(), getName(), className);
+                    NucleusLogger.METADATA.error(Localiser.msg("044113", getClassName(), getName(), className));
+                    NucleusException ne = new InvalidMemberMetaDataException("044113", getClassName(), getName(), className);
                     ne.setNestedException(cnre);
                     throw ne;
                 }
@@ -491,8 +492,8 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             if (fieldClass != null && !fieldClass.isAssignableFrom(thisClass))
             {
                 // TODO We could also check if persistable, but won't work when enhancing
-                NucleusLogger.METADATA.error(LOCALISER.msg("044114", getClassName(), getName(), className));
-                throw new InvalidMemberMetaDataException(LOCALISER, "044114", getClassName(), getName(), className);
+                NucleusLogger.METADATA.error(Localiser.msg("044114", getClassName(), getName(), className));
+                throw new InvalidMemberMetaDataException("044114", getClassName(), getName(), className);
             }
         }
 
@@ -605,10 +606,8 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         {
             if (defaultFetchGroup == Boolean.TRUE || primaryKey == Boolean.TRUE)
             {
-                NucleusLogger.GENERAL.info(">> Reporting exception with class=" + getClassName() + " name=" + name +
-                    " type=" + type);
-                throw new InvalidMemberMetaDataException(LOCALISER, "044109", getClassName(), name,
-                    this.getType().getName(), persistenceModifier.toString());
+                NucleusLogger.GENERAL.info(">> Reporting exception with class=" + getClassName() + " name=" + name + " type=" + type);
+                throw new InvalidMemberMetaDataException("044109", getClassName(), name, this.getType().getName(), persistenceModifier.toString());
             }
         }
 
@@ -686,7 +685,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                         CollectionMetaData collmd = new CollectionMetaData();
                         collmd.setElementType(Object.class.getName());
                         setContainer(collmd);
-                        NucleusLogger.METADATA.debug(LOCALISER.msg("044003", getClassName(), getName()));
+                        NucleusLogger.METADATA.debug(Localiser.msg("044003", getClassName(), getName()));
                     }
                 }
             }
@@ -743,7 +742,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                         mapmd.setKeyType(keyType);
                         mapmd.setValueType(valueType);
                         setContainer(mapmd);
-                        NucleusLogger.METADATA.debug(LOCALISER.msg("044004", getClassName(), getName()));
+                        NucleusLogger.METADATA.debug(Localiser.msg("044004", getClassName(), getName()));
                     }
                 }
             }
@@ -851,10 +850,8 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         if (this.containerMetaData != null && this.dependent != null)
         {
             // Check for invalid dependent field specifications
-            NucleusLogger.METADATA.error(LOCALISER.msg("044110",
-                getClassName(), getName(), ((ClassMetaData)this.parent).getName()));            
-            throw new InvalidMemberMetaDataException(LOCALISER, "044110", getClassName(), getName(),
-                ((ClassMetaData)this.parent).getName());
+            NucleusLogger.METADATA.error(Localiser.msg("044110", getClassName(), getName(), ((ClassMetaData)this.parent).getName()));            
+            throw new InvalidMemberMetaDataException("044110", getClassName(), getName(), ((ClassMetaData)this.parent).getName());
         }
 
         if (elementMetaData != null)
@@ -989,8 +986,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                     catch (ClassNotResolvedException cnre2)
                     {
                         // Implementation type not found
-                        throw new InvalidMemberMetaDataException(LOCALISER, "044116", getClassName(), getName(),
-                            implTypes[i]);
+                        throw new InvalidMemberMetaDataException("044116", getClassName(), getName(), implTypes[i]);
                     }
                 }
             }
@@ -2321,7 +2317,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             {
                 if (persistenceModifier == FieldPersistenceModifier.PERSISTENT)
                 {
-                    throw new InvalidMetaDataException(LOCALISER, "044118", getClassName(), getName());
+                    throw new InvalidMetaDataException("044118", getClassName(), getName());
                 }
                 return false;
             }
@@ -2833,7 +2829,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 AbstractMemberMetaData otherMmd = otherCmd.getMetaDataForMember(mappedBy);
                 if (otherMmd == null)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("044115", 
+                    throw new NucleusUserException(Localiser.msg("044115", 
                         getAbstractClassMetaData().getFullClassName(), name, mappedBy, otherCmd.getFullClassName())).setFatal();
                 }
 
@@ -3216,8 +3212,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             else
             {
                 // Invalid value
-                throw new InvalidMetaDataException(LOCALISER, "044002", "is-second-class",
-                    "true/false/default", isSecondClass);
+                throw new InvalidMetaDataException("044002", "is-second-class", "true/false/default", isSecondClass);
             }
         }
         else

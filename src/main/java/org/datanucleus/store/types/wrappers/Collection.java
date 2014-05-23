@@ -39,9 +39,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class Collection extends AbstractCollection implements SCOCollection, SCOMtoN, Cloneable, java.io.Serializable
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
 
@@ -78,7 +75,7 @@ public class Collection extends AbstractCollection implements SCOCollection, SCO
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023003", 
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", 
                 ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
                 SCOUtils.getSCOWrapperOptionsMessage(true, false, true, false)));
         }
@@ -92,7 +89,7 @@ public class Collection extends AbstractCollection implements SCOCollection, SCO
         delegate = new java.util.HashSet();
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023003", 
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", 
                 ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
                 SCOUtils.getSCOWrapperOptionsMessage(true, false, true, false)));
         }

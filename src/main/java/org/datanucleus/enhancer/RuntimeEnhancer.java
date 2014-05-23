@@ -27,13 +27,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.ClassMetaData;
-import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -41,10 +39,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class RuntimeEnhancer
 {
-    /** Message resource */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     private final ClassLoaderResolver clr;
 
     private final NucleusContext nucleusContext;

@@ -20,6 +20,7 @@ package org.datanucleus.store.valuegenerator;
 
 import java.util.Properties;
 
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -62,7 +63,7 @@ public abstract class AbstractUIDGenerator extends AbstractGenerator<String>
         }
         if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
         {
-            NucleusLogger.VALUEGENERATION.debug(LOCALISER.msg("040004", "" + size));
+            NucleusLogger.VALUEGENERATION.debug(Localiser.msg("040004", "" + size));
         }
         return new ValueGenerationBlock(ids);
     }

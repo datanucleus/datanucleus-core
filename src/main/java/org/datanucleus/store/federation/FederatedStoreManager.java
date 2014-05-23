@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.NucleusContext;
@@ -53,7 +52,6 @@ import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.store.schema.naming.NamingFactory;
 import org.datanucleus.store.valuegenerator.ValueGenerationManager;
-import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -74,10 +72,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class FederatedStoreManager implements StoreManager
 {
-    /** Localisation of messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     public static final String PROPERTY_DATA_FEDERATION_DATASTORE_NAME = "DATA_FEDERATION_DATASTORE_NAME";
 
     /** Primary StoreManager. */

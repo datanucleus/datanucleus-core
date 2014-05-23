@@ -21,6 +21,7 @@ import java.util.Date;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.expression.InvokeExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Evaluator for the method "{dateExpr}.getTime()".
@@ -40,7 +41,7 @@ public class DateGetTimeMethod implements InvocationEvaluator
         }
         if (!(invokedValue instanceof Date))
         {
-            throw new NucleusException(eval.getLocaliser().msg("021011", method, invokedValue.getClass().getName()));
+            throw new NucleusException(Localiser.msg("021011", method, invokedValue.getClass().getName()));
         }
 
         return Long.valueOf(((Date)invokedValue).getTime());

@@ -50,10 +50,6 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class JavaQueryEvaluator
 {
-    /** Localisation utility for output messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Name under which any set of results are stored in the state map. Used for aggregation. */
     public static final String RESULTS_SET = "DATANUCLEUS_RESULTS_SET";
 
@@ -200,7 +196,7 @@ public abstract class JavaQueryEvaluator
             // Process any filter constraints
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021012", "filter", language, filter));
+                NucleusLogger.QUERY.debug(Localiser.msg("021012", "filter", language, filter));
             }
             resultSet = handleFilter(resultSet);
         }
@@ -211,7 +207,7 @@ public abstract class JavaQueryEvaluator
             // Process any ordering constraints
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021012", "ordering", language, 
+                NucleusLogger.QUERY.debug(Localiser.msg("021012", "ordering", language, 
                     StringUtils.objectArrayToString(ordering)));
             }
             resultSet = ordering(resultSet);
@@ -232,7 +228,7 @@ public abstract class JavaQueryEvaluator
             }
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021012", "range", language, "" + fromIncl + "," + toExcl));
+                NucleusLogger.QUERY.debug(Localiser.msg("021012", "range", language, "" + fromIncl + "," + toExcl));
             }
             resultSet = handleRange(resultSet, fromIncl, toExcl);
         }
@@ -242,7 +238,7 @@ public abstract class JavaQueryEvaluator
             // Process any result/grouping/having constraints
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021012", "result", language,
+                NucleusLogger.QUERY.debug(Localiser.msg("021012", "result", language,
                     StringUtils.objectArrayToString(result)));
             }
 
@@ -284,7 +280,7 @@ public abstract class JavaQueryEvaluator
             // Process any result class constraints
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021012", "resultClass", language, query.getResultClass().getName()));
+                NucleusLogger.QUERY.debug(Localiser.msg("021012", "resultClass", language, query.getResultClass().getName()));
             }
             if (result != null && !(result[0] instanceof CreatorExpression))
             {
@@ -331,7 +327,7 @@ public abstract class JavaQueryEvaluator
             {
                 if (NucleusLogger.QUERY.isDebugEnabled())
                 {
-                    NucleusLogger.QUERY.debug(LOCALISER.msg("021023", StringUtils.toJVMIDString(obj)));
+                    NucleusLogger.QUERY.debug(Localiser.msg("021023", StringUtils.toJVMIDString(obj)));
                 }
                 result.add(obj);
             }
@@ -357,7 +353,7 @@ public abstract class JavaQueryEvaluator
         {
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021024", vnse.getVariableExpression().getId(),
+                NucleusLogger.QUERY.debug(Localiser.msg("021024", vnse.getVariableExpression().getId(),
                     StringUtils.objectArrayToString(vnse.getValues())));
             }
 
@@ -370,7 +366,7 @@ public abstract class JavaQueryEvaluator
                 eval.setVariableValue(vnse.getVariableExpression().getId(), null);
                 if (NucleusLogger.QUERY.isDebugEnabled())
                 {
-                    NucleusLogger.QUERY.debug(LOCALISER.msg("021025", vnse.getVariableExpression().getId(), "(null)"));
+                    NucleusLogger.QUERY.debug(Localiser.msg("021025", vnse.getVariableExpression().getId(), "(null)"));
                 }
                 if (Boolean.TRUE.equals(evaluateBooleanExpression(expr, eval)))
                 {
@@ -385,7 +381,7 @@ public abstract class JavaQueryEvaluator
                     eval.setVariableValue(vnse.getVariableExpression().getId(), vnse.getValues()[i]);
                     if (NucleusLogger.QUERY.isDebugEnabled())
                     {
-                        NucleusLogger.QUERY.debug(LOCALISER.msg("021025", vnse.getVariableExpression().getId(),
+                        NucleusLogger.QUERY.debug(Localiser.msg("021025", vnse.getVariableExpression().getId(),
                             vnse.getValues()[i]));
                     }
                     if (Boolean.TRUE.equals(evaluateBooleanExpression(expr, eval)))
@@ -398,7 +394,7 @@ public abstract class JavaQueryEvaluator
             // No variable value was successful so return FALSE
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021026", vnse.getVariableExpression().getId()));
+                NucleusLogger.QUERY.debug(Localiser.msg("021026", vnse.getVariableExpression().getId()));
             }
             eval.removeVariableValue(vnse.getVariableExpression().getId());
             return Boolean.FALSE;

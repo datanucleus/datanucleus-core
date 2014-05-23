@@ -64,10 +64,6 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class JavaQueryCompiler implements SymbolResolver
 {
-    /** Localisation utility for output messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     protected JavaQueryCompiler parentCompiler;
     protected Map<Object, String> parameterSubtitutionMap;
     protected int parameterSubstitutionNumber = 0;
@@ -691,7 +687,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                 String id = ((PrimaryExpression)expr[i]).getId();
                 if (isKeyword(id))
                 {
-                    throw new NucleusUserException(LOCALISER.msg("021052", getLanguage(), id));
+                    throw new NucleusUserException(Localiser.msg("021052", getLanguage(), id));
                 }
             }
             else if (expr[i] instanceof ParameterExpression)
@@ -699,7 +695,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                 String id = ((ParameterExpression)expr[i]).getId();
                 if (isKeyword(id))
                 {
-                    throw new NucleusUserException(LOCALISER.msg("021052", getLanguage(), id));
+                    throw new NucleusUserException(Localiser.msg("021052", getLanguage(), id));
                 }
             }
             else if (expr[i] instanceof VariableExpression)
@@ -707,7 +703,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                 String id = ((VariableExpression)expr[i]).getId();
                 if (isKeyword(id))
                 {
-                    throw new NucleusUserException(LOCALISER.msg("021052", getLanguage(), id));
+                    throw new NucleusUserException(Localiser.msg("021052", getLanguage(), id));
                 }
             }
         }
@@ -781,7 +777,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
             String varName = (String) node[i][1].getNodeValue();
             if (isKeyword(varName) || varName.equals(candidateAlias))
             {
-                throw new NucleusUserException(LOCALISER.msg("021052", getLanguage(), varName));
+                throw new NucleusUserException(Localiser.msg("021052", getLanguage(), varName));
             }
             Symbol varSym = symtbl.getSymbol(varName);
             Class nodeCls = resolveClass(node[i][0].getNodeChildId());
@@ -815,7 +811,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
             String paramName = (String) node[i][1].getNodeValue();
             if (isKeyword(paramName) || paramName.equals(candidateAlias))
             {
-                throw new NucleusUserException(LOCALISER.msg("021052", getLanguage(), paramName));
+                throw new NucleusUserException(Localiser.msg("021052", getLanguage(), paramName));
             }
 
             Symbol paramSym = symtbl.getSymbol(paramName);

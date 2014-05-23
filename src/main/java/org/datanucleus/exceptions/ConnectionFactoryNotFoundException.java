@@ -27,9 +27,6 @@ import org.datanucleus.util.Localiser;
  */
 public class ConnectionFactoryNotFoundException extends NucleusUserException
 {
-    private static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructs a connection factory not found exception.
      * @param name The JNDI name that was not found.
@@ -37,6 +34,6 @@ public class ConnectionFactoryNotFoundException extends NucleusUserException
      */
     public ConnectionFactoryNotFoundException(String name,Exception nested)
     {
-        super(LOCALISER.msg("009002", name), nested);
+        super(Localiser.msg("009002", name), nested);
     }
 }

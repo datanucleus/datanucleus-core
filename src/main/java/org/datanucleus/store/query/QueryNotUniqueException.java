@@ -27,14 +27,11 @@ import org.datanucleus.util.Localiser;
  */
 public class QueryNotUniqueException extends NucleusUserException
 {
-    protected static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructs the exception, populating the correct message.
      */
     public QueryNotUniqueException()
     {
-        super(LOCALISER.msg("021001"));
+        super(Localiser.msg("021001"));
     }
 }

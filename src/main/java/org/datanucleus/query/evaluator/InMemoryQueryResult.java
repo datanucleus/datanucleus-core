@@ -34,10 +34,6 @@ import org.datanucleus.util.Localiser;
  */
 public class InMemoryQueryResult extends AbstractList implements QueryResult, Serializable
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     ApiAdapter api;
 
     List results = null;
@@ -259,17 +255,17 @@ public class InMemoryQueryResult extends AbstractList implements QueryResult, Se
 
         public void remove()
         {
-            throw new UnsupportedOperationException(LOCALISER.msg("052604"));
+            throw new UnsupportedOperationException(Localiser.msg("052604"));
         }
 
         public void set(Object e)
         {
-            throw new UnsupportedOperationException(LOCALISER.msg("052604"));
+            throw new UnsupportedOperationException(Localiser.msg("052604"));
         }
 
         public void add(Object e)
         {
-            throw new UnsupportedOperationException(LOCALISER.msg("052604"));
+            throw new UnsupportedOperationException(Localiser.msg("052604"));
         }
     }
 
@@ -280,7 +276,7 @@ public class InMemoryQueryResult extends AbstractList implements QueryResult, Se
     {
         if (closed)
         {
-            String msg = LOCALISER.msg("052600");
+            String msg = Localiser.msg("052600");
             throw api.getUserExceptionForException(msg, null);
         }
     }
@@ -291,7 +287,7 @@ public class InMemoryQueryResult extends AbstractList implements QueryResult, Se
     @Override
     public boolean addAll(int index, Collection c)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052604"));
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
     }
 
     /* (non-Javadoc)
@@ -300,7 +296,7 @@ public class InMemoryQueryResult extends AbstractList implements QueryResult, Se
     @Override
     public boolean addAll(Collection c)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052604"));
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
     }
 
     /* (non-Javadoc)
@@ -309,7 +305,7 @@ public class InMemoryQueryResult extends AbstractList implements QueryResult, Se
     @Override
     public boolean add(Object e)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052604"));
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
     }
 
     /* (non-Javadoc)
@@ -318,7 +314,7 @@ public class InMemoryQueryResult extends AbstractList implements QueryResult, Se
     @Override
     public void add(int index, Object element)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052604"));
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
     }
 
     /* (non-Javadoc)
@@ -327,7 +323,7 @@ public class InMemoryQueryResult extends AbstractList implements QueryResult, Se
     @Override
     public void clear()
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052604"));
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
     }
 
     /* (non-Javadoc)
@@ -336,7 +332,7 @@ public class InMemoryQueryResult extends AbstractList implements QueryResult, Se
     @Override
     public Object remove(int index)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052604"));
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
     }
 
     /* (non-Javadoc)
@@ -345,7 +341,7 @@ public class InMemoryQueryResult extends AbstractList implements QueryResult, Se
     @Override
     public boolean remove(Object o)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052604"));
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
     }
 
     /* (non-Javadoc)
@@ -354,7 +350,7 @@ public class InMemoryQueryResult extends AbstractList implements QueryResult, Se
     @Override
     public boolean removeAll(Collection c)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052604"));
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
     }
 
     /* (non-Javadoc)
@@ -363,7 +359,7 @@ public class InMemoryQueryResult extends AbstractList implements QueryResult, Se
     @Override
     public boolean retainAll(Collection c)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052604"));
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
     }
 
     /* (non-Javadoc)
@@ -372,6 +368,6 @@ public class InMemoryQueryResult extends AbstractList implements QueryResult, Se
     @Override
     public Object set(int index, Object element)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052604"));
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
     }
 }

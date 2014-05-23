@@ -109,7 +109,7 @@ public class JoinMetaData extends MetaData implements ColumnMetaDataContainer
             // "table" has been specified but this join is within <field> or <property> so is not applicable
             //TODO fix message for property and field
             AbstractMemberMetaData mmd = (AbstractMemberMetaData) parent;
-            throw new InvalidMemberMetaDataException(LOCALISER, "044130", mmd.getClassName(), mmd.getFullFieldName());
+            throw new InvalidMemberMetaDataException("044130", mmd.getClassName(), mmd.getFullFieldName());
         }
 
         // Interpret the "indexed" value to create our IndexMetaData where it wasn't specified that way

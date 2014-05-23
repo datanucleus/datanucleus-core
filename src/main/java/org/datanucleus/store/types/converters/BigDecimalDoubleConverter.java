@@ -20,6 +20,7 @@ package org.datanucleus.store.types.converters;
 import java.math.BigDecimal;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
 
 /**
  * Class to handle the conversion between java.math.BigDecimal and a Double form.
@@ -39,7 +40,7 @@ public class BigDecimalDoubleConverter implements TypeConverter<BigDecimal, Doub
         }
         catch (NumberFormatException nfe)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("016002", val, BigDecimal.class.getName()), nfe);
+            throw new NucleusDataStoreException(Localiser.msg("016002", val, BigDecimal.class.getName()), nfe);
         }
     }
 

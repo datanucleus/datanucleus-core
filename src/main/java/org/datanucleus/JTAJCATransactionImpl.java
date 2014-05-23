@@ -26,6 +26,7 @@ import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
 import org.datanucleus.transaction.NucleusTransactionException;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -103,7 +104,7 @@ public class JTAJCATransactionImpl extends TransactionImpl implements Synchroniz
                 jtaTM = ec.getNucleusContext().getJtaTransactionManager();
                 if (jtaTM == null)
                 {
-                    throw new NucleusTransactionException(LOCALISER.msg("015030"));
+                    throw new NucleusTransactionException(Localiser.msg("015030"));
                 }
             }
             jtaTx = jtaTM.getTransaction();
@@ -141,7 +142,7 @@ public class JTAJCATransactionImpl extends TransactionImpl implements Synchroniz
         }
         catch (SystemException se)
         {
-            throw new NucleusTransactionException(LOCALISER.msg("015026"), se);
+            throw new NucleusTransactionException(Localiser.msg("015026"), se);
         }
         catch (RollbackException e)
         {

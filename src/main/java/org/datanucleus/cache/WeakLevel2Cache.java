@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.datanucleus.ClassConstants;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
@@ -54,10 +53,6 @@ import org.datanucleus.util.WeakValueMap;
  */
 public class WeakLevel2Cache implements Level2Cache
 {
-    /** Localiser for messages */
-    private static Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Collection of pinned classes whose objects should be pinned if they ever reach the cache. */
     protected Collection<PinnedClass> pinnedClasses;
 
@@ -510,7 +505,7 @@ public class WeakLevel2Cache implements Level2Cache
     {
         if (oid == null || pc == null)
         {
-            NucleusLogger.CACHE.warn(LOCALISER.msg("004011"));
+            NucleusLogger.CACHE.warn(Localiser.msg("004011"));
             return null;
         }
         else if (maxSize >= 0 && getSize() == maxSize)

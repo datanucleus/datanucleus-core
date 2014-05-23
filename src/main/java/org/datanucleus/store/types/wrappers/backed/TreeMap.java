@@ -38,6 +38,7 @@ import org.datanucleus.store.BackedSCOStoreManager;
 import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.store.scostore.Store;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -140,7 +141,7 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023007", 
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", 
                         ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
                 }
 
@@ -172,7 +173,7 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023008", 
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", 
                         ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
                 }
 
@@ -218,7 +219,7 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023007", 
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", 
                         ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
                 }
                 delegate.clear();
@@ -280,7 +281,7 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023006", 
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", 
                     ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();

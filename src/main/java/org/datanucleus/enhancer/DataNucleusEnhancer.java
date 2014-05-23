@@ -71,9 +71,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class DataNucleusEnhancer
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", ClassEnhancer.class.getClassLoader());
-
     /** Logger for enhancing. */
     public static final NucleusLogger LOGGER = NucleusLogger.getLoggerInstance("DataNucleus.Enhancer");
 
@@ -346,7 +343,7 @@ public class DataNucleusEnhancer
                 String msg = null;
                 if (!StringUtils.getFileForFilename(classNames[i]).exists())
                 {
-                    msg = LOCALISER.msg("Enhancer.InputFiles.Invalid", classNames[i]);
+                    msg = Localiser.msg("Enhancer.InputFiles.Invalid", classNames[i]);
                     addMessage(msg, true);
                     name = null;
                 }
@@ -533,12 +530,12 @@ public class DataNucleusEnhancer
         String msg = null;
         if (verbose)
         {
-            msg = LOCALISER.msg("Enhancer.Success", classNames.size(), "" + (inputTime-startTime),
+            msg = Localiser.msg("Enhancer.Success", classNames.size(), "" + (inputTime-startTime),
                 "" + (enhanceTime-inputTime), "" + (enhanceTime-startTime));
         }
         else
         {
-            msg = LOCALISER.msg("Enhancer.Success.Simple", classNames.size());
+            msg = Localiser.msg("Enhancer.Success.Simple", classNames.size());
         }
         addMessage(msg, false);
 
@@ -601,12 +598,12 @@ public class DataNucleusEnhancer
         String msg = null;
         if (verbose)
         {
-            msg = LOCALISER.msg("Enhancer.Success", classNames.size(), "" + (inputTime-startTime),
+            msg = Localiser.msg("Enhancer.Success", classNames.size(), "" + (inputTime-startTime),
                 "" + (enhanceTime-inputTime), "" + (enhanceTime-startTime));
         }
         else
         {
-            msg = LOCALISER.msg("Enhancer.Success.Simple", classNames.size());
+            msg = Localiser.msg("Enhancer.Success.Simple", classNames.size());
         }
         addMessage(msg, false);
 
@@ -676,7 +673,7 @@ public class DataNucleusEnhancer
                         String classFilename = (String)comp.getValue();
                         if (!StringUtils.getFileForFilename(classFilename).exists())
                         {
-                            String msg = LOCALISER.msg("Enhancer.InputFiles.Invalid", classFilename);
+                            String msg = Localiser.msg("Enhancer.InputFiles.Invalid", classFilename);
                             addMessage(msg, true);
                         }
                         else
@@ -698,7 +695,7 @@ public class DataNucleusEnhancer
                             String className = null;
                             if (!StringUtils.getFileForFilename(classFilenames[i]).exists())
                             {
-                                String msg = LOCALISER.msg("Enhancer.InputFiles.Invalid", classFilenames[i]);
+                                String msg = Localiser.msg("Enhancer.InputFiles.Invalid", classFilenames[i]);
                                 addMessage(msg, true);
                             }
                             else
@@ -762,12 +759,12 @@ public class DataNucleusEnhancer
                     {
                         // No "persistence.xml" files found yet they have specified a persistence-unit name!
                         throw new NucleusEnhanceException(
-                            LOCALISER.msg("Enhancer.PersistenceUnit.NoPersistenceFiles", comp.getValue()));
+                            Localiser.msg("Enhancer.PersistenceUnit.NoPersistenceFiles", comp.getValue()));
                     }
                     if (pumd == null)
                     {
                         throw new NucleusEnhanceException(
-                            LOCALISER.msg("Enhancer.PersistenceUnit.NoSuchUnit", comp.getValue()));
+                            Localiser.msg("Enhancer.PersistenceUnit.NoSuchUnit", comp.getValue()));
                     }
                     filemds = metadataMgr.loadPersistenceUnit(pumd, userClassLoader);
                     break;
@@ -917,7 +914,7 @@ public class DataNucleusEnhancer
         {
             if (LOGGER.isDebugEnabled())
             {
-                LOGGER.debug(LOCALISER.msg("Enhancer.EnhanceClassStart", cmd.getFullClassName()));
+                LOGGER.debug(Localiser.msg("Enhancer.EnhanceClassStart", cmd.getFullClassName()));
             }
             boolean enhanced = enhancer.enhance();
             if (enhanced)
@@ -991,7 +988,7 @@ public class DataNucleusEnhancer
                 addMessage("ERROR (NonPersistent) : " + cmd.getFullClassName(), false);
             }
 
-            String msg = LOCALISER.msg("Enhancer.ErrorEnhancingClass", cmd.getFullClassName(), ioe.getMessage());
+            String msg = Localiser.msg("Enhancer.ErrorEnhancingClass", cmd.getFullClassName(), ioe.getMessage());
             LOGGER.error(msg, ioe);
             System.out.println(msg);
 
@@ -1000,7 +997,7 @@ public class DataNucleusEnhancer
 
         if (LOGGER.isDebugEnabled())
         {
-            LOGGER.debug(LOCALISER.msg("Enhancer.EnhanceClassEnd", cmd.getFullClassName()));
+            LOGGER.debug(Localiser.msg("Enhancer.EnhanceClassEnd", cmd.getFullClassName()));
         }
 
         return success;
@@ -1016,7 +1013,7 @@ public class DataNucleusEnhancer
     {
         if (LOGGER.isDebugEnabled())
         {
-            LOGGER.debug(LOCALISER.msg("Enhancer.ValidateClassStart", cmd.getFullClassName()));
+            LOGGER.debug(Localiser.msg("Enhancer.ValidateClassStart", cmd.getFullClassName()));
         }
 
         boolean enhanced = enhancer.validate();
@@ -1059,7 +1056,7 @@ public class DataNucleusEnhancer
 
         if (LOGGER.isDebugEnabled())
         {
-            LOGGER.debug(LOCALISER.msg("Enhancer.ValidateClassEnd", cmd.getFullClassName()));
+            LOGGER.debug(Localiser.msg("Enhancer.ValidateClassEnd", cmd.getFullClassName()));
         }
 
         return true;
@@ -1146,7 +1143,7 @@ public class DataNucleusEnhancer
         catch (NucleusException ne)
         {
             System.out.println(ne.getMessage());
-            String msg = LOCALISER.msg("Enhancer.Failure");
+            String msg = Localiser.msg("Enhancer.Failure");
             LOGGER.error(msg, ne);
             if (!quiet)
             {
@@ -1157,7 +1154,7 @@ public class DataNucleusEnhancer
 
         if (numClasses == 0)
         {
-            String msg = LOCALISER.msg("Enhancer.NoClassesEnhanced");
+            String msg = Localiser.msg("Enhancer.NoClassesEnhanced");
             LOGGER.info(msg);
             if (!quiet)
             {

@@ -45,155 +45,49 @@ public class InvalidAnnotationException extends NucleusUserException
 
     /**
      * Constructor with message resource and cause exception
-     * @param localiser message resources
      * @param key message resources key
      * @param cause cause exception
      */
-    public InvalidAnnotationException(Localiser localiser, String key,
-        Throwable cause)
+    public InvalidAnnotationException(String key, Throwable cause)
     {
-        this(localiser, key, "", "", "");
+        this(key, "");
         this.cause = cause;
         setFatal();
     }
 
     /**
      * Constructor with message resource, message param and cause exception
-     * @param localiser message resources
      * @param key message resources key
-     * @param param1 message resources param0
+     * @param params parameters
      * @param cause cause exception
      */
-    public InvalidAnnotationException(Localiser localiser, String key,
-        Object param1, Throwable cause)
+    public InvalidAnnotationException(String key, Throwable cause, Object... params)
     {
-        this(localiser, key, param1, "", "");
-        this.cause = cause;
-        setFatal();
-    }
-
-    /**
-     * Constructor with message resource, message params and cause exception
-     * @param localiser message resources
-     * @param key message resources key
-     * @param param1 message resources param0
-     * @param param2 message resources param1
-     * @param cause cause exception
-     */
-    public InvalidAnnotationException(Localiser localiser, String key,
-        Object param1, Object param2, Throwable cause)
-    {
-        this(localiser, key, param1, param2, "");
-        this.cause = cause;
-        setFatal();
-    }
-
-    /**
-     * Constructor with message resource, message params and cause exception
-     * @param localiser message resources
-     * @param key message resources key
-     * @param param1 message resources param0
-     * @param param2 message resources param1
-     * @param param3 message resources param2
-     * @param cause cause exception
-     */
-    public InvalidAnnotationException(Localiser localiser, String key,
-        Object param1, Object param2, Object param3, Throwable cause)
-    {
-        super(localiser.msg(key, param1, param2, param3));
-        this.messageKey = key;
+        this(key, params);
         this.cause = cause;
         setFatal();
     }
 
     /**
      * Constructor with message resource 
-     * @param localiser message resources
      * @param key message resources key
      */
-    public InvalidAnnotationException(Localiser localiser, String key)
+    public InvalidAnnotationException(String key)
     {
-        this(localiser, key, "", "", "");
-        setFatal();
-    }
-
-    /**
-     * Constructor with message resource, message param
-     * @param localiser message resources
-     * @param key message resources key
-     * @param param1 message resources param0
-     */
-    public InvalidAnnotationException(Localiser localiser, String key,
-        Object param1)
-    {
-        this(localiser, key, param1, "", "");
+        this(key, "");
         setFatal();
     }
 
     /**
      * Constructor with message resource, message params
-     * @param localiser message resources
      * @param key message resources key
-     * @param param1 message resources param0
-     * @param param2 message resources param1
+     * @param params parameters to the message
      */
-    public InvalidAnnotationException(Localiser localiser, String key,
-        Object param1, Object param2)
+    public InvalidAnnotationException(String key, Object... params)
     {
-        this(localiser, key, param1, param2, "");
+        super(Localiser.msg(key, params));
         setFatal();
     }
-
-    /**
-     * Constructor with message resource, message params
-     * @param localiser message resources
-     * @param key message resources key
-     * @param param1 message resources param0
-     * @param param2 message resources param1
-     * @param param3 message resources param2
-     */
-    public InvalidAnnotationException(Localiser localiser, String key,
-        Object param1, Object param2, Object param3)
-    {
-        super(localiser.msg(key, param1, param2, param3));
-        this.messageKey = key;
-        setFatal();
-    }
-
-    /**
-     * Constructor with message resource, message params
-     * @param localiser message resources
-     * @param key message resources key
-     * @param param1 message resources param1
-     * @param param2 message resources param2
-     * @param param3 message resources param3
-     * @param param4 message resources param4
-     */
-    public InvalidAnnotationException(Localiser localiser, String key,
-        Object param1, Object param2, Object param3, Object param4)
-    {
-        super(localiser.msg(key, param1, param2, param3, param4));
-        this.messageKey = key;
-        setFatal();
-    }
-    
-    /**
-     * Constructor with message resource, message params
-     * @param localiser message resources
-     * @param key message resources key
-     * @param param1 message resources param1
-     * @param param2 message resources param2
-     * @param param3 message resources param3
-     * @param param4 message resources param4
-     * @param param5 message resources param5
-     */
-    public InvalidAnnotationException(Localiser localiser, String key,
-        Object param1, Object param2, Object param3, Object param4, Object param5)
-    {
-        super(localiser.msg(key, param1, param2, param3, param4, param5));
-        this.messageKey = key;
-        setFatal();
-    }    
 
     /**
      * Return message resource key

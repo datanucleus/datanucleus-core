@@ -56,9 +56,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class QueryManagerImpl implements QueryManager
 {
-    /** Localisation of messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     protected NucleusContext nucleusCtx;
 
     protected StoreManager storeMgr;
@@ -90,7 +87,7 @@ public class QueryManagerImpl implements QueryManager
             if (cacheClassName == null)
             {
                 // Plugin of this name not found
-                throw new NucleusUserException(LOCALISER.msg("021500", cacheType)).setFatal();
+                throw new NucleusUserException(Localiser.msg("021500", cacheType)).setFatal();
             }
 
             try
@@ -101,13 +98,13 @@ public class QueryManagerImpl implements QueryManager
                     new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusCtx});
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
-                    NucleusLogger.CACHE.debug(LOCALISER.msg("021502", cacheClassName));
+                    NucleusLogger.CACHE.debug(Localiser.msg("021502", cacheClassName));
                 }
             }
             catch (Exception e)
             {
                 // Class name for this Query cache plugin is not found!
-                throw new NucleusUserException(LOCALISER.msg("021501", cacheType, cacheClassName), e).setFatal();
+                throw new NucleusUserException(Localiser.msg("021501", cacheType, cacheClassName), e).setFatal();
             }
         }
 
@@ -120,7 +117,7 @@ public class QueryManagerImpl implements QueryManager
             if (cacheClassName == null)
             {
                 // Plugin of this name not found
-                throw new NucleusUserException(LOCALISER.msg("021500", cacheType)).setFatal();
+                throw new NucleusUserException(Localiser.msg("021500", cacheType)).setFatal();
             }
 
             try
@@ -132,13 +129,13 @@ public class QueryManagerImpl implements QueryManager
                     new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusCtx});
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
-                    NucleusLogger.CACHE.debug(LOCALISER.msg("021502", cacheClassName));
+                    NucleusLogger.CACHE.debug(Localiser.msg("021502", cacheClassName));
                 }
             }
             catch (Exception e)
             {
                 // Class name for this Query cache plugin is not found!
-                throw new NucleusUserException(LOCALISER.msg("021501", cacheType, cacheClassName), e).setFatal();
+                throw new NucleusUserException(Localiser.msg("021501", cacheType, cacheClassName), e).setFatal();
             }
         }
 
@@ -151,7 +148,7 @@ public class QueryManagerImpl implements QueryManager
             if (cacheClassName == null)
             {
                 // Plugin of this name not found
-                throw new NucleusUserException(LOCALISER.msg("021500", cacheType)).setFatal();
+                throw new NucleusUserException(Localiser.msg("021500", cacheType)).setFatal();
             }
 
             try
@@ -163,13 +160,13 @@ public class QueryManagerImpl implements QueryManager
                     new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusCtx});
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
-                    NucleusLogger.CACHE.debug(LOCALISER.msg("021502", cacheClassName));
+                    NucleusLogger.CACHE.debug(Localiser.msg("021502", cacheClassName));
                 }
             }
             catch (Exception e)
             {
                 // Class name for this Query cache plugin is not found!
-                throw new NucleusUserException(LOCALISER.msg("021501", cacheType, cacheClassName), e).setFatal();
+                throw new NucleusUserException(Localiser.msg("021501", cacheType, cacheClassName), e).setFatal();
             }
         }
     }
@@ -227,7 +224,7 @@ public class QueryManagerImpl implements QueryManager
                 if (q == null)
                 {
                     // No query support for this language
-                    throw new NucleusException(LOCALISER.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
+                    throw new NucleusException(Localiser.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
                 }
                 return q;
             }
@@ -246,7 +243,7 @@ public class QueryManagerImpl implements QueryManager
                     if (q == null)
                     {
                         // No query support for this language
-                        throw new NucleusException(LOCALISER.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
+                        throw new NucleusException(Localiser.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
                     }
                 }
                 else if (query instanceof Query)
@@ -261,7 +258,7 @@ public class QueryManagerImpl implements QueryManager
                     if (q == null)
                     {
                         // No query support for this language
-                        throw new NucleusException(LOCALISER.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
+                        throw new NucleusException(Localiser.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
                     }
                 }
                 else
@@ -276,7 +273,7 @@ public class QueryManagerImpl implements QueryManager
                     if (q == null)
                     {
                         // No query support for this language
-                        throw new NucleusException(LOCALISER.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
+                        throw new NucleusException(Localiser.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
                     }
                 }
                 return q;
@@ -340,7 +337,7 @@ public class QueryManagerImpl implements QueryManager
             {
                 if (NucleusLogger.QUERY.isDebugEnabled())
                 {
-                    NucleusLogger.QUERY.debug(LOCALISER.msg("021079", query, language));
+                    NucleusLogger.QUERY.debug(Localiser.msg("021079", query, language));
                 }
                 return compilation;
             }
@@ -398,7 +395,7 @@ public class QueryManagerImpl implements QueryManager
             {
                 if (NucleusLogger.QUERY.isDebugEnabled())
                 {
-                    NucleusLogger.QUERY.debug(LOCALISER.msg("021080", query, language, datastore));
+                    NucleusLogger.QUERY.debug(Localiser.msg("021080", query, language, datastore));
                 }
                 return compilation;
             }
@@ -439,7 +436,7 @@ public class QueryManagerImpl implements QueryManager
             queryResultsCache.put(queryKey, results);
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021081", query, results.size()));
+                NucleusLogger.QUERY.debug(Localiser.msg("021081", query, results.size()));
             }
         }
     }
@@ -458,7 +455,7 @@ public class QueryManagerImpl implements QueryManager
             {
                 if (NucleusLogger.QUERY.isDebugEnabled())
                 {
-                    NucleusLogger.QUERY.debug(LOCALISER.msg("021082", query, results.size()));
+                    NucleusLogger.QUERY.debug(Localiser.msg("021082", query, results.size()));
                 }
             }
             return results;

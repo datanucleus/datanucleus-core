@@ -57,7 +57,6 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Imports;
-import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -66,10 +65,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
 {
-    /** Localisation utility for output messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     String queryLanguage = null;
 
     Stack stack = new Stack();
@@ -115,11 +110,6 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
         this.clr = clr;
         this.candidateAlias = candidateAlias;
         this.queryLanguage = queryLang;
-    }
-
-    public Localiser getLocaliser()
-    {
-        return LOCALISER;
     }
 
     public Map getParameterValues()

@@ -30,10 +30,6 @@ import org.datanucleus.util.Localiser;
  */
 public class IllegalStateTransitionException extends NucleusException
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructs an illegal state transition exception.
      * @param state The object's current life-cycle state.
@@ -42,7 +38,7 @@ public class IllegalStateTransitionException extends NucleusException
      */
     public IllegalStateTransitionException(LifeCycleState state, String transition, ObjectProvider op)
     {
-        super(LOCALISER.msg("026027", transition, state, op));
+        super(Localiser.msg("026027", transition, state, op));
         setFatal();
     }
 }

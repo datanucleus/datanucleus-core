@@ -69,10 +69,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class SchemaTool
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     public static final NucleusLogger LOGGER = NucleusLogger.getLoggerInstance("DataNucleus.SchemaTool");
 
     public static final String OPTION_CREATE_SCHEMA = "createSchema";
@@ -128,20 +124,20 @@ public class SchemaTool
         SchemaTool tool = new SchemaTool();
 
         CommandLine cmd = new CommandLine();
-        cmd.addOption(OPTION_CREATE_SCHEMA, OPTION_CREATE_SCHEMA, OPTION_CREATE_SCHEMA, LOCALISER.msg(false, "014024"));
-        cmd.addOption(OPTION_DELETE_SCHEMA, OPTION_DELETE_SCHEMA, OPTION_DELETE_SCHEMA, LOCALISER.msg(false, "014025"));
+        cmd.addOption(OPTION_CREATE_SCHEMA, OPTION_CREATE_SCHEMA, OPTION_CREATE_SCHEMA, Localiser.msg("014024"));
+        cmd.addOption(OPTION_DELETE_SCHEMA, OPTION_DELETE_SCHEMA, OPTION_DELETE_SCHEMA, Localiser.msg("014025"));
 
-        cmd.addOption(OPTION_CREATE_TABLES_FOR_CLASSES, OPTION_CREATE_TABLES_FOR_CLASSES, null, LOCALISER.msg(false, "014026"));
-        cmd.addOption(OPTION_DELETE_TABLES_FOR_CLASSES, OPTION_DELETE_TABLES_FOR_CLASSES, null, LOCALISER.msg(false, "014027"));
-        cmd.addOption(OPTION_DELETE_CREATE_TABLES_FOR_CLASSES, OPTION_DELETE_CREATE_TABLES_FOR_CLASSES, null, LOCALISER.msg(false, "014044"));
-        cmd.addOption(OPTION_VALIDATE_TABLES_FOR_CLASSES, OPTION_VALIDATE_TABLES_FOR_CLASSES, null, LOCALISER.msg(false, "014028"));
+        cmd.addOption(OPTION_CREATE_TABLES_FOR_CLASSES, OPTION_CREATE_TABLES_FOR_CLASSES, null, Localiser.msg("014026"));
+        cmd.addOption(OPTION_DELETE_TABLES_FOR_CLASSES, OPTION_DELETE_TABLES_FOR_CLASSES, null, Localiser.msg("014027"));
+        cmd.addOption(OPTION_DELETE_CREATE_TABLES_FOR_CLASSES, OPTION_DELETE_CREATE_TABLES_FOR_CLASSES, null, Localiser.msg("014044"));
+        cmd.addOption(OPTION_VALIDATE_TABLES_FOR_CLASSES, OPTION_VALIDATE_TABLES_FOR_CLASSES, null, Localiser.msg("014028"));
 
-        cmd.addOption(OPTION_DBINFO, OPTION_DBINFO, null, LOCALISER.msg(false, "014029"));
-        cmd.addOption(OPTION_SCHEMAINFO, OPTION_SCHEMAINFO, null, LOCALISER.msg(false, "014030"));
-        cmd.addOption("help", "help", null, LOCALISER.msg(false, "014033"));
+        cmd.addOption(OPTION_DBINFO, OPTION_DBINFO, null, Localiser.msg("014029"));
+        cmd.addOption(OPTION_SCHEMAINFO, OPTION_SCHEMAINFO, null, Localiser.msg("014030"));
+        cmd.addOption("help", "help", null, Localiser.msg("014033"));
 
-        cmd.addOption(OPTION_DDL_FILE, OPTION_DDL_FILE, "ddlFile", LOCALISER.msg(false, "014031"));
-        cmd.addOption(OPTION_COMPLETE_DDL, OPTION_COMPLETE_DDL, null, LOCALISER.msg(false, "014032"));
+        cmd.addOption(OPTION_DDL_FILE, OPTION_DDL_FILE, "ddlFile", Localiser.msg("014031"));
+        cmd.addOption(OPTION_COMPLETE_DDL, OPTION_COMPLETE_DDL, null, Localiser.msg("014032"));
         cmd.addOption(OPTION_INCLUDE_AUTO_START, OPTION_INCLUDE_AUTO_START, null, "Include Auto-Start Mechanisms");
         cmd.addOption(OPTION_API, OPTION_API, "api", "API Adapter (JDO, JPA, etc)");
         cmd.addOption("v", "verbose", null, "verbose output");
@@ -164,48 +160,48 @@ public class SchemaTool
         if (cmd.hasOption(OPTION_CREATE_TABLES_FOR_CLASSES))
         {
             mode = Mode.CREATE;
-            msg = LOCALISER.msg(false, "014000");
+            msg = Localiser.msg("014000");
         }
         else if (cmd.hasOption(OPTION_DELETE_TABLES_FOR_CLASSES))
         {
             mode = Mode.DELETE;
-            msg = LOCALISER.msg(false, "014001");
+            msg = Localiser.msg("014001");
         }
         else if (cmd.hasOption(OPTION_DELETE_CREATE_TABLES_FOR_CLASSES))
         {
             mode = Mode.DELETE_CREATE;
-            msg = LOCALISER.msg(false, "014045");
+            msg = Localiser.msg("014045");
         }
         else if (cmd.hasOption(OPTION_VALIDATE_TABLES_FOR_CLASSES))
         {
             mode = Mode.VALIDATE;
-            msg = LOCALISER.msg(false, "014002");
+            msg = Localiser.msg("014002");
         }
         else if (cmd.hasOption(OPTION_CREATE_SCHEMA))
         {
             mode = Mode.CREATE_SCHEMA;
             tool.setSchemaName(cmd.getOptionArg(OPTION_CREATE_SCHEMA));
-            msg = LOCALISER.msg(false, "014034", tool.getSchemaName());
+            msg = Localiser.msg("014034", tool.getSchemaName());
         }
         else if (cmd.hasOption(OPTION_DELETE_SCHEMA))
         {
             mode = Mode.DELETE_SCHEMA;
             tool.setSchemaName(cmd.getOptionArg(OPTION_DELETE_SCHEMA));
-            msg = LOCALISER.msg(false, "014035", tool.getSchemaName());
+            msg = Localiser.msg("014035", tool.getSchemaName());
         }
         else if (cmd.hasOption(OPTION_DBINFO))
         {
             mode = Mode.DATABASE_INFO;
-            msg = LOCALISER.msg(false, "014003");
+            msg = Localiser.msg("014003");
         }
         else if (cmd.hasOption(OPTION_SCHEMAINFO))
         {
             mode = Mode.SCHEMA_INFO;
-            msg = LOCALISER.msg(false, "014004");
+            msg = Localiser.msg("014004");
         }
         else if (cmd.hasOption("help"))
         {
-            System.out.println(LOCALISER.msg(false, "014023", cmd.toString()));
+            System.out.println(Localiser.msg("014023", cmd.toString()));
             System.exit(0);
         }
         LOGGER.info(msg);
@@ -241,7 +237,7 @@ public class SchemaTool
         }
 
         // Classpath
-        msg = LOCALISER.msg(false, "014005");
+        msg = Localiser.msg("014005");
         LOGGER.info(msg);
         if (tool.isVerbose())
         {
@@ -250,7 +246,7 @@ public class SchemaTool
         StringTokenizer tokeniser = new StringTokenizer(System.getProperty("java.class.path"), File.pathSeparator);
         while (tokeniser.hasMoreTokens())
         {
-            msg = LOCALISER.msg(false, "014006", tokeniser.nextToken());
+            msg = Localiser.msg("014006", tokeniser.nextToken());
             LOGGER.info(msg);
             if (tool.isVerbose())
             {
@@ -266,7 +262,7 @@ public class SchemaTool
         String ddlFilename = tool.getDdlFile();
         if (ddlFilename != null)
         {
-            msg = LOCALISER.msg(false, tool.getCompleteDdl() ? "014018" : "014019", ddlFilename);
+            msg = Localiser.msg(tool.getCompleteDdl() ? "014018" : "014019", ddlFilename);
             LOGGER.info(msg);
             if (tool.isVerbose())
             {
@@ -295,7 +291,7 @@ public class SchemaTool
         {
             // Unable to create a NucleusContext so likely input errors
             LOGGER.error("Error creating NucleusContext", e);
-            System.out.println(LOCALISER.msg(false, "014008", e.getMessage()));
+            System.out.println(Localiser.msg("014008", e.getMessage()));
             System.exit(1);
             return;
         }
@@ -312,7 +308,7 @@ public class SchemaTool
 
                 if (filenames == null && persistenceUnitName == null)
                 {
-                    msg = LOCALISER.msg(false, "014007");
+                    msg = Localiser.msg("014007");
                     LOGGER.error(msg);
                     System.out.println(msg);
                     throw new NucleusUserException(msg);
@@ -322,7 +318,7 @@ public class SchemaTool
                 if (persistenceUnitName != null)
                 {
                     // Schema management via "persistence-unit"
-                    msg = LOCALISER.msg(false, "014015", persistenceUnitName);
+                    msg = Localiser.msg("014015", persistenceUnitName);
                     LOGGER.info(msg);
                     if (tool.isVerbose())
                     {
@@ -336,7 +332,7 @@ public class SchemaTool
                 else
                 {
                     // Schema management via "Input Files" (metadata/class)
-                    msg = LOCALISER.msg(false, "014009");
+                    msg = Localiser.msg("014009");
                     LOGGER.info(msg);
                     if (tool.isVerbose())
                     {
@@ -344,7 +340,7 @@ public class SchemaTool
                     }
                     for (int i = 0; i < filenames.length; i++)
                     {
-                        String entry = LOCALISER.msg(false, "014010", filenames[i]);
+                        String entry = Localiser.msg("014010", filenames[i]);
                         LOGGER.info(entry);
                         if (tool.isVerbose())
                         {
@@ -356,15 +352,15 @@ public class SchemaTool
                         System.out.println();
                     }
 
-                    LOGGER.debug(LOCALISER.msg(false, "014011", "" + filenames.length));
+                    LOGGER.debug(Localiser.msg("014011", "" + filenames.length));
                     filemds = MetaDataUtils.getFileMetaDataForInputFiles(metaDataMgr, clr, filenames);
-                    LOGGER.debug(LOCALISER.msg(false, "014012", "" + filenames.length));
+                    LOGGER.debug(Localiser.msg("014012", "" + filenames.length));
                 }
 
                 classNames = new TreeSet<String>();
                 if (filemds == null)
                 {
-                    msg = LOCALISER.msg(false, "014021");
+                    msg = Localiser.msg("014021");
                     LOGGER.error(msg);
                     System.out.println(msg);
                     System.exit(2);
@@ -440,13 +436,13 @@ public class SchemaTool
                 storeMgr.printInformation("SCHEMA", System.out);
             }
 
-            msg = LOCALISER.msg(false, "014043");
+            msg = Localiser.msg("014043");
             LOGGER.info(msg);
             System.out.println(msg);
         }
         catch (Exception e)
         {
-            msg = LOCALISER.msg(false, "014037", e.getMessage());
+            msg = Localiser.msg("014037", e.getMessage());
             System.out.println(msg);
             LOGGER.error(msg, e);
             System.exit(2);
@@ -698,7 +694,7 @@ public class SchemaTool
 
         if (verbose)
         {
-            String msg = LOCALISER.msg(false, "014020");
+            String msg = Localiser.msg("014020");
             LOGGER.info(msg);
             System.out.println(msg);
 
@@ -734,7 +730,7 @@ public class SchemaTool
                 if (display)
                 {
                     // Print the property to sysout
-                    msg = LOCALISER.msg(false, "014022", key, value);
+                    msg = Localiser.msg("014022", key, value);
                     LOGGER.info(msg);
                     System.out.println(msg);
                 }

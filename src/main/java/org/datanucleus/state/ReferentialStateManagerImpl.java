@@ -28,6 +28,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -132,7 +133,7 @@ public class ReferentialStateManagerImpl extends StateManagerImpl
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("026021", 
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("026021", 
                 cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getFullFieldName(), 
                 StringUtils.toJVMIDString(myPC), StringUtils.toJVMIDString(pc)));
         }
@@ -160,7 +161,7 @@ public class ReferentialStateManagerImpl extends StateManagerImpl
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("026022", 
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026022", 
                         cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldsToUpdate[i]).getFullFieldName(), 
                         IdentityUtils.getPersistableIdentityForId(myID),
                         StringUtils.toJVMIDString(op.getObject())));

@@ -24,6 +24,7 @@ import java.util.List;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -76,10 +77,8 @@ public class ImplementsMetaData extends MetaData
             }
             catch (ClassNotResolvedException cnre2)
             {
-                NucleusLogger.METADATA.error(LOCALISER.msg("044097",
-                    ((ClassMetaData)parent).getFullClassName(), name));
-                throw new InvalidClassMetaDataException(LOCALISER, "044097",
-                    ((ClassMetaData)parent).getFullClassName(), name);
+                NucleusLogger.METADATA.error(Localiser.msg("044097", ((ClassMetaData)parent).getFullClassName(), name));
+                throw new InvalidClassMetaDataException("044097", ((ClassMetaData)parent).getFullClassName(), name);
             }
         }
         setPopulated();

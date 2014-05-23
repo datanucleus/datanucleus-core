@@ -60,10 +60,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class SCOUtils
 {
-    /** Localiser for messages. */
-    private static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Method to create a new SCO wrapper for a SCO type.
      * The SCO wrapper will be appropriate for the passed value (which represents the instantiated type of the field)
@@ -88,7 +84,7 @@ public class SCOUtils
     {
         if (!mmd.getType().isAssignableFrom(declaredType))
         {
-            throw new NucleusUserException(LOCALISER.msg("023010",
+            throw new NucleusUserException(Localiser.msg("023010",
                 declaredType.getName(), mmd.getName(), mmd.getType()));
         }
 
@@ -131,7 +127,7 @@ public class SCOUtils
         }
         if (wrapperType == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("023011", 
+            throw new NucleusUserException(Localiser.msg("023011", 
                 declaredType.getName(), StringUtils.toJVMIDString(value), mmd.getFullFieldName()));
         }
 
@@ -273,7 +269,7 @@ public class SCOUtils
     public static String getContainerInfoMessage(ObjectProvider ownerOP, String fieldName, SCOContainer cont,
             boolean useCache, boolean queued, boolean allowNulls, boolean lazyLoading)
     {
-        String msg = LOCALISER.msg("023004", ownerOP.getObjectAsPrintable(), fieldName,
+        String msg = Localiser.msg("023004", ownerOP.getObjectAsPrintable(), fieldName,
             cont.getClass().getName(),
             "[cache-values=" + useCache + ", lazy-loading=" + lazyLoading +
             ", queued-operations=" + queued + ", allow-nulls=" + allowNulls + "]");
@@ -1076,7 +1072,7 @@ public class SCOUtils
             }
             catch (NucleusException jpe)
             {
-                NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("023012", fmd.getFullFieldName(), comparatorName));
+                NucleusLogger.PERSISTENCE.warn(Localiser.msg("023012", fmd.getFullFieldName(), comparatorName));
             }
         }
         return comparator;
@@ -1311,8 +1307,7 @@ public class SCOUtils
             ExecutionContext objectEC = api.getExecutionContext(object);
             if (objectEC != null && ec != objectEC)
             {
-                throw new NucleusUserException(LOCALISER.msg("023009", StringUtils.toJVMIDString(object)), 
-                    api.getIdForObject(object));
+                throw new NucleusUserException(Localiser.msg("023009", StringUtils.toJVMIDString(object)), api.getIdForObject(object));
             }
             else if (!api.isPersistent(object))
             {

@@ -22,7 +22,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.datanucleus.ClassConstants;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.util.NucleusLogger;
@@ -33,10 +32,6 @@ import org.datanucleus.util.Localiser;
  */
 public class ApiAdapterFactory
 {
-    /** Localisation of messages */
-    private static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** The adapter instances, mapped by naming string. */
     Map<String, ApiAdapter> adapters = new HashMap();
 
@@ -94,7 +89,7 @@ public class ApiAdapterFactory
                     name, "class-name", null, null);
                 if (api == null)
                 {
-                    String msg = LOCALISER.msg("022001", name);
+                    String msg = Localiser.msg("022001", name);
                     NucleusLogger.PERSISTENCE.error(msg);
                     throw new NucleusUserException(msg);
                 }
@@ -104,7 +99,7 @@ public class ApiAdapterFactory
             {
                 String className = pluginMgr.getAttributeValueForExtension("org.datanucleus.api_adapter", 
                     "name", name, "class-name");
-                String msg = LOCALISER.msg("022000", className, err.getMessage());
+                String msg = Localiser.msg("022000", className, err.getMessage());
                 NucleusLogger.PERSISTENCE.error(msg, err);
                 throw new NucleusUserException(msg);
             }
@@ -112,7 +107,7 @@ public class ApiAdapterFactory
             {
                 String className = pluginMgr.getAttributeValueForExtension("org.datanucleus.api_adapter", 
                     "name", name, "class-name");
-                String msg = LOCALISER.msg("022000", className, e.getTargetException());
+                String msg = Localiser.msg("022000", className, e.getTargetException());
                 NucleusLogger.PERSISTENCE.error(msg, e);
                 throw new NucleusUserException(msg);
             }
@@ -124,7 +119,7 @@ public class ApiAdapterFactory
             {
                 String className = pluginMgr.getAttributeValueForExtension("org.datanucleus.api_adapter", 
                     "name", name, "class-name");
-                String msg = LOCALISER.msg("022000", className, e.getMessage());
+                String msg = Localiser.msg("022000", className, e.getMessage());
                 NucleusLogger.PERSISTENCE.error(msg, e);
                 throw new NucleusUserException(msg);
             }

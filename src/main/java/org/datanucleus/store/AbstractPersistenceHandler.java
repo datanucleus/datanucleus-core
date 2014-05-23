@@ -33,10 +33,6 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class AbstractPersistenceHandler implements StorePersistenceHandler
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     protected StoreManager storeMgr;
 
     public AbstractPersistenceHandler(StoreManager storeMgr)
@@ -146,14 +142,14 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
         {
             if (op.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
             {
-                throw new DatastoreReadOnlyException(LOCALISER.msg("032004",
+                throw new DatastoreReadOnlyException(Localiser.msg("032004",
                     op.getObjectAsPrintable()), op.getExecutionContext().getClassLoaderResolver());
             }
             else
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("032005", op.getObjectAsPrintable()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("032005", op.getObjectAsPrintable()));
                 }
                 return;
             }
@@ -171,14 +167,14 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
                     {
                         if (op.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
                         {
-                            throw new DatastoreReadOnlyException(LOCALISER.msg("032006",
+                            throw new DatastoreReadOnlyException(Localiser.msg("032006",
                                 op.getObjectAsPrintable()), op.getExecutionContext().getClassLoaderResolver());
                         }
                         else
                         {
                             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                             {
-                                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("032007", op.getObjectAsPrintable()));
+                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("032007", op.getObjectAsPrintable()));
                             }
                             return;
                         }

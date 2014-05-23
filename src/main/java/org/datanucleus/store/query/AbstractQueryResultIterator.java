@@ -27,13 +27,6 @@ import org.datanucleus.util.Localiser;
  */
 public abstract class AbstractQueryResultIterator implements ListIterator
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
-    /**
-     * Constructor.
-     */
     public AbstractQueryResultIterator()
     {
     }
@@ -43,7 +36,7 @@ public abstract class AbstractQueryResultIterator implements ListIterator
      */
     public void add(Object arg0)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /* (non-Javadoc)
@@ -81,7 +74,7 @@ public abstract class AbstractQueryResultIterator implements ListIterator
      */
     public void remove()
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 
     /* (non-Javadoc)
@@ -89,6 +82,6 @@ public abstract class AbstractQueryResultIterator implements ListIterator
      */
     public void set(Object arg0)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("052603"));
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 }

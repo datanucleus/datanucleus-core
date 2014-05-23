@@ -41,9 +41,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class ObjectProviderFactoryImpl implements ObjectProviderFactory
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     Class opClass = null;
 
     public static Class[] OBJECT_PROVIDER_CTR_ARG_CLASSES = new Class[] {ExecutionContext.class, AbstractClassMetaData.class};
@@ -310,7 +307,7 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
         }
         catch (ClassNotResolvedException e)
         {
-            throw new NucleusUserException(LOCALISER.msg("026015", pcCls.getName())).setFatal();
+            throw new NucleusUserException(Localiser.msg("026015", pcCls.getName())).setFatal();
         }
     }
 }

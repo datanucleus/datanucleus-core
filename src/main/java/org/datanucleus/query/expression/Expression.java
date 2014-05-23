@@ -22,17 +22,12 @@ import java.io.Serializable;
 
 import org.datanucleus.query.symbol.Symbol;
 import org.datanucleus.query.symbol.SymbolTable;
-import org.datanucleus.util.Localiser;
 
 /**
  * A Scalar expression in a Query. Used to compute values with a resulting type.
  */
 public abstract class Expression implements Serializable
 {
-    /** Localiser for messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Parent of this expression in the tree (if any). */
     protected Expression parent;
 

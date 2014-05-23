@@ -27,6 +27,7 @@ import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.PersistenceFileMetaData;
 import org.datanucleus.metadata.PersistenceUnitMetaData;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -170,14 +171,14 @@ public class PersistenceFileMetaDataHandler extends AbstractMetaDataHandler
             }
             else
             {
-                String message = LOCALISER.msg("044037",qName);
+                String message = Localiser.msg("044037",qName);
                 NucleusLogger.METADATA.error(message);
                 throw new RuntimeException(message);
             }
         }
         catch (RuntimeException ex)
         {
-            NucleusLogger.METADATA.error(LOCALISER.msg("044042", qName, getStack(), uri), ex);
+            NucleusLogger.METADATA.error(Localiser.msg("044042", qName, getStack(), uri), ex);
             throw ex;
         }
     }

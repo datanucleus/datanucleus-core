@@ -23,6 +23,7 @@ import org.datanucleus.query.expression.InvokeExpression;
 import org.datanucleus.query.expression.Literal;
 import org.datanucleus.query.expression.ParameterExpression;
 import org.datanucleus.query.expression.PrimaryExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Evaluator for the function UPPER(stringExpr).
@@ -61,7 +62,7 @@ public class UpperFunction implements InvocationEvaluator
         }
         if (!(paramValue instanceof String))
         {
-            throw new NucleusException(eval.getLocaliser().msg("021011", method, paramValue.getClass().getName()));
+            throw new NucleusException(Localiser.msg("021011", method, paramValue.getClass().getName()));
         }
         return ((String)paramValue).toUpperCase();
     }

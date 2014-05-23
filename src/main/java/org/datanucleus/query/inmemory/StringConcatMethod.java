@@ -25,6 +25,7 @@ import org.datanucleus.query.expression.InvokeExpression;
 import org.datanucleus.query.expression.Literal;
 import org.datanucleus.query.expression.ParameterExpression;
 import org.datanucleus.query.expression.PrimaryExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Evaluator for the method "{stringExpr}.concat(extraStr)".
@@ -44,7 +45,7 @@ public class StringConcatMethod implements InvocationEvaluator
         }
         if (!(invokedValue instanceof String))
         {
-            throw new NucleusException(eval.getLocaliser().msg("021011", method, invokedValue.getClass().getName()));
+            throw new NucleusException(Localiser.msg("021011", method, invokedValue.getClass().getName()));
         }
 
         Expression arg0Expr = expr.getArguments().get(0);

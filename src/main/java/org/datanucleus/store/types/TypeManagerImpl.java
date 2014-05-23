@@ -52,9 +52,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class TypeManagerImpl implements TypeManager, Serializable
 {
-    private static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     protected NucleusContext nucCtx;
 
     protected transient ClassLoaderResolver clr;
@@ -515,7 +512,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
                         javaTypes.put(cls.getName(), type); // Register this subtype for reference
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("016001",
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("016001",
                                 cls.getName(), type.cls.getName()));
                         }
                         return type;
@@ -529,7 +526,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
                         javaTypes.put(cls.getName(), type); // Register this subtype for reference
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("016001", 
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("016001", 
                                 cls.getName(), type.cls.getName()));
                         }
                         return type;
@@ -619,7 +616,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
     {
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("016003"));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("016003"));
         }
         ClassLoaderResolver clr = getClassLoaderResolver();
         ConfigurationElement[] elems = mgr.getConfigurationElementsForExtension("org.datanucleus.java_type", null, null);
@@ -687,8 +684,8 @@ public class TypeManagerImpl implements TypeManager, Serializable
                             catch (NucleusException jpe)
                             {
                                 // Impossible to load the wrapper type from this plugin
-                                NucleusLogger.PERSISTENCE.error(LOCALISER.msg("016004", wrapperType));
-                                throw new NucleusException(LOCALISER.msg("016004", wrapperType));
+                                NucleusLogger.PERSISTENCE.error(Localiser.msg("016004", wrapperType));
+                                throw new NucleusException(Localiser.msg("016004", wrapperType));
                             }
                         }
                         Class wrapperClassBacked = null;
@@ -702,8 +699,8 @@ public class TypeManagerImpl implements TypeManager, Serializable
                             catch (NucleusException jpe)
                             {
                                 // Impossible to load the wrapper type from this plugin
-                                NucleusLogger.PERSISTENCE.error(LOCALISER.msg("016004", wrapperTypeBacked));
-                                throw new NucleusException(LOCALISER.msg("016004", wrapperTypeBacked));
+                                NucleusLogger.PERSISTENCE.error(Localiser.msg("016004", wrapperTypeBacked));
+                                throw new NucleusException(Localiser.msg("016004", wrapperTypeBacked));
                             }
                         }
 
@@ -730,7 +727,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         {
             List<String> typesList = new ArrayList<String>(javaTypes.keySet());
             Collections.sort(typesList, ALPHABETICAL_ORDER_STRING);
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("016006", StringUtils.collectionToString(typesList)));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("016006", StringUtils.collectionToString(typesList)));
         }
     }
 
@@ -743,7 +740,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
     {
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("016007"));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("016007"));
         }
 
         ClassLoaderResolver clr = getClassLoaderResolver();
@@ -798,7 +795,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("016008"));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("016008"));
             if (typeConverterMap != null)
             {
                 List<Class> typesList = new ArrayList<Class>(typeConverterMap.keySet());

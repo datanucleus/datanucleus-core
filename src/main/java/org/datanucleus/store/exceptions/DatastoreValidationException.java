@@ -19,7 +19,6 @@ Contributors:
 package org.datanucleus.store.exceptions;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
-import org.datanucleus.util.Localiser;
 
 /**
  * A <tt>DatastoreValidationException</tt> is thrown if a mismatch is discovered
@@ -28,9 +27,6 @@ import org.datanucleus.util.Localiser;
  */
 public class DatastoreValidationException extends NucleusDataStoreException
 {
-    protected static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructs a datastore validation exception with the specified detail
      * message.

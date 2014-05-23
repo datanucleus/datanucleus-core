@@ -40,9 +40,6 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class AbstractNucleusContext implements NucleusContext
 {
-    /** Localisation of messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Configuration for this context. */
     protected final Configuration config;
 
@@ -102,7 +99,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
         if (classLoaderResolverClassName == null)
         {
             // User has specified a classloader_resolver plugin that has not registered
-            throw new NucleusUserException(LOCALISER.msg("001001", clrName)).setFatal();
+            throw new NucleusUserException(Localiser.msg("001001", clrName)).setFatal();
         }
 
         // Initialise API, and set defaults for properties for the API
@@ -126,8 +123,6 @@ public abstract class AbstractNucleusContext implements NucleusContext
             CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_CLASSLOADER_RESOLVER_NAME, null, "datanucleus", null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY, null, null, null, false, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_LOCALISE_MESSAGECODES, null, false, false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_LOCALISE_LANGUAGE, null, null, null, false, false);
 
         // MetaData
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_ALWAYS_DETACHABLE, null, false, false, false);
@@ -185,11 +180,11 @@ public abstract class AbstractNucleusContext implements NucleusContext
             }
             catch (Exception e)
             {
-                throw new NucleusException(LOCALISER.msg("008010", apiName, e.getMessage()), e);
+                throw new NucleusException(Localiser.msg("008010", apiName, e.getMessage()), e);
             }
             if (metaDataManager == null)
             {
-                throw new NucleusException(LOCALISER.msg("008009", apiName));
+                throw new NucleusException(Localiser.msg("008009", apiName));
             }
         }
     
@@ -246,11 +241,11 @@ public abstract class AbstractNucleusContext implements NucleusContext
         }
         catch (ClassNotFoundException cnfe)
         {
-            throw new NucleusUserException(LOCALISER.msg("001002", classLoaderResolverClassName), cnfe).setFatal();
+            throw new NucleusUserException(Localiser.msg("001002", classLoaderResolverClassName), cnfe).setFatal();
         }
         catch (Exception e)
         {
-            throw new NucleusUserException(LOCALISER.msg("001003", classLoaderResolverClassName), e).setFatal();
+            throw new NucleusUserException(Localiser.msg("001003", classLoaderResolverClassName), e).setFatal();
         }
         classLoaderResolverMap.put(key, clr);
     
@@ -270,7 +265,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
             {
                 javaVersion = "unknown";
             }
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("008000", pluginManager.getVersionForBundle("org.datanucleus"), javaVersion, System.getProperty("os.name")));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("008000", pluginManager.getVersionForBundle("org.datanucleus"), javaVersion, System.getProperty("os.name")));
             NucleusLogger.PERSISTENCE.debug("Persistence API : " + getApiName());
             if (config.hasPropertyNotNull(PropertyNames.PROPERTY_PERSISTENCE_UNIT_NAME))
             {

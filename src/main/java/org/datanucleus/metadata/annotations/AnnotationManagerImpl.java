@@ -40,10 +40,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class AnnotationManagerImpl implements AnnotationManager
 {
-    /** Localiser for messages */
-    protected static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** MetaData Manager that we work for. */
     protected final MetaDataManager metadataMgr;
 
@@ -144,7 +140,7 @@ public class AnnotationManagerImpl implements AnnotationManager
         }
         if (readerClassName == null)
         {
-            NucleusLogger.METADATA.debug(LOCALISER.msg("044202", cls.getName()));
+            NucleusLogger.METADATA.debug(Localiser.msg("044202", cls.getName()));
             return null;
         }
 
@@ -163,7 +159,7 @@ public class AnnotationManagerImpl implements AnnotationManager
             }
             catch (Exception e)
             {
-                NucleusLogger.METADATA.warn(LOCALISER.msg("MetaData.AnnotationReaderNotFound", readerClassName));
+                NucleusLogger.METADATA.warn(Localiser.msg("MetaData.AnnotationReaderNotFound", readerClassName));
                 return null;
             }
         }
@@ -209,7 +205,7 @@ public class AnnotationManagerImpl implements AnnotationManager
             }
             catch (Exception e)
             {
-                NucleusLogger.METADATA.warn(LOCALISER.msg("MetaData.ClassAnnotationHandlerNotFound", annotationName));
+                NucleusLogger.METADATA.warn(Localiser.msg("MetaData.ClassAnnotationHandlerNotFound", annotationName));
                 return null;
             }
         }
@@ -237,7 +233,7 @@ public class AnnotationManagerImpl implements AnnotationManager
             }
             catch (Exception e)
             {
-                NucleusLogger.METADATA.warn(LOCALISER.msg("MetaData.MemberAnnotationHandlerNotFound", annotationName));
+                NucleusLogger.METADATA.warn(Localiser.msg("MetaData.MemberAnnotationHandlerNotFound", annotationName));
                 return null;
             }
         }

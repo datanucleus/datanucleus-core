@@ -35,10 +35,6 @@ import org.datanucleus.util.Localiser;
  */
 public class NucleusContextHelper
 {
-    /** Localisation of messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Random number generator, for use when needing unique names. */
     public static final Random random = new Random();
 
@@ -166,7 +162,7 @@ public class NucleusContextHelper
             if (storeMgr == null)
             {
                 // No StoreManager of the specified type exists in the CLASSPATH!
-                throw new NucleusUserException(LOCALISER.msg("008004", storeManagerType)).setFatal();
+                throw new NucleusUserException(Localiser.msg("008004", storeManagerType)).setFatal();
             }
         }
 
@@ -224,7 +220,7 @@ public class NucleusContextHelper
 
             if (storeMgr == null)
             {
-                throw new NucleusUserException(LOCALISER.msg("008004", url)).setFatal();
+                throw new NucleusUserException(Localiser.msg("008004", url)).setFatal();
             }
         }
 

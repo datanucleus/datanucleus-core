@@ -41,8 +41,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class IdentityManagerImpl implements IdentityManager
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     protected Class datastoreIdClass = null;
 
     /** Identity string translator (if any). */
@@ -67,7 +65,7 @@ public class IdentityManagerImpl implements IdentityManager
         if (datastoreIdentityClassName == null)
         {
             // User has specified a datastore_identity plugin that has not registered
-            throw new NucleusUserException(LOCALISER.msg("002001", dsidName)).setFatal();
+            throw new NucleusUserException(Localiser.msg("002001", dsidName)).setFatal();
         }
         ClassLoaderResolver clr = nucCtx.getClassLoaderResolver(null);
         try
@@ -76,7 +74,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
         catch (ClassNotResolvedException cnre)
         {
-            throw new NucleusUserException(LOCALISER.msg("002002", dsidName, datastoreIdentityClassName)).setFatal();
+            throw new NucleusUserException(Localiser.msg("002002", dsidName, datastoreIdentityClassName)).setFatal();
         }
 
         // Identity key translation
@@ -91,7 +89,7 @@ public class IdentityManagerImpl implements IdentityManager
             catch (Exception e)
             {
                 // User has specified a identity key translator plugin that has not registered
-                throw new NucleusUserException(LOCALISER.msg("002001", keyTranslatorType)).setFatal();
+                throw new NucleusUserException(Localiser.msg("002001", keyTranslatorType)).setFatal();
             }
         }
 
@@ -107,7 +105,7 @@ public class IdentityManagerImpl implements IdentityManager
             catch (Exception e)
             {
                 // User has specified a string identity translator plugin that has not registered
-                throw new NucleusUserException(LOCALISER.msg("002001", stringTranslatorType)).setFatal();
+                throw new NucleusUserException(Localiser.msg("002001", stringTranslatorType)).setFatal();
             }
         }
     }
@@ -261,19 +259,19 @@ public class IdentityManagerImpl implements IdentityManager
     {
         if (idType == null)
         {
-            throw new NucleusException(LOCALISER.msg("029001", pcType)).setFatal();
+            throw new NucleusException(Localiser.msg("029001", pcType)).setFatal();
         }
         if (pcType == null)
         {
-            throw new NucleusException(LOCALISER.msg("029000", idType)).setFatal();
+            throw new NucleusException(Localiser.msg("029000", idType)).setFatal();
         }
         if (key == null)
         {
-            throw new NucleusException(LOCALISER.msg("029003", idType, pcType)).setFatal();
+            throw new NucleusException(Localiser.msg("029003", idType, pcType)).setFatal();
         }
         if (!SingleFieldId.class.isAssignableFrom(idType))
         {
-            throw new NucleusException(LOCALISER.msg("029002", idType.getName(), pcType.getName())).setFatal();
+            throw new NucleusException(Localiser.msg("029002", idType.getName(), pcType.getName())).setFatal();
         }
 
         SingleFieldId id = null;
@@ -283,7 +281,7 @@ public class IdentityManagerImpl implements IdentityManager
             keyType = Long.class;
             if (!(key instanceof Long))
             {
-                throw new NucleusException(LOCALISER.msg("029004", idType.getName(), 
+                throw new NucleusException(Localiser.msg("029004", idType.getName(), 
                     pcType.getName(), key.getClass().getName(), "Long")).setFatal();
             }
         }
@@ -292,7 +290,7 @@ public class IdentityManagerImpl implements IdentityManager
             keyType = Integer.class;
             if (!(key instanceof Integer))
             {
-                throw new NucleusException(LOCALISER.msg("029004", idType.getName(), 
+                throw new NucleusException(Localiser.msg("029004", idType.getName(), 
                     pcType.getName(), key.getClass().getName(), "Integer")).setFatal();
             }
         }
@@ -301,7 +299,7 @@ public class IdentityManagerImpl implements IdentityManager
             keyType = String.class;
             if (!(key instanceof String))
             {
-                throw new NucleusException(LOCALISER.msg("029004", idType.getName(), 
+                throw new NucleusException(Localiser.msg("029004", idType.getName(), 
                     pcType.getName(), key.getClass().getName(), "String")).setFatal();
             }
         }
@@ -310,7 +308,7 @@ public class IdentityManagerImpl implements IdentityManager
             keyType = Byte.class;
             if (!(key instanceof Byte))
             {
-                throw new NucleusException(LOCALISER.msg("029004", idType.getName(), 
+                throw new NucleusException(Localiser.msg("029004", idType.getName(), 
                     pcType.getName(), key.getClass().getName(), "Byte")).setFatal();
             }
         }
@@ -319,7 +317,7 @@ public class IdentityManagerImpl implements IdentityManager
             keyType = Short.class;
             if (!(key instanceof Short))
             {
-                throw new NucleusException(LOCALISER.msg("029004", idType.getName(), 
+                throw new NucleusException(Localiser.msg("029004", idType.getName(), 
                     pcType.getName(), key.getClass().getName(), "Short")).setFatal();
             }
         }
@@ -328,7 +326,7 @@ public class IdentityManagerImpl implements IdentityManager
             keyType = Character.class;
             if (!(key instanceof Character))
             {
-                throw new NucleusException(LOCALISER.msg("029004", idType.getName(), 
+                throw new NucleusException(Localiser.msg("029004", idType.getName(), 
                     pcType.getName(), key.getClass().getName(), "Character")).setFatal();
             }
         }
@@ -426,7 +424,7 @@ public class IdentityManagerImpl implements IdentityManager
                 }
                 catch (Exception e) 
                 {
-                    String msg = LOCALISER.msg("010030", acmd.getObjectidClass(), acmd.getFullClassName());
+                    String msg = Localiser.msg("010030", acmd.getObjectidClass(), acmd.getFullClassName());
                     NucleusLogger.PERSISTENCE.error(msg, e);
                     throw new NucleusUserException(msg);
                 }

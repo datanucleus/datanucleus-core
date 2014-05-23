@@ -71,13 +71,12 @@ public class KeyMetaData extends AbstractElementMetaData
         }
         catch (ClassNotResolvedException cnre)
         {
-            throw new InvalidMemberMetaDataException(LOCALISER, "044147", fmd.getClassName(), fmd.getName(), keyType);
+            throw new InvalidMemberMetaDataException("044147", fmd.getClassName(), fmd.getName(), keyType);
         }
         if (embeddedMetaData != null &&
             (keyTypeClass.isInterface() || keyTypeClass.getName().equals("java.lang.Object")))
         {
-            throw new InvalidMemberMetaDataException(LOCALISER, "044152", fmd.getClassName(), fmd.getName(), 
-                keyTypeClass.getName());
+            throw new InvalidMemberMetaDataException("044152", fmd.getClassName(), fmd.getName(), keyTypeClass.getName());
         }
 
         // TODO This will not work currently since MapMetaData is populated *after* KeyMetaData and so the

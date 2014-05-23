@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.expression.InvokeExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Evaluator for the method "{stringExpr}.trimRight([trimChar])".
@@ -46,7 +47,7 @@ public class StringTrimRightMethod implements InvocationEvaluator
         }
         if (!(invokedValue instanceof String))
         {
-            throw new NucleusException(eval.getLocaliser().msg("021011", method, invokedValue.getClass().getName()));
+            throw new NucleusException(Localiser.msg("021011", method, invokedValue.getClass().getName()));
         }
 
         String strValue = (String)invokedValue;

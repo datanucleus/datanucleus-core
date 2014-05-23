@@ -19,8 +19,6 @@ package org.datanucleus.store.types.converters;
 
 import java.io.Serializable;
 
-import org.datanucleus.util.Localiser;
-
 /**
  * Converter for a java type to another type suitable for the datastore.
  * 
@@ -29,9 +27,6 @@ import org.datanucleus.util.Localiser;
  */
 public interface TypeConverter<X, Y> extends Serializable
 {
-    /** Localiser for messages */
-    static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Method to convert the passed member value to the datastore type.
      * @param memberValue Value from the member

@@ -35,6 +35,7 @@ import org.datanucleus.store.BackedSCOStoreManager;
 import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.store.scostore.Store;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -50,7 +51,7 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
 
     /**
      * Constructor
-     * @param ownerOP the owner ObjectProvider
+     * @param op the owner ObjectProvider
      * @param mmd Metadata for the member
      */
     public HashMap(ObjectProvider op, AbstractMemberMetaData mmd)
@@ -129,7 +130,7 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023007", 
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", 
                         ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
                 }
 
@@ -161,7 +162,7 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023008", 
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", 
                         ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
                 }
 
@@ -207,7 +208,7 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023007", 
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", 
                         ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
                 }
                 delegate.clear();
@@ -269,8 +270,7 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023006",
-                    ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
 

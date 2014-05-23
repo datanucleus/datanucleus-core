@@ -43,8 +43,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 class CommandLineHelper
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", ClassEnhancer.class.getClassLoader());
-
     /** Logger for enhancing. */
     public static final NucleusLogger LOGGER = NucleusLogger.getLoggerInstance("DataNucleus.Enhancer");
 
@@ -233,7 +231,7 @@ class CommandLineHelper
 
     private void logEnhancerVersion(DataNucleusEnhancer enhancer, String apiName)
     {
-        String msg = LOCALISER.msg("Enhancer.ClassEnhancer", enhancer.getEnhancerVersion(), apiName);
+        String msg = Localiser.msg("Enhancer.ClassEnhancer", enhancer.getEnhancerVersion(), apiName);
         LOGGER.info(msg);
         if (!isQuiet())
         {
@@ -244,15 +242,15 @@ class CommandLineHelper
     private void logClasspath(DataNucleusEnhancer enhancer)
     {
         // Debug Info : CLASSPATH
-        LOGGER.debug(LOCALISER.msg("Enhancer.Classpath"));
+        LOGGER.debug(Localiser.msg("Enhancer.Classpath"));
         if (enhancer.isVerbose())
         {
-            System.out.println(LOCALISER.msg("Enhancer.Classpath"));
+            System.out.println(Localiser.msg("Enhancer.Classpath"));
         }
         StringTokenizer tokeniser = new StringTokenizer(System.getProperty("java.class.path"), File.pathSeparator);
         while (tokeniser.hasMoreTokens())
         {
-            String entry = LOCALISER.msg("Enhancer.Classpath.Entry", tokeniser.nextToken());
+            String entry = Localiser.msg("Enhancer.Classpath.Entry", tokeniser.nextToken());
             if (LOGGER.isDebugEnabled())
             {
                 LOGGER.debug(entry);

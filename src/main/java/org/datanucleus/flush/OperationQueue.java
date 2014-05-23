@@ -43,9 +43,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class OperationQueue
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     protected List<Operation> queuedOperations = new ArrayList<Operation>();
 
     /**
@@ -106,7 +103,7 @@ public class OperationQueue
     {
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("023005", 
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023005", 
                 op.getObjectAsPrintable(), store.getOwnerMemberMetaData().getFullFieldName()));
         }
 

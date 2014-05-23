@@ -38,9 +38,6 @@ import org.datanucleus.util.Localiser;
  */
 public class ImplementationCreatorImpl implements Serializable, ImplementationCreator
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", ClassEnhancer.class.getClassLoader());
-
     /** MetaData manager to use. */
     protected final MetaDataManager metaDataMgr;
 
@@ -165,7 +162,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
 
                 if (imd.getMetaDataForMember(propertyName) == null)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("ImplementationCreator.InterfaceMethodUndefined",
+                    throw new NucleusUserException(Localiser.msg("ImplementationCreator.InterfaceMethodUndefined",
                         imd.getFullClassName(), methodName));
                 }
             }
@@ -208,13 +205,13 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
                 }
                 if (interfaces[i].getName().equals(Persistable.class.getName()))
                 {
-                    classLoaderPCMsg = LOCALISER.msg("ImplementationCreator.DifferentClassLoader", 
+                    classLoaderPCMsg = Localiser.msg("ImplementationCreator.DifferentClassLoader", 
                         interfaces[i].getClassLoader(), Persistable.class.getClassLoader());
                 }
             }
             implementedInterfacesMsg.append("]");
 
-            throw new NucleusException(LOCALISER.msg("ImplementationCreator.NotPCProblem", implFullClassName, 
+            throw new NucleusException(Localiser.msg("ImplementationCreator.NotPCProblem", implFullClassName, 
                 classLoaderPCMsg, implementedInterfacesMsg.toString()));
         }
     }
@@ -251,7 +248,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
 
                 if (cmd.getMetaDataForMember(propertyName) == null)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("ImplementationCreator.AbstractClassMethodUndefined",
+                    throw new NucleusUserException(Localiser.msg("ImplementationCreator.AbstractClassMethodUndefined",
                         cmd.getFullClassName(), methodName));
                 }
             }
@@ -295,13 +292,13 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
                 }
                 if (interfaces[i].getName().equals(Persistable.class.getName()))
                 {
-                    classLoaderPCMsg = LOCALISER.msg("ImplementationCreator.DifferentClassLoader", 
+                    classLoaderPCMsg = Localiser.msg("ImplementationCreator.DifferentClassLoader", 
                         interfaces[i].getClassLoader(), Persistable.class.getClassLoader());
                 }
             }
             implementedInterfacesMsg.append("]");
 
-            throw new NucleusException(LOCALISER.msg("ImplementationCreator.NotPCProblem", implFullClassName, 
+            throw new NucleusException(Localiser.msg("ImplementationCreator.NotPCProblem", implFullClassName, 
                 classLoaderPCMsg, implementedInterfacesMsg.toString()));
         }
     }

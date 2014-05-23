@@ -17,17 +17,11 @@
  **********************************************************************/
 package org.datanucleus.store.autostart;
 
-import org.datanucleus.util.Localiser;
-
 /**
  * Abstract representation of an autostart mechanism.
  */
 public abstract class AbstractAutoStartMechanism implements AutoStartMechanism
 {
-    /** Localisation of messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** AutoStart "mode" */
     protected Mode mode;
 

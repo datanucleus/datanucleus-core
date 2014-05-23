@@ -32,10 +32,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class VersionHelper
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Perform an optimistic version check on the passed object, against the passed version in the datastore.
      * @param op ObjectProvider of the object to check
@@ -73,18 +69,18 @@ public class VersionHelper
         else if (versionMetaData.getVersionStrategy() == VersionStrategy.STATE_IMAGE)
         {
             // TODO Support state-image strategy
-            throw new NucleusUserException(LOCALISER.msg("032017",
+            throw new NucleusUserException(Localiser.msg("032017",
                 op.getClassMetaData().getFullClassName(), versionMetaData.getVersionStrategy()));
         }
         else
         {
-            throw new NucleusUserException(LOCALISER.msg("032017",
+            throw new NucleusUserException(Localiser.msg("032017",
                 op.getClassMetaData().getFullClassName(), versionMetaData.getVersionStrategy()));
         }
 
         if (!valid)
         {
-            String msg = LOCALISER.msg("032016", 
+            String msg = Localiser.msg("032016", 
                 op.getObjectAsPrintable(), op.getInternalObjectId(), "" + versionDatastore, "" + versionObject);
             NucleusLogger.PERSISTENCE.error(msg);
             throw new NucleusOptimisticException(msg, op.getObject());

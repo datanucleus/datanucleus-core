@@ -27,6 +27,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusOptimisticException;
 import org.datanucleus.flush.FlushProcess;
 import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -86,7 +87,7 @@ public class FlushOrdered implements FlushProcess
             {
                 total += toFlushSecondary.length;
             }
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("010003", total));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("010003", total));
         }
 
         Set<Class> classesToFlush = null;

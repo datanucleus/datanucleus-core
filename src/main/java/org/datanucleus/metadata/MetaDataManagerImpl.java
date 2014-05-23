@@ -105,10 +105,6 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class MetaDataManagerImpl implements Serializable, MetaDataManager
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** The NucleusContext that this metadata manager is operating in. */
     protected final NucleusContext nucleusContext;
 
@@ -476,7 +472,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
             if (NucleusLogger.METADATA.isDebugEnabled())
             {
-                NucleusLogger.METADATA.debug(LOCALISER.msg("044005", StringUtils.objectArrayToString(metadataFiles)));
+                NucleusLogger.METADATA.debug(Localiser.msg("044005", StringUtils.objectArrayToString(metadataFiles)));
             }
 
             // Load MetaData files - will throw NucleusUserException if problems found
@@ -490,7 +486,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
             if (NucleusLogger.METADATA.isDebugEnabled())
             {
-                NucleusLogger.METADATA.debug(LOCALISER.msg("044010"));
+                NucleusLogger.METADATA.debug(Localiser.msg("044010"));
             }
             if (originatingLoadCall)
             {
@@ -534,7 +530,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
             if (NucleusLogger.METADATA.isDebugEnabled())
             {
-                NucleusLogger.METADATA.debug(LOCALISER.msg("044006", StringUtils.objectArrayToString(classNames)));
+                NucleusLogger.METADATA.debug(Localiser.msg("044006", StringUtils.objectArrayToString(classNames)));
             }
 
             // Load classes
@@ -564,7 +560,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                             if (cmd == null)
                             {
                                 // Class has no metadata or annotations so warn the user
-                                NucleusLogger.METADATA.debug(LOCALISER.msg("044017", classNames[i]));
+                                NucleusLogger.METADATA.debug(Localiser.msg("044017", classNames[i]));
                             }
                             else
                             {
@@ -591,7 +587,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             if (exceptions.size() > 0)
             {
                 // Exceptions while loading annotations
-                throw new NucleusUserException(LOCALISER.msg("044016"),
+                throw new NucleusUserException(Localiser.msg("044016"),
                     (Throwable[]) exceptions.toArray(new Throwable[exceptions.size()]),null);
             }
 
@@ -603,7 +599,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
             if (NucleusLogger.METADATA.isDebugEnabled())
             {
-                NucleusLogger.METADATA.debug(LOCALISER.msg("044010"));
+                NucleusLogger.METADATA.debug(Localiser.msg("044010"));
             }
             if (originatingLoadCall)
             {
@@ -647,7 +643,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
             if (NucleusLogger.METADATA.isDebugEnabled())
             {
-                NucleusLogger.METADATA.debug(LOCALISER.msg("044009", jarFileName));
+                NucleusLogger.METADATA.debug(Localiser.msg("044009", jarFileName));
             }
 
             ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(loader);
@@ -715,7 +711,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     }
                     catch (IOException ioe)
                     {
-                        NucleusLogger.METADATA.error(LOCALISER.msg("044027",
+                        NucleusLogger.METADATA.error(Localiser.msg("044027",
                             jarFileName, mappingFileName, ioe.getMessage()), ioe);
                     }
                 }
@@ -760,7 +756,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             }
             if (exceptions.size() > 0)
             {
-                throw new NucleusUserException(LOCALISER.msg("044024", jarFileName), 
+                throw new NucleusUserException(Localiser.msg("044024", jarFileName), 
                     exceptions.toArray(new Throwable[exceptions.size()]));
             }
 
@@ -772,7 +768,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
             if (NucleusLogger.METADATA.isDebugEnabled())
             {
-                NucleusLogger.METADATA.debug(LOCALISER.msg("044010"));
+                NucleusLogger.METADATA.debug(Localiser.msg("044010"));
             }
             if (originatingLoadCall)
             {
@@ -815,7 +811,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             }
             if (NucleusLogger.METADATA.isDebugEnabled())
             {
-                NucleusLogger.METADATA.debug(LOCALISER.msg("044007", pumd.getName()));
+                NucleusLogger.METADATA.debug(Localiser.msg("044007", pumd.getName()));
             }
 
             Properties puProps = pumd.getProperties();
@@ -984,7 +980,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                                 {
                                     for (int i=0;i<scannedClassNames.length;i++)
                                     {
-                                        NucleusLogger.METADATA.debug(LOCALISER.msg("044026", scannedClassNames[i], pumd.getName()));
+                                        NucleusLogger.METADATA.debug(Localiser.msg("044026", scannedClassNames[i], pumd.getName()));
                                         classNames.add(scannedClassNames[i]);
                                     }
                                 }
@@ -1039,7 +1035,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     }
                     catch (IOException ioe)
                     {
-                        NucleusLogger.METADATA.error(LOCALISER.msg("044027",
+                        NucleusLogger.METADATA.error(Localiser.msg("044027",
                             pumd.getName(), mappingFileName, ioe.getMessage()), ioe);
                     }
                 }
@@ -1089,7 +1085,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             }
             if (exceptions.size() > 0)
             {
-                throw new NucleusUserException(LOCALISER.msg("044023", pumd.getName()), exceptions.toArray(new Throwable[exceptions.size()]));
+                throw new NucleusUserException(Localiser.msg("044023", pumd.getName()), exceptions.toArray(new Throwable[exceptions.size()]));
             }
 
             if (fileMetaData.size() > 0)
@@ -1114,7 +1110,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
             if (NucleusLogger.METADATA.isDebugEnabled())
             {
-                NucleusLogger.METADATA.debug(LOCALISER.msg("044010"));
+                NucleusLogger.METADATA.debug(Localiser.msg("044010"));
             }
             if (originatingLoadCall)
             {
@@ -1163,7 +1159,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
             if (NucleusLogger.METADATA.isDebugEnabled())
             {
-                NucleusLogger.METADATA.debug(LOCALISER.msg("044008"));
+                NucleusLogger.METADATA.debug(Localiser.msg("044008"));
             }
 
             ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(loader);
@@ -1177,7 +1173,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
             if (NucleusLogger.METADATA.isDebugEnabled())
             {
-                NucleusLogger.METADATA.debug(LOCALISER.msg("044010"));
+                NucleusLogger.METADATA.debug(Localiser.msg("044010"));
             }
             if (originatingLoadCall)
             {
@@ -1272,14 +1268,14 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             }
             catch (Throwable t)
             {
-                throw new NucleusUserException(LOCALISER.msg("044012", so), t);
+                throw new NucleusUserException(Localiser.msg("044012", so), t);
             }
         }
         else
         {
             if (NucleusLogger.METADATA.isDebugEnabled())
             {
-                NucleusLogger.METADATA.debug(LOCALISER.msg("044011", so));
+                NucleusLogger.METADATA.debug(Localiser.msg("044011", so));
             }
             return null;
         }
@@ -1299,7 +1295,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         // a). Populate MetaData
         if (NucleusLogger.METADATA.isDebugEnabled())
         {
-            NucleusLogger.METADATA.debug(LOCALISER.msg("044018"));
+            NucleusLogger.METADATA.debug(Localiser.msg("044018"));
         }
         Iterator iter = fileMetaData.iterator();
         while (iter.hasNext())
@@ -1314,7 +1310,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         // b). Initialise MetaData
         if (NucleusLogger.METADATA.isDebugEnabled())
         {
-            NucleusLogger.METADATA.debug(LOCALISER.msg("044019"));
+            NucleusLogger.METADATA.debug(Localiser.msg("044019"));
         }
         iter = fileMetaData.iterator();
         while (iter.hasNext())
@@ -1335,7 +1331,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         }
         if (exceptions.size() > 0)
         {
-            throw new NucleusUserException(LOCALISER.msg("044020"), 
+            throw new NucleusUserException(Localiser.msg("044020"), 
                 (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
         }
     }
@@ -1391,7 +1387,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                         }
                         else
                         {
-                            throw new NucleusUserException(LOCALISER.msg("044015", metadataFiles[i]));
+                            throw new NucleusUserException(Localiser.msg("044015", metadataFiles[i]));
                         }
                     }
                     else
@@ -1410,7 +1406,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         if (exceptions.size() > 0)
         {
             // Exceptions while loading MetaData
-            throw new NucleusUserException(LOCALISER.msg("044016"), 
+            throw new NucleusUserException(Localiser.msg("044016"), 
                 exceptions.toArray(new Throwable[exceptions.size()]), null);
         }
 
@@ -2192,7 +2188,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         if (files == null)
         {
             // No "persistence.xml" files found
-            throw new NucleusUserException(LOCALISER.msg("044046"));
+            throw new NucleusUserException(Localiser.msg("044046"));
         }
         else
         {
@@ -2672,7 +2668,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE &&
                 !getNucleusContext().getApiAdapter().isPersistable(cls))
             {
-                throw new NucleusUserException(LOCALISER.msg("044059", cls.getName()));
+                throw new NucleusUserException(Localiser.msg("044059", cls.getName()));
             }
             populateAbstractClassMetaData(cmd, clr, cls.getClassLoader());
             initialiseAbstractClassMetaData(cmd, clr);

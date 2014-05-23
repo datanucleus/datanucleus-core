@@ -47,10 +47,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class TransactionImpl implements Transaction
 {
-    /** Localisation of messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     ExecutionContext ec;
 
     TransactionManager txnMgr;
@@ -156,7 +152,7 @@ public class TransactionImpl implements Transaction
         }
         if (NucleusLogger.TRANSACTION.isDebugEnabled())
         {
-            NucleusLogger.TRANSACTION.debug(LOCALISER.msg("015000", ec, "" + ec.getBooleanProperty(PropertyNames.PROPERTY_OPTIMISTIC)));
+            NucleusLogger.TRANSACTION.debug(Localiser.msg("015000", ec, "" + ec.getBooleanProperty(PropertyNames.PROPERTY_OPTIMISTIC)));
         }
 
         TransactionEventListener[] ls = getListenersForEvent();
@@ -186,7 +182,7 @@ public class TransactionImpl implements Transaction
                 throw (NucleusException)ex;
             }
             // Wrap all other exceptions in a NucleusTransactionException
-            throw new NucleusTransactionException(LOCALISER.msg("015005"), ex);
+            throw new NucleusTransactionException(Localiser.msg("015005"), ex);
         }
     }
 
@@ -210,7 +206,7 @@ public class TransactionImpl implements Transaction
                 throw (NucleusException)ex;
             }
             // Wrap all other exceptions in a NucleusTransactionException
-            throw new NucleusTransactionException(LOCALISER.msg("015005"), ex);
+            throw new NucleusTransactionException(Localiser.msg("015005"), ex);
         }
     }
 
@@ -252,10 +248,10 @@ public class TransactionImpl implements Transaction
             // Throw an exception since can only exit via rollback
             if (NucleusLogger.TRANSACTION.isDebugEnabled())
             {
-                NucleusLogger.TRANSACTION.debug(LOCALISER.msg("015020"));
+                NucleusLogger.TRANSACTION.debug(Localiser.msg("015020"));
             }
 
-            throw new NucleusDataStoreException(LOCALISER.msg("015020")).setFatal();
+            throw new NucleusDataStoreException(Localiser.msg("015020")).setFatal();
         }
 
         long startTime = System.currentTimeMillis();
@@ -343,13 +339,13 @@ public class TransactionImpl implements Transaction
         }
         if (errors.size() > 0)
         {
-            throw new NucleusTransactionException(LOCALISER.msg("015007"), (Throwable[])errors.toArray(
+            throw new NucleusTransactionException(Localiser.msg("015007"), (Throwable[])errors.toArray(
                 new Throwable[errors.size()]));
         }
 
         if (NucleusLogger.TRANSACTION.isDebugEnabled())
         {
-            NucleusLogger.TRANSACTION.debug(LOCALISER.msg("015022", (System.currentTimeMillis() - startTime)));
+            NucleusLogger.TRANSACTION.debug(Localiser.msg("015022", (System.currentTimeMillis() - startTime)));
         }
     }
 
@@ -363,7 +359,7 @@ public class TransactionImpl implements Transaction
 
         if (NucleusLogger.TRANSACTION.isDebugEnabled())
         {
-            NucleusLogger.TRANSACTION.debug(LOCALISER.msg("015001", ec));
+            NucleusLogger.TRANSACTION.debug(Localiser.msg("015001", ec));
         }
 
         if (sync != null)
@@ -474,7 +470,7 @@ public class TransactionImpl implements Transaction
         }
         catch (NucleusException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("015009"), e);
+            throw new NucleusDataStoreException(Localiser.msg("015009"), e);
         }
         finally
         {
@@ -483,7 +479,7 @@ public class TransactionImpl implements Transaction
 
         if (NucleusLogger.TRANSACTION.isDebugEnabled())
         {
-            NucleusLogger.TRANSACTION.debug(LOCALISER.msg("015023", (System.currentTimeMillis() - startTime)));
+            NucleusLogger.TRANSACTION.debug(Localiser.msg("015023", (System.currentTimeMillis() - startTime)));
         }
     }
 
@@ -491,7 +487,7 @@ public class TransactionImpl implements Transaction
     {
         if (NucleusLogger.TRANSACTION.isDebugEnabled())
         {
-            NucleusLogger.TRANSACTION.debug(LOCALISER.msg("015002", ec));
+            NucleusLogger.TRANSACTION.debug(Localiser.msg("015002", ec));
         }
 
         TransactionEventListener[] ls = getListenersForEvent();

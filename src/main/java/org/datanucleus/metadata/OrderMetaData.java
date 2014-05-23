@@ -127,8 +127,7 @@ public class OrderMetaData extends MetaData implements ColumnMetaDataContainer
             AbstractClassMetaData elementCmd = fmd.getCollection().element.classMetaData;
             if (elementCmd != null && !elementCmd.hasMember(mappedBy))
             {
-                throw new InvalidMemberMetaDataException(LOCALISER, "044137", fmd.getClassName(),
-                    fmd.getName(), elementCmd.getFullClassName(), mappedBy);
+                throw new InvalidMemberMetaDataException("044137", fmd.getClassName(), fmd.getName(), elementCmd.getFullClassName(), mappedBy);
             }
         }
 
@@ -292,8 +291,7 @@ public class OrderMetaData extends MetaData implements ColumnMetaDataContainer
                         }
                         else if (!direction.equalsIgnoreCase("ASC"))
                         {
-                            throw new InvalidMemberMetaDataException(LOCALISER, "044139", fmd.getClassName(),
-                                fmd.getName(), direction);
+                            throw new InvalidMemberMetaDataException("044139", fmd.getClassName(), fmd.getName(), direction);
                         }
                     }
                     else
@@ -304,8 +302,7 @@ public class OrderMetaData extends MetaData implements ColumnMetaDataContainer
 
                     if (!elementCmd.hasMember(fieldName))
                     {
-                        throw new InvalidMemberMetaDataException(LOCALISER, "044138", fmd.getClassName(),
-                            fmd.getName(), elementCmd.getFullClassName(), fieldName);
+                        throw new InvalidMemberMetaDataException("044138", fmd.getClassName(), fmd.getName(), elementCmd.getFullClassName(), fieldName);
                     }
 
                     // Add the field order

@@ -68,10 +68,6 @@ import org.datanucleus.util.TypeConversionHelper;
  */
 public class QueryUtils
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Convenience Class[] for parameter types in getMethod call. */
     final static Class[] classArrayObjectObject = new Class[]{Object.class, Object.class};
 
@@ -282,7 +278,7 @@ public class QueryUtils
         }
         catch (Exception e)
         {
-            String msg = LOCALISER.msg("021205", resultClass.getName());
+            String msg = Localiser.msg("021205", resultClass.getName());
             NucleusLogger.QUERY.error(msg);
             throw new NucleusUserException(msg);
         }
@@ -298,7 +294,7 @@ public class QueryUtils
                 {
                     fieldType = fieldValues[i].getClass().getName();
                 }
-                String msg = LOCALISER.msg("021204", resultClass.getName(), 
+                String msg = Localiser.msg("021204", resultClass.getName(), 
                     resultFieldNames[i], fieldType);
                 NucleusLogger.QUERY.error(msg);
                 throw new NucleusUserException(msg);
@@ -330,7 +326,7 @@ public class QueryUtils
         }
         catch (Exception e)
         {
-            String msg = LOCALISER.msg("021205", resultClass.getName());
+            String msg = Localiser.msg("021205", resultClass.getName());
             NucleusLogger.QUERY.error(msg);
             throw new NucleusUserException(msg);
         }
@@ -345,7 +341,7 @@ public class QueryUtils
                 {
                     fieldType = fieldValues[i].getClass().getName();
                 }
-                String msg = LOCALISER.msg("021204", resultClass.getName(), resultFieldNames[i], fieldType);
+                String msg = Localiser.msg("021204", resultClass.getName(), resultFieldNames[i], fieldType);
                 NucleusLogger.QUERY.error(msg);
                 throw new NucleusUserException(msg);
             }
@@ -410,7 +406,7 @@ public class QueryUtils
             }
             if (!fieldSet && NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021209", 
+                NucleusLogger.QUERY.debug(Localiser.msg("021209", 
                     obj.getClass().getName(), declaredFieldName));
             }
         }
@@ -488,7 +484,7 @@ public class QueryUtils
             }
             if (!fieldSet && NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021207", 
+                NucleusLogger.QUERY.debug(Localiser.msg("021207", 
                     obj.getClass().getName(), setMethodName, (argType != null ? argType.getName() : null)));
             }
         }
@@ -516,7 +512,7 @@ public class QueryUtils
             }
             if (!fieldSet && NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021208", 
+                NucleusLogger.QUERY.debug(Localiser.msg("021208", 
                     obj.getClass().getName(), "put"));
             }
         }

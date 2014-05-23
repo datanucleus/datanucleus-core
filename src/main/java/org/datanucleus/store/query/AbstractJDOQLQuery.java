@@ -29,6 +29,7 @@ import org.datanucleus.query.compiler.JDOQLCompiler;
 import org.datanucleus.query.compiler.JavaQueryCompiler;
 import org.datanucleus.query.compiler.QueryCompilation;
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -352,7 +353,7 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
         if (NucleusLogger.QUERY.isDebugEnabled())
         {
             startTime = System.currentTimeMillis();
-            NucleusLogger.QUERY.debug(LOCALISER.msg("021044", getLanguage(), getSingleStringQuery()));
+            NucleusLogger.QUERY.debug(Localiser.msg("021044", getLanguage(), getSingleStringQuery()));
         }
         JDOQLCompiler compiler = new JDOQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), 
             from, candidateClass, candidateCollection, 
@@ -375,7 +376,7 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
         }
         if (NucleusLogger.QUERY.isDebugEnabled())
         {
-            NucleusLogger.QUERY.debug(LOCALISER.msg("021045", getLanguage(), 
+            NucleusLogger.QUERY.debug(Localiser.msg("021045", getLanguage(), 
                 "" + (System.currentTimeMillis() - startTime)));
         }
 
@@ -420,7 +421,7 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
                 startTime = System.currentTimeMillis();
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021044", getLanguage(), 
+                NucleusLogger.QUERY.debug(Localiser.msg("021044", getLanguage(), 
                     ((AbstractJDOQLQuery)subquery).getSingleStringQuery()));
             }
 
@@ -443,8 +444,7 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
             parentCompilation.addSubqueryCompilation(entry.getKey(), subqueryCompilation);
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021045", getLanguage(), 
-                    "" + (System.currentTimeMillis() - startTime)));
+                NucleusLogger.QUERY.debug(Localiser.msg("021045", getLanguage(), "" + (System.currentTimeMillis() - startTime)));
             }
 
             if (subquery.subqueries != null) 

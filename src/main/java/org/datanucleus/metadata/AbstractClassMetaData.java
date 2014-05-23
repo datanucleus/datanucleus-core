@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.PropertyNames;
@@ -52,9 +51,6 @@ import org.datanucleus.util.ViewUtils;
  */
 public abstract class AbstractClassMetaData extends MetaData
 {
-    protected static final Localiser LOCALISER_API=Localiser.getInstance("org.datanucleus.Localisation",
-        ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Suffix to add on to the class name for any generated primary key class. */
     public static final String GENERATED_PK_SUFFIX = "_PK";
 
@@ -279,7 +275,7 @@ public abstract class AbstractClassMetaData extends MetaData
 
         if (StringUtils.isWhitespace(name))
         {
-            throw new InvalidMetaDataException(LOCALISER, "044061", parent.name);
+            throw new InvalidMetaDataException("044061", parent.name);
         }
 
         this.name = name;
@@ -519,7 +515,7 @@ public abstract class AbstractClassMetaData extends MetaData
     {
         if (!isInitialised())
         {
-            throw new NucleusException(LOCALISER.msg("044069",fullName)).setFatal();
+            throw new NucleusException(Localiser.msg("044069",fullName)).setFatal();
         }
     }
 
@@ -531,7 +527,7 @@ public abstract class AbstractClassMetaData extends MetaData
     {
         if (!isPopulated() && !isInitialised())
         {
-            throw new NucleusException(LOCALISER.msg("044070",fullName)).setFatal();
+            throw new NucleusException(Localiser.msg("044070",fullName)).setFatal();
         }
     }
 
@@ -560,7 +556,7 @@ public abstract class AbstractClassMetaData extends MetaData
         // No class loader, so use default
         if (clr == null)
         {
-            NucleusLogger.METADATA.warn(LOCALISER.msg("044067",fullName));
+            NucleusLogger.METADATA.warn(Localiser.msg("044067",fullName));
             clr = mmgr.getNucleusContext().getClassLoaderResolver(null);
         }
     
@@ -571,14 +567,14 @@ public abstract class AbstractClassMetaData extends MetaData
             cls = clr.classForName(fullName,primary,false);
             if (cls == null)
             {
-                NucleusLogger.METADATA.error(LOCALISER.msg("044080",fullName));
-                throw new InvalidClassMetaDataException(LOCALISER, "044080", fullName);
+                NucleusLogger.METADATA.error(Localiser.msg("044080",fullName));
+                throw new InvalidClassMetaDataException("044080", fullName);
             }
         }
         catch (ClassNotResolvedException cnre)
         {
-            NucleusLogger.METADATA.error(LOCALISER.msg("044080",fullName));
-            NucleusException ne = new InvalidClassMetaDataException(LOCALISER, "044080", fullName);
+            NucleusLogger.METADATA.error(Localiser.msg("044080",fullName));
+            NucleusException ne = new InvalidClassMetaDataException("044080", fullName);
             ne.setNestedException(cnre);
             throw ne;
         }
@@ -680,23 +676,23 @@ public abstract class AbstractClassMetaData extends MetaData
                 if (superCmd == null || 
                     superCmd.getPersistenceModifier() != ClassPersistenceModifier.PERSISTENCE_CAPABLE)
                 {
-                    throw new InvalidClassMetaDataException(LOCALISER, "044083", fullName, persistableSuperclass);
+                    throw new InvalidClassMetaDataException("044083", fullName, persistableSuperclass);
                 }
             }
             catch (ClassNotResolvedException cnre)
             {
-                throw new InvalidClassMetaDataException(LOCALISER, "044088", fullName, persistableSuperclass);
+                throw new InvalidClassMetaDataException("044088", fullName, persistableSuperclass);
             }
             if (realPcSuperclassName != null)
             {
-                throw new InvalidClassMetaDataException(LOCALISER, "044087", fullName, realPcSuperclassName,
+                throw new InvalidClassMetaDataException("044087", fullName, realPcSuperclassName,
                     persistableSuperclass);
             }
             else
             {
                 // The defined persistableSuperclass could NOT have been a superclass
                 // of this class, otherwise it would have been equal to the realPcSuperclassName.
-                throw new InvalidClassMetaDataException(LOCALISER, "044082", fullName, persistableSuperclass);
+                throw new InvalidClassMetaDataException("044082", fullName, persistableSuperclass);
             }
         }
         else if (persistableSuperclass == null && realPcSuperclassName != null)
@@ -704,7 +700,7 @@ public abstract class AbstractClassMetaData extends MetaData
             persistableSuperclass = realPcSuperclassName;
             if (NucleusLogger.METADATA.isDebugEnabled())
             {
-                NucleusLogger.METADATA.debug(LOCALISER.msg("044089", fullName, persistableSuperclass));
+                NucleusLogger.METADATA.debug(Localiser.msg("044089", fullName, persistableSuperclass));
             }
         }
         validateSuperClass(clr, cls, superclasses, mmgr);
@@ -745,12 +741,12 @@ public abstract class AbstractClassMetaData extends MetaData
             }
             catch (ClassNotResolvedException cnre)
             {
-                throw new InvalidClassMetaDataException(LOCALISER, "044081", fullName, persistableSuperclass);
+                throw new InvalidClassMetaDataException("044081", fullName, persistableSuperclass);
             }
 
             if (persistableSuperclass.equals(fullName) || !(pcsc.isAssignableFrom(cls)))
             {
-                throw new InvalidClassMetaDataException(LOCALISER, "044082", fullName, persistableSuperclass);
+                throw new InvalidClassMetaDataException("044082", fullName, persistableSuperclass);
             }
 
             // Retrieve the Meta-Data for the superclass
@@ -761,7 +757,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 if (pcSuperclassMetaData == null)
                 {
                     // Superclass isn't persistence capable since no MetaData could be found.
-                    throw new InvalidClassMetaDataException(LOCALISER, "044083", fullName, persistableSuperclass);
+                    throw new InvalidClassMetaDataException("044083", fullName, persistableSuperclass);
                 }
             }
             else
@@ -780,7 +776,7 @@ public abstract class AbstractClassMetaData extends MetaData
             }
             if (pcSuperclassMetaData == null)
             {
-                throw new InvalidClassMetaDataException(LOCALISER, "044084", fullName, persistableSuperclass);
+                throw new InvalidClassMetaDataException("044084", fullName, persistableSuperclass);
             }
             if (!pcSuperclassMetaData.isPopulated() && !pcSuperclassMetaData.isInitialised())
             {
@@ -798,7 +794,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 if (superCmd != null && 
                     superCmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
                 {
-                    throw new InvalidClassMetaDataException(LOCALISER, "044091", fullName, superclass.getName());
+                    throw new InvalidClassMetaDataException("044091", fullName, superclass.getName());
                 }
             }
         }
@@ -823,8 +819,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 identityMetaData.getValueStrategy() != IdentityStrategy.NATIVE)
             {
                 // User made deliberate attempt to change strategy in this subclass
-                throw new InvalidClassMetaDataException(LOCALISER, "044094",
-                    fullName, identityMetaData.getValueStrategy(), baseImd.getValueStrategy());
+                throw new InvalidClassMetaDataException("044094", fullName, identityMetaData.getValueStrategy(), baseImd.getValueStrategy());
             }
 
             if (baseCmd.identitySpecified && identityMetaData != null && 
@@ -908,11 +903,11 @@ public abstract class AbstractClassMetaData extends MetaData
                 String superObjectIdClass = pcSuperclassMetaData.getObjectidClass();
                 if (superObjectIdClass == null || !objectidClass.equals(superObjectIdClass))
                 {
-                    throw new InvalidClassMetaDataException(LOCALISER, "044085", fullName, persistableSuperclass);
+                    throw new InvalidClassMetaDataException("044085", fullName, persistableSuperclass);
                 }
 
                 // by default users should only specify the object-id class in the root persistent class
-                NucleusLogger.METADATA.warn(LOCALISER.msg("044086", name, persistableSuperclass));
+                NucleusLogger.METADATA.warn(Localiser.msg("044086", name, persistableSuperclass));
             }
             else
             {
@@ -931,7 +926,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 if (!this.identityType.equals(pcSuperclassMetaData.getIdentityType())) 
                 {
                     // We can't change the identity type from what was specified in the base class
-                    throw new InvalidClassMetaDataException(LOCALISER, "044093", fullName);
+                    throw new InvalidClassMetaDataException("044093", fullName);
                 }
             }
 
@@ -958,7 +953,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 }
                 if (noOfPkKeys > 0)
                 {
-                    throw new InvalidClassMetaDataException(LOCALISER, "044034", getFullClassName(), noOfPkKeys, pcSuperclassMetaData.getNoOfPopulatedPKMembers());
+                    throw new InvalidClassMetaDataException("044034", getFullClassName(), noOfPkKeys, pcSuperclassMetaData.getNoOfPopulatedPKMembers());
                 }
             }
         }
@@ -1012,14 +1007,14 @@ public abstract class AbstractClassMetaData extends MetaData
                 if (superCmd == null)
                 {
                     // We need a superclass table yet there is no superclass with its own table!
-                    throw new InvalidClassMetaDataException(LOCALISER, "044099", fullName);
+                    throw new InvalidClassMetaDataException("044099", fullName);
                 }
 
                 DiscriminatorMetaData superDismd = superCmd.getInheritanceMetaData().getDiscriminatorMetaData();
                 if (superDismd == null)
                 {
                     // If we are using "superclass-table" then the superclass should have specified the discriminator.
-                    throw new InvalidClassMetaDataException(LOCALISER, "044100",  fullName, superCmd.fullName);
+                    throw new InvalidClassMetaDataException("044100",  fullName, superCmd.fullName);
                 }
 
                 DiscriminatorMetaData dismd = inheritanceMetaData.getDiscriminatorMetaData();
@@ -1027,8 +1022,7 @@ public abstract class AbstractClassMetaData extends MetaData
                     (dismd == null || dismd.getValue() == null) && !mappedSuperclass && !isAbstract)
                 {
                     // If we are using "superclass-table" and the discriminator uses "value-map" then we must specify a value
-                    throw new InvalidClassMetaDataException(LOCALISER, "044102",
-                        fullName, superCmd.fullName, superDismd.getColumnName());
+                    throw new InvalidClassMetaDataException("044102", fullName, superCmd.fullName, superDismd.getColumnName());
                 }
             }
 
@@ -1038,7 +1032,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 DiscriminatorMetaData dismd = inheritanceMetaData.getDiscriminatorMetaData();
                 if (dismd != null && !StringUtils.isWhitespace(dismd.getValue()))
                 {
-                    NucleusLogger.METADATA.warn(LOCALISER.msg("044105", fullName));
+                    NucleusLogger.METADATA.warn(Localiser.msg("044105", fullName));
                 }
             }
             else
@@ -1052,7 +1046,7 @@ public abstract class AbstractClassMetaData extends MetaData
                         ColumnMetaData superDiscrimColmd = pcSuperclassMetaData.getDiscriminatorColumnMetaData();
                         if (superDiscrimColmd != null)
                         {
-                            NucleusLogger.GENERAL.debug(LOCALISER.msg("044126", fullName));
+                            NucleusLogger.GENERAL.debug(Localiser.msg("044126", fullName));
                         }
                     }
                 }
@@ -1241,7 +1235,7 @@ public abstract class AbstractClassMetaData extends MetaData
             AbstractClassMetaData superCmd = getClassManagingTable();
             if (superCmd == null)
             {
-                throw new InvalidClassMetaDataException(LOCALISER, "044064", getFullClassName());
+                throw new InvalidClassMetaDataException("044064", getFullClassName());
             }
 
             if (superCmd.getInheritanceMetaData() != null)
@@ -1293,11 +1287,11 @@ public abstract class AbstractClassMetaData extends MetaData
                 ColumnMetaData colmd = (ColumnMetaData)unmappedIter.next();
                 if (colmd.getName() == null)
                 {
-                    throw new InvalidClassMetaDataException(LOCALISER, "044119", fullName);
+                    throw new InvalidClassMetaDataException("044119", fullName);
                 }
                 if (colmd.getJdbcType() == null)
                 {
-                    throw new InvalidClassMetaDataException(LOCALISER, "044120", fullName, colmd.getName());
+                    throw new InvalidClassMetaDataException("044120", fullName, colmd.getName());
                 }
             }
         }
@@ -1438,13 +1432,13 @@ public abstract class AbstractClassMetaData extends MetaData
             // Update "objectid-class" if required yet not specified
             if (no_of_pk_fields == 0)
             {
-                NucleusLogger.METADATA.error(LOCALISER.msg("044065", fullName, "" + no_of_pk_fields));
-                throw new InvalidClassMetaDataException(LOCALISER, "044065", fullName, "" + no_of_pk_fields);
+                NucleusLogger.METADATA.error(Localiser.msg("044065", fullName, "" + no_of_pk_fields));
+                throw new InvalidClassMetaDataException("044065", fullName, "" + no_of_pk_fields);
             }
             else if (no_of_pk_fields > 1)
             {
                 // More than 1 PK yet no objectidClass - maybe added by enhancer later, so log warning
-                NucleusLogger.METADATA.warn(LOCALISER.msg("044065", fullName, "" + no_of_pk_fields));
+                NucleusLogger.METADATA.warn(Localiser.msg("044065", fullName, "" + no_of_pk_fields));
                 if (!mmgr.isEnhancing())
                 {
                     objectidClass = fullName + GENERATED_PK_SUFFIX;
@@ -1486,8 +1480,8 @@ public abstract class AbstractClassMetaData extends MetaData
                 }
                 else
                 {
-                    NucleusLogger.METADATA.error(LOCALISER.msg("044066", fullName, pk_type.getName()));
-                    throw new InvalidClassMetaDataException(LOCALISER, "044066", fullName, pk_type.getName());
+                    NucleusLogger.METADATA.error(Localiser.msg("044066", fullName, pk_type.getName()));
+                    throw new InvalidClassMetaDataException("044066", fullName, pk_type.getName());
                 }
             }
         }
@@ -1498,7 +1492,7 @@ public abstract class AbstractClassMetaData extends MetaData
             if (no_of_pk_fields == 0 && identityType == IdentityType.APPLICATION)
             {
                 // No primary key fields found (even in superclasses)
-                throw new InvalidMetaDataException(LOCALISER, "044077", fullName, objectidClass);
+                throw new InvalidMetaDataException(Localiser, "044077", fullName, objectidClass);
             }
         }*/
     }
@@ -1525,7 +1519,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 catch (ClassNotResolvedException cnre)
                 {
                     // ObjectIdClass not found
-                    throw new InvalidClassMetaDataException(LOCALISER, "044079", fullName, objectidClass);
+                    throw new InvalidClassMetaDataException("044079", fullName, objectidClass);
                 }
 
                 boolean validated = false;
@@ -1546,7 +1540,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 {
                     // Why is this wrapping all exceptions into 1 single exception? 
                     // This needs coordinating with the test expectations in the enhancer unit tests.
-                    throw new NucleusUserException(LOCALISER_API.msg("019016", getFullClassName(), obj_cls.getName()), 
+                    throw new NucleusUserException(Localiser.msg("019016", getFullClassName(), obj_cls.getName()), 
                         (Throwable[]) errors.toArray(new Throwable[errors.size()]));
                 }
             }
@@ -1618,8 +1612,7 @@ public abstract class AbstractClassMetaData extends MetaData
         if (pk_field_count > 0 && identityType != IdentityType.APPLICATION)
         {
             // primary key fields found, but not using application identity
-            throw new InvalidClassMetaDataException(LOCALISER, "044078", fullName, 
-                Integer.valueOf(pk_field_count), identityType);
+            throw new InvalidClassMetaDataException("044078", fullName, Integer.valueOf(pk_field_count), identityType);
         }
         else if (pk_field_count > 0)
         {
@@ -1636,7 +1629,7 @@ public abstract class AbstractClassMetaData extends MetaData
         else if (instantiable && pk_field_count == 0 && identityType == IdentityType.APPLICATION)
         {
             // No primary key fields found even though it does permit instances
-            throw new InvalidClassMetaDataException(LOCALISER, "044077", fullName, objectidClass);
+            throw new InvalidClassMetaDataException("044077", fullName, objectidClass);
         }
 
         nonPkMemberPositions = new int[memberCount-pk_field_count];
@@ -3504,7 +3497,7 @@ public abstract class AbstractClassMetaData extends MetaData
     {
         if (StringUtils.isWhitespace(queryName))
         {
-            throw new InvalidClassMetaDataException(LOCALISER, "044154", fullName);
+            throw new InvalidClassMetaDataException("044154", fullName);
         }
         QueryMetaData qmd = new QueryMetaData(queryName);
         addQuery(qmd);
@@ -3540,7 +3533,7 @@ public abstract class AbstractClassMetaData extends MetaData
     {
         if (StringUtils.isWhitespace(queryName))
         {
-            throw new InvalidClassMetaDataException(LOCALISER, "044154", fullName);
+            throw new InvalidClassMetaDataException("044154", fullName);
         }
         StoredProcQueryMetaData qmd = new StoredProcQueryMetaData(queryName);
         addStoredProcQuery(qmd);
@@ -3727,7 +3720,7 @@ public abstract class AbstractClassMetaData extends MetaData
                     (mmd instanceof FieldMetaData && md instanceof FieldMetaData))
                 {
                     // Duplicate entry for the same field or property
-                    throw new NucleusUserException(LOCALISER.msg("044090", fullName, mmd.getName()));
+                    throw new NucleusUserException(Localiser.msg("044090", fullName, mmd.getName()));
                 }
             }
 
@@ -3759,7 +3752,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 if (existingIsProperty && newIsProperty)
                 {
                     // Duplicate entry for the same field or property
-                    throw new NucleusUserException(LOCALISER.msg("044090", fullName, mmd.getName()));
+                    throw new NucleusUserException(Localiser.msg("044090", fullName, mmd.getName()));
                 }
                 else if (existingIsProperty && !newIsProperty)
                 {

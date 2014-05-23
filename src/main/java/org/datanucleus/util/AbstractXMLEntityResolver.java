@@ -38,10 +38,6 @@ import org.xml.sax.SAXException;
  */
 public abstract class AbstractXMLEntityResolver implements EntityResolver
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Map of public identity entities supported. The key will be the identity, and the value is the local input to use. */
     protected HashMap publicIdEntities = new HashMap();
 
@@ -88,7 +84,7 @@ public abstract class AbstractXMLEntityResolver implements EntityResolver
                     {
                         if (NucleusLogger.METADATA.isDebugEnabled())
                         {
-                            NucleusLogger.METADATA.debug(LOCALISER.msg("028001", publicId, systemId));
+                            NucleusLogger.METADATA.debug(Localiser.msg("028001", publicId, systemId));
                         }
                         FileInputStream in = new FileInputStream(file);
                         return new InputSource(in);
@@ -107,7 +103,7 @@ public abstract class AbstractXMLEntityResolver implements EntityResolver
                     {
                         if (NucleusLogger.METADATA.isDebugEnabled())
                         {
-                            NucleusLogger.METADATA.debug(LOCALISER.msg("028001", publicId, systemId));
+                            NucleusLogger.METADATA.debug(Localiser.msg("028001", publicId, systemId));
                         }
                         URL url = new URL(systemId);
                         InputStream url_stream = url.openStream();
@@ -120,12 +116,12 @@ public abstract class AbstractXMLEntityResolver implements EntityResolver
                 }
             }
 
-            NucleusLogger.METADATA.error(LOCALISER.msg("028002", publicId, systemId));
+            NucleusLogger.METADATA.error(Localiser.msg("028002", publicId, systemId));
             return null;
         }
         catch (Exception e)
         {
-        	NucleusLogger.METADATA.error(LOCALISER.msg("028003", publicId, systemId), e);
+        	NucleusLogger.METADATA.error(Localiser.msg("028003", publicId, systemId), e);
             throw new SAXException(e.getMessage(), e);
         }
     }
@@ -143,7 +139,7 @@ public abstract class AbstractXMLEntityResolver implements EntityResolver
     {
         if (NucleusLogger.METADATA.isDebugEnabled())
         {
-            NucleusLogger.METADATA.debug(LOCALISER.msg("028000", publicId, systemId, localPath));
+            NucleusLogger.METADATA.debug(Localiser.msg("028000", publicId, systemId, localPath));
         }
 
     	InputStream in = AbstractXMLEntityResolver.class.getResourceAsStream(localPath);

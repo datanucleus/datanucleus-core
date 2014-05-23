@@ -71,14 +71,13 @@ public class ValueMetaData extends AbstractElementMetaData
         }
         catch (ClassNotResolvedException cnre)
         {
-            throw new InvalidMemberMetaDataException(LOCALISER, "044150", fmd.getClassName(), fmd.getName(), 
+            throw new InvalidMemberMetaDataException("044150", fmd.getClassName(), fmd.getName(), 
                 valueType);
         }
         if (embeddedMetaData != null &&
             (valueTypeClass.isInterface() || valueTypeClass.getName().equals("java.lang.Object")))
         {
-            throw new InvalidMemberMetaDataException(LOCALISER, "044152", fmd.getClassName(), fmd.getName(), 
-                valueTypeClass.getName());
+            throw new InvalidMemberMetaDataException("044152", fmd.getClassName(), fmd.getName(), valueTypeClass.getName());
         }
 
         // TODO This will not work currently since MapMetaData is populated *after* ValueMetaData and so the

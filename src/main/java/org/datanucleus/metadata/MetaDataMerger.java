@@ -37,9 +37,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class MetaDataMerger
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Method to take a file JDO MetaData definition and merge in the ORM MetaData definition.
      * If something is specified in the JDO MetaData and also in the ORM MetaData then the ORM MetaData takes precedence.
@@ -55,12 +52,12 @@ public class MetaDataMerger
         }
         if (primaryFmd.isInitialised() || primaryFmd.isPopulated())
         {
-            throw new NucleusException(LOCALISER.msg("MetaData.File.AlreadyPopulatedError", 
+            throw new NucleusException(Localiser.msg("MetaData.File.AlreadyPopulatedError", 
                 primaryFmd.getFilename())).setFatal();
         }
         if (NucleusLogger.METADATA.isDebugEnabled())
         {
-            NucleusLogger.METADATA.debug(LOCALISER.msg("044056", primaryFmd.getFilename()));
+            NucleusLogger.METADATA.debug(Localiser.msg("044056", primaryFmd.getFilename()));
         }
 
         if (ormFmd.getCatalog() != null)
@@ -91,11 +88,11 @@ public class MetaDataMerger
         }
         if (primaryCmd.isInitialised() || primaryCmd.isPopulated())
         {
-            throw new NucleusException(LOCALISER.msg("044068", primaryCmd.name)).setFatal();
+            throw new NucleusException(Localiser.msg("044068", primaryCmd.name)).setFatal();
         }
         if (NucleusLogger.METADATA.isDebugEnabled())
         {
-            NucleusLogger.METADATA.debug(LOCALISER.msg("044096", primaryCmd.getFullClassName()));
+            NucleusLogger.METADATA.debug(Localiser.msg("044096", primaryCmd.getFullClassName()));
         }
 
         // Merge the attributes where they are set in the ORM
@@ -225,7 +222,7 @@ public class MetaDataMerger
             if (Boolean.TRUE.equals(ormFmd.primaryKey) && (primaryFmd == null || Boolean.FALSE.equals(primaryFmd.primaryKey)))
             {
                 // Root metadata (annotations/JDO file) had no PK info for this field but the ORM is trying to set it as the PK!
-                throw new NucleusUserException(LOCALISER.msg("044025", ormFmd.getFullFieldName())).setFatal();
+                throw new NucleusUserException(Localiser.msg("044025", ormFmd.getFullFieldName())).setFatal();
             }
 
             if (primaryFmd == null)
@@ -322,7 +319,7 @@ public class MetaDataMerger
 
         if (primaryFmd.isInitialised() || primaryFmd.isPopulated())
         {
-            throw new NucleusException(LOCALISER.msg("044107", primaryFmd.getClassName(), primaryFmd.getName())).setFatal();
+            throw new NucleusException(Localiser.msg("044107", primaryFmd.getClassName(), primaryFmd.getName())).setFatal();
         }
 
         if (ormFmd.persistenceModifier != null &&
@@ -481,12 +478,12 @@ public class MetaDataMerger
         }
         if (primaryCmd.isInitialised() || primaryCmd.isPopulated())
         {
-            throw new NucleusException(LOCALISER.msg("044068", primaryCmd.name)).setFatal();
+            throw new NucleusException(Localiser.msg("044068", primaryCmd.name)).setFatal();
         }
 
         if (NucleusLogger.METADATA.isDebugEnabled())
         {
-            NucleusLogger.METADATA.debug(LOCALISER.msg("044095", primaryCmd.getFullClassName()));
+            NucleusLogger.METADATA.debug(Localiser.msg("044095", primaryCmd.getFullClassName()));
         }
 
         // Merge any annotated information that is hanging off the package
@@ -769,7 +766,7 @@ public class MetaDataMerger
 
         if (primaryFmd.isInitialised() || primaryFmd.isPopulated())
         {
-            throw new NucleusException(LOCALISER.msg("044107", primaryFmd.getClassName(), primaryFmd.getName())).setFatal();
+            throw new NucleusException(Localiser.msg("044107", primaryFmd.getClassName(), primaryFmd.getName())).setFatal();
         }
 
         if (primaryFmd.className == null && annotFmd.className != null)

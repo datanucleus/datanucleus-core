@@ -25,15 +25,13 @@ import org.datanucleus.util.Localiser;
  */
 public class ClassNotPersistableException extends NucleusUserException
 {
-    private static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructs a class-not-persistable exception with the specified detail message.
      * @param className Name of the class
      */
     public ClassNotPersistableException(String className)
     {
-        super(LOCALISER.msg("018000", className));
+        super(Localiser.msg("018000", className));
     }
 
     /**
@@ -43,6 +41,6 @@ public class ClassNotPersistableException extends NucleusUserException
      */
     public ClassNotPersistableException(String className, Exception nested)
     {
-        super(LOCALISER.msg("018000", className), nested);
+        super(Localiser.msg("018000", className), nested);
     }
 }

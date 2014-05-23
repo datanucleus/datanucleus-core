@@ -25,16 +25,13 @@ import org.datanucleus.util.Localiser;
  */
 public class NoPersistenceInformationException extends NucleusUserException
 {
-    private static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructs an exception for the specified class.
      * @param className Name of the class
      */
     public NoPersistenceInformationException(String className)
     {
-        super(LOCALISER.msg("018001",className));
+        super(Localiser.msg("018001",className));
     }
 
     /**
@@ -44,6 +41,6 @@ public class NoPersistenceInformationException extends NucleusUserException
      */
     public NoPersistenceInformationException(String className, Exception nested)
     {
-        super(LOCALISER.msg("018001",className), nested);
+        super(Localiser.msg("018001",className), nested);
     }
 }

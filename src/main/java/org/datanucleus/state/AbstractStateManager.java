@@ -53,9 +53,6 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class AbstractStateManager<T> implements ObjectProvider<T>
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     protected static final SingleTypeFieldManager HOLLOWFIELDMANAGER = new SingleTypeFieldManager();
 
     /** Flag to signify that we are currently storing the persistable object, so we don't detach it on serialisation. */
@@ -813,7 +810,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     {
         if (isDeleting())
         {
-            throw new NucleusUserException(LOCALISER.msg("026008"));
+            throw new NucleusUserException(Localiser.msg("026008"));
         }
 
         activity = ActivityState.DELETING;
@@ -1002,7 +999,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
                     CachedPC copyCachedPC = cachedPC.getCopy();
                     if (NucleusLogger.CACHE.isDebugEnabled())
                     {
-                        NucleusLogger.CACHE.debug(LOCALISER.msg("026033", StringUtils.toJVMIDString(getObject()), myID,
+                        NucleusLogger.CACHE.debug(Localiser.msg("026033", StringUtils.toJVMIDString(getObject()), myID,
                             StringUtils.intArrayToString(cacheFieldsToLoad)));
                     }
 
@@ -1046,7 +1043,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
                 {
                     if (NucleusLogger.CACHE.isDebugEnabled())
                     {
-                        NucleusLogger.CACHE.debug(LOCALISER.msg("026034", StringUtils.toJVMIDString(getObject()), myID,
+                        NucleusLogger.CACHE.debug(Localiser.msg("026034", StringUtils.toJVMIDString(getObject()), myID,
                             StringUtils.intArrayToString(cacheFieldsToLoad)));
                     }
 

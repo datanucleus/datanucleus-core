@@ -51,10 +51,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class AttachFieldManager extends AbstractFieldManager
 {
-    /** Localiser for internationalisation. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** ObjectProvider for the attached instance */
     private final ObjectProvider attachedOP;
 
@@ -153,7 +149,7 @@ public class AttachFieldManager extends AbstractFieldManager
             {
                 // Check for a field storing a PC where it is being nulled and the other object is dependent
                 attachedOP.flush(); // Flush the nulling of the field
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("026026", oldValue, mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("026026", oldValue, mmd.getFullFieldName()));
                 ec.deleteObjectInternal(oldValue);
             }
         }
@@ -203,7 +199,7 @@ public class AttachFieldManager extends AbstractFieldManager
                     // Detached object didn't use wrapped field
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("026029", StringUtils.toJVMIDString(attachedOP.getObject()),
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029", StringUtils.toJVMIDString(attachedOP.getObject()),
                             attachedOP.getInternalObjectId(), mmd.getName()));
                     }
                     sco = SCOUtils.newSCOInstance(attachedOP, mmd, mmd.getType(), null, null, false, false, false);

@@ -22,6 +22,7 @@ import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
 import org.datanucleus.enhancer.DataNucleusEnhancer;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method to generate a default Constructor using ASM.
@@ -77,7 +78,7 @@ public class DefaultConstructor extends ClassMethod
         // Override the log message
         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
         {
-            DataNucleusEnhancer.LOGGER.debug(LOCALISER.msg("Enhancer.AddConstructor", 
+            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddConstructor", 
                 getClassEnhancer().getClassName() + "()"));
         }
     }
