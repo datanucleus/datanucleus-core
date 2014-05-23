@@ -47,18 +47,14 @@ public class JTAJCATransactionImpl extends TransactionImpl implements Synchroniz
     /**
      * Constructor.
      * @param ec ExecutionContext
+     * @param properties Properties to use with the transaction
      */
     JTAJCATransactionImpl(ExecutionContext ec, PropertyStore properties)
     {
         super(ec, properties);
         joinTransaction();
     }
-    
-    JTAJCATransactionImpl(ExecutionContext ec)
-    {
-        this(ec, null);
-    }
-    
+
     /* (non-Javadoc)
      * @see org.datanucleus.TransactionImpl#getIsActive()
      */

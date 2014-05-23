@@ -82,6 +82,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
      * Will attempt to join with the transaction manager to get the underlying transaction.
      * @param ec ExecutionContext
      * @param autoJoin Whether to auto-join to the underlying UserTransaction on isActive and at creation?
+     * @param properties Properties to use with the transaction
      */
     JTATransactionImpl(ExecutionContext ec, boolean autoJoin, PropertyStore properties)
     {
@@ -118,11 +119,6 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         }
     }
 
-    JTATransactionImpl(ExecutionContext ec, boolean autoJoin)
-    {
-        this(ec, autoJoin, null);
-    }
-    
     public boolean isJoined()
     {
         return (joinStatus == JoinStatus.JOINED);

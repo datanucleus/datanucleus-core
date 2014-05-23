@@ -88,6 +88,7 @@ public class TransactionImpl implements Transaction
     /**
      * Constructor for a transaction for the specified ExecutionContext.
      * @param ec ExecutionContext
+     * @param properties Properties to use with the transaction
      */
     public TransactionImpl(ExecutionContext ec, PropertyStore properties)
     {
@@ -121,12 +122,7 @@ public class TransactionImpl implements Transaction
             }            
         }
     }
-    
-    public TransactionImpl(ExecutionContext ec)
-    {
-        this(ec, null);
-    }
-    
+
     public void close()
     {
         closed = true;
