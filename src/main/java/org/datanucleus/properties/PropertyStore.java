@@ -30,6 +30,8 @@ public abstract class PropertyStore
 {
     /** Map of properties. */
     protected Map<String, Object> properties = new HashMap<String, Object>();
+    
+    protected FrequentlyAccessedProperties frequentProperties = new FrequentlyAccessedProperties();
 
     /**
      * Method to set a property in the store
@@ -39,6 +41,7 @@ public abstract class PropertyStore
     protected void setPropertyInternal(String name, Object value)
     {
         this.properties.put(name.toLowerCase(Locale.ENGLISH), value);
+        this.frequentProperties.setProperty(name, value);
     }
 
     /**
@@ -199,5 +202,14 @@ public abstract class PropertyStore
             return null;
         }
         throw new PropertyTypeInvalidException(name, "String");
+    }
+
+
+    /**
+     * @return properties, which are stored in field for faster access
+     */
+    public FrequentlyAccessedProperties getFrequentProperties()
+    {
+        return frequentProperties;
     }
 }

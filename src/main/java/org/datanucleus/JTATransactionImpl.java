@@ -33,6 +33,7 @@ import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.properties.PropertyStore;
 import org.datanucleus.store.connection.ConnectionFactory;
 import org.datanucleus.store.connection.ConnectionResourceType;
 import org.datanucleus.transaction.NucleusTransactionException;
@@ -82,9 +83,9 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
      * @param ec ExecutionContext
      * @param autoJoin Whether to auto-join to the underlying UserTransaction on isActive and at creation?
      */
-    JTATransactionImpl(ExecutionContext ec, boolean autoJoin)
+    JTATransactionImpl(ExecutionContext ec, boolean autoJoin, PropertyStore properties)
     {
-        super(ec);
+        super(ec, properties);
         this.autoJoin = autoJoin;
 
         // we only make sense in combination with ResourceType.JTA. Verify this has been set.
@@ -117,6 +118,11 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         }
     }
 
+    JTATransactionImpl(ExecutionContext ec, boolean autoJoin)
+    {
+        this(ec, autoJoin, null);
+    }
+    
     public boolean isJoined()
     {
         return (joinStatus == JoinStatus.JOINED);

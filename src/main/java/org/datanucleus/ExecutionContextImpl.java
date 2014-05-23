@@ -311,7 +311,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             Map.Entry<String, Object> entry = propIter.next();
             properties.setProperty(entry.getKey().toLowerCase(Locale.ENGLISH), entry.getValue());
         }
-
+        properties.getFrequentProperties().setDefaults(conf.getFrequentProperties());
+        
         // Set up FetchPlan
         fetchPlan = new FetchPlan(this, clr).setMaxFetchDepth(conf.getIntProperty(PropertyNames.PROPERTY_MAX_FETCH_DEPTH));
 
@@ -321,7 +322,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             if (getNucleusContext().isJcaMode())
             {
                 // JTA transaction under JCA
-                tx = new JTAJCATransactionImpl(this);
+                tx = new JTAJCATransactionImpl(this, properties);
             }
             else
             {
@@ -331,13 +332,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     autoJoin = Boolean.valueOf((String)options.get(OPTION_JTA_AUTOJOIN));
                 }
-                tx = new JTATransactionImpl(this, autoJoin);
+                tx = new JTATransactionImpl(this, autoJoin, properties);
             }
         }
         else
         {
             // Local transaction
-            tx = new TransactionImpl(this);
+            tx = new TransactionImpl(this, properties);
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
@@ -423,8 +424,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 }
             }
         }
-
-        if (getBooleanProperty(PropertyNames.PROPERTY_DETACH_ON_CLOSE))
+        
+        if (properties.getFrequentProperties().getDetachOnClose())
         {
             // "detach-on-close", detaching all currently cached objects.
             performDetachOnClose();
@@ -910,7 +911,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     protected boolean getReachabilityAtCommit()
     {
-        return properties.getBooleanProperty(PropertyNames.PROPERTY_PERSISTENCE_BY_REACHABILITY_AT_COMMIT.toLowerCase(Locale.ENGLISH));
+    	return properties.getFrequentProperties().getReachabilityAtCommit();
     }
 
     /**
@@ -1346,7 +1347,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 performLevel2CacheUpdateAtCommit();
             }
 
-            if (getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_COMMIT))
+            if (properties.getFrequentProperties().getDetachAllOnCommit())
             {
                 // "detach-on-commit"
                 performDetachAllOnTxnEndPreparation();
@@ -4133,7 +4134,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 performLevel2CacheUpdateAtCommit();
             }
 
-            if (getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_COMMIT))
+            if (properties.getFrequentProperties().getDetachAllOnCommit())
             {
                 // "detach-on-commit"
                 performDetachAllOnTxnEndPreparation();
@@ -4609,7 +4610,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 lock.lock();
             }
 
-            if (getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_COMMIT))
+            if (properties.getFrequentProperties().getDetachAllOnCommit())
             {
                 // Detach-all-on-commit
                 performDetachAllOnTxnEnd();
@@ -4633,7 +4634,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                             ops[i].postCommit(getTransaction());
 
                             // TODO Change this check so that we remove all objects that are no longer suitable for caching
-                            if (getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_COMMIT) && api.isDetachable(ops[i].getObject()))
+                            if (properties.getFrequentProperties().getDetachAllOnCommit() && api.isDetachable(ops[i].getObject()))
                             {
                                 // "DetachAllOnCommit" - Remove the object from the L1 cache since it is now detached
                                 removeObjectProvider(ops[i]);
@@ -4805,22 +4806,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     protected String getLevel2CacheRetrieveMode()
     {
-        String setting = (String)getProperty(PropertyNames.PROPERTY_CACHE_L2_RETRIEVE_MODE);
-        if (setting == null)
-        {
-            setting = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_CACHE_L2_RETRIEVE_MODE);
-        }
-        return setting;
+        return properties.getFrequentProperties().getLevel2CacheRetrieveMode();
     }
 
     protected String getLevel2CacheStoreMode()
     {
-        String setting = (String)getProperty(PropertyNames.PROPERTY_CACHE_L2_STORE_MODE);
-        if (setting == null)
-        {
-            setting = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_CACHE_L2_STORE_MODE);
-        }
-        return setting;
+        return properties.getFrequentProperties().getLevel2CacheStoreMode();
     }
 
     /**
