@@ -115,7 +115,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
         {
             String msg = ClassMethod.getMethodAdditionMessage(enhancer.getNamer().getGetMethodPrefixMethodName() + mmd.getName(), 
                 mmd.getType(), null, null);
-            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddMethod", msg));
+            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005019", msg));
         }
 
         if (!mmd.isAbstract())
@@ -252,7 +252,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
                     // "throw new JDODetachedFieldAccessException(...)"
                     mv.visitTypeInsn(Opcodes.NEW, namer.getDetachedFieldAccessExceptionAsmClassName());
                     mv.visitInsn(Opcodes.DUP);
-                    mv.visitLdcInsn(Localiser.msg("Enhancer.DetachedPropertyAccess", mmd.getName()));
+                    mv.visitLdcInsn(Localiser.msg("005026", mmd.getName()));
                     mv.visitMethodInsn(Opcodes.INVOKESPECIAL, namer.getDetachedFieldAccessExceptionAsmClassName(), 
                         "<init>", "(Ljava/lang/String;)V");
                     mv.visitInsn(Opcodes.ATHROW);
@@ -367,7 +367,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
                     // "throw new JDODetachedFieldAccessException(...)"
                     mv.visitTypeInsn(Opcodes.NEW, namer.getDetachedFieldAccessExceptionAsmClassName());
                     mv.visitInsn(Opcodes.DUP);
-                    mv.visitLdcInsn(Localiser.msg("Enhancer.DetachedPropertyAccess", mmd.getName()));
+                    mv.visitLdcInsn(Localiser.msg("005026", mmd.getName()));
                     mv.visitMethodInsn(Opcodes.INVOKESPECIAL, namer.getDetachedFieldAccessExceptionAsmClassName(), 
                         "<init>", "(Ljava/lang/String;)V");
                     mv.visitInsn(Opcodes.ATHROW);

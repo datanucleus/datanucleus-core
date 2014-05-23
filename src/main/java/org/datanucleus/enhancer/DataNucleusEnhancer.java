@@ -343,7 +343,7 @@ public class DataNucleusEnhancer
                 String msg = null;
                 if (!StringUtils.getFileForFilename(classNames[i]).exists())
                 {
-                    msg = Localiser.msg("Enhancer.InputFiles.Invalid", classNames[i]);
+                    msg = Localiser.msg("005003", classNames[i]);
                     addMessage(msg, true);
                     name = null;
                 }
@@ -530,12 +530,12 @@ public class DataNucleusEnhancer
         String msg = null;
         if (verbose)
         {
-            msg = Localiser.msg("Enhancer.Success", classNames.size(), "" + (inputTime-startTime),
+            msg = Localiser.msg("005004", classNames.size(), "" + (inputTime-startTime),
                 "" + (enhanceTime-inputTime), "" + (enhanceTime-startTime));
         }
         else
         {
-            msg = Localiser.msg("Enhancer.Success.Simple", classNames.size());
+            msg = Localiser.msg("005005", classNames.size());
         }
         addMessage(msg, false);
 
@@ -598,12 +598,12 @@ public class DataNucleusEnhancer
         String msg = null;
         if (verbose)
         {
-            msg = Localiser.msg("Enhancer.Success", classNames.size(), "" + (inputTime-startTime),
+            msg = Localiser.msg("005004", classNames.size(), "" + (inputTime-startTime),
                 "" + (enhanceTime-inputTime), "" + (enhanceTime-startTime));
         }
         else
         {
-            msg = Localiser.msg("Enhancer.Success.Simple", classNames.size());
+            msg = Localiser.msg("005005", classNames.size());
         }
         addMessage(msg, false);
 
@@ -673,7 +673,7 @@ public class DataNucleusEnhancer
                         String classFilename = (String)comp.getValue();
                         if (!StringUtils.getFileForFilename(classFilename).exists())
                         {
-                            String msg = Localiser.msg("Enhancer.InputFiles.Invalid", classFilename);
+                            String msg = Localiser.msg("005003", classFilename);
                             addMessage(msg, true);
                         }
                         else
@@ -695,7 +695,7 @@ public class DataNucleusEnhancer
                             String className = null;
                             if (!StringUtils.getFileForFilename(classFilenames[i]).exists())
                             {
-                                String msg = Localiser.msg("Enhancer.InputFiles.Invalid", classFilenames[i]);
+                                String msg = Localiser.msg("005003", classFilenames[i]);
                                 addMessage(msg, true);
                             }
                             else
@@ -758,13 +758,11 @@ public class DataNucleusEnhancer
                     catch (NucleusException ne)
                     {
                         // No "persistence.xml" files found yet they have specified a persistence-unit name!
-                        throw new NucleusEnhanceException(
-                            Localiser.msg("Enhancer.PersistenceUnit.NoPersistenceFiles", comp.getValue()));
+                        throw new NucleusEnhanceException(Localiser.msg("005008", comp.getValue()));
                     }
                     if (pumd == null)
                     {
-                        throw new NucleusEnhanceException(
-                            Localiser.msg("Enhancer.PersistenceUnit.NoSuchUnit", comp.getValue()));
+                        throw new NucleusEnhanceException(Localiser.msg("005009", comp.getValue()));
                     }
                     filemds = metadataMgr.loadPersistenceUnit(pumd, userClassLoader);
                     break;
@@ -914,7 +912,7 @@ public class DataNucleusEnhancer
         {
             if (LOGGER.isDebugEnabled())
             {
-                LOGGER.debug(Localiser.msg("Enhancer.EnhanceClassStart", cmd.getFullClassName()));
+                LOGGER.debug(Localiser.msg("005010", cmd.getFullClassName()));
             }
             boolean enhanced = enhancer.enhance();
             if (enhanced)
@@ -988,7 +986,7 @@ public class DataNucleusEnhancer
                 addMessage("ERROR (NonPersistent) : " + cmd.getFullClassName(), false);
             }
 
-            String msg = Localiser.msg("Enhancer.ErrorEnhancingClass", cmd.getFullClassName(), ioe.getMessage());
+            String msg = Localiser.msg("005018", cmd.getFullClassName(), ioe.getMessage());
             LOGGER.error(msg, ioe);
             System.out.println(msg);
 
@@ -997,7 +995,7 @@ public class DataNucleusEnhancer
 
         if (LOGGER.isDebugEnabled())
         {
-            LOGGER.debug(Localiser.msg("Enhancer.EnhanceClassEnd", cmd.getFullClassName()));
+            LOGGER.debug(Localiser.msg("005011", cmd.getFullClassName()));
         }
 
         return success;
@@ -1013,7 +1011,7 @@ public class DataNucleusEnhancer
     {
         if (LOGGER.isDebugEnabled())
         {
-            LOGGER.debug(Localiser.msg("Enhancer.ValidateClassStart", cmd.getFullClassName()));
+            LOGGER.debug(Localiser.msg("005012", cmd.getFullClassName()));
         }
 
         boolean enhanced = enhancer.validate();
@@ -1056,7 +1054,7 @@ public class DataNucleusEnhancer
 
         if (LOGGER.isDebugEnabled())
         {
-            LOGGER.debug(Localiser.msg("Enhancer.ValidateClassEnd", cmd.getFullClassName()));
+            LOGGER.debug(Localiser.msg("005013", cmd.getFullClassName()));
         }
 
         return true;
@@ -1143,7 +1141,7 @@ public class DataNucleusEnhancer
         catch (NucleusException ne)
         {
             System.out.println(ne.getMessage());
-            String msg = Localiser.msg("Enhancer.Failure");
+            String msg = Localiser.msg("005006");
             LOGGER.error(msg, ne);
             if (!quiet)
             {
@@ -1154,7 +1152,7 @@ public class DataNucleusEnhancer
 
         if (numClasses == 0)
         {
-            String msg = Localiser.msg("Enhancer.NoClassesEnhanced");
+            String msg = Localiser.msg("005007");
             LOGGER.info(msg);
             if (!quiet)
             {

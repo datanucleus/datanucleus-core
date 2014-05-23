@@ -120,14 +120,14 @@ public class EnhancerClassChecker extends ClassVisitor
 
             if (!hasInterface(interfaces, enhancer.getNamer().getPersistableAsmClassName()))
             {
-                reportError(Localiser.msg("Enhancer.Check.InterfaceMissing", enhancer.getClassName(), enhancer.getNamer().getPersistableClass().getName()));
+                reportError(Localiser.msg("005027", enhancer.getClassName(), enhancer.getNamer().getPersistableClass().getName()));
             }
 
             if (enhancer.getClassMetaData().isDetachable())
             {
                 if (!hasInterface(interfaces, enhancer.getNamer().getDetachableAsmClassName()))
                 {
-                    reportError(Localiser.msg("Enhancer.Check.InterfaceMissing", enhancer.getClassName(), enhancer.getNamer().getDetachableClass().getName()));
+                    reportError(Localiser.msg("005027", enhancer.getClassName(), enhancer.getNamer().getDetachableClass().getName()));
                 }
             }
         }
@@ -187,14 +187,14 @@ public class EnhancerClassChecker extends ClassVisitor
             while (fieldsIter.hasNext())
             {
                 ClassField field = (ClassField)fieldsIter.next();
-                reportError(Localiser.msg("Enhancer.Check.FieldMissing", enhancer.getClassName(), field.getName()));
+                reportError(Localiser.msg("005028", enhancer.getClassName(), field.getName()));
             }
 
             Iterator methodsIter = methodsRequired.iterator();
             while (methodsIter.hasNext())
             {
                 ClassMethod method = (ClassMethod)methodsIter.next();
-                reportError(Localiser.msg("Enhancer.Check.MethodMissing", enhancer.getClassName(), method.getName()));
+                reportError(Localiser.msg("005031", enhancer.getClassName(), method.getName()));
             }
         }
         else if (enhancer.getClassMetaData().getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_AWARE)
@@ -223,11 +223,11 @@ public class EnhancerClassChecker extends ClassVisitor
             {
                 if (field.getAccess() != access)
                 {
-                    reportError(Localiser.msg("Enhancer.Check.FieldIncorrectAccess", enhancer.getClassName(), name));
+                    reportError(Localiser.msg("005029", enhancer.getClassName(), name));
                 }
                 else if (!desc.equals(Type.getDescriptor((Class)field.getType())))
                 {
-                    reportError(Localiser.msg("Enhancer.Check.FieldIncorrectType", enhancer.getClassName(), name));
+                    reportError(Localiser.msg("005030", enhancer.getClassName(), name));
                 }
                 else
                 {
@@ -270,7 +270,7 @@ public class EnhancerClassChecker extends ClassVisitor
             {
                 if (method.getAccess() != access)
                 {
-                    reportError(Localiser.msg("Enhancer.Check.MethodIncorrectAccess", enhancer.getClassName(), name));
+                    reportError(Localiser.msg("005032", enhancer.getClassName(), name));
                 }
                 else
                 {

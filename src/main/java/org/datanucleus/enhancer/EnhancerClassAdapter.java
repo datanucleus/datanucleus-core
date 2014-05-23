@@ -149,7 +149,7 @@ public class EnhancerClassAdapter extends ClassVisitor
                     intfs[position++] = enhancer.getNamer().getDetachableAsmClassName();
                     if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
                     {
-                        DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddInterface", enhancer.getNamer().getDetachableClass().getName()));
+                        DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005022", enhancer.getNamer().getDetachableClass().getName()));
                     }
                 }
                 if (needsPersistable)
@@ -157,7 +157,7 @@ public class EnhancerClassAdapter extends ClassVisitor
                     intfs[position++] = enhancer.getNamer().getPersistableAsmClassName();
                     if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
                     {
-                        DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddInterface", enhancer.getNamer().getPersistableClass().getName()));
+                        DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005022", enhancer.getNamer().getPersistableClass().getName()));
                     }
                 }
             }
@@ -284,7 +284,7 @@ public class EnhancerClassAdapter extends ClassVisitor
 
                 if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
                 {
-                    DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddField", ((Class)field.getType()).getName() + " " + field.getName()));
+                    DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005021", ((Class)field.getType()).getName() + " " + field.getName()));
                 }
                 cv.visitField(field.getAccess(), field.getName(), Type.getDescriptor((Class)field.getType()), null, null);
             }
@@ -343,7 +343,7 @@ public class EnhancerClassAdapter extends ClassVisitor
                         Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, long.class, uid);
                     if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
                     {
-                        DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddField", ((Class)cf.getType()).getName() + " " + cf.getName()));
+                        DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005021", ((Class)cf.getType()).getName() + " " + cf.getName()));
                     }
                     cv.visitField(cf.getAccess(), cf.getName(), Type.getDescriptor((Class)cf.getType()), null, cf.getInitialValue());
                 }

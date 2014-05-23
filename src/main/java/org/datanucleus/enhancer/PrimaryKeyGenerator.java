@@ -114,12 +114,10 @@ public class PrimaryKeyGenerator
             String fieldTypeName = getTypeNameForField(mmd);
             if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
             {
-                DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddField", 
-                    fieldTypeName + " " + pkClassName + " " + mmd.getName()));
+                DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005021", fieldTypeName + " " + pkClassName + " " + mmd.getName()));
             }
 
-            FieldVisitor fv = cw.visitField(Opcodes.ACC_PUBLIC, mmd.getName(),
-                EnhanceUtils.getTypeDescriptorForType(fieldTypeName), null, null);
+            FieldVisitor fv = cw.visitField(Opcodes.ACC_PUBLIC, mmd.getName(), EnhanceUtils.getTypeDescriptorForType(fieldTypeName), null, null);
             fv.visitEnd();
         }
     }
@@ -144,7 +142,7 @@ public class PrimaryKeyGenerator
     {
         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
         {
-            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddConstructor", pkClassName + "()"));
+            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005020", pkClassName + "()"));
         }
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
         mv.visitCode();
@@ -174,7 +172,7 @@ public class PrimaryKeyGenerator
     {
         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
         {
-            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddConstructor", pkClassName + "(String str)"));
+            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005020", pkClassName + "(String str)"));
         }
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "(Ljava/lang/String;)V", null, null);
         mv.visitCode();
@@ -362,7 +360,7 @@ public class PrimaryKeyGenerator
     {
         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
         {
-            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddMethod", "String " + pkClassName + ".toString()"));
+            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005019", "String " + pkClassName + ".toString()"));
         }
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "toString", "()Ljava/lang/String;", null, null);
         mv.visitCode();
@@ -465,7 +463,7 @@ public class PrimaryKeyGenerator
     {
         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
         {
-            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddMethod", "boolean " + pkClassName + ".equals(Object obj)"));
+            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005019", "boolean " + pkClassName + ".equals(Object obj)"));
         }
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "equals", "(Ljava/lang/Object;)Z", null, null);
         mv.visitCode();
@@ -583,7 +581,7 @@ public class PrimaryKeyGenerator
     {
         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
         {
-            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddMethod", "int " + pkClassName + ".hashCode()"));
+            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005019", "int " + pkClassName + ".hashCode()"));
         }
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "hashCode", "()I", null, null);
         mv.visitCode();

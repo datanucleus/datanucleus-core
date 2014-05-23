@@ -108,7 +108,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
                         mv.visitMethodInsn(Opcodes.INVOKESTATIC, fieldOwner, enhancer.getNamer().getGetMethodPrefixMethodName() + name, "(L" + fieldOwner + ";)" + desc);
                         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
                         {
-                            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.EnhanceOriginalMethodField",
+                            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005023",
                                 enhancer.getClassName() + "." + methodName, (fmd.getClassName(true) + "." + name), 
                                 enhancer.getNamer().getGetMethodPrefixMethodName() + name + "()"));
                         }
@@ -120,7 +120,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
                         mv.visitMethodInsn(Opcodes.INVOKESTATIC, fieldOwner, enhancer.getNamer().getSetMethodPrefixMethodName() + name, "(L" + fieldOwner + ";" + desc + ")V");
                         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
                         {
-                            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.EnhanceOriginalMethodField",
+                            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005023",
                                 enhancer.getClassName() + "." + methodName, (fmd.getClassName(true) + "." + name),
                                 enhancer.getNamer().getSetMethodPrefixMethodName() + name + "()"));
                         }
@@ -130,7 +130,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
             }
             else
             {
-                DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.EnhanceOriginalMethodFieldOmit",
+                DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005024",
                     enhancer.getClassName() + "." + methodName, (opcode == Opcodes.GETFIELD ? "get" : "set"), (ownerName + "." + name)));
             }
         }

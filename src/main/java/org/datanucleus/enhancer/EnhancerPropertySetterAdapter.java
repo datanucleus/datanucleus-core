@@ -116,7 +116,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
         {
             String msg = ClassMethod.getMethodAdditionMessage(enhancer.getNamer().getSetMethodPrefixMethodName() + mmd.getName(), 
                 null, new Object[]{mmd.getType()}, new String[] {"val"});
-            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddMethod", msg));
+            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005019", msg));
         }
 
         if (!mmd.isAbstract())

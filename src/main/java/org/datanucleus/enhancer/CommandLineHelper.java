@@ -231,7 +231,7 @@ class CommandLineHelper
 
     private void logEnhancerVersion(DataNucleusEnhancer enhancer, String apiName)
     {
-        String msg = Localiser.msg("Enhancer.ClassEnhancer", enhancer.getEnhancerVersion(), apiName);
+        String msg = Localiser.msg("005000", enhancer.getEnhancerVersion(), apiName);
         LOGGER.info(msg);
         if (!isQuiet())
         {
@@ -242,15 +242,15 @@ class CommandLineHelper
     private void logClasspath(DataNucleusEnhancer enhancer)
     {
         // Debug Info : CLASSPATH
-        LOGGER.debug(Localiser.msg("Enhancer.Classpath"));
+        LOGGER.debug(Localiser.msg("005001"));
         if (enhancer.isVerbose())
         {
-            System.out.println(Localiser.msg("Enhancer.Classpath"));
+            System.out.println(Localiser.msg("005001"));
         }
         StringTokenizer tokeniser = new StringTokenizer(System.getProperty("java.class.path"), File.pathSeparator);
         while (tokeniser.hasMoreTokens())
         {
-            String entry = Localiser.msg("Enhancer.Classpath.Entry", tokeniser.nextToken());
+            String entry = Localiser.msg("005002", tokeniser.nextToken());
             if (LOGGER.isDebugEnabled())
             {
                 LOGGER.debug(entry);

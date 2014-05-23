@@ -203,7 +203,7 @@ public abstract class ClassMethod
         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
         {
             String msg = getMethodAdditionMessage(methodName, returnType, argTypes, argNames);
-            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddMethod", msg));
+            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005019", msg));
         }
     }
 

@@ -183,7 +183,7 @@ public class GetViaMediate extends ClassMethod
                 // "throw new DetachedFieldAccessException(...)"
                 visitor.visitTypeInsn(Opcodes.NEW, getNamer().getDetachedFieldAccessExceptionAsmClassName());
                 visitor.visitInsn(Opcodes.DUP);
-                visitor.visitLdcInsn(Localiser.msg("Enhancer.DetachedFieldAccess", fmd.getName()));
+                visitor.visitLdcInsn(Localiser.msg("005025", fmd.getName()));
                 visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, getNamer().getDetachedFieldAccessExceptionAsmClassName(),
                     "<init>", "(Ljava/lang/String;)V");
                 visitor.visitInsn(Opcodes.ATHROW);

@@ -78,8 +78,7 @@ public class DefaultConstructor extends ClassMethod
         // Override the log message
         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
         {
-            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("Enhancer.AddConstructor", 
-                getClassEnhancer().getClassName() + "()"));
+            DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005020", getClassEnhancer().getClassName() + "()"));
         }
     }
 }
