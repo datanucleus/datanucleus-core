@@ -187,6 +187,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
     protected Map<String, DiscriminatorLookup> discriminatorLookupByRootClassName = new ConcurrentHashMap<String, MetaDataManagerImpl.DiscriminatorLookup>();
 
+    /** Map of populated/initialized ClassMetaData, keyed by the class name. */
+    protected Map<String, AbstractClassMetaData> populatedClassMetaDataByClass = new ConcurrentHashMap<String, AbstractClassMetaData>();
+
     private class DiscriminatorLookup
     {
         Map<String, String> discrimValueByClass = new HashMap<String, String>();
@@ -255,7 +258,10 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     {
         classMetaDataByClass.clear();
         classMetaDataByClass = null;
-
+        
+        populatedClassMetaDataByClass.clear();
+        populatedClassMetaDataByClass = null;
+        
         fileMetaDataByURLString.clear();
         fileMetaDataByURLString = null;
 
@@ -1199,6 +1205,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         {
             updateLock.lock();
 
+            populatedClassMetaDataByClass.remove(className);
+
             // Remove any reference to the AbstractClassMetaData
             AbstractClassMetaData cmd = classMetaDataByClass.remove(className);
             Iterator<Map.Entry<String, AbstractClassMetaData>> iter = classMetaDataByDiscriminatorName.entrySet().iterator();
@@ -1501,9 +1509,30 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     /* (non-Javadoc)
      * @see org.datanucleus.metadata.MetaDataManager#getMetaDataForClass(java.lang.String, org.datanucleus.ClassLoaderResolver)
      */
-    @Override
-    public synchronized AbstractClassMetaData getMetaDataForClass(String className, ClassLoaderResolver clr)
+    public AbstractClassMetaData getMetaDataForClass(String className, ClassLoaderResolver clr)
     {
+        if (className == null)
+        {
+            return null;
+        }
+
+        AbstractClassMetaData d = populatedClassMetaDataByClass.get(className);
+        if (d != null) 
+        {
+            return d;
+        }
+        
+        d = getMetaDataForClassImpl(className, clr);
+        if (d != null) 
+        {
+            populatedClassMetaDataByClass.put(className, d);
+        }
+        return d;
+    }
+    
+    private synchronized AbstractClassMetaData getMetaDataForClassImpl(String className, ClassLoaderResolver clr)
+    {
+
         if (className == null)
         {
             return null;
@@ -1563,7 +1592,28 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      * @see org.datanucleus.metadata.MetaDataManager#getMetaDataForClass(java.lang.Class, org.datanucleus.ClassLoaderResolver)
      */
     @Override
-    public synchronized AbstractClassMetaData getMetaDataForClass(Class c, ClassLoaderResolver clr)
+    public AbstractClassMetaData getMetaDataForClass(Class c, ClassLoaderResolver clr)
+    {
+        if (c == null)
+        {
+            return null;
+        }
+
+        AbstractClassMetaData d = populatedClassMetaDataByClass.get(c.getName());
+        if (d != null) 
+        {
+            return d;
+        }
+        
+        d = getMetaDataForClassImpl(c, clr);
+        if (d != null) 
+        {
+            populatedClassMetaDataByClass.put(c.getName(), d);
+        }
+        return d;
+    }
+    
+    public synchronized AbstractClassMetaData getMetaDataForClassImpl(Class c, ClassLoaderResolver clr)        
     {
         if (c == null)
         {
