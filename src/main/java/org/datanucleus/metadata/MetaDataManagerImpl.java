@@ -1528,7 +1528,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             return null;
         }
 
-        synchronized (this)
+        synchronized(this)
         {
             // Check if we have the MetaData already
             cmd = classMetaDataByClass.get(className);
@@ -1705,7 +1705,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      * @see org.datanucleus.metadata.MetaDataManager#getMetaDataForEntityName(java.lang.String)
      */
     @Override
-    public synchronized AbstractClassMetaData getMetaDataForEntityName(String entityName)
+    public AbstractClassMetaData getMetaDataForEntityName(String entityName)
     {
         return classMetaDataByEntityName.get(entityName);
     }
@@ -1714,7 +1714,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      * @see org.datanucleus.metadata.MetaDataManager#getMetaDataForDiscriminator(java.lang.String)
      */
     @Override
-    public synchronized AbstractClassMetaData getMetaDataForDiscriminator(String discriminator)
+    public AbstractClassMetaData getMetaDataForDiscriminator(String discriminator)
     {
         return classMetaDataByDiscriminatorName.get(discriminator);
     }

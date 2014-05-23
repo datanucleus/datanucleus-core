@@ -27,9 +27,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.util.NucleusLogger;
 
 /**
- * Class for providing faster access to properties that are rarely set but often
- * read.
- *
+ * Class for providing faster access to properties that are rarely set but often read.
  */
 public class FrequentlyAccessedProperties
 {
@@ -52,7 +50,7 @@ public class FrequentlyAccessedProperties
     private Boolean optimisticTransaction = null;
 
     /**
-     * Set default properties that are read when property is not defined in this instance 
+     * Set default properties that are read when property is not defined in this instance
      */
     public void setDefaults(FrequentlyAccessedProperties defaults)
     {
@@ -60,7 +58,7 @@ public class FrequentlyAccessedProperties
     }
 
     /**
-     * Tries to set the property value for any of the "frequent" properties. 
+     * Tries to set the property value for any of the "frequent" properties.
      */
     public void setProperty(String property, Object value)
     {
@@ -74,10 +72,10 @@ public class FrequentlyAccessedProperties
         {
             return;
         }
-        
+
         try
         {
-            
+
             if (value == null)
             {
                 f.set(this, value);
@@ -92,14 +90,15 @@ public class FrequentlyAccessedProperties
                 }
                 else if (value instanceof String)
                 {
-                    Boolean boolVal = Boolean.valueOf((String)value);
+                    Boolean boolVal = Boolean.valueOf((String) value);
                     f.set(this, boolVal);
                 }
             }
-            else {
-                f.set(this, String.valueOf(value));                
+            else
+            {
+                f.set(this, String.valueOf(value));
             }
-            
+
         }
         catch (Exception e)
         {
@@ -110,7 +109,8 @@ public class FrequentlyAccessedProperties
 
     public Boolean getReachabilityAtCommit()
     {
-        if (reachabilityAtCommit == null && defaults != null) {
+        if (reachabilityAtCommit == null && defaults != null)
+        {
             return defaults.getReachabilityAtCommit();
         }
         return reachabilityAtCommit;
@@ -118,7 +118,8 @@ public class FrequentlyAccessedProperties
 
     public Boolean getDetachOnClose()
     {
-        if (detachOnClose == null && defaults != null) {
+        if (detachOnClose == null && defaults != null)
+        {
             return defaults.getDetachOnClose();
         }
         return detachOnClose;
@@ -126,7 +127,8 @@ public class FrequentlyAccessedProperties
 
     public Boolean getDetachAllOnCommit()
     {
-        if (detachAllOnCommit == null && defaults != null) {
+        if (detachAllOnCommit == null && defaults != null)
+        {
             return defaults.getDetachAllOnCommit();
         }
         return detachAllOnCommit;
@@ -134,7 +136,8 @@ public class FrequentlyAccessedProperties
 
     public String getLevel2CacheStoreMode()
     {
-        if (level2CacheStoreMode == null && defaults != null) {
+        if (level2CacheStoreMode == null && defaults != null)
+        {
             return defaults.getLevel2CacheStoreMode();
         }
         return level2CacheStoreMode;
@@ -142,7 +145,8 @@ public class FrequentlyAccessedProperties
 
     public String getLevel2CacheRetrieveMode()
     {
-        if (level2CacheRetrieveMode == null && defaults != null) {
+        if (level2CacheRetrieveMode == null && defaults != null)
+        {
             return defaults.getLevel2CacheRetrieveMode();
         }
         return level2CacheRetrieveMode;
@@ -150,7 +154,8 @@ public class FrequentlyAccessedProperties
 
     public Boolean getSerialiseRead()
     {
-        if (serialiseRead == null && defaults != null) {
+        if (serialiseRead == null && defaults != null)
+        {
             return defaults.getSerialiseRead();
         }
         return serialiseRead;
@@ -158,7 +163,8 @@ public class FrequentlyAccessedProperties
 
     public Boolean getOptimisticTransaction()
     {
-        if (optimisticTransaction == null && defaults != null) {
+        if (optimisticTransaction == null && defaults != null)
+        {
             return defaults.getOptimisticTransaction();
         }
         return optimisticTransaction;
@@ -188,5 +194,4 @@ public class FrequentlyAccessedProperties
             NucleusLogger.GENERAL.error("Failed to set up frequently accessed properties: " + e, e);
         }
     }
-
 }
