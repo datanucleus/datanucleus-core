@@ -45,11 +45,11 @@ import org.datanucleus.ClassConstants;
  * The internationalisation operates around a Java ResourceBundle, loading a properties file.
  * 
  * Messages are output via calling
- * <pre>Localiser.getInstance().msg("012345", args);</pre>
+ * <pre>Localiser.msg("012345", args);</pre>
  * The messages themselves are contained in a file for each package. For example, with the above example,
  * we have "org.datanucleus.Localisation.properties". This contains entries such as
  * <pre>012345=Initialising Schema "{0}" using "{1}" auto-start option</pre>
- * So the 2 parameters specified in the <pre>Localiser.getInstance().msg()</pre> call are inserted into the message. 
+ * So the 2 parameters specified in the <pre>Localiser.msg(...)</pre> call are inserted into the message. 
  * <h3>Extending for other languages</h3>
  * The language-specific parts are always contained in the Localisation.properties file.
  * To extend the current system to internationalise in, for example, French you would add a file 
@@ -93,6 +93,12 @@ public class Localiser
         registerBundle("org.datanucleus.Localisation", ClassConstants.NUCLEUS_CONTEXT_LOADER);
     }
 
+    /**
+     * Method to be called by plugins that have their own ResourceBundle, so the messages will be registered
+     * and available for use.
+     * @param bundleName Name of the bundle e.g "org.datanucleus.store.myplugin.Localisation"
+     * @param loader Loader for the bundle
+     */
     public static void registerBundle(String bundleName, ClassLoader loader)
     {
         try
