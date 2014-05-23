@@ -140,6 +140,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     /** Map of ClassMetaData, keyed by the class name. */
     protected Map<String, AbstractClassMetaData> classMetaDataByClass = new ConcurrentHashMap<String, AbstractClassMetaData>();
 
+    protected Map<String, AbstractClassMetaData> usableClassMetaDataByClass = new ConcurrentHashMap<String, AbstractClassMetaData>();
+
     /** Map of FileMetaData for the parsed files, keyed by the URL string. */
     protected Map<String, FileMetaData> fileMetaDataByURLString = new ConcurrentHashMap();
 
@@ -255,6 +257,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     {
         classMetaDataByClass.clear();
         classMetaDataByClass = null;
+
+        usableClassMetaDataByClass.clear();
+        usableClassMetaDataByClass = null;
 
         fileMetaDataByURLString.clear();
         fileMetaDataByURLString = null;
@@ -1200,6 +1205,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             updateLock.lock();
 
             // Remove any reference to the AbstractClassMetaData
+            usableClassMetaDataByClass.remove(className);
+
             AbstractClassMetaData cmd = classMetaDataByClass.remove(className);
             Iterator<Map.Entry<String, AbstractClassMetaData>> iter = classMetaDataByDiscriminatorName.entrySet().iterator();
             while (iter.hasNext())
@@ -1502,11 +1509,17 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      * @see org.datanucleus.metadata.MetaDataManager#getMetaDataForClass(java.lang.String, org.datanucleus.ClassLoaderResolver)
      */
     @Override
-    public synchronized AbstractClassMetaData getMetaDataForClass(String className, ClassLoaderResolver clr)
+    public AbstractClassMetaData getMetaDataForClass(String className, ClassLoaderResolver clr)
     {
         if (className == null)
         {
             return null;
+        }
+
+        AbstractClassMetaData cmd = usableClassMetaDataByClass.get(className);
+        if (cmd != null)
+        {
+            return cmd;
         }
 
         // Check if this class has no MetaData/annotations before instantiating its class
@@ -1515,45 +1528,53 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             return null;
         }
 
-        // Check if we have the MetaData already
-        AbstractClassMetaData cmd = classMetaDataByClass.get(className);
-        if (cmd != null && cmd.isPopulated() && cmd.isInitialised() && cmd instanceof ClassMetaData)
+        synchronized (this)
         {
-            // We explicitly don't return metadata for persistent interfaces here since they should return the impl CMD
-            return cmd;
-        }
-
-        // Resolve the class
-        Class c = null;
-        try
-        {
-            if (clr == null)
+            // Check if we have the MetaData already
+            cmd = classMetaDataByClass.get(className);
+            if (cmd != null && cmd.isPopulated() && cmd.isInitialised() && cmd instanceof ClassMetaData)
             {
-                c = Class.forName(className);
-            }
-            else
-            {
-                c = clr.classForName(className, null, false);
-            }
-        }
-        catch (ClassNotFoundException cnfe)
-        {
-        }
-        catch (ClassNotResolvedException cnre)
-        {
-        }
-        if (c == null)
-        {
-            if (cmd != null && cmd.isPopulated() && cmd.isInitialised())
-            {
-                // Return any previously loaded metadata
+                // We explicitly don't return metadata for persistent interfaces here since they should return the impl CMD
                 return cmd;
             }
 
-            return null;
-        }
+            // Resolve the class
+            Class c = null;
+            try
+            {
+                if (clr == null)
+                {
+                    c = Class.forName(className);
+                }
+                else
+                {
+                    c = clr.classForName(className, null, false);
+                }
+            }
+            catch (ClassNotFoundException cnfe)
+            {
+            }
+            catch (ClassNotResolvedException cnre)
+            {
+            }
+            if (c == null)
+            {
+                if (cmd != null && cmd.isPopulated() && cmd.isInitialised())
+                {
+                    // Return any previously loaded metadata
+                    return cmd;
+                }
 
-        return getMetaDataForClass(c, clr);
+                return null;
+            }
+
+            cmd = getMetaDataForClass(c, clr);
+            if (cmd != null)
+            {
+                usableClassMetaDataByClass.put(className, cmd);
+            }
+            return cmd;
+        }
     }
 
     /** Temporary list of the FileMetaData objects utilised in this call for metadata. */
@@ -1563,85 +1584,100 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      * @see org.datanucleus.metadata.MetaDataManager#getMetaDataForClass(java.lang.Class, org.datanucleus.ClassLoaderResolver)
      */
     @Override
-    public synchronized AbstractClassMetaData getMetaDataForClass(Class c, ClassLoaderResolver clr)
+    public AbstractClassMetaData getMetaDataForClass(Class c, ClassLoaderResolver clr)
     {
         if (c == null)
         {
             return null;
         }
+
+        AbstractClassMetaData cmd = usableClassMetaDataByClass.get(c.getName());
+        if (cmd != null)
+        {
+            return cmd;
+        }
+
+        // Check if this class has no MetaData/annotations before instantiating its class
         if (isClassWithoutPersistenceInfo(c.getName()))
         {
             return null;
         }
 
-        boolean originatingLoadCall = false;
-        if (listenersLoadedMetaData == null && listeners != null)
+        synchronized(this)
         {
-            originatingLoadCall = true;
-            listenersLoadedMetaData = new ArrayList<AbstractClassMetaData>();
-        }
-
-        AbstractClassMetaData cmd = null;
-        if (c.isInterface())
-        {
-            // "persistent-interface" - check if it has class built at runtime and return the MetaData for it 
-            cmd = getClassMetaDataForImplementationOfPersistentInterface(c.getName());
-        }
-        else
-        {
-            // "persistent-class"
-            cmd = getMetaDataForClassInternal(c, clr);
-        }
-
-        if (cmd != null)
-        {
-            // Make sure that anything returned is initialised
-            populateAbstractClassMetaData(cmd, clr, c.getClassLoader());
-            initialiseAbstractClassMetaData(cmd, clr);
-
-            // Make sure all FileMetaData that were subsequently loaded as a result of this call are
-            // all initialised before return
-            if (utilisedFileMetaData.size() > 0)
+            boolean originatingLoadCall = false;
+            if (listenersLoadedMetaData == null && listeners != null)
             {
-                // Pass 1 - initialise anything loaded during the initialise of the requested class
-                ArrayList utilisedFileMetaData1 = (ArrayList)utilisedFileMetaData.clone();
-                utilisedFileMetaData.clear();
-                Iterator iter1 = utilisedFileMetaData1.iterator();
-                while (iter1.hasNext())
-                {
-                    FileMetaData filemd = (FileMetaData)iter1.next();
-                    initialiseFileMetaData(filemd, clr,c.getClassLoader());
-                }
+                originatingLoadCall = true;
+                listenersLoadedMetaData = new ArrayList<AbstractClassMetaData>();
+            }
 
+            cmd = null;
+            if (c.isInterface())
+            {
+                // "persistent-interface" - check if it has class built at runtime and return the MetaData for it 
+                cmd = getClassMetaDataForImplementationOfPersistentInterface(c.getName());
+            }
+            else
+            {
+                // "persistent-class"
+                cmd = getMetaDataForClassInternal(c, clr);
+            }
+
+            if (cmd != null)
+            {
+                // Make sure that anything returned is initialised
+                populateAbstractClassMetaData(cmd, clr, c.getClassLoader());
+                initialiseAbstractClassMetaData(cmd, clr);
+
+                // Make sure all FileMetaData that were subsequently loaded as a result of this call are
+                // all initialised before return
                 if (utilisedFileMetaData.size() > 0)
                 {
-                    // Pass 2 - initialise anything loaded during the initialise of pass 1
-                    ArrayList utilisedFileMetaData2 = (ArrayList)utilisedFileMetaData.clone();
+                    // Pass 1 - initialise anything loaded during the initialise of the requested class
+                    ArrayList utilisedFileMetaData1 = (ArrayList)utilisedFileMetaData.clone();
                     utilisedFileMetaData.clear();
-                    Iterator iter2 = utilisedFileMetaData2.iterator();
-                    while (iter2.hasNext())
+                    Iterator iter1 = utilisedFileMetaData1.iterator();
+                    while (iter1.hasNext())
                     {
-                        FileMetaData filemd = (FileMetaData)iter2.next();
+                        FileMetaData filemd = (FileMetaData)iter1.next();
                         initialiseFileMetaData(filemd, clr,c.getClassLoader());
+                    }
+
+                    if (utilisedFileMetaData.size() > 0)
+                    {
+                        // Pass 2 - initialise anything loaded during the initialise of pass 1
+                        ArrayList utilisedFileMetaData2 = (ArrayList)utilisedFileMetaData.clone();
+                        utilisedFileMetaData.clear();
+                        Iterator iter2 = utilisedFileMetaData2.iterator();
+                        while (iter2.hasNext())
+                        {
+                            FileMetaData filemd = (FileMetaData)iter2.next();
+                            initialiseFileMetaData(filemd, clr,c.getClassLoader());
+                        }
                     }
                 }
             }
-        }
-        else
-        {
-            if (!c.isInterface())
+            else
             {
-                classesWithoutPersistenceInfo.add(c.getName());
+                if (!c.isInterface())
+                {
+                    classesWithoutPersistenceInfo.add(c.getName());
+                }
             }
-        }
-        utilisedFileMetaData.clear();
+            utilisedFileMetaData.clear();
 
-        if (originatingLoadCall)
-        {
-            processListenerLoadingCall();
-        }
+            if (originatingLoadCall)
+            {
+                processListenerLoadingCall();
+            }
 
-        return cmd;
+            if (cmd != null)
+            {
+                usableClassMetaDataByClass.put(c.getName(), cmd);
+            }
+            return cmd;
+        }
     }
 
     protected void processListenerLoadingCall()
