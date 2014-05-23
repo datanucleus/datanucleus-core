@@ -25,6 +25,7 @@ import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
+import org.datanucleus.properties.PropertyStore;
 import org.datanucleus.transaction.NucleusTransactionException;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -47,12 +48,17 @@ public class JTAJCATransactionImpl extends TransactionImpl implements Synchroniz
      * Constructor.
      * @param ec ExecutionContext
      */
-    JTAJCATransactionImpl(ExecutionContext ec)
+    JTAJCATransactionImpl(ExecutionContext ec, PropertyStore properties)
     {
-        super(ec);
+        super(ec, properties);
         joinTransaction();
     }
-
+    
+    JTAJCATransactionImpl(ExecutionContext ec)
+    {
+        this(ec, null);
+    }
+    
     /* (non-Javadoc)
      * @see org.datanucleus.TransactionImpl#getIsActive()
      */

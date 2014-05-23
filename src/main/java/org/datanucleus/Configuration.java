@@ -36,6 +36,7 @@ import java.util.Set;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.properties.BooleanPropertyValidator;
+import org.datanucleus.properties.FrequentlyAccessedProperties;
 import org.datanucleus.properties.IntegerPropertyValidator;
 import org.datanucleus.properties.PropertyValidator;
 import org.datanucleus.properties.PropertyStore;
@@ -69,6 +70,8 @@ public class Configuration extends PropertyStore implements Serializable
     
     private volatile Map<String, Object> managerOverrideableProperties;
     
+    private FrequentlyAccessedProperties defaultFrequentProperties = new FrequentlyAccessedProperties();
+    
     /**
      * Convenience class wrapping the plugin property specification information.
      */
@@ -97,7 +100,7 @@ public class Configuration extends PropertyStore implements Serializable
     public Configuration(NucleusContext nucCtx)
     {
         this.nucCtx = nucCtx;
-
+        this.frequentProperties.setDefaults(defaultFrequentProperties);
         // Load up properties for the context that is in use
         nucCtx.applyDefaultProperties(this);
 
@@ -290,6 +293,7 @@ public class Configuration extends PropertyStore implements Serializable
                     propValue = getValueForPropertyWithValidator((String)propValue, mapping.validatorName);
                 }
                 defaultProperties.put(((String)entry.getKey()).toLowerCase(Locale.ENGLISH), propValue);
+                defaultFrequentProperties.setProperty((String)entry.getKey(), propValue);
             }
         }
     }
@@ -336,6 +340,7 @@ public class Configuration extends PropertyStore implements Serializable
                     propValue = getValueForPropertyWithValidator(value, validatorName);
                 }
                 this.defaultProperties.put(storedName, propValue);
+                defaultFrequentProperties.setProperty(storedName, propValue);
             }
         }
     }

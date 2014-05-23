@@ -32,6 +32,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.exceptions.TransactionActiveOnBeginException;
 import org.datanucleus.exceptions.TransactionNotActiveException;
+import org.datanucleus.properties.PropertyStore;
 import org.datanucleus.transaction.HeuristicMixedException;
 import org.datanucleus.transaction.HeuristicRollbackException;
 import org.datanucleus.transaction.NucleusTransactionException;
@@ -81,17 +82,20 @@ public class TransactionImpl implements Transaction
     long beginTime;
 
     boolean closed = false;
+    
+    private PropertyStore properties;
 
     /**
      * Constructor for a transaction for the specified ExecutionContext.
      * @param ec ExecutionContext
      */
-    public TransactionImpl(ExecutionContext ec)
+    public TransactionImpl(ExecutionContext ec, PropertyStore properties)
     {
         this.ec = ec;
         this.ecListener = (TransactionEventListener) ec;
         this.txnMgr = ec.getNucleusContext().getTransactionManager();
-
+        this.properties = properties;
+        
         Configuration config = ec.getNucleusContext().getConfiguration();
 
         int isolationLevel = TransactionUtils.getTransactionIsolationLevelForName(
@@ -99,17 +103,30 @@ public class TransactionImpl implements Transaction
         setOption(Transaction.TRANSACTION_ISOLATION_OPTION, isolationLevel);
 
         // Locking of read objects in this transaction
-        Boolean serialiseReadProp = config.getBooleanObjectProperty(PropertyNames.PROPERTY_SERIALIZE_READ);
-        if (ec.getProperty(PropertyNames.PROPERTY_SERIALIZE_READ) != null)
+        if (properties != null) 
         {
-            serialiseReadProp = ec.getBooleanProperty(PropertyNames.PROPERTY_SERIALIZE_READ);
-        }
-        if (serialiseReadProp != null)
+            Boolean serialiseReadProp = properties.getFrequentProperties().getSerialiseRead();
+            serializeRead = serialiseReadProp == null ? serializeRead : serialiseReadProp;
+        } 
+        else 
         {
-            serializeRead = serialiseReadProp;
+            Boolean serialiseReadProp = config.getBooleanObjectProperty(PropertyNames.PROPERTY_SERIALIZE_READ);
+            if (ec.getProperty(PropertyNames.PROPERTY_SERIALIZE_READ) != null)
+            {
+                serialiseReadProp = ec.getBooleanProperty(PropertyNames.PROPERTY_SERIALIZE_READ);
+            }
+            if (serialiseReadProp != null)
+            {
+                serializeRead = serialiseReadProp;
+            }            
         }
     }
-
+    
+    public TransactionImpl(ExecutionContext ec)
+    {
+        this(ec, null);
+    }
+    
     public void close()
     {
         closed = true;
@@ -627,6 +644,10 @@ public class TransactionImpl implements Transaction
      */
     public boolean getOptimistic()
     {
+        if (properties != null)
+        {
+            return properties.getFrequentProperties().getOptimisticTransaction();
+        }
         return ec.getBooleanProperty(PropertyNames.PROPERTY_OPTIMISTIC);
     }
 
@@ -859,4 +880,10 @@ public class TransactionImpl implements Transaction
         }
         options.put(option, value);
     }
+
+    public void setProperties(PropertyStore properties)
+    {
+        this.properties = properties;
+    }
+    
 }
