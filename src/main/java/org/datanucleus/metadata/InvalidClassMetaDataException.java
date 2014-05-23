@@ -24,12 +24,6 @@ public class InvalidClassMetaDataException extends InvalidMetaDataException
 {
     String className;
 
-    public InvalidClassMetaDataException(String key, String className)
-    {
-        super(key, className);
-        this.className = className;
-    }
-
     public InvalidClassMetaDataException(String key, String className, Object... params)
     {
         super(key, className, params);

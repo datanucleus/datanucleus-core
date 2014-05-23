@@ -25,20 +25,6 @@ public class InvalidMemberMetaDataException extends InvalidMetaDataException
     String className;
     String memberName;
 
-    public InvalidMemberMetaDataException(String key, Object... params)
-    {
-        super(key, params);
-        this.className = (String)params[0];
-        this.memberName = (String)params[1];
-    }
-
-    public InvalidMemberMetaDataException(String key, String className, String memberName)
-    {
-        super(key, className, memberName);
-        this.className = className;
-        this.memberName = memberName;
-    }
-
     public InvalidMemberMetaDataException(String key, String className, String memberName, Object... params)
     {
         super(key, className, memberName, params);

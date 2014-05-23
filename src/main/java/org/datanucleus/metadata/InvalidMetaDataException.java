@@ -37,11 +37,6 @@ public class InvalidMetaDataException extends NucleusFatalUserException
         this.messageKey = key;
     }
 
-    public InvalidMetaDataException(String key)
-    {
-        this(key, Localiser.msg(key));
-    }
-
     public InvalidMetaDataException(String key, Object... params)
     {
         this(key, Localiser.msg(key, params));

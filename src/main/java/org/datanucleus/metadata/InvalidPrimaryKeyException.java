@@ -25,11 +25,6 @@ package org.datanucleus.metadata;
  */
 public class InvalidPrimaryKeyException extends InvalidClassMetaDataException
 {
-    public InvalidPrimaryKeyException(String key, String className)
-    {
-        super(key, className);
-    }
-
     public InvalidPrimaryKeyException(String key, String className, Object... params)
     {
         super(key, className, params);

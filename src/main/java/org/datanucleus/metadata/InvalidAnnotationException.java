@@ -35,27 +35,6 @@ public class InvalidAnnotationException extends NucleusUserException
     protected Throwable cause;
 
     /**
-     * Default Constructor
-     */
-    public InvalidAnnotationException()
-    {
-        super();
-        setFatal();
-    }
-
-    /**
-     * Constructor with message resource and cause exception
-     * @param key message resources key
-     * @param cause cause exception
-     */
-    public InvalidAnnotationException(String key, Throwable cause)
-    {
-        this(key, "");
-        this.cause = cause;
-        setFatal();
-    }
-
-    /**
      * Constructor with message resource, message param and cause exception
      * @param key message resources key
      * @param params parameters
@@ -65,16 +44,6 @@ public class InvalidAnnotationException extends NucleusUserException
     {
         this(key, params);
         this.cause = cause;
-        setFatal();
-    }
-
-    /**
-     * Constructor with message resource 
-     * @param key message resources key
-     */
-    public InvalidAnnotationException(String key)
-    {
-        this(key, "");
         setFatal();
     }
 
