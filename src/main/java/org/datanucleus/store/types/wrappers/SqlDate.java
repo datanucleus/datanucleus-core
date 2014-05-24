@@ -28,7 +28,7 @@ import org.datanucleus.store.types.SCO;
 /**
  * A mutable second-class SQL date object.
  */
-public class SqlDate extends java.sql.Date implements SCO
+public class SqlDate extends java.sql.Date implements SCO<java.sql.Date>
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
@@ -55,20 +55,20 @@ public class SqlDate extends java.sql.Date implements SCO
 
     /**
      * Method to initialise the SCO from an existing value.
-     * @param o The Object
+     * @param d The Object
      * @param forInsert Whether the object needs inserting in the datastore with this value
      * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(Object o, boolean forInsert, boolean forUpdate)
+    public void initialise(java.sql.Date d, boolean forInsert, boolean forUpdate)
     {
-        super.setTime(((java.sql.Date)o).getTime());
+        super.setTime(d.getTime());
     }
 
     /**
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public Object getValue()
+    public java.sql.Date getValue()
     {
         return new java.sql.Date(getTime());
     }
@@ -120,7 +120,7 @@ public class SqlDate extends java.sql.Date implements SCO
      * @param state State for detachment process
      * @return The detached object
      */
-    public Object detachCopy(FetchPlanState state)
+    public java.sql.Date detachCopy(FetchPlanState state)
     {
         return new java.sql.Date(getTime());
     }
@@ -129,13 +129,13 @@ public class SqlDate extends java.sql.Date implements SCO
      * Method to return an attached version for the passed ObjectProvider and field, using the passed value.
      * @param value The new value
      */
-    public void attachCopy(Object value)
+    public void attachCopy(java.sql.Date value)
     {
         long oldValue = getTime();
         initialise(value, false, true);
 
         // Check if the field has changed, and set the owner field as dirty if necessary
-        long newValue = ((java.sql.Date)value).getTime();
+        long newValue = value.getTime();
         if (oldValue != newValue)
         {
             makeDirty();

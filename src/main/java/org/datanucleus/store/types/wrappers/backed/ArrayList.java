@@ -103,13 +103,12 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
 
     /**
      * Method to initialise the SCO from an existing value.
-     * @param o The object to set from
+     * @param c The object to set from
      * @param forInsert Whether the object needs inserting in the datastore with this value
      * @param forUpdate Whether to update the SCO in the datastore with this value
      */
-    public void initialise(Object o, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.ArrayList c, boolean forInsert, boolean forUpdate)
     {
-        Collection c = (Collection) o;
         if (c != null)
         {
             // Check for the case of serialised PC elements, and assign ObjectProviders to the elements without
@@ -249,7 +248,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public Object getValue()
+    public java.util.ArrayList getValue()
     {
         loadFromStore();
         return super.getValue();

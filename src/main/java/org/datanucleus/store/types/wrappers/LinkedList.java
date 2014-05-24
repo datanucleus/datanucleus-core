@@ -37,7 +37,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class LinkedList extends java.util.LinkedList implements SCOList, Cloneable
+public class LinkedList extends java.util.LinkedList implements SCOList<java.util.LinkedList>, Cloneable
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
@@ -58,16 +58,15 @@ public class LinkedList extends java.util.LinkedList implements SCOList, Cloneab
 
     /**
      * Method to initialise the SCO from an existing value.
-     * @param o The object to set from
+     * @param c The object to set from
      * @param forInsert Whether the object needs inserting in the datastore with this value
      * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(Object o, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.LinkedList c, boolean forInsert, boolean forUpdate)
     {
-        Collection c = (Collection)o;
         if (c != null)
         {
-            delegate = (java.util.LinkedList)c;
+            delegate = c;
         }
         else
         {
@@ -101,7 +100,7 @@ public class LinkedList extends java.util.LinkedList implements SCOList, Cloneab
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public Object getValue()
+    public java.util.LinkedList getValue()
     {
         return delegate;
     }
@@ -183,9 +182,9 @@ public class LinkedList extends java.util.LinkedList implements SCOList, Cloneab
      * @param state State for detachment process
      * @return The detached container
      */
-    public Object detachCopy(FetchPlanState state)
+    public java.util.LinkedList detachCopy(FetchPlanState state)
     {
-        java.util.Collection detached = new java.util.LinkedList();
+        java.util.LinkedList detached = new java.util.LinkedList();
         SCOUtils.detachCopyForCollection(ownerOP, toArray(), state, detached);
         return detached;
     }
@@ -197,15 +196,13 @@ public class LinkedList extends java.util.LinkedList implements SCOList, Cloneab
      * value are attached.
      * @param value The new (collection) value
      */
-    public void attachCopy(Object value)
+    public void attachCopy(java.util.LinkedList value)
     {
-        java.util.Collection c = (java.util.Collection) value;
-
         // Attach all of the elements in the new list
         boolean elementsWithoutIdentity = SCOUtils.collectionHasElementsWithoutIdentity(ownerMmd);
 
-        java.util.List attachedElements = new java.util.ArrayList(c.size());
-        SCOUtils.attachCopyForCollection(ownerOP, c.toArray(), attachedElements, elementsWithoutIdentity);
+        java.util.List attachedElements = new java.util.ArrayList(value.size());
+        SCOUtils.attachCopyForCollection(ownerOP, value.toArray(), attachedElements, elementsWithoutIdentity);
 
         // Update the attached list with the detached elements
         SCOUtils.updateListWithListElements(this, attachedElements);

@@ -107,13 +107,12 @@ public class Map extends org.datanucleus.store.types.wrappers.Map implements Bac
 
     /**
      * Method to initialise the SCO from an existing value.
-     * @param o  The object to set from
+     * @param m The object to set from
      * @param forInsert Whether the object needs inserting in the datastore with this value
      * @param forUpdate Whether to update the datastore with this value
      */
-    public synchronized void initialise(Object o, boolean forInsert, boolean forUpdate)
+    public synchronized void initialise(java.util.Map m, boolean forInsert, boolean forUpdate)
     {
-        java.util.Map m = (java.util.Map)o;
         if (m != null)
         {
             // Check for the case of serialised maps, and assign ObjectProviders to any PC keys/values without
@@ -261,7 +260,7 @@ public class Map extends org.datanucleus.store.types.wrappers.Map implements Bac
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public Object getValue()
+    public java.util.Map getValue()
     {
         loadFromStore();
         return super.getValue();

@@ -22,7 +22,7 @@ package org.datanucleus.store.types;
 /**
  * Representation of a wrapper for a mutable Map SCO type supported.
  **/
-public interface SCOMap extends SCOContainer
+public interface SCOMap<T> extends SCOContainer<T>
 {
     /**
      * Method to update an embedded key stored in the map.

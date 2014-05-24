@@ -20,7 +20,7 @@ package org.datanucleus.store.types;
 /**
  * Representation of a wrapper for a mutable List SCO type supported.
  **/
-public interface SCOList extends SCOCollection
+public interface SCOList<T> extends SCOCollection<T>
 {
     /**
      * Overload the basic List set() method to allow turning off of the dependent-field

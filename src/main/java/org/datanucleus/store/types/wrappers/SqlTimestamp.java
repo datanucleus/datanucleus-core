@@ -28,7 +28,7 @@ import org.datanucleus.store.types.SCO;
 /**
  * A mutable second-class SQL timestamp object.
  */
-public class SqlTimestamp extends java.sql.Timestamp implements SCO
+public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Timestamp>
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
@@ -54,21 +54,21 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO
 
     /**
      * Method to initialise the SCO from an existing value.
-     * @param o The Object
+     * @param ts The Object
      * @param forInsert Whether the object needs inserting in the datastore with this value
      * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(Object o, boolean forInsert, boolean forUpdate)
+    public void initialise(java.sql.Timestamp ts, boolean forInsert, boolean forUpdate)
     {
-        super.setTime(((java.sql.Timestamp)o).getTime());
-        super.setNanos(((java.sql.Timestamp)o).getNanos());
+        super.setTime(ts.getTime());
+        super.setNanos(ts.getNanos());
     }
 
     /**
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public Object getValue()
+    public java.sql.Timestamp getValue()
     {
         Timestamp ts = new java.sql.Timestamp(getTime());
         ts.setNanos(getNanos());
@@ -122,7 +122,7 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO
      * @param state State for detachment process
      * @return The detached object
      */
-    public Object detachCopy(FetchPlanState state)
+    public java.sql.Timestamp detachCopy(FetchPlanState state)
     {
         Timestamp ts = new java.sql.Timestamp(getTime());
         ts.setNanos(getNanos());
@@ -133,13 +133,13 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO
      * Method to return an attached version for the passed ObjectProvider and field, using the passed value.
      * @param value The new value
      */
-    public void attachCopy(Object value)
+    public void attachCopy(java.sql.Timestamp value)
     {
         long oldValue = getTime();
         initialise(value, false, true);
 
         // Check if the field has changed, and set the owner field as dirty if necessary
-        long newValue = ((java.sql.Timestamp)value).getTime();
+        long newValue = value.getTime();
         if (oldValue != newValue)
         {
             makeDirty();

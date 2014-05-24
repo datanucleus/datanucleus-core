@@ -34,7 +34,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class Properties extends java.util.Properties implements SCOMap, Cloneable
+public class Properties extends java.util.Properties implements SCOMap<java.util.Properties>, Cloneable
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
@@ -55,13 +55,12 @@ public class Properties extends java.util.Properties implements SCOMap, Cloneabl
 
     /**
      * Method to initialise the SCO from an existing value.
-     * @param o Object to set value using.
+     * @param m Object to set value using.
      * @param forInsert Whether the object needs inserting in the datastore with this value
      * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(Object o, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.Properties m, boolean forInsert, boolean forUpdate)
     {
-        java.util.Map m = (java.util.Map)o;
         if (m != null)
         {
             delegate = new java.util.Properties();
@@ -97,7 +96,7 @@ public class Properties extends java.util.Properties implements SCOMap, Cloneabl
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public Object getValue()
+    public java.util.Properties getValue()
     {
         return delegate;
     }
@@ -191,7 +190,7 @@ public class Properties extends java.util.Properties implements SCOMap, Cloneabl
      * @param state State for detachment process
      * @return The detached container
      */
-    public Object detachCopy(FetchPlanState state)
+    public java.util.Properties detachCopy(FetchPlanState state)
     {
         java.util.Properties detached = new java.util.Properties();
         SCOUtils.detachCopyForMap(ownerOP, entrySet(), state, detached);
@@ -205,16 +204,14 @@ public class Properties extends java.util.Properties implements SCOMap, Cloneabl
      * value are attached.
      * @param value The new (map) value
      */
-    public void attachCopy(Object value)
+    public void attachCopy(java.util.Properties value)
     {
-        java.util.Map m = (java.util.Map) value;
-
         // Attach all of the keys/values in the new map
         boolean keysWithoutIdentity = SCOUtils.mapHasKeysWithoutIdentity(ownerMmd);
         boolean valuesWithoutIdentity = SCOUtils.mapHasValuesWithoutIdentity(ownerMmd);
 
         java.util.Properties attachedKeysValues = new java.util.Properties();
-        SCOUtils.attachCopyForMap(ownerOP, m.entrySet(), attachedKeysValues, keysWithoutIdentity, valuesWithoutIdentity);
+        SCOUtils.attachCopyForMap(ownerOP, value.entrySet(), attachedKeysValues, keysWithoutIdentity, valuesWithoutIdentity);
 
         // Update the attached map with the detached elements
         SCOUtils.updateMapWithMapKeysValues(ownerOP.getExecutionContext().getApiAdapter(), this, attachedKeysValues);

@@ -21,7 +21,7 @@ package org.datanucleus.store.types;
 /**
  * Representation of a SCO that contains other (persistable) objects.
  **/
-public interface SCOContainer extends SCO
+public interface SCOContainer<T> extends SCO<T>
 {
     /**
      * Inform the SCO that it should load itself fully now (in case it is using lazy loading).

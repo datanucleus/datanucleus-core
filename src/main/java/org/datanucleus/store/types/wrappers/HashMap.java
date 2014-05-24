@@ -37,7 +37,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class HashMap extends java.util.HashMap implements SCOMap, Cloneable
+public class HashMap extends java.util.HashMap implements SCOMap<java.util.HashMap>, Cloneable
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
@@ -59,16 +59,15 @@ public class HashMap extends java.util.HashMap implements SCOMap, Cloneable
 
     /**
      * Method to initialise the SCO from an existing value.
-     * @param o Object to set value using.
+     * @param m Object to set value using.
      * @param forInsert Whether the object needs inserting in the datastore with this value
      * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(Object o, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.HashMap m, boolean forInsert, boolean forUpdate)
     {
-        java.util.Map m = (java.util.Map)o;
         if (m != null)
         {
-            delegate = (java.util.HashMap)m;
+            delegate = m;
         }
         else
         {
@@ -100,7 +99,7 @@ public class HashMap extends java.util.HashMap implements SCOMap, Cloneable
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public Object getValue()
+    public java.util.HashMap getValue()
     {
         return delegate;
     }
@@ -194,9 +193,9 @@ public class HashMap extends java.util.HashMap implements SCOMap, Cloneable
      * @param state State for detachment process
      * @return The detached container
      */
-    public Object detachCopy(FetchPlanState state)
+    public java.util.HashMap detachCopy(FetchPlanState state)
     {
-        java.util.Map detached = new java.util.HashMap();
+        java.util.HashMap detached = new java.util.HashMap();
         SCOUtils.detachCopyForMap(ownerOP, entrySet(), state, detached);
         return detached;
     }
@@ -208,16 +207,14 @@ public class HashMap extends java.util.HashMap implements SCOMap, Cloneable
      * value are attached.
      * @param value The new (map) value
      */
-    public void attachCopy(Object value)
+    public void attachCopy(java.util.HashMap value)
     {
-        java.util.Map m = (java.util.Map) value;
-
         // Attach all of the keys/values in the new map
         boolean keysWithoutIdentity = SCOUtils.mapHasKeysWithoutIdentity(ownerMmd);
         boolean valuesWithoutIdentity = SCOUtils.mapHasValuesWithoutIdentity(ownerMmd);
 
-        java.util.Map attachedKeysValues = new java.util.HashMap(m.size());
-        SCOUtils.attachCopyForMap(ownerOP, m.entrySet(), attachedKeysValues, keysWithoutIdentity, valuesWithoutIdentity);
+        java.util.Map attachedKeysValues = new java.util.HashMap(value.size());
+        SCOUtils.attachCopyForMap(ownerOP, value.entrySet(), attachedKeysValues, keysWithoutIdentity, valuesWithoutIdentity);
 
         // Update the attached map with the detached elements
         SCOUtils.updateMapWithMapKeysValues(ownerOP.getExecutionContext().getApiAdapter(), this, attachedKeysValues);

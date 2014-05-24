@@ -36,7 +36,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMap, Cloneable, java.io.Serializable
+public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMap<java.util.SortedMap>, Cloneable, java.io.Serializable
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
@@ -57,13 +57,12 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
 
     /**
      * Method to initialise the SCO from an existing value.
-     * @param o Object to set value using.
+     * @param m Object to set value using.
      * @param forInsert Whether the object needs inserting in the datastore with this value
      * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(Object o, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.SortedMap m, boolean forInsert, boolean forUpdate)
     {
-        java.util.Map m = (java.util.Map)o;
         if (m != null)
         {
             initialiseDelegate();
@@ -115,7 +114,7 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public Object getValue()
+    public java.util.SortedMap getValue()
     {
         return delegate;
     }
@@ -209,9 +208,9 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
      * @param state State for detachment state
      * @return The detached container
      */
-    public Object detachCopy(FetchPlanState state)
+    public java.util.SortedMap detachCopy(FetchPlanState state)
     {
-        java.util.Map detached = new java.util.TreeMap();
+        java.util.SortedMap detached = new java.util.TreeMap();
         SCOUtils.detachCopyForMap(ownerOP, entrySet(), state, detached);
         return detached;
     }
@@ -223,16 +222,14 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
      * value are attached.
      * @param value The new (map) value
      */
-    public void attachCopy(Object value)
+    public void attachCopy(java.util.SortedMap value)
     {
-        java.util.Map m = (java.util.Map) value;
-
         // Attach all of the keys/values in the new map
         boolean keysWithoutIdentity = SCOUtils.mapHasKeysWithoutIdentity(ownerMmd);
         boolean valuesWithoutIdentity = SCOUtils.mapHasValuesWithoutIdentity(ownerMmd);
 
         java.util.Map attachedKeysValues = new java.util.TreeMap();
-        SCOUtils.attachCopyForMap(ownerOP, m.entrySet(), attachedKeysValues, keysWithoutIdentity, valuesWithoutIdentity);
+        SCOUtils.attachCopyForMap(ownerOP, value.entrySet(), attachedKeysValues, keysWithoutIdentity, valuesWithoutIdentity);
 
         // Update the attached map with the detached elements
         SCOUtils.updateMapWithMapKeysValues(ownerOP.getExecutionContext().getApiAdapter(), this, attachedKeysValues);

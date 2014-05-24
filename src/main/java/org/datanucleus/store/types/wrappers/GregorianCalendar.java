@@ -30,7 +30,7 @@ import org.datanucleus.store.types.SCO;
 /**
  * A mutable second-class GregorianCalendar object.
  */
-public class GregorianCalendar extends java.util.GregorianCalendar implements SCO
+public class GregorianCalendar extends java.util.GregorianCalendar implements SCO<java.util.GregorianCalendar>
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
@@ -57,13 +57,12 @@ public class GregorianCalendar extends java.util.GregorianCalendar implements SC
 
     /**
      * Method to initialise the SCO from an existing value.
-     * @param o The Object
+     * @param cal The Object
      * @param forInsert Whether the object needs inserting in the datastore with this value
      * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(Object o, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.GregorianCalendar cal, boolean forInsert, boolean forUpdate)
     {
-        java.util.Calendar cal = (java.util.Calendar)o;
         super.setTimeInMillis(cal.getTime().getTime());
         super.setTimeZone(cal.getTimeZone());
     }
@@ -72,7 +71,7 @@ public class GregorianCalendar extends java.util.GregorianCalendar implements SC
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public Object getValue()
+    public java.util.GregorianCalendar getValue()
     {
         java.util.GregorianCalendar cal = new java.util.GregorianCalendar(getTimeZone());
         cal.setTime(getTime());
@@ -126,7 +125,7 @@ public class GregorianCalendar extends java.util.GregorianCalendar implements SC
      * @param state State for detachment process
      * @return The detached copy
      */
-    public Object detachCopy(FetchPlanState state)
+    public java.util.GregorianCalendar detachCopy(FetchPlanState state)
     {
         // Return a java.util.GregorianCalendar
         java.util.GregorianCalendar cal = new java.util.GregorianCalendar(getTimeZone());
@@ -139,7 +138,7 @@ public class GregorianCalendar extends java.util.GregorianCalendar implements SC
      * field, using the passed value.
      * @param value The new value
      */
-    public void attachCopy(Object value)
+    public void attachCopy(java.util.GregorianCalendar value)
     {
         long oldValue = getTimeInMillis();
         initialise(value, false, true);

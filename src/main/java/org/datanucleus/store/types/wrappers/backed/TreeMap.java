@@ -92,13 +92,12 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
 
     /**
      * Method to initialise the SCO from an existing value.
-     * @param o Object to set value using.
+     * @param m Object to set value using.
      * @param forInsert Whether the object needs inserting in the datastore with this value
      * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(Object o, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.TreeMap m, boolean forInsert, boolean forUpdate)
     {
-        java.util.Map m = (java.util.Map)o;
         if (m != null)
         {
             // Check for the case of serialised maps, and assign ObjectProviders to any PC keys/values without
@@ -244,7 +243,7 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public Object getValue()
+    public java.util.TreeMap getValue()
     {
         loadFromStore();
         return super.getValue();

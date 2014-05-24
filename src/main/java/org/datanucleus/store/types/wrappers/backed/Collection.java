@@ -153,14 +153,13 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
 
     /**
      * Method to initialise the SCO from an existing value.
-     * @param o The object to set from
+     * @param c The object to set from
      * @param forInsert Whether the object needs inserting in the datastore with this value
      * @param forUpdate Whether to update the object in the datastore with this value
      */
-    public void initialise(Object o, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.Collection c, boolean forInsert, boolean forUpdate)
     {
-        java.util.Collection c = (java.util.Collection)o;
-        if (o instanceof java.util.List && !(delegate instanceof java.util.List))
+        if (c instanceof java.util.List && !(delegate instanceof java.util.List))
         {
             // Need to set the value to a List so we change our delegate to match
             delegate = new java.util.ArrayList();
@@ -372,7 +371,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public Object getValue()
+    public java.util.Collection getValue()
     {
         loadFromStore();
         return super.getValue();

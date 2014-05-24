@@ -37,7 +37,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class Stack extends java.util.Stack implements SCOList, Cloneable
+public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, Cloneable
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
@@ -58,13 +58,12 @@ public class Stack extends java.util.Stack implements SCOList, Cloneable
 
     /**
      * Method to initialise the SCO from an existing value.
-     * @param o The object to set from
+     * @param c The object to set from
      * @param forInsert Whether the object needs inserting in the datastore with this value
      * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(Object o, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.Stack c, boolean forInsert, boolean forUpdate)
     {
-        Collection c = (Collection)o;
         if (c != null)
         {
             delegate = new java.util.Stack(); // Make copy of container rather than using same memory
@@ -102,7 +101,7 @@ public class Stack extends java.util.Stack implements SCOList, Cloneable
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public Object getValue()
+    public java.util.Stack getValue()
     {
         return delegate;
     }
@@ -184,9 +183,9 @@ public class Stack extends java.util.Stack implements SCOList, Cloneable
      * @param state State of detachment state
      * @return The detached container
      */
-    public Object detachCopy(FetchPlanState state)
+    public java.util.Stack detachCopy(FetchPlanState state)
     {
-        java.util.Collection detached = new java.util.Stack();
+        java.util.Stack detached = new java.util.Stack();
         SCOUtils.detachCopyForCollection(ownerOP, toArray(), state, detached);
         return detached;
     }
@@ -198,15 +197,13 @@ public class Stack extends java.util.Stack implements SCOList, Cloneable
      * value are attached.
      * @param value The new (collection) value
      */
-    public void attachCopy(Object value)
+    public void attachCopy(java.util.Stack value)
     {
-        java.util.Collection c = (java.util.Collection) value;
-
         // Attach all of the elements in the new list
         boolean elementsWithoutIdentity = SCOUtils.collectionHasElementsWithoutIdentity(ownerMmd);
 
-        java.util.List attachedElements = new java.util.ArrayList(c.size());
-        SCOUtils.attachCopyForCollection(ownerOP, c.toArray(), attachedElements, elementsWithoutIdentity);
+        java.util.List attachedElements = new java.util.ArrayList(value.size());
+        SCOUtils.attachCopyForCollection(ownerOP, value.toArray(), attachedElements, elementsWithoutIdentity);
 
         // Update the attached list with the detached elements
         SCOUtils.updateListWithListElements(this, attachedElements);

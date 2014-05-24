@@ -126,13 +126,12 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
 
     /**
      * Method to initialise the SCO from an existing value.
-     * @param o The object to set from
+     * @param c The object to set from
      * @param forInsert Whether the object needs inserting in the datastore with this value
      * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(Object o, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.PriorityQueue c, boolean forInsert, boolean forUpdate)
     {
-        java.util.Collection c = (java.util.Collection)o;
         if (c != null)
         {
             // Check for the case of serialised PC elements, and assign ObjectProviders to the elements without
@@ -272,7 +271,7 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public Object getValue()
+    public java.util.PriorityQueue getValue()
     {
         loadFromStore();
         return super.getValue();

@@ -35,7 +35,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class Map extends AbstractMap implements java.util.Map, SCOMap, Cloneable, java.io.Serializable
+public class Map extends AbstractMap implements java.util.Map, SCOMap<java.util.Map>, Cloneable, java.io.Serializable
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
@@ -56,13 +56,12 @@ public class Map extends AbstractMap implements java.util.Map, SCOMap, Cloneable
 
     /**
      * Method to initialise the SCO from an existing value.
-     * @param o  The object to set from
+     * @param m The object to set from
      * @param forInsert Whether the object needs inserting in the datastore with this value
      * @param forUpdate Whether to update the datastore with this value
      */
-    public synchronized void initialise(Object o, boolean forInsert, boolean forUpdate)
+    public synchronized void initialise(java.util.Map m, boolean forInsert, boolean forUpdate)
     {
-        java.util.Map m = (java.util.Map)o;
         if (m != null)
         {
             delegate = new java.util.HashMap(m); // Make copy of container rather than using same memory
@@ -99,7 +98,7 @@ public class Map extends AbstractMap implements java.util.Map, SCOMap, Cloneable
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public Object getValue()
+    public java.util.Map getValue()
     {
         return delegate;
     }
@@ -193,7 +192,7 @@ public class Map extends AbstractMap implements java.util.Map, SCOMap, Cloneable
      * @param state State for detachment process
      * @return The detached container
      */
-    public Object detachCopy(FetchPlanState state)
+    public java.util.Map detachCopy(FetchPlanState state)
     {
         java.util.Map detached = new java.util.HashMap();
         SCOUtils.detachCopyForMap(ownerOP, entrySet(), state, detached);
@@ -207,16 +206,14 @@ public class Map extends AbstractMap implements java.util.Map, SCOMap, Cloneable
      * value are attached.
      * @param value The new (map) value
      */
-    public void attachCopy(Object value)
+    public void attachCopy(java.util.Map value)
     {
-        java.util.Map m = (java.util.Map) value;
-
         // Attach all of the keys/values in the new map
         boolean keysWithoutIdentity = SCOUtils.mapHasKeysWithoutIdentity(ownerMmd);
         boolean valuesWithoutIdentity = SCOUtils.mapHasValuesWithoutIdentity(ownerMmd);
 
-        java.util.Map attachedKeysValues = new java.util.HashMap(m.size());
-        SCOUtils.attachCopyForMap(ownerOP, m.entrySet(), attachedKeysValues, keysWithoutIdentity, valuesWithoutIdentity);
+        java.util.Map attachedKeysValues = new java.util.HashMap(value.size());
+        SCOUtils.attachCopyForMap(ownerOP, value.entrySet(), attachedKeysValues, keysWithoutIdentity, valuesWithoutIdentity);
 
         // Update the attached map with the detached entries
         SCOUtils.updateMapWithMapKeysValues(ownerOP.getExecutionContext().getApiAdapter(), this, attachedKeysValues);

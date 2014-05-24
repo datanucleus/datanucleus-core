@@ -28,7 +28,7 @@ import org.datanucleus.store.types.SCO;
 /**
  * A mutable second-class BitSet object.
  */
-public class BitSet extends java.util.BitSet implements SCO
+public class BitSet extends java.util.BitSet implements SCO<java.util.BitSet>
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
@@ -54,24 +54,24 @@ public class BitSet extends java.util.BitSet implements SCO
 
     /**
      * Method to initialise the SCO from an existing value.
-     * @param o The Object
+     * @param set The Object
      * @param forInsert Whether the object needs inserting in the datastore with this value
      * @param forUpdate Whether to update the object in the datastore with this value
      */
-    public void initialise(Object o, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.BitSet set, boolean forInsert, boolean forUpdate)
     {
         for (int i = 0; i < length(); i++)
         {
             super.clear(i);
         }
-        super.or((java.util.BitSet)o);
+        super.or(set);
     }
 
     /**
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public Object getValue()
+    public java.util.BitSet getValue()
     {
         java.util.BitSet bits = new java.util.BitSet();
         bits.or(this);
@@ -127,7 +127,7 @@ public class BitSet extends java.util.BitSet implements SCO
      * @param state State for detachment process
      * @return A copy of the object
      */
-    public Object detachCopy(FetchPlanState state)
+    public java.util.BitSet detachCopy(FetchPlanState state)
     {
         java.util.BitSet detached = new java.util.BitSet();
         detached.or(this);
@@ -138,7 +138,7 @@ public class BitSet extends java.util.BitSet implements SCO
      * Method to attached the passed value.
      * @param value The new value
      */
-    public void attachCopy(Object value)
+    public void attachCopy(java.util.BitSet value)
     {
         initialise(value, false, true);
         makeDirty();

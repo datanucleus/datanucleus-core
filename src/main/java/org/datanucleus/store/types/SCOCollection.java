@@ -21,7 +21,7 @@ package org.datanucleus.store.types;
 /**
  * Representation of a wrapper for a mutable Collection SCO type supported.
  **/
-public interface SCOCollection extends SCOContainer
+public interface SCOCollection<T> extends SCOContainer<T>
 {
     /**
      * Method to update an embedded element stored in the collection

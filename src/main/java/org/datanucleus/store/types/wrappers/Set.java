@@ -37,8 +37,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class Set extends AbstractSet
-    implements SCOCollection, SCOMtoN, Cloneable, java.io.Serializable
+public class Set extends AbstractSet implements SCOCollection<java.util.Set>, SCOMtoN, Cloneable, java.io.Serializable
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
@@ -59,13 +58,12 @@ public class Set extends AbstractSet
 
     /**
      * Method to initialise the SCO from an existing value.
-     * @param o The object to set from
+     * @param c The object to set from
      * @param forInsert Whether the object needs inserting in the datastore with this value
      * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(Object o, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.Set c, boolean forInsert, boolean forUpdate)
     {
-        java.util.Collection c = (java.util.Collection)o;
         if (c != null)
         {
             delegate = new java.util.HashSet(c); // Make copy of container rather than using same memory
@@ -102,7 +100,7 @@ public class Set extends AbstractSet
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public Object getValue()
+    public java.util.Set getValue()
     {
         return delegate;
     }
@@ -184,9 +182,9 @@ public class Set extends AbstractSet
      * @param state State for detachment process
      * @return The detached container
      */
-    public Object detachCopy(FetchPlanState state)
+    public java.util.Set detachCopy(FetchPlanState state)
     {
-        java.util.Collection detached = new java.util.HashSet();
+        java.util.Set detached = new java.util.HashSet();
         SCOUtils.detachCopyForCollection(ownerOP, toArray(), state, detached);
         return detached;
     }
@@ -198,11 +196,10 @@ public class Set extends AbstractSet
      * value are attached.
      * @param value The new (collection) value
      */
-    public void attachCopy(Object value)
+    public void attachCopy(java.util.Set value)
     {
-        java.util.Collection c = (java.util.Collection) value;
         boolean elementsWithoutIdentity = SCOUtils.collectionHasElementsWithoutIdentity(ownerMmd);
-        SCOUtils.attachCopyElements(ownerOP, this, c, elementsWithoutIdentity);
+        SCOUtils.attachCopyElements(ownerOP, this, value, elementsWithoutIdentity);
 
 /*        // Remove any no-longer-needed elements from this collection
         SCOUtils.attachRemoveDeletedElements(ownerOP.getExecutionContext().getApiAdapter(), this, c, elementsWithoutIdentity);

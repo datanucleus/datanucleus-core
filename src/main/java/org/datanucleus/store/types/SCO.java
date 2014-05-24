@@ -27,8 +27,9 @@ import org.datanucleus.state.FetchPlanState;
  * <i>{@link org.datanucleus.state.ObjectProvider} ownerOP</i>, <i>String fieldName</i>.
  * The constructor must be capable of taking nulls for these arguments to create a non-managed wrapper
  * which effectively just acts like an unwrapped object.
+ * @param <T> The type of the field/property
  */
-public interface SCO
+public interface SCO<T>
 {
     /**
      * Method to initialise the SCO for use using an existing object of the same or compatible type.
@@ -38,7 +39,7 @@ public interface SCO
      * @throws ClassCastException Thrown if the given object is not of a type that's compatible with this
      *                            second-class wrapper object.
      */
-    void initialise(Object value, boolean forInsert, boolean forUpdate) throws ClassCastException;
+    void initialise(T value, boolean forInsert, boolean forUpdate) throws ClassCastException;
 
     /**
      * Method to initialise the SCO for use.
@@ -68,7 +69,7 @@ public interface SCO
      * Method to return the value of the unwrapped type.
      * @return The value that is wrapped by this object.
      */
-    Object getValue();
+    T getValue();
 
     /**
      * Mutable second class objects are required to provide a public clone() method so that copying
@@ -83,12 +84,12 @@ public interface SCO
      * @param state State of the detachment process
      * @return The detached copy
      */
-    Object detachCopy(FetchPlanState state);
+    T detachCopy(FetchPlanState state);
 
     /**
      * Method to return an attached copy of this object.
      * Attaches all components of this object that are also persistable.
      * @param value The object value from the detached instance
      */
-    void attachCopy(Object value);
+    void attachCopy(T value);
 }
