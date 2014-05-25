@@ -230,6 +230,9 @@ public abstract class Query implements Serializable, ExecutionContextListener
         this.ignoreCache = ec.getBooleanProperty(PropertyNames.PROPERTY_IGNORE_CACHE);
         this.readTimeoutMillis = ec.getIntProperty(PropertyNames.PROPERTY_DATASTORE_READ_TIMEOUT);
         this.writeTimeoutMillis = ec.getIntProperty(PropertyNames.PROPERTY_DATASTORE_WRITE_TIMEOUT);
+
+        // Register this query as a listener for ExecutionContext closure, so we can read in all results as required.
+        ec.registerExecutionContextListener(this);
     }
 
     /**
@@ -2153,6 +2156,11 @@ public abstract class Query implements Serializable, ExecutionContextListener
      */
     public void closeAll()
     {
+        if (ec != null)
+        {
+            // No longer need notifying of ExecutionContext closure
+            ec.deregisterExecutionContextListener(this);
+        }
         if (queryResults != null)
         {
             QueryResult[] qrs = queryResults.toArray(new QueryResult[queryResults.size()]);

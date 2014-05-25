@@ -445,7 +445,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (ecListeners != null)
         {
             // Inform all interested parties that we are about to close
-            for (ExecutionContextListener lstr : ecListeners)
+            Set<ExecutionContextListener> listeners = new HashSet(ecListeners);
+            for (ExecutionContextListener lstr : listeners)
             {
                 lstr.executionContextClosing(this);
             }
@@ -523,6 +524,31 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         // Hand back to the pool for reuse
         nucCtx.getExecutionContextPool().checkIn(this);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.ExecutionContext#registerExecutionContextListener(org.datanucleus.ExecutionContextListener)
+     */
+    @Override
+    public void registerExecutionContextListener(ExecutionContextListener listener)
+    {
+        if (ecListeners == null)
+        {
+            ecListeners = new HashSet<ExecutionContextListener>();
+        }
+        ecListeners.add(listener);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.ExecutionContext#deregisterExecutionContextListener(org.datanucleus.ExecutionContextListener)
+     */
+    @Override
+    public void deregisterExecutionContextListener(ExecutionContextListener listener)
+    {
+        if (ecListeners != null)
+        {
+            ecListeners.remove(listener);
+        }
     }
 
     /**

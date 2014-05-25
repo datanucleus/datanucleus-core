@@ -925,4 +925,16 @@ public interface ExecutionContext
     void removeObjectProviderAssociatedValue(ObjectProvider op, Object key);
     boolean containsObjectProviderAssociatedValue(ObjectProvider op, Object key);
     void clearObjectProviderAssociatedValues(ObjectProvider op);
+
+    /**
+     * Register a listener to be called when this ExecutionContext is closing.
+     * @param listener The listener
+     */
+    void registerExecutionContextListener(ExecutionContextListener listener);
+
+    /**
+     * Deregister a listener from calling when this ExecutionContext is closing.
+     * @param listener The listener
+     */
+    void deregisterExecutionContextListener(ExecutionContextListener listener);
 }
