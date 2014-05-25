@@ -681,7 +681,7 @@ public class EnhancementHelper extends java.lang.Object
                     if (result == null)
                     {
                         throw new NucleusUserException("Exception in Date identity String constructor", 
-                            new Object[] {s, new Integer(pp.getErrorIndex()), dateFormatPattern});
+                            new Object[] {s, Integer.valueOf(pp.getErrorIndex()), dateFormatPattern});
                     }
                     return result;
                 }

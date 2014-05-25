@@ -42,7 +42,7 @@ public class BitSetStringConverter implements TypeConverter<BitSet, String>
             String token = tokeniser.nextToken().trim();
             try
             {
-                int position = new Integer(token).intValue();
+                int position = Integer.valueOf(token).intValue();
                 set.set(position);
             }
             catch (NumberFormatException nfe)
