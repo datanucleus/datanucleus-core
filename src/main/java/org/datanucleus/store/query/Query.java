@@ -80,6 +80,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
 
     public static final String EXTENSION_MULTITHREAD = "datanucleus.query.multithread";
     public static final String EXTENSION_RESULT_CACHE_TYPE = "datanucleus.query.resultCacheType";
+    public static final String EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE = "datanucleus.query.closeResultsAtManagerClose";
 
     protected final transient StoreManager storeMgr;
 
@@ -231,8 +232,12 @@ public abstract class Query implements Serializable, ExecutionContextListener
         this.readTimeoutMillis = ec.getIntProperty(PropertyNames.PROPERTY_DATASTORE_READ_TIMEOUT);
         this.writeTimeoutMillis = ec.getIntProperty(PropertyNames.PROPERTY_DATASTORE_WRITE_TIMEOUT);
 
-        // Register this query as a listener for ExecutionContext closure, so we can read in all results as required.
-        ec.registerExecutionContextListener(this);
+        boolean closeAtEcClose = getBooleanExtensionProperty(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE, false);
+        if (closeAtEcClose)
+        {
+            // Register this query as a listener for ExecutionContext closure, so we can read in all results as required.
+            ec.registerExecutionContextListener(this);
+        }
     }
 
     /**
@@ -496,6 +501,18 @@ public abstract class Query implements Serializable, ExecutionContextListener
             extensions = new HashMap();
         }
         extensions.put(key, value);
+        if (key.equals(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE))
+        {
+            boolean closeAtEcClose = getBooleanExtensionProperty(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE, false);
+            if (closeAtEcClose)
+            {
+                ec.registerExecutionContextListener(this);
+            }
+            else
+            {
+                ec.deregisterExecutionContextListener(this);
+            }
+        }
     }
 
     /**
@@ -508,6 +525,18 @@ public abstract class Query implements Serializable, ExecutionContextListener
     public void setExtensions(Map extensions)
     {
         this.extensions = (extensions != null ? new HashMap(extensions) : null);
+        if (extensions.containsKey(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE))
+        {
+            boolean closeAtEcClose = getBooleanExtensionProperty(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE, false);
+            if (closeAtEcClose)
+            {
+                ec.registerExecutionContextListener(this);
+            }
+            else
+            {
+                ec.deregisterExecutionContextListener(this);
+            }
+        }
     }
 
     /**
@@ -595,6 +624,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
         extensions.add(EXTENSION_COMPILATION_CACHED);
         extensions.add(EXTENSION_MULTITHREAD);
         extensions.add(EXTENSION_EVALUATE_IN_MEMORY);
+        extensions.add(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE);
         return extensions;
     }
 
@@ -2158,8 +2188,12 @@ public abstract class Query implements Serializable, ExecutionContextListener
     {
         if (ec != null)
         {
-            // No longer need notifying of ExecutionContext closure
-            ec.deregisterExecutionContextListener(this);
+            boolean closeAtEcClose = getBooleanExtensionProperty(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE, false);
+            if (closeAtEcClose)
+            {
+                // No longer need notifying of ExecutionContext closure
+                ec.deregisterExecutionContextListener(this);
+            }
         }
         if (queryResults != null)
         {
