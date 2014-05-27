@@ -584,7 +584,7 @@ public interface ExecutionContext
 
     /**
      * Convenience method to access an object in the cache.
-     * Firstly looks in the L1 cache for this PM, and if not found looks in the L2 cache.
+     * Firstly looks in the L1 cache for this ExecutionContext, and if not found looks in the L2 cache.
      * @param id Id of the object
      * @return Persistable object (with connected ObjectProvider).
      */
@@ -765,29 +765,19 @@ public interface ExecutionContext
     boolean isManagingRelations();
 
     /**
-     * Retrieve the callback handler for this PM
+     * Retrieve the callback handler for this ExecutionContext.
      * @return the callback handler
      */
     CallbackHandler getCallbackHandler();
 
     /**
-     * Method to register a listener for instances of the specified classes.
-     * @param listener The listener to sends events to
-     * @param classes The classes that it is interested in
+     * Close the callback handler, and disconnect any registered instance listeners.
      */
-    void addListener(Object listener, Class[] classes);
+    public void closeCallbackHandler();
 
     /**
-     * Method to remove a currently registered listener.
-     * @param listener The instance lifecycle listener to remove.
+     * Interface to be implemented by a listener for the closure of the ExecutionContext.
      */
-    void removeListener(Object listener);
-
-    /**
-     * Disconnect the registered LifecycleListener
-     */
-    public void disconnectLifecycleListener();
-
     public static interface LifecycleListener
     {
         /**

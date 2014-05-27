@@ -154,7 +154,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     private ClassLoaderResolver clr = null;
 
     /** Callback handler for this context. */
-    private CallbackHandler callbacks;
+    private CallbackHandler callbackHandler;
 
     /** Level 1 Cache, essentially a Map of ObjectProvider keyed by the id. */
     protected Level1Cache cache;
@@ -440,7 +440,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         // Disconnect remaining resources
         disconnectObjectProvidersFromCache();
-        disconnectLifecycleListener();
+        closeCallbackHandler();
 
         if (ecListeners != null)
         {
@@ -5483,35 +5483,23 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     // ------------------------------------- Callback Listeners --------------------------------------
 
-    /**
-     * This method removes all previously registered lifecycle listeners.
-     * It is necessary to make sure, that a cached context (in j2ee environment)
-     * will have no listener before the listeners are copied from the PMF/EMF.
-     * Otherwise they might be registered multiple times.
-     */
-    public void removeAllInstanceLifecycleListeners()
-    {
-        if (callbacks != null)
-        {
-            callbacks.close();
-        }
-    }
 
     /**
      * Retrieve the callback handler for this context.
+     * If the callback handler hasn't yet been created, this will create it.
      * @return the callback handler
      */
     public CallbackHandler getCallbackHandler()
     {
-        if (callbacks != null)
+        if (callbackHandler != null)
         {
-            return callbacks;
+            return callbackHandler;
         }
 
         if (!getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ALLOW_CALLBACKS))
         {
-            callbacks = new NullCallbackHandler();
-            return callbacks;
+            callbackHandler = new NullCallbackHandler();
+            return callbackHandler;
         }
         else
         {
@@ -5521,10 +5509,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 try
                 {
-                    callbacks = (CallbackHandler) getNucleusContext().getPluginManager().createExecutableExtension(
+                    callbackHandler = (CallbackHandler) getNucleusContext().getPluginManager().createExecutableExtension(
                         "org.datanucleus.callbackhandler", "name", getNucleusContext().getApiName(), "class-name",
                         new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {getNucleusContext()});
-                    return callbacks;
+                    return callbackHandler;
                 }
                 catch (Exception e)
                 {
@@ -5537,40 +5525,14 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Method to register a listener for instances of the specified classes.
-     * @param listener The listener to sends events to
-     * @param classes The classes that it is interested in
+     * Close the callback handler and disconnect any registered listeners.
      */
-    public void addListener(Object listener, Class[] classes)
+    public void closeCallbackHandler()
     {
-        if (listener == null)
+        if (callbackHandler != null)
         {
-            return;
-        }
-        getCallbackHandler().addListener(listener, classes);
-    }
-
-    /**
-     * Method to remove a currently registered listener.
-     * @param listener The listener to remove.
-     */
-    public void removeListener(Object listener)
-    {
-        if (listener != null)
-        {
-            getCallbackHandler().removeListener(listener);
-        }
-    }
-
-    /**
-     * Disconnect the registered LifecycleListener
-     */
-    public void disconnectLifecycleListener()
-    {
-        // Clear out lifecycle listeners that were registered
-        if (callbacks != null)
-        {
-            callbacks.close();
+            // Clear out lifecycle listeners that were registered
+            callbackHandler.close();
         }
     }
 
