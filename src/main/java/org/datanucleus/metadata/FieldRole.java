@@ -22,36 +22,32 @@ package org.datanucleus.metadata;
  * This is typically for use by mapped datastores, but relates to MetaData definitions too, so is
  * stored in org.datanucleus.metadata.
  */
-public class FieldRole
+public enum FieldRole
 {
-    /** User defined name specified for the field, for use only with identifier creation. */
-    // TODO Move this since refers to a different concept
-    public static final int ROLE_CUSTOM = -1;
-
     /** No role defined for this field. */
-    public static final int ROLE_NONE = 0;
+    ROLE_NONE,
 
     /** Field is the owner of a relation. */
-    public static final int ROLE_OWNER = 1;
+    ROLE_OWNER,
 
-    /** Field is a reference to another object. */
-    public static final int ROLE_FIELD = 2;
+    /** Field is a reference to another (persistable) object. */
+    ROLE_FIELD,
 
     /** Field is to be treated as the element of a collection. */
-    public static final int ROLE_COLLECTION_ELEMENT = 3;
+    ROLE_COLLECTION_ELEMENT,
 
     /** Field is to be treated as the element of an array. */
-    public static final int ROLE_ARRAY_ELEMENT = 4;
+    ROLE_ARRAY_ELEMENT,
 
     /** Field is to be treated as the key of a map. */
-    public static final int ROLE_MAP_KEY = 5;
+    ROLE_MAP_KEY,
 
     /** Field is to be treated as the value of a map. */
-    public static final int ROLE_MAP_VALUE = 6;
+    ROLE_MAP_VALUE,
 
     /** Field is to be treated as an ordering or index in a List. */
-    public static final int ROLE_INDEX = 7;
+    ROLE_INDEX,
 
     /** Field is to be treated as the relation to a persistable (via join table). */
-    public static final int ROLE_PERSISTABLE_RELATION = 8;
+    ROLE_PERSISTABLE_RELATION;
 }

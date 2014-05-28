@@ -144,8 +144,7 @@ public class MetaDataUtils
                 {
                     try
                     {
-                        String[] impls = getImplementationNamesForReferenceField(fmd,
-                            FieldRole.ROLE_COLLECTION_ELEMENT, clr, mmgr);
+                        String[] impls = getImplementationNamesForReferenceField(fmd, FieldRole.ROLE_COLLECTION_ELEMENT, clr, mmgr);
                         if (impls != null)
                         {
                             elementCls = clr.classForName(impls[0]);
@@ -183,8 +182,7 @@ public class MetaDataUtils
                 {
                     try
                     {
-                        String[] impls = getImplementationNamesForReferenceField(fmd,
-                            FieldRole.ROLE_MAP_KEY, clr, mmgr);
+                        String[] impls = getImplementationNamesForReferenceField(fmd, FieldRole.ROLE_MAP_KEY, clr, mmgr);
                         if (impls != null)
                         {
                             keyCls = clr.classForName(impls[0]);
@@ -220,8 +218,7 @@ public class MetaDataUtils
                 {
                     try
                     {
-                        String[] impls = getImplementationNamesForReferenceField(fmd,
-                            FieldRole.ROLE_MAP_VALUE, clr, mmgr);
+                        String[] impls = getImplementationNamesForReferenceField(fmd, FieldRole.ROLE_MAP_VALUE, clr, mmgr);
                         if (impls != null)
                         {
                             valueCls = clr.classForName(impls[0]);
@@ -264,8 +261,7 @@ public class MetaDataUtils
                 {
                     try
                     {
-                        String[] impls = getImplementationNamesForReferenceField(fmd, 
-                            FieldRole.ROLE_ARRAY_ELEMENT, clr, mmgr);
+                        String[] impls = getImplementationNamesForReferenceField(fmd, FieldRole.ROLE_ARRAY_ELEMENT, clr, mmgr);
                         if (impls != null)
                         {
                             elementCls = clr.classForName(impls[0]);
@@ -437,7 +433,7 @@ public class MetaDataUtils
      * @return Names of the classes of the possible implementations of this interface/Object
      * @throws NucleusUserException if no implementation types are found for the reference type field
      */
-    public String[] getImplementationNamesForReferenceField(AbstractMemberMetaData fmd, int fieldRole, 
+    public String[] getImplementationNamesForReferenceField(AbstractMemberMetaData fmd, FieldRole fieldRole, 
             ClassLoaderResolver clr, MetaDataManager mmgr)
     {
         // Check the JDO2 standard attribute for implementation types
