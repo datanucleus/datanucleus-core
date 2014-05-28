@@ -91,6 +91,12 @@ public abstract class AbstractJavaQuery extends Query
     }
 
     /**
+     * Method to generate the generic compilation of this query.
+     * @param parameterValues Values for any parameters
+     */
+    public abstract void compileGeneric(Map parameterValues);
+
+    /**
      * Execute the query to delete persistent objects.
      * @param parameters the Map containing all of the parameters.
      * @return the number of deleted objects.

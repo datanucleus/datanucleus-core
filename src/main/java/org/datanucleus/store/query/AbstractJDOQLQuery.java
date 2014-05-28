@@ -314,14 +314,11 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
         return singleString;
     }
 
-    /**
-     * Method to compile the JDOQL query.
-     * This implementation assumes that we are using the "generic" JDOQL compiler in 
-     * <i>org.datanucleus.query.compiler</i>. If not then override this method.
-     * Will populate the "compilation" class variable.
-     * @param parameterValues Map of parameter values keyed by parameter name.
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.query.AbstractJavaQuery#compileGeneric(java.util.Map)
      */
-    protected void compileInternal(Map parameterValues)
+    @Override
+    public void compileGeneric(Map parameterValues)
     {
         if (compilation != null)
         {
@@ -399,6 +396,18 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
             // Cache for future reference
             queryMgr.addQueryCompilation(getLanguage(), queryCacheKey, compilation);
         }
+    }
+
+    /**
+     * Method to compile the JDOQL query.
+     * This implementation assumes that we are using the "generic" JDOQL compiler in 
+     * <i>org.datanucleus.query.compiler</i>. If not then override this method.
+     * Will populate the "compilation" class variable.
+     * @param parameterValues Map of parameter values keyed by parameter name.
+     */
+    protected void compileInternal(Map parameterValues)
+    {
+        compileGeneric(parameterValues);
     }
 
     /**

@@ -230,15 +230,11 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
         return singleString;
     }
 
-    
-    /**
-     * Method to compile the JPQL query.
-     * This implementation assumes that we are using the "generic" JPQL compiler in 
-     * <i>org.datanucleus.query.compiler</i>. If not then override this method.
-     * Will populate the "compilation" class variable.
-     * @param parameterValues Map of param values keyed by param name.
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.query.AbstractJavaQuery#compileGeneric(java.util.Map)
      */
-    protected void compileInternal(Map parameterValues)
+    @Override
+    public void compileGeneric(Map parameterValues)
     {
         if (compilation != null)
         {
@@ -296,7 +292,7 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
         if (subqueries != null)
         {
             // Compile any subqueries
-        	compileSubqueries(subqueries, compilation, compiler, parameterValues);
+            compileSubqueries(subqueries, compilation, compiler, parameterValues);
         }
 
         if (NucleusLogger.QUERY.isDebugEnabled())
@@ -324,6 +320,18 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
             // Cache for future reference
             queryMgr.addQueryCompilation(getLanguage(), queryCacheKey, compilation);
         }
+    }
+
+    /**
+     * Method to compile the JPQL query.
+     * This implementation assumes that we are using the "generic" JPQL compiler in 
+     * <i>org.datanucleus.query.compiler</i>. If not then override this method.
+     * Will populate the "compilation" class variable.
+     * @param parameterValues Map of param values keyed by param name.
+     */
+    protected void compileInternal(Map parameterValues)
+    {
+        compileGeneric(parameterValues);
     }
 
     /**
