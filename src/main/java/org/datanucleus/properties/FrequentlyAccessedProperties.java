@@ -51,6 +51,7 @@ public class FrequentlyAccessedProperties
 
     /**
      * Set default properties that are read when property is not defined in this instance
+     * @param default Default properties
      */
     public void setDefaults(FrequentlyAccessedProperties defaults)
     {
@@ -59,6 +60,8 @@ public class FrequentlyAccessedProperties
 
     /**
      * Tries to set the property value for any of the "frequent" properties.
+     * @param property prop name
+     * @param value The value of the property
      */
     public void setProperty(String property, Object value)
     {
