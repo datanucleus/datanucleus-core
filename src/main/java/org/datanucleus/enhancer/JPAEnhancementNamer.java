@@ -19,11 +19,9 @@ package org.datanucleus.enhancer;
 
 /**
  * Definition of enhancement naming for use with the JPA API.
- * Follows the JDO spec except for the a couple of exceptions that can be thrown direct from 
+ * Follows the JDO enhancement method except for the a couple of exceptions that can be thrown direct from 
  * enhanced methods, whereby JPA will throw IllegalAccessException (when accessing a field that wasnt
  * detached), and IllegalStateException (when invoking a method inappropriately - shouldn't happen ever).
- * TODO Override more methods and make use of the bytecode enhancement contract classes 
- * under org.datanucleus.enhancer.spi
  */
 public class JPAEnhancementNamer extends JDOEnhancementNamer
 {
