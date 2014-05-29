@@ -51,7 +51,7 @@ public class FrequentlyAccessedProperties
 
     /**
      * Set default properties that are read when property is not defined in this instance
-     * @param default Default properties
+     * @param defaults Default properties
      */
     public void setDefaults(FrequentlyAccessedProperties defaults)
     {
