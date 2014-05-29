@@ -4787,8 +4787,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 // "detach-on-rollback"
                 performDetachAllOnTxnEnd();
             }
-            
-            if (objectsToEvictUponRollback != null) {
+
+            if (objectsToEvictUponRollback != null)
+            {
                 nucCtx.getLevel2Cache().evictAll(objectsToEvictUponRollback);
                 objectsToEvictUponRollback = null;
             }
