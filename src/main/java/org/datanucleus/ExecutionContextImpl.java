@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -255,6 +256,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * to pass information down through a large number of method calls.
      */
     private ThreadLocal contextInfoThreadLocal;
+    
+    /** Objects that were updated in L2 cache before commit, which should be evicted if rollback happens */
+    private List<Object> objectsToEvictUponRollback = null;
 
     /**
      * Constructor.
@@ -381,6 +385,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             reachabilityEnlistedIds = new HashSet();
         }
 
+        objectsToEvictUponRollback = null;
+        
         setLevel2Cache(true);
     }
 
@@ -512,6 +518,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             opAssociatedValuesMapByOP.clear();
             opAssociatedValuesMapByOP = null;
         }
+
+        objectsToEvictUponRollback = null;
 
         closed = true;
         tx.close(); // Close the transaction
@@ -4290,6 +4298,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         opsToCache = new HashSet<ObjectProvider>();
                     }
                     opsToCache.add(op);
+                    if (objectsToEvictUponRollback == null) 
+                    {
+                        objectsToEvictUponRollback = new LinkedList<Object>();
+                    } 
+                    objectsToEvictUponRollback.add(id);
                 }
             }
         }
@@ -4773,6 +4786,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 // "detach-on-rollback"
                 performDetachAllOnTxnEnd();
+            }
+            
+            if (objectsToEvictUponRollback != null) {
+                nucCtx.getLevel2Cache().evictAll(objectsToEvictUponRollback);
+                objectsToEvictUponRollback = null;
             }
         }
         finally
