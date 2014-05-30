@@ -37,7 +37,7 @@ import org.datanucleus.util.StringUtils;
  * the column elements contained in the foreign-key element have only the column
  * name.
  */
-public class ForeignKeyMetaData extends MetaData implements ColumnMetaDataContainer
+public class ForeignKeyMetaData extends MetaData implements ColumnMetaDataContainer // TODO Change to extend AbstractConstraintMetaData
 {
     /** the constraint name */
     protected String name;
@@ -48,7 +48,7 @@ public class ForeignKeyMetaData extends MetaData implements ColumnMetaDataContai
     /** The member names for this constraint. */
     protected List<String> memberNames = null;
 
-    /** The columns for this constraint. */
+    /** The columns for this constraint. */ // TODO Make this List<String>
     protected List<ColumnMetaData> columns = null;
 
     /**

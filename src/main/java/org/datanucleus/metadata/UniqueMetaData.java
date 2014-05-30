@@ -18,12 +18,10 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.metadata;
 
-import org.datanucleus.util.StringUtils;
-
 /**
  * MetaData representing a unique constraint.
  */
-public class UniqueMetaData extends AbstractConstraintMetaData
+public class UniqueMetaData extends ConstraintMetaData
 {
     /** Whether the unique is initially deferred. */
     boolean deferred = false;
@@ -40,26 +38,6 @@ public class UniqueMetaData extends AbstractConstraintMetaData
     {
         super(umd);
         this.deferred = umd.deferred;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = (StringUtils.isWhitespace(name) ? null : name);
-    }
-
-    public String getTable()
-    {
-        return table;
-    }
-
-    public void setTable(String table)
-    {
-        this.table = (StringUtils.isWhitespace(table) ? null : table);
     }
 
     public final boolean isDeferred()

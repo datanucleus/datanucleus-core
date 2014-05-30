@@ -26,10 +26,10 @@ import java.util.Set;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.metadata.AbstractClassMetaData;
+import org.datanucleus.metadata.ConstraintMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.EmbeddedMetaData;
-import org.datanucleus.metadata.IndexMetaData;
 import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.util.StringUtils;
 
@@ -240,13 +240,14 @@ public abstract class AbstractNamingFactory implements NamingFactory
      * @see org.datanucleus.store.schema.naming.NamingFactory#getIndexName(org.datanucleus.metadata.AbstractClassMetaData, org.datanucleus.metadata.IndexMetaData, int)
      */
     @Override
-    public String getIndexName(AbstractClassMetaData cmd, IndexMetaData idxmd, int position)
+    public String getConstraintName(AbstractClassMetaData cmd, ConstraintMetaData cnstrmd, int position)
     {
-        if (idxmd != null && !StringUtils.isWhitespace(idxmd.getName()))
+        if (cnstrmd != null && !StringUtils.isWhitespace(cnstrmd.getName()))
         {
-            return prepareIdentifierNameForUse(idxmd.getName(), SchemaComponent.CONSTRAINT);
+            return prepareIdentifierNameForUse(cnstrmd.getName(), SchemaComponent.CONSTRAINT);
         }
 
+        // TODO Different suffix if Unique or FK ?
         String idxName = cmd.getName() + wordSeparator + position + wordSeparator + "IDX";
         return prepareIdentifierNameForUse(idxName, SchemaComponent.CONSTRAINT);
     }
@@ -255,13 +256,14 @@ public abstract class AbstractNamingFactory implements NamingFactory
      * @see org.datanucleus.store.schema.naming.NamingFactory#getIndexName(org.datanucleus.metadata.AbstractMemberMetaData, org.datanucleus.metadata.IndexMetaData)
      */
     @Override
-    public String getIndexName(AbstractMemberMetaData mmd, IndexMetaData idxmd)
+    public String getConstraintName(AbstractMemberMetaData mmd, ConstraintMetaData cnstrmd)
     {
-        if (idxmd != null && !StringUtils.isWhitespace(idxmd.getName()))
+        if (cnstrmd != null && !StringUtils.isWhitespace(cnstrmd.getName()))
         {
-            return prepareIdentifierNameForUse(idxmd.getName(), SchemaComponent.CONSTRAINT);
+            return prepareIdentifierNameForUse(cnstrmd.getName(), SchemaComponent.CONSTRAINT);
         }
 
+        // TODO Different suffix if Unique or FK ?
         String idxName = mmd.getClassName(false) + wordSeparator + mmd.getName() + wordSeparator + "IDX";
         return prepareIdentifierNameForUse(idxName, SchemaComponent.CONSTRAINT);
     }
@@ -270,13 +272,14 @@ public abstract class AbstractNamingFactory implements NamingFactory
      * @see org.datanucleus.store.schema.naming.NamingFactory#getIndexName(org.datanucleus.metadata.AbstractClassMetaData, org.datanucleus.metadata.IndexMetaData, org.datanucleus.store.schema.naming.ColumnType)
      */
     @Override
-    public String getIndexName(AbstractClassMetaData cmd, IndexMetaData idxmd, ColumnType type)
+    public String getConstraintName(AbstractClassMetaData cmd, ConstraintMetaData cnstrmd, ColumnType type)
     {
-        if (idxmd != null && !StringUtils.isWhitespace(idxmd.getName()))
+        if (cnstrmd != null && !StringUtils.isWhitespace(cnstrmd.getName()))
         {
-            return prepareIdentifierNameForUse(idxmd.getName(), SchemaComponent.CONSTRAINT);
+            return prepareIdentifierNameForUse(cnstrmd.getName(), SchemaComponent.CONSTRAINT);
         }
 
+        // TODO Different suffix if Unique or FK ?
         String idxName = null;
         if (type == ColumnType.DATASTOREID_COLUMN)
         {

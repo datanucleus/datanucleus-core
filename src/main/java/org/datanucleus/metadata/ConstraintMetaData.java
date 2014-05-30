@@ -20,10 +20,13 @@ package org.datanucleus.metadata;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.datanucleus.util.StringUtils;
+
 /**
- * Abstract representation of an ORM constraint.
+ * Representation of an ORM constraint.
+ * This will be extended for indexes, unique keys, and foreign keys (and any otehr type of constraint).
  */
-public class AbstractConstraintMetaData extends MetaData
+public class ConstraintMetaData extends MetaData
 {
     /** the constraint name */
     protected String name;
@@ -40,7 +43,7 @@ public class AbstractConstraintMetaData extends MetaData
     /**
      * Default constructor. Set fields using setters before populate().
      */
-    public AbstractConstraintMetaData()
+    public ConstraintMetaData()
     {
     }
 
@@ -48,7 +51,7 @@ public class AbstractConstraintMetaData extends MetaData
      * Copy constructor.
      * @param acmd Metadata to copy
      */
-    public AbstractConstraintMetaData(AbstractConstraintMetaData acmd)
+    public ConstraintMetaData(ConstraintMetaData acmd)
     {
         super(null, acmd);
         this.name = acmd.name;
@@ -68,6 +71,26 @@ public class AbstractConstraintMetaData extends MetaData
                 addColumn(columnName);
             }
         }
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = (StringUtils.isWhitespace(name) ? null : name);
+    }
+
+    public String getTable()
+    {
+        return table;
+    }
+
+    public void setTable(String table)
+    {
+        this.table = (StringUtils.isWhitespace(table) ? null : table);
     }
 
     /**

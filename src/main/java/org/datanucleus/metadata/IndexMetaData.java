@@ -19,8 +19,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.metadata;
 
-import org.datanucleus.util.StringUtils;
-
 /**
  * For schema generation, it might be useful to specify that a column or columns
  * be indexed, and to provide the name of the index. For this purpose, an index
@@ -31,7 +29,7 @@ import org.datanucleus.util.StringUtils;
  * column elements are mapped elsewhere, and the column elements contain only
  * the column name.
  */
-public class IndexMetaData extends AbstractConstraintMetaData
+public class IndexMetaData extends ConstraintMetaData
 {
     /**
      * You can use UNIQUE constraints to ensure that no duplicate values are
@@ -67,26 +65,6 @@ public class IndexMetaData extends AbstractConstraintMetaData
     {
         super(imd);
         this.unique = imd.unique;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = (StringUtils.isWhitespace(name) ? null : name);
-    }
-
-    public String getTable()
-    {
-        return table;
-    }
-
-    public void setTable(String table)
-    {
-        this.table = (StringUtils.isWhitespace(table) ? null : table);
     }
 
     public final boolean isUnique()

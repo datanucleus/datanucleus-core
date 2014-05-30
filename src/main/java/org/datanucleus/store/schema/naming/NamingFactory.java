@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.datanucleus.metadata.AbstractClassMetaData;
+import org.datanucleus.metadata.ConstraintMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.IndexMetaData;
 import org.datanucleus.metadata.SequenceMetaData;
 
 /**
@@ -121,32 +121,30 @@ public interface NamingFactory
     String getColumnName(List<AbstractMemberMetaData> mmds, int position);
 
     /**
-     * Method to return the name of an index specified at class level.
+     * Method to return the name of a constraint specified at class level.
      * @param cmd Metadata for the class
-     * @param idxmd The index metadata
-     * @param position Number of the index at class level (first is 0)
-     * @return Name of the index
+     * @param cnstrmd The constraint metadata
+     * @param position Number of the constraint at class level (first is 0)
+     * @return Name of the constraint
      */
-    String getIndexName(AbstractClassMetaData cmd, IndexMetaData idxmd, int position);
+    String getConstraintName(AbstractClassMetaData cmd, ConstraintMetaData cnstrmd, int position);
 
     /**
-     * Method to return the name of an index specified at member level.
+     * Method to return the name of a constraint specified at member level.
      * @param mmd Metadata for the member
-     * @param idxmd The index metadata
-     * @return Name of the index
+     * @param cnstrmd The constraint metadata
+     * @return Name of the constraint
      */
-    String getIndexName(AbstractMemberMetaData mmd, IndexMetaData idxmd);
+    String getConstraintName(AbstractMemberMetaData mmd, ConstraintMetaData cnstrmd);
 
     /**
-     * Method to return the name of the index for the specified class (version, datastore-id, discriminator etc).
+     * Method to return the name of the constraint for the specified class (version, datastore-id, discriminator etc).
      * @param cmd Metadata for the class
-     * @param idxmd The index metadata
+     * @param cnstrmd The constraint metadata
      * @param type Column type
-     * @return Name of the index
+     * @return Name of the constraint
      */
-    String getIndexName(AbstractClassMetaData cmd, IndexMetaData idxmd, ColumnType type);
-
-    // TODO Support foreign-key naming
+    String getConstraintName(AbstractClassMetaData cmd, ConstraintMetaData cnstrmd, ColumnType type);
 
     /**
      * Method to return the name of sequence.
