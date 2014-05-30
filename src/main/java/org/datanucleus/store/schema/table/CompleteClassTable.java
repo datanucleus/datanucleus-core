@@ -461,7 +461,7 @@ public class CompleteClassTable implements Table
         {
             if (col.getPosition() >= columns.size())
             {
-                NucleusLogger.DATASTORE_SCHEMA.warn("Column with name " + col.getIdentifier() + " is specified with position=" + col.getPosition() + " which is invalid." +
+                NucleusLogger.DATASTORE_SCHEMA.warn("Column with name " + col.getName() + " is specified with position=" + col.getPosition() + " which is invalid." +
                    " This table has " + columns.size() + " columns");
                 unorderedCols.add(col);
             }
@@ -469,8 +469,8 @@ public class CompleteClassTable implements Table
             {
                 if (cols[col.getPosition()] != null)
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.warn("Column with name " + col.getIdentifier() + " defined for position=" + col.getPosition() + " yet there is also " +
-                        cols[col.getPosition()].getIdentifier() + " at that position! Ignoring");
+                    NucleusLogger.DATASTORE_SCHEMA.warn("Column with name " + col.getName() + " defined for position=" + col.getPosition() + " yet there is also " +
+                        cols[col.getPosition()].getName() + " at that position! Ignoring");
                     unorderedCols.add(col);
                 }
                 else
@@ -500,7 +500,7 @@ public class CompleteClassTable implements Table
         for (Column col : cols)
         {
             columns.add(col);
-            columnByName.put(col.getIdentifier(), col);
+            columnByName.put(col.getName(), col);
         }
     }
 
@@ -938,7 +938,7 @@ public class CompleteClassTable implements Table
         return catalogName;
     }
 
-    public String getIdentifier()
+    public String getName()
     {
         return identifier;
     }

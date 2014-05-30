@@ -63,7 +63,7 @@ public class ColumnImpl implements Column
         this.mapping = mapping;
     }
 
-    public String getIdentifier()
+    public String getName()
     {
         return identifier;
     }

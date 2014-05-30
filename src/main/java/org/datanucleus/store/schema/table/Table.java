@@ -31,15 +31,11 @@ public interface Table
 {
     StoreManager getStoreManager();
 
+    String getName();
+
     String getSchemaName();
 
     String getCatalogName();
-
-    /**
-     * Accessor for the identifier for this table (its "name").
-     * @return The table identifier
-     */
-    String getIdentifier();
 
     /**
      * Accessor for the primary class metadata for this table.

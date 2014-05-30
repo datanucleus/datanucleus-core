@@ -25,6 +25,8 @@ import org.datanucleus.store.schema.naming.ColumnType;
  */
 public interface Column
 {
+    String getName();
+
     /**
      * Accessor for the table for this column.
      * @return The table
@@ -36,12 +38,6 @@ public interface Column
      * @return The associated mapping (or null if this is a surrogate column)
      */
     MemberColumnMapping getMemberColumnMapping();
-
-    /**
-     * Accessor for the identifier for this column (its "name).
-     * @return The column identifier
-     */
-    String getIdentifier();
 
     boolean isPrimaryKey();
 
