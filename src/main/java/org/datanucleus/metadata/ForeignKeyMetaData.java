@@ -34,21 +34,14 @@ import org.datanucleus.util.StringUtils;
  * element, key, value, or join element, if all of the columns mapped are to be
  * part of the same foreign key. A foreign-key element can be contained within a
  * class element. In this case, the column elements are mapped elsewhere, and
- * the column elements contained in the foreign-key element have only the column
- * name.
+ * the column elements contained in the foreign-key element have only the column name.
  */
-public class ForeignKeyMetaData extends MetaData implements ColumnMetaDataContainer // TODO Change to extend AbstractConstraintMetaData
+public class ForeignKeyMetaData extends ConstraintMetaData
 {
-    /** the constraint name */
-    protected String name;
-
-    /** the constraint table name. Name of the table to which this applies (null implies the enclosing class' table). */
-    protected String table;
-
-    /** The member names for this constraint. */
-    protected List<String> memberNames = null;
-
-    /** The columns for this constraint. */ // TODO Make this List<String>
+    /**
+     * The columns for this foreign key. 
+     * Note that we don't use the "columnNames" in the superclass since the user can define the column target name also for a foreign-key.
+     */
     protected List<ColumnMetaData> columns = null;
 
     /**
@@ -93,17 +86,8 @@ public class ForeignKeyMetaData extends MetaData implements ColumnMetaDataContai
      */
     public ForeignKeyMetaData(ForeignKeyMetaData fkmd)
     {
-        super(null, fkmd);
-        this.name = fkmd.name;
-        this.table = fkmd.table;
+        super(fkmd);
 
-        if (fkmd.memberNames != null)
-        {
-            for (String memberName : fkmd.memberNames)
-            {
-                addMember(memberName);
-            }
-        }
         if (fkmd.columns != null)
         {
             for (ColumnMetaData colmd : fkmd.columns)
@@ -118,33 +102,6 @@ public class ForeignKeyMetaData extends MetaData implements ColumnMetaDataContai
         this.updateAction = fkmd.updateAction;
     }
 
-    /**
-     * Add a new member that is part of this constraint.
-     * @param memberName member name for the field/property
-     */
-    public void addMember(String memberName)
-    {
-        if (memberNames == null)
-        {
-            memberNames = new ArrayList<String>();
-        }
-        memberNames.add(memberName);
-    }
-
-    public final String[] getMemberNames()
-    {
-        if (memberNames == null)
-        {
-            return null;
-        }
-        return memberNames.toArray(new String[memberNames.size()]);
-    }
-
-    public int getNumberOfMembers()
-    {
-        return (memberNames != null ? memberNames.size() : 0);
-    }
-
     public void addColumn(ColumnMetaData colmd)
     {
         if (columns == null)
@@ -152,6 +109,7 @@ public class ForeignKeyMetaData extends MetaData implements ColumnMetaDataContai
             columns = new ArrayList<ColumnMetaData>();
         }
         columns.add(colmd);
+        addColumn(colmd.getName());
         colmd.parent = this;
     }
 
@@ -173,31 +131,6 @@ public class ForeignKeyMetaData extends MetaData implements ColumnMetaDataContai
             return null;
         }
         return columns.toArray(new ColumnMetaData[columns.size()]);
-    }
-
-    public int getNumberOfColumns()
-    {
-        return (columns != null ? columns.size() : 0);
-    }
-
-    public final String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = (StringUtils.isWhitespace(name) ? null : name);
-    }
-
-    public final String getTable()
-    {
-        return table;
-    }
-
-    public void setTable(String table)
-    {
-        this.table = (StringUtils.isWhitespace(table) ? null : table);
     }
 
     public final boolean isDeferred()
