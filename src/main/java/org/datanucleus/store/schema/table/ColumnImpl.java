@@ -31,7 +31,15 @@ public class ColumnImpl implements Column
 
     String identifier;
 
-    boolean primaryKey;
+    boolean primaryKey = false;
+
+    boolean nullable = false;
+
+    boolean defaultable = false;
+
+    Object defaultValue = null;
+
+    boolean unique = false;
 
     JdbcType jdbcType;
 
@@ -73,9 +81,77 @@ public class ColumnImpl implements Column
         return primaryKey;
     }
 
-    public void setPrimaryKey()
+    public Column setPrimaryKey()
     {
         this.primaryKey = true;
+        return this;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Column#setNullable(boolean)
+     */
+    @Override
+    public Column setNullable(boolean flag)
+    {
+        this.nullable = flag;
+        return this;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Column#isNullable()
+     */
+    @Override
+    public boolean isNullable()
+    {
+        return nullable;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Column#setDefaultable(java.lang.Object)
+     */
+    @Override
+    public Column setDefaultable(Object defaultValue)
+    {
+        this.defaultable = true;
+        this.defaultValue = defaultValue;
+        return this;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Column#isDefaultable()
+     */
+    @Override
+    public boolean isDefaultable()
+    {
+        return defaultable;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Column#getDefaultValue()
+     */
+    @Override
+    public Object getDefaultValue()
+    {
+        return defaultValue;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Column#setUnique(boolean)
+     */
+    @Override
+    public Column setUnique(boolean flag)
+    {
+        this.unique = flag;
+        return this;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Column#isUnique()
+     */
+    @Override
+    public boolean isUnique()
+    {
+        return unique;
     }
 
     public ColumnType getColumnType()
@@ -83,27 +159,30 @@ public class ColumnImpl implements Column
         return columnType;
     }
 
-    public void setJdbcType(JdbcType type)
+    public Column setJdbcType(JdbcType type)
     {
         this.jdbcType = type;
+        return this;
     }
     public JdbcType getJdbcType()
     {
         return jdbcType;
     }
 
-    public void setTypeName(String type)
+    public Column setTypeName(String type)
     {
         this.typeName = type;
+        return this;
     }
     public String getTypeName()
     {
         return typeName;
     }
 
-    public void setPosition(int pos)
+    public Column setPosition(int pos)
     {
         this.position = pos;
+        return this;
     }
     public int getPosition()
     {

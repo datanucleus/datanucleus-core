@@ -25,6 +25,10 @@ import org.datanucleus.store.schema.naming.ColumnType;
  */
 public interface Column
 {
+    /**
+     * Accessor for the column name.
+     * @return Name of column
+     */
     String getName();
 
     /**
@@ -39,19 +43,86 @@ public interface Column
      */
     MemberColumnMapping getMemberColumnMapping();
 
+    /**
+     * Whether this column is (part of) the primary key
+     * @return Whether part of the PK
+     */
     boolean isPrimaryKey();
 
+    /**
+     * Mutator to make the column (part of) the primary key.
+     * @return TODO
+     */
+    Column setPrimaryKey();
+
+    /**
+     * Mutator for the nullability of the column.
+     * @param nullable Whether this is nullable
+     * @return The column with the updated info
+     */
+    Column setNullable(boolean nullable);
+
+    /**
+     * Accessor for whether the column is nullable in the datastore.
+     * @return whether the column is nullable
+     */
+    boolean isNullable();
+
+    /**
+     * Mutator for the defaultability of the column.
+     * @param defaultValue The default to use
+     * @return The column with the updated info
+     */
+    Column setDefaultable(Object defaultValue); 
+
+    /**
+     * Accessor for whether the column is defaultable.
+     * @return whether the column is defaultable
+     */
+    boolean isDefaultable();
+
+    /**
+     * Accessor for the default Value
+     * @return the default value
+     */
+    Object getDefaultValue();
+
+    /**
+     * Mutator for the uniqueness of the column.
+     * @param unique The flag
+     * @return The column with the updated info
+     */
+    Column setUnique(boolean unique);
+
+    /**
+     * Accessor for whether the column is unique.
+     * @return whether the column is unique
+     */
+    boolean isUnique();
+
+    /**
+     * Accessor for the role that this column serves (if known).
+     * @return Role of the column
+     */
     ColumnType getColumnType();
 
-    void setJdbcType(JdbcType jdbcType);
+    Column setJdbcType(JdbcType jdbcType);
 
+    /**
+     * Accessor for the JDBC Type used for this column.
+     * @return The Jdbc type
+     */
     JdbcType getJdbcType();
 
-    void setTypeName(String type);
+    Column setTypeName(String type);
 
+    /**
+     * Accessor for the native type name in the datastore for this column.
+     * @return The column type name
+     */
     String getTypeName();
 
-    void setPosition(int pos);
+    Column setPosition(int pos);
 
     /**
      * Accessor for the position of this column in the table (if specified).
