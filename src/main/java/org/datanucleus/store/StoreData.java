@@ -23,11 +23,12 @@ import java.util.Map;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.MetaData;
+import org.datanucleus.store.schema.table.Table;
 import org.datanucleus.util.Localiser;
 
 /**
  * Basic store information about an object that is stored in a datastore.
- * Can be a class or field.
+ * Can be a class or member.
  */
 public class StoreData
 {
@@ -42,6 +43,14 @@ public class StoreData
 
     /** Type of data being stored (FCO, SCO). */
     protected final int type;
+
+    /** Metadata for the class, or member (join table) depending on what this represents. */
+    protected MetaData metadata;
+
+    /** Name of the persistent interface, when this represents one. Otherwise null. */
+    protected String interfaceName;
+
+    protected Table table;
 
     /** Extension props. Available for store manager to save additional info if required. */
     protected Map properties = new HashMap();
@@ -67,14 +76,8 @@ public class StoreData
     {
         this.name = name;
         this.type = type;
-        if (metadata != null)
-        {
-            addProperty("metadata", metadata);
-        }
-        if (interfaceName != null)
-        {
-            addProperty("interface-name", interfaceName);
-        }
+        this.metadata = metadata;
+        this.interfaceName = interfaceName;
     }
 
     /**
@@ -92,7 +95,7 @@ public class StoreData
      */
     public MetaData getMetaData()
     {
-        return (MetaData)properties.get("metadata");
+        return metadata;
     }
 
     /**
@@ -101,7 +104,7 @@ public class StoreData
      */
     public void setMetaData(MetaData md)
     {
-        addProperty("metadata", md);
+        this.metadata = md;
     }
 
     /**
@@ -137,7 +140,21 @@ public class StoreData
      */
     public String getInterfaceName()
     {
-        return (String)properties.get("interface-name");
+        return interfaceName;
+    }
+
+    public void setTable(Table tbl)
+    {
+        this.table = tbl;
+    }
+
+    /**
+     * Accessor for the generic Table for this class/member (if the store plugin supports generic Tables).
+     * @return The table associated with this class/member
+     */
+    public Table getTable()
+    {
+        return table;
     }
 
     public void addProperty(String key, Object value)
@@ -169,8 +186,7 @@ public class StoreData
         if (metadata instanceof ClassMetaData)
         {
             ClassMetaData cmd = (ClassMetaData)metadata;
-            return Localiser.msg("035004", name, "(none)",
-                cmd.getInheritanceMetaData().getStrategy().toString());
+            return Localiser.msg("035004", name, "(none)", cmd.getInheritanceMetaData().getStrategy().toString());
         }
         else if (metadata instanceof AbstractMemberMetaData)
         {

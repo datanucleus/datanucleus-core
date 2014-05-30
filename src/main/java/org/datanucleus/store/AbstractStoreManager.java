@@ -875,11 +875,10 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
 
         // Filter out any "simple" type classes
-        String[] filteredClassNames = 
-            getNucleusContext().getTypeManager().filterOutSupportedSecondClassNames(classNames);
+        String[] filteredClassNames = getNucleusContext().getTypeManager().filterOutSupportedSecondClassNames(classNames);
 
         // Find the ClassMetaData for these classes and all referenced by these classes
-        Iterator iter = getMetaDataManager().getReferencedClasses(filteredClassNames, clr).iterator();
+        Iterator<AbstractClassMetaData> iter = getMetaDataManager().getReferencedClasses(filteredClassNames, clr).iterator();
         while (iter.hasNext())
         {
             ClassMetaData cmd = (ClassMetaData)iter.next();
@@ -1005,8 +1004,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
 
         // Find if datastore=storeManagerKey has an extension for name="{language}"
-        String name = 
-            getNucleusContext().getPluginManager().getAttributeValueForExtension("org.datanucleus.store_query_query",
+        String name = getNucleusContext().getPluginManager().getAttributeValueForExtension("org.datanucleus.store_query_query",
                 new String[] {"name", "datastore"}, new String[]{language, storeManagerKey}, "name");
         return (name != null);
     }
@@ -1018,8 +1016,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      */
     public boolean supportsValueStrategy(String strategy)
     {
-        ConfigurationElement elem =
-            nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
+        ConfigurationElement elem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
                 new String[]{"name", "unique"}, new String[] {strategy, "true"});
         if (elem != null)
         {
