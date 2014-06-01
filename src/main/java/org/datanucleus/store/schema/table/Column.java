@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.schema.table;
 
+import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.schema.naming.ColumnType;
 
@@ -129,4 +130,12 @@ public interface Column
      * @return The position, or -1 if not specified
      */
     int getPosition();
+
+    Column setColumnMetaData(ColumnMetaData md);
+
+    /**
+     * Accessor for the metadata for this column (if any).
+     * @return Metadata for the column
+     */
+    ColumnMetaData getColumnMetaData();
 }

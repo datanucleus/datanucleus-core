@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.schema.table;
 
+import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.schema.naming.ColumnType;
 
@@ -48,6 +49,8 @@ public class ColumnImpl implements Column
     int position = -1;
 
     MemberColumnMapping mapping = null;
+
+    ColumnMetaData colmd = null;
 
     public ColumnImpl(Table tbl, String identifier, ColumnType colType)
     {
@@ -187,6 +190,17 @@ public class ColumnImpl implements Column
     public int getPosition()
     {
         return position;
+    }
+
+    public Column setColumnMetaData(ColumnMetaData md)
+    {
+        this.colmd = md;
+        return this;
+    }
+
+    public ColumnMetaData getColumnMetaData()
+    {
+        return colmd;
     }
 
     public String toString()
