@@ -138,10 +138,14 @@ public class CompleteClassTable implements Table
                 {
                     // Embedded PC field
                     boolean nested = false;
-                    String nestedStr = mmd.getValueForExtension("nested");
-                    if (nestedStr != null && nestedStr.equalsIgnoreCase("true") && storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_PC_NESTED))
+                    if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_PC_NESTED))
                     {
-                        nested = true;
+                        nested = !storeMgr.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_EMBEDDED_PC_FLAT);
+                        String nestedStr = mmd.getValueForExtension("nested");
+                        if (nestedStr != null && nestedStr.equalsIgnoreCase("" + !nested))
+                        {
+                            nested = !nested;
+                        }
                     }
 
                     if (nested)
@@ -655,10 +659,14 @@ public class CompleteClassTable implements Table
                 {
                     // Nested embedded PC, so recurse
                     boolean nested = false;
-                    String nestedStr = mmd.getValueForExtension("nested");
-                    if (nestedStr != null && nestedStr.equalsIgnoreCase("true") && storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_PC_NESTED))
+                    if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_PC_NESTED))
                     {
-                        nested = true;
+                        nested = !storeMgr.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_EMBEDDED_PC_FLAT);
+                        String nestedStr = mmd.getValueForExtension("nested");
+                        if (nestedStr != null && nestedStr.equalsIgnoreCase("" + !nested))
+                        {
+                            nested = !nested;
+                        }
                     }
 
                     List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
