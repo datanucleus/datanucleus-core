@@ -153,7 +153,7 @@ public class CompleteClassTable implements Table
                         ColumnImpl col = addColumn(mmd, colName, null);
                         if (colmds != null && colmds.length == 1)
                         {
-                            col.setColumnMetaData(colmds[i]);
+                            col.setColumnMetaData(colmds[0]);
                             if (colmds[0].getPosition() != null)
                             {
                                 col.setPosition(colmds[0].getPosition());
@@ -193,7 +193,7 @@ public class CompleteClassTable implements Table
                             ColumnImpl col = addColumn(mmd, colName, null);
                             if (colmds != null && colmds.length == 1)
                             {
-                                col.setColumnMetaData(colmds[i]);
+                                col.setColumnMetaData(colmds[0]);
                                 if (colmds[0].getPosition() != null)
                                 {
                                     col.setPosition(colmds[0].getPosition());
@@ -253,7 +253,7 @@ public class CompleteClassTable implements Table
                     ColumnImpl col = addColumn(mmd, colName, null);
                     if (colmds != null && colmds.length == 1)
                     {
-                        col.setColumnMetaData(colmds[i]);
+                        col.setColumnMetaData(colmds[0]);
                         if (colmds[0].getPosition() != null)
                         {
                             col.setPosition(colmds[0].getPosition());
@@ -287,7 +287,7 @@ public class CompleteClassTable implements Table
                                 ColumnImpl col = addColumn(mmd, colName, typeConv);
                                 if (colmds != null && colmds.length == 1)
                                 {
-                                    col.setColumnMetaData(colmds[i]);
+                                    col.setColumnMetaData(colmds[0]);
                                     if (colmds[j].getPosition() != null)
                                     {
                                         col.setPosition(colmds[j].getPosition());
@@ -316,7 +316,7 @@ public class CompleteClassTable implements Table
                             ColumnImpl col = addColumn(mmd, colName, typeConv);
                             if (colmds != null && colmds.length == 1)
                             {
-                                col.setColumnMetaData(colmds[i]);
+                                col.setColumnMetaData(colmds[0]);
                                 if (colmds[0].getPosition() != null)
                                 {
                                     col.setPosition(colmds[0].getPosition());
@@ -343,7 +343,7 @@ public class CompleteClassTable implements Table
                         ColumnImpl col = addColumn(mmd, colName, typeConv);
                         if (colmds != null && colmds.length == 1)
                         {
-                            col.setColumnMetaData(colmds[i]);
+                            col.setColumnMetaData(colmds[0]);
                             if (colmds[0].getPosition() != null)
                             {
                                 col.setPosition(colmds[0].getPosition());
