@@ -22,7 +22,7 @@ import java.util.UUID;
 /**
  * Class to handle the conversion between java.util.UUID and a String form.
  */
-public class UUIDStringConverter implements TypeConverter<UUID, String>
+public class UUIDStringConverter implements TypeConverter<UUID, String>, ColumnLengthDefiningTypeConverter
 {
     public UUID toMemberType(String str)
     {
@@ -37,5 +37,15 @@ public class UUIDStringConverter implements TypeConverter<UUID, String>
     public String toDatastoreType(UUID uuid)
     {
         return uuid != null ? uuid.toString() : null;
+    }
+
+    public int getDefaultColumnLength(int columnPosition)
+    {
+        if (columnPosition != 0)
+        {
+            return -1;
+        }
+        // java.util.UUID requires 36 chars.
+        return 36;
     }
 }
