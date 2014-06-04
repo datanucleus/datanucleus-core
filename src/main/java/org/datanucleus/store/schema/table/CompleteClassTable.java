@@ -230,16 +230,61 @@ public class CompleteClassTable implements Table
                         if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_MAP_NESTED))
                         {
                             // TODO Support nested embedded map key/value
+                            // Add column for the map (since the store needs a name to reference it by)
+                            ColumnMetaData[] colmds = mmd.getColumnMetaData();
+                            String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
+                            ColumnImpl col = addColumn(mmd, colName, null);
+                            if (colmds != null && colmds.length == 1)
+                            {
+                                col.setColumnMetaData(colmds[0]);
+                                if (colmds[0].getPosition() != null)
+                                {
+                                    col.setPosition(colmds[0].getPosition());
+                                }
+                                if (colmds[0].getJdbcType() != null)
+                                {
+                                    col.setJdbcType(colmds[0].getJdbcType());
+                                }
+                            }
+                            MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
+                            col.setMemberColumnMapping(mapping);
+                            if (schemaVerifier != null)
+                            {
+                                schemaVerifier.attributeMember(mapping, mmd);
+                            }
+                            mappingByMember.put(mmd, mapping);
                         }
                         NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not yet supported. Ignoring");
                         continue;
-                        
                     }
                     else if (mmd.hasArray())
                     {
                         if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_ARRAY_NESTED))
                         {
                             // TODO Support nested embedded array element
+                            // Add column for the array (since the store needs a name to reference it by)
+                            ColumnMetaData[] colmds = mmd.getColumnMetaData();
+                            String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
+                            ColumnImpl col = addColumn(mmd, colName, null);
+                            if (colmds != null && colmds.length == 1)
+                            {
+                                col.setColumnMetaData(colmds[0]);
+                                if (colmds[0].getPosition() != null)
+                                {
+                                    col.setPosition(colmds[0].getPosition());
+                                }
+                                if (colmds[0].getJdbcType() != null)
+                                {
+                                    col.setJdbcType(colmds[0].getJdbcType());
+                                }
+                            }
+                            MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
+                            col.setMemberColumnMapping(mapping);
+                            if (schemaVerifier != null)
+                            {
+                                schemaVerifier.attributeMember(mapping, mmd);
+                            }
+                            mappingByMember.put(mmd, mapping);
                         }
                         NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded array. Not yet supported. Ignoring");
                         continue;
