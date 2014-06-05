@@ -4742,12 +4742,16 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             {
                 case Persistable.LOAD_REQUIRED:
                     out.println("LOAD_REQUIRED");
+                    break;
                 case Persistable.READ_OK:
                     out.println("READ_OK");
+                    break;
                 case Persistable.READ_WRITE_OK:
                     out.println("READ_WRITE_OK");
+                    break;
                 default:
                     out.println("???");
+                    break;
             }
         }
         else
@@ -4796,12 +4800,16 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         {
             case Persistable.LOAD_REQUIRED:
                 out.println("persistenceFlags = LOAD_REQUIRED");
+                break;
             case Persistable.READ_OK:
                 out.println("persistenceFlags = READ_OK");
+                break;
             case Persistable.READ_WRITE_OK:
                 out.println("persistenceFlags = READ_WRITE_OK");
+                break;
             default:
                 out.println("persistenceFlags = ???");
+                break;
         }
         out.println("loadedFields = " + StringUtils.booleanArrayToString(loadedFields));
         out.print("myPC = ");
