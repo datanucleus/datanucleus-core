@@ -19,11 +19,12 @@ package org.datanucleus.query.compiler;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
+import java.util.Deque;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -36,7 +37,7 @@ import org.datanucleus.store.query.QueryCompilerSyntaxException;
 public class JPQLParser implements Parser
 {
     private Lexer p;
-    private Stack<Node> stack = new Stack();
+    private Deque<Node> stack = new ArrayDeque<Node>();
 
     /** Characters that parameters can be prefixed by. */
     private static String paramPrefixes = ":?";
@@ -59,7 +60,7 @@ public class JPQLParser implements Parser
     public Node parse(String expression)
     {
         p = new Lexer(expression, paramPrefixes, false);
-        stack = new Stack();
+        stack = new ArrayDeque<Node>();
         Node result = processExpression();
 
         if (p.ci.getIndex() != p.ci.getEndIndex())
@@ -77,7 +78,7 @@ public class JPQLParser implements Parser
     public Node parseVariable(String expression)
     {
         p = new Lexer(expression, paramPrefixes, false);
-        stack = new Stack();
+        stack = new ArrayDeque<Node>();
         if (!processIdentifier())
         {
             throw new QueryCompilerSyntaxException("expected identifier", p.getIndex(), p.getInput());
@@ -98,7 +99,7 @@ public class JPQLParser implements Parser
     public Node[] parseFrom(String expression)
     {
         p = new Lexer(expression, paramPrefixes, false);
-        stack = new Stack();
+        stack = new ArrayDeque<Node>();
         return processFromExpression();
     }
 
@@ -108,7 +109,7 @@ public class JPQLParser implements Parser
     public Node[] parseUpdate(String expression)
     {
         p = new Lexer(expression, paramPrefixes, false);
-        stack = new Stack();
+        stack = new ArrayDeque<Node>();
         return parseTupple(expression);
     }
 
@@ -118,7 +119,7 @@ public class JPQLParser implements Parser
     public Node[] parseOrder(String expression)
     {
         p = new Lexer(expression, paramPrefixes, false);
-        stack = new Stack();
+        stack = new ArrayDeque<Node>();
         return processOrderExpression();
     }
 
@@ -128,7 +129,7 @@ public class JPQLParser implements Parser
     public Node[] parseResult(String expression)
     {
         p = new Lexer(expression, paramPrefixes, false);
-        stack = new Stack();
+        stack = new ArrayDeque<Node>();
         List nodes = new ArrayList();
         do
         {
@@ -158,7 +159,7 @@ public class JPQLParser implements Parser
     public Node[] parseTupple(String expression)
     {
         p = new Lexer(expression, paramPrefixes, false);
-        stack = new Stack();
+        stack = new ArrayDeque<Node>();
         List nodes = new ArrayList();
         do
         {
@@ -483,7 +484,7 @@ public class JPQLParser implements Parser
                 expr.appendChildNode(nullsNode);
             }
 
-            if (!stack.empty())
+            if (!stack.isEmpty())
             {
                 expr.insertChildNode(stack.pop());
             }
