@@ -111,12 +111,9 @@ public class OrderMetaData extends MetaData implements ColumnMetaDataContainer
             indexMetaData = new IndexMetaData();
             indexMetaData.setUnique(indexed == IndexedValue.UNIQUE);
             indexMetaData.parent = this;
-            if (columns != null)
+            for (ColumnMetaData colmd : columns)
             {
-                for (ColumnMetaData colmd : columns)
-                {
-                    indexMetaData.addColumn(colmd.getName());
-                }
+                indexMetaData.addColumn(colmd.getName());
             }
         }
 

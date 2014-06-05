@@ -912,7 +912,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             Object invokedValue = getValueForArrayExpression((ArrayExpression)invokeExpr.getLeft());
 
             // Invoke method on this object
-            Class invokedType = (invokedValue != null ? invokedValue.getClass() : invokeExpr.getLeft().getSymbol().getValueType());
+            Class invokedType = invokedValue.getClass();
             InvocationEvaluator methodEval = queryMgr.getInMemoryEvaluatorForMethod(invokedType, method);
             if (methodEval != null)
             {

@@ -291,7 +291,7 @@ public class CommandLine
             Option o = (Option)optionList.get(i);
             if (o.shortName != null)
             {
-                if ((o.shortName != null) && (o.shortName.length() > shortMax))
+                if (o.shortName.length() > shortMax)
                 {
                     shortMax = o.shortName.length();
                 }

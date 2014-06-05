@@ -91,13 +91,7 @@ public class MultiMap extends HashMap
      */
     public boolean containsValue(Object value)
     {
-        Set pairs = super.entrySet();
-
-        if (pairs == null)
-        {
-            return false;
-        }
-        Iterator pairsIterator = pairs.iterator();
+        Iterator pairsIterator = super.entrySet().iterator();
         while (pairsIterator.hasNext())
         {
             Map.Entry keyValuePair = (Map.Entry) pairsIterator.next();

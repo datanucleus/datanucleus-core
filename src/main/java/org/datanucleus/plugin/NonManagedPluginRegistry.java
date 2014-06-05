@@ -583,7 +583,6 @@ public class NonManagedPluginRegistry implements PluginRegistry
         }
         catch (URISyntaxException use)
         {
-            use.printStackTrace();
             NucleusLogger.GENERAL.warn(Localiser.msg("024011", pluginURL), use);
             return null;
         }

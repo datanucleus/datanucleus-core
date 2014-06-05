@@ -61,7 +61,6 @@ public class StringUtils
         PrintWriter writer = new PrintWriter(str);
         try
         {
-            ex.printStackTrace(writer);
             return str.getBuffer().toString();
         }
         finally

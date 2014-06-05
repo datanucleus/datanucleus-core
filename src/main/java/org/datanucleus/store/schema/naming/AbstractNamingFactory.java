@@ -455,7 +455,7 @@ public abstract class AbstractNamingFactory implements NamingFactory
 
         // Apply any truncation necessary
         int maxLength = getMaximumLengthForComponent(cmpt);
-        if (preparedName != null && maxLength > 0 && preparedName.length() > maxLength)
+        if (maxLength > 0 && preparedName.length() > maxLength)
         {
             preparedName = truncate(preparedName, maxLength);
         }

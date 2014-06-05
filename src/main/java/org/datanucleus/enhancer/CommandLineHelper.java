@@ -315,8 +315,7 @@ class CommandLineHelper
         }
         catch (IOException e)
         {
-            System.err.println(fileListFile + " could not be read: " + e);
-            e.printStackTrace();
+            System.err.println(fileListFile + " could not be read: " + e.getMessage());
             System.exit(3);
         }
         return result;

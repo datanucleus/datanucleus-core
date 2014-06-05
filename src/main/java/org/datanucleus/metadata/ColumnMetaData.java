@@ -176,8 +176,11 @@ public class ColumnMetaData extends MetaData
         }
         else
         {
-            jdbcType = Enum.valueOf(JdbcType.class, jdbcTypeName.toUpperCase());
-            if (jdbcType == null && !StringUtils.isWhitespace(jdbcTypeName))
+            try
+            {
+                jdbcType = Enum.valueOf(JdbcType.class, jdbcTypeName.toUpperCase());
+            }
+            catch (IllegalArgumentException iae)
             {
                 NucleusLogger.METADATA.warn("Metadata has jdbc-type of " + jdbcType + " yet this is not valid. Ignored");
             }

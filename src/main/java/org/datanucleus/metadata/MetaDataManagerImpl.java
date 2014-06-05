@@ -1338,8 +1338,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         }
         if (exceptions.size() > 0)
         {
-            throw new NucleusUserException(Localiser.msg("044020"), 
-                (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
+            throw new NucleusUserException(Localiser.msg("044020"), (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
         }
     }
 
@@ -1404,8 +1403,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 }
                 catch (Exception e)
                 {
+                    NucleusLogger.METADATA.error(StringUtils.getStringFromStackTrace(e));
                     exceptions.add(e);
-                    e.printStackTrace();
                 }
             }
         }
@@ -1413,8 +1412,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         if (exceptions.size() > 0)
         {
             // Exceptions while loading MetaData
-            throw new NucleusUserException(Localiser.msg("044016"), 
-                exceptions.toArray(new Throwable[exceptions.size()]), null);
+            throw new NucleusUserException(Localiser.msg("044016"), exceptions.toArray(new Throwable[exceptions.size()]), null);
         }
 
         return fileMetaData;

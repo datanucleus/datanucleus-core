@@ -1379,7 +1379,6 @@ public class ClassUtils
                             }
                             catch (final Exception ex)
                             {
-                                ex.printStackTrace();
                                 throw new ClassNotFoundException(name);
                             }
                             finally
@@ -1392,7 +1391,6 @@ public class ClassUtils
                                     }
                                     catch (final IOException ioe)
                                     {
-                                        ioe.printStackTrace();
                                     }
                                 }
                             }

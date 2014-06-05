@@ -17,9 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.metadata;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
-
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.util.Localiser;
 
@@ -31,19 +28,15 @@ public class InvalidAnnotationException extends NucleusUserException
     /** Message resources key */
     protected String messageKey;
 
-    /** Cause of the exception */
-    protected Throwable cause;
-
     /**
      * Constructor with message resource, message param and cause exception
      * @param key message resources key
-     * @param params parameters
      * @param cause cause exception
+     * @param params parameters
      */
     public InvalidAnnotationException(String key, Throwable cause, Object... params)
     {
-        this(key, params);
-        this.cause = cause;
+        super(Localiser.msg(key, params), cause);
         setFatal();
     }
 
@@ -65,41 +58,5 @@ public class InvalidAnnotationException extends NucleusUserException
     public String getMessageKey()
     {
         return messageKey;
-    }
-
-    /* (non-Javadoc)
-     * @see java.lang.Throwable#printStackTrace()
-     */
-    public void printStackTrace()
-    {
-        super.printStackTrace();
-        if (cause != null)
-        {
-            cause.printStackTrace();
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see java.lang.Throwable#printStackTrace(java.io.PrintStream)
-     */
-    public void printStackTrace(PrintStream s)
-    {
-        super.printStackTrace(s);
-        if (cause != null)
-        {
-            cause.printStackTrace(s);
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see java.lang.Throwable#printStackTrace(java.io.PrintWriter)
-     */
-    public void printStackTrace(PrintWriter s)
-    {
-        super.printStackTrace(s);
-        if (cause != null)
-        {
-            cause.printStackTrace(s);
-        }
     }
 }
