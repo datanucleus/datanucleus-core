@@ -23,6 +23,8 @@ Contributors:
 package org.datanucleus.enhancer;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -46,7 +48,7 @@ public class EnhancerTask extends Java
     private String fileSuffixes = "jdo";
 
     /** Filesets of metadata files or class files to be enhanced. */
-    Vector<FileSet> filesets = new Vector<FileSet>();
+    List<FileSet> filesets = new ArrayList<FileSet>();
 
     /**
      * Default constructor
@@ -281,7 +283,7 @@ public class EnhancerTask extends Java
      */
     public void addFileSet(FileSet fs)
     {
-        filesets.addElement(fs);
+        filesets.add(fs);
     }
     
     protected File[] getFiles()
@@ -290,7 +292,7 @@ public class EnhancerTask extends Java
         final int size = filesets.size();
         for (int i = 0; i < size; i++)
         {
-            FileSet fs = filesets.elementAt(i);
+            FileSet fs = filesets.get(i);
             DirectoryScanner ds = fs.getDirectoryScanner(getProject());
             ds.scan();
             String[] f = ds.getIncludedFiles();
