@@ -24,7 +24,6 @@ package org.datanucleus.query.inmemory;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -33,7 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Deque;
+import java.util.Stack;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -68,7 +67,8 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
 {
     String queryLanguage = null;
 
-    Deque stack = new ArrayDeque();
+    // Note that the chosen queue needs to allow null elements
+    Stack stack = new Stack();
 
     /** Map of input parameter values, keyed by their name. */
     Map parameterValues;
