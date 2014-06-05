@@ -50,7 +50,7 @@ public class AbstractMetaDataHandler extends DefaultHandler
     protected final EntityResolver entityResolver;
 
     /** parser buffer */
-    protected StringBuffer charactersBuffer = new StringBuffer();
+    protected StringBuilder charactersBuffer = new StringBuilder();
 
     /** Whether to validate while parsing. */
     protected boolean validate = true;
@@ -211,7 +211,7 @@ public class AbstractMetaDataHandler extends DefaultHandler
     public String getString()
     {
         String result = charactersBuffer.toString();
-        charactersBuffer = new StringBuffer();
+        charactersBuffer = new StringBuilder();
         return result;
     }
 

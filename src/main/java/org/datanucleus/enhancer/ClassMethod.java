@@ -146,7 +146,7 @@ public abstract class ClassMethod
      */
     public String getDescriptor()
     {
-        StringBuffer str = new StringBuffer("(");
+        StringBuilder str = new StringBuilder("(");
         if (argTypes != null && argTypes.length > 0)
         {
             for (int i=0;i<argTypes.length;i++)
@@ -244,7 +244,7 @@ public abstract class ClassMethod
      */
     public static String getMethodAdditionMessage(String methodName, Object returnType, Object[] argTypes, String[] argNames)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (returnType != null)
         {
             if (returnType instanceof Class)
