@@ -940,6 +940,7 @@ public class CompleteClassTable implements Table
 
     protected ColumnImpl addColumn(AbstractMemberMetaData mmd, String colName, ColumnType colType, TypeConverter typeConv)
     {
+        // TODO Set defaultable method on Column
         ColumnImpl col = new ColumnImpl(this, colName, colType);
         if (mmd != null)
         {
@@ -961,6 +962,7 @@ public class CompleteClassTable implements Table
 
     protected ColumnImpl addEmbeddedColumn(String colName, TypeConverter typeConv)
     {
+        // TODO Set defaultable method on Column
         ColumnImpl col = new ColumnImpl(this, colName, ColumnType.COLUMN);
         columns.add(col);
         return col;
