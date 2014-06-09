@@ -67,7 +67,8 @@ public abstract class AbstractLevel2Cache implements Level2Cache
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.datanucleus.cache.Level2Cache#getAll(java.util.Collection)
      */
     public Map<Object, CachedPC> getAll(Collection oids)
@@ -87,7 +88,8 @@ public abstract class AbstractLevel2Cache implements Level2Cache
         return objs;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.datanucleus.cache.Level2Cache#putAll(java.util.Map)
      */
     public void putAll(Map<Object, CachedPC> objs)

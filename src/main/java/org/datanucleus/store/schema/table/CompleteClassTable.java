@@ -389,7 +389,7 @@ public class CompleteClassTable implements Table
                     {
                         // Create column for basic type
                         String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
-                        ColumnImpl col = addColumn(mmd, colName, typeConv);
+                        ColumnImpl col = addColumn(mmd, colName, null);
                         if (colmds != null && colmds.length == 1)
                         {
                             col.setColumnMetaData(colmds[0]);
@@ -902,7 +902,7 @@ public class CompleteClassTable implements Table
                     {
                         // Create column for basic type
                         String colName = namingFactory.getColumnName(embMmds, 0);
-                        ColumnImpl col = addEmbeddedColumn(colName, typeConv);
+                        ColumnImpl col = addEmbeddedColumn(colName, null);
                         if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getPosition() != null)
                         {
                             col.setPosition(embmdMmd.getColumnMetaData()[0].getPosition());

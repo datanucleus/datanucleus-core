@@ -139,10 +139,9 @@ public class WeakLevel2Cache implements Level2Cache
         Iterator pinnedIter = pinnedObjects.iterator();
         while (pinnedIter.hasNext())
         {
-            Map.Entry entry = (Map.Entry)pinnedIter.next();
-            CachedPC pc = (CachedPC)entry.getValue();
-            if (pcClass.getName().equals(pc.getObjectClass().getName()) ||
-                (subclasses && pcClass.isAssignableFrom(pc.getObjectClass())))
+            Map.Entry entry = (Map.Entry) pinnedIter.next();
+            CachedPC pc = (CachedPC) entry.getValue();
+            if (pcClass.getName().equals(pc.getObjectClass().getName()) || (subclasses && pcClass.isAssignableFrom(pc.getObjectClass())))
             {
                 oidsToEvict.add(entry.getKey());
             }
@@ -153,10 +152,9 @@ public class WeakLevel2Cache implements Level2Cache
         Iterator unpinnedIter = unpinnedObjects.iterator();
         while (unpinnedIter.hasNext())
         {
-            Map.Entry entry = (Map.Entry)unpinnedIter.next();
-            CachedPC pc = (CachedPC)entry.getValue();
-            if (pc != null && pcClass.getName().equals(pc.getObjectClass().getName()) ||
-                (subclasses && pcClass.isAssignableFrom(pc.getObjectClass())))
+            Map.Entry entry = (Map.Entry) unpinnedIter.next();
+            CachedPC pc = (CachedPC) entry.getValue();
+            if (pc != null && pcClass.getName().equals(pc.getObjectClass().getName()) || (subclasses && pcClass.isAssignableFrom(pc.getObjectClass())))
             {
                 oidsToEvict.add(entry.getKey());
             }
@@ -198,7 +196,7 @@ public class WeakLevel2Cache implements Level2Cache
             return;
         }
 
-        for (int i=0;i<oids.length;i++)
+        for (int i = 0; i < oids.length; i++)
         {
             evict(oids[i]);
         }
@@ -263,9 +261,8 @@ public class WeakLevel2Cache implements Level2Cache
         Iterator unpinnedIter = unpinnedObjects.iterator();
         while (unpinnedIter.hasNext())
         {
-            CachedPC obj = (CachedPC)unpinnedIter.next();
-            if ((subs && cls.isInstance(obj.getObjectClass())) ||
-                cls.getName().equals(obj.getObjectClass().getName()))
+            CachedPC obj = (CachedPC) unpinnedIter.next();
+            if ((subs && cls.isInstance(obj.getObjectClass())) || cls.getName().equals(obj.getObjectClass().getName()))
             {
                 pin(obj);
             }
@@ -301,7 +298,7 @@ public class WeakLevel2Cache implements Level2Cache
             return;
         }
 
-        for (int i=0;i<oids.length;i++)
+        for (int i = 0; i < oids.length; i++)
         {
             pin(oids[i]);
         }
@@ -356,9 +353,8 @@ public class WeakLevel2Cache implements Level2Cache
         Iterator pinnedIter = pinnedObjects.iterator();
         while (pinnedIter.hasNext())
         {
-            CachedPC obj = (CachedPC)pinnedIter.next();
-            if ((subs && cls.isInstance(obj.getObjectClass())) ||
-                cls.getName().equals(obj.getObjectClass().getName()))
+            CachedPC obj = (CachedPC) pinnedIter.next();
+            if ((subs && cls.isInstance(obj.getObjectClass())) || cls.getName().equals(obj.getObjectClass().getName()))
             {
                 unpin(obj);
             }
@@ -394,17 +390,15 @@ public class WeakLevel2Cache implements Level2Cache
             return;
         }
 
-        for (int i=0;i<oids.length;i++)
+        for (int i = 0; i < oids.length; i++)
         {
             unpin(oids[i]);
         }
     }
 
     /**
-     * Accessor for an object from the cache.
-     * The returned object will not have a ObjectProvider connected. This is
-     * because data stored in the Level 2 cache is ObjectProvider and
-     * PersistenceManager independent.
+     * Accessor for an object from the cache. The returned object will not have a ObjectProvider connected.
+     * This is because data stored in the Level 2 cache is ObjectProvider and PersistenceManager independent.
      * @param oid The Object ID
      * @return The L2 cacheable object
      */
@@ -415,16 +409,17 @@ public class WeakLevel2Cache implements Level2Cache
             return null;
         }
 
-        CachedPC pc = (CachedPC)pinnedCache.get(oid);
+        CachedPC pc = (CachedPC) pinnedCache.get(oid);
         if (pc != null)
         {
             return pc;
         }
-        pc = (CachedPC)unpinnedCache.get(oid);
+        pc = (CachedPC) unpinnedCache.get(oid);
         return pc;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.datanucleus.cache.Level2Cache#getAll(java.util.Collection)
      */
     public Map<Object, CachedPC> getAll(Collection oids)
@@ -472,7 +467,8 @@ public class WeakLevel2Cache implements Level2Cache
         return getNumberOfPinnedObjects() + getNumberOfUnpinnedObjects();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.datanucleus.cache.Level2Cache#putAll(java.util.Map)
      */
     public void putAll(Map<Object, CachedPC> objs)
@@ -494,9 +490,9 @@ public class WeakLevel2Cache implements Level2Cache
     }
 
     /**
-     * Method to put an object in the cache. Note that the pc object being
-     * passed in must NOT have a ObjectProvider connected. Data stored in
-     * the Level 2 cache has to be independent of PersistenceManager and ObjectProvider.
+     * Method to put an object in the cache. Note that the pc object being passed in must NOT have a
+     * ObjectProvider connected. Data stored in the Level 2 cache has to be independent of PersistenceManager
+     * and ObjectProvider.
      * @param oid The Object id for this object
      * @param pc The cacheable object
      * @return The value previously associated with this oid
@@ -522,8 +518,7 @@ public class WeakLevel2Cache implements Level2Cache
             while (pinnedClsIter.hasNext())
             {
                 PinnedClass pinCls = pinnedClsIter.next();
-                if (pinCls.cls.getName().equals(pc.getObjectClass().getName()) ||
-                    (pinCls.subclasses && pinCls.cls.isAssignableFrom(pc.getObjectClass())))
+                if (pinCls.cls.getName().equals(pc.getObjectClass().getName()) || (pinCls.subclasses && pinCls.cls.isAssignableFrom(pc.getObjectClass())))
                 {
                     toBePinned = true;
                     break;
@@ -544,7 +539,7 @@ public class WeakLevel2Cache implements Level2Cache
             obj = pinnedCache.put(oid, pc);
             if (obj != null)
             {
-                return (CachedPC)obj;
+                return (CachedPC) obj;
             }
         }
         else
@@ -561,7 +556,7 @@ public class WeakLevel2Cache implements Level2Cache
                 obj = unpinnedCache.put(oid, pc);
                 if (obj != null)
                 {
-                    return (CachedPC)obj;
+                    return (CachedPC) obj;
                 }
             }
         }
@@ -588,14 +583,12 @@ public class WeakLevel2Cache implements Level2Cache
         return (pinnedCache.isEmpty() && unpinnedCache.isEmpty());
     }
 
-    private void writeObject(ObjectOutputStream out) 
-    throws IOException
+    private void writeObject(ObjectOutputStream out) throws IOException
     {
         out.defaultWriteObject();
     }
 
-    private void readObject(ObjectInputStream in)
-    throws IOException, ClassNotFoundException
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
         // our "pseudo-constructor"
         in.defaultReadObject();

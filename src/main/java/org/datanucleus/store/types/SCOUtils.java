@@ -61,12 +61,12 @@ import org.datanucleus.util.StringUtils;
 public class SCOUtils
 {
     /**
-     * Method to create a new SCO wrapper for a SCO type.
-     * The SCO wrapper will be appropriate for the passed value (which represents the instantiated type of the field)
-     * unless it is null when the wrapper will be appropriate for the declared type of the field.
-     * While the "instantiated type" and the type of "value" should be the same when value is non-null, there are
-     * situations where we need to create a List based collection yet have no value so pass in the declaredType
-     * as Collection, instantiatedType as ArrayList, and value as null.
+     * Method to create a new SCO wrapper for a SCO type. The SCO wrapper will be appropriate for the passed
+     * value (which represents the instantiated type of the field) unless it is null when the wrapper will be
+     * appropriate for the declared type of the field. While the "instantiated type" and the type of "value"
+     * should be the same when value is non-null, there are situations where we need to create a List based
+     * collection yet have no value so pass in the declaredType as Collection, instantiatedType as ArrayList,
+     * and value as null.
      * @param ownerOP ObjectProvider for the owning object
      * @param mmd The Field MetaData for the related field.
      * @param declaredType The class of the object
@@ -78,14 +78,12 @@ public class SCOUtils
      * @return The Second-Class Object
      * @throws NucleusUserException if an error occurred when creating the SCO instance
      */
-    public static SCO newSCOInstance(ObjectProvider ownerOP, AbstractMemberMetaData mmd, 
-            Class declaredType, Class instantiatedType, Object value, boolean forInsert, boolean forUpdate,
-            boolean replaceField)
+    public static SCO newSCOInstance(ObjectProvider ownerOP, AbstractMemberMetaData mmd, Class declaredType, Class instantiatedType, Object value,
+            boolean forInsert, boolean forUpdate, boolean replaceField)
     {
         if (!mmd.getType().isAssignableFrom(declaredType))
         {
-            throw new NucleusUserException(Localiser.msg("023010",
-                declaredType.getName(), mmd.getName(), mmd.getType()));
+            throw new NucleusUserException(Localiser.msg("023010", declaredType.getName(), mmd.getName(), mmd.getType()));
         }
 
         // Check if the passed in value is a wrapper type
@@ -98,7 +96,7 @@ public class SCOUtils
                 // Replace the field with this value
                 ownerOP.replaceField(mmd.getAbsoluteFieldNumber(), value);
             }
-            return (SCO)value;
+            return (SCO) value;
         }
 
         String typeName = declaredType.getName();
@@ -127,8 +125,7 @@ public class SCOUtils
         }
         if (wrapperType == null)
         {
-            throw new NucleusUserException(Localiser.msg("023011", 
-                declaredType.getName(), StringUtils.toJVMIDString(value), mmd.getFullFieldName()));
+            throw new NucleusUserException(Localiser.msg("023011", declaredType.getName(), StringUtils.toJVMIDString(value), mmd.getFullFieldName()));
         }
 
         // Create the SCO wrapper
@@ -156,16 +153,15 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to return the backed wrapper type for the field definition.
-     * Wrapper is null if no backed wrapper is defined for the type.
+     * Convenience method to return the backed wrapper type for the field definition. Wrapper is null if no
+     * backed wrapper is defined for the type.
      * @param declaredType Declared type of the field
      * @param instantiatedType Instantiated type of the field
      * @param typeName Type name to try first
      * @param typeMgr The type manager
      * @return The wrapper type
      */
-    private static Class getBackedWrapperTypeForType(Class declaredType, Class instantiatedType, String typeName, 
-            TypeManager typeMgr)
+    private static Class getBackedWrapperTypeForType(Class declaredType, Class instantiatedType, String typeName, TypeManager typeMgr)
     {
         Class wrapperType = typeMgr.getWrappedTypeBackedForType(typeName);
         if (wrapperType == null)
@@ -186,16 +182,15 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to return the simple wrapper type for the field definition.
-     * Wrapper is null if no simple wrapper is defined for the type.
+     * Convenience method to return the simple wrapper type for the field definition. Wrapper is null if no
+     * simple wrapper is defined for the type.
      * @param declaredType Declared type of the field
      * @param instantiatedType Instantiated type of the field
      * @param typeName Type name to try first
      * @param typeMgr The type manager
      * @return The wrapper type
      */
-    private static Class getSimpleWrapperTypeForType(Class declaredType, Class instantiatedType, String typeName, 
-            TypeManager typeMgr)
+    private static Class getSimpleWrapperTypeForType(Class declaredType, Class instantiatedType, String typeName, TypeManager typeMgr)
     {
         Class wrapperType = typeMgr.getWrapperTypeForType(typeName);
         if (wrapperType == null)
@@ -226,13 +221,11 @@ public class SCOUtils
      * @param forUpdate Whether this value is to be updated in the datastore
      * @return The wrapped value
      */
-    private static SCO createSCOWrapper(Class wrapperType, ObjectProvider ownerOP, AbstractMemberMetaData mmd,
-            boolean replaceField, Object fieldValue, boolean forInsert, boolean forUpdate)
+    private static SCO createSCOWrapper(Class wrapperType, ObjectProvider ownerOP, AbstractMemberMetaData mmd, boolean replaceField, Object fieldValue,
+            boolean forInsert, boolean forUpdate)
     {
         // Create the SCO wrapper
-        SCO sco = (SCO) ClassUtils.newInstance(wrapperType, 
-            new Class[]{ObjectProvider.class, AbstractMemberMetaData.class}, 
-            new Object[]{ownerOP, mmd});
+        SCO sco = (SCO) ClassUtils.newInstance(wrapperType, new Class[]{ObjectProvider.class, AbstractMemberMetaData.class}, new Object[]{ownerOP, mmd});
 
         if (replaceField)
         {
@@ -266,13 +259,11 @@ public class SCOUtils
      * @param lazyLoading Whether to use lazy loading in the wrapper
      * @return The String
      */
-    public static String getContainerInfoMessage(ObjectProvider ownerOP, String fieldName, SCOContainer cont,
-            boolean useCache, boolean queued, boolean allowNulls, boolean lazyLoading)
+    public static String getContainerInfoMessage(ObjectProvider ownerOP, String fieldName, SCOContainer cont, boolean useCache, boolean queued,
+            boolean allowNulls, boolean lazyLoading)
     {
-        String msg = Localiser.msg("023004", ownerOP.getObjectAsPrintable(), fieldName,
-            cont.getClass().getName(),
-            "[cache-values=" + useCache + ", lazy-loading=" + lazyLoading +
-            ", queued-operations=" + queued + ", allow-nulls=" + allowNulls + "]");
+        String msg = Localiser.msg("023004", ownerOP.getObjectAsPrintable(), fieldName, cont.getClass().getName(),
+            "[cache-values=" + useCache + ", lazy-loading=" + lazyLoading + ", queued-operations=" + queued + ", allow-nulls=" + allowNulls + "]");
         return msg;
     }
 
@@ -342,8 +333,8 @@ public class SCOUtils
     }
 
     /**
-     * Utility to return whether or not to use the container cache for the
-     * collection/map for the passed ObjectProvider SCO.
+     * Utility to return whether or not to use the container cache for the collection/map for the passed
+     * ObjectProvider SCO.
      * @param ownerOP The ObjectProvider for the SCO field
      * @param mmd Metadata for the member that we are considering
      * @return Whether to use the cache.
@@ -356,8 +347,7 @@ public class SCOUtils
         }
 
         // Check whether we should cache collections based on PMF/PM
-        boolean useCache = 
-            ownerOP.getExecutionContext().getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS);
+        boolean useCache = ownerOP.getExecutionContext().getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS);
         if (ownerOP.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS) != null)
         {
             useCache = ownerOP.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS);
@@ -393,8 +383,8 @@ public class SCOUtils
         boolean lazy = false;
 
         AbstractClassMetaData cmd = ownerOP.getClassMetaData();
-        Boolean lazyCollections =
-            ownerOP.getExecutionContext().getNucleusContext().getConfiguration().getBooleanObjectProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS_LAZY);
+        Boolean lazyCollections = ownerOP.getExecutionContext().getNucleusContext().getConfiguration()
+                .getBooleanObjectProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS_LAZY);
         if (lazyCollections != null)
         {
             // Global setting for PMF
@@ -413,7 +403,7 @@ public class SCOUtils
             int fieldNo = mmd.getAbsoluteFieldNumber();
             if (fpFields != null && fpFields.length > 0)
             {
-                for (int i=0;i<fpFields.length;i++)
+                for (int i = 0; i < fpFields.length; i++)
                 {
                     if (fpFields[i] == fieldNo)
                     {
@@ -430,8 +420,8 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to return if a collection field has elements without their own identity.
-     * Checks if the elements are embedded in a join table, or in the main table, or serialised.
+     * Convenience method to return if a collection field has elements without their own identity. Checks if
+     * the elements are embedded in a join table, or in the main table, or serialised.
      * @param mmd MetaData for the field
      * @return Whether the elements have their own identity or not
      */
@@ -458,8 +448,8 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to return if a map field has keys without their own identity.
-     * Checks if the keys are embedded in a join table, or in the main table, or serialised.
+     * Convenience method to return if a map field has keys without their own identity. Checks if the keys are
+     * embedded in a join table, or in the main table, or serialised.
      * @param fmd MetaData for the field
      * @return Whether the keys have their own identity or not
      */
@@ -486,8 +476,8 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to return if a map field has values without their own identity.
-     * Checks if the values are embedded in a join table, or in the main table, or serialised.
+     * Convenience method to return if a map field has values without their own identity. Checks if the values
+     * are embedded in a join table, or in the main table, or serialised.
      * @param fmd MetaData for the field
      * @return Whether the values have their own identity or not
      */
@@ -514,17 +504,15 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to return if a collection field has the elements serialised into the
-     * table of the field as a single BLOB.
-     * This is really for use within an RDBMS context.
+     * Convenience method to return if a collection field has the elements serialised into the table of the
+     * field as a single BLOB. This is really for use within an RDBMS context.
      * @param fmd MetaData for the field
      * @return Whether the elements are serialised (either explicitly or implicitly)
      */
     public static boolean collectionHasSerialisedElements(AbstractMemberMetaData fmd)
     {
         boolean serialised = fmd.isSerialized();
-        if (fmd.getCollection() != null && fmd.getCollection().isEmbeddedElement() && 
-            fmd.getJoinMetaData() == null)
+        if (fmd.getCollection() != null && fmd.getCollection().isEmbeddedElement() && fmd.getJoinMetaData() == null)
         {
             // Elements are embedded but no join table so we serialise
             serialised = true;
@@ -534,8 +522,8 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to return if an array field has the elements stored into the
-     * table of the field as a single (BLOB) column.
+     * Convenience method to return if an array field has the elements stored into the table of the field as a
+     * single (BLOB) column.
      * @param fmd MetaData for the field
      * @param mmgr MetaData manager
      * @return Whether the elements are stored in a single column
@@ -555,7 +543,7 @@ public class SCOUtils
             ApiAdapter api = mmgr.getApiAdapter();
             if (!elementClass.isInterface() && !api.isPersistable(elementClass))
             {
-                // Array of non-PC with no join table  so store in single column of main table
+                // Array of non-PC with no join table so store in single column of main table
                 singleColumn = true;
             }
         }
@@ -564,8 +552,8 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to return if a map field has the keys/values serialised.
-     * This is really for use within an RDBMS context.
+     * Convenience method to return if a map field has the keys/values serialised. This is really for use
+     * within an RDBMS context.
      * @param fmd MetaData for the field
      * @return Whether the keys and values are serialised (either explicitly or implicitly)
      */
@@ -583,9 +571,7 @@ public class SCOUtils
         }
 
         boolean serialised = fmd.isSerialized();
-        if (fmd.getMap() != null && fmd.getJoinMetaData() == null &&
-            (fmd.getMap().isEmbeddedKey() && fmd.getMap().isEmbeddedValue()) &&
-            !inverseKeyField && !inverseValueField)
+        if (fmd.getMap() != null && fmd.getJoinMetaData() == null && (fmd.getMap().isEmbeddedKey() && fmd.getMap().isEmbeddedValue()) && !inverseKeyField && !inverseValueField)
         {
             // Keys AND values are embedded but no join table so we serialise the whole map
             // Note that we explicitly excluded the 1-N Map with the key stored in the value
@@ -596,16 +582,15 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method for use by Collection/Set/HashSet attachCopy methods to
-     * add any new elements (added whilst detached) to the collection.
+     * Convenience method for use by Collection/Set/HashSet attachCopy methods to add any new elements (added
+     * whilst detached) to the collection.
      * @param ownerOP Owner ObjectProvider
      * @param scoColl The current (attached) SCO collection
      * @param detachedElements The collection of (detached) elements that we're merging
      * @param elementsWithoutId Whether the elements have no identity
      * @return If the Collection was updated
      */
-    public static boolean attachCopyElements(ObjectProvider ownerOP, Collection scoColl, Collection detachedElements, 
-            boolean elementsWithoutId)
+    public static boolean attachCopyElements(ObjectProvider ownerOP, Collection scoColl, Collection detachedElements, boolean elementsWithoutId)
     {
         boolean updated = false;
 
@@ -702,17 +687,15 @@ public class SCOUtils
     }
 
     /**
-     * Method to return an attached copy of the passed (detached) value. The returned attached copy
-     * is a SCO wrapper. Goes through the existing elements in the store for this owner field and
-     * removes ones no longer present, and adds new elements. All elements in the (detached)
-     * value are attached.
+     * Method to return an attached copy of the passed (detached) value. The returned attached copy is a SCO
+     * wrapper. Goes through the existing elements in the store for this owner field and removes ones no
+     * longer present, and adds new elements. All elements in the (detached) value are attached.
      * @param ownerOP ObjectProvider for the owning object with the collection
      * @param detachedElements The detached elements in the collection
      * @param attached Collection to add the attached copies to
      * @param elementsWithoutIdentity Whether the elements have their own identity
      */
-    public static void attachCopyForCollection(ObjectProvider ownerOP, Object[] detachedElements,
-            Collection attached, boolean elementsWithoutIdentity)
+    public static void attachCopyForCollection(ObjectProvider ownerOP, Object[] detachedElements, Collection attached, boolean elementsWithoutIdentity)
     {
         ApiAdapter api = ownerOP.getExecutionContext().getApiAdapter();
         for (int i = 0; i < detachedElements.length; i++)
@@ -729,8 +712,8 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method for use by List attachCopy methods to update the
-     * passed (attached) list using the (attached) list elements passed.
+     * Convenience method for use by List attachCopy methods to update the passed (attached) list using the
+     * (attached) list elements passed.
      * @param list The current (attached) list
      * @param elements The list of (attached) elements needed.
      * @return If the List was updated
@@ -784,8 +767,7 @@ public class SCOUtils
             Object element = elementsIter.next();
             Object currentElement = list.get(position);
             boolean updatePosition = false;
-            if ((element == null && currentElement != null) ||
-                (element != null && currentElement == null))
+            if ((element == null && currentElement != null) || (element != null && currentElement == null))
             {
                 // Cater for null elements in the list
                 updatePosition = true;
@@ -798,7 +780,7 @@ public class SCOUtils
             if (updatePosition)
             {
                 // Update the position, taking care not to have dependent-field deletes taking place
-                ((SCOList)list).set(position, element, false);
+                ((SCOList) list).set(position, element, false);
                 updated = true;
             }
 
@@ -809,18 +791,16 @@ public class SCOUtils
     }
 
     /**
-     * Method to return an attached copy of the passed (detached) value. The returned attached copy
-     * is a SCO wrapper. Goes through the existing elements in the store for this owner field and
-     * removes ones no longer present, and adds new elements. All elements in the (detached)
-     * value are attached.
+     * Method to return an attached copy of the passed (detached) value. The returned attached copy is a SCO
+     * wrapper. Goes through the existing elements in the store for this owner field and removes ones no
+     * longer present, and adds new elements. All elements in the (detached) value are attached.
      * @param ownerOP ObjectProvider for the owning object with the map
      * @param detachedEntries The detached entries in the map
      * @param attached Map to add the attached copies to
      * @param keysWithoutIdentity Whether the keys have their own identity
      * @param valuesWithoutIdentity Whether the values have their own identity
      */
-    public static void attachCopyForMap(ObjectProvider ownerOP, Set detachedEntries,
-            Map attached, boolean keysWithoutIdentity, boolean valuesWithoutIdentity)
+    public static void attachCopyForMap(ObjectProvider ownerOP, Set detachedEntries, Map attached, boolean keysWithoutIdentity, boolean valuesWithoutIdentity)
     {
         Iterator iter = detachedEntries.iterator();
         ApiAdapter api = ownerOP.getExecutionContext().getApiAdapter();
@@ -842,8 +822,8 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method for use by Map attachCopy methods to update the
-     * passed (attached) map using the (attached) map keys/values passed.
+     * Convenience method for use by Map attachCopy methods to update the passed (attached) map using the
+     * (attached) map keys/values passed.
      * @param api Api adapter
      * @param map The current (attached) map
      * @param keysValues The keys/values required
@@ -907,13 +887,11 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to populate the passed delegate Map with the keys/values from
-     * the associated Store.
+     * Convenience method to populate the passed delegate Map with the keys/values from the associated Store.
      * <P>
-     * The issue here is that we need to load the keys and values in as few calls as possible.
-     * The method employed here reads in the keys (if persistable), then the values
-     * (if persistable), and then the "entries" (ids of keys and values) so we can 
-     * associate the keys to the values.
+     * The issue here is that we need to load the keys and values in as few calls as possible. The method
+     * employed here reads in the keys (if persistable), then the values (if persistable), and then the
+     * "entries" (ids of keys and values) so we can associate the keys to the values.
      * @param delegate The delegate
      * @param store The Store
      * @param ownerOP ObjectProvider of the owner of the map.
@@ -955,7 +933,7 @@ public class SCOUtils
         Iterator entryIter = entries.iterator(ownerOP);
         while (entryIter.hasNext())
         {
-            Map.Entry entry = (Map.Entry)entryIter.next();
+            Map.Entry entry = (Map.Entry) entryIter.next();
             Object key = entry.getKey();
             Object value = entry.getValue();
             delegate.put(key, value);
@@ -963,73 +941,68 @@ public class SCOUtils
 
         if (!store.keysAreEmbedded() && !store.keysAreSerialised() && delegate.size() != keys.size())
         {
-            // With Derby 10.x we can get instances where the values query returns no values yet entries is not empty
+            // With Derby 10.x we can get instances where the values query returns no values yet entries is
+            // not empty
             // TODO Maybe make this throw an exception
-            NucleusLogger.DATASTORE_RETRIEVE.warn("The number of Map key objects (" + keys.size() + ")" + 
-                " was different to the number of entries (" + delegate.size() + ")." +
-                " Likely there is a bug in your datastore");
+            NucleusLogger.DATASTORE_RETRIEVE
+                    .warn("The number of Map key objects (" + keys.size() + ")" + " was different to the number of entries (" + delegate.size() + ")." + " Likely there is a bug in your datastore");
         }
 
         if (!store.valuesAreEmbedded() && !store.valuesAreSerialised() && delegate.size() != values.size())
         {
-            // With Derby 10.x we can get instances where the values query returns no values yet entries is not empty
+            // With Derby 10.x we can get instances where the values query returns no values yet entries is
+            // not empty
             // TODO Maybe make this throw an exception
-            NucleusLogger.DATASTORE_RETRIEVE.warn("The number of Map value objects (" + values.size() + ")" + 
-                " was different to the number of entries (" + delegate.size() + ")." +
-                " Likely there is a bug in your datastore");
+            NucleusLogger.DATASTORE_RETRIEVE
+                    .warn("The number of Map value objects (" + values.size() + ")" + " was different to the number of entries (" + delegate.size() + ")." + " Likely there is a bug in your datastore");
         }
 
         keys.clear();
         values.clear();
     }
-    
+
     /**
-     * Returns <tt>true</tt> if this collection contains the specified
-     * element.  More formally, returns <tt>true</tt> if and only if this
-     * collection contains at least one element <tt>it</tt> such that
+     * Returns <tt>true</tt> if this collection contains the specified element. More formally, returns
+     * <tt>true</tt> if and only if this collection contains at least one element <tt>it</tt> such that
      * <tt>(o==null ? it==null : o.equals(it))</tt>.
      * <p>
-     * This implementation iterates over the elements in the collection,
-     * checking each element in turn for equality with the specified element.
+     * This implementation iterates over the elements in the collection, checking each element in turn for
+     * equality with the specified element.
      * @param backingStore the Store
      * @param op the ObjectProvider
      * @return <tt>true</tt> if this collection contains the specified element.
      */
-     public static Object[] toArray(CollectionStore backingStore, ObjectProvider op)
-     {
-         Object[] result = new Object[backingStore.size(op)];
-         Iterator it = backingStore.iterator(op);
-         for (int i=0; it.hasNext(); i++)
-         {
-             result[i] = it.next();
-         }        
-         return result;
+    public static Object[] toArray(CollectionStore backingStore, ObjectProvider op)
+    {
+        Object[] result = new Object[backingStore.size(op)];
+        Iterator it = backingStore.iterator(op);
+        for (int i = 0; it.hasNext(); i++)
+        {
+            result[i] = it.next();
+        }
+        return result;
     }
 
     /**
-     * Returns an array containing all of the elements in this collection; 
-     * 
-     * @param  backingStore the Store
-     * @param  op the ObjectProvider
-     * @param  a the array into which the elements of the collection are to
-     *         be stored, if it is big enough; otherwise, a new array of the
-     *         same runtime type is allocated for this purpose.
+     * Returns an array containing all of the elements in this collection;
+     * @param backingStore the Store
+     * @param op the ObjectProvider
+     * @param a the array into which the elements of the collection are to be stored, if it is big enough;
+     * otherwise, a new array of the same runtime type is allocated for this purpose.
      * @return an array containing the elements of the collection.
-     * 
      * @throws NullPointerException if the specified array is <tt>null</tt>.
-     * @throws ArrayStoreException if the runtime type of the specified array
-     *         is not a supertype of the runtime type of every element in this
-     *         collection.
+     * @throws ArrayStoreException if the runtime type of the specified array is not a supertype of the
+     * runtime type of every element in this collection.
      */
     public static Object[] toArray(CollectionStore backingStore, ObjectProvider op, Object a[])
     {
         int size = backingStore.size(op);
         if (a.length < size)
         {
-            a = (Object[])java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), size);
+            a = (Object[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), size);
         }
-        Iterator it=backingStore.iterator(op);
-        for (int i=0; i<size; i++)
+        Iterator it = backingStore.iterator(op);
+        for (int i = 0; i < size; i++)
         {
             a[i] = it.next();
         }
@@ -1039,7 +1012,7 @@ public class SCOUtils
             a[size] = null;
         }
 
-        return a;        
+        return a;
     }
 
     /**
@@ -1068,7 +1041,7 @@ public class SCOUtils
             try
             {
                 comparatorCls = clr.classForName(comparatorName);
-                comparator = (Comparator)ClassUtils.newInstance(comparatorCls, null, null);
+                comparator = (Comparator) ClassUtils.newInstance(comparatorCls, null, null);
             }
             catch (NucleusException jpe)
             {
@@ -1079,8 +1052,8 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to refresh fetch plan fields for all elements for a collection field.
-     * All elements that are persistable will be made transient.
+     * Convenience method to refresh fetch plan fields for all elements for a collection field. All elements
+     * that are persistable will be made transient.
      * @param ownerOP ObjectProvider for the owning object with the collection
      * @param elements The elements in the collection
      */
@@ -1097,8 +1070,8 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to refresh fetch plan fields for all elements for a map field.
-     * All elements that are persistable will be made transient.
+     * Convenience method to refresh fetch plan fields for all elements for a map field. All elements that are
+     * persistable will be made transient.
      * @param ownerOP ObjectProvider for the owning object with the map
      * @param entries The entries in the map
      */
@@ -1112,18 +1085,18 @@ public class SCOUtils
             Object key = entry.getKey();
             if (api.isPersistable(key))
             {
-               ownerOP.getExecutionContext().refreshObject(key);
+                ownerOP.getExecutionContext().refreshObject(key);
             }
             if (api.isPersistable(val))
             {
-               ownerOP.getExecutionContext().refreshObject(val);
+                ownerOP.getExecutionContext().refreshObject(val);
             }
         }
     }
 
     /**
-     * Convenience method to detach (recursively) all elements for a collection field.
-     * All elements that are persistable will be detached.
+     * Convenience method to detach (recursively) all elements for a collection field. All elements that are
+     * persistable will be detached.
      * @param ownerOP ObjectProvider for the owning object with the collection
      * @param elements The elements in the collection
      * @param state FetchPlan state
@@ -1141,8 +1114,8 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to detach copies (recursively) of all elements for a collection field.
-     * All elements that are persistable will be detached.
+     * Convenience method to detach copies (recursively) of all elements for a collection field. All elements
+     * that are persistable will be detached.
      * @param ownerOP ObjectProvider for the owning object with the collection
      * @param elements The elements in the collection
      * @param state FetchPlan state
@@ -1173,8 +1146,8 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to attach (recursively) all elements for a collection field.
-     * All elements that are persistable and not yet having an attached object will be attached.
+     * Convenience method to attach (recursively) all elements for a collection field. All elements that are
+     * persistable and not yet having an attached object will be attached.
      * @param ownerOP ObjectProvider for the owning object with the collection
      * @param elements The elements to process
      * @param elementsWithoutIdentity Whether the elements have their own identity
@@ -1198,8 +1171,8 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to detach (recursively) all elements for a map field.
-     * All elements that are persistable will be detached.
+     * Convenience method to detach (recursively) all elements for a map field. All elements that are
+     * persistable will be detached.
      * @param ownerOP ObjectProvider for the owning object with the map
      * @param entries The entries in the map
      * @param state FetchPlan state
@@ -1214,18 +1187,18 @@ public class SCOUtils
             Object key = entry.getKey();
             if (api.isPersistable(key))
             {
-               ownerOP.getExecutionContext().detachObject(key, state);
+                ownerOP.getExecutionContext().detachObject(key, state);
             }
             if (api.isPersistable(val))
             {
-               ownerOP.getExecutionContext().detachObject(val, state);
+                ownerOP.getExecutionContext().detachObject(val, state);
             }
         }
     }
 
     /**
-     * Convenience method to detach copies (recursively) of all elements for a map field.
-     * All elements that are persistable will be detached.
+     * Convenience method to detach copies (recursively) of all elements for a map field. All elements that
+     * are persistable will be detached.
      * @param ownerOP ObjectProvider for the owning object with the map
      * @param entries The entries in the map
      * @param state FetchPlan state
@@ -1252,8 +1225,8 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to attach (recursively) all keys/values for a map field.
-     * All keys/values that are persistable and don't already have an attached object will be attached.
+     * Convenience method to attach (recursively) all keys/values for a map field. All keys/values that are
+     * persistable and don't already have an attached object will be attached.
      * @param ownerOP ObjectProvider for the owning object with the map
      * @param entries The entries in the map to process
      * @param keysWithoutIdentity Whether the keys have their own identity
@@ -1290,8 +1263,8 @@ public class SCOUtils
     }
 
     /**
-     * Method to check if an object to be stored in a SCO container is already persistent, or is managed
-     * by a different ExecutionContext. If not persistent, this call will persist it. If not yet flushed to the
+     * Method to check if an object to be stored in a SCO container is already persistent, or is managed by a
+     * different ExecutionContext. If not persistent, this call will persist it. If not yet flushed to the
      * datastore this call will flush it.
      * @param ec ExecutionContext
      * @param object The object
@@ -1328,7 +1301,8 @@ public class SCOUtils
                             Object obj = ec.findObject(api.getIdForObject(object), true, false, object.getClass().getName());
                             if (obj != null)
                             {
-                                // PM.getObjectById creates a dummy object to represent this object and automatically
+                                // PM.getObjectById creates a dummy object to represent this object and
+                                // automatically
                                 // enlists it in the txn. Evict it to avoid issues with reachability
                                 ObjectProvider objSM = ec.findObjectProvider(obj);
                                 if (objSM != null)
@@ -1374,8 +1348,8 @@ public class SCOUtils
     }
 
     /**
-     * Method to check if objects to be stored in a SCO container are already persistent, or are managed by 
-     * a different ExecutionContext. If not persistent, this call will persist them.
+     * Method to check if objects to be stored in a SCO container are already persistent, or are managed by a
+     * different ExecutionContext. If not persistent, this call will persist them.
      * @param ec ExecutionContext
      * @param objects The objects (array, or Collection)
      */
@@ -1430,9 +1404,8 @@ public class SCOUtils
     }
 
     /**
-     * Method to return the type to instantiate a container as.
-     * Returns the declared type unless it is not a concrete type, in which case returns ArrayList, HashSet,
-     * or HashMap.
+     * Method to return the type to instantiate a container as. Returns the declared type unless it is not a
+     * concrete type, in which case returns ArrayList, HashSet, or HashMap.
      * @param declaredType The declared type
      * @param ordered Hint whether it needs ordering or not (null implies not)
      * @return The type to instantiate as
@@ -1485,8 +1458,8 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to return if we should use a queued update for the current operation.
-     * If within a transaction, and using queueing in general, and not flushing then returns true.
+     * Convenience method to return if we should use a queued update for the current operation. If within a
+     * transaction, and using queueing in general, and not flushing then returns true.
      * @param queued Whether supporting queued operations
      * @param op ObjectProvider
      * @return Whether to use queued for this operation
@@ -1503,8 +1476,7 @@ public class SCOUtils
      */
     public static boolean hasDependentElement(AbstractMemberMetaData mmd)
     {
-        if (!SCOUtils.collectionHasElementsWithoutIdentity(mmd) && mmd.getCollection() != null && 
-            mmd.getCollection().isDependentElement())
+        if (!SCOUtils.collectionHasElementsWithoutIdentity(mmd) && mmd.getCollection() != null && mmd.getCollection().isDependentElement())
         {
             return true;
         }
@@ -1518,8 +1490,7 @@ public class SCOUtils
      */
     public static boolean hasDependentKey(AbstractMemberMetaData mmd)
     {
-        if (!SCOUtils.mapHasKeysWithoutIdentity(mmd) && mmd.getMap() != null && 
-            mmd.getMap().isDependentKey())
+        if (!SCOUtils.mapHasKeysWithoutIdentity(mmd) && mmd.getMap() != null && mmd.getMap().isDependentKey())
         {
             return true;
         }
@@ -1533,8 +1504,7 @@ public class SCOUtils
      */
     public static boolean hasDependentValue(AbstractMemberMetaData mmd)
     {
-        if (!SCOUtils.mapHasValuesWithoutIdentity(mmd) && mmd.getMap() != null && 
-            mmd.getMap().isDependentValue())
+        if (!SCOUtils.mapHasValuesWithoutIdentity(mmd) && mmd.getMap() != null && mmd.getMap().isDependentValue())
         {
             return true;
         }

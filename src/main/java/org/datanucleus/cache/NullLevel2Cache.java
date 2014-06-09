@@ -49,9 +49,8 @@ public class NullLevel2Cache extends AbstractLevel2Cache implements Level2Cache
     }
 
     /**
-     * Evict the parameter instances from the second-level cache.
-     * All instances in the PersistenceManager's cache are evicted
-     * from the second-level cache.
+     * Evict the parameter instances from the second-level cache. All instances in the PersistenceManager's
+     * cache are evicted from the second-level cache.
      */
     public void evictAll()
     {
@@ -169,7 +168,6 @@ public class NullLevel2Cache extends AbstractLevel2Cache implements Level2Cache
     }
 
     /**
-     * 
      * @see org.datanucleus.cache.Level2Cache#getNumberOfPinnedObjects()
      */
     public int getNumberOfPinnedObjects()
@@ -178,7 +176,6 @@ public class NullLevel2Cache extends AbstractLevel2Cache implements Level2Cache
     }
 
     /**
-     * 
      * @see org.datanucleus.cache.Level2Cache#getNumberOfUnpinnedObjects()
      */
     public int getNumberOfUnpinnedObjects()
@@ -187,7 +184,6 @@ public class NullLevel2Cache extends AbstractLevel2Cache implements Level2Cache
     }
 
     /**
-     * 
      * @see org.datanucleus.cache.Level2Cache#getSize()
      */
     public int getSize()
@@ -196,7 +192,6 @@ public class NullLevel2Cache extends AbstractLevel2Cache implements Level2Cache
     }
 
     /**
-     * 
      * @see org.datanucleus.cache.Level2Cache#isEmpty()
      */
     public boolean isEmpty()

@@ -38,7 +38,10 @@ public class CachedPC<T> implements Serializable
     /** Class of the object being cached. */
     private Class<T> cls;
 
-    /** Values for the fields, keyed by the abs field number. Any relation fields store the id of the related object. */
+    /**
+     * Values for the fields, keyed by the abs field number. Any relation fields store the id of the related
+     * object.
+     */
     private Map<Integer, Object> fieldValues = null;
 
     /** Version of the cached object (if any) - Long, Timestamp etc. */
@@ -57,7 +60,7 @@ public class CachedPC<T> implements Serializable
     {
         this.cls = cls;
         this.loadedFields = new boolean[loadedFields.length];
-        for (int i=0;i<loadedFields.length;i++)
+        for (int i = 0; i < loadedFields.length; i++)
         {
             this.loadedFields[i] = loadedFields[i];
         }
@@ -98,8 +101,7 @@ public class CachedPC<T> implements Serializable
     }
 
     /**
-     * Accessor for the loaded fields of this object.
-     * Use setLoadedField() if you want to update a flag.
+     * Accessor for the loaded fields of this object. Use setLoadedField() if you want to update a flag.
      * @return The loaded fields flags
      */
     public boolean[] getLoadedFields()
@@ -114,35 +116,35 @@ public class CachedPC<T> implements Serializable
 
     public void setLoadedField(int fieldNumber, boolean loaded)
     {
-    	loadedFields[fieldNumber] = loaded;
+        loadedFields[fieldNumber] = loaded;
     }
 
     public synchronized CachedPC<T> getCopy()
     {
-    	CachedPC<T> copy = new CachedPC(cls, loadedFields, version);
-    	if (fieldValues != null)
-    	{
-    	    // TODO Some (mutable) field values may need copying
-    		copy.fieldValues = new HashMap<Integer, Object>(fieldValues.size());
-    		Iterator<Map.Entry<Integer, Object>> entryIter = fieldValues.entrySet().iterator();
-    		while (entryIter.hasNext())
-    		{
-    		    Map.Entry<Integer, Object> entry = entryIter.next();
-    		    Integer key = entry.getKey();
-    		    Object val = entry.getValue();
-    		    if (val != null && val instanceof CachedPC)
-    		    {
-    		        val = ((CachedPC)val).getCopy();
-    		    }
-    		    copy.fieldValues.put(key, val);
-    		}
-    	}
-    	return copy;
+        CachedPC<T> copy = new CachedPC(cls, loadedFields, version);
+        if (fieldValues != null)
+        {
+            // TODO Some (mutable) field values may need copying
+            copy.fieldValues = new HashMap<Integer, Object>(fieldValues.size());
+            Iterator<Map.Entry<Integer, Object>> entryIter = fieldValues.entrySet().iterator();
+            while (entryIter.hasNext())
+            {
+                Map.Entry<Integer, Object> entry = entryIter.next();
+                Integer key = entry.getKey();
+                Object val = entry.getValue();
+                if (val != null && val instanceof CachedPC)
+                {
+                    val = ((CachedPC) val).getCopy();
+                }
+                copy.fieldValues.put(key, val);
+            }
+        }
+        return copy;
     }
 
     /**
-     * Method to return a sting form of the cached object.
-     * Returns something like "CachedPC : version=1 loadedFlags=[YY]"
+     * Method to return a sting form of the cached object. Returns something like
+     * "CachedPC : version=1 loadedFlags=[YY]"
      * @return The string form
      */
     public String toString()
@@ -151,48 +153,54 @@ public class CachedPC<T> implements Serializable
     }
 
     /**
-     * Method to return a sting form of the cached object.
-     * Returns something like "CachedPC : version=1 loadedFlags=[YY]".
+     * Method to return a sting form of the cached object. Returns something like
+     * "CachedPC : version=1 loadedFlags=[YY]".
      * @param debug Whether to include the field values in the return
      * @return The string form
      */
     public String toString(boolean debug)
     {
-        return "CachedPC : cls=" + cls.getName() + " version=" + version +
-            " loadedFlags=" + StringUtils.booleanArrayToString(loadedFields) +
-            (debug ? (" vals=" + StringUtils.mapToString(fieldValues)) : "");
+        return "CachedPC : cls=" + cls.getName() + " version=" + version + " loadedFlags=" + StringUtils.booleanArrayToString(loadedFields) + (debug ? (" vals=" + StringUtils
+                .mapToString(fieldValues)) : "");
     }
 
     public static class CachedId implements Serializable, Comparable<CachedId>
     {
         String className;
+
         Object id;
+
         public CachedId(String className, Object id)
         {
             this.className = className;
             this.id = id;
         }
+
         public String getClassName()
         {
             return className;
         }
+
         public Object getId()
         {
             return id;
         }
+
         public boolean equals(Object obj)
         {
             if (obj == null || !(obj instanceof CachedId))
             {
                 return false;
             }
-            CachedId other = (CachedId)obj;
+            CachedId other = (CachedId) obj;
             return other.className.equals(className) && other.id.equals(id);
         }
+
         public int hashCode()
         {
             return className.hashCode() ^ id.hashCode();
         }
+
         public int compareTo(CachedId obj)
         {
             if (obj == null)

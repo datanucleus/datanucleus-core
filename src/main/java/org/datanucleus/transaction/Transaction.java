@@ -40,14 +40,23 @@ import org.omg.CORBA.SystemException;
 public class Transaction
 {
     public final static int STATUS_ACTIVE = 0;
+
     public final static int STATUS_MARKED_ROLLBACK = 1;
+
     public final static int STATUS_PREPARED = 2;
+
     public final static int STATUS_COMMITTED = 3;
+
     public final static int STATUS_ROLLEDBACK = 4;
+
     public final static int STATUS_UNKNOWN = 5;
+
     public final static int STATUS_NO_TRANSACTION = 6;
+
     public final static int STATUS_PREPARING = 7;
+
     public final static int STATUS_COMMITTING = 8;
+
     public final static int STATUS_ROLLING_BACK = 9;
 
     /** id of this instance **/
@@ -60,7 +69,7 @@ public class Transaction
     private int nextBranchId = 1;
 
     /** transaction id **/
-    private final Xid xid; 
+    private final Xid xid;
 
     /** transaction status **/
     private int status;
@@ -86,10 +95,10 @@ public class Transaction
     Transaction()
     {
         xid = new XidImpl(NODE_ID, 0, NEXT_GLOBAL_TRANSACTION_ID++);
-    	if (NucleusLogger.TRANSACTION.isDebugEnabled())
-    	{
-    		NucleusLogger.TRANSACTION.debug("Transaction created "+toString());
-    	}        
+        if (NucleusLogger.TRANSACTION.isDebugEnabled())
+        {
+            NucleusLogger.TRANSACTION.debug("Transaction created " + toString());
+        }
     }
 
     public int getStatus() throws SystemException
@@ -126,7 +135,7 @@ public class Transaction
                 }
                 catch (XAException e)
                 {
-                    //do nothing
+                    // do nothing
                 }
             }
         }
@@ -137,14 +146,13 @@ public class Transaction
         return false;
     }
 
-    public boolean enlistResource(XAResource xaRes) 
-    throws RollbackException, IllegalStateException, SystemException
+    public boolean enlistResource(XAResource xaRes) throws RollbackException, IllegalStateException, SystemException
     {
         if (xaRes == null)
         {
             return false;
         }
-        
+
         if (status == STATUS_MARKED_ROLLBACK)
         {
             throw new RollbackException();
@@ -184,10 +192,10 @@ public class Transaction
                 }
                 catch (XAException e)
                 {
-                    //do nothing
+                    // do nothing
                 }
             }
-            branchXid = new XidImpl(nextBranchId++,xid.getFormatId(),xid.getGlobalTransactionId());
+            branchXid = new XidImpl(nextBranchId++, xid.getFormatId(), xid.getGlobalTransactionId());
         }
         else
         {
@@ -222,8 +230,7 @@ public class Transaction
         return true;
     }
 
-    public boolean delistResource(XAResource xaRes, int flag) 
-    throws IllegalStateException, SystemException
+    public boolean delistResource(XAResource xaRes, int flag) throws IllegalStateException, SystemException
     {
         if (xaRes == null)
         {
@@ -245,7 +252,7 @@ public class Transaction
 
         if (NucleusLogger.TRANSACTION.isDebugEnabled())
         {
-           NucleusLogger.TRANSACTION.debug(Localiser.msg("015039", "delist", xaRes, getXAFlag(flag), toString()));
+            NucleusLogger.TRANSACTION.debug(Localiser.msg("015039", "delist", xaRes, getXAFlag(flag), toString()));
         }
 
         XAException exception = null;
@@ -291,10 +298,14 @@ public class Transaction
         }
         synchronization.add(sync);
     }
-    
-    public void commit() 
-    throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, 
-            IllegalStateException, SystemException
+
+    public void commit()
+        throws RollbackException,
+        HeuristicMixedException,
+        HeuristicRollbackException,
+        SecurityException,
+        IllegalStateException,
+        SystemException
     {
         if (completing)
         {
@@ -312,9 +323,9 @@ public class Transaction
             completing = true;
             if (NucleusLogger.TRANSACTION.isDebugEnabled())
             {
-                NucleusLogger.TRANSACTION.debug("Committing "+toString());
+                NucleusLogger.TRANSACTION.debug("Committing " + toString());
             }
-    
+
             // The transaction status must be ACTIVE
             if (status != STATUS_ACTIVE)
             {
@@ -357,14 +368,13 @@ public class Transaction
                     {
                         if (failures == null)
                         {
-                            //lazy instantiate this, because we only need on failures
+                            // lazy instantiate this, because we only need on failures
                             failures = new ArrayList();
                         }
                         failures.add(e);
                         failed = true;
                         status = STATUS_MARKED_ROLLBACK;
-                        NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "commit", resourceManager, 
-                            getXAErrorCode(e), toString()));                    
+                        NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "commit", resourceManager, getXAErrorCode(e), toString()));
                     }
                 }
                 if (!failed)
@@ -393,14 +403,13 @@ public class Transaction
                     {
                         if (failures == null)
                         {
-                            //lazy instantiate this, because we only need on failures
+                            // lazy instantiate this, because we only need on failures
                             failures = new ArrayList();
                         }
                         failures.add(e);
                         failed = true;
                         status = STATUS_MARKED_ROLLBACK;
-                        NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "prepare", resourceManager, 
-                            getXAErrorCode(e), toString()));
+                        NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "prepare", resourceManager, getXAErrorCode(e), toString()));
                     }
                 }
 
@@ -408,7 +417,7 @@ public class Transaction
                 {
                     status = STATUS_PREPARED;
                 }
-    
+
                 // Starts 2nd commit phase
                 // If fail, rollback
                 if (failed)
@@ -427,11 +436,10 @@ public class Transaction
                         }
                         catch (Throwable e)
                         {
-                            NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "rollback", resourceManager, 
-                                getXAErrorCode(e), toString()));                        
+                            NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "rollback", resourceManager, getXAErrorCode(e), toString()));
                             if (failures == null)
                             {
-                                //lazy instantiate this, because we only need on failures
+                                // lazy instantiate this, because we only need on failures
                                 failures = new ArrayList();
                             }
                             failures.add(e);
@@ -455,11 +463,10 @@ public class Transaction
                         }
                         catch (Throwable e)
                         {
-                            NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "commit", resourceManager, 
-                                getXAErrorCode(e), toString()));                     
+                            NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "commit", resourceManager, getXAErrorCode(e), toString()));
                             if (failures == null)
                             {
-                                //lazy instantiate this, because we only need on failures
+                                // lazy instantiate this, because we only need on failures
                                 failures = new ArrayList();
                             }
                             failures.add(e);
@@ -469,7 +476,7 @@ public class Transaction
                     status = STATUS_COMMITTED;
                 }
             }
-    
+
             // Synchronization.afterCompletion
             if (synchronization != null)
             {
@@ -479,15 +486,14 @@ public class Transaction
                     syncIterator.next().afterCompletion(status);
                 }
             }
-            
+
             if (status == STATUS_ROLLEDBACK)
             {
                 if (failed)
                 {
-                    if (failures.size() == 1) 
+                    if (failures.size() == 1)
                     {
-                        throw new HeuristicRollbackException("Transaction rolled back due to failure during commit", 
-                            (Throwable)failures.get(0));
+                        throw new HeuristicRollbackException("Transaction rolled back due to failure during commit", (Throwable) failures.get(0));
                     }
                     else
                     {
@@ -503,7 +509,7 @@ public class Transaction
             {
                 throw new HeuristicMixedException();
             }
-            
+
         }
         finally
         {
@@ -511,21 +517,20 @@ public class Transaction
         }
     }
 
-    public void rollback() 
-    throws IllegalStateException, SystemException
+    public void rollback() throws IllegalStateException, SystemException
     {
         if (completing)
         {
-         return;   
+            return;
         }
 
         try
         {
             completing = true;
-        	if (NucleusLogger.TRANSACTION.isDebugEnabled())
-        	{
-        		NucleusLogger.TRANSACTION.debug("Rolling back "+toString());
-        	}
+            if (NucleusLogger.TRANSACTION.isDebugEnabled())
+            {
+                NucleusLogger.TRANSACTION.debug("Rolling back " + toString());
+            }
             // Must be ACTIVE and MARKED ROLLBACK
             if (status != STATUS_ACTIVE && status != STATUS_MARKED_ROLLBACK)
             {
@@ -547,12 +552,11 @@ public class Transaction
                 {
                     if (failures == null)
                     {
-                        //lazy instantiate this, because we only need on failures
+                        // lazy instantiate this, because we only need on failures
                         failures = new ArrayList();
                     }
                     failures.add(e);
-                    NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "rollback", resourceManager, 
-                        getXAErrorCode(e), toString()));
+                    NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "rollback", resourceManager, getXAErrorCode(e), toString()));
                 }
             }
             status = STATUS_ROLLEDBACK;
@@ -573,8 +577,7 @@ public class Transaction
         }
     }
 
-    public void setRollbackOnly() 
-    throws IllegalStateException, SystemException
+    public void setRollbackOnly() throws IllegalStateException, SystemException
     {
         status = STATUS_MARKED_ROLLBACK;
     }
@@ -586,7 +589,7 @@ public class Transaction
             return "UNKNOWN";
         }
 
-        switch (((XAException)xae).errorCode)
+        switch (((XAException) xae).errorCode)
         {
             case XAException.XA_HEURCOM :
                 return "XA_HEURCOM";
@@ -665,14 +668,14 @@ public class Transaction
                 return "UNKNOWN";
         }
     }
-    
+
     public String toString()
     {
         String resString = null;
-        synchronized(enlistedResources)
+        synchronized (enlistedResources)
         {
             resString = enlistedResources.toString();
         }
-        return "[DataNucleus Transaction, ID=" + xid.toString()+ ", enlisted resources="+resString+"]";
+        return "[DataNucleus Transaction, ID=" + xid.toString() + ", enlisted resources=" + resString + "]";
     }
 }

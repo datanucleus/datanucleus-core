@@ -34,88 +34,95 @@ public class StrongRefCache implements Level1Cache
 {
     private Map<Object, ObjectProvider> cache = new HashMap();
 
-	public StrongRefCache()
-	{
-	}
+    public StrongRefCache()
+    {
+    }
 
-	public ObjectProvider put(Object key, ObjectProvider value)
-	{
-		return cache.put(key,value);        
-	}
+    public ObjectProvider put(Object key, ObjectProvider value)
+    {
+        return cache.put(key, value);
+    }
 
-	public ObjectProvider get(Object key)
-	{
-		return cache.get(key);
-	}
+    public ObjectProvider get(Object key)
+    {
+        return cache.get(key);
+    }
 
-	public boolean containsKey(Object key)
-	{
-		return cache.containsKey(key);
-	}
+    public boolean containsKey(Object key)
+    {
+        return cache.containsKey(key);
+    }
 
-	public ObjectProvider remove(Object key)
-	{
-		return cache.remove(key);       
-	}
+    public ObjectProvider remove(Object key)
+    {
+        return cache.remove(key);
+    }
 
-	public void clear()
-	{
-		cache.clear();
-	}
-    
-	/* (non-Javadoc)
-	 * @see java.util.Map#containsValue(java.lang.Object)
-	 */
-	public boolean containsValue(Object value)
-	{
-		return cache.containsValue(value);
-	}
+    public void clear()
+    {
+        cache.clear();
+    }
 
-	/* (non-Javadoc)
-	 * @see java.util.Map#entrySet()
-	 */
-	public Set entrySet()
-	{
-		return cache.entrySet();
-	}
+    /*
+     * (non-Javadoc)
+     * @see java.util.Map#containsValue(java.lang.Object)
+     */
+    public boolean containsValue(Object value)
+    {
+        return cache.containsValue(value);
+    }
 
-	/* (non-Javadoc)
-	 * @see java.util.Map#isEmpty()
-	 */
-	public boolean isEmpty()
-	{
-		return cache.isEmpty();
-	}
+    /*
+     * (non-Javadoc)
+     * @see java.util.Map#entrySet()
+     */
+    public Set entrySet()
+    {
+        return cache.entrySet();
+    }
 
-	/* (non-Javadoc)
-	 * @see java.util.Map#keySet()
-	 */
-	public Set keySet()
-	{
-		return cache.keySet();
-	}
+    /*
+     * (non-Javadoc)
+     * @see java.util.Map#isEmpty()
+     */
+    public boolean isEmpty()
+    {
+        return cache.isEmpty();
+    }
 
-	/* (non-Javadoc)
-	 * @see java.util.Map#putAll(java.util.Map)
-	 */
-	public void putAll(Map t)
-	{
-		cache.putAll(t);
-	}
+    /*
+     * (non-Javadoc)
+     * @see java.util.Map#keySet()
+     */
+    public Set keySet()
+    {
+        return cache.keySet();
+    }
 
-	/* (non-Javadoc)
-	 * @see java.util.Map#size()
-	 */
-	public int size()
-	{
-		return cache.size();
-	}
+    /*
+     * (non-Javadoc)
+     * @see java.util.Map#putAll(java.util.Map)
+     */
+    public void putAll(Map t)
+    {
+        cache.putAll(t);
+    }
 
-	/* (non-Javadoc)
-	 * @see java.util.Map#values()
-	 */
-	public Collection values()
-	{
-		return cache.values();
-	}
+    /*
+     * (non-Javadoc)
+     * @see java.util.Map#size()
+     */
+    public int size()
+    {
+        return cache.size();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see java.util.Map#values()
+     */
+    public Collection values()
+    {
+        return cache.values();
+    }
 }

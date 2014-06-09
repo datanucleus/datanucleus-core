@@ -90,13 +90,7 @@ public class Lexer
         int startIdx = ci.getIndex();
         char c = ci.current();
 
-        while (Character.isWhitespace(c) || 
-               c == '\t' || c == '\f' ||
-               c == '\n' || c == '\r' ||
-               c == '\u0009' || c == '\u000c' ||
-               c == '\u0020' || c == '\11' ||
-               c == '\12' || c == '\14' ||
-               c == '\15' || c == '\40')
+        while (Character.isWhitespace(c) || c == '\t' || c == '\f' || c == '\n' || c == '\r' || c == '\u0009' || c == '\u000c' || c == '\u0020' || c == '\11' || c == '\12' || c == '\14' || c == '\15' || c == '\40')
         {
             c = ci.next();
         }
@@ -166,7 +160,7 @@ public class Lexer
         int savedIdx = skipWS();
 
         int len = s.length();
-        char c = ci.current(); 
+        char c = ci.current();
 
         for (int i = 0; i < len; ++i)
         {
@@ -190,11 +184,11 @@ public class Lexer
     public boolean parseStringIgnoreCase(String s)
     {
         String lowerCasedString = s.toLowerCase();
-        
+
         int savedIdx = skipWS();
 
         int len = lowerCasedString.length();
-        char c = ci.current(); 
+        char c = ci.current();
 
         for (int i = 0; i < len; ++i)
         {
@@ -218,11 +212,11 @@ public class Lexer
     public boolean peekStringIgnoreCase(String s)
     {
         String lowerCasedString = s.toLowerCase();
-        
+
         int savedIdx = skipWS();
 
         int len = lowerCasedString.length();
-        char c = ci.current(); 
+        char c = ci.current();
 
         for (int i = 0; i < len; ++i)
         {
@@ -270,7 +264,7 @@ public class Lexer
     public String parseMethod()
     {
         int savedIdx = ci.getIndex();
-        
+
         String id;
 
         if ((id = parseIdentifier()) == null)
@@ -278,24 +272,22 @@ public class Lexer
             ci.setIndex(savedIdx);
             return null;
         }
-        
+
         skipWS();
-        
-        if (!parseChar('(') )
-    	{
+
+        if (!parseChar('('))
+        {
             ci.setIndex(savedIdx);
             return null;
-    	}
-        ci.setIndex(ci.getIndex()-1);        
+        }
+        ci.setIndex(ci.getIndex() - 1);
         return id;
     }
 
     /**
-     * Parses the text string (up to the next space) and
-     * returns it. The name includes '.' characters.
-     * This can be used, for example, when parsing a class name wanting to
-     * read in the full name (including package) so that it can then be
-     * checked for existence in the CLASSPATH.
+     * Parses the text string (up to the next space) and returns it. The name includes '.' characters. This
+     * can be used, for example, when parsing a class name wanting to read in the full name (including
+     * package) so that it can then be checked for existence in the CLASSPATH.
      * @return The name
      */
     public String parseName()
@@ -325,11 +317,9 @@ public class Lexer
     }
 
     /**
-     * Parse a cast in the query from the current position, returning
-     * the name of the class that is being cast to. 
-     * Returns null if the current position doesn't have a cast.
-     * Does no checking as to whether the name is a valid class name, just whether there is
-     * "({name})" from the current position.
+     * Parse a cast in the query from the current position, returning the name of the class that is being cast
+     * to. Returns null if the current position doesn't have a cast. Does no checking as to whether the name
+     * is a valid class name, just whether there is "({name})" from the current position.
      * @return The name of the class to cast to
      */
     public String parseCast()
@@ -417,7 +407,8 @@ public class Lexer
                 {
                     digits.append(c);
                     c = ci.next();
-                } while (isOctDigit(c));
+                }
+                while (isOctDigit(c));
             }
             else
             {
@@ -518,7 +509,8 @@ public class Lexer
             {
                 val.append(c);
                 c = ci.next();
-            } while (isDecDigit(c));
+            }
+            while (isDecDigit(c));
         }
 
         if (c == 'f' || c == 'F' || c == 'd' || c == 'D')
@@ -559,7 +551,7 @@ public class Lexer
 
         if (id.equals("true"))
         {
-             return Boolean.TRUE;
+            return Boolean.TRUE;
         }
         else if (id.equals("false"))
         {
@@ -588,7 +580,7 @@ public class Lexer
 
         if (id.equalsIgnoreCase("true"))
         {
-             return Boolean.TRUE;
+            return Boolean.TRUE;
         }
         else if (id.equalsIgnoreCase("false"))
         {
@@ -733,21 +725,29 @@ public class Lexer
                 throw new NucleusUserException("Invalid character escape: '\\" + Integer.toOctalString(i) + "'");
             }
 
-            return (char)i;
+            return (char) i;
         }
         else
         {
             switch (c)
             {
-                case 'b':   return '\b';
-                case 't':   return '\t';
-                case 'n':   return '\n';
-                case 'f':   return '\f';
-                case 'r':   return '\r';
-                case '"':   return '"';
-                case '\'':  return '\'';
-                case '\\':  return '\\';
-                default:
+                case 'b' :
+                    return '\b';
+                case 't' :
+                    return '\t';
+                case 'n' :
+                    return '\n';
+                case 'f' :
+                    return '\f';
+                case 'r' :
+                    return '\r';
+                case '"' :
+                    return '"';
+                case '\'' :
+                    return '\'';
+                case '\\' :
+                    return '\\';
+                default :
                     throw new NucleusUserException("Invalid character escape: '\\" + c + "'");
             }
         }
@@ -802,8 +802,7 @@ public class Lexer
     }
 
     /**
-     * Method to return the remaining part of the string not yet processed.
-     * Doesn't move the current position.
+     * Method to return the remaining part of the string not yet processed. Doesn't move the current position.
      * @return The remaining part of the string
      */
     public String remaining()
@@ -819,7 +818,7 @@ public class Lexer
         ci.setIndex(position);
         return sb.toString();
     }
-    
+
     public String toString()
     {
         return input;

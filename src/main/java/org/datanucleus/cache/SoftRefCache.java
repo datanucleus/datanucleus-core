@@ -37,94 +37,101 @@ import org.datanucleus.util.SoftValueMap;
  */
 public class SoftRefCache implements Level1Cache
 {
-	private Map<Object, ObjectProvider> softCache = new SoftValueMap();
+    private Map<Object, ObjectProvider> softCache = new SoftValueMap();
 
-	public SoftRefCache()
-	{
-	}
+    public SoftRefCache()
+    {
+    }
 
-	public ObjectProvider put(Object key, ObjectProvider value)
-	{
-		return softCache.put(key,value);        
-	}
+    public ObjectProvider put(Object key, ObjectProvider value)
+    {
+        return softCache.put(key, value);
+    }
 
-	public ObjectProvider get(Object key)
-	{
-		return softCache.get(key);
-	}
+    public ObjectProvider get(Object key)
+    {
+        return softCache.get(key);
+    }
 
-	public boolean containsKey(Object key)
-	{
-		return softCache.containsKey(key);
-	}
+    public boolean containsKey(Object key)
+    {
+        return softCache.containsKey(key);
+    }
 
-	public ObjectProvider remove(Object key)
-	{
-		return softCache.remove(key);       
-	}
+    public ObjectProvider remove(Object key)
+    {
+        return softCache.remove(key);
+    }
 
-	public void clear()
-	{
-	    if (isEmpty())
-	    {
-	        return;
-	    }
-		softCache.clear();
-	}
-    
-	/* (non-Javadoc)
-	 * @see java.util.Map#containsValue(java.lang.Object)
-	 */
-	public boolean containsValue(Object value)
-	{
-		return softCache.containsValue(value);
-	}
+    public void clear()
+    {
+        if (isEmpty())
+        {
+            return;
+        }
+        softCache.clear();
+    }
 
-	/* (non-Javadoc)
-	 * @see java.util.Map#entrySet()
-	 */
-	public Set entrySet()
-	{
-		return softCache.entrySet();
-	}
+    /*
+     * (non-Javadoc)
+     * @see java.util.Map#containsValue(java.lang.Object)
+     */
+    public boolean containsValue(Object value)
+    {
+        return softCache.containsValue(value);
+    }
 
-	/* (non-Javadoc)
-	 * @see java.util.Map#isEmpty()
-	 */
-	public boolean isEmpty()
-	{
-		return softCache.isEmpty();
-	}
+    /*
+     * (non-Javadoc)
+     * @see java.util.Map#entrySet()
+     */
+    public Set entrySet()
+    {
+        return softCache.entrySet();
+    }
 
-	/* (non-Javadoc)
-	 * @see java.util.Map#keySet()
-	 */
-	public Set keySet()
-	{
-		return softCache.keySet();
-	}
+    /*
+     * (non-Javadoc)
+     * @see java.util.Map#isEmpty()
+     */
+    public boolean isEmpty()
+    {
+        return softCache.isEmpty();
+    }
 
-	/* (non-Javadoc)
-	 * @see java.util.Map#putAll(java.util.Map)
-	 */
-	public void putAll(Map t)
-	{
-		softCache.putAll(t);
-	}
+    /*
+     * (non-Javadoc)
+     * @see java.util.Map#keySet()
+     */
+    public Set keySet()
+    {
+        return softCache.keySet();
+    }
 
-	/* (non-Javadoc)
-	 * @see java.util.Map#size()
-	 */
-	public int size()
-	{
-		return softCache.size();
-	}
+    /*
+     * (non-Javadoc)
+     * @see java.util.Map#putAll(java.util.Map)
+     */
+    public void putAll(Map t)
+    {
+        softCache.putAll(t);
+    }
 
-	/* (non-Javadoc)
-	 * @see java.util.Map#values()
-	 */
-	public Collection values()
-	{
-		return softCache.values();
-	}
+    /*
+     * (non-Javadoc)
+     * @see java.util.Map#size()
+     */
+    public int size()
+    {
+        return softCache.size();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see java.util.Map#values()
+     */
+    public Collection values()
+    {
+        return softCache.values();
+    }
 }

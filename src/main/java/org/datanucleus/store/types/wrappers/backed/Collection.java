@@ -471,7 +471,14 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
             loadFromStore();
         }
 
-        return ((java.util.HashSet)delegate).clone();
+        if (delegate instanceof java.util.ArrayList)
+        {
+            return ((java.util.ArrayList)delegate).clone();
+        }
+        else
+        {
+            return ((java.util.HashSet)delegate).clone();
+        }
     }
 
     /**

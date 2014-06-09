@@ -78,10 +78,9 @@ public class FrequentlyAccessedProperties
 
         try
         {
-
             if (value == null)
             {
-                f.set(this, value);
+                f.set(this, null);
                 return;
             }
 

@@ -34,65 +34,69 @@ import org.datanucleus.util.WeakValueMap;
  */
 public class WeakRefCache implements Level1Cache
 {
-	private Map<Object, ObjectProvider> weakCache = new WeakValueMap();
+    private Map<Object, ObjectProvider> weakCache = new WeakValueMap();
 
     /**
      * Default constructor (required)
      */
-	public WeakRefCache()
-	{
-	}
+    public WeakRefCache()
+    {
+    }
 
     public ObjectProvider put(Object key, ObjectProvider value)
     {
-		return weakCache.put(key,value);        
+        return weakCache.put(key, value);
     }
 
     public ObjectProvider get(Object key)
     {
-		return weakCache.get(key);
+        return weakCache.get(key);
     }
 
     public boolean containsKey(Object key)
     {
-		return weakCache.containsKey(key);
+        return weakCache.containsKey(key);
     }
 
     public ObjectProvider remove(Object key)
     {
-		return weakCache.remove(key);       
+        return weakCache.remove(key);
     }
 
     public void clear()
     {
-		weakCache.clear();
+        weakCache.clear();
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
      * @see java.util.Map#containsValue(java.lang.Object)
      */
     public boolean containsValue(Object value)
     {
-		return weakCache.containsValue(value);
+        return weakCache.containsValue(value);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see java.util.Map#entrySet()
      */
     public Set entrySet()
     {
-		return weakCache.entrySet();
+        return weakCache.entrySet();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see java.util.Map#isEmpty()
      */
     public boolean isEmpty()
     {
-		return weakCache.isEmpty();
+        return weakCache.isEmpty();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see java.util.Map#keySet()
      */
     public Set keySet()
@@ -100,15 +104,17 @@ public class WeakRefCache implements Level1Cache
         return weakCache.keySet();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see java.util.Map#putAll(java.util.Map)
      */
     public void putAll(Map t)
     {
-		weakCache.putAll(t);
+        weakCache.putAll(t);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see java.util.Map#size()
      */
     public int size()
@@ -116,7 +122,8 @@ public class WeakRefCache implements Level1Cache
         return weakCache.size();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see java.util.Map#values()
      */
     public Collection values()
