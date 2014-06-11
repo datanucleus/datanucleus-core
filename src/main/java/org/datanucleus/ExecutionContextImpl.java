@@ -3984,7 +3984,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Perform internal flush
             flushInternal(true);
 
-            if (dirtyOPs.size() > 0 || indirectDirtyOPs.size() > 0)
+            if (!dirtyOPs.isEmpty() || !indirectDirtyOPs.isEmpty())
             {
                 // If the flush caused the attach of an object it can get registered as dirty, so do second pass
                 NucleusLogger.GENERAL.info("Flush pass 1 resulted in " + (dirtyOPs.size() + indirectDirtyOPs.size()) +
@@ -4003,7 +4003,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void flushInternal(boolean flushToDatastore)
     {
-        if (!flushToDatastore && dirtyOPs.size() == 0 && indirectDirtyOPs.size() == 0)
+        if (!flushToDatastore && dirtyOPs.isEmpty() && indirectDirtyOPs.isEmpty())
         {
             // Nothing to flush so abort now
             return;
@@ -4336,7 +4336,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         // If we have some new objects in this transaction, and we have some known persisted objects (either
         // from makePersistent in this txn, or enlisted existing objects) then run reachability checks
-        if (reachabilityPersistedIds.size() > 0 && reachabilityFlushedNewIds.size() > 0)
+        if (!reachabilityPersistedIds.isEmpty() && !reachabilityFlushedNewIds.isEmpty())
         {
             Set currentReachables = new HashSet();
 
@@ -4471,7 +4471,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         Collection<ObjectProvider> ops = new ArrayList();
         Collection roots = fetchPlan.getDetachmentRoots();
         Class[] rootClasses = fetchPlan.getDetachmentRootClasses();
-        if (roots != null && roots.size() > 0)
+        if (roots != null && !roots.isEmpty())
         {
             // Detachment roots specified
             Iterator rootsIter = roots.iterator();
@@ -4580,7 +4580,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     private void performDetachOnClose()
     {
-        if (cache != null && cache.size() > 0)
+        if (cache != null && !cache.isEmpty())
         {
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("010011"));
             List<ObjectProvider> toDetach = new ArrayList();
@@ -5177,7 +5177,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         // Try L2 cache
-        if (idsNotFound.size() > 0)
+        if (!idsNotFound.isEmpty())
         {
             Map l2ObjsById = getObjectsFromLevel2Cache(idsNotFound);
             for (int i=0;i<ids.length;i++)
@@ -5803,10 +5803,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             List<EmbeddedOwnerRelation> ownerRels = opEmbeddedInfoByEmbedded.get(rel.getEmbeddedOP());
             ownerRels.remove(rel);
-            if (ownerRels.size() == 0)
+            if (ownerRels.isEmpty())
             {
                 opEmbeddedInfoByEmbedded.remove(rel.getEmbeddedOP());
-                if (opEmbeddedInfoByEmbedded.size() == 0)
+                if (opEmbeddedInfoByEmbedded.isEmpty())
                 {
                     opEmbeddedInfoByEmbedded = null;
                 }
@@ -5816,10 +5816,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             List<EmbeddedOwnerRelation> embRels = opEmbeddedInfoByOwner.get(rel.getOwnerOP());
             embRels.remove(rel);
-            if (embRels.size() == 0)
+            if (embRels.isEmpty())
             {
                 opEmbeddedInfoByOwner.remove(rel.getOwnerOP());
-                if (opEmbeddedInfoByOwner.size() == 0)
+                if (opEmbeddedInfoByOwner.isEmpty())
                 {
                     opEmbeddedInfoByOwner = null;
                 }

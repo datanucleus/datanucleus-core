@@ -355,7 +355,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             return;
         }
         listeners.remove(listener);
-        if (listeners.size() == 0)
+        if (listeners.isEmpty())
         {
             listeners = null;
         }
@@ -483,7 +483,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             // Load MetaData files - will throw NucleusUserException if problems found
             ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(loader);
             Collection fileMetaData = loadFiles(metadataFiles, clr);
-            if (fileMetaData.size() > 0)
+            if (!fileMetaData.isEmpty())
             {
                 // Populate/Initialise all loaded FileMetaData
                 initialiseFileMetaDataForUse(fileMetaData, clr);
@@ -589,14 +589,14 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     exceptions.add(e);
                 }
             }
-            if (exceptions.size() > 0)
+            if (!exceptions.isEmpty())
             {
                 // Exceptions while loading annotations
                 throw new NucleusUserException(Localiser.msg("044016"),
                     exceptions.toArray(new Throwable[exceptions.size()]),null);
             }
 
-            if (fileMetaData.size() > 0)
+            if (!fileMetaData.isEmpty())
             {
                 // Populate/Initialise all loaded FileMetaData
                 initialiseFileMetaDataForUse(fileMetaData, clr);
@@ -759,13 +759,13 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     }
                 }
             }
-            if (exceptions.size() > 0)
+            if (!exceptions.isEmpty())
             {
                 throw new NucleusUserException(Localiser.msg("044024", jarFileName), 
                     exceptions.toArray(new Throwable[exceptions.size()]));
             }
 
-            if (fileMetaData.size() > 0)
+            if (!fileMetaData.isEmpty())
             {
                 // Populate/Initialise all loaded FileMetaData
                 initialiseFileMetaDataForUse(fileMetaData, clr);
@@ -1088,12 +1088,12 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     }
                 }
             }
-            if (exceptions.size() > 0)
+            if (!exceptions.isEmpty())
             {
                 throw new NucleusUserException(Localiser.msg("044023", pumd.getName()), exceptions.toArray(new Throwable[exceptions.size()]));
             }
 
-            if (fileMetaData.size() > 0)
+            if (!fileMetaData.isEmpty())
             {
                 // Populate/Initialise all loaded FileMetaData
                 initialiseFileMetaDataForUse(fileMetaData, clr);
@@ -1231,7 +1231,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             {
                 Map.Entry entry = entryIter.next();
                 Collection<AbstractClassMetaData> collCmds = (Collection<AbstractClassMetaData>) entry.getValue();
-                if (collCmds.size() > 0)
+                if (!collCmds.isEmpty())
                 {
                     collCmds.remove(cmd);
                 }
@@ -1336,7 +1336,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 }
             }
         }
-        if (exceptions.size() > 0)
+        if (!exceptions.isEmpty())
         {
             throw new NucleusUserException(Localiser.msg("044020"), exceptions.toArray(new Throwable[exceptions.size()]));
         }
@@ -1409,7 +1409,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             }
         }
 
-        if (exceptions.size() > 0)
+        if (!exceptions.isEmpty())
         {
             // Exceptions while loading MetaData
             throw new NucleusUserException(Localiser.msg("044016"), exceptions.toArray(new Throwable[exceptions.size()]), null);
@@ -1630,7 +1630,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
                 // Make sure all FileMetaData that were subsequently loaded as a result of this call are
                 // all initialised before return
-                if (utilisedFileMetaData.size() > 0)
+                if (!utilisedFileMetaData.isEmpty())
                 {
                     // Pass 1 - initialise anything loaded during the initialise of the requested class
                     ArrayList utilisedFileMetaData1 = (ArrayList)utilisedFileMetaData.clone();
@@ -1642,7 +1642,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                         initialiseFileMetaData(filemd, clr,c.getClassLoader());
                     }
 
-                    if (utilisedFileMetaData.size() > 0)
+                    if (!utilisedFileMetaData.isEmpty())
                     {
                         // Pass 2 - initialise anything loaded during the initialise of pass 1
                         ArrayList utilisedFileMetaData2 = (ArrayList)utilisedFileMetaData.clone();
@@ -1831,7 +1831,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             }
             return classNames;
         }
-        else if (classes.size() > 0)
+        else if (!classes.isEmpty())
         {
             // Normal persistence
             // Put the classes into a sorter so we make sure we get the initial implementations first followed
@@ -2927,7 +2927,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     {
         Collection subclassNames2 = new HashSet();
         provideSubclassesForClass(className, includeDescendents, subclassNames2);
-        if (subclassNames2.size() > 0)
+        if (!subclassNames2.isEmpty())
         {
             return (String[])subclassNames2.toArray(new String[subclassNames2.size()]);
         }

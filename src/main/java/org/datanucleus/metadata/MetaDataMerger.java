@@ -159,7 +159,7 @@ public class MetaDataMerger
             }
             primaryCmd.queries.addAll(ormCmd.queries);
         }
-        if (ormCmd.joins.size() > 0)
+        if (!ormCmd.joins.isEmpty())
         {
             primaryCmd.joins.clear();
             Iterator iter = ormCmd.joins.iterator();
@@ -168,7 +168,7 @@ public class MetaDataMerger
                 primaryCmd.addJoin((JoinMetaData)iter.next());
             }
         }
-        if (ormCmd.indexes.size() > 0)
+        if (!ormCmd.indexes.isEmpty())
         {
             primaryCmd.indexes.clear();
             Iterator iter = ormCmd.indexes.iterator();
@@ -177,7 +177,7 @@ public class MetaDataMerger
                 primaryCmd.addIndex((IndexMetaData)iter.next());
             }
         }
-        if (ormCmd.foreignKeys.size() > 0)
+        if (!ormCmd.foreignKeys.isEmpty())
         {
             primaryCmd.foreignKeys.clear();
             Iterator iter = ormCmd.foreignKeys.iterator();
@@ -186,7 +186,7 @@ public class MetaDataMerger
                 primaryCmd.addForeignKey((ForeignKeyMetaData)iter.next());
             }
         }
-        if (ormCmd.uniqueConstraints.size() > 0)
+        if (!ormCmd.uniqueConstraints.isEmpty())
         {
             primaryCmd.uniqueConstraints.clear();
             Iterator iter = ormCmd.uniqueConstraints.iterator();
@@ -195,7 +195,7 @@ public class MetaDataMerger
                 primaryCmd.addUniqueConstraint((UniqueMetaData)iter.next());
             }
         }
-        if (ormCmd.fetchGroups.size() > 0)
+        if (!ormCmd.fetchGroups.isEmpty())
         {
             primaryCmd.fetchGroups.clear();
             Iterator iter = ormCmd.fetchGroups.iterator();
@@ -622,7 +622,7 @@ public class MetaDataMerger
                 primaryCmd.addQuery((QueryMetaData)iter.next());
             }
         }
-        if (primaryCmd.joins.size() == 0 && annotCmd.joins.size() > 0)
+        if (primaryCmd.joins.isEmpty() && !annotCmd.joins.isEmpty())
         {
             Iterator iter = annotCmd.joins.iterator();
             while (iter.hasNext())
@@ -630,7 +630,7 @@ public class MetaDataMerger
                 primaryCmd.addJoin((JoinMetaData)iter.next());
             }
         }
-        if (primaryCmd.indexes.size() == 0 && annotCmd.indexes.size() > 0)
+        if (primaryCmd.indexes.isEmpty() && !annotCmd.indexes.isEmpty())
         {
             Iterator iter = annotCmd.indexes.iterator();
             while (iter.hasNext())
@@ -638,7 +638,7 @@ public class MetaDataMerger
                 primaryCmd.addIndex((IndexMetaData)iter.next());
             }
         }
-        if (primaryCmd.foreignKeys.size() == 0 && annotCmd.foreignKeys.size() > 0)
+        if (primaryCmd.foreignKeys.isEmpty() && !annotCmd.foreignKeys.isEmpty())
         {
             Iterator iter = annotCmd.foreignKeys.iterator();
             while (iter.hasNext())
@@ -646,7 +646,7 @@ public class MetaDataMerger
                 primaryCmd.addForeignKey((ForeignKeyMetaData)iter.next());
             }
         }
-        if (primaryCmd.uniqueConstraints.size() == 0 && annotCmd.uniqueConstraints.size() > 0)
+        if (primaryCmd.uniqueConstraints.isEmpty() && !annotCmd.uniqueConstraints.isEmpty())
         {
             Iterator iter = annotCmd.uniqueConstraints.iterator();
             while (iter.hasNext())
@@ -654,7 +654,7 @@ public class MetaDataMerger
                 primaryCmd.addUniqueConstraint((UniqueMetaData)iter.next());
             }
         }
-        if (primaryCmd.fetchGroups.size() == 0 && annotCmd.fetchGroups.size() > 0)
+        if (primaryCmd.fetchGroups.isEmpty() && !annotCmd.fetchGroups.isEmpty())
         {
             Iterator iter = annotCmd.fetchGroups.iterator();
             while (iter.hasNext())
@@ -900,7 +900,7 @@ public class MetaDataMerger
             primaryFmd.uniqueMetaData.parent = primaryFmd;
         }
 
-        if (primaryFmd.columns.size() == 0 && annotFmd.columns.size() > 0)
+        if (primaryFmd.columns.isEmpty() && !annotFmd.columns.isEmpty())
         {
             // Columns specified in annotations but not in MetaData
             ColumnMetaData[] annotColumns = annotFmd.getColumnMetaData();
