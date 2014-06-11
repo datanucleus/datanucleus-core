@@ -41,6 +41,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class TreeSet extends java.util.TreeSet implements SCOCollection<java.util.TreeSet>, SCOMtoN, Cloneable
 {
+    private static final long serialVersionUID = 2716348073191575719L;
+
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
 

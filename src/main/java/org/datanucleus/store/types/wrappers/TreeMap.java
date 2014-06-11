@@ -38,6 +38,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class TreeMap extends java.util.TreeMap implements SCOMap<java.util.TreeMap>, Cloneable
 {
+    private static final long serialVersionUID = 269796187189499489L;
+
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
 

@@ -39,6 +39,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, Cloneable
 {
+    private static final long serialVersionUID = -2356534368275783162L;
+
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
 

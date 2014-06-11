@@ -40,6 +40,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class Vector extends java.util.Vector implements SCOList<java.util.Vector>, Cloneable
 {
+    private static final long serialVersionUID = -7852159568338224341L;
+
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
 
