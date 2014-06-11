@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -39,10 +40,10 @@ import org.xml.sax.SAXException;
 public abstract class AbstractXMLEntityResolver implements EntityResolver
 {
     /** Map of public identity entities supported. The key will be the identity, and the value is the local input to use. */
-    protected HashMap publicIdEntities = new HashMap();
+    protected Map<String, String> publicIdEntities = new HashMap();
 
     /** Map of system identity entities supported. The key will be the identity, and the value is the local input to use. */
-    protected HashMap systemIdEntities = new HashMap();
+    protected Map<String, String> systemIdEntities = new HashMap();
 
     /**
      * Method to resolve XML entities.
@@ -60,7 +61,7 @@ public abstract class AbstractXMLEntityResolver implements EntityResolver
             if (publicId != null)
             {
                 // Use publicId if possible
-                String internalEntity = (String)publicIdEntities.get(publicId);
+                String internalEntity = publicIdEntities.get(publicId);
                 if (internalEntity != null)
                 {
                     return getLocalInputSource(publicId, systemId, internalEntity);
@@ -70,7 +71,7 @@ public abstract class AbstractXMLEntityResolver implements EntityResolver
             if (systemId != null)
             {
                 // Use systemId if possible
-                String internalEntity = (String)systemIdEntities.get(systemId);
+                String internalEntity = systemIdEntities.get(systemId);
                 if (internalEntity != null)
                 {
                     return getLocalInputSource(publicId, systemId, internalEntity);

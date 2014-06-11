@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
@@ -488,7 +489,7 @@ public class DataNucleusEnhancer
 
         // Enhance the classes implied by the FileMetaData
         long inputTime = System.currentTimeMillis();
-        HashSet<String> classNames = new HashSet<String>();
+        Set<String> classNames = new HashSet<String>();
         Iterator<FileMetaData> filemdIter = fileMetaData.iterator();
         boolean success = true;
         while (filemdIter.hasNext())
@@ -567,7 +568,7 @@ public class DataNucleusEnhancer
 
         // Validate the classes implied by the FileMetaData
         long inputTime = System.currentTimeMillis();
-        HashSet<String> classNames = new HashSet<String>();
+        Set<String> classNames = new HashSet<String>();
         Iterator<FileMetaData> filemdIter = fileMetaData.iterator();
         while (filemdIter.hasNext())
         {

@@ -541,7 +541,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             // Load classes
             ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(loader);
             Collection fileMetaData = new ArrayList();
-            HashSet exceptions = new HashSet();
+            Set<Exception> exceptions = new HashSet();
             for (int i=0;i<classNames.length;i++)
             {
                 try
@@ -593,7 +593,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             {
                 // Exceptions while loading annotations
                 throw new NucleusUserException(Localiser.msg("044016"),
-                    (Throwable[]) exceptions.toArray(new Throwable[exceptions.size()]),null);
+                    exceptions.toArray(new Throwable[exceptions.size()]),null);
             }
 
             if (fileMetaData.size() > 0)
@@ -652,7 +652,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             }
 
             ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(loader);
-            ArrayList fileMetaData = new ArrayList();
+            List<FileMetaData> fileMetaData = new ArrayList();
 
             // Generate list of package.jdo and classes present in the jar
             Set mappingFiles = new HashSet();
@@ -780,7 +780,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 processListenerLoadingCall();
             }
 
-            return (FileMetaData[])fileMetaData.toArray(new FileMetaData[fileMetaData.size()]);
+            return fileMetaData.toArray(new FileMetaData[fileMetaData.size()]);
         }
         finally
         {
@@ -843,7 +843,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
             ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(loader);
             Set<Throwable> exceptions = new HashSet();
-            ArrayList fileMetaData = new ArrayList();
+            List<FileMetaData> fileMetaData = new ArrayList();
 
             // Generate list of XML files
             Set mappingFiles = new HashSet();
@@ -1122,7 +1122,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 processListenerLoadingCall();
             }
 
-            return (FileMetaData[])fileMetaData.toArray(new FileMetaData[fileMetaData.size()]);
+            return fileMetaData.toArray(new FileMetaData[fileMetaData.size()]);
         }
         finally
         {
@@ -1297,7 +1297,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      */
     protected void initialiseFileMetaDataForUse(Collection fileMetaData, ClassLoaderResolver clr)
     {
-        HashSet exceptions = new HashSet();
+        Set<Exception> exceptions = new HashSet();
 
         // a). Populate MetaData
         if (NucleusLogger.METADATA.isDebugEnabled())
@@ -1338,7 +1338,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         }
         if (exceptions.size() > 0)
         {
-            throw new NucleusUserException(Localiser.msg("044020"), (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
+            throw new NucleusUserException(Localiser.msg("044020"), exceptions.toArray(new Throwable[exceptions.size()]));
         }
     }
 

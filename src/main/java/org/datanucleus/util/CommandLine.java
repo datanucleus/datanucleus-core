@@ -19,6 +19,8 @@ package org.datanucleus.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Command line option parser.
@@ -27,13 +29,13 @@ import java.util.HashMap;
 public class CommandLine
 {
     /** Appended options */
-    protected HashMap<String, Option> options = new HashMap();
+    protected Map<String, Option> options = new HashMap();
 
     /** Appended options */
-    protected HashMap valueOptions = new HashMap();
+    protected Map<String, Option> valueOptions = new HashMap();
 
     /** Appended options */
-    protected ArrayList optionList = new ArrayList();
+    protected List<Option> optionList = new ArrayList<Option>();
 
     /** Default arguments */
     protected String defaultArg[];
@@ -172,7 +174,7 @@ public class CommandLine
      */
     public void parse(String args[])
     {
-        ArrayList defaultArg = new ArrayList();
+        List<String> defaultArg = new ArrayList();
         if ((args == null || (args.length == 0)))
         {
             return;
@@ -226,7 +228,7 @@ public class CommandLine
         String result[] = new String[defaultArg.size()];
         for (i = 0; i < result.length; i++)
         {
-            result[i] = (String)defaultArg.get(i);
+            result[i] = defaultArg.get(i);
         }
         this.defaultArg = result;
     }
@@ -242,7 +244,7 @@ public class CommandLine
         {
             throw new IllegalArgumentException("no such option " + name);
         }
-        Option option = (Option)valueOptions.get(name);
+        Option option = valueOptions.get(name);
         if (option instanceof NoArgOption)
         {
             return ((NoArgOption)option).selected;
@@ -262,7 +264,7 @@ public class CommandLine
         {
             throw new IllegalArgumentException("no such option " + name);
         }
-        Option option = (Option)valueOptions.get(name);
+        Option option = valueOptions.get(name);
         if (option instanceof NoArgOption)
         {
             return "" + ((NoArgOption)option).selected;
@@ -288,7 +290,7 @@ public class CommandLine
         int descMax = 0;
         for (int i = 0; i < optionList.size(); i++)
         {
-            Option o = (Option)optionList.get(i);
+            Option o = optionList.get(i);
             if (o.shortName != null)
             {
                 if (o.shortName.length() > shortMax)
@@ -331,7 +333,7 @@ public class CommandLine
         for (int i = 0; i < optionList.size(); i++)
         {
             int j = 0;
-            Option o = (Option)optionList.get(i);
+            Option o = optionList.get(i);
             if (StringUtils.notEmpty(o.shortName))
             {
                 if( this.displaysDash )

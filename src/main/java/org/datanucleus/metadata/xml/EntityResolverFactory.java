@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.util;
+package org.datanucleus.metadata.xml;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;

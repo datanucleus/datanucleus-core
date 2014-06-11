@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.datanucleus.NucleusContext;
 import org.datanucleus.PropertyNames;
@@ -36,7 +37,7 @@ import org.datanucleus.util.NucleusLogger;
 public class AbstractQueryResultsCache implements QueryResultsCache
 {
     /** Keys to pin, if entering into the cache. */
-    HashSet<String> keysToPin = new HashSet<String>();
+    Set<String> keysToPin = new HashSet<String>();
 
     /** Cache of pinned objects. */
     Map<String, List<Object>> pinnedCache = new HashMap<String, List<Object>>();

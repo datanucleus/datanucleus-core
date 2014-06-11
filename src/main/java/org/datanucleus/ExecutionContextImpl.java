@@ -1497,7 +1497,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     lock.lock();
                 }
 
-                ArrayList<ObjectProvider> opsToEvict = new ArrayList();
+                List<ObjectProvider> opsToEvict = new ArrayList();
                 opsToEvict.addAll(cache.values());
                 Iterator<ObjectProvider> opIter = opsToEvict.iterator();
                 while (opIter.hasNext())
@@ -1539,7 +1539,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (cache != null)
         {
             // All persistent non-transactional instances should be evicted here, but not yet supported
-            ArrayList<ObjectProvider> opsToEvict = new ArrayList();
+            List<ObjectProvider> opsToEvict = new ArrayList();
             opsToEvict.addAll(cache.values());
 
             // Evict ObjectProviders and remove objects from cache
@@ -1804,7 +1804,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             try
             {
                 getStoreManager().getPersistenceHandler().batchStart(this, PersistenceBatchType.PERSIST);
-                ArrayList<RuntimeException> failures = null;
+                List<RuntimeException> failures = null;
                 for (int i=0;i<objs.length;i++)
                 {
                     try
@@ -2155,7 +2155,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
             getStoreManager().getPersistenceHandler().batchStart(this, PersistenceBatchType.DELETE);
 
-            ArrayList<RuntimeException> failures = null;
+            List<RuntimeException> failures = null;
             for (int i=0;i<objs.length;i++)
             {
                 try
@@ -4721,7 +4721,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 lock.lock();
             }
 
-            ArrayList failures = null;
+            List<Exception> failures = null;
             try
             {
                 Collection<ObjectProvider> ops = enlistedOPCache.values();
@@ -4751,7 +4751,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
             if (failures != null && !failures.isEmpty())
             {
-                throw new RollbackStateTransitionException((Exception[]) failures.toArray(new Exception[failures.size()]));
+                throw new RollbackStateTransitionException(failures.toArray(new Exception[failures.size()]));
             }
 
             if (getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_ROLLBACK))

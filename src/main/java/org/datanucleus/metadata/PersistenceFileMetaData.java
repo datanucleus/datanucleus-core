@@ -19,6 +19,7 @@ package org.datanucleus.metadata;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Representation of a Meta-Data "persistence.xml" file. 
@@ -30,7 +31,7 @@ public class PersistenceFileMetaData extends MetaData
     protected String filename = null;
 
     /** Persistence units defined in this file. */
-    protected HashSet<PersistenceUnitMetaData> persistenceUnits = new HashSet();
+    protected Set<PersistenceUnitMetaData> persistenceUnits = new HashSet();
 
     /**
      * Constructor.
@@ -84,7 +85,7 @@ public class PersistenceFileMetaData extends MetaData
      */
     public PersistenceUnitMetaData[] getPersistenceUnits()
     {
-        if (persistenceUnits.size() == 0)
+        if (persistenceUnits.isEmpty())
         {
             return null;
         }

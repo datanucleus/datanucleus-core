@@ -46,6 +46,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -432,7 +433,7 @@ public class ClassUtils
     private static String[] getClassNamesForJarFile(JarFile jar)
     {
         Enumeration jarEntries = jar.entries();
-        HashSet classes = new HashSet();
+        Set<String> classes = new HashSet();
         while (jarEntries.hasMoreElements())
         {
             String entry = ((JarEntry)jarEntries.nextElement()).getName();
@@ -443,7 +444,7 @@ public class ClassUtils
                 classes.add(className);
             }
         }
-        return (String[])classes.toArray(new String[classes.size()]);
+        return classes.toArray(new String[classes.size()]);
     }
 
     /**
@@ -514,7 +515,7 @@ public class ClassUtils
     private static String[] getFileNamesWithSuffixForJarFile(JarFile jar, String suffix)
     {
         Enumeration jarEntries = jar.entries();
-        HashSet files = new HashSet();
+        Set<String> files = new HashSet();
         while (jarEntries.hasMoreElements())
         {
             String entry = ((JarEntry)jarEntries.nextElement()).getName();
@@ -523,7 +524,7 @@ public class ClassUtils
                 files.add(entry);
             }
         }
-        return (String[])files.toArray(new String[files.size()]);
+        return files.toArray(new String[files.size()]);
     }
 
     /**

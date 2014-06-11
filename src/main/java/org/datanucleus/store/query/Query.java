@@ -191,7 +191,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
      * Named parameters are keyed by String form of the name.
      * Numbered parameters are keyed by the position (Integer).
      */
-    protected transient HashMap implicitParameters = null;
+    protected transient Map implicitParameters = null;
 
     /** The imports definition. */
     protected transient Imports parsedImports = null;
@@ -207,7 +207,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
      * This is required because the query can be executed multiple times changing
      * the input slightly each time for example.
      */
-    protected transient HashSet<QueryResult> queryResults = new HashSet(1);
+    protected transient Set<QueryResult> queryResults = new HashSet(1);
 
     /** Currently executing object for this query, keyed by the thread, to allow for cancellation. */
     protected transient Map<Thread, Object> tasks = new ConcurrentHashMap(1);
@@ -2229,7 +2229,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
     protected Map getParameterMapForValues(Object[] parameterValues)
     {
         // Generate a parameter map from the parameter names to these input values
-        HashMap parameterMap = new HashMap();
+        Map parameterMap = new HashMap();
         int position = 0;
         if (explicitParameters != null)
         {

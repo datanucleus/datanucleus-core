@@ -23,6 +23,8 @@ import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -34,9 +36,9 @@ import org.datanucleus.exceptions.NucleusUserException;
  */
 public class Imports
 {
-    private HashMap primitives = new HashMap();
-    private HashMap importedClassesByName = new HashMap();
-    private HashSet importedPackageNames = new HashSet();
+    private Map<String, Class> primitives = new HashMap<String, Class>();
+    private Map<String, String> importedClassesByName = new HashMap();
+    private Set<String> importedPackageNames = new HashSet();
 
     /**
      * Constructor.
@@ -151,10 +153,10 @@ public class Imports
         Class c;
         if (classDecl.indexOf('.') < 0)
         {
-            c = (Class)primitives.get(classDecl);
+            c = primitives.get(classDecl);
             if (c == null)
             {
-                String cd = (String)importedClassesByName.get(classDecl);
+                String cd = importedClassesByName.get(classDecl);
                 if (cd != null)
                 {
                     c = clr.classForName(cd, primaryClassLoader);

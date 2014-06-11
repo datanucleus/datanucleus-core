@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -34,10 +35,10 @@ import org.datanucleus.util.NucleusLogger;
 public class StoreDataManager
 {
     /** Map of all managed store data, keyed by the class/field name. */
-    protected ConcurrentHashMap<Object, StoreData> storeDataByClass = new ConcurrentHashMap<Object, StoreData>();
+    protected Map<Object, StoreData> storeDataByClass = new ConcurrentHashMap<Object, StoreData>();
 
     /** the memory image of schema data before running it **/
-    protected ConcurrentHashMap<Object, StoreData> savedStoreDataByClass;
+    protected Map<Object, StoreData> savedStoreDataByClass;
 
     /**
      * Clear the cache

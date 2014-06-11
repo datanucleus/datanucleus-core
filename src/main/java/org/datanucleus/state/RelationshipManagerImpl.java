@@ -299,7 +299,7 @@ public class RelationshipManagerImpl implements RelationshipManager
 
         Integer fieldKey = Integer.valueOf(fieldNumber);
         Object changes = fieldChanges.get(fieldKey);
-        ArrayList changeList = null;
+        List<RelationChange> changeList = null;
         if (changes == null)
         {
             changeList = new ArrayList();
@@ -335,7 +335,7 @@ public class RelationshipManagerImpl implements RelationshipManager
 
         Integer fieldKey = Integer.valueOf(fieldNumber);
         Object changes = fieldChanges.get(fieldKey);
-        ArrayList changeList = null;
+        List<RelationChange> changeList = null;
         if (changes == null)
         {
             changeList = new ArrayList();

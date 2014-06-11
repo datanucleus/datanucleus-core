@@ -17,7 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.metadata.annotations;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -34,7 +34,7 @@ public class ValidationSizeAnnotationHandler implements MemberAnnotationHandler
     @Override
     public void processMemberAnnotation(AnnotationObject annotation, AbstractMemberMetaData mmd, ClassLoaderResolver clr)
     {
-        HashMap<String, Object> annotationValues = annotation.getNameValueMap();
+        Map<String, Object> annotationValues = annotation.getNameValueMap();
         int max = (Integer)annotationValues.get("max");
         ColumnMetaData[] colmds = mmd.getColumnMetaData();
         if (colmds == null || colmds.length == 0)

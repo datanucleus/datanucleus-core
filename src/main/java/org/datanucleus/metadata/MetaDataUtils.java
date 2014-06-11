@@ -782,8 +782,8 @@ public class MetaDataUtils
         try
         {
             // Split the input files into MetaData files and classes
-            HashSet metadataFiles = new HashSet();
-            HashSet classNames = new HashSet();
+            Set<String> metadataFiles = new HashSet();
+            Set<String> classNames = new HashSet();
             for (int i=0;i<inputFiles.length;i++)
             {
                 if (inputFiles[i].endsWith(".class"))
@@ -830,10 +830,8 @@ public class MetaDataUtils
             }
 
             // Initialise the MetaDataManager using the mapping files and class names
-            FileMetaData[] filemds1 = metaDataMgr.loadMetadataFiles(
-                (String[])metadataFiles.toArray(new String[metadataFiles.size()]), null);
-            FileMetaData[] filemds2 = metaDataMgr.loadClasses(
-                (String[])classNames.toArray(new String[classNames.size()]), null);
+            FileMetaData[] filemds1 = metaDataMgr.loadMetadataFiles(metadataFiles.toArray(new String[metadataFiles.size()]), null);
+            FileMetaData[] filemds2 = metaDataMgr.loadClasses(classNames.toArray(new String[classNames.size()]), null);
             filemds = new FileMetaData[filemds1.length + filemds2.length];
             int pos = 0;
             for (int i=0;i<filemds1.length;i++)

@@ -1135,7 +1135,7 @@ public class JDOQLParser implements Parser
         }
     }
 
-    private ArrayList<Object> parameterNameList = null;
+    private List<Object> parameterNameList = null;
 
     private int getPositionFromParameterName(Object name)
     {

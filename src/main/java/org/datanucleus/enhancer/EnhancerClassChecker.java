@@ -19,6 +19,7 @@ package org.datanucleus.enhancer;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.datanucleus.asm.AnnotationVisitor;
 import org.datanucleus.asm.Attribute;
@@ -39,10 +40,10 @@ public class EnhancerClassChecker extends ClassVisitor
     protected ClassEnhancer enhancer;
 
     /** Set of fields required to be present. */
-    protected HashSet<ClassField> fieldsRequired = new HashSet<ClassField>();
+    protected Set<ClassField> fieldsRequired = new HashSet<ClassField>();
 
     /** Set of methods required to be present. */
-    protected HashSet<ClassMethod> methodsRequired = new HashSet<ClassMethod>();
+    protected Set<ClassMethod> methodsRequired = new HashSet<ClassMethod>();
 
     /** Flag for whether the class is enhanced. Set in the visit process. */
     protected boolean enhanced = false;
