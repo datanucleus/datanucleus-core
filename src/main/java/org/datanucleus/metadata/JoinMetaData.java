@@ -38,6 +38,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class JoinMetaData extends MetaData implements ColumnMetaDataContainer
 {
+    private static final long serialVersionUID = -3132167406276575350L;
+
     /** the foreign-key element. */
     protected ForeignKeyMetaData foreignKeyMetaData;
 

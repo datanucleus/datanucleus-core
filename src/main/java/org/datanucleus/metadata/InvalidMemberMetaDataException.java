@@ -22,6 +22,7 @@ package org.datanucleus.metadata;
  */
 public class InvalidMemberMetaDataException extends InvalidMetaDataException
 {
+    private static final long serialVersionUID = -8889474376874514402L;
     String className;
     String memberName;
 

@@ -35,6 +35,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class CachedPC<T> implements Serializable
 {
+    private static final long serialVersionUID = 1326244752228266953L;
+
     /** Class of the object being cached. */
     private Class<T> cls;
 
@@ -166,6 +168,8 @@ public class CachedPC<T> implements Serializable
 
     public static class CachedId implements Serializable, Comparable<CachedId>
     {
+        private static final long serialVersionUID = -2806783207184913323L;
+
         String className;
 
         Object id;

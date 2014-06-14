@@ -29,6 +29,8 @@ import org.datanucleus.query.symbol.SymbolTable;
  */
 public class JoinExpression extends Expression
 {
+    private static final long serialVersionUID = -3758088504354624725L;
+
     public enum JoinType
     {
         JOIN_INNER, JOIN_LEFT_OUTER, JOIN_RIGHT_OUTER, JOIN_INNER_FETCH, JOIN_LEFT_OUTER_FETCH, JOIN_RIGHT_OUTER_FETCH

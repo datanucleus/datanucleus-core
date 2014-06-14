@@ -24,6 +24,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class QueryMetaData extends MetaData
 {
+    private static final long serialVersionUID = -4592528440929968977L;
+
     /** Scope of this query (if any). */
     protected String scope;
 

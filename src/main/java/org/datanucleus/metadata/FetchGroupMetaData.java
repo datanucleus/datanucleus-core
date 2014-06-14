@@ -30,6 +30,8 @@ import java.util.Set;
  */
 public class FetchGroupMetaData extends MetaData
 {
+    private static final long serialVersionUID = -9024912323171424927L;
+
     /**
      * The post-load attribute on the fetch-group element indicates whether the
      * jdoPost-Load callback will be made when the fetch group is loaded. It

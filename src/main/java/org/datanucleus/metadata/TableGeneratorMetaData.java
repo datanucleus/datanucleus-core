@@ -24,6 +24,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class TableGeneratorMetaData extends MetaData
 {
+    private static final long serialVersionUID = 6202716458802237130L;
+
     /** Name under which this table generator is known. */
     protected final String name;
 

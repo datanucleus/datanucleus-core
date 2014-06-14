@@ -38,6 +38,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class ImplementsMetaData extends MetaData
 {
+    private static final long serialVersionUID = -9035890748184431024L;
+
     /** Name of the interface implemented. */
     protected String name;
 

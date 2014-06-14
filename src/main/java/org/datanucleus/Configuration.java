@@ -58,6 +58,8 @@ import org.datanucleus.util.PersistenceUtils;
  */
 public class Configuration extends PropertyStore implements Serializable
 {
+    private static final long serialVersionUID = 1483628590934722025L;
+
     private NucleusContext nucCtx;
 
     /** Mapping for the properties of the plugins, PropertyMapping, keyed by the property name. */
@@ -77,6 +79,7 @@ public class Configuration extends PropertyStore implements Serializable
      */
     static class PropertyMapping implements Serializable
     {
+        private static final long serialVersionUID = 9004376979051886506L;
         String name;
         String internalName;
         String validatorName;

@@ -27,6 +27,8 @@ import org.datanucleus.util.Localiser;
  */
 public class BigIntegerLongConverter implements TypeConverter<BigInteger, Long>
 {
+    private static final long serialVersionUID = -946874444222779197L;
+
     public BigInteger toMemberType(Long val)
     {
         if (val == null)

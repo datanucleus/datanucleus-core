@@ -29,6 +29,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class PrimaryKeyMetaData extends MetaData implements ColumnMetaDataContainer
 {
+    private static final long serialVersionUID = 6303979815375277900L;
+
     /** PK constraint name. */
     protected String name = null;
 

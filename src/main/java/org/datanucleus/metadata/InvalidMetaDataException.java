@@ -28,6 +28,7 @@ import org.datanucleus.util.Localiser;
  */
 public class InvalidMetaDataException extends NucleusFatalUserException
 {
+    private static final long serialVersionUID = -1227318171934042330L;
     /** Message resources key */
     protected String messageKey;
 

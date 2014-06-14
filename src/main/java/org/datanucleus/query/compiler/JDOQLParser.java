@@ -47,7 +47,7 @@ public class JDOQLParser implements Parser
         "getObjectId", "abs", "sqrt"
     };
 
-    private enum ParameterType { IMPLICIT, EXPLICIT };
+    private enum ParameterType { IMPLICIT, EXPLICIT }
 
     private ParameterType paramType = ParameterType.IMPLICIT;
 

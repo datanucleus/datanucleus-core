@@ -29,6 +29,7 @@ import org.datanucleus.query.symbol.SymbolTable;
  */
 public class Literal extends Expression
 {
+    private static final long serialVersionUID = 1829184296603207264L;
     Object value;
 
     public Literal(Object value)

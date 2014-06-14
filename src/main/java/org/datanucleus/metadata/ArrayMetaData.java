@@ -36,6 +36,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class ArrayMetaData extends ContainerMetaData
 {
+    private static final long serialVersionUID = -6475718222404272345L;
+
     /** Representation of the element of the array. */
     protected ContainerComponent element;
     

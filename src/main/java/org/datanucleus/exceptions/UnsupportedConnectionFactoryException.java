@@ -27,6 +27,8 @@ import org.datanucleus.util.Localiser;
  */
 public class UnsupportedConnectionFactoryException extends NucleusUserException
 {
+    private static final long serialVersionUID = 7626152395007903364L;
+
     /**
      * Constructs an unsupported connection exception.
      * @param factory The connection factory object that is not supported.

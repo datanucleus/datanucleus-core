@@ -43,6 +43,8 @@ import org.datanucleus.exceptions.NucleusException;
  */
 public class MetaData implements Serializable
 {
+    private static final long serialVersionUID = -5477406260914096062L;
+
     /** State representing the start state of MetaData, representing the initial values passed in. */
     public static final int METADATA_CREATED_STATE = 0;
 

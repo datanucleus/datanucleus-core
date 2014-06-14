@@ -24,6 +24,8 @@ import java.net.URI;
  */
 public class URIStringConverter implements TypeConverter<URI, String>
 {
+    private static final long serialVersionUID = -3784990025093845546L;
+
     public URI toMemberType(String str)
     {
         if (str == null)

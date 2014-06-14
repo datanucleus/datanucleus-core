@@ -38,8 +38,8 @@ public class TypeConverterHelper
             try
             {
                 // Maybe is a wrapper to a converter, like for JPA
-                Method m = conv.getClass().getDeclaredMethod("getMemberClass", null);
-                return (Class)m.invoke(conv, null);
+                Method m = conv.getClass().getDeclaredMethod("getMemberClass");
+                return (Class)m.invoke(conv);
             }
             catch (Exception e2)
             {
@@ -64,8 +64,8 @@ public class TypeConverterHelper
         try
         {
             // Maybe is a wrapper to a converter, like for JPA
-            Method m = conv.getClass().getDeclaredMethod("getDatastoreClass", null);
-            return (Class)m.invoke(conv, null);
+            Method m = conv.getClass().getDeclaredMethod("getDatastoreClass");
+            return (Class)m.invoke(conv);
         }
         catch (Exception e2)
         {

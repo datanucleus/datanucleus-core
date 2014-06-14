@@ -35,6 +35,8 @@ import org.datanucleus.util.Base64;
 public class SerializableStringConverter implements TypeConverter<Serializable, String>
 {
 
+    private static final long serialVersionUID = 5269636067035783545L;
+
     /* (non-Javadoc)
      * @see org.datanucleus.store.types.converters.TypeConverter#toDatastoreType(java.lang.Object)
      */

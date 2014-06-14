@@ -36,6 +36,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class AbstractQueryResultsCache implements QueryResultsCache
 {
+    private static final long serialVersionUID = -1071931192920096219L;
+
     /** Keys to pin, if entering into the cache. */
     Set<String> keysToPin = new HashSet<String>();
 

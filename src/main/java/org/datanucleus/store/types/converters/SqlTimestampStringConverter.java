@@ -24,6 +24,8 @@ import java.sql.Timestamp;
  */
 public class SqlTimestampStringConverter implements TypeConverter<Timestamp, String>
 {
+    private static final long serialVersionUID = -6875184505578535496L;
+
     public Timestamp toMemberType(String str)
     {
         if (str == null)

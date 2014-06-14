@@ -272,6 +272,8 @@ public class NonManagedPluginRegistry implements PluginRegistry
      */
     protected static class ExtensionSorter implements Comparator<Extension>, Serializable
     {
+        private static final long serialVersionUID = 2606866392881023620L;
+
         /* (non-Javadoc)
          * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
          */

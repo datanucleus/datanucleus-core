@@ -52,6 +52,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class TypeManagerImpl implements TypeManager, Serializable
 {
+    private static final long serialVersionUID = 8217508318434539002L;
+
     protected NucleusContext nucCtx;
 
     protected transient ClassLoaderResolver clr;
@@ -587,6 +589,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
 
     static class JavaType implements Serializable
     {
+        private static final long serialVersionUID = -811442140006259453L;
         final Class cls;
         final Class genericType;
         final boolean embedded;

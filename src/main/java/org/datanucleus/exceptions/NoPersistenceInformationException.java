@@ -25,6 +25,8 @@ import org.datanucleus.util.Localiser;
  */
 public class NoPersistenceInformationException extends NucleusUserException
 {
+    private static final long serialVersionUID = -7436790264202971943L;
+
     /**
      * Constructs an exception for the specified class.
      * @param className Name of the class

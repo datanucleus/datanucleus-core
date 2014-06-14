@@ -24,6 +24,8 @@ import java.awt.Color;
  */
 public class ColorComponentsConverter implements TypeConverter<Color, int[]>, MultiColumnConverter
 {
+    private static final long serialVersionUID = -9008045063095458023L;
+
     public int[] toDatastoreType(Color memberValue)
     {
         if (memberValue == null)

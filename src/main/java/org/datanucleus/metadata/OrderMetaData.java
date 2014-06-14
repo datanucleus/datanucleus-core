@@ -37,6 +37,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class OrderMetaData extends MetaData implements ColumnMetaDataContainer
 {
+    private static final long serialVersionUID = 2673343183786417980L;
+
     /** The name of the column (if specified as input) */
     protected String columnName = null;
 
@@ -379,6 +381,7 @@ public class OrderMetaData extends MetaData implements ColumnMetaDataContainer
      */
     public static class FieldOrder implements Serializable
     {
+        private static final long serialVersionUID = 338498690476594298L;
         String fieldName;
         boolean forward = true;
 

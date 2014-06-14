@@ -39,6 +39,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
 {
+    private static final long serialVersionUID = 5721811300939822702L;
+
     /**
      * Constructor.
      * @param storeMgr StoreManager for this query

@@ -31,6 +31,7 @@ package org.datanucleus.metadata;
  */
 public class IndexMetaData extends ConstraintMetaData
 {
+    private static final long serialVersionUID = -2262544953953181136L;
     /**
      * You can use UNIQUE constraints to ensure that no duplicate values are
      * entered in specific columns that do not participate in a primary key.

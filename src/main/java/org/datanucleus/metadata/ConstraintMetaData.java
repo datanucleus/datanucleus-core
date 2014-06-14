@@ -28,6 +28,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class ConstraintMetaData extends MetaData
 {
+    private static final long serialVersionUID = 7230726771198108950L;
+
     /** the constraint name */
     protected String name;
 

@@ -33,6 +33,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class CreatorExpression extends Expression
 {
+    private static final long serialVersionUID = -6455308731943969503L;
+
     /** Components of the class name being created e.g ["org", "datanucleus", "MyClass"]. */
     List tuples;
 

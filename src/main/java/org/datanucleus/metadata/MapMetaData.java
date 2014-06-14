@@ -38,6 +38,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class MapMetaData extends ContainerMetaData
 {
+    private static final long serialVersionUID = -1151740606173916495L;
+
     public enum MapType
     {
         MAP_TYPE_JOIN, // Join table with refs to key and value

@@ -293,6 +293,7 @@ public class EnhancementHelper extends java.lang.Object
 
     public static class RegisterClassEvent extends EventObject
     {
+        private static final long serialVersionUID = -8336171250765467347L;
         /** The class object of the registered persistence-capable class */
         protected Class pcClass;
         /** The names of managed fields of the persistence-capable class */

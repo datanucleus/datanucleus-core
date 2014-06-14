@@ -34,6 +34,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class ValueGenerationBlock<T> implements Serializable
 {
+    private static final long serialVersionUID = -7180698168837344934L;
+
     /** The next id position. */
     private int nextIndex = 0;
 

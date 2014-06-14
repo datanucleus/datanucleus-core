@@ -51,6 +51,8 @@ import org.datanucleus.util.ViewUtils;
  */
 public abstract class AbstractClassMetaData extends MetaData
 {
+    private static final long serialVersionUID = -2433561862769017940L;
+
     /** Suffix to add on to the class name for any generated primary key class. */
     public static final String GENERATED_PK_SUFFIX = "_PK";
 

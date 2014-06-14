@@ -30,6 +30,7 @@ import org.datanucleus.query.symbol.SymbolTable;
  */
 public class SubqueryExpression extends Expression
 {
+    private static final long serialVersionUID = 833340286814838655L;
     String keyword;
 
     /**

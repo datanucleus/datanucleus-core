@@ -29,6 +29,7 @@ import org.datanucleus.query.symbol.SymbolTable;
  */
 public class CaseExpression extends Expression
 {
+    private static final long serialVersionUID = -7123407498309440027L;
     Map<Expression, Expression> actionByCondition = new HashMap<Expression, Expression>();
     Expression elseExpr;
 

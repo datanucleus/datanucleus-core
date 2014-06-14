@@ -41,6 +41,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class FieldMetaData extends AbstractMemberMetaData
 {
+    private static final long serialVersionUID = 2280126411219542L;
+
     /**
      * Convenience constructor to copy the specification from the passed field.
      * This is used when we have an overriding field and we make a copy of the baseline

@@ -39,6 +39,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class InterfaceMetaData extends AbstractClassMetaData
 {
+    private static final long serialVersionUID = -7719837155678222822L;
+
     /**
      * Constructor.
      * Takes the basic string information found in the MetaData file.

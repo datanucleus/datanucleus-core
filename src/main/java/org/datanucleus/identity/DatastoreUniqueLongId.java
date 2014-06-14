@@ -26,6 +26,7 @@ public class DatastoreUniqueLongId implements java.io.Serializable, DatastoreId,
 {
     // JDO spec 5.4.3 says: all serializable fields of ObjectID classes are required to be public.
 
+    private static final long serialVersionUID = -8633190725867210874L;
     public final long key;
 
     public DatastoreUniqueLongId()

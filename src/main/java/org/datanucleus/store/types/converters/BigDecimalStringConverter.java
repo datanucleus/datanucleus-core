@@ -27,6 +27,8 @@ import org.datanucleus.util.Localiser;
  */
 public class BigDecimalStringConverter implements TypeConverter<BigDecimal, String>
 {
+    private static final long serialVersionUID = 7218240846316253232L;
+
     public BigDecimal toMemberType(String str)
     {
         if (str == null)

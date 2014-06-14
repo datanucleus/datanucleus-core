@@ -25,6 +25,8 @@ import org.datanucleus.util.Localiser;
  */
 public class BooleanYNConverter implements TypeConverter<Boolean, Character>
 {
+    private static final long serialVersionUID = 778758633106246559L;
+
     public Boolean toMemberType(Character chr)
     {
         if (chr == null)

@@ -33,6 +33,8 @@ import org.datanucleus.query.symbol.SymbolTable;
  */
 public class DyadicExpression extends Expression
 {
+    private static final long serialVersionUID = -5200201785041579804L;
+
     /**
      * Perform a function <code>op</code> on <code>operand</code> 
      * @param op operator

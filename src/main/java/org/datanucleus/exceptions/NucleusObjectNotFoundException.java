@@ -22,6 +22,8 @@ package org.datanucleus.exceptions;
  */
 public class NucleusObjectNotFoundException extends NucleusException
 {
+    private static final long serialVersionUID = 85359813123790599L;
+
     /**
      * Constructs a new exception without a detail message.
      */

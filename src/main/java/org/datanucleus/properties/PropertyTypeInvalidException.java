@@ -27,6 +27,8 @@ import org.datanucleus.exceptions.NucleusUserException;
  */
 public class PropertyTypeInvalidException extends NucleusUserException
 {
+    private static final long serialVersionUID = -8890511238750369471L;
+
     /**
      * Constructs an exception for the specified class.
      * @param name Name of the property

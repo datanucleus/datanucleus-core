@@ -22,6 +22,8 @@ package org.datanucleus.exceptions;
  */
 public class NucleusFatalUserException extends NucleusUserException
 {
+    private static final long serialVersionUID = 900516249145530058L;
+
     /**
      * Constructs a new exception without a detail message.
      */

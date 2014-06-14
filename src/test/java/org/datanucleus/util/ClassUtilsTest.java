@@ -241,6 +241,8 @@ public class ClassUtilsTest extends TestCase
 
     private static abstract class MyArrayList extends java.util.ArrayList
     {
+
+        private static final long serialVersionUID = 9213661177131836840L;
         // Class for use by testGetSuperinterfacesViaSuperclass
     }
 

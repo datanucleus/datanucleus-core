@@ -24,6 +24,8 @@ import org.datanucleus.exceptions.NucleusException;
  */
 public class QueryTimeoutException extends NucleusException
 {
+    private static final long serialVersionUID = -4856425363125315854L;
+
     public QueryTimeoutException()
     {
         super();

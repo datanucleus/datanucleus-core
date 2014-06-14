@@ -27,6 +27,8 @@ import org.datanucleus.util.TypeConversionHelper;
  */
 public class BooleanArrayByteBufferConverter implements TypeConverter<boolean[], ByteBuffer>
 {
+    private static final long serialVersionUID = -1034562477183576606L;
+
     /* (non-Javadoc)
      * @see org.datanucleus.store.types.converters.TypeConverter#toDatastoreType(java.lang.Object)
      */

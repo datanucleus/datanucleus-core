@@ -25,6 +25,8 @@ import java.util.Calendar;
  */
 public class CalendarTimestampConverter implements TypeConverter<Calendar, Timestamp>
 {
+    private static final long serialVersionUID = 8751571323606648248L;
+
     public Calendar toMemberType(Timestamp ts)
     {
         if (ts == null)

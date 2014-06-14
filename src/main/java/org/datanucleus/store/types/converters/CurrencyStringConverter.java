@@ -24,6 +24,8 @@ import java.util.Currency;
  */
 public class CurrencyStringConverter implements TypeConverter<Currency, String>, ColumnLengthDefiningTypeConverter
 {
+    private static final long serialVersionUID = 466510473779336706L;
+
     public Currency toMemberType(String str)
     {
         if (str == null)

@@ -24,6 +24,8 @@ import java.sql.Date;
  */
 public class SqlDateDateConverter implements TypeConverter<Date, java.util.Date>
 {
+    private static final long serialVersionUID = 3850097783909422945L;
+
     public Date toMemberType(java.util.Date value)
     {
         if (value == null)

@@ -25,6 +25,8 @@ import java.util.Date;
  */
 public class CalendarDateConverter implements TypeConverter<Calendar, Date>
 {
+    private static final long serialVersionUID = -1285232696965546003L;
+
     public Calendar toMemberType(Date date)
     {
         if (date == null)

@@ -30,6 +30,8 @@ import org.datanucleus.util.Localiser;
  */
 public class NoExtentException extends NucleusUserException
 {
+    private static final long serialVersionUID = 3515714815763489073L;
+
     /**
      * Constructs a no extent exception.
      * @param className Name of the class on which the operation requiring an

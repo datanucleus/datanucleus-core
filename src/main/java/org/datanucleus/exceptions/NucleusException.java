@@ -22,6 +22,8 @@ package org.datanucleus.exceptions;
  */
 public class NucleusException extends RuntimeException
 {
+    private static final long serialVersionUID = 6533560396693164660L;
+
     /** Array of nested Throwables (optional) */
     Throwable[] nested;
 

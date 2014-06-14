@@ -27,6 +27,8 @@ import java.util.Set;
  */
 public class PersistenceFileMetaData extends MetaData
 {
+    private static final long serialVersionUID = -5448349113062382507L;
+
     /** Filename of the "persistence.xml" */
     protected String filename = null;
 

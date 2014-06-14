@@ -35,6 +35,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class QueryResultMetaData extends MetaData
 {
+    private static final long serialVersionUID = -3001099437789070838L;
+
     /** Name of the query result mapping. */
     protected final String name;
 

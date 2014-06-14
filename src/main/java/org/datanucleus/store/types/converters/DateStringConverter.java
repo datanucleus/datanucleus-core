@@ -30,6 +30,7 @@ import org.datanucleus.util.Localiser;
  */
 public class DateStringConverter implements TypeConverter<Date, String>
 {
+    private static final long serialVersionUID = 4638239842151376340L;
     private static final ThreadLocal<FormatterInfo> formatterThreadInfo = new ThreadLocal<FormatterInfo>()
     {
         protected FormatterInfo initialValue()

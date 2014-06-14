@@ -53,6 +53,8 @@ import org.datanucleus.util.WeakValueMap;
  */
 public class WeakLevel2Cache implements Level2Cache
 {
+    private static final long serialVersionUID = -4521848285620167823L;
+
     /** Collection of pinned classes whose objects should be pinned if they ever reach the cache. */
     protected Collection<PinnedClass> pinnedClasses;
 

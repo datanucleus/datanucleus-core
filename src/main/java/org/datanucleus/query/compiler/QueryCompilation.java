@@ -39,6 +39,8 @@ import org.datanucleus.query.symbol.SymbolTable;
  */
 public class QueryCompilation implements Serializable
 {
+    private static final long serialVersionUID = 2976142726587145777L;
+
     /** Query language that this is a compilation for. */
     protected String queryLanguage;
 

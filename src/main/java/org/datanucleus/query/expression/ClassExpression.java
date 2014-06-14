@@ -30,6 +30,7 @@ import org.datanucleus.query.symbol.SymbolTable;
  */
 public class ClassExpression extends Expression
 {
+    private static final long serialVersionUID = 4727718524363567502L;
     /** Optional candidate expression when in subquery and the class is a relation to the outer query. */
     String candidateExpression;
 

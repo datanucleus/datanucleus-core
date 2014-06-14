@@ -27,6 +27,7 @@ import org.datanucleus.exceptions.NucleusException;
  */
 public class PrimaryExpressionIsClassStaticFieldException extends NucleusException
 {
+    private static final long serialVersionUID = -5061563944018227349L;
     /** The class that the PrimaryExpression represents. */
     Field field;
 

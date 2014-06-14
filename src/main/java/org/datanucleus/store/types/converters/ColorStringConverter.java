@@ -24,6 +24,8 @@ import java.awt.Color;
  */
 public class ColorStringConverter implements TypeConverter<Color, String>
 {
+    private static final long serialVersionUID = -7940282427064674388L;
+
     public Color toMemberType(String str)
     {
         if (str == null)

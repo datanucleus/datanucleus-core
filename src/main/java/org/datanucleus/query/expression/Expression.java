@@ -28,6 +28,8 @@ import org.datanucleus.query.symbol.SymbolTable;
  */
 public abstract class Expression implements Serializable
 {
+    private static final long serialVersionUID = -847871617806099111L;
+
     /** Parent of this expression in the tree (if any). */
     protected Expression parent;
 
@@ -42,6 +44,7 @@ public abstract class Expression implements Serializable
      */
     public static class Operator implements Serializable
     {
+        private static final long serialVersionUID = -5417485338482984402L;
         protected final String symbol;
         protected final int precedence;
 
@@ -72,6 +75,8 @@ public abstract class Expression implements Serializable
      */
     public static class MonadicOperator extends Operator
     {
+        private static final long serialVersionUID = 1663447359955939741L;
+
         /**
          * Monodiac operator
          * @param symbol the source text or symbol of an operator. e.g  =, ==, +, /, &gt;, &lt;, etc
@@ -105,6 +110,7 @@ public abstract class Expression implements Serializable
      */
     public static class DyadicOperator extends Operator
     {
+        private static final long serialVersionUID = -2975478176127144417L;
         /**
          * An associative operator is one for which parentheses can be inserted and removed without 
          * changing the meaning of the expression 

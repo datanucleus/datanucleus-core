@@ -25,6 +25,8 @@ import java.util.Map;
  */
 public class EventListenerMetaData extends MetaData
 {
+    private static final long serialVersionUID = 6816110137508487523L;
+
     /** Name of the EventListener class. */
     String className;
 

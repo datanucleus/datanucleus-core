@@ -32,6 +32,8 @@ import org.datanucleus.util.SoftValueMap;
  */
 public class SoftLevel2Cache extends WeakLevel2Cache
 {
+    private static final long serialVersionUID = 1204825081286087936L;
+
     /**
      * Constructor.
      * @param nucleusCtx Context

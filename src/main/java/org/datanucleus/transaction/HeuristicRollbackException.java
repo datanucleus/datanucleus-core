@@ -20,6 +20,8 @@ package org.datanucleus.transaction;
 public class HeuristicRollbackException extends NucleusTransactionException
 {
 
+    private static final long serialVersionUID = 7937127770266014714L;
+
     public HeuristicRollbackException()
     {
         super();

@@ -24,6 +24,8 @@ import org.datanucleus.exceptions.NucleusException;
  */
 public class NucleusEnhanceException extends NucleusException
 {
+    private static final long serialVersionUID = -478183137030915917L;
+
     /**
      * Message-based exception constructor.
      * @param msg The message

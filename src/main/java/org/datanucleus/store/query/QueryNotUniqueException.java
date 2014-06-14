@@ -27,6 +27,8 @@ import org.datanucleus.util.Localiser;
  */
 public class QueryNotUniqueException extends NucleusUserException
 {
+    private static final long serialVersionUID = -7458437974414546277L;
+
     /**
      * Constructs the exception, populating the correct message.
      */

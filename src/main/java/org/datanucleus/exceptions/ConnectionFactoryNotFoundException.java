@@ -27,6 +27,8 @@ import org.datanucleus.util.Localiser;
  */
 public class ConnectionFactoryNotFoundException extends NucleusUserException
 {
+    private static final long serialVersionUID = -2474386281568460880L;
+
     /**
      * Constructs a connection factory not found exception.
      * @param name The JNDI name that was not found.

@@ -30,6 +30,8 @@ import org.datanucleus.util.Localiser;
  */
 public class IllegalStateTransitionException extends NucleusException
 {
+    private static final long serialVersionUID = -1686259899799936448L;
+
     /**
      * Constructs an illegal state transition exception.
      * @param state The object's current life-cycle state.

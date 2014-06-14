@@ -28,6 +28,7 @@ import org.datanucleus.query.symbol.SymbolTable;
  */
 public class VariableExpression extends Expression
 {
+    private static final long serialVersionUID = 5353841370656870816L;
     String name;
     Class type;
 

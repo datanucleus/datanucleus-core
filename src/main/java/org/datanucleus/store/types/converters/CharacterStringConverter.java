@@ -22,6 +22,8 @@ package org.datanucleus.store.types.converters;
  */
 public class CharacterStringConverter implements TypeConverter<Character, String>
 {
+    private static final long serialVersionUID = 5510626063899761384L;
+
     public Character toMemberType(String str)
     {
         if (str == null)

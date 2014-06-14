@@ -24,6 +24,8 @@ import java.util.UUID;
  */
 public class UUIDStringConverter implements TypeConverter<UUID, String>, ColumnLengthDefiningTypeConverter
 {
+    private static final long serialVersionUID = -7786945714314305089L;
+
     public UUID toMemberType(String str)
     {
         if (str == null)

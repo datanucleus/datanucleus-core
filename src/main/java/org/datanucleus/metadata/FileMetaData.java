@@ -30,6 +30,8 @@ import java.util.List;
  */
 public class FileMetaData extends MetaData
 {
+    private static final long serialVersionUID = 6622356672262681288L;
+
     // TODO Remove this, and pass in to populate/initialise as required
     /** Manager for this MetaData object. Used in AbstractMemberMetaData.setRelation process. */
     transient protected MetaDataManager metaDataManager;

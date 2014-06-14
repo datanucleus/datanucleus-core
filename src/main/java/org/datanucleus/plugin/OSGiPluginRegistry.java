@@ -151,6 +151,8 @@ public class OSGiPluginRegistry implements PluginRegistry
      */
     protected static class ExtensionSorter implements Comparator<Extension>, Serializable
     {
+        private static final long serialVersionUID = -264321551131696022L;
+
         public int compare(Extension o1, Extension o2)
         {
             String name1 = o1.getPlugin().getSymbolicName();

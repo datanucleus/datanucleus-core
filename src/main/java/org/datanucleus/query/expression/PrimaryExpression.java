@@ -38,6 +38,7 @@ import org.datanucleus.util.ClassUtils;
  */
 public class PrimaryExpression extends Expression
 {
+    private static final long serialVersionUID = 6725075523258882792L;
     /** The components of the expression. e.g "a.b.c" will have "a", "b", "c". */
     List<String> tuples;
 

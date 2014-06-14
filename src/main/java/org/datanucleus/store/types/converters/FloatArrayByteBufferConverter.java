@@ -27,6 +27,8 @@ import org.datanucleus.util.TypeConversionHelper;
  */
 public class FloatArrayByteBufferConverter implements TypeConverter<float[], ByteBuffer>
 {
+    private static final long serialVersionUID = -8328547369768394603L;
+
     /* (non-Javadoc)
      * @see org.datanucleus.store.types.converters.TypeConverter#toDatastoreType(java.lang.Object)
      */

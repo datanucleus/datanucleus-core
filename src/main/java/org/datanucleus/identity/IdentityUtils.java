@@ -405,7 +405,7 @@ public class IdentityUtils
         {
             try
             {
-                return getter.invoke(id, null);
+                return getter.invoke(id);
             }
             catch (Exception e)
             {

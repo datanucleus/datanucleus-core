@@ -28,6 +28,7 @@ import org.datanucleus.query.symbol.SymbolTable;
  */
 public class ParameterExpression extends Expression
 {
+    private static final long serialVersionUID = -2170413163550042263L;
     String name;
     int position; // Position in the query (when name not specified in execution parameters)
     Class type;

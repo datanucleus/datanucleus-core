@@ -24,6 +24,8 @@ import org.datanucleus.util.Localiser;
  */
 public class TransactionNotActiveException extends NucleusUserException
 {
+    private static final long serialVersionUID = -3462236079972766332L;
+
     /**
      * Constructs an exception with the specified detail message.
      */

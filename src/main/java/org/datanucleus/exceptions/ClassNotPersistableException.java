@@ -25,6 +25,8 @@ import org.datanucleus.util.Localiser;
  */
 public class ClassNotPersistableException extends NucleusUserException
 {
+    private static final long serialVersionUID = 3295175043550368870L;
+
     /**
      * Constructs a class-not-persistable exception with the specified detail message.
      * @param className Name of the class

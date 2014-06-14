@@ -25,6 +25,7 @@ import org.datanucleus.util.Localiser;
  */
 public class InvalidAnnotationException extends NucleusUserException
 {
+    private static final long serialVersionUID = -8436370607632552044L;
     /** Message resources key */
     protected String messageKey;
 

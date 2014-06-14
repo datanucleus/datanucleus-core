@@ -24,6 +24,8 @@ import org.datanucleus.exceptions.NucleusUserException;
  */
 public class QueryInvalidParametersException extends NucleusUserException
 {
+    private static final long serialVersionUID = -8859715327729874369L;
+
     /**
      * Constructs a new exception with the specified detail message.
      * @param msg the detail message.

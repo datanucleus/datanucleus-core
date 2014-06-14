@@ -33,6 +33,8 @@ import org.datanucleus.store.types.converters.TypeConverter;
 public class SerializableByteArrayConverter implements TypeConverter<Serializable, byte[]>
 {
 
+    private static final long serialVersionUID = 6620126332595722119L;
+
     /* (non-Javadoc)
      * @see org.datanucleus.store.types.converters.TypeConverter#toDatastoreType(java.lang.Object)
      */

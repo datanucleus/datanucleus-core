@@ -47,6 +47,8 @@ public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManage
      */
     public static class EndOfFetchPlanGraphException extends RuntimeException
     {
+
+        private static final long serialVersionUID = -7355093484885080388L;
     }
 
     /**

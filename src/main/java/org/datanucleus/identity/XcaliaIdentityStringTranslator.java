@@ -39,6 +39,8 @@ import org.datanucleus.metadata.IdentityType;
  */
 public class XcaliaIdentityStringTranslator implements IdentityStringTranslator
 {
+    private static final long serialVersionUID = -4844364972186523924L;
+
     /* (non-Javadoc)
      * @see org.datanucleus.identity.IdentityStringTranslator#getIdentity(org.datanucleus.ExecutionContext, java.lang.String)
      */

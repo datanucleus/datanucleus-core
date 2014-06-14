@@ -35,6 +35,7 @@ import java.util.Set;
  */
 public class MultiMap extends HashMap
 {
+    private static final long serialVersionUID = -3473757184670196986L;
     private transient Collection values=null;
     
     /**

@@ -31,6 +31,7 @@ import org.datanucleus.util.Localiser;
  */
 public class CalendarStringConverter implements TypeConverter<Calendar, String>
 {
+    private static final long serialVersionUID = -4905708644688677004L;
     private static final ThreadLocal<FormatterInfo> formatterThreadInfo = new ThreadLocal<FormatterInfo>()
     {
         protected FormatterInfo initialValue()

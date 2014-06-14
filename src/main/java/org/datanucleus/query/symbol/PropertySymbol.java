@@ -26,7 +26,9 @@ import java.io.Serializable;
  */
 public class PropertySymbol implements Symbol, Serializable
 {
-	/** Type of symbol. Variable, parameter, etc. */
+	private static final long serialVersionUID = -7781522317458406758L;
+
+    /** Type of symbol. Variable, parameter, etc. */
     int type;
 
     /** Qualified name of the symbol. */

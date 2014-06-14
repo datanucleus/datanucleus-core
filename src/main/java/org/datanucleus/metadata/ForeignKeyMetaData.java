@@ -38,6 +38,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class ForeignKeyMetaData extends ConstraintMetaData
 {
+    private static final long serialVersionUID = 3207934394330383432L;
+
     /**
      * The columns for this foreign key. 
      * Note that we don't use the "columnNames" in the superclass since the user can define the column target name also for a foreign-key.

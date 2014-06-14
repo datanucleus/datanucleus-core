@@ -45,6 +45,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class VersionMetaData extends MetaData
 {
+    private static final long serialVersionUID = 8277278092349220294L;
+
     /** strategy for generating the version. */
     protected VersionStrategy versionStrategy;
 

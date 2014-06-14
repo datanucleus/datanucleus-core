@@ -46,6 +46,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class FetchPlan implements Serializable
 {
+    private static final long serialVersionUID = 6031608568703439025L;
+
     /** Constant defining the fields in the default fetch group. */
     public static final String DEFAULT = "default";
 

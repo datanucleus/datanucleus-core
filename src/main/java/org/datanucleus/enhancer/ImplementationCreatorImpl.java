@@ -38,6 +38,8 @@ import org.datanucleus.util.Localiser;
  */
 public class ImplementationCreatorImpl implements Serializable, ImplementationCreator
 {
+    private static final long serialVersionUID = 4581773672324439549L;
+
     /** MetaData manager to use. */
     protected final MetaDataManager metaDataMgr;
 

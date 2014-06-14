@@ -25,6 +25,8 @@ import java.util.TimeZone;
  */
 public class CalendarComponentsConverter implements TypeConverter<Calendar, Object[]>, MultiColumnConverter
 {
+    private static final long serialVersionUID = 4725781321319221471L;
+
     public Calendar toMemberType(Object[] ts)
     {
         if (ts == null)

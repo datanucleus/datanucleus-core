@@ -25,6 +25,8 @@ import org.datanucleus.util.Localiser;
  */
 public class TransactionNotWritableException extends TransactionNotActiveException
 {
+    private static final long serialVersionUID = 7749963017601389361L;
+
     /**
      * Constructor.
      */

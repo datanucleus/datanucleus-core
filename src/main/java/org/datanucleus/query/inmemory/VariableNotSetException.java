@@ -24,6 +24,7 @@ import org.datanucleus.query.expression.VariableExpression;
  */
 public class VariableNotSetException extends RuntimeException
 {
+    private static final long serialVersionUID = -8348102622967122528L;
     protected VariableExpression varExpr = null;
     protected Object[] variableValues = null;
 

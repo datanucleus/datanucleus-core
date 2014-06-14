@@ -49,6 +49,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class EmbeddedMetaData extends MetaData
 {
+    private static final long serialVersionUID = -1180186183944475444L;
+
     /** Name of the field/property in the embedded object that refers to the owner (bidirectional relation). */
     protected String ownerMember;
 

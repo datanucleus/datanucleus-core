@@ -31,6 +31,8 @@ import java.util.Set;
  */
 public class PersistenceUnitMetaData extends MetaData
 {
+    private static final long serialVersionUID = 6021663206256915679L;
+
     /** Name of the persistence unit. */
     String name = null;
 

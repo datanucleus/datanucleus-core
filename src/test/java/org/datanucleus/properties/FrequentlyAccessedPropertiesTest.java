@@ -44,6 +44,8 @@ public class FrequentlyAccessedPropertiesTest
         props.put("datanucleus.storeManagerType", StoreManagerStub.class.getName());
 
         PersistenceNucleusContextImpl ctx = new PersistenceNucleusContextImpl(null, props) {
+            private static final long serialVersionUID = 6287389368679465707L;
+
             @Override
             public void initialise() {
             }

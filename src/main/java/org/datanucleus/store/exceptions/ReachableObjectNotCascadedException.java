@@ -28,6 +28,8 @@ import org.datanucleus.util.Localiser;
  */
 public class ReachableObjectNotCascadedException extends NucleusUserException
 {
+    private static final long serialVersionUID = -6261382506454022719L;
+
     /**
      * Constructs the exception.
      * @param fieldName Name of the field where the non-persisted object is stored.

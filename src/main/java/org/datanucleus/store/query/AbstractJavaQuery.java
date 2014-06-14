@@ -32,6 +32,8 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class AbstractJavaQuery extends Query
 {
+    private static final long serialVersionUID = 7429197167814283812L;
+
     /** Collection of candidates for this query. */
     protected transient Collection candidateCollection = null;
 

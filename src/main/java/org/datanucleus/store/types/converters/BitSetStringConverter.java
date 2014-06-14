@@ -28,6 +28,8 @@ import org.datanucleus.util.Localiser;
  */
 public class BitSetStringConverter implements TypeConverter<BitSet, String>
 {
+    private static final long serialVersionUID = -8700033712868623346L;
+
     public BitSet toMemberType(String str)
     {
         if (str == null)

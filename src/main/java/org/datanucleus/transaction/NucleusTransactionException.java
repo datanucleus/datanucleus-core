@@ -21,6 +21,8 @@ import org.datanucleus.exceptions.NucleusException;
 
 public class NucleusTransactionException extends NucleusException
 {
+    private static final long serialVersionUID = 2150861697402241048L;
+
     public NucleusTransactionException()
     {
     }

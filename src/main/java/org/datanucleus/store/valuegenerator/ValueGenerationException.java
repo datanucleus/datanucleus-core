@@ -25,6 +25,8 @@ import org.datanucleus.exceptions.NucleusException;
  */
 public class ValueGenerationException extends NucleusException
 {
+    private static final long serialVersionUID = -3825260450088569187L;
+
     /**
      * Constructor
      * @param message a localised message

@@ -30,6 +30,8 @@ import org.datanucleus.util.StringUtils;
  */
 class ContainerComponent implements Serializable
 {
+    private static final long serialVersionUID = -5662004381416396246L;
+
     /** Whether the component is stored embedded. */
     protected Boolean embedded;
 

@@ -123,7 +123,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
         if (name == null)
         {
             // Avoid the NPE and just throw a "not resolved" for null class
-            String msg = Localiser.msg("001000", null);
+            String msg = Localiser.msg("001000");
             throw new ClassNotResolvedException(msg);
         }
         if (name.equals(ClassNameConstants.BYTE))
@@ -233,7 +233,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
         if (name == null)
         {
             // Avoid the NPE and just throw a "not resolved"
-            String msg = Localiser.msg("001000", null);
+            String msg = Localiser.msg("001000");
             throw new ClassNotResolvedException(msg);
         }
         if (name.equals(ClassNameConstants.BYTE))

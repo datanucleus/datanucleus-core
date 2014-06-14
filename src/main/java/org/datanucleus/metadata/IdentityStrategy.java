@@ -26,6 +26,8 @@ import java.io.Serializable;
  */
 public class IdentityStrategy implements Serializable
 {
+    private static final long serialVersionUID = -6851202349718961853L;
+
     /**
      * strategy="native" in JDO, and "auto" in JPA
      * 

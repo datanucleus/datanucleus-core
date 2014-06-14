@@ -28,6 +28,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class FetchPlanMetaData extends MetaData
 {
+    private static final long serialVersionUID = 4984221717334769574L;
+
     /** Name of the FetchPlan. */
     String name;
 

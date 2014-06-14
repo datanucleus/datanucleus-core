@@ -28,6 +28,8 @@ import org.datanucleus.util.TypeConversionHelper;
  */
 public class BigIntegerArrayByteBufferConverter implements TypeConverter<BigInteger[], ByteBuffer>
 {
+    private static final long serialVersionUID = 1225964406998563456L;
+
     /* (non-Javadoc)
      * @see org.datanucleus.store.types.converters.TypeConverter#toDatastoreType(java.lang.Object)
      */

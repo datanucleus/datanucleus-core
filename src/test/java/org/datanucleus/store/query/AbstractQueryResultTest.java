@@ -81,6 +81,7 @@ public class AbstractQueryResultTest extends TestCase
      */
     public static class AbstractQueryResultImpl extends AbstractQueryResult
     {
+        private static final long serialVersionUID = 1765660364615061258L;
         private ArrayList list = new ArrayList();
 
         public AbstractQueryResultImpl(Query query)

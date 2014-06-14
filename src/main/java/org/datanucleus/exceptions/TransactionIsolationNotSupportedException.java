@@ -24,6 +24,8 @@ import org.datanucleus.util.Localiser;
  */
 public class TransactionIsolationNotSupportedException extends NucleusUserException
 {
+    private static final long serialVersionUID = 6916529341358743847L;
+
     /**
      * Constructs a transaction already active exception with the specified detail message.
      * @param level Isolation level

@@ -25,6 +25,8 @@ import java.util.List;
  */
 public class StoredProcQueryMetaData extends MetaData
 {
+    private static final long serialVersionUID = 7372988908718827901L;
+
     String name;
 
     String procedureName;

@@ -28,6 +28,8 @@ import org.datanucleus.util.Localiser;
  */
 public class IncompatibleFieldTypeException extends NucleusUserException
 {
+    private static final long serialVersionUID = 6864005515921540632L;
+
     /**
      * Constructs an incompatible field type exception.
      * @param classAndFieldName The name of the class and SCO field.

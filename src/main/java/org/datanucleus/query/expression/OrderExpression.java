@@ -28,6 +28,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class OrderExpression extends Expression
 {
+    private static final long serialVersionUID = -2397122673416437551L;
+
     private String sortOrder;
 
     /** Optional specification for null ordering. */

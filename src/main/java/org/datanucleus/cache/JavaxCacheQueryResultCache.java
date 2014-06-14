@@ -41,6 +41,7 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class JavaxCacheQueryResultCache implements QueryResultsCache
 {
+    private static final long serialVersionUID = -3967431477335678467L;
     /** The cache to use. */
     private Cache cache;
 

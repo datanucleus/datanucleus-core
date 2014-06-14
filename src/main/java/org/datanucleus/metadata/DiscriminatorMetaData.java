@@ -29,6 +29,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class DiscriminatorMetaData extends MetaData
 {
+    private static final long serialVersionUID = 4983675266122550860L;
+
     /** strategy tag value. */
     protected DiscriminatorStrategy strategy = null;
 

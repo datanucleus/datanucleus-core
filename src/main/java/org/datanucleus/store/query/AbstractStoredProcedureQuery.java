@@ -34,6 +34,8 @@ import org.datanucleus.store.StoreManager;
  */
 public abstract class AbstractStoredProcedureQuery extends Query
 {
+    private static final long serialVersionUID = 6944783614104829182L;
+
     protected String procedureName;
 
     protected Set<StoredProcedureParameter> storedProcParams = null;

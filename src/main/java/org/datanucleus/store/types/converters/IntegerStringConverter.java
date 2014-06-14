@@ -22,6 +22,8 @@ package org.datanucleus.store.types.converters;
  */
 public class IntegerStringConverter implements TypeConverter<Integer, String>
 {
+    private static final long serialVersionUID = 3043444938844407097L;
+
     public Integer toMemberType(String str)
     {
         if (str == null)

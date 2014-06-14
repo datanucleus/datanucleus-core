@@ -27,6 +27,8 @@ import org.datanucleus.util.Localiser;
  */
 public class DatastoreIdImplXcalia implements java.io.Serializable, DatastoreId, Comparable
 {
+    private static final long serialVersionUID = -5332981853673489183L;
+
     protected static final transient String STRING_DELIMITER = ":";
 
     // JDO spec 5.4.3 says: all serializable fields of ObjectID classes are required to be public.

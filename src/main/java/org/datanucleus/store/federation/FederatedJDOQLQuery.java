@@ -28,6 +28,8 @@ import org.datanucleus.store.query.AbstractJDOQLQuery;
  */
 public class FederatedJDOQLQuery extends AbstractJDOQLQuery
 {
+    private static final long serialVersionUID = 740380628222349781L;
+
     /**
      * Constructs a new query instance that uses the given execution context.
      * @param storeMgr StoreManager for this query

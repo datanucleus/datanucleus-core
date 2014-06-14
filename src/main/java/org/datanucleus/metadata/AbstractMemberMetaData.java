@@ -52,6 +52,8 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class AbstractMemberMetaData extends MetaData implements Comparable, ColumnMetaDataContainer
 {
+    private static final long serialVersionUID = -7689828287704042919L;
+
     protected final static String TYPE_CONVERTER_EXTENSION_NAME = "type-converter-name";
 
     protected final static String TYPE_CONVERTER_DISABLED = "type-converter-disabled";

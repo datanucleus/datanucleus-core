@@ -24,6 +24,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class SequenceMetaData extends MetaData
 {
+    private static final long serialVersionUID = 3146160559285680230L;
+
     /** Name under which this sequence generator is known. */
     protected String name;
 

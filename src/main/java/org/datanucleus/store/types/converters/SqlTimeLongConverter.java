@@ -24,6 +24,8 @@ import java.sql.Time;
  */
 public class SqlTimeLongConverter implements TypeConverter<Time, Long>
 {
+    private static final long serialVersionUID = -4450441515073250228L;
+
     public Time toMemberType(Long value)
     {
         if (value == null)

@@ -34,6 +34,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class InvokeExpression extends Expression
 {
+    private static final long serialVersionUID = -4907486904172153963L;
+
     /** Name of the method to invoke. */
     String methodName;
 

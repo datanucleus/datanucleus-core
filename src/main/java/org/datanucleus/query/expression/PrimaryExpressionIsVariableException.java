@@ -25,6 +25,7 @@ import org.datanucleus.exceptions.NucleusException;
  */
 public class PrimaryExpressionIsVariableException extends NucleusException
 {
+    private static final long serialVersionUID = 6811137517053964773L;
     /** The VariableExpression that the PrimaryExpression should be swapped with. */
     VariableExpression varExpr;
 

@@ -25,6 +25,8 @@ import org.datanucleus.util.Localiser;
  */
 public class CommitStateTransitionException extends NucleusException
 {
+    private static final long serialVersionUID = 5977558567821991933L;
+
     /**
      * Constructor.
      * @param nested Nested exceptions

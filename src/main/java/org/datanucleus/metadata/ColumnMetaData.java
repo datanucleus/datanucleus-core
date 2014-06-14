@@ -26,6 +26,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class ColumnMetaData extends MetaData
 {
+    private static final long serialVersionUID = -751430163728764079L;
+
     /** column name. */
     protected String name;
 

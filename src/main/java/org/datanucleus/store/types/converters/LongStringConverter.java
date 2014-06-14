@@ -22,6 +22,8 @@ package org.datanucleus.store.types.converters;
  */
 public class LongStringConverter implements TypeConverter<Long, String>
 {
+    private static final long serialVersionUID = -4708086231754476616L;
+
     public Long toMemberType(String str)
     {
         if (str == null)

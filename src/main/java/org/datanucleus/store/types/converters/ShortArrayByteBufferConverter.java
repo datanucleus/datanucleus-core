@@ -27,6 +27,8 @@ import org.datanucleus.util.TypeConversionHelper;
  */
 public class ShortArrayByteBufferConverter implements TypeConverter<short[], ByteBuffer>
 {
+    private static final long serialVersionUID = -8773804855531292024L;
+
     /* (non-Javadoc)
      * @see org.datanucleus.store.types.converters.TypeConverter#toDatastoreType(java.lang.Object)
      */

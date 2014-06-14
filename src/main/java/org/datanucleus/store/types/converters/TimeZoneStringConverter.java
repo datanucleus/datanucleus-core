@@ -24,6 +24,8 @@ import java.util.TimeZone;
  */
 public class TimeZoneStringConverter implements TypeConverter<TimeZone, String>, ColumnLengthDefiningTypeConverter
 {
+    private static final long serialVersionUID = 7364602996379282493L;
+
     public TimeZone toMemberType(String str)
     {
         if (str == null)

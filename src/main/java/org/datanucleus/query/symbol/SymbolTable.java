@@ -35,6 +35,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class SymbolTable implements Serializable
 {
+    private static final long serialVersionUID = -4839286733223290900L;
+
     /** SymbolTable for the parent query when this is a subquery, otherwise null. */
     SymbolTable parentSymbolTable = null;
 

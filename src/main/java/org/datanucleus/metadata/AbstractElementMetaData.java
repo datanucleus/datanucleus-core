@@ -35,6 +35,8 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class AbstractElementMetaData extends MetaData implements ColumnMetaDataContainer
 {
+    private static final long serialVersionUID = -6764719335323972803L;
+
     /** Whether to add a unique constraint */
     protected boolean unique;
 

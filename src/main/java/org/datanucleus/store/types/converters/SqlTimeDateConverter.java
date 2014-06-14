@@ -24,6 +24,8 @@ import java.sql.Time;
  */
 public class SqlTimeDateConverter implements TypeConverter<Time, java.util.Date>
 {
+    private static final long serialVersionUID = 3817497258319725482L;
+
     public Time toMemberType(java.util.Date value)
     {
         if (value == null)

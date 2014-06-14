@@ -26,6 +26,8 @@ import org.datanucleus.exceptions.NucleusUserException;
  */
 public class DatastoreInitialisationException extends NucleusUserException
 {
+    private static final long serialVersionUID = 3704576773794574913L;
+
     /**
      * Constructor for an exception with a message.
      * @param msg the detail message

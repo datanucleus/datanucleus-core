@@ -122,7 +122,7 @@ public class Localiser
      */
     public static String msg(String messageKey)
     {
-        return getMessage(messageKey, null);
+        return getMessage(messageKey);
     }
 
     /**

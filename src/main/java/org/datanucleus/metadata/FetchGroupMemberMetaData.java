@@ -24,6 +24,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class FetchGroupMemberMetaData extends MetaData
 {
+    private static final long serialVersionUID = 548676970076554443L;
+
     String name;
 
     int recursionDepth = 1;

@@ -34,6 +34,8 @@ import org.datanucleus.util.Localiser;
  */
 public class InMemoryQueryResult extends AbstractList implements QueryResult, Serializable
 {
+    private static final long serialVersionUID = 9111768802939625736L;
+
     ApiAdapter api;
 
     List results = null;

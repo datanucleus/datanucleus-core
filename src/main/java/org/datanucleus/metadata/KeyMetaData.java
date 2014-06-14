@@ -30,6 +30,8 @@ import org.datanucleus.exceptions.NucleusUserException;
  */
 public class KeyMetaData extends AbstractElementMetaData
 {
+    private static final long serialVersionUID = -3379637846354140692L;
+
     /**
      * Constructor to create a copy of the passed metadata using the provided parent.
      * @param kmd The metadata to copy

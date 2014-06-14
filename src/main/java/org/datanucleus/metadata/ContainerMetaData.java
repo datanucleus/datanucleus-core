@@ -32,6 +32,7 @@ import org.datanucleus.ClassLoaderResolver;
  */
 public class ContainerMetaData extends MetaData
 {
+    private static final long serialVersionUID = -8318504420004336339L;
     /** Whether this container allows nulls to be stored (as elements/keys/values). */
     Boolean allowNulls = null;
 

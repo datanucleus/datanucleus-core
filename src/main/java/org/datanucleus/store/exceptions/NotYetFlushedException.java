@@ -24,6 +24,7 @@ import org.datanucleus.exceptions.NucleusException;
  */
 public class NotYetFlushedException extends NucleusException
 {
+    private static final long serialVersionUID = 6053032947592880580L;
     private final Object pc;
     
     /**

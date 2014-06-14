@@ -22,6 +22,8 @@ package org.datanucleus.exceptions;
  */
 public class NucleusCanRetryException extends NucleusException
 {
+    private static final long serialVersionUID = 2772116140793944515L;
+
     /**
      * Constructs a new exception without a detail message.
      */

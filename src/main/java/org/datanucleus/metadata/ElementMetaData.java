@@ -31,6 +31,8 @@ import org.datanucleus.ClassLoaderResolver;
  */
 public class ElementMetaData extends AbstractElementMetaData
 {
+    private static final long serialVersionUID = 512052075696338985L;
+
     /**
      * Constructor to create a copy of the passed metadata using the provided parent.
      * @param emd The metadata to copy

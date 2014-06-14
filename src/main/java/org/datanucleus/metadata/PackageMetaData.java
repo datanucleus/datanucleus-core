@@ -31,6 +31,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class PackageMetaData extends MetaData
 {
+    private static final long serialVersionUID = 2129305063744686523L;
+
     /** List of interfaces (uses List to retain positioning). */
     protected List<InterfaceMetaData> interfaces = null;
 

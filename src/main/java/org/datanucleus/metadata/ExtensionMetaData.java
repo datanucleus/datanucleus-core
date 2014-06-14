@@ -27,6 +27,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class ExtensionMetaData implements Serializable
 {
+    private static final long serialVersionUID = -7234998789929538447L;
+
     /** vendor-name tag value. */
     protected String vendorName;
 

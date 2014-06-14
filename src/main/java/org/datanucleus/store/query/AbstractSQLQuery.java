@@ -42,6 +42,8 @@ import org.datanucleus.util.Localiser;
  */
 public abstract class AbstractSQLQuery extends Query
 {
+    private static final long serialVersionUID = 3079774959293575353L;
+
     /** The statement that the user specified to the Query. */
     protected transient final String inputSQL;
 

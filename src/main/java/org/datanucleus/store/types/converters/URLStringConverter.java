@@ -28,6 +28,8 @@ import org.datanucleus.util.Localiser;
  */
 public class URLStringConverter implements TypeConverter<URL, String>
 {
+    private static final long serialVersionUID = 536399905653117952L;
+
     public URL toMemberType(String str)
     {
         if (str == null)

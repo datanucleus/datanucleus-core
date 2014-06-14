@@ -24,6 +24,8 @@ import org.datanucleus.util.Localiser;
  */
 public class TransactionActiveOnCloseException extends NucleusUserException
 {
+    private static final long serialVersionUID = 8801501994814961125L;
+
     /**
      * Constructs a transaction is still active exception with the specified detail message.
      * @param failedObject ExecutionContext object that failed to close

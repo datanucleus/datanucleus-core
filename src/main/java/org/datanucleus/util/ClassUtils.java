@@ -694,10 +694,10 @@ public class ClassUtils
      */
     public static Method getGetterMethodForClass(Class cls, String beanName)
     {
-        Method getter = findDeclaredMethodInHeirarchy(cls, getJavaBeanGetterName(beanName, false), null);
+        Method getter = findDeclaredMethodInHeirarchy(cls, getJavaBeanGetterName(beanName, false));
         if (getter == null)
         {
-            getter = findDeclaredMethodInHeirarchy(cls, getJavaBeanGetterName(beanName, true), null);
+            getter = findDeclaredMethodInHeirarchy(cls, getJavaBeanGetterName(beanName, true));
         }
         return getter;
     }
@@ -1701,7 +1701,7 @@ public class ClassUtils
             return null;
         }
 
-        final Method method = getDeclaredMethodPrivileged(object.getClass(), methodName, null);
+        final Method method = getDeclaredMethodPrivileged(object.getClass(), methodName);
         if (method == null)
         {
             throw new NucleusUserException("Cannot access method: " + methodName + " in type " + object.getClass());
@@ -1909,7 +1909,7 @@ public class ClassUtils
         String getterName = ClassUtils.getJavaBeanGetterName(fieldName, false);
         try
         {
-            return ClassUtils.getValueOfMethodByReflection(id, getterName, null);
+            return ClassUtils.getValueOfMethodByReflection(id, getterName);
         }
         catch (NucleusException ne)
         {

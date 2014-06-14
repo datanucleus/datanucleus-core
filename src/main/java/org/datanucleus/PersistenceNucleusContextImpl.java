@@ -89,6 +89,8 @@ import org.datanucleus.validation.BeanValidatorHandler;
  */
 public class PersistenceNucleusContextImpl extends AbstractNucleusContext implements Serializable, PersistenceNucleusContext
 {
+    private static final long serialVersionUID = 7166558862250068749L;
+
     /** Manager for the datastore used by this PMF/EMF. */
     transient StoreManager storeMgr = null;
 

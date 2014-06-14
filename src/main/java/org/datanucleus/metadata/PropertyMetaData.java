@@ -31,6 +31,7 @@ import org.datanucleus.util.StringUtils;
  */
 public class PropertyMetaData extends AbstractMemberMetaData
 {
+    private static final long serialVersionUID = -1281091318359894652L;
     /** Name of the field that this property is wrapping (when part of a persistent class). */
     protected String fieldName;
 

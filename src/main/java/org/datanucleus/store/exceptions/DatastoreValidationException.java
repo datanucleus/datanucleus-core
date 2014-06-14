@@ -27,6 +27,8 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
  */
 public class DatastoreValidationException extends NucleusDataStoreException
 {
+    private static final long serialVersionUID = 5531946566608396432L;
+
     /**
      * Constructs a datastore validation exception with the specified detail
      * message.

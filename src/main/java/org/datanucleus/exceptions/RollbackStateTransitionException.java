@@ -27,6 +27,8 @@ import org.datanucleus.util.Localiser;
  */
 public class RollbackStateTransitionException extends NucleusException
 {
+    private static final long serialVersionUID = -174876092935572477L;
+
     /**
      * Constructor.
      * @param nested The nested exceptions

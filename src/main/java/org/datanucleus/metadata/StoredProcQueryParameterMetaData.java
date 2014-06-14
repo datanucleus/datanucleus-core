@@ -22,6 +22,8 @@ package org.datanucleus.metadata;
  */
 public class StoredProcQueryParameterMetaData extends MetaData
 {
+    private static final long serialVersionUID = 7363911357565223250L;
+
     String name;
 
     String type;

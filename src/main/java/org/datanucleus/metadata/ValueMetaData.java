@@ -30,6 +30,8 @@ import org.datanucleus.exceptions.NucleusFatalUserException;
  */
 public class ValueMetaData extends AbstractElementMetaData
 {
+    private static final long serialVersionUID = -3179830024157613599L;
+
     /**
      * Constructor to create a copy of the passed metadata using the provided parent.
      * @param vmd The metadata to copy

@@ -36,6 +36,7 @@ import org.datanucleus.util.StringUtils;
  */
 public class FetchGroup implements Serializable
 {
+    private static final long serialVersionUID = 8238931367627119563L;
     public static final String DEFAULT = "default";
     public static final String RELATIONSHIP = "relationship";
     public static final String MULTIVALUED = "multivalued";

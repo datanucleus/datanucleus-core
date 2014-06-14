@@ -25,6 +25,8 @@ import org.datanucleus.util.Localiser;
  */
 public class ObjectDetachedException extends NucleusUserException
 {
+    private static final long serialVersionUID = 3668084504263839288L;
+
     /**
      * Constructs a class-not-detachable exception with the specified
      * detail message.

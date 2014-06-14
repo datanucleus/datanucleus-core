@@ -34,6 +34,8 @@ import org.datanucleus.store.types.converters.TypeConverter;
 public class SerializableByteBufferConverter implements TypeConverter<Serializable, ByteBuffer>
 {
 
+    private static final long serialVersionUID = 585211414298721468L;
+
     /* (non-Javadoc)
      * @see org.datanucleus.store.types.converters.TypeConverter#toDatastoreType(java.lang.Object)
      */

@@ -35,6 +35,8 @@ import org.datanucleus.util.I18nUtils;
  */
 public class LocaleStringConverter implements TypeConverter<Locale, String>, ColumnLengthDefiningTypeConverter
 {
+    private static final long serialVersionUID = -5566584819761013454L;
+
     public Locale toMemberType(String str)
     {
         if (str == null)

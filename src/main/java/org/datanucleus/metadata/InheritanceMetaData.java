@@ -25,6 +25,8 @@ import org.datanucleus.ClassLoaderResolver;
  */
 public class InheritanceMetaData extends MetaData
 {
+    private static final long serialVersionUID = -3645685751605920718L;
+
     /** strategy tag value. */
     protected InheritanceStrategy strategy = null;
 

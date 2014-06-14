@@ -24,6 +24,8 @@ import java.util.Date;
  */
 public class DateLongConverter implements TypeConverter<Date, Long>
 {
+    private static final long serialVersionUID = -3378521433435793058L;
+
     public Date toMemberType(Long value)
     {
         if (value == null)

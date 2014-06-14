@@ -33,6 +33,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public abstract class AbstractLevel2Cache implements Level2Cache
 {
+    private static final long serialVersionUID = 7737532122953947585L;
+
     protected NucleusContext nucleusCtx;
 
     /** Maximum size of cache (if supported by the plugin). */

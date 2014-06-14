@@ -48,6 +48,8 @@ import org.datanucleus.util.Localiser;
  */
 public abstract class AbstractQueryResult<E> extends AbstractList<E> implements QueryResult<E>, Serializable
 {
+    private static final long serialVersionUID = -4600803916251436835L;
+
     /** Whether the results are close. */
     protected boolean closed = false;
 

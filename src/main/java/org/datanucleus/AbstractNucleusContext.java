@@ -72,7 +72,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
         STARTUP_PROPERTIES.add(PropertyNames.PROPERTY_CLASSLOADER_RESOLVER_NAME);
         STARTUP_PROPERTIES.add(PropertyNames.PROPERTY_PERSISTENCE_XML_FILENAME);
         STARTUP_PROPERTIES.add(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY);
-    };
+    }
 
     public AbstractNucleusContext(String apiName, Map startupProps, PluginManager pluginMgr)
     {

@@ -24,6 +24,7 @@ import org.datanucleus.ClassLoaderResolver;
  */
 public class ClassStringConverter implements TypeConverter<Class, String>
 {
+    private static final long serialVersionUID = 913106642606912411L;
     ClassLoaderResolver clr = null;
 
     public void setClassLoaderResolver(ClassLoaderResolver clr)

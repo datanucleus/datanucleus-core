@@ -27,6 +27,8 @@ import java.io.Serializable;
  */
 public class ForeignKeyAction implements Serializable
 {
+    private static final long serialVersionUID = -7578177253405576968L;
+
     /**
      * update/delete-action="cascade". The database will automatically delete all rows
      * that refer to the row being deleted

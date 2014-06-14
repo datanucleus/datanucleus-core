@@ -105,6 +105,8 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class MetaDataManagerImpl implements Serializable, MetaDataManager
 {
+    private static final long serialVersionUID = 5223949693488111123L;
+
     /** The NucleusContext that this metadata manager is operating in. */
     protected final NucleusContext nucleusContext;
 
@@ -1863,6 +1865,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      */
     private static class InterfaceClassComparator implements Comparator, Serializable
     {
+        private static final long serialVersionUID = -8114305773358090763L;
+
         /**
          * Default constructor.
          */

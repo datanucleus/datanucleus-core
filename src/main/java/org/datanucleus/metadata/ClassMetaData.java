@@ -83,6 +83,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class ClassMetaData extends AbstractClassMetaData
 {
+    private static final long serialVersionUID = -1029032058753152022L;
+
     /** List of implements. */
     protected List<ImplementsMetaData> implementations = null;
 
