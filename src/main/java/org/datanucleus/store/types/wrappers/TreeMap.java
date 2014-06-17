@@ -36,7 +36,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class TreeMap extends java.util.TreeMap implements SCOMap<java.util.TreeMap>, Cloneable
+public class TreeMap extends java.util.TreeMap implements SCOMap<java.util.TreeMap>
 {
     private static final long serialVersionUID = 269796187189499489L;
 

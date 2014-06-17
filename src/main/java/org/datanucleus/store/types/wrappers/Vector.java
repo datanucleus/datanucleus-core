@@ -38,7 +38,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class Vector extends java.util.Vector implements SCOList<java.util.Vector>, Cloneable
+public class Vector extends java.util.Vector implements SCOList<java.util.Vector>
 {
     private static final long serialVersionUID = -7852159568338224341L;
 

@@ -39,7 +39,7 @@ import org.datanucleus.util.WeakValueMap;
  * User can also define whether the returned objects are validated against the datastore upon retrieval
  * using the query extension "datanucleus.query.resultCache.validateObjects" (default=true)
  */
-public class CandidateIdsQueryResult<E> extends AbstractQueryResult<E> implements java.io.Serializable
+public class CandidateIdsQueryResult<E> extends AbstractQueryResult<E>
 {
     /** List of identities of the candidate objects. */
     final List<Object> ids;

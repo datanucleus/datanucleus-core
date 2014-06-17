@@ -35,7 +35,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class Map extends AbstractMap implements java.util.Map, SCOMap<java.util.Map>, Cloneable, java.io.Serializable
+public class Map extends AbstractMap implements SCOMap<java.util.Map>, Cloneable, java.io.Serializable
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;

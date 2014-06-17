@@ -114,7 +114,7 @@ import org.datanucleus.util.TypeConversionHelper;
  * 
  * TODO The future aim is to have different types of StateManagers (ObjectProviders) that have particular features.
  */
-public class StateManagerImpl extends AbstractStateManager<Persistable> implements StateManager, ObjectProvider<Persistable>
+public class StateManagerImpl extends AbstractStateManager<Persistable> implements StateManager
 {
     /** Image of the Persistable instance when the instance is enlisted in the transaction. */
     protected Persistable savedImage = null;

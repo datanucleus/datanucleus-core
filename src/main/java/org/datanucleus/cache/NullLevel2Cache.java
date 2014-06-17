@@ -26,7 +26,7 @@ import org.datanucleus.NucleusContext;
  * Null implementation of a Level 2 Cache.
  * Does nothing when its methods are invoked.
  */
-public class NullLevel2Cache extends AbstractLevel2Cache implements Level2Cache
+public class NullLevel2Cache extends AbstractLevel2Cache
 {
     private static final long serialVersionUID = -218917474395656038L;
 

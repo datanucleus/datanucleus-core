@@ -34,7 +34,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class Properties extends java.util.Properties implements SCOMap<java.util.Properties>, Cloneable
+public class Properties extends java.util.Properties implements SCOMap<java.util.Properties>
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;

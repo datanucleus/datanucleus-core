@@ -37,7 +37,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class LinkedHashSet extends java.util.LinkedHashSet implements SCOCollection<java.util.LinkedHashSet>, SCOMtoN, Cloneable
+public class LinkedHashSet extends java.util.LinkedHashSet implements SCOCollection<java.util.LinkedHashSet>, SCOMtoN
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;

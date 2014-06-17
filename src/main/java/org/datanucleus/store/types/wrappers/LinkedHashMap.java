@@ -34,7 +34,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class LinkedHashMap extends java.util.LinkedHashMap implements SCOMap<java.util.LinkedHashMap>, Cloneable
+public class LinkedHashMap extends java.util.LinkedHashMap implements SCOMap<java.util.LinkedHashMap>
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;

@@ -41,14 +41,13 @@ import org.datanucleus.query.expression.PrimaryExpression;
 import org.datanucleus.query.expression.VariableExpression;
 import org.datanucleus.query.symbol.PropertySymbol;
 import org.datanucleus.query.symbol.Symbol;
-import org.datanucleus.query.symbol.SymbolResolver;
 import org.datanucleus.query.symbol.SymbolTable;
 import org.datanucleus.util.Imports;
 
 /**
  * Implementation of a compiler for JDOQL (JSR0012, JSR0243).
  */
-public class JDOQLCompiler extends JavaQueryCompiler implements SymbolResolver
+public class JDOQLCompiler extends JavaQueryCompiler
 {
     boolean allowAll = false;
 

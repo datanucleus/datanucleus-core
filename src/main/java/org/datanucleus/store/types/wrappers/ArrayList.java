@@ -37,7 +37,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class ArrayList extends java.util.ArrayList implements SCOList<java.util.ArrayList>, Cloneable
+public class ArrayList extends java.util.ArrayList implements SCOList<java.util.ArrayList>
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;

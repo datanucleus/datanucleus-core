@@ -39,7 +39,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class TreeSet extends java.util.TreeSet implements SCOCollection<java.util.TreeSet>, SCOMtoN, Cloneable
+public class TreeSet extends java.util.TreeSet implements SCOCollection<java.util.TreeSet>, SCOMtoN
 {
     private static final long serialVersionUID = 2716348073191575719L;
 

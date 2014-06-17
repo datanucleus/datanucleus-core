@@ -34,7 +34,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class Hashtable extends java.util.Hashtable implements SCOMap<java.util.Hashtable>, Cloneable
+public class Hashtable extends java.util.Hashtable implements SCOMap<java.util.Hashtable>
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;

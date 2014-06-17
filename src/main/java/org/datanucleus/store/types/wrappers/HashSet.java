@@ -37,7 +37,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class HashSet extends java.util.HashSet implements SCOCollection<java.util.HashSet>, SCOMtoN, Cloneable
+public class HashSet extends java.util.HashSet implements SCOCollection<java.util.HashSet>, SCOMtoN
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
