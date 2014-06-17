@@ -24,7 +24,6 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.text.MessageFormat;
-import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -67,7 +66,7 @@ public class Localiser
 
     private static Map<String, String> properties = new ConcurrentHashMap<String, String>();
 
-    private static Hashtable<String, MessageFormat> msgFormats = new Hashtable();
+    private static Map<String, MessageFormat> msgFormats = new ConcurrentHashMap<String, MessageFormat>();
 
     static
     {

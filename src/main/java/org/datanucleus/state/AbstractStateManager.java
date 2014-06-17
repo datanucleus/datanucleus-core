@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.state;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -1667,7 +1668,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     }
 
     /** Cache of object-value-generators, keyed by their symbolic name. */
-    public static final HashMap<String, ObjectValueGenerator> objectValGenerators = new HashMap(1);
+    public static final Map<String, ObjectValueGenerator> objectValGenerators = new HashMap(1);
 
     /**
      * Method to find an object value generator based on its name. Caches the generators once generated.

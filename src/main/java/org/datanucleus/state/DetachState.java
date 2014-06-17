@@ -76,10 +76,7 @@ public class DetachState extends FetchPlanState
             // embedded element (NO ids)
             return StringUtils.toJVMIDString(pc);
         }
-        else
-        {
-            return id;
-        }
+        return id;
     }
 
     public class Entry

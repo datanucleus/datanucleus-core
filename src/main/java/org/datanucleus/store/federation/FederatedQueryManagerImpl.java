@@ -67,53 +67,48 @@ public class FederatedQueryManagerImpl extends QueryManagerImpl
             // TODO We don't have candidate so don't know the StoreManager to use
             throw new NucleusException("Not yet supported for queries with unknown candidate");
         }
+
+        if (query instanceof String)
+        {
+            // Single-string query
+            String queryString = (String)query;
+            String candidateName = null;
+            if (languageImpl.equalsIgnoreCase("JDOQL"))
+            {
+                int candidateStart = queryString.toUpperCase().indexOf(" FROM ") + 6;
+                int candidateEnd = queryString.indexOf(" ", candidateStart+1);
+                candidateName = queryString.substring(candidateStart, candidateEnd);
+            }
+
+            if (candidateName != null)
+            {
+                ClassLoaderResolver clr = nucleusCtx.getClassLoaderResolver(null);
+                AbstractClassMetaData cmd = nucleusCtx.getMetaDataManager().getMetaDataForClass(candidateName, clr);
+                StoreManager classStoreMgr = ((FederatedStoreManager)storeMgr).getStoreManagerForClass(cmd);
+                return classStoreMgr.getQueryManager().newQuery(languageImpl, ec, query);
+            }
+            // TODO Extract the candidate for this query
+            // TODO Find StoreManager for the candidate
+            throw new NucleusException("Not yet supported for single-string queries");
+        }
+        else if (query instanceof Query)
+        {
+            // Based on previous query
+            StoreManager storeMgr = ((Query)query).getStoreManager();
+            return storeMgr.getQueryManager().newQuery(languageImpl, ec, query);
+        }
         else
         {
-            if (query instanceof String)
+            if (query instanceof Class)
             {
-                // Single-string query
-                String queryString = (String)query;
-                String candidateName = null;
-                if (languageImpl.equalsIgnoreCase("JDOQL"))
-                {
-                    int candidateStart = queryString.toUpperCase().indexOf(" FROM ") + 6;
-                    int candidateEnd = queryString.indexOf(" ", candidateStart+1);
-                    candidateName = queryString.substring(candidateStart, candidateEnd);
-                }
-
-                if (candidateName != null)
-                {
-                    ClassLoaderResolver clr = nucleusCtx.getClassLoaderResolver(null);
-                    AbstractClassMetaData cmd = nucleusCtx.getMetaDataManager().getMetaDataForClass(candidateName, clr);
-                    StoreManager classStoreMgr = ((FederatedStoreManager)storeMgr).getStoreManagerForClass(cmd);
-                    return classStoreMgr.getQueryManager().newQuery(languageImpl, ec, query);
-                }
-                // TODO Extract the candidate for this query
-                // TODO Find StoreManager for the candidate
-                throw new NucleusException("Not yet supported for single-string queries");
+                // Find StoreManager for the candidate
+                Class cls = (Class)query;
+                ClassLoaderResolver clr = nucleusCtx.getClassLoaderResolver(cls.getClassLoader());
+                AbstractClassMetaData cmd = nucleusCtx.getMetaDataManager().getMetaDataForClass(cls, clr);
+                StoreManager classStoreMgr = ((FederatedStoreManager)storeMgr).getStoreManagerForClass(cmd);
+                return classStoreMgr.getQueryManager().newQuery(languageImpl, ec, query);
             }
-            else if (query instanceof Query)
-            {
-                // Based on previous query
-                StoreManager storeMgr = ((Query)query).getStoreManager();
-                return storeMgr.getQueryManager().newQuery(languageImpl, ec, query);
-            }
-            else
-            {
-                if (query instanceof Class)
-                {
-                    // Find StoreManager for the candidate
-                    Class cls = (Class)query;
-                    ClassLoaderResolver clr = nucleusCtx.getClassLoaderResolver(cls.getClassLoader());
-                    AbstractClassMetaData cmd = nucleusCtx.getMetaDataManager().getMetaDataForClass(cls, clr);
-                    StoreManager classStoreMgr = ((FederatedStoreManager)storeMgr).getStoreManagerForClass(cmd);
-                    return classStoreMgr.getQueryManager().newQuery(languageImpl, ec, query);
-                }
-                else
-                {
-                    throw new NucleusException("Not yet supported for queries taking in object of type " + query.getClass());
-                }
-            }
+            throw new NucleusException("Not yet supported for queries taking in object of type " + query.getClass());
         }
     }
 }

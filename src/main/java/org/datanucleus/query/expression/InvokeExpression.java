@@ -165,10 +165,7 @@ public class InvokeExpression extends Expression
         {
             return "InvokeExpression{STATIC." + methodName + "(" + StringUtils.collectionToString(arguments) + ")}";
         }
-        else
-        {
-            return "InvokeExpression{[" + left + "]." + methodName + "(" + StringUtils.collectionToString(arguments) + ")}";
-        }
+        return "InvokeExpression{[" + left + "]." + methodName + "(" + StringUtils.collectionToString(arguments) + ")}";
     }
 
     /**
@@ -184,10 +181,7 @@ public class InvokeExpression extends Expression
             return "InvokeExpression{STATIC." + methodName +
                 "(" + StringUtils.collectionToString(arguments) + ")}" + (alias != null ? " AS " + alias : "");
         }
-        else
-        {
-            return "InvokeExpression{[" + left + "]." + methodName +
+        return "InvokeExpression{[" + left + "]." + methodName +
                 "(" + StringUtils.collectionToString(arguments) + ")}" + (alias != null ? " AS " + alias : "");
-        }
     }
 }

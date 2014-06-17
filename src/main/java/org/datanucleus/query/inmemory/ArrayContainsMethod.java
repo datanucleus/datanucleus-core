@@ -97,25 +97,23 @@ public class ArrayContainsMethod implements InvocationEvaluator
                 {
                     return Boolean.TRUE;
                 }
-                else
-                {
-                    if (!paramValue.getClass().isAssignableFrom(elem.getClass()) &&
+
+                if (!paramValue.getClass().isAssignableFrom(elem.getClass()) &&
                         !elem.getClass().isAssignableFrom(paramValue.getClass()))
-                    {
-                        // Types are different, so add specific type conversion handling
-                        if ((paramValue.getClass() == Long.class || 
-                             paramValue.getClass() == Integer.class ||
-                             paramValue.getClass() == Short.class) &&
+                {
+                    // Types are different, so add specific type conversion handling
+                    if ((paramValue.getClass() == Long.class || 
+                            paramValue.getClass() == Integer.class ||
+                            paramValue.getClass() == Short.class) &&
                             (elem.getClass() == Long.class ||
-                             elem.getClass() == Integer.class ||
-                             elem.getClass() == Short.class))
+                            elem.getClass() == Integer.class ||
+                            elem.getClass() == Short.class))
+                    {
+                        long paramLong = ((Number)paramValue).longValue();
+                        long elemLong = ((Number)elem).longValue();
+                        if (paramLong == elemLong)
                         {
-                            long paramLong = ((Number)paramValue).longValue();
-                            long elemLong = ((Number)elem).longValue();
-                            if (paramLong == elemLong)
-                            {
-                                return Boolean.TRUE;
-                            }
+                            return Boolean.TRUE;
                         }
                     }
                 }

@@ -251,10 +251,7 @@ public class ArrayMetaData extends ContainerMetaData
         {
             return false;
         }
-        else
-        {
-            return element.embedded.booleanValue();
-        }
+        return element.embedded.booleanValue();
     }
 
     /**
@@ -267,10 +264,7 @@ public class ArrayMetaData extends ContainerMetaData
         {
             return false;
         }
-        else
-        {
-            return element.serialized.booleanValue();
-        }
+        return element.serialized.booleanValue();
     }
 
     /**
@@ -286,10 +280,7 @@ public class ArrayMetaData extends ContainerMetaData
         {
             return false;
         }
-        else
-        {
-            return element.dependent.booleanValue();
-        }
+        return element.dependent.booleanValue();
     }
 
     public ArrayMetaData setElementType(String type)

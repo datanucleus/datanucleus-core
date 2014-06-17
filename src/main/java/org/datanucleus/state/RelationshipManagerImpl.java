@@ -103,13 +103,9 @@ public class RelationshipManagerImpl implements RelationshipManager
         {
             if (oldValue != null)
             {
-                return "RelationChange type=" + type + " value=" + StringUtils.toJVMIDString(oldValue) + 
-                    " -> " + StringUtils.toJVMIDString(value);
+                return "RelationChange type=" + type + " value=" + StringUtils.toJVMIDString(oldValue) + " -> " + StringUtils.toJVMIDString(value);
             }
-            else
-            {
-                return "RelationChange type=" + type + " value=" + StringUtils.toJVMIDString(value);
-            }
+            return "RelationChange type=" + type + " value=" + StringUtils.toJVMIDString(value);
         }
     }
 
@@ -496,15 +492,13 @@ public class RelationshipManagerImpl implements RelationshipManager
                             NucleusLogger.PERSISTENCE.error(msg);
                             throw new NucleusUserException(msg);
                         }
-                        else
-                        {
-                            String msg = Localiser.msg("013002",
-                                StringUtils.toJVMIDString(pc), mmd.getName(),
-                                StringUtils.toJVMIDString(newValue), relatedMmd.getName(),
-                                StringUtils.toJVMIDString(newValueFieldValue));
-                            NucleusLogger.PERSISTENCE.error(msg);
-                            throw new NucleusUserException(msg);
-                        }
+
+                        String msg = Localiser.msg("013002",
+                            StringUtils.toJVMIDString(pc), mmd.getName(),
+                            StringUtils.toJVMIDString(newValue), relatedMmd.getName(),
+                            StringUtils.toJVMIDString(newValueFieldValue));
+                        NucleusLogger.PERSISTENCE.error(msg);
+                        throw new NucleusUserException(msg);
                     }
                 }
             }
@@ -533,39 +527,37 @@ public class RelationshipManagerImpl implements RelationshipManager
                     throw new NucleusUserException(Localiser.msg("013008",
                         StringUtils.toJVMIDString(pc), mmd.getName(), StringUtils.toJVMIDString(change.value)));
                 }
-                else
+
+                AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaData(clr)[0];
+                ObjectProvider newElementOP = ec.findObjectProvider(change.value);
+                if (newElementOP != null)
                 {
-                    AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaData(clr)[0];
-                    ObjectProvider newElementOP = ec.findObjectProvider(change.value);
-                    if (newElementOP != null)
+                    if (newElementOP.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
                     {
-                        if (newElementOP.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
+                        RelationshipManager newElementRelMgr = ec.getRelationshipManager(newElementOP);
+                        if (newElementRelMgr != null && newElementRelMgr.managesField(relatedMmd.getAbsoluteFieldNumber()))
                         {
-                            RelationshipManager newElementRelMgr = ec.getRelationshipManager(newElementOP);
-                            if (newElementRelMgr != null && newElementRelMgr.managesField(relatedMmd.getAbsoluteFieldNumber()))
+                            // Element has had the owner set, so make sure it is set to this object
+                            Object newValueFieldValue = newElementOP.provideField(relatedMmd.getAbsoluteFieldNumber());
+                            if (newValueFieldValue != pc && newValueFieldValue != null)
                             {
-                                // Element has had the owner set, so make sure it is set to this object
-                                Object newValueFieldValue = newElementOP.provideField(relatedMmd.getAbsoluteFieldNumber());
-                                if (newValueFieldValue != pc && newValueFieldValue != null)
+                                ApiAdapter api = ec.getApiAdapter();
+                                Object id1 = api.getIdForObject(pc);
+                                Object id2 = api.getIdForObject(newValueFieldValue);
+                                if (id1 != null && id2 != null && id1.equals(id2))
                                 {
-                                    ApiAdapter api = ec.getApiAdapter();
-                                    Object id1 = api.getIdForObject(pc);
-                                    Object id2 = api.getIdForObject(newValueFieldValue);
-                                    if (id1 != null && id2 != null && id1.equals(id2))
-                                    {
-                                        // Do nothing, just the difference between attached and detached form of the same object
-                                        // Note could add check on ExecutionContext of the two objects to be safe (detached will likely be null)
-                                    }
-                                    else
-                                    {
-                                        // The element has a different owner than the PC with this collection
-                                        // This catches cases where the user has set the wrong owner, and also
-                                        // will catch cases where the user has added it to two collections
-                                        throw new NucleusUserException(Localiser.msg("013009",
-                                            StringUtils.toJVMIDString(pc), mmd.getName(), 
-                                            StringUtils.toJVMIDString(change.value), 
-                                            StringUtils.toJVMIDString(newValueFieldValue)));
-                                    }
+                                    // Do nothing, just the difference between attached and detached form of the same object
+                                    // Note could add check on ExecutionContext of the two objects to be safe (detached will likely be null)
+                                }
+                                else
+                                {
+                                    // The element has a different owner than the PC with this collection
+                                    // This catches cases where the user has set the wrong owner, and also
+                                    // will catch cases where the user has added it to two collections
+                                    throw new NucleusUserException(Localiser.msg("013009",
+                                        StringUtils.toJVMIDString(pc), mmd.getName(), 
+                                        StringUtils.toJVMIDString(change.value), 
+                                        StringUtils.toJVMIDString(newValueFieldValue)));
                                 }
                             }
                         }

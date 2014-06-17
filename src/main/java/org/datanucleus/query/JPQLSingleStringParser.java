@@ -119,10 +119,7 @@ public class JPQLSingleStringParser
                 {
                     throw new NucleusUserException(Localiser.msg("043001", keyword));
                 }
-                else
-                {
-                    // unexpected token
-                }
+                // unexpected token
             }
         }
 

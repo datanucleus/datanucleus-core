@@ -721,10 +721,8 @@ public class LinkedHashMap extends org.datanucleus.store.types.wrappers.LinkedHa
             loadFromStore();
             return new java.util.LinkedHashMap(delegate);
         }
-        else
-        {
-            // TODO Cater for non-cached map, load elements in a DB call.
-            return new java.util.LinkedHashMap(delegate);
-        }
+
+        // TODO Cater for non-cached map, load elements in a DB call.
+        return new java.util.LinkedHashMap(delegate);
     }
 }

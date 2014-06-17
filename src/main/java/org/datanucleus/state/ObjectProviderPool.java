@@ -113,13 +113,11 @@ public class ObjectProviderPool
                         op.connect(ec, cmd);
                         return (op);
                     }
-                    else
-                    {
-                        // object failed validation
-                        recyclableOps.remove(op);
-                        expire(op);
-                        op = null;
-                    }
+
+                    // object failed validation
+                    recyclableOps.remove(op);
+                    expire(op);
+                    op = null;
                 }
             }
         }

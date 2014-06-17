@@ -85,10 +85,7 @@ public class StringId extends SingleFieldId<String>
             {
                 return key.compareTo(other.key);
             }
-            else
-            {
-                return result;
-            }
+            return result;
         }
         else if (o == null)
         {

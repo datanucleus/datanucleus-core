@@ -274,16 +274,14 @@ public abstract class AbstractGenerator<T> implements ValueGenerator<T>
                 {
                     throw new ValueGenerationException(Localiser.msg("040002"));
                 }
+
+                if (number < 0)
+                {
+                    block = reserveBlock();
+                }
                 else
                 {
-                    if (number < 0)
-                    {
-                        block = reserveBlock();
-                    }
-                    else
-                    {
-                        block = reserveBlock(number);
-                    }
+                    block = reserveBlock(number);
                 }
             }
             finally

@@ -77,10 +77,7 @@ public class SetExpression
             {
                 return 0;
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
         int i=0;
@@ -157,10 +154,7 @@ public class SetExpression
             {
                 return 0;
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
         int i=0;
@@ -237,10 +231,7 @@ public class SetExpression
             {
                 return 0;
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
         Object val = null;
@@ -335,10 +326,7 @@ public class SetExpression
             {
                 return 0.0d;
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
         // This is based around the JDOQL/JPQL definition of "avg" which should return "double"

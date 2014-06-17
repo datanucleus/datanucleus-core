@@ -138,10 +138,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
         {
             return cache.getAll((Set)oids);
         }
-        else
-        {
-            return cache.getAll(new HashSet(oids));
-        }
+        return cache.getAll(new HashSet(oids));
     }
 
     /**

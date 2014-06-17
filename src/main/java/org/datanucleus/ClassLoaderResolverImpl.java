@@ -361,10 +361,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
         {
             return classForNameWithInitialize(name, primary);
         }
-        else
-        {
-            return classForName(name, primary);
-        }
+        return classForName(name, primary);
     }
 
     /**

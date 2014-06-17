@@ -296,12 +296,9 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 // JDOFatalUserException when class is not registered 
                 throw new NucleusUserException(Localiser.msg("026018", pcClass.getName())).setFatal();
             }
-            else
-            {
-                // Provide advisory information since we can't create an instance of this class, so maybe they
-                // have an error in their data ?
-                throw new NucleusUserException(Localiser.msg("026019", pcClass.getName())).setFatal();
-            }
+
+            // Provide advisory information since we can't create an instance of this class, so maybe they have an error in their data ?
+            throw new NucleusUserException(Localiser.msg("026019", pcClass.getName())).setFatal();
         }
 
         loadFieldValues(fv); // as a minimum the PK fields are loaded here
@@ -889,10 +886,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         {
             return false;
         }
-        else
-        {
-            return myLC.isDirty();
-        }
+        return myLC.isDirty();
     }
 
     /**
@@ -916,10 +910,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         {
             return false;
         }
-        else
-        {
-            return myLC.isTransactional();
-        }
+        return myLC.isTransactional();
     }
 
     /**
@@ -935,10 +926,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         {
             return false;
         }
-        else
-        {
-            return myLC.isPersistent();
-        }
+        return myLC.isPersistent();
     }
 
     /**
@@ -957,10 +945,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         {
             return false;
         }
-        else
-        {
-            return myLC.isNew();
-        }
+        return myLC.isNew();
     }
 
     public boolean isDeleted()
@@ -981,10 +966,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         {
             return false;
         }
-        else
-        {
-            return myLC.isDeleted();
-        }
+        return myLC.isDeleted();
     }
 
     // -------------------------- Version handling ----------------------------
@@ -1002,10 +984,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             // JIRA-2993 This used to return myVersion but now we use transactionalVersion
             return transactionalVersion;
         }
-        else
-        {
-            return null;
-        }
+        return null;
     }
 
     /**
@@ -1115,10 +1094,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         {
             return Persistable.READ_WRITE_OK;
         }
-        else
-        {
-            return persistenceFlags;
-        }
+        return persistenceFlags;
     }
 
     /**
@@ -1948,10 +1924,8 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             replaceStateManager(pc, null);
             return true;
         }
-        else
-        {
-            return false;
-        }
+
+        return false;
     }
 
     /**
@@ -2301,13 +2275,10 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                                 throw new NucleusUserException(Localiser.msg("026017", cmd.getFullClassName(), 
                                     fmd.getName())).setFatal();
                             }
-                            else
-                            {
-                                // Log that the value is not yet set for this field, maybe set later in preStore?
-                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("026017", cmd.getFullClassName(),
-                                    fmd.getName()));
-                                return;
-                            }
+
+                            // Log that the value is not yet set for this field, maybe set later in preStore?
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("026017", cmd.getFullClassName(), fmd.getName()));
+                            return;
                         }
                     }
                 }
@@ -2436,17 +2407,15 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         {
             return null;
         }
-        else
+
+        try
         {
-            try
-            {
-                return getExternalObjectId(pc);
-            }
-            catch (NucleusException ne)
-            {
-                // This can be called from user-facing methods (e.g JDOHelper.getObjectId) so wrap any exception with API variant
-                throw myEC.getApiAdapter().getApiExceptionForNucleusException(ne);
-            }
+            return getExternalObjectId(pc);
+        }
+        catch (NucleusException ne)
+        {
+            // This can be called from user-facing methods (e.g JDOHelper.getObjectId) so wrap any exception with API variant
+            throw myEC.getApiAdapter().getApiExceptionForNucleusException(ne);
         }
     }
 
@@ -2931,49 +2900,47 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             {
                 return true;
             }
-            else
+
+            boolean checkRead = true;
+            boolean beingDeleted = false;
+            if ((myLC.isDeleted() && myEC.isFlushing()) || activity == ActivityState.DELETING)
             {
-                boolean checkRead = true;
-                boolean beingDeleted = false;
-                if ((myLC.isDeleted() && myEC.isFlushing()) || activity == ActivityState.DELETING)
-                {
-                    // Bypass "read-field" check when deleting, or when marked for deletion and flushing
-                    checkRead = false;
-                    beingDeleted = true;
-                }
-                if (checkRead)
-                {
-                    transitionReadField(loadedFields[fieldNumber]);
-                }
-
-                if (!loadedFields[fieldNumber])
-                {
-                    // Field not loaded, so load it
-                    if (objectType != ObjectProvider.PC)
-                    {
-                        // Embedded object so we assume that all was loaded before (when it was read)
-                        return true;
-                    }
-
-                    if (beingDeleted && preDeleteLoadedFields != null && preDeleteLoadedFields[fieldNumber])
-                    {
-                        // Field was loaded prior to starting delete so just return true
-                        return true;
-                    }
-                    else if (!beingDeleted && myFP.hasMember(fieldNumber))
-                    {
-                        // Load rest of FetchPlan if this is part of it (and not in the process of deletion)
-                        loadUnloadedFieldsInFetchPlan();
-                    }
-                    else
-                    {
-                        // Just load this field
-                        loadSpecifiedFields(new int[] {fieldNumber});
-                    }
-                }
-
-                return true;
+                // Bypass "read-field" check when deleting, or when marked for deletion and flushing
+                checkRead = false;
+                beingDeleted = true;
             }
+            if (checkRead)
+            {
+                transitionReadField(loadedFields[fieldNumber]);
+            }
+
+            if (!loadedFields[fieldNumber])
+            {
+                // Field not loaded, so load it
+                if (objectType != ObjectProvider.PC)
+                {
+                    // Embedded object so we assume that all was loaded before (when it was read)
+                    return true;
+                }
+
+                if (beingDeleted && preDeleteLoadedFields != null && preDeleteLoadedFields[fieldNumber])
+                {
+                    // Field was loaded prior to starting delete so just return true
+                    return true;
+                }
+                else if (!beingDeleted && myFP.hasMember(fieldNumber))
+                {
+                    // Load rest of FetchPlan if this is part of it (and not in the process of deletion)
+                    loadUnloadedFieldsInFetchPlan();
+                }
+                else
+                {
+                    // Just load this field
+                    loadSpecifiedFields(new int[] {fieldNumber});
+                }
+            }
+
+            return true;
         }
         catch (NucleusException ne)
         {
@@ -3942,27 +3909,25 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 // Return loaded fields
                 return getLoadedFieldNumbers();
             }
-            else
+
+            // Return all loaded plus any unloaded FP fields
+            int[] fieldsToDetach = myFP.getMemberNumbers();
+            int[] allFieldNumbers = cmd.getAllMemberPositions();
+            int[] loadedFieldNumbers = ClassUtils.getFlagsSetTo(loadedFields, allFieldNumbers, true);
+            if (loadedFieldNumbers != null && loadedFieldNumbers.length > 0)
             {
-                // Return all loaded plus any unloaded FP fields
-                int[] fieldsToDetach = myFP.getMemberNumbers();
-                int[] allFieldNumbers = cmd.getAllMemberPositions();
-                int[] loadedFieldNumbers = ClassUtils.getFlagsSetTo(loadedFields, allFieldNumbers, true);
-                if (loadedFieldNumbers != null && loadedFieldNumbers.length > 0)
+                boolean[] flds = new boolean[allFieldNumbers.length];
+                for (int i=0;i<fieldsToDetach.length;i++)
                 {
-                    boolean[] flds = new boolean[allFieldNumbers.length];
-                    for (int i=0;i<fieldsToDetach.length;i++)
-                    {
-                        flds[fieldsToDetach[i]] = true;
-                    }
-                    for (int i=0;i<loadedFieldNumbers.length;i++)
-                    {
-                        flds[loadedFieldNumbers[i]] = true;
-                    }
-                    fieldsToDetach = ClassUtils.getFlagsSetTo(flds, true);
+                    flds[fieldsToDetach[i]] = true;
                 }
-                return fieldsToDetach;
+                for (int i=0;i<loadedFieldNumbers.length;i++)
+                {
+                    flds[loadedFieldNumbers[i]] = true;
+                }
+                fieldsToDetach = ClassUtils.getFlagsSetTo(flds, true);
             }
+            return fieldsToDetach;
         }
         else
         {
@@ -3971,11 +3936,9 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 // Return loaded fields that are in the FetchPlan
                 return ClassUtils.getFlagsSetTo(loadedFields, myFP.getMemberNumbers(), true);
             }
-            else
-            {
-                // Return FetchPlan fields
-                return myFP.getMemberNumbers();
-            }
+
+            // Return FetchPlan fields
+            return myFP.getMemberNumbers();
         }
     }
 
@@ -4484,11 +4447,9 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 // detachAllOnCommit caused a field to be dirty so ignore it
                 return;
             }
-            else
-            {
-                // Not during flush, and not transactional-transient, and not inserting - so mark as dirty
-                myEC.markDirty(this, true);
-            }
+
+            // Not during flush, and not transactional-transient, and not inserting - so mark as dirty
+            myEC.markDirty(this, true);
         }
     }
 
@@ -4853,10 +4814,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             {
                 return StringUtils.toJVMIDString(value);
             }
-            else
-            {
-                return value;
-            }
+            return value;
         }
         catch (Exception e)
         {

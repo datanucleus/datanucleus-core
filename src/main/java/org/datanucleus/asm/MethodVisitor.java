@@ -440,8 +440,7 @@ public abstract class MethodVisitor {
      *            the method's descriptor (see {@link Type Type}).
      */
 //    @Deprecated TODO This was deprecated in ASM5 but we still use and don't want to see compiler warnings
-    public void visitMethodInsn(int opcode, String owner, String name,
-            String desc) {
+    public void visitMethodInsn(int opcode, String owner, String name, String desc) {
         if (api >= Opcodes.ASM5) {
             boolean itf = opcode == Opcodes.INVOKEINTERFACE;
             visitMethodInsn(opcode, owner, name, desc, itf);

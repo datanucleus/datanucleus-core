@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.enhancer;
 
-import java.lang.reflect.Constructor;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.DateFormat;
@@ -36,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 import org.datanucleus.exceptions.NucleusException;
@@ -430,7 +430,7 @@ public class EnhancementHelper extends java.lang.Object
      */
     public void addRegisterClassListener(RegisterClassListener crl)
     {
-        HashSet alreadyRegisteredClasses = null;
+        Set alreadyRegisteredClasses = null;
         synchronized (listeners)
         {
             listeners.add(crl);
@@ -712,11 +712,7 @@ public class EnhancementHelper extends java.lang.Object
             {
                 return stringConstructor.construct(keyString);
             }
-            else
-            {
-                Constructor keyConstructor = keyClass.getConstructor(new Class[]{String.class});
-                return keyConstructor.newInstance(new Object[]{keyString});
-            }
+            return keyClass.getConstructor(new Class[]{String.class}).newInstance(new Object[]{keyString});
         }
         catch (Exception ex)
         {

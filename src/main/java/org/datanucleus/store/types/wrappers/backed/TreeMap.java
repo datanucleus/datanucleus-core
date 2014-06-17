@@ -875,10 +875,8 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
             loadFromStore();
             return new java.util.TreeMap(delegate);
         }
-        else
-        {
-            // TODO Cater for non-cached map, load elements in a DB call.
-            return new java.util.TreeMap(delegate);
-        }
+
+        // TODO Cater for non-cached map, load elements in a DB call.
+        return new java.util.TreeMap(delegate);
     }
 }

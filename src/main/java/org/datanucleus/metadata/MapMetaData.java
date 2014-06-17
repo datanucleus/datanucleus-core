@@ -408,10 +408,7 @@ public class MapMetaData extends ContainerMetaData
         {
             return false;
         }
-        else
-        {
-            return key.embedded.booleanValue();
-        }
+        return key.embedded.booleanValue();
     }
 
     /**
@@ -424,10 +421,7 @@ public class MapMetaData extends ContainerMetaData
         {
             return false;
         }
-        else
-        {
-            return value.embedded.booleanValue();
-        }
+        return value.embedded.booleanValue();
     }
 
     /**
@@ -440,10 +434,7 @@ public class MapMetaData extends ContainerMetaData
         {
             return false;
         }
-        else
-        {
-            return key.serialized.booleanValue();
-        }
+        return key.serialized.booleanValue();
     }
 
     /**
@@ -456,10 +447,7 @@ public class MapMetaData extends ContainerMetaData
         {
             return false;
         }
-        else
-        {
-            return value.serialized.booleanValue();
-        }
+        return value.serialized.booleanValue();
     }
 
     /**

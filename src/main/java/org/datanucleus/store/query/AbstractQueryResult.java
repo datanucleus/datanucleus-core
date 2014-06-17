@@ -276,11 +276,8 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
         {
             return query.hashCode();
         }
-        else
-        {
-            // Disconnected
-            return super.hashCode();
-        }
+        // Disconnected
+        return super.hashCode();
     }
 
     /**
@@ -372,7 +369,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
     public List<E> subList(int fromIndex, int toIndex)
     {
         int subListLength = toIndex - fromIndex;
-        ArrayList subList = new ArrayList(subListLength);
+        List<E> subList = new ArrayList(subListLength);
         for (int i = fromIndex; i < toIndex; i++)
         {
             subList.add(get(i));

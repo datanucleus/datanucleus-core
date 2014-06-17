@@ -323,7 +323,7 @@ public class StringUtils
      */
     public static Set<String> convertCommaSeparatedStringToSet(String str)
     {
-        HashSet set = new HashSet();
+        Set set = new HashSet();
 
         StringTokenizer tokens = new StringTokenizer(str, ",");
         while (tokens.hasMoreTokens())
@@ -346,11 +346,8 @@ public class StringUtils
         {
             return "null";
         }
-        else
-        {
-            // Align to the Java VM way of printing identity hash codes, that means: hexadecimal
-            return obj.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(obj));
-        }
+        // Align to the Java VM way of printing identity hash codes, that means: hexadecimal
+        return obj.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(obj));
     }
 
     /**

@@ -98,10 +98,7 @@ public abstract class Expression implements Serializable
             {
                 return false;
             }
-            else
-            {
-                return precedence > op.precedence;
-            }
+            return precedence > op.precedence;
         }
     }
 
@@ -141,10 +138,7 @@ public abstract class Expression implements Serializable
             {
                 return false;
             }
-            else
-            {
-                return precedence > op.precedence;
-            }
+            return precedence > op.precedence;
         }
         /**
          * Checks if this operation is higher than operator <code>op</code> in right side of the expression

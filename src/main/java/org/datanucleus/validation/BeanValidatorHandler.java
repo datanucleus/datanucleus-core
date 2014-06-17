@@ -190,15 +190,13 @@ public class BeanValidatorHandler implements CallbackHandler
             }
             return null;
         }
-        else
+
+        String[] classNames = property.trim().split(",");
+        Class<?>[] groups = new Class<?>[classNames.length];
+        for (int i=0; i<classNames.length; i++)
         {
-            String[] classNames = property.trim().split(",");
-            Class<?>[] groups = new Class<?>[classNames.length];
-            for (int i=0; i<classNames.length; i++)
-            {
-                groups[i] = clr.classForName(classNames[i].trim());
-            }
-            return groups;
+            groups[i] = clr.classForName(classNames[i].trim());
         }
+        return groups;
     }
 }

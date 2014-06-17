@@ -182,12 +182,9 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             stack.push(result);
             return result;
         }
-        else
-        {
-            throw new NucleusUserException(
-                "Dont currently support expression on right of LIKE to be other than String but was " + 
-                right.getClass().getName());
-        }
+
+        throw new NucleusUserException(
+            "Dont currently support expression on right of LIKE to be other than String but was " + right.getClass().getName());
     }
 
     /* (non-Javadoc)
@@ -625,13 +622,11 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             stack.push(paramValue);
             return paramValue;
         }
-        else
-        {
-            // Field
-            Object value = getValueForPrimaryExpression(expr);
-            stack.push(value);
-            return value;
-        }
+
+        // Field
+        Object value = getValueForPrimaryExpression(expr);
+        stack.push(value);
+        return value;
     }
 
     /* (non-Javadoc)
@@ -795,12 +790,10 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                 {
                     return methodEval.evaluate(invokeExpr, null, this);
                 }
-                else
-                {
-                    NucleusLogger.QUERY.warn("Query contains call to static method " + method + 
+
+                NucleusLogger.QUERY.warn("Query contains call to static method " + method + 
                         " yet no support is available for in-memory evaluation of this");
-                    return new InMemoryFailure();
-                }
+                return new InMemoryFailure();
             }
         }
         else if (invokeExpr.getLeft() instanceof ParameterExpression)
@@ -816,12 +809,10 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             {
                 return methodEval.evaluate(invokeExpr, invokedValue, this);
             }
-            else
-            {
-                NucleusLogger.QUERY.warn("Query contains call to method " + 
+
+            NucleusLogger.QUERY.warn("Query contains call to method " + 
                     invokedValue.getClass().getName() + "." + method + " yet no support is available for this");
-                return new InMemoryFailure();
-            }
+            return new InMemoryFailure();
         }
         else if (invokeExpr.getLeft() instanceof PrimaryExpression)
         {
@@ -839,12 +830,10 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             {
                 return methodEval.evaluate(invokeExpr, invokedValue, this);
             }
-            else
-            {
-                NucleusLogger.QUERY.warn("Query contains call to method " + 
+
+            NucleusLogger.QUERY.warn("Query contains call to method " + 
                     invokedType.getName() + "." + method + " yet no support is available for this");
-                return new InMemoryFailure();
-            }
+            return new InMemoryFailure();
         }
         else if (invokeExpr.getLeft() instanceof InvokeExpression)
         {
@@ -863,12 +852,10 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             {
                 return methodEval.evaluate(invokeExpr, invokedValue, this);
             }
-            else
-            {
-                NucleusLogger.QUERY.warn("Query contains call to method " + 
+
+            NucleusLogger.QUERY.warn("Query contains call to method " + 
                     invokedType.getName() + "." + method + " yet no support is available for this");
-                return new InMemoryFailure();
-            }
+            return new InMemoryFailure();
         }
         else if (invokeExpr.getLeft() instanceof VariableExpression)
         {
@@ -882,12 +869,10 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             {
                 return methodEval.evaluate(invokeExpr, invokedValue, this);
             }
-            else
-            {
-                NucleusLogger.QUERY.warn("Query contains call to method " + 
+
+            NucleusLogger.QUERY.warn("Query contains call to method " + 
                     invokedType.getName() + "." + method + " yet no support is available for this");
-                return new InMemoryFailure();
-            }
+            return new InMemoryFailure();
         }
         else if (invokeExpr.getLeft() instanceof Literal)
         {
@@ -901,12 +886,10 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             {
                 return methodEval.evaluate(invokeExpr, invokedValue, this);
             }
-            else
-            {
-                NucleusLogger.QUERY.warn("Query contains call to method " + 
+
+            NucleusLogger.QUERY.warn("Query contains call to method " + 
                     invokedType.getName() + "." + method + " yet no support is available for this");
-                return new InMemoryFailure();
-            }
+            return new InMemoryFailure();
         }
         else if (invokeExpr.getLeft() instanceof ArrayExpression)
         {
@@ -920,12 +903,9 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             {
                 return methodEval.evaluate(invokeExpr, invokedValue, this);
             }
-            else
-            {
-                NucleusLogger.QUERY.warn("Query contains call to method " + 
+            NucleusLogger.QUERY.warn("Query contains call to method " + 
                     invokedType.getName() + "." + method + " yet no support is available for this");
-                return new InMemoryFailure();
-            }
+            return new InMemoryFailure();
         }
         else
         {

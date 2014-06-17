@@ -97,10 +97,7 @@ public class ShortId extends SingleFieldId<Short>
             {
                 return (key - other.key);
             }
-            else
-            {
-                return result;
-            }
+            return result;
         }
         else if (o == null)
         {

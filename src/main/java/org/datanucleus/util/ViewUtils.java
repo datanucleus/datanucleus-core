@@ -40,10 +40,7 @@ public class ViewUtils
      * @param referenceChain The List of class names that have been referenced
      * @throws NucleusUserException If a circular reference is found in the view definitions.
      */
-    public static void checkForCircularViewReferences(Map viewReferences,
-                                                      String referencer_name,
-                                                      String referencee_name,
-                                                      List referenceChain)
+    public static void checkForCircularViewReferences(Map viewReferences, String referencer_name, String referencee_name, List referenceChain)
     {
         Set class_names = (Set)viewReferences.get(referencee_name);
         if (class_names != null)
@@ -77,15 +74,10 @@ public class ViewUtils
 
                     throw new NucleusUserException(error.toString()).setFatal();
                 }
-                else
-                {
-                    // Make recursive call to check for any nested dependencies.
-                    // e.g A references B, B references C, C references A.
-                    checkForCircularViewReferences(viewReferences,
-                                                   referencer_name,
-                                                   current_name,
-                                                   referenceChain);
-                }
+
+                // Make recursive call to check for any nested dependencies.
+                // e.g A references B, B references C, C references A.
+                checkForCircularViewReferences(viewReferences, referencer_name, current_name, referenceChain);
             }
         }
     }

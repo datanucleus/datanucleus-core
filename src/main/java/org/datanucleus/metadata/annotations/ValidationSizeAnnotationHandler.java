@@ -44,13 +44,11 @@ public class ValidationSizeAnnotationHandler implements MemberAnnotationHandler
             mmd.addColumn(colmd);
             return;
         }
-        else
+
+        if (colmds[0].getLength() == null)
         {
-            if (colmds[0].getLength() == null)
-            {
-                // No length set, so 
-                colmds[0].setLength(max);
-            }
+            // No length set, so 
+            colmds[0].setLength(max);
         }
     }
 }

@@ -407,23 +407,21 @@ public abstract class JavaQueryEvaluator
         {
             return Collections.EMPTY_LIST;
         }
-        else
+
+        List resultList = new ArrayList();
+        Iterator it = set.iterator();
+        // skipping the unnecessary objects
+        for (long l = 0; l < fromIncl && it.hasNext(); l++)
         {
-            List resultList = new ArrayList();
-            Iterator it = set.iterator();
-            // skipping the unnecessary objects
-            for (long l = 0; l < fromIncl && it.hasNext(); l++)
-            {
-                it.next();
-            }
-            long l = 0;
-            while (l < (toExcl - fromIncl) && it.hasNext())
-            {
-                resultList.add(it.next());
-                l++;
-            }
-            return resultList;
+            it.next();
         }
+        long l = 0;
+        while (l < (toExcl - fromIncl) && it.hasNext())
+        {
+            resultList.add(it.next());
+            l++;
+        }
+        return resultList;
     }
 
     private List sortByGrouping(List set)

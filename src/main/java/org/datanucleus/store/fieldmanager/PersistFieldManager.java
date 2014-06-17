@@ -71,10 +71,7 @@ public class PersistFieldManager extends AbstractFieldManager
             {
                 return op.getExecutionContext().persistObjectInternal(pc, op, ownerFieldNum, objectType);
             }
-            else
-            {
-                return op.getExecutionContext().persistObjectInternal(pc, null, -1, objectType);
-            }
+            return op.getExecutionContext().persistObjectInternal(pc, null, -1, objectType);
         }
         return pc;
     }

@@ -94,29 +94,25 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
                     }
                     return obj;
                 }
-                else
-                {
-                    // Concrete class that is PC so just create an instance using its no args constructor
-                    return cls.newInstance();
-                }
-            }
-            else
-            {
-                // Interface, so we need an implemenation
-                InterfaceMetaData imd = metaDataMgr.getMetaDataForInterface(cls, clr);
-                if (imd == null)
-                {
-                    throw new NucleusException("Could not find metadata for class/interface "+cls.getName()).setFatal();
-                }
 
-                Object obj = newInstance(imd, clr);
-                if (!metaDataMgr.hasMetaDataForClass(obj.getClass().getName()))
-                {
-                    // No metadata yet present for the implementation so register it
-                    metaDataMgr.registerPersistentInterface(imd, obj.getClass(), clr);
-                }
-                return obj;
+                // Concrete class that is PC so just create an instance using its no args constructor
+                return cls.newInstance();
             }
+
+            // Interface, so we need an implemenation
+            InterfaceMetaData imd = metaDataMgr.getMetaDataForInterface(cls, clr);
+            if (imd == null)
+            {
+                throw new NucleusException("Could not find metadata for class/interface "+cls.getName()).setFatal();
+            }
+
+            Object obj = newInstance(imd, clr);
+            if (!metaDataMgr.hasMetaDataForClass(obj.getClass().getName()))
+            {
+                // No metadata yet present for the implementation so register it
+                metaDataMgr.registerPersistentInterface(imd, obj.getClass(), clr);
+            }
+            return obj;
         }
         catch (ClassNotFoundException e)
         {
@@ -191,28 +187,26 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
         {
             return (Persistable) instance;
         }
-        else
-        {
-            // Generated instance is not persistable for some reason so generate a suitable exception
-            Class interfaces[] = instance.getClass().getInterfaces();
-            StringBuilder implementedInterfacesMsg = new StringBuilder("[");
-            String classLoaderPCMsg = "";
-            for (int i=0; i<interfaces.length; i++)
-            {
-                implementedInterfacesMsg.append(interfaces[i].getName());
-                if (i<interfaces.length-1)
-                {
-                    implementedInterfacesMsg.append(",");
-                }
-                if (interfaces[i].getName().equals(Persistable.class.getName()))
-                {
-                    classLoaderPCMsg = Localiser.msg("011000", interfaces[i].getClassLoader(), Persistable.class.getClassLoader());
-                }
-            }
-            implementedInterfacesMsg.append("]");
 
-            throw new NucleusException(Localiser.msg("011001", implFullClassName, classLoaderPCMsg, implementedInterfacesMsg.toString()));
+        // Generated instance is not persistable for some reason so generate a suitable exception
+        Class interfaces[] = instance.getClass().getInterfaces();
+        StringBuilder implementedInterfacesMsg = new StringBuilder("[");
+        String classLoaderPCMsg = "";
+        for (int i=0; i<interfaces.length; i++)
+        {
+            implementedInterfacesMsg.append(interfaces[i].getName());
+            if (i<interfaces.length-1)
+            {
+                implementedInterfacesMsg.append(",");
+            }
+            if (interfaces[i].getName().equals(Persistable.class.getName()))
+            {
+                classLoaderPCMsg = Localiser.msg("011000", interfaces[i].getClassLoader(), Persistable.class.getClassLoader());
+            }
         }
+        implementedInterfacesMsg.append("]");
+
+        throw new NucleusException(Localiser.msg("011001", implFullClassName, classLoaderPCMsg, implementedInterfacesMsg.toString()));
     }
 
     /**
@@ -274,30 +268,28 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
         {
             return (Persistable) instance;
         }
-        else
-        {
-            // Generated instance is not persistable for some reason so generate a suitable exception
-            // TODO Correct this message for abstract classes
-            Class interfaces[] = instance.getClass().getInterfaces();
-            StringBuilder implementedInterfacesMsg = new StringBuilder("[");
-            String classLoaderPCMsg = "";
-            for (int i=0; i<interfaces.length; i++)
-            {
-                implementedInterfacesMsg.append(interfaces[i].getName()); 
-                if (i<interfaces.length-1)
-                {
-                    implementedInterfacesMsg.append(",");    
-                }
-                if (interfaces[i].getName().equals(Persistable.class.getName()))
-                {
-                    classLoaderPCMsg = Localiser.msg("ImplementationCreator.DifferentClassLoader", 
-                        interfaces[i].getClassLoader(), Persistable.class.getClassLoader());
-                }
-            }
-            implementedInterfacesMsg.append("]");
 
-            throw new NucleusException(Localiser.msg("011001", implFullClassName, classLoaderPCMsg, implementedInterfacesMsg.toString()));
+        // Generated instance is not persistable for some reason so generate a suitable exception
+        // TODO Correct this message for abstract classes
+        Class interfaces[] = instance.getClass().getInterfaces();
+        StringBuilder implementedInterfacesMsg = new StringBuilder("[");
+        String classLoaderPCMsg = "";
+        for (int i=0; i<interfaces.length; i++)
+        {
+            implementedInterfacesMsg.append(interfaces[i].getName()); 
+            if (i<interfaces.length-1)
+            {
+                implementedInterfacesMsg.append(",");    
+            }
+            if (interfaces[i].getName().equals(Persistable.class.getName()))
+            {
+                classLoaderPCMsg = Localiser.msg("ImplementationCreator.DifferentClassLoader", 
+                    interfaces[i].getClassLoader(), Persistable.class.getClassLoader());
+            }
         }
+        implementedInterfacesMsg.append("]");
+
+        throw new NucleusException(Localiser.msg("011001", implFullClassName, classLoaderPCMsg, implementedInterfacesMsg.toString()));
     }
 
     /**

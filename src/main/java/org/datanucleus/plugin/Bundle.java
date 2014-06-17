@@ -221,10 +221,7 @@ public class Bundle
             {
                 return result;
             }
-            else
-            {
-                return qualifier.compareTo(other.qualifier);
-            }
+            return qualifier.compareTo(other.qualifier);
         }
         public String toString()
         {

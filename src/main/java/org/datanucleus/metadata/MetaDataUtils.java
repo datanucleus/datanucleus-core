@@ -131,34 +131,32 @@ public class MetaDataUtils
                 // Collection of PC elements
                 return true;
             }
-            else
+
+            String elementType = fmd.getCollection().getElementType();
+            Class elementCls = clr.classForName(elementType);
+            if (mmgr.getMetaDataForImplementationOfReference(elementCls, null, clr) != null)
             {
-                String elementType = fmd.getCollection().getElementType();
-                Class elementCls = clr.classForName(elementType);
-                if (mmgr.getMetaDataForImplementationOfReference(elementCls, null, clr) != null)
+                // Collection of reference type for FCOs
+                return true;
+            }
+            if (elementCls != null && ClassUtils.isReferenceType(elementCls))
+            {
+                try
                 {
-                    // Collection of reference type for FCOs
-                    return true;
-                }
-                if (elementCls != null && ClassUtils.isReferenceType(elementCls))
-                {
-                    try
+                    String[] impls = getImplementationNamesForReferenceField(fmd, FieldRole.ROLE_COLLECTION_ELEMENT, clr, mmgr);
+                    if (impls != null)
                     {
-                        String[] impls = getImplementationNamesForReferenceField(fmd, FieldRole.ROLE_COLLECTION_ELEMENT, clr, mmgr);
-                        if (impls != null)
+                        elementCls = clr.classForName(impls[0]);
+                        if (ec.getApiAdapter().isPersistable(elementCls))
                         {
-                            elementCls = clr.classForName(impls[0]);
-                            if (ec.getApiAdapter().isPersistable(elementCls))
-                            {
-                                // Collection of reference type for FCOs
-                                return true;
-                            }
+                            // Collection of reference type for FCOs
+                            return true;
                         }
                     }
-                    catch (NucleusUserException nue)
-                    {
-                        // No implementations found so not persistable
-                    }
+                }
+                catch (NucleusUserException nue)
+                {
+                    // No implementations found so not persistable
                 }
             }
         }
@@ -169,34 +167,32 @@ public class MetaDataUtils
                 // Map of PC keys
                 return true;
             }
-            else
+
+            String keyType = fmd.getMap().getKeyType();
+            Class keyCls = clr.classForName(keyType);
+            if (mmgr.getMetaDataForImplementationOfReference(keyCls, null, clr) != null)
             {
-                String keyType = fmd.getMap().getKeyType();
-                Class keyCls = clr.classForName(keyType);
-                if (mmgr.getMetaDataForImplementationOfReference(keyCls, null, clr) != null)
+                // Map with keys of reference type for FCOs
+                return true;
+            }
+            if (keyCls != null && ClassUtils.isReferenceType(keyCls))
+            {
+                try
                 {
-                    // Map with keys of reference type for FCOs
-                    return true;
-                }
-                if (keyCls != null && ClassUtils.isReferenceType(keyCls))
-                {
-                    try
+                    String[] impls = getImplementationNamesForReferenceField(fmd, FieldRole.ROLE_MAP_KEY, clr, mmgr);
+                    if (impls != null)
                     {
-                        String[] impls = getImplementationNamesForReferenceField(fmd, FieldRole.ROLE_MAP_KEY, clr, mmgr);
-                        if (impls != null)
+                        keyCls = clr.classForName(impls[0]);
+                        if (ec.getApiAdapter().isPersistable(keyCls))
                         {
-                            keyCls = clr.classForName(impls[0]);
-                            if (ec.getApiAdapter().isPersistable(keyCls))
-                            {
-                                // Map with keys of reference type for FCOs
-                                return true;
-                            }
+                            // Map with keys of reference type for FCOs
+                            return true;
                         }
                     }
-                    catch (NucleusUserException nue)
-                    {
-                        // No implementations found so not persistable
-                    }
+                }
+                catch (NucleusUserException nue)
+                {
+                    // No implementations found so not persistable
                 }
             }
 
@@ -205,34 +201,32 @@ public class MetaDataUtils
                 // Map of PC values
                 return true;
             }
-            else
+
+            String valueType = fmd.getMap().getValueType();
+            Class valueCls = clr.classForName(valueType);
+            if (mmgr.getMetaDataForImplementationOfReference(valueCls, null, clr) != null)
             {
-                String valueType = fmd.getMap().getValueType();
-                Class valueCls = clr.classForName(valueType);
-                if (mmgr.getMetaDataForImplementationOfReference(valueCls, null, clr) != null)
+                // Map with values of reference type for FCOs
+                return true;
+            }
+            if (valueCls != null && ClassUtils.isReferenceType(valueCls))
+            {
+                try
                 {
-                    // Map with values of reference type for FCOs
-                    return true;
-                }
-                if (valueCls != null && ClassUtils.isReferenceType(valueCls))
-                {
-                    try
+                    String[] impls = getImplementationNamesForReferenceField(fmd, FieldRole.ROLE_MAP_VALUE, clr, mmgr);
+                    if (impls != null)
                     {
-                        String[] impls = getImplementationNamesForReferenceField(fmd, FieldRole.ROLE_MAP_VALUE, clr, mmgr);
-                        if (impls != null)
+                        valueCls = clr.classForName(impls[0]);
+                        if (ec.getApiAdapter().isPersistable(valueCls))
                         {
-                            valueCls = clr.classForName(impls[0]);
-                            if (ec.getApiAdapter().isPersistable(valueCls))
-                            {
-                                // Map with values of reference type for FCOs
-                                return true;
-                            }
+                            // Map with values of reference type for FCOs
+                            return true;
                         }
                     }
-                    catch (NucleusUserException nue)
-                    {
-                        // No implementations found so not persistable
-                    }
+                }
+                catch (NucleusUserException nue)
+                {
+                    // No implementations found so not persistable
                 }
             }
         }
@@ -243,39 +237,37 @@ public class MetaDataUtils
                 // persistable[]
                 return true;
             }
-            else
+
+            String elementType = fmd.getArray().getElementType();
+            Class elementCls = clr.classForName(elementType);
+            if (mmgr.getApiAdapter().isPersistable(elementCls))
             {
-                String elementType = fmd.getArray().getElementType();
-                Class elementCls = clr.classForName(elementType);
-                if (mmgr.getApiAdapter().isPersistable(elementCls))
+                // Array of reference type for FCOs
+                return true;
+            }
+            else if (mmgr.getMetaDataForImplementationOfReference(elementCls, null, clr) != null)
+            {
+                // Array of reference type for FCOs
+                return true;
+            }
+            else if (elementCls != null && ClassUtils.isReferenceType(elementCls))
+            {
+                try
                 {
-                    // Array of reference type for FCOs
-                    return true;
-                }
-                else if (mmgr.getMetaDataForImplementationOfReference(elementCls, null, clr) != null)
-                {
-                    // Array of reference type for FCOs
-                    return true;
-                }
-                else if (elementCls != null && ClassUtils.isReferenceType(elementCls))
-                {
-                    try
+                    String[] impls = getImplementationNamesForReferenceField(fmd, FieldRole.ROLE_ARRAY_ELEMENT, clr, mmgr);
+                    if (impls != null)
                     {
-                        String[] impls = getImplementationNamesForReferenceField(fmd, FieldRole.ROLE_ARRAY_ELEMENT, clr, mmgr);
-                        if (impls != null)
+                        elementCls = clr.classForName(impls[0]);
+                        if (ec.getApiAdapter().isPersistable(elementCls))
                         {
-                            elementCls = clr.classForName(impls[0]);
-                            if (ec.getApiAdapter().isPersistable(elementCls))
-                            {
-                                // Array of reference type for FCOs
-                                return true;
-                            }
+                            // Array of reference type for FCOs
+                            return true;
                         }
                     }
-                    catch (NucleusUserException nue)
-                    {
-                        // No implementations found so not persistable
-                    }
+                }
+                catch (NucleusUserException nue)
+                {
+                    // No implementations found so not persistable
                 }
             }
         }
@@ -325,16 +317,14 @@ public class MetaDataUtils
                 // Collection of PC elements
                 return true;
             }
-            else
-            {
-                String elementType = fmd.getCollection().getElementType();
-                Class elementCls = clr.classForName(elementType);
-                if (elementCls != null && ClassUtils.isReferenceType(elementCls) &&
+
+            String elementType = fmd.getCollection().getElementType();
+            Class elementCls = clr.classForName(elementType);
+            if (elementCls != null && ClassUtils.isReferenceType(elementCls) &&
                     mgr.getMetaDataForImplementationOfReference(elementCls, null, clr) != null)
-                {
-                    // Collection of reference type for FCOs
-                    return true;
-                }
+            {
+                // Collection of reference type for FCOs
+                return true;
             }
         }
         else if (fmd.hasMap())
@@ -344,16 +334,14 @@ public class MetaDataUtils
                 // Map of PC keys
                 return true;
             }
-            else
-            {
-                String keyType = fmd.getMap().getKeyType();
-                Class keyCls = clr.classForName(keyType);
-                if (keyCls != null && ClassUtils.isReferenceType(keyCls) &&
+
+            String keyType = fmd.getMap().getKeyType();
+            Class keyCls = clr.classForName(keyType);
+            if (keyCls != null && ClassUtils.isReferenceType(keyCls) &&
                     mgr.getMetaDataForImplementationOfReference(keyCls, null, clr) != null)
-                {
-                    // Map with keys of reference type for FCOs
-                    return true;
-                }
+            {
+                // Map with keys of reference type for FCOs
+                return true;
             }
                 
             if (fmd.getMap().valueIsPersistent() && !fmd.getMap().isEmbeddedValue() && !fmd.getMap().isSerializedValue())
@@ -361,16 +349,14 @@ public class MetaDataUtils
                 // Map of PC values
                 return true;
             }
-            else
-            {
-                String valueType = fmd.getMap().getValueType();
-                Class valueCls = clr.classForName(valueType);
-                if (valueCls != null && ClassUtils.isReferenceType(valueCls) &&
+
+            String valueType = fmd.getMap().getValueType();
+            Class valueCls = clr.classForName(valueType);
+            if (valueCls != null && ClassUtils.isReferenceType(valueCls) &&
                     mgr.getMetaDataForImplementationOfReference(valueCls, null, clr) != null)
-                {
-                    // Map with values of reference type for FCOs
-                    return true;
-                }
+            {
+                // Map with values of reference type for FCOs
+                return true;
             }
         }
         else if (fmd.hasArray() && !fmd.getArray().isSerializedElement() && !fmd.getArray().isEmbeddedElement())
@@ -883,40 +869,38 @@ public class MetaDataUtils
                 return null;
             }
         }
-        else
+
+        Set metadata = new LinkedHashSet();
+        try
         {
-            Set metadata = new LinkedHashSet();
-            try
+            // Find all "META-INF/persistence.xml" files in the CLASSPATH of the current thread
+            Enumeration files = clr.getResources("META-INF/persistence.xml", 
+                Thread.currentThread().getContextClassLoader());
+            if (!files.hasMoreElements())
             {
-                // Find all "META-INF/persistence.xml" files in the CLASSPATH of the current thread
-                Enumeration files = clr.getResources("META-INF/persistence.xml", 
-                    Thread.currentThread().getContextClassLoader());
-                if (!files.hasMoreElements())
-                {
-                    return null;
-                }
-
-                MetaDataParser parser = null;
-                for ( ; files.hasMoreElements() ;)
-                {
-                    // Parse the "persistence.xml"
-                    URL fileURL = (URL)files.nextElement();
-                    if (parser == null)
-                    {
-                        parser = new MetaDataParser(null, pluginMgr, validate);
-                    }
-                    MetaData permd = parser.parseMetaDataURL(fileURL, "persistence");
-                    metadata.add(permd);
-                }
-            }
-            catch (IOException ioe)
-            {
-                // Do nothing
-                NucleusLogger.METADATA.warn(StringUtils.getStringFromStackTrace(ioe));
+                return null;
             }
 
-            return (PersistenceFileMetaData[])metadata.toArray(new PersistenceFileMetaData[metadata.size()]);
+            MetaDataParser parser = null;
+            for ( ; files.hasMoreElements() ;)
+            {
+                // Parse the "persistence.xml"
+                URL fileURL = (URL)files.nextElement();
+                if (parser == null)
+                {
+                    parser = new MetaDataParser(null, pluginMgr, validate);
+                }
+                MetaData permd = parser.parseMetaDataURL(fileURL, "persistence");
+                metadata.add(permd);
+            }
         }
+        catch (IOException ioe)
+        {
+            // Do nothing
+            NucleusLogger.METADATA.warn(StringUtils.getStringFromStackTrace(ioe));
+        }
+
+        return (PersistenceFileMetaData[])metadata.toArray(new PersistenceFileMetaData[metadata.size()]);
     }
 
     /**

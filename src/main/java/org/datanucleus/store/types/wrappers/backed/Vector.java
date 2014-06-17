@@ -344,7 +344,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * In contrast to Object.clone(), this method must not throw a CloneNotSupportedException.
      * @return The cloned object
      */
-    public Object clone()
+    public synchronized Object clone()
     {
         if (useCache)
         {
@@ -405,7 +405,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param index The item to retrieve
      * @return The element at that position.
      **/
-    public Object elementAt(int index)
+    public synchronized Object elementAt(int index)
     {
         return get(index);
     }
@@ -459,27 +459,25 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
             loadFromStore();
             return delegate.elements();
         }
-        else
-        {
-            final Iterator iter = new SCOListIterator(this, ownerOP, delegate, backingStore, useCache, -1);
-            return new Enumeration() {
-                public boolean hasMoreElements()
-                {
-                    return iter.hasNext();
-                }
-                public Object nextElement()
-                {
-                    return iter.next();
-                }
-            };
-        }
+
+        final Iterator iter = new SCOListIterator(this, ownerOP, delegate, backingStore, useCache, -1);
+        return new Enumeration() {
+            public boolean hasMoreElements()
+            {
+                return iter.hasNext();
+            }
+            public Object nextElement()
+            {
+                return iter.next();
+            }
+        };
     }
 
     /**
      * Method to return the first element in the Vector.
      * @return The first element
      */
-    public Object firstElement()
+    public synchronized Object firstElement()
     {
         return get(0);
     }
@@ -489,7 +487,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param index The item to retrieve
      * @return The element at that position.
      **/
-    public Object get(int index)
+    public synchronized Object get(int index)
     {
         if (useCache)
         {
@@ -541,7 +539,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param startIndex The start position
      * @return The position.
      **/
-    public int indexOf(Object element, int startIndex)
+    public synchronized int indexOf(Object element, int startIndex)
     {
         if (useCache)
         {
@@ -560,7 +558,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * Accessor for whether the Vector is empty.
      * @return Whether it is empty.
      **/
-    public boolean isEmpty()
+    public synchronized boolean isEmpty()
     {
         return size() == 0;
     }
@@ -569,7 +567,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * Method to retrieve an iterator for the list.
      * @return The iterator
      **/
-    public Iterator iterator()
+    public synchronized Iterator iterator()
     {
         // Populate the cache if necessary
         if (useCache)
@@ -584,7 +582,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * Method to return the last element in the Vector.
      * @return The last element
      */
-    public Object lastElement()
+    public synchronized Object lastElement()
     {
         return get(size() - 1);
     }
@@ -594,7 +592,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param element The element
      * @return The last position of this element in the List.
      **/
-    public int lastIndexOf(Object element)
+    public synchronized int lastIndexOf(Object element)
     {
         if (useCache)
         {
@@ -614,7 +612,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param startIndex The start position
      * @return The last position of this element in the List.
      **/
-    public int lastIndexOf(Object element, int startIndex)
+    public synchronized int lastIndexOf(Object element, int startIndex)
     {
         if (useCache)
         {
@@ -633,7 +631,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * Method to retrieve a List iterator for the list.
      * @return The iterator
      **/
-    public ListIterator listIterator()
+    public synchronized ListIterator listIterator()
     {
         // Populate the cache if necessary
         if (useCache)
@@ -649,7 +647,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param index The start point 
      * @return The iterator
      **/
-    public ListIterator listIterator(int index)
+    public synchronized ListIterator listIterator(int index)
     {
         // Populate the cache if necessary
         if (useCache)
@@ -664,7 +662,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * Accessor for the size of the Vector.
      * @return The size.
      **/
-    public int size()
+    public synchronized int size()
     {
         if (useCache && isCacheLoaded)
         {
@@ -790,7 +788,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param element The new element
      * @return Whether it was added ok.
      **/
-    public boolean add(Object element)
+    public synchronized boolean add(Object element)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -841,7 +839,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param elements The collection
      * @return Whether it was added ok.
      **/
-    public boolean addAll(Collection elements)
+    public synchronized boolean addAll(Collection elements)
     {
         if (useCache)
         {
@@ -890,7 +888,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param elements The collection
      * @return Whether it was added ok.
      **/
-    public boolean addAll(int index, Collection elements)
+    public synchronized boolean addAll(int index, Collection elements)
     {
         if (useCache)
         {
@@ -938,7 +936,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * Method to add an element to the Vector.
      * @param element The new element
      **/
-    public void addElement(Object element)
+    public synchronized void addElement(Object element)
     {
         // This is a historical wrapper to the Collection method
         add(element);
@@ -975,7 +973,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param element The element
      * @return Whether the element was removed
      **/
-    public boolean remove(Object element)
+    public synchronized boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -985,7 +983,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param element The element
      * @param allowCascadeDelete Whether to allow cascade delete
      */
-    public boolean remove(Object element, boolean allowCascadeDelete)
+    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
     {
         makeDirty();
 
@@ -1036,7 +1034,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param index The element position.
      * @return The object that was removed
      **/
-    public Object remove(int index)
+    public synchronized Object remove(int index)
     {
         makeDirty();
  
@@ -1083,7 +1081,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param elements The collection
      * @return Whether it was removed ok.
      */
-    public boolean removeAll(Collection elements)
+    public synchronized boolean removeAll(Collection elements)
     {
         makeDirty();
 
@@ -1140,14 +1138,12 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
 
             return backingSuccess;
         }
-        else
+
+        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
         {
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
-            {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
-            }
-            return delegateSuccess;
+            ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
+        return delegateSuccess;
     }
 
     /**
@@ -1155,7 +1151,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param element The element
      * @return Whether the element was removed
      **/
-    public boolean removeElement(Object element)
+    public synchronized boolean removeElement(Object element)
     {
         // This is a historical wrapper to the Collection method
         return remove(element);
@@ -1165,7 +1161,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * Method to remove an element from the Vector.
      * @param index The element position.
      **/
-    public void removeElementAt(int index)
+    public synchronized void removeElementAt(int index)
     {
         // This is a historical wrapper to the Collection method
         remove(index);
@@ -1174,7 +1170,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
     /**
      * Method to remove all elements from the Vector.
      **/
-    public void removeAllElements()
+    public synchronized void removeAllElements()
     {
         clear();
     }
@@ -1262,7 +1258,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param element The new element
      * @return The element previously at that position
      **/
-    public Object set(int index,Object element)
+    public synchronized Object set(int index,Object element)
     {
         return set(index, element, true);
     }
@@ -1272,7 +1268,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param element The new element
      * @param index The position
      **/
-    public void setElementAt(Object element,int index)
+    public synchronized void setElementAt(Object element,int index)
     {
         // This is a historical wrapper to the Collection method
         set(index,element);
@@ -1298,10 +1294,8 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
             loadFromStore();
             return new java.util.Vector(delegate);
         }
-        else
-        {
-            // TODO Cater for non-cached collection, load elements in a DB call.
-            return new java.util.Vector(delegate);
-        }
+
+        // TODO Cater for non-cached collection, load elements in a DB call.
+        return new java.util.Vector(delegate);
     }
 }

@@ -67,10 +67,7 @@ public class ExecutionContextPool
         {
             return new ExecutionContextThreadedImpl(nucCtx, owner, options);
         }
-        else
-        {
-            return new ExecutionContextImpl(nucCtx, owner, options);
-        }
+        return new ExecutionContextImpl(nucCtx, owner, options);
     }
 
     public boolean validate(ExecutionContext ec)
@@ -109,13 +106,11 @@ public class ExecutionContextPool
                         ec.initialise(owner, options);
                         return (ec);
                     }
-                    else
-                    {
-                        // object failed validation
-                        recyclableECs.remove(ec);
-                        expire(ec);
-                        ec = null;
-                    }
+
+                    // object failed validation
+                    recyclableECs.remove(ec);
+                    expire(ec);
+                    ec = null;
                 }
             }
         }

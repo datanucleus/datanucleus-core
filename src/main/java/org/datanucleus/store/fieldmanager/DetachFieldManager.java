@@ -87,11 +87,9 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                     // Detach a copy and return the copy
                     return op.getExecutionContext().detachObjectCopy(pc, state);
                 }
-                else
-                {
-                    // Detach the object
-                    op.getExecutionContext().detachObject(pc, state);
-                }
+
+                // Detach the object
+                op.getExecutionContext().detachObject(pc, state);
             }
         }
         return pc;
@@ -163,37 +161,32 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                     }
                     return ((SCO)value).detachCopy(state);
                 }
-                else
+
+                if (!(value instanceof SCO))
                 {
-                    if (!(value instanceof SCO))
-                    {
-                        // Replace with SCO so we can work with it
-                        value = op.wrapSCOField(fieldNumber, value, false, false, true);
-                    }
-                    SCO sco = (SCO)value;
-
-                    if (sco instanceof Collection)
-                    {
-                        // Detach all PC elements of the collection
-                        SCOUtils.detachForCollection(op, ((Collection)sco).toArray(), state);
-                        sco.unsetOwner();
-                    }
-                    else if (sco instanceof Map)
-                    {
-                        // Detach all PC keys/values of the map
-                        SCOUtils.detachForMap(op, ((Map)sco).entrySet(), state);
-                        sco.unsetOwner();
-                    }
-
-                    if (SCOUtils.detachAsWrapped(op))
-                    {
-                        return sco;
-                    }
-                    else
-                    {
-                        return op.unwrapSCOField(fieldNumber, value, true);
-                    }
+                    // Replace with SCO so we can work with it
+                    value = op.wrapSCOField(fieldNumber, value, false, false, true);
                 }
+                SCO sco = (SCO)value;
+
+                if (sco instanceof Collection)
+                {
+                    // Detach all PC elements of the collection
+                    SCOUtils.detachForCollection(op, ((Collection)sco).toArray(), state);
+                    sco.unsetOwner();
+                }
+                else if (sco instanceof Map)
+                {
+                    // Detach all PC keys/values of the map
+                    SCOUtils.detachForMap(op, ((Map)sco).entrySet(), state);
+                    sco.unsetOwner();
+                }
+
+                if (SCOUtils.detachAsWrapped(op))
+                {
+                    return sco;
+                }
+                return op.unwrapSCOField(fieldNumber, value, true);
             }
             else if (mmd.hasArray())
             {
@@ -240,10 +233,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                 {
                     return sco;
                 }
-                else
-                {
-                    return op.unwrapSCOField(fieldNumber, value, true);
-                }
+                return op.unwrapSCOField(fieldNumber, value, true);
             }
         }
 

@@ -861,7 +861,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
      * @param element The element
      * @param allowCascadeDelete Whether to allow cascade delete
      */
-    public boolean remove(Object element, boolean allowCascadeDelete)
+    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
     {
         makeDirty();
 
@@ -1016,14 +1016,12 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
 
             return backingSuccess;
         }
-        else
+
+        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
         {
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
-            {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
-            }
-            return delegateSuccess;
+            ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
+        return delegateSuccess;
     }
 
     /**
@@ -1134,10 +1132,8 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
             loadFromStore();
             return new java.util.ArrayList(delegate);
         }
-        else
-        {
-            // TODO Cater for non-cached collection, load elements in a DB call.
-            return new java.util.ArrayList(delegate);
-        }
+
+        // TODO Cater for non-cached collection, load elements in a DB call.
+        return new java.util.ArrayList(delegate);
     }
 }

@@ -822,7 +822,7 @@ public class TreeSet extends org.datanucleus.store.types.wrappers.TreeSet implem
      * @param element The element
      * @return Whether it was removed ok.
      **/
-    public boolean remove(Object element)
+    public synchronized boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -832,7 +832,7 @@ public class TreeSet extends org.datanucleus.store.types.wrappers.TreeSet implem
      * @param element The element
      * @param allowCascadeDelete Whether to allow cascade delete
      */
-    public boolean remove(Object element, boolean allowCascadeDelete)
+    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
     {
         makeDirty();
 
@@ -955,14 +955,12 @@ public class TreeSet extends org.datanucleus.store.types.wrappers.TreeSet implem
 
             return backingSuccess;
         }
-        else
+
+        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
         {
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
-            {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
-            }
-            return delegateSuccess;
+            ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
+        return delegateSuccess;
     }
 
     /**
@@ -1018,10 +1016,8 @@ public class TreeSet extends org.datanucleus.store.types.wrappers.TreeSet implem
             loadFromStore();
             return new java.util.TreeSet(delegate);
         }
-        else
-        {
-            // TODO Cater for non-cached collection, load elements in a DB call.
-            return new java.util.TreeSet(delegate);
-        }
+
+        // TODO Cater for non-cached collection, load elements in a DB call.
+        return new java.util.TreeSet(delegate);
     }
 }

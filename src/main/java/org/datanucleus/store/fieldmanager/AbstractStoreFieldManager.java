@@ -70,9 +70,6 @@ public abstract class AbstractStoreFieldManager extends AbstractFieldManager
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 }

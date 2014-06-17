@@ -172,12 +172,10 @@ public abstract class AbstractLazyLoadList implements List
         {
             return itemsByIndex.get(index);
         }
-        else
-        {
-            Object obj = retrieveObjectForIndex(index);
-            itemsByIndex.put(index, obj);
-            return obj;
-        }
+
+        Object obj = retrieveObjectForIndex(index);
+        itemsByIndex.put(index, obj);
+        return obj;
     }
 
     /* (non-Javadoc)
@@ -397,16 +395,14 @@ public abstract class AbstractLazyLoadList implements List
                 {
                     return itemsByIndex.get(iteratorIndex);
                 }
-                else
+
+                Object obj = retrieveObjectForIndex(iteratorIndex);
+                if (itemsByIndex != null)
                 {
-                    Object obj = retrieveObjectForIndex(iteratorIndex);
-                    if (itemsByIndex != null)
-                    {
-                        itemsByIndex.put(iteratorIndex, obj);
-                    }
-                    iteratorIndex++;
-                    return obj;
+                    itemsByIndex.put(iteratorIndex, obj);
                 }
+                iteratorIndex++;
+                return obj;
             }
         }
 
@@ -439,16 +435,14 @@ public abstract class AbstractLazyLoadList implements List
                 {
                     return itemsByIndex.get(iteratorIndex);
                 }
-                else
+
+                Object obj = retrieveObjectForIndex(iteratorIndex);
+                if (itemsByIndex != null)
                 {
-                    Object obj = retrieveObjectForIndex(iteratorIndex);
-                    if (itemsByIndex != null)
-                    {
-                        itemsByIndex.put(iteratorIndex, obj);
-                    }
-                    iteratorIndex++;
-                    return obj;
+                    itemsByIndex.put(iteratorIndex, obj);
                 }
+                iteratorIndex++;
+                return obj;
             }
         }
 

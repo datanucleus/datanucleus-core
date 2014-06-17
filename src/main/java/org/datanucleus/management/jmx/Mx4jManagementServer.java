@@ -20,7 +20,8 @@ package org.datanucleus.management.jmx;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.rmi.NoSuchObjectException;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
@@ -73,13 +74,12 @@ public class Mx4jManagementServer implements ManagementServer
 
             //bind the MBeanServer to JNDI tree
             String hostName = InetAddress.getLocalHost().getHostName();
-            Hashtable env = new Hashtable();
-            env.put(Context.INITIAL_CONTEXT_FACTORY,"com.sun.jndi.rmi.registry.RegistryContextFactory");
+            Map<String, String> env = new HashMap<String, String>();
+            env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.rmi.registry.RegistryContextFactory");
             env.put(Context.PROVIDER_URL, "rmi://"+hostName+":"+port);
 
             // Start JMX server
-            JMXServiceURL address = new JMXServiceURL(
-                "service:jmx:rmi:///jndi/rmi://"+hostName+":"+port+"/datanucleus");
+            JMXServiceURL address = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://"+hostName+":"+port+"/datanucleus");
             jmxServer = JMXConnectorServerFactory.newJMXConnectorServer(address, env, server);
             jmxServer.start();
             if (NucleusLogger.GENERAL.isDebugEnabled())

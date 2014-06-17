@@ -97,10 +97,7 @@ public class IntId extends SingleFieldId<Integer>
             {
                 return (key - other.key);
             }
-            else
-            {
-                return result;
-            }
+            return result;
         }
         else if (o == null)
         {

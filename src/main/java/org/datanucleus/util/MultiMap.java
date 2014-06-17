@@ -208,10 +208,7 @@ public class MultiMap extends HashMap
         {
             return new ArrayList();
         }
-        else
-        {
-            return new ArrayList(c);
-        }
+        return new ArrayList(c);
     }
 
     /**

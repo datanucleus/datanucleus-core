@@ -59,10 +59,8 @@ public final class I18nUtils
             // No further "_" so is "{language}" only
             return new Locale(localeString, "");
         }
-        else
-        {
-            language = localeString.substring(0, languageIndex);
-        }
+
+        language = localeString.substring(0, languageIndex);
 
         // Extract country
         int countryIndex = localeString.indexOf('_', languageIndex + 1);
@@ -73,12 +71,10 @@ public final class I18nUtils
             country = localeString.substring(languageIndex+1);
             return new Locale(language, country);
         }
-        else
-        {
-            // Assume all remaining is the variant so is "{language}_{country}_{variant}"
-            country = localeString.substring(languageIndex+1, countryIndex);
-            String variant = localeString.substring(countryIndex+1);
-            return new Locale(language, country, variant);
-        }
+
+        // Assume all remaining is the variant so is "{language}_{country}_{variant}"
+        country = localeString.substring(languageIndex+1, countryIndex);
+        String variant = localeString.substring(countryIndex+1);
+        return new Locale(language, country, variant);
     }
 }

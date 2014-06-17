@@ -1637,52 +1637,50 @@ public class JPQLParser implements Parser
                     stack.push(next);
                     return true;
                 }
-                else
+
+                if (next.getNodeType() == NodeType.LITERAL)
                 {
-                    if (next.getNodeType() == NodeType.LITERAL)
+                    // TRIM(dir trimChar FROM string_primary)
+                    trimCharNode = next;
+                    if (p.parseStringIgnoreCase("FROM "))
                     {
-                        // TRIM(dir trimChar FROM string_primary)
-                        trimCharNode = next;
-                        if (p.parseStringIgnoreCase("FROM "))
-                        {
-                            // Ignore the FROM
-                        }
-                        processExpression();
-                        next = stack.pop();
+                        // Ignore the FROM
                     }
-                    else if (next.getNodeType() == NodeType.IDENTIFIER)
+                    processExpression();
+                    next = stack.pop();
+                }
+                else if (next.getNodeType() == NodeType.IDENTIFIER)
+                {
+                    // TRIM(dir FROM string_primary)
+                    Object litValue = next.getNodeValue();
+                    if (litValue instanceof String && ((String)litValue).equals("FROM"))
                     {
-                        // TRIM(dir FROM string_primary)
-                        Object litValue = next.getNodeValue();
-                        if (litValue instanceof String && ((String)litValue).equals("FROM"))
-                        {
-                            // FROM so ignore
-                            processExpression(); // field expression that we are trimming
-                            next = stack.pop();
-                        }
-                        else
-                        {
-                            throw new QueryCompilerSyntaxException("Unexpected expression", p.getIndex(), p.getInput());
-                        }
+                        // FROM so ignore
+                        processExpression(); // field expression that we are trimming
+                        next = stack.pop();
                     }
                     else
                     {
-                        // No "trimChar" or FROM, so "next" is the string expression node
+                        throw new QueryCompilerSyntaxException("Unexpected expression", p.getIndex(), p.getInput());
                     }
-
-                    if (!p.parseChar(')'))
-                    {
-                        throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
-                    }
-
-                    next.appendChildNode(invokeNode);
-                    if (trimCharNode != null)
-                    {
-                        invokeNode.addProperty(trimCharNode);
-                    }
-                    stack.push(next);
-                    return true;
                 }
+                else
+                {
+                    // No "trimChar" or FROM, so "next" is the string expression node
+                }
+
+                if (!p.parseChar(')'))
+                {
+                    throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
+                }
+
+                next.appendChildNode(invokeNode);
+                if (trimCharNode != null)
+                {
+                    invokeNode.addProperty(trimCharNode);
+                }
+                stack.push(next);
+                return true;
             }
             else if (method.equalsIgnoreCase("SIZE"))
             {

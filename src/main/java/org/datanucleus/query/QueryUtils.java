@@ -110,10 +110,7 @@ public class QueryUtils
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     /**
@@ -573,7 +570,7 @@ public class QueryUtils
         CharacterIterator ci = new StringCharacterIterator(str);
         int braces = 0;
         String text = "";
-        ArrayList exprList = new ArrayList();
+        List<String> exprList = new ArrayList();
         while (ci.getIndex() != ci.getEndIndex())
         {
             char c = ci.current();
@@ -599,7 +596,7 @@ public class QueryUtils
             ci.next();
         }
         exprList.add(text);
-        return (String[])exprList.toArray(new String[exprList.size()]);
+        return exprList.toArray(new String[exprList.size()]);
     }
 
     /**
@@ -1305,10 +1302,7 @@ public class QueryUtils
             // TODO Check if the params hashCode is adequate to use as a defining key
             return query.getLanguage() + ":" + query.toString() + ":" + params.hashCode();
         }
-        else
-        {
-            return query.getLanguage() + ":" + query.toString() + ":";
-        }
+        return query.getLanguage() + ":" + query.toString() + ":";
     }
 
     /**
@@ -1430,11 +1424,8 @@ public class QueryUtils
                                 // Ascending
                                 return result;
                             }
-                            else
-                            {
-                                // Descending
-                                return -1 * result;
-                            }
+                            // Descending
+                            return -1 * result;
                         }
                     }
                 }

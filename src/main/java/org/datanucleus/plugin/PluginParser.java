@@ -504,10 +504,7 @@ class PluginParser
                 ci.next();
                 return true;
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
         /**
@@ -524,11 +521,9 @@ class PluginParser
             {
                 return true;
             }
-            else
-            {
-                ci.setIndex(savedIdx);
-                return false;
-            }
+
+            ci.setIndex(savedIdx);
+            return false;
         }
 
         /**
@@ -876,29 +871,27 @@ class PluginParser
 
                 return (char)i;
             }
-            else
+
+            switch (c)
             {
-                switch (c)
-                {
-                    case 'b' :
-                        return '\b';
-                    case 't' :
-                        return '\t';
-                    case 'n' :
-                        return '\n';
-                    case 'f' :
-                        return '\f';
-                    case 'r' :
-                        return '\r';
-                    case '"' :
-                        return '"';
-                    case '\'' :
-                        return '\'';
-                    case '\\' :
-                        return '\\';
-                    default :
-                        throw new NucleusUserException("Invalid character escape: '\\" + c + "'");
-                }
+                case 'b' :
+                    return '\b';
+                case 't' :
+                    return '\t';
+                case 'n' :
+                    return '\n';
+                case 'f' :
+                    return '\f';
+                case 'r' :
+                    return '\r';
+                case '"' :
+                    return '"';
+                case '\'' :
+                    return '\'';
+                case '\\' :
+                    return '\\';
+                default :
+                    throw new NucleusUserException("Invalid character escape: '\\" + c + "'");
             }
         }
 

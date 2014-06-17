@@ -345,7 +345,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      *
      * @return The cloned object
      */
-    public Object clone()
+    public synchronized Object clone()
     {
         if (useCache)
         {
@@ -427,7 +427,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * @param index The item to retrieve
      * @return The element at that position.
      **/
-    public Object get(int index)
+    public synchronized Object get(int index)
     {
         if (useCache)
         {
@@ -464,7 +464,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * Accessor for whether the Stack is empty.
      * @return Whether it is empty.
      **/
-    public boolean isEmpty()
+    public synchronized boolean isEmpty()
     {
         return size() == 0;
     }
@@ -473,7 +473,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * Method to retrieve an iterator for the list.
      * @return The iterator
      **/
-    public Iterator iterator()
+    public synchronized Iterator iterator()
     {
         // Populate the cache if necessary
         if (useCache)
@@ -488,7 +488,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * Method to retrieve a List iterator for the list.
      * @return The iterator
      **/
-    public ListIterator listIterator()
+    public synchronized ListIterator listIterator()
     {
         // Populate the cache if necessary
         if (useCache)
@@ -504,7 +504,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * @param index The start point 
      * @return The iterator
      **/
-    public ListIterator listIterator(int index)
+    public synchronized ListIterator listIterator(int index)
     {
         // Populate the cache if necessary
         if (useCache)
@@ -520,7 +520,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * @param element The element
      * @return The last position of this element in the List.
      **/
-    public int lastIndexOf(Object element)
+    public synchronized int lastIndexOf(Object element)
     {
         if (useCache)
         {
@@ -539,7 +539,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      *
      * @return The element at the top of the stack
      **/
-    public Object peek()
+    public synchronized Object peek()
     {
         return get(0);
     }
@@ -548,7 +548,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * Accessor for the size of the Stack.
      * @return The size.
      **/
-    public int size()
+    public synchronized int size()
     {
         if (useCache && isCacheLoaded)
         {
@@ -676,7 +676,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * @param element The new element
      * @return Whether it was added ok.
      **/
-    public boolean add(Object element)
+    public synchronized boolean add(Object element)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -727,7 +727,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      *
      * @param element The new element
      **/
-    public void addElement(Object element)
+    public synchronized void addElement(Object element)
     {
         // This is a historical wrapper to the Collection method
         add(element);
@@ -738,7 +738,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * @param elements The collection
      * @return Whether it was added ok.
      **/
-    public boolean addAll(Collection elements)
+    public synchronized boolean addAll(Collection elements)
     {
         if (useCache)
         {
@@ -787,7 +787,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * @param elements The collection
      * @return Whether it was added ok.
      **/
-    public boolean addAll(int index, Collection elements)
+    public synchronized boolean addAll(int index, Collection elements)
     {
         if (useCache)
         {
@@ -861,7 +861,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * Method to remove the top element in the stack and return it.
      * @return The top element that was in the Stack (now removed).
      **/
-    public Object pop()
+    public synchronized Object pop()
     {
         makeDirty();
 
@@ -939,7 +939,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * @param element The element
      * @return Whether the element was removed
      */
-    public boolean remove(Object element)
+    public synchronized boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -949,7 +949,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * @param element The element
      * @param allowCascadeDelete Whether to allow cascade delete
      */
-    public boolean remove(Object element, boolean allowCascadeDelete)
+    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
     {
         makeDirty();
 
@@ -1000,7 +1000,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * @param elements The Collection
      * @return Whether the collection of elements were removed
      **/
-    public boolean removeAll(Collection elements)
+    public synchronized boolean removeAll(Collection elements)
     {
         makeDirty();
 
@@ -1057,14 +1057,12 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
 
             return backingSuccess;
         }
-        else
+
+        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
         {
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
-            {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
-            }
-            return delegateSuccess;
+            ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
+        return delegateSuccess;
     }
 
     /**
@@ -1072,7 +1070,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * @param element The element
      * @return Whether the element was removed
      **/
-    public boolean removeElement(Object element)
+    public synchronized boolean removeElement(Object element)
     {
         // This is a historical wrapper to the Collection method
         return remove(element);
@@ -1083,7 +1081,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * @param index The element position.
      * @return The object that was removed
      **/
-    public Object remove(int index)
+    public synchronized Object remove(int index)
     {
         makeDirty();
  
@@ -1129,7 +1127,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * Method to remove an element from the Stack
      * @param index The element position.
      **/
-    public void removeElementAt(int index)
+    public synchronized void removeElementAt(int index)
     {
         // This is a historical wrapper to the Collection method
         remove(index);
@@ -1139,7 +1137,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * Method to remove all elements from the Stack.
      * Same as clear().
      **/
-    public void removeAllElements()
+    public synchronized void removeAllElements()
     {
         clear();
     }
@@ -1228,7 +1226,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * @param element The new element
      * @return The element previously at that position
      **/
-    public Object set(int index,Object element)
+    public synchronized Object set(int index,Object element)
     {
         return set(index, element, true);
     }
@@ -1239,7 +1237,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
      * @param element The new element
      * @param index The position
      **/
-    public void setElementAt(Object element,int index)
+    public synchronized void setElementAt(Object element,int index)
     {
         // This is a historical wrapper to the Collection method
         set(index,element);
@@ -1267,12 +1265,10 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
             stack.addAll(delegate);
             return stack;
         }
-        else
-        {
-            // TODO Cater for non-cached collection, load elements in a DB call.
-            java.util.Stack stack = new java.util.Stack();
-            stack.addAll(delegate);
-            return stack;
-        }
+
+        // TODO Cater for non-cached collection, load elements in a DB call.
+        java.util.Stack stack = new java.util.Stack();
+        stack.addAll(delegate);
+        return stack;
     }
 }

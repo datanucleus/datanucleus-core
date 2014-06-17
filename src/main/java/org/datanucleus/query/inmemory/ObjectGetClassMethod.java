@@ -41,11 +41,7 @@ public class ObjectGetClassMethod implements InvocationEvaluator
             Object value = QueryUtils.getValueForParameterExpression(eval.getParameterValues(), paramExpr);
             return value.getClass();
         }
-        else
-        {
-            PrimaryExpression paramExpr = (PrimaryExpression)argExpr;
-            Object value = eval.getValueForPrimaryExpression(paramExpr);
-            return value.getClass();
-        }
+
+        return eval.getValueForPrimaryExpression((PrimaryExpression)argExpr).getClass();
     }
 }

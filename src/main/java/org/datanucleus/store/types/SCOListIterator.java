@@ -49,13 +49,12 @@ public class SCOListIterator implements ListIterator
      * @param useDelegate whether to use a delegate
      * @param startIndex The start index position (any value below 0 will mean start at index 0).
      */
-    public SCOListIterator(List sco, ObjectProvider sm, List theDelegate, ListStore theStore, boolean useDelegate,
-            int startIndex)
+    public SCOListIterator(List sco, ObjectProvider sm, List theDelegate, ListStore theStore, boolean useDelegate, int startIndex)
     {
         ownerSCO = sco;
 
         // Populate our entries list
-        ArrayList entries = new ArrayList();
+        List entries = new ArrayList();
 
         Iterator i=null;
         if (useDelegate)

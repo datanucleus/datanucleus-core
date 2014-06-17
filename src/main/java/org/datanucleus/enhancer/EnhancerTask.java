@@ -26,7 +26,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.Vector;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
@@ -288,7 +287,7 @@ public class EnhancerTask extends Java
     
     protected File[] getFiles()
     {
-        Vector<File> v = new Vector<File>();
+        List<File> v = new ArrayList<File>();
         final int size = filesets.size();
         for (int i = 0; i < size; i++)
         {
@@ -304,9 +303,7 @@ public class EnhancerTask extends Java
                 v.add(file);
             }
         }
-        File[] files = new File[v.size()];
-        v.copyInto(files);
-        return files;
+        return v.toArray(new File[v.size()]);
     }
 
     public void setIf(String ifpropertyset)

@@ -721,10 +721,8 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
             loadFromStore();
             return new java.util.HashMap(delegate);
         }
-        else
-        {
-            // TODO Cater for non-cached map, load elements in a DB call.
-            return new java.util.HashMap(delegate);
-        }
+
+        // TODO Cater for non-cached map, load elements in a DB call.
+        return new java.util.HashMap(delegate);
     }
 }

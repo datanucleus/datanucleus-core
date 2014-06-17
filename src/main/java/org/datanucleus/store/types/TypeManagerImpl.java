@@ -122,10 +122,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
             }
             return false;
         }
-        else
-        {
-            return true;
-        }
+        return true;
     }
 
     /* (non-Javadoc)

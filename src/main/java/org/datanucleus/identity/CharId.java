@@ -101,10 +101,7 @@ public class CharId extends SingleFieldId<Character>
             {
                 return (key - other.key);
             }
-            else
-            {
-                return result;
-            }
+            return result;
         }
         else if (o == null)
         {

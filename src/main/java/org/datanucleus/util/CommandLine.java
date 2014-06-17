@@ -201,11 +201,9 @@ public class CommandLine
                         {
                             throw new RuntimeException("option " + args[i] + " needs an argument");
                         }
-                        else
-                        {
-                            ((WithArgOption)option).option = args[i + 1];
-                            i++;
-                        }
+
+                        ((WithArgOption)option).option = args[i + 1];
+                        i++;
                     }
                 }
                 else

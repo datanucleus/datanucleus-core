@@ -1694,10 +1694,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             {
                 return cmd.getFullClassName();
             }
-            else
-            {
-                return cmd.getName();
-            }
+            return cmd.getName();
         }
         else if (parent instanceof EmbeddedMetaData)
         {
@@ -1766,10 +1763,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         {
             return false;
         }
-        else
-        {
-            return defaultFetchGroup.booleanValue();
-        }
+        return defaultFetchGroup.booleanValue();
     }
 
     public void setDefaultFetchGroup(boolean dfg)
@@ -1783,10 +1777,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         {
             return false;
         }
-        else
-        {
-            return dependent.booleanValue();
-        }
+        return dependent.booleanValue();
     }
 
     public void setDependent(boolean dependent)
@@ -1800,10 +1791,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         {
             return false;
         }
-        else
-        {
-            return embedded.booleanValue();
-        }
+        return embedded.booleanValue();
     }
 
     public void setEmbedded(boolean val)
@@ -1817,10 +1805,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         {
             return false;
         }
-        else
-        {
-            return serialized.booleanValue();
-        }
+        return serialized.booleanValue();
     }
 
     public void setSerialised(boolean flag)
@@ -1888,10 +1873,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         {
             return false;
         }
-        else
-        {
-            return primaryKey.booleanValue();
-        }
+        return primaryKey.booleanValue();
     }
 
     public AbstractMemberMetaData setPrimaryKey(boolean flag)
@@ -2028,11 +2010,9 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             // Normal field, parented by its true class
             return fieldId + getAbstractClassMetaData().getNoOfInheritedManagedMembers();
         }
-        else
-        {
-            // Overriding field, parented by a foster class
-            return getAbstractClassMetaData().getAbsolutePositionOfMember(name);
-        }
+
+        // Overriding field, parented by a foster class
+        return getAbstractClassMetaData().getAbsolutePositionOfMember(name);
     }
 
     /**
@@ -2737,13 +2717,10 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                             // Non-serialised, and with mapped-by so we need implementation classes
                             throw jpe;
                         }
-                        else
-                        {
-                            // Serialised element with no implementation types so ignore it
-                            NucleusLogger.METADATA.debug("Field " + getFullFieldName() +
-                                " is a collection of elements of reference type yet no implementation-classes are provided." + 
-                                " Assuming they arent persistable");
-                        }
+
+                        // Serialised element with no implementation types so ignore it
+                        NucleusLogger.METADATA.debug("Field " + getFullFieldName() +
+                            " is a collection of elements of reference type yet no implementation-classes are provided. Assuming they arent persistable");
                     }
                 }
             }
@@ -2851,7 +2828,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             {
                 // The "other" class maybe has "mapped-by" across to this field so navigate through the fields to find this one
                 int[] otherFieldNumbers = otherCmd.getAllMemberPositions();
-                HashSet relatedFields = new HashSet();
+                Set relatedFields = new HashSet();
                 for (int i=0;i<otherFieldNumbers.length;i++)
                 {
                     AbstractMemberMetaData otherFmd = otherCmd.getMetaDataForManagedMemberAtAbsolutePosition(otherFieldNumbers[i]);
@@ -3155,8 +3132,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      * @param clr the ClassLoaderResolver
      * @param mmgr MetaData manager
      */
-    void getReferencedClassMetaData(final List orderedCMDs, final Set referencedCMDs,
-            final ClassLoaderResolver clr, final MetaDataManager mmgr)
+    void getReferencedClassMetaData(final List orderedCMDs, final Set referencedCMDs, final ClassLoaderResolver clr, final MetaDataManager mmgr)
     {
         AbstractClassMetaData type_cmd = mmgr.getMetaDataForClass(getType(), clr);
         if (type_cmd != null)

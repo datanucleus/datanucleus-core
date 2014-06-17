@@ -338,7 +338,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
      * In contrast to Object.clone(), this method must not throw a CloneNotSupportedException.
      * @return The cloned object
      */
-    public Object clone()
+    public synchronized Object clone()
     {
         if (useCache)
         {
@@ -353,7 +353,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
      * @param key The key
      * @return Whether it is contained
      **/
-    public boolean containsKey(Object key)
+    public synchronized boolean containsKey(Object key)
     {
         if (useCache && isCacheLoaded)
         {
@@ -436,7 +436,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
      * @param key The key
      * @return The value.
      */
-    public Object get(Object key)
+    public synchronized Object get(Object key)
     {
         if (useCache)
         {
@@ -499,7 +499,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
      * Method to return if the Map is empty.
      * @return Whether it is empty.
      **/
-    public boolean isEmpty()
+    public synchronized boolean isEmpty()
     {
         return size() == 0;
     }
@@ -526,7 +526,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
      * Method to return the size of the Map.
      * @return The size
      **/
-    public int size()
+    public synchronized int size()
     {
         if (useCache && isCacheLoaded)
         {
@@ -593,7 +593,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
      * @param value The value
      * @return The previous value for the specified key.
      **/
-    public Object put(Object key,Object value)
+    public synchronized Object put(Object key,Object value)
     {
         // Reject inappropriate elements
         if (!allowNulls)
@@ -649,7 +649,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
      * Method to add the specified Map's values under their keys here.
      * @param m The map
      **/
-    public void putAll(java.util.Map m)
+    public synchronized void putAll(java.util.Map m)
     {
         makeDirty();
 
@@ -688,7 +688,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
      * @param key The key to remove
      * @return The value that was removed from this key.
      **/
-    public Object remove(Object key)
+    public synchronized Object remove(Object key)
     {
         makeDirty();
 
@@ -730,7 +730,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
      * @param value The value
      * @return The previous value for the specified key.
      */
-    public Object setProperty(String key, String value)
+    public synchronized Object setProperty(String key, String value)
     {
         return put(key, value);
     }
@@ -755,10 +755,8 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
             loadFromStore();
             return new java.util.Hashtable(delegate);
         }
-        else
-        {
-            // TODO Cater for non-cached map, load elements in a DB call.
-            return new java.util.Hashtable(delegate);
-        }
+
+        // TODO Cater for non-cached map, load elements in a DB call.
+        return new java.util.Hashtable(delegate);
     }
 }

@@ -475,10 +475,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
         {
             return ((java.util.ArrayList)delegate).clone();
         }
-        else
-        {
-            return ((java.util.HashSet)delegate).clone();
-        }
+        return ((java.util.HashSet)delegate).clone();
     }
 
     /**
@@ -827,7 +824,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
      * @param element The element
      * @param allowCascadeDelete Whether to allow cascade delete
      */
-    public boolean remove(Object element, boolean allowCascadeDelete)
+    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
     {
         makeDirty();
 
@@ -950,14 +947,12 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
 
             return backingSuccess;
         }
-        else
+
+        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
         {
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
-            {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
-            }
-            return delegateSuccess;
+            ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
+        return delegateSuccess;
     }
 
     /**
@@ -1012,10 +1007,8 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
             loadFromStore();
             return new java.util.HashSet(delegate);
         }
-        else
-        {
-            // TODO Cater for non-cached collection, load elements in a DB call.
-            return new java.util.HashSet(delegate);
-        }
+
+        // TODO Cater for non-cached collection, load elements in a DB call.
+        return new java.util.HashSet(delegate);
     }
 }

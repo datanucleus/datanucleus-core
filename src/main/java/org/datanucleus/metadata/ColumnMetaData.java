@@ -395,10 +395,7 @@ public class ColumnMetaData extends MetaData
         {
             return false;
         }
-        else
-        {
-            return allowsNull.booleanValue();
-        }
+        return allowsNull.booleanValue();
     }
 
     public Boolean getAllowsNull()

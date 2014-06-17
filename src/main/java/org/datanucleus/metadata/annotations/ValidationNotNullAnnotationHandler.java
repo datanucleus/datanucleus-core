@@ -40,13 +40,11 @@ public class ValidationNotNullAnnotationHandler implements MemberAnnotationHandl
             mmd.addColumn(colmd);
             return;
         }
-        else
+
+        if (colmds[0].getAllowsNull() == null)
         {
-            if (colmds[0].getAllowsNull() == null)
-            {
-                // No length set, so 
-                colmds[0].setAllowsNull(false);
-            }
+            // No length set, so 
+            colmds[0].setAllowsNull(false);
         }
     }
 }

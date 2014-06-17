@@ -221,7 +221,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      *
      * @return The cloned object
      */
-    public Object clone()
+    public synchronized Object clone()
     {
         return delegate.clone();
     }
@@ -260,7 +260,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * @param index The item to retrieve
      * @return The element at that position.
      **/
-    public Object get(int index)
+    public synchronized Object get(int index)
     {
         return delegate.get(index);
     }
@@ -279,7 +279,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * Accessor for whether the Stack is empty.
      * @return Whether it is empty.
      **/
-    public boolean isEmpty()
+    public synchronized boolean isEmpty()
     {
         return delegate.isEmpty();
     }
@@ -288,7 +288,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * Method to retrieve an iterator for the list.
      * @return The iterator
      **/
-    public Iterator iterator()
+    public synchronized Iterator iterator()
     {
         return new SCOListIterator(this, ownerOP, delegate, null, true, -1);
     }
@@ -297,7 +297,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * Method to retrieve a List iterator for the list.
      * @return The iterator
      **/
-    public ListIterator listIterator()
+    public synchronized ListIterator listIterator()
     {
         return new SCOListIterator(this, ownerOP, delegate, null, true, -1);
     }
@@ -307,7 +307,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * @param index The start point 
      * @return The iterator
      **/
-    public ListIterator listIterator(int index)
+    public synchronized ListIterator listIterator(int index)
     {
         return new SCOListIterator(this, ownerOP, delegate, null, true, index);
     }
@@ -317,7 +317,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * @param element The element
      * @return The last position of this element in the List.
      **/
-    public int lastIndexOf(Object element)
+    public synchronized int lastIndexOf(Object element)
     {
         return delegate.lastIndexOf(element);
     }
@@ -326,7 +326,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * Method to retrieve the element at the top of the stack.
      * @return The element at the top of the stack
      **/
-    public Object peek()
+    public synchronized Object peek()
     {
         return delegate.peek();
     }
@@ -335,7 +335,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * Accessor for the size of the Stack.
      * @return The size.
      **/
-    public int size()
+    public synchronized int size()
     {
         return delegate.size();
     }
@@ -397,7 +397,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * @param element The new element
      * @return Whether it was added ok.
      **/
-    public boolean add(Object element)
+    public synchronized boolean add(Object element)
     {
         boolean success = delegate.add(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -421,7 +421,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      *
      * @param element The new element
      **/
-    public void addElement(Object element)
+    public synchronized void addElement(Object element)
     {
         delegate.add(element);
         makeDirty();
@@ -436,7 +436,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * @param elements The collection
      * @return Whether it was added ok.
      **/
-    public boolean addAll(Collection elements)
+    public synchronized boolean addAll(Collection elements)
     {
         boolean success = delegate.addAll(elements);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -467,7 +467,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * @param elements The collection
      * @return Whether it was added ok.
      **/
-    public boolean addAll(int index, Collection elements)
+    public synchronized boolean addAll(int index, Collection elements)
     {
         boolean success = delegate.addAll(index, elements);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -535,7 +535,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * Method to remove the top element in the stack and return it.
      * @return The top element that was in the Stack (now removed).
      **/
-    public Object pop()
+    public synchronized Object pop()
     {
         Object obj = delegate.pop();
         makeDirty();
@@ -612,7 +612,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * @param elements The Collection
      * @return Whether the collection of elements were removed
      **/
-    public boolean removeAll(Collection elements)
+    public synchronized boolean removeAll(Collection elements)
     {
         boolean success = delegate.removeAll(elements);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -656,7 +656,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * @param element The element
      * @return Whether the element was removed
      **/
-    public boolean removeElement(Object element)
+    public synchronized boolean removeElement(Object element)
     {
         return remove(element);
     }
@@ -666,7 +666,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * @param index The element position.
      * @return The object that was removed
      **/
-    public Object remove(int index)
+    public synchronized Object remove(int index)
     {
         Object element = delegate.remove(index);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -695,7 +695,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * Method to remove an element from the Stack
      * @param index The element position.
      **/
-    public void removeElementAt(int index)
+    public synchronized void removeElementAt(int index)
     {
         remove(index);
     }
@@ -704,7 +704,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * Method to remove all elements from the Stack.
      * Same as clear().
      **/
-    public void removeAllElements()
+    public synchronized void removeAllElements()
     {
         clear();
     }
@@ -764,7 +764,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * @param element The new element
      * @return The element previously at that position
      **/
-    public Object set(int index,Object element)
+    public synchronized Object set(int index,Object element)
     {
         return set(index, element, true);
     }
@@ -775,7 +775,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>, 
      * @param element The new element
      * @param index The position
      **/
-    public void setElementAt(Object element,int index)
+    public synchronized void setElementAt(Object element,int index)
     {
         delegate.setElementAt(element, index);
         makeDirty();

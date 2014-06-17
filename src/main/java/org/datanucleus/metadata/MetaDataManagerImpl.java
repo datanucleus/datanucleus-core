@@ -2228,20 +2228,18 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             // No "persistence.xml" files found
             throw new NucleusUserException(Localiser.msg("044046"));
         }
-        else
+
+        for (int i=0;i<files.length;i++)
         {
-            for (int i=0;i<files.length;i++)
+            PersistenceUnitMetaData[] unitmds = files[i].getPersistenceUnits();
+            if (unitmds != null)
             {
-                PersistenceUnitMetaData[] unitmds = files[i].getPersistenceUnits();
-                if (unitmds != null)
+                for (int j=0;j<unitmds.length;j++)
                 {
-                    for (int j=0;j<unitmds.length;j++)
+                    if (unitmds[j].getName().equals(unitName))
                     {
-                        if (unitmds[j].getName().equals(unitName))
-                        {
-                            // Found the required unit
-                            return unitmds[j];
-                        }
+                        // Found the required unit
+                        return unitmds[j];
                     }
                 }
             }

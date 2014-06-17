@@ -216,10 +216,7 @@ public class AbstractQueryResultsCache implements QueryResultsCache
         {
             return pinnedCache.get(queryKey);
         }
-        else
-        {
-            return cache.get(queryKey);
-        }
+        return cache.get(queryKey);
     }
 
     /* (non-Javadoc)
@@ -244,10 +241,7 @@ public class AbstractQueryResultsCache implements QueryResultsCache
         {
             return pinnedCache.put(queryKey, results);
         }
-        else
-        {
-            return cache.put(queryKey, results);
-        }
+        return cache.put(queryKey, results);
     }
 
     /* (non-Javadoc)

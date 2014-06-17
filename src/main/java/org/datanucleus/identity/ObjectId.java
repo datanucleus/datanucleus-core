@@ -122,15 +122,9 @@ public class ObjectId extends SingleFieldId
                 {
                     return ((Comparable) key).compareTo(other.key);
                 }
-                else
-                {
-                    throw new ClassCastException("The key class (" + key.getClass().getName() + ") does not implement Comparable");
-                }
+                throw new ClassCastException("The key class (" + key.getClass().getName() + ") does not implement Comparable");
             }
-            else
-            {
-                return result;
-            }
+            return result;
         }
         else if (o == null)
         {

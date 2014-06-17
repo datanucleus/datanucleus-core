@@ -45,9 +45,6 @@ public class IdentityReference implements Serializable
         {
             return client == ((IdentityReference)o).client;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 }

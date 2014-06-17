@@ -112,10 +112,7 @@ public abstract class AbstractNamingFactory implements NamingFactory
         {
             return maxLengthByComponent.get(cmpt);
         }
-        else
-        {
-            return -1;
-        }
+        return -1;
     }
 
     /* (non-Javadoc)
@@ -381,10 +378,8 @@ public abstract class AbstractNamingFactory implements NamingFactory
 
             return name.substring(0, tailIndex) + suffix;
         }
-        else
-        {
-            return name;
-        }
+
+        return name;
     }
 
     /**

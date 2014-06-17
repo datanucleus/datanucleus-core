@@ -228,56 +228,54 @@ public class QueryManagerImpl implements QueryManager
                 }
                 return q;
             }
+
+            Query q = null;
+            if (query instanceof String)
+            {
+                // Try XXXQuery(ExecutionContext, String);
+                Class[] argsClass = new Class[]{ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT, String.class};
+                Object[] args = new Object[]{storeMgr, ec, query};
+                q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension(
+                    "org.datanucleus.store_query_query", new String[] {"name", "datastore"},
+                    new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, 
+                    "class-name", argsClass, args);
+                if (q == null)
+                {
+                    // No query support for this language
+                    throw new NucleusException(Localiser.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
+                }
+            }
+            else if (query instanceof Query)
+            {
+                // Try XXXQuery(StoreManager, ExecutionContext, Query.class);
+                Class[] argsClass = new Class[]{ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT, query.getClass()};
+                Object[] args = new Object[]{storeMgr, ec, query};
+                q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension(
+                    "org.datanucleus.store_query_query", new String[] {"name", "datastore"},
+                    new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, 
+                    "class-name", argsClass, args);
+                if (q == null)
+                {
+                    // No query support for this language
+                    throw new NucleusException(Localiser.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
+                }
+            }
             else
             {
-                Query q = null;
-                if (query instanceof String)
+                // Try XXXQuery(StoreManager, ExecutionContext, Object);
+                Class[] argsClass = new Class[]{ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT, Object.class};
+                Object[] args = new Object[]{storeMgr, ec, query};
+                q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension(
+                    "org.datanucleus.store_query_query", new String[] {"name", "datastore"},
+                    new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, 
+                    "class-name", argsClass, args);
+                if (q == null)
                 {
-                    // Try XXXQuery(ExecutionContext, String);
-                    Class[] argsClass = new Class[]{ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT, String.class};
-                    Object[] args = new Object[]{storeMgr, ec, query};
-                    q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension(
-                        "org.datanucleus.store_query_query", new String[] {"name", "datastore"},
-                        new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, 
-                        "class-name", argsClass, args);
-                    if (q == null)
-                    {
-                        // No query support for this language
-                        throw new NucleusException(Localiser.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
-                    }
+                    // No query support for this language
+                    throw new NucleusException(Localiser.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
                 }
-                else if (query instanceof Query)
-                {
-                    // Try XXXQuery(StoreManager, ExecutionContext, Query.class);
-                    Class[] argsClass = new Class[]{ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT, query.getClass()};
-                    Object[] args = new Object[]{storeMgr, ec, query};
-                    q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension(
-                        "org.datanucleus.store_query_query", new String[] {"name", "datastore"},
-                        new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, 
-                        "class-name", argsClass, args);
-                    if (q == null)
-                    {
-                        // No query support for this language
-                        throw new NucleusException(Localiser.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
-                    }
-                }
-                else
-                {
-                    // Try XXXQuery(StoreManager, ExecutionContext, Object);
-                    Class[] argsClass = new Class[]{ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT, Object.class};
-                    Object[] args = new Object[]{storeMgr, ec, query};
-                    q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension(
-                        "org.datanucleus.store_query_query", new String[] {"name", "datastore"},
-                        new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, 
-                        "class-name", argsClass, args);
-                    if (q == null)
-                    {
-                        // No query support for this language
-                        throw new NucleusException(Localiser.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
-                    }
-                }
-                return q;
             }
+            return q;
         }
         catch (InvocationTargetException e)
         {
@@ -503,65 +501,63 @@ public class QueryManagerImpl implements QueryManager
             }
             return null;
         }
-        else
+
+        // Not yet loaded anything for this method
+        ClassLoaderResolver clr = nucleusCtx.getClassLoaderResolver(type != null ? type.getClassLoader() : null);
+        PluginManager pluginMgr = nucleusCtx.getPluginManager();
+        ConfigurationElement[] elems = pluginMgr.getConfigurationElementsForExtension(
+            "org.datanucleus.query_method_evaluators", "method", methodName);
+        Map<Object, InvocationEvaluator> evaluators = new HashMap();
+        InvocationEvaluator requiredEvaluator = null;
+        if (elems == null)
         {
-            // Not yet loaded anything for this method
-            ClassLoaderResolver clr = nucleusCtx.getClassLoaderResolver(type != null ? type.getClassLoader() : null);
-            PluginManager pluginMgr = nucleusCtx.getPluginManager();
-            ConfigurationElement[] elems = pluginMgr.getConfigurationElementsForExtension(
-                "org.datanucleus.query_method_evaluators", "method", methodName);
-            Map<Object, InvocationEvaluator> evaluators = new HashMap();
-            InvocationEvaluator requiredEvaluator = null;
-            if (elems == null)
-            {
-                return null;
-            }
-
-            for (int i=0;i<elems.length;i++)
-            {
-                try
-                {
-                    String evalName = elems[i].getAttribute("evaluator");
-                    InvocationEvaluator eval =
-                        (InvocationEvaluator)pluginMgr.createExecutableExtension(
-                        "org.datanucleus.query_method_evaluators", new String[] {"method", "evaluator"},
-                        new String[] {methodName, evalName}, "evaluator", null, null);
-
-                    String elemClsName = elems[i].getAttribute("class");
-                    if (elemClsName != null && StringUtils.isWhitespace(elemClsName))
-                    {
-                        elemClsName = null;
-                    }
-                    if (elemClsName == null)
-                    {
-                        // Static method call
-                        if (type == null)
-                        {
-                            // Evaluator is applicable to the required type
-                            requiredEvaluator = eval;
-                        }
-                        evaluators.put("STATIC", eval);
-                    }
-                    else
-                    {
-                        Class elemCls = clr.classForName(elemClsName);
-                        if (elemCls.isAssignableFrom(type))
-                        {
-                            // Evaluator is applicable to the required type
-                            requiredEvaluator = eval;
-                        }
-                        evaluators.put(elemCls, eval);
-                    }
-                }
-                catch (Exception e)
-                {
-                    // Impossible to create the evaluator (class doesn't exist?) TODO Log this?
-                }
-            }
-
-            // Store evaluators for this method name
-            inmemoryQueryMethodEvaluatorMap.put(methodName, evaluators);
-            return requiredEvaluator;
+            return null;
         }
+
+        for (int i=0;i<elems.length;i++)
+        {
+            try
+            {
+                String evalName = elems[i].getAttribute("evaluator");
+                InvocationEvaluator eval =
+                        (InvocationEvaluator)pluginMgr.createExecutableExtension(
+                            "org.datanucleus.query_method_evaluators", new String[] {"method", "evaluator"},
+                            new String[] {methodName, evalName}, "evaluator", null, null);
+
+                String elemClsName = elems[i].getAttribute("class");
+                if (elemClsName != null && StringUtils.isWhitespace(elemClsName))
+                {
+                    elemClsName = null;
+                }
+                if (elemClsName == null)
+                {
+                    // Static method call
+                    if (type == null)
+                    {
+                        // Evaluator is applicable to the required type
+                        requiredEvaluator = eval;
+                    }
+                    evaluators.put("STATIC", eval);
+                }
+                else
+                {
+                    Class elemCls = clr.classForName(elemClsName);
+                    if (elemCls.isAssignableFrom(type))
+                    {
+                        // Evaluator is applicable to the required type
+                        requiredEvaluator = eval;
+                    }
+                    evaluators.put(elemCls, eval);
+                }
+            }
+            catch (Exception e)
+            {
+                // Impossible to create the evaluator (class doesn't exist?) TODO Log this?
+            }
+        }
+
+        // Store evaluators for this method name
+        inmemoryQueryMethodEvaluatorMap.put(methodName, evaluators);
+        return requiredEvaluator;
     }
 }

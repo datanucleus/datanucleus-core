@@ -495,15 +495,9 @@ public class Transaction
                     {
                         throw new HeuristicRollbackException("Transaction rolled back due to failure during commit", (Throwable) failures.get(0));
                     }
-                    else
-                    {
-                        throw new HeuristicRollbackException("Multiple failures");
-                    }
+                    throw new HeuristicRollbackException("Multiple failures");
                 }
-                else
-                {
-                    throw new RollbackException();
-                }
+                throw new RollbackException();
             }
             if ((status == STATUS_COMMITTED) && (failed))
             {

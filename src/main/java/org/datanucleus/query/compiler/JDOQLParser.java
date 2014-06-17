@@ -1127,12 +1127,10 @@ public class JDOQLParser implements Parser
             stack.push(expr);
             return true;
         }
-        else
-        {
-            Node expr = new Node(NodeType.IDENTIFIER, id);
-            stack.push(expr);
-            return true;
-        }
+
+        Node expr = new Node(NodeType.IDENTIFIER, id);
+        stack.push(expr);
+        return true;
     }
 
     private List<Object> parameterNameList = null;

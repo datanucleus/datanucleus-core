@@ -567,21 +567,19 @@ public class JDOQLSingleStringParser
                     tokenIndex--;
                     break;
                 }
+
+                // Append the content from the query string from the end of the last token to the end of this token
+                int endPos = queryString.indexOf(tokens[tokenIndex], queryStringPos) + tokens[tokenIndex].length();
+                String contentValue = queryString.substring(queryStringPos, endPos);
+                queryStringPos = endPos;
+
+                if (content.length() == 0)
+                {
+                    content = contentValue;
+                }
                 else
                 {
-                    // Append the content from the query string from the end of the last token to the end of this token
-                    int endPos = queryString.indexOf(tokens[tokenIndex], queryStringPos) + tokens[tokenIndex].length();
-                    String contentValue = queryString.substring(queryStringPos, endPos);
-                    queryStringPos = endPos;
-
-                    if (content.length() == 0)
-                    {
-                        content = contentValue;
-                    }
-                    else
-                    {
-                        content += contentValue;
-                    }
+                    content += contentValue;
                 }
             }
 

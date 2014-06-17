@@ -604,10 +604,7 @@ public class FetchPlan implements Serializable
         {
             return null;
         }
-        else 
-        {
-            return (Boolean) cachedIsToCallPostLoadFetchPlan.get(loadedFields);
-        }
+        return (Boolean) cachedIsToCallPostLoadFetchPlan.get(loadedFields);
     }
 
     void cacheIsToCallPostLoadFetchPlan(AbstractClassMetaData cmd, BitSet loadedFields, Boolean itcplfp)

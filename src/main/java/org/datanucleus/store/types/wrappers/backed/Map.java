@@ -779,10 +779,8 @@ public class Map extends org.datanucleus.store.types.wrappers.Map implements Bac
             loadFromStore();
             return new java.util.HashMap(delegate);
         }
-        else
-        {
-            // TODO Cater for non-cached map, load elements in a DB call.
-            return new java.util.HashMap(delegate);
-        }
+
+        // TODO Cater for non-cached map, load elements in a DB call.
+        return new java.util.HashMap(delegate);
     }
 }

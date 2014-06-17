@@ -85,9 +85,6 @@ public class LocateFunction implements InvocationEvaluator
             }
             return Integer.valueOf(((String)paramValue).indexOf(locStrValue, num2Value));
         }
-        else
-        {
-            return Integer.valueOf(((String)paramValue).indexOf(locStrValue));
-        }
+        return Integer.valueOf(((String)paramValue).indexOf(locStrValue));
     }
 }

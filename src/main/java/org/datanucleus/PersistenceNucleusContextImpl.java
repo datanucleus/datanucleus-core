@@ -1624,10 +1624,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             {
                 return true;
             }
-            else
-            {
-                return cacheableFlag;
-            }
+            return cacheableFlag;
         }
     }
 }

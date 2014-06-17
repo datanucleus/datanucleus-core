@@ -664,7 +664,7 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
      * @param element The element
      * @return Whether it was removed ok.
      **/
-    public boolean remove(Object element)
+    public synchronized boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -674,7 +674,7 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
      * @param element The element
      * @param allowCascadeDelete Whether to allow cascade delete
      */
-    public boolean remove(Object element, boolean allowCascadeDelete)
+    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
     {
         makeDirty();
 
@@ -797,14 +797,12 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
 
             return backingSuccess;
         }
-        else
+
+        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
         {
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
-            {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
-            }
-            return delegateSuccess;
+            ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
+        return delegateSuccess;
     }
 
     /**
@@ -859,10 +857,8 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
             loadFromStore();
             return new java.util.LinkedHashSet(delegate);
         }
-        else
-        {
-            // TODO Cater for non-cached collection, load elements in a DB call.
-            return new java.util.LinkedHashSet(delegate);
-        }
+
+        // TODO Cater for non-cached collection, load elements in a DB call.
+        return new java.util.LinkedHashSet(delegate);
     }
 }

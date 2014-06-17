@@ -97,10 +97,7 @@ public class ByteId extends SingleFieldId<Byte>
             {
                 return (key - other.key);
             }
-            else
-            {
-                return result;
-            }
+            return result;
         }
         else if (o == null)
         {

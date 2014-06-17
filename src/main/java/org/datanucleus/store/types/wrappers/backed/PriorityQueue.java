@@ -783,7 +783,7 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
      * @param element The element
      * @param allowCascadeDelete Whether to allow cascade delete
      */
-    public boolean remove(Object element, boolean allowCascadeDelete)
+    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
     {
         makeDirty();
 
@@ -891,14 +891,12 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
 
             return backingSuccess;
         }
-        else
+
+        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
         {
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
-            {
-                ownerOP.getExecutionContext().processNontransactionalUpdate();
-            }
-            return delegateSuccess;
+            ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
+        return delegateSuccess;
     }
 
     /**
@@ -953,10 +951,8 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
             loadFromStore();
             return new java.util.PriorityQueue(delegate);
         }
-        else
-        {
-            // TODO Cater for non-cached collection, load elements in a DB call.
-            return new java.util.PriorityQueue(delegate);
-        }
+
+        // TODO Cater for non-cached collection, load elements in a DB call.
+        return new java.util.PriorityQueue(delegate);
     }
 }

@@ -218,10 +218,7 @@ public class CollectionMetaData extends ContainerMetaData
         {
             return false;
         }
-        else
-        {
-            return element.embedded.booleanValue();
-        }
+        return element.embedded.booleanValue();
     }
 
     /**
@@ -257,10 +254,7 @@ public class CollectionMetaData extends ContainerMetaData
         {
             return false;
         }
-        else
-        {
-            return element.serialized.booleanValue();
-        }
+        return element.serialized.booleanValue();
     }
 
     public CollectionMetaData setElementType(String type)

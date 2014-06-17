@@ -125,13 +125,10 @@ public class AbstractResultClassMapper
                 {
                     return inputResult;
                 }
-                else
-                {
-                    String msg = Localiser.msg("021202",
-                        resultClass.getName(), inputResult.getClass().getName());
-                    NucleusLogger.QUERY.error(msg);
-                    throw new NucleusUserException(msg);
-                }
+
+                String msg = Localiser.msg("021202", resultClass.getName(), inputResult.getClass().getName());
+                NucleusLogger.QUERY.error(msg);
+                throw new NucleusUserException(msg);
             }
             else if (fieldNames.length > 1)
             {

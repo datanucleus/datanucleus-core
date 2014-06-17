@@ -21,6 +21,7 @@ package org.datanucleus.store.types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.scostore.CollectionStore;
@@ -44,13 +45,12 @@ public class SCOCollectionIterator implements Iterator
      * @param backingStore The backing store (connected to the DB)
      * @param useDelegate Whether to use the delegate
      */
-    public SCOCollectionIterator(Collection sco, ObjectProvider sm, Collection theDelegate,
-            CollectionStore backingStore, boolean useDelegate)
+    public SCOCollectionIterator(Collection sco, ObjectProvider sm, Collection theDelegate, CollectionStore backingStore, boolean useDelegate)
     {
         ownerSCO = sco;
 
         // Populate our entries list
-        ArrayList entries = new ArrayList();
+        List entries = new ArrayList();
 
         Iterator i=null; 
         if (useDelegate)

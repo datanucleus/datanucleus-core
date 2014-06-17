@@ -120,15 +120,13 @@ public abstract class AbstractSymbolResolver implements SymbolResolver
             }
             return fmd.getType();
         }
-        else
+
+        Field field = ClassUtils.getFieldForClass(cls, fieldName);
+        if (field == null)
         {
-            Field field = ClassUtils.getFieldForClass(cls, fieldName);
-            if (field == null)
-            {
-                throw new NucleusUserException("Cannot access field "+fieldName+" on type "+cls.getName());
-            }
-            return field.getType();
+            throw new NucleusUserException("Cannot access field "+fieldName+" on type "+cls.getName());
         }
+        return field.getType();
     }
 
     public Class getPrimaryClass()

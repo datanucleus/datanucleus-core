@@ -109,8 +109,7 @@ public class Label {
 
     /**
      * Field used to associate user information to a label. Warning: this field
-     * is used by the ASM tree package. In order to use it with the ASM tree
-     * package you must override the getLabelNode method.
+     * is used by the ASM tree package.
      */
     public Object info;
 
@@ -472,7 +471,7 @@ public class Label {
     void addToSubroutine(final long id, final int nbSubroutines) {
         if ((status & VISITED) == 0) {
             status |= VISITED;
-            srcAndRefPositions = new int[(nbSubroutines - 1) / 32 + 1];
+            srcAndRefPositions = new int[nbSubroutines / 32 + 1];
         }
         srcAndRefPositions[(int) (id >>> 32)] |= (int) id;
     }

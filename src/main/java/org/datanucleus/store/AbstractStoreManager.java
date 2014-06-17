@@ -1023,14 +1023,12 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             // Unique strategy so supported for all datastores
             return true;
         }
-        else
+
+        elem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
+            new String[]{"name", "datastore"}, new String[] {strategy, storeManagerKey});
+        if (elem != null)
         {
-            elem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
-                new String[]{"name", "datastore"}, new String[] {strategy, storeManagerKey});
-            if (elem != null)
-            {
-                return true;
-            }
+            return true;
         }
         return false;
     }
@@ -1373,32 +1371,30 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 throw new NucleusUserException("This datastore provider doesn't support native strategy for field of type " + type.getName());
             }
         }
-        else
-        {
-            IdentityMetaData idmd = cmd.getBaseIdentityMetaData();
-            if (idmd != null && idmd.getColumnMetaData() != null)
-            {
-                if (MetaDataUtils.isJdbcTypeString(idmd.getColumnMetaData().getJdbcType()))
-                {
-                    return "uuid-hex";
-                }
-            }
 
-            // Numeric datastore-identity
-            if (supportsValueStrategy("identity"))
+        IdentityMetaData idmd = cmd.getBaseIdentityMetaData();
+        if (idmd != null && idmd.getColumnMetaData() != null)
+        {
+            if (MetaDataUtils.isJdbcTypeString(idmd.getColumnMetaData().getJdbcType()))
             {
-                return "identity";
+                return "uuid-hex";
             }
-            else if (supportsValueStrategy("sequence") && idmd.getSequence() != null)
-            {
-                return "sequence";
-            }
-            else if (supportsValueStrategy("increment"))
-            {
-                return "increment";
-            }
-            throw new NucleusUserException("This datastore provider doesn't support numeric native strategy for class " + cmd.getFullClassName());
         }
+
+        // Numeric datastore-identity
+        if (supportsValueStrategy("identity"))
+        {
+            return "identity";
+        }
+        else if (supportsValueStrategy("sequence") && idmd.getSequence() != null)
+        {
+            return "sequence";
+        }
+        else if (supportsValueStrategy("increment"))
+        {
+            return "increment";
+        }
+        throw new NucleusUserException("This datastore provider doesn't support numeric native strategy for class " + cmd.getFullClassName());
     }
 
     /**
@@ -1595,7 +1591,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      */
     public Collection<String> getSubClassesForClass(String className, boolean includeDescendents, ClassLoaderResolver clr)
     {
-        HashSet subclasses = new HashSet();
+        Collection<String> subclasses = new HashSet<String>();
 
         String[] subclassNames = getMetaDataManager().getSubclassesForClass(className, includeDescendents);
         if (subclassNames != null)

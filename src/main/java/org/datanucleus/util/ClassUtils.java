@@ -2042,10 +2042,7 @@ public class ClassUtils
 
             return fieldNumbers;
         }
-        else
-        {
-            return null;
-        }
+        return null;
     }
 
     /**
@@ -2081,10 +2078,7 @@ public class ClassUtils
 
             return fieldNumbers;
         }
-        else
-        {
-            return null;
-        }
+        return null;
     }
 
     /**

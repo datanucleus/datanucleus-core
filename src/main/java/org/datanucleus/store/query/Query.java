@@ -576,15 +576,9 @@ public abstract class Query implements Serializable, ExecutionContextListener
             {
                 return (Boolean)value;
             }
-            else
-            {
-                return Boolean.valueOf((String)value);
-            }
+            return Boolean.valueOf((String)value);
         }
-        else
-        {
-            return ec.getNucleusContext().getConfiguration().getBooleanProperty(name, resultIfNotSet);
-        }
+        return ec.getNucleusContext().getConfiguration().getBooleanProperty(name, resultIfNotSet);
     }
 
     /**
@@ -601,11 +595,9 @@ public abstract class Query implements Serializable, ExecutionContextListener
         {
             return (String)extensions.get(name);
         }
-        else
-        {
-            String value = ec.getNucleusContext().getConfiguration().getStringProperty(name);
-            return (value != null ? value : resultIfNotSet);
-        }
+
+        String value = ec.getNucleusContext().getConfiguration().getStringProperty(name);
+        return (value != null ? value : resultIfNotSet);
     }
 
     /**
@@ -1824,10 +1816,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
                 {
                     return null;
                 }
-                else
-                {
-                    return Collections.EMPTY_LIST;
-                }
+                return Collections.EMPTY_LIST;
             }
 
             boolean failed = true; // flag to use for checking the state of the execution results
@@ -1864,23 +1853,21 @@ public abstract class Query implements Serializable, ExecutionContextListener
                             {
                                 throw new NoQueryResultsException("No query results were returned");
                             }
-                            else
-                            {
-                                if (!processesRangeInDatastoreQuery() && (toExclNo - fromInclNo <= 0))
-                                {
-                                    // JDO2 spec 14.6.8 (range excludes instances, so return null)
-                                    throw new NoQueryResultsException("No query results were returned in the required range");
-                                }
 
-                                Iterator qrIter = qr.iterator();
-                                Object firstRow = qrIter.next();
-                                if (qrIter.hasNext())
-                                {
-                                    failed = true;
-                                    throw new QueryNotUniqueException();
-                                }
-                                return firstRow;
+                            if (!processesRangeInDatastoreQuery() && (toExclNo - fromInclNo <= 0))
+                            {
+                                // JDO2 spec 14.6.8 (range excludes instances, so return null)
+                                throw new NoQueryResultsException("No query results were returned in the required range");
                             }
+
+                            Iterator qrIter = qr.iterator();
+                            Object firstRow = qrIter.next();
+                            if (qrIter.hasNext())
+                            {
+                                failed = true;
+                                throw new QueryNotUniqueException();
+                            }
+                            return firstRow;
                         }
                         finally
                         {
@@ -1892,16 +1879,14 @@ public abstract class Query implements Serializable, ExecutionContextListener
                             }
                         }
                     }
-                    else
-                    {
-                        if (qr instanceof QueryResult && queryResults != null)
-                        {
-                            // Result handler, so register the results so we can close later
-                            queryResults.add((QueryResult)qr);
-                        }
 
-                        return qr;
+                    if (qr instanceof QueryResult && queryResults != null)
+                    {
+                        // Result handler, so register the results so we can close later
+                        queryResults.add((QueryResult)qr);
                     }
+
+                    return qr;
                 }
                 else
                 {
@@ -2118,36 +2103,34 @@ public abstract class Query implements Serializable, ExecutionContextListener
             {
                 return 0;
             }
-            else
+
+            // TODO : To make this most efficient we shouldn't instantiate things into memory
+            // but instead check if the object to be deleted implements DeleteCallback, or there are
+            // any lifecycle listeners for this object type, or if there are any dependent fields
+            // and only then do we instantiate it.
+            int number = results.size();
+            if (requiresUnique && number > 1)
             {
-                // TODO : To make this most efficient we shouldn't instantiate things into memory
-                // but instead check if the object to be deleted implements DeleteCallback, or there are
-                // any lifecycle listeners for this object type, or if there are any dependent fields
-                // and only then do we instantiate it.
-                int number = results.size();
-                if (requiresUnique && number > 1)
-                {
-                    throw new NucleusUserException(Localiser.msg("021032"));
-                }
-
-                // Instances to be deleted are flushed first (JDO2 [14.8-4])
-                Iterator resultsIter = results.iterator();
-                while (resultsIter.hasNext())
-                {
-                    ec.findObjectProvider(resultsIter.next()).flush();
-                }
-
-                // Perform the deletion - deletes any dependent objects
-                ec.deleteObjects(results.toArray());
-
-                if (results instanceof QueryResult)
-                {
-                    // Close any results that are of type QueryResult (which manage the access to the results)
-                    ((QueryResult)results).close();
-                }
-
-                return number;
+                throw new NucleusUserException(Localiser.msg("021032"));
             }
+
+            // Instances to be deleted are flushed first (JDO2 [14.8-4])
+            Iterator resultsIter = results.iterator();
+            while (resultsIter.hasNext())
+            {
+                ec.findObjectProvider(resultsIter.next()).flush();
+            }
+
+            // Perform the deletion - deletes any dependent objects
+            ec.deleteObjects(results.toArray());
+
+            if (results instanceof QueryResult)
+            {
+                // Close any results that are of type QueryResult (which manage the access to the results)
+                ((QueryResult)results).close();
+            }
+
+            return number;
         }
         finally
         {

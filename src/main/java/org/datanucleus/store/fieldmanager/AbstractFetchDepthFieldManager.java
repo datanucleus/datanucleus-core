@@ -109,11 +109,9 @@ public abstract class AbstractFetchDepthFieldManager extends AbstractFieldManage
 
             return result;
         }
-        else
-        {
-            // Perform the fetch of this field
-            return internalFetchObjectField(fieldNumber);
-        }
+
+        // Perform the fetch of this field
+        return internalFetchObjectField(fieldNumber);
     }
 
     /**

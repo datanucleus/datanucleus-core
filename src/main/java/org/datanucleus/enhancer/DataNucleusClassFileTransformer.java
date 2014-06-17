@@ -146,10 +146,8 @@ public class DataNucleusClassFileTransformer implements ClassFileTransformer
 
             return null;
         }
-        else
-        {
-            // No args provided so pass all through to the transformer
-            return enhancer.enhance(name, classfileBuffer, loader);
-        }
+
+        // No args provided so pass all through to the transformer
+        return enhancer.enhance(name, classfileBuffer, loader);
     }
 }

@@ -92,13 +92,8 @@ public class JoinExpression extends Expression
     {
         if (right != null)
         {
-            return "JoinExpression{" + type + " " + primExpr + " alias=" + alias + " join=" + right + 
-                    (onExpr != null ? (" on=" + onExpr) : "") + "}";
+            return "JoinExpression{" + type + " " + primExpr + " alias=" + alias + " join=" + right + (onExpr != null ? (" on=" + onExpr) : "") + "}";
         }
-        else
-        {
-            return "JoinExpression{" + type + " " + primExpr + " alias=" + alias + 
-                    (onExpr != null ? (" on=" + onExpr) : "") + "}";
-        }
+        return "JoinExpression{" + type + " " + primExpr + " alias=" + alias + (onExpr != null ? (" on=" + onExpr) : "") + "}";
     }
 }

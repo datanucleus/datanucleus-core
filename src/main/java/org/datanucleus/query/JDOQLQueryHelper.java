@@ -243,10 +243,7 @@ public class JDOQLQueryHelper
             {
                 return ":" + paramExpr.getId();
             }
-            else
-            {
-                return "?" + paramExpr.getPosition();
-            }
+            return "?" + paramExpr.getPosition();
         }
         else if (expr instanceof VariableExpression)
         {
@@ -297,10 +294,7 @@ public class JDOQLQueryHelper
                 {
                     return "null";
                 }
-                else
-                {
-                    return litExpr.getLiteral().toString();
-                }
+                return litExpr.getLiteral().toString();
             }
         }
         else if (expr instanceof VariableExpression)

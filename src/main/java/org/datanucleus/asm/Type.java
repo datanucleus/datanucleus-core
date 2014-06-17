@@ -285,9 +285,9 @@ public class Type {
             } else /* if (c == Long.TYPE) */{
                 return LONG_TYPE;
             }
-        } else {
-            return getType(getDescriptor(c));
         }
+
+        return getType(getDescriptor(c));
     }
 
     /**
@@ -556,11 +556,11 @@ public class Type {
         case DOUBLE:
             return "double";
         case ARRAY:
-            StringBuffer b = new StringBuffer(getElementType().getClassName());
+            StringBuilder sb = new StringBuilder(getElementType().getClassName());
             for (int i = getDimensions(); i > 0; --i) {
-                b.append("[]");
+                sb.append("[]");
             }
-            return b.toString();
+            return sb.toString();
         case OBJECT:
             return new String(buf, off, len).replace('/', '.');
         default:
@@ -825,11 +825,11 @@ public class Type {
             // the offset for IALOAD or IASTORE is in byte 1 of 'off' for
             // primitive types (buf == null)
             return opcode + (buf == null ? (off & 0xFF00) >> 8 : 4);
-        } else {
-            // the offset for other instructions is in byte 2 of 'off' for
-            // primitive types (buf == null)
-            return opcode + (buf == null ? (off & 0xFF0000) >> 16 : 4);
         }
+
+        // the offset for other instructions is in byte 2 of 'off' for
+        // primitive types (buf == null)
+        return opcode + (buf == null ? (off & 0xFF0000) >> 16 : 4);
     }
 
     // ------------------------------------------------------------------------

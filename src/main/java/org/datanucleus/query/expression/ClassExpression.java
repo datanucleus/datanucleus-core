@@ -78,15 +78,9 @@ public class ClassExpression extends Expression
     {
         if (right != null)
         {
-            return "ClassExpression(" + 
-                (candidateExpression != null ? ("candidate=" + candidateExpression + " ") : "") + 
-                "alias=" + alias + " join=" + right + ")";
+            return "ClassExpression(" + (candidateExpression != null ? ("candidate=" + candidateExpression + " ") : "") + "alias=" + alias + " join=" + right + ")";
         }
-        else
-        {
-            return "ClassExpression(" + 
-                (candidateExpression != null ? ("candidate=" + candidateExpression + " ") : "") + 
-                "alias=" + alias + ")";
-        }
+
+        return "ClassExpression(" + (candidateExpression != null ? ("candidate=" + candidateExpression + " ") : "") + "alias=" + alias + ")";
     }
 }

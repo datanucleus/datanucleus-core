@@ -187,10 +187,7 @@ public class IdentityUtils
         {
             return ((SingleFieldId)id).getTargetClassName() + ":" + ((SingleFieldId)id).getKeyAsObject();
         }
-        else
-        {
-            return id.toString();
-        }
+        return id.toString();
     }
 
     /**
@@ -331,42 +328,40 @@ public class IdentityUtils
                 }
                 return id;
             }
-            else
-            {
-                // Create user-defined PK class with PK field values
-                try
-                {
-                    // All user-defined PK classes have a default constructor
-                    Object id = idClass.newInstance();
 
-                    for (int i=0;i<pkFieldNums.length;i++)
-                    {
-                        AbstractMemberMetaData pkMmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkFieldNums[i]);
-                        Object value = pkFieldValues[i];
-                        if (api.isPersistable(value))
-                        {
-                            // CompoundIdentity, so use id
-                            value = api.getIdForObject(value);
-                        }
-                        if (pkMmd instanceof FieldMetaData)
-                        {
-                            // Set the field directly (assumed to be public)
-                            Field pkField = ClassUtils.getFieldForClass(idClass, pkMmd.getName());
-                            pkField.set(id, value);
-                        }
-                        else
-                        {
-                            // Use the setter
-                            Method pkMethod = ClassUtils.getSetterMethodForClass(idClass, pkMmd.getName(), pkMmd.getType());
-                            pkMethod.invoke(id, value);
-                        }
-                    }
-                    return id;
-                }
-                catch (Exception e)
+            // Create user-defined PK class with PK field values
+            try
+            {
+                // All user-defined PK classes have a default constructor
+                Object id = idClass.newInstance();
+
+                for (int i=0;i<pkFieldNums.length;i++)
                 {
-                    return null;
+                    AbstractMemberMetaData pkMmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkFieldNums[i]);
+                    Object value = pkFieldValues[i];
+                    if (api.isPersistable(value))
+                    {
+                        // CompoundIdentity, so use id
+                        value = api.getIdForObject(value);
+                    }
+                    if (pkMmd instanceof FieldMetaData)
+                    {
+                        // Set the field directly (assumed to be public)
+                        Field pkField = ClassUtils.getFieldForClass(idClass, pkMmd.getName());
+                        pkField.set(id, value);
+                    }
+                    else
+                    {
+                        // Use the setter
+                        Method pkMethod = ClassUtils.getSetterMethodForClass(idClass, pkMmd.getName(), pkMmd.getType());
+                        pkMethod.invoke(id, value);
+                    }
                 }
+                return id;
+            }
+            catch (Exception e)
+            {
+                return null;
             }
         }
         return null;

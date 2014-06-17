@@ -193,88 +193,82 @@ public class PrimaryExpression extends Expression
                         throw new NucleusUserException("Class name " + className + " could not be resolved");
                     }
                 }
-                else
+
+                try
                 {
+                    String staticFieldName = className.substring(className.lastIndexOf('.')+1);
+                    className = className.substring(0, className.lastIndexOf('.'));
+                    Class cls = symtbl.getSymbolResolver().resolveClass(className);
                     try
                     {
-                        String staticFieldName = className.substring(className.lastIndexOf('.')+1);
-                        className = className.substring(0, className.lastIndexOf('.'));
-                        Class cls = symtbl.getSymbolResolver().resolveClass(className);
-                        try
+                        Field fld = cls.getDeclaredField(staticFieldName);
+                        if (!Modifier.isStatic(fld.getModifiers()))
                         {
-                            Field fld = cls.getDeclaredField(staticFieldName);
-                            if (!Modifier.isStatic(fld.getModifiers()))
-                            {
-                                throw new NucleusUserException("Identifier " + className + "." + staticFieldName +
+                            throw new NucleusUserException("Identifier " + className + "." + staticFieldName +
                                     " is unresolved (not a static field)");
-                            }
-                            throw new PrimaryExpressionIsClassStaticFieldException(fld);
                         }
-                        catch (NoSuchFieldException nsfe)
-                        {
-                            throw new NucleusUserException("Identifier " + className + "." + staticFieldName + 
-                                " is unresolved (not a static field)");
-                        }
+                        throw new PrimaryExpressionIsClassStaticFieldException(fld);
                     }
-                    catch (ClassNotResolvedException cnre2)
+                    catch (NoSuchFieldException nsfe)
                     {
-                        if (getId().indexOf(".") > 0)
+                        throw new NucleusUserException("Identifier " + className + "." + staticFieldName + 
+                                " is unresolved (not a static field)");
+                    }
+                }
+                catch (ClassNotResolvedException cnre2)
+                {
+                    if (getId().indexOf(".") > 0)
+                    {
+                        Iterator<String> tupleIter = tuples.iterator();
+                        Class cls = null;
+                        while (tupleIter.hasNext())
                         {
-                            Iterator<String> tupleIter = tuples.iterator();
-                            Class cls = null;
-                            while (tupleIter.hasNext())
+                            String tuple = tupleIter.next();
+                            if (cls == null)
                             {
-                                String tuple = tupleIter.next();
-                                if (cls == null)
+                                Symbol sym = symtbl.getSymbol(tuple);
+                                if (sym == null)
                                 {
-                                    Symbol sym = symtbl.getSymbol(tuple);
+                                    sym = symtbl.getSymbol("this");
                                     if (sym == null)
                                     {
-                                        sym = symtbl.getSymbol("this");
-                                        if (sym == null)
-                                        {
-                                            // TODO Need to get hold of candidate alias
-                                            break;
-                                        }
-                                    }
-                                    cls = sym.getValueType();
-                                }
-                                else
-                                {
-                                    // Look for member of the current class
-                                    if (cls.isArray() && tuple.equals("length") && !tupleIter.hasNext())
-                                    {
-                                        // Special case of Array.length
-                                        PrimaryExpression primExpr = new PrimaryExpression(left, tuples.subList(0, tuples.size()-1));
-                                        InvokeExpression invokeExpr = new InvokeExpression(primExpr, "size", null);
-                                        throw new PrimaryExpressionIsInvokeException(invokeExpr);
-                                    }
-                                    else
-                                    {
-                                        cls = ClassUtils.getClassForMemberOfClass(cls, tuple);
+                                        // TODO Need to get hold of candidate alias
+                                        break;
                                     }
                                 }
+                                cls = sym.getValueType();
                             }
-                            if (cls != null)
+                            else
                             {
-                                // TODO Add symbol
+                                // Look for member of the current class
+                                if (cls.isArray() && tuple.equals("length") && !tupleIter.hasNext())
+                                {
+                                    // Special case of Array.length
+                                    PrimaryExpression primExpr = new PrimaryExpression(left, tuples.subList(0, tuples.size()-1));
+                                    InvokeExpression invokeExpr = new InvokeExpression(primExpr, "size", null);
+                                    throw new PrimaryExpressionIsInvokeException(invokeExpr);
+                                }
+                                cls = ClassUtils.getClassForMemberOfClass(cls, tuple);
                             }
                         }
+                        if (cls != null)
+                        {
+                            // TODO Add symbol
+                        }
+                    }
 
-                        if (symtbl.getSymbolResolver().supportsImplicitVariables() && left == null)
-                        {
-                            // Implicit variable, so put as "left" and remove from tuples
-                            VariableExpression varExpr = new VariableExpression(className);
-                            varExpr.bind(symtbl);
-                            left = varExpr;
-                            tuples.remove(0);
-                        }
-                        else
-                        {
-                            // Just throw the original exception
-                            throw new NucleusUserException("Cannot find type of (part of) " + getId() +
-                                " since symbol has no type; implicit variable?");
-                        }
+                    if (symtbl.getSymbolResolver().supportsImplicitVariables() && left == null)
+                    {
+                        // Implicit variable, so put as "left" and remove from tuples
+                        VariableExpression varExpr = new VariableExpression(className);
+                        varExpr.bind(symtbl);
+                        left = varExpr;
+                        tuples.remove(0);
+                    }
+                    else
+                    {
+                        // Just throw the original exception
+                        throw new NucleusUserException("Cannot find type of (part of) " + getId() + " since symbol has no type; implicit variable?");
                     }
                 }
             }
@@ -293,9 +287,6 @@ public class PrimaryExpression extends Expression
         {
             return "PrimaryExpression{" + left + "." + getId() + "}" + (alias != null ? " AS " + alias : "");
         }
-        else
-        {
-            return "PrimaryExpression{" + getId() + "}" + (alias != null ? " AS " + alias : "");
-        }
+        return "PrimaryExpression{" + getId() + "}" + (alias != null ? " AS " + alias : "");
     }
 }

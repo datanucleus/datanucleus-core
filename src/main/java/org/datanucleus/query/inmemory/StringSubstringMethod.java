@@ -110,10 +110,7 @@ public class StringSubstringMethod implements InvocationEvaluator
                 {
                     return null;
                 }
-                else
-                {
-                    return ((String)invokedValue).substring(arg0);
-                }
+                return ((String)invokedValue).substring(arg0);
             }
             result = ((String)invokedValue).substring(arg0, arg1);
         }

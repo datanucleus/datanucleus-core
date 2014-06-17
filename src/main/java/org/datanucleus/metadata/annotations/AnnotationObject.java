@@ -18,7 +18,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.metadata.annotations;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -39,7 +38,7 @@ public class AnnotationObject
      * @param name Class name of the annotation object
      * @param map Map of the annotation properties
      */
-    public AnnotationObject(String name, HashMap<String, Object> map)
+    public AnnotationObject(String name, Map<String, Object> map)
     {
         this.name = name;
         this.nameValueMap = map;

@@ -123,10 +123,7 @@ public class Lexer
             ci.next();
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     /**
@@ -143,11 +140,8 @@ public class Lexer
         {
             return true;
         }
-        else
-        {
-            ci.setIndex(savedIdx);
-            return false;
-        }
+        ci.setIndex(savedIdx);
+        return false;
     }
 
     /**
@@ -442,10 +436,7 @@ public class Lexer
         {
             return new BigInteger(digits.toString(), radix).negate();
         }
-        else
-        {
-            return new BigInteger(digits.toString(), radix);
-        }
+        return new BigInteger(digits.toString(), radix);
     }
 
     /**
@@ -529,10 +520,7 @@ public class Lexer
         {
             return new BigDecimal(val.toString()).negate();
         }
-        else
-        {
-            return new BigDecimal(val.toString());
-        }
+        return new BigDecimal(val.toString());
     }
 
     /**
@@ -727,29 +715,27 @@ public class Lexer
 
             return (char) i;
         }
-        else
+
+        switch (c)
         {
-            switch (c)
-            {
-                case 'b' :
-                    return '\b';
-                case 't' :
-                    return '\t';
-                case 'n' :
-                    return '\n';
-                case 'f' :
-                    return '\f';
-                case 'r' :
-                    return '\r';
-                case '"' :
-                    return '"';
-                case '\'' :
-                    return '\'';
-                case '\\' :
-                    return '\\';
-                default :
-                    throw new NucleusUserException("Invalid character escape: '\\" + c + "'");
-            }
+            case 'b' :
+                return '\b';
+            case 't' :
+                return '\t';
+            case 'n' :
+                return '\n';
+            case 'f' :
+                return '\f';
+            case 'r' :
+                return '\r';
+            case '"' :
+                return '"';
+            case '\'' :
+                return '\'';
+            case '\\' :
+                return '\\';
+            default :
+                throw new NucleusUserException("Invalid character escape: '\\" + c + "'");
         }
     }
 

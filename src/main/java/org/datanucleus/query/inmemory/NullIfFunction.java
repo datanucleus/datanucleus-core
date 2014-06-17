@@ -56,10 +56,7 @@ public class NullIfFunction implements InvocationEvaluator
         {
             return null;
         }
-        else
-        {
-            return argValue1;
-        }
+        return argValue1;
     }
 
     protected Object getValueForArgExpression(Expression argExpr, InMemoryExpressionEvaluator eval)

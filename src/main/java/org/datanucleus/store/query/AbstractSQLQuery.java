@@ -326,7 +326,7 @@ public abstract class AbstractSQLQuery extends Query
     public Object executeWithArray(Object[] parameters)
     {
         // Convert the input array into a Map with Integer keys 1, 2, etc
-        HashMap parameterMap = new HashMap();
+        Map parameterMap = new HashMap();
         if (parameters != null)
         {
             for (int i = 0; i < parameters.length; ++i)

@@ -183,10 +183,7 @@ public class JPQLQueryHelper
             {
                 return ":" + paramExpr.getId();
             }
-            else
-            {
-                return "?" + paramExpr.getPosition();
-            }
+            return "?" + paramExpr.getPosition();
         }
         else if (expr instanceof InvokeExpression)
         {
@@ -345,10 +342,7 @@ public class JPQLQueryHelper
                     DyadicExpression dyExpr = (DyadicExpression)argExpr;
                     return "COUNT(DISTINCT " + JPQLQueryHelper.getJPQLForExpression(dyExpr.getLeft()) + ")";
                 }
-                else
-                {
-                    return "COUNT(" + JPQLQueryHelper.getJPQLForExpression(argExpr) + ")";
-                }
+                return "COUNT(" + JPQLQueryHelper.getJPQLForExpression(argExpr) + ")";
             }
             else if (method.equalsIgnoreCase("COALESCE"))
             {

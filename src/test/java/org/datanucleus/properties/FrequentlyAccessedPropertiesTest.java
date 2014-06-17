@@ -47,7 +47,7 @@ public class FrequentlyAccessedPropertiesTest
             private static final long serialVersionUID = 6287389368679465707L;
 
             @Override
-            public void initialise() {
+            public synchronized void initialise() {
             }
         };
         Configuration conf = ctx.getConfiguration();

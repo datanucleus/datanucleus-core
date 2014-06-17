@@ -435,7 +435,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
         int numberOfAnns = annotations.length;
         for (int i=0;i<numberOfAnns;i++)
         {
-            HashMap<String, Object> map = new HashMap<String, Object>();
+            Map<String, Object> map = new HashMap<String, Object>();
             Method[] annMethods = annotations[i].annotationType().getDeclaredMethods();
             int numberOfAnnotateMethods = annMethods.length;
             for (int j = 0; j < numberOfAnnotateMethods; j++)

@@ -1559,14 +1559,12 @@ public class SCOUtils
                         // One is not persistent so just return false
                         return false;
                     }
-                    else
+
+                    if (!oldId.equals(newId))
                     {
-                        if (!oldId.equals(newId))
-                        {
-                            return false;
-                        }
-                        // Id is the same so element is the same
+                        return false;
                     }
+                    // Id is the same so element is the same
                 }
                 else
                 {

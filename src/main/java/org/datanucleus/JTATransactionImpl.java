@@ -239,18 +239,14 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
                 // already joined so already in sync, so return "active" flag to avoid JNDI lookups
                 return super.isActive();
             }
-            else
-            {
-                // join as required
-                joinTransaction();
-                return super.isActive() || joinStatus == JoinStatus.IMPOSSIBLE;
-            }
+
+            // join as required
+            joinTransaction();
+            return super.isActive() || joinStatus == JoinStatus.IMPOSSIBLE;
         }
-        else
-        {
-            // Just return the "active" flag
-            return super.isActive();
-        }
+
+        // Just return the "active" flag
+        return super.isActive();
     }
 
     /**

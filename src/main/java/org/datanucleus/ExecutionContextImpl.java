@@ -971,25 +971,17 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 return false;
             }
-            else
-            {
                 return true;
-            }
         }
-        else
+
+        // Default behaviour
+        if (tx.isActive())
         {
-            // Default behaviour
-            if (tx.isActive())
-            {
-                // We delay ops with optimistic, and don't (currently) with datastore txns
-                return tx.getOptimistic();
-            }
-            else
-            {
-                // Delay ops if not atomic flushing
-                return !isNonTxAtomic();
-            }
+            // We delay ops with optimistic, and don't (currently) with datastore txns
+            return tx.getOptimistic();
         }
+        // Delay ops if not atomic flushing
+        return !isNonTxAtomic();
     }
 
     /**
@@ -1721,43 +1713,41 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 return persistObjectWork(obj);
             }
-            else
+
+            threadInfo.nontxPersistDelete = true;
+            boolean success = true;
+            Set cachedIds = (cache != null ? new HashSet(cache.keySet()) : null);
+            try
             {
-                threadInfo.nontxPersistDelete = true;
-                boolean success = true;
-                Set cachedIds = (cache != null ? new HashSet(cache.keySet()) : null);
-                try
+                return persistObjectWork(obj);
+            }
+            catch (RuntimeException re)
+            {
+                success = false;
+                if (cache != null)
                 {
-                    return persistObjectWork(obj);
-                }
-                catch (RuntimeException re)
-                {
-                    success = false;
-                    if (cache != null)
+                    // Make sure we evict any objects that have been put in the L1 cache during this step
+                    // TODO Also ought to disconnect any state manager
+                    Iterator cacheIter = cache.keySet().iterator();
+                    while (cacheIter.hasNext())
                     {
-                        // Make sure we evict any objects that have been put in the L1 cache during this step
-                        // TODO Also ought to disconnect any state manager
-                        Iterator cacheIter = cache.keySet().iterator();
-                        while (cacheIter.hasNext())
+                        Object id = cacheIter.next();
+                        if (!cachedIds.contains(id))
                         {
-                            Object id = cacheIter.next();
-                            if (!cachedIds.contains(id))
-                            {
-                                // Remove from L1 cache
-                                cacheIter.remove();
-                            }
+                            // Remove from L1 cache
+                            cacheIter.remove();
                         }
                     }
-                    throw re;
                 }
-                finally
+                throw re;
+            }
+            finally
+            {
+                threadInfo.nontxPersistDelete = false;
+                if (success)
                 {
-                    threadInfo.nontxPersistDelete = false;
-                    if (success)
-                    {
-                        // Commit any non-tx changes
-                        processNontransactionalAtomicChanges();
-                    }
+                    // Commit any non-tx changes
+                    processNontransactionalAtomicChanges();
                 }
             }
         }
@@ -1832,11 +1822,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         throw new NucleusFatalUserException(Localiser.msg("010039"), 
                             failures.toArray(new Exception[failures.size()]));
                     }
-                    else
-                    {
-                        throw new NucleusUserException(Localiser.msg("010039"), 
-                            failures.toArray(new Exception[failures.size()]));
-                    }
+                    throw new NucleusUserException(Localiser.msg("010039"), failures.toArray(new Exception[failures.size()]));
                 }
             }
             finally
@@ -2121,10 +2107,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             ObjectProvider op = findObjectProvider(ownerOP.getObject());
             return persistObjectInternal(pc, null, op, ownerFieldNum, objectType);
         }
-        else
-        {
-            return persistObjectInternal(pc, null, null, ownerFieldNum, objectType);
-        }
+        return persistObjectInternal(pc, null, null, ownerFieldNum, objectType);
     }
 
     public <T> T persistObjectInternal(T pc, final FieldValues preInsertChanges, int objectType)
@@ -2180,14 +2163,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 if (e instanceof NucleusException && ((NucleusException)e).isFatal())
                 {
                     // Should really check all and see if any are fatal not just first one
-                    throw new NucleusFatalUserException(Localiser.msg("010040"), 
-                        failures.toArray(new Exception[failures.size()]));
+                    throw new NucleusFatalUserException(Localiser.msg("010040"), failures.toArray(new Exception[failures.size()]));
                 }
-                else
-                {
-                    throw new NucleusUserException(Localiser.msg("010040"), 
-                        failures.toArray(new Exception[failures.size()]));
-                }
+                throw new NucleusUserException(Localiser.msg("010040"), failures.toArray(new Exception[failures.size()]));
             }
         }
         finally
@@ -4151,10 +4129,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     {
                         throw (NucleusException) t;
                     }
-                    else
-                    {
-                        throw new NucleusException("Unexpected error during precommit",t);
-                    }
+                    throw new NucleusException("Unexpected error during precommit",t);
                 }
                 finally
                 {
@@ -5219,12 +5194,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
                 return pc;
             }
-            else
+
+            if (NucleusLogger.CACHE.isDebugEnabled())
             {
-                if (NucleusLogger.CACHE.isDebugEnabled())
-                {
-                    NucleusLogger.CACHE.debug(Localiser.msg("003007", IdentityUtils.getPersistableIdentityForId(id), "" + cache.size()));
-                }
+                NucleusLogger.CACHE.debug(Localiser.msg("003007", IdentityUtils.getPersistableIdentityForId(id), "" + cache.size()));
             }
         }
         return null;
@@ -5282,13 +5255,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
                 return pc;
             }
-            else
+
+            if (NucleusLogger.CACHE.isDebugEnabled())
             {
-                if (NucleusLogger.CACHE.isDebugEnabled())
-                {
-                    NucleusLogger.CACHE.debug(Localiser.msg("004005",
-                        IdentityUtils.getPersistableIdentityForId(id)));
-                }
+                NucleusLogger.CACHE.debug(Localiser.msg("004005", IdentityUtils.getPersistableIdentityForId(id)));
             }
         }
 
@@ -5520,23 +5490,21 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             callbackHandler = new NullCallbackHandler();
             return callbackHandler;
         }
-        else
+
+        String callbackHandlerClassName = getNucleusContext().getPluginManager().getAttributeValueForExtension(
+            "org.datanucleus.callbackhandler", "name", getNucleusContext().getApiName(), "class-name");
+        if (callbackHandlerClassName != null)
         {
-            String callbackHandlerClassName = getNucleusContext().getPluginManager().getAttributeValueForExtension(
-                "org.datanucleus.callbackhandler", "name", getNucleusContext().getApiName(), "class-name");
-            if (callbackHandlerClassName != null)
+            try
             {
-                try
-                {
-                    callbackHandler = (CallbackHandler) getNucleusContext().getPluginManager().createExecutableExtension(
-                        "org.datanucleus.callbackhandler", "name", getNucleusContext().getApiName(), "class-name",
-                        new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {getNucleusContext()});
-                    return callbackHandler;
-                }
-                catch (Exception e)
-                {
-                    NucleusLogger.PERSISTENCE.error(Localiser.msg("025000", callbackHandlerClassName, e));
-                }
+                callbackHandler = (CallbackHandler) getNucleusContext().getPluginManager().createExecutableExtension(
+                    "org.datanucleus.callbackhandler", "name", getNucleusContext().getApiName(), "class-name",
+                    new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {getNucleusContext()});
+                return callbackHandler;
+            }
+            catch (Exception e)
+            {
+                NucleusLogger.PERSISTENCE.error(Localiser.msg("025000", callbackHandlerClassName, e));
             }
         }
 

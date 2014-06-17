@@ -346,46 +346,41 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                     }
                 }
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
-        else
+
+        if (value == null)
         {
-            if (value == null)
-            {
-                return null;
-            }
-            else if (value instanceof StringBuffer)
-            {
-                // Use our own copy of this mutable type
-                return new StringBuffer(((StringBuffer)value).toString());
-            }
-            else if (value instanceof StringBuilder)
-            {
-                // Use our own copy of this mutable type
-                return new StringBuilder(((StringBuilder)value).toString());
-            }
-            else if (value instanceof Date)
-            {
-                // Use our own copy of this mutable type
-                value = ((Date)value).clone();
-            }
-            else if (value instanceof Calendar)
-            {
-                // Use our own copy of this mutable type
-                value = ((Calendar)value).clone();
-            }
-
-            boolean[] mutables = mmd.getAbstractClassMetaData().getSCOMutableMemberFlags();
-            if (mutables[fieldNumber])
-            {
-                return op.wrapSCOField(fieldNumber, value, false, false, true);
-            }
-
-            return value;
+            return null;
         }
+        else if (value instanceof StringBuffer)
+        {
+            // Use our own copy of this mutable type
+            return new StringBuffer(((StringBuffer)value).toString());
+        }
+        else if (value instanceof StringBuilder)
+        {
+            // Use our own copy of this mutable type
+            return new StringBuilder(((StringBuilder)value).toString());
+        }
+        else if (value instanceof Date)
+        {
+            // Use our own copy of this mutable type
+            value = ((Date)value).clone();
+        }
+        else if (value instanceof Calendar)
+        {
+            // Use our own copy of this mutable type
+            value = ((Calendar)value).clone();
+        }
+
+        boolean[] mutables = mmd.getAbstractClassMetaData().getSCOMutableMemberFlags();
+        if (mutables[fieldNumber])
+        {
+            return op.wrapSCOField(fieldNumber, value, false, false, true);
+        }
+
+        return value;
     }
 
     private Object getObjectFromCachedId(Object cachedId)

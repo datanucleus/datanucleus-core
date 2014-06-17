@@ -690,12 +690,10 @@ public abstract class AbstractClassMetaData extends MetaData
                 throw new InvalidClassMetaDataException("044087", fullName, realPcSuperclassName,
                     persistableSuperclass);
             }
-            else
-            {
-                // The defined persistableSuperclass could NOT have been a superclass
-                // of this class, otherwise it would have been equal to the realPcSuperclassName.
-                throw new InvalidClassMetaDataException("044082", fullName, persistableSuperclass);
-            }
+
+            // The defined persistableSuperclass could NOT have been a superclass
+            // of this class, otherwise it would have been equal to the realPcSuperclassName.
+            throw new InvalidClassMetaDataException("044082", fullName, persistableSuperclass);
         }
         else if (persistableSuperclass == null && realPcSuperclassName != null)
         {
@@ -843,10 +841,7 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             return pcSuperclassMetaData.getBaseAbstractClassMetaData();
         }
-        else
-        {
-            return this;
-        }
+        return this;
     }
 
     /**
@@ -864,10 +859,7 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             return true;
         }
-        else
-        {
-            return pcSuperclassMetaData.isDescendantOf(cmd);
-        }
+        return pcSuperclassMetaData.isDescendantOf(cmd);
     }
 
     protected String getBaseInheritanceStrategy()
@@ -2849,25 +2841,23 @@ public abstract class AbstractClassMetaData extends MetaData
             {
                 return null;
             }
-            else
+
+            AbstractMemberMetaData mmd = pcSuperclassMetaData.getMetaDataForManagedMemberAtAbsolutePositionInternal(abs_position);
+            if (mmd != null)
             {
-                AbstractMemberMetaData mmd = pcSuperclassMetaData.getMetaDataForManagedMemberAtAbsolutePositionInternal(abs_position);
-                if (mmd != null)
+                for (int i=0;i<overriddenMembers.length;i++)
                 {
-                    for (int i=0;i<overriddenMembers.length;i++)
-                    {
-                        if (overriddenMembers[i].getName().equals(mmd.getName()) &&
+                    if (overriddenMembers[i].getName().equals(mmd.getName()) &&
                             overriddenMembers[i].getClassName().equals(mmd.getClassName()))
-                        {
-                            // Return the overriding field if we have one (class and field name is the safest comparison)
-                            return overriddenMembers[i];
-                        }
+                    {
+                        // Return the overriding field if we have one (class and field name is the safest comparison)
+                        return overriddenMembers[i];
                     }
-                    
-                    return mmd;
                 }
-                return null;
+
+                return mmd;
             }
+            return null;
         }
         // If the field is in this class, return it
         else if (abs_position - noOfInheritedManagedMembers >= managedMembers.length)
@@ -3015,10 +3005,7 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             return 0;
         }
-        else
-        {
-            return pkMemberPositions.length;
-        }
+        return pkMemberPositions.length;
     }
 
     /**
@@ -3909,10 +3896,7 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     /**
@@ -3933,10 +3917,7 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     /**
@@ -4062,9 +4043,6 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             return getSuperAbstractClassMetaData().hasFetchGroupWithPostLoad() || fetchGroupMetaWithPostLoad.booleanValue();
         }
-        else
-        {
-            return fetchGroupMetaWithPostLoad.booleanValue();
-        }
+        return fetchGroupMetaWithPostLoad.booleanValue();
     }
 }

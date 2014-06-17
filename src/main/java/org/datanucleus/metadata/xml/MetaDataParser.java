@@ -304,11 +304,8 @@ public class MetaDataParser extends DefaultHandler
             {
                 throw (InvalidMetaDataException)cause;
             }
-            else
-            {
-                String message = Localiser.msg("044033", e);
-                throw new NucleusException(message, cause);
-            }
+
+            throw new NucleusException(Localiser.msg("044033", e), cause);
         }
         finally
         {

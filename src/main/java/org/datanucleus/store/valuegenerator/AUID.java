@@ -915,15 +915,9 @@ class AUID implements Comparable
             {
                 return ((bytes[begin] & 0xffL) << (8 * (octets - 1))) | getOctets(octets - 1, bytes, begin + 1, bigendian);
             }
-            else
-            {
-                return getOctets(octets - 1, bytes, begin, bigendian) | ((bytes[begin + octets - 1] & 0xffL) << (8 * (octets - 1)));
-            }
+            return getOctets(octets - 1, bytes, begin, bigendian) | ((bytes[begin + octets - 1] & 0xffL) << (8 * (octets - 1)));
         }
-        else
-        {
-            return bytes[begin] & 0xffL;
-        }
+        return bytes[begin] & 0xffL;
     }
 
     /**

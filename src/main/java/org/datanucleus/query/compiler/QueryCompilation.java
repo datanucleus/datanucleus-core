@@ -196,11 +196,9 @@ public class QueryCompilation implements Serializable
             }
             return results;
         }
-        else
-        {
-            // Each row must be an instance of the candidate
-            return new Class[] {candidateClass};
-        }
+
+        // Each row must be an instance of the candidate
+        return new Class[] {candidateClass};
     }
 
     /**

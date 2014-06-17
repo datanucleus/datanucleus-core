@@ -420,27 +420,25 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
                         return;
                     }
                 }
-                else
+
+                // Collection<Non-PC> so just return it
+                if (value instanceof SCOContainer)
                 {
-                    // Collection<Non-PC> so just return it
-                    if (value instanceof SCOContainer)
+                    if (((SCOContainer)value).isLoaded())
                     {
-                        if (((SCOContainer)value).isLoaded())
-                        {
-                            // Return unwrapped collection
-                            cachedPC.setFieldValue(fieldNumber, ((SCO)value).getValue());
-                        }
-                        else
-                        {
-                            // Contents not loaded so just mark as unloaded
-                            cachedPC.setLoadedField(fieldNumber, false);
-                            return;
-                        }
+                        // Return unwrapped collection
+                        cachedPC.setFieldValue(fieldNumber, ((SCO)value).getValue());
                     }
                     else
                     {
-                        cachedPC.setFieldValue(fieldNumber, value);
+                        // Contents not loaded so just mark as unloaded
+                        cachedPC.setLoadedField(fieldNumber, false);
+                        return;
                     }
+                }
+                else
+                {
+                    cachedPC.setFieldValue(fieldNumber, value);
                 }
             }
             else if (value instanceof Map)
@@ -523,27 +521,25 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
                         return;
                     }
                 }
-                else
+
+                // Map<Non-PC, Non-PC>
+                if (value instanceof SCOContainer)
                 {
-                    // Map<Non-PC, Non-PC>
-                    if (value instanceof SCOContainer)
+                    if (((SCOContainer)value).isLoaded())
                     {
-                        if (((SCOContainer)value).isLoaded())
-                        {
-                            // Return unwrapped map
-                            cachedPC.setFieldValue(fieldNumber, ((SCO)value).getValue());
-                        }
-                        else
-                        {
-                            // Contents not loaded so just mark as unloaded
-                            cachedPC.setLoadedField(fieldNumber, false);
-                            return;
-                        }
+                        // Return unwrapped map
+                        cachedPC.setFieldValue(fieldNumber, ((SCO)value).getValue());
                     }
                     else
                     {
-                        cachedPC.setFieldValue(fieldNumber, value);
+                        // Contents not loaded so just mark as unloaded
+                        cachedPC.setLoadedField(fieldNumber, false);
+                        return;
                     }
+                }
+                else
+                {
+                    cachedPC.setFieldValue(fieldNumber, value);
                 }
             }
             else if (value instanceof Object[])
@@ -577,11 +573,9 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
                     cachedPC.setFieldValue(fieldNumber, returnArr);
                     return;
                 }
-                else
-                {
-                    // Array element type is not persistable so just return the value
-                    cachedPC.setFieldValue(fieldNumber, value);
-                }
+
+                // Array element type is not persistable so just return the value
+                cachedPC.setFieldValue(fieldNumber, value);
             }
             else if (value instanceof StringBuffer)
             {
@@ -640,10 +634,8 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
         {
             return id;
         }
-        else
-        {
-            // Doesn't store the class name, so wrap it in a CachedId
-            return new CachedId(pc.getClass().getName(), id);
-        }
+
+        // Doesn't store the class name, so wrap it in a CachedId
+        return new CachedId(pc.getClass().getName(), id);
     }
 }

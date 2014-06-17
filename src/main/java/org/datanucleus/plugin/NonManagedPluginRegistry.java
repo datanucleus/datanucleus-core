@@ -352,32 +352,30 @@ public class NonManagedPluginRegistry implements PluginRegistry
                   }
                   return registerBundle(mf, url);
                 }
-                else
+
+                int begin = 4;
+                if (manifest.getProtocol().equals("wsjar"))
                 {
-                    int begin = 4;
-                    if (manifest.getProtocol().equals("wsjar"))
-                    {
-                        begin = 6;
-                    }
-                    // protocol formats: 
-                    //     jar:<path>!<manifest-file>, zip:<path>!<manifest-file>
-                    //     jar:file:<path>!<manifest-file>, zip:file:<path>!<manifest-file>
-                    String path = StringUtils.getDecodedStringFromURLString(manifest.toExternalForm());
-                    int index = path.indexOf(JAR_SEPARATOR);
-                    String jarPath = path.substring(begin, index);
-                    if (jarPath.startsWith("file:"))
-                    {
-                        // remove "file:" from path, so we can use in File constructor
-                        jarPath = jarPath.substring(5);
-                    }
-                    File jarFile = new File(jarPath);
-                    mf = new JarFile(jarFile).getManifest();
-                    if (mf == null)
-                    {
-                        return null;
-                    }
-                    return registerBundle(mf, jarFile.toURI().toURL());
+                    begin = 6;
                 }
+                // protocol formats: 
+                //     jar:<path>!<manifest-file>, zip:<path>!<manifest-file>
+                //     jar:file:<path>!<manifest-file>, zip:file:<path>!<manifest-file>
+                String path = StringUtils.getDecodedStringFromURLString(manifest.toExternalForm());
+                int index = path.indexOf(JAR_SEPARATOR);
+                String jarPath = path.substring(begin, index);
+                if (jarPath.startsWith("file:"))
+                {
+                    // remove "file:" from path, so we can use in File constructor
+                    jarPath = jarPath.substring(5);
+                }
+                File jarFile = new File(jarPath);
+                mf = new JarFile(jarFile).getManifest();
+                if (mf == null)
+                {
+                    return null;
+                }
+                return registerBundle(mf, jarFile.toURI().toURL());
             }
             else if (manifest.getProtocol().equals("rar") || manifest.getProtocol().equals("war"))
             {

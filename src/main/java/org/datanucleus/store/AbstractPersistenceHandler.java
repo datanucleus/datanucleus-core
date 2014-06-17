@@ -145,40 +145,34 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
                 throw new DatastoreReadOnlyException(Localiser.msg("032004",
                     op.getObjectAsPrintable()), op.getExecutionContext().getClassLoaderResolver());
             }
-            else
+
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("032005", op.getObjectAsPrintable()));
-                }
-                return;
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("032005", op.getObjectAsPrintable()));
             }
+            return;
         }
-        else
+
+        AbstractClassMetaData cmd = op.getClassMetaData();
+        if (cmd.hasExtension("read-only"))
         {
-            AbstractClassMetaData cmd = op.getClassMetaData();
-            if (cmd.hasExtension("read-only"))
+            String value = cmd.getValueForExtension("read-only");
+            if (!StringUtils.isWhitespace(value))
             {
-                String value = cmd.getValueForExtension("read-only");
-                if (!StringUtils.isWhitespace(value))
+                boolean readonly = Boolean.valueOf(value).booleanValue();
+                if (readonly)
                 {
-                    boolean readonly = Boolean.valueOf(value).booleanValue();
-                    if (readonly)
+                    if (op.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
                     {
-                        if (op.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
-                        {
-                            throw new DatastoreReadOnlyException(Localiser.msg("032006",
-                                op.getObjectAsPrintable()), op.getExecutionContext().getClassLoaderResolver());
-                        }
-                        else
-                        {
-                            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                            {
-                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("032007", op.getObjectAsPrintable()));
-                            }
-                            return;
-                        }
+                        throw new DatastoreReadOnlyException(Localiser.msg("032006",
+                            op.getObjectAsPrintable()), op.getExecutionContext().getClassLoaderResolver());
                     }
+
+                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                    {
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("032007", op.getObjectAsPrintable()));
+                    }
+                    return;
                 }
             }
         }
