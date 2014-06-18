@@ -631,7 +631,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
                 String wrapperType = elems[i].getAttribute("wrapper-type");
                 String wrapperTypeBacked = elems[i].getAttribute("wrapper-type-backed");
                 String typeConverterName = elems[i].getAttribute("converter-name");
-                // TODO Support priority so that plugins can override default handling providing their own wrappers etc.
 
                 boolean embedded = false;
                 if (embeddedString != null && embeddedString.equalsIgnoreCase("true"))
