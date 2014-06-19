@@ -88,7 +88,7 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
      * @param allowNulls Whether nulls are allowed
      * @param backingStore The backing store
      */
-    Set(ObjectProvider ownerOP, AbstractMemberMetaData mmd, boolean allowNulls, SetStore backingStore)
+    public Set(ObjectProvider ownerOP, AbstractMemberMetaData mmd, boolean allowNulls, SetStore backingStore)
     {
         super(ownerOP, mmd);
 

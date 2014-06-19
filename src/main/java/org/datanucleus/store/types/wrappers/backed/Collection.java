@@ -119,7 +119,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
      * @param allowNulls Whether nulls are allowed
      * @param backingStore The backing store
      */
-    Collection(ObjectProvider ownerOP, AbstractMemberMetaData mmd, boolean allowNulls, CollectionStore backingStore)
+    public Collection(ObjectProvider ownerOP, AbstractMemberMetaData mmd, boolean allowNulls, CollectionStore backingStore)
     {
         super(ownerOP, mmd);
 
