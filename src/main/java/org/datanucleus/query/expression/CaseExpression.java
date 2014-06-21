@@ -59,7 +59,17 @@ public class CaseExpression extends Expression
     @Override
     public Symbol bind(SymbolTable symtbl)
     {
-        // TODO Auto-generated method stub
+        Iterator<Map.Entry<Expression, Expression>> actionMapIter = actionByCondition.entrySet().iterator();
+        while (actionMapIter.hasNext())
+        {
+            Map.Entry<Expression, Expression> entry = actionMapIter.next();
+            entry.getKey().bind(symtbl);
+            entry.getValue().bind(symtbl);
+        }
+        if (elseExpr != null)
+        {
+            elseExpr.bind(symtbl);
+        }
         return null;
     }
 
