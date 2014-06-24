@@ -116,7 +116,7 @@ public class ColumnImpl implements Column
     public Column setDefaultable(Object defaultValue)
     {
         this.defaultable = true;
-        this.defaultValue = defaultValue;
+        this.defaultValue = defaultValue; // TODO Convert to required type
         return this;
     }
 
@@ -195,6 +195,10 @@ public class ColumnImpl implements Column
     public Column setColumnMetaData(ColumnMetaData md)
     {
         this.colmd = md;
+        if (md != null && md.getDefaultValue() != null)
+        {
+        	setDefaultable(md.getDefaultValue());
+        }
         return this;
     }
 
