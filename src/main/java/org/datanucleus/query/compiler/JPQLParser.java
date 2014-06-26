@@ -1948,13 +1948,51 @@ public class JPQLParser implements Parser
      */
     protected boolean processLiteral()
     {
-        Object litValue = null;
+        if (p.parseChar('{'))
+        {
+            // JDBC escape syntax
+            // {d '...'}
+            // {t '...'}
+            // {ts '...'}
+            StringBuilder jdbcLiteralStr = new StringBuilder("{");
+            if (p.parseChar('d'))
+            {
+                jdbcLiteralStr.append("d ");
+            }
+            else if (p.parseChar('t'))
+            {
+                jdbcLiteralStr.append("t ");
+            }
+            else if (p.parseString("ts"))
+            {
+                jdbcLiteralStr.append("ts ");
+            }
+            else
+            {
+                throw new QueryCompilerSyntaxException("d, t or ts expected after { (JDBC escape syntax)", p.getIndex(), p.getInput());
+            }
 
+            if (p.nextIsSingleQuote())
+            {
+                String datetimeLit = p.parseStringLiteral();
+                jdbcLiteralStr.append("'").append(datetimeLit).append("'");
+                if (p.parseChar('}'))
+                {
+                    jdbcLiteralStr.append('}');
+                    stack.push(new Node(NodeType.LITERAL, jdbcLiteralStr.toString()));
+                    return true;
+                }
+
+                throw new QueryCompilerSyntaxException("} expected in JDBC escape syntax", p.getIndex(), p.getInput());
+            }
+            throw new QueryCompilerSyntaxException("'...' expected in JDBC escape syntax", p.getIndex(), p.getInput());
+        }
+
+        Object litValue = null;
         String sLiteral;
         BigDecimal fLiteral;
         BigInteger iLiteral;
         Boolean bLiteral;
-
         boolean single_quote_next = p.nextIsSingleQuote();
         if ((sLiteral = p.parseStringLiteral()) != null)
         {
