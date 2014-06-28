@@ -199,6 +199,32 @@ public class Lexer
     }
 
     /**
+     * Check if String "s" is found and not moving the cursor position.
+     * @param s the String to find
+     * @return true if string is found
+     */
+    public boolean peekString(String s)
+    {
+        int savedIdx = skipWS();
+
+        int len = s.length();
+        char c = ci.current();
+
+        for (int i = 0; i < len; ++i)
+        {
+            if (c != s.charAt(i))
+            {
+                ci.setIndex(savedIdx);
+                return false;
+            }
+            c = ci.next();
+        }
+        ci.setIndex(savedIdx);
+
+        return true;
+    }
+
+    /**
      * Check if String "s" is found ignoring the case, and not moving the cursor position.
      * @param s the String to find
      * @return true if string is found
