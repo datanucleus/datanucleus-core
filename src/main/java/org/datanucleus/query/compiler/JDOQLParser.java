@@ -674,6 +674,11 @@ public class JDOQLParser implements Parser
             castNode = stack.pop();
         }
 
+        if (p.peekString("IF(") || p.peekString("if(") || p.peekString("IF (") || p.peekString("if ("))
+        {
+            processIfElseExpression();
+            return;
+        }
         if (processCreator())
         {
             // "new MyClass(...)", allow chain of method invocations
@@ -888,6 +893,62 @@ public class JDOQLParser implements Parser
             return node;
         }
         return getLastDescendantNodeForNode(node.getChildNode(0));
+    }
+
+    /**
+     * Method to parse the query syntax for an "IF ... ELSE ..." expression.
+     * Creates a Node of type "CASE" with children in the order 
+     * <pre>ifNode, ifActionNode [, ifNode, ifActionNode]*, elseActionNode</pre>
+     */
+    private void processIfElseExpression()
+    {
+        Node caseNode = new Node(NodeType.CASE);
+
+        // Process "IF (expr) actionExpr"
+        if (!p.parseString("IF") || p.parseString("if"))
+        {
+            throw new QueryCompilerSyntaxException("Expected IF or if", p.getIndex(), p.getInput());
+        }
+
+        if (!p.parseChar('('))
+        {
+            throw new QueryCompilerSyntaxException("Expected '(' as part of IF (...)", p.getIndex(), p.getInput());
+        }
+        processExpression();
+        Node whenNode = stack.pop();
+        caseNode.appendChildNode(whenNode);
+        if (!p.parseChar(')'))
+        {
+            throw new QueryCompilerSyntaxException("Expected ')' as part of IF (...)", p.getIndex(), p.getInput());
+        }
+
+        processExpression();
+        Node actionNode = stack.pop();
+        caseNode.appendChildNode(actionNode);
+
+        // Process "ELSE IF (expr) actionExpr ELSE actionExpr"
+        while (p.parseString("ELSE") || p.parseString("else"))
+        {
+            if (p.parseString("IF") || p.parseString("if"))
+            {
+                if (!p.parseChar('('))
+                {
+                    throw new QueryCompilerSyntaxException("Expected '(' as part of IF (...)", p.getIndex(), p.getInput());
+                }
+                processExpression();
+                whenNode = stack.pop();
+                caseNode.appendChildNode(whenNode);
+                if (!p.parseChar(')'))
+                {
+                    throw new QueryCompilerSyntaxException("Expected ')' as part of IF (...)", p.getIndex(), p.getInput());
+                }
+            }
+
+            processExpression();
+            actionNode = stack.pop();
+            caseNode.appendChildNode(actionNode);
+        }
+        stack.push(caseNode);
     }
 
     /**
