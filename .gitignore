@@ -2,9 +2,4 @@ target/
 /bin
 /datanucleus.log
 /target
-/target
-/target
-/target
-/target
-/target
-/target
+nb-*.xml

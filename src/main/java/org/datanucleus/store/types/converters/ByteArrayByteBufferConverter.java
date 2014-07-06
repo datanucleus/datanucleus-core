@@ -33,8 +33,7 @@ public class ByteArrayByteBufferConverter implements TypeConverter<byte[], ByteB
      */
     public ByteBuffer toDatastoreType(byte[] memberValue)
     {
-        ByteBuffer byteBuffer = ByteBuffer.allocate(memberValue.length);
-        byteBuffer.put(memberValue);
+        ByteBuffer byteBuffer = ByteBuffer.wrap(memberValue);        
         return byteBuffer;
     }
 
