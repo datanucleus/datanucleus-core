@@ -3261,7 +3261,8 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         return super.toString(prefix, indent);
     }
 
-    public boolean equals(Object o)
+    // TODO Enable these and fix compareTo() to do the equivalent
+    /*public boolean equals(Object o)
     {
         if (o == null)
         {
@@ -3269,6 +3270,10 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         }
         return compareTo(o) == 0;
     }
+    public int hashCode()
+    {
+        return getFullFieldName().hashCode();
+    }*/
 
     /**
      * Comparator method. This allows the ClassMetaData to search for a
