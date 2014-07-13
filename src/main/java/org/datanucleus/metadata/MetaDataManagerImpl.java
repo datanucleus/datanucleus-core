@@ -1973,51 +1973,51 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         while (classMetaDataClassesIter.hasNext())
         {
             String class_name = classMetaDataClassesIter.next();
-            AbstractClassMetaData acmd_cls = classMetaDataByClass.get(class_name);
+            AbstractClassMetaData cmd_cls = classMetaDataByClass.get(class_name);
 
-            if (acmd_cls instanceof ClassMetaData)
+            if (cmd_cls instanceof ClassMetaData)
             {
-                if (referenceClass.getClassLoader() != null) // May be null in some OSGi situations
+                try
                 {
-                    try
+                    // Check if class is implementation of "implValue" (in the case of java.lang.Object, all will be!)
+                    // Class cls = referenceClass.getClassLoader().loadClass(class_name);
+                    // if (referenceClass.isAssignableFrom(cls))
+                    if (referenceClass == Object.class || clr.isAssignableFrom(referenceClass, class_name))
                     {
-                        // Check if class is implementation of "implValue" (in the case of java.lang.Object, all will be!)
-                        Class cls = referenceClass.getClassLoader().loadClass(class_name);
-                        if (referenceClass.isAssignableFrom(cls))
+                        // Find the base class that is an implementation
+                        cmd = (ClassMetaData) cmd_cls;
+                        if (implValue != null && cmd.getFullClassName().equals(implValue.getClass().getName()))
                         {
-                            // Find the base class that is an implementation
-                            cmd = (ClassMetaData)acmd_cls;
-                            if (implValue != null && cmd.getFullClassName().equals(implValue.getClass().getName()))
+                            return cmd;
+                        }
+
+                        cmd_cls = cmd.getSuperAbstractClassMetaData();
+                        while (cmd_cls != null)
+                        {
+//                          if (!referenceClass.isAssignableFrom(clr.classForName(((ClassMetaData)cmd_superclass).getFullClassName())))
+                            if (referenceClass != Object.class && !clr.isAssignableFrom(referenceClass, ((ClassMetaData)cmd_cls).getFullClassName()))
                             {
-                                return cmd;
+                                // No point going further up since no longer an implementation
+                                break;
                             }
 
-                            AbstractClassMetaData cmd_superclass = cmd.getSuperAbstractClassMetaData();
-                            while (cmd_superclass != null)
+                            cmd = (ClassMetaData) cmd_cls;
+                            if (implValue != null && cmd.getFullClassName().equals(implValue.getClass().getName()))
                             {
-                                if (!referenceClass.isAssignableFrom(clr.classForName(((ClassMetaData)cmd_superclass).getFullClassName())))
-                                {
-                                    break;
-                                }
-                                // TODO Check if superclass is an implementation
-                                cmd = (ClassMetaData) cmd_superclass;
-                                if (implValue != null && cmd.getFullClassName().equals(implValue.getClass().getName()))
-                                {
-                                    break;
-                                }
+                                break;
+                            }
 
-                                // Go to next superclass
-                                cmd_superclass = cmd_superclass.getSuperAbstractClassMetaData();
-                                if (cmd_superclass == null)
-                                {
-                                    break;
-                                }
+                            // Go to next superclass
+                            cmd_cls = cmd_cls.getSuperAbstractClassMetaData();
+                            if (cmd_cls == null)
+                            {
+                                break;
                             }
                         }
                     }
-                    catch (Exception e)
-                    {
-                    }
+                }
+                catch (Exception e)
+                {
                 }
             }
         }
