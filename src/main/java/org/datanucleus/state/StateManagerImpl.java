@@ -2838,6 +2838,8 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 }
             }
 
+            updateLevel2CacheForFields(fieldNumbers);
+
             if (callPostLoad)
             {
                 postLoad();
@@ -2846,7 +2848,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             getCallbackHandler().postRefresh(myPC);
         }
     }
-    
+
     /**
      * Refreshes from the database all fields currently loaded.
      * Called by life-cycle transitions when making transactional or reading fields.
@@ -2863,6 +2865,8 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
 
             boolean callPostLoad = myFP.isToCallPostLoadFetchPlan(this.loadedFields);
             loadFieldsFromDatastore(fieldNumbers);
+            updateLevel2CacheForFields(fieldNumbers);
+
             if (callPostLoad)
             {
                 postLoad();

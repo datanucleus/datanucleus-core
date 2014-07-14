@@ -972,8 +972,6 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     /**
      * Convenience method to update a Level2 cached version of this object if cacheable
      * and has not been modified during this transaction.
-     * If any of the specified fields are not loaded in the current L2 cached object this will
-     * update the loaded value for that field(s).
      * @param fieldNumbers Numbers of fields to update in L2 cached object
      */
     protected void updateLevel2CacheForFields(int[] fieldNumbers)
@@ -994,21 +992,25 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
             CachedPC<T> cachedPC = l2cache.get(myID);
             if (cachedPC != null)
             {
+                // This originally just updated the L2 cache for fields where the L2 cache didn't have a value for that field, like this
+                /*
                 int[] cacheFieldsToLoad = ClassUtils.getFlagsSetTo(cachedPC.getLoadedFields(), fieldNumbers, false);
-                if (cacheFieldsToLoad != null && cacheFieldsToLoad.length > 0)
+                if (cacheFieldsToLoad == null || cacheFieldsToLoad.length == 0)
                 {
-                    CachedPC copyCachedPC = cachedPC.getCopy();
-                    if (NucleusLogger.CACHE.isDebugEnabled())
-                    {
-                        NucleusLogger.CACHE.debug(Localiser.msg("026033", StringUtils.toJVMIDString(getObject()), myID,
-                            StringUtils.intArrayToString(cacheFieldsToLoad)));
-                    }
-
-                    provideFields(cacheFieldsToLoad, new L2CachePopulateFieldManager(this, copyCachedPC));
-
-                    // Replace the current L2 cached object with this one
-                    myEC.getNucleusContext().getLevel2Cache().put(getInternalObjectId(), copyCachedPC);
+                    return;
                 }
+                */
+                int[] cacheFieldsToLoad = fieldNumbers;
+                CachedPC copyCachedPC = cachedPC.getCopy();
+                if (NucleusLogger.CACHE.isDebugEnabled())
+                {
+                    NucleusLogger.CACHE.debug(Localiser.msg("026033", StringUtils.toJVMIDString(getObject()), myID, StringUtils.intArrayToString(cacheFieldsToLoad)));
+                }
+
+                provideFields(cacheFieldsToLoad, new L2CachePopulateFieldManager(this, copyCachedPC));
+
+                // Replace the current L2 cached object with this one
+                myEC.getNucleusContext().getLevel2Cache().put(getInternalObjectId(), copyCachedPC);
             }
         }
     }
