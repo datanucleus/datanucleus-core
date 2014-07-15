@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.PropertyNames;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
@@ -554,8 +555,33 @@ public class CompleteClassTable implements Table
         columns = new ArrayList<Column>();
         for (Column col : cols)
         {
-            columns.add(col);
-            columnByName.put(col.getName(), col);
+            MemberColumnMapping mapping = col.getMemberColumnMapping();
+            if (mapping != null)
+            {
+                if (!mapping.getMemberMetaData().isInsertable() && !mapping.getMemberMetaData().isUpdateable())
+                {
+                    // Ignored
+                    NucleusLogger.DATASTORE_SCHEMA.debug("Not adding column " + col.getName() + " for member=" + mapping.getMemberMetaData().getFullFieldName() + 
+                        " since is not insertable/updateable");
+                }
+                else
+                {
+                    if (columnByName.containsKey(col.getName()))
+                    {
+                        NucleusLogger.DATASTORE_SCHEMA.error("Unable to add column with name=" + col.getName() + " to table=" + getName() + " for class=" + cmd.getFullClassName() + 
+                            " since one with same name already exists.");
+                        throw new NucleusUserException("Unable to add column with name=" + col.getName() + " to table=" + getName() + " for class=" + cmd.getFullClassName() + 
+                                " since one with same name already exists.");
+                    }
+                    columns.add(col);
+                    columnByName.put(col.getName(), col);
+                }
+            }
+            else
+            {
+                columns.add(col);
+                columnByName.put(col.getName(), col);
+            }
         }
     }
 
