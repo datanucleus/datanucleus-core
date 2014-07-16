@@ -3347,8 +3347,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                             myEC != null ? IdentityUtils.getPersistableIdentityForId(myID) : myID, fmd.getName()));
                     }
                 }
-                return SCOUtils.newSCOInstance(this, fmd, fmd.getType(), 
-                    value.getClass(), value, forInsert, forUpdate, replaceFieldIfChanged);
+                return SCOUtils.newSCOInstance(this, fmd, fmd.getType(), value.getClass(), value, forInsert, forUpdate, replaceFieldIfChanged);
             }
         }
 
