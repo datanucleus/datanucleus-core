@@ -120,6 +120,7 @@ public class OperationQueue
             }
         }
 
+        // TODO Cater for Lists where cascade delete is enabled but we want to only allow cascade delete if the element isn't later added at a different place in the list.
         ListIterator<Operation> flushOperIter = flushOperations.listIterator();
         while (flushOperIter.hasNext())
         {
