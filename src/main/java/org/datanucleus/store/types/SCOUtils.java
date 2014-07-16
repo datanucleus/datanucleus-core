@@ -132,7 +132,7 @@ public class SCOUtils
         SCO sco = null;
         try
         {
-            sco = createSCOWrapper(wrapperType, ownerOP, mmd, replaceField, value, forInsert, forUpdate);
+            sco = (SCO) ClassUtils.newInstance(wrapperType, new Class[]{ObjectProvider.class, AbstractMemberMetaData.class}, new Object[]{ownerOP, mmd});
         }
         catch (UnsupportedOperationException uoe)
         {
@@ -141,12 +141,30 @@ public class SCOUtils
             {
                 NucleusLogger.PERSISTENCE.warn("Creation of backed wrapper for " + mmd.getFullFieldName() + " unsupported, so trying simple wrapper");
                 wrapperType = SCOUtils.getSimpleWrapperTypeForType(declaredType, instantiatedType, typeName, typeMgr);
-                sco = createSCOWrapper(wrapperType, ownerOP, mmd, replaceField, value, forInsert, forUpdate);
+                sco = (SCO) ClassUtils.newInstance(wrapperType, new Class[]{ObjectProvider.class, AbstractMemberMetaData.class}, new Object[]{ownerOP, mmd});
             }
             else
             {
                 throw uoe;
             }
+        }
+
+        if (replaceField)
+        {
+            // Replace the field in the owner with the wrapper before initialising it
+            ownerOP.replaceField(mmd.getAbsoluteFieldNumber(), sco);
+        }
+
+        // Initialise the SCO for use
+        if (value != null)
+        {
+            // Apply the existing value
+            sco.initialise(value, forInsert, forUpdate);
+        }
+        else
+        {
+            // Just create it empty and load from the datastore
+            sco.initialise();
         }
 
         return sco;
@@ -208,44 +226,6 @@ public class SCOUtils
             }
         }
         return wrapperType;
-    }
-
-    /**
-     * Convenience method to create an instance of the wrapper class.
-     * @param wrapperType Wrapper type
-     * @param ownerOP ObjectProvider for the object with the field being replaced with this wrapper
-     * @param mmd Metadata for the field/property
-     * @param replaceField Whether we should replace the field in the owner with this wrapper
-     * @param fieldValue The value of the field (to wrap)
-     * @param forInsert Whether this value is to be inserted in the datastore
-     * @param forUpdate Whether this value is to be updated in the datastore
-     * @return The wrapped value
-     */
-    private static SCO createSCOWrapper(Class wrapperType, ObjectProvider ownerOP, AbstractMemberMetaData mmd, boolean replaceField, Object fieldValue,
-            boolean forInsert, boolean forUpdate)
-    {
-        // Create the SCO wrapper
-        SCO sco = (SCO) ClassUtils.newInstance(wrapperType, new Class[]{ObjectProvider.class, AbstractMemberMetaData.class}, new Object[]{ownerOP, mmd});
-
-        if (replaceField)
-        {
-            // Replace the field with this value before initialising it
-            ownerOP.replaceField(mmd.getAbsoluteFieldNumber(), sco);
-        }
-
-        // Initialise the SCO for use
-        if (fieldValue != null)
-        {
-            // Apply the existing value
-            sco.initialise(fieldValue, forInsert, forUpdate);
-        }
-        else
-        {
-            // Just create it empty and load from the datastore
-            sco.initialise();
-        }
-
-        return sco;
     }
 
     /**
