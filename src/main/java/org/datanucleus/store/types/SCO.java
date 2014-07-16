@@ -36,10 +36,8 @@ public interface SCO<T>
      * @param value the object from which to copy the value.
      * @param forInsert Whether the object needs inserting in the datastore with this value
      * @param forUpdate Whether the object needs updating in the datastore with this value
-     * @throws ClassCastException Thrown if the given object is not of a type that's compatible with this
-     *                            second-class wrapper object.
      */
-    void initialise(T value, boolean forInsert, boolean forUpdate) throws ClassCastException;
+    void initialise(T value, boolean forInsert, boolean forUpdate);
 
     /**
      * Method to initialise the SCO for use.
