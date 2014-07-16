@@ -1783,6 +1783,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             if (needsSCOUpdating)
             {
                 // Wrap with SCO so we can detect future updates
+                // TODO Pass in oldValue when available so we can do an update bearing in mind what was there before (e.g for Lists when moving elements)
                 newValue = wrapSCOField(fieldNumber, newValue, false, true, true);
             }
 
