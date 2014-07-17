@@ -699,7 +699,8 @@ public class RelationshipManagerImpl implements RelationshipManager
             // Previously had "a.b = b1"; Now have "a.b = b2"
             // Need to set the other side if not yet set, and unset any related old value on the other side
             AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, newValue);
-            ObjectProvider newOP = ec.findObjectProvider(newValue);
+            // Force persistence because it might not be persisted yet when using delayed operations
+            ObjectProvider newOP = ec.findObjectProvider(newValue,true);
             if (newOP != null && relatedMmd != null)
             {
                 if (!newOP.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
