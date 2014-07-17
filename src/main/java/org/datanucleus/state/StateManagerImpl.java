@@ -4172,6 +4172,8 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             else
             {
                 // Attaching object that was detached from another datastore, so perform as replicate
+                // Reset lifecycle to P_NEW since not persistent yet in this datastore
+                myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.P_NEW);
 
                 // Copy field values from detached to attached so we know what value will need inserting
                 replaceStateManager(detachedPC, this);
