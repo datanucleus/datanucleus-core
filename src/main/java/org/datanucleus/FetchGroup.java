@@ -19,11 +19,11 @@ package org.datanucleus;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -31,12 +31,13 @@ import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Group of fields for fetching, to be part of a FetchPlan.
- * Defined at runtime, via the API.
+ * Group of fields for fetching, to be used by a FetchPlan.
+ * Defined at runtime, via the API (aka dynamic fetch group). Shared by FetchPlan's, so can be used by multiple threads.
  */
 public class FetchGroup implements Serializable
 {
     private static final long serialVersionUID = 8238931367627119563L;
+
     public static final String DEFAULT = "default";
     public static final String RELATIONSHIP = "relationship";
     public static final String MULTIVALUED = "multivalued";
@@ -56,13 +57,13 @@ public class FetchGroup implements Serializable
     private boolean postLoad = false;
 
     /** Names of the fields/properties of the class that are part of this group. */
-    private Set<String> memberNames = new HashSet();
+    private Set<String> memberNames = Collections.newSetFromMap(new ConcurrentHashMap());
 
     /** Map of recursion depth, keyed by the member name. Only has entries when not using default. */
     private Map<String, Integer> recursionDepthByMemberName = null;
 
     /** FetchPlans listening to this group for changes. */
-    private Collection<FetchPlan> planListeners = null;
+    private Collection<FetchPlan> planListeners = Collections.newSetFromMap(new ConcurrentHashMap());
 
     /** Whether this group can be modified. */
     private boolean unmodifiable = false;
@@ -98,7 +99,7 @@ public class FetchGroup implements Serializable
 
         if (grp.recursionDepthByMemberName != null)
         {
-            recursionDepthByMemberName = new HashMap(grp.recursionDepthByMemberName);
+            recursionDepthByMemberName = new ConcurrentHashMap(grp.recursionDepthByMemberName);
         }
     }
 
@@ -171,11 +172,14 @@ public class FetchGroup implements Serializable
 
         if (memberNames.contains(memberName))
         {
-            if (recursionDepthByMemberName == null)
+            synchronized (this)
             {
-                recursionDepthByMemberName = new HashMap();
+                if (recursionDepthByMemberName == null)
+                {
+                    recursionDepthByMemberName = new ConcurrentHashMap();
+                }
+                recursionDepthByMemberName.put(memberName, Integer.valueOf(recursionDepth));
             }
-            recursionDepthByMemberName.put(memberName, Integer.valueOf(recursionDepth));
         }
         return this;
     }
@@ -205,7 +209,7 @@ public class FetchGroup implements Serializable
 
     /**
      * Convenience method to add the members for the specified category.
-     * Supports the categories defined in the JDO2.2 spec.
+     * Supports the categories defined in the JDO spec.
      * @param categoryName Name of the category
      * @return This group
      */
@@ -227,7 +231,7 @@ public class FetchGroup implements Serializable
 
     /**
      * Convenience method to remove the members for the specified category.
-     * Supports the categories defined in the JDO2.2 spec.
+     * Supports the categories defined in the JDO spec.
      * @param categoryName Name of the category
      * @return This group
      */
@@ -366,7 +370,7 @@ public class FetchGroup implements Serializable
      */
     private void notifyListeners()
     {
-        if (planListeners != null)
+        if (!planListeners.isEmpty())
         {
             Iterator<FetchPlan> iter = planListeners.iterator();
             while (iter.hasNext())
@@ -382,10 +386,6 @@ public class FetchGroup implements Serializable
      */
     public void registerListener(FetchPlan plan)
     {
-        if (planListeners == null)
-        {
-            planListeners = new HashSet<FetchPlan>();
-        }
         planListeners.add(plan);
     }
 
@@ -395,7 +395,7 @@ public class FetchGroup implements Serializable
      */
     public void deregisterListener(FetchPlan plan)
     {
-        if (planListeners != null)
+        if (!planListeners.isEmpty())
         {
             planListeners.remove(plan);
         }
@@ -406,7 +406,7 @@ public class FetchGroup implements Serializable
      */
     public void disconnectFromListeners()
     {
-        if (planListeners != null)
+        if (!planListeners.isEmpty())
         {
             Iterator<FetchPlan> iter = planListeners.iterator();
             while (iter.hasNext())
@@ -414,7 +414,6 @@ public class FetchGroup implements Serializable
                 iter.next().notifyFetchGroupRemove(this);
             }
             planListeners.clear();
-            planListeners = null;
         }
     }
 
