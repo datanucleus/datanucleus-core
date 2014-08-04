@@ -981,6 +981,16 @@ public class ClassUtils
         {
             return Double.valueOf(((Number)value).doubleValue());
         }
+        else if (type == Boolean.class && value instanceof Long)
+        {
+            // Convert a Long (0, 1) to Boolean (FALSE, TRUE) and null otherwise
+            return (Long)value == 0 ? Boolean.FALSE : ((Long)value == 1 ? Boolean.TRUE : null);
+        }
+        else if (type == Boolean.class && value instanceof Integer)
+        {
+            // Convert a Integer (0, 1) to Boolean (FALSE, TRUE) and null otherwise
+            return (Integer)value == 0 ? Boolean.FALSE : ((Integer)value == 1 ? Boolean.TRUE : null);
+        }
         return null;
     }
 
