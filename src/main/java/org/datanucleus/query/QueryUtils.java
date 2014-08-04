@@ -291,8 +291,7 @@ public class QueryUtils
                 {
                     fieldType = fieldValues[i].getClass().getName();
                 }
-                String msg = Localiser.msg("021204", resultClass.getName(), 
-                    resultFieldNames[i], fieldType);
+                String msg = Localiser.msg("021204", resultClass.getName(), resultFieldNames[i], fieldType);
                 NucleusLogger.QUERY.error(msg);
                 throw new NucleusUserException(msg);
             }
@@ -450,7 +449,7 @@ public class QueryUtils
                 // Find a method with the right name and a single arg and try conversion of the supplied value
                 Method[] methods = (Method[])AccessController.doPrivileged(new PrivilegedAction() 
                 {
-                    public Object run() 
+                    public Object run()
                     {
                         return obj.getClass().getDeclaredMethods();
                     }
@@ -458,16 +457,16 @@ public class QueryUtils
                 for (int i=0;i<methods.length;i++)
                 {
                     Class[] args = methods[i].getParameterTypes();
-                    if (methods[i].getName().equals(setMethodName) && Modifier.isPublic(methods[i].getModifiers()) &&
-                        args != null && args.length == 1)
+                    if (methods[i].getName().equals(setMethodName) && Modifier.isPublic(methods[i].getModifiers()) && args != null && args.length == 1)
                     {
                         try
                         {
-                            methods[i].invoke(obj, new Object[]{ClassUtils.convertValue(value, args[0])});
+                            Object convValue = ClassUtils.convertValue(value, args[0]);
+                            methods[i].invoke(obj, new Object[]{convValue});
                             fieldSet = true;
                             if (NucleusLogger.QUERY.isDebugEnabled())
                             {
-                                String msg = "ResultObject set field=" + fieldName + " using " + setMethodName + "() method";
+                                String msg = "ResultObject set field=" + fieldName + " using " + setMethodName + "() method after converting value";
                                 NucleusLogger.QUERY.debug(msg);
                             }
                             break;
