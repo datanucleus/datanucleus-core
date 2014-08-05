@@ -35,6 +35,10 @@ public class BigDecimalArrayByteBufferConverter implements TypeConverter<BigDeci
      */
     public ByteBuffer toDatastoreType(BigDecimal[] memberValue)
     {
+        if (memberValue == null)
+        {
+            return null;
+        }
         byte[] bytes = TypeConversionHelper.getByteArrayFromBigDecimalArray(memberValue);
         ByteBuffer byteBuffer = ByteBuffer.allocate(memberValue.length);
         byteBuffer.put(bytes);
@@ -46,6 +50,10 @@ public class BigDecimalArrayByteBufferConverter implements TypeConverter<BigDeci
      */
     public BigDecimal[] toMemberType(ByteBuffer datastoreValue)
     {
+        if (datastoreValue == null)
+        {
+            return null;
+        }
         return TypeConversionHelper.getBigDecimalArrayFromByteArray(datastoreValue.array());
     }
 }

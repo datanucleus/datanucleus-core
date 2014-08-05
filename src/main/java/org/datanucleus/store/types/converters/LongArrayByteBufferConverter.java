@@ -34,6 +34,10 @@ public class LongArrayByteBufferConverter implements TypeConverter<long[], ByteB
      */
     public ByteBuffer toDatastoreType(long[] memberValue)
     {
+        if (memberValue == null)
+        {
+            return null;
+        }
         byte[] bytes = TypeConversionHelper.getByteArrayFromLongArray(memberValue);
         ByteBuffer byteBuffer = ByteBuffer.allocate(memberValue.length);
         byteBuffer.put(bytes);
@@ -45,6 +49,10 @@ public class LongArrayByteBufferConverter implements TypeConverter<long[], ByteB
      */
     public long[] toMemberType(ByteBuffer datastoreValue)
     {
+        if (datastoreValue == null)
+        {
+            return null;
+        }
         return TypeConversionHelper.getLongArrayFromByteArray(datastoreValue.array());
     }
 }

@@ -35,6 +35,10 @@ public class BigIntegerArrayByteBufferConverter implements TypeConverter<BigInte
      */
     public ByteBuffer toDatastoreType(BigInteger[] memberValue)
     {
+        if (memberValue == null)
+        {
+            return null;
+        }
         byte[] bytes = TypeConversionHelper.getByteArrayFromBigIntegerArray(memberValue);
         ByteBuffer byteBuffer = ByteBuffer.allocate(memberValue.length);
         byteBuffer.put(bytes);
@@ -46,6 +50,10 @@ public class BigIntegerArrayByteBufferConverter implements TypeConverter<BigInte
      */
     public BigInteger[] toMemberType(ByteBuffer datastoreValue)
     {
+        if (datastoreValue == null)
+        {
+            return null;
+        }
         return TypeConversionHelper.getBigIntegerArrayFromByteArray(datastoreValue.array());
     }
 }

@@ -34,6 +34,10 @@ public class BooleanArrayByteBufferConverter implements TypeConverter<boolean[],
      */
     public ByteBuffer toDatastoreType(boolean[] memberValue)
     {
+        if (memberValue == null)
+        {
+            return null;
+        }
         byte[] bytes = TypeConversionHelper.getByteArrayFromBooleanArray(memberValue);
         ByteBuffer byteBuffer = ByteBuffer.allocate(memberValue.length);
         byteBuffer.put(bytes);
@@ -45,6 +49,10 @@ public class BooleanArrayByteBufferConverter implements TypeConverter<boolean[],
      */
     public boolean[] toMemberType(ByteBuffer datastoreValue)
     {
+        if (datastoreValue == null)
+        {
+            return null;
+        }
         return TypeConversionHelper.getBooleanArrayFromByteArray(datastoreValue.array());
     }
 }

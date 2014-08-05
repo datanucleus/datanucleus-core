@@ -41,6 +41,10 @@ public class SerializableByteBufferConverter implements TypeConverter<Serializab
      */
     public ByteBuffer toDatastoreType(Serializable memberValue)
     {
+        if (memberValue == null)
+        {
+            return null;
+        }
         byte[] bytes = null;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = null;
@@ -82,6 +86,10 @@ public class SerializableByteBufferConverter implements TypeConverter<Serializab
      */
     public Serializable toMemberType(ByteBuffer datastoreValue)
     {
+        if (datastoreValue == null)
+        {
+            return null;
+        }
         Serializable obj = null;
         ByteArrayInputStream bais = new ByteArrayInputStream(datastoreValue.array());
         ObjectInputStream ois = null;

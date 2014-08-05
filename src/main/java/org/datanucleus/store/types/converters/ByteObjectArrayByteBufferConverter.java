@@ -34,6 +34,10 @@ public class ByteObjectArrayByteBufferConverter implements TypeConverter<Byte[],
      */
     public ByteBuffer toDatastoreType(Byte[] memberValue)
     {
+        if (memberValue == null)
+        {
+            return null;
+        }
         byte[] bytes = TypeConversionHelper.getByteArrayFromByteObjectArray(memberValue);
         ByteBuffer byteBuffer = ByteBuffer.allocate(memberValue.length);
         byteBuffer.put(bytes);
@@ -45,6 +49,10 @@ public class ByteObjectArrayByteBufferConverter implements TypeConverter<Byte[],
      */
     public Byte[] toMemberType(ByteBuffer datastoreValue)
     {
+        if (datastoreValue == null)
+        {
+            return null;
+        }
         return TypeConversionHelper.getByteObjectArrayFromByteArray(datastoreValue.array());
     }
 }
