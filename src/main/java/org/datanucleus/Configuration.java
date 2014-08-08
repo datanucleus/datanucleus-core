@@ -572,9 +572,17 @@ public class Configuration extends PropertyStore implements Serializable
             // Not yet instantiated so try to create validator
             try
             {
-                Class validatorCls = nucCtx.getClassLoaderResolver(getClass().getClassLoader()).classForName(validatorName);
-                validator = (PropertyValidator)validatorCls.newInstance();
-                propertyValidators.put(validatorName, validator);
+                validator = (PropertyValidator)nucCtx.getPluginManager().createExecutableExtension("org.datanucleus.persistence_properties", "name", name, "validator", null, null);
+                if (validator == null)
+                {
+                    // Core properties are not in plugin.xml, so load via class loader since the class is in this bundle
+                    Class validatorCls = nucCtx.getClassLoaderResolver(getClass().getClassLoader()).classForName(validatorName);
+                    validator = (PropertyValidator)validatorCls.newInstance();
+                }
+                if (validator != null)
+                {
+                    propertyValidators.put(validatorName, validator);
+                }
             }
             catch (Exception e)
             {
