@@ -442,9 +442,9 @@ public abstract class AbstractClassMetaData extends MetaData
         setPersistenceModifier(ClassPersistenceModifier.PERSISTENCE_CAPABLE);
         setEmbeddedOnly(cmd.embeddedOnly);
         setIdentityType(cmd.identityType);
-        setPersistableSuperclass(cmd.getFullClassName());
 
-        implementationOfPersistentDefinition = true;
+        this.persistableSuperclass = cmd.getFullClassName();
+        this.implementationOfPersistentDefinition = true;
 
         // Mark all artificial fields (added in implementing the abstract class) as non-persistent
         for (int i=0; i<cmd.getMemberCount(); i++)
@@ -623,27 +623,16 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
-     * Determine the super persistable class.
-     * The persistence-capable-superclass attribute is deprecated for JDO2.0. 
-     * The attribute will be ignored so metadata files from previous releases can be used.
-     * The persistableSuperclass we use will be retrieved from the class itself.
+     * Determine the nearest superclass that is persistable (if any).
      * @param clr The ClassLoaderResolver
      * @param cls This class
      * @param mmgr MetaData manager
-     * @throws InvalidMetaDataException if the declared <code>persistence-capable-superclass</code> super class 
-     *                                  cannot be loaded by the <code>clr</code>. 
-     * @throws InvalidMetaDataException if the declared <code>persistence-capable-superclass</code> has
-     *                                  no reachable MetaData
+     * @throws InvalidMetaDataException if the super class cannot be loaded by the <code>clr</code>. 
+     * @throws InvalidMetaDataException if the declared <code>persistence-capable-superclass</code> is not actually assignable from <code>cls</code> 
+     * @throws InvalidMetaDataException if any of the super classes is persistable, but the MetaData says that class is not persistent. 
      */
     protected void determineSuperClassName(ClassLoaderResolver clr, Class cls, MetaDataManager mmgr)
     {
-        if (persistableSuperclass != null)
-        {
-            // Make sure any pc superclass name has the parent package (if omitted during specification)
-            persistableSuperclass =
-                ClassUtils.createFullClassName(((PackageMetaData)parent).name, persistableSuperclass);
-        }
-
         // Find the true superclass name (using reflection)
         String realPcSuperclassName = null;
         Collection<Class<?>> superclasses;
@@ -659,81 +648,17 @@ public abstract class AbstractClassMetaData extends MetaData
         for (Class<?> superclass : superclasses)
         {
             AbstractClassMetaData superCmd = mmgr.getMetaDataForClassInternal(superclass, clr);
-            if (superCmd != null &&
-                superCmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
+            if (superCmd != null && superCmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
             {
                 realPcSuperclassName = superclass.getName();
                 break;
             }
         }
 
-        // Validate any specified superclass name
-        if (persistableSuperclass != null && 
-            !persistableSuperclass.equals(realPcSuperclassName))
-        {
-            // Validate the defined superclass
-            try
-            {
-                AbstractClassMetaData superCmd = mmgr.getMetaDataForClassInternal(clr.classForName(persistableSuperclass), clr);
-                if (superCmd == null || 
-                    superCmd.getPersistenceModifier() != ClassPersistenceModifier.PERSISTENCE_CAPABLE)
-                {
-                    throw new InvalidClassMetaDataException("044083", fullName, persistableSuperclass);
-                }
-            }
-            catch (ClassNotResolvedException cnre)
-            {
-                throw new InvalidClassMetaDataException("044088", fullName, persistableSuperclass);
-            }
-            if (realPcSuperclassName != null)
-            {
-                throw new InvalidClassMetaDataException("044087", fullName, realPcSuperclassName,
-                    persistableSuperclass);
-            }
-
-            // The defined persistableSuperclass could NOT have been a superclass
-            // of this class, otherwise it would have been equal to the realPcSuperclassName.
-            throw new InvalidClassMetaDataException("044082", fullName, persistableSuperclass);
-        }
-        else if (persistableSuperclass == null && realPcSuperclassName != null)
-        {
-            persistableSuperclass = realPcSuperclassName;
-            if (NucleusLogger.METADATA.isDebugEnabled())
-            {
-                NucleusLogger.METADATA.debug(Localiser.msg("044089", fullName, persistableSuperclass));
-            }
-        }
-        validateSuperClass(clr, cls, superclasses, mmgr);
-
+        persistableSuperclass = realPcSuperclassName;
         if (persistableSuperclass != null)
         {
-            // Inherit detachable flag from superclass
-            if (!isDetachable() && pcSuperclassMetaData.isDetachable())
-            {
-                detachable = true;
-            }
-        }
-    }
-
-    /**
-     * Check if the previously determined super class is persistable and has 
-     * reachable MetaData file. The super class MetaData is populated if not yet populated or initialised.
-     * @param clr the ClassLoaderResolver
-     * @param cls This class
-     * @param superclasses A List of super classes of this class, starting from the least derived super class up to the root class
-     * @param mmgr MetaData manager
-     * @throws InvalidMetaDataException if the super class cannot be loaded by the <code>clr</code>. 
-     * @throws InvalidMetaDataException if the declared <code>persistence-capable-superclass</code> is not 
-     *                                  actually assignable from <code>cls</code> 
-     * @throws InvalidMetaDataException if any of the super classes is persistable, but the MetaData says that class is not persistent. 
-     */
-    private void validateSuperClass(ClassLoaderResolver clr, Class cls, Collection<Class<?>> superclasses, MetaDataManager mmgr)
-    {
-        // "persistence-capable-superclass"
-        // Check that the class can be loaded, and is a true superclass 
-        if (persistableSuperclass != null)
-        {
-            Class pcsc=null;
+            Class pcsc = null;
             try
             {
                 // Load using same class loader resolver as this class
@@ -764,13 +689,11 @@ public abstract class AbstractClassMetaData extends MetaData
             {
                 // The enhancer doesn't need MetaDataManager so just navigate to FileMetaData and find it.
                 // NOTE : assumes that the class is specified in the same file 
-                String superclass_pkg_name = 
-                    persistableSuperclass.substring(0,persistableSuperclass.lastIndexOf('.'));
-                PackageMetaData pmd=getPackageMetaData().getFileMetaData().getPackage(superclass_pkg_name);
+                String superclass_pkg_name = persistableSuperclass.substring(0,persistableSuperclass.lastIndexOf('.'));
+                PackageMetaData pmd = getPackageMetaData().getFileMetaData().getPackage(superclass_pkg_name);
                 if (pmd != null)
                 {
-                    String superclass_class_name = 
-                        persistableSuperclass.substring(persistableSuperclass.lastIndexOf('.')+1);
+                    String superclass_class_name = persistableSuperclass.substring(persistableSuperclass.lastIndexOf('.')+1);
                     pcSuperclassMetaData = pmd.getClass(superclass_class_name);
                 }
             }
@@ -784,18 +707,13 @@ public abstract class AbstractClassMetaData extends MetaData
                 pcSuperclassMetaData.populate(clr, cls.getClassLoader(), mmgr);
             }
         }
-        else
+
+        if (persistableSuperclass != null)
         {
-            // Check that none of our real superclasses is persistable since this
-            // class hasn't declared a PC superclass
-            for (Class<?> superclass : superclasses)
+            // Inherit detachable flag from superclass
+            if (!isDetachable() && pcSuperclassMetaData.isDetachable())
             {
-                AbstractClassMetaData superCmd = mmgr.getMetaDataForClassInternal(superclass, clr);
-                if (superCmd != null && 
-                    superCmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
-                {
-                    throw new InvalidClassMetaDataException("044091", fullName, superclass.getName());
-                }
+                detachable = true;
             }
         }
     }
@@ -891,7 +809,7 @@ public abstract class AbstractClassMetaData extends MetaData
         // Check that the class can be loaded, and is a true superclass 
         if (persistableSuperclass != null)
         {
-            // Class has superclass, yet has objectid-class defined! ops, this might result in user errors
+            // Class has superclass, yet has objectid-class defined! this might result in user errors
             if (objectidClass != null)
             {
                 String superObjectIdClass = pcSuperclassMetaData.getObjectidClass();
@@ -1707,14 +1625,14 @@ public abstract class AbstractClassMetaData extends MetaData
             // Add on any superclass
             if (persistableSuperclass != null)
             {
-                AbstractClassMetaData super_cmd=getSuperAbstractClassMetaData();
+                AbstractClassMetaData super_cmd = getSuperAbstractClassMetaData();
                 super_cmd.getReferencedClassMetaData(orderedCMDs, referencedCMDs, clr, mmgr);
             }
 
             // Add on any objectid class
             if (objectidClass != null)
             {
-                AbstractClassMetaData id_cmd= mmgr.getMetaDataForClass(objectidClass, clr);
+                AbstractClassMetaData id_cmd = mmgr.getMetaDataForClass(objectidClass, clr);
                 if (id_cmd != null)
                 {
                     id_cmd.getReferencedClassMetaData(orderedCMDs, referencedCMDs, clr, mmgr);
@@ -2498,13 +2416,6 @@ public abstract class AbstractClassMetaData extends MetaData
     public String getPersistableSuperclass()
     {
         return persistableSuperclass;
-    }
-
-    public synchronized void setPersistableSuperclass(String pcSuperclassName)
-    {
-        checkNotYetPopulated();
-
-        this.persistableSuperclass = pcSuperclassName;
     }
 
     /**
