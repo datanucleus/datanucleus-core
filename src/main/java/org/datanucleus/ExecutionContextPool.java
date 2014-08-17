@@ -56,8 +56,7 @@ public class ExecutionContextPool
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug("Started pool of ExecutionContext (maxPool=" + maxIdle + 
-                ", reaperThread=" + (cleaner != null) + ")");
+            NucleusLogger.PERSISTENCE.debug("Started pool of ExecutionContext (maxPool=" + maxIdle + ", reaperThread=" + (cleaner != null) + ")");
         }
     }
 

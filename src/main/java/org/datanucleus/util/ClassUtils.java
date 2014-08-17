@@ -81,12 +81,12 @@ public class ClassUtils
         Object obj;
         try
         {
-            StringBuilder name = new StringBuilder(""+type.hashCode());
+            StringBuilder name = new StringBuilder(""+type.getName());
             if (parameterTypes != null)
             {
                 for (int i=0;i<parameterTypes.length; i++)
                 {
-                    name.append("-").append(parameterTypes[i].hashCode());
+                    name.append("-").append(parameterTypes[i].getName());
                 }
             }
             Constructor ctor = (Constructor)constructorsCache.get(name.toString());

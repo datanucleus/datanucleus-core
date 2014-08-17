@@ -717,14 +717,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     protected void initialiseLevel1Cache()
     {
         String level1Type = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_CACHE_L1_TYPE);
-        if (level1Type != null && level1Type.equalsIgnoreCase("none"))
+        if ("none".equalsIgnoreCase(level1Type))
         {
             return;
         }
 
         // Find the L1 cache class name from its plugin name
-        String level1ClassName = getNucleusContext().getPluginManager().getAttributeValueForExtension("org.datanucleus.cache_level1", 
-            "name", level1Type, "class-name");
+        String level1ClassName = getNucleusContext().getPluginManager().getAttributeValueForExtension("org.datanucleus.cache_level1", "name", level1Type, "class-name");
         if (level1ClassName == null)
         {
             // Plugin of this name not found
@@ -875,8 +874,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         while (propertiesIter.hasNext())
         {
             Map.Entry<String, Object> entry = propertiesIter.next();
-            String propName = nucCtx.getConfiguration().getCaseSensitiveNameForPropertyName(entry.getKey());
-            props.put(propName, entry.getValue());
+            props.put(nucCtx.getConfiguration().getCaseSensitiveNameForPropertyName(entry.getKey()), entry.getValue());
         }
         return props;
     }
@@ -886,8 +884,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
         {
             assertIsOpen();
-            String intName = getNucleusContext().getConfiguration().getInternalNameForProperty(name);
-            return properties.getBooleanProperty(intName);
+            return properties.getBooleanProperty(getNucleusContext().getConfiguration().getInternalNameForProperty(name));
         }
         return null;
     }
@@ -897,8 +894,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
         {
             assertIsOpen();
-            String intName = getNucleusContext().getConfiguration().getInternalNameForProperty(name);
-            return properties.getIntProperty(intName);
+            return properties.getIntProperty(getNucleusContext().getConfiguration().getInternalNameForProperty(name));
         }
         return null;
     }
@@ -908,8 +904,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
         {
             assertIsOpen();
-            String intName = getNucleusContext().getConfiguration().getInternalNameForProperty(name);
-            return properties.getStringProperty(intName);
+            return properties.getStringProperty(getNucleusContext().getConfiguration().getInternalNameForProperty(name));
         }
         return null;
     }
@@ -919,8 +914,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
         {
             assertIsOpen();
-            String intName = getNucleusContext().getConfiguration().getInternalNameForProperty(name);
-            return properties.getProperty(intName.toLowerCase(Locale.ENGLISH));
+            return properties.getProperty(getNucleusContext().getConfiguration().getInternalNameForProperty(name).toLowerCase(Locale.ENGLISH));
         }
         return null;
     }
@@ -967,11 +961,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (flushModeString != null)
         {
             // User has overridden any default behaviour
-            if (flushModeString.equalsIgnoreCase("AUTO"))
-            {
-                return false;
-            }
-                return true;
+            return !flushModeString.equalsIgnoreCase("AUTO");
         }
 
         // Default behaviour
@@ -980,6 +970,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // We delay ops with optimistic, and don't (currently) with datastore txns
             return tx.getOptimistic();
         }
+
         // Delay ops if not atomic flushing
         return !isNonTxAtomic();
     }
@@ -3577,8 +3568,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         }
 
-        boolean performValidationWhenCached = 
-            (nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED));
+        boolean performValidationWhenCached = (nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED));
         if (validate && (!fromCache || performValidationWhenCached))
         {
             // User requests validation of the instance so go to the datastore to validate it
@@ -4009,8 +3999,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
             // Retrieve the appropriate flush process, and execute it
             FlushProcess flusher = getStoreManager().getFlushProcess();
-            List<NucleusOptimisticException> optimisticFailures =
-                    flusher.execute(this, dirtyOPs, indirectDirtyOPs, operationQueue);
+            List<NucleusOptimisticException> optimisticFailures = flusher.execute(this, dirtyOPs, indirectDirtyOPs, operationQueue);
 
             if (flushToDatastore)
             {
@@ -4214,7 +4203,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return;
         }
         String cacheStoreMode = getLevel2CacheStoreMode();
-        if (cacheStoreMode.equalsIgnoreCase("bypass"))
+        if ("bypass".equalsIgnoreCase(cacheStoreMode))
         {
             // L2 cache storage turned off right now
             return;
@@ -4256,8 +4245,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     // Object has been deleted so remove from L2 cache
                     if (NucleusLogger.CACHE.isDebugEnabled())
                     {
-                        NucleusLogger.CACHE.debug(Localiser.msg("004007",
-                            StringUtils.toJVMIDString(obj), op.getInternalObjectId()));
+                        NucleusLogger.CACHE.debug(Localiser.msg("004007", StringUtils.toJVMIDString(obj), op.getInternalObjectId()));
                     }
                     if (idsToRemove == null)
                     {
@@ -4593,8 +4581,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         while (iter.hasNext())
         {
             ObjectProvider op = iter.next();
-            if (op != null && op.getObject() != null && 
-                !op.getExecutionContext().getApiAdapter().isDeleted(op.getObject()) &&
+            if (op != null && op.getObject() != null && !op.getExecutionContext().getApiAdapter().isDeleted(op.getObject()) &&
                 op.getExternalObjectId() != null)
             {
                 // If the object is deleted then no point detaching.
@@ -4942,11 +4929,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             if (NucleusLogger.CACHE.isDebugEnabled())
             {
                 int[] loadedFieldNums = cachedPC.getLoadedFieldNumbers();
-                String fieldNames = (loadedFieldNums == null || loadedFieldNums.length == 0) ?
-                        "" : StringUtils.intArrayToString(loadedFieldNums);
-                NucleusLogger.CACHE.debug(Localiser.msg("004015", 
-                    StringUtils.toJVMIDString(op.getObject()), op.getInternalObjectId(), fieldNames, cachedPC.getVersion(),
-                    StringUtils.intArrayToString(fieldsToUpdate)));
+                String fieldNames = (loadedFieldNums == null || loadedFieldNums.length == 0) ? "" : StringUtils.intArrayToString(loadedFieldNums);
+                NucleusLogger.CACHE.debug(Localiser.msg("004015", StringUtils.toJVMIDString(op.getObject()), op.getInternalObjectId(), 
+                    fieldNames, cachedPC.getVersion(), StringUtils.intArrayToString(fieldsToUpdate)));
             }
         }
         else
@@ -4964,8 +4949,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             if (NucleusLogger.CACHE.isDebugEnabled())
             {
                 int[] loadedFieldNums = cachedPC.getLoadedFieldNumbers();
-                String fieldNames = (loadedFieldNums == null || loadedFieldNums.length == 0) ?
-                        "" : StringUtils.intArrayToString(loadedFieldNums);
+                String fieldNames = (loadedFieldNums == null || loadedFieldNums.length == 0) ? "" : StringUtils.intArrayToString(loadedFieldNums);
                 NucleusLogger.CACHE.debug(Localiser.msg("004003", 
                     StringUtils.toJVMIDString(op.getObject()), op.getInternalObjectId(), fieldNames, cachedPC.getVersion()));
             }
@@ -5049,15 +5033,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             if (NucleusLogger.CACHE.isDebugEnabled())
             {
-                NucleusLogger.CACHE.debug(Localiser.msg("003009", 
-                    IdentityUtils.getPersistableIdentityForId(id), String.valueOf(cache.size())));
+                NucleusLogger.CACHE.debug(Localiser.msg("003009", IdentityUtils.getPersistableIdentityForId(id), String.valueOf(cache.size())));
             }
             Object pcRemoved = cache.remove(id);
             if (pcRemoved == null && NucleusLogger.CACHE.isDebugEnabled())
             {
                 // For some reason the object isn't in the L1 cache - garbage collected maybe ?
-                NucleusLogger.CACHE.debug(Localiser.msg("003010", 
-                    IdentityUtils.getPersistableIdentityForId(id)));
+                NucleusLogger.CACHE.debug(Localiser.msg("003010", IdentityUtils.getPersistableIdentityForId(id)));
             }
         }
     }
@@ -5220,7 +5202,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
 
             String cacheRetrieveMode = getLevel2CacheRetrieveMode();
-            if (cacheRetrieveMode.equalsIgnoreCase("bypass"))
+            if ("bypass".equalsIgnoreCase(cacheRetrieveMode))
             {
                 // Cache retrieval currently turned off
                 return null;
@@ -5236,8 +5218,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 pc = op.getObject(); // Object in P_CLEAN state
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
-                    NucleusLogger.CACHE.debug(Localiser.msg("004006",
-                        IdentityUtils.getPersistableIdentityForId(id),
+                    NucleusLogger.CACHE.debug(Localiser.msg("004006", IdentityUtils.getPersistableIdentityForId(id),
                         StringUtils.intArrayToString(cachedPC.getLoadedFieldNumbers()), cachedPC.getVersion(),
                         StringUtils.toJVMIDString(pc)));
                 }
@@ -5290,8 +5271,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     Object pc = op.getObject(); // Object in P_CLEAN state
                     if (NucleusLogger.CACHE.isDebugEnabled())
                     {
-                        NucleusLogger.CACHE.debug(Localiser.msg("004006",
-                            IdentityUtils.getPersistableIdentityForId(id),
+                        NucleusLogger.CACHE.debug(Localiser.msg("004006", IdentityUtils.getPersistableIdentityForId(id),
                             StringUtils.intArrayToString(cachedPC.getLoadedFieldNumbers()), cachedPC.getVersion(),
                             StringUtils.toJVMIDString(pc)));
                     }
@@ -5352,8 +5332,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
                     NucleusLogger.CACHE.debug(Localiser.msg("003012", StringUtils.toJVMIDString(pc), 
-                        IdentityUtils.getPersistableIdentityForId(oldID), 
-                        IdentityUtils.getPersistableIdentityForId(newID)));
+                        IdentityUtils.getPersistableIdentityForId(oldID), IdentityUtils.getPersistableIdentityForId(newID)));
                 }
                 cache.remove(oldID);
             }
@@ -5372,10 +5351,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 enlistedOPCache.put(newID, op);
                 if (NucleusLogger.TRANSACTION.isDebugEnabled())
                 {
-                    NucleusLogger.TRANSACTION.debug(Localiser.msg("015018",
-                        StringUtils.toJVMIDString(pc),
-                        IdentityUtils.getPersistableIdentityForId(oldID),
-                        IdentityUtils.getPersistableIdentityForId(newID)));
+                    NucleusLogger.TRANSACTION.debug(Localiser.msg("015018", StringUtils.toJVMIDString(pc),
+                        IdentityUtils.getPersistableIdentityForId(oldID), IdentityUtils.getPersistableIdentityForId(newID)));
                 }
             }
         }
@@ -5917,6 +5894,5 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             opAssociatedValuesMapByOP.remove(op);
         }
-        
     }
 }

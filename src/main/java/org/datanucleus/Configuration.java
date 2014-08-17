@@ -409,11 +409,11 @@ public class Configuration extends PropertyStore implements Serializable
         try
         {
             props = PersistenceUtils.setPropertiesUsingFile(filename);
-            setPropertyInternal("datanucleus.propertiesFile", filename);
+            setPropertyInternal(PropertyNames.PROPERTY_PROPERTIES_FILE, filename);
         }
         catch (NucleusUserException nue)
         {
-            properties.remove("datanucleus.propertiesFile");
+            properties.remove(PropertyNames.PROPERTY_PROPERTIES_FILE);
             throw nue;
         }
         if (props != null && !props.isEmpty())
@@ -500,8 +500,7 @@ public class Configuration extends PropertyStore implements Serializable
             {
                 if (mapping.validatorName != null)
                 {
-                    validatePropertyValue(mapping.internalName != null ? mapping.internalName : propertyName, value,
-                            mapping.validatorName);
+                    validatePropertyValue(mapping.internalName != null ? mapping.internalName : propertyName, value, mapping.validatorName);
 
                     if (value != null && value instanceof String)
                     {
@@ -520,7 +519,7 @@ public class Configuration extends PropertyStore implements Serializable
                 }
 
                 // Special behaviour properties
-                if (propertyName.equals("datanucleus.propertiesFile"))
+                if (propertyName.equals(PropertyNames.PROPERTY_PROPERTIES_FILE))
                 {
                     // Load all properties from the specified file
                     setPropertiesUsingFile((String)value);
