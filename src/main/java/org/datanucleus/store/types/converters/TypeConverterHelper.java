@@ -30,7 +30,7 @@ public class TypeConverterHelper
     {
         try
         {
-            Method m = conv.getClass().getDeclaredMethod("toMemberType", new Class[] {datastoreType});
+            Method m = conv.getClass().getMethod("toMemberType", new Class[] {datastoreType});
             return m.getReturnType();
         }
         catch (Exception e)
@@ -38,7 +38,7 @@ public class TypeConverterHelper
             try
             {
                 // Maybe is a wrapper to a converter, like for JPA
-                Method m = conv.getClass().getDeclaredMethod("getMemberClass");
+                Method m = conv.getClass().getMethod("getMemberClass");
                 return (Class)m.invoke(conv);
             }
             catch (Exception e2)
@@ -53,7 +53,7 @@ public class TypeConverterHelper
     {
         try
         {
-            Method m = conv.getClass().getDeclaredMethod("toDatastoreType", new Class[] {memberType});
+            Method m = conv.getClass().getMethod("toDatastoreType", new Class[] {memberType});
             return m.getReturnType();
         }
         catch (Exception e)
@@ -64,7 +64,7 @@ public class TypeConverterHelper
         try
         {
             // Maybe is a wrapper to a converter, like for JPA
-            Method m = conv.getClass().getDeclaredMethod("getDatastoreClass");
+            Method m = conv.getClass().getMethod("getDatastoreClass");
             return (Class)m.invoke(conv);
         }
         catch (Exception e2)
@@ -75,7 +75,7 @@ public class TypeConverterHelper
         // Maybe there is a toDatastoreType but not precise member type so just find the toDatastoreType method
         try
         {
-            Method[] methods = conv.getClass().getDeclaredMethods();
+            Method[] methods = conv.getClass().getMethods();
             if (methods != null)
             {
                 // Note that with reflection we get duplicated methods here, so if we have a method "String toDatastoreType(Serializable)" then
