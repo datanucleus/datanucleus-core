@@ -117,10 +117,14 @@ public class KeyMetaData extends AbstractElementMetaData
         {
             sb.append(" mapped-by=\"" + mappedBy + "\"");
         }
+        if (table != null)
+        {
+            sb.append("\n").append(prefix).append("      table=\"" + table + "\"");
+        }
         if (columnName != null)
         {
             sb.append("\n");
-            sb.append(prefix).append("     column=\"" + columnName + "\"");
+            sb.append(prefix).append("      column=\"" + columnName + "\"");
         }
         sb.append(">\n");
 

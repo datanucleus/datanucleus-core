@@ -58,6 +58,8 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
     /** EmbeddedMetaData */
     protected EmbeddedMetaData embeddedMetaData;
 
+    protected String table;
+
     protected String columnName;
 
     protected List<ColumnMetaData> columns = null;
@@ -69,6 +71,7 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
     public AbstractElementMetaData(AbstractElementMetaData aemd)
     {
         super(null, aemd);
+        this.table = aemd.table;
         this.columnName = aemd.columnName;
         this.unique = aemd.unique;
         this.indexed = aemd.indexed;
@@ -168,6 +171,16 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
         }
 
         setInitialised();
+    }
+
+    public String getTable()
+    {
+        return table;
+    }
+
+    public void setTable(String table)
+    {
+        this.table = table;
     }
 
     public String getMappedBy()
