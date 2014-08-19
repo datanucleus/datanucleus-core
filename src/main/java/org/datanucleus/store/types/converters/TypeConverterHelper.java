@@ -43,7 +43,7 @@ public class TypeConverterHelper
             }
             catch (Exception e2)
             {
-                NucleusLogger.GENERAL.warn(">> Converter " + conv + " didn't have adequate information from toMemberType nor from getDatastoreClass");
+                NucleusLogger.GENERAL.warn("Converter " + conv + " didn't have adequate information from toMemberType nor from getMemberClass");
             }
         }
         return null;
@@ -92,7 +92,7 @@ public class TypeConverterHelper
         }
         catch (Exception e3)
         {
-            NucleusLogger.GENERAL.warn(">> Converter " + conv + " didn't have adequate information from toDatastoreType nor from getDatastoreClass");
+            NucleusLogger.GENERAL.warn("Converter " + conv + " didn't have adequate information from toDatastoreType nor from getDatastoreClass");
         }
 
         return null;
