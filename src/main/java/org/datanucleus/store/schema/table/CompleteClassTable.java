@@ -405,7 +405,6 @@ public class CompleteClassTable implements Table
                         }
                         MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
                         col.setMemberColumnMapping(mapping);
-                        mapping.setTypeConverter(typeConv);
                         if (schemaVerifier != null)
                         {
                             schemaVerifier.attributeMember(mapping, mmd);
@@ -947,7 +946,6 @@ public class CompleteClassTable implements Table
                         }
                         MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
                         col.setMemberColumnMapping(mapping);
-                        mapping.setTypeConverter(typeConv);
                         if (schemaVerifier != null)
                         {
                             schemaVerifier.attributeEmbeddedMember(mapping, embMmds);
