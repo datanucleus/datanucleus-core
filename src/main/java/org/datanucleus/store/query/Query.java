@@ -224,7 +224,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
         this.ec = ec;
         if (ec == null)
         {
-            // EX should always be provided so throw exception if null
+            // ExecutionContext should always be provided so throw exception if null
             throw new NucleusUserException(Localiser.msg("021012"));
         }
         this.clr = ec.getClassLoaderResolver();
@@ -485,7 +485,12 @@ public abstract class Query implements Serializable, ExecutionContextListener
 
     public void executionContextClosing(ExecutionContext ec)
     {
+        NucleusLogger.QUERY.debug("ExecutionContext is closing so closing query results for \"" + this + "\"");
         closeAll();
+        if (fetchPlan != null)
+        {
+            fetchPlan.clearGroups();
+        }
         this.ec = null;
     }
 
