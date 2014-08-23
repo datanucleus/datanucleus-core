@@ -258,38 +258,37 @@ public class FetchGroup implements Serializable
      */
     private String[] getMemberNamesForCategory(String categoryName)
     {
-        AbstractClassMetaData acmd = getMetaDataForClass();
+        AbstractClassMetaData cmd = getMetaDataForClass();
         int[] memberPositions = null;
         if (categoryName.equals(DEFAULT))
         {
-            memberPositions = acmd.getDFGMemberPositions();
+            memberPositions = cmd.getDFGMemberPositions();
         }
         else if (categoryName.equals(ALL))
         {
-            memberPositions = acmd.getAllMemberPositions();
+            memberPositions = cmd.getAllMemberPositions();
         }
         else if (categoryName.equals(BASIC))
         {
-            memberPositions = acmd.getBasicMemberPositions(nucleusCtx.getClassLoaderResolver(null), nucleusCtx.getMetaDataManager());
+            memberPositions = cmd.getBasicMemberPositions(nucleusCtx.getClassLoaderResolver(null), nucleusCtx.getMetaDataManager());
         }
         else if (categoryName.equals(RELATIONSHIP))
         {
-            memberPositions = acmd.getRelationMemberPositions(nucleusCtx.getClassLoaderResolver(null), nucleusCtx.getMetaDataManager());
+            memberPositions = cmd.getRelationMemberPositions(nucleusCtx.getClassLoaderResolver(null), nucleusCtx.getMetaDataManager());
         }
         else if (categoryName.equals(MULTIVALUED))
         {
-            memberPositions = acmd.getMultivaluedMemberPositions();
+            memberPositions = cmd.getMultivaluedMemberPositions();
         }
         else
         {
-            throw nucleusCtx.getApiAdapter().getUserExceptionForException(
-                "Category " + categoryName + " is invalid", null);
+            throw nucleusCtx.getApiAdapter().getUserExceptionForException("Category " + categoryName + " is invalid", null);
         }
 
         String[] names = new String[memberPositions.length];
         for (int i=0;i<memberPositions.length;i++)
         {
-            names[i] = acmd.getMetaDataForManagedMemberAtAbsolutePosition(memberPositions[i]).getName();
+            names[i] = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberPositions[i]).getName();
         }
         return names;
     }
@@ -380,6 +379,11 @@ public class FetchGroup implements Serializable
         }
     }
 
+    public Collection<FetchPlan> getListenerFPs()
+    {
+        return Collections.unmodifiableCollection(planListeners);
+    }
+
     /**
      * Method to register a listener for changes to this FetchGroup.
      * @param plan The FetchPlan that is listening
@@ -445,18 +449,18 @@ public class FetchGroup implements Serializable
 
     private AbstractClassMetaData getMetaDataForClass()
     {
-        AbstractClassMetaData acmd = null;
+        AbstractClassMetaData cmd = null;
         if (cls.isInterface())
         {
             // Persistent interface
-            acmd = nucleusCtx.getMetaDataManager().getMetaDataForInterface(cls, nucleusCtx.getClassLoaderResolver(null));
+            cmd = nucleusCtx.getMetaDataManager().getMetaDataForInterface(cls, nucleusCtx.getClassLoaderResolver(null));
         }
         else
         {
             // Persistence class
-            acmd = nucleusCtx.getMetaDataManager().getMetaDataForClass(cls, nucleusCtx.getClassLoaderResolver(null));
+            cmd = nucleusCtx.getMetaDataManager().getMetaDataForClass(cls, nucleusCtx.getClassLoaderResolver(null));
         }
-        return acmd;
+        return cmd;
     }
 
     public boolean equals(Object obj)
