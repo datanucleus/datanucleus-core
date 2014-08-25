@@ -66,8 +66,10 @@ import org.datanucleus.util.StringUtils;
  * or explicit (defined via declareParameters). They can also be named or numbered.
  * When passing a map of parameters with values, they are keyed by String (named parameters)
  * or Integer (numbered parameters).
+ * 
+ * @param <T> Type of the candidate of this query
  */
-public abstract class Query implements Serializable, ExecutionContextListener
+public abstract class Query<T> implements Serializable, ExecutionContextListener
 {
     private static final long serialVersionUID = 7820102897590182771L;
     public static final String EXTENSION_FLUSH_BEFORE_EXECUTION = PropertyNames.PROPERTY_QUERY_FLUSH_BEFORE_EXECUTE;
@@ -98,16 +100,13 @@ public abstract class Query implements Serializable, ExecutionContextListener
     protected short type = SELECT;
 
     /** The candidate class for this query. */
-    protected Class candidateClass;
+    protected Class<T> candidateClass;
 
     /** Name of the candidate class (used when specified via Single-String). */
     protected String candidateClassName;
 
     /** Whether to allow subclasses of the candidate class be returned. */
     protected boolean subclasses = true;
-
-    /** Whether to return single value, or collection from the query. */
-    protected boolean unique = false;
 
     /** From clause of the query (optional). */
     protected transient String from = null;
@@ -120,6 +119,9 @@ public abstract class Query implements Serializable, ExecutionContextListener
 
     /** Whether the results are marked as distinct. This is extracted out of the result for clarity. */
     protected boolean resultDistinct = false;
+
+    /** Whether to return single value, or collection from the query. */
+    protected boolean unique = false;
 
     /** User-defined class that best represents the results of a query. Populated if specified via setResultClass(). */
     protected Class resultClass = null;
@@ -214,7 +216,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
     protected transient Map<Thread, Object> tasks = new ConcurrentHashMap(1);
 
     /**
-     * Constructs a new query instance that uses the given object manager.
+     * Constructs a new query instance that uses the given ExecutionContext.
      * @param storeMgr Store Manager used for this query
      * @param ec execution context
      */
@@ -1528,7 +1530,7 @@ public abstract class Query implements Serializable, ExecutionContextListener
             // Register the subquery against its variable name for later use
             if (subqueries == null)
             {
-                subqueries = new HashMap();
+                subqueries = new HashMap<String, SubqueryDefinition>();
             }
             String subqueryVariableName = variableDecl.trim();
             int sepPos = subqueryVariableName.indexOf(' ');

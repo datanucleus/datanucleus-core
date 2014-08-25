@@ -87,11 +87,10 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
 
         if (q != null && q.subqueries != null && !q.subqueries.isEmpty())
         {
-            Iterator<String> subqueryKeyIter = q.subqueries.keySet().iterator();
-            while (subqueryKeyIter.hasNext())
+            Iterator<SubqueryDefinition> subqueryDefIter = q.subqueries.values().iterator();
+            while (subqueryDefIter.hasNext())
             {
-                String key = subqueryKeyIter.next();
-                SubqueryDefinition subquery = q.subqueries.get(key);
+                SubqueryDefinition subquery = subqueryDefIter.next();
                 // TODO Make copies rather than using the objects
                 addSubquery(subquery.query, subquery.variableDecl, subquery.candidateExpression, subquery.parameterMap);
             }
