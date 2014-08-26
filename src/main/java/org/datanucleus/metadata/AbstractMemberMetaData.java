@@ -246,6 +246,9 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     /** Wrapper for the ugly JPA "lob" so that when being populated we should make this serialised in some way. */
     protected boolean storeInLob = false;
 
+    /** Placeholder for the JPA "mapsId" attribute, in case a store plugin wants to use it */
+    protected String mapsIdAttribute = null;
+
     /** Flags for use in enhancement process [see JDO spec 21.14] */
     protected byte persistenceFlags;
 
@@ -390,8 +393,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      * @param primary the primary ClassLoader to use (or null)
      * @param mmgr MetaData manager
      */
-    public synchronized void populate(ClassLoaderResolver clr, Field field, Method method, 
-            ClassLoader primary, MetaDataManager mmgr)
+    public synchronized void populate(ClassLoaderResolver clr, Field field, Method method, ClassLoader primary, MetaDataManager mmgr)
     {
         if (isPopulated() || isInitialised())
         {
@@ -618,8 +620,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             // Set up the jdbcType/serialized settings according to the field type in line with JPA
             boolean useClob = false;
             if (type == String.class ||
-                (type.isArray() && type.getComponentType() == Character.class) ||
-                (type.isArray() && type.getComponentType() == char.class))
+                (type.isArray() && type.getComponentType() == Character.class) || (type.isArray() && type.getComponentType() == char.class))
             {
                 useClob = true;
                 if (columns == null || columns.size() == 0)
@@ -1055,8 +1056,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      * @param mmgr MetaData manager
      * @return The default field PersistenceModifier.
      */
-    public final FieldPersistenceModifier getDefaultFieldPersistenceModifier(Class c, int modifier,
-            boolean isPCclass, MetaDataManager mmgr)
+    public final FieldPersistenceModifier getDefaultFieldPersistenceModifier(Class c, int modifier, boolean isPCclass, MetaDataManager mmgr)
     {
         // Set modifier for static, final, transient as per capabilities we currently handle
         if (!PERSIST_FINAL && Modifier.isFinal(modifier) && this instanceof FieldMetaData)
@@ -1318,8 +1318,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         {
             // Enhancing so return if we have MetaData that is persistable
             AbstractClassMetaData cmd = mmgr.readMetaDataForClass(type.getComponentType().getName());
-            if (cmd != null && cmd instanceof ClassMetaData &&
-                cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
+            if (cmd != null && cmd instanceof ClassMetaData && cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
             {
                 return true;
             }
@@ -1787,11 +1786,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     public boolean isEmbedded()
     {
-        if (embedded == null)
-        {
-            return false;
-        }
-        return embedded.booleanValue();
+        return embedded == null ? false : embedded.booleanValue();
     }
 
     public void setEmbedded(boolean val)
@@ -1801,16 +1796,17 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     public boolean isSerialized()
     {
-        if (serialized == null)
-        {
-            return false;
-        }
-        return serialized.booleanValue();
+        return serialized == null ? false : serialized.booleanValue();
     }
 
     public void setSerialised(boolean flag)
     {
         serialized = flag;
+    }
+
+    public String getMapsIdAttribute()
+    {
+        return mapsIdAttribute;
     }
 
     /**
@@ -1869,11 +1865,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     public boolean isPrimaryKey()
     {
-        if (primaryKey == null)
-        {
-            return false;
-        }
-        return primaryKey.booleanValue();
+        return primaryKey == null ? false : primaryKey.booleanValue();
     }
 
     public AbstractMemberMetaData setPrimaryKey(boolean flag)
@@ -2234,11 +2226,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      */
     public boolean hasArray()
     {
-        if (containerMetaData == null)
-        {
-            return false;
-        }
-        return (containerMetaData instanceof ArrayMetaData);
+        return containerMetaData == null ? false : (containerMetaData instanceof ArrayMetaData);
     }
 
     /**
@@ -2247,11 +2235,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      */
     public boolean hasCollection()
     {
-        if (containerMetaData == null)
-        {
-            return false;
-        }
-        return (containerMetaData instanceof CollectionMetaData);
+        return containerMetaData == null ? false : (containerMetaData instanceof CollectionMetaData);
     }
 
     /**
@@ -2260,11 +2244,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      */
     public boolean hasMap()
     {
-        if (containerMetaData == null)
-        {
-            return false;
-        }
-        return (containerMetaData instanceof MapMetaData);
+        return containerMetaData == null ? false : (containerMetaData instanceof MapMetaData);
     }
 
     /**
@@ -2341,6 +2321,17 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         storeInLob = true;
     }
 
+    public void setMapsIdAttribute(String attr)
+    {
+        // Note that empty string implies use the default id attribute. Null means this is not set
+        this.mapsIdAttribute = attr;
+        if (mapsIdAttribute != null)
+        {
+            // TODO Make use of this in store plugins where required
+            NucleusLogger.METADATA.warn("@MapsId specified on member " + getFullFieldName() + " yet not currently supported (" + mapsIdAttribute + ")");
+        }
+    }
+
     /**
      * Mutator for the cascading of persist operations on this field.
      * @param cascade Whether to cascade at persist
@@ -2403,7 +2394,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     {
         if (StringUtils.isWhitespace(generator))
         {
-            valueGeneratorName = null;
+            this.valueGeneratorName = null;
         }
         else
         {
