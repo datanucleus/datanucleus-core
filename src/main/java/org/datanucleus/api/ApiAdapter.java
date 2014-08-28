@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.enhancer.Persistable;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.MetaDataManager;
@@ -175,6 +176,14 @@ public interface ApiAdapter extends Serializable
      * @return Whether it is valid
      */
     boolean isValidPrimaryKeyClass(Class pkClass, AbstractClassMetaData cmd, ClassLoaderResolver clr, int noOfPkFields, MetaDataManager mmgr);
+
+    /**
+     * Method to set the pk fields of the object from the provided identity.
+     * @param pc The persistable object
+     * @param fm ObjectIdFieldConsumer
+     * @param id The identity
+     */
+    void copyKeyFieldsFromIdToObject(Object pc, Persistable.ObjectIdFieldConsumer fm, Object id);
 
     // ------------------------------ Persistence --------------------------------
 
