@@ -793,7 +793,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Accessor for the owner of this ExecutionContext. This will typically be a PersistenceManager (JDO) or a dummy PersistenceManager representing an EntityManager (JPA).
+     * Accessor for the owner of this ExecutionContext. This will typically be PersistenceManager (JDO) or EntityManager (JPA).
      * @return The owner
      */
     public Object getOwner()
@@ -1171,7 +1171,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             foundOP = null;
             // We call "ApiAdapter.getExecutionContext(pc)".
             // This then calls "JDOHelper.getPersistenceManager(pc)".
-            // Which calls "StateManager.getPersistenceManager(pc)".
+            // Which calls "StateManager.getExecutionContext(pc)".
             // That then calls "hereIsObjectProvider(sm, pc)" which sets "foundOP".
             ExecutionContext ec = getApiAdapter().getExecutionContext(pc);
             if (ec != null && this != ec)
