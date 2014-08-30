@@ -1298,7 +1298,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void processNontransactionalUpdate()
     {
-        if (tx.isActive() || !tx.getNontransactionalWrite() || !isNonTxAtomic())
+        if (tx.isActive() || !tx.getNontransactionalWrite() || !tx.getNontransactionalWriteAutoCommit())
         {
             return;
         }
@@ -1333,13 +1333,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     protected void processNontransactionalAtomicChanges()
     {
-        if (tx.isActive() || !tx.getNontransactionalWrite())
+        if (tx.isActive() || !tx.getNontransactionalWrite() || !tx.getNontransactionalWriteAutoCommit())
         {
-            return;
-        }
-        else if (!isNonTxAtomic())
-        {
-            // Not using atomic nontransactional operations so just return
             return;
         }
 

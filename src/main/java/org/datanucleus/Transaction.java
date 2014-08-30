@@ -80,39 +80,31 @@ public interface Transaction
     /**
      * Begin a transaction.
      * The type of transaction (datastore/optimistic) is determined by the setting of the Optimistic flag.
-     * @throws NucleusUserException if transactions are managed by a container
-     *     in the managed environment, or if the transaction is already active.
+     * @throws NucleusUserException if transactions are managed by a container in the managed environment, or if the transaction is already active.
      */
     void begin();
 
     /**
      * Commit the current transaction. The commit will trigger flushing the transaction, will
-     * invoke the preCommit, commit the resources and invoke postCommit listeners. 
-     * 
+     * invoke the preCommit, commit the resources and invoke postCommit listeners.
      * If during flush or preCommit phases a NucleusUserException is raised, then the transaction will not
      * complete and the transaction remains active. The NucleusUserException is cascaded to the caller.
-     * 
-     * @throws NucleusUserException if transactions are managed by a container
-     *     in the managed environment, or if the transaction is not active.
+     * @throws NucleusUserException if transactions are managed by a container in the managed environment, or if the transaction is not active.
      */
     void commit();
 
     /**
      * Rollback the current transaction. The commit will trigger flushing the transaction, will
-     * invoke the preRollback, rollback the resources and invoke postRollback listeners. 
-     * 
+     * invoke the preRollback, rollback the resources and invoke postRollback listeners.
      * If during flush or preRollback phases a NucleusUserException is raised, then the transaction will not
      * complete and the transaction remains active. The NucleusUserException is cascaded to the caller.
-     * 
-     * @throws NucleusUserException if transactions are managed by a container
-     *     in the managed environment, or if the transaction is not active.
+     * @throws NucleusUserException if transactions are managed by a container in the managed environment, or if the transaction is not active.
      */
     void rollback();
 
     /**
      * Returns whether there is a transaction currently active. This can also attempt to join to
-     * any underlying transaction if the implementation requires it. Use <pre>getIsActive</pre> if you
-     * just want the active flag.
+     * any underlying transaction if the implementation requires it. Use <pre>getIsActive</pre> if you just want the active flag.
      * @return Whether the transaction is active.
      */
     boolean isActive();
@@ -139,58 +131,61 @@ public interface Transaction
     void end();
     
     /**
-     * Returns the rollback-only status of the transaction. 
-     * When begun, the rollback-only status is false. Either the
-     * application or the JDO implementation may set this flag
-     * using setRollbackOnly.
+     * Returns the rollback-only status of the transaction.
+     * When begun, the rollback-only status is false. Either the application or the JDO implementation may set this flag using setRollbackOnly.
      * @return Whether the transaction has been marked for rollback.
      */
     boolean getRollbackOnly();
 
     /**
      * Sets the rollback-only status of the transaction to <code>true</code>.
-     * After this flag is set to <code>true</code>, the transaction
-     * can no longer be committed.
-     * @throws NucleusUserException if the flag is true and an attempt is made
-     *     to commit the txn
+     * After this flag is set to <code>true</code>, the transaction can no longer be committed.
+     * @throws NucleusUserException if the flag is true and an attempt is made to commit the txn
      */
     void setRollbackOnly();
 
     /**
-     * If <code>true</code>, allow persistent instances to be read without
-     * a transaction active.
-     * If an implementation does not support this option, a
+     * If <code>true</code>, allow persistent instances to be read without a transaction active.
+     * If an implementation does not support this option, a NucleusUserException is thrown.
      * @param nontransactionalRead Whether to have non-tx reads
      * @throws NucleusUserException if not supported
      */
     void setNontransactionalRead(boolean nontransactionalRead);
 
-
     /**
-     * If <code>true</code>, allows persistent instances to be read without
-     * a transaction active.
+     * If <code>true</code>, allows persistent instances to be read without a transaction active.
      * @return Whether we are allowing non-tx reads
      */
     boolean getNontransactionalRead();
 
     /**
-     * If <code>true</code>, allow persistent instances to be written without
-     * a transaction active.
+     * If <code>true</code>, allow persistent instances to be written without a transaction active.
      * @param nontransactionalWrite Whether requiring non-tx writes
      * @throws NucleusUserException if not supported
      */
     void setNontransactionalWrite(boolean nontransactionalWrite);
 
     /**
-     * If <code>true</code>, allows persistent instances to be written without
-     * a transaction active.
+     * If <code>true</code>, allows persistent instances to be written without a transaction active.
      * @return Whether we are allowing non-tx writes
      */
     boolean getNontransactionalWrite();
 
     /**
-     * If <code>true</code>, at commit instances retain their values and the
-     * instances transition to persistent-nontransactional.
+     * Set whether to auto-commit any non-tx writes.
+     * @param autoCommit Whether to auto-commit any non-tx writes
+     * @throws NucleusUserException if not supported
+     */
+    void setNontransactionalWriteAutoCommit(boolean autoCommit);
+
+    /**
+     * Whether to auto-commit any non-tx writes.
+     * @return Whether to auto-commit any non-tx writes.
+     */
+    boolean getNontransactionalWriteAutoCommit();
+
+    /**
+     * If <code>true</code>, at commit instances retain their values and the instances transition to persistent-nontransactional.
      * @param retainValues the value of the retainValues property
      * @throws NucleusUserException if not supported
      */
@@ -203,15 +198,11 @@ public interface Transaction
     boolean getRetainValues();
 
     /**
-     * If <code>true</code>, at rollback, fields of newly persistent instances
-     * are restored to their values as of the beginning of the transaction, and 
-     * the instances revert to transient. Additionally, fields of modified
-     * instances of primitive types and immutable reference types
-     * are restored to their values as of the beginning of the
-     * transaction.
-     * <P>If <code>false</code>, at rollback, the values of fields of
-     * newly persistent instances are unchanged and the instances revert to
-     * transient.  Additionally, dirty instances transition to hollow.
+     * If <code>true</code>, at rollback, fields of newly persistent instances are restored to their values as of the beginning of 
+     * the transaction, and the instances revert to transient. Additionally, fields of modified instances of primitive types and 
+     * immutable reference types are restored to their values as of the beginning of the transaction.
+     * <P>If <code>false</code>, at rollback, the values of fields of newly persistent instances are unchanged and the instances revert 
+     * to transient. Additionally, dirty instances transition to hollow.
      * @param restoreValues the value of the restoreValues property
      * @throws NucleusUserException if not supported
      */
@@ -249,25 +240,21 @@ public interface Transaction
     Boolean getSerializeRead();
 
     /**
-     * The user can specify a <code>Synchronization</code> instance to be
-     * notified on transaction completions.  The <code>beforeCompletion</code>
-     * method is called prior to flushing instances to the data store.
-     *
-     * <P>The <code>afterCompletion</code> method is called after performing
-     * state transitions of persistent and transactional instances, following
-     * the data store commit or rollback operation.
-     * <P>Only one <code>Synchronization</code> instance can be registered with
-     * the  <code>Transaction</code>. If the application requires more than one
-     * instance to receive synchronization callbacks, then the single
-     * application instance is responsible for managing them, and forwarding
-     * callbacks to them.
-     * @param sync the <code>Synchronization</code> instance to be notified;
-     * <code>null</code> for none
+     * The user can specify a <code>Synchronization</code> instance to be notified on transaction completions.
+     * The <code>beforeCompletion</code> method is called prior to flushing instances to the data store.
+     * <P>
+     * The <code>afterCompletion</code> method is called after performing state transitions of persistent and transactional instances, 
+     * following the data store commit or rollback operation.
+     * <P>
+     * Only one <code>Synchronization</code> instance can be registered with the <code>Transaction</code>. If the application requires 
+     * more than one instance to receive synchronization callbacks, then the single application instance is responsible for managing 
+     * them, and forwarding callbacks to them.
+     * @param sync the <code>Synchronization</code> instance to be notified; <code>null</code> for none
      */
     void setSynchronization(Synchronization sync);
 
-    /** The user-specified <code>Synchronization</code> instance for this
-     * <code>Transaction</code> instance.
+    /**
+     * The user-specified <code>Synchronization</code> instance for this <code>Transaction</code> instance.
      * @return the user-specified <code>Synchronization</code> instance.
      */
     Synchronization getSynchronization();

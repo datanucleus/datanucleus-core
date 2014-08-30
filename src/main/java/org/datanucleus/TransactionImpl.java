@@ -635,6 +635,15 @@ public class TransactionImpl implements Transaction
     }
 
     /**
+     * Accessor for whether non-tx writes are auto-commit.
+     * @return Whether auto-committing non-tx writes.
+     */
+    public boolean getNontransactionalWriteAutoCommit()
+    {
+        return ec.getBooleanProperty(PropertyNames.PROPERTY_NONTX_ATOMIC);
+    }
+
+    /**
      * Accessor for the Optimistic setting
      * @return Whether optimistic transactions are in operation.
      */
@@ -699,6 +708,15 @@ public class TransactionImpl implements Transaction
     public void setNontransactionalWrite(boolean nontransactionalWrite)
     {
         ec.setProperty(PropertyNames.PROPERTY_NONTX_WRITE, nontransactionalWrite);
+    }
+
+    /**
+     * Mutator for whether non-tx writes are auto-commit (false implies delayed til next transaction commit).
+     * @param autoCommit Whether auto-commit of non-tx writes
+     */
+    public void setNontransactionalWriteAutoCommit(boolean autoCommit)
+    {
+        ec.setProperty(PropertyNames.PROPERTY_NONTX_ATOMIC, autoCommit);
     }
 
     /**
