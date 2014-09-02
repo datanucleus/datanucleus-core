@@ -92,7 +92,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     private static final long serialVersionUID = 7166558862250068749L;
 
     /** Manager for the datastore used by this PMF/EMF. */
-    transient StoreManager storeMgr = null;
+    private transient StoreManager storeMgr = null;
 
     private boolean federated = false;
 
@@ -103,7 +103,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     private boolean jca = false;
 
     /** Level 2 Cache, caching across ExecutionContexts. */
-    protected Level2Cache cache;
+    private Level2Cache cache;
 
     /** Transaction Manager. */
     private transient TransactionManager txManager = null;
@@ -115,13 +115,13 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     private transient JTASyncRegistry jtaSyncRegistry = null;
 
     /** Manager for JMX features. */
-    transient ManagementManager jmxManager = null;
+    private transient ManagementManager jmxManager = null;
 
     /** Statistics gathering object. */
-    transient FactoryStatistics statistics = null;
+    private transient FactoryStatistics statistics = null;
 
     /** Manager for object identities. */
-    protected IdentityManager identityManager;
+    private IdentityManager identityManager;
 
     /** ImplementationCreator for any persistent interfaces. */
     private ImplementationCreator implCreator;
@@ -129,7 +129,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     private List<ExecutionContext.LifecycleListener> executionContextListeners = new ArrayList();
 
     /** Manager for dynamic fetch groups defined on the PMF/EMF. */
-    transient FetchGroupManager fetchGrpMgr;
+    private transient FetchGroupManager fetchGrpMgr;
 
     /** Factory for validation. */
     private transient Object validatorFactory = null;
@@ -138,10 +138,10 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     private transient boolean validatorFactoryInit = false;
 
     /** Pool for ExecutionContexts. */
-    ExecutionContextPool ecPool = null;
+    private ExecutionContextPool ecPool = null;
 
     /** Factory for ObjectProviders for managing persistable objects. */
-    ObjectProviderFactory opFactory = null;
+    private ObjectProviderFactory opFactory = null;
 
     /**
      * Constructor for the context.
