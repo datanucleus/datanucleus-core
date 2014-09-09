@@ -31,6 +31,7 @@ import org.datanucleus.util.StringUtils;
  * <ul>
  * <li>instances of persistent classes - mapping from the result columns to the persistent fields</li>
  * <li>scalar values - names of result columns that are returned as scalars (Integer, String etc)</li>
+ * <li>instances of constructor types - columns passed in to the constructor of the provided type</li>
  * </ul>
  */
 public class QueryResultMetaData extends MetaData
@@ -45,6 +46,8 @@ public class QueryResultMetaData extends MetaData
 
     /** Collection of column names in the result set that are returned as scalars. */
     protected List<String> scalarColumns;
+
+    protected List<ConstructorTypeMapping> ctrTypeMappings;
 
     /**
      * Constructor.
@@ -123,6 +126,19 @@ public class QueryResultMetaData extends MetaData
     }
 
     /**
+     * Accessor for the persistent type mapping information for this result set.
+     * @return Array of persistent types and their mapping info
+     */
+    public PersistentTypeMapping[] getPersistentTypeMappings()
+    {
+        if (persistentTypeMappings == null)
+        {
+            return null;
+        }
+        return persistentTypeMappings.toArray(new PersistentTypeMapping[persistentTypeMappings.size()]);
+    }
+
+    /**
      * Class to wrap the mapping for a persistent type.
      */
     public static class PersistentTypeMapping
@@ -162,19 +178,6 @@ public class QueryResultMetaData extends MetaData
     }
 
     /**
-     * Accessor for the persistent type mapping information for this result set.
-     * @return Array of persistent types and their mapping info
-     */
-    public PersistentTypeMapping[] getPersistentTypeMappings()
-    {
-        if (persistentTypeMappings == null)
-        {
-            return null;
-        }
-        return persistentTypeMappings.toArray(new PersistentTypeMapping[persistentTypeMappings.size()]);
-    }
-
-    /**
      * Accessor for the names of the result set columns that are returned as scalars.
      * @return Column names whose values are returned as scalars
      */
@@ -185,5 +188,48 @@ public class QueryResultMetaData extends MetaData
             return null;
         }
         return scalarColumns.toArray(new String[scalarColumns.size()]);
+    }
+
+    public void addConstructorTypeMapping(String className, List<String> colNames)
+    {
+        if (ctrTypeMappings == null)
+        {
+            ctrTypeMappings = new ArrayList<ConstructorTypeMapping>();
+        }
+        ConstructorTypeMapping m = new ConstructorTypeMapping();
+        m.className = className;
+        m.ctrColumnNames = new ArrayList<String>(colNames);
+        ctrTypeMappings.add(m);
+    }
+
+    public ConstructorTypeMapping[] getConstructorTypeMappings()
+    {
+        if (ctrTypeMappings == null)
+        {
+            return null;
+        }
+        return ctrTypeMappings.toArray(new ConstructorTypeMapping[ctrTypeMappings.size()]);
+    }
+
+    /**
+     * Class to wrap the mapping for a constructor type.
+     */
+    public static class ConstructorTypeMapping
+    {
+        String className;
+        List<String> ctrColumnNames;
+
+        public String getClassName()
+        {
+            return className;
+        }
+        public List<String> getColumnsForConstructor()
+        {
+            if (ctrColumnNames == null)
+            {
+                return null;
+            }
+            return ctrColumnNames;
+        }
     }
 }
