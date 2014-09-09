@@ -240,7 +240,10 @@ public class QueryResultMetaData extends MetaData
         public ConstructorTypeColumn(String colName, Class type)
         {
             this.columnName = colName;
-            this.javaType = type;
+            if (type != void.class)
+            {
+                this.javaType = type;
+            }
         }
         public String getColumnName()
         {
