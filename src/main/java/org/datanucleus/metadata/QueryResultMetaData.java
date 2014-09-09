@@ -190,7 +190,7 @@ public class QueryResultMetaData extends MetaData
         return scalarColumns.toArray(new String[scalarColumns.size()]);
     }
 
-    public void addConstructorTypeMapping(String className, List<String> colNames)
+    public void addConstructorTypeMapping(String className, List<ConstructorTypeColumn> colNames)
     {
         if (ctrTypeMappings == null)
         {
@@ -198,7 +198,7 @@ public class QueryResultMetaData extends MetaData
         }
         ConstructorTypeMapping m = new ConstructorTypeMapping();
         m.className = className;
-        m.ctrColumnNames = new ArrayList<String>(colNames);
+        m.ctrColumns = new ArrayList<ConstructorTypeColumn>(colNames);
         ctrTypeMappings.add(m);
     }
 
@@ -217,19 +217,38 @@ public class QueryResultMetaData extends MetaData
     public static class ConstructorTypeMapping
     {
         String className;
-        List<String> ctrColumnNames;
+        List<ConstructorTypeColumn> ctrColumns;
 
         public String getClassName()
         {
             return className;
         }
-        public List<String> getColumnsForConstructor()
+        public List<ConstructorTypeColumn> getColumnsForConstructor()
         {
-            if (ctrColumnNames == null)
+            if (ctrColumns == null)
             {
                 return null;
             }
-            return ctrColumnNames;
+            return ctrColumns;
+        }
+    }
+
+    public static class ConstructorTypeColumn
+    {
+        String columnName;
+        Class javaType;
+        public ConstructorTypeColumn(String colName, Class type)
+        {
+            this.columnName = colName;
+            this.javaType = type;
+        }
+        public String getColumnName()
+        {
+            return columnName;
+        }
+        public Class getJavaType()
+        {
+            return javaType;
         }
     }
 }
