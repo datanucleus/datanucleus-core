@@ -131,11 +131,12 @@ public interface NamingFactory
 
     /**
      * Method to return the name of a constraint specified at member level.
+     * @param className Name of the class that this constraint is for.
      * @param mmd Metadata for the member
      * @param cnstrmd The constraint metadata
      * @return Name of the constraint
      */
-    String getConstraintName(AbstractMemberMetaData mmd, ConstraintMetaData cnstrmd);
+    String getConstraintName(String className, AbstractMemberMetaData mmd, ConstraintMetaData cnstrmd);
 
     /**
      * Method to return the name of the constraint for the specified class (version, datastore-id, discriminator etc).

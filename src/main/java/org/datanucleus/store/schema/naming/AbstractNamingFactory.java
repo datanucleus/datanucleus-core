@@ -250,10 +250,10 @@ public abstract class AbstractNamingFactory implements NamingFactory
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.naming.NamingFactory#getIndexName(org.datanucleus.metadata.AbstractMemberMetaData, org.datanucleus.metadata.IndexMetaData)
+     * @see org.datanucleus.store.schema.naming.NamingFactory#getIndexName(String, org.datanucleus.metadata.AbstractMemberMetaData, org.datanucleus.metadata.IndexMetaData)
      */
     @Override
-    public String getConstraintName(AbstractMemberMetaData mmd, ConstraintMetaData cnstrmd)
+    public String getConstraintName(String className, AbstractMemberMetaData mmd, ConstraintMetaData cnstrmd)
     {
         if (cnstrmd != null && !StringUtils.isWhitespace(cnstrmd.getName()))
         {
@@ -261,7 +261,7 @@ public abstract class AbstractNamingFactory implements NamingFactory
         }
 
         // TODO Different suffix if Unique or FK ?
-        String idxName = mmd.getClassName(false) + wordSeparator + mmd.getName() + wordSeparator + "IDX";
+        String idxName = className + wordSeparator + mmd.getName() + wordSeparator + "IDX";
         return prepareIdentifierNameForUse(idxName, SchemaComponent.CONSTRAINT);
     }
 
