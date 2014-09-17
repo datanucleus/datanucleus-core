@@ -27,7 +27,6 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.types.SCOCollection;
 import org.datanucleus.store.types.SCOCollectionIterator;
-import org.datanucleus.store.types.SCOMtoN;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -37,7 +36,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class Collection extends AbstractCollection implements SCOCollection<java.util.Collection>, SCOMtoN, Cloneable, java.io.Serializable
+public class Collection extends AbstractCollection implements SCOCollection<java.util.Collection>, Cloneable, java.io.Serializable
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;

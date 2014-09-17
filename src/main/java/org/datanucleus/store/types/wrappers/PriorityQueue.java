@@ -26,7 +26,6 @@ import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.types.SCOCollection;
 import org.datanucleus.store.types.SCOCollectionIterator;
-import org.datanucleus.store.types.SCOMtoN;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -36,7 +35,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class PriorityQueue extends java.util.PriorityQueue implements SCOCollection<java.util.PriorityQueue>, SCOMtoN, Cloneable
+public class PriorityQueue extends java.util.PriorityQueue implements SCOCollection<java.util.PriorityQueue>, Cloneable
 {
     protected ObjectProvider ownerOP;
     protected AbstractMemberMetaData ownerMmd;

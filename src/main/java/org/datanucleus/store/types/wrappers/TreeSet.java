@@ -29,7 +29,6 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.types.SCOCollection;
 import org.datanucleus.store.types.SCOCollectionIterator;
-import org.datanucleus.store.types.SCOMtoN;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -39,7 +38,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class TreeSet extends java.util.TreeSet implements SCOCollection<java.util.TreeSet>, SCOMtoN
+public class TreeSet extends java.util.TreeSet implements SCOCollection<java.util.TreeSet>
 {
     private static final long serialVersionUID = 2716348073191575719L;
 
