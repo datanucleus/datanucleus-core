@@ -41,6 +41,8 @@ public interface MetaDataManager
 
     AnnotationManager getAnnotationManager();
 
+    String getEnhancedMethodNamePrefix();
+
     /**
      * Method to register a listener to be notified when metadata for a class/interface is initialised.
      * @param listener The listener

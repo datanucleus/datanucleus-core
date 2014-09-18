@@ -364,6 +364,15 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     }
 
     /* (non-Javadoc)
+     * @see org.datanucleus.metadata.MetaDataManager#getEnhancedMethodNamePrefix()
+     */
+    @Override
+    public String getEnhancedMethodNamePrefix()
+    {
+        return "dn";
+    }
+
+    /* (non-Javadoc)
      * @see org.datanucleus.metadata.MetaDataManager#setAllowMetaDataLoad(boolean)
      */
     @Override

@@ -362,7 +362,7 @@ public class ClassMetaData extends AbstractClassMetaData
                 // Limit to fields in this class, that aren't enhancer-added fields
                 // that aren't inner class fields, and that aren't static
                 if (clsFields[i].getDeclaringClass().getName().equals(fullName) &&
-                    !clsFields[i].getName().startsWith("dn") &&
+                    !clsFields[i].getName().startsWith(mmgr.getEnhancedMethodNamePrefix()) &&
                     !ClassUtils.isInnerClass(clsFields[i].getName()) &&
                     !Modifier.isStatic(clsFields[i].getModifiers()))
                 {

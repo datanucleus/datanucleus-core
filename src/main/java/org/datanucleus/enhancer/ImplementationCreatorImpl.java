@@ -146,7 +146,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
         for (int i=0;i<methods.length;i++)
         {
             String methodName = methods[i].getName();
-            if (!methodName.startsWith("dn"))
+            if (!methodName.startsWith(metaDataMgr.getEnhancedMethodNamePrefix()))
             {
                 String propertyName = methodName;
                 if (methodName.startsWith("set"))
@@ -227,7 +227,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
         for (int i=0;i<methods.length;i++)
         {
             String methodName = methods[i].getName();
-            if (Modifier.isAbstract(methods[i].getModifiers()) && !methodName.startsWith("dn"))
+            if (Modifier.isAbstract(methods[i].getModifiers()) && !methodName.startsWith(metaDataMgr.getEnhancedMethodNamePrefix()))
             {
                 String propertyName = methodName;
                 if (methodName.startsWith("set"))
