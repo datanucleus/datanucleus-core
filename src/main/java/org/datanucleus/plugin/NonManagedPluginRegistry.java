@@ -221,8 +221,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
                     continue;
                 }
 
-                List[] elements =
-                    PluginParser.parsePluginElements(docBuilder, this, pluginURL, bundle, clr);
+                List[] elements = PluginParser.parsePluginElements(docBuilder, this, pluginURL, bundle, clr);
                 registerExtensionPointsForPluginInternal(elements[0], false);
                 registeringExtensions.addAll(elements[1]);
             }
@@ -232,8 +231,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
             throw new NucleusException("Error loading resource", e).setFatal();
         }
 
-        extensionPoints = extensionPointsByUniqueId.values().toArray(
-            new ExtensionPoint[extensionPointsByUniqueId.values().size()]);
+        extensionPoints = extensionPointsByUniqueId.values().toArray(new ExtensionPoint[extensionPointsByUniqueId.values().size()]);
 
         // Register the extensions now that we have the extension-points all loaded
         for (int i = 0; i < registeringExtensions.size(); i++)
@@ -312,8 +310,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
         }
         if (updateExtensionPointsArray)
         {
-            extensionPoints = extensionPointsByUniqueId.values().toArray(
-                new ExtensionPoint[extensionPointsByUniqueId.values().size()]);
+            extensionPoints = extensionPointsByUniqueId.values().toArray(new ExtensionPoint[extensionPointsByUniqueId.values().size()]);
         }
     }
 
@@ -457,8 +454,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
         {
             if (NucleusLogger.GENERAL.isDebugEnabled())
             {
-                NucleusLogger.GENERAL.debug("Registering bundle " + bundle.getSymbolicName() + " version " +
-                    bundle.getVersion() + " at URL " + bundle.getManifestLocation() + ".");
+                NucleusLogger.GENERAL.debug("Registering bundle " + bundle.getSymbolicName() + " version " + bundle.getVersion() + " at URL " + bundle.getManifestLocation() + ".");
             }
             registeredPluginByPluginId.put(bundle.getSymbolicName(), bundle);
         }
@@ -468,8 +464,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
             if (bundle.getSymbolicName().startsWith(DATANUCLEUS_PKG) &&
                 !bundle.getManifestLocation().toExternalForm().equals(previousBundle.getManifestLocation().toExternalForm()))
             {
-                String msg = Localiser.msg("024009", bundle.getSymbolicName(),
-                    bundle.getManifestLocation(), previousBundle.getManifestLocation());
+                String msg = Localiser.msg("024009", bundle.getSymbolicName(), bundle.getManifestLocation(), previousBundle.getManifestLocation());
                 if (bundleCheckType.equalsIgnoreCase("EXCEPTION"))
                 {
                     throw new NucleusException(msg);
@@ -655,8 +650,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
                 Bundle requiredBundle = registeredPluginByPluginId.get(symbolicName);
                 if (requiredBundle == null) // TODO Add option of only logging problems in DataNucleus deps
                 {
-                    if (bd.getParameter("resolution") != null &&
-                        bd.getParameter("resolution").equalsIgnoreCase("optional"))
+                    if (bd.getParameter("resolution") != null && bd.getParameter("resolution").equalsIgnoreCase("optional"))
                     {
                         NucleusLogger.GENERAL.debug(Localiser.msg("024013", bundle.getSymbolicName(), symbolicName));
                     }
@@ -671,8 +665,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
                     if (requiredBundle != null && 
                         !isVersionInInterval(requiredBundle.getVersion(), bd.getParameter("bundle-version")))
                     {
-                        NucleusLogger.GENERAL.error(Localiser.msg("024015", bundle.getSymbolicName(), 
-                            symbolicName, bd.getParameter("bundle-version"), bundle.getVersion()));
+                        NucleusLogger.GENERAL.error(Localiser.msg("024015", bundle.getSymbolicName(), symbolicName, bd.getParameter("bundle-version"), bundle.getVersion()));
                     }
                 }
             }
@@ -690,7 +683,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
         //versionRange has only floor
         Bundle.BundleVersionRange versionRange = PluginParser.parseVersionRange(version);
         Bundle.BundleVersionRange intervalRange = PluginParser.parseVersionRange(interval);
-        int compare_floor=versionRange.floor.compareTo(intervalRange.floor);
+        int compare_floor = versionRange.floor.compareTo(intervalRange.floor);
         boolean result = true;
         if (intervalRange.floor_inclusive)
         {
@@ -709,7 +702,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
             }
             else
             {
-                result = compare_ceiling<0;
+                result = compare_ceiling < 0;
             }
         }
         return result;

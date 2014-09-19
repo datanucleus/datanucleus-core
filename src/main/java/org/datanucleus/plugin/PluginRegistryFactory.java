@@ -30,16 +30,15 @@ import org.datanucleus.util.Localiser;
 public class PluginRegistryFactory
 {
     /**
-     * Instantiates a PluginRegistry.
-     * If DN "core" is deployed as an eclipse plugin, uses the Eclipse OSGI Registry to find other DN plug-ins
+     * Instantiates a PluginRegistry. Will typically use NonManagedPluginRegistry in non-OSGi environments and
+     * OSGiPluginRegistry otherwise, subject to user input.
      * @param registryClassName Name of the registry
-     * @param registryBundleCheck What to do on check of bundles (Only for Non-Eclipse)
-     * @param allowUserBundles Whether to only load DataNucleus bundles (org.datanucleus) (Only for Non-Eclipse)
+     * @param registryBundleCheck What to do on check of bundles (Only for Non-OSGi)
+     * @param allowUserBundles Whether to only load DataNucleus bundles (org.datanucleus) (Only for Non-OSGi)
      * @param clr the ClassLoaderResolver
      * @return instance of the PluginRegistry
      */
-    public static PluginRegistry newPluginRegistry(String registryClassName, String registryBundleCheck, 
-            boolean allowUserBundles, ClassLoaderResolver clr)
+    public static PluginRegistry newPluginRegistry(String registryClassName, String registryBundleCheck, boolean allowUserBundles, ClassLoaderResolver clr)
     {
         PluginRegistry registry = null;
         if (registryClassName != null)
@@ -54,18 +53,6 @@ public class PluginRegistryFactory
                 }
                 return registry;
             }
-        }
-
-        // Try to fallback to the Eclipse RegistryFactory
-        registry = newInstance("org.eclipse.core.runtime.RegistryFactory", 
-            "org.datanucleus.plugin.EclipsePluginRegistry", clr);
-        if (registry != null)
-        {
-            if (NucleusLogger.GENERAL.isDebugEnabled())
-            {
-                NucleusLogger.GENERAL.debug("Using PluginRegistry " + registry.getClass().getName());
-            }
-            return registry;
         }
 
         if (NucleusLogger.GENERAL.isDebugEnabled())
