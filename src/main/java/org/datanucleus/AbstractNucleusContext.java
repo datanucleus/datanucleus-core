@@ -94,12 +94,19 @@ public abstract class AbstractNucleusContext implements NucleusContext
 
         // Set the name of class loader resolver
         String clrName = config.getStringProperty(PropertyNames.PROPERTY_CLASSLOADER_RESOLVER_NAME);
-        classLoaderResolverClassName = pluginManager.getAttributeValueForExtension(
-            "org.datanucleus.classloader_resolver", "name", clrName, "class-name");
-        if (classLoaderResolverClassName == null)
+        if (clrName != null)
         {
-            // User has specified a classloader_resolver plugin that has not registered
-            throw new NucleusUserException(Localiser.msg("001001", clrName)).setFatal();
+            classLoaderResolverClassName = pluginManager.getAttributeValueForExtension(
+                "org.datanucleus.classloader_resolver", "name", clrName, "class-name");
+            if (classLoaderResolverClassName == null)
+            {
+                // User has specified a classloader_resolver plugin that has not registered
+                throw new NucleusUserException(Localiser.msg("001001", clrName)).setFatal();
+            }
+        }
+        else
+        {
+            classLoaderResolverClassName = null;
         }
 
         // Initialise API, and set defaults for properties for the API
@@ -121,7 +128,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_PLUGIN_VALIDATEPLUGINS, null, false, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_PLUGIN_REGISTRYBUNDLECHECK, null, "EXCEPTION", 
             CorePropertyValidator.class.getName(), false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CLASSLOADER_RESOLVER_NAME, null, "datanucleus", null, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CLASSLOADER_RESOLVER_NAME, null, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY, null, null, null, false, false);
 
         // MetaData
@@ -214,42 +221,47 @@ public abstract class AbstractNucleusContext implements NucleusContext
     {
         // Set the key we will refer to this loader by
         String resolverName = config.getStringProperty(PropertyNames.PROPERTY_CLASSLOADER_RESOLVER_NAME);
-        String key = resolverName;
+        String key = (resolverName!=null ? resolverName : "datanucleus");
         if (primaryLoader != null)
         {
             key += ":[" + StringUtils.toJVMIDString(primaryLoader) + "]"; 
         }
-    
+
         if (classLoaderResolverMap == null)
         {
             classLoaderResolverMap = new HashMap<String, ClassLoaderResolver>();
         }
-    
         ClassLoaderResolver clr = classLoaderResolverMap.get(key);
         if (clr != null)
         {
             // Return the cached loader resolver
             return clr;
         }
-    
-        // Create the ClassLoaderResolver of this type with this primary loader
-        try
+
+        // Create the ClassLoaderResolver of the required type with this primary loader
+        if (resolverName == null)
         {
-            clr = (ClassLoaderResolver)pluginManager.createExecutableExtension(
-                "org.datanucleus.classloader_resolver", "name", resolverName,
-                "class-name", new Class[] {ClassLoader.class}, new Object[] {primaryLoader});
-            clr.registerUserClassLoader((ClassLoader)config.getProperty(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY));
+            clr = new ClassLoaderResolverImpl(primaryLoader);
         }
-        catch (ClassNotFoundException cnfe)
+        else
         {
-            throw new NucleusUserException(Localiser.msg("001002", classLoaderResolverClassName), cnfe).setFatal();
+            try
+            {
+                clr = (ClassLoaderResolver)pluginManager.createExecutableExtension("org.datanucleus.classloader_resolver", "name", resolverName, 
+                    "class-name", new Class[] {ClassLoader.class}, new Object[] {primaryLoader});
+            }
+            catch (ClassNotFoundException cnfe)
+            {
+                throw new NucleusUserException(Localiser.msg("001002", classLoaderResolverClassName), cnfe).setFatal();
+            }
+            catch (Exception e)
+            {
+                throw new NucleusUserException(Localiser.msg("001003", classLoaderResolverClassName), e).setFatal();
+            }
         }
-        catch (Exception e)
-        {
-            throw new NucleusUserException(Localiser.msg("001003", classLoaderResolverClassName), e).setFatal();
-        }
+        clr.registerUserClassLoader((ClassLoader)config.getProperty(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY));
         classLoaderResolverMap.put(key, clr);
-    
+
         return clr;
     }
 
@@ -273,9 +285,14 @@ public abstract class AbstractNucleusContext implements NucleusContext
                 NucleusLogger.PERSISTENCE.debug("Persistence-Unit : " + config.getStringProperty(PropertyNames.PROPERTY_PERSISTENCE_UNIT_NAME));
             }
             NucleusLogger.PERSISTENCE.debug("Plugin Registry : " + pluginManager.getRegistryClassName());
+
             Object primCL = config.getProperty(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY);
-            NucleusLogger.PERSISTENCE.debug("ClassLoading : " + config.getStringProperty(PropertyNames.PROPERTY_CLASSLOADER_RESOLVER_NAME) +
-                (primCL != null ? ("primary=" + primCL) : ""));
+            String clrName = config.getStringProperty(PropertyNames.PROPERTY_CLASSLOADER_RESOLVER_NAME);
+            if (clrName == null)
+            {
+                clrName = "default";
+            }
+            NucleusLogger.PERSISTENCE.debug("ClassLoading : " + clrName + (primCL != null ? ("primary=" + primCL) : ""));
 
             logConfigurationDetails();
 
