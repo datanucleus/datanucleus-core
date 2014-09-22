@@ -13,13 +13,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 Contributors:
-    ...
+    barisergun75@gmail.com
 **********************************************************************/
 package org.datanucleus.store.types.converters;
 
 import java.nio.ByteBuffer;
 
-import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
  * Convenience class to handle Java serialisation of a byte[] object to/from ByteBuffer.
@@ -31,6 +30,7 @@ public class ByteArrayByteBufferConverter implements TypeConverter<byte[], ByteB
     /* (non-Javadoc)
      * @see org.datanucleus.store.types.converters.TypeConverter#toDatastoreType(java.lang.Object)
      */
+    @Override
     public ByteBuffer toDatastoreType(byte[] memberValue)
     {
         if (memberValue == null)
@@ -44,12 +44,15 @@ public class ByteArrayByteBufferConverter implements TypeConverter<byte[], ByteB
     /* (non-Javadoc)
      * @see org.datanucleus.store.types.converters.TypeConverter#toMemberType(java.lang.Object)
      */
+    @Override
     public byte[] toMemberType(ByteBuffer datastoreValue)
     {
         if (datastoreValue == null)
         {
             return null;
         }
-        return datastoreValue.array();
+        byte [] dataStoreValueInBytes = new byte[datastoreValue.remaining()];
+        datastoreValue.get(dataStoreValueInBytes);
+        return dataStoreValueInBytes;
     }
 }
