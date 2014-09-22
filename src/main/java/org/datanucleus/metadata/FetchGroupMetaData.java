@@ -157,7 +157,7 @@ public class FetchGroupMetaData extends MetaData
     public String toString(String prefix, String indent)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(prefix).append("<fetch-group name=\"" + name + "\"\n");
+        sb.append(prefix).append("<fetch-group name=\"" + name + "\">\n");
 
         // Add fetch-groups
         if (fetchGroups != null)

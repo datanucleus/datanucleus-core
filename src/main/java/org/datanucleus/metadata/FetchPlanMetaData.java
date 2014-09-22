@@ -166,7 +166,7 @@ public class FetchPlanMetaData extends MetaData
         StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<fetch-plan name=\"" + name + "\"" + 
             " max-fetch-depth=\"" + maxFetchDepth + "\"" +
-            " fetch-size=\"" + fetchSize + "\"\n");
+            " fetch-size=\"" + fetchSize + "\">\n");
 
         // Add fetch-groups
         Iterator iter = fetchGroups.iterator();
