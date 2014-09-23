@@ -294,7 +294,10 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
                     {
                         if (SCOUtils.useQueuedUpdate(queued, ownerOP))
                         {
-                            ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
+                            if (ownerOP.isFlushedToDatastore())
+                            {
+                                ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
+                            }
                         }
                         else
                         {
@@ -319,9 +322,12 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
                     {
                         if (SCOUtils.useQueuedUpdate(queued, ownerOP))
                         {
-                            for (Object element : c)
+                            if (ownerOP.isFlushedToDatastore())
                             {
-                                ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
+                                for (Object element : c)
+                                {
+                                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
+                                }
                             }
                         }
                         else

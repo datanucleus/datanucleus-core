@@ -139,8 +139,7 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", 
-                        ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
                 }
 
                 if (useCache)
@@ -171,8 +170,7 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", 
-                        ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
                 }
 
                 // TODO This is clear+putAll. Improve it to work out what is changed
@@ -181,7 +179,11 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
                 {
                     if (SCOUtils.useQueuedUpdate(queued, ownerOP))
                     {
-                        ownerOP.getExecutionContext().addOperationToQueue(new MapClearOperation(ownerOP, backingStore));
+                        // If not yet flushed to store then no need to add to queue (since will be handled via insert)
+                        if (ownerOP.isFlushedToDatastore())
+                        {
+                            ownerOP.getExecutionContext().addOperationToQueue(new MapClearOperation(ownerOP, backingStore));
+                        }
                     }
                     else
                     {
@@ -198,11 +200,15 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
                 {
                     if (SCOUtils.useQueuedUpdate(queued, ownerOP))
                     {
-                        Iterator iter = m.entrySet().iterator();
-                        while (iter.hasNext())
+                        // If not yet flushed to store then no need to add to queue (since will be handled via insert)
+                        if (ownerOP.isFlushedToDatastore())
                         {
-                            Map.Entry entry = (Map.Entry)iter.next();
-                            ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, entry.getKey(), entry.getValue()));
+                            Iterator iter = m.entrySet().iterator();
+                            while (iter.hasNext())
+                            {
+                                Map.Entry entry = (Map.Entry)iter.next();
+                                ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, entry.getKey(), entry.getValue()));
+                            }
                         }
                     }
                     else
@@ -217,8 +223,7 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", 
-                        ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
                 }
                 delegate.clear();
                 delegate.putAll(m);

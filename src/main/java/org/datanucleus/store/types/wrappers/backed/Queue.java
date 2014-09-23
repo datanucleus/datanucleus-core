@@ -135,8 +135,7 @@ public class Queue extends org.datanucleus.store.types.wrappers.Queue implements
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", 
-                        ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
                 }
 
                 if (useCache)
@@ -171,8 +170,7 @@ public class Queue extends org.datanucleus.store.types.wrappers.Queue implements
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", 
-                        ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
                 }
 
                 // TODO This does clear+addAll : Improve this and work out which elements are added and which deleted
@@ -180,7 +178,10 @@ public class Queue extends org.datanucleus.store.types.wrappers.Queue implements
                 {
                     if (SCOUtils.useQueuedUpdate(queued, ownerOP))
                     {
-                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
+                        if (ownerOP.isFlushedToDatastore())
+                        {
+                            ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
+                        }
                     }
                     else
                     {
@@ -196,9 +197,12 @@ public class Queue extends org.datanucleus.store.types.wrappers.Queue implements
                 {
                     if (SCOUtils.useQueuedUpdate(queued, ownerOP))
                     {
-                        for (Object element : c)
+                        if (ownerOP.isFlushedToDatastore())
                         {
-                            ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
+                            for (Object element : c)
+                            {
+                                ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
+                            }
                         }
                     }
                     else
@@ -220,8 +224,7 @@ public class Queue extends org.datanucleus.store.types.wrappers.Queue implements
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", 
-                        ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
                 }
                 delegate.clear();
                 delegate.addAll(c);

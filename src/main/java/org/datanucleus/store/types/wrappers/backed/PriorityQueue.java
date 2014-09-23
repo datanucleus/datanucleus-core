@@ -160,8 +160,7 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", 
-                        ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
                 }
 
                 if (useCache)
@@ -196,8 +195,7 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", 
-                        ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
                 }
 
                 // TODO This is clear+addAll. Change to detect updates
@@ -205,7 +203,10 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
                 {
                     if (SCOUtils.useQueuedUpdate(queued, ownerOP))
                     {
-                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
+                        if (ownerOP.isFlushedToDatastore())
+                        {
+                            ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
+                        }
                     }
                     else
                     {
@@ -220,9 +221,12 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
                 {
                     if (SCOUtils.useQueuedUpdate(queued, ownerOP))
                     {
-                        for (Object element : c)
+                        if (ownerOP.isFlushedToDatastore())
                         {
-                            ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
+                            for (Object element : c)
+                            {
+                                ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
+                            }
                         }
                     }
                     else
@@ -244,8 +248,7 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", 
-                        ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
                 }
                 delegate.clear();
                 delegate.addAll(c);
