@@ -357,8 +357,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 // Register the MBean with the active JMX manager
                 ManagementManager mgmtMgr = nucCtx.getJMXManager();
                 name = mgmtMgr.getDomainName() + ":InstanceName=" + mgmtMgr.getInstanceName() +
-                        ",Type=" + ManagerStatistics.class.getName() +
-                        ",Name=Manager" + NucleusContextHelper.random.nextLong();
+                        ",Type=" + ManagerStatistics.class.getName() + ",Name=Manager" + NucleusContextHelper.random.nextLong();
             }
             statistics = new ManagerStatistics(name, nucCtx.getStatistics());
             if (nucCtx.getJMXManager() != null)
@@ -1378,8 +1377,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     try
                     {
                         // Run through "postCommit" to migrate the lifecycle state
-                        if (ops[i] != null && ops[i].getObject() != null &&
-                            api.isPersistent(ops[i].getObject()) && api.isDirty(ops[i].getObject()))
+                        if (ops[i] != null && ops[i].getObject() != null && api.isPersistent(ops[i].getObject()) && api.isDirty(ops[i].getObject()))
                         {
                             ops[i].postCommit(getTransaction());
                         }
@@ -1805,8 +1803,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     if (e instanceof NucleusException && ((NucleusException)e).isFatal())
                     {
                         // Should really check all and see if any are fatal not just first one
-                        throw new NucleusFatalUserException(Localiser.msg("010039"), 
-                            failures.toArray(new Exception[failures.size()]));
+                        throw new NucleusFatalUserException(Localiser.msg("010039"), failures.toArray(new Exception[failures.size()]));
                     }
                     throw new NucleusUserException(Localiser.msg("010039"), failures.toArray(new Exception[failures.size()]));
                 }
@@ -2051,8 +2048,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
             else
             {
-                if (api.isPersistent(obj) && api.isTransactional(obj) && api.isDirty(obj) &&
-                    isDelayDatastoreOperationsEnabled())
+                if (api.isPersistent(obj) && api.isTransactional(obj) && api.isDirty(obj) && isDelayDatastoreOperationsEnabled())
                 {
                     // Object provisionally persistent (but not in datastore) so re-run reachability maybe
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
@@ -2467,8 +2463,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 if (l1CachedOP != null && l1CachedOP.getObject() != pc)
                 {
                     // attached object with the same id already present in the L1 cache so cannot attach in-situ
-                    throw new NucleusUserException(Localiser.msg("010017",
-                        StringUtils.toJVMIDString(pc)));
+                    throw new NucleusUserException(Localiser.msg("010017", StringUtils.toJVMIDString(pc)));
                 }
             }
 
@@ -2539,7 +2534,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     NucleusLogger.PERSISTENCE.debug(Localiser.msg("010018", StringUtils.toJVMIDString(pc), StringUtils.toJVMIDString(pcTarget)));
                 }
-
                 targetOP.attachCopy(pc, sco);
             }
         }
@@ -3014,8 +3008,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     }
                     catch (ClassNotResolvedException e)
                     {
-                        String msg = Localiser.msg("010027", 
-                            IdentityUtils.getPersistableIdentityForId(id));
+                        String msg = Localiser.msg("010027", IdentityUtils.getPersistableIdentityForId(id));
                         NucleusLogger.PERSISTENCE.warn(msg);
                         throw new NucleusUserException(msg, e);
                     }
@@ -3204,8 +3197,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         if (Modifier.isAbstract(pcClass.getModifiers()))
                         {
                             // This class is abstract so impossible to have an instance of this type
-                            throw new NucleusObjectNotFoundException(Localiser.msg("010027", 
-                                IdentityUtils.getPersistableIdentityForId(id), className));
+                            throw new NucleusObjectNotFoundException(Localiser.msg("010027", IdentityUtils.getPersistableIdentityForId(id), className));
                         }
 
                         op = nucCtx.getObjectProviderFactory().newForHollow(this, pcClass, id);
@@ -3220,10 +3212,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     }
                     catch (ClassNotResolvedException e)
                     {
-                        NucleusLogger.PERSISTENCE.warn(Localiser.msg("010027", 
-                            IdentityUtils.getPersistableIdentityForId(id)));
-                        throw new NucleusUserException(Localiser.msg("010027", 
-                            IdentityUtils.getPersistableIdentityForId(id)), e);
+                        NucleusLogger.PERSISTENCE.warn(Localiser.msg("010027", IdentityUtils.getPersistableIdentityForId(id)));
+                        throw new NucleusUserException(Localiser.msg("010027", IdentityUtils.getPersistableIdentityForId(id)), e);
                     }
 
                     if (validate)
@@ -3243,8 +3233,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Validate the objects that need it
             try
             {
-                getStoreManager().getPersistenceHandler().locateObjects(
-                    opsToValidate.toArray(new ObjectProvider[opsToValidate.size()]));
+                getStoreManager().getPersistenceHandler().locateObjects(opsToValidate.toArray(new ObjectProvider[opsToValidate.size()]));
             }
             catch (NucleusObjectNotFoundException nonfe)
             {
@@ -3516,8 +3505,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         if (Modifier.isAbstract(pcClass.getModifiers()))
                         {
                             // This class is abstract so impossible to have an instance of this type
-                            throw new NucleusObjectNotFoundException(Localiser.msg("010027",
-                                IdentityUtils.getPersistableIdentityForId(id), className));
+                            throw new NucleusObjectNotFoundException(Localiser.msg("010027", IdentityUtils.getPersistableIdentityForId(id), className));
                         }
 
                         op = nucCtx.getObjectProviderFactory().newForHollow(this, pcClass, id);
@@ -3533,10 +3521,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     }
                     catch (ClassNotResolvedException e)
                     {
-                        NucleusLogger.PERSISTENCE.warn(Localiser.msg("010027", 
-                            IdentityUtils.getPersistableIdentityForId(id)));
-                        throw new NucleusUserException(Localiser.msg("010027",
-                            IdentityUtils.getPersistableIdentityForId(id)), e);
+                        NucleusLogger.PERSISTENCE.warn(Localiser.msg("010027", IdentityUtils.getPersistableIdentityForId(id)));
+                        throw new NucleusUserException(Localiser.msg("010027", IdentityUtils.getPersistableIdentityForId(id)), e);
                     }
                 }
             }
@@ -3693,8 +3679,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
             // Populate any strategy value for the "datastore-identity" element
-            Object nextIdentifier = getStoreManager().getStrategyValue(this, cmd, -1);
-            return nucCtx.getIdentityManager().getDatastoreId(cmd.getFullClassName(), nextIdentifier);
+            return nucCtx.getIdentityManager().getDatastoreId(cmd.getFullClassName(), getStoreManager().getStrategyValue(this, cmd, -1));
         }
         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
         {
@@ -4037,6 +4022,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         if (operationQueue != null)
         {
+            // TODO Remove this when NUCCORE-904 is implemented, and process operationQueue in flush()
             operationQueue.performAll(backingStore, op);
         }
     }
