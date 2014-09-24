@@ -3910,8 +3910,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     /**
      * Method callable from external APIs for user-management of flushing.
      * Called by JDO PM.flush, or JPA EM.flush().
-     * Performs management of relations, prior to performing internal flush of all dirty/new/deleted
-     * instances to the datastore.
+     * Performs management of relations, prior to performing internal flush of all dirty/new/deleted instances to the datastore.
      */
     public void flush()
     {
@@ -3929,6 +3928,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 NucleusLogger.GENERAL.info("Flush pass 1 resulted in " + (dirtyOPs.size() + indirectDirtyOPs.size()) +
                     " additional objects being made dirty. Performing flush pass 2");
                 flushInternal(true);
+            }
+
+            if (operationQueue != null && !operationQueue.getOperations().isEmpty())
+            {
+                NucleusLogger.PERSISTENCE.warn("Queue of operations after flush() is not empty! Generate a testcase and report this. See below (debug) for full details of unflushed ops");
+                operationQueue.log();
             }
         }
     }
@@ -4771,11 +4776,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         if (operationQueue != null)
         {
-            if (!operationQueue.getOperations().isEmpty())
-            {
-                NucleusLogger.PERSISTENCE.warn("Queue of operations for flushing is not empty! Ignoring unprocessed operations. Generate a testcase and report this. See the log for full details of unflushed ops");
-                operationQueue.log();
-            }
             operationQueue.clear();
         }
         opAttachDetachObjectReferenceMap = null;
