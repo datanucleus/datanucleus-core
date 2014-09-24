@@ -22,7 +22,7 @@ import org.datanucleus.store.scostore.ListStore;
 import org.datanucleus.store.scostore.Store;
 
 /**
- * Set operation for a list.
+ * Set operation for a list where we have a backing store.
  */
 public class ListSetOperation implements SCOOperation
 {

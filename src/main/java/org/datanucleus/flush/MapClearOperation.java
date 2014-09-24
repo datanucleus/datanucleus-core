@@ -22,7 +22,7 @@ import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.store.scostore.Store;
 
 /**
- * Clear operation for a map.
+ * Clear operation for a map where we have a backing store.
  */
 public class MapClearOperation implements SCOOperation
 {

@@ -22,7 +22,7 @@ import org.datanucleus.store.scostore.ListStore;
 import org.datanucleus.store.scostore.Store;
 
 /**
- * Remove operation for a list at a particular index.
+ * Remove operation for a list at a particular index where we have a backing store.
  */
 public class ListRemoveAtOperation implements SCOOperation
 {

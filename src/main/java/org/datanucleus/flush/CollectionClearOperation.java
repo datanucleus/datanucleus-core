@@ -22,7 +22,7 @@ import org.datanucleus.store.scostore.CollectionStore;
 import org.datanucleus.store.scostore.Store;
 
 /**
- * Clear operation for a collection.
+ * Clear operation for a collection where we have a backing store.
  */
 public class CollectionClearOperation implements SCOOperation
 {

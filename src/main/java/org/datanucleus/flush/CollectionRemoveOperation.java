@@ -23,7 +23,7 @@ import org.datanucleus.store.scostore.Store;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Remove operation for a collection.
+ * Remove operation for a collection where we have a backing store.
  */
 public class CollectionRemoveOperation implements SCOOperation
 {

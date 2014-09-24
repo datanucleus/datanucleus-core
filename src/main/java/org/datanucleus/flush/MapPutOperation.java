@@ -22,7 +22,7 @@ import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.store.scostore.Store;
 
 /**
- * Put operation for a map.
+ * Put operation for a map where we have a backing store.
  */
 public class MapPutOperation implements SCOOperation
 {

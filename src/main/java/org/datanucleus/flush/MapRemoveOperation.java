@@ -22,7 +22,7 @@ import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.store.scostore.Store;
 
 /**
- * Remove operation for a map.
+ * Remove operation for a map where we have a backing store.
  */
 public class MapRemoveOperation implements SCOOperation
 {

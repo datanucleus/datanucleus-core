@@ -23,7 +23,7 @@ import org.datanucleus.store.scostore.Store;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Add operation for a collection.
+ * Add operation for a collection where we have a backing store.
  */
 public class CollectionAddOperation implements SCOOperation
 {
