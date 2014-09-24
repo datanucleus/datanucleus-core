@@ -69,7 +69,6 @@ public class SCOUtils
      * and value as null.
      * @param ownerOP ObjectProvider for the owning object
      * @param mmd The Field MetaData for the related field.
-     * @param declaredType The class of the object
      * @param instantiatedType Instantiated type for the field if known
      * @param value The value we are wrapping if known
      * @param forInsert Whether the SCO needs inserting in the datastore with this value
@@ -78,14 +77,8 @@ public class SCOUtils
      * @return The Second-Class Object
      * @throws NucleusUserException if an error occurred when creating the SCO instance
      */
-    public static SCO newSCOInstance(ObjectProvider ownerOP, AbstractMemberMetaData mmd, Class declaredType, Class instantiatedType, Object value,
-            boolean forInsert, boolean forUpdate, boolean replaceField)
+    public static SCO newSCOInstance(ObjectProvider ownerOP, AbstractMemberMetaData mmd, Class instantiatedType, Object value, boolean forInsert, boolean forUpdate, boolean replaceField)
     {
-        if (!mmd.getType().isAssignableFrom(declaredType))
-        {
-            throw new NucleusUserException(Localiser.msg("023010", declaredType.getName(), mmd.getName(), mmd.getType()));
-        }
-
         // Check if the passed in value is a wrapper type
         TypeManager typeMgr = ownerOP.getExecutionContext().getNucleusContext().getTypeManager();
         if (value != null && typeMgr.isSecondClassWrapper(value.getClass().getName()))
@@ -99,7 +92,7 @@ public class SCOUtils
             return (SCO) value;
         }
 
-        String typeName = declaredType.getName();
+        String typeName = mmd.getTypeName();
         if (instantiatedType != null)
         {
             // Use instantiated type if available
@@ -117,15 +110,15 @@ public class SCOUtils
         Class wrapperType = null;
         if (backedWrapper)
         {
-            wrapperType = SCOUtils.getBackedWrapperTypeForType(declaredType, instantiatedType, typeName, typeMgr);
+            wrapperType = SCOUtils.getBackedWrapperTypeForType(mmd.getType(), instantiatedType, typeName, typeMgr);
         }
         else
         {
-            wrapperType = SCOUtils.getSimpleWrapperTypeForType(declaredType, instantiatedType, typeName, typeMgr);
+            wrapperType = SCOUtils.getSimpleWrapperTypeForType(mmd.getType(), instantiatedType, typeName, typeMgr);
         }
         if (wrapperType == null)
         {
-            throw new NucleusUserException(Localiser.msg("023011", declaredType.getName(), StringUtils.toJVMIDString(value), mmd.getFullFieldName()));
+            throw new NucleusUserException(Localiser.msg("023011", mmd.getTypeName(), StringUtils.toJVMIDString(value), mmd.getFullFieldName()));
         }
 
         // Create the SCO wrapper
@@ -140,7 +133,7 @@ public class SCOUtils
             if (backedWrapper)
             {
                 NucleusLogger.PERSISTENCE.warn("Creation of backed wrapper for " + mmd.getFullFieldName() + " unsupported, so trying simple wrapper");
-                wrapperType = SCOUtils.getSimpleWrapperTypeForType(declaredType, instantiatedType, typeName, typeMgr);
+                wrapperType = SCOUtils.getSimpleWrapperTypeForType(mmd.getType(), instantiatedType, typeName, typeMgr);
                 sco = (SCO) ClassUtils.newInstance(wrapperType, new Class[]{ObjectProvider.class, AbstractMemberMetaData.class}, new Object[]{ownerOP, mmd});
             }
             else

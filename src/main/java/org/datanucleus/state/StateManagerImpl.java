@@ -3342,12 +3342,11 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 {
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029", 
-                            StringUtils.toJVMIDString(myPC), 
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029", StringUtils.toJVMIDString(myPC), 
                             myEC != null ? IdentityUtils.getPersistableIdentityForId(myID) : myID, fmd.getName()));
                     }
                 }
-                return SCOUtils.newSCOInstance(this, fmd, fmd.getType(), value.getClass(), value, forInsert, forUpdate, replaceFieldIfChanged);
+                return SCOUtils.newSCOInstance(this, fmd, value.getClass(), value, forInsert, forUpdate, replaceFieldIfChanged);
             }
         }
 
