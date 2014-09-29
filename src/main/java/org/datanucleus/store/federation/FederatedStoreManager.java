@@ -376,6 +376,11 @@ public class FederatedStoreManager implements StoreManager
         return primaryStoreMgr.supportsQueryLanguage(language);
     }
 
+    public String getNativeQueryLanguage()
+    {
+        return primaryStoreMgr.getNativeQueryLanguage();
+    }
+
     public boolean supportsValueStrategy(String language)
     {
         return primaryStoreMgr.supportsValueStrategy(language);

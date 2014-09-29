@@ -330,6 +330,12 @@ public interface StoreManager
     boolean supportsQueryLanguage(String language);
 
     /**
+     * Accessor for the native query language of this store.
+     * @return The native query language (e.g "SQL")
+     */
+    String getNativeQueryLanguage();
+
+    /**
      * Accessor for whether this value strategy is supported.
      * @param strategy The strategy
      * @return Whether it is supported.

@@ -1009,6 +1009,15 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         return (name != null);
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.StoreManager#getNativeQueryLanguage()
+     */
+    @Override
+    public String getNativeQueryLanguage()
+    {
+        return null;
+    }
+
     /**
      * Accessor for whether this value strategy is supported.
      * @param strategy The strategy
