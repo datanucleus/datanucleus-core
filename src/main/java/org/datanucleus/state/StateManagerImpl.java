@@ -3018,16 +3018,11 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 EmbeddedOwnerRelation ownerRel = ownerRelIter.next();
                 AbstractStateManager ownerOP = (AbstractStateManager) ownerRel.getOwnerOP();
 
-                if (ownerOP == null || ownerOP.getClassMetaData() == null)
-                {
-                    //for some reason these are null... raised when running JPA TCK
-                    continue;
-                }
-
                 AbstractMemberMetaData ownerMmd = ownerOP.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(ownerRel.getOwnerFieldNum());
                 if (ownerMmd.getCollection() != null)
                 {
                     // PC Object embedded in collection
+                    // TODO Respect makeDirty?
                     Object ownerField = ownerOP.provideField(ownerRel.getOwnerFieldNum());
                     if (ownerField instanceof SCOCollection)
                     {
@@ -3037,6 +3032,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 else if (ownerMmd.getMap() != null)
                 {
                     // PC Object embedded in map
+                    // TODO Respect makeDirty?
                     Object ownerField = ownerOP.provideField(ownerRel.getOwnerFieldNum());
                     if (ownerField instanceof SCOMap)
                     {
@@ -3055,8 +3051,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                     // PC Object embedded in PC object
                     if ((ownerOP.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
                     {
-                        // Update the owner when one of our fields have changed, EXCEPT when they have just
-                        // notified us of our owner field!
+                        // Update the owner when one of our fields have changed, EXCEPT when they have just notified us of our owner field!
                         if (makeDirty)
                         {
                             ownerOP.replaceFieldMakeDirty(ownerRel.getOwnerFieldNum(), pc);
