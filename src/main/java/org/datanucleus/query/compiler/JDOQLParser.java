@@ -927,10 +927,14 @@ public class JDOQLParser implements Parser
         caseNode.appendChildNode(actionNode);
 
         // Process "ELSE IF (expr) actionExpr ELSE actionExpr"
+        // TODO Detect lack of ELSE with no IF and throw exception
+        boolean elseClause = false;
         while (p.parseString("ELSE") || p.parseString("else"))
         {
+            boolean hasIf = false;
             if (p.parseString("IF") || p.parseString("if"))
             {
+                hasIf = true;
                 if (!p.parseChar('('))
                 {
                     throw new QueryCompilerSyntaxException("Expected '(' as part of IF (...)", p.getIndex(), p.getInput());
@@ -947,6 +951,15 @@ public class JDOQLParser implements Parser
             processExpression();
             actionNode = stack.pop();
             caseNode.appendChildNode(actionNode);
+            if (!hasIf)
+            {
+                elseClause = true;
+            }
+        }
+
+        if (!elseClause)
+        {
+            throw new QueryCompilerSyntaxException("Use of IF {expr} ELSE IF {expr} structure should always terminate with ELSE {expr} but doesn't", p.getIndex(), p.getInput());
         }
         stack.push(caseNode);
     }
