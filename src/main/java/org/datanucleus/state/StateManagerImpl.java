@@ -2358,12 +2358,6 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 {
                     AbstractStateManager ownerOP = (AbstractStateManager) owner.getOwnerOP();
 
-                    if (ownerOP == null || ownerOP.getClassMetaData() == null)
-                    {
-                        // for some reason these are null... raised when running JPA TCK
-                        continue;
-                    }
-
                     if ((ownerOP.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
                     {
                         ownerOP.makeDirty(owner.getOwnerFieldNum());
