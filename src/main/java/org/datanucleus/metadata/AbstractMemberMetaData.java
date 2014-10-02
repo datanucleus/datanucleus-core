@@ -610,7 +610,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         {
             if (defaultFetchGroup == Boolean.TRUE || primaryKey == Boolean.TRUE)
             {
-                NucleusLogger.GENERAL.info(">> Reporting exception with class=" + getClassName() + " name=" + name + " type=" + type);
                 throw new InvalidMemberMetaDataException("044109", getClassName(), name, this.getType().getName(), persistenceModifier.toString());
             }
         }
@@ -826,27 +825,34 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             setOrderMetaData(ordmd);
         }
 
-        if (elementMetaData == null && !isSerialized() && !isEmbedded() && columnMetaData != null)
+        if (!isSerialized() && !isEmbedded() && columnMetaData != null)
         {
-            if (hasCollection() || hasArray())
+            // Not serialising or embedding this field, yet column info was specified. Check for specific conditions
+            if ((hasCollection() || hasArray()) && elementMetaData == null)
             {
-                // Collection/Array with column(s) specified on field but not serialising so move to element
+                // Collection/Array with column(s) specified on field but not on element so move all column info to element
                 ElementMetaData elemmd = new ElementMetaData();
                 setElementMetaData(elemmd);
                 for (int i=0;i<columnMetaData.length;i++)
                 {
                     elemmd.addColumn(columnMetaData[i]);
                 }
+                columnMetaData = null;
+                columns.clear();
+                column = null;
             }
-        }
-        if (valueMetaData == null && hasMap() && !isEmbedded() && !isSerialized() && columnMetaData != null)
-        {
-            // Column specified directly but no value and not serialising field so add a value and apply cols there
-            ValueMetaData valmd = new ValueMetaData();
-            setValueMetaData(valmd);
-            for (int i=0;i<columnMetaData.length;i++)
+            else if (hasMap() && valueMetaData == null)
             {
-                valmd.addColumn(columnMetaData[i]);
+                // Map with column(s) specified on field but not on value so move all column info to value
+                ValueMetaData valmd = new ValueMetaData();
+                setValueMetaData(valmd);
+                for (int i=0;i<columnMetaData.length;i++)
+                {
+                    valmd.addColumn(columnMetaData[i]);
+                }
+                columnMetaData = null;
+                columns.clear();
+                column = null;
             }
         }
 
