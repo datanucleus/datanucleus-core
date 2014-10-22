@@ -111,8 +111,7 @@ public class StoreDataManager
             {
                 Object prop1Value = data.getProperties().get(key1);
                 Object prop2Value = data.getProperties().get(key2);
-                if (prop1Value != null && prop1Value.equals(value1) && 
-                        prop2Value != null && prop2Value.equals(value2))
+                if (prop1Value != null && prop1Value.equals(value1) && prop2Value != null && prop2Value.equals(value2))
                 {
                     if (results == null)
                     {
@@ -147,7 +146,7 @@ public class StoreDataManager
     public Collection<StoreData> getManagedStoreData()
     {
         return Collections.unmodifiableCollection(storeDataByClass.values());
-    }    
+    }
 
     /**
      * Get the StoreData by the given className
@@ -160,13 +159,13 @@ public class StoreDataManager
     }
 
     /**
-     * Get the StoreData by the given field/property
-     * @param apmd the field/property
+     * Get the StoreData by the given field/property, if it has some specific store data component (join table).
+     * @param mmd metadata for the the field/property
      * @return the StoreData
      */
-    public StoreData get(AbstractMemberMetaData apmd)
+    public StoreData get(AbstractMemberMetaData mmd)
     {
-        return storeDataByClass.get(apmd);
+        return storeDataByClass.get(mmd);
     }
 
     /**
