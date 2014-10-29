@@ -96,9 +96,15 @@ public class OSGiPluginRegistry implements PluginRegistry
             return;
         }
         List registeringExtensions = new ArrayList();
-        
-        BundleContext ctx = FrameworkUtil.getBundle(this.getClass()).getBundleContext();
-        
+
+        org.osgi.framework.Bundle bdl = FrameworkUtil.getBundle(this.getClass());
+        BundleContext ctx = bdl.getBundleContext();
+        if (ctx == null)
+        {
+            // TODO Any way we can handle this better? e.g force OSGi to start it?
+            NucleusLogger.GENERAL.error("Bundle " + bdl.getSymbolicName() + " is in state " + bdl.getState() + " and has NULL context, so cannot register it properly!");
+        }
+
         // parse the plugin files
         DocumentBuilder docBuilder = OSGiBundleParser.getDocumentBuilder();
         org.osgi.framework.Bundle[] osgiBundles = ctx.getBundles();
