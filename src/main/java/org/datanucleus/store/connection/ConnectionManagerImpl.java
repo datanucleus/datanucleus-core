@@ -20,7 +20,9 @@ Contributors:
 package org.datanucleus.store.connection;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.transaction.xa.XAResource;
 
@@ -306,8 +308,7 @@ public class ConnectionManagerImpl implements ConnectionManager
         }
 
         // Create new connection
-        final ManagedConnection mconn = factory.createManagedConnection(ec, 
-            options == null && transaction != null ? transaction.getOptions() : options);
+        final ManagedConnection mconn = factory.createManagedConnection(ec, mergeOptions(transaction, options));
 
         // Enlist the connection in this transaction
         if (ec != null)
@@ -371,6 +372,35 @@ public class ConnectionManagerImpl implements ConnectionManager
         }
 
         return mconn;
+    }
+
+    /**
+     * merge the transaction options with those from the store manager's connection
+     *
+     * in case of conflicting options preference will be given to those of the transaction, and a message will be logged
+     *
+     * @param transaction
+     * @param options
+     * @return
+     */
+    private Map mergeOptions(final org.datanucleus.Transaction transaction,
+            final Map options) {
+        Map m = new HashMap();
+        if (transaction == null || transaction.getOptions() == null ||transaction.getOptions().isEmpty()) {
+            m.putAll(options);
+        } else if (options == null || options.isEmpty()) {
+            m.putAll(transaction.getOptions());
+        } else {
+            Set s = new HashSet(transaction.getOptions().keySet());
+            s.retainAll(options.keySet());
+            if (!s.isEmpty()) {
+                NucleusLogger.CONNECTION.info(
+                        Localiser.msg("009008", options, transaction.getOptions()));
+            }
+            m.putAll(options);
+            m.putAll(transaction.getOptions());
+        }
+        return m;
     }
 
     /**
