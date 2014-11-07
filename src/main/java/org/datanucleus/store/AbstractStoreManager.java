@@ -58,6 +58,7 @@ import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.properties.PropertyStore;
 import org.datanucleus.state.StateManagerImpl;
 import org.datanucleus.store.autostart.AutoStartMechanism;
+import org.datanucleus.store.connection.AbstractConnectionFactory;
 import org.datanucleus.store.connection.ConnectionFactory;
 import org.datanucleus.store.connection.ConnectionManager;
 import org.datanucleus.store.connection.ConnectionManagerImpl;
@@ -206,7 +207,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                     new String[] {"datastore", "transactional"},
                     new String[] {storeManagerKey, "true"}, "class-name",
                     new Class[] {StoreManager.class, String.class},
-                    new Object[] {this, "tx"});
+                    new Object[] {this, AbstractConnectionFactory.RESOURCE_NAME_TX});
                 connectionMgr.registerConnectionFactory(primaryConnectionFactoryName, cf);
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
