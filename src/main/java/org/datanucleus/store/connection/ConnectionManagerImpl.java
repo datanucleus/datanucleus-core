@@ -240,8 +240,8 @@ public class ConnectionManagerImpl implements ConnectionManager
      * @param options Options for the connection (e.g isolation). These will override those of the txn itself
      * @return The ManagedConnection
      */
-    public ManagedConnection allocateConnection(final ConnectionFactory factory, final ExecutionContext ec,
-            final org.datanucleus.Transaction transaction, Map options)
+    public ManagedConnection allocateConnection(final ConnectionFactory factory, final ExecutionContext ec, final org.datanucleus.Transaction transaction, 
+            Map defaultOptions, Map options)
     {
         if (ec != null && connectionPoolEnabled)
         {
@@ -274,6 +274,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                         if (res != null && tx != null && !tx.isEnlisted(res))
                         {
                             boolean enlistInLocalTM = true;
+                            // TODO Get this flag from ConnectionFactory instead of options
                             if (options != null && options.get(ConnectionFactory.RESOURCE_TYPE_OPTION) != null &&
                                 ConnectionResourceType.JTA.toString().equalsIgnoreCase((String)options.get(ConnectionFactory.RESOURCE_TYPE_OPTION)))
                             {
@@ -305,9 +306,8 @@ public class ConnectionManagerImpl implements ConnectionManager
             }
         }
 
-        // Create new connection
-        final ManagedConnection mconn = factory.createManagedConnection(ec, 
-            options == null && transaction != null ? transaction.getOptions() : options);
+        // Create new connection, with required options
+        final ManagedConnection mconn = factory.createManagedConnection(ec, mergeOptions(transaction, defaultOptions, options));
 
         // Enlist the connection in this transaction
         if (ec != null)
@@ -325,11 +325,11 @@ public class ConnectionManagerImpl implements ConnectionManager
                 if (res != null && tx != null && !tx.isEnlisted(res))
                 {
                     boolean enlistInLocalTM = true;
+                    // TODO Get this flag from ConnectionFactory instead of options
                     if (options != null && options.get(ConnectionFactory.RESOURCE_TYPE_OPTION) != null &&
                         ConnectionResourceType.JTA.toString().equalsIgnoreCase((String)options.get(ConnectionFactory.RESOURCE_TYPE_OPTION)))
                     {
-                        //XAResource will be enlisted in an external JTA container,
-                        //so we don't enlist it in the internal Transaction Manager
+                        // XAResource will be enlisted in an external JTA container, so we don't enlist it in the internal Transaction Manager
                         enlistInLocalTM = false;
                     }
                     if (enlistInLocalTM)
@@ -374,13 +374,36 @@ public class ConnectionManagerImpl implements ConnectionManager
     }
 
     /**
-     * Configure a TransactionEventListener that closes the managed connection when a 
-     * transaction commits or rolls back
+     * Merge the options defined for the transaction with any overriding options specified for this connection.
+     * @param transaction The transaction
+     * @param defaultOptions The default options
+     * @param overridingOptions Any options requested
+     * @return The merged options
+     */
+    private Map mergeOptions(final org.datanucleus.Transaction transaction, final Map defaultOptions, final Map overridingOptions)
+    {
+        Map m = new HashMap();
+        if (defaultOptions != null && !defaultOptions.isEmpty())
+        {
+            m.putAll(defaultOptions);
+        }
+        if (transaction != null && transaction.getOptions() != null && !transaction.getOptions().isEmpty())
+        {
+            m.putAll(transaction.getOptions());
+        }
+        if (overridingOptions != null && !overridingOptions.isEmpty())
+        {
+            m.putAll(overridingOptions);
+        }
+        return m;
+    }
+
+    /**
+     * Configure a TransactionEventListener that closes the managed connection when a transaction commits or rolls back
      * @param transaction The transaction that we add a listener to
      * @param mconn Managed connection being used
      */
-    private void configureTransactionEventListener(final org.datanucleus.Transaction transaction,
-            final ManagedConnection mconn)
+    private void configureTransactionEventListener(final org.datanucleus.Transaction transaction, final ManagedConnection mconn)
     {
         // Add handler for any enlisted connection to the transaction so we know when to close it
         if (mconn.closeAfterTransactionEnd())

@@ -64,12 +64,12 @@ public interface ConnectionManager
      * @param factory The ConnectionFactory to create any new connection with
      * @param ec ExecutionContext that binds the connection during its lifetime (key in the pool)
      * @param tx The transaction
+     * @param defaultOptions Fallback options, from the ConnectionFactory TODO Drop this and take from ConnectionFactory when it has accessor
      * @param options Any options for allocating the connection (e.g isolation)
      * @return The ManagedConnection
      */
-    public ManagedConnection allocateConnection(ConnectionFactory factory, final ExecutionContext ec, 
-            org.datanucleus.Transaction tx, Map options);
-    
+    public ManagedConnection allocateConnection(ConnectionFactory factory, final ExecutionContext ec, org.datanucleus.Transaction tx, Map defaultOptions, Map options);
+
     /**
      * Disable binding objects to "ExecutionContext" references, so automatically
      * disables the connection pooling 

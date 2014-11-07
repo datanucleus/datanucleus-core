@@ -33,6 +33,7 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory
 
     protected Map options = null;
 
+    // TODO Rename this to "factoryName" so we can have resourceType as "JTA"/"Local"
     protected String resourceType;
 
     /**
@@ -50,6 +51,7 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory
         }
         else if (resourceType.equals("tx"))
         {
+            // TODO Move RESOURCE_TYPE_OPTION to an explicit accessor on this class instead of "options"
             // Transactional
             String configuredResourceTypeProperty = storeMgr.getStringProperty(DATANUCLEUS_CONNECTION_RESOURCE_TYPE);
             if (configuredResourceTypeProperty != null)
@@ -81,17 +83,7 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory
      */
     public ManagedConnection getConnection(ExecutionContext ec, org.datanucleus.Transaction txn, Map options)
     {
-        Map addedOptions = new HashMap();
-        if (options != null)
-        {
-            addedOptions.putAll(options);
-        }
-        if (this.options != null)
-        {
-            addedOptions.putAll(this.options);
-        }
-
-        ManagedConnection mconn = storeMgr.getConnectionManager().allocateConnection(this, ec, txn, addedOptions);
+        ManagedConnection mconn = storeMgr.getConnectionManager().allocateConnection(this, ec, txn, this.options, options);
         ((AbstractManagedConnection)mconn).incrementUseCount();
         return mconn;
     }
