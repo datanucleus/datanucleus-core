@@ -43,32 +43,31 @@ public interface ConnectionManager
      * @param name The lookup name "e.g "jdbc/tx"
      * @return The connection factory
      */
-    public ConnectionFactory lookupConnectionFactory(String name);
+    ConnectionFactory lookupConnectionFactory(String name);
 
     /**
      * Method to register a connection factory
      * @param name The lookup name "e.g "jdbc/tx"
      * @param factory The connection factory
      */
-    public void registerConnectionFactory(String name, ConnectionFactory factory);
+    void registerConnectionFactory(String name, ConnectionFactory factory);
 
     /**
      * Method to close all pooled connections for the specified key of the specified factory.
      * @param factory The factory
      * @param ec The key in the pool
      */
-    public void closeAllConnections(final ConnectionFactory factory, final ExecutionContext ec);
+    void closeAllConnections(final ConnectionFactory factory, final ExecutionContext ec);
 
     /**
      * Allocate a connection using the specified factory (unless we already have one cached for the ExecutionContext).
      * @param factory The ConnectionFactory to create any new connection with
      * @param ec ExecutionContext that binds the connection during its lifetime (key in the pool)
      * @param tx The transaction
-     * @param defaultOptions Fallback options, from the ConnectionFactory TODO Drop this and take from ConnectionFactory when it has accessor
-     * @param options Any options for allocating the connection (e.g isolation)
+     * @param options Any overriding options for allocating the connection (e.g isolation) that override the transaction (default) options
      * @return The ManagedConnection
      */
-    public ManagedConnection allocateConnection(ConnectionFactory factory, final ExecutionContext ec, org.datanucleus.Transaction tx, Map defaultOptions, Map options);
+    ManagedConnection allocateConnection(ConnectionFactory factory, final ExecutionContext ec, org.datanucleus.Transaction tx, Map options);
 
     /**
      * Disable binding objects to "ExecutionContext" references, so automatically

@@ -31,14 +31,6 @@ public interface ConnectionFactory
     public static final String DATANUCLEUS_CONNECTION_RESOURCE_TYPE = "datanucleus.connection.resourceType";
     /** User-visible configuration property name */
     public static final String DATANUCLEUS_CONNECTION2_RESOURCE_TYPE = "datanucleus.connection2.resourceType";
-    
-    /** 
-     * Internal property name used on ConnectionFactory instances,  
-     * range of Values: JTA | RESOURCE_LOCAL
-     * @see #DATANUCLEUS_CONNECTION_RESOURCE_TYPE
-     * @see #DATANUCLEUS_CONNECTION2_RESOURCE_TYPE
-     */
-    public static final String RESOURCE_TYPE_OPTION = "resource-type";
 
     /**
      * Obtain a connection from the Factory. The connection will be enlisted within the transaction
@@ -63,4 +55,10 @@ public interface ConnectionFactory
      * Release any resources that have been allocated.
      */
     void close();
+
+    /**
+     * Type of resource that this ConnectionFactory represents. See ConnectionResourceType.
+     * @return Resource type ("JTA", "RESOURCE_LOCAL")
+     */
+    String getResourceType();
 }

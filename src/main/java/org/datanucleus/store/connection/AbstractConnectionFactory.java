@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.connection;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
@@ -31,51 +30,47 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory
 {
     protected StoreManager storeMgr;
 
-    protected Map options = null;
-
-    // TODO Rename this to "factoryName" so we can have resourceType as "JTA"/"Local"
+    /** Type of resource represented by this ConnectionFactory. See ConnectionResourceType. */
     protected String resourceType;
+
+    /** Name of this resource ("tx", "non-tx" etc). */
+    protected String resourceName;
+
+    public static final String RESOURCE_NAME_TX = "tx";
 
     /**
      * Constructor.
      * @param storeMgr The store manager needing the connection
-     * @param resourceType Type of resource (tx, nontx)
+     * @param resourceName Name of resource (tx, nontx)
      */
-    public AbstractConnectionFactory(StoreManager storeMgr, String resourceType)
+    public AbstractConnectionFactory(StoreManager storeMgr, String resourceName)
     {
         this.storeMgr = storeMgr;
-        this.resourceType = resourceType;
-        if (resourceType == null)
+        this.resourceName = resourceName;
+        if (resourceName == null)
         {
             // Should never be null
         }
-        else if (resourceType.equals("tx"))
+        else if (resourceName.equals(RESOURCE_NAME_TX))
         {
-            // TODO Move RESOURCE_TYPE_OPTION to an explicit accessor on this class instead of "options"
             // Transactional
-            String configuredResourceTypeProperty = storeMgr.getStringProperty(DATANUCLEUS_CONNECTION_RESOURCE_TYPE);
-            if (configuredResourceTypeProperty != null)
-            {
-                if (options == null)
-                {
-                    options = new HashMap();
-                }
-                options.put(ConnectionFactory.RESOURCE_TYPE_OPTION, configuredResourceTypeProperty);
-            }
+            resourceType = storeMgr.getStringProperty(DATANUCLEUS_CONNECTION_RESOURCE_TYPE);
         }
         else
         {
             // Non-transactional
-            String configuredResourceTypeProperty = storeMgr.getStringProperty(DATANUCLEUS_CONNECTION2_RESOURCE_TYPE);
-            if (configuredResourceTypeProperty!=null)
-            {
-                if (options == null)
-                {
-                    options = new HashMap();
-                }
-                options.put(ConnectionFactory.RESOURCE_TYPE_OPTION, configuredResourceTypeProperty);
-            }
+            resourceType = storeMgr.getStringProperty(DATANUCLEUS_CONNECTION2_RESOURCE_TYPE);
         }
+    }
+
+    public String getResourceName()
+    {
+        return resourceName;
+    }
+
+    public String getResourceType()
+    {
+        return resourceType;
     }
 
     /* (non-Javadoc)
@@ -83,7 +78,7 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory
      */
     public ManagedConnection getConnection(ExecutionContext ec, org.datanucleus.Transaction txn, Map options)
     {
-        ManagedConnection mconn = storeMgr.getConnectionManager().allocateConnection(this, ec, txn, this.options, options);
+        ManagedConnection mconn = storeMgr.getConnectionManager().allocateConnection(this, ec, txn, options);
         ((AbstractManagedConnection)mconn).incrementUseCount();
         return mconn;
     }
@@ -101,6 +96,6 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory
      */
     public String toString()
     {
-        return "ConnectionFactory:" + resourceType + "[" + StringUtils.toJVMIDString(this) + "]";
+        return "ConnectionFactory:" + resourceName + "[" + StringUtils.toJVMIDString(this) + "]";
     }
 }

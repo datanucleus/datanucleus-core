@@ -38,6 +38,7 @@ import org.datanucleus.cache.Level2Cache;
 import org.datanucleus.cache.NullLevel2Cache;
 import org.datanucleus.enhancer.ImplementationCreatorImpl;
 import org.datanucleus.exceptions.ClassNotResolvedException;
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.DatastoreUniqueLongId;
 import org.datanucleus.identity.IdentityManager;
@@ -421,30 +422,38 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         }
 
         // Create the StoreManager
-        Set<String> propNamesWithDatastore = config.getPropertyNamesWithPrefix("datanucleus.datastore.");
-        if (propNamesWithDatastore == null)
+        try
         {
-            // Find the StoreManager using the persistence property if specified
-            NucleusLogger.DATASTORE.debug("Creating StoreManager for datastore");
-            Map<String, Object> datastoreProps = config.getDatastoreProperties();
-            this.storeMgr = NucleusContextHelper.createStoreManagerForProperties(config.getPersistenceProperties(), datastoreProps, clr, this);
-
-            // Make sure the isolation level is valid for this StoreManager and correct if necessary
-            String transactionIsolation = config.getStringProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION);
-            if (transactionIsolation != null)
+            Set<String> propNamesWithDatastore = config.getPropertyNamesWithPrefix("datanucleus.datastore.");
+            if (propNamesWithDatastore == null)
             {
-                String reqdIsolation = NucleusContextHelper.getTransactionIsolationForStoreManager(storeMgr, transactionIsolation);
-                if (!transactionIsolation.equalsIgnoreCase(reqdIsolation))
+                // Find the StoreManager using the persistence property if specified
+                NucleusLogger.DATASTORE.debug("Creating StoreManager for datastore");
+                Map<String, Object> datastoreProps = config.getDatastoreProperties();
+                this.storeMgr = NucleusContextHelper.createStoreManagerForProperties(config.getPersistenceProperties(), datastoreProps, clr, this);
+
+                // Make sure the isolation level is valid for this StoreManager and correct if necessary
+                String transactionIsolation = config.getStringProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION);
+                if (transactionIsolation != null)
                 {
-                    config.setProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION, reqdIsolation);
+                    String reqdIsolation = NucleusContextHelper.getTransactionIsolationForStoreManager(storeMgr, transactionIsolation);
+                    if (!transactionIsolation.equalsIgnoreCase(reqdIsolation))
+                    {
+                        config.setProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION, reqdIsolation);
+                    }
                 }
             }
+            else
+            {
+                NucleusLogger.DATASTORE.debug("Creating FederatedStoreManager to handle federation of primary StoreManager and " + propNamesWithDatastore.size() + " secondary datastores");
+                this.storeMgr = new FederatedStoreManager(clr, this);
+                this.federated = true;
+            }
         }
-        else
+        catch (NucleusException ne)
         {
-            NucleusLogger.DATASTORE.debug("Creating FederatedStoreManager to handle federation of primary StoreManager and " + propNamesWithDatastore.size() + " secondary datastores");
-            this.storeMgr = new FederatedStoreManager(clr, this);
-            this.federated = true;
+            NucleusLogger.DATASTORE.error("Exception thrown creating StoreManager. See the nested exception", ne);
+            throw ne;
         }
         NucleusLogger.DATASTORE.debug("StoreManager now created");
 

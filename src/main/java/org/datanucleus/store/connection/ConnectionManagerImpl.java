@@ -240,8 +240,7 @@ public class ConnectionManagerImpl implements ConnectionManager
      * @param options Options for the connection (e.g isolation). These will override those of the txn itself
      * @return The ManagedConnection
      */
-    public ManagedConnection allocateConnection(final ConnectionFactory factory, final ExecutionContext ec, final org.datanucleus.Transaction transaction, 
-            Map defaultOptions, Map options)
+    public ManagedConnection allocateConnection(final ConnectionFactory factory, final ExecutionContext ec, final org.datanucleus.Transaction transaction, Map options)
     {
         if (ec != null && connectionPoolEnabled)
         {
@@ -273,17 +272,10 @@ public class ConnectionManagerImpl implements ConnectionManager
                         Transaction tx = nucleusContext.getTransactionManager().getTransaction(ec);
                         if (res != null && tx != null && !tx.isEnlisted(res))
                         {
-                            boolean enlistInLocalTM = true;
-                            // TODO Get this flag from ConnectionFactory instead of options
-                            if (options != null && options.get(ConnectionFactory.RESOURCE_TYPE_OPTION) != null &&
-                                ConnectionResourceType.JTA.toString().equalsIgnoreCase((String)options.get(ConnectionFactory.RESOURCE_TYPE_OPTION)))
+                            String cfResourceType = factory.getResourceType();
+                            if (!ConnectionResourceType.JTA.toString().equalsIgnoreCase(cfResourceType))
                             {
-                                //XAResource will be enlisted in an external JTA container,
-                                //so we don't enlist it in the internal Transaction Manager
-                                enlistInLocalTM = false;
-                            }
-                            if (enlistInLocalTM)
-                            {
+                                // Enlist the resource with this transaction EXCEPT where using external JTA container
                                 tx.enlistResource(res);
                             }
                         }
@@ -306,8 +298,8 @@ public class ConnectionManagerImpl implements ConnectionManager
             }
         }
 
-        // Create new connection, with required options
-        final ManagedConnection mconn = factory.createManagedConnection(ec, mergeOptions(transaction, defaultOptions, options));
+        // No cached connection so create new connection with required options
+        final ManagedConnection mconn = factory.createManagedConnection(ec, mergeOptions(transaction, options));
 
         // Enlist the connection in this transaction
         if (ec != null)
@@ -324,16 +316,10 @@ public class ConnectionManagerImpl implements ConnectionManager
                 XAResource res = mconn.getXAResource();
                 if (res != null && tx != null && !tx.isEnlisted(res))
                 {
-                    boolean enlistInLocalTM = true;
-                    // TODO Get this flag from ConnectionFactory instead of options
-                    if (options != null && options.get(ConnectionFactory.RESOURCE_TYPE_OPTION) != null &&
-                        ConnectionResourceType.JTA.toString().equalsIgnoreCase((String)options.get(ConnectionFactory.RESOURCE_TYPE_OPTION)))
+                    String cfResourceType = factory.getResourceType();
+                    if (!ConnectionResourceType.JTA.toString().equalsIgnoreCase(cfResourceType))
                     {
-                        // XAResource will be enlisted in an external JTA container, so we don't enlist it in the internal Transaction Manager
-                        enlistInLocalTM = false;
-                    }
-                    if (enlistInLocalTM)
-                    {
+                        // Enlist the resource with this transaction EXCEPT where using external JTA container
                         tx.enlistResource(res);
                     }
                 }
@@ -376,17 +362,12 @@ public class ConnectionManagerImpl implements ConnectionManager
     /**
      * Merge the options defined for the transaction with any overriding options specified for this connection.
      * @param transaction The transaction
-     * @param defaultOptions The default options
      * @param overridingOptions Any options requested
      * @return The merged options
      */
-    private Map mergeOptions(final org.datanucleus.Transaction transaction, final Map defaultOptions, final Map overridingOptions)
+    private Map mergeOptions(final org.datanucleus.Transaction transaction, final Map overridingOptions)
     {
         Map m = new HashMap();
-        if (defaultOptions != null && !defaultOptions.isEmpty())
-        {
-            m.putAll(defaultOptions);
-        }
         if (transaction != null && transaction.getOptions() != null && !transaction.getOptions().isEmpty())
         {
             m.putAll(transaction.getOptions());
