@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.metadata;
 
+
 /**
  * Exception thrown when meta-data specific to a class is invalid.
  */
@@ -27,7 +28,7 @@ public class InvalidClassMetaDataException extends InvalidMetaDataException
 
     public InvalidClassMetaDataException(String key, String className, Object... params)
     {
-        super(key, className, params);
+        super(key, params);
         this.className = className;
     }
 
