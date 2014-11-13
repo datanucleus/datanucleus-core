@@ -71,7 +71,6 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
     protected transient boolean allowNulls = false;
     protected transient boolean useCache = true;
     protected transient boolean isCacheLoaded = false;
-    protected transient boolean queued = false;
 
     /**
      * Constructor.
@@ -84,7 +83,6 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
 
         ExecutionContext ec = op.getExecutionContext();
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
-        queued = ec.isDelayDatastoreOperationsEnabled();
         useCache = SCOUtils.useContainerCache(op, mmd);
 
         if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
@@ -108,7 +106,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(op, ownerMmd.getName(), this,
-                useCache, queued, allowNulls, SCOUtils.useCachedLazyLoading(op, ownerMmd)));
+                useCache, allowNulls, SCOUtils.useCachedLazyLoading(op, ownerMmd)));
         }
     }
 
@@ -130,7 +128,6 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
 
         ExecutionContext ec = ownerOP.getExecutionContext();
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
-        queued = ec.isDelayDatastoreOperationsEnabled();
         useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
@@ -147,7 +144,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this,
-                useCache, queued, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
+                useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
         }
     }
 
@@ -213,7 +210,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
                 }
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         for (Object element : c)
                         {
@@ -292,7 +289,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
                     // TODO This is clear+addAll. Change to detect updates
                     if (backingStore != null)
                     {
-                        if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                        if (SCOUtils.useQueuedUpdate(ownerOP))
                         {
                             if (ownerOP.isFlushedToDatastore())
                             {
@@ -320,7 +317,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
                     }
                     if (backingStore != null)
                     {
-                        if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                        if (SCOUtils.useQueuedUpdate(ownerOP))
                         {
                             if (ownerOP.isFlushedToDatastore())
                             {
@@ -701,7 +698,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
             }
@@ -756,7 +753,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 for (Object element : c)
                 {
@@ -799,7 +796,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
             }
@@ -850,7 +847,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 backingSuccess = contained;
                 if (backingSuccess)
@@ -896,7 +893,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
 
         int size = (useCache ? delegate.size() : -1);
         java.util.Collection contained = null;
-        if (backingStore != null && SCOUtils.useQueuedUpdate(queued, ownerOP))
+        if (backingStore != null && SCOUtils.useQueuedUpdate(ownerOP))
         {
             // Check which are contained before updating the delegate
             contained = new java.util.HashSet();
@@ -924,7 +921,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
         if (backingStore != null)
         {
             boolean backingSuccess = true;
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 backingSuccess = false;
                 for (Object element : contained)

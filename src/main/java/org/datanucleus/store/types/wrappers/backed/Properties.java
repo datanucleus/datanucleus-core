@@ -48,7 +48,6 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
     protected transient boolean allowNulls = false;
     protected transient boolean useCache = true;
     protected transient boolean isCacheLoaded = false;
-    protected transient boolean queued = false;
 
     /**
      * Constructor
@@ -63,7 +62,6 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         this.delegate = new java.util.Properties();
 
         ExecutionContext ec = ownerOP.getExecutionContext();
-        queued = ec.isDelayDatastoreOperationsEnabled();
         useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
         if (!SCOUtils.mapHasSerialisedKeysAndValues(mmd) && 
@@ -76,7 +74,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this,
-                useCache, queued, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
+                useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
         }
     }
 
@@ -141,7 +139,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                 }
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         Iterator iter = m.entrySet().iterator();
                         while (iter.hasNext())
@@ -168,7 +166,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                 delegate.clear();
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         // If not yet flushed to store then no need to add to queue (since will be handled via insert)
                         if (ownerOP.isFlushedToDatastore())
@@ -189,7 +187,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
 
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         // If not yet flushed to store then no need to add to queue (since will be handled via insert)
                         if (ownerOP.isFlushedToDatastore())
@@ -576,7 +574,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new MapClearOperation(ownerOP, backingStore));
             }
@@ -624,7 +622,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         Object oldValue = null;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, key, value));
             }
@@ -638,7 +636,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         {
             oldValue = delegateOldValue;
         }
-        else if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+        else if (SCOUtils.useQueuedUpdate(ownerOP))
         {
             oldValue = delegateOldValue;
         }
@@ -666,7 +664,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 Iterator iter = m.entrySet().iterator();
                 while (iter.hasNext())
@@ -707,7 +705,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         Object delegateRemoved = delegate.remove(key);
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerOP, backingStore, key, delegateRemoved));
                 removed = delegateRemoved;

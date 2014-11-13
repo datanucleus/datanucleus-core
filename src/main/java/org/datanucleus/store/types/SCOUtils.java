@@ -227,16 +227,14 @@ public class SCOUtils
      * @param fieldName Field with the container
      * @param cont The SCOContainer
      * @param useCache Whether to use caching of values in the container
-     * @param queued Whether operations are queued in the wrapper
      * @param allowNulls Whether to allow nulls
      * @param lazyLoading Whether to use lazy loading in the wrapper
      * @return The String
      */
-    public static String getContainerInfoMessage(ObjectProvider ownerOP, String fieldName, SCOContainer cont, boolean useCache, boolean queued,
-            boolean allowNulls, boolean lazyLoading)
+    public static String getContainerInfoMessage(ObjectProvider ownerOP, String fieldName, SCOContainer cont, boolean useCache, boolean allowNulls, boolean lazyLoading)
     {
         String msg = Localiser.msg("023004", ownerOP.getObjectAsPrintable(), fieldName, cont.getClass().getName(),
-            "[cache-values=" + useCache + ", lazy-loading=" + lazyLoading + ", queued-operations=" + queued + ", allow-nulls=" + allowNulls + "]");
+            "[cache-values=" + useCache + ", lazy-loading=" + lazyLoading + ", allow-nulls=" + allowNulls + "]");
         return msg;
     }
 
@@ -1433,13 +1431,12 @@ public class SCOUtils
     /**
      * Convenience method to return if we should use a queued update for the current operation. If within a
      * transaction, and using queueing in general, and not flushing then returns true.
-     * @param queued Whether supporting queued operations
      * @param op ObjectProvider
      * @return Whether to use queued for this operation
      */
-    public static boolean useQueuedUpdate(boolean queued, ObjectProvider op)
+    public static boolean useQueuedUpdate(ObjectProvider op)
     {
-        return queued && !op.getExecutionContext().isFlushing() && op.getExecutionContext().getTransaction().isActive();
+        return op != null && op.getExecutionContext().isDelayDatastoreOperationsEnabled() && !op.getExecutionContext().isFlushing() && op.getExecutionContext().getTransaction().isActive();
     }
 
     /**

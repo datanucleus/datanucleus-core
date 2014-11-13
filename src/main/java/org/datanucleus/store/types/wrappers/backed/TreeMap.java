@@ -50,7 +50,6 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
     protected transient boolean allowNulls = false;
     protected transient boolean useCache = true;
     protected transient boolean isCacheLoaded = false;
-    protected transient boolean queued = false;
 
     /**
      * Constructor
@@ -63,7 +62,6 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
 
         ExecutionContext ec = ownerOP.getExecutionContext();
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
-        queued = ec.isDelayDatastoreOperationsEnabled();
         useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
         if (!SCOUtils.mapHasSerialisedKeysAndValues(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
@@ -86,7 +84,7 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(op, ownerMmd.getName(), this,
-                useCache, queued, allowNulls, SCOUtils.useCachedLazyLoading(op, ownerMmd)));
+                useCache, allowNulls, SCOUtils.useCachedLazyLoading(op, ownerMmd)));
         }
     }
 
@@ -150,7 +148,7 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
                 }
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         Iterator iter = m.entrySet().iterator();
                         while (iter.hasNext())
@@ -178,7 +176,7 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
                 delegate.clear();
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         // If not yet flushed to store then no need to add to queue (since will be handled via insert)
                         if (ownerOP.isFlushedToDatastore())
@@ -199,7 +197,7 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
 
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         // If not yet flushed to store then no need to add to queue (since will be handled via insert)
                         if (ownerOP.isFlushedToDatastore())
@@ -707,7 +705,7 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new MapClearOperation(ownerOP, backingStore));
             }
@@ -755,7 +753,7 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
         Object oldValue = null;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, key, value));
             }
@@ -769,7 +767,7 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
         {
             oldValue = delegateOldValue;
         }
-        else if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+        else if (SCOUtils.useQueuedUpdate(ownerOP))
         {
             oldValue = delegateOldValue;
         }
@@ -797,7 +795,7 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 Iterator iter = m.entrySet().iterator();
                 while (iter.hasNext())
@@ -838,7 +836,7 @@ public class TreeMap extends org.datanucleus.store.types.wrappers.TreeMap implem
         Object delegateRemoved = delegate.remove(key);
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerOP, backingStore, key, delegateRemoved));
                 removed = delegateRemoved;

@@ -47,7 +47,6 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
     protected transient MapStore backingStore;
     protected transient boolean useCache=true;
     protected transient boolean isCacheLoaded=false;
-    protected transient boolean queued = false;
 
     /**
      * Constructor
@@ -63,7 +62,6 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
 
         ExecutionContext ec = ownerOP.getExecutionContext();
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
-        queued = ec.isDelayDatastoreOperationsEnabled();
         useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
         if (!SCOUtils.mapHasSerialisedKeysAndValues(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
@@ -75,7 +73,7 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this,
-                useCache, queued, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
+                useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
         }
     }
 
@@ -140,7 +138,7 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
                 }
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         Iterator iter = m.entrySet().iterator();
                         while (iter.hasNext())
@@ -168,7 +166,7 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
                 delegate.clear();
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         // If not yet flushed to store then no need to add to queue (since will be handled via insert)
                         if (ownerOP.isFlushedToDatastore())
@@ -189,7 +187,7 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
 
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         // If not yet flushed to store then no need to add to queue (since will be handled via insert)
                         if (ownerOP.isFlushedToDatastore())
@@ -553,7 +551,7 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new MapClearOperation(ownerOP, backingStore));
             }
@@ -601,7 +599,7 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
         Object oldValue = null;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, key, value));
             }
@@ -615,7 +613,7 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
         {
             oldValue = delegateOldValue;
         }
-        else if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+        else if (SCOUtils.useQueuedUpdate(ownerOP))
         {
             oldValue = delegateOldValue;
         }
@@ -643,7 +641,7 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 Iterator iter = m.entrySet().iterator();
                 while (iter.hasNext())
@@ -684,7 +682,7 @@ public class HashMap extends org.datanucleus.store.types.wrappers.HashMap implem
         Object delegateRemoved = delegate.remove(key);
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerOP, backingStore, key, delegateRemoved));
                 removed = delegateRemoved;

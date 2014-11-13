@@ -73,7 +73,6 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
     protected transient boolean allowNulls = false;
     protected transient boolean useCache=true;
     protected transient boolean isCacheLoaded=false;
-    protected transient boolean queued = false;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -89,7 +88,6 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
 
         ExecutionContext ec = ownerOP.getExecutionContext();
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
-        queued = ec.isDelayDatastoreOperationsEnabled();
         useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
         if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
@@ -101,7 +99,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this,
-                useCache, queued, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
+                useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
         }
     }
 
@@ -150,7 +148,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
                 }
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         for (Object element : c)
                         {
@@ -182,7 +180,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
                 // TODO This is clear+addAll. Change to detect updates
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         if (ownerOP.isFlushedToDatastore())
                         {
@@ -200,7 +198,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
                 }
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         if (ownerOP.isFlushedToDatastore())
                         {
@@ -661,7 +659,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
             }
@@ -711,7 +709,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerOP, backingStore, index, element));
             }
@@ -755,7 +753,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 for (Object element : elements)
                 {
@@ -804,7 +802,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 int pos = index;
                 for (Object element : elements)
@@ -848,7 +846,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
             }
@@ -894,7 +892,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 backingSuccess = contained;
                 if (backingSuccess)
@@ -944,7 +942,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
         Object backingObject = null;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 backingObject = delegateObject;
                 ownerOP.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerOP, backingStore, index));
@@ -987,7 +985,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
 
         int size = (useCache ? delegate.size() : -1);
         Collection contained = null;
-        if (backingStore != null && SCOUtils.useQueuedUpdate(queued, ownerOP))
+        if (backingStore != null && SCOUtils.useQueuedUpdate(ownerOP))
         {
             // Check which are contained before updating the delegate
             contained = new java.util.HashSet();
@@ -1004,7 +1002,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
         if (backingStore != null)
         {
             boolean backingSuccess = true;
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 backingSuccess = false;
                 for (Object element : contained)
@@ -1102,7 +1100,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
         Object delegateReturn = delegate.set(index, element);
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new ListSetOperation(ownerOP, backingStore, index, element, allowDependentField));
             }

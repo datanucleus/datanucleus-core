@@ -69,7 +69,6 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
     protected transient boolean allowNulls = false;
     protected transient boolean useCache = true;
     protected transient boolean isCacheLoaded = false;
-    protected transient boolean queued = false;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -85,7 +84,6 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
 
         ExecutionContext ec = ownerOP.getExecutionContext();
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
-        queued = ec.isDelayDatastoreOperationsEnabled();
         useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
         if (!SCOUtils.collectionHasSerialisedElements(mmd) && 
@@ -98,7 +96,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this,
-                useCache, queued, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
+                useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
         }
     }
 
@@ -147,7 +145,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
                 }
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         for (Object element : c)
                         {
@@ -179,7 +177,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
                 // TODO This does clear+addAll : Improve this and work out which elements are added and which deleted
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         if (ownerOP.isFlushedToDatastore())
                         {
@@ -198,7 +196,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
                 }
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         if (ownerOP.isFlushedToDatastore())
                         {
@@ -644,7 +642,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerOP, backingStore, index, element));
             }
@@ -695,7 +693,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
             }
@@ -751,7 +749,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 for (Object element : elements)
                 {
@@ -800,7 +798,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 int pos = index;
                 for (Object element : elements)
@@ -844,7 +842,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
             }
@@ -875,7 +873,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerOP, backingStore, 0));
             }
@@ -914,7 +912,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerOP, backingStore, 0, element));
             }
@@ -968,7 +966,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 backingSuccess = contained;
                 if (backingSuccess)
@@ -1014,7 +1012,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
 
         int size = (useCache ? delegate.size() : -1);
         Collection contained = null;
-        if (backingStore != null && SCOUtils.useQueuedUpdate(queued, ownerOP))
+        if (backingStore != null && SCOUtils.useQueuedUpdate(ownerOP))
         {
             // Check which are contained before updating the delegate
             contained = new java.util.HashSet();
@@ -1031,7 +1029,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
         if (backingStore != null)
         {
             boolean backingSuccess = true;
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 backingSuccess = false;
                 for (Object element : contained)
@@ -1099,7 +1097,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
         Object backingObject = null;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 backingObject = delegateObject;
                 ownerOP.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerOP, backingStore, index));
@@ -1205,7 +1203,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
         Object delegateReturn = delegate.set(index, element);
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new ListSetOperation(ownerOP, backingStore, index, element, allowDependentField));
             }

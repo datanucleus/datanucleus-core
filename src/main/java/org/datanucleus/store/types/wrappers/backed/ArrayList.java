@@ -69,7 +69,6 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
     protected transient boolean allowNulls = false;
     protected transient boolean useCache=true;
     protected transient boolean isCacheLoaded=false;
-    protected transient boolean queued = false;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -85,7 +84,6 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
 
         ExecutionContext ec = op.getExecutionContext();
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
-        queued = ec.isDelayDatastoreOperationsEnabled();
         useCache = SCOUtils.useContainerCache(op, mmd);
 
         if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
@@ -97,7 +95,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(op, ownerMmd.getName(), this,
-                useCache, queued, allowNulls, SCOUtils.useCachedLazyLoading(op, ownerMmd)));
+                useCache, allowNulls, SCOUtils.useCachedLazyLoading(op, ownerMmd)));
         }
     }
 
@@ -145,7 +143,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
                 }
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         for (Object element : c)
                         {
@@ -177,7 +175,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
                 // TODO This does clear+addAll : Improve this and work out which elements are added and which deleted
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         if (ownerOP.isFlushedToDatastore())
                         {
@@ -196,7 +194,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
                 }
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         if (ownerOP.isFlushedToDatastore())
                         {
@@ -645,7 +643,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new ListAddAtOperation(ownerOP, backingStore, index, element));
             }
@@ -695,7 +693,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
             }
@@ -740,7 +738,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 for (Object element : elements)
                 {
@@ -789,7 +787,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 int pos = index;
                 for (Object element : elements)
@@ -833,7 +831,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
 
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
             }
@@ -880,7 +878,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
         boolean backingSuccess = true;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 backingSuccess = contained;
                 if (backingSuccess)
@@ -930,7 +928,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
         Object backingObject = null;
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 backingObject = delegateObject;
                 ownerOP.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerOP, backingStore, index));
@@ -973,7 +971,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
 
         int size = (useCache ? delegate.size() : -1);
         Collection contained = null;
-        if (backingStore != null && SCOUtils.useQueuedUpdate(queued, ownerOP))
+        if (backingStore != null && SCOUtils.useQueuedUpdate(ownerOP))
         {
             // Check which are contained before updating the delegate
             contained = new java.util.HashSet();
@@ -990,7 +988,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
         if (backingStore != null)
         {
             boolean backingSuccess = true;
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 backingSuccess = false;
                 for (Object element : contained)
@@ -1087,7 +1085,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
         Object delegateReturn = delegate.set(index, element);
         if (backingStore != null)
         {
-            if (SCOUtils.useQueuedUpdate(queued, ownerOP))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new ListSetOperation(ownerOP, backingStore, index, element, allowDependentField));
             }
