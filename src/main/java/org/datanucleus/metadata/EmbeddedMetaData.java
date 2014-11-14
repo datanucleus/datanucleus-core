@@ -127,8 +127,7 @@ public class EmbeddedMetaData extends MetaData
             if (embCmd == null)
             {
                 NucleusLogger.METADATA.error(Localiser.msg("044121", apmd.getFullFieldName(), apmd.getTypeName()));
-                throw new InvalidMemberMetaDataException("044121", apmd.getClassName(), apmd.getName(), 
-                    apmd.getTypeName());
+                throw new InvalidMemberMetaDataException("044121", apmd.getClassName(), apmd.getName(), apmd.getTypeName());
             }
         }
         else if (md instanceof ElementMetaData)
@@ -149,8 +148,7 @@ public class EmbeddedMetaData extends MetaData
             if (embCmd == null)
             {
                 NucleusLogger.METADATA.error(Localiser.msg("044122", apmd.getFullFieldName(), embeddedType));
-                throw new InvalidMemberMetaDataException("044122", apmd.getClassName(), apmd.getName(),
-                    embeddedType);
+                throw new InvalidMemberMetaDataException("044122", apmd.getClassName(), apmd.getName(), embeddedType);
             }
         }
         else if (md instanceof KeyMetaData)
@@ -171,8 +169,7 @@ public class EmbeddedMetaData extends MetaData
             if (embCmd == null)
             {
                 NucleusLogger.METADATA.error(Localiser.msg("044123", apmd.getFullFieldName(), embeddedType));
-                throw new InvalidMemberMetaDataException("044123", apmd.getClassName(), apmd.getName(), 
-                    embeddedType);
+                throw new InvalidMemberMetaDataException("044123", apmd.getClassName(), apmd.getName(), embeddedType);
             }
         }
         else if (md instanceof ValueMetaData)
@@ -193,8 +190,7 @@ public class EmbeddedMetaData extends MetaData
             if (embCmd == null)
             {
                 NucleusLogger.METADATA.error(Localiser.msg("044124", apmd.getFullFieldName(), embeddedType));
-                throw new InvalidMemberMetaDataException("044124", apmd.getClassName(), apmd.getName(), 
-                    embeddedType);
+                throw new InvalidMemberMetaDataException("044124", apmd.getClassName(), apmd.getName(), embeddedType);
             }
         }
 

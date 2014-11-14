@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.metadata;
 
-
 /**
  * Exception thrown when meta-data specific to a class is invalid.
  */
@@ -26,10 +25,15 @@ public class InvalidClassMetaDataException extends InvalidMetaDataException
     private static final long serialVersionUID = 6498740110129166983L;
     String className;
 
-    public InvalidClassMetaDataException(String key, String className, Object... params)
+    /**
+     * Constructor. The first params element should be the class name.
+     * @param key The message key
+     * @param params Params for the message
+     */
+    public InvalidClassMetaDataException(String key, Object... params)
     {
         super(key, params);
-        this.className = className;
+        this.className = (String)params[0];
     }
 
     public String getClassName()

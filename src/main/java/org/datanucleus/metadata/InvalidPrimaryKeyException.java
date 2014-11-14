@@ -34,6 +34,6 @@ public class InvalidPrimaryKeyException extends InvalidClassMetaDataException
      */
     public InvalidPrimaryKeyException(String key, Object... params)
     {
-        super(key, (String)params[0], params);
+        super(key, params);
     }
 }

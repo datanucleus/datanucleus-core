@@ -26,11 +26,16 @@ public class InvalidMemberMetaDataException extends InvalidMetaDataException
     String className;
     String memberName;
 
-    public InvalidMemberMetaDataException(String key, String className, String memberName, Object... params)
+    /**
+     * Constructor. The first params element should be the class name, and the second element should be the member name.
+     * @param key The message key
+     * @param params Params for the message
+     */
+    public InvalidMemberMetaDataException(String key, Object... params)
     {
-        super(key, className, memberName, params);
-        this.className = className;
-        this.memberName = memberName;
+        super(key, params);
+        this.className = (String)params[0];
+        this.memberName = (String)params[1];
     }
 
     public String getClassName()
