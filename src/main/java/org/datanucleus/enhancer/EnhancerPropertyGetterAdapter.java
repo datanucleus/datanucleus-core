@@ -26,6 +26,7 @@ import org.datanucleus.asm.MethodVisitor;
 import org.datanucleus.asm.Opcodes;
 import org.datanucleus.asm.Type;
 import org.datanucleus.asm.TypePath;
+import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.util.Localiser;

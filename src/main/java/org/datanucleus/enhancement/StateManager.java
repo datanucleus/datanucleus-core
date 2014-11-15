@@ -15,11 +15,9 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.state;
+package org.datanucleus.enhancement;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.enhancer.Detachable;
-import org.datanucleus.enhancer.Persistable;
 
 /**
  * This interface is the point of contact between managed instances of <code>Persistable</code> classes and DataNucleus.
@@ -34,6 +32,7 @@ public interface StateManager
      * Return the <code>ExecutionContext</code> that owns this instance.
      * @param pc the calling <code>Persistable</code> instance
      * @return the <code>ExecutionContext</code> that owns this instance
+     * TODO Change this to return ExecutionContextReference
      */
     ExecutionContext getExecutionContext(Persistable pc);
 

@@ -29,6 +29,7 @@ import org.datanucleus.asm.FieldVisitor;
 import org.datanucleus.asm.MethodVisitor;
 import org.datanucleus.asm.Opcodes;
 import org.datanucleus.asm.Type;
+import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.enhancer.methods.DefaultConstructor;
 import org.datanucleus.enhancer.methods.InitClass;
 import org.datanucleus.enhancer.methods.GetNormal;

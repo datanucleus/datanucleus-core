@@ -15,10 +15,9 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.enhancer;
+package org.datanucleus.enhancement;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.state.StateManager;
 
 /**
  * A class that can be managed by DataNucleus must implement this interface.
@@ -63,6 +62,7 @@ public interface Persistable
      * Transient non-transactional instances return null.
      * This method always delegates to the StateManager if it is non-null.
      * @return the ExecutionContext associated with this instance.
+     * TODO Change this to return ExecutionContextReference
      */
     ExecutionContext dnGetExecutionContext();
 

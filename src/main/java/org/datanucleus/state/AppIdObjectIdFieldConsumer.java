@@ -18,7 +18,7 @@ Contributors:
 package org.datanucleus.state;
 
 import org.datanucleus.api.ApiAdapter;
-import org.datanucleus.enhancer.Persistable;
+import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.store.fieldmanager.FieldManager;
 
 /**

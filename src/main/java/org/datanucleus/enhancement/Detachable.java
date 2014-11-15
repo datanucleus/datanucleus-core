@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.enhancer;
+package org.datanucleus.enhancement;
 
 /**
  * This interface is implemented by classes that can be detached from the persistence context and later

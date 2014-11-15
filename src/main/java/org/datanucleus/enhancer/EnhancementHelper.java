@@ -38,9 +38,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+import org.datanucleus.enhancement.Persistable;
+import org.datanucleus.enhancement.StateManager;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.state.StateManager;
 
 /**
  * Helper class for the DN bytecode enhancement contract. It contains methods to register metadata for

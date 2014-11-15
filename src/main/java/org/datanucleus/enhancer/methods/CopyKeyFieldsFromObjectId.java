@@ -43,7 +43,7 @@ import org.datanucleus.util.ClassUtils;
  * </pre>
  * and for SingleFieldIdentity it is
  * <pre>
- * public void dnCopyKeyFieldsFromObjectId(PersistenceCaable.ObjectIdFieldConsumer fc, Object oid)
+ * public void dnCopyKeyFieldsFromObjectId(Persistable.ObjectIdFieldConsumer fc, Object oid)
  * {
  *     if (fc == null)
  *         throw new IllegalArgumentException("ObjectIdFieldConsumer is null");

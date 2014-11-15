@@ -19,8 +19,8 @@ package org.datanucleus;
 
 import java.io.Serializable;
 
-import org.datanucleus.enhancer.Persistable;
-import org.datanucleus.state.StateManager;
+import org.datanucleus.enhancement.Persistable;
+import org.datanucleus.enhancement.StateManager;
 
 /**
  * Constants with classes names (created to reduce overhead on calling Class.class.getName()), namely performance.

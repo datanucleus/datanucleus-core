@@ -31,8 +31,8 @@ import junit.framework.TestCase;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ClassLoaderResolverImpl;
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.enhancer.Persistable;
-import org.datanucleus.state.StateManager;
+import org.datanucleus.enhancement.Persistable;
+import org.datanucleus.enhancement.StateManager;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.ClassUtilsTest.MyBaseClass;
 

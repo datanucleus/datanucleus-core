@@ -20,6 +20,8 @@ package org.datanucleus.enhancer;
 import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.asm.Type;
+import org.datanucleus.enhancement.Detachable;
+import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.util.DetachListener;
 
 /**

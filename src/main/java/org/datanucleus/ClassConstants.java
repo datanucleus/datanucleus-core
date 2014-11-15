@@ -20,7 +20,8 @@ package org.datanucleus;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.datanucleus.enhancer.Persistable;
+import org.datanucleus.enhancement.Persistable;
+import org.datanucleus.enhancement.StateManager;
 import org.datanucleus.identity.ByteId;
 import org.datanucleus.identity.CharId;
 import org.datanucleus.identity.IntId;
@@ -30,7 +31,6 @@ import org.datanucleus.identity.ObjectId;
 import org.datanucleus.identity.ShortId;
 import org.datanucleus.identity.StringId;
 import org.datanucleus.metadata.MetaDataManager;
-import org.datanucleus.state.StateManager;
 import org.datanucleus.store.StoreManager;
 
 /**
