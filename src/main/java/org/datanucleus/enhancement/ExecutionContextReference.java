@@ -28,4 +28,12 @@ public interface ExecutionContextReference
      * @return The owner
      */
     Object getOwner();
+
+    /**
+     * Accessor for an object given the object id.
+     * @param id The id of the object
+     * @param validate Whether to validate the id
+     * @return The object
+     */
+    Object findObject(Object id, boolean validate);
 }
