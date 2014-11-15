@@ -17,8 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.enhancement;
 
-import org.datanucleus.ExecutionContext;
-
 /**
  * A class that can be managed by DataNucleus must implement this interface.
  * <P>
@@ -62,9 +60,8 @@ public interface Persistable
      * Transient non-transactional instances return null.
      * This method always delegates to the StateManager if it is non-null.
      * @return the ExecutionContext associated with this instance.
-     * TODO Change this to return ExecutionContextReference
      */
-    ExecutionContext dnGetExecutionContext();
+    ExecutionContextReference dnGetExecutionContext();
 
     /**
      * This method sets the StateManager instance that manages the state of this instance. This method is

@@ -53,6 +53,7 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.cache.CachedPC;
 import org.datanucleus.cache.L2CacheRetrieveFieldManager;
 import org.datanucleus.enhancement.Detachable;
+import org.datanucleus.enhancement.ExecutionContextReference;
 import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.enhancement.StateManager;
 import org.datanucleus.enhancer.EnhancementHelper;
@@ -846,7 +847,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
      * @param pc The Persistable instance
      * @return The ExecutionContext that owns this instance
      */
-    public ExecutionContext getExecutionContext(Persistable pc)
+    public ExecutionContextReference getExecutionContext(Persistable pc)
     {
         //in identifying relationships, jdoCopyKeyFieldsFromId will call
         //this method, and at this moment, myPC in statemanager is null

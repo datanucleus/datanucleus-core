@@ -20,6 +20,7 @@ package org.datanucleus;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import org.datanucleus.enhancement.ExecutionContextReference;
 import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.enhancement.StateManager;
 import org.datanucleus.identity.ByteId;
@@ -74,6 +75,7 @@ public class ClassConstants
     public static final Class STORE_MANAGER = StoreManager.class;
     public static final Class METADATA_MANAGER = MetaDataManager.class;
     public static final Class EXECUTION_CONTEXT = ExecutionContext.class;
+    public static final Class EXECUTION_CONTEXT_REFERENCE = ExecutionContextReference.class;
 
     public static final Class PERSISTABLE = Persistable.class;
     public static final Class STATE_MANAGER = StateManager.class;

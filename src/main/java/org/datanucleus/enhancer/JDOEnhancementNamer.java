@@ -50,12 +50,12 @@ public class JDOEnhancementNamer implements EnhancementNamer
     private static final Class CL_Persistable = ClassConstants.PERSISTABLE;
     private static final Class CL_ObjectIdFieldConsumer = Persistable.ObjectIdFieldConsumer.class;
     private static final Class CL_ObjectIdFieldSupplier = Persistable.ObjectIdFieldSupplier.class;
-    private static final Class CL_ExecutionContext = ClassConstants.EXECUTION_CONTEXT;
+    private static final Class CL_ExecutionContextRef = ClassConstants.EXECUTION_CONTEXT_REFERENCE;
     private static final Class CL_StateManager = ClassConstants.STATE_MANAGER;
 
     private final static String ACN_DetachListener = DetachListener.class.getName().replace('.', '/');
     private final static String ACN_StateManager = CL_StateManager.getName().replace('.', '/');
-    private final static String ACN_ExecutionContext = CL_ExecutionContext.getName().replace('.', '/');
+    private final static String ACN_ExecutionContext = CL_ExecutionContextRef.getName().replace('.', '/');
     private final static String ACN_Persistable = CL_Persistable.getName().replace('.', '/');
     private final static String ACN_Detachable = CL_Detachable.getName().replace('.', '/');
     private final static String ACN_ObjectIdFieldConsumer = CL_ObjectIdFieldConsumer.getName().replace('.', '/');
@@ -72,7 +72,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
     private final static String CD_StringIdentity = Type.getDescriptor(ClassConstants.IDENTITY_SINGLEFIELD_STRING);
     private final static String CD_ObjectIdentity = Type.getDescriptor(ClassConstants.IDENTITY_SINGLEFIELD_OBJECT);
     private final static String CD_StateManager = Type.getDescriptor(ClassConstants.STATE_MANAGER);
-    private final static String CD_ExecutionContext = Type.getDescriptor(ClassConstants.EXECUTION_CONTEXT);
+    private final static String CD_ExecutionContextRef = Type.getDescriptor(ClassConstants.EXECUTION_CONTEXT_REFERENCE);
     private final static String CD_Persistable = Type.getDescriptor(ClassConstants.PERSISTABLE);
     private final static String CD_Detachable = Type.getDescriptor(CL_Detachable);
     private final static String CD_ObjectIdFieldConsumer = Type.getDescriptor(Persistable.ObjectIdFieldConsumer.class);
@@ -541,7 +541,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public String getExecutionContextDescriptor()
     {
-        return CD_ExecutionContext;
+        return CD_ExecutionContextRef;
     }
 
     /* (non-Javadoc)
@@ -691,7 +691,7 @@ public class JDOEnhancementNamer implements EnhancementNamer
      */
     public Class getExecutionContextClass()
     {
-        return CL_ExecutionContext;
+        return CL_ExecutionContextRef;
     }
 
     /* (non-Javadoc)

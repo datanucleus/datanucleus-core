@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import org.datanucleus.api.ApiAdapter;
+import org.datanucleus.enhancement.ExecutionContextReference;
 import org.datanucleus.exceptions.ClassNotPersistableException;
 import org.datanucleus.exceptions.NoPersistenceInformationException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
@@ -62,7 +63,7 @@ import org.datanucleus.store.types.TypeManager;
  * are defined by the "OPTION_{YYY}" static Strings.
  * </p>
  */
-public interface ExecutionContext
+public interface ExecutionContext extends ExecutionContextReference
 {
     /** Startup option overriding the default (PMF/EMF) username for the connectionURL. */
     public static final String OPTION_USERNAME = "user";

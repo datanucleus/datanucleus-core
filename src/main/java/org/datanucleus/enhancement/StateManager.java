@@ -17,8 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.enhancement;
 
-import org.datanucleus.ExecutionContext;
-
 /**
  * This interface is the point of contact between managed instances of <code>Persistable</code> classes and DataNucleus.
  * It contains the methods used by <code>Persistable</code> instances to delegate behavior to DataNucleus.
@@ -32,9 +30,8 @@ public interface StateManager
      * Return the <code>ExecutionContext</code> that owns this instance.
      * @param pc the calling <code>Persistable</code> instance
      * @return the <code>ExecutionContext</code> that owns this instance
-     * TODO Change this to return ExecutionContextReference
      */
-    ExecutionContext getExecutionContext(Persistable pc);
+    ExecutionContextReference getExecutionContext(Persistable pc);
 
     /**
      * The owning <code>StateManager</code> uses this method to supply the value of the flags to the
