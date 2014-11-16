@@ -27,12 +27,21 @@ import org.datanucleus.store.scostore.Store;
 public class CollectionClearOperation implements SCOOperation
 {
     final ObjectProvider op;
+    final int fieldNumber;
     final CollectionStore store;
 
     public CollectionClearOperation(ObjectProvider op, CollectionStore store)
     {
         this.op = op;
+        this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
         this.store = store;
+    }
+
+    public CollectionClearOperation(ObjectProvider op, int fieldNum)
+    {
+        this.op = op;
+        this.fieldNumber = fieldNum;
+        this.store = null;
     }
 
     /**
@@ -40,7 +49,10 @@ public class CollectionClearOperation implements SCOOperation
      */
     public void perform()
     {
-        store.clear(op);
+        if (store != null)
+        {
+            store.clear(op);
+        }
     }
 
     public Store getStore()
@@ -58,6 +70,10 @@ public class CollectionClearOperation implements SCOOperation
 
     public String toString()
     {
-        return "COLLECTION CLEAR : " + op + " field=" + store.getOwnerMemberMetaData().getName();
+        if (store != null)
+        {
+            return "COLLECTION CLEAR : " + op + " field=" + store.getOwnerMemberMetaData().getName();
+        }
+        return "COLLECTION CLEAR : " + op + " field=" + op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
     }
 }

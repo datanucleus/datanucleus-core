@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 
+import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
@@ -470,7 +471,17 @@ public class SortedSet extends java.util.AbstractSet implements java.util.Sorted
                 Iterator iter = delegate.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
+                    Object element = iter.next();
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
+                    {
+                        // Queue the cascade delete
+                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
+                    }
+                    else
+                    {
+                        // Perform the cascade delete
+                        ownerOP.getExecutionContext().deleteObjectInternal(element);
+                    }
                 }
             }
         }
@@ -513,7 +524,16 @@ public class SortedSet extends java.util.AbstractSet implements java.util.Sorted
             // Cascade delete
             if (SCOUtils.hasDependentElement(ownerMmd))
             {
-                ownerOP.getExecutionContext().deleteObjectInternal(element);
+                if (SCOUtils.useQueuedUpdate(ownerOP))
+                {
+                    // Queue the cascade delete
+                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
+                }
+                else
+                {
+                    // Perform the cascade delete
+                    ownerOP.getExecutionContext().deleteObjectInternal(element);
+                }
             }
         }
 
@@ -556,7 +576,17 @@ public class SortedSet extends java.util.AbstractSet implements java.util.Sorted
                 Iterator iter = elements.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
+                    Object element = iter.next();
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
+                    {
+                        // Queue the cascade delete
+                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
+                    }
+                    else
+                    {
+                        // Perform the cascade delete
+                        ownerOP.getExecutionContext().deleteObjectInternal(element);
+                    }
                 }
             }
         }

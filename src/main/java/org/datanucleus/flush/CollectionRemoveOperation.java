@@ -23,11 +23,14 @@ import org.datanucleus.store.scostore.Store;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Remove operation for a collection where we have a backing store.
+ * Remove operation for a collection.
+ * This is usually for the situation where we have a backing store, but also can be used where we are removing an object from a collection and
+ * the field is marked as cascade delete but we don't want to delete immediately.
  */
 public class CollectionRemoveOperation implements SCOOperation
 {
     final ObjectProvider op;
+    final int fieldNumber;
     final CollectionStore store;
 
     /** The value to remove. */
@@ -39,7 +42,17 @@ public class CollectionRemoveOperation implements SCOOperation
     public CollectionRemoveOperation(ObjectProvider op, CollectionStore store, Object value, boolean allowCascadeDelete)
     {
         this.op = op;
+        this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
         this.store = store;
+        this.value = value;
+        this.allowCascadeDelete = allowCascadeDelete;
+    }
+
+    public CollectionRemoveOperation(ObjectProvider op, int fieldNum, Object value, boolean allowCascadeDelete)
+    {
+        this.op = op;
+        this.fieldNumber = fieldNum;
+        this.store = null;
         this.value = value;
         this.allowCascadeDelete = allowCascadeDelete;
     }
@@ -58,7 +71,10 @@ public class CollectionRemoveOperation implements SCOOperation
      */
     public void perform()
     {
-        store.remove(op, value, -1, allowCascadeDelete);
+        if (store != null)
+        {
+            store.remove(op, value, -1, allowCascadeDelete);
+        }
     }
 
     public Store getStore()
@@ -76,6 +92,10 @@ public class CollectionRemoveOperation implements SCOOperation
 
     public String toString()
     {
-        return "COLLECTION REMOVE : " + op + " field=" + store.getOwnerMemberMetaData().getName() + " value=" + StringUtils.toJVMIDString(value);
+        if (store != null)
+        {
+            return "COLLECTION REMOVE : " + op + " field=" + store.getOwnerMemberMetaData().getName() + " value=" + StringUtils.toJVMIDString(value);
+        }
+        return "COLLECTION REMOVE : " + op + " field=" + op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName() + " value=" + StringUtils.toJVMIDString(value);
     }
 }

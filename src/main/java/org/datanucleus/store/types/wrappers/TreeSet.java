@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.SortedSet;
 
+import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
@@ -472,7 +473,17 @@ public class TreeSet extends java.util.TreeSet implements SCOCollection<java.uti
                 Iterator iter = delegate.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
+                    Object element = iter.next();
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
+                    {
+                        // Queue the cascade delete
+                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
+                    }
+                    else
+                    {
+                        // Perform the cascade delete
+                        ownerOP.getExecutionContext().deleteObjectInternal(element);
+                    }
                 }
             }
         }
@@ -515,7 +526,16 @@ public class TreeSet extends java.util.TreeSet implements SCOCollection<java.uti
             // Cascade delete
             if (SCOUtils.hasDependentElement(ownerMmd))
             {
-                ownerOP.getExecutionContext().deleteObjectInternal(element);
+                if (SCOUtils.useQueuedUpdate(ownerOP))
+                {
+                    // Queue the cascade delete
+                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
+                }
+                else
+                {
+                    // Perform the cascade delete
+                    ownerOP.getExecutionContext().deleteObjectInternal(element);
+                }
             }
         }
 
@@ -558,7 +578,17 @@ public class TreeSet extends java.util.TreeSet implements SCOCollection<java.uti
                 Iterator iter = elements.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
+                    Object element = iter.next();
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
+                    {
+                        // Queue the cascade delete
+                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
+                    }
+                    else
+                    {
+                        // Perform the cascade delete
+                        ownerOP.getExecutionContext().deleteObjectInternal(element);
+                    }
                 }
             }
         }

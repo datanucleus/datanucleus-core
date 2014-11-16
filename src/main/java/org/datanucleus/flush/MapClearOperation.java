@@ -27,12 +27,21 @@ import org.datanucleus.store.scostore.Store;
 public class MapClearOperation implements SCOOperation
 {
     final ObjectProvider op;
+    final int fieldNumber;
     final MapStore store;
 
     public MapClearOperation(ObjectProvider op, MapStore store)
     {
         this.op = op;
+        this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
         this.store = store;
+    }
+
+    public MapClearOperation(ObjectProvider op, int fieldNum)
+    {
+        this.op = op;
+        this.fieldNumber = fieldNum;
+        this.store = null;
     }
 
     /**
@@ -40,7 +49,10 @@ public class MapClearOperation implements SCOOperation
      */
     public void perform()
     {
-        store.clear(op);
+        if (store != null)
+        {
+            store.clear(op);
+        }
     }
 
     public Store getStore()
@@ -58,6 +70,10 @@ public class MapClearOperation implements SCOOperation
 
     public String toString()
     {
-        return "MAP CLEAR : " + op + " field=" + store.getOwnerMemberMetaData().getName();
+        if (store != null)
+        {
+            return "MAP CLEAR : " + op + " field=" + store.getOwnerMemberMetaData().getName();
+        }
+        return "MAP CLEAR : " + op + " field=" + op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
     }
 }

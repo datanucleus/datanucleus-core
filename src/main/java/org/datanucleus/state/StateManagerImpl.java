@@ -1796,6 +1796,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                     if (myEC.getApiAdapter().isPersistent(oldValue))
                     {
                         // PC field being nulled, so delete previous PC value
+                        // TODO Queue this when using optimistic txns, so the old value could be assigned somewhere else
                         NucleusLogger.PERSISTENCE.debug(Localiser.msg("026026", oldValue, mmd.getFullFieldName()));
                         myEC.deleteObjectInternal(oldValue);
                     }
