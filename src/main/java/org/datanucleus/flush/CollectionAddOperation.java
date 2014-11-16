@@ -28,15 +28,25 @@ import org.datanucleus.util.StringUtils;
 public class CollectionAddOperation implements SCOOperation
 {
     final ObjectProvider op;
+    final int fieldNumber;
     final CollectionStore store;
 
     /** The value to add. */
-    private final Object value;
+    final Object value;
 
     public CollectionAddOperation(ObjectProvider op, CollectionStore store, Object value)
     {
         this.op = op;
+        this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
         this.store = store;
+        this.value = value;
+    }
+
+    public CollectionAddOperation(ObjectProvider op, int fieldNum, Object value)
+    {
+        this.op = op;
+        this.fieldNumber = fieldNum;
+        this.store = null;
         this.value = value;
     }
 
@@ -54,8 +64,11 @@ public class CollectionAddOperation implements SCOOperation
      */
     public void perform()
     {
-        // TODO If this value is the detached object and we are using attachCopy this needs swapping for the attached object
-        store.add(op, value, -1);
+        if (store != null)
+        {
+            // TODO If this value is the detached object and we are using attachCopy this needs swapping for the attached object
+            store.add(op, value, -1);
+        }
     }
 
     public Store getStore()
@@ -73,6 +86,8 @@ public class CollectionAddOperation implements SCOOperation
 
     public String toString()
     {
-        return "COLLECTION ADD : " + op + " field=" + store.getOwnerMemberMetaData().getName() + " value=" + StringUtils.toJVMIDString(value);
+        return "COLLECTION ADD : " + op + " field=" + 
+            (store!=null?store.getOwnerMemberMetaData().getName() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName()) + 
+            " value=" + StringUtils.toJVMIDString(value);
     }
 }

@@ -27,18 +27,29 @@ import org.datanucleus.store.scostore.Store;
 public class MapPutOperation implements SCOOperation
 {
     final ObjectProvider op;
+    final int fieldNumber;
     final MapStore store;
 
     /** The key to add. */
-    private final Object key;
+    final Object key;
 
     /** The value to add. */
-    private final Object value;
+    final Object value;
 
     public MapPutOperation(ObjectProvider op, MapStore store, Object key, Object value)
     {
         this.op = op;
+        this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
         this.store = store;
+        this.key = key;
+        this.value = value;
+    }
+
+    public MapPutOperation(ObjectProvider op, int fieldNum, Object key, Object value)
+    {
+        this.op = op;
+        this.fieldNumber = fieldNum;
+        this.store = null;
         this.key = key;
         this.value = value;
     }
@@ -66,7 +77,10 @@ public class MapPutOperation implements SCOOperation
      */
     public void perform()
     {
-        store.put(op, key, value);
+        if (store != null)
+        {
+            store.put(op, key, value);
+        }
     }
 
     public Store getStore()
@@ -84,6 +98,7 @@ public class MapPutOperation implements SCOOperation
 
     public String toString()
     {
-        return "MAP PUT : " + op + " field=" + store.getOwnerMemberMetaData().getName();
+        return "MAP PUT : " + op + " field=" + 
+            store!=null?store.getOwnerMemberMetaData().getName() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
     }
 }

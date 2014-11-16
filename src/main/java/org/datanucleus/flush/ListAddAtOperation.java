@@ -27,18 +27,29 @@ import org.datanucleus.store.scostore.Store;
 public class ListAddAtOperation implements SCOOperation
 {
     final ObjectProvider op;
+    final int fieldNumber;
     final ListStore store;
 
     /** The value to add. */
-    private final Object value;
+    final Object value;
 
     /** Index to add the object at. */
-    private final int index;
+    final int index;
 
     public ListAddAtOperation(ObjectProvider op, ListStore store, int index, Object value)
     {
         this.op = op;
+        this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
         this.store = store;
+        this.index = index;
+        this.value = value;
+    }
+
+    public ListAddAtOperation(ObjectProvider op, int fieldNum, int index, Object value)
+    {
+        this.op = op;
+        this.fieldNumber = fieldNum;
+        this.store = null;
         this.index = index;
         this.value = value;
     }
@@ -48,7 +59,10 @@ public class ListAddAtOperation implements SCOOperation
      */
     public void perform()
     {
-        store.add(op, value, index, -1);
+        if (store != null)
+        {
+            store.add(op, value, index, -1);
+        }
     }
 
     public Store getStore()
@@ -66,6 +80,7 @@ public class ListAddAtOperation implements SCOOperation
 
     public String toString()
     {
-        return "COLLECTION ADD-AT : " + op + " field=" + store.getOwnerMemberMetaData().getName() + " index=" + index;
+        return "COLLECTION ADD-AT : " + op + " field=" + 
+            (store!=null?store.getOwnerMemberMetaData().getName() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName()) + " index=" + index;
     }
 }

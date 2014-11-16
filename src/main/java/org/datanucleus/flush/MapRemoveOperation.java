@@ -31,10 +31,10 @@ public class MapRemoveOperation implements SCOOperation
     final MapStore store;
 
     /** The key to remove. */
-    private final Object key;
+    final Object key;
 
     /** The value to remove. */
-    private final Object value;
+    final Object value;
 
     public MapRemoveOperation(ObjectProvider op, MapStore store, Object key, Object val)
     {
@@ -105,10 +105,7 @@ public class MapRemoveOperation implements SCOOperation
 
     public String toString()
     {
-        if (store != null)
-        {
-            return "MAP REMOVE : " + op + " field=" + store.getOwnerMemberMetaData().getName();
-        }
-        return "MAP REMOVE : " + op + " field=" + op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
+        return "MAP REMOVE : " + op + " field=" + 
+            (store!=null?store.getOwnerMemberMetaData().getName() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName());
     }
 }

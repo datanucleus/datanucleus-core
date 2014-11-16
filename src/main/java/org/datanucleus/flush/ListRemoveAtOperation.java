@@ -27,15 +27,25 @@ import org.datanucleus.store.scostore.Store;
 public class ListRemoveAtOperation implements SCOOperation
 {
     final ObjectProvider op;
+    final int fieldNumber;
     final ListStore store;
 
     /** The index to remove. */
-    private final int index;
+    final int index;
 
     public ListRemoveAtOperation(ObjectProvider op, ListStore store, int index)
     {
         this.op = op;
+        this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
         this.store = store;
+        this.index = index;
+    }
+
+    public ListRemoveAtOperation(ObjectProvider op, int fieldNum, int index)
+    {
+        this.op = op;
+        this.fieldNumber = fieldNum;
+        this.store = null;
         this.index = index;
     }
 
@@ -44,7 +54,10 @@ public class ListRemoveAtOperation implements SCOOperation
      */
     public void perform()
     {
-        store.remove(op, index, -1);
+        if (store != null)
+        {
+            store.remove(op, index, -1);
+        }
     }
 
     public Store getStore()
@@ -62,6 +75,7 @@ public class ListRemoveAtOperation implements SCOOperation
 
     public String toString()
     {
-        return "COLLECTION REMOVE-AT : " + op + " field=" + store.getOwnerMemberMetaData().getName() + " index=" + index;
+        return "COLLECTION REMOVE-AT : " + op + " field=" + 
+            (store!=null?store.getOwnerMemberMetaData().getName() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName()) + " index=" + index;
     }
 }

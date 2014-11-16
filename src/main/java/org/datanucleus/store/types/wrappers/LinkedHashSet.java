@@ -21,6 +21,7 @@ import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.datanucleus.flush.CollectionAddOperation;
 import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.FetchPlanState;
@@ -327,6 +328,10 @@ public class LinkedHashSet extends java.util.LinkedHashSet implements SCOCollect
         }
         if (success)
         {
+            if (SCOUtils.useQueuedUpdate(ownerOP))
+            {
+                ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element));
+            }
             makeDirty();
             if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
             {
@@ -355,6 +360,13 @@ public class LinkedHashSet extends java.util.LinkedHashSet implements SCOCollect
         }
         if (success)
         {
+            if (SCOUtils.useQueuedUpdate(ownerOP))
+            {
+                for (Object element : elements)
+                {
+                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element));
+                }
+            }
             makeDirty();
             if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
             {

@@ -27,13 +27,14 @@ import org.datanucleus.store.scostore.Store;
 public class ListSetOperation implements SCOOperation
 {
     final ObjectProvider op;
+    final int fieldNumber;
     final ListStore store;
 
     /** The position to set the value at. */
-    private final int index;
+    final int index;
 
     /** The value to set. */
-    private final Object value;
+    final Object value;
 
     /** Whether to allow cascade-delete checks. */
     boolean allowCascadeDelete = true;
@@ -41,7 +42,18 @@ public class ListSetOperation implements SCOOperation
     public ListSetOperation(ObjectProvider op, ListStore store, int index, Object value, boolean allowCascadeDelete)
     {
         this.op = op;
+        this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
         this.store = store;
+        this.index = index;
+        this.value = value;
+        this.allowCascadeDelete = allowCascadeDelete;
+    }
+
+    public ListSetOperation(ObjectProvider op, int fieldNum, int index, Object value, boolean allowCascadeDelete)
+    {
+        this.op = op;
+        this.fieldNumber = fieldNum;
+        this.store = null;
         this.index = index;
         this.value = value;
         this.allowCascadeDelete = allowCascadeDelete;
@@ -52,7 +64,10 @@ public class ListSetOperation implements SCOOperation
      */
     public void perform()
     {
-        store.set(op, index, value, allowCascadeDelete);
+        if (store != null)
+        {
+            store.set(op, index, value, allowCascadeDelete);
+        }
     }
 
     public Store getStore()
@@ -70,6 +85,7 @@ public class ListSetOperation implements SCOOperation
 
     public String toString()
     {
-        return "COLLECTION SET : " + op + " field=" + store.getOwnerMemberMetaData().getName() + " index=" + index;
+        return "COLLECTION SET : " + op + " field=" + 
+            (store!=null?store.getOwnerMemberMetaData().getName() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName()) + " index=" + index;
     }
 }

@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 
+import org.datanucleus.flush.CollectionAddOperation;
 import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.FetchPlanState;
@@ -410,6 +411,10 @@ public class SortedSet extends java.util.AbstractSet implements java.util.Sorted
         }
         if (success)
         {
+            if (SCOUtils.useQueuedUpdate(ownerOP))
+            {
+                ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element));
+            }
             makeDirty();
             if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
             {
@@ -438,6 +443,13 @@ public class SortedSet extends java.util.AbstractSet implements java.util.Sorted
         }
         if (success)
         {
+            if (SCOUtils.useQueuedUpdate(ownerOP))
+            {
+                for (Object element : elements)
+                {
+                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element));
+                }
+            }
             makeDirty();
             if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
             {

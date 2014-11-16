@@ -34,10 +34,10 @@ public class CollectionRemoveOperation implements SCOOperation
     final CollectionStore store;
 
     /** The value to remove. */
-    private final Object value;
+    final Object value;
 
     /** Whether to allow cascade-delete checks. */
-    private final boolean allowCascadeDelete;
+    final boolean allowCascadeDelete;
 
     public CollectionRemoveOperation(ObjectProvider op, CollectionStore store, Object value, boolean allowCascadeDelete)
     {
@@ -92,10 +92,8 @@ public class CollectionRemoveOperation implements SCOOperation
 
     public String toString()
     {
-        if (store != null)
-        {
-            return "COLLECTION REMOVE : " + op + " field=" + store.getOwnerMemberMetaData().getName() + " value=" + StringUtils.toJVMIDString(value);
-        }
-        return "COLLECTION REMOVE : " + op + " field=" + op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName() + " value=" + StringUtils.toJVMIDString(value);
+        return "COLLECTION REMOVE : " + op + " field=" + 
+            (store!=null?store.getOwnerMemberMetaData().getName() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName()) + 
+            " value=" + StringUtils.toJVMIDString(value);
     }
 }
