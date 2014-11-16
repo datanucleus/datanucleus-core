@@ -39,11 +39,8 @@ public class FlushNonReferential implements FlushProcess
     /* (non-Javadoc)
      * @see org.datanucleus.FlushProcess#execute(org.datanucleus.ExecutionContext, java.util.List, java.util.List, org.datanucleus.flush.OperationQueue)
      */
-    public List<NucleusOptimisticException> execute(ExecutionContext ec, List<ObjectProvider> primaryOPs, 
-        List<ObjectProvider> secondaryOPs, OperationQueue opQueue)
+    public List<NucleusOptimisticException> execute(ExecutionContext ec, List<ObjectProvider> primaryOPs, List<ObjectProvider> secondaryOPs, OperationQueue opQueue)
     {
-        // Note that opQueue is not processed here since all datastores this is used with don't use backed SCOs
-
         // Make copy of ObjectProviders so we don't have ConcurrentModification issues
         Set<ObjectProvider> opsToFlush = new HashSet<ObjectProvider>();
         if (primaryOPs != null)
@@ -56,6 +53,9 @@ public class FlushNonReferential implements FlushProcess
             opsToFlush.addAll(secondaryOPs);
             secondaryOPs.clear();
         }
+
+        // Note that opQueue is not currently processed here since all datastores this is used with don't use backed SCOs
+        // TODO Use operationQueue to detect cascade-delete operations
 
         return flushDeleteInsertUpdateGrouped(opsToFlush, ec);
     }
