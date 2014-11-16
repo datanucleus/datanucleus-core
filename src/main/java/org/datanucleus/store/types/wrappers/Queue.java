@@ -22,6 +22,8 @@ import java.util.AbstractQueue;
 import java.util.Comparator;
 import java.util.Iterator;
 
+import org.datanucleus.flush.CollectionAddOperation;
+import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
@@ -348,6 +350,10 @@ public class Queue extends AbstractQueue implements SCOCollection<java.util.Queu
         boolean success = delegate.add(element);
         if (success)
         {
+            if (SCOUtils.useQueuedUpdate(ownerOP))
+            {
+                ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element));
+            }
             makeDirty();
             if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
             {
@@ -367,6 +373,13 @@ public class Queue extends AbstractQueue implements SCOCollection<java.util.Queu
         boolean success = delegate.addAll(elements);
         if (success)
         {
+            if (SCOUtils.useQueuedUpdate(ownerOP))
+            {
+                for (Object element : elements)
+                {
+                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element));
+                }
+            }
             makeDirty();
             if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
             {
@@ -389,7 +402,15 @@ public class Queue extends AbstractQueue implements SCOCollection<java.util.Queu
                 Iterator iter = delegate.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
+                    Object element = iter.next();
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
+                    {
+                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
+                    }
+                    else
+                    {
+                        ownerOP.getExecutionContext().deleteObjectInternal(element);
+                    }
                 }
             }
         }
@@ -461,7 +482,14 @@ public class Queue extends AbstractQueue implements SCOCollection<java.util.Queu
             // Cascade delete
             if (SCOUtils.hasDependentElement(ownerMmd))
             {
-                ownerOP.getExecutionContext().deleteObjectInternal(element);
+                if (SCOUtils.useQueuedUpdate(ownerOP))
+                {
+                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
+                }
+                else
+                {
+                    ownerOP.getExecutionContext().deleteObjectInternal(element);
+                }
             }
         }
 
@@ -494,7 +522,15 @@ public class Queue extends AbstractQueue implements SCOCollection<java.util.Queu
                 Iterator iter = elements.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
+                    Object element = iter.next();
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
+                    {
+                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
+                    }
+                    else
+                    {
+                        ownerOP.getExecutionContext().deleteObjectInternal(element);
+                    }
                 }
             }
         }

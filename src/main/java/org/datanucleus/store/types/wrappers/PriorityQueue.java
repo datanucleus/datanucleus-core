@@ -21,6 +21,8 @@ import java.io.ObjectStreamException;
 import java.util.Comparator;
 import java.util.Iterator;
 
+import org.datanucleus.flush.CollectionAddOperation;
+import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
@@ -382,6 +384,10 @@ public class PriorityQueue extends java.util.PriorityQueue implements SCOCollect
         boolean success = delegate.add(element);
         if (success)
         {
+            if (SCOUtils.useQueuedUpdate(ownerOP))
+            {
+                ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element));
+            }
             makeDirty();
             if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
             {
@@ -401,6 +407,13 @@ public class PriorityQueue extends java.util.PriorityQueue implements SCOCollect
         boolean success = delegate.addAll(elements);
         if (success)
         {
+            if (SCOUtils.useQueuedUpdate(ownerOP))
+            {
+                for (Object element : elements)
+                {
+                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element));
+                }
+            }
             makeDirty();
             if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
             {
@@ -423,7 +436,15 @@ public class PriorityQueue extends java.util.PriorityQueue implements SCOCollect
                 Iterator iter = delegate.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
+                    Object element = iter.next();
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
+                    {
+                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
+                    }
+                    else
+                    {
+                        ownerOP.getExecutionContext().deleteObjectInternal(element);
+                    }
                 }
             }
         }
@@ -495,7 +516,14 @@ public class PriorityQueue extends java.util.PriorityQueue implements SCOCollect
             // Cascade delete
             if (SCOUtils.hasDependentElement(ownerMmd))
             {
-                ownerOP.getExecutionContext().deleteObjectInternal(element);
+                if (SCOUtils.useQueuedUpdate(ownerOP))
+                {
+                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
+                }
+                else
+                {
+                    ownerOP.getExecutionContext().deleteObjectInternal(element);
+                }
             }
         }
 
@@ -528,7 +556,15 @@ public class PriorityQueue extends java.util.PriorityQueue implements SCOCollect
                 Iterator iter = elements.iterator();
                 while (iter.hasNext())
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
+                    Object element = iter.next();
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
+                    {
+                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
+                    }
+                    else
+                    {
+                        ownerOP.getExecutionContext().deleteObjectInternal(element);
+                    }
                 }
             }
         }
