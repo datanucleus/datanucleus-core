@@ -716,7 +716,7 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Accessor for the operation queue.
-     * The queue can be null if 
+     * The queue can be null if there are no operations queued (txn not active, not optimistic, no ops arrived yet).
      * @return The operation queue (typically for collections/maps)
      */
     OperationQueue getOperationQueue();
