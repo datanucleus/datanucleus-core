@@ -567,6 +567,15 @@ public class FederatedStoreManager implements StoreManager
     }
 
     /* (non-Javadoc)
+     * @see org.datanucleus.store.StoreManager#usesBackedSCOWrappers()
+     */
+    @Override
+    public boolean usesBackedSCOWrappers()
+    {
+        return primaryStoreMgr.usesBackedSCOWrappers();
+    }
+
+    /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#getDefaultObjectProviderClassName()
      */
     public String getDefaultObjectProviderClassName()

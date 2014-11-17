@@ -39,11 +39,10 @@ public class FlushOrdered implements FlushProcess
     /* (non-Javadoc)
      * @see org.datanucleus.FlushProcess#execute(org.datanucleus.ExecutionContext, java.util.List, java.util.List, org.datanucleus.flush.OperationQueue)
      */
-    public List<NucleusOptimisticException> execute(ExecutionContext ec, List<ObjectProvider> primaryOPs, 
-        List<ObjectProvider> secondaryOPs, OperationQueue opQueue)
+    public List<NucleusOptimisticException> execute(ExecutionContext ec, List<ObjectProvider> primaryOPs, List<ObjectProvider> secondaryOPs, OperationQueue opQueue)
     {
-        // Note that opQueue is not processed directly here, but instead will be processed
-        // via callbacks from the persistence of other objects
+        // Note that opQueue is not processed directly here, but instead will be processed via callbacks from the persistence of other objects
+        // TODO The opQueue needs to be processed from here instead of via the callbacks, see NUCCORE-904
 
         List<NucleusOptimisticException> optimisticFailures = null;
 
@@ -126,13 +125,13 @@ public class FlushOrdered implements FlushProcess
         {
             for (int i = 0; i < toFlushSecondary.length; i++)
             {
-                ObjectProvider sm = (ObjectProvider) toFlushSecondary[i];
+                ObjectProvider op = (ObjectProvider) toFlushSecondary[i];
                 try
                 {
-                    sm.flush();
+                    op.flush();
                     if (classesToFlush != null)
                     {
-                        classesToFlush.add(sm.getObject().getClass());
+                        classesToFlush.add(op.getObject().getClass());
                     }
                 }
                 catch (NucleusOptimisticException oe)
@@ -144,6 +143,12 @@ public class FlushOrdered implements FlushProcess
                     optimisticFailures.add(oe);
                 }
             }
+        }
+
+        if (opQueue != null && !ec.getStoreManager().usesBackedSCOWrappers())
+        {
+            // This ExecutionContext is not using backing store SCO wrappers, so process SCO Operations for cascade delete etc.
+            opQueue.processOperationsForNoBackingStoreSCOs(ec);
         }
 
         if (classesToFlush != null)

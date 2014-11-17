@@ -20,14 +20,17 @@ package org.datanucleus.flush;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.datanucleus.ExecutionContext;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.scostore.CollectionStore;
 import org.datanucleus.store.scostore.ListStore;
 import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.store.scostore.Store;
+import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -168,6 +171,151 @@ public class OperationQueue
             else
             {
                 oper.perform();
+            }
+        }
+    }
+
+    /**
+     * Method to process all SCO operations where the SCOs don't use a backing store.
+     * This will check for add+remove/remove+add and perform cascade delete as appropriate.
+     * It will then remove the SCO operations from the queue. It doesn't actually process the queued operations since when you have
+     * no backing store there is nothing to do.
+     * @param ec ExecutionContext
+     */
+    public void processOperationsForNoBackingStoreSCOs(ExecutionContext ec)
+    {
+        if (queuedOperations != null && !ec.getStoreManager().usesBackedSCOWrappers())
+        {
+            // Make use of OperationQueue for any cascade deletes that may be needed as a result of removal from collections/maps
+            List<Operation> opsToIgnore = new ArrayList();
+            List<Object> objectsToCascadeDelete = null;
+            Iterator<Operation> opsIter = queuedOperations.listIterator();
+            while (opsIter.hasNext())
+            {
+                Operation op = opsIter.next();
+                if (op instanceof CollectionRemoveOperation)
+                {
+                    // TODO Need to catch cases where user has persisted a new owner object (of same type) and this in the same field.
+                    CollectionRemoveOperation collRemoveOp = (CollectionRemoveOperation)op;
+                    if (collRemoveOp.getStore() == null && SCOUtils.hasDependentElement(collRemoveOp.getMemberMetaData()))
+                    {
+                        // Check for addition of the same element, hence avoiding cascade-delete
+                        boolean needsRemoving = true;
+                        if (opsIter.hasNext())
+                        {
+                            // Check for later addition that negates the cascade delete
+                            ListIterator<Operation> subOpsIter = queuedOperations.listIterator();
+                            while (subOpsIter.hasNext())
+                            {
+                                Operation subOp = subOpsIter.next();
+                                if (subOp instanceof CollectionAddOperation)
+                                {
+                                    CollectionAddOperation collAddOp = (CollectionAddOperation)subOp;
+                                    if (collRemoveOp.getValue().equals(collAddOp.getValue()))
+                                    {
+                                        needsRemoving = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (needsRemoving)
+                        {
+                            if (objectsToCascadeDelete == null)
+                            {
+                                objectsToCascadeDelete = new ArrayList();
+                            }
+                            NucleusLogger.GENERAL.info(">> Flush collection element needs cascade delete " + collRemoveOp.getValue());
+                            objectsToCascadeDelete.add(collRemoveOp.getValue());
+                        }
+                    }
+                }
+                else if (op instanceof MapRemoveOperation)
+                {
+                    MapRemoveOperation mapRemoveOp = (MapRemoveOperation)op;
+                    if (mapRemoveOp.getStore() == null)
+                    {
+                        if (SCOUtils.hasDependentKey(mapRemoveOp.getMemberMetaData()))
+                        {
+                            // Check for later addition of the same key, hence avoiding cascade-delete
+                            boolean keyNeedsRemoving = true;
+                            if (opsIter.hasNext())
+                            {
+                                // Check for later addition that negates the cascade delete
+                                ListIterator<Operation> subOpsIter = queuedOperations.listIterator();
+                                while (subOpsIter.hasNext())
+                                {
+                                    Operation subOp = subOpsIter.next();
+                                    if (subOp instanceof MapPutOperation)
+                                    {
+                                        MapPutOperation mapPutOp = (MapPutOperation)subOp;
+                                        if (mapRemoveOp.getKey().equals(mapPutOp.getKey()))
+                                        {
+                                            keyNeedsRemoving = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if (keyNeedsRemoving)
+                            {
+                                if (objectsToCascadeDelete == null)
+                                {
+                                    objectsToCascadeDelete = new ArrayList();
+                                }
+                                objectsToCascadeDelete.add(mapRemoveOp.getKey());
+                            }
+                        }
+                        else if (SCOUtils.hasDependentValue(mapRemoveOp.getMemberMetaData()))
+                        {
+                            // Check for later addition of the same value, hence avoiding cascade-delete
+                            boolean valNeedsRemoving = true;
+                            if (opsIter.hasNext())
+                            {
+                                // Check for later addition that negates the cascade delete
+                                ListIterator<Operation> subOpsIter = queuedOperations.listIterator();
+                                while (subOpsIter.hasNext())
+                                {
+                                    Operation subOp = subOpsIter.next();
+                                    if (subOp instanceof MapPutOperation)
+                                    {
+                                        MapPutOperation mapPutOp = (MapPutOperation)subOp;
+                                        if (mapRemoveOp.getValue().equals(mapPutOp.getValue()))
+                                        {
+                                            valNeedsRemoving = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if (valNeedsRemoving)
+                            {
+                                if (objectsToCascadeDelete == null)
+                                {
+                                    objectsToCascadeDelete = new ArrayList();
+                                }
+                                objectsToCascadeDelete.add(mapRemoveOp.getValue());
+                            }
+                        }
+                    }
+                }
+
+                if (op instanceof SCOOperation)
+                {
+                    opsToIgnore.add(op);
+                }
+            }
+
+            // Remove all SCO operations since we don't have backing store SCOs here
+            queuedOperations.removeAll(opsToIgnore);
+
+            if (objectsToCascadeDelete != null)
+            {
+                for (Object deleteObj : objectsToCascadeDelete)
+                {
+                    NucleusLogger.PERSISTENCE.debug("Initiating cascade delete of " + deleteObj);
+                    ec.deleteObjectInternal(deleteObj);
+                }
             }
         }
     }

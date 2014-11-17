@@ -419,4 +419,10 @@ public interface StoreManager
     void transactionRolledBack(ExecutionContext ec);
 
     String getDefaultObjectProviderClassName();
+
+    /**
+     * Whether this store manager uses backing-store based SCO wrappers.
+     * @return Whether this store provides backing stores for SCO wrappers.
+     */
+    boolean usesBackedSCOWrappers();
 }
