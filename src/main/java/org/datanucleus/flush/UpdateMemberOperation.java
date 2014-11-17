@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.flush;
 
+import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.ObjectProvider;
 
 /**
@@ -33,6 +34,15 @@ public class UpdateMemberOperation implements Operation
         this.op = op;
         this.fieldNumber = fieldNum;
         this.newValue = newVal;
+    }
+
+    /**
+     * Accessor for the metadata for the member that this operation is for.
+     * @return The member metadata
+     */
+    public AbstractMemberMetaData getMemberMetaData()
+    {
+        return op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
     }
 
     /* (non-Javadoc)
@@ -53,6 +63,6 @@ public class UpdateMemberOperation implements Operation
 
     public String toString()
     {
-        return "UPDATE : " + op + " field=" + op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
+        return "UPDATE : " + op + " field=" + getMemberMetaData().getName();
     }
 }
