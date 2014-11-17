@@ -19,39 +19,25 @@ package org.datanucleus.flush;
 
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.scostore.ListStore;
-import org.datanucleus.store.scostore.Store;
 
 /**
  * Add operation at a position for a list where we have a backing store.
  */
-public class ListAddAtOperation implements SCOOperation
+public class ListAddAtOperation extends CollectionAddOperation
 {
-    final ObjectProvider op;
-    final int fieldNumber;
-    final ListStore store;
-
-    /** The value to add. */
-    final Object value;
-
     /** Index to add the object at. */
     final int index;
 
     public ListAddAtOperation(ObjectProvider op, ListStore store, int index, Object value)
     {
-        this.op = op;
-        this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
-        this.store = store;
+        super(op, store, value);
         this.index = index;
-        this.value = value;
     }
 
     public ListAddAtOperation(ObjectProvider op, int fieldNum, int index, Object value)
     {
-        this.op = op;
-        this.fieldNumber = fieldNum;
-        this.store = null;
+        super(op, fieldNum, value);
         this.index = index;
-        this.value = value;
     }
 
     /**
@@ -61,26 +47,13 @@ public class ListAddAtOperation implements SCOOperation
     {
         if (store != null)
         {
-            store.add(op, value, index, -1);
+            ((ListStore)store).add(op, value, index, -1);
         }
-    }
-
-    public Store getStore()
-    {
-        return store;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.flush.Operation#getObjectProvider()
-     */
-    public ObjectProvider getObjectProvider()
-    {
-        return op;
     }
 
     public String toString()
     {
-        return "COLLECTION ADD-AT : " + op + " field=" + 
+        return "LIST ADD-AT : " + op + " field=" + 
             (store!=null?store.getOwnerMemberMetaData().getName() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName()) + " index=" + index;
     }
 }

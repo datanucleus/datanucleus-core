@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.flush;
 
+import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.scostore.CollectionStore;
 import org.datanucleus.store.scostore.Store;
@@ -42,6 +43,15 @@ public class CollectionClearOperation implements SCOOperation
         this.op = op;
         this.fieldNumber = fieldNum;
         this.store = null;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.flush.SCOOperation#getMemberMetaData()
+     */
+    @Override
+    public AbstractMemberMetaData getMemberMetaData()
+    {
+        return store != null ? store.getOwnerMemberMetaData() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
     }
 
     /**

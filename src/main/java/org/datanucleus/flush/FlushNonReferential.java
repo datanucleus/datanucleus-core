@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
@@ -33,6 +34,8 @@ import org.datanucleus.util.NucleusLogger;
 /**
  * Flush method for cases where the datastore doesn't use referential integrity so we can send batches
  * of deletes, then batches of inserts, then any updates to optimise the persistence.
+ * This also makes use of the OperationQueue to do more intelligent handling of cascade delete when elements are removed
+ * from Collections, checking if it is later added to a different collection.
  */
 public class FlushNonReferential implements FlushProcess
 {
@@ -54,10 +57,81 @@ public class FlushNonReferential implements FlushProcess
             secondaryOPs.clear();
         }
 
-        // Note that opQueue is not currently processed here since all datastores this is used with don't use backed SCOs
-        // TODO Use operationQueue to detect cascade-delete operations
+        // Process all delete, insert and update of objects
+        List<NucleusOptimisticException> excptns = flushDeleteInsertUpdateGrouped(opsToFlush, ec);
 
-        return flushDeleteInsertUpdateGrouped(opsToFlush, ec);
+        if (opQueue != null)
+        {
+            // Make use of OperationQueue for any cascade deletes that may be needed as a result of removal from collections/maps
+            List<Operation> opsToIgnore = new ArrayList();
+            List<Operation> opsToCascadeDelete = null;
+            List<Operation> ops = opQueue.getOperations();
+            Iterator<Operation> opsIter = ops.listIterator();
+            int index = 0;
+            while (opsIter.hasNext())
+            {
+                Operation op = opsIter.next();
+                if (op instanceof CollectionRemoveOperation)
+                {
+                    CollectionRemoveOperation collRemoveOp = (CollectionRemoveOperation)op;
+                    boolean needsRemoving = true;
+                    if (collRemoveOp.getStore() == null && opsIter.hasNext()) // TODO Do the Cascade delete check here rather than in the wrapper?
+                    {
+                        // Check for later addition that negates the cascade delete
+                        ListIterator<Operation> subOpsIter = ops.listIterator(index+1);
+                        while (subOpsIter.hasNext())
+                        {
+                            Operation subOp = subOpsIter.next();
+                            if (subOp instanceof CollectionAddOperation)
+                            {
+                                CollectionAddOperation collAddOp = (CollectionAddOperation)subOp;
+                                if (collRemoveOp.getValue().equals(collAddOp.getValue()))
+                                {
+                                    needsRemoving = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (needsRemoving)
+                    {
+                        if (opsToCascadeDelete == null)
+                        {
+                            opsToCascadeDelete = new ArrayList();
+                        }
+                        opsToCascadeDelete.add(collRemoveOp);
+                    }
+                }
+                else if (op instanceof MapRemoveOperation)
+                {
+                    // TODO Support map removal and cascade delete also
+                }
+
+                if (op instanceof SCOOperation)
+                {
+                    opsToIgnore.add(op);
+                }
+                index++;
+            }
+
+            // Remove all SCO operations since we don't have backing store SCOs here
+            opQueue.removeOperations(opsToIgnore);
+
+            if (opsToCascadeDelete != null)
+            {
+                for (Operation op : opsToCascadeDelete)
+                {
+                    if (op instanceof CollectionRemoveOperation)
+                    {
+                        CollectionRemoveOperation collRemoveOp = (CollectionRemoveOperation)op;
+                        NucleusLogger.PERSISTENCE.debug("Initiating cascade delete of " + collRemoveOp.getValue());
+                        ec.deleteObjectInternal(collRemoveOp.getValue());
+                    }
+                }
+            }
+        }
+
+        return excptns;
     }
 
     /**

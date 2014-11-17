@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.flush;
 
+import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.scostore.ListStore;
 import org.datanucleus.store.scostore.Store;
@@ -57,6 +58,15 @@ public class ListSetOperation implements SCOOperation
         this.index = index;
         this.value = value;
         this.allowCascadeDelete = allowCascadeDelete;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.flush.SCOOperation#getMemberMetaData()
+     */
+    @Override
+    public AbstractMemberMetaData getMemberMetaData()
+    {
+        return store != null ? store.getOwnerMemberMetaData() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
     }
 
     /**

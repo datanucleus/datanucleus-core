@@ -59,7 +59,7 @@ public class OperationQueue
      */
     public synchronized void log()
     {
-        NucleusLogger.GENERAL.debug(">> OperationQueue :");
+        NucleusLogger.GENERAL.debug(">> OperationQueue :" + (queuedOperations.isEmpty() ? " Empty" : ("" + queuedOperations.size() + " operations")));
         for (Operation op : queuedOperations)
         {
             NucleusLogger.GENERAL.debug(">> " + op);
@@ -78,6 +78,11 @@ public class OperationQueue
     public List<Operation> getOperations()
     {
         return Collections.unmodifiableList(queuedOperations);
+    }
+
+    public void removeOperations(List<Operation> removedOps)
+    {
+        queuedOperations.removeAll(removedOps);
     }
 
     /**
@@ -103,8 +108,7 @@ public class OperationQueue
     {
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023005", 
-                op.getObjectAsPrintable(), store.getOwnerMemberMetaData().getFullFieldName()));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023005", op.getObjectAsPrintable(), store.getOwnerMemberMetaData().getFullFieldName()));
         }
 
         // Extract those operations for the specified backing store
@@ -177,8 +181,7 @@ public class OperationQueue
      * @param listIter The iterator of operations
      * @return Whether this is an ADD that has a REMOVE of the same element immediately after
      */
-    protected static boolean isAddFollowedByRemoveOnSameSCO(Store store, ObjectProvider op, 
-            Operation currentOper, ListIterator<Operation> listIter)
+    protected static boolean isAddFollowedByRemoveOnSameSCO(Store store, ObjectProvider op, Operation currentOper, ListIterator<Operation> listIter)
     {
         if (CollectionAddOperation.class.isInstance(currentOper))
         {
@@ -194,10 +197,8 @@ public class OperationQueue
                     if (value == CollectionRemoveOperation.class.cast(operNext).getValue())
                     {
                         addThenRemove = true;
-                        NucleusLogger.PERSISTENCE.info(
-                            "Member " + store.getOwnerMemberMetaData().getFullFieldName() + 
-                            " of " + StringUtils.toJVMIDString(op.getObject()) +
-                            " had an add then a remove of element " + 
+                        NucleusLogger.PERSISTENCE.info("Member " + store.getOwnerMemberMetaData().getFullFieldName() + 
+                            " of " + StringUtils.toJVMIDString(op.getObject()) + " had an add then a remove of element " + 
                             StringUtils.toJVMIDString(value) + " - operations ignored");
                     }
                 }
@@ -219,8 +220,7 @@ public class OperationQueue
      * @param listIter The iterator of operations
      * @return Whether this is a REMOVE that has an ADD of the same element immediately after
      */
-    protected static boolean isRemoveFollowedByAddOnSameSCO(Store store, ObjectProvider op, 
-            Operation currentOper, ListIterator<Operation> listIter)
+    protected static boolean isRemoveFollowedByAddOnSameSCO(Store store, ObjectProvider op, Operation currentOper, ListIterator<Operation> listIter)
     {
         if (CollectionRemoveOperation.class.isInstance(currentOper))
         {
@@ -236,10 +236,8 @@ public class OperationQueue
                     if (value == CollectionAddOperation.class.cast(opNext).getValue())
                     {
                         removeThenAdd = true;
-                        NucleusLogger.PERSISTENCE.info(
-                            "Member" + store.getOwnerMemberMetaData().getFullFieldName() + 
-                            " of " + StringUtils.toJVMIDString(op.getObject()) +
-                            " had a remove then add of element " + 
+                        NucleusLogger.PERSISTENCE.info("Member" + store.getOwnerMemberMetaData().getFullFieldName() + 
+                            " of " + StringUtils.toJVMIDString(op.getObject()) + " had a remove then add of element " + 
                             StringUtils.toJVMIDString(value) + " - operations ignored");
                     }
                 }
@@ -261,8 +259,7 @@ public class OperationQueue
      * @param listIter The iterator of operations
      * @return Whether this is a PUT that has a REMOVE of the same key immediately after
      */
-    protected static boolean isPutFollowedByRemoveOnSameSCO(Store store, ObjectProvider op, 
-            Operation currentOper, ListIterator<Operation> listIter)
+    protected static boolean isPutFollowedByRemoveOnSameSCO(Store store, ObjectProvider op, Operation currentOper, ListIterator<Operation> listIter)
     {
         if (MapPutOperation.class.isInstance(currentOper))
         {
@@ -278,10 +275,8 @@ public class OperationQueue
                     if (key == MapRemoveOperation.class.cast(operNext).getKey())
                     {
                         putThenRemove = true;
-                        NucleusLogger.PERSISTENCE.info(
-                            "Member " + store.getOwnerMemberMetaData().getFullFieldName() + 
-                            " of " + StringUtils.toJVMIDString(op.getObject()) +
-                            " had a put then a remove of key " + 
+                        NucleusLogger.PERSISTENCE.info("Member " + store.getOwnerMemberMetaData().getFullFieldName() + 
+                            " of " + StringUtils.toJVMIDString(op.getObject()) + " had a put then a remove of key " + 
                             StringUtils.toJVMIDString(key) + " - operations ignored");
                     }
                 }

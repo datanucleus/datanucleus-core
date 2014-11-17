@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.flush;
 
+import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.scostore.Store;
 
 /**
@@ -24,6 +25,12 @@ import org.datanucleus.store.scostore.Store;
  */
 public interface SCOOperation extends Operation
 {
+    /**
+     * Accessor for the metadata for the member that this operation is for.
+     * @return The member metadata
+     */
+    AbstractMemberMetaData getMemberMetaData();
+
     /**
      * Accessor for the backing store for this operation.
      * @return The backing store
