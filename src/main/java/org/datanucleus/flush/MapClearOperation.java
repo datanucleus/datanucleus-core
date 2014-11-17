@@ -80,7 +80,6 @@ public class MapClearOperation implements SCOOperation
 
     public String toString()
     {
-        return "MAP CLEAR : " + op + " field=" +
-            (store!=null?store.getOwnerMemberMetaData().getName() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName());
+        return "MAP CLEAR : " + op + " field=" + getMemberMetaData().getName();
     }
 }

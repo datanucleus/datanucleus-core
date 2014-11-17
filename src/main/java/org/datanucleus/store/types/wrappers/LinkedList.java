@@ -558,21 +558,22 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
         if (ownerOP != null && !delegate.isEmpty())
         {
             // Cascade delete
-            if (SCOUtils.hasDependentElement(ownerMmd))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 java.util.List copy = new java.util.ArrayList(delegate);
                 Iterator iter = copy.iterator();
                 while (iter.hasNext())
                 {
-                    Object element = iter.next();
-                    if (SCOUtils.useQueuedUpdate(ownerOP))
-                    {
-                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
-                    }
-                    else
-                    {
-                        ownerOP.getExecutionContext().deleteObjectInternal(element);
-                    }
+                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                }
+            }
+            else if (SCOUtils.hasDependentElement(ownerMmd))
+            {
+                java.util.List copy = new java.util.ArrayList(delegate);
+                Iterator iter = copy.iterator();
+                while (iter.hasNext())
+                {
+                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
                 }
             }
         }
@@ -604,9 +605,9 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
             // Cascade delete
             if (SCOUtils.useQueuedUpdate(ownerOP))
             {
-                ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
+                ownerOP.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), index, element));
             }
-            else
+            else if (SCOUtils.hasDependentElement(ownerMmd))
             {
                 ownerOP.getExecutionContext().deleteObjectInternal(element);
             }
@@ -651,7 +652,7 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
             }
-            else
+            else if (SCOUtils.hasDependentElement(ownerMmd))
             {
                 ownerOP.getExecutionContext().deleteObjectInternal(element);
             }
@@ -691,20 +692,20 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
         if (ownerOP != null && elements != null && !elements.isEmpty())
         {
             // Cascade delete
-            if (SCOUtils.hasDependentElement(ownerMmd))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 Iterator iter = elements.iterator();
                 while (iter.hasNext())
                 {
-                    Object element = iter.next();
-                    if (SCOUtils.useQueuedUpdate(ownerOP))
-                    {
-                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
-                    }
-                    else
-                    {
-                        ownerOP.getExecutionContext().deleteObjectInternal(element);
-                    }
+                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                }
+            }
+            else if (SCOUtils.hasDependentElement(ownerMmd))
+            {
+                Iterator iter = elements.iterator();
+                while (iter.hasNext())
+                {
+                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
                 }
             }
         }
@@ -727,24 +728,7 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
      **/
     public Object removeFirst()
     {
-        Object element = delegate.removeFirst();
-
-        if (ownerOP != null && SCOUtils.hasDependentElement(ownerMmd))
-        {
-            // Cascade delete
-            ownerOP.getExecutionContext().deleteObjectInternal(element);
-        }
-
-        if (SCOUtils.useQueuedUpdate(ownerOP))
-        {
-            ownerOP.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), 0));
-        }
-        makeDirty();
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
-        {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
-        }
-        return element;
+        return remove(0);
     }
 
     /**
@@ -753,24 +737,7 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
      */
     public Object removeLast()
     {
-        Object element = delegate.removeLast();
-
-        if (ownerOP != null && SCOUtils.hasDependentElement(ownerMmd))
-        {
-            // Cascade delete
-            ownerOP.getExecutionContext().deleteObjectInternal(element);
-        }
-
-        if (SCOUtils.useQueuedUpdate(ownerOP))
-        {
-            ownerOP.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), 0));
-        }
-        makeDirty();
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
-        {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
-        }
-        return element;
+        return remove(size()-1);
     }
 
     /**
@@ -807,16 +774,13 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
         if (ownerOP != null && allowDependentField && !delegate.contains(prevElement))
         {
             // Cascade delete
-            if (SCOUtils.hasDependentElement(ownerMmd))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
-                if (SCOUtils.useQueuedUpdate(ownerOP))
-                {
-                    ownerOP.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), index));
-                }
-                else
-                {
-                    ownerOP.getExecutionContext().deleteObjectInternal(prevElement);
-                }
+                ownerOP.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), index, prevElement));
+            }
+            else if (SCOUtils.hasDependentElement(ownerMmd))
+            {
+                ownerOP.getExecutionContext().deleteObjectInternal(prevElement);
             }
         }
 

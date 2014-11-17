@@ -521,21 +521,22 @@ public class ArrayList extends java.util.ArrayList implements SCOList<java.util.
         if (ownerOP != null && !delegate.isEmpty())
         {
             // Cascade delete
-            if (SCOUtils.hasDependentElement(ownerMmd))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 java.util.List copy = new java.util.ArrayList(delegate);
                 Iterator iter = copy.iterator();
                 while (iter.hasNext())
                 {
-                    Object element = iter.next();
-                    if (SCOUtils.useQueuedUpdate(ownerOP))
-                    {
-                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
-                    }
-                    else
-                    {
-                        ownerOP.getExecutionContext().deleteObjectInternal(element);
-                    }
+                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                }
+            }
+            else if (SCOUtils.hasDependentElement(ownerMmd))
+            {
+                java.util.List copy = new java.util.ArrayList(delegate);
+                Iterator iter = copy.iterator();
+                while (iter.hasNext())
+                {
+                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
                 }
             }
         }
@@ -575,16 +576,13 @@ public class ArrayList extends java.util.ArrayList implements SCOList<java.util.
         if (ownerOP != null && allowCascadeDelete)
         {
             // Cascade delete
-            if (SCOUtils.hasDependentElement(ownerMmd))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
-                if (SCOUtils.useQueuedUpdate(ownerOP))
-                {
-                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
-                }
-                else
-                {
-                    ownerOP.getExecutionContext().deleteObjectInternal(element);
-                }
+                ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
+            }
+            else if (SCOUtils.hasDependentElement(ownerMmd))
+            {
+                ownerOP.getExecutionContext().deleteObjectInternal(element);
             }
         }
 
@@ -616,20 +614,17 @@ public class ArrayList extends java.util.ArrayList implements SCOList<java.util.
         if (ownerOP != null)
         {
             // Cascade delete
-            if (SCOUtils.hasDependentElement(ownerMmd))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
-                if (SCOUtils.useQueuedUpdate(ownerOP))
-                {
-                    ownerOP.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), index));
-                }
-                else
-                {
-                    ownerOP.getExecutionContext().deleteObjectInternal(element);
-                }
+                ownerOP.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), index, element));
+            }
+            else if (SCOUtils.hasDependentElement(ownerMmd))
+            {
+                ownerOP.getExecutionContext().deleteObjectInternal(element);
             }
         }
-
         makeDirty();
+
         if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
         {
             ownerOP.getExecutionContext().processNontransactionalUpdate();
@@ -659,20 +654,20 @@ public class ArrayList extends java.util.ArrayList implements SCOList<java.util.
         if (ownerOP != null && elements != null && !elements.isEmpty())
         {
             // Cascade delete
-            if (SCOUtils.hasDependentElement(ownerMmd))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
                 Iterator iter = elements.iterator();
                 while (iter.hasNext())
                 {
-                    Object element = iter.next();
-                    if (SCOUtils.useQueuedUpdate(ownerOP))
-                    {
-                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
-                    }
-                    else
-                    {
-                        ownerOP.getExecutionContext().deleteObjectInternal(element);
-                    }
+                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                }
+            }
+            else if (SCOUtils.hasDependentElement(ownerMmd))
+            {
+                Iterator iter = elements.iterator();
+                while (iter.hasNext())
+                {
+                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
                 }
             }
         }
@@ -723,16 +718,13 @@ public class ArrayList extends java.util.ArrayList implements SCOList<java.util.
         if (ownerOP != null && allowDependentField && !delegate.contains(prevElement))
         {
             // Cascade delete
-            if (SCOUtils.hasDependentElement(ownerMmd))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
-                if (SCOUtils.useQueuedUpdate(ownerOP))
-                {
-                    ownerOP.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), index));
-                }
-                else
-                {
-                    ownerOP.getExecutionContext().deleteObjectInternal(prevElement);
-                }
+                ownerOP.getExecutionContext().addOperationToQueue(new ListRemoveAtOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), index, prevElement));
+            }
+            else if (SCOUtils.hasDependentElement(ownerMmd))
+            {
+                ownerOP.getExecutionContext().deleteObjectInternal(prevElement);
             }
         }
 

@@ -80,7 +80,6 @@ public class CollectionClearOperation implements SCOOperation
 
     public String toString()
     {
-        return "COLLECTION CLEAR : " + op + " field=" + 
-            (store!=null?store.getOwnerMemberMetaData().getName() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName());
+        return "COLLECTION CLEAR : " + op + " field=" + getMemberMetaData().getName();
     }
 }

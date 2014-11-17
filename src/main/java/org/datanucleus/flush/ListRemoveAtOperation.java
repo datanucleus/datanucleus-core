@@ -25,28 +25,20 @@ import org.datanucleus.store.scostore.Store;
 /**
  * Remove operation for a list at a particular index where we have a backing store.
  */
-public class ListRemoveAtOperation implements SCOOperation
+public class ListRemoveAtOperation extends CollectionRemoveOperation
 {
-    final ObjectProvider op;
-    final int fieldNumber;
-    final ListStore store;
-
     /** The index to remove. */
     final int index;
 
     public ListRemoveAtOperation(ObjectProvider op, ListStore store, int index)
     {
-        this.op = op;
-        this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
-        this.store = store;
+        super(op, store, null, true);
         this.index = index;
     }
 
-    public ListRemoveAtOperation(ObjectProvider op, int fieldNum, int index)
+    public ListRemoveAtOperation(ObjectProvider op, int fieldNum, int index, Object value)
     {
-        this.op = op;
-        this.fieldNumber = fieldNum;
-        this.store = null;
+        super(op, fieldNum, value, true);
         this.index = index;
     }
 
@@ -66,7 +58,7 @@ public class ListRemoveAtOperation implements SCOOperation
     {
         if (store != null)
         {
-            store.remove(op, index, -1);
+            ((ListStore)store).remove(op, index, -1);
         }
     }
 
@@ -85,7 +77,6 @@ public class ListRemoveAtOperation implements SCOOperation
 
     public String toString()
     {
-        return "COLLECTION REMOVE-AT : " + op + " field=" + 
-            (store!=null?store.getOwnerMemberMetaData().getName() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName()) + " index=" + index;
+        return "LIST REMOVE-AT : " + op + " field=" + getMemberMetaData().getName() + " index=" + index;
     }
 }

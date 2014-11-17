@@ -102,8 +102,6 @@ public class CollectionRemoveOperation implements SCOOperation
 
     public String toString()
     {
-        return "COLLECTION REMOVE : " + op + " field=" + 
-            (store!=null?store.getOwnerMemberMetaData().getName() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName()) + 
-            " value=" + StringUtils.toJVMIDString(value);
+        return "COLLECTION REMOVE : " + op + " field=" + getMemberMetaData().getName() + " value=" + StringUtils.toJVMIDString(value);
     }
 }

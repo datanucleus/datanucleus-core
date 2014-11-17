@@ -115,7 +115,5 @@ public class MapRemoveOperation implements SCOOperation
 
     public String toString()
     {
-        return "MAP REMOVE : " + op + " field=" + 
-            (store!=null?store.getOwnerMemberMetaData().getName() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName());
-    }
+        return "MAP REMOVE : " + op + " field=" + getMemberMetaData().getName();    }
 }

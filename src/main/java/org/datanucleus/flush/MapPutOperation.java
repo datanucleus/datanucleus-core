@@ -108,7 +108,6 @@ public class MapPutOperation implements SCOOperation
 
     public String toString()
     {
-        return "MAP PUT : " + op + " field=" + 
-            store!=null?store.getOwnerMemberMetaData().getName() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
+        return "MAP PUT : " + op + " field=" + getMemberMetaData().getName();
     }
 }

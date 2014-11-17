@@ -394,22 +394,22 @@ public class Collection extends AbstractCollection implements SCOCollection<java
         if (ownerOP != null && !delegate.isEmpty())
         {
             // Cascade delete
-            if (SCOUtils.hasDependentElement(ownerMmd))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
+            {
+                // Queue the cascade delete
+                Iterator iter = delegate.iterator();
+                while (iter.hasNext())
+                {
+                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                }
+            }
+            else if (SCOUtils.hasDependentElement(ownerMmd))
             {
                 Iterator iter = delegate.iterator();
                 while (iter.hasNext())
                 {
-                    Object element = iter.next();
-                    if (SCOUtils.useQueuedUpdate(ownerOP))
-                    {
-                        // Queue the cascade delete
-                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
-                    }
-                    else
-                    {
-                        // Perform the cascade delete
-                        ownerOP.getExecutionContext().deleteObjectInternal(element);
-                    }
+                    // Perform the cascade delete
+                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
                 }
             }
         }
@@ -450,18 +450,15 @@ public class Collection extends AbstractCollection implements SCOCollection<java
         if (ownerOP != null && allowCascadeDelete)
         {
             // Cascade delete
-            if (SCOUtils.hasDependentElement(ownerMmd))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
-                if (SCOUtils.useQueuedUpdate(ownerOP))
-                {
-                    // Queue the cascade delete
-                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
-                }
-                else
-                {
-                    // Perform the cascade delete
-                    ownerOP.getExecutionContext().deleteObjectInternal(element);
-                }
+                // Queue the cascade delete
+                ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, allowCascadeDelete));
+            }
+            else if (SCOUtils.hasDependentElement(ownerMmd))
+            {
+                // Perform the cascade delete
+                ownerOP.getExecutionContext().deleteObjectInternal(element);
             }
         }
 
@@ -499,22 +496,22 @@ public class Collection extends AbstractCollection implements SCOCollection<java
         if (ownerOP != null && elements != null && !elements.isEmpty())
         {
             // Cascade delete
-            if (SCOUtils.hasDependentElement(ownerMmd))
+            if (SCOUtils.useQueuedUpdate(ownerOP))
             {
+                // Queue the cascade delete
                 Iterator iter = elements.iterator();
                 while (iter.hasNext())
                 {
-                    Object element = iter.next();
-                    if (SCOUtils.useQueuedUpdate(ownerOP))
-                    {
-                        // Queue the cascade delete
-                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), element, true));
-                    }
-                    else
-                    {
-                        // Perform the cascade delete
-                        ownerOP.getExecutionContext().deleteObjectInternal(element);
-                    }
+                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                }
+            }
+            else if (SCOUtils.hasDependentElement(ownerMmd))
+            {
+                // Perform the cascade delete
+                Iterator iter = elements.iterator();
+                while (iter.hasNext())
+                {
+                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
                 }
             }
         }

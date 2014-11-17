@@ -21,6 +21,8 @@ import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.datanucleus.flush.MapPutOperation;
+import org.datanucleus.flush.MapRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
@@ -332,7 +334,16 @@ public class Properties extends java.util.Properties implements SCOMap<java.util
         if (ownerOP != null && !delegate.isEmpty())
         {
             // Cascade delete
-            if (SCOUtils.hasDependentKey(ownerMmd) || SCOUtils.hasDependentValue(ownerMmd)) 
+            if (SCOUtils.useQueuedUpdate(ownerOP))
+            {
+                Iterator<Map.Entry<Object, Object>> entryIter = delegate.entrySet().iterator();
+                while (entryIter.hasNext())
+                {
+                    Map.Entry entry = entryIter.next();
+                    ownerOP.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), entry.getKey(), entry.getValue()));
+                }
+            }
+            else if (SCOUtils.hasDependentKey(ownerMmd) || SCOUtils.hasDependentValue(ownerMmd)) 
             {
                 Iterator<Map.Entry<Object, Object>> entryIter = delegate.entrySet().iterator();
                 while (entryIter.hasNext())
@@ -368,6 +379,11 @@ public class Properties extends java.util.Properties implements SCOMap<java.util
     {
         Object oldValue = delegate.put(key, value);
         makeDirty();
+        if (SCOUtils.useQueuedUpdate(ownerOP))
+        {
+            ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), key, value));
+        }
+
         if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
         {
             ownerOP.getExecutionContext().processNontransactionalUpdate();
@@ -383,6 +399,16 @@ public class Properties extends java.util.Properties implements SCOMap<java.util
     {
         delegate.putAll(m);
         makeDirty();
+        if (SCOUtils.useQueuedUpdate(ownerOP))
+        {
+            Iterator<Map.Entry> entryIter = m.entrySet().iterator();
+            while (entryIter.hasNext())
+            {
+                Map.Entry entry = entryIter.next();
+                ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), entry.getKey(), entry.getValue()));
+            }
+        }
+
         if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
         {
             ownerOP.getExecutionContext().processNontransactionalUpdate();
@@ -401,7 +427,11 @@ public class Properties extends java.util.Properties implements SCOMap<java.util
         if (ownerOP != null)
         {
             // Cascade delete
-            if (SCOUtils.hasDependentKey(ownerMmd) || SCOUtils.hasDependentValue(ownerMmd)) 
+            if (SCOUtils.useQueuedUpdate(ownerOP))
+            {
+                ownerOP.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), key, value));
+            }
+            else if (SCOUtils.hasDependentKey(ownerMmd) || SCOUtils.hasDependentValue(ownerMmd)) 
             {
                 if (SCOUtils.hasDependentKey(ownerMmd))
                 {

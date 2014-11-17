@@ -95,7 +95,6 @@ public class ListSetOperation implements SCOOperation
 
     public String toString()
     {
-        return "COLLECTION SET : " + op + " field=" + 
-            (store!=null?store.getOwnerMemberMetaData().getName() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName()) + " index=" + index;
+        return "LIST SET : " + op + " field=" + getMemberMetaData().getName() + " index=" + index;
     }
 }

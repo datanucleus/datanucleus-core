@@ -53,7 +53,6 @@ public class ListAddAtOperation extends CollectionAddOperation
 
     public String toString()
     {
-        return "LIST ADD-AT : " + op + " field=" + 
-            (store!=null?store.getOwnerMemberMetaData().getName() : op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName()) + " index=" + index;
+        return "LIST ADD-AT : " + op + " field=" + getMemberMetaData().getName() + " index=" + index;
     }
 }
