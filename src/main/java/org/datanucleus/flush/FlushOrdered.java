@@ -145,10 +145,14 @@ public class FlushOrdered implements FlushProcess
             }
         }
 
-        if (opQueue != null && !ec.getStoreManager().usesBackedSCOWrappers())
+        if (opQueue != null)
         {
-            // This ExecutionContext is not using backing store SCO wrappers, so process SCO Operations for cascade delete etc.
-            opQueue.processOperationsForNoBackingStoreSCOs(ec);
+            if (!ec.getStoreManager().usesBackedSCOWrappers())
+            {
+                // This ExecutionContext is not using backing store SCO wrappers, so process SCO Operations for cascade delete etc.
+                opQueue.processOperationsForNoBackingStoreSCOs(ec);
+            }
+            opQueue.clearPersistDeleteUpdateOperations();
         }
 
         if (classesToFlush != null)

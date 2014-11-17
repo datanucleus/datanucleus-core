@@ -59,9 +59,14 @@ public class FlushNonReferential implements FlushProcess
         // Process all delete, insert and update of objects
         List<NucleusOptimisticException> excptns = flushDeleteInsertUpdateGrouped(opsToFlush, ec);
 
-        if (opQueue != null && !ec.getStoreManager().usesBackedSCOWrappers())
+        if (opQueue != null)
         {
-            opQueue.processOperationsForNoBackingStoreSCOs(ec);
+            if (!ec.getStoreManager().usesBackedSCOWrappers())
+            {
+                // This ExecutionContext is not using backing store SCO wrappers, so process SCO Operations for cascade delete etc.
+                opQueue.processOperationsForNoBackingStoreSCOs(ec);
+            }
+            opQueue.clearPersistDeleteUpdateOperations();
         }
 
         return excptns;

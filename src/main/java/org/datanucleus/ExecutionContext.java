@@ -722,6 +722,13 @@ public interface ExecutionContext extends ExecutionContextReference
     OperationQueue getOperationQueue();
 
     /**
+     * Accessor for whether the operation queue is currently active.
+     * Will return false if not delaying flush, or not in a transaction, or flushing.
+     * @return Whether the operation queue is active for adding operations
+     */
+    boolean operationQueueIsActive();
+
+    /**
      * Method to add an operation to the queue.
      * @param oper The operation to add
      */

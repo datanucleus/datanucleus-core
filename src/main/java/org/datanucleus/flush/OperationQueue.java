@@ -19,10 +19,12 @@ Contributors:
 package org.datanucleus.flush;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.state.ObjectProvider;
@@ -175,6 +177,22 @@ public class OperationQueue
         }
     }
 
+    public void clearPersistDeleteUpdateOperations()
+    {
+        if (queuedOperations != null)
+        {
+            Iterator<Operation> opsIter = queuedOperations.iterator();
+            while (opsIter.hasNext())
+            {
+                Operation op = opsIter.next();
+                if (op instanceof PersistOperation || op instanceof DeleteOperation || op instanceof UpdateMemberOperation)
+                {
+                    opsIter.remove();
+                }
+            }
+        }
+    }
+
     /**
      * Method to process all SCO operations where the SCOs don't use a backing store.
      * This will check for add+remove/remove+add and perform cascade delete as appropriate.
@@ -189,7 +207,7 @@ public class OperationQueue
             // Make use of OperationQueue for any cascade deletes that may be needed as a result of removal from collections/maps
             List<Operation> opsToIgnore = new ArrayList();
             List<Object> objectsToCascadeDelete = null;
-            Iterator<Operation> opsIter = queuedOperations.listIterator();
+            Iterator<Operation> opsIter = queuedOperations.iterator();
             while (opsIter.hasNext())
             {
                 Operation op = opsIter.next();
@@ -201,10 +219,10 @@ public class OperationQueue
                     {
                         // Check for addition of the same element, hence avoiding cascade-delete
                         boolean needsRemoving = true;
-                        if (opsIter.hasNext())
+                        if (queuedOperations.size() > 1)
                         {
                             // Check for later addition that negates the cascade delete
-                            ListIterator<Operation> subOpsIter = queuedOperations.listIterator();
+                            Iterator<Operation> subOpsIter = queuedOperations.iterator();
                             while (subOpsIter.hasNext())
                             {
                                 Operation subOp = subOpsIter.next();
@@ -215,6 +233,20 @@ public class OperationQueue
                                     {
                                         needsRemoving = false;
                                         break;
+                                    }
+                                }
+                                else if (subOp instanceof PersistOperation)
+                                {
+                                    // Check whether this is the persist of an object the same type as the owner of the removed element (i.e assigned to new owner)
+                                    PersistOperation persOp = (PersistOperation)subOp;
+                                    if (persOp.getObjectProvider().getObject().getClass().equals(collRemoveOp.getObjectProvider().getObject().getClass()))
+                                    {
+                                        Collection persColl = (Collection) persOp.getObjectProvider().provideField(collRemoveOp.getMemberMetaData().getAbsoluteFieldNumber());
+                                        if (persColl != null && persColl.contains(collRemoveOp.getValue()))
+                                        {
+                                            needsRemoving = false;
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -239,10 +271,10 @@ public class OperationQueue
                         {
                             // Check for later addition of the same key, hence avoiding cascade-delete
                             boolean keyNeedsRemoving = true;
-                            if (opsIter.hasNext())
+                            if (queuedOperations.size() > 1)
                             {
                                 // Check for later addition that negates the cascade delete
-                                ListIterator<Operation> subOpsIter = queuedOperations.listIterator();
+                                Iterator<Operation> subOpsIter = queuedOperations.iterator();
                                 while (subOpsIter.hasNext())
                                 {
                                     Operation subOp = subOpsIter.next();
@@ -253,6 +285,20 @@ public class OperationQueue
                                         {
                                             keyNeedsRemoving = false;
                                             break;
+                                        }
+                                    }
+                                    else if (subOp instanceof PersistOperation)
+                                    {
+                                        // Check whether this is the persist of an object the same type as the owner of the removed key (i.e assigned to new owner)
+                                        PersistOperation persOp = (PersistOperation)subOp;
+                                        if (persOp.getObjectProvider().getObject().getClass().equals(mapRemoveOp.getObjectProvider().getObject().getClass()))
+                                        {
+                                            Map persMap = (Map) persOp.getObjectProvider().provideField(mapRemoveOp.getMemberMetaData().getAbsoluteFieldNumber());
+                                            if (persMap != null && persMap.containsKey(mapRemoveOp.getKey()))
+                                            {
+                                                keyNeedsRemoving = false;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
@@ -270,10 +316,10 @@ public class OperationQueue
                         {
                             // Check for later addition of the same value, hence avoiding cascade-delete
                             boolean valNeedsRemoving = true;
-                            if (opsIter.hasNext())
+                            if (queuedOperations.size() > 1)
                             {
                                 // Check for later addition that negates the cascade delete
-                                ListIterator<Operation> subOpsIter = queuedOperations.listIterator();
+                                Iterator<Operation> subOpsIter = queuedOperations.iterator();
                                 while (subOpsIter.hasNext())
                                 {
                                     Operation subOp = subOpsIter.next();
@@ -284,6 +330,20 @@ public class OperationQueue
                                         {
                                             valNeedsRemoving = false;
                                             break;
+                                        }
+                                    }
+                                    else if (subOp instanceof PersistOperation)
+                                    {
+                                        // Check whether this is the persist of an object the same type as the owner of the removed value (i.e assigned to new owner)
+                                        PersistOperation persOp = (PersistOperation)subOp;
+                                        if (persOp.getObjectProvider().getObject().getClass().equals(mapRemoveOp.getObjectProvider().getObject().getClass()))
+                                        {
+                                            Map persMap = (Map) persOp.getObjectProvider().provideField(mapRemoveOp.getMemberMetaData().getAbsoluteFieldNumber());
+                                            if (persMap != null && persMap.containsValue(mapRemoveOp.getValue()))
+                                            {
+                                                valNeedsRemoving = false;
+                                                break;
+                                            }
                                         }
                                     }
                                 }

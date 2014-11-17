@@ -61,6 +61,9 @@ import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.flush.DeleteOperation;
+import org.datanucleus.flush.PersistOperation;
+import org.datanucleus.flush.UpdateMemberOperation;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -1776,10 +1779,17 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 updateField(pc, fieldNumber, newValue);
             }
 
-            if (!equal && RelationType.isBidirectional(relationType)&& myEC.getManageRelations())
+            if (!equal)
             {
-                // Managed Relationships - add the field to be managed so we can analyse its value at flush
-                myEC.getRelationshipManager(this).relationChange(fieldNumber, oldValue, newValue);
+                if (RelationType.isBidirectional(relationType)&& myEC.getManageRelations())
+                {
+                    // Managed Relationships - add the field to be managed so we can analyse its value at flush
+                    myEC.getRelationshipManager(this).relationChange(fieldNumber, oldValue, newValue);
+                }
+                if (myEC.operationQueueIsActive())
+                {
+                    myEC.addOperationToQueue(new UpdateMemberOperation(this, fieldNumber, newValue, oldValue));
+                }
             }
 
             if (needsSCOUpdating)
@@ -3363,6 +3373,10 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             return;
         }
 
+        if (myEC.operationQueueIsActive())
+        {
+            myEC.addOperationToQueue(new PersistOperation(this));
+        }
         if (dirty && !myLC.isDeleted() && myLC.isTransactional() && myEC.isDelayDatastoreOperationsEnabled())
         {
             // Already provisionally persistent, but delaying til commit so just re-run reachability
@@ -4256,6 +4270,10 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             if (myEC.isDelayDatastoreOperationsEnabled())
             {
                 // Optimistic transactions, with all updates delayed til flush/commit
+                if (myEC.operationQueueIsActive())
+                {
+                    myEC.addOperationToQueue(new DeleteOperation(this));
+                }
 
                 // Call any lifecycle listeners waiting for this event
                 getCallbackHandler().preDelete(myPC);

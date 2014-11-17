@@ -25,15 +25,27 @@ import org.datanucleus.state.ObjectProvider;
  */
 public class UpdateMemberOperation implements Operation
 {
-    ObjectProvider op;
-    int fieldNumber;
+    final ObjectProvider op;
+    final int fieldNumber;
+    Object oldValue;
     Object newValue;
 
-    public UpdateMemberOperation(ObjectProvider op, int fieldNum, Object newVal)
+    public UpdateMemberOperation(ObjectProvider op, int fieldNum, Object newVal, Object oldVal)
     {
         this.op = op;
         this.fieldNumber = fieldNum;
         this.newValue = newVal;
+        this.oldValue = oldVal;
+    }
+
+    public Object getNewValue()
+    {
+        return newValue;
+    }
+
+    public Object getOldValue()
+    {
+        return oldValue;
     }
 
     /**

@@ -4032,6 +4032,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.ExecutionContext#operationQueueIsActive()
+     */
+    @Override
+    public boolean operationQueueIsActive()
+    {
+        return isDelayDatastoreOperationsEnabled() && !isFlushing() && getTransaction().isActive();
+    }
+
     /**
      * Method to perform any post-begin checks.
      */

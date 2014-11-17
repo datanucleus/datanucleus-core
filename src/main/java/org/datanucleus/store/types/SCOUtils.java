@@ -1429,14 +1429,13 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to return if we should use a queued update for the current operation. If within a
-     * transaction, and using queueing in general, and not flushing then returns true.
+     * Convenience method to return if we should use a queued update for the current operation.
      * @param op ObjectProvider
      * @return Whether to use queued for this operation
      */
     public static boolean useQueuedUpdate(ObjectProvider op)
     {
-        return op != null && op.getExecutionContext().isDelayDatastoreOperationsEnabled() && !op.getExecutionContext().isFlushing() && op.getExecutionContext().getTransaction().isActive();
+        return op != null && op.getExecutionContext().operationQueueIsActive();
     }
 
     /**
