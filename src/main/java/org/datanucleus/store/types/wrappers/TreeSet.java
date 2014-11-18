@@ -619,10 +619,42 @@ public class TreeSet extends java.util.TreeSet implements SCOCollection<java.uti
      **/
     public synchronized boolean retainAll(java.util.Collection c)
     {
+        if (c == null)
+        {
+            throw new NullPointerException("Input collection was null");
+        }
+        Collection collToRemove = new java.util.TreeSet();
+        for (Object o : delegate)
+        {
+            if (!c.contains(o))
+            {
+                collToRemove.add(o);
+            }
+        }
+
         boolean success = delegate.retainAll(c);
         if (success)
         {
             makeDirty();
+            if (SCOUtils.useQueuedUpdate(ownerOP))
+            {
+                // Queue any cascade delete
+                Iterator iter = collToRemove.iterator();
+                while (iter.hasNext())
+                {
+                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), iter.next(), true));
+                }
+            }
+            else if (SCOUtils.hasDependentElement(ownerMmd))
+            {
+                // Perform the cascade delete
+                Iterator iter = collToRemove.iterator();
+                while (iter.hasNext())
+                {
+                    ownerOP.getExecutionContext().deleteObjectInternal(iter.next());
+                }
+            }
+
             if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
             {
                 ownerOP.getExecutionContext().processNontransactionalUpdate();
