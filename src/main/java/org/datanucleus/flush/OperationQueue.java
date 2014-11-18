@@ -44,7 +44,6 @@ import org.datanucleus.util.StringUtils;
  * The queue will contain all operations to be performed for an ExecutionContext. There are two methods for
  * processing them, one processing all (for use in the future when we support that mode in full), and one
  * that processes all for a particular SCO (backing store).
- * TODO Pass operations for PERSIST, DELETE, UPDATE through here too so they can be processed more efficiently?
  */
 public class OperationQueue
 {
@@ -65,9 +64,9 @@ public class OperationQueue
     public synchronized void log()
     {
         NucleusLogger.GENERAL.debug(">> OperationQueue :" + (queuedOperations.isEmpty() ? " Empty" : ("" + queuedOperations.size() + " operations")));
-        for (Operation op : queuedOperations)
+        for (Operation oper : queuedOperations)
         {
-            NucleusLogger.GENERAL.debug(">> " + op);
+            NucleusLogger.GENERAL.debug(">> " + oper);
         }
     }
 
@@ -205,44 +204,44 @@ public class OperationQueue
         if (queuedOperations != null && !ec.getStoreManager().usesBackedSCOWrappers())
         {
             // Make use of OperationQueue for any cascade deletes that may be needed as a result of removal from collections/maps
-            List<Operation> opsToIgnore = new ArrayList();
+            List<Operation> opersToIgnore = new ArrayList();
             List<Object> objectsToCascadeDelete = null;
-            Iterator<Operation> opsIter = queuedOperations.iterator();
-            while (opsIter.hasNext())
+            Iterator<Operation> opersIter = queuedOperations.iterator();
+            while (opersIter.hasNext())
             {
-                Operation op = opsIter.next();
-                if (op instanceof CollectionRemoveOperation)
+                Operation oper = opersIter.next();
+                if (oper instanceof CollectionRemoveOperation)
                 {
-                    // TODO Need to catch cases where user has persisted a new owner object (of same type) and this in the same field.
-                    CollectionRemoveOperation collRemoveOp = (CollectionRemoveOperation)op;
-                    if (collRemoveOp.getStore() == null && SCOUtils.hasDependentElement(collRemoveOp.getMemberMetaData()))
+                    // TODO Improve this test to catch things like remove from one collection, add to another and delete from the second one.
+                    CollectionRemoveOperation collRemoveOper = (CollectionRemoveOperation)oper;
+                    if (collRemoveOper.getStore() == null && SCOUtils.hasDependentElement(collRemoveOper.getMemberMetaData()))
                     {
                         // Check for addition of the same element, hence avoiding cascade-delete
                         boolean needsRemoving = true;
                         if (queuedOperations.size() > 1)
                         {
                             // Check for later addition that negates the cascade delete
-                            Iterator<Operation> subOpsIter = queuedOperations.iterator();
-                            while (subOpsIter.hasNext())
+                            Iterator<Operation> subOpersIter = queuedOperations.iterator();
+                            while (subOpersIter.hasNext())
                             {
-                                Operation subOp = subOpsIter.next();
-                                if (subOp instanceof CollectionAddOperation)
+                                Operation subOper = subOpersIter.next();
+                                if (subOper instanceof CollectionAddOperation)
                                 {
-                                    CollectionAddOperation collAddOp = (CollectionAddOperation)subOp;
-                                    if (collRemoveOp.getValue().equals(collAddOp.getValue()))
+                                    CollectionAddOperation collAddOper = (CollectionAddOperation)subOper;
+                                    if (collRemoveOper.getValue().equals(collAddOper.getValue()))
                                     {
                                         needsRemoving = false;
                                         break;
                                     }
                                 }
-                                else if (subOp instanceof PersistOperation)
+                                else if (subOper instanceof PersistOperation)
                                 {
                                     // Check whether this is the persist of an object the same type as the owner of the removed element (i.e assigned to new owner)
-                                    PersistOperation persOp = (PersistOperation)subOp;
-                                    if (persOp.getObjectProvider().getObject().getClass().equals(collRemoveOp.getObjectProvider().getObject().getClass()))
+                                    PersistOperation persOp = (PersistOperation)subOper;
+                                    if (persOp.getObjectProvider().getObject().getClass().equals(collRemoveOper.getObjectProvider().getObject().getClass()))
                                     {
-                                        Collection persColl = (Collection) persOp.getObjectProvider().provideField(collRemoveOp.getMemberMetaData().getAbsoluteFieldNumber());
-                                        if (persColl != null && persColl.contains(collRemoveOp.getValue()))
+                                        Collection persColl = (Collection) persOp.getObjectProvider().provideField(collRemoveOper.getMemberMetaData().getAbsoluteFieldNumber());
+                                        if (persColl != null && persColl.contains(collRemoveOper.getValue()))
                                         {
                                             needsRemoving = false;
                                             break;
@@ -257,44 +256,45 @@ public class OperationQueue
                             {
                                 objectsToCascadeDelete = new ArrayList();
                             }
-                            NucleusLogger.GENERAL.info(">> Flush collection element needs cascade delete " + collRemoveOp.getValue());
-                            objectsToCascadeDelete.add(collRemoveOp.getValue());
+                            NucleusLogger.GENERAL.info(">> Flush collection element needs cascade delete " + collRemoveOper.getValue());
+                            objectsToCascadeDelete.add(collRemoveOper.getValue());
                         }
                     }
                 }
-                else if (op instanceof MapRemoveOperation)
+                else if (oper instanceof MapRemoveOperation)
                 {
-                    MapRemoveOperation mapRemoveOp = (MapRemoveOperation)op;
-                    if (mapRemoveOp.getStore() == null)
+                    // TODO Improve this test to catch things like remove from one map, add to another and delete from the second one.
+                    MapRemoveOperation mapRemoveOper = (MapRemoveOperation)oper;
+                    if (mapRemoveOper.getStore() == null)
                     {
-                        if (SCOUtils.hasDependentKey(mapRemoveOp.getMemberMetaData()))
+                        if (SCOUtils.hasDependentKey(mapRemoveOper.getMemberMetaData()))
                         {
                             // Check for later addition of the same key, hence avoiding cascade-delete
                             boolean keyNeedsRemoving = true;
                             if (queuedOperations.size() > 1)
                             {
                                 // Check for later addition that negates the cascade delete
-                                Iterator<Operation> subOpsIter = queuedOperations.iterator();
-                                while (subOpsIter.hasNext())
+                                Iterator<Operation> subOpersIter = queuedOperations.iterator();
+                                while (subOpersIter.hasNext())
                                 {
-                                    Operation subOp = subOpsIter.next();
-                                    if (subOp instanceof MapPutOperation)
+                                    Operation subOper = subOpersIter.next();
+                                    if (subOper instanceof MapPutOperation)
                                     {
-                                        MapPutOperation mapPutOp = (MapPutOperation)subOp;
-                                        if (mapRemoveOp.getKey().equals(mapPutOp.getKey()))
+                                        MapPutOperation mapPutOper = (MapPutOperation)subOper;
+                                        if (mapRemoveOper.getKey().equals(mapPutOper.getKey()))
                                         {
                                             keyNeedsRemoving = false;
                                             break;
                                         }
                                     }
-                                    else if (subOp instanceof PersistOperation)
+                                    else if (subOper instanceof PersistOperation)
                                     {
                                         // Check whether this is the persist of an object the same type as the owner of the removed key (i.e assigned to new owner)
-                                        PersistOperation persOp = (PersistOperation)subOp;
-                                        if (persOp.getObjectProvider().getObject().getClass().equals(mapRemoveOp.getObjectProvider().getObject().getClass()))
+                                        PersistOperation persOper = (PersistOperation)subOper;
+                                        if (persOper.getObjectProvider().getObject().getClass().equals(mapRemoveOper.getObjectProvider().getObject().getClass()))
                                         {
-                                            Map persMap = (Map) persOp.getObjectProvider().provideField(mapRemoveOp.getMemberMetaData().getAbsoluteFieldNumber());
-                                            if (persMap != null && persMap.containsKey(mapRemoveOp.getKey()))
+                                            Map persMap = (Map) persOper.getObjectProvider().provideField(mapRemoveOper.getMemberMetaData().getAbsoluteFieldNumber());
+                                            if (persMap != null && persMap.containsKey(mapRemoveOper.getKey()))
                                             {
                                                 keyNeedsRemoving = false;
                                                 break;
@@ -309,37 +309,37 @@ public class OperationQueue
                                 {
                                     objectsToCascadeDelete = new ArrayList();
                                 }
-                                objectsToCascadeDelete.add(mapRemoveOp.getKey());
+                                objectsToCascadeDelete.add(mapRemoveOper.getKey());
                             }
                         }
-                        else if (SCOUtils.hasDependentValue(mapRemoveOp.getMemberMetaData()))
+                        else if (SCOUtils.hasDependentValue(mapRemoveOper.getMemberMetaData()))
                         {
                             // Check for later addition of the same value, hence avoiding cascade-delete
                             boolean valNeedsRemoving = true;
                             if (queuedOperations.size() > 1)
                             {
                                 // Check for later addition that negates the cascade delete
-                                Iterator<Operation> subOpsIter = queuedOperations.iterator();
-                                while (subOpsIter.hasNext())
+                                Iterator<Operation> subOpersIter = queuedOperations.iterator();
+                                while (subOpersIter.hasNext())
                                 {
-                                    Operation subOp = subOpsIter.next();
-                                    if (subOp instanceof MapPutOperation)
+                                    Operation subOper = subOpersIter.next();
+                                    if (subOper instanceof MapPutOperation)
                                     {
-                                        MapPutOperation mapPutOp = (MapPutOperation)subOp;
-                                        if (mapRemoveOp.getValue().equals(mapPutOp.getValue()))
+                                        MapPutOperation mapPutOper = (MapPutOperation)subOper;
+                                        if (mapRemoveOper.getValue().equals(mapPutOper.getValue()))
                                         {
                                             valNeedsRemoving = false;
                                             break;
                                         }
                                     }
-                                    else if (subOp instanceof PersistOperation)
+                                    else if (subOper instanceof PersistOperation)
                                     {
                                         // Check whether this is the persist of an object the same type as the owner of the removed value (i.e assigned to new owner)
-                                        PersistOperation persOp = (PersistOperation)subOp;
-                                        if (persOp.getObjectProvider().getObject().getClass().equals(mapRemoveOp.getObjectProvider().getObject().getClass()))
+                                        PersistOperation persOper = (PersistOperation)subOper;
+                                        if (persOper.getObjectProvider().getObject().getClass().equals(mapRemoveOper.getObjectProvider().getObject().getClass()))
                                         {
-                                            Map persMap = (Map) persOp.getObjectProvider().provideField(mapRemoveOp.getMemberMetaData().getAbsoluteFieldNumber());
-                                            if (persMap != null && persMap.containsValue(mapRemoveOp.getValue()))
+                                            Map persMap = (Map) persOper.getObjectProvider().provideField(mapRemoveOper.getMemberMetaData().getAbsoluteFieldNumber());
+                                            if (persMap != null && persMap.containsValue(mapRemoveOper.getValue()))
                                             {
                                                 valNeedsRemoving = false;
                                                 break;
@@ -354,20 +354,20 @@ public class OperationQueue
                                 {
                                     objectsToCascadeDelete = new ArrayList();
                                 }
-                                objectsToCascadeDelete.add(mapRemoveOp.getValue());
+                                objectsToCascadeDelete.add(mapRemoveOper.getValue());
                             }
                         }
                     }
                 }
 
-                if (op instanceof SCOOperation)
+                if (oper instanceof SCOOperation)
                 {
-                    opsToIgnore.add(op);
+                    opersToIgnore.add(oper);
                 }
             }
 
             // Remove all SCO operations since we don't have backing store SCOs here
-            queuedOperations.removeAll(opsToIgnore);
+            queuedOperations.removeAll(opersToIgnore);
 
             if (objectsToCascadeDelete != null)
             {
