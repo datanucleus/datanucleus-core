@@ -408,8 +408,7 @@ public class ClassMetaData extends AbstractClassMetaData
      * @throws InvalidMetaDataException if the Class for a declared type in a field cannot be loaded by the <code>clr</code>
      * @throws InvalidMetaDataException if a field declared in the MetaData does not exist in the Class
      */
-    protected void populateMemberMetaData(ClassLoaderResolver clr, Class cls, boolean pkMembers,
-            ClassLoader primary, MetaDataManager mmgr)
+    protected void populateMemberMetaData(ClassLoaderResolver clr, Class cls, boolean pkMembers, ClassLoader primary, MetaDataManager mmgr)
     {
         Collections.sort(members);
         
@@ -442,7 +441,7 @@ public class ClassMetaData extends AbstractClassMetaData
                     }
                     else
                     {
-                        // No superclass so it doenst make sense so assume to be for this class
+                        // No superclass so it doesn't make sense so assume to be for this class
                         mmd.className = null;
                     }
                 }
@@ -464,8 +463,8 @@ public class ClassMetaData extends AbstractClassMetaData
                         }
                         catch (ClassNotResolvedException cnre2)
                         {
-                            NucleusLogger.METADATA.error(Localiser.msg("044080", fieldClassName));
-                            throw new InvalidClassMetaDataException("044080", fullName, fieldClassName);
+                            NucleusLogger.METADATA.error(Localiser.msg("044092", fullName, mmd.getFullFieldName(), fieldClassName));
+                            throw new InvalidClassMetaDataException("044092", fullName, mmd.getFullFieldName(), fieldClassName);
                         }
                     }
                 }
