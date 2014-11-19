@@ -1050,6 +1050,8 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         finally
         {
             int[] nonpkFields = cmd.getNonPKMemberPositions();
+            // TODO If an object goes HOLLOW and the user had a handle on a SCO collection then we could disconnect them
+//            provideFields(nonpkFields, new UnsetOwnerFieldManager());
             clearFieldsByNumbers(nonpkFields);
             clearDirtyFlags(nonpkFields);
 
