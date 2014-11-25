@@ -4839,28 +4839,6 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         }
     }
 
-    /**
-     * Accessor for the owning ObjectProviders for the managed object when stored embedded.
-     * Should really only have a single owner but users could, in principle, assign it to multiple.
-     * TODO Move this to ExecutionContext - need to update some store plugins
-     * @return ObjectProviders owning this embedded object.
-     */
-    public ObjectProvider[] getEmbeddedOwners()
-    {
-        List<EmbeddedOwnerRelation> ownerRels = myEC.getOwnerInformationForEmbedded(this);
-        if (ownerRels == null)
-        {
-            return null;
-        }
-        ObjectProvider[] owners = new ObjectProvider[ownerRels.size()];
-        int i = 0;
-        for (EmbeddedOwnerRelation rel : ownerRels)
-        {
-            owners[i++] = rel.getOwnerOP();
-        }
-        return owners;
-    }
-
     public void changeActivityState(ActivityState state)
     {
         // Does nothing in this implementation; refer to ReferentialJDOStateManager

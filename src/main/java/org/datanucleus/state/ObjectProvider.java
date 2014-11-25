@@ -353,12 +353,6 @@ public interface ObjectProvider<T>
     void makeDirty(int field);
 
     /**
-     * Accessor for the overall owner ObjectProviders of the managed object when embedded.
-     * @return Owning ObjectProviders when embedded (if any)
-     */
-    ObjectProvider[] getEmbeddedOwners();
-
-    /**
      * Convenience accessor for whether this ObjectProvider manages an embedded/serialised object.
      * @return Whether the managed object is embedded/serialised.
      */

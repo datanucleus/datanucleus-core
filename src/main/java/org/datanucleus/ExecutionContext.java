@@ -881,17 +881,24 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Accessor for the relations for the specified embedded ObjectProvider where it is embedded.
+     * @param ownerOP The ObjectProvider that owns the embedded
+     * @return The List of embedded relations involving this ObjectProvider as owner
+     */
+    List<EmbeddedOwnerRelation> getEmbeddedInformationForOwner(ObjectProvider ownerOP);
+
+    /**
+     * Accessor for the relations for the specified embedded ObjectProvider where it is embedded.
      * @param embOP The ObjectProvider that is embedded
      * @return The List of embedded relations involving this ObjectProvider as embedded
      */
     List<EmbeddedOwnerRelation> getOwnerInformationForEmbedded(ObjectProvider embOP);
 
     /**
-     * Accessor for the relations for the specified embedded ObjectProvider where it is embedded.
-     * @param ownerOP The ObjectProvider that owns the embedded
-     * @return The List of embedded relations involving this ObjectProvider as owner
+     * Accessor for the owner objects for the provided embedded object provider.
+     * @param embOP The ObjectProvider that is embedded
+     * @return The owner object(s) that have this object embedded.
      */
-    List<EmbeddedOwnerRelation> getEmbeddedInformationForOwner(ObjectProvider ownerOP);
+    ObjectProvider[] getOwnersForEmbeddedObjectProvider(ObjectProvider embOP);
 
     /**
      * Convenience method to remove the EmbeddedOwnerRelation between the specified ObjectProviders.

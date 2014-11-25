@@ -1215,7 +1215,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             embeddedOP = nucCtx.getObjectProviderFactory().newForEmbedded(this, value, false, owner,
                 owner.getClassMetaData().getMetaDataForMember(mmd.getName()).getAbsoluteFieldNumber());
         }
-        if (embeddedOP.getEmbeddedOwners() == null || embeddedOP.getEmbeddedOwners().length == 0)
+        ObjectProvider[] embOwnerOPs = getOwnersForEmbeddedObjectProvider(embeddedOP);
+        if (embOwnerOPs == null || embOwnerOPs.length == 0)
         {
             int absoluteFieldNumber = owner.getClassMetaData().getMetaDataForMember(mmd.getName()).getAbsoluteFieldNumber();
             registerEmbeddedRelation(owner, absoluteFieldNumber, embeddedOP);
@@ -5777,11 +5778,34 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
+    /**
+     * Accessor for the owning ObjectProviders for the managed object when stored embedded.
+     * Should really only have a single owner but users could, in principle, assign it to multiple.
+     * @param embOP The ObjectProvider that is embedded that we are looking for the owners for
+     * @return ObjectProviders owning this embedded object.
+     */
+    public ObjectProvider[] getOwnersForEmbeddedObjectProvider(ObjectProvider embOP)
+    {
+        if (opEmbeddedInfoByEmbedded == null || !opEmbeddedInfoByEmbedded.containsKey(embOP))
+        {
+            return null;
+        }
+        List<EmbeddedOwnerRelation> ownerRels = opEmbeddedInfoByEmbedded.get(embOP);
+        ObjectProvider[] owners = new ObjectProvider[ownerRels.size()];
+        int i = 0;
+        for (EmbeddedOwnerRelation rel : ownerRels)
+        {
+            owners[i++] = rel.getOwnerOP();
+        }
+        return owners;
+    }
+
     /* (non-Javadoc)
      * @see org.datanucleus.ExecutionContext#getOwnerInformationForEmbedded(org.datanucleus.state.ObjectProvider)
      */
     public List<EmbeddedOwnerRelation> getOwnerInformationForEmbedded(ObjectProvider embOP)
     {
+        // TODO Drop this method
         if (opEmbeddedInfoByEmbedded == null)
         {
             return null;
