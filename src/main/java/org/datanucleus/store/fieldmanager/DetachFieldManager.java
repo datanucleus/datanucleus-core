@@ -186,7 +186,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                 {
                     return sco;
                 }
-                return SCOUtils.unwrapSCOField(op, fieldNumber, value, true);
+                return SCOUtils.unwrapSCOField(op, fieldNumber, sco, true);
             }
             else if (mmd.hasArray())
             {
@@ -233,7 +233,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                 {
                     return sco;
                 }
-                return SCOUtils.unwrapSCOField(op, fieldNumber, value, true);
+                return SCOUtils.unwrapSCOField(op, fieldNumber, sco, true);
             }
         }
 

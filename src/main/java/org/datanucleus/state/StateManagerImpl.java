@@ -3257,7 +3257,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 Object value = provideField(i);
                 if (value instanceof SCO)
                 {
-                    SCOUtils.unwrapSCOField(this, i, value, true);
+                    SCOUtils.unwrapSCOField(this, i, (SCO)value, true);
                 }
             }
         }

@@ -67,34 +67,29 @@ public class SCOUtils
      * If "replaceFieldIfChanged" is set, we replace the value in the object with the unwrapped value.
      * @param op The ObjectProvider
      * @param fieldNumber The field number
-     * @param value The value for the field
+     * @param sco The SCO value for the field
      * @param replaceFieldIfChanged Whether to replace the field value in the object if unwrapping the value
      * @return The unwrapped field value
      */
-    public static Object unwrapSCOField(ObjectProvider op, int fieldNumber, Object value, boolean replaceFieldIfChanged)
+    public static Object unwrapSCOField(ObjectProvider op, int fieldNumber, SCO sco, boolean replaceFieldIfChanged)
     {
-        if (value == null || !op.getClassMetaData().getSCOMutableMemberFlags()[fieldNumber])
+        if (sco == null)
         {
-            return value;
+            return null;
         }
 
-        if (value instanceof SCO)
+        Object unwrappedValue = sco.getValue();
+        if (replaceFieldIfChanged)
         {
-            SCO sco = (SCO)value;
-            Object unwrappedValue = sco.getValue();
-            if (replaceFieldIfChanged)
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                AbstractMemberMetaData fmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026030", StringUtils.toJVMIDString(op.getObject()), 
-                        IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), fmd.getName()));
-                }
-                op.replaceField(fieldNumber, unwrappedValue);
+                AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("026030", StringUtils.toJVMIDString(op.getObject()), 
+                    IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), mmd.getName()));
             }
-            return unwrappedValue;
+            op.replaceField(fieldNumber, unwrappedValue);
         }
-        return value;
+        return unwrappedValue;
     }
 
     /**
