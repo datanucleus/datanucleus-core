@@ -109,15 +109,13 @@ import org.datanucleus.util.TypeConversionHelper;
  * any owning objects are updated so that they can update their tables accordingly.
  *
  * <H3>Performance and Memory</H3>
- * StateManagers are very performance-critical, because for each PersistentCapable object made persistent,
+ * StateManagers are very performance-critical, because for each Persistable object made persistent,
  * there will be one StateManager instance, adding up to the total memory footprint of that object.
- * In heap profiling analysis, JDOStateManager showed to consume bytes 169 per StateManager by itself
+ * In heap profiling analysis, StateManagerImpl showed to consume bytes 169 per StateManager by itself
  * and about 500 bytes per StateManager when taking PC-individual child-object (like the OID) referred
  * by the StateManager into account. With small Java objects this can mean a substantial memory overhead and
  * for applications using such small objects can be critical. For this reason the StateManager should always
  * be minimal in memory consumption.
- * 
- * TODO The future aim is to have different types of StateManagers (ObjectProviders) that have particular features.
  */
 public class StateManagerImpl extends AbstractStateManager<Persistable> implements StateManager
 {
@@ -1797,7 +1795,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             if (needsSCOUpdating)
             {
                 // Wrap with SCO so we can detect future updates
-                // TODO Pass in oldValue when available so we can do an update bearing in mind what was there before (e.g for Lists when moving elements)
+                // TODO Pass in oldValue when available so we can do an update bearing in mind what was there before (e.g for Lists when moving elements) NUCCORE-1238
                 newValue = SCOUtils.wrapSCOField(this, fieldNumber, newValue, false, true, true);
             }
 
@@ -2313,43 +2311,6 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             myEC.replaceObjectId(myPC, myInternalID, myID);
 
             this.myInternalID = myID;
-        }
-    }
-
-    /**
-     * Convenience method to update our object with the field values from the passed object.
-     * Objects need to be of the same type, and the other object should not have a StateManager.
-     * TODO Only used by XML plugin so strip this out into a convenience method.
-     * @param obj The object that we should copy fields from
-     * @param fieldNumbers Numbers of fields to copy
-     */
-    public void copyFieldsFromObject(Object obj, int[] fieldNumbers)
-    {
-        if (obj == null)
-        {
-            return;
-        }
-        if (!obj.getClass().getName().equals(myPC.getClass().getName()))
-        {
-            return;
-        }
-        if (!(obj instanceof Persistable))
-        {
-            throw new NucleusUserException("Must be Persistable");
-        }
-        Persistable pc = (Persistable)obj;
-
-        // Assign the new object to this StateManager temporarily so that we can copy its fields
-        replaceStateManager(pc, this);
-        myPC.dnCopyFields(pc, fieldNumbers);
-
-        // Remove the StateManager from the other object
-        replaceStateManager(pc, null);
-
-        // Set the loaded flags now that we have copied
-        for (int i=0;i<fieldNumbers.length;i++)
-        {
-            loadedFields[fieldNumbers[i]] = true;
         }
     }
 
@@ -4780,5 +4741,42 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     public void updateFieldAfterInsert(Object pc, int fieldNumber)
     {
         // Does nothing in this implementation; refer to ReferentialJDOStateManager
+    }
+
+    /**
+     * Convenience method to update our object with the field values from the passed object.
+     * Objects need to be of the same type, and the other object should not have a StateManager.
+     * TODO Only used by XML plugin so strip this out into a convenience method.
+     * @param obj The object that we should copy fields from
+     * @param fieldNumbers Numbers of fields to copy
+     */
+    public void copyFieldsFromObject(Object obj, int[] fieldNumbers)
+    {
+        if (obj == null)
+        {
+            return;
+        }
+        if (!obj.getClass().getName().equals(myPC.getClass().getName()))
+        {
+            return;
+        }
+        if (!(obj instanceof Persistable))
+        {
+            throw new NucleusUserException("Must be Persistable");
+        }
+        Persistable pc = (Persistable)obj;
+
+        // Assign the new object to this StateManager temporarily so that we can copy its fields
+        replaceStateManager(pc, this);
+        myPC.dnCopyFields(pc, fieldNumbers);
+
+        // Remove the StateManager from the other object
+        replaceStateManager(pc, null);
+
+        // Set the loaded flags now that we have copied
+        for (int i=0;i<fieldNumbers.length;i++)
+        {
+            loadedFields[fieldNumbers[i]] = true;
+        }
     }
 }

@@ -965,8 +965,7 @@ public class SCOUtils
         }
 
         // Retrieve the entries (key-value pairs so we can associate them)
-        // TODO Ultimately would like to just call this, but the entry query can omit the inheritance level
-        // of a key or value
+        // TODO Ultimately would like to just call this, but the entry query can omit the inheritance level of a key or value
         SetStore entries = store.entrySetStore();
         Iterator entryIter = entries.iterator(ownerOP);
         while (entryIter.hasNext())
@@ -979,20 +978,16 @@ public class SCOUtils
 
         if (!store.keysAreEmbedded() && !store.keysAreSerialised() && delegate.size() != keys.size())
         {
-            // With Derby 10.x we can get instances where the values query returns no values yet entries is
-            // not empty
-            // TODO Maybe make this throw an exception
-            NucleusLogger.DATASTORE_RETRIEVE
-                    .warn("The number of Map key objects (" + keys.size() + ")" + " was different to the number of entries (" + delegate.size() + ")." + " Likely there is a bug in your datastore");
+            // With Derby 10.x we can get instances where the values query returns no values yet entries is not empty TODO Maybe make this throw an exception
+            NucleusLogger.DATASTORE_RETRIEVE.warn("The number of Map key objects (" + keys.size() + ")" + " was different to the number of entries (" + delegate.size() + 
+                ")." + " Likely there is a bug in your datastore");
         }
 
         if (!store.valuesAreEmbedded() && !store.valuesAreSerialised() && delegate.size() != values.size())
         {
-            // With Derby 10.x we can get instances where the values query returns no values yet entries is
-            // not empty
-            // TODO Maybe make this throw an exception
-            NucleusLogger.DATASTORE_RETRIEVE
-                    .warn("The number of Map value objects (" + values.size() + ")" + " was different to the number of entries (" + delegate.size() + ")." + " Likely there is a bug in your datastore");
+            // With Derby 10.x we can get instances where the values query returns no values yet entries is not empty TODO Maybe make this throw an exception
+            NucleusLogger.DATASTORE_RETRIEVE.warn("The number of Map value objects (" + values.size() + ")" + " was different to the number of entries (" + delegate.size() + 
+                ")." + " Likely there is a bug in your datastore");
         }
 
         keys.clear();
