@@ -1798,7 +1798,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             {
                 // Wrap with SCO so we can detect future updates
                 // TODO Pass in oldValue when available so we can do an update bearing in mind what was there before (e.g for Lists when moving elements)
-                newValue = wrapSCOField(fieldNumber, newValue, false, true, true);
+                newValue = SCOUtils.wrapSCOField(this, fieldNumber, newValue, false, true, true);
             }
 
             if (oldValue != null && newValue == null && oldValue instanceof Persistable)
@@ -3237,7 +3237,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 Object value = provideField(i);
                 if (!(value instanceof SCO))
                 {
-                    wrapSCOField(i, value, false, false, true);
+                    SCOUtils.wrapSCOField(this, i, value, false, false, true);
                 }
             }
         }
@@ -3257,76 +3257,29 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 Object value = provideField(i);
                 if (value instanceof SCO)
                 {
-                    unwrapSCOField(i, value, true);
+                    SCOUtils.unwrapSCOField(this, i, value, true);
                 }
             }
         }
     }
 
     /**
-     * Method to unwrap a SCO field (if it is wrapped currently).
-     * If the field is not a SCO field will just return the value.
-     * If "replaceFieldIfChanged" is set, we replace the value in the object with the unwrapped value.
-     * @param fieldNumber The field number
-     * @param value The value for the field
-     * @param replaceFieldIfChanged Whether to replace the field value in the object if unwrapping the value
-     * @return The unwrapped field value
-     */
-    public Object unwrapSCOField(int fieldNumber, Object value, boolean replaceFieldIfChanged)
-    {
-        if (value == null)
-        {
-            return value;
-        }
-        if (cmd.getSCOMutableMemberFlags()[fieldNumber] && value instanceof SCO)
-        {
-            SCO sco = (SCO)value;
-
-            // Not a SCO wrapper, or is a SCO wrapper but not owned by this object
-            Object unwrappedValue = sco.getValue();
-            if (replaceFieldIfChanged)
-            {
-                AbstractMemberMetaData fmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026030",
-                        StringUtils.toJVMIDString(myPC),
-                        IdentityUtils.getPersistableIdentityForId(myID), fmd.getName()));
-                }
-                replaceField(myPC, fieldNumber, unwrappedValue, false);
-            }
-            return unwrappedValue;
-        }
-        return value;
-    }
-
-    /**
-     * Method to create a new SCO wrapper for the specified field.
-     * If the field is not a SCO field will just return the value.
+     * Method to update the "owner-field" in an embedded object with the owner object.
+     * TODO Likely this should be moved into a replaceField method, or maybe Managed Relationships.
      * @param fieldNumber The field number
      * @param value The value to initialise the wrapper with (if any)
-     * @param forInsert Whether the creation of any wrapper should insert this value into the datastore
-     * @param forUpdate Whether the creation of any wrapper should update the datastore with this value
-     * @param replaceFieldIfChanged Whether to replace the field in the object if wrapping the value
-     * @return The wrapper (or original value if not wrappable)
      */
-    public Object wrapSCOField(int fieldNumber, Object value, boolean forInsert, boolean forUpdate, boolean replaceFieldIfChanged)
+    public void updateOwnerFieldInEmbeddedField(int fieldNumber, Object value)
     {
-        if (value == null)
+        if (value != null)
         {
-            // We don't wrap null objects currently
-            return value;
-        }
-
-        if (value instanceof Persistable)
-        {
-            // Special case of SCO that we should split into a separate method for clarity, nothing to do with wrapping
-            AbstractMemberMetaData fmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-            if (fmd.getEmbeddedMetaData() != null && fmd.getEmbeddedMetaData().getOwnerMember() != null)
+            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            RelationType relationType = mmd.getRelationType(myEC.getClassLoaderResolver());
+            if (RelationType.isRelationSingleValued(relationType) && mmd.getEmbeddedMetaData() != null && mmd.getEmbeddedMetaData().getOwnerMember() != null)
             {
                 // Embedded field, so assign the embedded/serialised object "owner-field" if specified
-                AbstractStateManager subSM = (AbstractStateManager)myEC.findObjectProvider(value);
-                int ownerAbsFieldNum = subSM.getClassMetaData().getAbsolutePositionOfMember(fmd.getEmbeddedMetaData().getOwnerMember());
+                ObjectProvider subSM = myEC.findObjectProvider(value);
+                int ownerAbsFieldNum = subSM.getClassMetaData().getAbsolutePositionOfMember(mmd.getEmbeddedMetaData().getOwnerMember());
                 if (ownerAbsFieldNum >= 0)
                 {
                     flags |= FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER;
@@ -3335,26 +3288,6 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 }
             }
         }
-
-        if (cmd.getSCOMutableMemberFlags()[fieldNumber])
-        {
-            if (!(value instanceof SCO) || myPC != ((SCO)value).getOwner())
-            {
-                // Not a SCO wrapper, or is a SCO wrapper but not owned by this object
-                AbstractMemberMetaData fmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-                if (replaceFieldIfChanged)
-                {
-                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                    {
-                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029", StringUtils.toJVMIDString(myPC), 
-                            myEC != null ? IdentityUtils.getPersistableIdentityForId(myID) : myID, fmd.getName()));
-                    }
-                }
-                return SCOUtils.newSCOInstance(this, fmd, value.getClass(), value, forInsert, forUpdate, replaceFieldIfChanged);
-            }
-        }
-
-        return value;
     }
 
     // ------------------------- Lifecycle Methods -----------------------------

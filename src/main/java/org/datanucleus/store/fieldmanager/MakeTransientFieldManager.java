@@ -30,6 +30,7 @@ import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.types.SCO;
+import org.datanucleus.store.types.SCOUtils;
 
 /**
  * Field Manager to handle the making transient of fields.
@@ -91,7 +92,7 @@ public class MakeTransientFieldManager extends AbstractFetchDepthFieldManager
                     if (!(value instanceof SCO))
                     {
                         // Replace with SCO
-                        value = op.wrapSCOField(fieldNumber, value, false, false, true);
+                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, true);
                     }
                     SCO sco = (SCO)value;
 
@@ -113,7 +114,7 @@ public class MakeTransientFieldManager extends AbstractFetchDepthFieldManager
                     if (!(value instanceof SCO))
                     {
                         // Replace with SCO
-                        value = op.wrapSCOField(fieldNumber, value, false, false, true);
+                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, true);
                     }
                     SCO sco = (SCO)value;
 

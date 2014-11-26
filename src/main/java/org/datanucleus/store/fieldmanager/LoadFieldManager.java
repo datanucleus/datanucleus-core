@@ -31,6 +31,7 @@ import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.types.SCO;
+import org.datanucleus.store.types.SCOUtils;
 
 /**
  * Field Manager to handle loading all fields of all objects in the fetch plan.
@@ -95,7 +96,7 @@ public class LoadFieldManager extends AbstractFetchDepthFieldManager
                     if (!(value instanceof SCO))
                     {
                         // Replace with SCO
-                        value = op.wrapSCOField(fieldNumber, value, false, false, true);
+                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, true);
                     }
 
                     Collection coll = (Collection)value;
@@ -115,7 +116,7 @@ public class LoadFieldManager extends AbstractFetchDepthFieldManager
                     if (!(value instanceof SCO))
                     {
                         // Replace with SCO
-                        value = op.wrapSCOField(fieldNumber, value, false, false, true);
+                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, true);
                     }
 
                     Map map = (Map)value;

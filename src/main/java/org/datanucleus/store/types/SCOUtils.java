@@ -40,6 +40,7 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
@@ -60,6 +61,77 @@ import org.datanucleus.util.StringUtils;
  */
 public class SCOUtils
 {
+    /**
+     * Method to unwrap a SCO field (if it is wrapped currently).
+     * If the field is not a SCO field will just return the value.
+     * If "replaceFieldIfChanged" is set, we replace the value in the object with the unwrapped value.
+     * @param op The ObjectProvider
+     * @param fieldNumber The field number
+     * @param value The value for the field
+     * @param replaceFieldIfChanged Whether to replace the field value in the object if unwrapping the value
+     * @return The unwrapped field value
+     */
+    public static Object unwrapSCOField(ObjectProvider op, int fieldNumber, Object value, boolean replaceFieldIfChanged)
+    {
+        if (value == null || !op.getClassMetaData().getSCOMutableMemberFlags()[fieldNumber])
+        {
+            return value;
+        }
+
+        if (value instanceof SCO)
+        {
+            SCO sco = (SCO)value;
+            Object unwrappedValue = sco.getValue();
+            if (replaceFieldIfChanged)
+            {
+                AbstractMemberMetaData fmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                {
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026030", StringUtils.toJVMIDString(op.getObject()), 
+                        IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), fmd.getName()));
+                }
+                op.replaceField(fieldNumber, unwrappedValue);
+            }
+            return unwrappedValue;
+        }
+        return value;
+    }
+
+    /**
+     * Method to create a new SCO wrapper for the specified field. If the field is not a SCO field will just return the value.
+     * @param op The ObjectProvider
+     * @param fieldNumber The field number
+     * @param value The value to initialise the wrapper with (if any)
+     * @param forInsert Whether the creation of any wrapper should insert this value into the datastore
+     * @param forUpdate Whether the creation of any wrapper should update the datastore with this value
+     * @param replaceFieldIfChanged Whether to replace the field in the object if wrapping the value
+     * @return The wrapper (or original value if not wrappable)
+     */
+    public static Object wrapSCOField(ObjectProvider op, int fieldNumber, Object value, boolean forInsert, boolean forUpdate, boolean replaceFieldIfChanged)
+    {
+        if (value == null || !op.getClassMetaData().getSCOMutableMemberFlags()[fieldNumber])
+        {
+            // We don't wrap null objects currently
+            return value;
+        }
+
+        if (!(value instanceof SCO) || op.getObject() != ((SCO)value).getOwner())
+        {
+            // Not a SCO wrapper, or is a SCO wrapper but not owned by this object
+            AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            if (replaceFieldIfChanged)
+            {
+                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                {
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029", StringUtils.toJVMIDString(op.getObject()), 
+                        op.getExecutionContext() != null ? IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()) : op.getInternalObjectId(), mmd.getName()));
+                }
+            }
+            return SCOUtils.newSCOInstance(op, mmd, value.getClass(), value, forInsert, forUpdate, replaceFieldIfChanged);
+        }
+        return value;
+    }
+
     /**
      * Method to create a new SCO wrapper for a SCO type. The SCO wrapper will be appropriate for the passed
      * value (which represents the instantiated type of the field) unless it is null when the wrapper will be

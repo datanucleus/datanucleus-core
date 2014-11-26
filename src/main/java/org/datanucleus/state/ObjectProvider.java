@@ -279,30 +279,6 @@ public interface ObjectProvider<T>
     Object provideField(int fieldNumber);
 
     /**
-     * Method to wrap a SCO field (if not wrapped currently) and return the wrapped value.
-     * If the field is not a SCO field will just return the value.
-     * If "replaceFieldIfChanged" is set, we replace the value in the object with the wrapped value.
-     * @param fieldNumber Number of the field
-     * @param value The value to give it
-     * @param forInsert Whether the creation of any wrapper should insert this value into the datastore
-     * @param forUpdate Whether the creation of any wrapper should update the datastore with this value
-     * @param replaceFieldIfChanged Whether to replace the field in the object if wrapping the value
-     * @return The wrapper (or original value if not wrappable)
-     */
-    Object wrapSCOField(int fieldNumber, Object value, boolean forInsert, boolean forUpdate, boolean replaceFieldIfChanged);
-
-    /**
-     * Method to unwrap a SCO field (if it is wrapped currently) and return the unwrapped value.
-     * If the field is not a SCO field will just return the value.
-     * If "replaceFieldIfChanged" is set, we replace the value in the object with the unwrapped value.
-     * @param fieldNumber The field number
-     * @param value The value to unwrap for this field
-     * @param replaceFieldIfChanged Whether to replace the field value in the object if unwrapping the value
-     * @return The unwrapped field value
-     */
-    Object unwrapSCOField(int fieldNumber, Object value, boolean replaceFieldIfChanged);
-
-    /**
      * Method to set an associated value stored with this object.
      * This is for a situation such as in ORM where this object can have an "external" foreign-key
      * provided by an owning object (e.g 1-N uni relation and this is the element with no knowledge
@@ -357,6 +333,13 @@ public interface ObjectProvider<T>
      * @return Whether the managed object is embedded/serialised.
      */
     boolean isEmbedded();
+
+    /**
+     * Method to update the owner field in an embedded field.
+     * @param fieldNumber The field of this object that is embedded
+     * @param value The value of the field (embedded)
+     */
+    void updateOwnerFieldInEmbeddedField(int fieldNumber, Object value);
 
     /**
      * Convenience method to update our object with the field values from the passed object.

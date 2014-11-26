@@ -28,6 +28,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.types.SCO;
+import org.datanucleus.store.types.SCOUtils;
 
 /**
  * Field manager that perists all unpersisted PC objects referenced from the source object.
@@ -97,7 +98,7 @@ public class PersistFieldManager extends AbstractFieldManager
                 if (secondClassMutableFieldFlags[fieldNumber] && !(value instanceof SCO))
                 {
                     // Replace the field with a SCO wrapper
-                    value = op.wrapSCOField(fieldNumber, value, false, false, true);
+                    value = SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, true);
                 }
             }
 
