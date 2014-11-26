@@ -133,11 +133,15 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
      * @param element The element
      * @param fieldNumber Number of field in the element
      * @param value New value for this field
+     * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value)
+    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
     {
-        // Just mark field in embedded owners as dirty
-        makeDirty();
+        if (makeDirty)
+        {
+            // Just mark field in embedded owners as dirty
+            makeDirty();
+        }
     }
 
     /**

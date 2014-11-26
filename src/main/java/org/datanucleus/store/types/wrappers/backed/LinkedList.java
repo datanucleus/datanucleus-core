@@ -312,8 +312,9 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
      * @param element The element
      * @param fieldNumber Number of field in the element
      * @param value New value for this field
+     * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value)
+    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (backingStore != null)
         {

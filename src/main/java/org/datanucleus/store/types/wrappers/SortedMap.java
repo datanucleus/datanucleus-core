@@ -142,11 +142,15 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
      * @param key The key
      * @param fieldNumber Number of field in the key
      * @param newValue New value for this field
+     * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedKey(Object key, int fieldNumber, Object newValue)
+    public void updateEmbeddedKey(Object key, int fieldNumber, Object newValue, boolean makeDirty)
     {
-        // Just mark field in embedded owners as dirty
-        makeDirty();
+        if (makeDirty)
+        {
+            // Just mark field in embedded owners as dirty
+            makeDirty();
+        }
     }
 
     /**
@@ -154,11 +158,15 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
      * @param value The value
      * @param fieldNumber Number of field in the value
      * @param newValue New value for this field
+     * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedValue(Object value, int fieldNumber, Object newValue)
+    public void updateEmbeddedValue(Object value, int fieldNumber, Object newValue, boolean makeDirty)
     {
-        // Just mark field in embedded owners as dirty
-        makeDirty();
+        if (makeDirty)
+        {
+            // Just mark field in embedded owners as dirty
+            makeDirty();
+        }
     }
 
     /**

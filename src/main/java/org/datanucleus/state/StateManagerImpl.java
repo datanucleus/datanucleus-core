@@ -2998,27 +2998,25 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 if (ownerMmd.getCollection() != null)
                 {
                     // PC Object embedded in collection
-                    // TODO Respect makeDirty?
                     Object ownerField = ownerOP.provideField(ownerRel.getOwnerFieldNum());
                     if (ownerField instanceof SCOCollection)
                     {
-                        ((SCOCollection)ownerField).updateEmbeddedElement(myPC, fieldNumber, value);
+                        ((SCOCollection)ownerField).updateEmbeddedElement(myPC, fieldNumber, value, makeDirty);
                     }
                 }
                 else if (ownerMmd.getMap() != null)
                 {
                     // PC Object embedded in map
-                    // TODO Respect makeDirty?
                     Object ownerField = ownerOP.provideField(ownerRel.getOwnerFieldNum());
                     if (ownerField instanceof SCOMap)
                     {
                         if (objectType == ObjectProvider.EMBEDDED_MAP_KEY_PC)
                         {
-                            ((SCOMap)ownerField).updateEmbeddedKey(myPC, fieldNumber, value);
+                            ((SCOMap)ownerField).updateEmbeddedKey(myPC, fieldNumber, value, makeDirty);
                         }
                         if (objectType == ObjectProvider.EMBEDDED_MAP_VALUE_PC)
                         {
-                            ((SCOMap)ownerField).updateEmbeddedValue(myPC, fieldNumber, value);
+                            ((SCOMap)ownerField).updateEmbeddedValue(myPC, fieldNumber, value, makeDirty);
                         }
                     }
                 }

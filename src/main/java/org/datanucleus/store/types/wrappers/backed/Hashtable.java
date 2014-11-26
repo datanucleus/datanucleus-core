@@ -292,8 +292,9 @@ public class Hashtable extends org.datanucleus.store.types.wrappers.Hashtable im
      * @param key The key
      * @param fieldNumber Number of field in the key
      * @param newValue New value for this field
+     * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedKey(Object key, int fieldNumber, Object newValue)
+    public void updateEmbeddedKey(Object key, int fieldNumber, Object newValue, boolean makeDirty)
     {
         if (backingStore != null)
         {
@@ -306,8 +307,9 @@ public class Hashtable extends org.datanucleus.store.types.wrappers.Hashtable im
      * @param value The value
      * @param fieldNumber Number of field in the value
      * @param newValue New value for this field
+     * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedValue(Object value, int fieldNumber, Object newValue)
+    public void updateEmbeddedValue(Object value, int fieldNumber, Object newValue, boolean makeDirty)
     {
         if (backingStore != null)
         {
