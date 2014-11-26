@@ -1048,8 +1048,14 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         finally
         {
             int[] nonpkFields = cmd.getNonPKMemberPositions();
-            // TODO If an object goes HOLLOW and the user had a handle on a SCO collection then we could disconnect them
-//            provideFields(nonpkFields, new UnsetOwnerFieldManager());
+
+            // Unset owner of any SCO wrapper so if the user holds on to a wrapper it doesn't affect the datastore
+            int[] nonPkScoFields = ClassUtils.getFlagsSetTo(cmd.getSCOMutableMemberFlags(), ClassUtils.getFlagsSetTo(loadedFields, cmd.getNonPKMemberPositions(), true), true);
+            if (nonPkScoFields != null)
+            {
+                provideFields(nonPkScoFields, new UnsetOwnerFieldManager());
+            }
+
             clearFieldsByNumbers(nonpkFields);
             clearDirtyFlags(nonpkFields);
 
