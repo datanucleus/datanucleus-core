@@ -92,7 +92,7 @@ public class MakeTransientFieldManager extends AbstractFetchDepthFieldManager
                     if (!(value instanceof SCO))
                     {
                         // Replace with SCO
-                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, true);
+                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
                     }
                     SCO sco = (SCO)value;
 
@@ -114,7 +114,7 @@ public class MakeTransientFieldManager extends AbstractFetchDepthFieldManager
                     if (!(value instanceof SCO))
                     {
                         // Replace with SCO
-                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, true);
+                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
                     }
                     SCO sco = (SCO)value;
 

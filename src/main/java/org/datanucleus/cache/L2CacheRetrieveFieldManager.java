@@ -197,7 +197,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                                 fieldColl.add(null);
                             }
                         }
-                        return SCOUtils.wrapSCOField(op, fieldNumber, fieldColl, false, false, true);
+                        return SCOUtils.wrapSCOField(op, fieldNumber, fieldColl, true);
                     }
                     catch (Exception e)
                     {
@@ -252,7 +252,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
 
                             fieldMap.put(mapKey, mapValue);
                         }
-                        return SCOUtils.wrapSCOField(op, fieldNumber, fieldMap, false, false, true);
+                        return SCOUtils.wrapSCOField(op, fieldNumber, fieldMap, true);
                     }
                     catch (Exception e)
                     {
@@ -378,7 +378,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         boolean[] mutables = mmd.getAbstractClassMetaData().getSCOMutableMemberFlags();
         if (mutables[fieldNumber])
         {
-            return SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, true);
+            return SCOUtils.wrapSCOField(op, fieldNumber, value, true);
         }
 
         return value;

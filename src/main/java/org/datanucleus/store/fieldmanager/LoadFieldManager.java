@@ -96,7 +96,7 @@ public class LoadFieldManager extends AbstractFetchDepthFieldManager
                     if (!(value instanceof SCO))
                     {
                         // Replace with SCO
-                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, true);
+                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
                     }
 
                     Collection coll = (Collection)value;
@@ -116,7 +116,7 @@ public class LoadFieldManager extends AbstractFetchDepthFieldManager
                     if (!(value instanceof SCO))
                     {
                         // Replace with SCO
-                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, true);
+                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
                     }
 
                     Map map = (Map)value;

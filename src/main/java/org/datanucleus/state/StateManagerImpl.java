@@ -1715,9 +1715,9 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             }
             else if (oldValue != null && newValue != null)
             {
-                if (oldValue instanceof Persistable)
+                if (RelationType.isRelationSingleValued(relationType))
                 {
-                    // PC object field so compare object equality
+                    // Persistable field so compare object equality
                     // See JDO2 [5.4] "The JDO implementation must not use the application's hashCode and equals methods 
                     // from the persistence-capable classes except as needed to implement the Collections Framework" 
                     if (oldValue == newValue)
@@ -1727,7 +1727,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 }
                 else
                 {
-                    // Non-PC object field so compare using equals()
+                    // Non-persistable field so compare using equals()
                     if (oldValue.equals(newValue))
                     {
                         equal = true;
@@ -1801,17 +1801,16 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             if (needsSCOUpdating)
             {
                 // Wrap with SCO so we can detect future updates
-                // TODO Pass in oldValue when available so we can do an update bearing in mind what was there before (e.g for Lists when moving elements) NUCCORE-1238
-                newValue = SCOUtils.wrapSCOField(this, fieldNumber, newValue, false, true, true);
+                newValue = SCOUtils.wrapAndReplaceSCOField(this, fieldNumber, newValue, oldValue, true);
             }
 
-            if (oldValue != null && newValue == null && oldValue instanceof Persistable)
+            if (oldValue != null && newValue == null)
             {
-                if (mmd.isDependent() || mmd.isCascadeRemoveOrphans())
+                if (RelationType.isRelationSingleValued(relationType) && (mmd.isDependent() || mmd.isCascadeRemoveOrphans()))
                 {
+                    // Persistable field being nulled, so delete previous persistable value if in a position to be deleted
                     if (myEC.getApiAdapter().isPersistent(oldValue))
                     {
-                        // PC field being nulled, so delete previous PC value
                         // TODO Queue this when using optimistic txns, so the old value could be assigned somewhere else
                         NucleusLogger.PERSISTENCE.debug(Localiser.msg("026026", oldValue, mmd.getFullFieldName()));
                         myEC.deleteObjectInternal(oldValue);
@@ -3202,7 +3201,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 Object value = provideField(i);
                 if (!(value instanceof SCO))
                 {
-                    SCOUtils.wrapSCOField(this, i, value, false, false, true);
+                    SCOUtils.wrapSCOField(this, i, value, true);
                 }
             }
         }
@@ -3222,7 +3221,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 Object value = provideField(i);
                 if (value instanceof SCO)
                 {
-                    SCOUtils.unwrapSCOField(this, i, (SCO)value, true);
+                    SCOUtils.unwrapSCOField(this, i, (SCO)value);
                 }
             }
         }

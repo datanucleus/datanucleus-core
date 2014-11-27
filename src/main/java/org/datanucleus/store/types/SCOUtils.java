@@ -62,16 +62,13 @@ import org.datanucleus.util.StringUtils;
 public class SCOUtils
 {
     /**
-     * Method to unwrap a SCO field (if it is wrapped currently).
-     * If the field is not a SCO field will just return the value.
-     * If "replaceFieldIfChanged" is set, we replace the value in the object with the unwrapped value.
+     * Method to unwrap a SCO field (if it is wrapped currently). If the field is not a SCO field will just return the value.
      * @param op The ObjectProvider
      * @param fieldNumber The field number
      * @param sco The SCO value for the field
-     * @param replaceFieldIfChanged Whether to replace the field value in the object if unwrapping the value
      * @return The unwrapped field value
      */
-    public static Object unwrapSCOField(ObjectProvider op, int fieldNumber, SCO sco, boolean replaceFieldIfChanged)
+    public static Object unwrapSCOField(ObjectProvider op, int fieldNumber, SCO sco)
     {
         if (sco == null)
         {
@@ -79,16 +76,13 @@ public class SCOUtils
         }
 
         Object unwrappedValue = sco.getValue();
-        if (replaceFieldIfChanged)
+        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-            {
-                AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("026030", StringUtils.toJVMIDString(op.getObject()), 
-                    IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), mmd.getName()));
-            }
-            op.replaceField(fieldNumber, unwrappedValue);
+            AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("026030", StringUtils.toJVMIDString(op.getObject()), 
+                IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), mmd.getName()));
         }
+        op.replaceField(fieldNumber, unwrappedValue);
         return unwrappedValue;
     }
 
@@ -97,12 +91,10 @@ public class SCOUtils
      * @param op The ObjectProvider
      * @param fieldNumber The field number
      * @param value The value to initialise the wrapper with (if any)
-     * @param forInsert Whether the creation of any wrapper should insert this value into the datastore
-     * @param forUpdate Whether the creation of any wrapper should update the datastore with this value
      * @param replaceFieldIfChanged Whether to replace the field in the object if wrapping the value
      * @return The wrapper (or original value if not wrappable)
      */
-    public static Object wrapSCOField(ObjectProvider op, int fieldNumber, Object value, boolean forInsert, boolean forUpdate, boolean replaceFieldIfChanged)
+    public static Object wrapSCOField(ObjectProvider op, int fieldNumber, Object value, boolean replaceFieldIfChanged)
     {
         if (value == null || !op.getClassMetaData().getSCOMutableMemberFlags()[fieldNumber])
         {
@@ -122,9 +114,44 @@ public class SCOUtils
                         op.getExecutionContext() != null ? IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()) : op.getInternalObjectId(), mmd.getName()));
                 }
             }
-            return SCOUtils.newSCOInstance(op, mmd, value.getClass(), value, forInsert, forUpdate, replaceFieldIfChanged);
+            return SCOUtils.newSCOInstance(op, mmd, value.getClass(), value, false, replaceFieldIfChanged);
         }
         return value;
+    }
+
+    /**
+     * Method to create a new SCO wrapper for the specified field replacing the old value with the new value. 
+     * If the field is not a SCO field will just return the (new) value.
+     * @param op The ObjectProvider
+     * @param fieldNumber The field number
+     * @param newValue The value to initialise the wrapper with (if any)
+     * @param oldValue The previous value that we are replacing with this value
+     * @param replaceFieldIfChanged Whether to replace the field in the object if wrapping the value
+     * @return The wrapper (or original value if not wrappable)
+     */
+    public static Object wrapAndReplaceSCOField(ObjectProvider op, int fieldNumber, Object newValue, Object oldValue, boolean replaceFieldIfChanged)
+    {
+        if (newValue == null || !op.getClassMetaData().getSCOMutableMemberFlags()[fieldNumber])
+        {
+            // We don't wrap null objects currently
+            return newValue;
+        }
+
+        if (!(newValue instanceof SCO) || op.getObject() != ((SCO)newValue).getOwner())
+        {
+            // Not a SCO wrapper, or is a SCO wrapper but not owned by this object
+            AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            if (replaceFieldIfChanged)
+            {
+                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                {
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029", StringUtils.toJVMIDString(op.getObject()), 
+                        op.getExecutionContext() != null ? IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()) : op.getInternalObjectId(), mmd.getName()));
+                }
+            }
+            return SCOUtils.newSCOInstance(op, mmd, newValue.getClass(), newValue, true, replaceFieldIfChanged); // TODO Pass oldValue in
+        }
+        return newValue;
     }
 
     /**
@@ -135,16 +162,15 @@ public class SCOUtils
      * collection yet have no value so pass in the declaredType as Collection, instantiatedType as ArrayList,
      * and value as null.
      * @param ownerOP ObjectProvider for the owning object
-     * @param mmd The Field MetaData for the related field.
-     * @param instantiatedType Instantiated type for the field if known
+     * @param mmd The MetaData for the related member.
+     * @param instantiatedType Instantiated type for the member if known
      * @param value The value we are wrapping if known
-     * @param forInsert Whether the SCO needs inserting in the datastore with this value
      * @param forUpdate Whether the SCO needs updating in the datastore with this value
      * @param replaceField Whether to replace the field with this value
      * @return The Second-Class Object
      * @throws NucleusUserException if an error occurred when creating the SCO instance
      */
-    public static SCO newSCOInstance(ObjectProvider ownerOP, AbstractMemberMetaData mmd, Class instantiatedType, Object value, boolean forInsert, boolean forUpdate, boolean replaceField)
+    public static SCO newSCOInstance(ObjectProvider ownerOP, AbstractMemberMetaData mmd, Class instantiatedType, Object value, boolean forUpdate, boolean replaceField)
     {
         // Check if the passed in value is a wrapper type
         TypeManager typeMgr = ownerOP.getExecutionContext().getNucleusContext().getTypeManager();
@@ -218,8 +244,9 @@ public class SCOUtils
         // Initialise the SCO for use
         if (value != null)
         {
+            // TODO Drop the second argument, and pass in the oldValue on an update
             // Apply the existing value
-            sco.initialise(value, forInsert, forUpdate);
+            sco.initialise(value, false, forUpdate);
         }
         else
         {

@@ -98,7 +98,7 @@ public class PersistFieldManager extends AbstractFieldManager
                 if (secondClassMutableFieldFlags[fieldNumber] && !(value instanceof SCO))
                 {
                     // Replace the field with a SCO wrapper
-                    value = SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, true);
+                    value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
                 }
             }
 

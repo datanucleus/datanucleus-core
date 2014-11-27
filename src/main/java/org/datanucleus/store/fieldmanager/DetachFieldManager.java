@@ -135,7 +135,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                     if (!(value instanceof SCO))
                     {
                         // Replace with SCO so we can work with it
-                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, true);
+                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
                     }
                     if (!(value instanceof SCO) && mmd.isSerialized())
                     {
@@ -165,7 +165,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                 if (!(value instanceof SCO))
                 {
                     // Replace with SCO so we can work with it
-                    value = SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, true);
+                    value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
                 }
                 SCO sco = (SCO)value;
 
@@ -186,7 +186,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                 {
                     return sco;
                 }
-                return SCOUtils.unwrapSCOField(op, fieldNumber, sco, true);
+                return SCOUtils.unwrapSCOField(op, fieldNumber, sco);
             }
             else if (mmd.hasArray())
             {
@@ -217,7 +217,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                     if (!(value instanceof SCO))
                     {
                         // Replace with SCO so we can work with it
-                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, true);
+                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
                     }
                     return ((SCO)value).detachCopy(state);
                 }
@@ -225,7 +225,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                 if (!(value instanceof SCO))
                 {
                     // Replace with SCO so we can work with it
-                    value = SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, true);
+                    value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
                 }
                 SCO sco = (SCO)value;
 
@@ -233,7 +233,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                 {
                     return sco;
                 }
-                return SCOUtils.unwrapSCOField(op, fieldNumber, sco, true);
+                return SCOUtils.unwrapSCOField(op, fieldNumber, sco);
             }
         }
 
