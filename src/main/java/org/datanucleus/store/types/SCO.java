@@ -34,8 +34,8 @@ public interface SCO<T>
     /**
      * Method to initialise the SCO for use using an existing object of the same or compatible type.
      * @param value the object from which to copy the value.
-     * @param forInsert Whether the object needs inserting in the datastore with this value
-     * @param forUpdate Whether the object needs updating in the datastore with this value
+     * @param forInsert Whether the object needs inserting in the datastore with this value TODO Remove this
+     * @param forUpdate Whether the object needs updating in the datastore with this value TODO Remove this and enable other initialise method
      */
     void initialise(T value, boolean forInsert, boolean forUpdate);
 
@@ -44,6 +44,15 @@ public interface SCO<T>
      * This can be utilised to perform any eager loading of information from the datastore.
      */
     void initialise();
+
+    // TODO Enable this
+    /**
+     * Method to initialise the SCO for use, where replacing an old value with a new value such as when
+     * calling a setter field passing in a new value.
+     * @param newValue New value (to wrap)
+     * @param oldValue Old value (to use in deciding what needs deleting etc)
+     */
+//    void initialise(T newValue, T oldValue);
 
     /**
      * Accessor for the field name.
