@@ -194,8 +194,12 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
                 // Detect which objects are added and which are deleted
                 if (useCache)
                 {
-                    isCacheLoaded = false; // Mark as false since need to load the old collection
-                    loadFromStore();
+                    java.util.Collection oldColl = (java.util.Collection)oldValue;
+                    if (oldColl != null)
+                    {
+                        delegate.addAll(oldColl);
+                    }
+                    isCacheLoaded = true;
 
                     for (Object elem : newValue)
                     {

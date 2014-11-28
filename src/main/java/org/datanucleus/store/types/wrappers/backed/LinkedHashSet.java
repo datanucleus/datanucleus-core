@@ -130,8 +130,12 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
             // Detect which objects are added and which are deleted
             if (useCache)
             {
-                isCacheLoaded = false; // Mark as false since need to load the old collection
-                loadFromStore();
+                Collection oldColl = (Collection)oldValue;
+                if (oldColl != null)
+                {
+                    delegate.addAll(oldColl);
+                }
+                isCacheLoaded = true;
 
                 for (Object elem : newValue)
                 {
