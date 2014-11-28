@@ -194,9 +194,8 @@ public class SCOUtils
         // Initialise the SCO for use
         if (value != null)
         {
-            // TODO Drop the second/third arguments
             // Apply the existing value
-            sco.initialise(value, false, false);
+            sco.initialise(value);
         }
         else
         {
@@ -245,14 +244,14 @@ public class SCOUtils
             ownerOP.replaceField(mmd.getAbsoluteFieldNumber(), sco);
         }
 
-        // Initialise the SCO for use TODO Pass in the oldValue on an update
-        sco.initialise(newValue, false, true);
+        // Initialise the SCO for use, providing new and old values so the wrapper has the ability to do something intelligent
+        sco.initialise(newValue, oldValue);
 
         return sco;
     }
 
     /**
-     * Method to create a new SCO wrapper for a SCO type.
+     * Method to create a new SCO wrapper for member type.
      * Will find a wrapper suitable for the instantiated type (if provided), otherwise suitable for the member metadata type.
      * @param ownerOP ObjectProvider for the owning object
      * @param mmd The MetaData for the related member.

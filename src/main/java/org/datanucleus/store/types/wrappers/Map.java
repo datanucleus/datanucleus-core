@@ -56,13 +56,19 @@ public class Map extends AbstractMap implements SCOMap<java.util.Map>, Cloneable
         this.ownerMmd = mmd;
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
+     */
+    public void initialise(java.util.Map newValue, Object oldValue)
+    {
+        initialise(newValue);
+    }
+
     /**
      * Method to initialise the SCO from an existing value.
      * @param m The object to set from
-     * @param forInsert Whether the object needs inserting in the datastore with this value
-     * @param forUpdate Whether to update the datastore with this value
      */
-    public synchronized void initialise(java.util.Map m, boolean forInsert, boolean forUpdate)
+    public synchronized void initialise(java.util.Map m)
     {
         if (m != null)
         {

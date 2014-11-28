@@ -53,13 +53,19 @@ public class SqlDate extends java.sql.Date implements SCO<java.sql.Date>
     {
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
+     */
+    public void initialise(java.sql.Date newValue, Object oldValue)
+    {
+        initialise(newValue);
+    }
+
     /**
      * Method to initialise the SCO from an existing value.
      * @param d The Object
-     * @param forInsert Whether the object needs inserting in the datastore with this value
-     * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(java.sql.Date d, boolean forInsert, boolean forUpdate)
+    public void initialise(java.sql.Date d)
     {
         super.setTime(d.getTime());
     }
@@ -132,7 +138,7 @@ public class SqlDate extends java.sql.Date implements SCO<java.sql.Date>
     public void attachCopy(java.sql.Date value)
     {
         long oldValue = getTime();
-        initialise(value, false, true);
+        initialise(value);
 
         // Check if the field has changed, and set the owner field as dirty if necessary
         long newValue = value.getTime();

@@ -55,13 +55,19 @@ public class GregorianCalendar extends java.util.GregorianCalendar implements SC
     {
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
+     */
+    public void initialise(java.util.GregorianCalendar newValue, Object oldValue)
+    {
+        initialise(newValue);
+    }
+
     /**
      * Method to initialise the SCO from an existing value.
      * @param cal The Object
-     * @param forInsert Whether the object needs inserting in the datastore with this value
-     * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(java.util.GregorianCalendar cal, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.GregorianCalendar cal)
     {
         super.setTimeInMillis(cal.getTime().getTime());
         super.setTimeZone(cal.getTimeZone());
@@ -141,7 +147,7 @@ public class GregorianCalendar extends java.util.GregorianCalendar implements SC
     public void attachCopy(java.util.GregorianCalendar value)
     {
         long oldValue = getTimeInMillis();
-        initialise(value, false, true);
+        initialise(value);
 
         // Check if the field has changed, and set the owner field as dirty if
         // necessary

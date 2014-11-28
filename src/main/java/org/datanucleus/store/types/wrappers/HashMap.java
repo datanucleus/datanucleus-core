@@ -59,13 +59,19 @@ public class HashMap extends java.util.HashMap implements SCOMap<java.util.HashM
         this.ownerMmd = mmd;
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
+     */
+    public void initialise(java.util.HashMap newValue, Object oldValue)
+    {
+        initialise(newValue);
+    }
+
     /**
      * Method to initialise the SCO from an existing value.
      * @param m Object to set value using.
-     * @param forInsert Whether the object needs inserting in the datastore with this value
-     * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(java.util.HashMap m, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.HashMap m)
     {
         if (m != null)
         {

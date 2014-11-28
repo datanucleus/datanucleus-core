@@ -57,13 +57,19 @@ public class Queue extends AbstractQueue implements SCOCollection<java.util.Queu
         this.ownerMmd = mmd;
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
+     */
+    public void initialise(java.util.Queue newValue, Object oldValue)
+    {
+        initialise(newValue);
+    }
+
     /**
      * Method to initialise the SCO from an existing value.
      * @param c The object to set from
-     * @param forInsert Whether the object needs inserting in the datastore with this value
-     * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(java.util.Queue c, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.Queue c)
     {
         if (c != null)
         {

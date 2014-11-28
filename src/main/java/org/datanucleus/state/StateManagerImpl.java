@@ -1696,8 +1696,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                     oldValue = provideField(fieldNumber);
                 }
 
-                if (relationType != RelationType.NONE && newValue == null && 
-                    (mmd.isDependent() || mmd.isCascadeRemoveOrphans()))
+                if (relationType != RelationType.NONE && newValue == null && (mmd.isDependent() || mmd.isCascadeRemoveOrphans()))
                 {
                     // Field being nulled and is dependent so load the existing value so it can be deleted
                     loadField(fieldNumber);

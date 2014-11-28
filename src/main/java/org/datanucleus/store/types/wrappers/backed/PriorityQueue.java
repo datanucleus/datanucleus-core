@@ -122,13 +122,90 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
         }
     }
 
+    public void initialise(java.util.PriorityQueue newValue, Object oldValue)
+    {
+        if (newValue != null)
+        {
+            // Check for the case of serialised PC elements, and assign ObjectProviders to the elements without
+            if (SCOUtils.collectionHasSerialisedElements(ownerMmd) && ownerMmd.getCollection().elementIsPersistent())
+            {
+                ExecutionContext ec = ownerOP.getExecutionContext();
+                Iterator iter = newValue.iterator();
+                while (iter.hasNext())
+                {
+                    Object pc = iter.next();
+                    ObjectProvider objSM = ec.findObjectProvider(pc);
+                    if (objSM == null)
+                    {
+                        objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, pc, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                    }
+                }
+            }
+
+            if (backingStore != null && useCache && !isCacheLoaded)
+            {
+                // Mark as loaded
+                isCacheLoaded = true;
+            }
+
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            {
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + newValue.size()));
+            }
+
+            // TODO This is clear+addAll. Change to detect updates
+            if (backingStore != null)
+            {
+                if (SCOUtils.useQueuedUpdate(ownerOP))
+                {
+                    if (ownerOP.isFlushedToDatastore())
+                    {
+                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
+                    }
+                }
+                else
+                {
+                    backingStore.clear(ownerOP);
+                }
+            }
+            if (useCache)
+            {
+                loadFromStore();
+            }
+            if (backingStore != null)
+            {
+                if (SCOUtils.useQueuedUpdate(ownerOP))
+                {
+                    if (ownerOP.isFlushedToDatastore())
+                    {
+                        for (Object element : newValue)
+                        {
+                            ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
+                        }
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        backingStore.addAll(ownerOP, newValue, (useCache ? delegate.size() : -1));
+                    }
+                    catch (NucleusDataStoreException dse)
+                    {
+                        NucleusLogger.PERSISTENCE.warn(Localiser.msg("023013", "addAll", ownerMmd.getName(), dse));
+                    }
+                }
+            }
+            delegate.addAll(newValue);
+            makeDirty();
+        }
+    }
+
     /**
      * Method to initialise the SCO from an existing value.
      * @param c The object to set from
-     * @param forInsert Whether the object needs inserting in the datastore with this value
-     * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(java.util.PriorityQueue c, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.PriorityQueue c)
     {
         if (c != null)
         {
@@ -154,103 +231,12 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
                 isCacheLoaded = true;
             }
 
-            if (forInsert)
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
-                }
-
-                if (useCache)
-                {
-                    loadFromStore();
-                }
-                if (backingStore != null)
-                {
-                    if (SCOUtils.useQueuedUpdate(ownerOP))
-                    {
-                        for (Object element : c)
-                        {
-                            ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            backingStore.addAll(ownerOP, c, (useCache ? delegate.size() : -1));
-                        }
-                        catch (NucleusDataStoreException dse)
-                        {
-                            NucleusLogger.PERSISTENCE.warn(Localiser.msg("023013", "addAll", ownerMmd.getName(), dse));
-                        }
-                    }
-                }
-                makeDirty();
-                delegate.addAll(c);
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
             }
-            else if (forUpdate)
-            {
-                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
-                }
-
-                // TODO This is clear+addAll. Change to detect updates
-                if (backingStore != null)
-                {
-                    if (SCOUtils.useQueuedUpdate(ownerOP))
-                    {
-                        if (ownerOP.isFlushedToDatastore())
-                        {
-                            ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
-                        }
-                    }
-                    else
-                    {
-                        backingStore.clear(ownerOP);
-                    }
-                }
-                if (useCache)
-                {
-                    loadFromStore();
-                }
-                if (backingStore != null)
-                {
-                    if (SCOUtils.useQueuedUpdate(ownerOP))
-                    {
-                        if (ownerOP.isFlushedToDatastore())
-                        {
-                            for (Object element : c)
-                            {
-                                ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
-                            }
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            backingStore.addAll(ownerOP, c, (useCache ? delegate.size() : -1));
-                        }
-                        catch (NucleusDataStoreException dse)
-                        {
-                            NucleusLogger.PERSISTENCE.warn(Localiser.msg("023013", "addAll", ownerMmd.getName(), dse));
-                        }
-                    }
-                }
-                delegate.addAll(c);
-                makeDirty();
-            }
-            else
-            {
-                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + c.size()));
-                }
-                delegate.clear();
-                delegate.addAll(c);
-            }
+            delegate.clear();
+            delegate.addAll(c);
         }
     }
 

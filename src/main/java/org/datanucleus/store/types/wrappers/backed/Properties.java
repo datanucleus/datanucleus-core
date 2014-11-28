@@ -78,13 +78,104 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         }
     }
 
+    public void initialise(java.util.Properties newValue, Object oldValue)
+    {
+        if (newValue != null)
+        {
+            // Check for the case of serialised maps, and assign ObjectProviders to any PC keys/values without
+            if (SCOUtils.mapHasSerialisedKeysAndValues(ownerMmd) &&
+                (ownerMmd.getMap().keyIsPersistent() || ownerMmd.getMap().valueIsPersistent()))
+            {
+                ExecutionContext ec = ownerOP.getExecutionContext();
+                Iterator iter = newValue.entrySet().iterator();
+                while (iter.hasNext())
+                {
+                    Map.Entry entry = (Map.Entry)iter.next();
+                    Object key = entry.getKey();
+                    Object value = entry.getValue();
+                    if (ownerMmd.getMap().keyIsPersistent())
+                    {
+                        ObjectProvider objSM = ec.findObjectProvider(key);
+                        if (objSM == null)
+                        {
+                            objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                        }
+                    }
+                    if (ownerMmd.getMap().valueIsPersistent())
+                    {
+                        ObjectProvider objSM = ec.findObjectProvider(value);
+                        if (objSM == null)
+                        {
+                            objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                        }
+                    }
+                }
+            }
+
+            if (backingStore != null && useCache && !isCacheLoaded)
+            {
+                // Mark as loaded
+                isCacheLoaded = true;
+            }
+
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            {
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + newValue.size()));
+            }
+
+            // TODO This is clear+putAll. Improve it to work out what is changed
+            delegate.clear();
+            if (backingStore != null)
+            {
+                if (SCOUtils.useQueuedUpdate(ownerOP))
+                {
+                    // If not yet flushed to store then no need to add to queue (since will be handled via insert)
+                    if (ownerOP.isFlushedToDatastore())
+                    {
+                        ownerOP.getExecutionContext().addOperationToQueue(new MapClearOperation(ownerOP, backingStore));
+                    }
+                }
+                else
+                {
+                    backingStore.clear(ownerOP);
+                }
+            }
+            if (useCache)
+            {
+                // Make sure we have all values loaded (e.g if in optimistic tx and we put new entry)
+                loadFromStore();
+            }
+
+            if (backingStore != null)
+            {
+                if (SCOUtils.useQueuedUpdate(ownerOP))
+                {
+                    // If not yet flushed to store then no need to add to queue (since will be handled via insert)
+                    if (ownerOP.isFlushedToDatastore())
+                    {
+                        Iterator iter = newValue.entrySet().iterator();
+                        while (iter.hasNext())
+                        {
+                            Map.Entry entry = (Map.Entry)iter.next();
+                            ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, entry.getKey(), entry.getValue()));
+                        }
+                    }
+                }
+                else
+                {
+                    backingStore.putAll(ownerOP, newValue);
+                }
+            }
+            delegate.putAll(newValue);
+            makeDirty();
+        }
+    }
+
     /**
      * Method to initialise the SCO from an existing value.
      * @param m Object to set value using.
-     * @param forInsert Whether the object needs inserting in the datastore with this value
-     * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(java.util.Properties m, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.Properties m)
     {
         if (m != null)
         {
@@ -124,99 +215,12 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                 isCacheLoaded = true;
             }
 
-            if (forInsert)
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
-                }
-
-                makeDirty();
-                if (useCache)
-                {
-                    // Make sure we have all values loaded (e.g if in optimistic tx and we put new entry)
-                    loadFromStore();
-                }
-                if (backingStore != null)
-                {
-                    if (SCOUtils.useQueuedUpdate(ownerOP))
-                    {
-                        Iterator iter = m.entrySet().iterator();
-                        while (iter.hasNext())
-                        {
-                            Map.Entry entry = (Map.Entry)iter.next();
-                            ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, entry.getKey(), entry.getValue()));
-                        }
-                    }
-                    else
-                    {
-                        backingStore.putAll(ownerOP, m);
-                    }
-                }
-                delegate.putAll(m);
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
             }
-            else if (forUpdate)
-            {
-                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
-                }
-
-                // TODO This is clear+putAll. Improve it to work out what is changed
-                delegate.clear();
-                if (backingStore != null)
-                {
-                    if (SCOUtils.useQueuedUpdate(ownerOP))
-                    {
-                        // If not yet flushed to store then no need to add to queue (since will be handled via insert)
-                        if (ownerOP.isFlushedToDatastore())
-                        {
-                            ownerOP.getExecutionContext().addOperationToQueue(new MapClearOperation(ownerOP, backingStore));
-                        }
-                    }
-                    else
-                    {
-                        backingStore.clear(ownerOP);
-                    }
-                }
-                if (useCache)
-                {
-                    // Make sure we have all values loaded (e.g if in optimistic tx and we put new entry)
-                    loadFromStore();
-                }
-
-                if (backingStore != null)
-                {
-                    if (SCOUtils.useQueuedUpdate(ownerOP))
-                    {
-                        // If not yet flushed to store then no need to add to queue (since will be handled via insert)
-                        if (ownerOP.isFlushedToDatastore())
-                        {
-                            Iterator iter = m.entrySet().iterator();
-                            while (iter.hasNext())
-                            {
-                                Map.Entry entry = (Map.Entry)iter.next();
-                                ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, entry.getKey(), entry.getValue()));
-                            }
-                        }
-                    }
-                    else
-                    {
-                        backingStore.putAll(ownerOP, m);
-                    }
-                }
-                delegate.putAll(m);
-                makeDirty();
-            }
-            else
-            {
-                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
-                }
-                delegate.clear();
-                delegate.putAll(m);
-            }
+            delegate.clear();
+            delegate.putAll(m);
         }
     }
 

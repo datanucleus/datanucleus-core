@@ -244,7 +244,7 @@ public class AttachFieldManager extends AbstractFieldManager
                         else
                         {
                             // Initialise the SCO with the new value
-                            sco.initialise(value, false, false);
+                            sco.initialise(value);
                         }
                     }
                 }

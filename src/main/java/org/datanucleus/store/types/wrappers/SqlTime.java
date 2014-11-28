@@ -51,13 +51,19 @@ public class SqlTime extends java.sql.Time implements SCO<java.sql.Time>
     {
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
+     */
+    public void initialise(java.sql.Time newValue, Object oldValue)
+    {
+        initialise(newValue);
+    }
+
     /**
      * Method to initialise the SCO from an existing value.
      * @param t The Object
-     * @param forInsert Whether the object needs inserting in the datastore with this value
-     * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(java.sql.Time t, boolean forInsert, boolean forUpdate)
+    public void initialise(java.sql.Time t)
     {
         super.setTime(t.getTime());
     }
@@ -130,7 +136,7 @@ public class SqlTime extends java.sql.Time implements SCO<java.sql.Time>
     public void attachCopy(java.sql.Time value)
     {
         long oldValue = getTime();
-        initialise(value, false, true);
+        initialise(value);
 
         // Check if the field has changed, and set the owner field as dirty if necessary
         long newValue = value.getTime();

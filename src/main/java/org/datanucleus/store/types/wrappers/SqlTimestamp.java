@@ -52,13 +52,19 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Tim
     {
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
+     */
+    public void initialise(java.sql.Timestamp newValue, Object oldValue)
+    {
+        initialise(newValue);
+    }
+
     /**
      * Method to initialise the SCO from an existing value.
      * @param ts The Object
-     * @param forInsert Whether the object needs inserting in the datastore with this value
-     * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(java.sql.Timestamp ts, boolean forInsert, boolean forUpdate)
+    public void initialise(java.sql.Timestamp ts)
     {
         super.setTime(ts.getTime());
         super.setNanos(ts.getNanos());
@@ -136,7 +142,7 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Tim
     public void attachCopy(java.sql.Timestamp value)
     {
         long oldValue = getTime();
-        initialise(value, false, true);
+        initialise(value);
 
         // Check if the field has changed, and set the owner field as dirty if necessary
         long newValue = value.getTime();

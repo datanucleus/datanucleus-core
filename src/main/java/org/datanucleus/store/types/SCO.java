@@ -1,5 +1,5 @@
 /**********************************************************************
-Copyright (c) 2003 Mike Martin and others. All rights reserved.
+Copyright (c) 2007 Andy Jefferson and others. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -13,8 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 Contributors:
-2003 Andy Jefferson - commented
-2007 Andy Jefferson - added detachCopy, attachCopy, initialise, getValue
     ...
 **********************************************************************/
 package org.datanucleus.store.types;
@@ -22,9 +20,9 @@ package org.datanucleus.store.types;
 import org.datanucleus.state.FetchPlanState;
 
 /**
- * Representation of a wrapper/proxy for a mutable SCO type supported.
+ * Representation of a wrapper/proxy for a mutable SCO type (e.g Date, Collection, Map).
  * An implementation of this interface must have a constructor with the arguments 
- * <i>{@link org.datanucleus.state.ObjectProvider} ownerOP</i>, <i>String fieldName</i>.
+ * <i>{@link org.datanucleus.state.ObjectProvider} ownerOP</i>, <i>AbstractMemberMetaData mmd</i>.
  * The constructor must be capable of taking nulls for these arguments to create a non-managed wrapper
  * which effectively just acts like an unwrapped object.
  * @param <T> The type of the field/property
@@ -32,27 +30,26 @@ import org.datanucleus.state.FetchPlanState;
 public interface SCO<T>
 {
     /**
-     * Method to initialise the SCO for use using an existing object of the same or compatible type.
+     * Method to initialise the SCO for use with the provided initial value.
+     * This is used, for example, when retrieving the field from the datastore and setting it in the persistable object.
      * @param value the object from which to copy the value.
-     * @param forInsert Whether the object needs inserting in the datastore with this value TODO Remove this
-     * @param forUpdate Whether the object needs updating in the datastore with this value TODO Remove this and enable other initialise method
      */
-    void initialise(T value, boolean forInsert, boolean forUpdate);
+    void initialise(T value);
 
     /**
-     * Method to initialise the SCO for use.
+     * Method to initialise the SCO for use, starting from no initial value.
      * This can be utilised to perform any eager loading of information from the datastore.
      */
     void initialise();
 
-    // TODO Enable this
     /**
-     * Method to initialise the SCO for use, where replacing an old value with a new value such as when
-     * calling a setter field passing in a new value.
+     * Method to initialise the SCO for use, where replacing an old value with a new value such as when calling a setter field 
+     * passing in a new value. Note that oldValue is marked as Object since for cases where the member type is Collection the
+     * newValue could be, for example, ArrayList, and the oldValue of type Collection (representing null).
      * @param newValue New value (to wrap)
      * @param oldValue Old value (to use in deciding what needs deleting etc)
      */
-//    void initialise(T newValue, T oldValue);
+    void initialise(T newValue, Object oldValue);
 
     /**
      * Accessor for the field name.

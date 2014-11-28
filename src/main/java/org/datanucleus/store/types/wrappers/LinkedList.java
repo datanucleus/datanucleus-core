@@ -60,13 +60,19 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
         this.ownerMmd = mmd;
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
+     */
+    public void initialise(java.util.LinkedList newValue, Object oldValue)
+    {
+        initialise(newValue);
+    }
+
     /**
      * Method to initialise the SCO from an existing value.
      * @param c The object to set from
-     * @param forInsert Whether the object needs inserting in the datastore with this value
-     * @param forUpdate Whether to update the datastore with this value
      */
-    public void initialise(java.util.LinkedList c, boolean forInsert, boolean forUpdate)
+    public void initialise(java.util.LinkedList c)
     {
         if (c != null)
         {
