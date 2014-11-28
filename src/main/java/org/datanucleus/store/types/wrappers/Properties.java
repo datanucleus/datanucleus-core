@@ -55,18 +55,11 @@ public class Properties extends java.util.Properties implements SCOMap<java.util
         this.ownerMmd = mmd;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
-     */
     public void initialise(java.util.Properties newValue, Object oldValue)
     {
         initialise(newValue);
     }
 
-    /**
-     * Method to initialise the SCO from an existing value.
-     * @param m Object to set value using.
-     */
     public void initialise(java.util.Properties m)
     {
         if (m != null)
@@ -85,17 +78,9 @@ public class Properties extends java.util.Properties implements SCOMap<java.util
         }
     }
 
-    /**
-     * Method to initialise the SCO for use.
-     */
     public void initialise()
     {
-        delegate = new java.util.Properties();
-        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-        {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", this.getClass().getName(), ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
-                SCOUtils.getSCOWrapperOptionsMessage(true, false, false, false)));
-        }
+        initialise(null);
     }
 
     /**

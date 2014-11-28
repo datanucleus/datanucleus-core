@@ -61,18 +61,11 @@ public class List extends AbstractList implements SCOList<java.util.List>, Clone
         this.ownerMmd = mmd;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
-     */
     public void initialise(java.util.List newValue, Object oldValue)
     {
         initialise(newValue);
     }
 
-    /**
-     * Method to initialise the SCO from an existing value.
-     * @param c The object to set from
-     */
     public void initialise(java.util.List c)
     {
         if (c != null)
@@ -90,17 +83,9 @@ public class List extends AbstractList implements SCOList<java.util.List>, Clone
         }
     }
 
-    /**
-     * Method to initialise the SCO for use.
-     */
     public void initialise()
     {
-        delegate = new java.util.ArrayList();
-        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-        {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", this.getClass().getName(), ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
-                SCOUtils.getSCOWrapperOptionsMessage(true, false, true, false)));
-        }
+        initialise(null);
     }
 
     // ----------------------------- Implementation of SCO methods -----------------------------------

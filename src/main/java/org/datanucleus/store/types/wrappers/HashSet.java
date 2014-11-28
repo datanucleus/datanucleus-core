@@ -58,18 +58,11 @@ public class HashSet extends java.util.HashSet implements SCOCollection<java.uti
         this.ownerMmd = mmd;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
-     */
     public void initialise(java.util.HashSet newValue, Object oldValue)
     {
         initialise(newValue);
     }
 
-    /**
-     * Method to initialise the SCO from an existing value.
-     * @param c The object to set from
-     */
     public void initialise(java.util.HashSet c)
     {
         if (c != null)
@@ -87,17 +80,9 @@ public class HashSet extends java.util.HashSet implements SCOCollection<java.uti
         }
     }
 
-    /**
-     * Method to initialise the SCO for use.
-     */
     public void initialise()
     {
-        delegate = new java.util.HashSet();
-        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-        {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", this.getClass().getName(), ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
-                SCOUtils.getSCOWrapperOptionsMessage(true, false, true, false)));
-        }
+        initialise(null);
     }
 
     // ----------------------- Implementation of SCO methods -------------------

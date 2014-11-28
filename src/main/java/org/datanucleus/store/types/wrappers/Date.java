@@ -46,25 +46,15 @@ public class Date extends java.util.Date implements SCO<java.util.Date>
         this.ownerMmd = mmd;
     }
 
-    /**
-     * Method to initialise the SCO for use.
-     */
     public void initialise()
     {
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
-     */
     public void initialise(java.util.Date newValue, Object oldValue)
     {
         initialise(newValue);
     }
 
-    /**
-     * Method to initialise the SCO from an existing value.
-     * @param d The Object
-     */
     public void initialise(java.util.Date d)
     {
         super.setTime(d.getTime());

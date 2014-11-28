@@ -48,25 +48,15 @@ public class GregorianCalendar extends java.util.GregorianCalendar implements SC
         this.ownerMmd = mmd;
     }
 
-    /**
-     * Method to initialise the SCO for use.
-     */
     public void initialise()
     {
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
-     */
     public void initialise(java.util.GregorianCalendar newValue, Object oldValue)
     {
         initialise(newValue);
     }
 
-    /**
-     * Method to initialise the SCO from an existing value.
-     * @param cal The Object
-     */
     public void initialise(java.util.GregorianCalendar cal)
     {
         super.setTimeInMillis(cal.getTime().getTime());

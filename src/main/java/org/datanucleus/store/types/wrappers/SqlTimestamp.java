@@ -45,25 +45,15 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Tim
         this.ownerMmd = mmd;
     }
 
-    /**
-     * Method to initialise the SCO for use.
-     */
     public void initialise()
     {
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
-     */
     public void initialise(java.sql.Timestamp newValue, Object oldValue)
     {
         initialise(newValue);
     }
 
-    /**
-     * Method to initialise the SCO from an existing value.
-     * @param ts The Object
-     */
     public void initialise(java.sql.Timestamp ts)
     {
         super.setTime(ts.getTime());

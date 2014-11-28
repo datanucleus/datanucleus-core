@@ -45,25 +45,15 @@ public class BitSet extends java.util.BitSet implements SCO<java.util.BitSet>
         this.ownerMmd = mmd;
     }
 
-    /**
-     * Method to initialise the SCO for use.
-     */
     public void initialise()
     {
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
-     */
     public void initialise(java.util.BitSet newValue, Object oldValue)
     {
         initialise(newValue);
     }
 
-    /**
-     * Method to initialise the SCO from an existing value.
-     * @param set The Object
-     */
     public void initialise(java.util.BitSet set)
     {
         for (int i = 0; i < length(); i++)

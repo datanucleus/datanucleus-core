@@ -62,18 +62,11 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
         this.ownerMmd = mmd;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
-     */
     public void initialise(java.util.Stack newValue, Object oldValue)
     {
         initialise(newValue);
     }
 
-    /**
-     * Method to initialise the SCO from an existing value.
-     * @param c The object to set from
-     */
     public void initialise(java.util.Stack c)
     {
         if (c != null)
@@ -92,17 +85,9 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
         }
     }
 
-    /**
-     * Method to initialise the SCO for use.
-     */
     public void initialise()
     {
-        delegate = new java.util.Stack();
-        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-        {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", this.getClass().getName(), ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
-                SCOUtils.getSCOWrapperOptionsMessage(true, false, true, false)));
-        }
+        initialise(null);
     }
 
     // ----------------------- Implementation of SCO methods -------------------

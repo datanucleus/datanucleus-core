@@ -44,25 +44,15 @@ public class SqlTime extends java.sql.Time implements SCO<java.sql.Time>
         this.ownerMmd = mmd;
     }
 
-    /**
-     * Method to initialise the SCO for use.
-     */
     public void initialise()
     {
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
-     */
     public void initialise(java.sql.Time newValue, Object oldValue)
     {
         initialise(newValue);
     }
 
-    /**
-     * Method to initialise the SCO from an existing value.
-     * @param t The Object
-     */
     public void initialise(java.sql.Time t)
     {
         super.setTime(t.getTime());

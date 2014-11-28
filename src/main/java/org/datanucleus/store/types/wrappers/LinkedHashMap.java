@@ -56,18 +56,11 @@ public class LinkedHashMap extends java.util.LinkedHashMap implements SCOMap<jav
         this.ownerMmd = mmd;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.types.SCO#initialise(java.lang.Object, java.lang.Object)
-     */
     public void initialise(java.util.LinkedHashMap newValue, Object oldValue)
     {
         initialise(newValue);
     }
 
-    /**
-     * Method to initialise the SCO from an existing value.
-     * @param m Object to set value using.
-     */
     public void initialise(java.util.LinkedHashMap m)
     {
         if (m != null)
@@ -85,17 +78,9 @@ public class LinkedHashMap extends java.util.LinkedHashMap implements SCOMap<jav
         }
     }
 
-    /**
-     * Method to initialise the SCO for use.
-     */
     public void initialise()
     {
-        delegate = new java.util.LinkedHashMap();
-        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-        {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023003", this.getClass().getName(), ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + size(), 
-                SCOUtils.getSCOWrapperOptionsMessage(true, false, true, false)));
-        }
+        initialise(null);
     }
 
     /**
