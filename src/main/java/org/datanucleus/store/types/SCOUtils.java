@@ -820,8 +820,7 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method for use by List attachCopy methods to update the passed (attached) list using the
-     * (attached) list elements passed.
+     * Convenience method for use by List attachCopy methods to update the passed (attached) list using the (attached) list elements passed.
      * @param list The current (attached) list
      * @param elements The list of (attached) elements needed.
      * @return If the List was updated
@@ -859,7 +858,7 @@ public class SCOUtils
         while (elementsIter.hasNext())
         {
             Object element = elementsIter.next();
-            if (!oldCopy.remove(element))
+            if (!oldCopy.remove(element)) // Why remove it if wanting to check if present?
             {
                 // Now present, so add it
                 list.add(element);

@@ -112,18 +112,13 @@ public class LinkedHashMap extends org.datanucleus.store.types.wrappers.LinkedHa
                 }
             }
 
-            if (backingStore != null && useCache && !isCacheLoaded)
-            {
-                // Mark as loaded
-                isCacheLoaded = true;
-            }
-
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + newValue.size()));
             }
 
-            // TODO This is clear+putAll. Change to detect updates
+
+            // TODO This is clear+putAll. Improve it to work out what is changed using oldValue
             if (backingStore != null)
             {
                 if (SCOUtils.useQueuedUpdate(ownerOP))
@@ -132,25 +127,7 @@ public class LinkedHashMap extends org.datanucleus.store.types.wrappers.LinkedHa
                     if (ownerOP.isFlushedToDatastore())
                     {
                         ownerOP.getExecutionContext().addOperationToQueue(new MapClearOperation(ownerOP, backingStore));
-                    }
-                }
-                else
-                {
-                    backingStore.clear(ownerOP);
-                }
-            }
-            if (useCache)
-            {
-                // Make sure we have all values loaded (e.g if in optimistic tx and we put new entry)
-                loadFromStore();
-            }
-            if (backingStore != null)
-            {
-                if (SCOUtils.useQueuedUpdate(ownerOP))
-                {
-                    // If not yet flushed to store then no need to add to queue (since will be handled via insert)
-                    if (ownerOP.isFlushedToDatastore())
-                    {
+
                         Iterator iter = newValue.entrySet().iterator();
                         while (iter.hasNext())
                         {
@@ -161,10 +138,12 @@ public class LinkedHashMap extends org.datanucleus.store.types.wrappers.LinkedHa
                 }
                 else
                 {
+                    backingStore.clear(ownerOP);
                     backingStore.putAll(ownerOP, newValue);
                 }
             }
             delegate.putAll(newValue);
+            isCacheLoaded = true;
             makeDirty();
         }
     }
