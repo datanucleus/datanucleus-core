@@ -137,12 +137,6 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
                 }
             }
 
-            if (backingStore != null && useCache && !isCacheLoaded)
-            {
-                // Mark as loaded
-                isCacheLoaded = true;
-            }
-
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + newValue.size()));

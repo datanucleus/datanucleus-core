@@ -178,12 +178,6 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
                 }
             }
 
-            if (backingStore != null && useCache && !isCacheLoaded)
-            {
-                // Mark as loaded
-                isCacheLoaded = true;
-            }
-
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + newValue.size()));
@@ -239,6 +233,12 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
             }
             else
             {
+                if (backingStore != null && useCache && !isCacheLoaded)
+                {
+                    // Mark as loaded
+                    isCacheLoaded = true;
+                }
+
                 // TODO This is clear+addAll. Change to detect updates
                 if (backingStore != null)
                 {
