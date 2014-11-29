@@ -37,7 +37,7 @@ public interface SCO<T>
     void initialise(T value);
 
     /**
-     * Method to initialise the SCO for use, starting from no initial value.
+     * Method to initialise the SCO for use, and allowing the SCO to be loaded from the datastore (when we have a backing store).
      * This can be utilised to perform any eager loading of information from the datastore.
      */
     void initialise();

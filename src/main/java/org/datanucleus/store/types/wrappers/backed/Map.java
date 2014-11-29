@@ -26,7 +26,6 @@ import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.flush.MapClearOperation;
 import org.datanucleus.flush.MapPutOperation;
@@ -85,21 +84,18 @@ public class Map extends org.datanucleus.store.types.wrappers.Map implements Bac
 
         // Set up our "delegate"
         this.delegate = new java.util.HashMap();
-
-        ExecutionContext ec = ownerOP.getExecutionContext();
-        allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
-        useCache = SCOUtils.useContainerCache(ownerOP, mmd);
+        this.allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
+        this.useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
         if (!SCOUtils.mapHasSerialisedKeysAndValues(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            ClassLoaderResolver clr = ec.getClassLoaderResolver();
-            this.backingStore = (MapStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.Map.class);
+            this.backingStore = (MapStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(), 
+                mmd, java.util.Map.class);
         }
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this,
-                useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
+            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this, useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
         }
     }
 
@@ -108,8 +104,7 @@ public class Map extends org.datanucleus.store.types.wrappers.Map implements Bac
         if (newValue != null)
         {
             // Check for the case of serialised maps, and assign ObjectProviders to any PC keys/values without
-            if (SCOUtils.mapHasSerialisedKeysAndValues(ownerMmd) &&
-                (ownerMmd.getMap().keyIsPersistent() || ownerMmd.getMap().valueIsPersistent()))
+            if (SCOUtils.mapHasSerialisedKeysAndValues(ownerMmd) && (ownerMmd.getMap().keyIsPersistent() || ownerMmd.getMap().valueIsPersistent()))
             {
                 ExecutionContext ec = ownerOP.getExecutionContext();
                 Iterator iter = newValue.entrySet().iterator();
@@ -166,6 +161,7 @@ public class Map extends org.datanucleus.store.types.wrappers.Map implements Bac
                     backingStore.putAll(ownerOP, newValue);
                 }
             }
+
             delegate.putAll(newValue);
             isCacheLoaded = true;
             makeDirty();
@@ -181,8 +177,7 @@ public class Map extends org.datanucleus.store.types.wrappers.Map implements Bac
         if (m != null)
         {
             // Check for the case of serialised maps, and assign ObjectProviders to any PC keys/values without
-            if (SCOUtils.mapHasSerialisedKeysAndValues(ownerMmd) &&
-                (ownerMmd.getMap().keyIsPersistent() || ownerMmd.getMap().valueIsPersistent()))
+            if (SCOUtils.mapHasSerialisedKeysAndValues(ownerMmd) && (ownerMmd.getMap().keyIsPersistent() || ownerMmd.getMap().valueIsPersistent()))
             {
                 ExecutionContext ec = ownerOP.getExecutionContext();
                 Iterator iter = m.entrySet().iterator();
@@ -210,18 +205,13 @@ public class Map extends org.datanucleus.store.types.wrappers.Map implements Bac
                 }
             }
 
-            if (backingStore != null && useCache && !isCacheLoaded)
-            {
-                // Mark as loaded
-                isCacheLoaded = true;
-            }
-
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
             }
-            delegate.clear();
+
             delegate.putAll(m);
+            isCacheLoaded = true;
         }
     }
 

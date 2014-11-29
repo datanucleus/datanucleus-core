@@ -59,31 +59,22 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
     {
         super(op, mmd);
 
-        ExecutionContext ec = ownerOP.getExecutionContext();
-        allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
-        useCache = SCOUtils.useContainerCache(ownerOP, mmd);
+        // Set up our delegate, using a suitable comparator
+        ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
+        Comparator comparator = SCOUtils.getComparator(mmd, clr);
+        this.delegate = (comparator != null) ? new java.util.TreeMap(comparator) : new java.util.TreeMap();
+        this.allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
+        this.useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
         if (!SCOUtils.mapHasSerialisedKeysAndValues(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            ClassLoaderResolver clr = ec.getClassLoaderResolver();
             this.backingStore = (MapStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.SortedMap.class);
         }
 
-        // Set up our delegate, using a suitable comparator
-        Comparator comparator = SCOUtils.getComparator(mmd, ec.getClassLoaderResolver());
-        if (comparator != null)
-        {
-            this.delegate = new java.util.TreeMap(comparator);
-        }
-        else
-        {
-            this.delegate = new java.util.TreeMap();
-        }
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(op, ownerMmd.getName(), this,
-                useCache, allowNulls, SCOUtils.useCachedLazyLoading(op, ownerMmd)));
+            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(op, ownerMmd.getName(), this, useCache, allowNulls, SCOUtils.useCachedLazyLoading(op, ownerMmd)));
         }
     }
 
@@ -92,8 +83,7 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
         if (newValue != null)
         {
             // Check for the case of serialised maps, and assign ObjectProviders to any PC keys/values without
-            if (SCOUtils.mapHasSerialisedKeysAndValues(ownerMmd) &&
-                (ownerMmd.getMap().keyIsPersistent() || ownerMmd.getMap().valueIsPersistent()))
+            if (SCOUtils.mapHasSerialisedKeysAndValues(ownerMmd) && (ownerMmd.getMap().keyIsPersistent() || ownerMmd.getMap().valueIsPersistent()))
             {
                 ExecutionContext ec = ownerOP.getExecutionContext();
                 Iterator iter = newValue.entrySet().iterator();
@@ -150,6 +140,7 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
                     backingStore.putAll(ownerOP, newValue);
                 }
             }
+
             delegate.putAll(newValue);
             isCacheLoaded = true;
             makeDirty();
@@ -165,8 +156,7 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
         if (m != null)
         {
             // Check for the case of serialised maps, and assign ObjectProviders to any PC keys/values without
-            if (SCOUtils.mapHasSerialisedKeysAndValues(ownerMmd) &&
-                (ownerMmd.getMap().keyIsPersistent() || ownerMmd.getMap().valueIsPersistent()))
+            if (SCOUtils.mapHasSerialisedKeysAndValues(ownerMmd) && (ownerMmd.getMap().keyIsPersistent() || ownerMmd.getMap().valueIsPersistent()))
             {
                 ExecutionContext ec = ownerOP.getExecutionContext();
                 Iterator iter = m.entrySet().iterator();
@@ -194,18 +184,13 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
                 }
             }
 
-            if (backingStore != null && useCache && !isCacheLoaded)
-            {
-                // Mark as loaded
-                isCacheLoaded = true;
-            }
-
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
             }
-            delegate.clear();
+
             delegate.putAll(m);
+            isCacheLoaded = true;
         }
     }
 

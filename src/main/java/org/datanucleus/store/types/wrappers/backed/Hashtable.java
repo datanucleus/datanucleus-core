@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.flush.MapClearOperation;
 import org.datanucleus.flush.MapPutOperation;
@@ -58,20 +57,17 @@ public class Hashtable extends org.datanucleus.store.types.wrappers.Hashtable im
 
         // Set up our "delegate"
         this.delegate = new java.util.Hashtable();
-
-        ExecutionContext ec = ownerOP.getExecutionContext();
-        useCache = SCOUtils.useContainerCache(ownerOP, mmd);
+        this.useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
         if (!SCOUtils.mapHasSerialisedKeysAndValues(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            ClassLoaderResolver clr = ec.getClassLoaderResolver();
-            this.backingStore = (MapStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.Hashtable.class);
+            this.backingStore = (MapStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(), 
+                mmd, java.util.Hashtable.class);
         }
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this,
-                useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
+            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this, useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
         }
     }
 
@@ -80,8 +76,7 @@ public class Hashtable extends org.datanucleus.store.types.wrappers.Hashtable im
         if (newValue != null)
         {
             // Check for the case of serialised maps, and assign ObjectProviders to any PC keys/values without
-            if (SCOUtils.mapHasSerialisedKeysAndValues(ownerMmd) && 
-                (ownerMmd.getMap().keyIsPersistent() || ownerMmd.getMap().valueIsPersistent()))
+            if (SCOUtils.mapHasSerialisedKeysAndValues(ownerMmd) && (ownerMmd.getMap().keyIsPersistent() || ownerMmd.getMap().valueIsPersistent()))
             {
                 ExecutionContext ec = ownerOP.getExecutionContext();
                 Iterator iter = newValue.entrySet().iterator();
@@ -138,6 +133,7 @@ public class Hashtable extends org.datanucleus.store.types.wrappers.Hashtable im
                     backingStore.putAll(ownerOP, newValue);
                 }
             }
+
             delegate.putAll(newValue);
             isCacheLoaded = true;
             makeDirty();
@@ -153,8 +149,7 @@ public class Hashtable extends org.datanucleus.store.types.wrappers.Hashtable im
         if (m != null)
         {
             // Check for the case of serialised maps, and assign ObjectProviders to any PC keys/values without
-            if (SCOUtils.mapHasSerialisedKeysAndValues(ownerMmd) && 
-                (ownerMmd.getMap().keyIsPersistent() || ownerMmd.getMap().valueIsPersistent()))
+            if (SCOUtils.mapHasSerialisedKeysAndValues(ownerMmd) && (ownerMmd.getMap().keyIsPersistent() || ownerMmd.getMap().valueIsPersistent()))
             {
                 ExecutionContext ec = ownerOP.getExecutionContext();
                 Iterator iter = m.entrySet().iterator();
@@ -182,18 +177,13 @@ public class Hashtable extends org.datanucleus.store.types.wrappers.Hashtable im
                 }
             }
 
-            if (backingStore != null && useCache && !isCacheLoaded)
-            {
-                // Mark as loaded
-                isCacheLoaded = true;
-            }
-
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("023007", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + m.size()));
             }
-            delegate.clear();
+
             delegate.putAll(m);
+            isCacheLoaded = true;
         }
     }
 
