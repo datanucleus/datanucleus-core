@@ -39,6 +39,7 @@ import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.BackedSCOStoreManager;
 import org.datanucleus.store.scostore.SetStore;
 import org.datanucleus.store.scostore.Store;
+import org.datanucleus.store.types.SCOCollection;
 import org.datanucleus.store.types.SCOCollectionIterator;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.Localiser;
@@ -154,20 +155,29 @@ public class HashSet extends org.datanucleus.store.types.wrappers.HashSet implem
             }
             else
             {
+                java.util.Collection oldColl = (java.util.Collection)oldValue;
+                if (oldColl instanceof SCOCollection)
+                {
+                    oldColl = (java.util.Collection) ((SCOCollection)oldColl).getValue();
+                }
+
                 for (Object elem : newValue)
                 {
-                    if (!contains(elem))
+                    if (oldColl == null || !oldColl.contains(elem))
                     {
                         add(elem);
                     }
                 }
-                Iterator iter = iterator();
-                while (iter.hasNext())
+                if (oldColl != null)
                 {
-                    Object elem = iter.next();
-                    if (!newValue.contains(elem))
+                    Iterator iter = oldColl.iterator();
+                    while (iter.hasNext())
                     {
-                        remove(elem);
+                        Object elem = iter.next();
+                        if (!newValue.contains(elem))
+                        {
+                            remove(elem);
+                        }
                     }
                 }
             }
