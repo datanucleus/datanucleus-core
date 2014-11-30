@@ -929,8 +929,7 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method for use by Map attachCopy methods to update the passed (attached) map using the
-     * (attached) map keys/values passed.
+     * Convenience method for use by Map attachCopy methods to update the passed (attached) map using the (attached) map keys/values passed.
      * @param api Api adapter
      * @param map The current (attached) map
      * @param keysValues The keys/values required
@@ -940,23 +939,8 @@ public class SCOUtils
     {
         boolean updated = false;
 
-        // Take a copy of the map so we can call remove() on the map itself
-        // TODO Change this to use EntrySet in the future.
-        // EntrySet.iterator().remove() doesn't seem to feed through to the DB at the moment
-        Map copy = new HashMap(map);
-
-        // Delete any keys that are no longer in the Map
-        Iterator attachedIter = copy.entrySet().iterator();
-        while (attachedIter.hasNext())
-        {
-            Map.Entry entry = (Map.Entry) attachedIter.next();
-            Object key = entry.getKey();
-            if (!keysValues.containsKey(key))
-            {
-                map.remove(key);
-                updated = true;
-            }
-        }
+        // Copy the original map, so we know which ones to check for removal later
+        java.util.Map copy = new java.util.HashMap(map);
 
         // Add any new keys/values and update any changed values
         Iterator keysIter = keysValues.entrySet().iterator();
@@ -964,8 +948,13 @@ public class SCOUtils
         {
             Map.Entry entry = (Map.Entry) keysIter.next();
             Object key = entry.getKey();
-            Object value = entry.getValue();
-            if (!map.containsKey(key))
+            if (api.isPersistable(key) && !api.isPersistent(key))
+            {
+                // Not present so add it
+                map.put(key, keysValues.get(key));
+                updated = true;
+            }
+            else if (!map.containsKey(key))
             {
                 // Not present so add it
                 map.put(key, keysValues.get(key));
@@ -974,8 +963,14 @@ public class SCOUtils
             else
             {
                 // Update any values
+                Object value = entry.getValue();
                 Object oldValue = map.get(key);
-                if (api.isPersistable(value) && api.getIdForObject(value) != api.getIdForObject(oldValue))
+                if (api.isPersistable(value) && !api.isPersistent(value))
+                {
+                    // New persistable value
+                    map.put(key, value);
+                }
+                else if (api.isPersistable(value) && api.getIdForObject(value) != api.getIdForObject(oldValue))
                 {
                     // In case they have changed the PC for this key (different id)
                     map.put(key, value);
@@ -987,6 +982,19 @@ public class SCOUtils
                         map.put(key, value);
                     }
                 }
+            }
+        }
+
+        // Delete any keys that are no longer in the Map
+        Iterator<Map.Entry> attachedIter = copy.entrySet().iterator();
+        while (attachedIter.hasNext())
+        {
+            Map.Entry entry = attachedIter.next();
+            Object key = entry.getKey();
+            if (!keysValues.containsKey(key))
+            {
+                map.remove(key);
+                updated = true;
             }
         }
 

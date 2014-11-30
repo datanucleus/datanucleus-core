@@ -112,34 +112,48 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + newValue.size()));
             }
 
-            // TODO This is clear+putAll. Improve it to work out what is changed using oldValue
-            if (backingStore != null)
+            if (useCache)
             {
-                if (SCOUtils.useQueuedUpdate(ownerOP))
+                // Load up old values into delegate as starting point
+                java.util.Map oldMap = (java.util.Map)oldValue;
+                if (oldMap != null)
                 {
-                    // If not yet flushed to store then no need to add to queue (since will be handled via insert)
-                    if (ownerOP.isFlushedToDatastore())
-                    {
-                        ownerOP.getExecutionContext().addOperationToQueue(new MapClearOperation(ownerOP, backingStore));
+                    delegate.putAll(oldMap);
+                }
+                isCacheLoaded = true;
 
-                        Iterator iter = newValue.entrySet().iterator();
-                        while (iter.hasNext())
+                SCOUtils.updateMapWithMapKeysValues(ownerOP.getExecutionContext().getApiAdapter(), this, newValue);
+            }
+            else
+            {
+                // TODO This is clear+putAll. Improve it to work out what is changed using oldValue
+                if (backingStore != null)
+                {
+                    if (SCOUtils.useQueuedUpdate(ownerOP))
+                    {
+                        // If not yet flushed to store then no need to add to queue (since will be handled via insert)
+                        if (ownerOP.isFlushedToDatastore())
                         {
-                            java.util.Map.Entry entry = (java.util.Map.Entry)iter.next();
-                            ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, entry.getKey(), entry.getValue()));
+                            ownerOP.getExecutionContext().addOperationToQueue(new MapClearOperation(ownerOP, backingStore));
+
+                            Iterator iter = newValue.entrySet().iterator();
+                            while (iter.hasNext())
+                            {
+                                java.util.Map.Entry entry = (java.util.Map.Entry)iter.next();
+                                ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, entry.getKey(), entry.getValue()));
+                            }
                         }
                     }
+                    else
+                    {
+                        backingStore.clear(ownerOP);
+                        backingStore.putAll(ownerOP, newValue);
+                    }
                 }
-                else
-                {
-                    backingStore.clear(ownerOP);
-                    backingStore.putAll(ownerOP, newValue);
-                }
+                delegate.putAll(newValue);
+                isCacheLoaded = true;
+                makeDirty();
             }
-
-            delegate.putAll(newValue);
-            isCacheLoaded = true;
-            makeDirty();
         }
     }
 
