@@ -143,21 +143,7 @@ public class TreeSet extends org.datanucleus.store.types.wrappers.TreeSet implem
                 }
                 isCacheLoaded = true;
 
-                for (Object elem : newValue)
-                {
-                    if (!delegate.contains(elem))
-                    {
-                        add(elem);
-                    }
-                }
-                java.util.TreeSet delegateCopy = new java.util.TreeSet(delegate);
-                for (Object elem : delegateCopy)
-                {
-                    if (!newValue.contains(elem))
-                    {
-                        remove(elem);
-                    }
-                }
+                SCOUtils.updateCollectionWithCollection(ownerOP.getExecutionContext().getApiAdapter(), this, newValue);
             }
             else
             {

@@ -137,21 +137,7 @@ public class HashSet extends org.datanucleus.store.types.wrappers.HashSet implem
                 }
                 isCacheLoaded = true;
 
-                for (Object elem : newValue)
-                {
-                    if (!delegate.contains(elem))
-                    {
-                        add(elem);
-                    }
-                }
-                java.util.HashSet delegateCopy = new java.util.HashSet(delegate);
-                for (Object elem : delegateCopy)
-                {
-                    if (!newValue.contains(elem))
-                    {
-                        remove(elem);
-                    }
-                }
+                SCOUtils.updateCollectionWithCollection(ownerOP.getExecutionContext().getApiAdapter(), this, newValue);
             }
             else
             {
@@ -170,10 +156,8 @@ public class HashSet extends org.datanucleus.store.types.wrappers.HashSet implem
                 }
                 if (oldColl != null)
                 {
-                    Iterator iter = oldColl.iterator();
-                    while (iter.hasNext())
+                    for (Object elem : oldColl)
                     {
-                        Object elem = iter.next();
                         if (!newValue.contains(elem))
                         {
                             remove(elem);

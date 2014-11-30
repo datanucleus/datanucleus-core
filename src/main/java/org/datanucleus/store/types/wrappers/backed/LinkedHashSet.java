@@ -132,21 +132,7 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
                 }
                 isCacheLoaded = true;
 
-                for (Object elem : newValue)
-                {
-                    if (!delegate.contains(elem))
-                    {
-                        add(elem);
-                    }
-                }
-                java.util.LinkedHashSet delegateCopy = new java.util.LinkedHashSet(delegate);
-                for (Object elem : delegateCopy)
-                {
-                    if (!newValue.contains(elem))
-                    {
-                        remove(elem);
-                    }
-                }
+                SCOUtils.updateCollectionWithCollection(ownerOP.getExecutionContext().getApiAdapter(), this, newValue);
             }
             else
             {

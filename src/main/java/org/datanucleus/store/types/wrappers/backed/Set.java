@@ -153,21 +153,7 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
                 }
                 isCacheLoaded = true;
 
-                for (Object elem : newValue)
-                {
-                    if (!delegate.contains(elem))
-                    {
-                        add(elem);
-                    }
-                }
-                java.util.HashSet delegateCopy = new java.util.HashSet(delegate);
-                for (Object elem : delegateCopy)
-                {
-                    if (!newValue.contains(elem))
-                    {
-                        remove(elem);
-                    }
-                }
+                SCOUtils.updateCollectionWithCollection(ownerOP.getExecutionContext().getApiAdapter(), this, newValue);
             }
             else
             {

@@ -929,6 +929,54 @@ public class SCOUtils
     }
 
     /**
+     * Convenience method to update a Collection to match the provided elements.
+     * @param api Api adapter
+     * @param coll The collection to update
+     * @param elements The new collection of elements that we need to match
+     * @return Whether the collection was updated
+     */
+    public static boolean updateCollectionWithCollection(ApiAdapter api, java.util.Collection coll, java.util.Collection elements)
+    {
+        boolean updated = false;
+
+        java.util.Collection unwrapped = coll;
+        if (coll instanceof SCO)
+        {
+            unwrapped = (java.util.Collection)((SCO)coll).getValue();
+        }
+
+        java.util.Collection delegateCopy = new java.util.HashSet(unwrapped);
+
+        // Check for new elements not previously present
+        for (Object elem : elements)
+        {
+            if (api.isPersistable(elem) && !api.isPersistent(elem))
+            {
+                // Not present so add it
+                coll.add(elem);
+                updated = true;
+            }
+            else if (!unwrapped.contains(elem))
+            {
+                coll.add(elem);
+                updated = true;
+            }
+        }
+
+        // Check for elements that are no longer present
+        for (Object elem : delegateCopy)
+        {
+            if (!elements.contains(elem))
+            {
+                coll.remove(elem);
+                updated = true;
+            }
+        }
+
+        return updated;
+    }
+
+    /**
      * Convenience method for use by Map attachCopy methods to update the passed (attached) map using the (attached) map keys/values passed.
      * @param api Api adapter
      * @param map The current (attached) map

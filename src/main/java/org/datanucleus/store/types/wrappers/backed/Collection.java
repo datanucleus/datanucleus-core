@@ -196,21 +196,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
                     }
                     isCacheLoaded = true;
 
-                    for (Object elem : newValue)
-                    {
-                        if (!delegate.contains(elem))
-                        {
-                            add(elem);
-                        }
-                    }
-                    java.util.HashSet delegateCopy = new java.util.HashSet(delegate);
-                    for (Object elem : delegateCopy)
-                    {
-                        if (!newValue.contains(elem))
-                        {
-                            remove(elem);
-                        }
-                    }
+                    SCOUtils.updateCollectionWithCollection(ownerOP.getExecutionContext().getApiAdapter(), this, newValue);
                 }
                 else
                 {
