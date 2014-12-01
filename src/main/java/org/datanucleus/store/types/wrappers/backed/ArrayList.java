@@ -122,12 +122,6 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
                 }
             }
 
-            if (backingStore != null && useCache && !isCacheLoaded)
-            {
-                // Mark as loaded so we just use the value
-                isCacheLoaded = true;
-            }
-
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + newValue.size()));
@@ -141,24 +135,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
                     if (ownerOP.isFlushedToDatastore())
                     {
                         ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
-                    }
-                }
-                else
-                {
-                    backingStore.clear(ownerOP);
-                }
-            }
 
-            if (useCache)
-            {
-                loadFromStore();
-            }
-            if (backingStore != null)
-            {
-                if (SCOUtils.useQueuedUpdate(ownerOP))
-                {
-                    if (ownerOP.isFlushedToDatastore())
-                    {
                         for (Object element : newValue)
                         {
                             ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
@@ -167,9 +144,11 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
                 }
                 else
                 {
+                    backingStore.clear(ownerOP);
+
                     try
                     {
-                        backingStore.addAll(ownerOP, newValue, (useCache ? delegate.size() : -1));
+                        backingStore.addAll(ownerOP, newValue, (useCache ? 0 : -1));
                     }
                     catch (NucleusDataStoreException dse)
                     {
@@ -178,6 +157,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
                 }
             }
             delegate.addAll(newValue);
+            isCacheLoaded = true;
             makeDirty();
         }
     }

@@ -820,6 +820,85 @@ public class SCOUtils
     }
 
     /**
+     * Method to return an attached copy of the passed (detached) value. The returned attached copy is a SCO
+     * wrapper. Goes through the existing elements in the store for this owner field and removes ones no
+     * longer present, and adds new elements. All elements in the (detached) value are attached.
+     * @param ownerOP ObjectProvider for the owning object with the map
+     * @param detachedEntries The detached entries in the map
+     * @param attached Map to add the attached copies to
+     * @param keysWithoutIdentity Whether the keys have their own identity
+     * @param valuesWithoutIdentity Whether the values have their own identity
+     */
+    public static void attachCopyForMap(ObjectProvider ownerOP, Set detachedEntries, Map attached, boolean keysWithoutIdentity, boolean valuesWithoutIdentity)
+    {
+        Iterator iter = detachedEntries.iterator();
+        ApiAdapter api = ownerOP.getExecutionContext().getApiAdapter();
+        while (iter.hasNext())
+        {
+            Map.Entry entry = (Map.Entry) iter.next();
+            Object val = entry.getValue();
+            Object key = entry.getKey();
+            if (api.isPersistable(val) && api.isDetachable(val))
+            {
+                val = ownerOP.getExecutionContext().attachObjectCopy(ownerOP, val, valuesWithoutIdentity);
+            }
+            if (api.isPersistable(key) && api.isDetachable(key))
+            {
+                key = ownerOP.getExecutionContext().attachObjectCopy(ownerOP, key, keysWithoutIdentity);
+            }
+            attached.put(key, val);
+        }
+    }
+
+    /**
+     * Convenience method to update a Collection to match the provided elements.
+     * @param api Api adapter
+     * @param coll The collection to update
+     * @param elements The new collection of elements that we need to match
+     * @return Whether the collection was updated
+     */
+    public static boolean updateCollectionWithCollection(ApiAdapter api, java.util.Collection coll, java.util.Collection elements)
+    {
+        boolean updated = false;
+
+        java.util.Collection unwrapped = coll;
+        if (coll instanceof SCO)
+        {
+            unwrapped = (java.util.Collection)((SCO)coll).getValue();
+        }
+
+        java.util.Collection unwrappedCopy = new java.util.HashSet(unwrapped);
+
+        // Check for new elements not previously present
+        for (Object elem : elements)
+        {
+            if (api.isPersistable(elem) && !api.isPersistent(elem))
+            {
+                // Not present so add it
+                coll.add(elem);
+                updated = true;
+            }
+            else if (!unwrapped.contains(elem))
+            {
+                coll.add(elem);
+                updated = true;
+            }
+        }
+
+        // Check for elements that are no longer present
+        for (Object elem : unwrappedCopy)
+        {
+            if (!elements.contains(elem))
+            {
+                coll.remove(elem);
+                updated = true;
+            }
+        }
+
+        return updated;
+    }
+
+    /**
      * Convenience method for use by List attachCopy methods to update the passed (attached) list using the (attached) list elements passed.
      * @param list The current (attached) list
      * @param elements The list of (attached) elements needed.
@@ -892,85 +971,6 @@ public class SCOUtils
             }
 
             position++;
-        }
-
-        return updated;
-    }
-
-    /**
-     * Method to return an attached copy of the passed (detached) value. The returned attached copy is a SCO
-     * wrapper. Goes through the existing elements in the store for this owner field and removes ones no
-     * longer present, and adds new elements. All elements in the (detached) value are attached.
-     * @param ownerOP ObjectProvider for the owning object with the map
-     * @param detachedEntries The detached entries in the map
-     * @param attached Map to add the attached copies to
-     * @param keysWithoutIdentity Whether the keys have their own identity
-     * @param valuesWithoutIdentity Whether the values have their own identity
-     */
-    public static void attachCopyForMap(ObjectProvider ownerOP, Set detachedEntries, Map attached, boolean keysWithoutIdentity, boolean valuesWithoutIdentity)
-    {
-        Iterator iter = detachedEntries.iterator();
-        ApiAdapter api = ownerOP.getExecutionContext().getApiAdapter();
-        while (iter.hasNext())
-        {
-            Map.Entry entry = (Map.Entry) iter.next();
-            Object val = entry.getValue();
-            Object key = entry.getKey();
-            if (api.isPersistable(val) && api.isDetachable(val))
-            {
-                val = ownerOP.getExecutionContext().attachObjectCopy(ownerOP, val, valuesWithoutIdentity);
-            }
-            if (api.isPersistable(key) && api.isDetachable(key))
-            {
-                key = ownerOP.getExecutionContext().attachObjectCopy(ownerOP, key, keysWithoutIdentity);
-            }
-            attached.put(key, val);
-        }
-    }
-
-    /**
-     * Convenience method to update a Collection to match the provided elements.
-     * @param api Api adapter
-     * @param coll The collection to update
-     * @param elements The new collection of elements that we need to match
-     * @return Whether the collection was updated
-     */
-    public static boolean updateCollectionWithCollection(ApiAdapter api, java.util.Collection coll, java.util.Collection elements)
-    {
-        boolean updated = false;
-
-        java.util.Collection unwrapped = coll;
-        if (coll instanceof SCO)
-        {
-            unwrapped = (java.util.Collection)((SCO)coll).getValue();
-        }
-
-        java.util.Collection delegateCopy = new java.util.HashSet(unwrapped);
-
-        // Check for new elements not previously present
-        for (Object elem : elements)
-        {
-            if (api.isPersistable(elem) && !api.isPersistent(elem))
-            {
-                // Not present so add it
-                coll.add(elem);
-                updated = true;
-            }
-            else if (!unwrapped.contains(elem))
-            {
-                coll.add(elem);
-                updated = true;
-            }
-        }
-
-        // Check for elements that are no longer present
-        for (Object elem : delegateCopy)
-        {
-            if (!elements.contains(elem))
-            {
-                coll.remove(elem);
-                updated = true;
-            }
         }
 
         return updated;

@@ -229,13 +229,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
             }
             else
             {
-                if (backingStore != null && useCache && !isCacheLoaded)
-                {
-                    // Mark as loaded
-                    isCacheLoaded = true;
-                }
-
-                // TODO This is clear+addAll. Change to detect updates
+                // TODO This does clear+addAll : Improve this and work out which elements are added and which deleted
                 if (backingStore != null)
                 {
                     if (SCOUtils.useQueuedUpdate(ownerOP))
@@ -243,33 +237,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
                         if (ownerOP.isFlushedToDatastore())
                         {
                             ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
-                        }
-                    }
-                    else
-                    {
-                        backingStore.clear(ownerOP);
-                    }
-                }
-                if (useCache)
-                {
-                    loadFromStore();
-                }
-                if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
-                {
-                    // Relationship management
-                    Iterator iter = newValue.iterator();
-                    RelationshipManager relMgr = ownerOP.getExecutionContext().getRelationshipManager(ownerOP);
-                    while (iter.hasNext())
-                    {
-                        relMgr.relationAdd(ownerMmd.getAbsoluteFieldNumber(), iter.next());
-                    }
-                }
-                if (backingStore != null)
-                {
-                    if (SCOUtils.useQueuedUpdate(ownerOP))
-                    {
-                        if (ownerOP.isFlushedToDatastore())
-                        {
+
                             for (Object element : newValue)
                             {
                                 ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
@@ -278,9 +246,11 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
                     }
                     else
                     {
+                        backingStore.clear(ownerOP);
+
                         try
                         {
-                            backingStore.addAll(ownerOP, newValue, (useCache ? delegate.size() : -1));
+                            backingStore.addAll(ownerOP, newValue, (useCache ? 0 : -1));
                         }
                         catch (NucleusDataStoreException dse)
                         {
@@ -289,6 +259,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
                     }
                 }
                 delegate.addAll(newValue);
+                isCacheLoaded = true;
                 makeDirty();
             }
         }

@@ -122,18 +122,12 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
                 }
             }
 
-            if (backingStore != null && useCache && !isCacheLoaded)
-            {
-                // Mark as loaded
-                isCacheLoaded = true;
-            }
-
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("023008", ownerOP.getObjectAsPrintable(), ownerMmd.getName(), "" + newValue.size()));
             }
 
-            // TODO This is clear+addAll. Change to detect updates
+            // TODO This does clear+addAll : Improve this and work out which elements are added and which deleted
             if (backingStore != null)
             {
                 if (SCOUtils.useQueuedUpdate(ownerOP))
@@ -141,23 +135,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
                     if (ownerOP.isFlushedToDatastore())
                     {
                         ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
-                    }
-                }
-                else
-                {
-                    backingStore.clear(ownerOP);
-                }
-            }
-            if (useCache)
-            {
-                loadFromStore();
-            }
-            if (backingStore != null)
-            {
-                if (SCOUtils.useQueuedUpdate(ownerOP))
-                {
-                    if (ownerOP.isFlushedToDatastore())
-                    {
+
                         for (Object element : newValue)
                         {
                             ownerOP.getExecutionContext().addOperationToQueue(new CollectionAddOperation(ownerOP, backingStore, element));
@@ -166,9 +144,11 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
                 }
                 else
                 {
+                    backingStore.clear(ownerOP);
+
                     try
                     {
-                        backingStore.addAll(ownerOP, newValue, (useCache ? delegate.size() : -1));
+                        backingStore.addAll(ownerOP, newValue, (useCache ? 0 : -1));
                     }
                     catch (NucleusDataStoreException dse)
                     {
@@ -177,6 +157,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
                 }
             }
             delegate.addAll(newValue);
+            isCacheLoaded = true;
             makeDirty();
         }
     }
