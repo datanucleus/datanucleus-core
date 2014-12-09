@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import org.datanucleus.api.ApiAdapter;
+import org.datanucleus.cache.Level1Cache;
 import org.datanucleus.enhancement.ExecutionContextReference;
 import org.datanucleus.exceptions.ClassNotPersistableException;
 import org.datanucleus.exceptions.NoPersistenceInformationException;
@@ -81,6 +82,8 @@ public interface ExecutionContext extends ExecutionContextReference
      * @return The owner manager object
      */
     Object getOwner();
+
+    Level1Cache getLevel1Cache();
 
     /**
      * Accessor for the current transaction for this execution context.

@@ -746,6 +746,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.ExecutionContext#getLevel1Cache()
+     */
+    @Override
+    public Level1Cache getLevel1Cache()
+    {
+        return cache;
+    }
+
     public ClassLoaderResolver getClassLoaderResolver()
     {
         return clr;
@@ -1262,8 +1271,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         if (cache != null)
         {
-            // Clear out the cache (use separate list since sm.disconnect will remove the object from "cache" so we avoid
-            // any ConcurrentModification issues)
+            // Clear out the cache (use separate list since sm.disconnect will remove the object from "cache" so we avoid any ConcurrentModification issues)
             Collection<ObjectProvider> cachedOPsClone = new HashSet(cache.values());
             Iterator<ObjectProvider> iter = cachedOPsClone.iterator();
             while (iter.hasNext())
@@ -1474,8 +1482,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     lock.lock();
                 }
 
-                List<ObjectProvider> opsToEvict = new ArrayList();
-                opsToEvict.addAll(cache.values());
+                Set<ObjectProvider> opsToEvict = new HashSet(cache.values());
                 Iterator<ObjectProvider> opIter = opsToEvict.iterator();
                 while (opIter.hasNext())
                 {
@@ -1515,21 +1522,24 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         if (cache != null)
         {
-            // All persistent non-transactional instances should be evicted here, but not yet supported
-            List<ObjectProvider> opsToEvict = new ArrayList();
-            opsToEvict.addAll(cache.values());
+            // TODO All persistent non-transactional instances should be evicted here, but not yet supported
 
-            // Evict ObjectProviders and remove objects from cache
-            // Performed in separate loop to avoid ConcurrentModificationException
+            // Evict ObjectProviders and remove objects from cache. Performed in separate loop to avoid ConcurrentModificationException
+            Set<ObjectProvider> opsToEvict = new HashSet(cache.values());
             Iterator<ObjectProvider> opIter = opsToEvict.iterator();
             while (opIter.hasNext())
             {
                 ObjectProvider op = opIter.next();
-                Object pc = op.getObject();
-                op.evict();
+                if (op != null)
+                {
+                    op.evict();
+                }
+            }
 
-                // Evict from L1
-                removeObjectFromLevel1Cache(getApiAdapter().getIdForObject(pc));
+            cache.clear();
+            if (NucleusLogger.CACHE.isDebugEnabled())
+            {
+                NucleusLogger.CACHE.debug(Localiser.msg("003011"));
             }
         }
     }
@@ -2679,8 +2689,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void detachAll()
     {
-        Collection<ObjectProvider> opsToDetach = new HashSet();
-        opsToDetach.addAll(this.enlistedOPCache.values());
+        Collection<ObjectProvider> opsToDetach = new HashSet(this.enlistedOPCache.values());
         if (cache != null)
         {
             opsToDetach.addAll(this.cache.values());
@@ -3126,8 +3135,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         }
 
-        boolean performValidationWhenCached = 
-            (nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED));
+        boolean performValidationWhenCached = (nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED));
         List<ObjectProvider> opsToValidate = new ArrayList<ObjectProvider>();
         if (validate)
         {
@@ -3987,8 +3995,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             if (optimisticFailures != null)
             {
                 // Throw a single NucleusOptimisticException containing all optimistic failures
-                throw new NucleusOptimisticException(Localiser.msg("010031"), 
-                    optimisticFailures.toArray(new Throwable[optimisticFailures.size()]));
+                throw new NucleusOptimisticException(Localiser.msg("010031"), optimisticFailures.toArray(new Throwable[optimisticFailures.size()]));
             }
         }
         finally
@@ -4474,8 +4481,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     // This object doesnt exist in the datastore at this point.
                     // Either the user has some other process that has deleted it or they have
                     // defined datastore based cascade delete and it has been deleted that way
-                    NucleusLogger.PERSISTENCE.warn(Localiser.msg("010013",
-                        StringUtils.toJVMIDString(pc), op.getInternalObjectId()));
+                    NucleusLogger.PERSISTENCE.warn(Localiser.msg("010013", StringUtils.toJVMIDString(pc), op.getInternalObjectId()));
                     opsIter.remove();
                     // TODO Move the object state to P_DELETED for consistency
                 }
@@ -4533,8 +4539,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (cache != null && !cache.isEmpty())
         {
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("010011"));
-            List<ObjectProvider> toDetach = new ArrayList();
-            toDetach.addAll(cache.values());
+            List<ObjectProvider> toDetach = new ArrayList(cache.values());
 
             if (tx.getNontransactionalRead())
             {
@@ -4571,8 +4576,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             if (op != null && op.getObject() != null && !op.getExecutionContext().getApiAdapter().isDeleted(op.getObject()) &&
                 op.getExternalObjectId() != null)
             {
-                // If the object is deleted then no point detaching.
-                // An object can be in L1 cache if transient and passed in to a query as a param for example
+                // If the object is deleted then no point detaching. An object can be in L1 cache if transient and passed in to a query as a param for example
                 try
                 {
                     op.detach(new DetachState(getApiAdapter()));
@@ -4932,8 +4936,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 int[] loadedFieldNums = cachedPC.getLoadedFieldNumbers();
                 String fieldNames = (loadedFieldNums == null || loadedFieldNums.length == 0) ? "" : StringUtils.intArrayToString(loadedFieldNums);
-                NucleusLogger.CACHE.debug(Localiser.msg("004003", 
-                    StringUtils.toJVMIDString(op.getObject()), op.getInternalObjectId(), fieldNames, cachedPC.getVersion()));
+                NucleusLogger.CACHE.debug(Localiser.msg("004003", StringUtils.toJVMIDString(op.getObject()), op.getInternalObjectId(), fieldNames, cachedPC.getVersion()));
             }
         }
 
@@ -5201,8 +5204,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
                     NucleusLogger.CACHE.debug(Localiser.msg("004006", IdentityUtils.getPersistableIdentityForId(id),
-                        StringUtils.intArrayToString(cachedPC.getLoadedFieldNumbers()), cachedPC.getVersion(),
-                        StringUtils.toJVMIDString(pc)));
+                        StringUtils.intArrayToString(cachedPC.getLoadedFieldNumbers()), cachedPC.getVersion(), StringUtils.toJVMIDString(pc)));
                 }
 
                 if (tx.isActive() && tx.getOptimistic())
