@@ -4230,7 +4230,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 // Modified object still enlisted so cacheable
                 Object obj = op.getObject();
                 Object objID = getApiAdapter().getIdForObject(obj);
-                if (objID == null)
+                if (objID == null || objID instanceof IdentityReference)
                 {
                     // Must be embedded
                 }
@@ -5035,7 +5035,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void removeObjectFromLevel2Cache(Object id)
     {
-        if (id != null)
+        if (id != null && !(id instanceof IdentityReference))
         {
             Level2Cache l2Cache = nucCtx.getLevel2Cache();
             if (l2Cache.containsOid(id))
