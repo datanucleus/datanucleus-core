@@ -126,8 +126,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
         conf.addDefaultProperty(PropertyNames.PROPERTY_PLUGIN_REGISTRY_CLASSNAME, null, null, null, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_PLUGIN_ALLOW_USER_BUNDLES, null, true, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_PLUGIN_VALIDATEPLUGINS, null, false, false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_PLUGIN_REGISTRYBUNDLECHECK, null, "EXCEPTION", 
-            CorePropertyValidator.class.getName(), false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_PLUGIN_REGISTRYBUNDLECHECK, null, "EXCEPTION", CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_CLASSLOADER_RESOLVER_NAME, null, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY, null, null, null, false, false);
 
@@ -143,8 +142,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
         conf.addDefaultProperty(PropertyNames.PROPERTY_METADATA_JDO_SUFFIX, null, "jdo", null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_METADATA_ORM_SUFFIX, null, "orm", null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_METADATA_JDOQUERY_SUFFIX, null, "jdoquery", null, false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_METADATA_DEFAULT_INHERITANCE_STRATEGY, null, "JDO2", 
-            CorePropertyValidator.class.getName(), false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_METADATA_DEFAULT_INHERITANCE_STRATEGY, null, "JDO2", CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_EMBEDDED_PC_FLAT, null, true, false, false);
     }
 
@@ -182,8 +180,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
             String apiName = getApiName();
             try
             {
-                metaDataManager = (MetaDataManager)pluginManager.createExecutableExtension(
-                    "org.datanucleus.metadata_manager", new String[]{"name"}, new String[]{apiName}, 
+                metaDataManager = (MetaDataManager)pluginManager.createExecutableExtension("org.datanucleus.metadata_manager", new String[]{"name"}, new String[]{apiName}, 
                     "class", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[]{this});
             }
             catch (Exception e)

@@ -586,9 +586,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     throws DatastoreInitialisationException
     {
         String autoStartMechanism = config.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM);
-        String autoStarterClassName =
-            getPluginManager().getAttributeValueForExtension("org.datanucleus.autostart", 
-                "name", autoStartMechanism, "class-name");
+        String autoStarterClassName = getPluginManager().getAttributeValueForExtension("org.datanucleus.autostart", "name", autoStartMechanism, "class-name");
         if (autoStarterClassName != null)
         {
             String mode = config.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_MODE);
@@ -596,8 +594,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             Object[] args = new Object[] {storeMgr, clr};
             try
             {
-                starter = (AutoStartMechanism) getPluginManager().createExecutableExtension(
-                    "org.datanucleus.autostart", "name", autoStartMechanism, "class-name", argsClass, args);
+                starter = (AutoStartMechanism) getPluginManager().createExecutableExtension("org.datanucleus.autostart", "name", autoStartMechanism, "class-name", argsClass, args);
                 if (mode.equalsIgnoreCase("None"))
                 {
                     starter.setMode(org.datanucleus.store.autostart.AutoStartMechanism.Mode.NONE);
@@ -677,8 +674,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                             {
                                 // StoreData doesnt have its metadata set yet so load it
                                 // This ensures that the MetaDataManager always knows about these classes
-                                AbstractClassMetaData acmd =
-                                    getMetaDataManager().getMetaDataForClass(classFound, clr);
+                                AbstractClassMetaData acmd = getMetaDataManager().getMetaDataForClass(classFound, clr);
                                 if (acmd != null)
                                 {
                                     data.setMetaData(acmd);
@@ -742,11 +738,10 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 {
                     // Exception while adding so some of the (referenced) classes dont exist
                     NucleusLogger.PERSISTENCE.warn(Localiser.msg("034002", e));
-                    //if an exception happens while loading AutoStart data, them we disable it, since
-                    //it was unable to load the data from AutoStart. The memory state of AutoStart does
-                    //not represent the database, and if we don't disable it, we could
-                    //think that the autostart store is empty, and we would try to insert new entries in
-                    //the autostart store that are already in there
+
+                    // if an exception happens while loading AutoStart data, them we disable it, since it was unable to load the data from AutoStart. The memory state of AutoStart does
+                    // not represent the database, and if we don't disable it, we could think that the autostart store is empty, and we would try to insert new entries in
+                    // the autostart store that are already in there
                     illegalState = true;
 
                     // TODO Go back and add classes one-by-one to eliminate the class(es) with the problem
@@ -863,15 +858,13 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             for (String queryName : queryNames)
             {
                 QueryMetaData qmd = mmgr.getMetaDataForQuery(null, clr, queryName);
-                if (qmd.getLanguage().equals(QueryLanguage.JPQL.toString()) ||
-                    qmd.getLanguage().equals(QueryLanguage.JDOQL.toString()))
+                if (qmd.getLanguage().equals(QueryLanguage.JPQL.toString()) || qmd.getLanguage().equals(QueryLanguage.JDOQL.toString()))
                 {
                     if (NucleusLogger.QUERY.isDebugEnabled())
                     {
                         NucleusLogger.QUERY.debug(Localiser.msg("008017", queryName, qmd.getQuery()));
                     }
-                    org.datanucleus.store.query.Query q = storeMgr.getQueryManager().newQuery(
-                        qmd.getLanguage().toString(), ec, qmd.getQuery());
+                    org.datanucleus.store.query.Query q = storeMgr.getQueryManager().newQuery(qmd.getLanguage().toString(), ec, qmd.getQuery());
                     q.compile();
                     q.closeAll();
                 }
@@ -1060,8 +1053,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         {
             try
             {
-                URI uri = new URI(scriptResourceName);
-                file = new File(uri);
+                file = new File(new URI(scriptResourceName));
             }
             catch (Exception e)
             {
@@ -1184,9 +1176,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             if (getJMXManager() != null)
             {
                 // Register the MBean with the active JMX manager
-                name = jmxManager.getDomainName() + ":InstanceName=" + jmxManager.getInstanceName() +
-                    ",Type=" + FactoryStatistics.class.getName() +
-                    ",Name=Factory" + NucleusContextHelper.random.nextInt();
+                name = jmxManager.getDomainName() + ":InstanceName=" + jmxManager.getInstanceName() + ",Type=" + FactoryStatistics.class.getName() + 
+                        ",Name=Factory" + NucleusContextHelper.random.nextInt();
             }
             statistics = new FactoryStatistics(name);
             if (jmxManager != null)
@@ -1384,8 +1375,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             String level2Type = config.getStringProperty(PropertyNames.PROPERTY_CACHE_L2_TYPE);
 
             // Find the L2 cache class name from its plugin name
-            String level2ClassName = pluginManager.getAttributeValueForExtension(
-                "org.datanucleus.cache_level2", "name", level2Type, "class-name");
+            String level2ClassName = pluginManager.getAttributeValueForExtension("org.datanucleus.cache_level2", "name", level2Type, "class-name");
             if (level2ClassName == null)
             {
                 // Plugin of this name not found
@@ -1395,8 +1385,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             try
             {
                 // Create an instance of the L2 Cache
-                cache = (Level2Cache)pluginManager.createExecutableExtension(
-                    "org.datanucleus.cache_level2", "name", level2Type, "class-name",
+                cache = (Level2Cache)pluginManager.createExecutableExtension("org.datanucleus.cache_level2", "name", level2Type, "class-name",
                     new Class[]{ClassConstants.NUCLEUS_CONTEXT}, new Object[]{this});
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
@@ -1550,6 +1539,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         {
             return false;
         }
+
         AbstractClassMetaData cmd = null;
         if (id instanceof DatastoreUniqueLongId)
         {
@@ -1564,8 +1554,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         else
         {
             // Application identity with user PK class, so find all using this PK and take first one
-            Collection<AbstractClassMetaData> cmds =
-                getMetaDataManager().getClassMetaDataWithApplicationId(id.getClass().getName());
+            Collection<AbstractClassMetaData> cmds = getMetaDataManager().getClassMetaDataWithApplicationId(id.getClass().getName());
             if (cmds != null && !cmds.isEmpty())
             {
                 cmd = cmds.iterator().next();

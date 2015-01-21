@@ -104,12 +104,12 @@ public class Configuration extends PropertyStore implements Serializable
     {
         this.nucCtx = nucCtx;
         this.frequentProperties.setDefaults(defaultFrequentProperties);
+
         // Load up properties for the context that is in use
         nucCtx.applyDefaultProperties(this);
 
         // Add properties from plugins
-        ConfigurationElement[] propElements =
-            nucCtx.getPluginManager().getConfigurationElementsForExtension("org.datanucleus.persistence_properties", null, null);
+        ConfigurationElement[] propElements = nucCtx.getPluginManager().getConfigurationElementsForExtension("org.datanucleus.persistence_properties", null, null);
         if (propElements != null)
         {
             for (int i=0;i<propElements.length;i++)
@@ -208,8 +208,7 @@ public class Configuration extends PropertyStore implements Serializable
             PropertyMapping mapping = entry.getValue();
             if (mapping.managerOverride)
             {
-                String propName = (mapping.internalName != null ? 
-                        mapping.internalName.toLowerCase(Locale.ENGLISH) : mapping.name.toLowerCase(Locale.ENGLISH));
+                String propName = (mapping.internalName != null ? mapping.internalName.toLowerCase(Locale.ENGLISH) : mapping.name.toLowerCase(Locale.ENGLISH));
                 props.put(propName, getProperty(propName));
             }
             else if (mapping.internalName != null)
@@ -251,8 +250,7 @@ public class Configuration extends PropertyStore implements Serializable
         }
         for (PropertyMapping mapping : propertyMappings.values())
         {
-            if (mapping.internalName != null && mapping.internalName.toLowerCase().equals(propName.toLowerCase()) &&
-                mapping.name.startsWith(propPrefix))
+            if (mapping.internalName != null && mapping.internalName.toLowerCase().equals(propName.toLowerCase()) && mapping.name.startsWith(propPrefix))
             {
                 return mapping.name;
             }
@@ -301,28 +299,22 @@ public class Configuration extends PropertyStore implements Serializable
         }
     }
 
-    public void addDefaultBooleanProperty(String name, String internalName, Boolean value, 
-            boolean datastore, boolean managerOverrideable)
+    public void addDefaultBooleanProperty(String name, String internalName, Boolean value, boolean datastore, boolean managerOverrideable)
     {
-        addDefaultProperty(name, internalName, value!=null?""+value:null, 
-            BooleanPropertyValidator.class.getName(), datastore, managerOverrideable);
+        addDefaultProperty(name, internalName, value!=null?""+value:null, BooleanPropertyValidator.class.getName(), datastore, managerOverrideable);
     }
 
-    public void addDefaultIntegerProperty(String name, String internalName, Integer value, 
-            boolean datastore, boolean managerOverrideable)
+    public void addDefaultIntegerProperty(String name, String internalName, Integer value, boolean datastore, boolean managerOverrideable)
     {
-        addDefaultProperty(name, internalName, value!=null?""+value:null,
-            IntegerPropertyValidator.class.getName(), datastore, managerOverrideable);
+        addDefaultProperty(name, internalName, value!=null?""+value:null, IntegerPropertyValidator.class.getName(), datastore, managerOverrideable);
     }
 
-    public void addDefaultProperty(String name, String internalName, String value, 
-            String validatorName, boolean datastore, boolean managerOverrideable)
+    public void addDefaultProperty(String name, String internalName, String value, String validatorName, boolean datastore, boolean managerOverrideable)
     {
         managerOverrideableProperties = null;
 
         // Add the mapping
-        propertyMappings.put(name.toLowerCase(Locale.ENGLISH), new PropertyMapping(name, internalName, validatorName,
-            datastore, managerOverrideable));
+        propertyMappings.put(name.toLowerCase(Locale.ENGLISH), new PropertyMapping(name, internalName, validatorName, datastore, managerOverrideable));
 
         String storedName = internalName != null ? internalName.toLowerCase(Locale.ENGLISH) : name.toLowerCase(Locale.ENGLISH);
         if (!defaultProperties.containsKey(storedName))

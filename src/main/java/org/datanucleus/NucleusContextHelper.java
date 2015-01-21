@@ -53,39 +53,39 @@ public class NucleusContextHelper
             // Transaction isolation has been specified and we need to provide at least this level
             // Order of priority is :-
             // read-uncommitted (lowest), read-committed, repeatable-read, serializable (highest)
-            Collection srmOptions = storeMgr.getSupportedOptions();
-            if (!srmOptions.contains("TransactionIsolationLevel." + transactionIsolation))
+            Collection<String> supportedOptions = storeMgr.getSupportedOptions();
+            if (!supportedOptions.contains("TransactionIsolationLevel." + transactionIsolation))
             {
                 // Requested transaction isolation isn't supported by datastore so check for higher
                 if (transactionIsolation.equals("read-uncommitted"))
                 {
-                    if (srmOptions.contains(StoreManager.OPTION_TXN_ISOLATION_READ_COMMITTED))
+                    if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_READ_COMMITTED))
                     {
                         return "read-committed";
                     }
-                    else if (srmOptions.contains(StoreManager.OPTION_TXN_ISOLATION_REPEATABLE_READ))
+                    else if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_REPEATABLE_READ))
                     {
                         return "repeatable-read";
                     }
-                    else if (srmOptions.contains(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE))
+                    else if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE))
                     {
                         return "serializable";
                     }
                 }
                 else if (transactionIsolation.equals("read-committed"))
                 {
-                    if (srmOptions.contains(StoreManager.OPTION_TXN_ISOLATION_REPEATABLE_READ))
+                    if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_REPEATABLE_READ))
                     {
                         return "repeatable-read";
                     }
-                    else if (srmOptions.contains(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE))
+                    else if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE))
                     {
                         return "serializable";
                     }
                 }
                 else if (transactionIsolation.equals("repeatable-read"))
                 {
-                    if (srmOptions.contains(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE))
+                    if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE))
                     {
                         return "serializable";
                     }
@@ -108,9 +108,7 @@ public class NucleusContextHelper
      * @return The StoreManager
      * @throws NucleusUserException if impossible to create the StoreManager (not in CLASSPATH?, invalid definition?)
      */
-    public static StoreManager createStoreManagerForProperties(Map<String, Object> props,
-            Map<String, Object> datastoreProps, ClassLoaderResolver clr,
-            NucleusContext nucCtx)
+    public static StoreManager createStoreManagerForProperties(Map<String, Object> props, Map<String, Object> datastoreProps, ClassLoaderResolver clr, NucleusContext nucCtx)
     {
         Extension[] exts = nucCtx.getPluginManager().getExtensionPoint("org.datanucleus.store_manager").getExtensions();
         Class[] ctrArgTypes = new Class[] {ClassConstants.CLASS_LOADER_RESOLVER, ClassConstants.PERSISTENCE_NUCLEUS_CONTEXT, Map.class};
@@ -132,9 +130,8 @@ public class NucleusContextHelper
                     {
                         try
                         {
-                            storeMgr = (StoreManager)nucCtx.getPluginManager().createExecutableExtension(
-                                "org.datanucleus.store_manager", "key", storeManagerType, 
-                                "class-name", ctrArgTypes, ctrArgs);
+                            storeMgr = (StoreManager)nucCtx.getPluginManager().createExecutableExtension("org.datanucleus.store_manager", "key", storeManagerType, "class-name", 
+                                ctrArgTypes, ctrArgs);
                         }
                         catch (InvocationTargetException ex)
                         {
@@ -190,8 +187,7 @@ public class NucleusContextHelper
                         // Either no URL, or url defined so take this StoreManager
                         try
                         {
-                            storeMgr = (StoreManager)nucCtx.getPluginManager().createExecutableExtension(
-                                "org.datanucleus.store_manager", "url-key", url == null ? urlKey : url, 
+                            storeMgr = (StoreManager)nucCtx.getPluginManager().createExecutableExtension("org.datanucleus.store_manager", "url-key", url == null ? urlKey : url, 
                                 "class-name", ctrArgTypes, ctrArgs);
                         }
                         catch (InvocationTargetException ex)

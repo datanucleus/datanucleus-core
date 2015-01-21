@@ -98,9 +98,7 @@ public class TransactionImpl implements Transaction
         this.properties = properties;
         
         Configuration config = ec.getNucleusContext().getConfiguration();
-
-        int isolationLevel = TransactionUtils.getTransactionIsolationLevelForName(
-            config.getStringProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION));
+        int isolationLevel = TransactionUtils.getTransactionIsolationLevelForName(config.getStringProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION));
         setOption(Transaction.TRANSACTION_ISOLATION_OPTION, isolationLevel);
 
         // Locking of read objects in this transaction
@@ -578,8 +576,7 @@ public class TransactionImpl implements Transaction
 
     private TransactionEventListener[] getListenersForEvent()
     {
-        TransactionEventListener[] ls =
-            new TransactionEventListener[userListeners.size()+listenersPerTransaction.size() + 1];
+        TransactionEventListener[] ls = new TransactionEventListener[userListeners.size()+listenersPerTransaction.size() + 1];
         System.arraycopy(listenersPerTransaction.toArray(), 0, ls, 0, listenersPerTransaction.size());
         System.arraycopy(userListeners.toArray(), 0,  ls, listenersPerTransaction.size(), userListeners.size());
         ls[ls.length-1] = ecListener;
@@ -899,5 +896,4 @@ public class TransactionImpl implements Transaction
     {
         this.properties = properties;
     }
-    
 }

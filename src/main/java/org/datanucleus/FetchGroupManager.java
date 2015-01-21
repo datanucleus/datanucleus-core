@@ -59,16 +59,15 @@ public class FetchGroupManager
         }
 
         // Check for existing group with this name for this type
-        Collection coll = (Collection)fetchGroupByName.get(grp.getName());
+        Collection<FetchGroup> coll = (Collection<FetchGroup>)fetchGroupByName.get(grp.getName());
         if (coll != null)
         {
             // Check for existing entry for this name and class
-            Iterator iter = coll.iterator();
+            Iterator<FetchGroup> iter = coll.iterator();
             while (iter.hasNext())
             {
-                FetchGroup existingGrp = (FetchGroup)iter.next();
-                if (existingGrp.getName().equals(grp.getName()) && 
-                    existingGrp.getType().getName().equals(grp.getType().getName()))
+                FetchGroup existingGrp = iter.next();
+                if (existingGrp.getName().equals(grp.getName()) && existingGrp.getType().getName().equals(grp.getType().getName()))
                 {
                     // Already have a group for this name+class so replace it
                     existingGrp.disconnectFromListeners(); // Remove the old group from use
@@ -88,14 +87,13 @@ public class FetchGroupManager
     {
         if (fetchGroupByName != null)
         {
-            Collection coll = (Collection) fetchGroupByName.get(grp.getName());
+            Collection<FetchGroup> coll = (Collection<FetchGroup>) fetchGroupByName.get(grp.getName());
             if (coll != null)
             {
-                Iterator iter = coll.iterator();
+                Iterator<FetchGroup> iter = coll.iterator();
                 while (iter.hasNext())
                 {
-                    Object obj = iter.next();
-                    FetchGroup existingGrp = (FetchGroup)obj;
+                    FetchGroup existingGrp = iter.next();
                     if (existingGrp.getType() == grp.getType())
                     {
                         existingGrp.disconnectFromListeners(); // Remove the group from use
@@ -117,13 +115,13 @@ public class FetchGroupManager
     {
         if (fetchGroupByName != null)
         {
-            Collection coll = (Collection) fetchGroupByName.get(name);
+            Collection<FetchGroup> coll = (Collection) fetchGroupByName.get(name);
             if (coll != null)
             {
-                Iterator iter = coll.iterator();
+                Iterator<FetchGroup> iter = coll.iterator();
                 while (iter.hasNext())
                 {
-                    FetchGroup grp = (FetchGroup)iter.next();
+                    FetchGroup grp = iter.next();
                     if (grp.getType() == cls)
                     {
                         return grp;

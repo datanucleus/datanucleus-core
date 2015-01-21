@@ -40,10 +40,7 @@ public class CachedPC<T> implements Serializable
     /** Class of the object being cached. */
     private Class<T> cls;
 
-    /**
-     * Values for the fields, keyed by the abs field number. Any relation fields store the id of the related
-     * object.
-     */
+    /** Values for the fields, keyed by the abs field number. Any relation fields store the id of the related object. */
     private Map<Integer, Object> fieldValues = null;
 
     /** Version of the cached object (if any) - Long, Timestamp etc. */
@@ -85,11 +82,7 @@ public class CachedPC<T> implements Serializable
 
     public Object getFieldValue(Integer fieldNumber)
     {
-        if (fieldValues == null)
-        {
-            return null;
-        }
-        return fieldValues.get(fieldNumber);
+        return (fieldValues == null) ? null : fieldValues.get(fieldNumber);
     }
 
     public void setVersion(Object ver)
@@ -162,8 +155,8 @@ public class CachedPC<T> implements Serializable
      */
     public String toString(boolean debug)
     {
-        return "CachedPC : cls=" + cls.getName() + " version=" + version + " loadedFlags=" + StringUtils.booleanArrayToString(loadedFields) + (debug ? (" vals=" + StringUtils
-                .mapToString(fieldValues)) : "");
+        return "CachedPC : cls=" + cls.getName() + " version=" + version + " loadedFlags=" + StringUtils.booleanArrayToString(loadedFields) + 
+                (debug ? (" vals=" + StringUtils.mapToString(fieldValues)) : "");
     }
 
     public static class CachedId implements Serializable, Comparable<CachedId>

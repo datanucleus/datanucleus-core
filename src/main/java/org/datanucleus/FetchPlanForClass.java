@@ -124,8 +124,7 @@ public class FetchPlanForClass
         Set<String> currentGroupNames = new HashSet(plan.getGroups());
 
         // find FetchGroupMetaDatas that contain the field in question
-        Set<FetchGroupMetaData> fetchGroupsContainingField =
-                getFetchGroupsForMemberNumber(cmd.getFetchGroupMetaData(currentGroupNames), memberNum);
+        Set<FetchGroupMetaData> fetchGroupsContainingField = getFetchGroupsForMemberNumber(cmd.getFetchGroupMetaData(currentGroupNames), memberNum);
 
         // find recursion depth for field in its class <field> definition
         int recursionDepth = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum).getRecursionDepth();
@@ -357,8 +356,7 @@ public class FetchPlanForClass
                     FetchGroupMetaData nestedFGMD = cmd.getFetchGroupMetaData(nestedGroupName);
                     if (nestedFGMD == null)
                     {
-                        throw new NucleusUserException(Localiser.msg("006001", 
-                            subFgmd.getName(), fgmd.getName(), cmd.getFullClassName())).setFatal();
+                        throw new NucleusUserException(Localiser.msg("006001", subFgmd.getName(), fgmd.getName(), cmd.getFullClassName())).setFatal();
                     }
                     memberNumbers.or(getMemberNumbersForFetchGroup(nestedFGMD));
                 }
@@ -437,8 +435,7 @@ public class FetchPlanForClass
                 // if field in actual fetch plan was not previously loaded
                 if (!loadedMembers[fieldNumber])
                 {
-                    if (cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).isDefaultFetchGroup() &&
-                        plan.getGroups().contains(FetchPlan.DEFAULT))
+                    if (cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).isDefaultFetchGroup() && plan.getGroups().contains(FetchPlan.DEFAULT))
                     {
                         // to call jdoPostLoad, field must be in default-fetch-group when DFG is active
                         result = Boolean.TRUE;
@@ -482,8 +479,7 @@ public class FetchPlanForClass
                             {
                                 FetchGroup group = it.next();
                                 Set groupMembers = group.getMembers();
-                                if (group.getType().isAssignableFrom(cls) &&
-                                    groupMembers.contains(fieldName) && group.getPostLoad())
+                                if (group.getType().isAssignableFrom(cls) && groupMembers.contains(fieldName) && group.getPostLoad())
                                 {
                                     result = Boolean.TRUE;
                                 }

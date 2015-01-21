@@ -85,7 +85,7 @@ public interface StoreManager
     public static final String OPTION_QUERY_CANCEL = "Query.Cancel";
     public static final String OPTION_DATASTORE_TIMEOUT = "Datastore.Timeout";
 
-    Collection getSupportedOptions();
+    Collection<String> getSupportedOptions();
 
     void close();
 
