@@ -32,21 +32,17 @@ public abstract class SingleFieldId<T> implements Externalizable, Comparable
 {
     protected static final String STRING_DELIMITER = ":";
 
-    /** The class of the target object. TODO Would like to drop this to save space, but is needed to convert to JDO-specific ids. */
-    transient private Class targetClass;
-
-    /** The name of the class of the target object. */
+    /** The name of the class of the target persistable object. */
     protected String targetClassName;
 
     protected int hashCode;
 
-    protected SingleFieldId(Class pcClass)
+    protected SingleFieldId(Class pcClass) // TODO Pass in String instead of Class?
     {
         if (pcClass == null)
         {
             throw new NullPointerException();
         }
-        targetClass = pcClass;
         targetClassName = pcClass.getName();
     }
 
@@ -66,15 +62,6 @@ public abstract class SingleFieldId<T> implements Externalizable, Comparable
         }
     }
 
-    /**
-     * Return the target class.
-     * @return the target class.
-     */
-    public Class getTargetClass()
-    {
-        return targetClass;
-    }
-
     public String getTargetClassName()
     {
         return targetClassName;
@@ -83,9 +70,9 @@ public abstract class SingleFieldId<T> implements Externalizable, Comparable
     public abstract T getKeyAsObject();
 
     /**
-     * Check the class and class name and object type. If restored from serialization, class will be null so compare class name.
+     * Check the class and class name and object type.
      * @param obj the other object
-     * @return true if the class or class name is the same
+     * @return true if the class name is the same
      */
     public boolean equals(Object obj)
     {
@@ -100,10 +87,6 @@ public abstract class SingleFieldId<T> implements Externalizable, Comparable
         else
         {
             SingleFieldId other = (SingleFieldId) obj;
-            if (targetClass != null && targetClass == other.targetClass)
-            {
-                return true;
-            }
             return targetClassName.equals(other.targetClassName);
         }
     }
@@ -125,11 +108,11 @@ public abstract class SingleFieldId<T> implements Externalizable, Comparable
 
     /**
      * Read from the input stream. Creates a new instance with the target class name set
+     * @param in Input object
      */
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
     {
-        targetClass = null;
-        targetClassName = (String) in.readObject();
+        targetClassName = (String)in.readObject();
         hashCode = in.readInt();
     }
 
