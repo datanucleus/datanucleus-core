@@ -180,8 +180,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultProperty(PropertyNames.PROPERTY_PMF_NAME, null, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_PERSISTENCE_UNIT_NAME, null, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_PERSISTENCE_XML_FILENAME, null, null, null, false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_SERVER_TIMEZONE_ID, null, null,
-            CorePropertyValidator.class.getName(), false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_SERVER_TIMEZONE_ID, null, null, CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_PROPERTIES_FILE, null, null, null, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_PERSISTENCE_UNIT_LOAD_CLASSES, null, false, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_EXECUTION_CONTEXT_REAPER_THREAD, null, false, false, false);
@@ -197,26 +196,21 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_USE_IMPLEMENTATION_CREATOR, null, true, false, false);
 
         // Transactions
-        conf.addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_TYPE, null, null,
-            CorePropertyValidator.class.getName(), false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_TYPE, null, null, CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_JTA_LOCATOR, null, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_JTA_JNDI_LOCATION, null, null, null, false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION, null, "read-committed", 
-            CorePropertyValidator.class.getName(), false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION, null, "read-committed", CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_NONTX_READ, null, true, false, true);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_NONTX_WRITE, null, true, false, true);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_NONTX_ATOMIC, null, true, false, true);
 
         // Flush process
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_FLUSH_AUTO_OBJECT_LIMIT, null, 1, false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_FLUSH_MODE, null, null, 
-            CorePropertyValidator.class.getName(), false, true);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_FLUSH_MODE, null, null, CorePropertyValidator.class.getName(), false, true);
 
         // Value Generation
-        conf.addDefaultProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ISOLATION, null, "read-committed", 
-            CorePropertyValidator.class.getName(), false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ATTRIBUTE, null, "New", 
-            CorePropertyValidator.class.getName(), false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ISOLATION, null, "read-committed", CorePropertyValidator.class.getName(), false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ATTRIBUTE, null, "NEW", CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_VALUEGEN_SEQUENCE_ALLOCSIZE, null, 10, false, false);
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_VALUEGEN_INCREMENT_ALLOCSIZE, null, 10, false, false);
 
@@ -247,8 +241,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultProperty(PropertyNames.PROPERTY_CACHE_L2_TYPE, null, "soft", null, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS, null, true, false, true);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS_LAZY, null, null, false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CACHE_L2_MODE, null, "UNSPECIFIED", 
-            CorePropertyValidator.class.getName(), false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CACHE_L2_MODE, null, "UNSPECIFIED", CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_CACHE_L2_NAME, null, "datanucleus", null, false, false);
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_CACHE_L2_MAXSIZE, null, -1, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_LOADFIELDS, null, true, false, false);
@@ -260,12 +253,9 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_WRITE_THROUGH, null, true, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_STATISTICS_ENABLED, null, false, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_STORE_BY_VALUE, null, true, false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CACHE_L2_RETRIEVE_MODE, null, "use",
-            CorePropertyValidator.class.getName(), false, true);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CACHE_L2_STORE_MODE, null, "use",
-            CorePropertyValidator.class.getName(), false, true);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_CACHE_L2_UPDATE_MODE, null, "commit-and-datastore-read", 
-            CorePropertyValidator.class.getName(), false, true);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CACHE_L2_RETRIEVE_MODE, null, "use", CorePropertyValidator.class.getName(), false, true);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CACHE_L2_STORE_MODE, null, "use", CorePropertyValidator.class.getName(), false, true);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_CACHE_L2_UPDATE_MODE, null, "commit-and-datastore-read", CorePropertyValidator.class.getName(), false, true);
 
         conf.addDefaultProperty(PropertyNames.PROPERTY_CACHE_QUERYCOMPILE_TYPE, null, "soft", null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_CACHE_QUERYCOMPILEDATASTORE_TYPE, null, "soft", null, false, false);
@@ -293,8 +283,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS, null, true, false, true);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS_CHECKS, null, true, false, true);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SERIALIZE_READ, null, false, false, true);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_DELETION_POLICY, null, "JDO2", 
-            CorePropertyValidator.class.getName(), false, true);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_DELETION_POLICY, null, "JDO2", CorePropertyValidator.class.getName(), false, true);
         // TODO Would be nice to set the default here to "false" but JDO TCK "instanceCallbacks" fails
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED, null, true, false, true);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_TYPE_CONVERSION, null, true, false, false); // TODO Change last arg to true
@@ -306,10 +295,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE, null, true, false, true);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_ALLOW_ATTACH_OF_TRANSIENT, null, false, false, true);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_DETACH_AS_WRAPPED, null, false, false, true);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_DETACH_DETACHMENT_FIELDS, null, "load-fields", 
-            CorePropertyValidator.class.getName(), false, false); // TODO Change last arg to true
-        conf.addDefaultProperty(PropertyNames.PROPERTY_DETACH_DETACHED_STATE, null, "fetch-groups", 
-            CorePropertyValidator.class.getName(), false, false); // TODO Change last arg to true
+        conf.addDefaultProperty(PropertyNames.PROPERTY_DETACH_DETACHMENT_FIELDS, null, "load-fields", CorePropertyValidator.class.getName(), false, false); // TODO Change last arg to true
+        conf.addDefaultProperty(PropertyNames.PROPERTY_DETACH_DETACHED_STATE, null, "fetch-groups", CorePropertyValidator.class.getName(), false, false); // TODO Change last arg to true
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_MAX_FETCH_DEPTH, null, 1, false, true);
 
         // ========================= Generally all properties below here are specified at the StoreManager level =============================
