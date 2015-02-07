@@ -63,4 +63,23 @@ public abstract class AbstractDatastoreGenerator<T> extends AbstractGenerator<T>
     {
         connectionProvider = provider;
     }
+    
+    public enum ConnectionPreference
+    {
+        NONE,
+        EXISTING,
+        NEW
+    }
+
+    /**
+     * Accessor for any requirement for connection used by this value generator.
+     * EXISTING means use the same connection as the ExecutionContext is using.
+     * NEW means use a new connection, and commit it after any operation.
+     * NONE means use NEW and allow override by the persistence property "datanucleus.valuegeneration.transactionAttribute".
+     * @return The connection preference
+     */
+    public ConnectionPreference getConnectionPreference()
+    {
+        return ConnectionPreference.NONE;
+    }
 }
