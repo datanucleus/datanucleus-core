@@ -63,6 +63,8 @@ import org.datanucleus.exceptions.NucleusUserException;
  * The Resource layer is handled by the datastore. For example, with RDBMS databases,
  * the javax.sql.Connection is the API used to demarcate the database transactions. In The RBDMS database,
  * the resource layer, it is handling the database transaction.
+ * 
+ * For a treatment of isolation levels, refer to http://www.cs.umb.edu/~poneil/iso.pdf
  */ 
 public interface Transaction
 {
