@@ -13,4 +13,24 @@
         <I>DefaultLevel2Cache</I>. Alternatively, there are plugins for EHCache, SwarmCache, OSCache
         and Coherence products
     </P>
+    
+    <P>
+        As far as Level 2 caching is concerned each class is configurable via metadata @Cacheable (and equivalent XML).
+        In addition we can define which fields are cacheable using this mechanism, but maybe using @Extension metadata
+        if the persistence API doesn't support field-level restrictions.
+    </P>
+    <P>
+        At commit of a transaction we check all enlisted objects and have a recursive process that navigates down
+        through all objects to cache (limited by the FetchPlan) and at the end all of these objects will be put in 
+        the L2 cache (and logged). Also at this point if any enlisted objects have been deleted during the transaction 
+        we remove them from the L2 cache.
+        When an object is to be put in the L2 cache we check if it already has an entry in the L2 cache and, if so, 
+        we update that object with the current field values, version, etc. When an object is to be put in the L2 cache 
+        and it has relation fields, we don't store the actual objects of those relations instead storing the identities 
+        of the related objects in the CachedPC object. When an object is to be taken from the L2 cache we create a 
+        copy of that object and copy the field values across for all fields that were loaded when it was originally 
+        put in the cache. When a relation field is required to be loaded we use the identities that are stored in the 
+        CachedPC, and find the equivalent object for that identity from the L1/L2 caches, reinstating it into the 
+        managed object.
+    </P>
 </BODY>
