@@ -65,8 +65,7 @@ import org.datanucleus.util.StringUtils;
  * The programmatic way would be something like this :-
  * <pre>
  * DataNucleusEnhancer enhancer = new DataNucleusEnhancer();
- * enhancer.setVerbose();
- * enhancer.enhancePersistenceUnit("myPersistenceUnit");
+ * enhancer.setVerbose().addPersistenceUnit("myPersistenceUnit").enhance();
  * </pre>
  * enhancing all classes specified by the persistence unit.
  */
