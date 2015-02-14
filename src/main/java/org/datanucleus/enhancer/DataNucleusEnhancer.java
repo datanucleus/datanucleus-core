@@ -468,6 +468,23 @@ public class DataNucleusEnhancer
     }
 
     /**
+     * Method to add the classes defined by the persistence-unit to the list of classes to enhance.
+     * @param pumd The persistence-unit metadata (dynamically created)
+     * @return The enhancer
+     */
+    public DataNucleusEnhancer addPersistenceUnit(PersistenceUnitMetaData pumd)
+    {
+        if (pumd == null)
+        {
+            return this;
+        }
+
+        componentsToEnhance.add(new EnhanceComponent(EnhanceComponent.PERSISTENCE_UNIT, pumd));
+
+        return this;
+    }
+
+    /**
      * Method to enhance all classes defined by addClass, addClasses, addJar, addPersistenceUnit, addFiles.
      * @return Number of classes enhanced
      */
@@ -754,13 +771,22 @@ public class DataNucleusEnhancer
                     PersistenceUnitMetaData pumd = null;
                     try
                     {
-                        pumd = metadataMgr.getMetaDataForPersistenceUnit((String)comp.getValue());
+                        Object puValue = comp.getValue();
+                        if (puValue instanceof String)
+                        {
+                            pumd = metadataMgr.getMetaDataForPersistenceUnit((String)comp.getValue());
+                        }
+                        else
+                        {
+                            pumd = (PersistenceUnitMetaData)puValue;
+                        }
                     }
                     catch (NucleusException ne)
                     {
                         // No "persistence.xml" files found yet they have specified a persistence-unit name!
                         throw new NucleusEnhanceException(Localiser.msg("005008", comp.getValue()));
                     }
+
                     if (pumd == null)
                     {
                         throw new NucleusEnhanceException(Localiser.msg("005009", comp.getValue()));
