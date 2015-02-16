@@ -375,8 +375,7 @@ public class DataNucleusEnhancer
 
         if (names.size() > 0)
         {
-            componentsToEnhance.add(new EnhanceComponent(EnhanceComponent.CLASS,
-                names.toArray(new String[names.size()])));
+            componentsToEnhance.add(new EnhanceComponent(EnhanceComponent.CLASS, names.toArray(new String[names.size()])));
         }
         return this;
     }
@@ -415,18 +414,15 @@ public class DataNucleusEnhancer
 
         if (mappingFiles.size() > 0)
         {
-            componentsToEnhance.add(new EnhanceComponent(EnhanceComponent.MAPPING_FILE,
-                mappingFiles.toArray(new String[mappingFiles.size()])));
+            componentsToEnhance.add(new EnhanceComponent(EnhanceComponent.MAPPING_FILE, mappingFiles.toArray(new String[mappingFiles.size()])));
         }
         if (jarFiles.size() > 0)
         {
-            componentsToEnhance.add(new EnhanceComponent(EnhanceComponent.JAR_FILE,
-                jarFiles.toArray(new String[jarFiles.size()])));
+            componentsToEnhance.add(new EnhanceComponent(EnhanceComponent.JAR_FILE, jarFiles.toArray(new String[jarFiles.size()])));
         }
         if (classFiles.size() > 0)
         {
-            componentsToEnhance.add(new EnhanceComponent(EnhanceComponent.CLASS_FILE,
-                classFiles.toArray(new String[classFiles.size()])));
+            componentsToEnhance.add(new EnhanceComponent(EnhanceComponent.CLASS_FILE, classFiles.toArray(new String[classFiles.size()])));
         }
 
         return this;
@@ -547,8 +543,7 @@ public class DataNucleusEnhancer
         String msg = null;
         if (verbose)
         {
-            msg = Localiser.msg("005004", classNames.size(), "" + (inputTime-startTime),
-                "" + (enhanceTime-inputTime), "" + (enhanceTime-startTime));
+            msg = Localiser.msg("005004", classNames.size(), "" + (inputTime-startTime), "" + (enhanceTime-inputTime), "" + (enhanceTime-startTime));
         }
         else
         {
@@ -602,8 +597,7 @@ public class DataNucleusEnhancer
                     }
 
                     classNames.add(cmd.getFullClassName());
-                    byte[] bytes = bytesForClassesToEnhanceByClassName != null ?
-                            bytesForClassesToEnhanceByClassName.get(cmd.getFullClassName()) : null;
+                    byte[] bytes = bytesForClassesToEnhanceByClassName != null ? bytesForClassesToEnhanceByClassName.get(cmd.getFullClassName()) : null;
                     ClassEnhancer classEnhancer = getClassEnhancer(cmd, bytes);
                     validateClass(cmd, classEnhancer);
                 }
@@ -615,8 +609,7 @@ public class DataNucleusEnhancer
         String msg = null;
         if (verbose)
         {
-            msg = Localiser.msg("005004", classNames.size(), "" + (inputTime-startTime),
-                "" + (enhanceTime-inputTime), "" + (enhanceTime-startTime));
+            msg = Localiser.msg("005004", classNames.size(), "" + (inputTime-startTime), "" + (enhanceTime-inputTime), "" + (enhanceTime-startTime));
         }
         else
         {
@@ -655,8 +648,7 @@ public class DataNucleusEnhancer
                     {
                         // Single class
                         String className = (String)comp.getValue();
-                        if (bytesForClassesToEnhanceByClassName != null &&
-                            bytesForClassesToEnhanceByClassName.get(className) != null)
+                        if (bytesForClassesToEnhanceByClassName != null && bytesForClassesToEnhanceByClassName.get(className) != null)
                         {
                             // Retrieve the meta-data "file"
                             AbstractClassMetaData cmd = metadataMgr.getMetaDataForClass(className, clr);
@@ -671,8 +663,7 @@ public class DataNucleusEnhancer
                         }
                         else
                         {
-                            filemds = metadataMgr.loadClasses(new String[] {(String)comp.getValue()},
-                                userClassLoader);
+                            filemds = metadataMgr.loadClasses(new String[] {(String)comp.getValue()}, userClassLoader);
                         }
                     }
                     else
@@ -724,8 +715,7 @@ public class DataNucleusEnhancer
                                 classNames.add(className);
                             }
                         }
-                        filemds = metadataMgr.loadClasses(classNames.toArray(new String[classNames.size()]),
-                            userClassLoader);
+                        filemds = metadataMgr.loadClasses(classNames.toArray(new String[classNames.size()]), userClassLoader);
                     }
                     break;
 
@@ -733,8 +723,7 @@ public class DataNucleusEnhancer
                     if (comp.getValue() instanceof String)
                     {
                         // Single mapping file
-                        filemds = metadataMgr.loadMetadataFiles(new String[] {(String)comp.getValue()},
-                            userClassLoader);
+                        filemds = metadataMgr.loadMetadataFiles(new String[] {(String)comp.getValue()}, userClassLoader);
                     }
                     else
                     {
@@ -996,8 +985,7 @@ public class DataNucleusEnhancer
                         addMessage("NOT ENHANCED (NonPersistent) : " + cmd.getFullClassName(), false);
                     }
                 }
-                if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE ||
-                        cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_AWARE)
+                if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE || cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_AWARE)
                 {
                     // Error in enhancement
                     success = false;
