@@ -101,7 +101,7 @@ import org.datanucleus.util.WeakValueMap;
 
 /**
  * Manager for persistence/retrieval of objects within an execution context, equating to the work
- * required by javax.jdo.PersistenceManager and javax.persistence.EntityManager.
+ * required by JDO PersistenceManager and JPA EntityManager.
  * <h3>Caching</h3>
  * <p>
  * An ExecutionContext has its own Level 1 cache. This stores objects against their identity. The Level 1 cache

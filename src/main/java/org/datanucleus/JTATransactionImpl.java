@@ -250,11 +250,9 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
     }
 
     /**
-     * "16.1.3 Stateless Session Bean with Bean Managed Transactions": "acquiring a PersistenceManager without beginning
-     * a UserTransaction results in the PersistenceManager being able to manage transaction boundaries via begin,
-     * commit, and rollback methods on javax.jdo.Transaction. The PersistenceManager will automatically begin the User-
-     * Transaction during javax.jdo.Transaction.begin and automatically commit the UserTransaction during
-     * javax.jdo.Transaction.commit"
+     * JDO spec "16.1.3 Stateless Session Bean with Bean Managed Transactions": "acquiring a PM without beginning a UserTransaction results 
+     * in the PM being able to manage transaction boundaries via begin, commit, and rollback methods on JDO Transaction.
+     * The PM will automatically begin the User-Transaction during Transaction.begin and automatically commit the UserTransaction during Transaction.commit"
      */
     public void begin()
     {

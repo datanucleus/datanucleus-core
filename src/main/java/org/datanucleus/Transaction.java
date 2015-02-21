@@ -38,8 +38,8 @@ import org.datanucleus.exceptions.NucleusUserException;
  *
  * In the the API layer, there are interfaces provided to the user application, as such:
  * <ul>
- * <li>javax.jdo.Transaction - the JDO API interface</li>
- * <li>javax.persistence.EntityTransaction - the JPA API interface</li>
+ * <li>JDO Transaction - the JDO API interface</li>
+ * <li>JPA EntityTransaction - the JPA API interface</li>
  * <li>{@link javax.transaction.UserTransaction} - the JTA API interface</li>
  * </ul>
  *

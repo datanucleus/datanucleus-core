@@ -553,7 +553,7 @@ public class SchemaTool
         if (persistenceUnitName != null)
         {
             // Obtain any props defined for the persistence-unit
-            props.put("javax.jdo.option.persistenceunitname", persistenceUnitName);
+            props.put(PropertyNames.PROPERTY_PERSISTENCE_UNIT_NAME.toLowerCase(), persistenceUnitName);
             pumd = nucleusCtx.getMetaDataManager().getMetaDataForPersistenceUnit(persistenceUnitName);
             if (pumd != null)
             {
