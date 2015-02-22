@@ -142,8 +142,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      * @param nucleusContext The corresponding nucleus context.
      * @param props Any properties controlling this datastore
      */
-    protected AbstractStoreManager(String key, ClassLoaderResolver clr, PersistenceNucleusContext nucleusContext,
-            Map<String, Object> props)
+    protected AbstractStoreManager(String key, ClassLoaderResolver clr, PersistenceNucleusContext nucleusContext, Map<String, Object> props)
     {
         this.storeManagerKey = key;
         this.nucleusContext = nucleusContext;
@@ -190,8 +189,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         String datastoreName = getStringProperty(FederatedStoreManager.PROPERTY_DATA_FEDERATION_DATASTORE_NAME);
 
         // Factory for connections - transactional
-        ConfigurationElement cfElem = nucleusContext.getPluginManager().getConfigurationElementForExtension(
-            "org.datanucleus.store_connectionfactory",
+        ConfigurationElement cfElem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_connectionfactory",
             new String[] {"datastore", "transactional"}, new String[] {storeManagerKey, "true"});
         if (cfElem != null)
         {
@@ -202,12 +200,9 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             }
             try
             {
-                ConnectionFactory cf = (ConnectionFactory)nucleusContext.getPluginManager().createExecutableExtension(
-                    "org.datanucleus.store_connectionfactory",
-                    new String[] {"datastore", "transactional"},
-                    new String[] {storeManagerKey, "true"}, "class-name",
-                    new Class[] {StoreManager.class, String.class},
-                    new Object[] {this, AbstractConnectionFactory.RESOURCE_NAME_TX});
+                ConnectionFactory cf = (ConnectionFactory)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.store_connectionfactory",
+                    new String[] {"datastore", "transactional"}, new String[] {storeManagerKey, "true"}, "class-name",
+                    new Class[] {StoreManager.class, String.class}, new Object[] {this, AbstractConnectionFactory.RESOURCE_NAME_TX});
                 connectionMgr.registerConnectionFactory(primaryConnectionFactoryName, cf);
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
@@ -225,8 +220,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
 
         // Factory for connections - typically for schema/sequences etc
-        cfElem = nucleusContext.getPluginManager().getConfigurationElementForExtension(
-            "org.datanucleus.store_connectionfactory",
+        cfElem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_connectionfactory",
             new String[] {"datastore", "transactional"}, new String[] {storeManagerKey, "false"});
         if (cfElem != null)
         {
@@ -237,12 +231,9 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             }
             try
             {
-                ConnectionFactory cf = (ConnectionFactory)nucleusContext.getPluginManager().createExecutableExtension(
-                    "org.datanucleus.store_connectionfactory",
-                    new String[] {"datastore", "transactional"},
-                    new String[] {storeManagerKey, "false"}, "class-name",
-                    new Class[] {StoreManager.class, String.class},
-                    new Object[] {this, "nontx"});
+                ConnectionFactory cf = (ConnectionFactory)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.store_connectionfactory",
+                    new String[] {"datastore", "transactional"}, new String[] {storeManagerKey, "false"}, "class-name",
+                    new Class[] {StoreManager.class, String.class}, new Object[] {this, AbstractConnectionFactory.RESOURCE_NAME_NONTX});
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
                     NucleusLogger.CONNECTION.debug(Localiser.msg("032019", secondaryConnectionFactoryName));
@@ -552,8 +543,8 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             {
                 Class[] argTypes = new Class[] {ClassConstants.NUCLEUS_CONTEXT};
                 Object[] args = new Object[] {nucleusContext};
-                namingFactory = (NamingFactory)nucleusContext.getPluginManager().createExecutableExtension(
-                    "org.datanucleus.identifier_namingfactory", "name", namingFactoryName, "class-name", argTypes, args);
+                namingFactory = (NamingFactory)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.identifier_namingfactory", 
+                    "name", namingFactoryName, "class-name", argTypes, args);
             }
             catch (Throwable thr)
             {
@@ -831,12 +822,9 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             String namingCase = getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_CASE);
             NucleusLogger.DATASTORE.debug("Schema : NamingFactory=" + namingFactoryName + " identifierCase=" + namingCase);
 
-            String[] queryLanguages = nucleusContext.getPluginManager().getAttributeValuesForExtension(
-                "org.datanucleus.store_query_query", "datastore", storeManagerKey, "name");
-            NucleusLogger.DATASTORE.debug("Query Languages : " + 
-                (queryLanguages != null ? StringUtils.objectArrayToString(queryLanguages) : "none"));
-            NucleusLogger.DATASTORE.debug("Queries : Timeout=" +
-                getIntProperty(PropertyNames.PROPERTY_DATASTORE_READ_TIMEOUT));
+            String[] queryLanguages = nucleusContext.getPluginManager().getAttributeValuesForExtension("org.datanucleus.store_query_query", "datastore", storeManagerKey, "name");
+            NucleusLogger.DATASTORE.debug("Query Languages : " + (queryLanguages != null ? StringUtils.objectArrayToString(queryLanguages) : "none"));
+            NucleusLogger.DATASTORE.debug("Queries : Timeout=" + getIntProperty(PropertyNames.PROPERTY_DATASTORE_READ_TIMEOUT));
 
             NucleusLogger.DATASTORE.debug("===========================================================");
         }
@@ -1006,7 +994,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
 
         // Find if datastore=storeManagerKey has an extension for name="{language}"
         String name = getNucleusContext().getPluginManager().getAttributeValueForExtension("org.datanucleus.store_query_query",
-                new String[] {"name", "datastore"}, new String[]{language, storeManagerKey}, "name");
+            new String[] {"name", "datastore"}, new String[]{language, storeManagerKey}, "name");
         return (name != null);
     }
 
@@ -1027,7 +1015,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     public boolean supportsValueStrategy(String strategy)
     {
         ConfigurationElement elem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
-                new String[]{"name", "unique"}, new String[] {strategy, "true"});
+            new String[]{"name", "unique"}, new String[] {strategy, "true"});
         if (elem != null)
         {
             // Unique strategy so supported for all datastores
@@ -1066,8 +1054,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         else
         {
             // Application identity with user PK class, so find all using this PK
-            Collection<AbstractClassMetaData> cmds = getMetaDataManager().getClassMetaDataWithApplicationId(
-                id.getClass().getName());
+            Collection<AbstractClassMetaData> cmds = getMetaDataManager().getClassMetaDataWithApplicationId(id.getClass().getName());
             if (cmds != null)
             {
                 Iterator<AbstractClassMetaData> iter = cmds.iterator();
@@ -1198,8 +1185,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         {
             if (strategy == IdentityStrategy.INCREMENT)
             {
-                tableGeneratorMetaData = getMetaDataManager().getMetaDataForTableGenerator(ec.getClassLoaderResolver(), 
-                    valueGeneratorName);
+                tableGeneratorMetaData = getMetaDataManager().getMetaDataForTableGenerator(ec.getClassLoaderResolver(), valueGeneratorName);
                 if (tableGeneratorMetaData == null)
                 {
                     throw new NucleusUserException(Localiser.msg("038005", fieldName, valueGeneratorName));
@@ -1207,8 +1193,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             }
             else if (strategy == IdentityStrategy.SEQUENCE)
             {
-                sequenceMetaData = getMetaDataManager().getMetaDataForSequence(ec.getClassLoaderResolver(), 
-                    valueGeneratorName);
+                sequenceMetaData = getMetaDataManager().getMetaDataForSequence(ec.getClassLoaderResolver(), valueGeneratorName);
                 if (sequenceMetaData == null)
                 {
                     throw new NucleusUserException(Localiser.msg("038006", fieldName, valueGeneratorName));
@@ -1223,8 +1208,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             {
                 // JPOX 1.1 behaviour was just to use the sequence name in the datastore so log it and fallback to that
                 NucleusLogger.VALUEGENERATION.warn("Field " + fieldName + " has been specified to use sequence " + sequence +
-                    " but there is no <sequence> specified in the MetaData. " + 
-                    "Falling back to use a sequence in the datastore with this name directly.");
+                    " but there is no <sequence> specified in the MetaData. Falling back to use a sequence in the datastore with this name directly.");
             }
         }
 
@@ -1234,10 +1218,8 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         // Generate the name for ValueGenerationManager to use the strategy for this field/class.
         String generatorName = null;
         String generatorNameKeyInManager = null;
-        ConfigurationElement elem =
-            nucleusContext.getPluginManager().getConfigurationElementForExtension(
-                "org.datanucleus.store_valuegenerator",
-                new String[]{"name", "unique"}, new String[] {strategyName, "true"});
+        ConfigurationElement elem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
+            new String[]{"name", "unique"}, new String[] {strategyName, "true"});
         if (elem != null)
         {
             // Unique value generator so set the key in ValueGenerationManager to the value generator name itself
@@ -1247,8 +1229,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         else
         {
             // Not a unique (datastore-independent) generator so try just for this datastore
-            elem = nucleusContext.getPluginManager().getConfigurationElementForExtension(
-                "org.datanucleus.store_valuegenerator", 
+            elem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator", 
                 new String[]{"name", "datastore"}, new String[] {strategyName, storeManagerKey});
             if (elem != null)
             {
@@ -1293,16 +1274,14 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 Class cls = null;
                 if (elem != null)
                 {
-                    cls = nucleusContext.getPluginManager().loadClass(elem.getExtension().getPlugin().getSymbolicName(), 
-                        elem.getAttribute("class-name"));
+                    cls = nucleusContext.getPluginManager().loadClass(elem.getExtension().getPlugin().getSymbolicName(), elem.getAttribute("class-name"));
                 }
                 if (cls == null)
                 {
                     throw new NucleusException("Cannot create Value Generator for strategy " + generatorName);
                 }
 
-                // Create the new ValueGenerator since the first time required (registers it with 
-                // the ValueGenerationManager too)
+                // Create the new ValueGenerator since the first time required (registers it with the ValueGenerationManager too)
                 generator = getValueGenerationManager().createValueGenerator(generatorNameKeyInManager, cls, props, this, null);
             }
         }
@@ -1359,8 +1338,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             {
                 return "uuid-hex";
             }
-            else if (type == Long.class || type == Integer.class || type == Short.class || 
-                type == long.class || type == int.class || type == short.class)
+            else if (type == Long.class || type == Integer.class || type == Short.class || type == long.class || type == int.class || type == short.class)
             {
                 if (supportsValueStrategy("identity"))
                 {
@@ -1552,8 +1530,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             if (!properties.containsKey("key-cache-size"))
             {
                 // Use default allocation size
-                int allocSize = getIntProperty(PropertyNames.PROPERTY_VALUEGEN_INCREMENT_ALLOCSIZE);
-                properties.put("key-cache-size", "" + allocSize);
+                properties.put("key-cache-size", "" + getIntProperty(PropertyNames.PROPERTY_VALUEGEN_INCREMENT_ALLOCSIZE));
             }
         }
         else if (strategy == IdentityStrategy.SEQUENCE && seqmd != null)
@@ -1572,8 +1549,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 else
                 {
                     // Use default allocation size
-                    int allocSize = getIntProperty(PropertyNames.PROPERTY_VALUEGEN_SEQUENCE_ALLOCSIZE);
-                    properties.put("key-cache-size", "" + allocSize);
+                    properties.put("key-cache-size", "" + getIntProperty(PropertyNames.PROPERTY_VALUEGEN_SEQUENCE_ALLOCSIZE));
                 }
                 properties.put("sequence-name", "" + seqmd.getDatastoreSequence());
 

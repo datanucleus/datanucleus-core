@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -37,6 +38,7 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory
     protected String resourceName;
 
     public static final String RESOURCE_NAME_TX = "tx";
+    public static final String RESOURCE_NAME_NONTX = "nontx";
 
     /**
      * Constructor.
@@ -50,6 +52,7 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory
         if (resourceName == null)
         {
             // Should never be null
+            NucleusLogger.CONNECTION.warn("Attempt to create ConnectionFactory with NULL resourceName for connection factory with storeManager=" + StringUtils.toJVMIDString(storeMgr));
         }
         else if (resourceName.equals(RESOURCE_NAME_TX))
         {
