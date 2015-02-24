@@ -71,16 +71,6 @@ public abstract class AbstractGenerator<T> implements ValueGenerator<T>
     }
 
     /**
-     * Accessor for the storage class for values generated with this generator.
-     * TODO Drop this method now that we use generics
-     * @return Storage class (e.g Long.class)
-     */
-    public static Class getStorageClass()
-    {
-        return Long.class;
-    }
-
-    /**
      * Accessor for the symbolic name for this generator.
      * @return Symbolic name for the generator.
      */

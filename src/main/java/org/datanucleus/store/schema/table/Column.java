@@ -52,7 +52,7 @@ public interface Column
 
     /**
      * Mutator to make the column (part of) the primary key.
-     * @return TODO
+     * @return This column
      */
     Column setPrimaryKey();
 

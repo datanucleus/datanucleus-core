@@ -36,6 +36,7 @@ import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.MetaDataUtils;
+import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
 import org.datanucleus.store.types.SCO;
@@ -285,6 +286,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
     public void storeObjectField(int fieldNumber, Object value)
     {
         AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
         if (mmd.getPersistenceModifier() == FieldPersistenceModifier.TRANSACTIONAL)
         {
             // Cannot cache transactional fields
@@ -308,12 +310,10 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
         else
         {
             // TODO Make use of RelationType methods here rather than "instanceof Collection" etc.
-            if (api.isPersistable(value))
+            if (RelationType.isRelationSingleValued(relType))
             {
-                // 1-1, N-1 PC field
-                if (mmd.isSerialized() ||
-                    MetaDataUtils.isMemberEmbedded(mmd, mmd.getRelationType(ec.getClassLoaderResolver()),
-                        ec.getClassLoaderResolver(), ec.getMetaDataManager()))
+                // 1-1, N-1 persistable field
+                if (mmd.isSerialized() || MetaDataUtils.isMemberEmbedded(mmd, relType, ec.getClassLoaderResolver(), ec.getMetaDataManager()))
                 {
                     if (ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CACHE_EMBEDDED))
                     {
@@ -339,17 +339,15 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
             else if (value instanceof Collection)
             {
                 // 1-N, M-N Collection
-                if (MetaDataUtils.getInstance().storesPersistable(mmd, ec))
+                if (RelationType.isRelationMultiValued(relType))
                 {
-                    if (value instanceof List && mmd.getOrderMetaData() != null && 
-                        !mmd.getOrderMetaData().isIndexedList())
+                    if (value instanceof List && mmd.getOrderMetaData() != null && !mmd.getOrderMetaData().isIndexedList())
                     {
                         // Ordered list so don't cache since dependent on datastore-retrieve order
                         cachedPC.setLoadedField(fieldNumber, false);
                         return;
                     }
-                    if (mmd.isSerialized() || mmd.isEmbedded() ||
-                        mmd.getCollection().isSerializedElement() || mmd.getCollection().isEmbeddedElement())
+                    if (mmd.isSerialized() || mmd.isEmbedded() || mmd.getCollection().isSerializedElement() || mmd.getCollection().isEmbeddedElement())
                     {
                         // TODO Support serialised/embedded elements
                         cachedPC.setLoadedField(fieldNumber, false);
@@ -412,8 +410,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
                     }
                     catch (Exception e)
                     {
-                        NucleusLogger.CACHE.warn("Unable to create object of type " + value.getClass().getName() +
-                            " for L2 caching : " + e.getMessage());
+                        NucleusLogger.CACHE.warn("Unable to create object of type " + value.getClass().getName() + " for L2 caching : " + e.getMessage());
 
                         // Contents not loaded so just mark as unloaded
                         cachedPC.setLoadedField(fieldNumber, false);
@@ -444,13 +441,10 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
             else if (value instanceof Map)
             {
                 // 1-N, M-N Map
-                if (MetaDataUtils.getInstance().storesPersistable(mmd, ec))
+                if (RelationType.isRelationMultiValued(relType))
                 {
-                    if (mmd.isSerialized() || mmd.isEmbedded() ||
-                        mmd.getMap().isSerializedKey() || 
-                        (mmd.getMap().keyIsPersistent() && mmd.getMap().isEmbeddedKey()) ||
-                        mmd.getMap().isSerializedValue() || 
-                        (mmd.getMap().valueIsPersistent() && mmd.getMap().isEmbeddedValue()))
+                    if (mmd.isSerialized() || mmd.isEmbedded() || mmd.getMap().isSerializedKey() || mmd.getMap().isSerializedValue() || 
+                        (mmd.getMap().keyIsPersistent() && mmd.getMap().isEmbeddedKey()) || (mmd.getMap().valueIsPersistent() && mmd.getMap().isEmbeddedValue()))
                     {
                         // TODO Support serialised/embedded keys/values
                         cachedPC.setLoadedField(fieldNumber, false);
@@ -513,8 +507,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
                     }
                     catch (Exception e)
                     {
-                        NucleusLogger.CACHE.warn("Unable to create object of type " + value.getClass().getName() +
-                            " for L2 caching : " + e.getMessage());
+                        NucleusLogger.CACHE.warn("Unable to create object of type " + value.getClass().getName() + " for L2 caching : " + e.getMessage());
 
                         // Contents not loaded so just mark as unloaded
                         cachedPC.setLoadedField(fieldNumber, false);

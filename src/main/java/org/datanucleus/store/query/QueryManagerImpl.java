@@ -82,8 +82,7 @@ public class QueryManagerImpl implements QueryManager
         String cacheType = conf.getStringProperty(PropertyNames.PROPERTY_CACHE_QUERYCOMPILE_TYPE);
         if (cacheType != null && !cacheType.equalsIgnoreCase("none"))
         {
-            String cacheClassName = nucleusCtx.getPluginManager().getAttributeValueForExtension(
-                "org.datanucleus.cache_query_compilation", "name", cacheType, "class-name");
+            String cacheClassName = nucleusCtx.getPluginManager().getAttributeValueForExtension("org.datanucleus.cache_query_compilation", "name", cacheType, "class-name");
             if (cacheClassName == null)
             {
                 // Plugin of this name not found
@@ -93,9 +92,8 @@ public class QueryManagerImpl implements QueryManager
             try
             {
                 // Create an instance of the Query Cache
-                queryCompilationCache = (QueryCompilationCache)nucleusCtx.getPluginManager().createExecutableExtension(
-                    "org.datanucleus.cache_query_compilation", "name", cacheType, "class-name", 
-                    new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusCtx});
+                queryCompilationCache = (QueryCompilationCache)nucleusCtx.getPluginManager().createExecutableExtension("org.datanucleus.cache_query_compilation",
+                    "name", cacheType, "class-name", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusCtx});
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
                     NucleusLogger.CACHE.debug(Localiser.msg("021502", cacheClassName));
@@ -112,8 +110,7 @@ public class QueryManagerImpl implements QueryManager
         cacheType = conf.getStringProperty(PropertyNames.PROPERTY_CACHE_QUERYCOMPILEDATASTORE_TYPE);
         if (cacheType != null && !cacheType.equalsIgnoreCase("none"))
         {
-            String cacheClassName = nucleusCtx.getPluginManager().getAttributeValueForExtension(
-                "org.datanucleus.cache_query_compilation_store", "name", cacheType, "class-name");
+            String cacheClassName = nucleusCtx.getPluginManager().getAttributeValueForExtension("org.datanucleus.cache_query_compilation_store", "name", cacheType, "class-name");
             if (cacheClassName == null)
             {
                 // Plugin of this name not found
@@ -123,10 +120,8 @@ public class QueryManagerImpl implements QueryManager
             try
             {
                 // Create an instance of the Query Cache
-                queryCompilationCacheDatastore = 
-                    (QueryDatastoreCompilationCache)nucleusCtx.getPluginManager().createExecutableExtension(
-                    "org.datanucleus.cache_query_compilation_store", "name", cacheType, "class-name", 
-                    new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusCtx});
+                queryCompilationCacheDatastore = (QueryDatastoreCompilationCache)nucleusCtx.getPluginManager().createExecutableExtension("org.datanucleus.cache_query_compilation_store", 
+                    "name", cacheType, "class-name", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusCtx});
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
                     NucleusLogger.CACHE.debug(Localiser.msg("021502", cacheClassName));
@@ -143,8 +138,7 @@ public class QueryManagerImpl implements QueryManager
         cacheType = conf.getStringProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_TYPE);
         if (cacheType != null && !cacheType.equalsIgnoreCase("none"))
         {
-            String cacheClassName = nucleusCtx.getPluginManager().getAttributeValueForExtension(
-                "org.datanucleus.cache_query_result", "name", cacheType, "class-name");
+            String cacheClassName = nucleusCtx.getPluginManager().getAttributeValueForExtension("org.datanucleus.cache_query_result", "name", cacheType, "class-name");
             if (cacheClassName == null)
             {
                 // Plugin of this name not found
@@ -154,10 +148,8 @@ public class QueryManagerImpl implements QueryManager
             try
             {
                 // Create an instance of the Query Cache
-                queryResultsCache = 
-                    (QueryResultsCache)nucleusCtx.getPluginManager().createExecutableExtension(
-                    "org.datanucleus.cache_query_result", "name", cacheType, "class-name", 
-                    new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusCtx});
+                queryResultsCache = (QueryResultsCache)nucleusCtx.getPluginManager().createExecutableExtension("org.datanucleus.cache_query_result", 
+                    "name", cacheType, "class-name", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusCtx});
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
                     NucleusLogger.CACHE.debug(Localiser.msg("021502", cacheClassName));
@@ -217,10 +209,8 @@ public class QueryManagerImpl implements QueryManager
             {
                 Class[] argsClass = new Class[] {ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT};
                 Object[] args = new Object[] {storeMgr, ec};
-                Query q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension(
-                    "org.datanucleus.store_query_query", new String[] {"name", "datastore"},
-                    new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, 
-                    "class-name", argsClass, args);
+                Query q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store_query_query",
+                    new String[] {"name", "datastore"}, new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, "class-name", argsClass, args);
                 if (q == null)
                 {
                     // No query support for this language
@@ -235,10 +225,8 @@ public class QueryManagerImpl implements QueryManager
                 // Try XXXQuery(ExecutionContext, String);
                 Class[] argsClass = new Class[]{ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT, String.class};
                 Object[] args = new Object[]{storeMgr, ec, query};
-                q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension(
-                    "org.datanucleus.store_query_query", new String[] {"name", "datastore"},
-                    new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, 
-                    "class-name", argsClass, args);
+                q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store_query_query", 
+                    new String[] {"name", "datastore"}, new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, "class-name", argsClass, args);
                 if (q == null)
                 {
                     // No query support for this language
@@ -250,10 +238,8 @@ public class QueryManagerImpl implements QueryManager
                 // Try XXXQuery(StoreManager, ExecutionContext, Query.class);
                 Class[] argsClass = new Class[]{ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT, query.getClass()};
                 Object[] args = new Object[]{storeMgr, ec, query};
-                q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension(
-                    "org.datanucleus.store_query_query", new String[] {"name", "datastore"},
-                    new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, 
-                    "class-name", argsClass, args);
+                q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store_query_query", 
+                    new String[] {"name", "datastore"}, new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, "class-name", argsClass, args);
                 if (q == null)
                 {
                     // No query support for this language
@@ -265,10 +251,8 @@ public class QueryManagerImpl implements QueryManager
                 // Try XXXQuery(StoreManager, ExecutionContext, Object);
                 Class[] argsClass = new Class[]{ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT, Object.class};
                 Object[] args = new Object[]{storeMgr, ec, query};
-                q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension(
-                    "org.datanucleus.store_query_query", new String[] {"name", "datastore"},
-                    new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, 
-                    "class-name", argsClass, args);
+                q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store_query_query",
+                    new String[] {"name", "datastore"}, new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, "class-name", argsClass, args);
                 if (q == null)
                 {
                     // No query support for this language
@@ -505,8 +489,7 @@ public class QueryManagerImpl implements QueryManager
         // Not yet loaded anything for this method
         ClassLoaderResolver clr = nucleusCtx.getClassLoaderResolver(type != null ? type.getClassLoader() : null);
         PluginManager pluginMgr = nucleusCtx.getPluginManager();
-        ConfigurationElement[] elems = pluginMgr.getConfigurationElementsForExtension(
-            "org.datanucleus.query_method_evaluators", "method", methodName);
+        ConfigurationElement[] elems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.query_method_evaluators", "method", methodName);
         Map<Object, InvocationEvaluator> evaluators = new HashMap();
         InvocationEvaluator requiredEvaluator = null;
         if (elems == null)
@@ -519,10 +502,8 @@ public class QueryManagerImpl implements QueryManager
             try
             {
                 String evalName = elems[i].getAttribute("evaluator");
-                InvocationEvaluator eval =
-                        (InvocationEvaluator)pluginMgr.createExecutableExtension(
-                            "org.datanucleus.query_method_evaluators", new String[] {"method", "evaluator"},
-                            new String[] {methodName, evalName}, "evaluator", null, null);
+                InvocationEvaluator eval = (InvocationEvaluator)pluginMgr.createExecutableExtension("org.datanucleus.query_method_evaluators", 
+                    new String[] {"method", "evaluator"}, new String[] {methodName, evalName}, "evaluator", null, null);
 
                 String elemClsName = elems[i].getAttribute("class");
                 if (elemClsName != null && StringUtils.isWhitespace(elemClsName))
