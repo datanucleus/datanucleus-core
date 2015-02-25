@@ -62,7 +62,6 @@ import org.datanucleus.store.valuegenerator.ValueGenerationManager;
  */
 public interface StoreManager
 {
-    // TODO Categorise all other optional features here so they can be made available for use by store plugins
     public static final String OPTION_APPLICATION_ID = "ApplicationId";
     public static final String OPTION_APPLICATION_COMPOSITE_ID = "ApplicationCompositeId";
     public static final String OPTION_DATASTORE_ID = "DatastoreId";
@@ -380,12 +379,12 @@ public interface StoreManager
     /**
      * Utility to return the names of the classes that are known subclasses of the provided
      * class. Actually uses the MetaDataManager for determining what is a subclass
-     * since the MetaData is often registered before being needed by the Store.
+     * since the MetaData is often registered before being needed by the Store. 
+     * <b>The important difference is that this method will then register the subclass as required</b>
      * @param className Class for which we search for subclasses.
      * @param includeDescendents Whether to include subclasses of subclasses etc
      * @param clr The ClassLoaderResolver
      * @return Set of classes that are subclasses of the input class.
-     * TODO Use method in MetaDataManager and remove this
      */
     Collection<String> getSubClassesForClass(String className, boolean includeDescendents, ClassLoaderResolver clr);
 

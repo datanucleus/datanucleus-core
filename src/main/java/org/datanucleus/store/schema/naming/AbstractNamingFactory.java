@@ -30,6 +30,7 @@ import org.datanucleus.metadata.ConstraintMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.EmbeddedMetaData;
+import org.datanucleus.metadata.ForeignKeyMetaData;
 import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.util.StringUtils;
 
@@ -244,8 +245,12 @@ public abstract class AbstractNamingFactory implements NamingFactory
             return prepareIdentifierNameForUse(cnstrmd.getName(), SchemaComponent.CONSTRAINT);
         }
 
-        // TODO Different suffix if Unique or FK ?
-        String idxName = cmd.getName() + wordSeparator + position + wordSeparator + "IDX";
+        String suffix = "IDX";
+        if (cnstrmd instanceof ForeignKeyMetaData)
+        {
+            suffix = "FK";
+        }
+        String idxName = cmd.getName() + wordSeparator + position + wordSeparator + suffix;
         return prepareIdentifierNameForUse(idxName, SchemaComponent.CONSTRAINT);
     }
 
@@ -260,8 +265,12 @@ public abstract class AbstractNamingFactory implements NamingFactory
             return prepareIdentifierNameForUse(cnstrmd.getName(), SchemaComponent.CONSTRAINT);
         }
 
-        // TODO Different suffix if Unique or FK ?
-        String idxName = className + wordSeparator + mmd.getName() + wordSeparator + "IDX";
+        String suffix = "IDX";
+        if (cnstrmd instanceof ForeignKeyMetaData)
+        {
+            suffix = "FK";
+        }
+        String idxName = className + wordSeparator + mmd.getName() + wordSeparator + suffix;
         return prepareIdentifierNameForUse(idxName, SchemaComponent.CONSTRAINT);
     }
 
@@ -276,23 +285,27 @@ public abstract class AbstractNamingFactory implements NamingFactory
             return prepareIdentifierNameForUse(cnstrmd.getName(), SchemaComponent.CONSTRAINT);
         }
 
-        // TODO Different suffix if Unique or FK ?
+        String suffix = "IDX";
+        if (cnstrmd instanceof ForeignKeyMetaData)
+        {
+            suffix = "FK";
+        }
         String idxName = null;
         if (type == ColumnType.DATASTOREID_COLUMN)
         {
-            idxName = cmd.getName() + wordSeparator + "DATASTORE" + wordSeparator + "IDX";
+            idxName = cmd.getName() + wordSeparator + "DATASTORE" + wordSeparator + suffix;
         }
         else if (type == ColumnType.VERSION_COLUMN)
         {
-            idxName = cmd.getName() + wordSeparator + "VERSION" + wordSeparator + "IDX";
+            idxName = cmd.getName() + wordSeparator + "VERSION" + wordSeparator + suffix;
         }
         else if (type == ColumnType.MULTITENANCY_COLUMN)
         {
-            idxName = cmd.getName() + wordSeparator + "TENANT" + wordSeparator + "IDX";
+            idxName = cmd.getName() + wordSeparator + "TENANT" + wordSeparator + suffix;
         }
         else
         {
-            idxName = "IDX";
+            idxName = suffix;
         }
         return prepareIdentifierNameForUse(idxName, SchemaComponent.CONSTRAINT);
     }

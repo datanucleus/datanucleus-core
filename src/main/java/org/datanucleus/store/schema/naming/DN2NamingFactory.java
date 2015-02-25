@@ -162,7 +162,6 @@ public class DN2NamingFactory extends AbstractNamingFactory
         String name = null;
         if (type == ColumnType.COLUMN)
         {
-            // TODO Handle multiple columns
             ColumnMetaData[] colmds = mmd.getColumnMetaData();
             if (colmds != null && colmds.length > position)
             {
