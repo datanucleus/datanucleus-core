@@ -17,9 +17,9 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.query.expression;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 
 import org.datanucleus.query.symbol.Symbol;
 import org.datanucleus.query.symbol.SymbolTable;
@@ -30,7 +30,7 @@ import org.datanucleus.query.symbol.SymbolTable;
 public class CaseExpression extends Expression
 {
     private static final long serialVersionUID = -7123407498309440027L;
-    Map<Expression, Expression> actionByCondition = new HashMap<Expression, Expression>();
+    List<ExpressionPair> actionConditions = new ArrayList<ExpressionPair>();
     Expression elseExpr;
 
     public CaseExpression(Expression elseExpr)
@@ -40,12 +40,12 @@ public class CaseExpression extends Expression
 
     public void addCondition(Expression whenExpr, Expression actionExpr)
     {
-        actionByCondition.put(whenExpr, actionExpr);
+        actionConditions.add(new ExpressionPair(whenExpr, actionExpr));
     }
 
-    public Map<Expression, Expression> getConditions()
+    public List<ExpressionPair> getConditions()
     {
-        return actionByCondition;
+        return actionConditions;
     }
 
     public Expression getElseExpression()
@@ -59,12 +59,12 @@ public class CaseExpression extends Expression
     @Override
     public Symbol bind(SymbolTable symtbl)
     {
-        Iterator<Map.Entry<Expression, Expression>> actionMapIter = actionByCondition.entrySet().iterator();
-        while (actionMapIter.hasNext())
+        Iterator<ExpressionPair> actionCondIter = actionConditions.iterator();
+        while (actionCondIter.hasNext())
         {
-            Map.Entry<Expression, Expression> entry = actionMapIter.next();
-            entry.getKey().bind(symtbl);
-            entry.getValue().bind(symtbl);
+            ExpressionPair pair = actionCondIter.next();
+            pair.getWhenExpression().bind(symtbl);
+            pair.getActionExpression().bind(symtbl);
         }
         if (elseExpr != null)
         {
@@ -76,17 +76,35 @@ public class CaseExpression extends Expression
     public String toString()
     {
         StringBuilder str = new StringBuilder("CaseExpression : ");
-        Iterator<Expression> keyIter = actionByCondition.keySet().iterator();
-        while (keyIter.hasNext())
+        Iterator<ExpressionPair> actionCondIter = actionConditions.iterator();
+        while (actionCondIter.hasNext())
         {
-            Expression whenExpr = keyIter.next();
-            Expression actionExpr = actionByCondition.get(whenExpr);
-            str.append("WHEN ").append(whenExpr).append(" THEN ").append(actionExpr).append(" ");
+            ExpressionPair pair = actionCondIter.next();
+            str.append("WHEN ").append(pair.getWhenExpression()).append(" THEN ").append(pair.getActionExpression()).append(" ");
         }
         if (elseExpr != null)
         {
             str.append("ELSE ").append(elseExpr);
         }
         return str.toString();
+    }
+
+    public class ExpressionPair
+    {
+        Expression whenExpr;
+        Expression actionExpr;
+        public ExpressionPair(Expression when, Expression action)
+        {
+            this.whenExpr = when;
+            this.actionExpr = action;
+        }
+        public Expression getWhenExpression()
+        {
+            return whenExpr;
+        }
+        public Expression getActionExpression()
+        {
+            return actionExpr;
+        }
     }
 }

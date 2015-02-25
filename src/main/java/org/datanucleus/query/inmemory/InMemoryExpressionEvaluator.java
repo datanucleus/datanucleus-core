@@ -33,7 +33,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -46,6 +45,7 @@ import org.datanucleus.query.evaluator.AbstractExpressionEvaluator;
 import org.datanucleus.query.evaluator.JavaQueryEvaluator;
 import org.datanucleus.query.expression.ArrayExpression;
 import org.datanucleus.query.expression.CaseExpression;
+import org.datanucleus.query.expression.CaseExpression.ExpressionPair;
 import org.datanucleus.query.expression.CreatorExpression;
 import org.datanucleus.query.expression.DyadicExpression;
 import org.datanucleus.query.expression.Expression;
@@ -635,28 +635,28 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
     @Override
     protected Object processCaseExpression(CaseExpression expr)
     {
-        Map<Expression, Expression> exprs = expr.getConditions();
-        Iterator<Entry<Expression, Expression>> entryIter = exprs.entrySet().iterator();
-        while (entryIter.hasNext())
+        List<ExpressionPair> exprs = expr.getConditions();
+        Iterator<ExpressionPair> exprCondIter = exprs.iterator();
+        while (exprCondIter.hasNext())
         {
-            Entry<Expression, Expression> entry = entryIter.next();
-            Expression keyExpr = entry.getKey();
-            Expression valExpr = entry.getValue();
+            ExpressionPair pair = exprCondIter.next();
+            Expression whenExpr = pair.getWhenExpression();
+            Expression actionExpr = pair.getActionExpression();
 
-            Object keyResult = keyExpr.evaluate(this);
+            Object keyResult = whenExpr.evaluate(this);
             if (keyResult instanceof Boolean)
             {
                 if ((Boolean)keyResult)
                 {
                     // This case clause resolves to true, so return its result
-                    Object value = valExpr.evaluate(this);
+                    Object value = actionExpr.evaluate(this);
                     stack.push(value);
                     return value;
                 }
             }
             else
             {
-                NucleusLogger.QUERY.error("Case expression " + expr + " clause " + keyExpr + " did not return boolean");
+                NucleusLogger.QUERY.error("Case expression " + expr + " clause " + whenExpr + " did not return boolean");
                 Object value = new InMemoryFailure();
                 stack.push(value);
                 return value;
