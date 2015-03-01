@@ -919,6 +919,10 @@ public class TypeConversionHelper
             {
                 return new BigInteger(value.toString());
             }
+            else if (type == Timestamp.class)
+            {
+                return Timestamp.valueOf(value.toString());
+            }
             else if (type == String.class)
             {
                 return value.toString();
