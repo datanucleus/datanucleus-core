@@ -26,6 +26,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 
@@ -921,6 +922,10 @@ public class TypeConversionHelper
             }
             else if (type == Timestamp.class)
             {
+                if (value instanceof Date)
+                {
+                    return new Timestamp(((Date)value).getTime());
+                }
                 return Timestamp.valueOf(value.toString());
             }
             else if (type == String.class)
