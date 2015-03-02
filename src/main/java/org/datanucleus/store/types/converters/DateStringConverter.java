@@ -27,6 +27,7 @@ import org.datanucleus.util.Localiser;
 
 /**
  * Class to handle the conversion between java.util.Date and a String form.
+ * The String form follows the format "EEE MMM dd HH:mm:ss zzz yyyy". That is, milliseconds are not retained currently.
  */
 public class DateStringConverter implements TypeConverter<Date, String>
 {
@@ -49,6 +50,7 @@ public class DateStringConverter implements TypeConverter<Date, String>
         FormatterInfo formatInfo = formatterThreadInfo.get();
         if (formatInfo.formatter == null)
         {
+            // TODO Handle millisecs
             formatInfo.formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
         }
         return formatInfo.formatter;
