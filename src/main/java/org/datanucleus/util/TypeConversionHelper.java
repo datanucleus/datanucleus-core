@@ -877,6 +877,11 @@ public class TypeConversionHelper
      */
     public static Object convertTo(Object value, Class type)
     {
+        if (type == null || value == null)
+        {
+            return value;
+        }
+
         //check if the id can be assigned for the field type, otherwise convert the id to the appropriate type
         if (!type.isAssignableFrom(value.getClass()))
         {
