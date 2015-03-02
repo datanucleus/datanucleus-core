@@ -21,6 +21,7 @@ import java.util.Date;
 
 /**
  * Class to handle the conversion between java.util.Date and a Long form.
+ * The Long form is the number of milliseconds after January 1, 1970, 00:00:00 GMT.
  */
 public class DateLongConverter implements TypeConverter<Date, Long>
 {
