@@ -113,6 +113,8 @@ public class DeleteFieldManager extends AbstractFieldManager
                         }
                         else if (relationType == RelationType.MANY_TO_ONE_BI)
                         {
+                            // Make sure field at other side is loaded, and remove from any Collection
+                            valueOP.loadField(relMmd.getAbsoluteFieldNumber());
                             Object relValue = valueOP.provideField(relMmd.getAbsoluteFieldNumber());
                             if (relValue != null)
                             {
