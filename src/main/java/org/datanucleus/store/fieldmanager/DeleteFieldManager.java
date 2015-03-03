@@ -106,8 +106,22 @@ public class DeleteFieldManager extends AbstractFieldManager
                     if (valueOP != null && !valueOP.getLifecycleState().isDeleted() && !valueOP.isDeleting())
                     {
                         AbstractMemberMetaData relMmd = mmd.getRelatedMemberMetaData(ec.getClassLoaderResolver())[0];
-                        valueOP.replaceFieldMakeDirty(relMmd.getAbsoluteFieldNumber(), null);
-                        valueOP.flush();
+                        if (relationType == RelationType.ONE_TO_ONE_BI)
+                        {
+                            valueOP.replaceFieldMakeDirty(relMmd.getAbsoluteFieldNumber(), null);
+                            valueOP.flush();
+                        }
+                        else if (relationType == RelationType.MANY_TO_ONE_BI)
+                        {
+                            Object relValue = valueOP.provideField(relMmd.getAbsoluteFieldNumber());
+                            if (relValue != null)
+                            {
+                                if (relValue instanceof Collection)
+                                {
+                                    ((Collection)relValue).remove(op.getObject());
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -136,8 +150,7 @@ public class DeleteFieldManager extends AbstractFieldManager
                             }
                         }
                     }
-                    else if (nullBidirIfNotDependent && RelationType.isBidirectional(relationType) && !mmd.isEmbedded() &&
-                            !mmd.getCollection().isEmbeddedElement())
+                    else if (nullBidirIfNotDependent && RelationType.isBidirectional(relationType) && !mmd.isEmbedded() && !mmd.getCollection().isEmbeddedElement())
                     {
                         if (relationType == RelationType.ONE_TO_MANY_BI)
                         {
