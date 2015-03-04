@@ -461,8 +461,7 @@ public class RelationshipManagerImpl implements RelationshipManager
      * @param oldValue The old value
      * @param newValue The new value
      */
-    protected void checkOneToOneBidirectionalRelation(AbstractMemberMetaData mmd,
-            ClassLoaderResolver clr, ExecutionContext ec, Object oldValue, Object newValue)
+    protected void checkOneToOneBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, Object oldValue, Object newValue)
     {
         if (newValue != null)
         {
@@ -486,16 +485,12 @@ public class RelationshipManagerImpl implements RelationshipManager
                         // New value has had its side of the relation changed to a different value altogether!
                         if (newValueFieldValue == null)
                         {
-                            String msg = Localiser.msg("013003",
-                                StringUtils.toJVMIDString(pc), mmd.getName(),
-                                StringUtils.toJVMIDString(newValue), relatedMmd.getName());
+                            String msg = Localiser.msg("013003", StringUtils.toJVMIDString(pc), mmd.getName(), StringUtils.toJVMIDString(newValue), relatedMmd.getName());
                             NucleusLogger.PERSISTENCE.error(msg);
                             throw new NucleusUserException(msg);
                         }
 
-                        String msg = Localiser.msg("013002",
-                            StringUtils.toJVMIDString(pc), mmd.getName(),
-                            StringUtils.toJVMIDString(newValue), relatedMmd.getName(),
+                        String msg = Localiser.msg("013002", StringUtils.toJVMIDString(pc), mmd.getName(), StringUtils.toJVMIDString(newValue), relatedMmd.getName(),
                             StringUtils.toJVMIDString(newValueFieldValue));
                         NucleusLogger.PERSISTENCE.error(msg);
                         throw new NucleusUserException(msg);
@@ -512,8 +507,7 @@ public class RelationshipManagerImpl implements RelationshipManager
      * @param ec ExecutionContext
      * @param changes List of changes to the collection
      */
-    protected void checkOneToManyBidirectionalRelation(AbstractMemberMetaData mmd,
-            ClassLoaderResolver clr, ExecutionContext ec, List<RelationChange> changes)
+    protected void checkOneToManyBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, List<RelationChange> changes)
     {
         Iterator iter = changes.iterator();
         while (iter.hasNext())
@@ -554,10 +548,8 @@ public class RelationshipManagerImpl implements RelationshipManager
                                     // The element has a different owner than the PC with this collection
                                     // This catches cases where the user has set the wrong owner, and also
                                     // will catch cases where the user has added it to two collections
-                                    throw new NucleusUserException(Localiser.msg("013009",
-                                        StringUtils.toJVMIDString(pc), mmd.getName(), 
-                                        StringUtils.toJVMIDString(change.value), 
-                                        StringUtils.toJVMIDString(newValueFieldValue)));
+                                    throw new NucleusUserException(Localiser.msg("013009", StringUtils.toJVMIDString(pc), mmd.getName(), 
+                                        StringUtils.toJVMIDString(change.value), StringUtils.toJVMIDString(newValueFieldValue)));
                                 }
                             }
                         }
@@ -587,8 +579,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                                 {
                                     // The element was removed from the collection, but was updated to have its owner
                                     // set to the collection owner!
-                                    throw new NucleusUserException(Localiser.msg("013010",
-                                        StringUtils.toJVMIDString(pc), mmd.getName(),
+                                    throw new NucleusUserException(Localiser.msg("013010", StringUtils.toJVMIDString(pc), mmd.getName(),
                                         StringUtils.toJVMIDString(change.value)));
                                 }
                             }
@@ -615,8 +606,7 @@ public class RelationshipManagerImpl implements RelationshipManager
      * @param oldValue The old value
      * @param newValue The new value
      */
-    protected void checkManyToOneBidirectionalRelation(AbstractMemberMetaData mmd,
-            ClassLoaderResolver clr, ExecutionContext ec, Object oldValue, Object newValue)
+    protected void checkManyToOneBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, Object oldValue, Object newValue)
     {
         // TODO Implement N-1
     }
@@ -628,8 +618,7 @@ public class RelationshipManagerImpl implements RelationshipManager
      * @param ec ExecutionContext
      * @param changes List of changes to the collection
      */
-    protected void checkManyToManyBidirectionalRelation(AbstractMemberMetaData mmd,
-            ClassLoaderResolver clr, ExecutionContext ec, List<RelationChange> changes)
+    protected void checkManyToManyBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, List<RelationChange> changes)
     {
         // TODO Implement M-N
     }
@@ -651,8 +640,7 @@ public class RelationshipManagerImpl implements RelationshipManager
      * @param oldValue The old value
      * @param newValue The new value
      */
-    protected void processOneToOneBidirectionalRelation(AbstractMemberMetaData mmd,
-            ClassLoaderResolver clr, ExecutionContext ec, Object oldValue, Object newValue)
+    protected void processOneToOneBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, Object oldValue, Object newValue)
     {
         if (oldValue != null)
         {
@@ -681,8 +669,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                         // Still set to this object, so null out the other objects relation
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("013004",
-                                    StringUtils.toJVMIDString(oldValue), relatedMmd.getFullFieldName(),
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("013004", StringUtils.toJVMIDString(oldValue), relatedMmd.getFullFieldName(),
                                     StringUtils.toJVMIDString(pc), StringUtils.toJVMIDString(newValue)));
                         }
                         oldOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), null);
@@ -714,8 +701,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                     // Was set to null so set to our object
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("013005",
-                                StringUtils.toJVMIDString(newValue), relatedMmd.getFullFieldName(),
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("013005", StringUtils.toJVMIDString(newValue), relatedMmd.getFullFieldName(),
                                 StringUtils.toJVMIDString(pc)));
                     }
                     newOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), pc);
@@ -734,9 +720,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                         }
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("013004",
-                                    StringUtils.toJVMIDString(newValueFieldValue), 
-                                    mmd.getFullFieldName(),
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("013004", StringUtils.toJVMIDString(newValueFieldValue), mmd.getFullFieldName(),
                                     StringUtils.toJVMIDString(newValue), StringUtils.toJVMIDString(pc)));
                         }
                         newValueFieldOP.replaceFieldValue(mmd.getAbsoluteFieldNumber(), null);
@@ -744,8 +728,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                     // Update the field of the new value to our object
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("013005",
-                                StringUtils.toJVMIDString(newValue), relatedMmd.getFullFieldName(),
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("013005", StringUtils.toJVMIDString(newValue), relatedMmd.getFullFieldName(),
                                 StringUtils.toJVMIDString(pc)));
                     }
                     newOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), pc);
@@ -761,8 +744,7 @@ public class RelationshipManagerImpl implements RelationshipManager
      * @param ec ExecutionContext
      * @param changes List of changes to the collection
      */
-    protected void processOneToManyBidirectionalRelation(AbstractMemberMetaData mmd,
-            ClassLoaderResolver clr, ExecutionContext ec, List<RelationChange> changes)
+    protected void processOneToManyBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, List<RelationChange> changes)
     {
         // TODO A better way here would be to consider a particular element and if removed+added
         // then we should allow for that in updates. Also, what if an element is reassigned to a different
@@ -842,16 +824,14 @@ public class RelationshipManagerImpl implements RelationshipManager
      * @param oldValue The old value
      * @param newValue The new value
      */
-    protected void processManyToOneBidirectionalRelation(AbstractMemberMetaData mmd,
-            ClassLoaderResolver clr, ExecutionContext ec, Object oldValue, Object newValue)
+    protected void processManyToOneBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, Object oldValue, Object newValue)
     {
         if (oldValue != null)
         {
             // Has been removed from a Collection/Map
             AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, oldValue);
             ObjectProvider oldOP = ec.findObjectProvider(oldValue);
-            if (oldOP != null && relatedMmd != null &&
-                oldOP.getLoadedFields()[relatedMmd.getAbsoluteFieldNumber()])
+            if (oldOP != null && relatedMmd != null && oldOP.getLoadedFields()[relatedMmd.getAbsoluteFieldNumber()])
             {
                 if (oldOP.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
                 {
@@ -863,8 +843,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                         {
                             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                             {
-                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("013006",
-                                        StringUtils.toJVMIDString(pc), mmd.getFullFieldName(),
+                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("013006", StringUtils.toJVMIDString(pc), mmd.getFullFieldName(),
                                         relatedMmd.getFullFieldName(), StringUtils.toJVMIDString(oldValue)));
                             }
 
@@ -895,8 +874,7 @@ public class RelationshipManagerImpl implements RelationshipManager
             // Add new value to the Collection
             AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, newValue);
             ObjectProvider newOP = ec.findObjectProvider(newValue);
-            if (newOP != null && relatedMmd != null &&
-                newOP.getLoadedFields()[relatedMmd.getAbsoluteFieldNumber()])
+            if (newOP != null && relatedMmd != null && newOP.getLoadedFields()[relatedMmd.getAbsoluteFieldNumber()])
             {
                 Object newContainerValue = newOP.provideField(relatedMmd.getAbsoluteFieldNumber());
                 if (newContainerValue instanceof Collection)
@@ -906,8 +884,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                     {
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("013007",
-                                    StringUtils.toJVMIDString(pc), mmd.getFullFieldName(),
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("013007", StringUtils.toJVMIDString(pc), mmd.getFullFieldName(),
                                     relatedMmd.getFullFieldName(), StringUtils.toJVMIDString(newValue)));
                         }
                         newColl.add(pc);
@@ -917,8 +894,7 @@ public class RelationshipManagerImpl implements RelationshipManager
             else
             {
                 // Relation field not loaded so evict it from the L2 cache to avoid loading old field values
-                ownerOP.getExecutionContext().removeObjectFromLevel2Cache(
-                    ownerOP.getExecutionContext().getApiAdapter().getIdForObject(newValue));
+                ownerOP.getExecutionContext().removeObjectFromLevel2Cache(ownerOP.getExecutionContext().getApiAdapter().getIdForObject(newValue));
             }
         }
     }
@@ -930,8 +906,7 @@ public class RelationshipManagerImpl implements RelationshipManager
      * @param ec ExecutionContext
      * @param changes List of changes to the collection
      */
-    protected void processManyToManyBidirectionalRelation(AbstractMemberMetaData mmd,
-            ClassLoaderResolver clr, ExecutionContext ec, List<RelationChange> changes)
+    protected void processManyToManyBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, List<RelationChange> changes)
     {
         Iterator iter = changes.iterator();
         while (iter.hasNext())
