@@ -137,6 +137,7 @@ public class RelationshipManagerImpl implements RelationshipManager
 
         if (relationType == RelationType.ONE_TO_MANY_BI || relationType == RelationType.MANY_TO_MANY_BI)
         {
+            // TODO This really ought to be simply stored as RelationChange with oldColl, newColl and then move this logic to process().
             if (mmd.hasCollection())
             {
                 if (oldValue == null)
@@ -248,6 +249,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                         }
                     }
                 }
+                // TODO What about maps?
             }
         }
     }
