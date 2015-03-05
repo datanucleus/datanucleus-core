@@ -39,7 +39,7 @@ public class DeleteFieldManager extends AbstractFieldManager
     /** ObjectProvider for the owning object. */
     private final ObjectProvider op;
 
-    private boolean nullBidirIfNotDependent = false;
+    private boolean manageRelationships = false;
 
     /**
      * Constructor.
@@ -53,12 +53,12 @@ public class DeleteFieldManager extends AbstractFieldManager
     /**
      * Constructor.
      * @param op The ObjectProvider for the object.
-     * @param nullBidirIfNotDependent Whether we should null the field if not dependent
+     * @param manageRelationships Whether to make an attempt to manage relationships when bidir fields are affected by this deletion (RDBMS typically doesnt need this)
      */
-    public DeleteFieldManager(ObjectProvider op, boolean nullBidirIfNotDependent)
+    public DeleteFieldManager(ObjectProvider op, boolean manageRelationships)
     {
         this.op = op;
-        this.nullBidirIfNotDependent = nullBidirIfNotDependent;
+        this.manageRelationships = manageRelationships;
     }
 
     /**
@@ -100,7 +100,7 @@ public class DeleteFieldManager extends AbstractFieldManager
                 {
                     processPersistable(value);
                 }
-                else if (nullBidirIfNotDependent && RelationType.isBidirectional(relationType) && !mmd.isEmbedded())
+                else if (manageRelationships && RelationType.isBidirectional(relationType) && !mmd.isEmbedded())
                 {
                     ObjectProvider valueOP = ec.findObjectProvider(value);
                     if (valueOP != null && !valueOP.getLifecycleState().isDeleted() && !valueOP.isDeleting())
@@ -152,7 +152,7 @@ public class DeleteFieldManager extends AbstractFieldManager
                             }
                         }
                     }
-                    else if (nullBidirIfNotDependent && RelationType.isBidirectional(relationType) && !mmd.isEmbedded() && !mmd.getCollection().isEmbeddedElement())
+                    else if (manageRelationships && RelationType.isBidirectional(relationType) && !mmd.isEmbedded() && !mmd.getCollection().isEmbeddedElement())
                     {
                         if (relationType == RelationType.ONE_TO_MANY_BI)
                         {
