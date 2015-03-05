@@ -145,7 +145,6 @@ public class FetchPlan implements Serializable
      * Access the fetch plan for the class.
      * @param cmd metadata for the class
      * @return the FetchPlanForClass
-     * TODO Only pass in class name
      */
     public synchronized FetchPlanForClass getFetchPlanForClass(AbstractClassMetaData cmd)
     {

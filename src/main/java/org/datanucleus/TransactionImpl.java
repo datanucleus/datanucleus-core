@@ -268,7 +268,7 @@ public class TransactionImpl implements Transaction
         long startTime = System.currentTimeMillis();
         boolean success = false;
         boolean canComplete = true; //whether the transaction can be completed
-        List errors = new ArrayList();
+        List<Throwable> errors = new ArrayList();
         try
         {
             flush(); // TODO Is this needed? om.preCommit will handle flush calls
@@ -350,8 +350,7 @@ public class TransactionImpl implements Transaction
         }
         if (errors.size() > 0)
         {
-            throw new NucleusTransactionException(Localiser.msg("015007"), (Throwable[])errors.toArray(
-                new Throwable[errors.size()]));
+            throw new NucleusTransactionException(Localiser.msg("015007"), errors.toArray(new Throwable[errors.size()]));
         }
 
         if (NucleusLogger.TRANSACTION.isDebugEnabled())
@@ -509,8 +508,7 @@ public class TransactionImpl implements Transaction
     }
 
     /**
-     * Internal rollback, DataNucleus invokes it's own transaction manager implementation, if
-     * an external transaction manager is not used.
+     * Internal rollback. DataNucleus invokes it's own transaction manager implementation, if an external transaction manager is not used.
      */
     protected void internalRollback()
     {
@@ -593,8 +591,7 @@ public class TransactionImpl implements Transaction
     }
 
     /**
-     * Similar to "isActive" except that it just returns the "active" flag whereas the isActive() method can
-     * also embody rejoining to underlying transactions.
+     * Similar to "isActive" except that it just returns the "active" flag whereas the isActive() method can also embody rejoining to underlying transactions.
      * @return The "active" flag
      */
     public boolean getIsActive()

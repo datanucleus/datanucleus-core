@@ -3620,7 +3620,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (cmd.usesSingleFieldIdentityClass())
         {
             // Single Field Identity
-            if (nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_TYPE_CONVERSION) && translator == null && !key.getClass().getName().equals(cmd.getObjectidClass()))
+            if (getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_TYPE_CONVERSION) && translator == null && !key.getClass().getName().equals(cmd.getObjectidClass()))
             {
                 // key provided is intended to be the type of the PK member, so provide convenience type conversion to the actual type required
                 AbstractMemberMetaData mmd = cmd.getMetaDataForMember(cmd.getPrimaryKeyMemberNames()[0]);

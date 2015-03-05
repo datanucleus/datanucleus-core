@@ -286,7 +286,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultProperty(PropertyNames.PROPERTY_DELETION_POLICY, null, "JDO2", CorePropertyValidator.class.getName(), false, true);
         // TODO Would be nice to set the default here to "false" but JDO TCK "instanceCallbacks" fails
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED, null, true, false, true);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_TYPE_CONVERSION, null, true, false, false); // TODO Change last arg to true
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_TYPE_CONVERSION, null, true, false, true);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_ALLOW_CALLBACKS, null, true, false, true);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_COMMIT, null, false, false, true);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_ROLLBACK, null, false, false, true);
@@ -989,7 +989,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 if (!StringUtils.isWhitespace(createScript))
                 {
                     String scriptContent = getDatastoreScriptForResourceName(createScript);
-                    NucleusLogger.DATASTORE_SCHEMA.debug(">> dropScript=" + scriptContent);
+                    NucleusLogger.DATASTORE_SCHEMA.debug(">> createScript=" + scriptContent);
                     if (storeMgr instanceof SchemaScriptAwareStoreManager && !StringUtils.isWhitespace(scriptContent))
                     {
                         ((SchemaScriptAwareStoreManager)storeMgr).executeScript(scriptContent);
