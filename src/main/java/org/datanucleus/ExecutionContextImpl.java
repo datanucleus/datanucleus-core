@@ -2915,26 +2915,26 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         if (cls == null || key == null)
         {
-            // TODO Throw exception
+            throw new NucleusUserException(Localiser.msg("010051", cls, key));
         }
 
-        AbstractClassMetaData acmd = getMetaDataManager().getMetaDataForClass(cls, clr);
-        if (acmd == null)
+        AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(cls, clr);
+        if (cmd == null)
         {
-            // TODO Throw exception
+            throw new NucleusUserException(Localiser.msg("010052", cls.getName()));
         }
 
         // Get the identity
         Object id = key;
-        if (acmd.getIdentityType() == IdentityType.DATASTORE)
+        if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
             if (!IdentityUtils.isDatastoreIdentity(id))
             {
                 // Create an OID
-                id = nucCtx.getIdentityManager().getDatastoreId(acmd.getFullClassName(), key);
+                id = nucCtx.getIdentityManager().getDatastoreId(cmd.getFullClassName(), key);
             }
         }
-        else if (!acmd.getObjectidClass().equals(key.getClass().getName()))
+        else if (!cmd.getObjectidClass().equals(key.getClass().getName()))
         {
             // primaryKey is just the key (when using single-field identity), so create a PK object
             try
@@ -5256,8 +5256,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     if (NucleusLogger.CACHE.isDebugEnabled())
                     {
                         NucleusLogger.CACHE.debug(Localiser.msg("004006", IdentityUtils.getPersistableIdentityForId(id),
-                            StringUtils.intArrayToString(cachedPC.getLoadedFieldNumbers()), cachedPC.getVersion(),
-                            StringUtils.toJVMIDString(pc)));
+                            StringUtils.intArrayToString(cachedPC.getLoadedFieldNumbers()), cachedPC.getVersion(), StringUtils.toJVMIDString(pc)));
                     }
 
                     if (tx.isActive() && tx.getOptimistic())
