@@ -23,11 +23,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.store.types.SCOCollection;
@@ -50,8 +52,13 @@ public class RelationshipManagerImpl implements RelationshipManager
     /** Object being managed. */
     final Object pc;
 
-    /** Map of bidirectional field "changes", keyed by the absolute field number. */
-    final Map<Integer, List<RelationChange>> fieldChangesByFieldNumber;
+    /**
+     * Map of bidirectional field "changes". 
+     * For 1-1, N-1 fields the "change" is actually the original value (for later comparison).
+     * For 1-N, M-N fields the "change" is an ArrayList of RelationChange objects.
+     * TODO Change 1-1 to use RelationChange and have old+new value defined
+     */
+    final Map<Integer, Object> fieldChanges;
 
     /**
      * Constructor.
@@ -62,14 +69,14 @@ public class RelationshipManagerImpl implements RelationshipManager
         this.ownerOP = op;
         this.ec = op.getExecutionContext();
         this.pc = op.getObject();
-        this.fieldChangesByFieldNumber = new HashMap();
+        this.fieldChanges = new HashMap();
     }
 
     private enum ChangeType
     {
         ADD_OBJECT, // Element added to a collection
         REMOVE_OBJECT, // Element removed from a collection
-        CHANGE_OBJECT // Field value set (setXXX)
+        CHANGE_OBJECT // Field value set (1-1, N-1)
     }
 
     /**
@@ -85,6 +92,7 @@ public class RelationshipManagerImpl implements RelationshipManager
             this.type = type;
             this.value = val;
         }
+        @SuppressWarnings("unused")
         public RelationChange(ChangeType type, Object val, Object oldVal)
         {
             this.type = type;
@@ -106,7 +114,7 @@ public class RelationshipManagerImpl implements RelationshipManager
      */
     public void clearFields()
     {
-        fieldChangesByFieldNumber.clear();
+        fieldChanges.clear();
     }
 
     /* (non-Javadoc)
@@ -114,25 +122,32 @@ public class RelationshipManagerImpl implements RelationshipManager
      */
     public void relationChange(int fieldNumber, Object oldValue, Object newValue)
     {
-        if (ec.isManagingRelations())
+        if (ownerOP.getExecutionContext().isManagingRelations())
         {
             return;
         }
 
         Integer fieldKey = Integer.valueOf(fieldNumber);
-        List<RelationChange> changes = fieldChangesByFieldNumber.get(fieldKey);
+        AbstractClassMetaData cmd = ownerOP.getClassMetaData();
+        AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        RelationType relationType = mmd.getRelationType(ownerOP.getExecutionContext().getClassLoaderResolver());
+        if (relationType == RelationType.ONE_TO_ONE_BI || relationType == RelationType.MANY_TO_ONE_BI)
+        {
+            // TODO If this field is changed multiple times, we don't currently handle it
+            // e.g "myObj.setX(null);" followed by "myObj.setX(newX);"
+            if (!fieldChanges.containsKey(fieldKey))
+            {
+                // Only allow for set of PC field (ignore set of Collection fields)
+                fieldChanges.put(fieldKey, oldValue);
+            }
+            return;
+        }
+
+        List<RelationChange> changes = (List<RelationChange>)fieldChanges.get(fieldKey);
         if (changes == null)
         {
             changes = new ArrayList<RelationChange>();
-            fieldChangesByFieldNumber.put(fieldKey, changes);
-        }
-
-        AbstractMemberMetaData mmd = ownerOP.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-        RelationType relationType = mmd.getRelationType(ec.getClassLoaderResolver());
-        if (relationType == RelationType.ONE_TO_ONE_BI || relationType == RelationType.MANY_TO_ONE_BI)
-        {
-            changes.add(new RelationChange(ChangeType.CHANGE_OBJECT, newValue, oldValue));
-            return;
+            fieldChanges.put(fieldKey, changes);
         }
 
         if (relationType == RelationType.ONE_TO_MANY_BI || relationType == RelationType.MANY_TO_MANY_BI)
@@ -156,7 +171,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                 {
                     if (newValue == null)
                     {
-                        AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaData(ec.getClassLoaderResolver())[0];
+                        AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaData(ownerOP.getExecutionContext().getClassLoaderResolver())[0];
                         Iterator iter = ((Collection)oldValue).iterator();
                         while (iter.hasNext())
                         {
@@ -164,8 +179,8 @@ public class RelationshipManagerImpl implements RelationshipManager
                             if (ownerOP.getLifecycleState().isDeleted)
                             {
                                 // Deleting the owner, so register the element to reset its owner
-                                ec.removeObjectFromLevel2Cache(ec.getApiAdapter().getIdForObject(element));
-                                ObjectProvider elementOP = ec.findObjectProvider(element);
+                                ownerOP.getExecutionContext().removeObjectFromLevel2Cache(ownerOP.getExecutionContext().getApiAdapter().getIdForObject(element));
+                                ObjectProvider elementOP = ownerOP.getExecutionContext().findObjectProvider(element);
                                 if (relationType == RelationType.ONE_TO_MANY_BI)
                                 {
                                     // TODO This needs marking as a secondary change. i.e we dont want follow on checks, just null out the relation during process()
@@ -204,10 +219,10 @@ public class RelationshipManagerImpl implements RelationshipManager
                             }
                             if (!alreadyExists)
                             {
-                                ObjectProvider elemOP = ec.findObjectProvider(newElem);
+                                ObjectProvider elemOP = ownerOP.getExecutionContext().findObjectProvider(newElem);
                                 if (elemOP != null)
                                 {
-                                    AbstractMemberMetaData elemMmd = mmd.getRelatedMemberMetaData(ec.getClassLoaderResolver())[0];
+                                    AbstractMemberMetaData elemMmd = mmd.getRelatedMemberMetaData(ownerOP.getExecutionContext().getClassLoaderResolver())[0];
                                     Object oldOwner = elemOP.provideField(elemMmd.getAbsoluteFieldNumber());
                                     if (!elemOP.isFieldLoaded(elemMmd.getAbsoluteFieldNumber()))
                                     {
@@ -216,7 +231,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                                     if (oldOwner != null)
                                     {
                                         // Remove from old owner collection
-                                        ObjectProvider oldOwnerOP = ec.findObjectProvider(oldOwner);
+                                        ObjectProvider oldOwnerOP = ownerOP.getExecutionContext().findObjectProvider(oldOwner);
                                         if (oldOwnerOP != null)
                                         {
                                             // TODO This needs marking as a secondary change. i.e we dont want follow on checks, just remove the element from the relation during process()
@@ -249,7 +264,6 @@ public class RelationshipManagerImpl implements RelationshipManager
                         }
                     }
                 }
-                // TODO What about maps?
             }
         }
     }
@@ -259,39 +273,46 @@ public class RelationshipManagerImpl implements RelationshipManager
      */
     public void relationAdd(int fieldNumber, Object val)
     {
-        if (ec.isManagingRelations())
+        if (ownerOP.getExecutionContext().isManagingRelations())
         {
             return;
         }
 
-        AbstractMemberMetaData mmd = ownerOP.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-        RelationType relationType = mmd.getRelationType(ec.getClassLoaderResolver());
+        AbstractClassMetaData cmd = ownerOP.getClassMetaData();
+        AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        RelationType relationType = mmd.getRelationType(ownerOP.getExecutionContext().getClassLoaderResolver());
         if (relationType != RelationType.ONE_TO_MANY_BI && relationType != RelationType.MANY_TO_MANY_BI)
         {
             return;
         }
 
-        ObjectProvider elemOP = ec.findObjectProvider(val);
+        ObjectProvider elemOP = ownerOP.getExecutionContext().findObjectProvider(val);
         if (elemOP != null)
         {
-            AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaData(ec.getClassLoaderResolver())[0];
+            AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaData(ownerOP.getExecutionContext().getClassLoaderResolver())[0];
             if (elemOP.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
             {
-                Object currentOwnerId = ec.getApiAdapter().getIdForObject(elemOP.provideField(relatedMmd.getAbsoluteFieldNumber()));
-                ec.removeObjectFromLevel2Cache(currentOwnerId);
+                Object currentOwnerId = ownerOP.getExecutionContext().getApiAdapter().getIdForObject(elemOP.provideField(relatedMmd.getAbsoluteFieldNumber()));
+                ownerOP.getExecutionContext().removeObjectFromLevel2Cache(currentOwnerId);
             }
         }
 
         Integer fieldKey = Integer.valueOf(fieldNumber);
-        List<RelationChange> changeList = fieldChangesByFieldNumber.get(fieldKey);
-        if (changeList == null)
+        Object changes = fieldChanges.get(fieldKey);
+        List<RelationChange> changeList = null;
+        if (changes == null)
         {
             changeList = new ArrayList();
-            fieldChangesByFieldNumber.put(fieldKey, changeList);
+        }
+        else
+        {
+            // Assume we have an ArrayList
+            changeList = (ArrayList)changes;
         }
         RelationChange change = new RelationChange(ChangeType.ADD_OBJECT, val);
-        ec.removeObjectFromLevel2Cache(ec.getApiAdapter().getIdForObject(val));
+        ownerOP.getExecutionContext().removeObjectFromLevel2Cache(ownerOP.getExecutionContext().getApiAdapter().getIdForObject(val));
         changeList.add(change);
+        fieldChanges.put(fieldKey, changeList);
     }
 
     /* (non-Javadoc)
@@ -299,38 +320,44 @@ public class RelationshipManagerImpl implements RelationshipManager
      */
     public void relationRemove(int fieldNumber, Object val)
     {
-        if (ec.isManagingRelations())
+        if (ownerOP.getExecutionContext().isManagingRelations())
         {
             return;
         }
 
-        AbstractMemberMetaData mmd = ownerOP.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-        RelationType relationType = mmd.getRelationType(ec.getClassLoaderResolver());
+        AbstractClassMetaData cmd = ownerOP.getClassMetaData();
+        AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        RelationType relationType = mmd.getRelationType(ownerOP.getExecutionContext().getClassLoaderResolver());
         if (relationType != RelationType.ONE_TO_MANY_BI && relationType != RelationType.MANY_TO_MANY_BI)
         {
             return;
         }
 
         Integer fieldKey = Integer.valueOf(fieldNumber);
-        List<RelationChange> changeList = fieldChangesByFieldNumber.get(fieldKey);
-        if (changeList == null)
+        Object changes = fieldChanges.get(fieldKey);
+        List<RelationChange> changeList = null;
+        if (changes == null)
         {
             changeList = new ArrayList();
-            fieldChangesByFieldNumber.put(fieldKey, changeList);
+            fieldChanges.put(fieldKey, changeList);
+        }
+        else
+        {
+            changeList = (ArrayList)changes;
         }
         RelationChange change = new RelationChange(ChangeType.REMOVE_OBJECT, val);
-        ec.removeObjectFromLevel2Cache(ec.getApiAdapter().getIdForObject(val));
+        ownerOP.getExecutionContext().removeObjectFromLevel2Cache(ownerOP.getExecutionContext().getApiAdapter().getIdForObject(val));
         changeList.add(change);
     }
 
     /**
      * Accessor for whether a field is being managed.
-     * @param fieldNumber Absolute field number
-     * @return Whether the field is currently managed
+     * @param fieldNumber Number of the field
+     * @return Whether it is currently managed
      */
     public boolean managesField(int fieldNumber)
     {
-        return fieldChangesByFieldNumber.containsKey(Integer.valueOf(fieldNumber));
+        return fieldChanges.containsKey(Integer.valueOf(fieldNumber));
     }
 
     /* (non-Javadoc)
@@ -338,34 +365,40 @@ public class RelationshipManagerImpl implements RelationshipManager
      */
     public void checkConsistency()
     {
-        Iterator iter = fieldChangesByFieldNumber.entrySet().iterator();
+        Set entries = fieldChanges.entrySet();
+        Iterator iter = entries.iterator();
+        AbstractClassMetaData cmd = ownerOP.getClassMetaData();
+        ExecutionContext ec = ownerOP.getExecutionContext();
         while (iter.hasNext())
         {
-            Map.Entry<Integer, List<RelationChange>> entry = (Map.Entry)iter.next();
-            int fieldNumber = entry.getKey().intValue();
-            List<RelationChange> changes = entry.getValue();
-
-            AbstractMemberMetaData mmd = ownerOP.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            Map.Entry entry = (Map.Entry)iter.next();
+            int fieldNumber = ((Integer)entry.getKey()).intValue();
+            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
             ClassLoaderResolver clr = ec.getClassLoaderResolver();
+            Object oldValue = entry.getValue();
             RelationType relationType = mmd.getRelationType(clr);
             if (relationType == RelationType.ONE_TO_ONE_BI)
             {
                 // 1-1 bidirectional
-                checkOneToOneBidirectionalRelation(mmd, clr, ec, changes);
+                Object newValue = ownerOP.provideField(fieldNumber);
+                checkOneToOneBidirectionalRelation(mmd, clr, ec, oldValue, newValue);
             }
             else if (relationType == RelationType.MANY_TO_ONE_BI)
             {
                 // N-1 bidirectional
-                checkManyToOneBidirectionalRelation(mmd, clr, ec, changes);
+                Object newValue = ownerOP.provideField(fieldNumber);
+                checkManyToOneBidirectionalRelation(mmd, clr, ec, oldValue, newValue);
             }
             else if (relationType == RelationType.ONE_TO_MANY_BI)
             {
                 // 1-N bidirectional
+                List changes = (List)oldValue;
                 checkOneToManyBidirectionalRelation(mmd, clr, ec, changes);
             }
             else if (relationType == RelationType.MANY_TO_MANY_BI)
             {
                 // M-N bidirectional
+                List changes = (List)oldValue;
                 checkManyToManyBidirectionalRelation(mmd, clr, ec, changes);
             }
         }
@@ -376,34 +409,40 @@ public class RelationshipManagerImpl implements RelationshipManager
      */
     public void process()
     {
-        Iterator iter = fieldChangesByFieldNumber.entrySet().iterator();
+        Set entries = fieldChanges.entrySet();
+        Iterator iter = entries.iterator();
+        AbstractClassMetaData cmd = ownerOP.getClassMetaData();
+        ExecutionContext ec = ownerOP.getExecutionContext();
         while (iter.hasNext())
         {
-            Map.Entry<Integer, List<RelationChange>> entry = (Map.Entry)iter.next();
-            int fieldNumber = entry.getKey().intValue();
-            List<RelationChange> changes = entry.getValue();
-
-            AbstractMemberMetaData mmd = ownerOP.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            Map.Entry entry = (Map.Entry)iter.next();
+            int fieldNumber = ((Integer)entry.getKey()).intValue();
+            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
             ClassLoaderResolver clr = ec.getClassLoaderResolver();
+            Object oldValue = entry.getValue();
             RelationType relationType = mmd.getRelationType(clr);
             if (relationType == RelationType.ONE_TO_ONE_BI)
             {
                 // 1-1 bidirectional
-                processOneToOneBidirectionalRelation(mmd, clr, ec, changes);
+                Object newValue = ownerOP.provideField(fieldNumber);
+                processOneToOneBidirectionalRelation(mmd, clr, ec, oldValue, newValue);
             }
             else if (relationType == RelationType.MANY_TO_ONE_BI)
             {
                 // N-1 bidirectional
-                processManyToOneBidirectionalRelation(mmd, clr, ec, changes);
+                Object newValue = ownerOP.provideField(fieldNumber);
+                processManyToOneBidirectionalRelation(mmd, clr, ec, oldValue, newValue);
             }
             else if (relationType == RelationType.ONE_TO_MANY_BI)
             {
                 // 1-N bidirectional
+                List changes = (List)oldValue;
                 processOneToManyBidirectionalRelation(mmd, clr, ec, changes);
             }
             else if (relationType == RelationType.MANY_TO_MANY_BI)
             {
                 // M-N bidirectional
+                List changes = (List)oldValue;
                 processManyToManyBidirectionalRelation(mmd, clr, ec, changes);
             }
         }
@@ -423,50 +462,42 @@ public class RelationshipManagerImpl implements RelationshipManager
      * @param mmd MetaData for the field
      * @param clr ClassLoader resolver
      * @param ec ExecutionContext
-     * @param changes List of changes to the field
+     * @param oldValue The old value
+     * @param newValue The new value
      */
-    protected void checkOneToOneBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, List<RelationChange> changes)
+    protected void checkOneToOneBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, Object oldValue, Object newValue)
     {
-        Iterator iter = changes.iterator();
-        while (iter.hasNext())
+        if (newValue != null)
         {
-            RelationChange change = (RelationChange)iter.next();
-            if (change.type == ChangeType.CHANGE_OBJECT)
+            // Previously had "a.b = b1"; Now have "a.b = b2"
+            // Check that the new value hasnt been assigned to something other than this object
+            AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, newValue);
+            ObjectProvider newOP = ec.findObjectProvider(newValue);
+            if (newOP != null && relatedMmd != null)
             {
-                Object newValue = change.value;
-                if (newValue != null)
+                if (!newOP.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
                 {
-                    // Previously had "a.b = b1"; Now have "a.b = b2"
-                    // Check that the new value hasnt been assigned to something other than this object
-                    AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, newValue);
-                    ObjectProvider newOP = ec.findObjectProvider(newValue);
-                    if (newOP != null && relatedMmd != null)
+                    // Load the field in case we need to set the old value
+                    newOP.loadField(relatedMmd.getAbsoluteFieldNumber());
+                }
+                Object newValueFieldValue = newOP.provideField(relatedMmd.getAbsoluteFieldNumber());
+                if (newValueFieldValue != pc)
+                {
+                    RelationshipManager newRelMgr = ec.getRelationshipManager(newOP);
+                    if (newRelMgr != null && newRelMgr.managesField(relatedMmd.getAbsoluteFieldNumber()))
                     {
-                        if (!newOP.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
+                        // New value has had its side of the relation changed to a different value altogether!
+                        if (newValueFieldValue == null)
                         {
-                            // Load the field in case we need to set the old value
-                            newOP.loadField(relatedMmd.getAbsoluteFieldNumber());
+                            String msg = Localiser.msg("013003", StringUtils.toJVMIDString(pc), mmd.getName(), StringUtils.toJVMIDString(newValue), relatedMmd.getName());
+                            NucleusLogger.PERSISTENCE.error(msg);
+                            throw new NucleusUserException(msg);
                         }
-                        Object newValueFieldValue = newOP.provideField(relatedMmd.getAbsoluteFieldNumber());
-                        if (newValueFieldValue != pc)
-                        {
-                            RelationshipManager newRelMgr = ec.getRelationshipManager(newOP);
-                            if (newRelMgr != null && newRelMgr.managesField(relatedMmd.getAbsoluteFieldNumber()))
-                            {
-                                // New value has had its side of the relation changed to a different value altogether!
-                                if (newValueFieldValue == null)
-                                {
-                                    String msg = Localiser.msg("013003", StringUtils.toJVMIDString(pc), mmd.getName(), StringUtils.toJVMIDString(newValue), relatedMmd.getName());
-                                    NucleusLogger.PERSISTENCE.error(msg);
-                                    throw new NucleusUserException(msg);
-                                }
 
-                                String msg = Localiser.msg("013002", StringUtils.toJVMIDString(pc), mmd.getName(), StringUtils.toJVMIDString(newValue), relatedMmd.getName(),
-                                    StringUtils.toJVMIDString(newValueFieldValue));
-                                NucleusLogger.PERSISTENCE.error(msg);
-                                throw new NucleusUserException(msg);
-                            }
-                        }
+                        String msg = Localiser.msg("013002", StringUtils.toJVMIDString(pc), mmd.getName(), StringUtils.toJVMIDString(newValue), relatedMmd.getName(),
+                            StringUtils.toJVMIDString(newValueFieldValue));
+                        NucleusLogger.PERSISTENCE.error(msg);
+                        throw new NucleusUserException(msg);
                     }
                 }
             }
@@ -488,10 +519,11 @@ public class RelationshipManagerImpl implements RelationshipManager
             RelationChange change = (RelationChange)iter.next();
             if (change.type == ChangeType.ADD_OBJECT)
             {
-                if (ec.getApiAdapter().isDeleted(change.value))
+                if (ownerOP.getExecutionContext().getApiAdapter().isDeleted(change.value))
                 {
                     // The element was added but was then the element object was deleted!
-                    throw new NucleusUserException(Localiser.msg("013008", StringUtils.toJVMIDString(pc), mmd.getName(), StringUtils.toJVMIDString(change.value)));
+                    throw new NucleusUserException(Localiser.msg("013008",
+                        StringUtils.toJVMIDString(pc), mmd.getName(), StringUtils.toJVMIDString(change.value)));
                 }
 
                 AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaData(clr)[0];
@@ -530,7 +562,7 @@ public class RelationshipManagerImpl implements RelationshipManager
             }
             else if (change.type == ChangeType.REMOVE_OBJECT)
             {
-                if (ec.getApiAdapter().isDeleted(change.value))
+                if (ownerOP.getExecutionContext().getApiAdapter().isDeleted(change.value))
                 {
                     // The element was removed and was then the element object was deleted so do nothing
                 }
@@ -551,7 +583,8 @@ public class RelationshipManagerImpl implements RelationshipManager
                                 {
                                     // The element was removed from the collection, but was updated to have its owner
                                     // set to the collection owner!
-                                    throw new NucleusUserException(Localiser.msg("013010", StringUtils.toJVMIDString(pc), mmd.getName(), StringUtils.toJVMIDString(change.value)));
+                                    throw new NucleusUserException(Localiser.msg("013010", StringUtils.toJVMIDString(pc), mmd.getName(),
+                                        StringUtils.toJVMIDString(change.value)));
                                 }
                             }
                         }
@@ -574,9 +607,10 @@ public class RelationshipManagerImpl implements RelationshipManager
      * @param mmd MetaData for the field
      * @param clr ClassLoader resolver
      * @param ec ExecutionContext
-     * @param changes List of changes to the field
+     * @param oldValue The old value
+     * @param newValue The new value
      */
-    protected void checkManyToOneBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, List<RelationChange> changes)
+    protected void checkManyToOneBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, Object oldValue, Object newValue)
     {
         // TODO Implement N-1
     }
@@ -607,110 +641,101 @@ public class RelationshipManagerImpl implements RelationshipManager
      * @param mmd MetaData for the field
      * @param clr ClassLoader resolver
      * @param ec ExecutionContext
-     * @param changes List of changes to the field
+     * @param oldValue The old value
+     * @param newValue The new value
      */
-    protected void processOneToOneBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, List<RelationChange> changes)
+    protected void processOneToOneBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, Object oldValue, Object newValue)
     {
-        Iterator<RelationChange> iter = changes.iterator();
-        while (iter.hasNext())
+        if (oldValue != null)
         {
-            RelationChange change = iter.next();
-            if (change.type == ChangeType.CHANGE_OBJECT)
+            // Previously had "a.b = b1"; "a.b" has been changed
+            // Need to remove from the other side if still set
+            AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, oldValue);
+            ObjectProvider oldOP = ec.findObjectProvider(oldValue);
+            if (oldOP != null)
             {
-                Object oldValue = change.oldValue;
-                Object newValue = change.value;
-                if (oldValue != null)
+                boolean oldIsDeleted = ec.getApiAdapter().isDeleted(oldOP.getObject());
+                if (!oldIsDeleted)
                 {
-                    // Previously had "a.b = b1"; "a.b" has been changed
-                    // Need to remove from the other side if still set
-                    AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, oldValue);
-                    ObjectProvider oldOP = ec.findObjectProvider(oldValue);
-                    if (oldOP != null)
+                    // Old still exists, so make sure its relation is correct
+                    if (!oldOP.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
                     {
-                        boolean oldIsDeleted = ec.getApiAdapter().isDeleted(oldOP.getObject());
-                        if (!oldIsDeleted)
+                        // Load the field in case we need to set the old value
+                        oldOP.loadField(relatedMmd.getAbsoluteFieldNumber());
+                    }
+                    Object oldValueFieldValue = oldOP.provideField(relatedMmd.getAbsoluteFieldNumber());
+                    if (oldValueFieldValue == null)
+                    {
+                        // Set to null so nothing to do
+                    }
+                    else if (oldValueFieldValue == pc)
+                    {
+                        // Still set to this object, so null out the other objects relation
+                        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            // Old still exists, so make sure its relation is correct
-                            if (!oldOP.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
-                            {
-                                // Load the field in case we need to set the old value
-                                oldOP.loadField(relatedMmd.getAbsoluteFieldNumber());
-                            }
-                            Object oldValueFieldValue = oldOP.provideField(relatedMmd.getAbsoluteFieldNumber());
-                            if (oldValueFieldValue == null)
-                            {
-                                // Set to null so nothing to do
-                            }
-                            else if (oldValueFieldValue == pc)
-                            {
-                                // Still set to this object, so null out the other objects relation
-                                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                                {
-                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("013004", StringUtils.toJVMIDString(oldValue), relatedMmd.getFullFieldName(),
-                                        StringUtils.toJVMIDString(pc), StringUtils.toJVMIDString(newValue)));
-                                }
-                                oldOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), null);
-                            }
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("013004", StringUtils.toJVMIDString(oldValue), relatedMmd.getFullFieldName(),
+                                    StringUtils.toJVMIDString(pc), StringUtils.toJVMIDString(newValue)));
                         }
-                        else
-                        {
-                            // Old value is already deleted so don't need to set its relation field
-                        }
+                        oldOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), null);
                     }
                 }
-                if (newValue != null)
+                else
                 {
-                    // Previously had "a.b = b1"; Now have "a.b = b2"
-                    // Need to set the other side if not yet set, and unset any related old value on the other side
-                    AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, newValue);
-                    // Force persistence because it might not be persisted yet when using delayed operations
-                    ObjectProvider newOP = ec.findObjectProvider(newValue,true);
-                    if (newOP != null && relatedMmd != null)
+                    // Old value is already deleted so don't need to set its relation field
+                }
+            }
+        }
+        if (newValue != null)
+        {
+            // Previously had "a.b = b1"; Now have "a.b = b2"
+            // Need to set the other side if not yet set, and unset any related old value on the other side
+            AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, newValue);
+            // Force persistence because it might not be persisted yet when using delayed operations
+            ObjectProvider newOP = ec.findObjectProvider(newValue,true);
+            if (newOP != null && relatedMmd != null)
+            {
+                if (!newOP.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
+                {
+                    // Load the field in case we need to set the link from the old value
+                    newOP.loadField(relatedMmd.getAbsoluteFieldNumber());
+                }
+                Object newValueFieldValue = newOP.provideField(relatedMmd.getAbsoluteFieldNumber());
+                if (newValueFieldValue == null)
+                {
+                    // Was set to null so set to our object
+                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        if (!newOP.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("013005", StringUtils.toJVMIDString(newValue), relatedMmd.getFullFieldName(),
+                                StringUtils.toJVMIDString(pc)));
+                    }
+                    newOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), pc);
+                }
+                else if (newValueFieldValue != pc)
+                {
+                    // Was set to different object, so null out the other objects relation
+                    ObjectProvider newValueFieldOP = ec.findObjectProvider(newValueFieldValue);
+                    if (newValueFieldOP != null)
+                    {
+                        // Null out the field of the related object of the new value
+                        if (!newValueFieldOP.isFieldLoaded(mmd.getAbsoluteFieldNumber()))
                         {
                             // Load the field in case we need to set the link from the old value
-                            newOP.loadField(relatedMmd.getAbsoluteFieldNumber());
+                            newValueFieldOP.loadField(mmd.getAbsoluteFieldNumber());
                         }
-                        Object newValueFieldValue = newOP.provideField(relatedMmd.getAbsoluteFieldNumber());
-                        if (newValueFieldValue == null)
+                        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            // Was set to null so set to our object
-                            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                            {
-                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("013005", StringUtils.toJVMIDString(newValue), relatedMmd.getFullFieldName(),
-                                    StringUtils.toJVMIDString(pc)));
-                            }
-                            newOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), pc);
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("013004", StringUtils.toJVMIDString(newValueFieldValue), mmd.getFullFieldName(),
+                                    StringUtils.toJVMIDString(newValue), StringUtils.toJVMIDString(pc)));
                         }
-                        else if (newValueFieldValue != pc)
-                        {
-                            // Was set to different object, so null out the other objects relation
-                            ObjectProvider newValueFieldOP = ec.findObjectProvider(newValueFieldValue);
-                            if (newValueFieldOP != null)
-                            {
-                                // Null out the field of the related object of the new value
-                                if (!newValueFieldOP.isFieldLoaded(mmd.getAbsoluteFieldNumber()))
-                                {
-                                    // Load the field in case we need to set the link from the old value
-                                    newValueFieldOP.loadField(mmd.getAbsoluteFieldNumber());
-                                }
-                                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                                {
-                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("013004", StringUtils.toJVMIDString(newValueFieldValue), mmd.getFullFieldName(),
-                                        StringUtils.toJVMIDString(newValue), StringUtils.toJVMIDString(pc)));
-                                }
-                                newValueFieldOP.replaceFieldValue(mmd.getAbsoluteFieldNumber(), null);
-                            }
-                            // Update the field of the new value to our object
-                            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                            {
-                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("013005", StringUtils.toJVMIDString(newValue), relatedMmd.getFullFieldName(),
-                                    StringUtils.toJVMIDString(pc)));
-                            }
-                            newOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), pc);
-                        }
+                        newValueFieldOP.replaceFieldValue(mmd.getAbsoluteFieldNumber(), null);
                     }
+                    // Update the field of the new value to our object
+                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                    {
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("013005", StringUtils.toJVMIDString(newValue), relatedMmd.getFullFieldName(),
+                                StringUtils.toJVMIDString(pc)));
+                    }
+                    newOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), pc);
                 }
             }
         }
@@ -763,7 +788,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                     }
                     else
                     {
-                        ec.removeObjectFromLevel2Cache(op.getInternalObjectId());
+                        ownerOP.getExecutionContext().removeObjectFromLevel2Cache(op.getInternalObjectId());
                     }
                 }
                 else if (change.type == ChangeType.REMOVE_OBJECT)
@@ -780,7 +805,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                     }
                     else
                     {
-                        ec.removeObjectFromLevel2Cache(op.getInternalObjectId());
+                        ownerOP.getExecutionContext().removeObjectFromLevel2Cache(op.getInternalObjectId());
                     }
                 }
             }
@@ -800,89 +825,80 @@ public class RelationshipManagerImpl implements RelationshipManager
      * @param mmd MetaData for the field
      * @param clr ClassLoader resolver
      * @param ec ExecutionContext
-     * @param changes List of changes to the field
+     * @param oldValue The old value
+     * @param newValue The new value
      */
-    protected void processManyToOneBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, List<RelationChange> changes)
+    protected void processManyToOneBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, Object oldValue, Object newValue)
     {
-        Iterator<RelationChange> iter = changes.iterator();
-        while (iter.hasNext())
+        if (oldValue != null)
         {
-            RelationChange change = iter.next();
-            if (change.type == ChangeType.CHANGE_OBJECT)
+            // Has been removed from a Collection/Map
+            AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, oldValue);
+            ObjectProvider oldOP = ec.findObjectProvider(oldValue);
+            if (oldOP != null && relatedMmd != null && oldOP.getLoadedFields()[relatedMmd.getAbsoluteFieldNumber()])
             {
-                Object oldValue = change.oldValue;
-                Object newValue = change.value;
-                if (oldValue != null)
+                if (oldOP.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
                 {
-                    // Has been removed from a Collection/Map
-                    AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, oldValue);
-                    ObjectProvider oldOP = ec.findObjectProvider(oldValue);
-                    if (oldOP != null && relatedMmd != null && oldOP.getLoadedFields()[relatedMmd.getAbsoluteFieldNumber()])
+                    Object oldContainerValue = oldOP.provideField(relatedMmd.getAbsoluteFieldNumber());
+                    if (oldContainerValue instanceof Collection)
                     {
-                        if (oldOP.isFieldLoaded(relatedMmd.getAbsoluteFieldNumber()))
+                        Collection oldColl = (Collection)oldContainerValue;
+                        if (oldColl.contains(pc))
                         {
-                            Object oldContainerValue = oldOP.provideField(relatedMmd.getAbsoluteFieldNumber());
-                            if (oldContainerValue instanceof Collection)
+                            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                             {
-                                Collection oldColl = (Collection)oldContainerValue;
-                                if (oldColl.contains(pc))
-                                {
-                                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                                    {
-                                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("013006", StringUtils.toJVMIDString(pc), mmd.getFullFieldName(),
-                                            relatedMmd.getFullFieldName(), StringUtils.toJVMIDString(oldValue)));
-                                    }
+                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("013006", StringUtils.toJVMIDString(pc), mmd.getFullFieldName(),
+                                        relatedMmd.getFullFieldName(), StringUtils.toJVMIDString(oldValue)));
+                            }
 
-                                    if (oldColl instanceof SCOCollection)
-                                    {
-                                        // Avoid any cascade deletes that could have been fired by this action
-                                        ((SCOCollection)oldColl).remove(pc, false);
-                                    }
-                                    else
-                                    {
-                                        oldColl.remove(pc);
-                                    }
-                                }
+                            if (oldColl instanceof SCOCollection)
+                            {
+                                // Avoid any cascade deletes that could have been fired by this action
+                                ((SCOCollection)oldColl).remove(pc, false);
+                            }
+                            else
+                            {
+                                oldColl.remove(pc);
                             }
                         }
                     }
-                    else
-                    {
-                        if (oldOP != null)
-                        {
-                            ec.removeObjectFromLevel2Cache(oldOP.getInternalObjectId());
-                        }
-                    }
                 }
-
-                if (newValue != null)
+            }
+            else
+            {
+                if (oldOP != null)
                 {
-                    // Add new value to the Collection
-                    AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, newValue);
-                    ObjectProvider newOP = ec.findObjectProvider(newValue);
-                    if (newOP != null && relatedMmd != null && newOP.getLoadedFields()[relatedMmd.getAbsoluteFieldNumber()])
+                    ownerOP.getExecutionContext().removeObjectFromLevel2Cache(oldOP.getInternalObjectId());
+                }
+            }
+        }
+
+        if (newValue != null)
+        {
+            // Add new value to the Collection
+            AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, pc, newValue);
+            ObjectProvider newOP = ec.findObjectProvider(newValue);
+            if (newOP != null && relatedMmd != null && newOP.getLoadedFields()[relatedMmd.getAbsoluteFieldNumber()])
+            {
+                Object newContainerValue = newOP.provideField(relatedMmd.getAbsoluteFieldNumber());
+                if (newContainerValue instanceof Collection)
+                {
+                    Collection newColl = (Collection)newContainerValue;
+                    if (!newColl.contains(pc))
                     {
-                        Object newContainerValue = newOP.provideField(relatedMmd.getAbsoluteFieldNumber());
-                        if (newContainerValue instanceof Collection)
+                        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            Collection newColl = (Collection)newContainerValue;
-                            if (!newColl.contains(pc))
-                            {
-                                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                                {
-                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("013007", StringUtils.toJVMIDString(pc), mmd.getFullFieldName(),
-                                        relatedMmd.getFullFieldName(), StringUtils.toJVMIDString(newValue)));
-                                }
-                                newColl.add(pc);
-                            }
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("013007", StringUtils.toJVMIDString(pc), mmd.getFullFieldName(),
+                                    relatedMmd.getFullFieldName(), StringUtils.toJVMIDString(newValue)));
                         }
-                    }
-                    else
-                    {
-                        // Relation field not loaded so evict it from the L2 cache to avoid loading old field values
-                        ec.removeObjectFromLevel2Cache(ec.getApiAdapter().getIdForObject(newValue));
+                        newColl.add(pc);
                     }
                 }
+            }
+            else
+            {
+                // Relation field not loaded so evict it from the L2 cache to avoid loading old field values
+                ownerOP.getExecutionContext().removeObjectFromLevel2Cache(ownerOP.getExecutionContext().getApiAdapter().getIdForObject(newValue));
             }
         }
     }
@@ -921,8 +937,8 @@ public class RelationshipManagerImpl implements RelationshipManager
                 {
                     // make sure the element has the owner in its collection
                     AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaData(clr)[0];
-                    ec.removeObjectFromLevel2Cache(op.getInternalObjectId());
-                    ec.removeObjectFromLevel2Cache(ownerOP.getInternalObjectId());
+                    ownerOP.getExecutionContext().removeObjectFromLevel2Cache(op.getInternalObjectId());
+                    ownerOP.getExecutionContext().removeObjectFromLevel2Cache(ownerOP.getInternalObjectId());
                     if (ownerOP.isFieldLoaded(mmd.getAbsoluteFieldNumber()) && !ownerOP.getLifecycleState().isDeleted)
                     {
                         Collection currentVal = (Collection)ownerOP.provideField(mmd.getAbsoluteFieldNumber());
@@ -944,8 +960,8 @@ public class RelationshipManagerImpl implements RelationshipManager
                 {
                     // make sure the element removes the owner from its collection
                     AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaData(clr)[0];
-                    ec.removeObjectFromLevel2Cache(op.getInternalObjectId());
-                    ec.removeObjectFromLevel2Cache(ownerOP.getInternalObjectId());
+                    ownerOP.getExecutionContext().removeObjectFromLevel2Cache(op.getInternalObjectId());
+                    ownerOP.getExecutionContext().removeObjectFromLevel2Cache(ownerOP.getInternalObjectId());
                     if (ownerOP.isFieldLoaded(mmd.getAbsoluteFieldNumber()) && !ownerOP.getLifecycleState().isDeleted)
                     {
                         Collection currentVal = (Collection)ownerOP.provideField(mmd.getAbsoluteFieldNumber());
