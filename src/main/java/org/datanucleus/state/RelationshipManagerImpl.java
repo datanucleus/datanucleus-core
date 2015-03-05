@@ -182,10 +182,12 @@ public class RelationshipManagerImpl implements RelationshipManager
                                 ObjectProvider elementOP = ownerOP.getExecutionContext().findObjectProvider(element);
                                 if (relationType == RelationType.ONE_TO_MANY_BI)
                                 {
+                                    // TODO This needs marking as a secondary change. i.e we dont want follow on checks, just null out the relation during process()
                                     ec.getRelationshipManager(elementOP).relationChange(relatedMmd.getAbsoluteFieldNumber(), ownerOP.getObject(), null);
                                 }
                                 else if (relationType == RelationType.MANY_TO_MANY_BI)
                                 {
+                                    // TODO This needs marking as a secondary change. i.e we dont want follow on checks, just remove the element from the relation during process()
                                     ec.getRelationshipManager(elementOP).relationRemove(relatedMmd.getAbsoluteFieldNumber(), ownerOP.getObject());
                                 }
                             }
@@ -231,6 +233,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                                         ObjectProvider oldOwnerOP = ownerOP.getExecutionContext().findObjectProvider(oldOwner);
                                         if (oldOwnerOP != null)
                                         {
+                                            // TODO This needs marking as a secondary change. i.e we dont want follow on checks, just remove the element from the relation during process()
                                             ec.getRelationshipManager(oldOwnerOP).relationRemove(fieldNumber, newElem);
                                         }
                                     }
