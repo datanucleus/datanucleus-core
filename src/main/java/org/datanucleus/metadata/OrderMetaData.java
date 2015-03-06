@@ -97,10 +97,10 @@ public class OrderMetaData extends MetaData implements ColumnMetaDataContainer
      */
     public void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
     {
-        if (hasExtension("list-ordering"))
+        if (hasExtension(MetaData.EXTENSION_MEMBER_LIST_ORDERING))
         {
             // User has provided extension "list-ordering" meaning that we use an ordered list for this collection (like in JPA)
-            String val = getValueForExtension("list-ordering");
+            String val = getValueForExtension(MetaData.EXTENSION_MEMBER_LIST_ORDERING);
             if (!StringUtils.isWhitespace(val))
             {
                 this.ordering = val;

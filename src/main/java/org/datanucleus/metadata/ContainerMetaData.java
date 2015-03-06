@@ -61,13 +61,13 @@ public class ContainerMetaData extends MetaData
     public void populate(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr)
     {
         // Set the default for allowNulls if not set, based on the java type
-        if (parent != null && parent.hasExtension("allow-nulls"))
+        if (parent != null && parent.hasExtension(MetaData.EXTENSION_MEMBER_CONTAINER_ALLOW_NULLS))
         {
-            if (parent.getValueForExtension("allow-nulls").equalsIgnoreCase("true"))
+            if (parent.getValueForExtension(MetaData.EXTENSION_MEMBER_CONTAINER_ALLOW_NULLS).equalsIgnoreCase("true"))
             {
                 allowNulls = Boolean.TRUE;
             }
-            else if (parent.getValueForExtension("allow-nulls").equalsIgnoreCase("false"))
+            else if (parent.getValueForExtension(MetaData.EXTENSION_MEMBER_CONTAINER_ALLOW_NULLS).equalsIgnoreCase("false"))
             {
                 allowNulls = Boolean.FALSE;
             }

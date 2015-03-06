@@ -1551,10 +1551,9 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      */
     public boolean fetchFKOnly()
     {
-        if (hasExtension("fetch-fk-only"))
+        if (hasExtension(MetaData.EXTENSION_MEMBER_FETCH_FK_ONLY))
         {
-            String val = getValueForExtension("fetch-fk-only");
-            return Boolean.valueOf(val);
+            return Boolean.valueOf(getValueForExtension(MetaData.EXTENSION_MEMBER_FETCH_FK_ONLY));
         }
         return false;
     }

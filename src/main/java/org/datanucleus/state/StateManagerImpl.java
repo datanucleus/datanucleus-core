@@ -69,6 +69,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityStrategy;
 import org.datanucleus.metadata.IdentityType;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.ObjectReferencingStoreManager;
@@ -2186,8 +2187,8 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 // Default JDO2 behaviour is to always provide a strategy value when it is marked as using a strategy
                 boolean applyStrategy = true;
                 if (!mmd.getType().isPrimitive() &&
-                    mmd.hasExtension("strategy-when-notnull") &&
-                    mmd.getValueForExtension("strategy-when-notnull").equalsIgnoreCase("false") &&
+                    mmd.hasExtension(MetaData.EXTENSION_MEMBER_STRATEGY_WHEN_NOTNULL) &&
+                    mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_STRATEGY_WHEN_NOTNULL).equalsIgnoreCase("false") &&
                     this.provideField(fieldNumber) != null)
                 {
                     // extension to only provide a value-strategy value where the field is null at persistence.

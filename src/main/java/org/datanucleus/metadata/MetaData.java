@@ -81,6 +81,9 @@ public class MetaData implements Serializable
     /** Class : when using multitenancy, defines the jdbc-type used for the mutitenancy discriminator column. */
     public static final String EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE = "multitenancy-jdbc-type";
 
+    /** Class : define the name of a field that will store the version of this class. */
+    public static final String EXTENSION_CLASS_VERSION_FIELD_NAME = "field-name";
+
     /** Member : name of type converter to use. */
     public final static String EXTENSION_MEMBER_TYPE_CONVERTER_NAME = "type-converter-name";
 
@@ -118,6 +121,18 @@ public class MetaData implements Serializable
 
     /** Member : whether the field is (L2) cacheable (for JPA). */
     public static final String EXTENSION_MEMBER_CACHEABLE = "cacheable";
+
+    /** Member : whether to fetch just the FK (and not populate the related object). */
+    public static final String EXTENSION_MEMBER_FETCH_FK_ONLY = "fetch-fk-only";
+
+    /** Member : whether this member (collection/map/array) should allow null elements/keys/values. */
+    public static final String EXTENSION_MEMBER_CONTAINER_ALLOW_NULLS = "allow-nulls";
+
+    /** Member : the ordering clause to use for this List field. */
+    public static final String EXTENSION_MEMBER_LIST_ORDERING = "list-ordering";
+
+    /** Member : when this field has a value generator, only apply it when the field is not set. */
+    public static final String EXTENSION_MEMBER_STRATEGY_WHEN_NOTNULL = "strategy-when-notnull";
 
     /** List of extensions for this MetaData element. */
     protected Collection<ExtensionMetaData> extensions = null;

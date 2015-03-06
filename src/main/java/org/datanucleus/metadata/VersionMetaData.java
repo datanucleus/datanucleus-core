@@ -76,11 +76,11 @@ public class VersionMetaData extends MetaData
      */
     public void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
     {
-        if (hasExtension("field-name"))
+        if (hasExtension(MetaData.EXTENSION_CLASS_VERSION_FIELD_NAME))
         {
             // User has provided extension "field-name" meaning that we store the version in the column
             // for the specified field (like in JPA)
-            String val = getValueForExtension("field-name");
+            String val = getValueForExtension(MetaData.EXTENSION_CLASS_VERSION_FIELD_NAME);
             if (!StringUtils.isWhitespace(val))
             {
                 this.fieldName = val;

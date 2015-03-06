@@ -302,6 +302,7 @@ public class ColumnMetaData extends MetaData
 
     public Integer getPosition()
     {
+        // TODO Drop support for this. We have had "position" for some time
         if (hasExtension("index"))
         {
             // Make use of legacy extension if provided
