@@ -23,6 +23,7 @@ package org.datanucleus.metadata;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusFatalUserException;
+import org.datanucleus.util.StringUtils;
 
 /**
  * This element specifies the mapping for the value component of maps.
@@ -118,14 +119,13 @@ public class ValueMetaData extends AbstractElementMetaData
         {
             sb.append(" mapped-by=\"" + mappedBy + "\"");
         }
-        if (table != null)
+        if (!StringUtils.isWhitespace(table))
         {
-            sb.append("\n").append(prefix).append("      table=\"" + table + "\"");
+            sb.append(" table=\"" + table + "\"");
         }
-        if (columnName != null)
+        if (!StringUtils.isWhitespace(columnName))
         {
-            sb.append("\n");
-            sb.append(prefix).append("      column=\"" + columnName + "\"");
+            sb.append(" column=\"" + columnName + "\"");
         }
         sb.append(">\n");
 
