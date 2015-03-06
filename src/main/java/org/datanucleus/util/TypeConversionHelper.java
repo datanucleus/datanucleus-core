@@ -20,6 +20,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.util;
 
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
@@ -29,6 +30,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
+
+import org.datanucleus.ExecutionContext;
+import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.FieldRole;
+import org.datanucleus.metadata.MetaData;
 
 /**
  * Class with methods for type conversion.
@@ -1230,5 +1236,151 @@ public class TypeConversionHelper
         {
             return dflt;
         }
+    }
+
+    /**
+     * Convenience method to get an Enum from its "value". The "value" will firstly be checked whether the field has a getter method present and use that to get the Enum, otherwise
+     * it will assume the "value" is the ordinal and get the Enum that way.
+     * @param mmd Metadata for the member
+     * @param role Role of this value in the member (field, collection element, map key etc).
+     * @param ec ExecutionContext
+     * @param longValue The "value"
+     * @return The Enum
+     */
+    public static Object getEnumFromValue(AbstractMemberMetaData mmd, FieldRole role, ExecutionContext ec, long longValue)
+    {
+        Class enumType = mmd.getType();
+        String getterMethodName = null;
+        if (role == FieldRole.ROLE_FIELD && mmd.hasExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE))
+        {
+            // Case where the user has defined their own "value" for each enum
+            getterMethodName = mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE);
+        }
+
+        if (role == FieldRole.ROLE_COLLECTION_ELEMENT)
+        {
+            enumType = ec.getClassLoaderResolver().classForName(mmd.getCollection().getElementType());
+            if (mmd.getElementMetaData() != null && mmd.getElementMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE))
+            {
+                // Case where the user has defined their own "value" for each enum
+                getterMethodName = mmd.getElementMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE);
+            }
+        }
+        else if (role == FieldRole.ROLE_ARRAY_ELEMENT)
+        {
+            enumType = ec.getClassLoaderResolver().classForName(mmd.getArray().getElementType());
+            if (mmd.getElementMetaData() != null && mmd.getElementMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE))
+            {
+                // Case where the user has defined their own "value" for each enum
+                getterMethodName = mmd.getElementMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE);
+            }
+        }
+        else if (role == FieldRole.ROLE_MAP_KEY)
+        {
+            enumType = ec.getClassLoaderResolver().classForName(mmd.getMap().getKeyType());
+            if (mmd.getKeyMetaData() != null && mmd.getKeyMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE))
+            {
+                // Case where the user has defined their own "value" for each enum
+                getterMethodName = mmd.getKeyMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE);
+            }
+        }
+        else if (role == FieldRole.ROLE_MAP_VALUE)
+        {
+            enumType = ec.getClassLoaderResolver().classForName(mmd.getMap().getValueType());
+            if (mmd.getValueMetaData() != null && mmd.getValueMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE))
+            {
+                // Case where the user has defined their own "value" for each enum
+                getterMethodName = mmd.getValueMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE);
+            }
+        }
+        if (getterMethodName != null)
+        {
+            try
+            {
+                Method getterMethod = ClassUtils.getMethodForClass(enumType, getterMethodName, new Class[] {short.class});
+                return getterMethod.invoke(null, new Object[] {(short)longValue});
+            }
+            catch (Exception e)
+            {
+                NucleusLogger.PERSISTENCE.warn("Specified enum getter-by-value for field " + mmd.getFullFieldName() +
+                    " gave an error on extracting the enum so just using the ordinal : " + e.getMessage());
+            }
+            try
+            {
+                Method getterMethod = ClassUtils.getMethodForClass(enumType, getterMethodName, new Class[] {int.class});
+                return getterMethod.invoke(null, new Object[] {(int)longValue});
+            }
+            catch (Exception e)
+            {
+                NucleusLogger.PERSISTENCE.warn("Specified enum getter-by-value for field " + mmd.getFullFieldName() +
+                    " gave an error on extracting the enum so just using the ordinal : " + e.getMessage());
+            }
+        }
+        return enumType.getEnumConstants()[(int)longValue];
+    }
+
+    /**
+     * Convenience method to return the "value" of an Enum, for a field and role.
+     * Firstly checks for a defined method on the Enum that returns the "value", otherwise falls back to use the ordinal.
+     * @param mmd Metadata for the member
+     * @param role Role of the Enum in this member
+     * @param myEnum The enum
+     * @return The "value"
+     */
+    public static long getValueFromEnum(AbstractMemberMetaData mmd, FieldRole role, Enum myEnum)
+    {
+        String methodName = null;
+        if (role == FieldRole.ROLE_FIELD)
+        {
+            if (mmd != null && mmd.hasExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER))
+            {
+                // Case where the user has defined their own "value" for each enum
+                methodName = mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER);
+            }
+        }
+        else if (role == FieldRole.ROLE_COLLECTION_ELEMENT || role == FieldRole.ROLE_ARRAY_ELEMENT)
+        {
+            if (mmd != null && mmd.getElementMetaData() != null && mmd.getElementMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER))
+            {
+                // Case where the user has defined their own "value" for each enum
+                methodName = mmd.getElementMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER);
+            }
+        }
+        else if (role == FieldRole.ROLE_MAP_KEY)
+        {
+            if (mmd != null && mmd.getKeyMetaData() != null && mmd.getKeyMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER))
+            {
+                // Case where the user has defined their own "value" for each enum
+                methodName = mmd.getKeyMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER);
+            }
+        }
+        else if (role == FieldRole.ROLE_MAP_VALUE)
+        {
+            if (mmd != null && mmd.getValueMetaData() != null && mmd.getValueMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER))
+            {
+                // Case where the user has defined their own "value" for each enum
+                methodName = mmd.getValueMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER);
+            }
+        }
+
+        if (methodName != null)
+        {
+            Long longVal = null;
+            try
+            {
+                Method getterMethod = ClassUtils.getMethodForClass(myEnum.getClass(), methodName, null);
+                Number num = (Number)getterMethod.invoke(myEnum);
+                longVal = Long.valueOf(num.longValue());
+                if (longVal != null)
+                {
+                    return longVal.intValue();
+                }
+            }
+            catch (Exception e)
+            {
+                NucleusLogger.PERSISTENCE.warn("Specified enum value-getter for method " + methodName + " on field " + mmd.getFullFieldName() + " gave an error on extracting the value", e);
+            }
+        }
+        return myEnum.ordinal();
     }
 }
