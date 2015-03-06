@@ -66,6 +66,59 @@ public class MetaData implements Serializable
     /** Vendor name (DataNucleus) used for extensions. */
     public static final String VENDOR_NAME = "datanucleus";
 
+    /** Class : read only. */
+    public static final String EXTENSION_CLASS_READ_ONLY = "read-only";
+
+    /** Class : when using multitenancy, disables its use for this class. */
+    public static final String EXTENSION_CLASS_MULTITENANCY_DISABLE = "multitenancy-disable";
+
+    /** Class : when using multitenancy, defines the column name used for the mutitenancy discriminator. */
+    public static final String EXTENSION_CLASS_MULTITENANCY_COLUMN_NAME = "multitenancy-column-name";
+
+    /** Class : when using multitenancy, defines the length of column used for the mutitenancy discriminator. */
+    public static final String EXTENSION_CLASS_MULTITENANCY_COLUMN_LENGTH = "multitenancy-column-length";
+
+    /** Class : when using multitenancy, defines the jdbc-type used for the mutitenancy discriminator column. */
+    public static final String EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE = "multitenancy-jdbc-type";
+
+    /** Member : name of type converter to use. */
+    public final static String EXTENSION_MEMBER_TYPE_CONVERTER_NAME = "type-converter-name";
+
+    public final static String EXTENSION_MEMBER_TYPE_CONVERTER_DISABLED = "type-converter-disabled";
+
+    /** Member : name of comparator class when of SortedSet/SortedMap type. */
+    public static final String EXTENSION_MEMBER_COMPARATOR_NAME = "comparator-name";
+
+    /** Member : implementation class names, when the member is of a interface/reference type. */
+    public static final String EXTENSION_MEMBER_IMPLEMENTATION_CLASSES = "implementation-classes";
+
+    /** Member : when field is enum, name of the method to get the "value" of the enum. */
+    public static final String EXTENSION_MEMBER_ENUM_VALUE_GETTER = "enum-value-getter";
+
+    /** Member : when field is enum, name of the method to return the enum given the value. */
+    public static final String EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE = "enum-getter-by-value";
+
+    /** Member : when the field is Calendar, signifies that it should be stored as a single column. */
+    public static final String EXTENSION_MEMBER_CALENDAR_ONE_COLUMN = "calendar-one-column";
+
+    /** Member : whether the field is insertable (for JDO). */
+    public static final String EXTENSION_MEMBER_INSERTABLE = "insertable";
+
+    /** Member : whether the field is updateable (for JDO). */
+    public static final String EXTENSION_MEMBER_UPDATEABLE = "updateable";
+
+    /** Member : whether the field is cascade-persist (for JDO). */
+    public static final String EXTENSION_MEMBER_CASCADE_PERSIST = "cascade-persist";
+
+    /** Member : whether the field is cascade-update (for JDO). */
+    public static final String EXTENSION_MEMBER_CASCADE_UPDATE = "cascade-update";
+
+    /** Member : whether the field is cascade-refresh (for JDO). */
+    public static final String EXTENSION_MEMBER_CASCADE_REFRESH = "cascade-refresh";
+
+    /** Member : whether the field is (L2) cacheable (for JPA). */
+    public static final String EXTENSION_MEMBER_CACHEABLE = "cacheable";
+
     /** List of extensions for this MetaData element. */
     protected Collection<ExtensionMetaData> extensions = null;
 

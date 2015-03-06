@@ -54,10 +54,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 {
     private static final long serialVersionUID = -7689828287704042919L;
 
-    protected final static String TYPE_CONVERTER_EXTENSION_NAME = "type-converter-name";
-
-    protected final static String TYPE_CONVERTER_DISABLED = "type-converter-disabled";
-
     /** Whether we currently allow persistence of static fields. */
     public static final boolean PERSIST_STATIC = false;
     /** Whether we currently allow persistence of final fields. */
@@ -1262,10 +1258,10 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             orderMetaData.initialise(clr, mmgr);
         }
 
-        if (hasExtension("cascade-persist"))
+        if (hasExtension(MetaData.EXTENSION_MEMBER_CASCADE_PERSIST))
         {
             // JDO doesn't have a metadata attribute for this so we use an extension
-            String cascadeValue = getValueForExtension("cascade-persist");
+            String cascadeValue = getValueForExtension(MetaData.EXTENSION_MEMBER_CASCADE_PERSIST);
             if (cascadeValue.equalsIgnoreCase("true"))
             {
                 cascadePersist = true;
@@ -1275,10 +1271,10 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 cascadePersist = false;
             }
         }
-        if (hasExtension("cascade-update"))
+        if (hasExtension(MetaData.EXTENSION_MEMBER_CASCADE_UPDATE))
         {
             // JDO doesn't have a metadata attribute for this so we use an extension
-            String cascadeValue = getValueForExtension("cascade-update");
+            String cascadeValue = getValueForExtension(MetaData.EXTENSION_MEMBER_CASCADE_UPDATE);
             if (cascadeValue.equalsIgnoreCase("true"))
             {
                 cascadeUpdate = true;
@@ -1288,10 +1284,10 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 cascadeUpdate = false;
             }
         }
-        if (hasExtension("cascade-refresh"))
+        if (hasExtension(MetaData.EXTENSION_MEMBER_CASCADE_REFRESH))
         {
             // JDO doesn't have a metadata attribute for this so we use an extension
-            String cascadeValue = getValueForExtension("cascade-refresh");
+            String cascadeValue = getValueForExtension(MetaData.EXTENSION_MEMBER_CASCADE_REFRESH);
             if (cascadeValue.equalsIgnoreCase("true"))
             {
                 cascadeRefresh = true;
@@ -1475,10 +1471,10 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     public boolean isCacheable()
     {
-        if (hasExtension("cacheable"))
+        if (hasExtension(MetaData.EXTENSION_MEMBER_CACHEABLE))
         {
             // JPA doesn't have way of specifying field cacheability so use extension
-            return (getValueForExtension("cacheable").equalsIgnoreCase("false") ? false : true);
+            return (getValueForExtension(MetaData.EXTENSION_MEMBER_CACHEABLE).equalsIgnoreCase("false") ? false : true);
         }
         return cacheable;
     }
@@ -1501,9 +1497,9 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     public String getTypeConverterName()
     {
-        if (hasExtension(TYPE_CONVERTER_EXTENSION_NAME))
+        if (hasExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME))
         {
-            return getValueForExtension(TYPE_CONVERTER_EXTENSION_NAME);
+            return getValueForExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME);
         }
         return null;
     }
@@ -1511,17 +1507,17 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     public void setTypeConverterName(String name)
     {
         // Store it as an extension
-        addExtension(TYPE_CONVERTER_EXTENSION_NAME, name);
+        addExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME, name);
     }
 
     public boolean isTypeConversionDisabled()
     {
-        return hasExtension(TYPE_CONVERTER_DISABLED);
+        return hasExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_DISABLED);
     }
 
     public void setTypeConverterDisabled()
     {
-        addExtension(TYPE_CONVERTER_DISABLED, "true");
+        addExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_DISABLED, "true");
     }
 
     public int getRecursionDepth()

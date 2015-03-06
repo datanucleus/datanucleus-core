@@ -43,6 +43,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
@@ -61,8 +62,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class SCOUtils
 {
-    public static final String EXTENSION_COMPARATOR_NAME = "comparator-name";
-
     /**
      * Method to unwrap a SCO field/property (if it is wrapped currently). If the member value is not a SCO will just return the value.
      * @param ownerOP The ObjectProvider of the owner
@@ -493,8 +492,7 @@ public class SCOUtils
         boolean lazy = false;
 
         AbstractClassMetaData cmd = ownerOP.getClassMetaData();
-        Boolean lazyCollections = ownerOP.getExecutionContext().getNucleusContext().getConfiguration()
-                .getBooleanObjectProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS_LAZY);
+        Boolean lazyCollections = ownerOP.getExecutionContext().getNucleusContext().getConfiguration().getBooleanObjectProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS_LAZY);
         if (lazyCollections != null)
         {
             // Global setting for PMF
@@ -1189,25 +1187,25 @@ public class SCOUtils
         if (mmd.hasMap())
         {
             // Specified under <field> or <map>
-            if (mmd.hasExtension(EXTENSION_COMPARATOR_NAME))
+            if (mmd.hasExtension(MetaData.EXTENSION_MEMBER_COMPARATOR_NAME))
             {
-                comparatorName = mmd.getValueForExtension(EXTENSION_COMPARATOR_NAME);
+                comparatorName = mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_COMPARATOR_NAME);
             }
-            else if (mmd.getMap().hasExtension(EXTENSION_COMPARATOR_NAME))
+            else if (mmd.getMap().hasExtension(MetaData.EXTENSION_MEMBER_COMPARATOR_NAME))
             {
-                comparatorName = mmd.getMap().getValueForExtension(EXTENSION_COMPARATOR_NAME);
+                comparatorName = mmd.getMap().getValueForExtension(MetaData.EXTENSION_MEMBER_COMPARATOR_NAME);
             }
         }
         else if (mmd.hasCollection())
         {
             // Specified under <field> or <collection>
-            if (mmd.hasExtension(EXTENSION_COMPARATOR_NAME))
+            if (mmd.hasExtension(MetaData.EXTENSION_MEMBER_COMPARATOR_NAME))
             {
-                comparatorName = mmd.getValueForExtension(EXTENSION_COMPARATOR_NAME);
+                comparatorName = mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_COMPARATOR_NAME);
             }
-            else if (mmd.getCollection().hasExtension(EXTENSION_COMPARATOR_NAME))
+            else if (mmd.getCollection().hasExtension(MetaData.EXTENSION_MEMBER_COMPARATOR_NAME))
             {
-                comparatorName = mmd.getCollection().getValueForExtension(EXTENSION_COMPARATOR_NAME);
+                comparatorName = mmd.getCollection().getValueForExtension(MetaData.EXTENSION_MEMBER_COMPARATOR_NAME);
             }
         }
 

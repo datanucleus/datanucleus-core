@@ -22,6 +22,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.VersionMetaData;
 
 /**
@@ -137,9 +138,9 @@ public class DN2NamingFactory extends AbstractNamingFactory
         }
         else if (type == ColumnType.MULTITENANCY_COLUMN)
         {
-            if (cmd.hasExtension("multitenancy-column-name"))
+            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_NAME))
             {
-                name = cmd.getValueForExtension("multitenancy-column-name");
+                name = cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_NAME);
             }
             if (name == null)
             {

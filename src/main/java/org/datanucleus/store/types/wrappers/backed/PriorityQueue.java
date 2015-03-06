@@ -32,6 +32,7 @@ import org.datanucleus.flush.ListRemoveAtOperation;
 import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.BackedSCOStoreManager;
 import org.datanucleus.store.scostore.ListStore;
@@ -92,9 +93,16 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
         // Set up our delegate, using suitable comparator (DN extension to JDO)
         Comparator comparator = null;
         String comparatorName = null;
-        if (mmd.getCollection().hasExtension("comparatorName"))
+        if (mmd.hasExtension(MetaData.EXTENSION_MEMBER_COMPARATOR_NAME))
         {
-            comparatorName = mmd.getCollection().getValueForExtension("comparatorName");
+            comparatorName = mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_COMPARATOR_NAME);
+        }
+        else if (mmd.getCollection().hasExtension(MetaData.EXTENSION_MEMBER_COMPARATOR_NAME))
+        {
+            comparatorName = mmd.getCollection().getValueForExtension(MetaData.EXTENSION_MEMBER_COMPARATOR_NAME);
+        }
+        if (comparatorName != null)
+        {
             Class comparatorCls = null;
             try
             {
@@ -106,6 +114,7 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
                 NucleusLogger.PERSISTENCE.warn(Localiser.msg("023012", mmd.getFullFieldName(), comparatorName));
             }
         }
+
         if (comparator != null)
         {
             this.delegate = new java.util.PriorityQueue(5, comparator);
