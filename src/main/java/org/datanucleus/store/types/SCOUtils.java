@@ -61,6 +61,8 @@ import org.datanucleus.util.StringUtils;
  */
 public class SCOUtils
 {
+    public static final String EXTENSION_COMPARATOR_NAME = "comparator-name";
+
     /**
      * Method to unwrap a SCO field/property (if it is wrapped currently). If the member value is not a SCO will just return the value.
      * @param ownerOP The ObjectProvider of the owner
@@ -1176,21 +1178,37 @@ public class SCOUtils
     /**
      * Convenience method for creating a Comparator using extension metadata tags for the specified field.
      * Uses the extension key "comparator-name".
-     * @param fmd The field that needs the comparator
+     * @param mmd The field that needs the comparator
      * @param clr ClassLoader resolver
      * @return The Comparator
      */
-    public static Comparator getComparator(AbstractMemberMetaData fmd, ClassLoaderResolver clr)
+    public static Comparator getComparator(AbstractMemberMetaData mmd, ClassLoaderResolver clr)
     {
         Comparator comparator = null;
         String comparatorName = null;
-        if (fmd.hasMap() && fmd.getMap().hasExtension("comparator-name"))
+        if (mmd.hasMap())
         {
-            comparatorName = fmd.getMap().getValueForExtension("comparator-name");
+            // Specified under <field> or <map>
+            if (mmd.hasExtension(EXTENSION_COMPARATOR_NAME))
+            {
+                comparatorName = mmd.getValueForExtension(EXTENSION_COMPARATOR_NAME);
+            }
+            else if (mmd.getMap().hasExtension(EXTENSION_COMPARATOR_NAME))
+            {
+                comparatorName = mmd.getMap().getValueForExtension(EXTENSION_COMPARATOR_NAME);
+            }
         }
-        else if (fmd.hasCollection() && fmd.getCollection().hasExtension("comparator-name"))
+        else if (mmd.hasCollection())
         {
-            comparatorName = fmd.getCollection().getValueForExtension("comparator-name");
+            // Specified under <field> or <collection>
+            if (mmd.hasExtension(EXTENSION_COMPARATOR_NAME))
+            {
+                comparatorName = mmd.getValueForExtension(EXTENSION_COMPARATOR_NAME);
+            }
+            else if (mmd.getCollection().hasExtension(EXTENSION_COMPARATOR_NAME))
+            {
+                comparatorName = mmd.getCollection().getValueForExtension(EXTENSION_COMPARATOR_NAME);
+            }
         }
 
         if (comparatorName != null)
@@ -1203,7 +1221,7 @@ public class SCOUtils
             }
             catch (NucleusException jpe)
             {
-                NucleusLogger.PERSISTENCE.warn(Localiser.msg("023012", fmd.getFullFieldName(), comparatorName));
+                NucleusLogger.PERSISTENCE.warn(Localiser.msg("023012", mmd.getFullFieldName(), comparatorName));
             }
         }
         return comparator;
