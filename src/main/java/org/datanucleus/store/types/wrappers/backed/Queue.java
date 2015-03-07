@@ -25,21 +25,18 @@ import java.util.Iterator;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
-import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.flush.CollectionAddOperation;
 import org.datanucleus.flush.CollectionClearOperation;
 import org.datanucleus.flush.ListRemoveAtOperation;
 import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
-import org.datanucleus.metadata.MetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.BackedSCOStoreManager;
 import org.datanucleus.store.scostore.ListStore;
 import org.datanucleus.store.scostore.Store;
 import org.datanucleus.store.types.SCOCollectionIterator;
 import org.datanucleus.store.types.SCOUtils;
-import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -81,30 +78,7 @@ public class Queue extends org.datanucleus.store.types.wrappers.Queue implements
         super(op, mmd);
 
         // Set up our delegate, using suitable comparator (DN extension to JDO)
-        Comparator comparator = null;
-        String comparatorName = null;
-        if (mmd.hasExtension(MetaData.EXTENSION_MEMBER_COMPARATOR_NAME))
-        {
-            comparatorName = mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_COMPARATOR_NAME);
-        }
-        else if (mmd.getCollection().hasExtension(MetaData.EXTENSION_MEMBER_COMPARATOR_NAME))
-        {
-            comparatorName = mmd.getCollection().getValueForExtension(MetaData.EXTENSION_MEMBER_COMPARATOR_NAME);
-        }
-        if (comparatorName != null)
-        {
-            Class comparatorCls = null;
-            try
-            {
-                comparatorCls = op.getExecutionContext().getClassLoaderResolver().classForName(comparatorName);
-                comparator = (Comparator)ClassUtils.newInstance(comparatorCls, null, null);
-            }
-            catch (NucleusException jpe)
-            {
-                NucleusLogger.PERSISTENCE.warn(Localiser.msg("023012", mmd.getFullFieldName(), comparatorName));
-            }
-        }
-
+        Comparator comparator = SCOUtils.getComparator(ownerMmd, ownerOP.getExecutionContext().getClassLoaderResolver());
         if (comparator != null)
         {
             this.delegate = new java.util.PriorityQueue(5, comparator);
