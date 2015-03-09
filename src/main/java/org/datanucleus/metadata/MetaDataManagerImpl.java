@@ -2449,6 +2449,26 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     }
 
     /**
+     * Convenience method to register a query under a name.
+     * @param qmd Query metadata
+     */
+    public void registerNamedQuery(QueryMetaData qmd)
+    {
+        if (queryMetaDataByName == null)
+        {
+            queryMetaDataByName = new ConcurrentHashMap();
+        }
+
+        String scope = qmd.getScope();
+        String key = qmd.getName();
+        if (scope != null)
+        {
+            key = scope + "_" + key;
+        }
+        queryMetaDataByName.put(key, qmd);
+    }
+
+    /**
      * Convenience method to register all queries found in the passed file.
      * @param filemd MetaData for the file
      */

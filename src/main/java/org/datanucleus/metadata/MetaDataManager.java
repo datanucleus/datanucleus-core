@@ -289,7 +289,17 @@ public interface MetaDataManager
      **/
     QueryMetaData getMetaDataForQuery(Class cls, ClassLoaderResolver clr, String queryName);
 
+    /**
+     * Convenience method to access the names of named queries that are registered with this manager.
+     * @return Names of the named queries
+     */
     Set<String> getNamedQueryNames();
+
+    /**
+     * Method to register a named query.
+     * @param qmd The definition of the query, with its name
+     */
+    void registerNamedQuery(QueryMetaData qmd);
 
     /**
      * Accessor for the MetaData for a named stored procedure query for a class.
