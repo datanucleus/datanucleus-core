@@ -1079,8 +1079,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             }
         }
 
-        NucleusLogger.DATASTORE_SCHEMA.info("Datastore script " + scriptResourceName + 
-            " was not a valid script; has to be a filename, or a URL string");
+        NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("014046", scriptResourceName));
         return null;
     }
 
@@ -1214,11 +1213,9 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     {
         if (jtaTxManager == null)
         {
-            // Find the JTA transaction manager
-            // Before J2EE 5 there is no standard way to do this so use the finder process.
+            // Find the JTA transaction manager - before J2EE 5 there is no standard way to do this so use the finder process.
             // See http://www.onjava.com/pub/a/onjava/2005/07/20/transactions.html
-            jtaTxManager = new TransactionManagerFinder(this).getTransactionManager(
-                getClassLoaderResolver((ClassLoader)config.getProperty(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY)));
+            jtaTxManager = new TransactionManagerFinder(this).getTransactionManager(getClassLoaderResolver((ClassLoader)config.getProperty(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY)));
             if (jtaTxManager == null)
             {
                 throw new NucleusTransactionException(Localiser.msg("015030"));
