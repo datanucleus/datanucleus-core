@@ -86,22 +86,21 @@ public abstract class AbstractSQLQuery extends Query
             throw new NucleusUserException(Localiser.msg("059001"));
         }
 
-        // Remove any end-of-line chars for when user dumped the query in a text file with one word per line!
-        this.inputSQL = sqlText.replace('\n', ' ').trim();
+        // Remove any end-of-line/tab chars for when user dumped the query in a text file with one word per line!
+        this.inputSQL = sqlText.replace('\r', ' ').replace('\n', ' ').replace('\t', ' ').trim();
 
         // Detect type of SQL statement
-        String firstToken = new StringTokenizer(inputSQL, " ").nextToken();
-        if (firstToken.equalsIgnoreCase("SELECT"))
+        String firstToken = inputSQL.trim().substring(0,6).toUpperCase(); 
+        if (firstToken.equals("SELECT"))
         {
             type = SELECT;
         }
-        else if (firstToken.equalsIgnoreCase("DELETE"))
+        else if (firstToken.equals("DELETE"))
         {
             type = BULK_DELETE;
             unique = true;
         }
-        else if (firstToken.equalsIgnoreCase("UPDATE") || firstToken.equalsIgnoreCase("INSERT") ||
-                firstToken.equalsIgnoreCase("MERGE"))
+        else if (firstToken.equals("UPDATE") || firstToken.equals("INSERT") || firstToken.startsWith("MERGE"))
         {
             type = BULK_UPDATE;
             unique = true;
@@ -113,10 +112,10 @@ public abstract class AbstractSQLQuery extends Query
             unique = true;
         }
 
-        Configuration conf = ec.getNucleusContext().getConfiguration();
         if (ec.getApiAdapter().getName().equalsIgnoreCase("JDO"))
         {
             // Check for strict SQL if required
+            Configuration conf = ec.getNucleusContext().getConfiguration();
             boolean allowAllSyntax = conf.getBooleanProperty(PropertyNames.PROPERTY_QUERY_SQL_ALLOWALL);
             if (ec.getProperty(PropertyNames.PROPERTY_QUERY_SQL_ALLOWALL) != null)
             {
@@ -124,8 +123,8 @@ public abstract class AbstractSQLQuery extends Query
             }
             if (!allowAllSyntax)
             {
-                // JDO spec [14.7] : SQL queries must start with SELECT/select
-                if (!firstToken.equals("SELECT") && !firstToken.startsWith("select"))
+                // JDO spec [14.7] : SQL queries must start with SELECT
+                if (!firstToken.equals("SELECT"))
                 {
                     throw new NucleusUserException(Localiser.msg("059002", inputSQL));
                 }
