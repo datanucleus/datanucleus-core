@@ -499,6 +499,7 @@ public class ClassMetaData extends AbstractClassMetaData
                             if (methods[i].getName().equals(setterName) && methods[i].getParameterTypes() != null && methods[i].getParameterTypes().length == 1)
                             {
                                 setMethod = methods[i];
+                                break;
                             }
                         }
                         if (setMethod == null)
@@ -509,6 +510,7 @@ public class ClassMetaData extends AbstractClassMetaData
                                 if (methods[i].getName().equals(setterName) && methods[i].getParameterTypes() != null && methods[i].getParameterTypes().length == 1)
                                 {
                                     setMethod = methods[i];
+                                    break;
                                 }
                             }
                         }
