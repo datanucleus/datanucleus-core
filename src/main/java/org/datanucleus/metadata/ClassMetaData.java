@@ -479,16 +479,14 @@ public class ClassMetaData extends AbstractClassMetaData
                     {
                         // Find the getter
                         // a). Try as a standard form of getter (getXXX)
-                        getMethod = fieldCls.getDeclaredMethod(
-                            ClassUtils.getJavaBeanGetterName(mmd.getName(), false));
+                        getMethod = fieldCls.getDeclaredMethod(ClassUtils.getJavaBeanGetterName(mmd.getName(), false));
                     }
                     catch (Exception e)
                     {
                         try
                         {
                             // b). Try as a boolean form of getter (isXXX)
-                            getMethod = fieldCls.getDeclaredMethod(
-                                ClassUtils.getJavaBeanGetterName(mmd.getName(), true));
+                            getMethod = fieldCls.getDeclaredMethod(ClassUtils.getJavaBeanGetterName(mmd.getName(), true));
                         }
                         catch (Exception e2)
                         {
@@ -505,13 +503,25 @@ public class ClassMetaData extends AbstractClassMetaData
                     {
                         // Find the setter
                         String setterName = ClassUtils.getJavaBeanSetterName(mmd.getName());
-                        Method[] methods = fieldCls.getDeclaredMethods();
+                        Method[] methods = fieldCls.getMethods(); // Public, including superclass(es)
                         for (int i=0;i<methods.length;i++)
                         {
-                            if (methods[i].getName().equals(setterName) && methods[i].getParameterTypes() != null &&
-                                methods[i].getParameterTypes().length == 1)
+                            if (methods[i].getName().equals(setterName) && methods[i].getParameterTypes() != null && methods[i].getParameterTypes().length == 1)
                             {
                                 setMethod = methods[i];
+                                break;
+                            }
+                        }
+                        if (setMethod == null)
+                        {
+                            methods = fieldCls.getDeclaredMethods(); // Just in this class
+                            for (int i=0;i<methods.length;i++)
+                            {
+                                if (methods[i].getName().equals(setterName) && methods[i].getParameterTypes() != null && methods[i].getParameterTypes().length == 1)
+                                {
+                                    setMethod = methods[i];
+                                    break;
+                                }
                             }
                         }
                     }
