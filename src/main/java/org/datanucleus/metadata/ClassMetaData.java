@@ -333,8 +333,7 @@ public class ClassMetaData extends AbstractClassMetaData
                 {
                     // Limit to valid java bean getter methods in this class (don't allow inner class methods)
                     if (clsMethods[i].getDeclaringClass().getName().equals(fullName) &&
-                        ClassUtils.isJavaBeanGetterMethod(clsMethods[i]) &&
-                        !ClassUtils.isInnerClass(clsMethods[i].getName()))
+                        ClassUtils.isJavaBeanGetterMethod(clsMethods[i]) && !ClassUtils.isInnerClass(clsMethods[i].getName()))
                     {
                         // Find if there is metadata for this property
                         String propertyName = ClassUtils.getFieldNameForJavaBeanGetter(clsMethods[i].getName());
@@ -363,8 +362,7 @@ public class ClassMetaData extends AbstractClassMetaData
                 // that aren't inner class fields, and that aren't static
                 if (clsFields[i].getDeclaringClass().getName().equals(fullName) &&
                     !clsFields[i].getName().startsWith(mmgr.getEnhancedMethodNamePrefix()) &&
-                    !ClassUtils.isInnerClass(clsFields[i].getName()) &&
-                    !Modifier.isStatic(clsFields[i].getModifiers()))
+                    !ClassUtils.isInnerClass(clsFields[i].getName()) && !Modifier.isStatic(clsFields[i].getModifiers()))
                 {
                     // Find if there is metadata for this field
                     // TODO : This will not check if the name is a field! so we can miss field+property clashes
@@ -429,14 +427,7 @@ public class ClassMetaData extends AbstractClassMetaData
                         if (superFmd != null)
                         {
                             // Field is for a superclass so set its "className"
-                            if (superFmd.className != null)
-                            {
-                                mmd.className = superFmd.className;
-                            }
-                            else
-                            {
-                                mmd.className = superFmd.getClassName();
-                            }
+                            mmd.className = (superFmd.className != null) ? superFmd.className : superFmd.getClassName();
                         }
                     }
                     else
@@ -478,16 +469,14 @@ public class ClassMetaData extends AbstractClassMetaData
                     {
                         // Find the getter
                         // a). Try as a standard form of getter (getXXX)
-                        getMethod = fieldCls.getDeclaredMethod(
-                            ClassUtils.getJavaBeanGetterName(mmd.getName(), false));
+                        getMethod = fieldCls.getDeclaredMethod(ClassUtils.getJavaBeanGetterName(mmd.getName(), false)); // Only public?
                     }
                     catch (Exception e)
                     {
                         try
                         {
                             // b). Try as a boolean form of getter (isXXX)
-                            getMethod = fieldCls.getDeclaredMethod(
-                                ClassUtils.getJavaBeanGetterName(mmd.getName(), true));
+                            getMethod = fieldCls.getDeclaredMethod(ClassUtils.getJavaBeanGetterName(mmd.getName(), true)); // Only public?
                         }
                         catch (Exception e2)
                         {
@@ -504,13 +493,23 @@ public class ClassMetaData extends AbstractClassMetaData
                     {
                         // Find the setter
                         String setterName = ClassUtils.getJavaBeanSetterName(mmd.getName());
-                        Method[] methods = fieldCls.getDeclaredMethods();
+                        Method[] methods = fieldCls.getMethods(); // Only gives public methods
                         for (int i=0;i<methods.length;i++)
                         {
-                            if (methods[i].getName().equals(setterName) && methods[i].getParameterTypes() != null &&
-                                methods[i].getParameterTypes().length == 1)
+                            if (methods[i].getName().equals(setterName) && methods[i].getParameterTypes() != null && methods[i].getParameterTypes().length == 1)
                             {
                                 setMethod = methods[i];
+                            }
+                        }
+                        if (setMethod == null)
+                        {
+                            methods = fieldCls.getDeclaredMethods(); // Also try protected/private of this class
+                            for (int i=0;i<methods.length;i++)
+                            {
+                                if (methods[i].getName().equals(setterName) && methods[i].getParameterTypes() != null && methods[i].getParameterTypes().length == 1)
+                                {
+                                    setMethod = methods[i];
+                                }
                             }
                         }
                     }
@@ -667,8 +666,7 @@ public class ClassMetaData extends AbstractClassMetaData
                 {
                     pcSuperclassMetaData.initialise(clr, mmgr);
                 }
-                noOfInheritedManagedMembers = pcSuperclassMetaData.getNoOfInheritedManagedMembers() + 
-                    pcSuperclassMetaData.getNoOfManagedMembers();
+                noOfInheritedManagedMembers = pcSuperclassMetaData.getNoOfInheritedManagedMembers() + pcSuperclassMetaData.getNoOfManagedMembers();
             }
     
             // Set up the various convenience arrays of field numbers
