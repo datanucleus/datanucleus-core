@@ -31,9 +31,9 @@ import org.datanucleus.util.Localiser;
  * Adapter for methods in persistence-enabled classes allowing enhancement of direct access to user fields.
  * Currently performs the following updates
  * <ul>
- * <li>Any GETFIELD on a field of a Persistable class is replaced by a call to aaaGetXXX()</li>
- * <li>Any PUTFIELD on a field of a Persistable class is replaced by a call to aaaSetXXX()</li>
- * <li>Any clone() method that has no superclass but calls clone() is changed to call aaaSuperClone()</li>
+ * <li>Any GETFIELD on a field of a Persistable class is replaced by a call to dnGetXXX()</li>
+ * <li>Any PUTFIELD on a field of a Persistable class is replaced by a call to dnSetXXX()</li>
+ * <li>Any clone() method that has no superclass but calls clone() is changed to call dnSuperClone()</li>
  * <li>Any static class initialisation adds on the "InitClass" instructions</li>
  * </ul>
  */
