@@ -136,40 +136,43 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
 
             if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
             {
-                boolean propertyAccessor = false;
-
-                // Extract the annotations for the getters
+                Collection<AnnotatedMember> annotatedFields = getFieldAnnotationsForClass(cls);
                 Collection<AnnotatedMember> annotatedMethods = getJavaBeanAccessorAnnotationsForClass(cls);
-                Map<String, AnnotatedMember> m = new HashMap<String, AnnotatedMember>();
-                Iterator it = annotatedMethods.iterator();
-                while (it.hasNext())
+
+                // Check if we are using property or field access
+                boolean propertyAccessor = false;
+                if (cmd.getAccessViaField() != null)
                 {
-                    AnnotatedMember method = (AnnotatedMember)it.next();
-                    m.put(method.getName(), method);
-                    if (method.getAnnotations().length > 0)
+                    // Respect @Access setting if provided
+                    if (cmd.getAccessViaField() == Boolean.FALSE)
                     {
-                        // We have a getter with at least one annotation so must be using properties
                         propertyAccessor = true;
                     }
                 }
-
-                // Extract the annotations for the fields
-                Collection<AnnotatedMember> annotatedFields = getFieldAnnotationsForClass(cls);
-                Map<String, AnnotatedMember> f = new HashMap<String, AnnotatedMember>();
-                it = annotatedFields.iterator();
-                while (it.hasNext())
+                else
                 {
-                    AnnotatedMember field = (AnnotatedMember)it.next();
-                    f.put(field.getName(), field);
+                    // Extract the annotations for the getters
+                    Iterator it = annotatedMethods.iterator();
+                    while (it.hasNext())
+                    {
+                        AnnotatedMember method = (AnnotatedMember) it.next();
+                        if (method.getAnnotations().length > 0)
+                        {
+                            // We have a getter with at least one annotation so must be using properties
+                            propertyAccessor = true;
+                        }
+                    }
                 }
 
                 // Process the getters
-                it = m.values().iterator();
-                while (it.hasNext())
+                Iterator<AnnotatedMember> methodIter = annotatedMethods.iterator();
+                while (methodIter.hasNext())
                 {
-                    AnnotatedMember method = (AnnotatedMember)it.next();
+                    AnnotatedMember method = methodIter.next();
                     AnnotationObject[] annotations = method.getAnnotations();
 
+                    // Process members with annotations against the method
+                    // TODO Omit if no annotations?
                     AbstractMemberMetaData mmd = processMemberAnnotations(cmd, method.getMember(), annotations, propertyAccessor);
 
                     if (annotations != null && annotations.length > 0)
@@ -192,13 +195,16 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                     }
                 }
 
+                // TODO If we have property access then should we ignore these?
                 // Process the fields
-                it = f.values().iterator();
-                while (it.hasNext())
+                Iterator<AnnotatedMember> fieldMapValueIter = annotatedFields.iterator();
+                while (fieldMapValueIter.hasNext())
                 {
-                    AnnotatedMember field = (AnnotatedMember)it.next();
+                    AnnotatedMember field = fieldMapValueIter.next();
                     AnnotationObject[] annotations = field.getAnnotations();
 
+                    // Process members with annotations against the field
+                    // TODO Omit if no annotations?
                     AbstractMemberMetaData mmd = processMemberAnnotations(cmd, field.getMember(), annotations, propertyAccessor);
 
                     if (annotations != null && annotations.length > 0)
@@ -341,43 +347,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
     }
 
     /**
-     * Method returning a Map containing an array of the annotations for each method of the
-     * passed class, keyed by the method name.
-     * @param cls The class
-     * @return Collection of the annotated methods
-     */
-    protected Collection<Annotation[]> getMethodAnnotationsForClass(Class cls)
-    {
-        Collection<Annotation[]> annotatedMethods = new HashSet<Annotation[]>();
-
-        Method[] methods = cls.getDeclaredMethods();
-        int numberOfMethods = methods.length;
-
-        for (int i = 0; i < numberOfMethods; i++)
-        {
-            Annotation[] annotations = methods[i].getAnnotations();
-            if (annotations != null && annotations.length > 0)
-            {
-                // Strip out unsupported annotations
-                AnnotationManager annMgr = mgr.getAnnotationManager();
-                List<Annotation> supportedAnnots = new ArrayList();
-                for (int j=0;j<annotations.length;j++)
-                {
-                    String annName = annotations[j].annotationType().getName();
-                    if (isSupportedAnnotation(annName) || annMgr.getMemberAnnotationHasHandler(annName))
-                    {
-                        supportedAnnots.add(annotations[j]);
-                    }
-                }
-                annotatedMethods.add(supportedAnnots.toArray(new Annotation[supportedAnnots.size()]));
-            }
-        }
-        return annotatedMethods;
-    }    
-
-    /**
-     * Method returning a Map containing an array of the annotations for each field of the
-     * passed class, keyed by the field name.
+     * Method returning a Collection of the annotated fields for the specified class.
      * @param cls The class
      * @return Collection of the annotated fields
      */
