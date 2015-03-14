@@ -72,6 +72,8 @@ public abstract class AbstractClassMetaData extends MetaData
      */
     protected boolean instantiable = true;
 
+    protected Boolean accessViaField = null;
+
     /** Identity-type tag value. */
     protected IdentityType identityType = IdentityType.DATASTORE;
 
@@ -3348,6 +3350,15 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     // ------------------------------- Mutators --------------------------------
+
+    public void setAccessViaField(boolean flag)
+    {
+    	this.accessViaField = flag;
+    }
+    public Boolean getAccessViaField()
+    {
+    	return this.accessViaField;
+    }
 
     public void setMappedSuperclass(boolean mapped)
     {
