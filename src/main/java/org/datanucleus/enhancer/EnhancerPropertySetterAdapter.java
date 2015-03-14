@@ -35,20 +35,20 @@ import org.datanucleus.util.Localiser;
  * Adapter for property setter methods in persistence-enabled classes.
  * This adapter processes the setXXX method and
  * <ul>
- * <li>Creates aaaSetXXX with the same code as was present in setXXX</li>
+ * <li>Creates dnSetXXX with the same code as was present in setXXX</li>
  * <li>Changes setXXX to have the code below</li>
  * </ul>
  * When detachable this will be (CHECK_WRITE variant)
  * <pre>
  * void setZZZ(YYY zzz)
  * {
- *     if (aaaFlags != 0 &amp;&amp; aaaStateManager != null)
- *         aaaStateManager.setStringField(this, 2, aaaGetZZZ(), zzz);
+ *     if (dnFlags != 0 &amp;&amp; dnStateManager != null)
+ *         dnStateManager.setStringField(this, 2, dnGetZZZ(), zzz);
  *     else
  *     {
- *         aaaSetXXX(zzz);
- *         if (aaaIsDetached() == true)
- *             ((BitSet) aaaDetachedState[3]).set(2);
+ *         dnSetXXX(zzz);
+ *         if (dnIsDetached() == true)
+ *             ((BitSet) dnDetachedState[3]).set(2);
  *     }
  * }
  * </pre>
@@ -56,9 +56,9 @@ import org.datanucleus.util.Localiser;
  * <pre>
  * void setZZZ(YYY zzz)
  * {
- *     if (aFlags &gt; 0 &amp;&amp; aaaStateManager != null)
- *         aaaStateManager.setObjectField(this, 2, aaaGetZZZ(), zzz);
- *     aaaSetXXX(zzz);
+ *     if (aFlags &gt; 0 &amp;&amp; dnStateManager != null)
+ *         dnStateManager.setObjectField(this, 2, dnGetZZZ(), zzz);
+ *     dnSetXXX(zzz);
  * }
  * </pre>
  * There are other variants for MEDIATE_WRITE and NORMAL_WRITE
@@ -77,7 +77,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
     /** MetaData for the property. */
     protected AbstractMemberMetaData mmd;
 
-    /** Visitor for the aaaSetXXX method. */
+    /** Visitor for the dnSetXXX method. */
     protected MethodVisitor visitor = null;
 
     /**
@@ -98,7 +98,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
         this.methodDescriptor = methodDesc;
         this.mmd = mmd;
 
-        // Generate aaaSetXXX method to include code that this setXXX currently has
+        // Generate dnSetXXX method to include code that this setXXX currently has
         int access = (mmd.isPublic() ? Opcodes.ACC_PUBLIC : 0) | 
             (mmd.isProtected() ? Opcodes.ACC_PROTECTED : 0) | 
             (mmd.isPrivate() ? Opcodes.ACC_PRIVATE : 0) |
@@ -108,7 +108,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
 
     /**
      * Method called at the end of visiting the setXXX method.
-     * This is used to add the aaaSetXXX method with the same code as is present originally in the setXXX method.
+     * This is used to add the dnSetXXX method with the same code as is present originally in the setXXX method.
      */
     public void visitEnd()
     {
@@ -122,7 +122,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
 
         if (!mmd.isAbstract())
         {
-            // Property is not abstract so generate the setXXX method to use the aaaSetXXX we just added
+            // Property is not abstract so generate the setXXX method to use the dnSetXXX we just added
             generateSetXXXMethod(mv, mmd, enhancer.getASMClassName(), enhancer.getClassDescriptor(), enhancer.getNamer());
         }
     }
@@ -151,7 +151,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
             Label startLabel = new Label();
             mv.visitLabel(startLabel);
 
-            // "if (objPC.aaaStateManager == null) objPC.ZZZ = zzz;"
+            // "if (objPC.dnStateManager == null) objPC.ZZZ = zzz;"
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName,
                 namer.getStateManagerFieldName(), "L" + namer.getStateManagerAsmClassName() + ";");
@@ -165,7 +165,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
             mv.visitJumpInsn(Opcodes.GOTO, l3);
             mv.visitLabel(l1);
 
-            // "else objPC.aaaStateManager.setYYYField(objPC, 0, objPC.ZZZ, zzz);"
+            // "else objPC.dnStateManager.setYYYField(objPC, 0, objPC.ZZZ, zzz);"
             mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName,
@@ -195,14 +195,14 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
 
             if (cmd.isDetachable())
             {
-                // "if (objPC.aaaIsDetached() == true)"
+                // "if (objPC.dnIsDetached() == true)"
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName,
                     namer.getIsDetachedMethodName(), "()Z");
                 Label l6 = new Label();
                 mv.visitJumpInsn(Opcodes.IFEQ, l6);
 
-                // "((BitSet) objPC.aaaDetachedState[3]).set(0);"
+                // "((BitSet) objPC.dnDetachedState[3]).set(0);"
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName,
                     namer.getDetachedStateFieldName(), "[Ljava/lang/Object;");
@@ -235,7 +235,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
             Label startLabel = new Label();
             mv.visitLabel(startLabel);
 
-            // "if (objPC.aaaFlags != 0 && objPC.aaaStateManager != null)"
+            // "if (objPC.dnFlags != 0 && objPC.dnStateManager != null)"
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName, namer.getFlagsFieldName(), "B");
             Label l1 = new Label();
@@ -245,7 +245,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
                 namer.getStateManagerFieldName(), "L" + namer.getStateManagerAsmClassName() + ";");
             mv.visitJumpInsn(Opcodes.IFNULL, l1);
 
-            // "objPC.aaaStateManager.setYYYField(objPC, 8, objPC.ZZZ, val);"
+            // "objPC.dnStateManager.setYYYField(objPC, 8, objPC.ZZZ, val);"
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName,
                 namer.getStateManagerFieldName(), "L" + namer.getStateManagerAsmClassName() + ";");
@@ -282,7 +282,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
 
             if (cmd.isDetachable())
             {
-                // "if (objPC.aaaIsDetached() == true)  ((BitSet) objPC.aaaDetachedState[3]).set(8);"
+                // "if (objPC.dnIsDetached() == true)  ((BitSet) objPC.dnDetachedState[3]).set(8);"
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName,
                     namer.getIsDetachedMethodName(), "()Z");

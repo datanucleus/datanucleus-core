@@ -35,28 +35,28 @@ import org.datanucleus.util.Localiser;
  * Adapter for property getter methods in persistence-enabled classes.
  * This adapter processes the getXXX method and
  * <ul>
- * <li>Creates aaaGetXXX with the same code as was present in getXXX</li>
+ * <li>Creates dnGetXXX with the same code as was present in getXXX</li>
  * <li>Changes getXXX to have the code below</li>
  * </ul>
  * When detachable this will be (CHECK_READ variant)
  * <pre>
- * YYY aaaGetZZZ()
+ * YYY dnGetZZZ()
  * {
- *     if (aaaFlags &gt; 0 &amp;&amp; aaaStateManager != null &amp;&amp; !aaaStateManager.isLoaded(this, 0))
- *         return (Integer) aaaStateManager.getObjectField(this, 0, aaaGetXXX());
- *     if (aaaIsDetached() &amp;&amp; !((BitSet) aaaDetachedState[2]).get(0))
+ *     if (dnFlags &gt; 0 &amp;&amp; dnStateManager != null &amp;&amp; !dnStateManager.isLoaded(this, 0))
+ *         return (Integer) dnStateManager.getObjectField(this, 0, dnGetXXX());
+ *     if (dnIsDetached() &amp;&amp; !((BitSet) dnDetachedState[2]).get(0))
  *         throw new DetachedFieldAccessException
  *             ("You have just attempted to access property \"id\" yet this field was not detached ...");
- *     return aaaGetXXX();
+ *     return dnGetXXX();
  * }
  * </pre>
  * and when not detachable
  * <pre>
- * YYY aaaGetZZZ()
+ * YYY dnGetZZZ()
  * {
- *     if (aaaFlags &gt; 0 &amp;&amp; aaaStateManager != null &amp;&amp; !aaaStateManager.isLoaded(this, 0))
- *         return (Integer) aaaStateManager.getObjectField(this, 0, aaaGetXXX());
- *     return aaaGetXXX();
+ *     if (dnFlags &gt; 0 &amp;&amp; dnStateManager != null &amp;&amp; !dnStateManager.isLoaded(this, 0))
+ *         return (Integer) dnStateManager.getObjectField(this, 0, dnGetXXX());
+ *     return dnGetXXX();
  * }
  * </pre>
  * There are other variants for MEDIATE_READ and NORMAL_READ
@@ -75,7 +75,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
     /** MetaData for the property. */
     protected AbstractMemberMetaData mmd;
 
-    /** Visitor for the aaaGetXXX method. */
+    /** Visitor for the dnGetXXX method. */
     protected MethodVisitor visitor = null;
 
     /**
@@ -96,7 +96,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
         this.methodDescriptor = methodDesc;
         this.mmd = mmd;
 
-        // Generate aaaGetXXX method to include code that this getXXX currently has
+        // Generate dnGetXXX method to include code that this getXXX currently has
         int access = (mmd.isPublic() ? Opcodes.ACC_PUBLIC : 0) | 
             (mmd.isProtected() ? Opcodes.ACC_PROTECTED : 0) | 
             (mmd.isPrivate() ? Opcodes.ACC_PRIVATE : 0) |
@@ -107,7 +107,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
 
     /**
      * Method called at the end of visiting the getXXX method.
-     * This is used to add the aaaGetXXX method with the same code as is present originally in the getXXX method.
+     * This is used to add the dnGetXXX method with the same code as is present originally in the getXXX method.
      */
     public void visitEnd()
     {
@@ -121,7 +121,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
 
         if (!mmd.isAbstract())
         {
-            // Property is not abstract so generate the getXXX method to use the aaaGetXXX we just added
+            // Property is not abstract so generate the getXXX method to use the dnGetXXX we just added
             generateGetXXXMethod(mv, mmd, enhancer.getASMClassName(), enhancer.getClassDescriptor(), false, enhancer.getNamer());
         }
     }
@@ -204,7 +204,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
 
             if (cmd.isDetachable())
             {
-                // "if (objPC.aaaIsDetached() != false && ((BitSet) objPC.aaaDetachedState[2]).get(5) != true)"
+                // "if (objPC.dnIsDetached() != false && ((BitSet) objPC.dnDetachedState[2]).get(5) != true)"
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getIsDetachedMethodName(), "()Z");
 
@@ -333,7 +333,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
 
             if (cmd.isDetachable())
             {
-                // "if (objPC.aaaIsDetached() != false && ((BitSet) objPC.aaaDetachedState[2]).get(5) != true)"
+                // "if (objPC.dnIsDetached() != false && ((BitSet) objPC.dnDetachedState[2]).get(5) != true)"
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getIsDetachedMethodName(), "()Z");
                 Label l4 = new Label();
