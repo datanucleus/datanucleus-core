@@ -29,7 +29,10 @@ import org.datanucleus.asm.TypePath;
 import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.FieldMetaData;
+import org.datanucleus.metadata.PropertyMetaData;
 import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Adapter for property getter methods in persistence-enabled classes.
@@ -433,6 +436,10 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
 
     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf)
     {
+        if (mmd instanceof PropertyMetaData)
+        {
+            NucleusLogger.GENERAL.debug(">> GetterAdapter mmd=" + mmd.getFullFieldName() + " visitMethodInsn(itf) owner=" + owner + " name=" + name + " desc=" + desc);
+        }
         visitor.visitMethodInsn(opcode, owner, name, desc, itf);
     }
 
@@ -467,9 +474,13 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
         visitor.visitCode();
     }
 
-    public void visitFieldInsn(int arg0, String arg1, String arg2, String arg3)
+    public void visitFieldInsn(int opcode, String owner, String name, String desc)
     {
-        visitor.visitFieldInsn(arg0, arg1, arg2, arg3);
+        if (mmd instanceof FieldMetaData)
+        {
+            NucleusLogger.GENERAL.debug(">> GetterAdapter mmd=" + mmd.getFullFieldName() + " visitMethodInsn owner=" + owner + " name=" + name + " desc=" + desc);
+        }
+        visitor.visitFieldInsn(opcode, owner, name, desc);
     }
 
     public void visitFrame(int arg0, int arg1, Object[] arg2, int arg3, Object[] arg4)
@@ -482,9 +493,9 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
         visitor.visitIincInsn(arg0, arg1);
     }
 
-    public void visitInsn(int arg0)
+    public void visitInsn(int opcode)
     {
-        visitor.visitInsn(arg0);
+        visitor.visitInsn(opcode);
     }
 
     public void visitIntInsn(int arg0, int arg1)
@@ -527,9 +538,13 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
         visitor.visitMaxs(arg0, arg1);
     }
 
-    public void visitMethodInsn(int arg0, String arg1, String arg2, String arg3)
+    public void visitMethodInsn(int opcode, String owner, String name, String desc)
     {
-        visitor.visitMethodInsn(arg0, arg1, arg2, arg3);
+        if (mmd instanceof PropertyMetaData)
+        {
+            NucleusLogger.GENERAL.debug(">> GetterAdapter mmd=" + mmd.getFullFieldName() + " visitMethodInsn owner=" + owner + " name=" + name + " desc=" + desc);
+        }
+        visitor.visitMethodInsn(opcode, owner, name, desc);
     }
 
     public void visitMultiANewArrayInsn(String arg0, int arg1)
