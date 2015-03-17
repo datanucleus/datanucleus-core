@@ -1094,9 +1094,8 @@ public class JPQLParser implements Parser
     }
 
     /**
-     * Parses the primary. First look for a literal (e.g. "text"), then
-     * an identifier(e.g. variable) In the next step, call a function, if
-     * executing a function, on the literal or the identifier found.
+     * Parses the primary. First look for a literal (e.g. "text"), then an identifier(e.g. variable). 
+     * In the next step, call a function, if executing a function, on the literal or the identifier found.
      */
     protected void processPrimary()
     {
@@ -1202,6 +1201,131 @@ public class JPQLParser implements Parser
             }
 
             stack.push(castNode);
+            return;
+        }
+        else if (p.parseString("KEY"))
+        {
+            // KEY(identification_variable)
+            // Convert to be {primary}.INVOKE(mapKey)
+            p.skipWS();
+            p.parseChar('(');
+            Node invokeNode = new Node(NodeType.INVOKE, "mapKey");
+            processExpression();
+            if (!p.parseChar(')'))
+            {
+                throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
+            }
+
+            Node primaryNode = stack.pop(); // Could check type ? (Map)
+            Node primaryRootNode = primaryNode;
+            while (primaryNode.getFirstChild() != null)
+            {
+                primaryNode = primaryNode.getFirstChild();
+            }
+            primaryNode.appendChildNode(invokeNode);
+            stack.push(primaryRootNode);
+
+            // Allow referral to chain of field(s) of key
+            int size = stack.size();
+            while (p.parseChar('.'))
+            {
+                if (processIdentifier())
+                {
+                    // "a.field"
+                }
+                else
+                {
+                    throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
+                }
+            }
+            // For all added nodes, step back and chain them so we have
+            // Node[IDENTIFIER, a]
+            // +--- Node[IDENTIFIER, b]
+            //      +--- Node[IDENTIFIER, c]
+            if (size != stack.size())
+            {
+                Node lastNode = invokeNode;
+                while (stack.size() > size)
+                {
+                    Node top = stack.pop();
+                    lastNode.insertChildNode(top);
+                    lastNode = top;
+                }
+            }
+            return;
+        }
+        else if (p.parseString("VALUE"))
+        {
+            // VALUE(identification_variable)
+            // Convert to be {primary}.INVOKE(mapValue)
+            p.skipWS();
+            p.parseChar('(');
+            Node invokeNode = new Node(NodeType.INVOKE, "mapValue");
+            processExpression();
+            if (!p.parseChar(')'))
+            {
+                throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
+            }
+
+            Node primaryNode = stack.pop(); // Could check type ? (Map)
+            Node primaryRootNode = primaryNode;
+            while (primaryNode.getFirstChild() != null)
+            {
+                primaryNode = primaryNode.getFirstChild();
+            }
+            primaryNode.appendChildNode(invokeNode);
+            stack.push(primaryRootNode);
+
+            // Allow referral to chain of field(s) of key
+            int size = stack.size();
+            while (p.parseChar('.'))
+            {
+                if (processIdentifier())
+                {
+                    // "a.field"
+                }
+                else
+                {
+                    throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
+                }
+            }
+            // For all added nodes, step back and chain them so we have
+            // Node[IDENTIFIER, a]
+            // +--- Node[IDENTIFIER, b]
+            //      +--- Node[IDENTIFIER, c]
+            if (size != stack.size())
+            {
+                Node lastNode = invokeNode;
+                while (stack.size() > size)
+                {
+                    Node top = stack.pop();
+                    lastNode.insertChildNode(top);
+                    lastNode = top;
+                }
+            }
+            return;
+        }
+        else if (p.parseString("ENTRY"))
+        {
+            // ENTRY(identification_variable)
+            // Convert to be {primary}.INVOKE(mapEntry)
+            p.skipWS();
+            p.parseChar('(');
+            Node invokeNode = new Node(NodeType.INVOKE, "mapEntry");
+            processExpression();
+            if (!p.parseChar(')'))
+            {
+                throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
+            }
+
+            Node primaryNode = stack.pop(); // Could check type ? (Map)
+            Node primaryRootNode = primaryNode;
+            while (primaryNode.getFirstChild() != null)
+            {
+                primaryNode = primaryNode.getFirstChild();
+            }
+            primaryNode.appendChildNode(invokeNode);
+            stack.push(primaryRootNode);
             return;
         }
         else if (processCreator() || processLiteral() || processMethod())
@@ -1694,69 +1818,6 @@ public class JPQLParser implements Parser
                 }
 
                 Node primaryNode = stack.pop(); // Could check type ? (Collection/Map/array)
-                Node primaryRootNode = primaryNode;
-                while (primaryNode.getFirstChild() != null)
-                {
-                    primaryNode = primaryNode.getFirstChild();
-                }
-                primaryNode.appendChildNode(invokeNode);
-                stack.push(primaryRootNode);
-                return true;
-            }
-            else if (method.equalsIgnoreCase("KEY"))
-            {
-                // KEY(identification_variable)
-                // Convert to be {primary}.INVOKE(mapKey)
-                Node invokeNode = new Node(NodeType.INVOKE, "mapKey");
-                processExpression();
-                if (!p.parseChar(')'))
-                {
-                    throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
-                }
-
-                Node primaryNode = stack.pop(); // Could check type ? (Map)
-                Node primaryRootNode = primaryNode;
-                while (primaryNode.getFirstChild() != null)
-                {
-                    primaryNode = primaryNode.getFirstChild();
-                }
-                primaryNode.appendChildNode(invokeNode);
-                stack.push(primaryRootNode);
-                return true;
-            }
-            else if (method.equalsIgnoreCase("VALUE"))
-            {
-                // VALUE(identification_variable)
-                // Convert to be {primary}.INVOKE(mapValue)
-                Node invokeNode = new Node(NodeType.INVOKE, "mapValue");
-                processExpression();
-                if (!p.parseChar(')'))
-                {
-                    throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
-                }
-
-                Node primaryNode = stack.pop(); // Could check type ? (Map)
-                Node primaryRootNode = primaryNode;
-                while (primaryNode.getFirstChild() != null)
-                {
-                    primaryNode = primaryNode.getFirstChild();
-                }
-                primaryNode.appendChildNode(invokeNode);
-                stack.push(primaryRootNode);
-                return true;
-            }
-            else if (method.equalsIgnoreCase("ENTRY"))
-            {
-                // ENTRY(identification_variable)
-                // Convert to be {primary}.INVOKE(mapEntry)
-                Node invokeNode = new Node(NodeType.INVOKE, "mapEntry");
-                processExpression();
-                if (!p.parseChar(')'))
-                {
-                    throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
-                }
-
-                Node primaryNode = stack.pop(); // Could check type ? (Map)
                 Node primaryRootNode = primaryNode;
                 while (primaryNode.getFirstChild() != null)
                 {
