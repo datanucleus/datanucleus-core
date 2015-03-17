@@ -335,6 +335,12 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
         mv.visitEnd();
     }
 
+    public AnnotationVisitor visitAnnotation(String arg0, boolean arg1)
+    {
+        // Keep any annotation on the setXXX method, so use "mv"
+        return mv.visitAnnotation(arg0, arg1);
+    }
+
     // IMPORTANT : BELOW HERE WE MUST INTERCEPT ALL OTHER METHODS AND RELAY TO "visitor"
 
     public void visitParameter(String name, int access)
@@ -371,12 +377,6 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
             String desc, boolean visible)
     {
         return visitor.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, desc, visible);
-    }
-
-    public AnnotationVisitor visitAnnotation(String arg0, boolean arg1)
-    {
-        // Keep any annotation on the setXXX method
-        return mv.visitAnnotation(arg0, arg1);
     }
 
     public AnnotationVisitor visitAnnotationDefault()

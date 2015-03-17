@@ -29,10 +29,9 @@ import org.datanucleus.asm.TypePath;
 import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.FieldMetaData;
 import org.datanucleus.metadata.PropertyMetaData;
+import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
-import org.datanucleus.util.NucleusLogger;
 
 /**
  * Adapter for property getter methods in persistence-enabled classes.
@@ -104,8 +103,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
             (mmd.isProtected() ? Opcodes.ACC_PROTECTED : 0) | 
             (mmd.isPrivate() ? Opcodes.ACC_PRIVATE : 0) |
             (mmd.isAbstract() ? Opcodes.ACC_ABSTRACT : 0);
-        this.visitor = cv.visitMethod(access, enhancer.getNamer().getGetMethodPrefixMethodName() + mmd.getName(), methodDesc, 
-            null, null);
+        this.visitor = cv.visitMethod(access, enhancer.getNamer().getGetMethodPrefixMethodName() + mmd.getName(), methodDesc, null, null);
     }
 
     /**
@@ -117,8 +115,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
         visitor.visitEnd();
         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
         {
-            String msg = ClassMethod.getMethodAdditionMessage(enhancer.getNamer().getGetMethodPrefixMethodName() + mmd.getName(), 
-                mmd.getType(), null, null);
+            String msg = ClassMethod.getMethodAdditionMessage(enhancer.getNamer().getGetMethodPrefixMethodName() + mmd.getName(), mmd.getType(), null, null);
             DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005019", msg));
         }
 
@@ -130,8 +127,7 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
     }
 
     /**
-     * Convenience method to use the MethodVisitor to generate the code for the method getXXX() for the
-     * property with the specified MetaData.
+     * Convenience method to use the MethodVisitor to generate the code for the method getXXX() for the property with the specified MetaData.
      * @param mv MethodVisitor
      * @param mmd MetaData for the property
      * @param asmClassName ASM class name for the owning class
@@ -411,13 +407,13 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
         mv.visitEnd();
     }
 
-    // IMPORTANT : BELOW HERE WE MUST INTERCEPT ALL OTHER METHODS AND RELAY TO "visitor"
-
     public AnnotationVisitor visitAnnotation(String arg0, boolean arg1)
     {
-        // Keep any annotations on the getXXX method
+        // Keep any annotations on the getXXX method, so use "mv"
         return mv.visitAnnotation(arg0, arg1);
     }
+
+    // IMPORTANT : BELOW HERE WE MUST INTERCEPT ALL OTHER METHODS AND RELAY TO "visitor"
 
     public AnnotationVisitor visitAnnotationDefault()
     {
@@ -438,7 +434,37 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
     {
         if (mmd instanceof PropertyMetaData)
         {
-            NucleusLogger.GENERAL.debug(">> GetterAdapter mmd=" + mmd.getFullFieldName() + " visitMethodInsn(itf) owner=" + owner + " name=" + name + " desc=" + desc);
+            // Check for any calls to getters/setters of properties that are from superclass(es)
+            String ownerClassName = owner.replace('/', '.');
+            AbstractClassMetaData cmd = mmd.getAbstractClassMetaData();
+            if (!cmd.getFullClassName().equals(ownerClassName))
+            {
+                String propName = ClassUtils.getFieldNameForJavaBeanGetter(name);
+                if (propName != null)
+                {
+                    boolean callingOverriddenSuperclassMethod = false;
+                    while (cmd.getSuperAbstractClassMetaData() != null)
+                    {
+                        cmd = cmd.getSuperAbstractClassMetaData();
+                        if (cmd.getFullClassName().equals(ownerClassName))
+                        {
+                            AbstractMemberMetaData theMmd = cmd.getMetaDataForMember(mmd.getName());
+                            if (theMmd != null)
+                            {
+                                callingOverriddenSuperclassMethod = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (callingOverriddenSuperclassMethod)
+                    {
+                        // Call dnGet{propName} in owner instead of "get{propName}"
+                        String redirectMethodName = enhancer.getNamer().getGetMethodPrefixMethodName() + propName;
+                        visitor.visitMethodInsn(opcode, owner, redirectMethodName, desc, itf);
+                        return;
+                    }
+                }
+            }
         }
         visitor.visitMethodInsn(opcode, owner, name, desc, itf);
     }
@@ -476,10 +502,6 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
 
     public void visitFieldInsn(int opcode, String owner, String name, String desc)
     {
-        if (mmd instanceof FieldMetaData)
-        {
-            NucleusLogger.GENERAL.debug(">> GetterAdapter mmd=" + mmd.getFullFieldName() + " visitMethodInsn owner=" + owner + " name=" + name + " desc=" + desc);
-        }
         visitor.visitFieldInsn(opcode, owner, name, desc);
     }
 
@@ -540,10 +562,6 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
 
     public void visitMethodInsn(int opcode, String owner, String name, String desc)
     {
-        if (mmd instanceof PropertyMetaData)
-        {
-            NucleusLogger.GENERAL.debug(">> GetterAdapter mmd=" + mmd.getFullFieldName() + " visitMethodInsn owner=" + owner + " name=" + name + " desc=" + desc);
-        }
         visitor.visitMethodInsn(opcode, owner, name, desc);
     }
 
