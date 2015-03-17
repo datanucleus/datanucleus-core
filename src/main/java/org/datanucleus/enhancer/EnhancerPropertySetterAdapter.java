@@ -29,6 +29,8 @@ import org.datanucleus.asm.TypePath;
 import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.PropertyMetaData;
+import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -128,16 +130,14 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
     }
 
     /**
-     * Convenience method to use the MethodVisitor to generate the code for the method setXXX() for the
-     * property with the specified MetaData.
+     * Convenience method to use the MethodVisitor to generate the code for the method setXXX() for the property with the specified MetaData.
      * @param mv MethodVisitor
      * @param mmd MetaData for the property
      * @param asmClassName ASM class name for the owning class
      * @param asmClassDesc ASM descriptor for the owning class
      * @param namer Namer for methods etc
      */
-    public static void generateSetXXXMethod(MethodVisitor mv, AbstractMemberMetaData mmd,
-            String asmClassName, String asmClassDesc, EnhancementNamer namer)
+    public static void generateSetXXXMethod(MethodVisitor mv, AbstractMemberMetaData mmd, String asmClassName, String asmClassDesc, EnhancementNamer namer)
     {
         String[] argNames = new String[] {"this", "val"};
         String fieldTypeDesc = Type.getDescriptor(mmd.getType());
@@ -153,14 +153,12 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
 
             // "if (objPC.dnStateManager == null) objPC.ZZZ = zzz;"
             mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName,
-                namer.getStateManagerFieldName(), "L" + namer.getStateManagerAsmClassName() + ";");
+            mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName, namer.getStateManagerFieldName(), "L" + namer.getStateManagerAsmClassName() + ";");
             Label l1 = new Label();
             mv.visitJumpInsn(Opcodes.IFNONNULL, l1);
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             EnhanceUtils.addLoadForType(mv, mmd.getType(), 1);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName,
-                namer.getSetMethodPrefixMethodName() + mmd.getName(), "(" + fieldTypeDesc + ")V");
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getSetMethodPrefixMethodName() + mmd.getName(), "(" + fieldTypeDesc + ")V");
             Label l3 = new Label();
             mv.visitJumpInsn(Opcodes.GOTO, l3);
             mv.visitLabel(l1);
@@ -168,8 +166,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
             // "else objPC.dnStateManager.setYYYField(objPC, 0, objPC.ZZZ, zzz);"
             mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName,
-                namer.getStateManagerFieldName(), "L" + namer.getStateManagerAsmClassName() + ";");
+            mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName, namer.getStateManagerFieldName(), "L" + namer.getStateManagerAsmClassName() + ";");
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             EnhanceUtils.addBIPUSHToMethod(mv, mmd.getFieldId());
             if (cmd.getPersistableSuperclass() != null)
@@ -178,8 +175,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
                 mv.visitInsn(Opcodes.IADD);
             }
             mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, 
-                namer.getGetMethodPrefixMethodName() + mmd.getName(), "()" + fieldTypeDesc);
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getGetMethodPrefixMethodName() + mmd.getName(), "()" + fieldTypeDesc);
             EnhanceUtils.addLoadForType(mv, mmd.getType(), 1);
             String methodName = "set" + EnhanceUtils.getTypeNameForPersistableMethod(mmd.getType()) + "Field";
             String argTypeDesc = fieldTypeDesc;
@@ -197,23 +193,20 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
             {
                 // "if (objPC.dnIsDetached() == true)"
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName,
-                    namer.getIsDetachedMethodName(), "()Z");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getIsDetachedMethodName(), "()Z");
                 Label l6 = new Label();
                 mv.visitJumpInsn(Opcodes.IFEQ, l6);
 
                 // "((BitSet) objPC.dnDetachedState[3]).set(0);"
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
-                mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName,
-                    namer.getDetachedStateFieldName(), "[Ljava/lang/Object;");
+                mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName, namer.getDetachedStateFieldName(), "[Ljava/lang/Object;");
                 mv.visitInsn(Opcodes.ICONST_3);
                 mv.visitInsn(Opcodes.AALOAD);
                 mv.visitTypeInsn(Opcodes.CHECKCAST, "java/util/BitSet");
                 EnhanceUtils.addBIPUSHToMethod(mv, mmd.getFieldId());
                 if (cmd.getPersistableSuperclass() != null)
                 {
-                    mv.visitFieldInsn(Opcodes.GETSTATIC, asmClassName,
-                        namer.getInheritedFieldCountFieldName(), "I");
+                    mv.visitFieldInsn(Opcodes.GETSTATIC, asmClassName, namer.getInheritedFieldCountFieldName(), "I");
                     mv.visitInsn(Opcodes.IADD);
                 }
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "set", "(I)V");
@@ -241,20 +234,17 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
             Label l1 = new Label();
             mv.visitJumpInsn(Opcodes.IFEQ, l1);
             mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName,
-                namer.getStateManagerFieldName(), "L" + namer.getStateManagerAsmClassName() + ";");
+            mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName, namer.getStateManagerFieldName(), "L" + namer.getStateManagerAsmClassName() + ";");
             mv.visitJumpInsn(Opcodes.IFNULL, l1);
 
             // "objPC.dnStateManager.setYYYField(objPC, 8, objPC.ZZZ, val);"
             mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName,
-                namer.getStateManagerFieldName(), "L" + namer.getStateManagerAsmClassName() + ";");
+            mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName, namer.getStateManagerFieldName(), "L" + namer.getStateManagerAsmClassName() + ";");
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             EnhanceUtils.addBIPUSHToMethod(mv, mmd.getFieldId());
             if (cmd.getPersistableSuperclass() != null)
             {
-                mv.visitFieldInsn(Opcodes.GETSTATIC, asmClassName,
-                    namer.getInheritedFieldCountFieldName(), "I");
+                mv.visitFieldInsn(Opcodes.GETSTATIC, asmClassName, namer.getInheritedFieldCountFieldName(), "I");
                 mv.visitInsn(Opcodes.IADD);
             }
             mv.visitVarInsn(Opcodes.ALOAD, 0);
@@ -277,27 +267,23 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
             mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             EnhanceUtils.addLoadForType(mv, mmd.getType(), 1);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName,
-                namer.getSetMethodPrefixMethodName() + mmd.getName(), "(" + fieldTypeDesc + ")V");
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getSetMethodPrefixMethodName() + mmd.getName(), "(" + fieldTypeDesc + ")V");
 
             if (cmd.isDetachable())
             {
                 // "if (objPC.dnIsDetached() == true)  ((BitSet) objPC.dnDetachedState[3]).set(8);"
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName,
-                    namer.getIsDetachedMethodName(), "()Z");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getIsDetachedMethodName(), "()Z");
                 mv.visitJumpInsn(Opcodes.IFEQ, l3);
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
-                mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName,
-                    namer.getDetachedStateFieldName(), "[Ljava/lang/Object;");
+                mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName, namer.getDetachedStateFieldName(), "[Ljava/lang/Object;");
                 mv.visitInsn(Opcodes.ICONST_3);
                 mv.visitInsn(Opcodes.AALOAD);
                 mv.visitTypeInsn(Opcodes.CHECKCAST, "java/util/BitSet");
                 EnhanceUtils.addBIPUSHToMethod(mv, mmd.getFieldId());
                 if (cmd.getPersistableSuperclass() != null)
                 {
-                    mv.visitFieldInsn(Opcodes.GETSTATIC, asmClassName,
-                        namer.getInheritedFieldCountFieldName(), "I");
+                    mv.visitFieldInsn(Opcodes.GETSTATIC, asmClassName, namer.getInheritedFieldCountFieldName(), "I");
                     mv.visitInsn(Opcodes.IADD);
                 }
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "set", "(I)V");
@@ -321,8 +307,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
 
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             EnhanceUtils.addLoadForType(mv, mmd.getType(), 1);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName,
-                namer.getSetMethodPrefixMethodName() + mmd.getName(), "(" + fieldTypeDesc + ")V");
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getSetMethodPrefixMethodName() + mmd.getName(), "(" + fieldTypeDesc + ")V");
             mv.visitInsn(Opcodes.RETURN);
 
             Label endLabel = new Label();
@@ -355,6 +340,40 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
 
     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf)
     {
+        if (mmd instanceof PropertyMetaData)
+        {
+            // Check for any calls to getters/setters of properties that are from superclass(es)
+            String ownerClassName = owner.replace('/', '.');
+            AbstractClassMetaData cmd = mmd.getAbstractClassMetaData();
+            if (!cmd.getFullClassName().equals(ownerClassName))
+            {
+                String propName = ClassUtils.getFieldNameForJavaBeanSetter(name);
+                if (propName != null)
+                {
+                    boolean callingOverriddenSuperclassMethod = false;
+                    while (cmd.getSuperAbstractClassMetaData() != null)
+                    {
+                        cmd = cmd.getSuperAbstractClassMetaData();
+                        if (cmd.getFullClassName().equals(ownerClassName))
+                        {
+                            AbstractMemberMetaData theMmd = cmd.getMetaDataForMember(mmd.getName());
+                            if (theMmd != null)
+                            {
+                                callingOverriddenSuperclassMethod = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (callingOverriddenSuperclassMethod)
+                    {
+                        // Call dnGet{propName} in owner instead of "get{propName}"
+                        String redirectMethodName = enhancer.getNamer().getSetMethodPrefixMethodName() + propName;
+                        visitor.visitMethodInsn(opcode, owner, redirectMethodName, desc, itf);
+                        return;
+                    }
+                }
+            }
+        }
         visitor.visitMethodInsn(opcode, owner, name, desc, itf);
     }
 
@@ -373,8 +392,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
         return visitor.visitTryCatchAnnotation(typeRef, typePath, desc, visible);
     }
 
-    public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index,
-            String desc, boolean visible)
+    public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, String desc, boolean visible)
     {
         return visitor.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, desc, visible);
     }
@@ -454,9 +472,9 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
         visitor.visitMaxs(arg0, arg1);
     }
 
-    public void visitMethodInsn(int arg0, String arg1, String arg2, String arg3)
+    public void visitMethodInsn(int opcode, String owner, String name, String desc)
     {
-        visitor.visitMethodInsn(arg0, arg1, arg2, arg3);
+        visitor.visitMethodInsn(opcode, owner, name, desc);
     }
 
     public void visitMultiANewArrayInsn(String arg0, int arg1)

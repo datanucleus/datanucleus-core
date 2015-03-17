@@ -42,7 +42,7 @@ import org.datanucleus.util.Localiser;
  * </ul>
  * When detachable this will be (CHECK_READ variant)
  * <pre>
- * YYY dnGetZZZ()
+ * YYY getZZZ()
  * {
  *     if (dnFlags &gt; 0 &amp;&amp; dnStateManager != null &amp;&amp; !dnStateManager.isLoaded(this, 0))
  *         return (Integer) dnStateManager.getObjectField(this, 0, dnGetXXX());
@@ -54,7 +54,7 @@ import org.datanucleus.util.Localiser;
  * </pre>
  * and when not detachable
  * <pre>
- * YYY dnGetZZZ()
+ * YYY getZZZ()
  * {
  *     if (dnFlags &gt; 0 &amp;&amp; dnStateManager != null &amp;&amp; !dnStateManager.isLoaded(this, 0))
  *         return (Integer) dnStateManager.getObjectField(this, 0, dnGetXXX());
