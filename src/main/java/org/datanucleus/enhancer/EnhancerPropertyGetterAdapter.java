@@ -436,8 +436,8 @@ public class EnhancerPropertyGetterAdapter extends MethodVisitor
         {
             // Check for any calls to getters/setters of properties that are from superclass(es)
             String ownerClassName = owner.replace('/', '.');
-            AbstractClassMetaData cmd = mmd.getAbstractClassMetaData();
-            if (!cmd.getFullClassName().equals(ownerClassName))
+            AbstractClassMetaData cmd = enhancer.getClassMetaData();
+            if (!enhancer.getASMClassName().equals(owner))
             {
                 String propName = ClassUtils.getFieldNameForJavaBeanGetter(name);
                 if (propName != null)
