@@ -40,6 +40,7 @@ public class JPAEnhancementNamer extends JDOEnhancementNamer
     {
     }
 
+    // TODO Really we ought to declare some methods as throwing these since not RuntimeException
     private static final String ACN_DetachedFieldAccessException = IllegalAccessException.class.getName().replace('.', '/');
     private static final String ACN_FatalInternalException = IllegalStateException.class.getName().replace('.', '/');
 
