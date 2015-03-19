@@ -1834,6 +1834,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      */
     public boolean isCascadeDelete()
     {
+        // TODO Never called?
         return cascadeDelete;
     }
 
