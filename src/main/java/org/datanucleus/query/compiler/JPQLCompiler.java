@@ -39,10 +39,8 @@ import org.datanucleus.util.Imports;
  */
 public class JPQLCompiler extends JavaQueryCompiler
 {
-    public JPQLCompiler(MetaDataManager metaDataManager, ClassLoaderResolver clr, 
-            String from, Class candidateClass, Collection candidates,
-            String filter, Imports imports, String ordering, String result, String grouping, String having, 
-            String params, String update)
+    public JPQLCompiler(MetaDataManager metaDataManager, ClassLoaderResolver clr, String from, Class candidateClass, Collection candidates,
+            String filter, Imports imports, String ordering, String result, String grouping, String having, String params, String update)
     {
         super(metaDataManager, clr, from, candidateClass, candidates,
             filter, imports, ordering, result, grouping, having, params, null, update);
