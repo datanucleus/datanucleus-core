@@ -118,8 +118,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
             queryMethodAliasByPrefix = new HashMap<String, String>();
             for (int i=0;i<queryMethodAliases.length;i++)
             {
-                queryMethodAliasByPrefix.put(queryMethodAliases[i].getAttribute("prefix"), 
-                    queryMethodAliases[i].getAttribute("alias"));
+                queryMethodAliasByPrefix.put(queryMethodAliases[i].getAttribute("prefix"), queryMethodAliases[i].getAttribute("alias"));
             }
         }
 
@@ -263,12 +262,12 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                 {
                     Node joinedNode = childNode.getFirstChild();
                     String joinedAlias = (String)joinedNode.getNodeValue();
-                    Symbol joinedSym =
-                        (caseSensitiveAliases ? symtbl.getSymbol(joinedAlias) : symtbl.getSymbolIgnoreCase(joinedAlias));
+                    Symbol joinedSym = (caseSensitiveAliases ? symtbl.getSymbol(joinedAlias) : symtbl.getSymbolIgnoreCase(joinedAlias));
                     if (joinedSym == null)
                     {
                         throw new QueryCompilerSyntaxException("FROM clause has identifier " + joinedNode.getNodeValue() + " but this is unknown");
                     }
+
                     AbstractClassMetaData joinedCmd = metaDataManager.getMetaDataForClass(joinedSym.getValueType(), clr);
                     Class joinedCls = joinedSym.getValueType();
                     while (joinedNode.getFirstChild() != null)
@@ -287,20 +286,22 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                             }
 
                             RelationType relationType = mmd.getRelationType(clr);
-                            if (relationType == RelationType.ONE_TO_ONE_UNI || relationType == RelationType.ONE_TO_ONE_BI ||
-                                    relationType == RelationType.MANY_TO_ONE_BI)
+                            if (RelationType.isRelationSingleValued(relationType))
                             {
                                 joinedCls = mmd.getType();
                                 joinedCmd = metaDataManager.getMetaDataForClass(joinedCls, clr);
                             }
-                            else if (relationType == RelationType.ONE_TO_MANY_UNI || relationType == RelationType.ONE_TO_MANY_BI ||
-                                relationType == RelationType.MANY_TO_MANY_BI)
+                            else if (RelationType.isRelationMultiValued(relationType))
                             {
                                 if (mmd.hasCollection())
                                 {
                                     // TODO Don't currently allow interface field navigation
                                     joinedCmd = mmd.getCollection().getElementClassMetaData(clr, metaDataManager);
                                     joinedCls = clr.classForName(joinedCmd.getFullClassName());
+                                }
+                                else if (mmd.hasMap())
+                                {
+                                    // TODO Support map, but we can't join to anything from this, so of what value?
                                 }
                                 else if (mmd.hasArray())
                                 {
@@ -316,6 +317,16 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                     if (aliasNode.getNodeType() == NodeType.NAME)
                     {
                         symtbl.addSymbol(new PropertySymbol((String)aliasNode.getNodeValue(), joinedCls));
+                    }
+                    Node nextNode = childNode.getNextChild();
+                    if (nextNode != null)
+                    {
+                        // ON condition
+                        ExpressionCompiler comp = new ExpressionCompiler();
+                        comp.setSymbolTable(symtbl);
+                        comp.setMethodAliases(queryMethodAliasByPrefix);
+                        Expression nextExpr = comp.compileExpression(nextNode);
+                        nextExpr.bind(symtbl);
                     }
                 }
             }
