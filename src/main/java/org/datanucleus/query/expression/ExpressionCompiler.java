@@ -772,7 +772,8 @@ public class ExpressionCompiler
             }
 
             Node elseNode = children.get(children.size()-1);
-            CaseExpression caseExpr = new CaseExpression(compileExpression(elseNode));
+            Expression elseExpr = compileExpression(elseNode);
+            CaseExpression caseExpr = new CaseExpression();
             Iterator<Node> childIter = children.iterator();
             while (childIter.hasNext())
             {
@@ -785,6 +786,7 @@ public class ExpressionCompiler
                     caseExpr.addCondition(whenExpr, actionExpr);
                 }
             }
+            caseExpr.setElseExpression(elseExpr);
             return caseExpr;
         }
         else

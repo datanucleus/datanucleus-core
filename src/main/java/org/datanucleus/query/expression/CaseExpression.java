@@ -30,17 +30,22 @@ import org.datanucleus.query.symbol.SymbolTable;
 public class CaseExpression extends Expression
 {
     private static final long serialVersionUID = -7123407498309440027L;
+
     List<ExpressionPair> actionConditions = new ArrayList<ExpressionPair>();
     Expression elseExpr;
 
-    public CaseExpression(Expression elseExpr)
+    public CaseExpression()
     {
-        this.elseExpr = elseExpr;
     }
 
     public void addCondition(Expression whenExpr, Expression actionExpr)
     {
         actionConditions.add(new ExpressionPair(whenExpr, actionExpr));
+    }
+
+    public void setElseExpression(Expression elseExpr)
+    {
+        this.elseExpr = elseExpr;
     }
 
     public List<ExpressionPair> getConditions()
