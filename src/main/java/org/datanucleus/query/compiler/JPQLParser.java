@@ -964,29 +964,74 @@ public class JPQLParser implements Parser
     private void processCaseExpression()
     {
         Node caseNode = new Node(NodeType.CASE);
-        while (p.parseStringIgnoreCase("WHEN "))
+        boolean simple = true;
+        if (p.peekStringIgnoreCase("WHEN "))
         {
-            processExpression();
-            Node whenNode = stack.pop();
-            caseNode.appendChildNode(whenNode);
+            simple = false;
+        }
+        if (simple)
+        {
+            // Simple CASE "CASE {expr} WHEN {eqExpr} THEN {actionExpr} WHEN {eqExpr} THEN {actionExpr} ELSE {actionExpr} END"
+            Node exprNode = processExpression();
+            stack.pop();
 
-            boolean hasThen = p.parseStringIgnoreCase("THEN ");
-            if (!hasThen)
+            while (p.parseStringIgnoreCase("WHEN "))
             {
-                throw new QueryCompilerSyntaxException("expected 'THEN' as part of CASE", p.getIndex(), p.getInput());
+                processExpression();
+                Node eqCondNode = stack.pop(); // exprNode == eqCondNode
+                Node whenNode = new Node(NodeType.OPERATOR, "==");
+                whenNode.insertChildNode(exprNode.clone(null));
+                whenNode.insertChildNode(eqCondNode);
+                caseNode.appendChildNode(whenNode);
+
+                boolean hasThen = p.parseStringIgnoreCase("THEN ");
+                if (!hasThen)
+                {
+                    throw new QueryCompilerSyntaxException("expected 'THEN' as part of CASE", p.getIndex(), p.getInput());
+                }
+                processExpression();
+                Node actionNode = stack.pop();
+                caseNode.appendChildNode(actionNode);
             }
-            processExpression();
-            Node actionNode = stack.pop();
-            caseNode.appendChildNode(actionNode);
+            if (p.parseStringIgnoreCase("ELSE "))
+            {
+                processExpression();
+                Node elseNode = stack.pop();
+                caseNode.appendChildNode(elseNode);
+            }
+            if (!p.parseStringIgnoreCase("END")) 
+            {
+                throw new QueryCompilerSyntaxException("expected 'END' as part of CASE", p.getIndex(), p.getInput());
+            }
         }
-        if (p.parseStringIgnoreCase("ELSE "))
+        else
         {
-            processExpression();
-            Node elseNode = stack.pop();
-            caseNode.appendChildNode(elseNode);
-        }
-        if (!p.parseStringIgnoreCase("END")) {
-        	throw new QueryCompilerSyntaxException("expected 'END' as part of CASE", p.getIndex(), p.getInput());
+            // General CASE 
+            while (p.parseStringIgnoreCase("WHEN "))
+            {
+                processExpression();
+                Node whenNode = stack.pop();
+                caseNode.appendChildNode(whenNode);
+
+                boolean hasThen = p.parseStringIgnoreCase("THEN ");
+                if (!hasThen)
+                {
+                    throw new QueryCompilerSyntaxException("expected 'THEN' as part of CASE", p.getIndex(), p.getInput());
+                }
+                processExpression();
+                Node actionNode = stack.pop();
+                caseNode.appendChildNode(actionNode);
+            }
+            if (p.parseStringIgnoreCase("ELSE "))
+            {
+                processExpression();
+                Node elseNode = stack.pop();
+                caseNode.appendChildNode(elseNode);
+            }
+            if (!p.parseStringIgnoreCase("END")) 
+            {
+                throw new QueryCompilerSyntaxException("expected 'END' as part of CASE", p.getIndex(), p.getInput());
+            }
         }
         stack.push(caseNode);
     }
