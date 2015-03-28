@@ -45,7 +45,7 @@ public class Node
     protected Node parent;
 
     /** List of child nodes in the tree below here. */
-    protected List childNodes = new ArrayList();
+    protected List<Node> childNodes = new ArrayList();
 
     /** List of properties for the node. Used for invocation of methods, representing the arguments. */
     protected List<Node> properties = null;
@@ -108,7 +108,7 @@ public class Node
         properties.set(position, node);
     }
 
-    public List getChildNodes()
+    public List<Node> getChildNodes()
     {
         return childNodes;
     }
@@ -136,7 +136,7 @@ public class Node
         return node;
     }
 
-    public Node[] appendChildNode(Node[] node)
+    /*public Node[] appendChildNode(Node[] node)
     {
         childNodes.add(node);
         return node;
@@ -146,11 +146,11 @@ public class Node
     {
         childNodes.add(node);
         return node;
-    }
+    }*/
 
     public Node getChildNode(int index)
     {
-        return (Node)childNodes.get(index);
+        return childNodes.get(index);
     }
 
     public Node getFirstChild()
@@ -160,7 +160,7 @@ public class Node
         {
             return null;
         }
-        return (Node)childNodes.get(0);
+        return childNodes.get(0);
     }
 
     public Node getNextChild()
@@ -170,7 +170,7 @@ public class Node
         {
             return null;
         }
-        return (Node)childNodes.get(cursorPos);
+        return childNodes.get(cursorPos);
     }
 
     public boolean hasNextChild()
@@ -241,6 +241,29 @@ public class Node
         return sb.toString();
     }
 
+    public Node clone(Node parent)
+    {
+        Node n = new Node(nodeType, nodeValue);
+        n.parent = parent;
+        if (!childNodes.isEmpty())
+        {
+            for (Node child : childNodes)
+            {
+                Node c = child.clone(n);
+                n.appendChildNode(c);
+            }
+        }
+        if (properties != null && !properties.isEmpty())
+        {
+            for (Node prop : properties)
+            {
+                Node p = prop.clone(n);
+                n.addProperty(p);
+            }
+        }
+        return n;
+    }
+
     /**
      * Utility method to print out the node tree.
      * @param indentation What indent to use
@@ -281,7 +304,7 @@ public class Node
 
             for (int i=0; i<childNodes.size(); i++)
             {
-                sb.append(((Node)childNodes.get(i)).printTree(indentation+1));
+                sb.append((childNodes.get(i)).printTree(indentation+1));
                 if (i < childNodes.size()-1)
                 {
                     sb.append(",");
