@@ -1325,8 +1325,7 @@ public abstract class AbstractClassMetaData extends MetaData
         if (no_of_pk_fields == 0 && inheritanceMetaData.getStrategy() == InheritanceStrategy.SUBCLASS_TABLE && getSuperclassManagingTable() == null)
         {
             // Case where we have no table for this class (abstract) and no superclass with a table, and no pk fields
-            // TODO Localise this message
-            NucleusLogger.METADATA.warn("Class " + getFullClassName() + " has no table of its own, is using application-identity and has no primary key fields. Marking as not persistence instantiable");
+            NucleusLogger.METADATA.debug(Localiser.msg("044163", getFullClassName()));
             instantiable = false;
             return;
         }
@@ -1356,8 +1355,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 if (!mmgr.isEnhancing())
                 {
                     objectidClass = fullName + GENERATED_PK_SUFFIX;
-                    NucleusLogger.METADATA.debug("Class " + fullName + " has " + getNoOfPrimaryKeyMembers() + 
-                        " primary-key field(s) yet no objectidClass defined. Assumed to be " + objectidClass);
+                    NucleusLogger.METADATA.debug(Localiser.msg("044164", fullName, "" + getNoOfPrimaryKeyMembers(), objectidClass));
                 }
             }
             else
@@ -1454,8 +1452,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 {
                     // Why is this wrapping all exceptions into 1 single exception? 
                     // This needs coordinating with the test expectations in the enhancer unit tests.
-                    throw new NucleusUserException(Localiser.msg("019016", getFullClassName(), obj_cls.getName()), 
-                        (Throwable[]) errors.toArray(new Throwable[errors.size()]));
+                    throw new NucleusUserException(Localiser.msg("019016", getFullClassName(), obj_cls.getName()), (Throwable[]) errors.toArray(new Throwable[errors.size()]));
                 }
             }
         }
