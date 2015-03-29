@@ -301,7 +301,8 @@ public class JDOQLSingleStringParser
             if (content.indexOf("SELECT ") > 0 || content.indexOf("select ") > 0)
             {
                 // Subquery (or subqueries) present so split them out and just apply the filter for this query
-                processFilterContent(content);
+                String substitutedContent = processContentWithSubqueries(content);
+                query.setFilter(substitutedContent);
             }
             else
             {
@@ -310,11 +311,11 @@ public class JDOQLSingleStringParser
         }
 
         /**
-         * Method to extract the filter clause for this query, splitting out any subqueries and
-         * replacing by variables in this filter, and adding to the query as actual subqueries.
+         * Method to extract the required clause, splitting out any subqueries and replacing by variables (adding subqueries to the underlying query), returning the clause to use.
          * @param content The input string
+         * @return Content with subqueries substituted
          */
-        private void processFilterContent(String content)
+        private String processContentWithSubqueries(String content)
         {
             StringBuilder stringContent = new StringBuilder();
             boolean withinLiteralDouble = false;
@@ -376,6 +377,10 @@ public class JDOQLSingleStringParser
                             // TODO Set the type of the variable
                             query.addSubquery(subquery, "double " + subqueryVarName, null, null);
 
+                            if (stringContent.length() > 0 && stringContent.charAt(stringContent.length()-1) != ' ')
+                            {
+                                stringContent.append(' ');
+                            }
                             stringContent.append(subqueryVarName);
                             i = endPosition;
                             subqueryProcessed = true;
@@ -396,7 +401,7 @@ public class JDOQLSingleStringParser
                 throw new NucleusUserException(Localiser.msg("042017"));
             }
 
-            query.setFilter(stringContent.toString());
+            return stringContent.toString();
         }
 
         private void compileVariables()
