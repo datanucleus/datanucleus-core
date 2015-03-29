@@ -368,7 +368,7 @@ public class JDOQLSingleStringParser
                             }
 
                             String subqueryStr = content.substring(i+1, endPosition).trim();
-                            String subqueryVarName = "DATANUCLEUS_SUBQUERY_" + subqueryNum;
+                            String subqueryVarName = "DN_SUBQUERY_" + subqueryNum;
 
                             Query subquery = (Query)ClassUtils.newInstance(query.getClass(),
                                 new Class[]{ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT, String.class},

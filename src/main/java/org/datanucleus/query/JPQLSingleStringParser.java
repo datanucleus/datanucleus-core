@@ -56,7 +56,7 @@ import org.datanucleus.util.NucleusLogger;
  * "FROM Entity [[AS] identifier]"
  * </pre>
  * <p>
- * Note that {filter} and {having-clause} can contain subqueries, hence containing keywords
+ * Note that {filter} and {having-clause} can contain subqueries in JPQL, hence containing keywords
  * <pre>
  * SELECT c FROM Customer c WHERE NOT EXISTS (SELECT o1 FROM c.orders o1)
  * </pre>
@@ -101,6 +101,7 @@ public class JPQLSingleStringParser
     private class Compiler
     {
         Parser tokenizer;
+        int subqueryNum = 1;
         
         Compiler(Parser tokenizer)
         {
@@ -239,11 +240,11 @@ public class JPQLSingleStringParser
                 throw new NucleusUserException(Localiser.msg("043004", "WHERE", "<filter>"));
             }
 
-            String contentUpper = content.toUpperCase();
-            if (contentUpper.indexOf("SELECT ") > 0) // Case insensitive search
+            if (content.toUpperCase().indexOf("SELECT ") > 0) // Case insensitive search
             {
                 // Subquery (or subqueries) present so split them out and just apply the filter for this query
-                processFilterContent(content);
+                String substitutedContent = processContentWithSubqueries(content);
+                query.setFilter(substitutedContent);
             }
             else
             {
@@ -251,17 +252,60 @@ public class JPQLSingleStringParser
             }
         }
 
+        private void compileGroup()
+        {
+            String content = tokenizer.parseContent(null, false);
+            if (content.length() == 0)
+            {
+                // content cannot be empty
+                throw new NucleusUserException(Localiser.msg("043004", "GROUP BY", "<grouping>"));
+            }
+            query.setGrouping(content);
+        }
+
+        private void compileHaving()
+        {
+            // "TRIM" may include "FROM" keyword so ignore subsequent FROMs
+            String content = tokenizer.parseContent("FROM", true);
+            if (content.length() == 0)
+            {
+                // content cannot be empty
+                throw new NucleusUserException(Localiser.msg("043004", "HAVING", "<having>"));
+            }
+
+            if (content.toUpperCase().indexOf("SELECT ") > 0)
+            {
+                // Subquery (or subqueries) present so split them out and just apply the having for this query
+                String substitutedContent = processContentWithSubqueries(content);
+                query.setHaving(substitutedContent);
+            }
+            else
+            {
+                query.setHaving(content);
+            }
+        }
+
+        private void compileOrder()
+        {
+            String content = tokenizer.parseContent(null, false);
+            if (content.length() == 0)
+            {
+                // content cannot be empty
+                throw new NucleusUserException(Localiser.msg("043004", "ORDER BY", "<ordering>"));
+            }
+            query.setOrdering(content);
+        }
+
         /**
-         * Method to extract the filter clause for this query, splitting out any subqueries and
-         * replacing by variables in this filter, and adding to the query as actual subqueries.
+         * Method to extract the required clause, splitting out any subqueries and replacing by variables (adding subqueries to the underlying query), returning the clause to use.
          * @param content The input string
+         * @return Content with subqueries substituted
          */
-        private void processFilterContent(String content)
+        private String processContentWithSubqueries(String content)
         {
             StringBuilder stringContent = new StringBuilder();
             boolean withinLiteralDouble = false;
             boolean withinLiteralSingle = false;
-            int subqueryNum = 1;
             for (int i=0;i<content.length();i++)
             {
                 boolean subqueryProcessed = false;
@@ -310,7 +354,7 @@ public class JPQLSingleStringParser
                             }
 
                             String subqueryStr = content.substring(i+1, endPosition).trim();
-                            String subqueryVarName = "DATANUCLEUS_SUBQUERY_" + subqueryNum;
+                            String subqueryVarName = "DN_SUBQUERY_" + subqueryNum;
 
                             Query subquery = (Query)ClassUtils.newInstance(query.getClass(),
                                 new Class[]{ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT, String.class},
@@ -337,41 +381,7 @@ public class JPQLSingleStringParser
                 throw new NucleusUserException(Localiser.msg("042017"));
             }
 
-            query.setFilter(stringContent.toString());
-        }
-
-        private void compileGroup()
-        {
-            String content = tokenizer.parseContent(null, false);
-            if (content.length() == 0)
-            {
-                // content cannot be empty
-                throw new NucleusUserException(Localiser.msg("043004", "GROUP BY", "<grouping>"));
-            }
-            query.setGrouping(content);
-        }
-
-        private void compileHaving()
-        {
-            // "TRIM" may include "FROM" keyword so ignore subsequent FROMs
-            String content = tokenizer.parseContent("FROM", true);
-            if (content.length() == 0)
-            {
-                // content cannot be empty
-                throw new NucleusUserException(Localiser.msg("043004", "HAVING", "<having>"));
-            }
-            query.setHaving(content);
-        }
-
-        private void compileOrder()
-        {
-            String content = tokenizer.parseContent(null, false);
-            if (content.length() == 0)
-            {
-                // content cannot be empty
-                throw new NucleusUserException(Localiser.msg("043004", "ORDER BY", "<ordering>"));
-            }
-            query.setOrdering(content);
+            return stringContent.toString();
         }
     }
 
@@ -467,8 +477,7 @@ public class JPQLSingleStringParser
                     tokenIndex--;
                     break;
                 }
-                else if (level == 0 && tokenIndex < tokens.length - 1 && 
-                        JPQLQueryHelper.isKeyword(tokens[tokenIndex] + ' ' + tokens[tokenIndex + 1]))
+                else if (level == 0 && tokenIndex < tokens.length - 1 && JPQLQueryHelper.isKeyword(tokens[tokenIndex] + ' ' + tokens[tokenIndex + 1]))
                 {
                     // Invalid keyword entered ("GROUP BY", "ORDER BY") and not currently in subquery block
                     tokenIndex--;
@@ -510,9 +519,7 @@ public class JPQLSingleStringParser
                     if (keywords[tokenIndex].equalsIgnoreCase(keyword))
                     {
                         // Move query position to end of last processed token
-                        queryStringPos = 
-                            queryString.indexOf(keywords[tokenIndex], queryStringPos) + 
-                            keywords[tokenIndex].length()+1;
+                        queryStringPos = queryString.indexOf(keywords[tokenIndex], queryStringPos) + keywords[tokenIndex].length()+1;
                         return true;
                     }
                     if (keyword.indexOf(' ') > -1)
@@ -520,12 +527,8 @@ public class JPQLSingleStringParser
                         if ((keywords[tokenIndex] + ' ' + keywords[tokenIndex + 1]).equalsIgnoreCase(keyword))
                         {
                             // Move query position to end of last processed token
-                            queryStringPos =
-                                queryString.indexOf(keywords[tokenIndex], queryStringPos) + 
-                                keywords[tokenIndex].length()+1;
-                            queryStringPos = 
-                                queryString.indexOf(keywords[tokenIndex+1], queryStringPos) + 
-                                keywords[tokenIndex+1].length()+1;
+                            queryStringPos = queryString.indexOf(keywords[tokenIndex], queryStringPos) + keywords[tokenIndex].length()+1;
+                            queryStringPos = queryString.indexOf(keywords[tokenIndex+1], queryStringPos) + keywords[tokenIndex+1].length()+1;
                             tokenIndex++;
                             return true;
                         }
