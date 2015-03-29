@@ -362,7 +362,11 @@ public class JPQLSingleStringParser
                             // TODO Set the type of the variable
                             query.addSubquery(subquery, "double " + subqueryVarName, null, null);
 
-                            stringContent.append(" ").append(subqueryVarName);
+                            if (stringContent.length() > 0 && stringContent.charAt(stringContent.length()-1) != ' ')
+                            {
+                                stringContent.append(' ');
+                            }
+                            stringContent.append(subqueryVarName);
                             i = endPosition;
                             subqueryNum++;
                             subqueryProcessed = true;
