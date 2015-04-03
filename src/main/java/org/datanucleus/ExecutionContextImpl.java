@@ -5662,7 +5662,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             return null;
         }
-        return getFetchGroupManager().getFetchGroup(cls, name);
+        return getFetchGroupManager().getFetchGroup(cls, name, true);
     }
 
     /**

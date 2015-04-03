@@ -1483,10 +1483,10 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getInternalFetchGroup(java.lang.Class, java.lang.String)
+     * @see org.datanucleus.NucleusContext#getInternalFetchGroup(java.lang.Class, java.lang.String, boolean)
      */
     @Override
-    public FetchGroup getInternalFetchGroup(Class cls, String name)
+    public FetchGroup getInternalFetchGroup(Class cls, String name, boolean createIfNotPresent)
     {
         if (!cls.isInterface() && !getApiAdapter().isPersistable(cls))
         {
@@ -1501,7 +1501,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             // Interface but not persistent
             throw new NucleusUserException("Cannot create FetchGroup for " + cls + " since it is not persistable");
         }
-        return getFetchGroupManager().getFetchGroup(cls, name);
+        return getFetchGroupManager().getFetchGroup(cls, name, createIfNotPresent);
     }
 
     /* (non-Javadoc)

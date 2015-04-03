@@ -157,10 +157,11 @@ public interface PersistenceNucleusContext extends StoreNucleusContext
      * Accessor for an internal fetch group for the specified class.
      * @param cls The class
      * @param name Name of the group
+     * @param createIfNotPresent Whether to create the fetch group if not present
      * @return The FetchGroup
      * @throws NucleusUserException if the class is not persistable
      */
-    FetchGroup getInternalFetchGroup(Class cls, String name);
+    FetchGroup getInternalFetchGroup(Class cls, String name, boolean createIfNotPresent);
 
     /**
      * Accessor for the fetch groups for the specified name.

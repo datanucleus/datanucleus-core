@@ -22,6 +22,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.datanucleus.metadata.AbstractClassMetaData;
+import org.datanucleus.metadata.FetchGroupMemberMetaData;
+import org.datanucleus.metadata.FetchGroupMetaData;
 import org.datanucleus.util.MultiMap;
 
 /**
@@ -106,12 +109,13 @@ public class FetchGroupManager
 
     /**
      * Accessor for a fetch group for the specified class.
-     * If the fetch group of this name for this class doesn't exist then will create one.
+     * If the fetch group of this name for this class doesn't exist then will create one if the flag is set.
      * @param cls The class
      * @param name Name of the group
+     * @param createIfNotPresent Whether this method should create+add a FetchGroup if on with this name isn't found.
      * @return The FetchGroup
      */
-    public synchronized FetchGroup getFetchGroup(Class cls, String name)
+    public synchronized FetchGroup getFetchGroup(Class cls, String name, boolean createIfNotPresent)
     {
         if (fetchGroupByName != null)
         {
@@ -130,15 +134,19 @@ public class FetchGroupManager
             }
         }
 
-        // Create a new group and add to our managed list
-        FetchGroup grp = createFetchGroup(cls, name);
-        addFetchGroup(grp);
-        return grp;
+        if (createIfNotPresent)
+        {
+            // Create a new group and add to our managed list
+            FetchGroup grp = createFetchGroup(cls, name);
+            addFetchGroup(grp);
+            return grp;
+        }
+        return null;
     }
 
     /**
      * Method to create a new FetchGroup for the class and name.
-     * Doesn't add it to the internally managed groups.
+     * <b>Doesn't add it to the internally managed groups.</b>
      * @param cls The class
      * @param name Name of the group
      * @return The FetchGroup
@@ -146,11 +154,39 @@ public class FetchGroupManager
     public FetchGroup createFetchGroup(Class cls, String name)
     {
         // Not present so create a new FetchGroup and add it
-        return new FetchGroup(nucleusCtx, name, cls);
+        FetchGroup fg = new FetchGroup(nucleusCtx, name, cls);
+        if (name.equals(FetchGroup.DEFAULT))
+        {
+            // Special case of wanting to create a group to override the DFG
+            fg.addCategory(FetchGroup.DEFAULT);
+        }
+        else
+        {
+            // Check if this class has a named FetchGroup of this name, so we start from the same members
+            ClassLoaderResolver clr = nucleusCtx.getClassLoaderResolver(cls.getClassLoader());
+            AbstractClassMetaData cmd = nucleusCtx.getMetaDataManager().getMetaDataForClass(cls, clr);
+            if (cmd != null)
+            {
+                FetchGroupMetaData fgmd = cmd.getFetchGroupMetaData(name);
+                if (fgmd != null)
+                {
+                    Set<FetchGroupMemberMetaData> fgmmds = fgmd.getMembers();
+                    for (FetchGroupMemberMetaData fgmmd : fgmmds)
+                    {
+                        fg.addMember(fgmmd.getName());
+                        if (fgmmd.getRecursionDepth() != 1)
+                        {
+                            fg.setRecursionDepth(fgmmd.getName(), fgmmd.getRecursionDepth());
+                        }
+                    }
+                }
+            }
+        }
+        return fg;
     }
 
     /**
-     * Accessor for the fetch groups for the specified name.
+     * Accessor for the fetch groups for the specified name. Used by FetchPlan to find FetchGroups for a specific name.
      * @param name Name of the group
      * @return The FetchGroup
      */
