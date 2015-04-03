@@ -485,7 +485,7 @@ public class FetchGroup implements Serializable
     public String toString()
     {
         return "FetchGroup : " + name + " for " + cls.getName() + 
-            " members=" + StringUtils.collectionToString(memberNames) +
+            " members=[" + StringUtils.collectionToString(memberNames) + "]" +
             ", modifiable=" + (!unmodifiable) +
             ", postLoad=" + postLoad +
             ", listeners.size=" + (planListeners != null ? planListeners.size() : 0);
