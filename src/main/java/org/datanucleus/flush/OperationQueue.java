@@ -55,6 +55,16 @@ public class OperationQueue
      */
     public synchronized void enqueue(Operation oper)
     {
+        ObjectProvider op = oper.getObjectProvider();
+        if (oper instanceof SCOOperation)
+        {
+            if (op.isWaitingToBeFlushedToDatastore())
+            {
+                NucleusLogger.GENERAL.info(">> OperationQueue : not adding operation since owner not yet flushed - " + oper);
+                // Don't enlist since not yet flushed
+                return;
+            }
+        }
         queuedOperations.add(oper);
     }
 
