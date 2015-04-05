@@ -946,7 +946,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 DiscriminatorMetaData dismd = inheritanceMetaData.getDiscriminatorMetaData();
                 if (dismd != null && !StringUtils.isWhitespace(dismd.getValue()))
                 {
-                    NucleusLogger.METADATA.warn(Localiser.msg("044105", fullName));
+                    NucleusLogger.METADATA.info(Localiser.msg("044105", fullName));
                 }
             }
             else
