@@ -821,7 +821,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 }
 
                 // by default users should only specify the object-id class in the root persistent class
-                NucleusLogger.METADATA.warn(Localiser.msg("044086", name, persistableSuperclass));
+                NucleusLogger.METADATA.info(Localiser.msg("044086", name, persistableSuperclass));
             }
             else
             {
