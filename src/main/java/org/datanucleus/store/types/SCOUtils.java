@@ -1184,6 +1184,7 @@ public class SCOUtils
     {
         Comparator comparator = null;
         String comparatorName = null;
+        // TODO Support class in same package as the fields class
         if (mmd.hasMap())
         {
             // Specified under <field> or <map>
