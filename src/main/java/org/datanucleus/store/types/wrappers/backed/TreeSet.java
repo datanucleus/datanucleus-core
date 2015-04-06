@@ -71,6 +71,7 @@ public class TreeSet extends org.datanucleus.store.types.wrappers.TreeSet implem
     protected transient SetStore backingStore;
     protected transient boolean useCache = true;
     protected transient boolean isCacheLoaded = false;
+    protected transient boolean initialising = false;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -134,6 +135,7 @@ public class TreeSet extends org.datanucleus.store.types.wrappers.TreeSet implem
             }
 
             // Detect which objects are added and which are deleted
+            initialising = true;
             if (useCache)
             {
                 Collection oldColl = (Collection)oldValue;
@@ -173,6 +175,7 @@ public class TreeSet extends org.datanucleus.store.types.wrappers.TreeSet implem
                     }
                 }
             }
+            initialising = false;
         }
     }
 
@@ -660,7 +663,7 @@ public class TreeSet extends org.datanucleus.store.types.wrappers.TreeSet implem
             return false;
         }
 
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
             ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationAdd(ownerMmd.getAbsoluteFieldNumber(), element);
@@ -710,7 +713,7 @@ public class TreeSet extends org.datanucleus.store.types.wrappers.TreeSet implem
         {
             loadFromStore();
         }
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
             Iterator iter = elements.iterator();
@@ -810,7 +813,7 @@ public class TreeSet extends org.datanucleus.store.types.wrappers.TreeSet implem
         int size = (useCache ? delegate.size() : -1);
         boolean contained = delegate.contains(element);
         boolean delegateSuccess = delegate.remove(element);
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
         }
@@ -878,7 +881,7 @@ public class TreeSet extends org.datanucleus.store.types.wrappers.TreeSet implem
         }
         boolean delegateSuccess = delegate.removeAll(elements);
 
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
             Iterator iter = elements.iterator();

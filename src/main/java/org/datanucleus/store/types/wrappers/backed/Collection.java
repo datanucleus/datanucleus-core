@@ -72,6 +72,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
     protected transient boolean allowNulls = false;
     protected transient boolean useCache = true;
     protected transient boolean isCacheLoaded = false;
+    protected transient boolean initialising = false;
 
     /**
      * Constructor.
@@ -136,8 +137,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
         {
             this.backingStore = backingStore;
         }
-        else if (!SCOUtils.collectionHasSerialisedElements(mmd) && 
-                mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
+        else if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
             this.backingStore = (CollectionStore)
                 ((BackedSCOStoreManager)ec.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.Collection.class);
@@ -187,6 +187,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
             if (delegate instanceof Set)
             {
                 // Detect which objects are added and which are deleted
+                initialising = true;
                 if (useCache)
                 {
                     java.util.Collection oldColl = (java.util.Collection)oldValue;
@@ -226,6 +227,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
                         }
                     }
                 }
+                initialising = false;
             }
             else
             {
@@ -644,7 +646,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
             return false;
         }
 
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
             ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationAdd(ownerMmd.getAbsoluteFieldNumber(), element);
@@ -694,7 +696,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
         {
             loadFromStore();
         }
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
             Iterator iter = c.iterator();
@@ -794,7 +796,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
         int size = (useCache ? delegate.size() : -1);
         boolean contained = delegate.contains(element);
         boolean delegateSuccess = delegate.remove(element);
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
         }
@@ -862,7 +864,7 @@ public class Collection extends org.datanucleus.store.types.wrappers.Collection 
         }
         boolean delegateSuccess = delegate.removeAll(elements);
 
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
             Iterator iter = elements.iterator();

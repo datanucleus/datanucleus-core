@@ -72,6 +72,7 @@ public class HashSet extends org.datanucleus.store.types.wrappers.HashSet implem
     protected transient boolean allowNulls = false;
     protected transient boolean useCache = true;
     protected transient boolean isCacheLoaded = false;
+    protected transient boolean initialising = false;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -128,6 +129,7 @@ public class HashSet extends org.datanucleus.store.types.wrappers.HashSet implem
             }
 
             // Detect which objects are added and which are deleted
+            initialising = true;
             if (useCache)
             {
                 Collection oldColl = (Collection)oldValue;
@@ -165,6 +167,7 @@ public class HashSet extends org.datanucleus.store.types.wrappers.HashSet implem
                     }
                 }
             }
+            initialising = false;
         }
     }
 
@@ -512,7 +515,7 @@ public class HashSet extends org.datanucleus.store.types.wrappers.HashSet implem
             return false;
         }
 
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
             ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationAdd(ownerMmd.getAbsoluteFieldNumber(), element);
@@ -563,7 +566,7 @@ public class HashSet extends org.datanucleus.store.types.wrappers.HashSet implem
             loadFromStore();
         }
 
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
             Iterator iter = c.iterator();
@@ -663,7 +666,7 @@ public class HashSet extends org.datanucleus.store.types.wrappers.HashSet implem
         int size = (useCache ? delegate.size() : -1);
         boolean contained = delegate.contains(element);
         boolean delegateSuccess = delegate.remove(element);
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
         }
@@ -731,7 +734,7 @@ public class HashSet extends org.datanucleus.store.types.wrappers.HashSet implem
         }
         boolean delegateSuccess = delegate.removeAll(elements);
 
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
             Iterator iter = elements.iterator();

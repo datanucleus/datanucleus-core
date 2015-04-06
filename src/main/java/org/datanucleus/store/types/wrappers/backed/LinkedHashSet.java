@@ -68,6 +68,7 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
     protected transient SetStore backingStore;
     protected transient boolean useCache = true;
     protected transient boolean isCacheLoaded = false;
+    protected transient boolean initialising = false;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -123,6 +124,7 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
             }
 
             // Detect which objects are added and which are deleted
+            initialising = true;
             if (useCache)
             {
                 Collection oldColl = (Collection)oldValue;
@@ -162,6 +164,7 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
                     }
                 }
             }
+            initialising = false;
         }
     }
 
@@ -501,7 +504,7 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
             return false;
         }
 
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
             ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationAdd(ownerMmd.getAbsoluteFieldNumber(), element);
@@ -551,7 +554,7 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
         {
             loadFromStore();
         }
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
             Iterator iter = elements.iterator();
@@ -651,7 +654,7 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
         int size = (useCache ? delegate.size() : -1);
         boolean contained = delegate.contains(element);
         boolean delegateSuccess = delegate.remove(element);
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
         }
@@ -719,7 +722,7 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
         }
         boolean delegateSuccess = delegate.removeAll(elements);
 
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
             Iterator iter = elements.iterator();

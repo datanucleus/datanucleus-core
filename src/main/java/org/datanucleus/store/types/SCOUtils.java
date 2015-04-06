@@ -150,7 +150,32 @@ public class SCOUtils
                         ownerOP.getExecutionContext() != null ? IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()) : ownerOP.getInternalObjectId(), mmd.getName()));
                 }
             }
-            return SCOUtils.newSCOInstanceForUpdate(ownerOP, mmd, newValue, oldValue, replaceFieldIfChanged);
+
+            if (newValue != null && newValue instanceof SCO)
+            {
+                // Passed in value is a wrapper type already, so just return it!
+                if (replaceFieldIfChanged)
+                {
+                    // Replace the field with this value
+                    ownerOP.replaceField(mmd.getAbsoluteFieldNumber(), newValue);
+                }
+                return newValue;
+            }
+
+            // Create new wrapper of the required type
+            Class requiredType = newValue != null ? newValue.getClass() : (oldValue != null ? oldValue.getClass() : null);
+            SCO sco = createSCOInstance(ownerOP, mmd, requiredType);
+
+            if (replaceFieldIfChanged)
+            {
+                // Replace the field in the owner with the wrapper before initialising it
+                ownerOP.replaceField(mmd.getAbsoluteFieldNumber(), sco);
+            }
+
+            // Initialise the SCO for use, providing new and old values so the wrapper has the ability to do something intelligent
+            sco.initialise(newValue, oldValue);
+
+            return sco;
         }
         return newValue;
     }
@@ -203,50 +228,6 @@ public class SCOUtils
             // Just create it empty and load from the datastore
             sco.initialise();
         }
-
-        return sco;
-    }
-
-    /**
-     * Method to create a new SCO wrapper for a SCO type. The SCO wrapper will be appropriate for the passed
-     * value (which represents the instantiated type of the field) unless it is null when the wrapper will be
-     * appropriate for the declared type of the field. While the "instantiated type" and the type of "value"
-     * should be the same when value is non-null, there are situations where we need to create a List based
-     * collection yet have no value so pass in the declaredType as Collection, instantiatedType as ArrayList,
-     * and value as null.
-     * @param ownerOP ObjectProvider for the owning object
-     * @param mmd The MetaData for the related member.
-     * @param newValue The new value for this member
-     * @param oldValue The old value for this member
-     * @param replaceField Whether to replace the field with this value
-     * @return The Second-Class Object
-     * @throws NucleusUserException if an error occurred when creating the SCO instance
-     */
-    public static SCO newSCOInstanceForUpdate(ObjectProvider ownerOP, AbstractMemberMetaData mmd, Object newValue, Object oldValue, boolean replaceField)
-    {
-        if (newValue != null && newValue instanceof SCO)
-        {
-            // Passed in value is a wrapper type already, so just return it!
-            if (replaceField)
-            {
-                // Replace the field with this value
-                ownerOP.replaceField(mmd.getAbsoluteFieldNumber(), newValue);
-            }
-            return (SCO) newValue;
-        }
-
-        // Create new wrapper of the required type
-        Class requiredType = newValue != null ? newValue.getClass() : (oldValue != null ? oldValue.getClass() : null);
-        SCO sco = createSCOInstance(ownerOP, mmd, requiredType);
-
-        if (replaceField)
-        {
-            // Replace the field in the owner with the wrapper before initialising it
-            ownerOP.replaceField(mmd.getAbsoluteFieldNumber(), sco);
-        }
-
-        // Initialise the SCO for use, providing new and old values so the wrapper has the ability to do something intelligent
-        sco.initialise(newValue, oldValue);
 
         return sco;
     }

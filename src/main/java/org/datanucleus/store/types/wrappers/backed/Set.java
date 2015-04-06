@@ -70,6 +70,7 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
     protected transient boolean allowNulls = false;
     protected transient boolean useCache = true;
     protected transient boolean isCacheLoaded = false;
+    protected transient boolean initialising = false;
 
     /**
      * Constructor. 
@@ -144,6 +145,7 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
             }
 
             // Detect which objects are added and which are deleted
+            initialising = true;
             if (useCache)
             {
                 Collection oldColl = (Collection)oldValue;
@@ -183,6 +185,7 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
                     }
                 }
             }
+            initialising = false;
         }
     }
 
@@ -556,7 +559,7 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
             return false;
         }
 
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
             ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationAdd(ownerMmd.getAbsoluteFieldNumber(), element);
@@ -606,7 +609,7 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
         {
             loadFromStore();
         }
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
             Iterator iter = c.iterator();
@@ -706,7 +709,7 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
         int size = (useCache ? delegate.size() : -1);
         boolean contained = delegate.contains(element);
         boolean delegateSuccess = delegate.remove(element);
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
         }
@@ -774,7 +777,7 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
         }
         boolean delegateSuccess = delegate.removeAll(elements);
 
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
         {
             // Relationship management
             Iterator iter = elements.iterator();
