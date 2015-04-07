@@ -38,7 +38,9 @@ import org.datanucleus.util.StringUtils;
 /**
  * Manager for (bidirectional) relationships of a class.
  * Designed as a stand-alone process to run just before flush.
- * Operates in 2 steps, firstly to check the user-defined relations, and secondly to do the management of both sides of the relations.
+ * Updates on bidirectional relations are registered during the persistence process. 
+ * Call to checkConsistency() will check for consistency and throw exceptions as appropriate.
+ * Call to process() will perform updates at the other side of the registered relations so all is consistent.
  */
 public class RelationshipManagerImpl implements RelationshipManager
 {
@@ -50,12 +52,7 @@ public class RelationshipManagerImpl implements RelationshipManager
     /** Object being managed. */
     final Object pc;
 
-    /**
-     * Map of bidirectional field "changes", keyed by the absolute field number.
-     * For 1-1, N-1 fields the "change" is actually the original value (for later comparison).
-     * For 1-N, M-N fields the "change" is a List of RelationChange objects.
-     * TODO Change this to be Map<Integer, List<RelationChange>> and update 1-1/N-1 handling
-     */
+    /** Map of bidirectional field "changes", keyed by the absolute field number of the owner object. */
     final Map<Integer, List<RelationChange>> fieldChanges;
 
     /**
