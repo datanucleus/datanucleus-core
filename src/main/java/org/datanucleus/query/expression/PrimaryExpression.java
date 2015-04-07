@@ -256,20 +256,20 @@ public class PrimaryExpression extends Expression
                             // TODO Add symbol
                         }
                     }
+                }
 
-                    if (symtbl.getSymbolResolver().supportsImplicitVariables() && left == null)
-                    {
-                        // Implicit variable, so put as "left" and remove from tuples
-                        VariableExpression varExpr = new VariableExpression(className);
-                        varExpr.bind(symtbl);
-                        left = varExpr;
-                        tuples.remove(0);
-                    }
-                    else
-                    {
-                        // Just throw the original exception
-                        throw new NucleusUserException("Cannot find type of (part of) " + getId() + " since symbol has no type; implicit variable?");
-                    }
+                if (symtbl.getSymbolResolver().supportsImplicitVariables() && left == null)
+                {
+                    // Implicit variable, so put as "left" and remove from tuples
+                    String varName = tuples.remove(0);
+                    VariableExpression varExpr = new VariableExpression(varName);
+                    varExpr.bind(symtbl);
+                    left = varExpr;
+                }
+                else
+                {
+                    // Just throw the original exception
+                    throw new NucleusUserException("Cannot find type of (part of) " + getId() + " since symbol has no type; implicit variable?");
                 }
             }
         }
