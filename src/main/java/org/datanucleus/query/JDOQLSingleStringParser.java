@@ -211,10 +211,25 @@ public class JDOQLSingleStringParser
 
         private void compileResult()
         {
-            String content = tokenizer.parseContent(false);
+           /* String content = tokenizer.parseContent(false);
             if (content.length() > 0)
             {
                 query.setResult(content);
+            }*/
+
+            String content = tokenizer.parseContent(true);
+            if (content.length() > 0)
+            {
+                if (content.indexOf("SELECT ") > 0 || content.indexOf("select ") > 0)
+                {
+                    // Subquery (or subqueries) present so split them out and just apply the result for this query
+                    String substitutedContent = processContentWithSubqueries(content);
+                    query.setResult(substitutedContent);
+                }
+                else
+                {
+                    query.setResult(content);
+                }
             }
         }
 

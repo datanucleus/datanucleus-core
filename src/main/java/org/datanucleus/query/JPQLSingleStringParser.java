@@ -192,10 +192,21 @@ public class JPQLSingleStringParser
 
         private void compileResult()
         {
-            String content = tokenizer.parseContent(null, false);
-            if (content.length() > 0)
+            String content = tokenizer.parseContent(null, true);
+            if (content.length() == 0)
             {
-                //content may be empty
+                // content cannot be empty
+                throw new NucleusUserException(Localiser.msg("043004", "SELECT", "<result>"));
+            }
+
+            if (content.toUpperCase().indexOf("SELECT ") > 0) // Case insensitive search
+            {
+                // Subquery (or subqueries) present so split them out and just apply the result for this query
+                String substitutedContent = processContentWithSubqueries(content);
+                query.setResult(substitutedContent);
+            }
+            else
+            {
                 query.setResult(content);
             }
         }
