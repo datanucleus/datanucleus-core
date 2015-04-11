@@ -390,6 +390,18 @@ Contributors:
     <extension point="org.datanucleus.query_method_evaluators">
         <query-method-evaluator method="Math.abs" evaluator="org.datanucleus.query.inmemory.AbsFunction"/>
         <query-method-evaluator method="Math.sqrt" evaluator="org.datanucleus.query.inmemory.SqrtFunction"/>
+        <query-method-evaluator method="Math.acos" evaluator="org.datanucleus.query.inmemory.ArcCosineFunction"/>
+        <query-method-evaluator method="Math.asin" evaluator="org.datanucleus.query.inmemory.ArcSineFunction"/>
+        <query-method-evaluator method="Math.atan" evaluator="org.datanucleus.query.inmemory.ArcTangentFunction"/>
+        <query-method-evaluator method="Math.cos" evaluator="org.datanucleus.query.inmemory.CosineFunction"/>
+        <query-method-evaluator method="Math.sin" evaluator="org.datanucleus.query.inmemory.SineFunction"/>
+        <query-method-evaluator method="Math.tan" evaluator="org.datanucleus.query.inmemory.TangentFunction"/>
+        <query-method-evaluator method="Math.log" evaluator="org.datanucleus.query.inmemory.LogFunction"/>
+        <query-method-evaluator method="Math.exp" evaluator="org.datanucleus.query.inmemory.ExpFunction"/>
+        <query-method-evaluator method="Math.floor" evaluator="org.datanucleus.query.inmemory.FloorFunction"/>
+        <query-method-evaluator method="Math.ceil" evaluator="org.datanucleus.query.inmemory.CeilFunction"/>
+        <query-method-evaluator method="Math.toDegrees" evaluator="org.datanucleus.query.inmemory.DegreesFunction"/>
+        <query-method-evaluator method="Math.toRadians" evaluator="org.datanucleus.query.inmemory.RadiansFunction"/>
         <query-method-evaluator method="CURRENT_DATE" evaluator="org.datanucleus.query.inmemory.CurrentDateFunction"/>
         <query-method-evaluator method="CURRENT_TIME" evaluator="org.datanucleus.query.inmemory.CurrentTimeFunction"/>
         <query-method-evaluator method="CURRENT_TIMESTAMP" evaluator="org.datanucleus.query.inmemory.CurrentTimestampFunction"/>
@@ -418,6 +430,8 @@ Contributors:
         <query-method-evaluator method="TRIM" evaluator="org.datanucleus.query.inmemory.TrimFunction"/>
         <query-method-evaluator method="TRIM_LEADING" evaluator="org.datanucleus.query.inmemory.TrimFunction"/>
         <query-method-evaluator method="TRIM_TRAILING" evaluator="org.datanucleus.query.inmemory.TrimFunction"/>
+        <query-method-evaluator method="DEGREES" evaluator="org.datanucleus.query.inmemory.DegreesFunction"/>
+        <query-method-evaluator method="RADIANS" evaluator="org.datanucleus.query.inmemory.RadiansFunction"/>
 
         <query-method-evaluator class="java.lang.Enum" method="matches" evaluator="org.datanucleus.query.inmemory.EnumMatchesMethod"/>
         <query-method-evaluator class="java.lang.Enum" method="toString" evaluator="org.datanucleus.query.inmemory.EnumToStringMethod"/>
