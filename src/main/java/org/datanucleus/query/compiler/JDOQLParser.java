@@ -231,9 +231,9 @@ public class JDOQLParser implements Parser
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.query.compiler.Parser#parseTupple(java.lang.String)
+     * @see org.datanucleus.query.compiler.Parser#parseTuple(java.lang.String)
      */
-    public Node[] parseTupple(String expression)
+    public Node[] parseTuple(String expression)
     {
         p = new Lexer(expression, paramPrefixes, true);
         stack = new ArrayDeque<Node>();

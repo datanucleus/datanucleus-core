@@ -110,7 +110,7 @@ public class JPQLParser implements Parser
     {
         p = new Lexer(expression, paramPrefixes, false);
         stack = new ArrayDeque<Node>();
-        return parseTupple(expression);
+        return parseTuple(expression);
     }
 
     /* (non-Javadoc)
@@ -154,9 +154,9 @@ public class JPQLParser implements Parser
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.query.compiler.Parser#parseTupple(java.lang.String)
+     * @see org.datanucleus.query.compiler.Parser#parseTuple(java.lang.String)
      */
-    public Node[] parseTupple(String expression)
+    public Node[] parseTuple(String expression)
     {
         p = new Lexer(expression, paramPrefixes, false);
         stack = new ArrayDeque<Node>();

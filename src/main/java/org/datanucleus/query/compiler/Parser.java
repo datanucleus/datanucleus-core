@@ -17,29 +17,27 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.query.compiler;
 
-
 /**
- * Interface for a parser of a query.
- * To be implemented for each particular query language.
+ * Interface for a parser of a query. To be implemented for each particular query language.
  * Responsible for taking a String clause of a query and converting it into a Node tree.
  */
 public interface Parser
 {
-    public abstract Node parse(String expression);
+    Node parse(String expression);
 
-    public abstract Node[] parseFrom(String expression);
+    Node[] parseFrom(String expression);
 
-    public abstract Node[] parseUpdate(String expression);
+    Node[] parseUpdate(String expression);
 
-    public abstract Node[] parseOrder(String expression);
+    Node[] parseOrder(String expression);
 
-    public abstract Node[] parseResult(String expression);
+    Node[] parseResult(String expression);
 
-    public abstract Node[] parseTupple(String expression);
+    Node[] parseTuple(String expression);
 
-    public abstract Node[][] parseVariables(String expression);
+    Node[][] parseVariables(String expression);
 
-    public abstract Node parseVariable(String expression);
+    Node parseVariable(String expression);
 
-    public abstract Node[][] parseParameters(String expression);
+    Node[][] parseParameters(String expression);
 }

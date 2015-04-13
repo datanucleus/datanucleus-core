@@ -448,7 +448,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
         {
             return null;
         }
-        Node[] node = parser.parseTupple(update);
+        Node[] node = parser.parseTuple(update);
         Expression[] expr = new Expression[node.length];
         for (int i = 0; i < node.length; i++)
         {
@@ -728,7 +728,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
         {
             return null;
         }
-        Node[] node = parser.parseTupple(grouping);
+        Node[] node = parser.parseTuple(grouping);
         Expression[] expr = new Expression[node.length];
         for (int i = 0; i < node.length; i++)
         {
