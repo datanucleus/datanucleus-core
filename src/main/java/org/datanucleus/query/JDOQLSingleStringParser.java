@@ -186,15 +186,15 @@ public class JDOQLSingleStringParser
             {
                 compileParameters();
             }
-            if (tokenizer.parseKeyword("import"))
+            if (tokenizer.parseKeyword("IMPORT") || tokenizer.parseKeyword("import"))
             {
                 compileImport();
             }
-            if (tokenizer.parseKeyword("GROUP") || tokenizer.parseKeyword("group"))
+            if (tokenizer.parseKeyword("GROUP") || tokenizer.parseKeyword("group")) // GROUP BY
             {
                 compileGroup();
             }
-            if (tokenizer.parseKeyword("ORDER") || tokenizer.parseKeyword("order"))
+            if (tokenizer.parseKeyword("ORDER") || tokenizer.parseKeyword("order")) // ORDER BY
             {
                 compileOrder();
             }
@@ -607,8 +607,7 @@ public class JDOQLSingleStringParser
         }
 
         /**
-         * Parse the next token looking for a keyword. The cursor position is
-         * skipped in one tick if a keyword is found
+         * Parse the next token looking for a keyword. The cursor position is skipped in one tick if a keyword is found
          * @param keyword the searched keyword
          * @return true if the keyword
          */
@@ -622,9 +621,7 @@ public class JDOQLSingleStringParser
                     if (keywords[tokenIndex].equals(keyword))
                     {
                         // Move query position to end of last processed token
-                        queryStringPos = 
-                            queryString.indexOf(keywords[tokenIndex], queryStringPos) + 
-                            keywords[tokenIndex].length()+1;
+                        queryStringPos = queryString.indexOf(keywords[tokenIndex], queryStringPos) + keywords[tokenIndex].length()+1;
                         return true;
                     }
                 }

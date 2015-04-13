@@ -537,7 +537,7 @@ public class JPQLSingleStringParser
                         queryStringPos = queryString.indexOf(keywords[tokenIndex], queryStringPos) + keywords[tokenIndex].length()+1;
                         return true;
                     }
-                    if (keyword.indexOf(' ') > -1)
+                    if (keyword.indexOf(' ') > -1) // "GROUP BY", "ORDER BY"
                     {
                         if ((keywords[tokenIndex] + ' ' + keywords[tokenIndex + 1]).equalsIgnoreCase(keyword))
                         {
