@@ -26,7 +26,8 @@ import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ClassNameConstants;
-import org.datanucleus.api.ApiAdapter;
+import org.datanucleus.exceptions.ClassNotResolvedException;
+import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -81,11 +82,8 @@ public class ArrayMetaData extends ContainerMetaData
             throw new InvalidMemberMetaDataException("044140", mmd.getClassName(), mmd.getName());
         }
 
-        ApiAdapter api = mmgr.getApiAdapter();
-
         // Make sure the type in "element" is set
-        element.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), 
-            clr, primary, mmgr);
+        element.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), clr, primary, mmgr);
 
         // Check the field type and see if it is an array type
         Class field_type = getMemberMetaData().getType();
@@ -104,8 +102,7 @@ public class ArrayMetaData extends ContainerMetaData
             {
                 element.embedded = Boolean.TRUE;
             }
-            else if (api.isPersistable(component_type) || Object.class.isAssignableFrom(component_type) ||
-                component_type.isInterface())
+            else if (mmgr.getApiAdapter().isPersistable(component_type) || Object.class.isAssignableFrom(component_type) || component_type.isInterface())
             {
                 element.embedded = Boolean.FALSE;
             }
@@ -119,8 +116,7 @@ public class ArrayMetaData extends ContainerMetaData
             // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
             // Note : this fails when using in the enhancer since not yet PC
             Class component_type = field_type.getComponentType();
-            if (!api.isPersistable(component_type) && !component_type.isInterface() &&
-                component_type != java.lang.Object.class)
+            if (!mmgr.getApiAdapter().isPersistable(component_type) && !component_type.isInterface() && component_type != java.lang.Object.class)
             {
                 element.embedded = Boolean.TRUE;
             }
@@ -130,7 +126,7 @@ public class ArrayMetaData extends ContainerMetaData
         {
             // Catch situations that we don't support
             if (getMemberMetaData().getJoinMetaData() == null &&
-                !api.isPersistable(getMemberMetaData().getType().getComponentType()) &&
+                !mmgr.getApiAdapter().isPersistable(getMemberMetaData().getType().getComponentType()) &&
                 mmgr.supportsORM())
             {
                 // We only support persisting particular array types as byte-streams (non-Java-serialised)
@@ -166,13 +162,10 @@ public class ArrayMetaData extends ContainerMetaData
         if (element.type != null)
         {
             Class elementCls = clr.classForName(element.type, primary);
-            
-            if (api.isPersistable(elementCls))
+            if (mmgr.getApiAdapter().isPersistable(elementCls))
             {
                 mayContainPersistableElements = true;
             }
-            
-            
             element.classMetaData = mmgr.getMetaDataForClassInternal(elementCls, clr);
         }
         else
@@ -180,10 +173,48 @@ public class ArrayMetaData extends ContainerMetaData
             element.type = field_type.getComponentType().getName();
             element.classMetaData = mmgr.getMetaDataForClassInternal(field_type.getComponentType(), clr);
         }
-        
-        if (element.classMetaData!=null)
+
+        if (element.classMetaData != null)
         {
             mayContainPersistableElements = true;
+        }
+
+        if (hasExtension("implementation-classes"))
+        {
+            // Check/fix the validity of the implementation-classes and qualify them where required.
+            StringBuilder str = new StringBuilder();
+            String[] implTypes = getValuesForExtension("implementation-classes");
+            for (int i=0;i<implTypes.length;i++)
+            {
+                String implTypeName = ClassUtils.createFullClassName(getMemberMetaData().getPackageName(), implTypes[i]);
+                if (i > 0)
+                {
+                    str.append(",");
+                }
+
+                try
+                {
+                    clr.classForName(implTypeName);
+                    str.append(implTypeName);
+                }
+                catch (ClassNotResolvedException cnre)
+                {
+                    try
+                    {
+                        // Maybe the user specified a java.lang class without fully-qualifying it
+                        // This is beyond the scope of the JDO spec which expects java.lang cases to be fully-qualified
+                        String langClassName = ClassUtils.getJavaLangClassForType(implTypeName);
+                        clr.classForName(langClassName);
+                        str.append(langClassName);
+                    }
+                    catch (ClassNotResolvedException cnre2)
+                    {
+                        // Implementation type not found
+                        throw new InvalidMemberMetaDataException("044116", getMemberMetaData().getClassName(), getMemberMetaData().getName(), implTypes[i]);
+                    }
+                }
+            }
+            addExtension(VENDOR_NAME, "implementation-classes", str.toString()); // Replace with this new value
         }
 
         // Make sure anything in the superclass is populated too
@@ -194,12 +225,16 @@ public class ArrayMetaData extends ContainerMetaData
 
     /**
      * Accessor for the element implementation types (when element is a reference type).
-     * The return can contain comma-separated values.
      * @return element implementation types
      */
     public String getElementType()
     {
         return element.type;
+    }
+
+    public String[] getElementTypes()
+    {
+        return ((AbstractMemberMetaData)getParent()).getValuesForExtension("implementation-classes");
     }
 
     public boolean elementIsPersistent()
@@ -322,8 +357,7 @@ public class ArrayMetaData extends ContainerMetaData
      * @param clr the ClassLoaderResolver
      * @param mmgr MetaData manager
      */
-    void getReferencedClassMetaData(final List orderedCMDs, final Set referencedCMDs,
-            final ClassLoaderResolver clr, final MetaDataManager mmgr)
+    void getReferencedClassMetaData(final List orderedCMDs, final Set referencedCMDs, final ClassLoaderResolver clr, final MetaDataManager mmgr)
     {
         AbstractClassMetaData element_cmd = 
             mmgr.getMetaDataForClass(getMemberMetaData().getType().getComponentType(), clr);

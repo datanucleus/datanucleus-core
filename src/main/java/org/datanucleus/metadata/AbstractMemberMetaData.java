@@ -193,16 +193,9 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      * to the parent ClassMetaData, and will have a value if it is an overriding field.
      */
     protected String className = null;
-    
+
     /** Cache result of {@link #getFullFieldName()}. */
     protected String fullFieldName = null;
-
-    /**
-     * Specification of the possible type(s) that can be stored in this field. This is for the case where the
-     * field/property is declared as an interface, or Object and hence can contain derived types. This 
-     * provides the restriction to a particular type.
-     */
-    protected String[] fieldTypes;
 
     /** Field type being represented. */
     protected Class type;
@@ -210,19 +203,13 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     /** The member (field/method) being represented here. Note, this prevents Serialization. */
     protected Member memberRepresented;
 
-    /**
-     * Id of the field in its class (only for fields that are managed).
-     * If the value is -1, the field is NOT managed or the object hasn't been populated.
-     */
+    /** Id of the field in its class (only for fields that are managed). If the value is -1, the field is NOT managed or the object hasn't been populated. */
     protected int fieldId=-1;
 
     /** The relation type of this field (1-1, 1-N, M-N, N-1). */
     protected RelationType relationType = null;
 
-    /**
-     * MetaData for the other end of a relation when this member is a bidirectional relation. 
-     * This may be multiple fields if the FK is shared.
-     */
+    /** MetaData for the other end of a relation when this member is a bidirectional relation. This may be multiple fields if the FK is shared. */
     protected AbstractMemberMetaData[] relatedMemberMetaData = null;
 
     /** Temporary flag to signify if the field is ordered. */
@@ -284,14 +271,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         this.loadFetchGroup = mmd.loadFetchGroup;
         this.storeInLob = mmd.storeInLob;
         this.column = mmd.column;
-        if (mmd.fieldTypes != null)
-        {
-            this.fieldTypes = new String[mmd.fieldTypes.length];
-            for (int i=0;i<mmd.fieldTypes.length;i++)
-            {
-                this.fieldTypes[i] = mmd.fieldTypes[i];
-            }
-        }
 
         // Create copies of the object fields
         if (mmd.joinMetaData != null)
@@ -1047,6 +1026,11 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         }
 
         setPopulated();
+    }
+
+    public String getPackageName()
+    {
+        return className.substring(0, className.lastIndexOf('.'));
     }
 
     /**
@@ -1977,7 +1961,8 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      */
     public final String[] getFieldTypes()
     {
-        return fieldTypes;
+        return getValuesForExtension("implementation-classes");
+//        return fieldTypes;
     }
 
     /**
@@ -1988,8 +1973,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     {
         if (!StringUtils.isWhitespace(types))
         {
-            // Split the passed value assuming that it is comma-separated
-            fieldTypes = MetaDataUtils.getInstance().getValuesForCommaSeparatedAttribute(types);
+            addExtension("implementation-classes", types);
         }
     }
 
@@ -2744,8 +2728,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 // Reference field - take the metadata of the first implementation if persistable
                 try
                 {
-                    String[] implNames = MetaDataUtils.getInstance().getImplementationNamesForReferenceField(this,
-                        FieldRole.ROLE_FIELD, clr, mmgr);
+                    String[] implNames = MetaDataUtils.getInstance().getImplementationNamesForReferenceField(this, FieldRole.ROLE_FIELD, clr, mmgr);
                     if (implNames != null && implNames.length > 0)
                     {
                         otherCmd = mmgr.getMetaDataForClass(implNames[0], clr);
@@ -2758,10 +2741,10 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 }
             }
             // TODO Check for field with generic type where generic type is persistable
-            else if (getType().getName().equals(ClassNameConstants.Object) && fieldTypes != null && fieldTypes.length > 0)
+            else if (getType().getName().equals(ClassNameConstants.Object) && getFieldTypes() != null)
             {
                 // Reference field - take the metadata of the first field type (if specified, and if persistable)
-                otherCmd = mmgr.getMetaDataForClass(fieldTypes[0], clr);
+                otherCmd = mmgr.getMetaDataForClass(getFieldTypes()[0], clr);
             }
             else
             {
@@ -2987,12 +2970,11 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 {
                     return true;
                 }
-                else if (fieldTypes != null)
+
+                String[] fieldTypes = getFieldTypes();
+                if (fieldTypes != null && mmgr.isPersistentInterface(fieldTypes[0]))
                 {
-                    if (mmgr.isPersistentInterface(fieldTypes[0]))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
         }

@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.util.ClassUtils;
@@ -63,6 +62,7 @@ public class MapMetaData extends ContainerMetaData
     public MapMetaData(MapMetaData mapmd)
     {
         super(mapmd);
+
         key = new ContainerComponent();
         key.embedded = mapmd.key.embedded;
         key.serialized = mapmd.key.serialized;
@@ -105,13 +105,9 @@ public class MapMetaData extends ContainerMetaData
             throw new InvalidMemberMetaDataException("044144", mmd.getClassName(), mmd.getName());
         }
 
-        ApiAdapter api = mmgr.getApiAdapter();
-
         // Make sure the type in "key", "value" is set
-        key.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), 
-            clr, primary, mmgr);
-        value.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), 
-            clr, primary, mmgr);
+        key.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), clr, primary, mmgr);
+        value.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), clr, primary, mmgr);
 
         // Check the field type and see if it is castable to a Map
         Class field_type = getMemberMetaData().getType();
@@ -175,9 +171,7 @@ public class MapMetaData extends ContainerMetaData
             {
                 key.embedded = Boolean.TRUE;
             }
-            else if (api.isPersistable(keyTypeClass) ||
-                Object.class.isAssignableFrom(keyTypeClass) ||
-                keyTypeClass.isInterface())
+            else if (mmgr.getApiAdapter().isPersistable(keyTypeClass) || Object.class.isAssignableFrom(keyTypeClass) || keyTypeClass.isInterface())
             {
                 key.embedded = Boolean.FALSE;
             }
@@ -190,8 +184,7 @@ public class MapMetaData extends ContainerMetaData
         {
             // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
             // Note : this fails when using in the enhancer since not yet PC
-            if (!api.isPersistable(keyTypeClass) && !keyTypeClass.isInterface() &&
-                keyTypeClass != java.lang.Object.class)
+            if (!mmgr.getApiAdapter().isPersistable(keyTypeClass) && !keyTypeClass.isInterface() && keyTypeClass != java.lang.Object.class)
             {
                 key.embedded = Boolean.TRUE;
             }
@@ -201,6 +194,44 @@ public class MapMetaData extends ContainerMetaData
         {
             // If the user has specified <embedded>, set to true
             key.embedded = Boolean.TRUE;
+        }
+
+        if (hasExtension("key-implementation-classes"))
+        {
+            // Check/fix the validity of the implementation-classes and qualify them where required.
+            StringBuilder str = new StringBuilder();
+            String[] implTypes = getValuesForExtension("key-implementation-classes");
+            for (int i=0;i<implTypes.length;i++)
+            {
+                String implTypeName = ClassUtils.createFullClassName(getMemberMetaData().getPackageName(), implTypes[i]);
+                if (i > 0)
+                {
+                    str.append(",");
+                }
+
+                try
+                {
+                    clr.classForName(implTypeName);
+                    str.append(implTypeName);
+                }
+                catch (ClassNotResolvedException cnre)
+                {
+                    try
+                    {
+                        // Maybe the user specified a java.lang class without fully-qualifying it
+                        // This is beyond the scope of the JDO spec which expects java.lang cases to be fully-qualified
+                        String langClassName = ClassUtils.getJavaLangClassForType(implTypeName);
+                        clr.classForName(langClassName);
+                        str.append(langClassName);
+                    }
+                    catch (ClassNotResolvedException cnre2)
+                    {
+                        // Implementation type not found
+                        throw new InvalidMemberMetaDataException("044116", getMemberMetaData().getClassName(), getMemberMetaData().getName(), implTypes[i]);
+                    }
+                }
+            }
+            addExtension(VENDOR_NAME, "key-implementation-classes", str.toString()); // Replace with this new value
         }
 
         // "value-type"
@@ -245,9 +276,7 @@ public class MapMetaData extends ContainerMetaData
             {
                 value.embedded = Boolean.TRUE;
             }
-            else if (api.isPersistable(valueTypeClass) ||
-                Object.class.isAssignableFrom(valueTypeClass) ||
-                valueTypeClass.isInterface())
+            else if (mmgr.getApiAdapter().isPersistable(valueTypeClass) || Object.class.isAssignableFrom(valueTypeClass) || valueTypeClass.isInterface())
             {
                 value.embedded = Boolean.FALSE;
             }
@@ -260,8 +289,7 @@ public class MapMetaData extends ContainerMetaData
         {
             // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
             // Note : this fails when using in the enhancer since not yet PC
-            if (!api.isPersistable(valueTypeClass) && !valueTypeClass.isInterface() &&
-                valueTypeClass != java.lang.Object.class)
+            if (!mmgr.getApiAdapter().isPersistable(valueTypeClass) && !valueTypeClass.isInterface() && valueTypeClass != java.lang.Object.class)
             {
                 value.embedded = Boolean.TRUE;
             }
@@ -271,6 +299,44 @@ public class MapMetaData extends ContainerMetaData
         {
             // If the user has specified <embedded>, set to true
             value.embedded = Boolean.TRUE;
+        }
+
+        if (hasExtension("value-implementation-classes"))
+        {
+            // Check/fix the validity of the implementation-classes and qualify them where required.
+            StringBuilder str = new StringBuilder();
+            String[] implTypes = getValuesForExtension("value-implementation-classes");
+            for (int i=0;i<implTypes.length;i++)
+            {
+                String implTypeName = ClassUtils.createFullClassName(getMemberMetaData().getPackageName(), implTypes[i]);
+                if (i > 0)
+                {
+                    str.append(",");
+                }
+
+                try
+                {
+                    clr.classForName(implTypeName);
+                    str.append(implTypeName);
+                }
+                catch (ClassNotResolvedException cnre)
+                {
+                    try
+                    {
+                        // Maybe the user specified a java.lang class without fully-qualifying it
+                        // This is beyond the scope of the JDO spec which expects java.lang cases to be fully-qualified
+                        String langClassName = ClassUtils.getJavaLangClassForType(implTypeName);
+                        clr.classForName(langClassName);
+                        str.append(langClassName);
+                    }
+                    catch (ClassNotResolvedException cnre2)
+                    {
+                        // Implementation type not found
+                        throw new InvalidMemberMetaDataException("044116", getMemberMetaData().getClassName(), getMemberMetaData().getName(), implTypes[i]);
+                    }
+                }
+            }
+            addExtension(VENDOR_NAME, "value-implementation-classes", str.toString()); // Replace with this new value
         }
 
         key.classMetaData = mmgr.getMetaDataForClassInternal(keyTypeClass, clr);
@@ -283,8 +349,7 @@ public class MapMetaData extends ContainerMetaData
             if (value.classMetaData.getNoOfPrimaryKeyMembers() != 1)
             {
                 // TODO Localise this
-                throw new NucleusUserException("DataNucleus does not support use of <map-key> with no name field when the" +
-                    " value class has a composite primary key");
+                throw new NucleusUserException("DataNucleus does not support use of <map-key> with no name field when the value class has a composite primary key");
             }
             int[] valuePkFieldNums = value.classMetaData.getPKMemberPositions();
             keymd.mappedBy = value.classMetaData.getMetaDataForManagedMemberAtAbsolutePosition(valuePkFieldNums[0]).name;
@@ -330,6 +395,11 @@ public class MapMetaData extends ContainerMetaData
         return key.type;
     }
 
+    public String[] getKeyTypes()
+    {
+        return ((AbstractMemberMetaData)getParent()).getValuesForExtension("key-implementation-classes");
+    }
+
     /**
      * Convenience accessor for the Key ClassMetaData.
      * @param clr ClassLoader resolver (in case we need to initialise it)
@@ -367,6 +437,11 @@ public class MapMetaData extends ContainerMetaData
     public String getValueType()
     {
         return value.type;
+    }
+
+    public String[] getValueTypes()
+    {
+        return ((AbstractMemberMetaData)getParent()).getValuesForExtension("value-implementation-classes");
     }
 
     /**
@@ -550,8 +625,7 @@ public class MapMetaData extends ContainerMetaData
      * @param clr the ClassLoaderResolver
      * @param mmgr MetaData manager
      */
-    void getReferencedClassMetaData(final List orderedCMDs, final Set referencedCMDs,
-            final ClassLoaderResolver clr, final MetaDataManager mmgr)
+    void getReferencedClassMetaData(final List orderedCMDs, final Set referencedCMDs, final ClassLoaderResolver clr, final MetaDataManager mmgr)
     {
         AbstractClassMetaData key_cmd = mmgr.getMetaDataForClass(key.type,clr);
         if (key_cmd != null)

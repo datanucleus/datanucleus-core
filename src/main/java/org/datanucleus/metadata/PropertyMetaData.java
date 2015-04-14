@@ -133,6 +133,7 @@ public class PropertyMetaData extends AbstractMemberMetaData
         {
             sb.append("\n").append(prefix).append("       mapped-by=\"" + mappedBy + "\"");
         }
+        String[] fieldTypes = getFieldTypes();
         if (fieldTypes != null)
         {
             sb.append("\n").append(prefix).append("       field-type=\"");

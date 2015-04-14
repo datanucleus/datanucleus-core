@@ -419,75 +419,41 @@ public class MetaDataUtils
      * @return Names of the classes of the possible implementations of this interface/Object
      * @throws NucleusUserException if no implementation types are found for the reference type field
      */
-    public String[] getImplementationNamesForReferenceField(AbstractMemberMetaData fmd, FieldRole fieldRole, 
-            ClassLoaderResolver clr, MetaDataManager mmgr)
+    public String[] getImplementationNamesForReferenceField(AbstractMemberMetaData fmd, FieldRole fieldRole, ClassLoaderResolver clr, MetaDataManager mmgr)
     {
-        // Check the JDO2 standard attribute for implementation types
         String[] implTypes = null;
 
-        // TODO Support specification of collection/map implementation types using element-type,key-type,value-type
-        /*if (DatastoreField.ROLE_COLLECTION_ELEMENT == role)
-        {
-            implTypeStr = fmd.getCollection().getElementType();
-        }
-        else if (DatastoreField.ROLE_MAP_KEY == role)
-        {
-            implTypeStr = fmd.getMap().getKeyImplementationType();
-        }
-        else if (DatastoreField.ROLE_MAP_VALUE == role)
-        {
-            implTypeStr = fmd.getMap().getValueImplementationType();
-        }
-        else */
-        if (FieldRole.ROLE_ARRAY_ELEMENT == fieldRole)
-        {
-            // TODO Change ElementMetaData to have elementTypes
-            String implTypeStr = fmd.getArray().getElementType();
-            if (implTypeStr != null)
-            {
-                implTypes = getValuesForCommaSeparatedAttribute(implTypeStr);
-            }
-        }
-        else
+        if (fieldRole == FieldRole.ROLE_FIELD)
         {
             implTypes = fmd.getFieldTypes();
-        }
 
-        // Check if the user has defined an interface type being "implemented by" an interface ("persistent-interface")
-        if (implTypes != null && implTypes.length == 1)
-        {
-            // Single class/interface name specified
-            Class implCls = clr.classForName(implTypes[0].trim());
-            if (implCls.isInterface())
+            // Check if the user has defined an interface type being "implemented by" an interface ("persistent-interface")
+            if (implTypes != null && implTypes.length == 1)
             {
-                // The specified "implementation" is itself an interface so assume it is a "persistent-interface"
-                implTypes = mmgr.getClassesImplementingInterface(implTypes[0], clr);
+                // Single class/interface name specified
+                Class implCls = clr.classForName(implTypes[0].trim());
+                if (implCls.isInterface())
+                {
+                    // The specified "implementation" is itself an interface so assume it is a "persistent-interface"
+                    implTypes = mmgr.getClassesImplementingInterface(implTypes[0], clr);
+                }
             }
         }
-
-        if (implTypes == null)
+        else if (FieldRole.ROLE_COLLECTION_ELEMENT == fieldRole)
         {
-            // No implementation(s) specified using JDO2 mechanism, so fallback to extensions
-            if (FieldRole.ROLE_COLLECTION_ELEMENT == fieldRole)
-            {
-                implTypes = fmd.getValuesForExtension("implementation-classes");
-            }
-            else if (FieldRole.ROLE_ARRAY_ELEMENT == fieldRole)
-            {
-                implTypes = fmd.getValuesForExtension("implementation-classes");
-            }
-            else if (FieldRole.ROLE_MAP_KEY == fieldRole)
-            {
-                implTypes = fmd.getValuesForExtension("key-implementation-classes");
-            }
-            else if (FieldRole.ROLE_MAP_VALUE == fieldRole)
-            {
-                implTypes = fmd.getValuesForExtension("value-implementation-classes");
-            }
-            else
-            {
-                implTypes = fmd.getValuesForExtension("implementation-classes");
-            }
+            implTypes = fmd.getCollection().getElementTypes();
+        }
+        else if (FieldRole.ROLE_ARRAY_ELEMENT == fieldRole)
+        {
+            implTypes = fmd.getArray().getElementTypes();
+        }
+        else if (FieldRole.ROLE_MAP_KEY == fieldRole)
+        {
+            implTypes = fmd.getMap().getKeyTypes();
+        }
+        else if (FieldRole.ROLE_MAP_VALUE == fieldRole)
+        {
+            implTypes = fmd.getMap().getValueTypes();
         }
 
         if (implTypes == null)
@@ -508,7 +474,11 @@ public class MetaDataUtils
             }
             else if (fmd.hasArray() && fieldRole == FieldRole.ROLE_ARRAY_ELEMENT)
             {
-                type = fmd.getType().getComponentType().getName();
+                type = fmd.getArray().getElementType();
+                if (type == null)
+                {
+                    type = fmd.getType().getComponentType().getName();
+                }
             }
             else
             {

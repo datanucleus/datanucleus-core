@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.ClassNotResolvedException;
+import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -36,6 +36,7 @@ import org.datanucleus.util.StringUtils;
 public class CollectionMetaData extends ContainerMetaData
 {
     private static final long serialVersionUID = -5567408442228331561L;
+
     /** Representation of the element of the collection. */
     protected ContainerComponent element;
 
@@ -112,7 +113,6 @@ public class CollectionMetaData extends ContainerMetaData
         }
 
 		// "embedded-element"
-        ApiAdapter api = mmgr.getApiAdapter();
         if (element.embedded == null)
         {
             // Assign default for "embedded-element" based on 18.13.1 of JDO 2 spec
@@ -121,7 +121,7 @@ public class CollectionMetaData extends ContainerMetaData
             {
                 element.embedded = Boolean.TRUE;
             }
-            else if (api.isPersistable(elementTypeClass) ||
+            else if (mmgr.getApiAdapter().isPersistable(elementTypeClass) ||
                 Object.class.isAssignableFrom(elementTypeClass) ||
                 elementTypeClass.isInterface())
             {
@@ -136,8 +136,7 @@ public class CollectionMetaData extends ContainerMetaData
         {
             // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
             // Note : this fails when using in the enhancer since not yet PC
-            if (!api.isPersistable(elementTypeClass) && !elementTypeClass.isInterface() &&
-                elementTypeClass != java.lang.Object.class)
+            if (!mmgr.getApiAdapter().isPersistable(elementTypeClass) && !elementTypeClass.isInterface() && elementTypeClass != java.lang.Object.class)
             {
                 element.embedded = Boolean.TRUE;
             }
@@ -153,8 +152,7 @@ public class CollectionMetaData extends ContainerMetaData
         {
             // If the user has set a non-PC/non-reference as dependent, correct it since not valid.
             // Note : this fails when using in the enhancer since not yet PC
-            if (!api.isPersistable(elementTypeClass) && !elementTypeClass.isInterface() &&
-                elementTypeClass != java.lang.Object.class)
+            if (!mmgr.getApiAdapter().isPersistable(elementTypeClass) && !elementTypeClass.isInterface() && elementTypeClass != java.lang.Object.class)
             {
                 element.dependent = Boolean.FALSE;
             }
@@ -162,6 +160,44 @@ public class CollectionMetaData extends ContainerMetaData
 
         // Keep a reference to the MetaData for the element
         element.classMetaData = mmgr.getMetaDataForClassInternal(elementTypeClass, clr);
+
+        if (hasExtension("implementation-classes"))
+        {
+            // Check/fix the validity of the implementation-classes and qualify them where required.
+            StringBuilder str = new StringBuilder();
+            String[] implTypes = getValuesForExtension("implementation-classes");
+            for (int i=0;i<implTypes.length;i++)
+            {
+                String implTypeName = ClassUtils.createFullClassName(getMemberMetaData().getPackageName(), implTypes[i]);
+                if (i > 0)
+                {
+                    str.append(",");
+                }
+
+                try
+                {
+                    clr.classForName(implTypeName);
+                    str.append(implTypeName);
+                }
+                catch (ClassNotResolvedException cnre)
+                {
+                    try
+                    {
+                        // Maybe the user specified a java.lang class without fully-qualifying it
+                        // This is beyond the scope of the JDO spec which expects java.lang cases to be fully-qualified
+                        String langClassName = ClassUtils.getJavaLangClassForType(implTypeName);
+                        clr.classForName(langClassName);
+                        str.append(langClassName);
+                    }
+                    catch (ClassNotResolvedException cnre2)
+                    {
+                        // Implementation type not found
+                        throw new InvalidMemberMetaDataException("044116", getMemberMetaData().getClassName(), getMemberMetaData().getName(), implTypes[i]);
+                    }
+                }
+            }
+            addExtension(VENDOR_NAME, "implementation-classes", str.toString()); // Replace with this new value
+        }
 
         // Make sure anything in the superclass is populated too
         super.populate(clr, primary, mmgr);
@@ -177,6 +213,11 @@ public class CollectionMetaData extends ContainerMetaData
     public String getElementType()
     {
         return element.type;
+    }
+
+    public String[] getElementTypes()
+    {
+        return ((AbstractMemberMetaData)getParent()).getValuesForExtension("implementation-classes");
     }
 
     public boolean elementIsPersistent()
