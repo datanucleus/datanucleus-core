@@ -472,7 +472,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             statistics = null;
         }
 
-        cache.clear();
+        if (cache != null)
+        {
+            cache.clear();
+        }
         enlistedOPCache.clear();
         dirtyOPs.clear();
         indirectDirtyOPs.clear();
