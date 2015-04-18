@@ -1624,17 +1624,17 @@ public abstract class AbstractClassMetaData extends MetaData
             // Add on any superclass
             if (persistableSuperclass != null)
             {
-                AbstractClassMetaData super_cmd = getSuperAbstractClassMetaData();
-                super_cmd.getReferencedClassMetaData(orderedCMDs, referencedCMDs, clr, mmgr);
+                AbstractClassMetaData superCmd = getSuperAbstractClassMetaData();
+                superCmd.getReferencedClassMetaData(orderedCMDs, referencedCMDs, clr, mmgr);
             }
 
             // Add on any objectid class
-            if (objectidClass != null)
+            if (objectidClass != null && !usesSingleFieldIdentityClass())
             {
-                AbstractClassMetaData id_cmd = mmgr.getMetaDataForClass(objectidClass, clr);
-                if (id_cmd != null)
+                AbstractClassMetaData idCmd = mmgr.getMetaDataForClass(objectidClass, clr);
+                if (idCmd != null)
                 {
-                    id_cmd.getReferencedClassMetaData(orderedCMDs, referencedCMDs, clr, mmgr);
+                    idCmd.getReferencedClassMetaData(orderedCMDs, referencedCMDs, clr, mmgr);
                 }
             }
 
@@ -1642,8 +1642,7 @@ public abstract class AbstractClassMetaData extends MetaData
             String viewDefStr = getValueForExtension("view-definition");
             if (viewDefStr!= null)
             {
-                MacroString viewDef = new MacroString(fullName, getValueForExtension("view-imports"),
-                    viewDefStr);
+                MacroString viewDef = new MacroString(fullName, getValueForExtension("view-imports"), viewDefStr);
                 viewDef.substituteMacros(new MacroString.MacroHandler()
                     {
                         public void onIdentifierMacro(MacroString.IdentifierMacro im)
@@ -1652,8 +1651,7 @@ public abstract class AbstractClassMetaData extends MetaData
                             {
                                 addViewReference(viewReferences,im.className);
                                 AbstractClassMetaData view_cmd = mmgr.getMetaDataForClass(im.className, clr);
-                                view_cmd.getReferencedClassMetaData(orderedCMDs, referencedCMDs, 
-                                    viewReferences, clr, mmgr);
+                                view_cmd.getReferencedClassMetaData(orderedCMDs, referencedCMDs, viewReferences, clr, mmgr);
                             }
                         }
 
@@ -1684,7 +1682,7 @@ public abstract class AbstractClassMetaData extends MetaData
             if (referencedSet == null)
             {
                 referencedSet = new HashSet();
-                viewReferences.put(fullName,referencedSet);
+                viewReferences.put(fullName, referencedSet);
             }
             referencedSet.add(referenced_name);
 
