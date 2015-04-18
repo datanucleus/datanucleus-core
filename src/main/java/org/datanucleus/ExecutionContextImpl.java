@@ -1458,7 +1458,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             ObjectProvider op = findObjectProvider(obj);
             if (op == null)
             {
-                throw new NucleusUserException(Localiser.msg("010007", getApiAdapter().getIdForObject(obj)));
+                throw new NucleusUserException(Localiser.msg("010048", StringUtils.toJVMIDString(obj), getApiAdapter().getIdForObject(obj), "evict"));
             }
             op.evict();
         }
@@ -1568,7 +1568,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             ObjectProvider op = findObjectProvider(obj);
             if (op == null)
             {
-                throw new NucleusUserException(Localiser.msg("010007", getApiAdapter().getIdForObject(obj)));
+                throw new NucleusUserException(Localiser.msg("010048", StringUtils.toJVMIDString(obj), getApiAdapter().getIdForObject(obj), "refresh"));
             }
 
             if (getApiAdapter().isPersistent(obj) && op.isWaitingToBeFlushedToDatastore())
@@ -1660,7 +1660,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             ObjectProvider op = findObjectProvider(obj);
             if (op == null)
             {
-                throw new NucleusUserException(Localiser.msg("010007", getApiAdapter().getIdForObject(obj)));
+                throw new NucleusUserException(Localiser.msg("010048", StringUtils.toJVMIDString(obj), getApiAdapter().getIdForObject(obj), "retrieve"));
             }
             op.retrieve(fgOnly);
         }
