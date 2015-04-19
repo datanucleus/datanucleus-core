@@ -47,7 +47,6 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.ExecutionContext.EmbeddedOwnerRelation;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.FetchPlanForClass;
-import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.cache.CachedPC;
@@ -165,7 +164,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * Disconnect the provider from the ExecutionContext and PC object.
+     * Disconnect this ObjectProvider from the ExecutionContext and PC object.
      */
     public void disconnect()
     {
@@ -174,10 +173,9 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("026011", StringUtils.toJVMIDString(myPC), this));
         }
 
-        //we are transitioning to TRANSIENT state, so if any postLoad
-        //action is pending we do it before. This usually happens when
-        //we make transient instances using the fetch plan and some
-        //fields were loaded during this action which triggered a jdoPostLoad event
+        // Transitioning to TRANSIENT state, so if any postLoad action is pending we do it before. 
+        // This usually happens when we make transient instances using the fetch plan and some
+        // fields were loaded during this action which triggered a jdoPostLoad event
         if (isPostLoadPending())
         {
             flags &= ~FLAG_CHANGING_STATE; //hack to make sure postLoad does not return without processing
@@ -192,8 +190,8 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             provideFields(fieldNumbers, new UnsetOwnerFieldManager());
         }
 
-        myEC.clearObjectProviderAssociatedValues(this);
         myEC.removeObjectProvider(this);
+
         persistenceFlags = Persistable.READ_WRITE_OK;
         myPC.dnReplaceFlags();
 
@@ -207,13 +205,9 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             setDisconnecting(false);
         }
 
-        this.preDeleteLoadedFields = null;
-        this.myEC.setAttachDetachReferencedObject(this, null);
-        this.objectType = 0;
-
         clearSavedFields();
-
-        PersistenceNucleusContext nucCtx = myEC.getNucleusContext();
+        preDeleteLoadedFields = null;
+        objectType = 0;
         myPC = null;
         myID = null;
         myInternalID = null;
@@ -221,20 +215,17 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         myEC = null;
         myFP = null;
         myVersion = null;
-
         persistenceFlags = 0;
         flags = 0;
         restoreValues = false;
         transactionalVersion = null;
         currFM = null;
         dirty = false;
-
         cmd = null;
         dirtyFields = null;
         loadedFields = null;
 
-        // Remove the object from any pooling
-        nucCtx.getObjectProviderFactory().disconnectObjectProvider(this);
+        // TODO Remove the object from any pooling (when we enable it) via nucCtx.getObjectProviderFactory().disconnectObjectProvider(this);
     }
 
     /**
@@ -799,11 +790,8 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             if (myEC == ((StateManagerImpl)sm).getExecutionContext())
             {
                 NucleusLogger.PERSISTENCE.debug(">> SM.replacingStateManager this=" + this + " sm=" + sm + " with same EC");
-                // This is a race condition when makePersistent or
-                // makeTransactional is called on the same PC instance for the
-                // same PM. It has been already set to this SM - just 
-                // disconnect the other one. Return this SM so it won't be
-                // replaced.
+                // This is a race condition when makePersistent or makeTransactional is called on the same PC instance for the
+                // same PM. It has been already set to this SM - just disconnect the other one. Return this SM so it won't be replaced.
                 ((StateManagerImpl)sm).disconnect();
                 return this;
             }
@@ -3493,8 +3481,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
 
     /**
      * Method to detach this object.
-     * If the object is detachable then it will be migrated to DETACHED state, otherwise will migrate
-     * to TRANSIENT. Used by "DetachAllOnCommit"/"DetachAllOnRollback"
+     * If the object is detachable then it will be migrated to DETACHED state, otherwise will migrate to TRANSIENT. Used by "DetachAllOnCommit"/"DetachAllOnRollback"
      * @param state State for the detachment process
      */
     public void detach(FetchPlanState state)
@@ -3517,8 +3504,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("010009", StringUtils.toJVMIDString(myPC), 
-                    "" + state.getCurrentFetchDepth()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("010009", StringUtils.toJVMIDString(myPC), "" + state.getCurrentFetchDepth()));
             }
 
             // Call any "pre-detach" listeners
@@ -3563,8 +3549,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             }
 
             // Detach all (loaded) fields in the FetchPlan
-            FieldManager detachFieldManager = new DetachFieldManager(this, cmd.getSCOMutableMemberFlags(), 
-                myFP, state, false);
+            FieldManager detachFieldManager = new DetachFieldManager(this, cmd.getSCOMutableMemberFlags(), myFP, state, false);
             for (int i = 0; i < loadedFields.length; i++)
             {
                 if (loadedFields[i])
@@ -3587,8 +3572,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                                 String fieldName = cmd.getMetaDataForManagedMemberAtAbsolutePosition(i).getName();
                                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                                 {
-                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026032", 
-                                        StringUtils.toJVMIDString(myPC), 
+                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026032", StringUtils.toJVMIDString(myPC), 
                                         IdentityUtils.getPersistableIdentityForId(myID), fieldName));
                                 }
                                 unloadField(fieldName);
@@ -3626,8 +3610,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             else
             {
                 // Warn the user since they selected detachAllOnCommit
-                NucleusLogger.PERSISTENCE.warn(Localiser.msg("026031", myPC.getClass().getName(), 
-                    IdentityUtils.getPersistableIdentityForId(myID)));
+                NucleusLogger.PERSISTENCE.warn(Localiser.msg("026031", myPC.getClass().getName(), IdentityUtils.getPersistableIdentityForId(myID)));
 
                 // Make the object transient
                 makeTransient(null);

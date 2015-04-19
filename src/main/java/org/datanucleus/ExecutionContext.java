@@ -782,11 +782,6 @@ public interface ExecutionContext extends ExecutionContextReference
     CallbackHandler getCallbackHandler();
 
     /**
-     * Close the callback handler, and disconnect any registered instance listeners.
-     */
-    public void closeCallbackHandler();
-
-    /**
      * Interface to be implemented by a listener for the closure of the ExecutionContext.
      */
     public static interface LifecycleListener
@@ -932,7 +927,6 @@ public interface ExecutionContext extends ExecutionContextReference
     Object getObjectProviderAssociatedValue(ObjectProvider op, Object key);
     void removeObjectProviderAssociatedValue(ObjectProvider op, Object key);
     boolean containsObjectProviderAssociatedValue(ObjectProvider op, Object key);
-    void clearObjectProviderAssociatedValues(ObjectProvider op);
 
     /**
      * Register a listener to be called when this ExecutionContext is closing.

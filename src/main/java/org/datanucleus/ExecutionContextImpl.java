@@ -145,6 +145,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     /** The owning PersistenceManager/EntityManager object. */
     private Object owner;
 
+    private boolean closing = false;
+
     /** State variable for whether the context is closed. */
     private boolean closed;
 
@@ -316,7 +318,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             properties.setProperty(entry.getKey().toLowerCase(Locale.ENGLISH), entry.getValue());
         }
         properties.getFrequentProperties().setDefaults(conf.getFrequentProperties());
-        
+
         // Set up FetchPlan
         fetchPlan = new FetchPlan(this, clr).setMaxFetchDepth(conf.getIntProperty(PropertyNames.PROPERTY_MAX_FETCH_DEPTH));
 
@@ -429,23 +431,86 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 }
             }
         }
-        
-        if (properties.getFrequentProperties().getDetachOnClose())
+
+        if (properties.getFrequentProperties().getDetachOnClose() && cache != null && !cache.isEmpty())
         {
+            // TODO Can we optimise this in terms of cache clearance?
             // "detach-on-close", detaching all currently cached objects.
-            performDetachOnClose();
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("010011"));
+            List<ObjectProvider> toDetach = new ArrayList(cache.values());
+
+            if (tx.getNontransactionalRead())
+            {
+                // Handle it non-transactionally
+                performDetachOnCloseWork(toDetach);
+            }
+            else
+            {
+                // Perform in a transaction
+                try
+                {
+                    tx.begin();
+                    performDetachOnCloseWork(toDetach);
+                    tx.commit();
+                }
+                finally
+                {
+                    if (tx.isActive())
+                    {
+                        tx.rollback();
+                    }
+                }
+            }
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("010012"));
+
+            cache.clear();
+            if (NucleusLogger.CACHE.isDebugEnabled())
+            {
+                NucleusLogger.CACHE.debug(Localiser.msg("003011"));
+            }
         }
 
-        // Call all listeners to do their clean up
+        // Call all listeners to do their clean up TODO Why is this here and not after "disconnect remaining resources" or before "detachOnClose"?
         ExecutionContext.LifecycleListener[] listener = nucCtx.getExecutionContextListeners();
         for (int i=0; i<listener.length; i++)
         {
             listener[i].preClose(this);
         }
 
+        closing = true;
+
         // Disconnect remaining resources
-        disconnectObjectProvidersFromCache();
-        closeCallbackHandler();
+        if (cache != null && !cache.isEmpty())
+        {
+            // Clear out the cache (use separate list since sm.disconnect will remove the object from "cache" so we avoid any ConcurrentModification issues)
+            Collection<ObjectProvider> cachedOPsClone = new HashSet(cache.values());
+            Iterator<ObjectProvider> iter = cachedOPsClone.iterator();
+            while (iter.hasNext())
+            {
+                ObjectProvider op = iter.next();
+                if (op != null)
+                {
+                    // Remove it from any transaction
+                    op.disconnect();
+                }
+            }
+
+            cache.clear();
+            if (NucleusLogger.CACHE.isDebugEnabled())
+            {
+                NucleusLogger.CACHE.debug(Localiser.msg("003011"));
+            }
+        }
+        else
+        {
+            // TODO If there is no cache we need a way for ObjectProviders to be disconnected; have ObjectProvider as listener for EC close? (ecListeners below)
+        }
+
+        if (callbackHandler != null)
+        {
+            // Clear out lifecycle listeners that were registered
+            callbackHandler.close();
+        }
 
         if (ecListeners != null)
         {
@@ -472,10 +537,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             statistics = null;
         }
 
-        if (cache != null)
-        {
-            cache.clear();
-        }
         enlistedOPCache.clear();
         dirtyOPs.clear();
         indirectDirtyOPs.clear();
@@ -523,6 +584,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         objectsToEvictUponRollback = null;
 
+        closing = false;
         closed = true;
         tx.close(); // Close the transaction
         tx = null;
@@ -534,6 +596,27 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         // Hand back to the pool for reuse
         nucCtx.getExecutionContextPool().checkIn(this);
+    }
+
+    private void performDetachOnCloseWork(List<ObjectProvider> opsToDetach)
+    {
+        Iterator<ObjectProvider> iter = opsToDetach.iterator();
+        while (iter.hasNext())
+        {
+            ObjectProvider op = iter.next();
+            if (op != null && op.getObject() != null && !op.getExecutionContext().getApiAdapter().isDeleted(op.getObject()) && op.getExternalObjectId() != null)
+            {
+                // If the object is deleted then no point detaching. An object can be in L1 cache if transient and passed in to a query as a param for example
+                try
+                {
+                    op.detach(new DetachState(getApiAdapter()));
+                }
+                catch (NucleusObjectNotFoundException onfe)
+                {
+                    // Catch exceptions for any objects that are deleted in other managers whilst having this open
+                }
+            }
+        }
     }
 
     /* (non-Javadoc)
@@ -1126,6 +1209,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void removeObjectProvider(ObjectProvider op)
     {
+        if (closing)
+        {
+            // All state variables will be reset in bulk in close()
+            return;
+        }
+
         // Remove from the Level 1 Cache
         removeObjectFromLevel1Cache(op.getInternalObjectId());
 
@@ -1164,6 +1253,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             opAssociatedValuesMapByOP.remove(op);
         }
+        setAttachDetachReferencedObject(op, null);
     }
 
     /**
@@ -1264,32 +1354,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (objectLookingForOP == pc)
         {
             foundOP = op;
-        }
-    }
-
-    /**
-     * Disconnect ObjectProviders that are cached from their objects, and removes them from the cache. 
-     */
-    protected void disconnectObjectProvidersFromCache()
-    {
-        if (cache != null)
-        {
-            // Clear out the cache (use separate list since sm.disconnect will remove the object from "cache" so we avoid any ConcurrentModification issues)
-            Collection<ObjectProvider> cachedOPsClone = new HashSet(cache.values());
-            Iterator<ObjectProvider> iter = cachedOPsClone.iterator();
-            while (iter.hasNext())
-            {
-                ObjectProvider op = iter.next();
-                if (op != null)
-                {
-                    op.disconnect();
-                }
-            }
-            cache.clear();
-            if (NucleusLogger.CACHE.isDebugEnabled())
-            {
-                NucleusLogger.CACHE.debug(Localiser.msg("003011"));
-            }
         }
     }
 
@@ -4534,65 +4598,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Method to perform detach on close (of the context).
-     * Processes all (non-deleted) objects in the L1 cache and detaches them.
-     */
-    private void performDetachOnClose()
-    {
-        if (cache != null && !cache.isEmpty())
-        {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("010011"));
-            List<ObjectProvider> toDetach = new ArrayList(cache.values());
-
-            if (tx.getNontransactionalRead())
-            {
-                // Handle it non-transactionally
-                performDetachOnCloseWork(toDetach);
-            }
-            else
-            {
-                // Perform in a transaction
-                try
-                {
-                    tx.begin();
-                    performDetachOnCloseWork(toDetach);
-                    tx.commit();
-                }
-                finally
-                {
-                    if (tx.isActive())
-                    {
-                        tx.rollback();
-                    }
-                }
-            }
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("010012"));
-        }
-    }
-
-    private void performDetachOnCloseWork(List<ObjectProvider> smsToDetach)
-    {
-        Iterator<ObjectProvider> iter = smsToDetach.iterator();
-        while (iter.hasNext())
-        {
-            ObjectProvider op = iter.next();
-            if (op != null && op.getObject() != null && !op.getExecutionContext().getApiAdapter().isDeleted(op.getObject()) &&
-                op.getExternalObjectId() != null)
-            {
-                // If the object is deleted then no point detaching. An object can be in L1 cache if transient and passed in to a query as a param for example
-                try
-                {
-                    op.detach(new DetachState(getApiAdapter()));
-                }
-                catch (NucleusObjectNotFoundException onfe)
-                {
-                    // Catch exceptions for any objects that are deleted in other managers whilst having this open
-                }
-            }
-        }
-    }
-
-    /**
      * Commit any changes made to objects managed by the object manager to the database.
      */
     public void postCommit()
@@ -5474,18 +5479,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return null;
     }
 
-    /**
-     * Close the callback handler and disconnect any registered listeners.
-     */
-    public void closeCallbackHandler()
-    {
-        if (callbackHandler != null)
-        {
-            // Clear out lifecycle listeners that were registered
-            callbackHandler.close();
-        }
-    }
-
     // ------------------------------- Assert Utilities ---------------------------------
 
     /**
@@ -5891,17 +5884,5 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return opAssociatedValuesMapByOP.get(op).containsKey(key);
         }
         return false;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.ExecutionContext#clearObjectProviderAssociatedValues(org.datanucleus.state.ObjectProvider)
-     */
-    @Override
-    public void clearObjectProviderAssociatedValues(ObjectProvider op)
-    {
-        if (opAssociatedValuesMapByOP != null)
-        {
-            opAssociatedValuesMapByOP.remove(op);
-        }
     }
 }
