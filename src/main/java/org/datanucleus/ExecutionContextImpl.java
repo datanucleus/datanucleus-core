@@ -434,26 +434,44 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         if (properties.getFrequentProperties().getDetachOnClose() && cache != null && !cache.isEmpty())
         {
-            // TODO Can we optimise this in terms of cache clearance?
             // "detach-on-close", detaching all currently cached objects.
+            // Note that this will delete each object from the L1 cache one-by-one TODO Can we optimise this in terms of cache clearance?
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("010011"));
             List<ObjectProvider> toDetach = new ArrayList(cache.values());
 
-            if (tx.getNontransactionalRead())
+            try
             {
-                // Handle it non-transactionally
-                performDetachOnCloseWork(toDetach);
-            }
-            else
-            {
-                // Perform in a transaction
-                try
+                if (!tx.getNontransactionalRead())
                 {
                     tx.begin();
-                    performDetachOnCloseWork(toDetach);
+                }
+
+                Iterator<ObjectProvider> iter = toDetach.iterator();
+                while (iter.hasNext())
+                {
+                    ObjectProvider op = iter.next();
+                    if (op != null && op.getObject() != null && !op.getExecutionContext().getApiAdapter().isDeleted(op.getObject()) && op.getExternalObjectId() != null)
+                    {
+                        // If the object is deleted then no point detaching. An object can be in L1 cache if transient and passed in to a query as a param for example
+                        try
+                        {
+                            op.detach(new DetachState(getApiAdapter()));
+                        }
+                        catch (NucleusObjectNotFoundException onfe)
+                        {
+                            // Catch exceptions for any objects that are deleted in other managers whilst having this open
+                        }
+                    }
+                }
+
+                if (!tx.getNontransactionalRead())
+                {
                     tx.commit();
                 }
-                finally
+            }
+            finally
+            {
+                if (!tx.getNontransactionalRead())
                 {
                     if (tx.isActive())
                     {
@@ -462,12 +480,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 }
             }
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("010012"));
-
-            cache.clear();
-            if (NucleusLogger.CACHE.isDebugEnabled())
-            {
-                NucleusLogger.CACHE.debug(Localiser.msg("003011"));
-            }
         }
 
         // Call all listeners to do their clean up TODO Why is this here and not after "disconnect remaining resources" or before "detachOnClose"?
@@ -596,27 +608,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         // Hand back to the pool for reuse
         nucCtx.getExecutionContextPool().checkIn(this);
-    }
-
-    private void performDetachOnCloseWork(List<ObjectProvider> opsToDetach)
-    {
-        Iterator<ObjectProvider> iter = opsToDetach.iterator();
-        while (iter.hasNext())
-        {
-            ObjectProvider op = iter.next();
-            if (op != null && op.getObject() != null && !op.getExecutionContext().getApiAdapter().isDeleted(op.getObject()) && op.getExternalObjectId() != null)
-            {
-                // If the object is deleted then no point detaching. An object can be in L1 cache if transient and passed in to a query as a param for example
-                try
-                {
-                    op.detach(new DetachState(getApiAdapter()));
-                }
-                catch (NucleusObjectNotFoundException onfe)
-                {
-                    // Catch exceptions for any objects that are deleted in other managers whilst having this open
-                }
-            }
-        }
     }
 
     /* (non-Javadoc)
