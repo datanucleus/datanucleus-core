@@ -232,6 +232,9 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     /** Placeholder for the JPA "mapsId" attribute, in case a store plugin wants to use it */
     protected String mapsIdAttribute = null;
 
+    /** Placeholder for the JPA relation type ManyToOne, OneToOne etc so we can store what the user specified. */
+    protected String relationTypeString = null;
+
     /** Flags for use in enhancement process [see JDO spec 21.14] */
     protected byte persistenceFlags;
 
@@ -270,6 +273,8 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         this.uniqueConstraint = mmd.uniqueConstraint;
         this.loadFetchGroup = mmd.loadFetchGroup;
         this.storeInLob = mmd.storeInLob;
+        this.mapsIdAttribute = mmd.mapsIdAttribute;
+        this.relationTypeString = mmd.relationTypeString;
         this.column = mmd.column;
 
         // Create copies of the object fields
@@ -2316,6 +2321,15 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             // TODO Make use of this in store plugins where required
             NucleusLogger.METADATA.warn("@MapsId specified on member " + getFullFieldName() + " yet not currently supported (" + mapsIdAttribute + ")");
         }
+    }
+
+    public void setRelationTypeString(String relType)
+    {
+        this.relationTypeString = relType;
+    }
+    public String getRelationTypeString()
+    {
+        return relationTypeString;
     }
 
     /**
