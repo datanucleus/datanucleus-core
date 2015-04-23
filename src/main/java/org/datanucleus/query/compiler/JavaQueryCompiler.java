@@ -301,7 +301,12 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                                 }
                                 else if (mmd.hasMap())
                                 {
-                                    // TODO Support map, but we can't join to anything from this, so of what value?
+                                    joinedCmd = mmd.getMap().getValueClassMetaData(clr, metaDataManager);
+                                    if (joinedCmd != null)
+                                    {
+                                        // JPA assumption that the value is an entity ... but it may not be!
+                                        joinedCls = clr.classForName(joinedCmd.getFullClassName());
+                                    }
                                 }
                                 else if (mmd.hasArray())
                                 {
