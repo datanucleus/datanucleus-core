@@ -66,8 +66,7 @@ public class JPQLParser implements Parser
         if (p.ci.getIndex() != p.ci.getEndIndex())
         {
             // Error occurred in the JDOQL processing due to syntax error(s)
-            String unparsed = p.getInput().substring(p.ci.getIndex());
-            throw new QueryCompilerSyntaxException("Portion of expression could not be parsed: " + unparsed);
+            throw new QueryCompilerSyntaxException("Portion of expression could not be parsed: " + p.getInput().substring(p.ci.getIndex()));
         }
         return result;
     }
@@ -748,8 +747,7 @@ public class JPQLParser implements Parser
                 }
                 else
                 {
-                    throw new NucleusException("Encountered IS " + (not ? "NOT " : " ") + 
-                        " that should be followed by NULL | EMPTY but isnt");
+                    throw new NucleusException("Encountered IS " + (not ? "NOT " : " ") + " that should be followed by NULL | EMPTY but isnt");
                 }
             }
             else if (p.parseString("<="))
@@ -869,8 +867,7 @@ public class JPQLParser implements Parser
             processPrimary();
             if (stack.peek() == null)
             {
-                throw new QueryCompilerSyntaxException("Expected literal|parameter but got " + 
-                    p.remaining(), p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("Expected literal|parameter but got " + p.remaining(), p.getIndex(), p.getInput());
             }
 
             // Generate node for comparison with this value
@@ -892,6 +889,12 @@ public class JPQLParser implements Parser
                     containsNode.addProperty(inputNode);
                     valueNode.appendChildNode(containsNode);
                     inNode = valueNode;
+                    if (not)
+                    {
+                        Node notNode = new Node(NodeType.OPERATOR, "!");
+                        notNode.appendChildNode(inNode);
+                        inNode = notNode;
+                    }
                     break;
                 }
             }
@@ -915,8 +918,7 @@ public class JPQLParser implements Parser
 
         if (!p.parseChar(')'))
         {
-            throw new QueryCompilerSyntaxException("Expected: ')' but got " + p.remaining(), 
-                p.getIndex(), p.getInput());
+            throw new QueryCompilerSyntaxException("Expected: ')' but got " + p.remaining(), p.getIndex(), p.getInput());
         }
 
         stack.push(inNode);
