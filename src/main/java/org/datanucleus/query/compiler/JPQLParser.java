@@ -937,9 +937,10 @@ public class JPQLParser implements Parser
         Node containerNode = stack.peek();
 
         // Make sure we put the INVOKE at the end of the IDENTIFIER chain
-        while (containerNode.getFirstChild() != null)
+        Node lastNode = containerNode;
+        while (lastNode.getFirstChild() != null)
         {
-            containerNode = containerNode.getFirstChild();
+            lastNode = lastNode.getFirstChild();
         }
 
         if (not)
@@ -955,7 +956,7 @@ public class JPQLParser implements Parser
         //      ---> Node(IDENTIFIER, containsNode)
         Node containsNode = new Node(NodeType.INVOKE, "contains");
         containsNode.addProperty(inputNode);
-        containerNode.appendChildNode(containsNode);
+        lastNode.appendChildNode(containsNode);
     }
 
     /**

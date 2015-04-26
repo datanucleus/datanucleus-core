@@ -414,6 +414,10 @@ public class ExpressionCompiler
                             currentExpr = new PrimaryExpression(tupple.subList(0, tupple.size()-1));
                         }
                     }
+                    else if (currentExpr != null && tupple.size() > 1)
+                    {
+                        currentExpr = new PrimaryExpression(currentExpr, tupple.subList(0, tupple.size()-1));
+                    }
 
                     String methodName = (String)tupple.get(tupple.size()-1);
                     if (currentExpr instanceof PrimaryExpression)
