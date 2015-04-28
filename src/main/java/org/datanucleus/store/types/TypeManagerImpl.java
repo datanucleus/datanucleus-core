@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
@@ -59,7 +59,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
     protected transient ClassLoaderResolver clr;
 
     /** Map of java types, keyed by the class name. */
-    protected Map<String, JavaType> javaTypes = new HashMap();
+    protected Map<String, JavaType> javaTypes = new ConcurrentHashMap();
 
     /** Map of TypeConverter keyed by their symbolic name. */
     protected Map<String, TypeConverter> convertersByName = null;
@@ -384,14 +384,14 @@ public class TypeManagerImpl implements TypeManager, Serializable
     {
         if (convertersByName == null)
         {
-            convertersByName = new HashMap<String, TypeConverter>();
+            convertersByName = new ConcurrentHashMap<String, TypeConverter>();
         }
         convertersByName.put(name, converter);
         if (autoApply)
         {
             if (autoApplyConvertersByType == null)
             {
-                autoApplyConvertersByType = new HashMap<String, TypeConverter>();
+                autoApplyConvertersByType = new ConcurrentHashMap<String, TypeConverter>();
             }
             autoApplyConvertersByType.put(autoApplyType, converter);
         }
@@ -440,7 +440,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
     @Override
     public TypeConverter getTypeConverterForType(Class memberType, Class datastoreType)
     {
-        if (typeConverterMap == null)
+        if (typeConverterMap == null || memberType == null)
         {
             return null;
         }
@@ -762,14 +762,14 @@ public class TypeManagerImpl implements TypeManager, Serializable
                     registerConverter(name, conv);
                     if (typeConverterMap == null)
                     {
-                        typeConverterMap = new HashMap<Class, Map<Class,TypeConverter>>();
+                        typeConverterMap = new ConcurrentHashMap<Class, Map<Class,TypeConverter>>();
                     }
                     memberType = clr.classForName(memberTypeName);
                     Class datastoreType = clr.classForName(datastoreTypeName);
                     Map<Class, TypeConverter> convertersForMember = typeConverterMap.get(memberType);
                     if (convertersForMember == null)
                     {
-                        convertersForMember = new HashMap<Class, TypeConverter>();
+                        convertersForMember = new ConcurrentHashMap<Class, TypeConverter>();
                         typeConverterMap.put(memberType, convertersForMember);
                     }
                     convertersForMember.put(datastoreType, conv);
