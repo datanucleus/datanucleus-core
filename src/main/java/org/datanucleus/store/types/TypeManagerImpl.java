@@ -373,7 +373,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
     @Override
     public TypeConverter getTypeConverterForName(String converterName)
     {
-        return convertersByName == null ? null : convertersByName.get(converterName);
+        return (convertersByName == null || converterName == null) ? null : convertersByName.get(converterName);
     }
 
     /* (non-Javadoc)
@@ -459,7 +459,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
     @Override
     public Collection<TypeConverter> getTypeConvertersForType(Class memberType)
     {
-        if (typeConverterMap == null)
+        if (typeConverterMap == null || memberType == null)
         {
             return null;
         }
