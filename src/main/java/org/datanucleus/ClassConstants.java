@@ -88,5 +88,5 @@ public class ClassConstants
     public static final Class IDENTITY_SINGLEFIELD_BYTE = ByteId.class;
     public static final Class IDENTITY_SINGLEFIELD_OBJECT = ObjectId.class;
     public static final Class IDENTITY_SINGLEFIELD_SHORT = ShortId.class;
-    public static final Class IDENTITY_OID_IMPL = DatastoreIdImpl.class;
+    public static final Class IDENTITY_DATASTORE_IMPL = DatastoreIdImpl.class;
 }

@@ -83,7 +83,7 @@ public class ClassNameConstants
     public static final String IDENTITY_SINGLEFIELD_BYTE = ClassConstants.IDENTITY_SINGLEFIELD_BYTE.getName();
     public static final String IDENTITY_SINGLEFIELD_OBJECT = ClassConstants.IDENTITY_SINGLEFIELD_OBJECT.getName();
     public static final String IDENTITY_SINGLEFIELD_SHORT = ClassConstants.IDENTITY_SINGLEFIELD_SHORT.getName();
-    public static final String IDENTITY_OID_IMPL = ClassConstants.IDENTITY_OID_IMPL.getName();
+    public static final String IDENTITY_OID_IMPL = ClassConstants.IDENTITY_DATASTORE_IMPL.getName();
 
     public static final String PERSISTABLE = Persistable.class.getName();
     public static final String STATE_MANAGER = StateManager.class.getName();

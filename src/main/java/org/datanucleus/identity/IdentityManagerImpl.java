@@ -145,7 +145,7 @@ public class IdentityManagerImpl implements IdentityManager
     public DatastoreId getDatastoreId(String className, Object value)
     {
         DatastoreId id;
-        if (datastoreIdClass == ClassConstants.IDENTITY_OID_IMPL)
+        if (datastoreIdClass == ClassConstants.IDENTITY_DATASTORE_IMPL)
         {
             //we hard code OIDImpl to improve performance
             id = new DatastoreIdImpl(className, value);
@@ -217,7 +217,7 @@ public class IdentityManagerImpl implements IdentityManager
     public DatastoreId getDatastoreId(String idString)
     {
         DatastoreId id;
-        if (datastoreIdClass == ClassConstants.IDENTITY_OID_IMPL)
+        if (datastoreIdClass == ClassConstants.IDENTITY_DATASTORE_IMPL)
         {
             //we hard code OIDImpl to improve performance
             id = new DatastoreIdImpl(idString);
