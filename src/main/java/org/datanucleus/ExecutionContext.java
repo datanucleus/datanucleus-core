@@ -939,4 +939,10 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param listener The listener
      */
     void deregisterExecutionContextListener(ExecutionContextListener listener);
+
+    /**
+     * Close the callback handler, and disconnect any registered instance listeners.
+     * Used by JCA.
+     */
+    void closeCallbackHandler();
 }

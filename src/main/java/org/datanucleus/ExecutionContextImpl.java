@@ -518,11 +518,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // TODO If there is no cache we need a way for ObjectProviders to be disconnected; have ObjectProvider as listener for EC close? (ecListeners below)
         }
 
-        if (callbackHandler != null)
-        {
-            // Clear out lifecycle listeners that were registered
-            callbackHandler.close();
-        }
+        // Clear out lifecycle listeners that were registered
+        closeCallbackHandler();
 
         if (ecListeners != null)
         {
@@ -5468,6 +5465,18 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         return null;
+    }
+
+    /**
+     * Close the callback handler and disconnect any registered listeners.
+     */
+    public void closeCallbackHandler()
+    {
+        if (callbackHandler != null)
+        {
+            // Clear out lifecycle listeners that were registered
+            callbackHandler.close();
+        }
     }
 
     // ------------------------------- Assert Utilities ---------------------------------
