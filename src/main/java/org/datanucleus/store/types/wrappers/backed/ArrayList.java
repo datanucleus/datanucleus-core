@@ -132,7 +132,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
             {
                 if (SCOUtils.useQueuedUpdate(ownerOP))
                 {
-                    if (ownerOP.isFlushedToDatastore())
+                    if (ownerOP.isFlushedToDatastore() || !ownerOP.getLifecycleState().isNew())
                     {
                         ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
 

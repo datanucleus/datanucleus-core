@@ -133,7 +133,7 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
             // TODO This does clear+addAll : Improve this and work out which elements are added and which deleted
             if (backingStore != null)
             {
-                if (SCOUtils.useQueuedUpdate(ownerOP))
+                if (SCOUtils.useQueuedUpdate(ownerOP) || !ownerOP.getLifecycleState().isNew())
                 {
                     if (ownerOP.isFlushedToDatastore())
                     {
