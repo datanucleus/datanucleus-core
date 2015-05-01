@@ -177,7 +177,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
                 {
                     if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
-                        if (ownerOP.isFlushedToDatastore())
+                        if (ownerOP.isFlushedToDatastore() || !ownerOP.getLifecycleState().isNew())
                         {
                             ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
                         }
@@ -195,7 +195,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
                 {
                     if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
-                        if (ownerOP.isFlushedToDatastore())
+                        if (ownerOP.isFlushedToDatastore() || !ownerOP.getLifecycleState().isNew())
                         {
                             for (Object element : c)
                             {

@@ -143,7 +143,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
                 }
                 if (backingStore != null)
                 {
-                    if (SCOUtils.useQueuedUpdate(ownerOP))
+                    if (SCOUtils.useQueuedUpdate(ownerOP) || !ownerOP.getLifecycleState().isNew())
                     {
                         for (Object element : c)
                         {
@@ -177,7 +177,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
                 {
                     if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
-                        if (ownerOP.isFlushedToDatastore())
+                        if (ownerOP.isFlushedToDatastore() || !ownerOP.getLifecycleState().isNew())
                         {
                             ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
                         }
@@ -196,7 +196,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
                 {
                     if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
-                        if (ownerOP.isFlushedToDatastore())
+                        if (ownerOP.isFlushedToDatastore() || !ownerOP.getLifecycleState().isNew())
                         {
                             for (Object element : c)
                             {
