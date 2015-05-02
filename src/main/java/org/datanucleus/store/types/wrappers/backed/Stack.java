@@ -179,7 +179,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
                 {
                     if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
-                        if (ownerOP.isFlushedToDatastore())
+                        if (ownerOP.isFlushedToDatastore() || !ownerOP.getLifecycleState().isNew())
                         {
                             ownerOP.getExecutionContext().addOperationToQueue(new CollectionClearOperation(ownerOP, backingStore));
                         }
@@ -198,7 +198,7 @@ public class Stack extends org.datanucleus.store.types.wrappers.Stack implements
                 {
                     if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
-                        if (ownerOP.isFlushedToDatastore())
+                        if (ownerOP.isFlushedToDatastore() || !ownerOP.getLifecycleState().isNew())
                         {
                             for (Object element : c)
                             {

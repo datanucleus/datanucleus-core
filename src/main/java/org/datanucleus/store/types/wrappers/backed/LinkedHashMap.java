@@ -168,7 +168,7 @@ public class LinkedHashMap extends org.datanucleus.store.types.wrappers.LinkedHa
                     if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         // If not yet flushed to store then no need to add to queue (since will be handled via insert)
-                        if (ownerOP.isFlushedToDatastore())
+                        if (ownerOP.isFlushedToDatastore() || !ownerOP.getLifecycleState().isNew())
                         {
                             ownerOP.getExecutionContext().addOperationToQueue(new MapClearOperation(ownerOP, backingStore));
                         }
@@ -188,7 +188,7 @@ public class LinkedHashMap extends org.datanucleus.store.types.wrappers.LinkedHa
                     if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
                         // If not yet flushed to store then no need to add to queue (since will be handled via insert)
-                        if (ownerOP.isFlushedToDatastore())
+                        if (ownerOP.isFlushedToDatastore() || !ownerOP.getLifecycleState().isNew())
                         {
                             Iterator iter = m.entrySet().iterator();
                             while (iter.hasNext())
