@@ -2611,27 +2611,6 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
-     * Accessor for MetaData for an overridden field/property in this class.
-     * @param position The position of the overridden field/property.
-     * @return MetaData for the field/property at that position
-     */
-    public AbstractMemberMetaData getOverriddenMember(int position)
-    {
-        checkInitialised();
-
-        if (overriddenMembers == null)
-        {
-            return null;
-        }
-        if (position < 0 || position >= overriddenMembers.length)
-        {
-            return null;
-        }
-
-        return overriddenMembers[position];
-    }
-
-    /**
      * Accessor for an overridden field/property with the specified name.
      * @param name Name of the field/property
      * @return The MetaData for the field/property
