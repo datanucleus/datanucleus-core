@@ -27,6 +27,9 @@ package org.datanucleus.metadata;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -352,6 +355,51 @@ public class ClassMetaData extends AbstractClassMetaData
                         }
                     }
                 }
+
+                // Check for any TypeVariables used with Java bean getter/setter methods in superclass(es) and override the metadata in the superclass to use the right type
+                Method[] allclsMethods = cls.getMethods();
+                for (int i=0;i<allclsMethods.length;i++)
+                {
+                    // Limit to valid java bean getter methods in this class (don't allow inner class methods)
+                    if (!allclsMethods[i].getDeclaringClass().getName().equals(fullName) && 
+                        ClassUtils.isJavaBeanGetterMethod(allclsMethods[i]) && !ClassUtils.isInnerClass(allclsMethods[i].getName()) &&
+                        allclsMethods[i].getGenericReturnType() != null && allclsMethods[i].getGenericReturnType() instanceof TypeVariable)
+                    {
+                        TypeVariable methodTypeVar = (TypeVariable) allclsMethods[i].getGenericReturnType();
+                        Class declCls = allclsMethods[i].getDeclaringClass();
+                        TypeVariable[] declTypes = declCls.getTypeParameters();
+                        if (declTypes != null)
+                        {
+                            for (int j=0;j<declTypes.length;j++)
+                            {
+                                if (declTypes[j].getName().equals(methodTypeVar.getName()) && cls.getGenericSuperclass() instanceof ParameterizedType)
+                                {
+                                    ParameterizedType genSuperclsType = (ParameterizedType) cls.getGenericSuperclass();
+                                    Type[] paramTypeArgs = genSuperclsType.getActualTypeArguments();
+                                    if (paramTypeArgs != null && paramTypeArgs.length > j)
+                                    {
+                                        NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " method=" + allclsMethods[i].getName() +
+                                            " declared to return " + methodTypeVar + ", namely TypeVariable(" + j + ") of " + declCls.getName() + " so using " + paramTypeArgs[j]);
+                                        String propertyName = allclsMethods[i].getDeclaringClass().getName() + "." + ClassUtils.getFieldNameForJavaBeanGetter(allclsMethods[i].getName());
+                                        if (Collections.binarySearch(members, propertyName) < 0)
+                                        {
+                                            // No property of this name - add a default PropertyMetaData for this method with the type set to what we need
+                                            NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, propertyName));
+                                            AbstractMemberMetaData mmd = new PropertyMetaData(this, propertyName);
+                                            mmd.type = (Class) paramTypeArgs[j];
+                                            members.add(mmd);
+                                            Collections.sort(members);
+                                        }
+                                        else
+                                        {
+                                            // TODO Cater for the user overriding it
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             // Process all (reflected) fields in the populating class
@@ -369,21 +417,72 @@ public class ClassMetaData extends AbstractClassMetaData
                     if (Collections.binarySearch(members, clsFields[i].getName()) < 0)
                     {
                         // No field/property of this name
+                        AbstractMemberMetaData mmd = new FieldMetaData(this, clsFields[i].getName());
                         if (hasProperties && api.equalsIgnoreCase("JPA"))
                         {
                             // JPA : Class has properties but field not present, so add as transient field (JPA)
-                            AbstractMemberMetaData mmd = new FieldMetaData(this, clsFields[i].getName());
                             mmd.setNotPersistent();
-                            members.add(mmd);
-                            Collections.sort(members);
                         }
                         else
                         {
                             // Class has fields but field not present, so add as field
                             NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, clsFields[i].getName()));
-                            AbstractMemberMetaData mmd = new FieldMetaData(this, clsFields[i].getName());
-                            members.add(mmd);
-                            Collections.sort(members);
+                        }
+                        members.add(mmd);
+                        Collections.sort(members);
+                    }
+                }
+            }
+
+            // Check for any TypeVariables used with fields in superclass(es) and override the metadata in the superclass to use the right type
+            Class theClass = cls;
+            while (theClass.getSuperclass() != null)
+            {
+                theClass = theClass.getSuperclass();
+                Field[] theclsFields = theClass.getDeclaredFields();
+                for (int i=0;i<theclsFields.length;i++)
+                {
+                    if (!theclsFields[i].getName().startsWith(mmgr.getEnhancedMethodNamePrefix()) &&
+                        !ClassUtils.isInnerClass(theclsFields[i].getName()) && !Modifier.isStatic(theclsFields[i].getModifiers()) &&
+                        theclsFields[i].getGenericType() != null && theclsFields[i].getGenericType() instanceof TypeVariable)
+                    {
+                        TypeVariable fieldTypeVar = (TypeVariable) theclsFields[i].getGenericType();
+                        Class declCls = theclsFields[i].getDeclaringClass();
+                        TypeVariable[] declTypes = declCls.getTypeParameters();
+                        if (declTypes != null)
+                        {
+                            for (int j=0;j<declTypes.length;j++)
+                            {
+                                if (declTypes[j].getName().equals(fieldTypeVar.getName()) && cls.getGenericSuperclass() instanceof ParameterizedType)
+                                {
+                                    ParameterizedType genSuperclsType = (ParameterizedType) cls.getGenericSuperclass();
+                                    Type[] paramTypeArgs = genSuperclsType.getActualTypeArguments();
+                                    if (paramTypeArgs != null && paramTypeArgs.length > j)
+                                    {
+                                        NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " field=" + theclsFields[i].getName() +
+                                            " declared to be " + fieldTypeVar + ", namely TypeVariable(" + j + ") of " + declCls.getName() + " so using " + paramTypeArgs[j]);
+                                        String fieldName = declCls.getName() + "." + theclsFields[i].getName();
+                                        if (Collections.binarySearch(members, fieldName) < 0)
+                                        {
+                                            // No property of this name - add a default FieldMetaData for this method with the type set to what we need
+                                            NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, fieldName));
+                                            AbstractMemberMetaData mmd = new FieldMetaData(this, fieldName);
+                                            if (hasProperties && api.equalsIgnoreCase("JPA"))
+                                            {
+                                                // JPA : Class has properties but field not present, so add as transient field (JPA)
+                                                mmd.setNotPersistent();
+                                            }
+                                            mmd.type = (Class) paramTypeArgs[j];
+                                            members.add(mmd);
+                                            Collections.sort(members);
+                                        }
+                                        else
+                                        {
+                                            // TODO Cater for the user overriding it
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
