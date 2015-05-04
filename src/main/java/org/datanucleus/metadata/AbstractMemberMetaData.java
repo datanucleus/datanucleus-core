@@ -420,13 +420,17 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         }
 
         memberRepresented = (field != null ? field : method);
-        if (field != null)
+        if (type == null)
         {
-        	this.type = field.getType();
-        }
-        else if (method != null)
-        {
-        	this.type = method.getReturnType();
+            // Type not yet set so set from field/method (will only be set if we are imposing the type due to Java generics TypeVariable usage)
+            if (field != null)
+            {
+                this.type = field.getType();
+            }
+            else if (method != null)
+            {
+                this.type = method.getReturnType();
+            }
         }
 
         if (className != null)
