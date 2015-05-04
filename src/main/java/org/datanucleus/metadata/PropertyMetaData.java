@@ -91,7 +91,7 @@ public class PropertyMetaData extends AbstractMemberMetaData
      */
     public String toString(String prefix,String indent)
     {
-        // If this field is static, don't bother with MetaData since JDO will ignore it anway.
+        // If this field is static, don't bother with MetaData since JDO will ignore it anyway.
         if (isStatic())
         {
             return "";
