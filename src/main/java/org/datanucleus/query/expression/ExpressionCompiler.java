@@ -137,6 +137,14 @@ public class ExpressionCompiler
                     {
                         joinTypeId = JoinType.JOIN_LEFT_OUTER;
                     }
+                    else if (joinType.equals("JOIN_OUTER_FETCH_RIGHT"))
+                    {
+                        joinTypeId = JoinType.JOIN_RIGHT_OUTER_FETCH;
+                    }
+                    else if (joinType.equals("JOIN_OUTER_RIGHT"))
+                    {
+                        joinTypeId = JoinType.JOIN_RIGHT_OUTER;
+                    }
                     Node joinedNode = childNode.getFirstChild();
                     Node joinedAliasNode = childNode.getNextChild();
                     PrimaryExpression primExpr = (PrimaryExpression)compilePrimaryExpression(joinedNode);

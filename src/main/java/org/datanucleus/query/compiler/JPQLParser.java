@@ -357,8 +357,9 @@ public class JPQLParser implements Parser
         boolean moreJoins = true;
         while (moreJoins)
         {
-            // Check for JOIN syntax "[LEFT [OUTER] | INNER] JOIN ... [ON {cond_expr}]"  (EJB3 syntax)
+            // Check for JOIN syntax "[LEFT|RIGHT [OUTER] | INNER] JOIN ... [ON {cond_expr}]"  (EJB3 syntax)
             boolean leftJoin = false;
+            boolean rightJoin = false; // extension to JPA
             boolean innerJoin = false;
             if (p.parseStringIgnoreCase("INNER "))
             {
@@ -370,10 +371,16 @@ public class JPQLParser implements Parser
                 p.parseStringIgnoreCase("OUTER");
                 leftJoin = true;
             }
+            else if (p.parseStringIgnoreCase("RIGHT "))
+            {
+                //optional and useless (for parser) outer keyword
+                p.parseStringIgnoreCase("OUTER");
+                rightJoin = true;
+            }
 
             if (p.parseStringIgnoreCase("JOIN "))
             {
-                if (!innerJoin && !leftJoin)
+                if (!innerJoin && !leftJoin && !rightJoin)
                 {
                     innerJoin = true;
                 }
@@ -416,6 +423,10 @@ public class JPQLParser implements Parser
                 else if (leftJoin)
                 {
                     joinType = (fetch ? "JOIN_OUTER_FETCH" : "JOIN_OUTER");
+                }
+                else if (rightJoin)
+                {
+                    joinType = (fetch ? "JOIN_OUTER_FETCH_RIGHT" : "JOIN_OUTER_RIGHT");
                 }
                 Node joinNode = new Node(NodeType.OPERATOR, joinType);
                 joinNode.appendChildNode(joinedNode);
