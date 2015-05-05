@@ -870,21 +870,19 @@ public class JPQLParser implements Parser
                 throw new QueryCompilerSyntaxException("Expected literal|parameter but got " + p.remaining(), p.getIndex(), p.getInput());
             }
 
-            // Generate node for comparison with this value
             numArgs++;
+            // Generate node for comparison with this value
             Node valueNode = stack.pop();
-
             p.skipWS();
-            if (numArgs == 1 && !p.peekStringIgnoreCase(",") && valueNode.getNodeType() == NodeType.PARAMETER &&
-                parameterValues != null && parameterValues.containsKey(valueNode.getNodeValue()))
+
+            if (numArgs == 1 && !p.peekStringIgnoreCase(",") && valueNode.getNodeType() == NodeType.PARAMETER)
             {
-                // Special case of "xxx IN :param" where param is multiple-valued
-                Object paramValue = parameterValues.get(valueNode.getNodeValue());
-                if (paramValue instanceof Collection)
+                if (parameterValues != null && parameterValues.containsKey(valueNode.getNodeValue()) && parameterValues.get(valueNode.getNodeValue()) instanceof Collection)
                 {
+                    // Special case of "xxx IN :param" where param is multiple-valued
                     // Node (PARAMETER, param)
                     // ---> Node (INVOKE, "contains")
-                    //      ---> Node(IDENTIFIER, inputNode)
+                    // ---> Node(IDENTIFIER, inputNode)
                     Node containsNode = new Node(NodeType.INVOKE, "contains");
                     containsNode.addProperty(inputNode);
                     valueNode.appendChildNode(containsNode);
@@ -897,12 +895,20 @@ public class JPQLParser implements Parser
                     }
                     break;
                 }
+
+                // Special case of "xxx IN (:param)" so compile as IN/NOT IN since the param may not be a Collection
+                inNode = new Node(NodeType.OPERATOR, (not ? "NOT IN" : "IN"));
+                inNode.appendChildNode(inputNode);
+                inNode.appendChildNode(valueNode);
+                stack.push(inNode);
+                break;
             }
 
+            // Compile as (input == val1 || input == val2 || input == val3) 
+            //      or as (input != val1 && input != val2 && input != val3)
             Node compareNode = new Node(NodeType.OPERATOR, (not ? "!=" : "=="));
             compareNode.appendChildNode(inputNode);
             compareNode.appendChildNode(valueNode);
-
             if (inNode == null)
             {
                 inNode = compareNode;
