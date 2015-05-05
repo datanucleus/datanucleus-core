@@ -38,7 +38,7 @@ public class JoinExpression extends Expression
 
     JoinType type;
     PrimaryExpression primExpr; // Expression for the field we are joining to
-    DyadicExpression onExpr; // Optional ON expression to add to the join clause
+    Expression onExpr; // Optional ON expression to add to the join clause
 
     public JoinExpression(PrimaryExpression expr, String alias, JoinType type)
     {
@@ -52,7 +52,7 @@ public class JoinExpression extends Expression
         this.right = expr;
     }
 
-    public void setOnExpression(DyadicExpression expr)
+    public void setOnExpression(Expression expr)
     {
         this.onExpr = expr;
     }
@@ -62,7 +62,7 @@ public class JoinExpression extends Expression
         return primExpr;
     }
 
-    public DyadicExpression getOnExpression()
+    public Expression getOnExpression()
     {
         return onExpr;
     }

@@ -148,15 +148,15 @@ public class ExpressionCompiler
                     Node joinedNode = childNode.getFirstChild();
                     Node joinedAliasNode = childNode.getNextChild();
                     PrimaryExpression primExpr = (PrimaryExpression)compilePrimaryExpression(joinedNode);
-                    DyadicExpression onExpr = null;
+
+                    Expression onExpr = null;
                     if (childNode.hasNextChild())
                     {
                         Node onNode = childNode.getNextChild();
-                        onExpr = (DyadicExpression)compileExpression(onNode);
+                        onExpr = compileExpression(onNode);
                     }
 
-                    JoinExpression joinExpr = new JoinExpression(primExpr, 
-                        (String)joinedAliasNode.getNodeValue(), joinTypeId);
+                    JoinExpression joinExpr = new JoinExpression(primExpr, (String)joinedAliasNode.getNodeValue(), joinTypeId);
                     if (currentJoinExpr != null)
                     {
                         currentJoinExpr.setJoinExpression(joinExpr);
