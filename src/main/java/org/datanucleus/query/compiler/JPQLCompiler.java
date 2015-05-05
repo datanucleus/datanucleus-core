@@ -56,7 +56,7 @@ public class JPQLCompiler extends JavaQueryCompiler
      */
     public QueryCompilation compile(Map parameters, Map subqueryMap)
     {
-        parser = new JPQLParser(null, parameters); // TODO Add options
+        parser = new JPQLParser(null); // TODO Add options
         symtbl = new SymbolTable();
         symtbl.setSymbolResolver(this);
         if (parentCompiler != null)

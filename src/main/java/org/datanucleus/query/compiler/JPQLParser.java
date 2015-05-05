@@ -21,7 +21,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Deque;
@@ -42,16 +41,12 @@ public class JPQLParser implements Parser
     /** Characters that parameters can be prefixed by. */
     private static String paramPrefixes = ":?";
 
-    private Map parameterValues;
-
     /**
      * Constructor for a JPQL Parser.
      * @param options parser options
-     * @param params Map of parameter values keyed by name/number
      */
-    public JPQLParser(Map options, Map params)
+    public JPQLParser(Map options)
     {
-        parameterValues = params;
     }
 
     /* (non-Javadoc)
@@ -877,27 +872,7 @@ public class JPQLParser implements Parser
 
             if (numArgs == 1 && !p.peekStringIgnoreCase(",") && valueNode.getNodeType() == NodeType.PARAMETER)
             {
-                if (parameterValues != null && parameterValues.containsKey(valueNode.getNodeValue()) && parameterValues.get(valueNode.getNodeValue()) instanceof Collection)
-                {
-                    // TODO Just pass this through as "IN"/"NOT IN" and update QueryToSQLMapper to perform a contains() invoke when it is a collection
-                    // Special case of "xxx IN :param" where param is multiple-valued
-                    // Node (PARAMETER, param)
-                    // ---> Node (INVOKE, "contains")
-                    // ---> Node(IDENTIFIER, inputNode)
-                    Node containsNode = new Node(NodeType.INVOKE, "contains");
-                    containsNode.addProperty(inputNode);
-                    valueNode.appendChildNode(containsNode);
-                    inNode = valueNode;
-                    if (not)
-                    {
-                        Node notNode = new Node(NodeType.OPERATOR, "!");
-                        notNode.appendChildNode(inNode);
-                        inNode = notNode;
-                    }
-                    break;
-                }
-
-                // Special case of "xxx IN (:param)" so compile as IN/NOT IN since the param may not be a Collection
+                // Special case of "xxx IN (:param)" so compile as IN/NOT IN since the param could be a Collection or a single value
                 inNode = new Node(NodeType.OPERATOR, (not ? "NOT IN" : "IN"));
                 inNode.appendChildNode(inputNode);
                 inNode.appendChildNode(valueNode);
