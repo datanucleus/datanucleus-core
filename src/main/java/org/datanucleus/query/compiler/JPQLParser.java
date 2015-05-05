@@ -879,6 +879,7 @@ public class JPQLParser implements Parser
             {
                 if (parameterValues != null && parameterValues.containsKey(valueNode.getNodeValue()) && parameterValues.get(valueNode.getNodeValue()) instanceof Collection)
                 {
+                    // TODO Just pass this through as "IN"/"NOT IN" and update QueryToSQLMapper to perform a contains() invoke when it is a collection
                     // Special case of "xxx IN :param" where param is multiple-valued
                     // Node (PARAMETER, param)
                     // ---> Node (INVOKE, "contains")
