@@ -858,7 +858,8 @@ public class JPQLParser implements Parser
             Node inNode = new Node(NodeType.OPERATOR, (not ? "NOT IN" : "IN"));
             inNode.appendChildNode(inputNode);
 
-            processExpression(); // subquery variable
+            // Get variable name that was substituted for the subquery
+            processPrimary();
             Node subqueryNode = stack.pop();
             inNode.appendChildNode(subqueryNode);
             stack.push(inNode);
