@@ -24,6 +24,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -756,6 +759,33 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 {
                     elementType = ClassUtils.getCollectionElementType(method);
                 }
+                if (elementType == null)
+                {
+                    // Try to use generics to furnish any missing type info
+                    Type genericType = null;
+                    if (field != null)
+                    {
+                        genericType = field.getGenericType();
+                    }
+                    else if (method != null)
+                    {
+                        genericType = method.getGenericReturnType();
+                    }
+                    if (genericType != null && genericType instanceof ParameterizedType)
+                    {
+                        ParameterizedType paramGenType = (ParameterizedType)genericType;
+                        Type elemGenericType = paramGenType.getActualTypeArguments()[0];
+                        if (elemGenericType instanceof TypeVariable)
+                        {
+                            Type elemGenTypeBound = ((TypeVariable)elemGenericType).getBounds()[0];
+                            if (elemGenTypeBound instanceof Class)
+                            {
+                                elementType = ((Class)elemGenTypeBound).getName();
+                            }
+                        }
+                    }
+                }
+
                 if (elementType != null)
                 {
                     if (getCollection().element.type == null || 
@@ -786,6 +816,49 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 {
                     valueType = ClassUtils.getMapValueType(method);
                 }
+
+                if (keyType == null || valueType == null)
+                {
+                    // Try to use generics to furnish any missing type info
+                    Type genericType = null;
+                    if (field != null)
+                    {
+                        genericType = field.getGenericType();
+                    }
+                    else if (method != null)
+                    {
+                        genericType = method.getGenericReturnType();
+                    }
+                    if (genericType != null && genericType instanceof ParameterizedType)
+                    {
+                        ParameterizedType paramGenType = (ParameterizedType)genericType;
+                        if (keyType == null)
+                        {
+                            Type keyGenericType = paramGenType.getActualTypeArguments()[0];
+                            if (keyGenericType instanceof TypeVariable)
+                            {
+                                Type keyGenTypeBound = ((TypeVariable)keyGenericType).getBounds()[0];
+                                if (keyGenTypeBound instanceof Class)
+                                {
+                                    keyType = ((Class)keyGenTypeBound).getName();
+                                }
+                            }
+                        }
+                        if (valueType == null)
+                        {
+                            Type valueGenericType = paramGenType.getActualTypeArguments()[1];
+                            if (valueGenericType instanceof TypeVariable)
+                            {
+                                Type valueGenTypeBound = ((TypeVariable)valueGenericType).getBounds()[0];
+                                if (valueGenTypeBound instanceof Class)
+                                {
+                                    valueType = ((Class)valueGenTypeBound).getName();
+                                }
+                            }
+                        }
+                    }
+                }
+
                 if (keyType != null && valueType != null)
                 {
                     if (getMap().key.type == null || getMap().key.type.equals(ClassNameConstants.Object))
