@@ -64,6 +64,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
     /** Map of TypeConverter keyed by their symbolic name. */
     protected Map<String, TypeConverter> convertersByName = null;
 
+    /** Map of TypeConverter keyed by type name that we should default to for this type (user-defined). */
     protected Map<String, TypeConverter> autoApplyConvertersByType = null;
 
     /** Map of (Map of TypeConverter keyed by the datastore type), keyed by the member type. */
