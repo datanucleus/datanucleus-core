@@ -139,6 +139,23 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                 Collection<AnnotatedMember> annotatedFields = getFieldAnnotationsForClass(cls);
                 Collection<AnnotatedMember> annotatedMethods = getJavaBeanAccessorAnnotationsForClass(cls);
 
+                // Check for duplicate field/method and put on to field
+                for (AnnotatedMember field : annotatedFields)
+                {
+                    Iterator<AnnotatedMember> methodIter = annotatedMethods.iterator();
+                    while (methodIter.hasNext())
+                    {
+                        AnnotatedMember method = methodIter.next();
+                        if (field.getName().equals(method.getName()))
+                        {
+                            NucleusLogger.METADATA.info("Processable annotations specified on both field and getter for " + cls.getName() + "." + field.getName() + " so using as FIELD");
+                            field.addAnnotations(method.getAnnotations());
+                            methodIter.remove();
+                            break;
+                        }
+                    }
+                }
+
                 // Check if we are using property or field access
                 boolean propertyAccessor = false;
                 if (cmd.getAccessViaField() != null)
@@ -303,7 +320,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
      * Method returning a Map containing an array of the annotations for each Java Bean accessor method of the
      * passed class, keyed by the method name.
      * @param cls The class
-     * @return Collection of the annotated methods
+     * @return Collection of the annotated methods (with supported annotations)
      */
     protected Collection<AnnotatedMember> getJavaBeanAccessorAnnotationsForClass(Class cls)
     {
@@ -335,11 +352,14 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                         }
                     }
                 }
-                AnnotationObject[] objects = getAnnotationObjectsForAnnotations(cls.getName(),
-                    supportedAnnots.toArray(new Annotation[supportedAnnots.size()]));
 
-                AnnotatedMember annMember = new AnnotatedMember(new Member(methods[i]), objects);
-                annotatedMethods.add(annMember);
+                if (!supportedAnnots.isEmpty())
+                {
+                    AnnotationObject[] objects = getAnnotationObjectsForAnnotations(cls.getName(),
+                        supportedAnnots.toArray(new Annotation[supportedAnnots.size()]));
+                    AnnotatedMember annMember = new AnnotatedMember(new Member(methods[i]), objects);
+                    annotatedMethods.add(annMember);
+                }
             }
         }
 
@@ -349,7 +369,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
     /**
      * Method returning a Collection of the annotated fields for the specified class.
      * @param cls The class
-     * @return Collection of the annotated fields
+     * @return Collection of the annotated fields (with supported annotations)
      */
     protected Collection<AnnotatedMember> getFieldAnnotationsForClass(Class cls)
     {
@@ -377,11 +397,13 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                 }
             }
 
-            AnnotationObject[] objects = getAnnotationObjectsForAnnotations(cls.getName(),
-                supportedAnnots.toArray(new Annotation[supportedAnnots.size()]));
-
-            AnnotatedMember annField = new AnnotatedMember(new Member(fields[i]), objects);
-            annotatedFields.add(annField);
+            if (!supportedAnnots.isEmpty())
+            {
+                AnnotationObject[] objects = getAnnotationObjectsForAnnotations(cls.getName(),
+                    supportedAnnots.toArray(new Annotation[supportedAnnots.size()]));
+                AnnotatedMember annField = new AnnotatedMember(new Member(fields[i]), objects);
+                annotatedFields.add(annField);
+            }
         }
 
         return annotatedFields;
