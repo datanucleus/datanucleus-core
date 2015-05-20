@@ -134,7 +134,7 @@ public interface TypeManager
      * @param name The name to register the converter under
      * @param converter The converter
      * @param autoApply Whether this should be used as an auto-apply converter
-     * @param autoApplyType Type to auto apply
+     * @param autoApplyType Java type to auto apply this for
      */
     void registerConverter(String name, TypeConverter converter, boolean autoApply, String autoApplyType);
 
