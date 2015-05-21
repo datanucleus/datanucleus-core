@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.enhancer;
 
+import org.datanucleus.asm.Label;
 import org.datanucleus.asm.MethodVisitor;
 import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.methods.InitClass;
@@ -35,6 +36,7 @@ import org.datanucleus.util.Localiser;
  * <li>Any PUTFIELD on a field of a Persistable class is replaced by a call to dnSetXXX()</li>
  * <li>Any clone() method that has no superclass but calls clone() is changed to call dnSuperClone()</li>
  * <li>Any static class initialisation adds on the "InitClass" instructions</li>
+ * <li>Any user-provided "writeObject" method will have "dnPreSerialize" added before the user method code.
  * </ul>
  */
 public class EnhancerMethodAdapter extends MethodVisitor
@@ -61,6 +63,30 @@ public class EnhancerMethodAdapter extends MethodVisitor
         this.enhancer = enhancer;
         this.methodName = methodName;
         this.methodDescriptor = methodDesc;
+    }
+
+    boolean firstLabel = true;
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.asm.MethodVisitor#visitLabel(org.datanucleus.asm.Label)
+     */
+    @Override
+    public void visitLabel(Label label)
+    {
+        super.visitLabel(label);
+
+        if (methodName.equals("writeObject") && firstLabel)
+        {
+            // User has provided a "writeObject" method so enhance it by adding "dnPreSerialize" before user code (so after the first "label")
+            mv.visitVarInsn(Opcodes.ALOAD, 0);
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, enhancer.getASMClassName(), enhancer.getNamer().getPreSerializeMethodName(), "()V");
+            // TODO Really would like "new Label", "visitLabel", "visitLineNumber" so it appears correct in byte-code decompilers ...
+            if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
+            {
+                DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005033", enhancer.getClassName() + "." + methodName));
+            }
+        }
+        firstLabel = false;
     }
 
     /**
@@ -151,7 +177,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
             enhancer.getClassMetaData().getPersistableSuperclass() == null &&
             opcode == Opcodes.INVOKESPECIAL && name.equals("clone") && desc.equals("()Ljava/lang/Object;"))
         {
-            // clone() method calls super.clone() so change to use JdoSuperClone()
+            // clone() method calls super.clone() so change to use dnSuperClone()
             mv.visitMethodInsn(Opcodes.INVOKESPECIAL, enhancer.getASMClassName(), enhancer.getNamer().getSuperCloneMethodName(), "()Ljava/lang/Object;");
             return;
         }

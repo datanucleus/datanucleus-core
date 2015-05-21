@@ -40,8 +40,7 @@ public class WriteObject extends ClassMethod
 {
     public static WriteObject getInstance(ClassEnhancer enhancer)
     {
-        return new WriteObject(enhancer, "writeObject", 
-            Opcodes.ACC_PRIVATE,
+        return new WriteObject(enhancer, "writeObject", Opcodes.ACC_PRIVATE,
             null, new Class[] {ObjectOutputStream.class}, new String[] {"out"},
             new String[] {IOException.class.getName().replace('.', '/')});
     }
@@ -86,11 +85,13 @@ public class WriteObject extends ClassMethod
 
         Label startLabel = new Label();
         visitor.visitLabel(startLabel);
+
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
-            getNamer().getPreSerializeMethodName(), "()V");
+        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), getNamer().getPreSerializeMethodName(), "()V");
+
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/ObjectOutputStream", "defaultWriteObject", "()V");
+
         visitor.visitInsn(Opcodes.RETURN);
 
         Label endLabel = new Label();
