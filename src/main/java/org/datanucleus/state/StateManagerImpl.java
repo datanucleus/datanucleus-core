@@ -789,7 +789,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
 
             if (myEC == ((StateManagerImpl)sm).getExecutionContext())
             {
-                NucleusLogger.PERSISTENCE.debug(">> SM.replacingStateManager this=" + this + " sm=" + sm + " with same EC");
+                NucleusLogger.PERSISTENCE.debug("StateManagerImpl.replacingStateManager this=" + this + " sm=" + sm + " with same EC");
                 // This is a race condition when makePersistent or makeTransactional is called on the same PC instance for the
                 // same PM. It has been already set to this SM - just disconnect the other one. Return this SM so it won't be replaced.
                 ((StateManagerImpl)sm).disconnect();
@@ -2235,9 +2235,8 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
 
     /**
      * Utility to set the identity for the Persistable object.
-     * Creates the identity instance if the required PK field(s) are all already set (by the user, or by
-     * a value-strategy). If the identity is set in the datastore (sequence, autoassign, etc) then this
-     * will not set the identity.
+     * Creates the identity instance if the required PK field(s) are all already set (by the user, or by a value-strategy). 
+     * If the identity is set in the datastore (sequence, autoassign, etc) then this will not set the identity.
      * @param afterPreStore Whether preStore has (just) been invoked
      */
     private void setIdentity(boolean afterPreStore)
@@ -2270,24 +2269,25 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                         idSetInDatastore = true;
                         break;
                     }
-                    else if (cmd.usesSingleFieldIdentityClass())
+                    // TODO This was enabled up to and including 4.1.0. No idea why since the JDO TCK runs fine without it as do DN tests. Delete it at some future point (and the input arg)
+                    // Having this block will cause problems for single-field id cases where you call pm.makeTransactional
+                    // Alternatively, why is this ONLY for single-field id, and what situation does it cover, so add comments that clarify it
+                    /*else if (cmd.usesSingleFieldIdentityClass())
                     {
                         if (this.provideField(fieldNumber) == null)
                         {
-                            // PK field has not had its value set (user/value-strategy)
-                            // and must be set for single-field identity
+                            // PK field has not had its value set (user/value-strategy) and must be set for single-field identity
                             if (afterPreStore)
                             {
                                 // Not set even after preStore, so user error
-                                throw new NucleusUserException(Localiser.msg("026017", cmd.getFullClassName(), 
-                                    fmd.getName())).setFatal();
+                                throw new NucleusUserException(Localiser.msg("026017", cmd.getFullClassName(), fmd.getName())).setFatal();
                             }
 
                             // Log that the value is not yet set for this field, maybe set later in preStore?
                             NucleusLogger.PERSISTENCE.debug(Localiser.msg("026017", cmd.getFullClassName(), fmd.getName()));
                             return;
                         }
-                    }
+                    }*/
                 }
             }
 
@@ -2348,8 +2348,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             int fieldNumber = cmd.getAbsolutePositionOfMember(fieldName);
             if (fieldNumber == -1)
             {
-                throw myEC.getApiAdapter().getUserExceptionForException(
-                    Localiser.msg("026002", fieldName, cmd.getFullClassName()), null);
+                throw myEC.getApiAdapter().getUserExceptionForException(Localiser.msg("026002", fieldName, cmd.getFullClassName()), null);
             }
 
             makeDirty(fieldNumber);
