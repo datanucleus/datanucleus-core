@@ -425,55 +425,51 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
 
         if (cmd.getIdentityType() == IdentityType.APPLICATION)
         {
-            //load key fields from Application Id instance to PC instance
-
-            //if a primary key field is of type Persistable, it must first be persistent
-            int totalNumFields = cmd.getAllMemberPositions().length;
-            for (int fieldNumber = 0; fieldNumber < totalNumFields; fieldNumber++)
+            int[] pkFieldNumbers = cmd.getPKMemberPositions();
+            for (int i=0;i<pkFieldNumbers.length;i++)
             {
+                int fieldNumber = pkFieldNumbers[i];
                 AbstractMemberMetaData fmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-                if (fmd.isPrimaryKey())
+                if (myEC.getMetaDataManager().getMetaDataForClass(fmd.getType(), getExecutionContext().getClassLoaderResolver()) != null)
                 {
-                    if (myEC.getMetaDataManager().getMetaDataForClass(fmd.getType(), getExecutionContext().getClassLoaderResolver()) != null)
+                    // if a primary key field is of type Persistable, it must first be persistent
+                    try
                     {
+                        if (myEC.getMultithreaded())
+                        {
+                            myEC.getLock().lock();
+                            lock.lock();
+                        }
+
+                        FieldManager prevFM = currFM;
                         try
                         {
-                            if (myEC.getMultithreaded())
+                            currFM = new SingleValueFieldManager();
+                            myPC.dnProvideField(fieldNumber);
+                            Persistable pkFieldPC = (Persistable) ((SingleValueFieldManager) currFM).fetchObjectField(fieldNumber);
+                            if (pkFieldPC == null)
                             {
-                                myEC.getLock().lock();
-                                lock.lock();
+                                throw new NucleusUserException(Localiser.msg("026016", fmd.getFullFieldName()));
                             }
-
-                            FieldManager prevFM = currFM;
-                            try
+                            if (!myEC.getApiAdapter().isPersistent(pkFieldPC))
                             {
-                                currFM = new SingleValueFieldManager();
-                                myPC.dnProvideField(fieldNumber);
-                                Persistable pkFieldPC = (Persistable) ((SingleValueFieldManager) currFM).fetchObjectField(fieldNumber);
-                                if (pkFieldPC == null)
-                                {
-                                    throw new NucleusUserException(Localiser.msg("026016", fmd.getFullFieldName()));
-                                }
-                                if (!myEC.getApiAdapter().isPersistent(pkFieldPC))
-                                {
-                                    // Make sure the PC field is persistent - can cause the insert of our object 
-                                    // being managed by this SM via flush() when bidir relation
-                                    Object persistedFieldPC = myEC.persistObjectInternal(pkFieldPC, null, null, -1, ObjectProvider.PC);
-                                    replaceField(myPC, fieldNumber, persistedFieldPC, false);
-                                }
-                            }
-                            finally
-                            {
-                                currFM = prevFM;
+                                // Make sure the PC field is persistent - can cause the insert of our object 
+                                // being managed by this SM via flush() when bidir relation
+                                Object persistedFieldPC = myEC.persistObjectInternal(pkFieldPC, null, null, -1, ObjectProvider.PC);
+                                replaceField(myPC, fieldNumber, persistedFieldPC, false);
                             }
                         }
                         finally
                         {
-                            if (myEC.getMultithreaded())
-                            {
-                                lock.unlock();
-                                myEC.getLock().unlock();
-                            }
+                            currFM = prevFM;
+                        }
+                    }
+                    finally
+                    {
+                        if (myEC.getMultithreaded())
+                        {
+                            lock.unlock();
+                            myEC.getLock().unlock();
                         }
                     }
                 }
