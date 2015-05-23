@@ -2258,9 +2258,10 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
         {
             boolean idSetInDatastore = false;
-            int totalFieldCount = cmd.getNoOfInheritedManagedMembers() + cmd.getNoOfManagedMembers();
-            for (int fieldNumber=0; fieldNumber<totalFieldCount; fieldNumber++)
+            int[] pkMemberNumbers = cmd.getPKMemberPositions();
+            for (int i=0;i<pkMemberNumbers.length;i++)
             {
+                int fieldNumber = pkMemberNumbers[i];
                 AbstractMemberMetaData fmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
                 if (fmd.isPrimaryKey())
                 {
@@ -2269,25 +2270,24 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                         idSetInDatastore = true;
                         break;
                     }
-                    // TODO This was enabled up to and including 4.1.0. No idea why since the JDO TCK runs fine without it as do DN tests. Delete it at some future point (and the input arg)
-                    // Having this block will cause problems for single-field id cases where you call pm.makeTransactional
-                    // Alternatively, why is this ONLY for single-field id, and what situation does it cover, so add comments that clarify it
-                    /*else if (cmd.usesSingleFieldIdentityClass())
+
+                    if (pkMemberNumbers.length == 1 && afterPreStore)
                     {
-                        if (this.provideField(fieldNumber) == null)
+                        // Only 1 PK field and after preStore callback, so check that it is set
+                        try
                         {
-                            // PK field has not had its value set (user/value-strategy) and must be set for single-field identity
-                            if (afterPreStore)
+                            if (this.provideField(fieldNumber) == null)
                             {
-                                // Not set even after preStore, so user error
+                                // Cannot have sole PK field as null
                                 throw new NucleusUserException(Localiser.msg("026017", cmd.getFullClassName(), fmd.getName())).setFatal();
                             }
-
-                            // Log that the value is not yet set for this field, maybe set later in preStore?
-                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("026017", cmd.getFullClassName(), fmd.getName()));
+                        }
+                        catch (Exception e)
+                        {
+                            // StateManager maybe not yet connected to the object
                             return;
                         }
-                    }*/
+                    }
                 }
             }
 
