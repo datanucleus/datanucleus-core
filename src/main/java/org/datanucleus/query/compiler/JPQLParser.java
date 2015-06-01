@@ -2055,24 +2055,24 @@ public class JPQLParser implements Parser
         {
             // JDBC escape syntax
             // {d '...'}
-            // {t '...'}
             // {ts '...'}
+            // {t '...'}
             StringBuilder jdbcLiteralStr = new StringBuilder("{");
             if (p.parseChar('d'))
             {
                 jdbcLiteralStr.append("d ");
             }
-            else if (p.parseChar('t'))
-            {
-                jdbcLiteralStr.append("t ");
-            }
             else if (p.parseString("ts"))
             {
                 jdbcLiteralStr.append("ts ");
             }
+            else if (p.parseChar('t'))
+            {
+                jdbcLiteralStr.append("t ");
+            }
             else
             {
-                throw new QueryCompilerSyntaxException("d, t or ts expected after { (JDBC escape syntax)", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("d, ts or t expected after { (JDBC escape syntax)", p.getIndex(), p.getInput());
             }
 
             if (p.nextIsSingleQuote())
