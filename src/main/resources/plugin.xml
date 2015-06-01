@@ -491,14 +491,12 @@ Contributors:
 
     <!-- METADATA RESOLVERS -->
     <extension point="org.datanucleus.metadata_entityresolver">
-       <entityresolver identity="http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
-             type="SYSTEM" url="/org/datanucleus/metadata/persistence_1_0.xsd"/>
-       <entityresolver identity="http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
-             type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_0.xsd"/>
-       <entityresolver identity="http://java.sun.com/xml/ns/persistence/persistence_2_1.xsd"
-             type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_1.xsd"/>
-       <entityresolver identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
-             type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_1.xsd"/>
+       <entityresolver identity="http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_1_0.xsd"/>
+       <entityresolver identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_1_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_1_0.xsd"/>
+       <entityresolver identity="http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_0.xsd"/>
+       <entityresolver identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_2_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_0.xsd"/>
+       <entityresolver identity="http://java.sun.com/xml/ns/persistence/persistence_2_1.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_1.xsd"/>
+       <entityresolver identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_1.xsd"/>
        <entityresolver url="/org/datanucleus/metadata/persistence_2_0.xsd"/>
     </extension>
 
