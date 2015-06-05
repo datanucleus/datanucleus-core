@@ -101,8 +101,7 @@ public abstract class JavaQueryEvaluator
         state = new HashMap<String, Object>();
         state.put(this.candidateAlias, query.getCandidateClass());
 
-        evaluator = new InMemoryExpressionEvaluator(query.getExecutionContext(),
-            parameterValues, state, query.getParsedImports(), clr, this.candidateAlias, query.getLanguage());
+        evaluator = new InMemoryExpressionEvaluator(query.getExecutionContext(), parameterValues, state, query.getParsedImports(), clr, this.candidateAlias, query.getLanguage());
     }
 
     /**
@@ -125,8 +124,7 @@ public abstract class JavaQueryEvaluator
      * @param applyRange Whether to apply any range constraint on the results
      * @return The results after evaluation.
      */
-    public Collection execute(boolean applyFilter, boolean applyOrdering, boolean applyResult,
-            boolean applyResultClass, boolean applyRange)
+    public Collection execute(boolean applyFilter, boolean applyOrdering, boolean applyResult, boolean applyResultClass, boolean applyRange)
     {
         if (!applyFilter && !applyOrdering && !applyResult && !applyResultClass && !applyRange)
         {
@@ -157,8 +155,8 @@ public abstract class JavaQueryEvaluator
             }
         }
 
-        // TODO Where the subquery makes use of the parent query candidate, set the candidates for the
-        // subquery using that. This currently just passes the same parent candidates in!
+        // TODO Retain variables across the different parts of the query. Currently evaluated in filter then forgotten
+        // TODO Where the subquery makes use of the parent query candidate, set the candidates for the subquery using that. This currently just passes the same parent candidates in!
         String[] subqueryAliases = compilation.getSubqueryAliases();
         if (subqueryAliases != null)
         {
@@ -166,8 +164,7 @@ public abstract class JavaQueryEvaluator
             {
                 // Evaluate subquery first
                 Query subquery = query.getSubqueryForVariable(subqueryAliases[i]).getQuery();
-                QueryCompilation subqueryCompilation =
-                    compilation.getCompilationForSubquery(subqueryAliases[i]);
+                QueryCompilation subqueryCompilation = compilation.getCompilationForSubquery(subqueryAliases[i]);
                 if (subqueryCompilation.getExprFrom() != null)
                 {
                     // TODO Evaluate "from"
@@ -207,8 +204,7 @@ public abstract class JavaQueryEvaluator
             // Process any ordering constraints
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(Localiser.msg("021012", "ordering", language, 
-                    StringUtils.objectArrayToString(ordering)));
+                NucleusLogger.QUERY.debug(Localiser.msg("021012", "ordering", language, StringUtils.objectArrayToString(ordering)));
             }
             resultSet = ordering(resultSet);
         }
@@ -238,8 +234,7 @@ public abstract class JavaQueryEvaluator
             // Process any result/grouping/having constraints
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(Localiser.msg("021012", "result", language,
-                    StringUtils.objectArrayToString(result)));
+                NucleusLogger.QUERY.debug(Localiser.msg("021012", "result", language, StringUtils.objectArrayToString(result)));
             }
 
             // Apply grouping
@@ -308,6 +303,8 @@ public abstract class JavaQueryEvaluator
         {
             NucleusLogger.QUERY.debug("Evaluating filter for " + set.size() + " candidates");
         }
+
+        // TODO Need to use variables from each valid result for the other parts of the query
         while (it.hasNext())
         {
             // Set the value of the candidate being tested, and evaluate it
@@ -318,10 +315,8 @@ public abstract class JavaQueryEvaluator
             }
             state.put(candidateAlias, obj);
 
-            InMemoryExpressionEvaluator eval =
-                new InMemoryExpressionEvaluator(query.getExecutionContext(), 
+            InMemoryExpressionEvaluator eval = new InMemoryExpressionEvaluator(query.getExecutionContext(), 
                     parameterValues, state, query.getParsedImports(), clr, candidateAlias, query.getLanguage());
-
             Object evalResult = evaluateBooleanExpression(filter, eval);
             if (Boolean.TRUE.equals(evalResult))
             {
@@ -353,8 +348,7 @@ public abstract class JavaQueryEvaluator
         {
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(Localiser.msg("021024", vnse.getVariableExpression().getId(),
-                    StringUtils.objectArrayToString(vnse.getValues())));
+                NucleusLogger.QUERY.debug(Localiser.msg("021024", vnse.getVariableExpression().getId(), StringUtils.objectArrayToString(vnse.getValues())));
             }
 
             // TODO The iteration through possible variable values needs improving. We currently just drop out
@@ -381,8 +375,7 @@ public abstract class JavaQueryEvaluator
                     eval.setVariableValue(vnse.getVariableExpression().getId(), vnse.getValues()[i]);
                     if (NucleusLogger.QUERY.isDebugEnabled())
                     {
-                        NucleusLogger.QUERY.debug(Localiser.msg("021025", vnse.getVariableExpression().getId(),
-                            vnse.getValues()[i]));
+                        NucleusLogger.QUERY.debug(Localiser.msg("021025", vnse.getVariableExpression().getId(), vnse.getValues()[i]));
                     }
                     if (Boolean.TRUE.equals(evaluateBooleanExpression(expr, eval)))
                     {
@@ -476,8 +469,7 @@ public abstract class JavaQueryEvaluator
         // Save the result set
         state.put(RESULTS_SET, set);
 
-        return QueryUtils.orderCandidates(set, ordering, state, candidateAlias,
-            query.getExecutionContext(), clr, parameterValues, query.getParsedImports(), query.getLanguage());
+        return QueryUtils.orderCandidates(set, ordering, state, candidateAlias, query.getExecutionContext(), clr, parameterValues, query.getParsedImports(), query.getLanguage());
     }
 
     /**
@@ -665,8 +657,7 @@ public abstract class JavaQueryEvaluator
                     if (resExpr[i] instanceof InvokeExpression)
                     {
                         String method = ((InvokeExpression) resExpr[i]).getOperation().toLowerCase();
-                        if (method.equals("count") || method.equals("sum") || method.equals("avg") || 
-                            method.equals("min") || method.equals("max"))
+                        if (method.equals("count") || method.equals("sum") || method.equals("avg") || method.equals("min") || method.equals("max"))
                         {
                             aggregates = true;
                         }
@@ -680,8 +671,7 @@ public abstract class JavaQueryEvaluator
                     if (resultExprs[i] instanceof InvokeExpression)
                     {
                         String method = ((InvokeExpression)resultExprs[i]).getOperation().toLowerCase();
-                        if (method.equals("count") || method.equals("sum") || method.equals("avg") || 
-                            method.equals("min") || method.equals("max"))
+                        if (method.equals("count") || method.equals("sum") || method.equals("avg") || method.equals("min") || method.equals("max"))
                         {
                             aggregates = true;
                         }

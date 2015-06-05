@@ -590,14 +590,23 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             Object value = state.get(expr.getId());
             if (value == null)
             {
-                NucleusLogger.QUERY.warn("Variable expression " + expr.getId() +
-                    " doesnt have its value set yet. Unsupported query structure");
+                NucleusLogger.QUERY.warn("Variable expression " + expr.getId() + " doesnt have its value set yet. Unsupported query structure");
                 value = new InMemoryFailure();
             }
             stack.push(value);
             return value;
         }
-        return super.processVariableExpression(expr);
+
+        try
+        {
+            Object varExprValue = getValueForVariableExpression(expr);
+            // Variable has a value that is available so use that
+            return varExprValue;
+        }
+        catch (VariableNotSetException vnse)
+        {
+            return super.processVariableExpression(expr);
+        }
     }
 
     /* (non-Javadoc)
@@ -1161,5 +1170,10 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
         }
 
         return variableValues.get(varExpr.getId());
+    }
+
+    public Map<String, Object> getVariableExpressionValues()
+    {
+        return variableValues;
     }
 }
