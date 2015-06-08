@@ -200,9 +200,9 @@ public class PersistenceFileMetaDataHandler extends AbstractMetaDataHandler
 
         // Save the current string for elements that have a body value
         String currentString = getString().trim();
+        MetaData md = getStack();
         if (currentString.length() > 0)
         {
-            MetaData md = getStack();
             if (localName.equals("description"))
             {
                 // Unit description
@@ -246,17 +246,18 @@ public class PersistenceFileMetaDataHandler extends AbstractMetaDataHandler
             {
                 ((PersistenceUnitMetaData)md).setValidationMode(currentString);
             }
-            else if (localName.equals("exclude-unlisted-classes"))
+        }
+        // Handle outside the preceding conditional stmt so handles an empty element tag.
+        if (localName.equals("exclude-unlisted-classes"))
+        {
+            if (StringUtils.isWhitespace(currentString))
             {
-                if (StringUtils.isWhitespace(currentString))
-                {
-                    currentString = "true";
-                }
-                Boolean val = Boolean.valueOf(currentString);
-                if (val != null)
-                {
-                    ((PersistenceUnitMetaData)md).setExcludeUnlistedClasses(val.booleanValue());
-                }
+                currentString = "true";
+            }
+            Boolean val = Boolean.valueOf(currentString);
+            if (val != null)
+            {
+                ((PersistenceUnitMetaData)md).setExcludeUnlistedClasses(val.booleanValue());
             }
         }
 
