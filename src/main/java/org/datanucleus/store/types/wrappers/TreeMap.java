@@ -112,6 +112,11 @@ public class TreeMap extends java.util.TreeMap implements SCOMap<java.util.TreeM
         return delegate;
     }
 
+    public void setValue(java.util.TreeMap value)
+    {
+        this.delegate = value;
+    }
+
     /**
      * Method to effect the load of the data in the SCO.
      * Used when the SCO supports lazy-loading to tell it to load all now.

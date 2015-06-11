@@ -96,6 +96,11 @@ public class LinkedHashSet extends java.util.LinkedHashSet implements SCOCollect
         return delegate;
     }
 
+    public void setValue(java.util.LinkedHashSet value)
+    {
+        this.delegate = value;
+    }
+
     /**
      * Method to effect the load of the data in the SCO.
      * Used when the SCO supports lazy-loading to tell it to load all now.

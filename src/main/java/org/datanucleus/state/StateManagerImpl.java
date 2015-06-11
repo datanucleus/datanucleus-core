@@ -1693,6 +1693,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
 
             // Check equality of old and new values
             boolean equal = false;
+            boolean equalButContainerRefChanged = false;
             if (oldValue == null && newValue == null)
             {
                 equal = true;
@@ -1711,21 +1712,22 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 }
                 else
                 {
-                    // Non-persistable field so compare using equals()
+                    // Not 1-1/N-1 relation so compare using equals()
                     if (oldValue.equals(newValue))
                     {
                         equal = true;
-                    }
-                    else
-                    {
-                        // TODO If the field value is equal, cater for situation of a Collection/Map which has same elements but different reference
+                        if (oldValue instanceof SCOContainer && ((SCOContainer)oldValue).getValue() != newValue && !(newValue instanceof SCO))
+                        {
+                            // Field value is equal (i.e same elements/keys/values) BUT different container reference so need to update the delegate in SCO wrappers
+                            equalButContainerRefChanged = true;
+                        }
                     }
                 }
             }
 
             // Update the field
             boolean needsSCOUpdating = false;
-            if (!loadedFields[fieldNumber] || !equal || mmd.hasArray())
+            if (!loadedFields[fieldNumber] || !equal || equalButContainerRefChanged || mmd.hasArray())
             {
                 if (cmd.getIdentityType() == IdentityType.NONDURABLE && relationType == RelationType.NONE)
                 {
@@ -1737,9 +1739,8 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 }
 
                 // Either field isn't loaded, or has changed, or is an array.
-                // We include arrays here since we have no way of knowing if the array element has changed
-                // except if the user sets the array field. See JDO2 [6.3] that the application should
-                // replace the value with its current value.
+                // We include arrays here since we have no way of knowing if the array element has changed except if the user sets the array field. 
+                // See JDO2 spec [6.3] that the application should replace the value with its current value.
                 if (oldValue instanceof SCO)
                 {
                     if (oldValue instanceof SCOContainer)
@@ -1747,7 +1748,10 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                         // Make sure container values are loaded
                         ((SCOContainer)oldValue).load();
                     }
-                    ((SCO) oldValue).unsetOwner();
+                    if (!equalButContainerRefChanged)
+                    {
+                        ((SCO) oldValue).unsetOwner();
+                    }
                 }
                 if (newValue instanceof SCO)
                 {
@@ -1784,6 +1788,11 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 {
                     myEC.addOperationToQueue(new UpdateMemberOperation(this, fieldNumber, newValue, oldValue));
                 }
+            }
+            else if (equalButContainerRefChanged)
+            {
+                // TODO Update the current SCO with this value
+                ((SCOContainer)oldValue).setValue(newValue);
             }
 
             if (needsSCOUpdating)

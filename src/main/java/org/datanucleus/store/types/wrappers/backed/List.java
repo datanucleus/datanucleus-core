@@ -321,7 +321,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
             loadFromStore();
         }
 
-        return delegate.clone();
+        return ((java.util.ArrayList)delegate).clone();
     }
 
     /**

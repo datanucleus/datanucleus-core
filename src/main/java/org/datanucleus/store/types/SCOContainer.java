@@ -20,7 +20,7 @@ package org.datanucleus.store.types;
 
 /**
  * Representation of a SCO that contains other (persistable) objects.
- **/
+ */
 public interface SCOContainer<T> extends SCO<T>
 {
     /**
@@ -34,4 +34,10 @@ public interface SCOContainer<T> extends SCO<T>
      * @return Whether it is loaded
      */
     boolean isLoaded();
+
+    /**
+     * Method to change the delegate value this wraps (to save recreating the wrapper).
+     * @param value The new value
+     */
+    void setValue(T value);
 }

@@ -48,7 +48,7 @@ public class List extends AbstractList implements SCOList<java.util.List>, Clone
     protected AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.ArrayList delegate;
+    protected java.util.List delegate;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -97,6 +97,11 @@ public class List extends AbstractList implements SCOList<java.util.List>, Clone
     public java.util.List getValue()
     {
         return delegate;
+    }
+
+    public void setValue(java.util.List value)
+    {
+        this.delegate = value;
     }
 
     /**
@@ -216,7 +221,7 @@ public class List extends AbstractList implements SCOList<java.util.List>, Clone
      */
     public Object clone()
     {
-        return delegate.clone();
+        return ((java.util.ArrayList)delegate).clone();
     }
 
     /**

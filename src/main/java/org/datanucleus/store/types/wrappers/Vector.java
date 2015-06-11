@@ -102,6 +102,11 @@ public class Vector extends java.util.Vector implements SCOList<java.util.Vector
         return delegate;
     }
 
+    public void setValue(java.util.Vector value)
+    {
+        this.delegate = value;
+    }
+
     /**
      * Method to effect the load of the data in the SCO.
      * Used when the SCO supports lazy-loading to tell it to load all now.

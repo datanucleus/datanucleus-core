@@ -112,6 +112,11 @@ public class Queue extends AbstractQueue implements SCOCollection<java.util.Queu
         return delegate;
     }
 
+    public void setValue(java.util.Queue value)
+    {
+        this.delegate = value;
+    }
+
     /**
      * Method to effect the load of the data in the SCO.
      * Used when the SCO supports lazy-loading to tell it to load all now.

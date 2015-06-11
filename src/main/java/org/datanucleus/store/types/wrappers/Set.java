@@ -96,6 +96,11 @@ public class Set extends AbstractSet implements SCOCollection<java.util.Set>, Cl
         return delegate;
     }
 
+    public void setValue(java.util.Set value)
+    {
+        this.delegate = value;
+    }
+
     /**
      * Method to effect the load of the data in the SCO.
      * Used when the SCO supports lazy-loading to tell it to load all now.

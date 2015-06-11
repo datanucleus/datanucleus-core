@@ -46,7 +46,7 @@ public class SortedSet extends java.util.AbstractSet implements java.util.Sorted
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.TreeSet delegate;
+    protected java.util.SortedSet delegate;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -112,6 +112,11 @@ public class SortedSet extends java.util.AbstractSet implements java.util.Sorted
     public java.util.SortedSet getValue()
     {
         return delegate;
+    }
+
+    public void setValue(java.util.SortedSet value)
+    {
+        this.delegate = value;
     }
 
     /**
@@ -243,7 +248,7 @@ public class SortedSet extends java.util.AbstractSet implements java.util.Sorted
      */
     public Object clone()
     {
-        return delegate.clone();
+        return ((java.util.TreeSet)delegate).clone();
     }
 
     /**

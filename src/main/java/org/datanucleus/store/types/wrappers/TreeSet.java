@@ -116,6 +116,11 @@ public class TreeSet extends java.util.TreeSet implements SCOCollection<java.uti
         return delegate;
     }
 
+    public void setValue(java.util.TreeSet value)
+    {
+        this.delegate = value;
+    }
+
     /**
      * Method to effect the load of the data in the SCO.
      * Used when the SCO supports lazy-loading to tell it to load all now.

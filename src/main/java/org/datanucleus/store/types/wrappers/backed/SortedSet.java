@@ -335,7 +335,7 @@ public class SortedSet extends org.datanucleus.store.types.wrappers.SortedSet im
             loadFromStore();
         }
 
-        return delegate.clone();
+        return ((java.util.TreeSet)delegate).clone();
     }
 
     /**

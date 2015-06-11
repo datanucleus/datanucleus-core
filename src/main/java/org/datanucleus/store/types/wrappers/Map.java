@@ -94,6 +94,11 @@ public class Map extends AbstractMap implements SCOMap<java.util.Map>, Cloneable
         return delegate;
     }
 
+    public void setValue(java.util.Map value)
+    {
+        this.delegate = value;
+    }
+
     /**
      * Method to effect the load of the data in the SCO.
      * Used when the SCO supports lazy-loading to tell it to load all now.

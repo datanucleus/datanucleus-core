@@ -338,7 +338,7 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
             loadFromStore();
         }
 
-        return delegate.clone();
+        return ((java.util.TreeMap)delegate).clone();
     }
 
     /**

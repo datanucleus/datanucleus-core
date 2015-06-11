@@ -44,7 +44,7 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.TreeMap delegate;
+    protected java.util.SortedMap delegate;
 
     /**
      * Constructor
@@ -108,6 +108,11 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
     public java.util.SortedMap getValue()
     {
         return delegate;
+    }
+
+    public void setValue(java.util.SortedMap value)
+    {
+        this.delegate = value;
     }
 
     /**
@@ -244,7 +249,7 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
      */
     public Object clone()
     {
-        return delegate.clone();
+        return ((java.util.TreeMap)delegate).clone();
     }
 
     /**
