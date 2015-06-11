@@ -1718,7 +1718,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                         equal = true;
                         if (oldValue instanceof SCOContainer && ((SCOContainer)oldValue).getValue() != newValue && !(newValue instanceof SCO))
                         {
-                            // Field value is equal (i.e same elements/keys/values) BUT different container reference so need to update the delegate in SCO wrappers
+                            // Field value is container and equal (i.e same elements/keys/values) BUT different container reference so need to update the delegate in SCO wrappers
                             equalButContainerRefChanged = true;
                         }
                     }
@@ -1791,8 +1791,11 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             }
             else if (equalButContainerRefChanged)
             {
-                // TODO Update the current SCO with this value
+                // Previous value was a SCO wrapper and this new value is equal to the old wrappers delegate so swap the delegate for the original wrapper to this new value
                 ((SCOContainer)oldValue).setValue(newValue);
+                newValue = oldValue; // Point to the old wrapper
+                needsSCOUpdating = false;
+                replaceField(fieldNumber, oldValue);
             }
 
             if (needsSCOUpdating)
