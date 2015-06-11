@@ -25,9 +25,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.query.compiler.QueryCompilation;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.store.query.Query;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Class to evaluate a JPQL query in whole or part.
@@ -42,8 +44,7 @@ public class JPQLEvaluator extends JavaQueryEvaluator
      * @param parameterValues Input parameter values
      * @param clr ClassLoader resolver
      */
-    public JPQLEvaluator(Query query, Collection candidates, QueryCompilation compilation,
-            Map parameterValues, ClassLoaderResolver clr)
+    public JPQLEvaluator(Query query, Collection candidates, QueryCompilation compilation, Map parameterValues, ClassLoaderResolver clr)
     {
         super("JPQL", query, compilation, parameterValues, clr, candidates);
 
@@ -85,6 +86,16 @@ public class JPQLEvaluator extends JavaQueryEvaluator
                 this.parameterValues = paramValues;
             }
         }
+
+        if (compilation.getExprFrom() != null && compilation.getExprFrom().length > 0)
+        {
+            // TODO Remove this if we ever support JOIN aliases
+            String alias = compilation.getExprFrom()[0].getAlias();
+            if (!StringUtils.isWhitespace(alias))
+            {
+                throw new NucleusUserException("In-memory evaluation of query does not currently support JPQL FROM joins with aliases. Please remove");
+            }
+        }
     }
 
     /**
@@ -95,8 +106,7 @@ public class JPQLEvaluator extends JavaQueryEvaluator
      * @param outerCandidate Current candidate in the outer query (for use when linking back)
      * @return The result
      */
-    protected Collection evaluateSubquery(Query query, QueryCompilation compilation, Collection candidates,
-            Object outerCandidate)
+    protected Collection evaluateSubquery(Query query, QueryCompilation compilation, Collection candidates, Object outerCandidate)
     {
         JPQLEvaluator eval = new JPQLEvaluator(query, candidates, compilation, parameterValues, clr);
         // TODO Make use of outer candidate
