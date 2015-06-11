@@ -1716,6 +1716,10 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                     {
                         equal = true;
                     }
+                    else
+                    {
+                        // TODO If the field value is equal, cater for situation of a Collection/Map which has same elements but different reference
+                    }
                 }
             }
 
