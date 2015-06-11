@@ -1067,7 +1067,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                 catch (VariableNotSetException vnse)
                 {
                     // We don't know the possible values here!
-                    NucleusLogger.QUERY.error("Attempt to access variable " + varExpr.getId() + " as part of primaryExpression " + primExpr);
+                    NucleusLogger.QUERY.error("Attempt to access variable " + varExpr.getId() + " as part of primaryExpression " + primExpr + " : variable is not yet set!");
                     return new InMemoryFailure();
                 }
             }
