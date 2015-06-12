@@ -112,8 +112,7 @@ public abstract class JavaQueryEvaluator
      * @param outerCandidate The current outer candidate (for use when linking back to outer query)
      * @return The result
      */
-    protected abstract Collection evaluateSubquery(Query subquery, QueryCompilation compilation, Collection candidates,
-            Object outerCandidate);
+    protected abstract Collection evaluateSubquery(Query subquery, QueryCompilation compilation, Collection candidates, Object outerCandidate);
 
     /**
      * Method to perform the evaluation, applying the query restrictions that are required.
@@ -155,6 +154,8 @@ public abstract class JavaQueryEvaluator
             }
         }
 
+        // Really we should aim to have the following order of execution of the different components : FROM, WHERE, GROUP BY, HAVING, SELECT, ORDER BY
+
         // TODO Retain variables across the different parts of the query. Currently evaluated in filter then forgotten
         // TODO Where the subquery makes use of the parent query candidate, set the candidates for the subquery using that. This currently just passes the same parent candidates in!
         String[] subqueryAliases = compilation.getSubqueryAliases();
@@ -186,6 +187,7 @@ public abstract class JavaQueryEvaluator
             }
         }
 
+        // Evaluate filter
         List resultSet = new ArrayList(executeCandidates);
         Expression filter = compilation.getExprFilter();
         if (applyFilter && filter != null)
