@@ -25,11 +25,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.query.compiler.QueryCompilation;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.store.query.Query;
-import org.datanucleus.util.StringUtils;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Class to evaluate a JPQL query in whole or part.
@@ -89,11 +88,10 @@ public class JPQLEvaluator extends JavaQueryEvaluator
 
         if (compilation.getExprFrom() != null && compilation.getExprFrom().length > 0)
         {
-            // TODO Remove this if we ever support JOIN aliases
-            String alias = compilation.getExprFrom()[0].getAlias();
-            if (!StringUtils.isWhitespace(alias))
+            Expression[] fromExprs = compilation.getExprFrom();
+            if (fromExprs.length > 1 || fromExprs[0].getRight() != null)
             {
-                throw new NucleusUserException("In-memory evaluation of query does not currently support JPQL FROM joins with aliases. Please remove");
+                NucleusLogger.DATASTORE_RETRIEVE.warn("In-memory evaluation of query does not currently support JPQL FROM joins with aliases. This will be ignored so if depending on aliases defined in FROM then the query will fail");
             }
         }
     }
