@@ -27,7 +27,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.datanucleus.asm;
 
 /**
@@ -152,6 +151,9 @@ public class TypePath {
                     typeArg = typeArg * 10 + c - '0';
                     i += 1;
                 }
+                if (i < n && typePath.charAt(i) == ';') {
+                    i += 1;
+                }
                 out.put11(TYPE_ARGUMENT, typeArg);
             }
         }
@@ -164,7 +166,7 @@ public class TypePath {
      * ARRAY_ELEMENT} steps are represented with '[', {@link #INNER_TYPE
      * INNER_TYPE} steps with '.', {@link #WILDCARD_BOUND WILDCARD_BOUND} steps
      * with '*' and {@link #TYPE_ARGUMENT TYPE_ARGUMENT} steps with their type
-     * argument index in decimal form.
+     * argument index in decimal form followed by ';'.
      */
     @Override
     public String toString() {
@@ -182,7 +184,7 @@ public class TypePath {
                 result.append('*');
                 break;
             case TYPE_ARGUMENT:
-                result.append(getStepArgument(i));
+                result.append(getStepArgument(i)).append(';');
                 break;
             default:
                 result.append('_');

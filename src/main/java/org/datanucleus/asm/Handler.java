@@ -84,9 +84,7 @@ class Handler {
         if (h == null) {
             return null;
         }
-
         h.next = remove(h.next, start, end);
-
         int hstart = h.start.position;
         int hend = h.end.position;
         int s = start.position;

@@ -286,7 +286,6 @@ public class Type {
                 return LONG_TYPE;
             }
         }
-
         return getType(getDescriptor(c));
     }
 
@@ -826,7 +825,6 @@ public class Type {
             // primitive types (buf == null)
             return opcode + (buf == null ? (off & 0xFF00) >> 8 : 4);
         }
-
         // the offset for other instructions is in byte 2 of 'off' for
         // primitive types (buf == null)
         return opcode + (buf == null ? (off & 0xFF0000) >> 16 : 4);
