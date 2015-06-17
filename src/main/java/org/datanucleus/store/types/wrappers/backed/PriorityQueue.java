@@ -432,7 +432,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
      * Accessor for an iterator for the Collection.
      * @return The iterator
      **/
-    public synchronized Iterator iterator()
+    public synchronized Iterator<E> iterator()
     {
         // Populate the cache if necessary
         if (useCache)

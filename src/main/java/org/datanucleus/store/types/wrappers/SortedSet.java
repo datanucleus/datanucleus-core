@@ -108,12 +108,12 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.SortedSet getValue()
+    public java.util.SortedSet<E> getValue()
     {
         return delegate;
     }
 
-    public void setValue(java.util.SortedSet value)
+    public void setValue(java.util.SortedSet<E> value)
     {
         this.delegate = value;
     }

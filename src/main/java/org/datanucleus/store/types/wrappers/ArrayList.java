@@ -94,12 +94,12 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.ArrayList getValue()
+    public java.util.ArrayList<E> getValue()
     {
         return delegate;
     }
 
-    public void setValue(java.util.ArrayList value)
+    public void setValue(java.util.ArrayList<E> value)
     {
         this.delegate = value;
     }
@@ -159,7 +159,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
     /**
      * Method to unset the owner and field information.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         if (ownerOP != null)
         {
@@ -239,17 +239,12 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      * @param c The collection of elements.
      * @return Whether they are contained.
      **/
-    public synchronized boolean containsAll(java.util.Collection c)
+    public boolean containsAll(java.util.Collection c)
     {
         return delegate.containsAll(c);
     }
 
-    /**
-     * Equality operator.
-     * @param o The object to compare against.
-     * @return Whether this object is the same.
-     **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         return delegate.equals(o);
     }
@@ -344,8 +339,8 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      * @param from Start index (inclusive)
      * @param to End index (exclusive) 
      * @return The subList
-     **/
-    public synchronized java.util.List subList(int from,int to)
+     */
+    public java.util.List subList(int from,int to)
     {
         return delegate.subList(from, to);
     }
@@ -353,8 +348,8 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
     /**
      * Method to return the list as an array.
      * @return The array
-     **/
-    public synchronized Object[] toArray()
+     */
+    public Object[] toArray()
     {
         return delegate.toArray();
     }
@@ -363,8 +358,8 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      * Method to return the list as an array.
      * @param a The runtime types of the array being defined by this param
      * @return The array
-     **/
-    public synchronized Object[] toArray(Object a[])
+     */
+    public Object[] toArray(Object a[])
     {
         return delegate.toArray(a);
     }
@@ -503,7 +498,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
     /**
      * Method to clear the ArrayList.
      */
-    public synchronized void clear()
+    public void clear()
     {
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
         {
@@ -553,7 +548,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      * @param element The Element to remove
      * @return Whether it was removed successfully.
      **/
-    public synchronized boolean remove(Object element)
+    public boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -563,7 +558,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      * @param element The Element to remove
      * @return Whether it was removed successfully.
      */
-    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
+    public boolean remove(Object element, boolean allowCascadeDelete)
     {
         boolean success = delegate.remove(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -601,7 +596,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      * @param index The element position.
      * @return The object that was removed
      */
-    public synchronized E remove(int index)
+    public E remove(int index)
     {
         E element = delegate.remove(index);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -686,8 +681,8 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      * Method to retain a Collection of elements (and remove all others).
      * @param c The collection to retain
      * @return Whether they were retained successfully.
-     **/
-    public synchronized boolean retainAll(java.util.Collection c)
+     */
+    public boolean retainAll(java.util.Collection c)
     {
         boolean success = delegate.retainAll(c);
         if (success)

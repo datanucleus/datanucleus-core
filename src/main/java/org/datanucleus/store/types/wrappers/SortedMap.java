@@ -38,7 +38,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.SortedMap<K, V>, SCOMap<java.util.SortedMap<K, V>>, Cloneable, java.io.Serializable
+public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.SortedMap<K, V>, SCOMap<java.util.SortedMap<K, V>, K, V>, Cloneable, java.io.Serializable
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
@@ -140,7 +140,7 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
      * @param newValue New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedKey(Object key, int fieldNumber, Object newValue, boolean makeDirty)
+    public void updateEmbeddedKey(K key, int fieldNumber, Object newValue, boolean makeDirty)
     {
         if (makeDirty)
         {
@@ -156,7 +156,7 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
      * @param newValue New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedValue(Object value, int fieldNumber, Object newValue, boolean makeDirty)
+    public void updateEmbeddedValue(V value, int fieldNumber, Object newValue, boolean makeDirty)
     {
         if (makeDirty)
         {

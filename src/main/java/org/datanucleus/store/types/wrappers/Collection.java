@@ -90,12 +90,12 @@ public class Collection<E> extends AbstractCollection<E> implements SCOCollectio
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.Collection getValue()
+    public java.util.Collection<E> getValue()
     {
         return delegate;
     }
 
-    public void setValue(java.util.Collection value)
+    public void setValue(java.util.Collection<E> value)
     {
         this.delegate = value;
     }

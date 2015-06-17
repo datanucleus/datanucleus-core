@@ -36,9 +36,7 @@ public class IncompatibleFieldTypeException extends NucleusUserException
      * @param requiredTypeName Name of required type of the field.
      * @param requestedTypeName Name of requested type of the field.
      */
-    public IncompatibleFieldTypeException(String classAndFieldName,
-                                          String requiredTypeName,
-                                          String requestedTypeName)
+    public IncompatibleFieldTypeException(String classAndFieldName, String requiredTypeName, String requestedTypeName)
     {
         super(Localiser.msg("023000", classAndFieldName, requiredTypeName, requestedTypeName));
     }

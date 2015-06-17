@@ -280,7 +280,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * @param newValue New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedKey(Object key, int fieldNumber, Object newValue, boolean makeDirty)
+    public void updateEmbeddedKey(K key, int fieldNumber, Object newValue, boolean makeDirty)
     {
         if (backingStore != null)
         {
@@ -295,7 +295,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * @param newValue New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedValue(Object value, int fieldNumber, Object newValue, boolean makeDirty)
+    public void updateEmbeddedValue(V value, int fieldNumber, Object newValue, boolean makeDirty)
     {
         if (backingStore != null)
         {

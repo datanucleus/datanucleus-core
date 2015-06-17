@@ -27,15 +27,15 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.scostore.ListStore;
 
 /**
- * An iterator for a SCO List object. Operates from either a delegate or a backing store, and provides 
- * iteration through the objects.
+ * An iterator for a SCO List object. Operates from either a delegate or a backing store, and provides iteration through the objects.
+ * @param <E> Type of element in the List
  */
 public class SCOListIterator<E> implements ListIterator<E>
 {
     private final ListIterator<E> iter;
 
     /** The owning SCO that we are really iterating. */
-    private final List ownerSCO;
+    private final List<E> ownerSCO;
 
     /** Whether the most recent access operation was a previous() */
     private boolean reverse;
@@ -49,14 +49,14 @@ public class SCOListIterator<E> implements ListIterator<E>
      * @param useDelegate whether to use a delegate
      * @param startIndex The start index position (any value below 0 will mean start at index 0).
      */
-    public SCOListIterator(List sco, ObjectProvider sm, List theDelegate, ListStore theStore, boolean useDelegate, int startIndex)
+    public SCOListIterator(List<E> sco, ObjectProvider sm, List<E> theDelegate, ListStore<E> theStore, boolean useDelegate, int startIndex)
     {
         ownerSCO = sco;
 
         // Populate our entries list
-        List entries = new ArrayList();
+        List<E> entries = new ArrayList<E>();
 
-        Iterator i=null;
+        Iterator<E> i=null;
         if (useDelegate)
         {
             i = theDelegate.iterator();

@@ -91,12 +91,12 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.Set getValue()
+    public java.util.Set<E> getValue()
     {
         return delegate;
     }
 
-    public void setValue(java.util.Set value)
+    public void setValue(java.util.Set<E> value)
     {
         this.delegate = value;
     }

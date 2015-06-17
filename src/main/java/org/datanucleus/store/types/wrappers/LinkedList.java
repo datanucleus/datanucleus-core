@@ -93,12 +93,12 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.LinkedList getValue()
+    public java.util.LinkedList<E> getValue()
     {
         return delegate;
     }
 
-    public void setValue(java.util.LinkedList value)
+    public void setValue(java.util.LinkedList<E> value)
     {
         this.delegate = value;
     }

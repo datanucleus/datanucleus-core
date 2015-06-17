@@ -535,7 +535,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * Accessor for an iterator for the Collection.
      * @return The iterator
      **/
-    public synchronized Iterator iterator()
+    public synchronized Iterator<E> iterator()
     {
         // Populate the cache if necessary
         if (useCache)

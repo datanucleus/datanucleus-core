@@ -107,12 +107,12 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.PriorityQueue getValue()
+    public java.util.PriorityQueue<E> getValue()
     {
         return delegate;
     }
 
-    public void setValue(java.util.PriorityQueue value)
+    public void setValue(java.util.PriorityQueue<E> value)
     {
         this.delegate = value;
     }

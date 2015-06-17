@@ -107,12 +107,12 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.Queue getValue()
+    public java.util.Queue<E> getValue()
     {
         return delegate;
     }
 
-    public void setValue(java.util.Queue value)
+    public void setValue(java.util.Queue<E> value)
     {
         this.delegate = value;
     }

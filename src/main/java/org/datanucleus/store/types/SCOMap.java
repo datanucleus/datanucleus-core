@@ -21,8 +21,10 @@ package org.datanucleus.store.types;
 
 /**
  * Representation of a wrapper for a mutable Map SCO type supported.
- **/
-public interface SCOMap<T> extends SCOContainer<T>
+ * @param <K> Key type of the map
+ * @param <V> Value type of the map
+ */
+public interface SCOMap<T, K, V> extends SCOContainer<T>
 {
     /**
      * Method to update an embedded key stored in the map.
@@ -31,7 +33,7 @@ public interface SCOMap<T> extends SCOContainer<T>
      * @param newValue the new value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedKey(Object key, int fieldNumber, Object newValue, boolean makeDirty);
+    public void updateEmbeddedKey(K key, int fieldNumber, Object newValue, boolean makeDirty);
 
     /**
      * Method to update an embedded value stored in the map.
@@ -40,5 +42,5 @@ public interface SCOMap<T> extends SCOContainer<T>
      * @param newValue the new value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedValue(Object value, int fieldNumber, Object newValue, boolean makeDirty);
+    public void updateEmbeddedValue(V value, int fieldNumber, Object newValue, boolean makeDirty);
 }

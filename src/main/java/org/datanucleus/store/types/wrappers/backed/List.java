@@ -179,10 +179,10 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
                 while (iter.hasNext())
                 {
                     Object pc = iter.next();
-                    ObjectProvider objSM = ec.findObjectProvider(pc);
-                    if (objSM == null)
+                    ObjectProvider elemOP = ec.findObjectProvider(pc);
+                    if (elemOP == null)
                     {
-                        objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, pc, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                        elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, pc, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
                     }
                 }
             }
@@ -484,7 +484,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * Accessor for an iterator for the List
      * @return The iterator
      **/
-    public synchronized Iterator iterator()
+    public synchronized Iterator<E> iterator()
     {
         // Populate the cache if necessary
         if (useCache)
@@ -499,7 +499,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * Method to retrieve a List iterator for the list.
      * @return The iterator
      **/
-    public ListIterator listIterator()
+    public ListIterator<E> listIterator()
     {
         // Populate the cache if necessary
         if (useCache)
@@ -515,7 +515,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * @param index The start point 
      * @return The iterator
      **/
-    public ListIterator listIterator(int index)
+    public ListIterator<E> listIterator(int index)
     {
         // Populate the cache if necessary
         if (useCache)

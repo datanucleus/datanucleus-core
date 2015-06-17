@@ -531,7 +531,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
      * Method to retrieve an iterator for the list.
      * @return The iterator
      **/
-    public synchronized Iterator iterator()
+    public synchronized Iterator<E> iterator()
     {
         // Populate the cache if necessary
         if (useCache)
@@ -595,7 +595,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
      * Method to retrieve a List iterator for the list.
      * @return The iterator
      **/
-    public synchronized ListIterator listIterator()
+    public synchronized ListIterator<E> listIterator()
     {
         // Populate the cache if necessary
         if (useCache)
@@ -611,7 +611,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
      * @param index The start point 
      * @return The iterator
      **/
-    public synchronized ListIterator listIterator(int index)
+    public synchronized ListIterator<E> listIterator(int index)
     {
         // Populate the cache if necessary
         if (useCache)

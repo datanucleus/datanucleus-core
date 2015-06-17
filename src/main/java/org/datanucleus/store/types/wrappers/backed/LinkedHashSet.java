@@ -302,7 +302,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
     /**
      * Method to unset the owner and backing store information.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         super.unsetOwner();
         if (backingStore != null)
@@ -351,8 +351,8 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
      * Accessor for whether a collection is contained in this Set.
      * @param c The collection
      * @return Whether it is contained.
-     **/
-    public synchronized boolean containsAll(java.util.Collection c)
+     */
+    public boolean containsAll(java.util.Collection c)
     {
         if (useCache)
         {
@@ -373,12 +373,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         return delegate.containsAll(c);
     }
 
-    /**
-     * Equality operator.
-     * @param o The object to compare against.
-     * @return Whether this object is the same.
-     **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         if (useCache)
         {
@@ -398,11 +393,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         return c.size() == size() && containsAll(c);
     }
 
-    /**
-     * Hashcode operator.
-     * @return The Hash code.
-     **/
-    public synchronized int hashCode()
+    public int hashCode()
     {
         if (useCache)
         {
@@ -423,8 +414,8 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
     /**
      * Accessor for an iterator for the Set.
      * @return The iterator
-     **/
-    public Iterator iterator()
+     */
+    public Iterator<E> iterator()
     {
         // Populate the cache if necessary
         if (useCache)
@@ -631,8 +622,8 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
      * Method to remove an element from the LinkedHashSet.
      * @param element The element
      * @return Whether it was removed ok.
-     **/
-    public synchronized boolean remove(Object element)
+     */
+    public boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -642,7 +633,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
      * @param element The element
      * @param allowCascadeDelete Whether to allow cascade delete
      */
-    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
+    public boolean remove(Object element, boolean allowCascadeDelete)
     {
         makeDirty();
 
@@ -777,8 +768,8 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
      * Method to retain a Collection of elements (and remove all others).
      * @param c The collection to retain
      * @return Whether they were retained successfully.
-     **/
-    public synchronized boolean retainAll(java.util.Collection c)
+     */
+    public boolean retainAll(java.util.Collection c)
     {
         makeDirty();
 

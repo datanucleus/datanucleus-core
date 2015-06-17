@@ -39,7 +39,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class HashMap<K, V> extends java.util.HashMap<K, V> implements SCOMap<java.util.HashMap<K, V>>
+public class HashMap<K, V> extends java.util.HashMap<K, V> implements SCOMap<java.util.HashMap<K, V>, K, V>
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
@@ -125,7 +125,7 @@ public class HashMap<K, V> extends java.util.HashMap<K, V> implements SCOMap<jav
      * @param newValue New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedKey(Object key, int fieldNumber, Object newValue, boolean makeDirty)
+    public void updateEmbeddedKey(K key, int fieldNumber, Object newValue, boolean makeDirty)
     {
         if (makeDirty)
         {
@@ -141,7 +141,7 @@ public class HashMap<K, V> extends java.util.HashMap<K, V> implements SCOMap<jav
      * @param newValue New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedValue(Object value, int fieldNumber, Object newValue, boolean makeDirty)
+    public void updateEmbeddedValue(V value, int fieldNumber, Object newValue, boolean makeDirty)
     {
         if (makeDirty)
         {
@@ -170,8 +170,8 @@ public class HashMap<K, V> extends java.util.HashMap<K, V> implements SCOMap<jav
 
     /**
      * Method to unset the owner and field details.
-     **/
-    public synchronized void unsetOwner()
+     */
+    public void unsetOwner()
     {
         if (ownerOP != null)
         {
@@ -266,12 +266,7 @@ public class HashMap<K, V> extends java.util.HashMap<K, V> implements SCOMap<jav
         return delegate.entrySet();
     }
 
-    /**
-     * Method to check the equality of this map, and another.
-     * @param o The map to compare against.
-     * @return Whether they are equal.
-     **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         return delegate.equals(o);
     }
@@ -286,11 +281,7 @@ public class HashMap<K, V> extends java.util.HashMap<K, V> implements SCOMap<jav
         return delegate.get(key);
     }
 
-    /**
-     * Method to generate a hashcode for this Map.
-     * @return The hashcode.
-     **/
-    public synchronized int hashCode()
+    public int hashCode()
     {
         return delegate.hashCode();
     }

@@ -27,8 +27,7 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.scostore.CollectionStore;
 
 /**
- * An iterator for a SCO Collection object. Works from either the delegate or a backing store, and provides 
- * iteration through the objects.
+ * An iterator for a SCO Collection object. Works from either the delegate or a backing store, and provides iteration through the objects.
  * @param <E> Element type for the collection
  */
 public class SCOCollectionIterator<E> implements Iterator<E>
@@ -36,17 +35,17 @@ public class SCOCollectionIterator<E> implements Iterator<E>
     private final Iterator<E> iter;
     private E last = null;
 
-    private Collection ownerSCO;
+    private Collection<E> ownerSCO;
 
     /**
      * Constructor taking the delegate or backing store.
      * @param sco The owner sco
-     * @param sm ObjectProvider of SCO Collection to iterate
+     * @param op ObjectProvider of SCO Collection to iterate
      * @param theDelegate The delegate collection
      * @param backingStore The backing store (connected to the DB)
      * @param useDelegate Whether to use the delegate
      */
-    public SCOCollectionIterator(Collection sco, ObjectProvider sm, Collection theDelegate, CollectionStore backingStore, boolean useDelegate)
+    public SCOCollectionIterator(Collection<E> sco, ObjectProvider op, Collection<E> theDelegate, CollectionStore<E> backingStore, boolean useDelegate)
     {
         ownerSCO = sco;
 
@@ -62,7 +61,7 @@ public class SCOCollectionIterator<E> implements Iterator<E>
         {
             if (backingStore != null)
             {
-                i = backingStore.iterator(sm);
+                i = backingStore.iterator(op);
             }
             else
             {

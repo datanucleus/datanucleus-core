@@ -20,6 +20,7 @@ package org.datanucleus.store.types;
 
 /**
  * Representation of a SCO that contains other (persistable) objects.
+ * @param <T> Type being wrapped
  */
 public interface SCOContainer<T> extends SCO<T>
 {

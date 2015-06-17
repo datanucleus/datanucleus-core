@@ -94,12 +94,12 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.List getValue()
+    public java.util.List<E> getValue()
     {
         return delegate;
     }
 
-    public void setValue(java.util.List value)
+    public void setValue(java.util.List<E> value)
     {
         this.delegate = value;
     }

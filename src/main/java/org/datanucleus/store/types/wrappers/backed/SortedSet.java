@@ -468,8 +468,8 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
     /**
      * Accessor for an iterator for the Set.
      * @return The iterator
-     **/
-    public Iterator iterator()
+     */
+    public Iterator<E> iterator()
     {
         // Populate the cache if necessary
         if (useCache)

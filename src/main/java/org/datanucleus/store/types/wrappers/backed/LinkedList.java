@@ -486,8 +486,8 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
     /**
      * Method to retrieve an iterator for the list.
      * @return The iterator
-     **/
-    public Iterator iterator()
+     */
+    public Iterator<E> iterator()
     {
         // Populate the cache if necessary
         if (useCache)
@@ -503,7 +503,7 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
      * @param index The start point 
      * @return The iterator
      **/
-    public ListIterator listIterator(int index)
+    public ListIterator<E> listIterator(int index)
     {
         // Populate the cache if necessary
         if (useCache)

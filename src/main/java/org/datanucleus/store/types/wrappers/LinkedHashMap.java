@@ -36,7 +36,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V> implements SCOMap<java.util.LinkedHashMap<K, V>>
+public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V> implements SCOMap<java.util.LinkedHashMap<K, V>, K, V>
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
@@ -122,7 +122,7 @@ public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V> implement
      * @param newValue New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedKey(Object key, int fieldNumber, Object newValue, boolean makeDirty)
+    public void updateEmbeddedKey(K key, int fieldNumber, Object newValue, boolean makeDirty)
     {
         if (makeDirty)
         {
@@ -138,7 +138,7 @@ public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V> implement
      * @param newValue New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedValue(Object value, int fieldNumber, Object newValue, boolean makeDirty)
+    public void updateEmbeddedValue(V value, int fieldNumber, Object newValue, boolean makeDirty)
     {
         if (makeDirty)
         {

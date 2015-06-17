@@ -97,12 +97,12 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.Vector getValue()
+    public java.util.Vector<E> getValue()
     {
         return delegate;
     }
 
-    public void setValue(java.util.Vector value)
+    public void setValue(java.util.Vector<E> value)
     {
         this.delegate = value;
     }

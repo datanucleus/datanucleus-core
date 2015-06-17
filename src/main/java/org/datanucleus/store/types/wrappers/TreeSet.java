@@ -111,12 +111,12 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.TreeSet getValue()
+    public java.util.TreeSet<E> getValue()
     {
         return delegate;
     }
 
-    public void setValue(java.util.TreeSet value)
+    public void setValue(java.util.TreeSet<E> value)
     {
         this.delegate = value;
     }
@@ -176,7 +176,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
     /**
      * Method to unset the owner and field information.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         if (ownerOP != null)
         {
@@ -276,18 +276,13 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      * Accessor for whether a collection is contained in this Set.
      * @param c The collection
      * @return Whether it is contained.
-     **/
-    public synchronized boolean containsAll(java.util.Collection c)
+     */
+    public boolean containsAll(java.util.Collection c)
     {
         return delegate.containsAll(c);
     }
 
-    /**
-     * Equality operator.
-     * @param o The object to compare against.
-     * @return Whether this object is the same.
-     **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         return delegate.equals(o);
     }
@@ -301,11 +296,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
         return delegate.first();
     }
 
-    /**
-     * Hashcode operator.
-     * @return The Hash code.
-     **/
-    public synchronized int hashCode()
+    public int hashCode()
     {
         return delegate.hashCode();
     }
@@ -511,8 +502,8 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      * Method to remove an element from the List
      * @param element The Element to remove
      * @return Whether it was removed successfully.
-     **/
-    public synchronized boolean remove(Object element)
+     */
+    public boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -521,8 +512,8 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      * Method to remove an element from the List
      * @param element The Element to remove
      * @return Whether it was removed successfully.
-     **/
-    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
+     */
+    public boolean remove(Object element, boolean allowCascadeDelete)
     {
         boolean success = delegate.remove(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -616,8 +607,8 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      * Method to retain a Collection of elements (and remove all others).
      * @param c The collection to retain
      * @return Whether they were retained successfully.
-     **/
-    public synchronized boolean retainAll(java.util.Collection c)
+     */
+    public boolean retainAll(java.util.Collection c)
     {
         if (c == null)
         {

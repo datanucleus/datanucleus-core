@@ -20,7 +20,8 @@ package org.datanucleus.store.types;
 
 /**
  * Representation of a wrapper for a mutable Collection SCO type supported.
- **/
+ * @param <E> Element type of the collection
+ */
 public interface SCOCollection<T, E> extends SCOContainer<T>
 {
     /**

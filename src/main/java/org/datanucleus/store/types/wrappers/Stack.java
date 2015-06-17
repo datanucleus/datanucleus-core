@@ -96,12 +96,12 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
-    public java.util.Stack getValue()
+    public java.util.Stack<E> getValue()
     {
         return delegate;
     }
 
-    public void setValue(java.util.Stack value)
+    public void setValue(java.util.Stack<E> value)
     {
         this.delegate = value;
     }

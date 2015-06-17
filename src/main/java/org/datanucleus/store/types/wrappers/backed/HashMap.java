@@ -282,7 +282,7 @@ public class HashMap<K, V> extends org.datanucleus.store.types.wrappers.HashMap<
      * @param newValue New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedKey(Object key, int fieldNumber, Object newValue, boolean makeDirty)
+    public void updateEmbeddedKey(K key, int fieldNumber, Object newValue, boolean makeDirty)
     {
         if (backingStore != null)
         {
@@ -297,7 +297,7 @@ public class HashMap<K, V> extends org.datanucleus.store.types.wrappers.HashMap<
      * @param newValue New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedValue(Object value, int fieldNumber, Object newValue, boolean makeDirty)
+    public void updateEmbeddedValue(V value, int fieldNumber, Object newValue, boolean makeDirty)
     {
         if (backingStore != null)
         {
@@ -307,8 +307,8 @@ public class HashMap<K, V> extends org.datanucleus.store.types.wrappers.HashMap<
 
     /**
      * Method to unset the owner and field details.
-     **/
-    public synchronized void unsetOwner()
+     */
+    public void unsetOwner()
     {
         super.unsetOwner();
         if (backingStore != null)
@@ -393,12 +393,7 @@ public class HashMap<K, V> extends org.datanucleus.store.types.wrappers.HashMap<
         return delegate.entrySet();
     }
 
-    /**
-     * Method to check the equality of this map, and another.
-     * @param o The map to compare against.
-     * @return Whether they are equal.
-     **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         if (useCache)
         {
@@ -437,11 +432,7 @@ public class HashMap<K, V> extends org.datanucleus.store.types.wrappers.HashMap<
         return delegate.get(key);
     }
 
-    /**
-     * Method to generate a hashcode for this Map.
-     * @return The hashcode.
-     **/
-    public synchronized int hashCode()
+    public int hashCode()
     {
         if (useCache)
         {
