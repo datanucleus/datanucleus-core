@@ -41,13 +41,13 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class ArrayList extends java.util.ArrayList implements SCOList<java.util.ArrayList>
+public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java.util.ArrayList<E>, E>
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.ArrayList delegate;
+    protected java.util.ArrayList<E> delegate;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the member.
@@ -61,7 +61,7 @@ public class ArrayList extends java.util.ArrayList implements SCOList<java.util.
         this.ownerMmd = mmd;
     }
 
-    public void initialise(java.util.ArrayList newValue, Object oldValue)
+    public void initialise(java.util.ArrayList<E> newValue, Object oldValue)
     {
         initialise(newValue);
     }
@@ -129,7 +129,7 @@ public class ArrayList extends java.util.ArrayList implements SCOList<java.util.
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (makeDirty)
         {
@@ -259,7 +259,7 @@ public class ArrayList extends java.util.ArrayList implements SCOList<java.util.
      * @param index The item to retrieve
      * @return The element at that position.
      **/
-    public Object get(int index)
+    public E get(int index)
     {
         return delegate.get(index);
     }
@@ -374,7 +374,7 @@ public class ArrayList extends java.util.ArrayList implements SCOList<java.util.
      * @param index The position
      * @param element The new element
      */
-    public void add(int index, Object element)
+    public void add(int index, E element)
     {
         delegate.add(index, element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -398,7 +398,7 @@ public class ArrayList extends java.util.ArrayList implements SCOList<java.util.
      * @param element The new element
      * @return Whether it was added ok.
      */
-    public boolean add(Object element)
+    public boolean add(E element)
     {
         boolean success = delegate.add(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -601,9 +601,9 @@ public class ArrayList extends java.util.ArrayList implements SCOList<java.util.
      * @param index The element position.
      * @return The object that was removed
      */
-    public synchronized Object remove(int index)
+    public synchronized E remove(int index)
     {
-        Object element = delegate.remove(index);
+        E element = delegate.remove(index);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
         {
             ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
@@ -710,9 +710,9 @@ public class ArrayList extends java.util.ArrayList implements SCOList<java.util.
      * @param element The new element
      * @return The element previously at that position
      */
-    public Object set(int index, Object element, boolean allowDependentField)
+    public E set(int index, E element, boolean allowDependentField)
     {
-        Object prevElement = delegate.set(index, element);
+        E prevElement = delegate.set(index, element);
         if (ownerOP != null && allowDependentField && !delegate.contains(prevElement))
         {
             // Cascade delete
@@ -741,7 +741,7 @@ public class ArrayList extends java.util.ArrayList implements SCOList<java.util.
      * @param element The new element
      * @return The element previously at that position
      */
-    public Object set(int index, Object element)
+    public E set(int index, E element)
     {
         return set(index, element, true);
     }

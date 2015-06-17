@@ -38,13 +38,13 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class LinkedHashSet extends java.util.LinkedHashSet implements SCOCollection<java.util.LinkedHashSet>
+public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOCollection<java.util.LinkedHashSet<E>, E>
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.LinkedHashSet delegate;
+    protected java.util.LinkedHashSet<E> delegate;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -58,7 +58,7 @@ public class LinkedHashSet extends java.util.LinkedHashSet implements SCOCollect
         this.ownerMmd = mmd;
     }
 
-    public void initialise(java.util.LinkedHashSet newValue, Object oldValue)
+    public void initialise(java.util.LinkedHashSet<E> newValue, Object oldValue)
     {
         initialise(newValue);
     }
@@ -126,7 +126,7 @@ public class LinkedHashSet extends java.util.LinkedHashSet implements SCOCollect
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (makeDirty)
         {
@@ -316,7 +316,7 @@ public class LinkedHashSet extends java.util.LinkedHashSet implements SCOCollect
      * @param element The new element
      * @return Whether it was added ok.
      **/
-    public boolean add(Object element)
+    public boolean add(E element)
     {
         boolean success = delegate.add(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())

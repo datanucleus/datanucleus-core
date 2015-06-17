@@ -21,7 +21,7 @@ package org.datanucleus.store.types;
 /**
  * Representation of a wrapper for a mutable Collection SCO type supported.
  **/
-public interface SCOCollection<T> extends SCOContainer<T>
+public interface SCOCollection<T, E> extends SCOContainer<T>
 {
     /**
      * Method to update an embedded element stored in the collection
@@ -30,7 +30,7 @@ public interface SCOCollection<T> extends SCOContainer<T>
      * @param value the new value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty);
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty);
 
     /**
      * Method to remove an element from the collection, and observe the flag for whether to allow 
@@ -39,5 +39,5 @@ public interface SCOCollection<T> extends SCOContainer<T>
      * @param allowCascadeDelete Whether to allow cascade delete
      * @return Whether the element was removed
      */
-    public boolean remove(Object element, boolean allowCascadeDelete);
+    public boolean remove(E element, boolean allowCascadeDelete);
 }

@@ -64,9 +64,9 @@ import org.datanucleus.util.NucleusLogger;
  * "backing store" (where present) and does this as necessary. Some methods (<B>size()</B>) just check if 
  * everything is loaded and use the delegate if possible, otherwise going direct to the datastore.
  */
-public class SortedSet extends org.datanucleus.store.types.wrappers.SortedSet implements BackedSCO
+public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet<E> implements BackedSCO
 {
-    protected transient SetStore backingStore;
+    protected transient SetStore<E> backingStore;
     protected transient boolean allowNulls = false;
     protected transient boolean useCache = true;
     protected transient boolean isCacheLoaded = false;
@@ -109,7 +109,7 @@ public class SortedSet extends org.datanucleus.store.types.wrappers.SortedSet im
         }
     }
 
-    public void initialise(java.util.SortedSet newValue, Object oldValue)
+    public void initialise(java.util.SortedSet<E> newValue, Object oldValue)
     {
         if (newValue != null)
         {
@@ -155,7 +155,7 @@ public class SortedSet extends org.datanucleus.store.types.wrappers.SortedSet im
                     oldColl = (java.util.Collection) ((SCOCollection)oldColl).getValue();
                 }
 
-                for (Object elem : newValue)
+                for (E elem : newValue)
                 {
                     if (oldColl == null || !oldColl.contains(elem))
                     {
@@ -277,7 +277,7 @@ public class SortedSet extends org.datanucleus.store.types.wrappers.SortedSet im
                     ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
-            Iterator iter=backingStore.iterator(ownerOP);
+            Iterator<E> iter=backingStore.iterator(ownerOP);
             while (iter.hasNext())
             {
                 delegate.add(iter.next());
@@ -302,7 +302,7 @@ public class SortedSet extends org.datanucleus.store.types.wrappers.SortedSet im
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (backingStore != null)
         {
@@ -422,7 +422,7 @@ public class SortedSet extends org.datanucleus.store.types.wrappers.SortedSet im
      * Accessor for the first element in the sorted set.
      * @return The first element
      **/
-    public Object first()
+    public E first()
     {
         if (useCache && isCacheLoaded)
         {
@@ -436,7 +436,7 @@ public class SortedSet extends org.datanucleus.store.types.wrappers.SortedSet im
         else
         {
             // Use Iterator to get element
-            Iterator iter = iterator();
+            Iterator<E> iter = iterator();
             return iter.next();
         }
 
@@ -484,7 +484,7 @@ public class SortedSet extends org.datanucleus.store.types.wrappers.SortedSet im
      * @param toElement the element to return up to.
      * @return The set of elements meeting the input
      */
-    public java.util.SortedSet headSet(Object toElement)
+    public java.util.SortedSet headSet(E toElement)
     {
         if (useCache && isCacheLoaded)
         {
@@ -510,7 +510,7 @@ public class SortedSet extends org.datanucleus.store.types.wrappers.SortedSet im
      * @param toElement The end element
      * @return The set of elements meeting the input
      */
-    public java.util.SortedSet subSet(Object fromElement, Object toElement)
+    public java.util.SortedSet subSet(E fromElement, E toElement)
     {
         if (useCache && isCacheLoaded)
         {
@@ -535,7 +535,7 @@ public class SortedSet extends org.datanucleus.store.types.wrappers.SortedSet im
      * @param fromElement The start element
      * @return The set of elements meeting the input
      */
-    public java.util.SortedSet tailSet(Object fromElement)
+    public java.util.SortedSet tailSet(E fromElement)
     {
         if (useCache && isCacheLoaded)
         {
@@ -559,7 +559,7 @@ public class SortedSet extends org.datanucleus.store.types.wrappers.SortedSet im
      * Accessor for the last element in the sorted set.
      * @return The last element
      **/
-    public Object last()
+    public E last()
     {
         if (useCache && isCacheLoaded)
         {
@@ -573,8 +573,8 @@ public class SortedSet extends org.datanucleus.store.types.wrappers.SortedSet im
         else
         {
             // Use Iterator to get element
-            Iterator iter = iterator();
-            Object last = null;
+            Iterator<E> iter = iterator();
+            E last = null;
             while (iter.hasNext())
             {
                 last = iter.next();
@@ -646,7 +646,7 @@ public class SortedSet extends org.datanucleus.store.types.wrappers.SortedSet im
      * @param element The new element
      * @return Whether it was added ok.
      **/
-    public boolean add(Object element)
+    public boolean add(E element)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)

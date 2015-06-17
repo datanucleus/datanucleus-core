@@ -42,7 +42,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class Vector extends java.util.Vector implements SCOList<java.util.Vector>
+public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.Vector<E>, E>
 {
     private static final long serialVersionUID = -7852159568338224341L;
 
@@ -50,7 +50,7 @@ public class Vector extends java.util.Vector implements SCOList<java.util.Vector
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.Vector delegate;
+    protected java.util.Vector<E> delegate;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -64,7 +64,7 @@ public class Vector extends java.util.Vector implements SCOList<java.util.Vector
         this.ownerMmd = mmd;
     }
 
-    public void initialise(java.util.Vector newValue, Object oldValue)
+    public void initialise(java.util.Vector<E> newValue, Object oldValue)
     {
         initialise(newValue);
     }
@@ -132,7 +132,7 @@ public class Vector extends java.util.Vector implements SCOList<java.util.Vector
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (makeDirty)
         {
@@ -251,8 +251,8 @@ public class Vector extends java.util.Vector implements SCOList<java.util.Vector
      * Method to retrieve an element no.
      * @param index The item to retrieve
      * @return The element at that position.
-     **/
-    public synchronized Object elementAt(int index)
+     */
+    public synchronized E elementAt(int index)
     {
         return delegate.elementAt(index);
     }
@@ -280,7 +280,7 @@ public class Vector extends java.util.Vector implements SCOList<java.util.Vector
      * Method to return the first element in the Vector.
      * @return The first element
      */
-    public synchronized Object firstElement()
+    public synchronized E firstElement()
     {
         return delegate.firstElement();
     }
@@ -290,7 +290,7 @@ public class Vector extends java.util.Vector implements SCOList<java.util.Vector
      * @param index The item to retrieve
      * @return The element at that position.
      **/
-    public synchronized Object get(int index)
+    public synchronized E get(int index)
     {
         return delegate.get(index);
     }
@@ -338,7 +338,7 @@ public class Vector extends java.util.Vector implements SCOList<java.util.Vector
      * Method to retrieve an iterator for the list.
      * @return The iterator
      **/
-    public synchronized Iterator iterator()
+    public synchronized Iterator<E> iterator()
     {
         return new SCOListIterator(this, ownerOP, delegate, null, true, -1);
     }
@@ -347,7 +347,7 @@ public class Vector extends java.util.Vector implements SCOList<java.util.Vector
      * Method to return the last element in the Vector.
      * @return The last element
      */
-    public synchronized Object lastElement()
+    public synchronized E lastElement()
     {
         return delegate.lastElement();
     }
@@ -436,7 +436,7 @@ public class Vector extends java.util.Vector implements SCOList<java.util.Vector
      * @param index The position
      * @param element The new element
      */
-    public void add(int index, Object element)
+    public void add(int index, E element)
     {
         delegate.add(index, element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -460,7 +460,7 @@ public class Vector extends java.util.Vector implements SCOList<java.util.Vector
      * @param element The new element
      * @return Whether it was added ok.
      */
-    public synchronized boolean add(Object element)
+    public synchronized boolean add(E element)
     {
         boolean success = delegate.add(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -563,7 +563,7 @@ public class Vector extends java.util.Vector implements SCOList<java.util.Vector
      * Method to add an element to the Vector.
      * @param element The new element
      */
-    public synchronized void addElement(Object element)
+    public synchronized void addElement(E element)
     {
         add(element);
     }
@@ -669,9 +669,9 @@ public class Vector extends java.util.Vector implements SCOList<java.util.Vector
      * @param index The element position.
      * @return The object that was removed
      */
-    public synchronized Object remove(int index)
+    public synchronized E remove(int index)
     {
-        Object element = delegate.remove(index);
+        E element = delegate.remove(index);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
         {
             ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
@@ -805,9 +805,9 @@ public class Vector extends java.util.Vector implements SCOList<java.util.Vector
      * @param element The new element
      * @return The element previously at that position
      */
-    public Object set(int index, Object element, boolean allowDependentField)
+    public E set(int index, E element, boolean allowDependentField)
     {
-        Object prevElement = delegate.set(index, element);
+        E prevElement = delegate.set(index, element);
         if (ownerOP != null && allowDependentField && !delegate.contains(prevElement))
         {
             // Cascade delete
@@ -835,7 +835,7 @@ public class Vector extends java.util.Vector implements SCOList<java.util.Vector
      * @param element The new element
      * @return The element previously at that position
      **/
-    public synchronized Object set(int index,Object element)
+    public synchronized E set(int index, E element)
     {
         return set(index, element, true);
     }
@@ -845,7 +845,7 @@ public class Vector extends java.util.Vector implements SCOList<java.util.Vector
      * @param element The new element
      * @param index The position
      **/
-    public synchronized void setElementAt(Object element,int index)
+    public synchronized void setElementAt(E element,int index)
     {
         // This is a historical wrapper to the Collection method
         set(index,element);

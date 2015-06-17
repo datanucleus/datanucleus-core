@@ -61,9 +61,9 @@ import org.datanucleus.util.NucleusLogger;
  * "backing store" (where present) and does this as necessary. Some methods (<B>size()</B>) just check if 
  * everything is loaded and use the delegate if possible, otherwise going direct to the datastore.
  */
-public class PriorityQueue extends org.datanucleus.store.types.wrappers.PriorityQueue implements BackedSCO
+public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.PriorityQueue<E> implements BackedSCO
 {
-    protected transient ListStore backingStore; // Really need a List since the Queue needs ordering
+    protected transient ListStore<E> backingStore; // Really need a List since the Queue needs ordering
     protected transient boolean allowNulls = false;
     protected transient boolean useCache = true;
     protected transient boolean isCacheLoaded = false;
@@ -263,7 +263,7 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
                     ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
-            Iterator iter=backingStore.iterator(ownerOP);
+            Iterator<E> iter=backingStore.iterator(ownerOP);
             while (iter.hasNext())
             {
                 delegate.add(iter.next());
@@ -288,7 +288,7 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (backingStore != null)
         {
@@ -446,7 +446,7 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
      * Method to peek at the next element in the Queue.
      * @return The element
      **/
-    public synchronized Object peek()
+    public synchronized E peek()
     {
         if (useCache)
         {
@@ -544,7 +544,7 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
      * @param element The element to add
      * @return Whether it was added successfully.
      **/
-    public synchronized boolean add(Object element)
+    public synchronized boolean add(E element)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -671,7 +671,7 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
      * @param element The element to offer
      * @return Whether it was added successfully.
      **/
-    public synchronized boolean offer(Object element)
+    public synchronized boolean offer(E element)
     {
         return add(element);
     }
@@ -680,7 +680,7 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
      * Method to poll the next element in the Queue.
      * @return The element (now removed)
      **/
-    public synchronized Object poll()
+    public synchronized E poll()
     {
         makeDirty();
  
@@ -690,9 +690,8 @@ public class PriorityQueue extends org.datanucleus.store.types.wrappers.Priority
         }
 
         int size = (useCache ? delegate.size() : -1);
-        Object delegateObject = delegate.poll();
-
-        Object backingObject = null;
+        E delegateObject = delegate.poll();
+        E backingObject = null;
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))

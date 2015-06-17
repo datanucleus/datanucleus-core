@@ -21,7 +21,7 @@ package org.datanucleus.store.scostore;
 /**
  * Interface representation of the backing store for a Set.
  */
-public interface SetStore extends CollectionStore
+public interface SetStore<E> extends CollectionStore<E>
 {
     // Add any methods specific to Set here
 }

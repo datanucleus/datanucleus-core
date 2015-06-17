@@ -64,9 +64,9 @@ import org.datanucleus.util.NucleusLogger;
  * "backing store" (where present) and does this as necessary. Some methods (<B>size()</B>) just check if 
  * everything is loaded and use the delegate if possible, otherwise going direct to the datastore.
  */
-public class Set extends org.datanucleus.store.types.wrappers.Set implements BackedSCO
+public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implements BackedSCO
 {
-    protected transient SetStore backingStore;
+    protected transient SetStore<E> backingStore;
     protected transient boolean allowNulls = false;
     protected transient boolean useCache = true;
     protected transient boolean isCacheLoaded = false;
@@ -119,7 +119,7 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
         }
     }
 
-    public void initialise(java.util.Set newValue, Object oldValue)
+    public void initialise(java.util.Set<E> newValue, Object oldValue)
     {
         if (newValue != null)
         {
@@ -165,7 +165,7 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
                     oldColl = (java.util.Collection) ((SCOCollection)oldColl).getValue();
                 }
 
-                for (Object elem : newValue)
+                for (E elem : newValue)
                 {
                     if (oldColl == null || !oldColl.contains(elem))
                     {
@@ -287,7 +287,7 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
                     ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
-            Iterator iter=backingStore.iterator(ownerOP);
+            Iterator<E> iter=backingStore.iterator(ownerOP);
             while (iter.hasNext())
             {
                 delegate.add(iter.next());
@@ -312,7 +312,7 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (backingStore != null)
         {
@@ -542,7 +542,7 @@ public class Set extends org.datanucleus.store.types.wrappers.Set implements Bac
      * @param element The element to add
      * @return Whether it was added successfully.
      **/
-    public synchronized boolean add(Object element)
+    public synchronized boolean add(E element)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)

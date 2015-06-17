@@ -36,13 +36,13 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class Hashtable extends java.util.Hashtable implements SCOMap<java.util.Hashtable>
+public class Hashtable<K, V> extends java.util.Hashtable<K, V> implements SCOMap<java.util.Hashtable<K, V>>
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.Hashtable delegate;
+    protected java.util.Hashtable<K, V> delegate;
 
     /**
      * Constructor
@@ -278,7 +278,7 @@ public class Hashtable extends java.util.Hashtable implements SCOMap<java.util.H
      * @param key The key
      * @return The value.
      **/
-    public synchronized Object get(Object key)
+    public synchronized V get(Object key)
     {
         return delegate.get(key);
     }
@@ -340,7 +340,7 @@ public class Hashtable extends java.util.Hashtable implements SCOMap<java.util.H
             // Cascade delete
             if (SCOUtils.useQueuedUpdate(ownerOP))
             {
-                Iterator<Map.Entry> entryIter = delegate.entrySet().iterator();
+                Iterator<Map.Entry<K, V>> entryIter = delegate.entrySet().iterator();
                 while (entryIter.hasNext())
                 {
                     Map.Entry entry = entryIter.next();
@@ -349,7 +349,7 @@ public class Hashtable extends java.util.Hashtable implements SCOMap<java.util.H
             }
             else if (SCOUtils.hasDependentKey(ownerMmd) || SCOUtils.hasDependentValue(ownerMmd)) 
             {
-                Iterator<Map.Entry> entryIter = delegate.entrySet().iterator();
+                Iterator<Map.Entry<K, V>> entryIter = delegate.entrySet().iterator();
                 while (entryIter.hasNext())
                 {
                     Map.Entry entry = entryIter.next();
@@ -380,9 +380,9 @@ public class Hashtable extends java.util.Hashtable implements SCOMap<java.util.H
      * @param value The value
      * @return The previous value for the specified key.
      */
-    public synchronized Object put(Object key,Object value)
+    public synchronized V put(K key, V value)
     {
-        Object oldValue = delegate.put(key, value);
+        V oldValue = delegate.put(key, value);
         makeDirty();
         if (SCOUtils.useQueuedUpdate(ownerOP))
         {
@@ -425,9 +425,9 @@ public class Hashtable extends java.util.Hashtable implements SCOMap<java.util.H
      * @param key The key to remove
      * @return The value that was removed from this key.
      */
-    public synchronized Object remove(Object key)
+    public synchronized V remove(Object key)
     {
-        Object value = delegate.remove(key);
+        V value = delegate.remove(key);
 
         if (ownerOP != null)
         {

@@ -38,13 +38,13 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class Collection extends AbstractCollection implements SCOCollection<java.util.Collection>, Cloneable, java.io.Serializable
+public class Collection<E> extends AbstractCollection<E> implements SCOCollection<java.util.Collection<E>, E>, Cloneable, java.io.Serializable
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.Collection delegate;
+    protected java.util.Collection<E> delegate;
 
     /**
      * Constructor. Called from CollectionMapping. 
@@ -57,7 +57,7 @@ public class Collection extends AbstractCollection implements SCOCollection<java
         this.ownerMmd = mmd;
     }
 
-    public void initialise(java.util.Collection newValue, Object oldValue)
+    public void initialise(java.util.Collection<E> newValue, Object oldValue)
     {
         initialise(newValue);
     }
@@ -125,7 +125,7 @@ public class Collection extends AbstractCollection implements SCOCollection<java
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (makeDirty)
         {
@@ -315,7 +315,7 @@ public class Collection extends AbstractCollection implements SCOCollection<java
      * @param element The element to add
      * @return Whether it was added successfully.
      **/
-    public synchronized boolean add(Object element)
+    public synchronized boolean add(E element)
     {
         boolean success = delegate.add(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())

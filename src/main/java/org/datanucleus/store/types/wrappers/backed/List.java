@@ -67,9 +67,9 @@ import org.datanucleus.util.NucleusLogger;
  * "backing store" (where present) and does this as necessary. Some methods (<B>size()</B>) just check if 
  * everything is loaded and use the delegate if possible, otherwise going direct to the datastore.
  */
-public class List extends org.datanucleus.store.types.wrappers.List implements BackedSCO
+public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implements BackedSCO
 {
-    protected transient ListStore backingStore;
+    protected transient ListStore<E> backingStore;
     protected transient boolean allowNulls = false;
     protected transient boolean useCache=true;
     protected transient boolean isCacheLoaded=false;
@@ -261,7 +261,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
                     ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
-            Iterator iter=backingStore.iterator(ownerOP);
+            Iterator<E> iter=backingStore.iterator(ownerOP);
             while (iter.hasNext())
             {
                 delegate.add(iter.next());
@@ -286,7 +286,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (backingStore != null)
         {
@@ -409,8 +409,8 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
      * Method to retrieve an element no.
      * @param index The item to retrieve
      * @return The element at that position.
-     **/
-    public Object get(int index)
+     */
+    public E get(int index)
     {
         if (useCache)
         {
@@ -424,10 +424,6 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
         return delegate.get(index);
     }
 
-    /**
-     * Hashcode operator.
-     * @return The Hash code.
-     **/
     public synchronized int hashCode()
     {
         if (useCache)
@@ -611,7 +607,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
      * @param element The element to add
      * @return Whether it was added successfully.
      **/
-    public synchronized boolean add(Object element)
+    public synchronized boolean add(E element)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -662,7 +658,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
      * @param element The element to add
      * @param index The position
      **/
-    public void add(int index, Object element)
+    public void add(int index, E element)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -895,7 +891,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
      * @param index The element position.
      * @return The object that was removed
      */
-    public Object remove(int index)
+    public E remove(int index)
     {
         makeDirty();
 
@@ -905,9 +901,9 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
         }
 
         int size = (useCache ? delegate.size() : -1);
-        Object delegateObject = (useCache ? delegate.remove(index) : null);
+        E delegateObject = (useCache ? delegate.remove(index) : null);
 
-        Object backingObject = null;
+        E backingObject = null;
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))
@@ -1049,7 +1045,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
      * @param element The new element
      * @return The element previously at that position
      */
-    public Object set(int index, Object element, boolean allowDependentField)
+    public E set(int index, E element, boolean allowDependentField)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -1065,7 +1061,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
         }
 
         // Update the delegate since updating this can cause removal of the original object
-        Object delegateReturn = delegate.set(index, element);
+        E delegateReturn = delegate.set(index, element);
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))
@@ -1091,7 +1087,7 @@ public class List extends org.datanucleus.store.types.wrappers.List implements B
      * @param element The new element
      * @return The element previously at that position
      */
-    public Object set(int index, Object element)
+    public E set(int index, E element)
     {
         return set(index, element, true);
     }

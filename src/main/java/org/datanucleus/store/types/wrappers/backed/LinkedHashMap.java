@@ -40,10 +40,10 @@ import org.datanucleus.util.NucleusLogger;
 /**
  * A mutable second-class LinkedHashMap object. Backed by a MapStore object.
  */
-public class LinkedHashMap extends org.datanucleus.store.types.wrappers.LinkedHashMap implements BackedSCO
+public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.LinkedHashMap<K, V> implements BackedSCO
 {
     protected transient boolean allowNulls = true;
-    protected transient MapStore backingStore;
+    protected transient MapStore<K, V> backingStore;
     protected transient boolean useCache=true;
     protected transient boolean isCacheLoaded=false;
 
@@ -424,7 +424,7 @@ public class LinkedHashMap extends org.datanucleus.store.types.wrappers.LinkedHa
      * @param key The key
      * @return The value.
      **/
-    public Object get(Object key)
+    public V get(Object key)
     {
         if (useCache)
         {
@@ -560,7 +560,7 @@ public class LinkedHashMap extends org.datanucleus.store.types.wrappers.LinkedHa
      * @param value The value
      * @return The previous value for the specified key.
      */
-    public Object put(Object key, Object value)
+    public V put(K key, V value)
     {
         // Reject inappropriate values
         if (!allowNulls)
@@ -583,7 +583,7 @@ public class LinkedHashMap extends org.datanucleus.store.types.wrappers.LinkedHa
 
         makeDirty();
 
-        Object oldValue = null;
+        V oldValue = null;
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))
@@ -595,7 +595,7 @@ public class LinkedHashMap extends org.datanucleus.store.types.wrappers.LinkedHa
                 oldValue = backingStore.put(ownerOP, key, value);
             }
         }
-        Object delegateOldValue = delegate.put(key, value);
+        V delegateOldValue = delegate.put(key, value);
         if (backingStore == null)
         {
             oldValue = delegateOldValue;
@@ -655,7 +655,7 @@ public class LinkedHashMap extends org.datanucleus.store.types.wrappers.LinkedHa
      * @param key The key to remove
      * @return The value that was removed from this key.
      **/
-    public Object remove(Object key)
+    public V remove(Object key)
     {
         makeDirty();
 
@@ -665,8 +665,8 @@ public class LinkedHashMap extends org.datanucleus.store.types.wrappers.LinkedHa
             loadFromStore();
         }
 
-        Object removed = null;
-        Object delegateRemoved = delegate.remove(key);
+        V removed = null;
+        V delegateRemoved = delegate.remove(key);
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))

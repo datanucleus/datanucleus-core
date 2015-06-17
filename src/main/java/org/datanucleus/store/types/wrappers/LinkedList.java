@@ -41,13 +41,13 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class LinkedList extends java.util.LinkedList implements SCOList<java.util.LinkedList>
+public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<java.util.LinkedList<E>, E>
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.LinkedList delegate;
+    protected java.util.LinkedList<E> delegate;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -60,7 +60,7 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
         this.ownerMmd = mmd;
     }
 
-    public void initialise(java.util.LinkedList newValue, Object oldValue)
+    public void initialise(java.util.LinkedList<E> newValue, Object oldValue)
     {
         initialise(newValue);
     }
@@ -128,7 +128,7 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (makeDirty)
         {
@@ -258,7 +258,7 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
      * @param index The item to retrieve
      * @return The element at that position.
      **/
-    public Object get(int index)
+    public E get(int index)
     {
         return delegate.get(index);
     }
@@ -267,7 +267,7 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
      * Method to retrieve the first element.
      * @return The first element
      **/
-    public Object getFirst()
+    public E getFirst()
     {
         return delegate.getFirst();
     }
@@ -276,7 +276,7 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
      * Method to retrieve the last element.
      * @return The last element
      **/
-    public Object getLast()
+    public E getLast()
     {
         return delegate.getLast();
     }
@@ -382,7 +382,7 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
      * @param index The position
      * @param element The new element
      **/
-    public void add(int index, Object element)
+    public void add(int index, E element)
     {
         delegate.add(index, element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -406,7 +406,7 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
      * @param element The new element
      * @return Whether it was added ok.
      **/
-    public boolean add(Object element)
+    public boolean add(E element)
     {
         boolean success = delegate.add(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -509,7 +509,7 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
      * Method to add an element as first in the LinkedList.
      * @param element The new element
      **/
-    public void addFirst(Object element)
+    public void addFirst(E element)
     {
         delegate.addFirst(element);
         makeDirty();
@@ -523,7 +523,7 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
      * Method to add an element as last in the LinkedList.
      * @param element The new element
      **/
-    public void addLast(Object element)
+    public void addLast(E element)
     {
         delegate.addLast(element);
         if (SCOUtils.useQueuedUpdate(ownerOP))
@@ -589,10 +589,10 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
      * Method to remove an element from the LinkedList.
      * @param index The element position.
      * @return The object that was removed
-     **/
-    public Object remove(int index)
+     */
+    public E remove(int index)
     {
-        Object element = delegate.remove(index);
+        E element = delegate.remove(index);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
         {
             ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
@@ -723,8 +723,8 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
     /**
      * Method to remove the first element from the LinkedList.
      * @return The object that was removed
-     **/
-    public Object removeFirst()
+     */
+    public E removeFirst()
     {
         return remove(0);
     }
@@ -733,7 +733,7 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
      * Method to remove the last element from the LinkedList.
      * @return The object that was removed
      */
-    public Object removeLast()
+    public E removeLast()
     {
         return remove(size()-1);
     }
@@ -766,9 +766,9 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
      * @param element The new element
      * @return The element previously at that position
      */
-    public Object set(int index, Object element, boolean allowDependentField)
+    public E set(int index, E element, boolean allowDependentField)
     {
-        Object prevElement = delegate.set(index, element);
+        E prevElement = delegate.set(index, element);
         if (ownerOP != null && allowDependentField && !delegate.contains(prevElement))
         {
             // Cascade delete
@@ -796,7 +796,7 @@ public class LinkedList extends java.util.LinkedList implements SCOList<java.uti
      * @param element The new element
      * @return The element previously at that position
      **/
-    public Object set(int index, Object element)
+    public E set(int index, E element)
     {
         return set(index, element, true);
     }

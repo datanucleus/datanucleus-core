@@ -41,7 +41,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
+public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.Stack<E>, E>
 {
     private static final long serialVersionUID = -2356534368275783162L;
 
@@ -49,7 +49,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.Stack delegate;
+    protected java.util.Stack<E> delegate;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -62,7 +62,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
         this.ownerMmd = mmd;
     }
 
-    public void initialise(java.util.Stack newValue, Object oldValue)
+    public void initialise(java.util.Stack<E> newValue, Object oldValue)
     {
         initialise(newValue);
     }
@@ -131,7 +131,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (makeDirty)
         {
@@ -261,8 +261,8 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
      * Method to retrieve an element no.
      * @param index The item to retrieve
      * @return The element at that position.
-     **/
-    public synchronized Object get(int index)
+     */
+    public synchronized E get(int index)
     {
         return delegate.get(index);
     }
@@ -328,7 +328,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
      * Method to retrieve the element at the top of the stack.
      * @return The element at the top of the stack
      **/
-    public synchronized Object peek()
+    public synchronized E peek()
     {
         return delegate.peek();
     }
@@ -378,7 +378,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
      * @param index The position
      * @param element The new element
      **/
-    public void add(int index,Object element)
+    public void add(int index, E element)
     {
         delegate.add(index, element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -403,7 +403,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
      * @param element The new element
      * @return Whether it was added ok.
      **/
-    public synchronized boolean add(Object element)
+    public synchronized boolean add(E element)
     {
         boolean success = delegate.add(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -431,7 +431,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
      *
      * @param element The new element
      **/
-    public synchronized void addElement(Object element)
+    public synchronized void addElement(E element)
     {
         add(element);
     }
@@ -564,7 +564,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
      * Method to remove the top element in the stack and return it.
      * @return The top element that was in the Stack (now removed).
      **/
-    public synchronized Object pop()
+    public synchronized E pop()
     {
         return remove(0);
     }
@@ -574,10 +574,10 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
      *
      * @param element The element to push onto the stack.
      * @return The element that was pushed onto the Stack
-     **/
-    public Object push(Object element)
+     */
+    public E push(E element)
     {
-        Object obj = delegate.push(element);
+        E obj = delegate.push(element);
         makeDirty();
         if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
         {
@@ -701,9 +701,9 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
      * @param index The element position.
      * @return The object that was removed
      **/
-    public synchronized Object remove(int index)
+    public synchronized E remove(int index)
     {
-        Object element = delegate.remove(index);
+        E element = delegate.remove(index);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
         {
             ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
@@ -776,9 +776,9 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
      * @param element The new element
      * @return The element previously at that position
      */
-    public Object set(int index, Object element, boolean allowDependentField)
+    public E set(int index, E element, boolean allowDependentField)
     {
-        Object prevElement = delegate.set(index, element);
+        E prevElement = delegate.set(index, element);
         if (ownerOP != null && allowDependentField && !delegate.contains(prevElement))
         {
             // Cascade delete
@@ -807,7 +807,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
      * @param element The new element
      * @return The element previously at that position
      **/
-    public synchronized Object set(int index,Object element)
+    public synchronized E set(int index, E element)
     {
         return set(index, element, true);
     }
@@ -818,7 +818,7 @@ public class Stack extends java.util.Stack implements SCOList<java.util.Stack>
      * @param element The new element
      * @param index The position
      **/
-    public synchronized void setElementAt(Object element,int index)
+    public synchronized void setElementAt(E element,int index)
     {
         set(index, element);
     }

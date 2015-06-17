@@ -66,10 +66,10 @@ import org.datanucleus.util.NucleusLogger;
  * everything is loaded and use the delegate if possible, otherwise going
  * direct to the datastore.
  */
-public class Map extends org.datanucleus.store.types.wrappers.Map implements BackedSCO
+public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> implements BackedSCO
 {
     protected transient boolean allowNulls = true;
-    protected transient MapStore backingStore;
+    protected transient MapStore<K, V> backingStore;
     protected transient boolean useCache=true;
     protected transient boolean isCacheLoaded=false;
 
@@ -452,7 +452,7 @@ public class Map extends org.datanucleus.store.types.wrappers.Map implements Bac
      * @param key The key
      * @return The value.
      **/
-    public synchronized Object get(Object key)
+    public synchronized V get(Object key)
     {
         if (useCache)
         {
@@ -618,7 +618,7 @@ public class Map extends org.datanucleus.store.types.wrappers.Map implements Bac
      * @param value The value
      * @return The previous value against this key (if any).
      */
-    public synchronized Object put(Object key, Object value)
+    public synchronized V put(K key, V value)
     {
         // Reject inappropriate values
         if (!allowNulls)
@@ -641,7 +641,7 @@ public class Map extends org.datanucleus.store.types.wrappers.Map implements Bac
 
         makeDirty();
 
-        Object oldValue = null;
+        V oldValue = null;
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))
@@ -653,7 +653,7 @@ public class Map extends org.datanucleus.store.types.wrappers.Map implements Bac
                 oldValue = backingStore.put(ownerOP, key, value);
             }
         }
-        Object delegateOldValue = delegate.put(key, value);
+        V delegateOldValue = delegate.put(key, value);
         if (backingStore == null)
         {
             oldValue = delegateOldValue;
@@ -713,7 +713,7 @@ public class Map extends org.datanucleus.store.types.wrappers.Map implements Bac
      * @param key The key for the value.
      * @return The value removed.
      **/
-    public synchronized Object remove(Object key)
+    public synchronized V remove(Object key)
     {
         makeDirty();
 
@@ -723,8 +723,8 @@ public class Map extends org.datanucleus.store.types.wrappers.Map implements Bac
             loadFromStore();
         }
 
-        Object removed = null;
-        Object delegateRemoved = delegate.remove(key);
+        V removed = null;
+        V delegateRemoved = delegate.remove(key);
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))

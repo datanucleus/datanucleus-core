@@ -39,13 +39,13 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class HashMap extends java.util.HashMap implements SCOMap<java.util.HashMap>
+public class HashMap<K, V> extends java.util.HashMap<K, V> implements SCOMap<java.util.HashMap<K, V>>
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.HashMap delegate;
+    protected java.util.HashMap<K, V> delegate;
 
     /**
      * Constructor
@@ -59,7 +59,7 @@ public class HashMap extends java.util.HashMap implements SCOMap<java.util.HashM
         this.ownerMmd = mmd;
     }
 
-    public void initialise(java.util.HashMap newValue, Object oldValue)
+    public void initialise(java.util.HashMap<K, V> newValue, Object oldValue)
     {
         initialise(newValue);
     }
@@ -281,7 +281,7 @@ public class HashMap extends java.util.HashMap implements SCOMap<java.util.HashM
      * @param key The key
      * @return The value.
      **/
-    public Object get(Object key)
+    public V get(Object key)
     {
         return delegate.get(key);
     }
@@ -341,7 +341,7 @@ public class HashMap extends java.util.HashMap implements SCOMap<java.util.HashM
             // Cascade delete
             if (SCOUtils.useQueuedUpdate(ownerOP))
             {
-                Iterator<Map.Entry> entryIter = delegate.entrySet().iterator();
+                Iterator<Map.Entry<K, V>> entryIter = delegate.entrySet().iterator();
                 while (entryIter.hasNext())
                 {
                     Map.Entry entry = entryIter.next();
@@ -350,7 +350,7 @@ public class HashMap extends java.util.HashMap implements SCOMap<java.util.HashM
             }
             else if (SCOUtils.hasDependentKey(ownerMmd) || SCOUtils.hasDependentValue(ownerMmd)) 
             {
-                Iterator<Map.Entry> entryIter = delegate.entrySet().iterator();
+                Iterator<Map.Entry<K, V>> entryIter = delegate.entrySet().iterator();
                 while (entryIter.hasNext())
                 {
                     Map.Entry entry = entryIter.next();
@@ -381,9 +381,9 @@ public class HashMap extends java.util.HashMap implements SCOMap<java.util.HashM
      * @param value The value
      * @return The previous value for the specified key.
      */
-    public Object put(Object key,Object value)
+    public V put(K key, V value)
     {
-        Object oldValue = delegate.put(key, value);
+        V oldValue = delegate.put(key, value);
         makeDirty();
         if (SCOUtils.useQueuedUpdate(ownerOP))
         {
@@ -426,9 +426,9 @@ public class HashMap extends java.util.HashMap implements SCOMap<java.util.HashM
      * @param key The key to remove
      * @return The value that was removed from this key.
      */
-    public Object remove(Object key)
+    public V remove(Object key)
     {
-        Object value = delegate.remove(key);
+        V value = delegate.remove(key);
 
         if (ownerOP != null)
         {

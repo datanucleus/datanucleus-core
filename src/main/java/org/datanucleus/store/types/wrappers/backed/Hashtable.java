@@ -39,9 +39,9 @@ import org.datanucleus.util.NucleusLogger;
 /**
  * A mutable second-class Hashtable object. Backed by a MapStore object.
  */
-public class Hashtable extends org.datanucleus.store.types.wrappers.Hashtable implements BackedSCO
+public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashtable<K, V> implements BackedSCO
 {
-    protected transient MapStore backingStore;
+    protected transient MapStore<K, V> backingStore;
     protected transient boolean allowNulls = false;
     protected transient boolean useCache = true;
     protected transient boolean isCacheLoaded = false;
@@ -420,7 +420,7 @@ public class Hashtable extends org.datanucleus.store.types.wrappers.Hashtable im
      * @param key The key
      * @return The value.
      **/
-    public synchronized Object get(Object key)
+    public synchronized V get(Object key)
     {
         if (useCache)
         {
@@ -556,7 +556,7 @@ public class Hashtable extends org.datanucleus.store.types.wrappers.Hashtable im
      * @param value The value
      * @return The previous value for the specified key.
      **/
-    public synchronized Object put(Object key,Object value)
+    public synchronized V put(K key, V value)
     {
         // Reject inappropriate values
         if (!allowNulls)
@@ -579,7 +579,7 @@ public class Hashtable extends org.datanucleus.store.types.wrappers.Hashtable im
 
         makeDirty();
 
-        Object oldValue = null;
+        V oldValue = null;
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))
@@ -591,7 +591,7 @@ public class Hashtable extends org.datanucleus.store.types.wrappers.Hashtable im
                 oldValue = backingStore.put(ownerOP, key, value);
             }
         }
-        Object delegateOldValue = delegate.put(key, value);
+        V delegateOldValue = delegate.put(key, value);
         if (backingStore == null)
         {
             oldValue = delegateOldValue;
@@ -651,7 +651,7 @@ public class Hashtable extends org.datanucleus.store.types.wrappers.Hashtable im
      * @param key The key to remove
      * @return The value that was removed from this key.
      **/
-    public synchronized Object remove(Object key)
+    public synchronized V remove(Object key)
     {
         makeDirty();
 
@@ -661,8 +661,8 @@ public class Hashtable extends org.datanucleus.store.types.wrappers.Hashtable im
             loadFromStore();
         }
 
-        Object removed = null;
-        Object delegateRemoved = delegate.remove(key);
+        V removed = null;
+        V delegateRemoved = delegate.remove(key);
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))

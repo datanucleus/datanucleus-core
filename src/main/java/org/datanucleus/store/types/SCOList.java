@@ -20,7 +20,7 @@ package org.datanucleus.store.types;
 /**
  * Representation of a wrapper for a mutable List SCO type supported.
  **/
-public interface SCOList<T> extends SCOCollection<T>
+public interface SCOList<T, E> extends SCOCollection<T, E>
 {
     /**
      * Overload the basic List set() method to allow turning off of the dependent-field
@@ -30,5 +30,5 @@ public interface SCOList<T> extends SCOCollection<T>
      * @param allowDependentField Whether to allow dependent-field deletes
      * @return The previous object at this position
      */
-    public Object set(int index, Object element, boolean allowDependentField);
+    public E set(int index, E element, boolean allowDependentField);
 }

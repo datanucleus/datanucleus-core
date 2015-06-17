@@ -37,13 +37,13 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class Map extends AbstractMap implements SCOMap<java.util.Map>, Cloneable, java.io.Serializable
+public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map<K, V>>, Cloneable, java.io.Serializable
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.Map delegate;
+    protected java.util.Map<K, V> delegate;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -280,7 +280,7 @@ public class Map extends AbstractMap implements SCOMap<java.util.Map>, Cloneable
      * @param key The key
      * @return The value.
      **/
-    public synchronized Object get(Object key)
+    public synchronized V get(Object key)
     {
         return delegate.get(key);
     }
@@ -340,7 +340,7 @@ public class Map extends AbstractMap implements SCOMap<java.util.Map>, Cloneable
             // Cascade delete
             if (SCOUtils.useQueuedUpdate(ownerOP))
             {
-                Iterator<Map.Entry> entryIter = delegate.entrySet().iterator();
+                Iterator<Map.Entry<K, V>> entryIter = delegate.entrySet().iterator();
                 while (entryIter.hasNext())
                 {
                     Map.Entry entry = entryIter.next();
@@ -349,7 +349,7 @@ public class Map extends AbstractMap implements SCOMap<java.util.Map>, Cloneable
             }
             else if (SCOUtils.hasDependentKey(ownerMmd) || SCOUtils.hasDependentValue(ownerMmd)) 
             {
-                Iterator<Map.Entry> entryIter = delegate.entrySet().iterator();
+                Iterator<Map.Entry<K, V>> entryIter = delegate.entrySet().iterator();
                 while (entryIter.hasNext())
                 {
                     Map.Entry entry = entryIter.next();
@@ -380,10 +380,10 @@ public class Map extends AbstractMap implements SCOMap<java.util.Map>, Cloneable
      * @param value The value
      * @return The previous value against this key (if any).
      **/
-    public synchronized Object put(Object key, Object value)
+    public synchronized V put(K key, V value)
     {
         // Reject inappropriate elements
-        Object oldValue = delegate.put(key, value);
+        V oldValue = delegate.put(key, value);
         makeDirty();
         if (SCOUtils.useQueuedUpdate(ownerOP))
         {
@@ -426,9 +426,9 @@ public class Map extends AbstractMap implements SCOMap<java.util.Map>, Cloneable
      * @param key The key for the value.
      * @return The value removed.
      **/
-    public synchronized Object remove(Object key)
+    public synchronized V remove(Object key)
     {
-        Object value = delegate.remove(key);
+        V value = delegate.remove(key);
 
         if (ownerOP != null)
         {

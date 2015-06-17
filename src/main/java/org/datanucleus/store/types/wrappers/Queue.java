@@ -38,13 +38,13 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class Queue extends AbstractQueue implements SCOCollection<java.util.Queue>, Cloneable, java.io.Serializable
+public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.util.Queue<E>, E>, Cloneable, java.io.Serializable
 {
     protected ObjectProvider ownerOP;
     protected AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.Queue delegate;
+    protected java.util.Queue<E> delegate;
 
     /**
      * Constructor. 
@@ -57,7 +57,7 @@ public class Queue extends AbstractQueue implements SCOCollection<java.util.Queu
         this.ownerMmd = mmd;
     }
 
-    public void initialise(java.util.Queue newValue, Object oldValue)
+    public void initialise(java.util.Queue<E> newValue, Object oldValue)
     {
         initialise(newValue);
     }
@@ -142,7 +142,7 @@ public class Queue extends AbstractQueue implements SCOCollection<java.util.Queu
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (makeDirty)
         {
@@ -305,7 +305,7 @@ public class Queue extends AbstractQueue implements SCOCollection<java.util.Queu
      * Method to peek at the next element in the Queue.
      * @return The element
      **/
-    public synchronized Object peek()
+    public synchronized E peek()
     {
         return delegate.peek();
     }
@@ -343,7 +343,7 @@ public class Queue extends AbstractQueue implements SCOCollection<java.util.Queu
      * @param element The element to add
      * @return Whether it was added successfully.
      */
-    public synchronized boolean add(Object element)
+    public synchronized boolean add(E element)
     {
         boolean success = delegate.add(element);
         if (success)
@@ -429,7 +429,7 @@ public class Queue extends AbstractQueue implements SCOCollection<java.util.Queu
      * @param element The element to offer
      * @return Whether it was added successfully.
      **/
-    public synchronized boolean offer(Object element)
+    public synchronized boolean offer(E element)
     {
         return add(element);
     }
@@ -438,9 +438,9 @@ public class Queue extends AbstractQueue implements SCOCollection<java.util.Queu
      * Method to poll the next element in the Queue.
      * @return The element (now removed)
      **/
-    public synchronized Object poll()
+    public synchronized E poll()
     {
-        Object obj = delegate.poll();
+        E obj = delegate.poll();
         makeDirty();
         if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
         {

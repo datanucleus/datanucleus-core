@@ -40,7 +40,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class TreeSet extends java.util.TreeSet implements SCOCollection<java.util.TreeSet>
+public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<java.util.TreeSet<E>, E>
 {
     private static final long serialVersionUID = 2716348073191575719L;
 
@@ -48,7 +48,7 @@ public class TreeSet extends java.util.TreeSet implements SCOCollection<java.uti
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.TreeSet delegate;
+    protected java.util.TreeSet<E> delegate;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -61,7 +61,7 @@ public class TreeSet extends java.util.TreeSet implements SCOCollection<java.uti
         this.ownerMmd = mmd;
     }
 
-    public void initialise(java.util.TreeSet newValue, Object oldValue)
+    public void initialise(java.util.TreeSet<E> newValue, Object oldValue)
     {
         initialise(newValue);
     }
@@ -146,7 +146,7 @@ public class TreeSet extends java.util.TreeSet implements SCOCollection<java.uti
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (makeDirty)
         {
@@ -296,7 +296,7 @@ public class TreeSet extends java.util.TreeSet implements SCOCollection<java.uti
      * Accessor for the first element in the sorted set.
      * @return The first element
      **/
-    public Object first()
+    public E first()
     {
         return delegate.first();
     }
@@ -333,7 +333,7 @@ public class TreeSet extends java.util.TreeSet implements SCOCollection<java.uti
      * @param toElement the element to return up to.
      * @return The set of elements meeting the input
      */
-    public SortedSet headSet(Object toElement)
+    public SortedSet headSet(E toElement)
     {
         return delegate.headSet(toElement);
     }
@@ -344,7 +344,7 @@ public class TreeSet extends java.util.TreeSet implements SCOCollection<java.uti
      * @param toElement The end element
      * @return The set of elements meeting the input
      */
-    public SortedSet subSet(Object fromElement, Object toElement)
+    public SortedSet subSet(E fromElement, E toElement)
     {
         return delegate.subSet(fromElement, toElement);
     }
@@ -354,7 +354,7 @@ public class TreeSet extends java.util.TreeSet implements SCOCollection<java.uti
      * @param fromElement The start element
      * @return The set of elements meeting the input
      */
-    public SortedSet tailSet(Object fromElement)
+    public SortedSet tailSet(E fromElement)
     {
         return delegate.headSet(fromElement);
     }
@@ -363,7 +363,7 @@ public class TreeSet extends java.util.TreeSet implements SCOCollection<java.uti
      * Accessor for the last element in the sorted set.
      * @return The last element
      **/
-    public Object last()
+    public E last()
     {
         return delegate.last();
     }
@@ -401,7 +401,7 @@ public class TreeSet extends java.util.TreeSet implements SCOCollection<java.uti
      * @param element The new element
      * @return Whether it was added ok.
      */
-    public boolean add(Object element)
+    public boolean add(E element)
     {
         boolean success = delegate.add(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())

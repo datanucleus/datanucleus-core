@@ -38,13 +38,13 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class HashSet extends java.util.HashSet implements SCOCollection<java.util.HashSet>
+public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<java.util.HashSet<E>, E>
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.HashSet delegate;
+    protected java.util.HashSet<E> delegate;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -58,7 +58,7 @@ public class HashSet extends java.util.HashSet implements SCOCollection<java.uti
         this.ownerMmd = mmd;
     }
 
-    public void initialise(java.util.HashSet newValue, Object oldValue)
+    public void initialise(java.util.HashSet<E> newValue, Object oldValue)
     {
         initialise(newValue);
     }
@@ -126,7 +126,7 @@ public class HashSet extends java.util.HashSet implements SCOCollection<java.uti
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (makeDirty)
         {
@@ -276,7 +276,7 @@ public class HashSet extends java.util.HashSet implements SCOCollection<java.uti
      * Accessor for an iterator for the Set.
      * @return The iterator
      **/
-    public Iterator iterator()
+    public Iterator<E> iterator()
     {
         return new SCOCollectionIterator(this, ownerOP, delegate, null, true);
     }
@@ -314,7 +314,7 @@ public class HashSet extends java.util.HashSet implements SCOCollection<java.uti
      * @param element The new element
      * @return Whether it was added ok.
      **/
-    public boolean add(Object element)
+    public boolean add(E element)
     {
         boolean success = delegate.add(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())

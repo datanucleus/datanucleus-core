@@ -29,8 +29,9 @@ import org.datanucleus.state.ObjectProvider;
 /**
  * Interface representation of the backing store for a List.
  * Takes the collection methods and extends them for lists.
+ * @param <E> Element type for this list
  */
-public interface ListStore extends CollectionStore
+public interface ListStore<E> extends CollectionStore<E>
 {
     /**
      * Method to add an element to the List.
@@ -39,7 +40,7 @@ public interface ListStore extends CollectionStore
      * @param index Position to add the element. 
      * @param size Current size of list (if known). -1 if not known
      */
-    void add(ObjectProvider op, Object element, int index, int size);
+    void add(ObjectProvider op, E element, int index, int size);
 
     /**
      * Method to add a collection of elements to the List.
@@ -49,7 +50,7 @@ public interface ListStore extends CollectionStore
      * @param size Current size of the list (if known). -1 if not known
      * @return Whether the elements were added ok
      */
-	boolean addAll(ObjectProvider op, Collection c, int index, int size);
+	boolean addAll(ObjectProvider op, Collection<E> c, int index, int size);
 
     /**
      * Method to remove an element from the List.
@@ -58,7 +59,7 @@ public interface ListStore extends CollectionStore
      * @param size Current size of the list (if known). -1 if not known
      * @return The element that was removed.
      */
-	Object remove(ObjectProvider op, int index, int size);
+	E remove(ObjectProvider op, int index, int size);
 
     /**
      * Method to retrieve an element from a position in the List.
@@ -66,7 +67,7 @@ public interface ListStore extends CollectionStore
      * @param index Position of the element.
      * @return The element at that position.
      */
-	Object get(ObjectProvider op, int index);
+	E get(ObjectProvider op, int index);
 
     /**
      * Method to update an element at a position in the List.
@@ -108,5 +109,5 @@ public interface ListStore extends CollectionStore
      * @param op ObjectProvider for the owner of the List. 
      * @return List iterator for the List.
      */
-	ListIterator listIterator(ObjectProvider op);
+	ListIterator<E> listIterator(ObjectProvider op);
 }

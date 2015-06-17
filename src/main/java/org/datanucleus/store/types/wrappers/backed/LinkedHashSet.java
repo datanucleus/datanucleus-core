@@ -62,10 +62,10 @@ import org.datanucleus.util.NucleusLogger;
  * "backing store" (where present) and does this as necessary. Some methods (<B>size()</B>) just check if 
  * everything is loaded and use the delegate if possible, otherwise going direct to the datastore.
  */
-public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHashSet implements BackedSCO
+public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.LinkedHashSet<E> implements BackedSCO
 {
     protected transient boolean allowNulls = false;
-    protected transient SetStore backingStore;
+    protected transient SetStore<E> backingStore;
     protected transient boolean useCache = true;
     protected transient boolean isCacheLoaded = false;
     protected transient boolean initialising = false;
@@ -98,7 +98,7 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
         }
     }
 
-    public void initialise(java.util.LinkedHashSet newValue, Object oldValue)
+    public void initialise(java.util.LinkedHashSet<E> newValue, Object oldValue)
     {
         if (newValue != null)
         {
@@ -144,7 +144,7 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
                     oldColl = (java.util.Collection) ((SCOCollection)oldColl).getValue();
                 }
 
-                for (Object elem : newValue)
+                for (E elem : newValue)
                 {
                     if (oldColl == null || !oldColl.contains(elem))
                     {
@@ -266,7 +266,7 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
                     ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
-            Iterator iter=backingStore.iterator(ownerOP);
+            Iterator<E> iter=backingStore.iterator(ownerOP);
             while (iter.hasNext())
             {
                 delegate.add(iter.next());
@@ -291,7 +291,7 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (backingStore != null)
         {
@@ -487,7 +487,7 @@ public class LinkedHashSet extends org.datanucleus.store.types.wrappers.LinkedHa
      * @param element The new element
      * @return Whether it was added ok.
      **/
-    public boolean add(Object element)
+    public boolean add(E element)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)

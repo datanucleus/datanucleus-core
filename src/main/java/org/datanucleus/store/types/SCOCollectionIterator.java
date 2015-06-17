@@ -29,11 +29,12 @@ import org.datanucleus.store.scostore.CollectionStore;
 /**
  * An iterator for a SCO Collection object. Works from either the delegate or a backing store, and provides 
  * iteration through the objects.
+ * @param <E> Element type for the collection
  */
-public class SCOCollectionIterator implements Iterator
+public class SCOCollectionIterator<E> implements Iterator<E>
 {
-    private final Iterator iter;
-    private Object last = null;
+    private final Iterator<E> iter;
+    private E last = null;
 
     private Collection ownerSCO;
 
@@ -82,9 +83,10 @@ public class SCOCollectionIterator implements Iterator
         return iter.hasNext();
     }
 
-    public Object next()
+    public E next()
     {
-        return last = iter.next();
+        last = iter.next();
+        return last;
     }
 
     public void remove()

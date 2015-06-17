@@ -38,13 +38,13 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMap<java.util.SortedMap>, Cloneable, java.io.Serializable
+public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.SortedMap<K, V>, SCOMap<java.util.SortedMap<K, V>>, Cloneable, java.io.Serializable
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.SortedMap delegate;
+    protected java.util.SortedMap<K, V> delegate;
 
     /**
      * Constructor
@@ -304,7 +304,7 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
      * Accessor for the first key in the sorted map.
      * @return The first key
      **/
-    public Object firstKey()
+    public K firstKey()
     {
         return delegate.firstKey();
     }
@@ -313,7 +313,7 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
      * Accessor for the last key in the sorted map.
      * @return The last key
      **/
-    public Object lastKey()
+    public K lastKey()
     {
         return delegate.lastKey();
     }
@@ -323,7 +323,7 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
      * @param toKey the key to return up to.
      * @return The map meeting the input
      */
-    public java.util.SortedMap headMap(Object toKey)
+    public java.util.SortedMap headMap(K toKey)
     {
         return delegate.headMap(toKey);
     }
@@ -334,7 +334,7 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
      * @param toKey The end key
      * @return The map meeting the input
      */
-    public java.util.SortedMap subMap(Object fromKey, Object toKey)
+    public java.util.SortedMap subMap(K fromKey, K toKey)
     {
         return delegate.subMap(fromKey, toKey);
     }
@@ -344,7 +344,7 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
      * @param fromKey The start key
      * @return The map meeting the input
      */
-    public java.util.SortedMap tailMap(Object fromKey)
+    public java.util.SortedMap tailMap(K fromKey)
     {
         return delegate.headMap(fromKey);
     }
@@ -354,7 +354,7 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
      * @param key The key
      * @return The value.
      **/
-    public Object get(Object key)
+    public V get(Object key)
     {
         return delegate.get(key);
     }
@@ -416,7 +416,7 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
             // Cascade delete
             if (SCOUtils.useQueuedUpdate(ownerOP))
             {
-                Iterator<Map.Entry> entryIter = delegate.entrySet().iterator();
+                Iterator<Map.Entry<K, V>> entryIter = delegate.entrySet().iterator();
                 while (entryIter.hasNext())
                 {
                     Map.Entry entry = entryIter.next();
@@ -425,7 +425,7 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
             }
             else if (SCOUtils.hasDependentKey(ownerMmd) || SCOUtils.hasDependentValue(ownerMmd)) 
             {
-                Iterator<Map.Entry> entryIter = delegate.entrySet().iterator();
+                Iterator<Map.Entry<K, V>> entryIter = delegate.entrySet().iterator();
                 while (entryIter.hasNext())
                 {
                     Map.Entry entry = entryIter.next();
@@ -455,9 +455,9 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
      * @param value The value
      * @return The previous value for the specified key.
      */
-    public Object put(Object key,Object value)
+    public V put(K key, V value)
     {
-        Object oldValue = delegate.put(key, value);
+        V oldValue = delegate.put(key, value);
         makeDirty();
         if (SCOUtils.useQueuedUpdate(ownerOP))
         {
@@ -500,9 +500,9 @@ public class SortedMap extends AbstractMap implements java.util.SortedMap, SCOMa
      * @param key The key to remove
      * @return The value that was removed from this key.
      **/
-    public Object remove(Object key)
+    public V remove(Object key)
     {
-        Object value = delegate.remove(key);
+        V value = delegate.remove(key);
 
         if (ownerOP != null)
         {

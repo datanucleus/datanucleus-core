@@ -43,9 +43,9 @@ import org.datanucleus.util.NucleusLogger;
 /**
  * A mutable second-class SortedMap object. Backed by a MapStore object.
  */
-public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap implements BackedSCO
+public class SortedMap<K, V> extends org.datanucleus.store.types.wrappers.SortedMap<K, V> implements BackedSCO
 {
-    protected transient MapStore backingStore;
+    protected transient MapStore<K, V> backingStore;
     protected transient boolean allowNulls = false;
     protected transient boolean useCache = true;
     protected transient boolean isCacheLoaded = false;
@@ -437,7 +437,7 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
      * Accessor for the first key in the sorted map.
      * @return The first key
      **/
-    public Object firstKey()
+    public K firstKey()
     {
         if (useCache && isCacheLoaded)
         {
@@ -451,8 +451,8 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
         else
         {
             // Use Iterator to get element
-            java.util.Set keys = keySet();
-            Iterator keysIter = keys.iterator();
+            java.util.Set<K> keys = keySet();
+            Iterator<K> keysIter = keys.iterator();
             return keysIter.next();
         }
 
@@ -463,7 +463,7 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
      * Accessor for the last key in the sorted map.
      * @return The last key
      **/
-    public Object lastKey()
+    public K lastKey()
     {
         if (useCache && isCacheLoaded)
         {
@@ -477,9 +477,9 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
         else
         {
             // Use Iterator to get element
-            java.util.Set keys = keySet();
-            Iterator keysIter = keys.iterator();
-            Object last = null;
+            java.util.Set<K> keys = keySet();
+            Iterator<K> keysIter = keys.iterator();
+            K last = null;
             while (keysIter.hasNext())
             {
                 last = keysIter.next();
@@ -495,7 +495,7 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
      * @param toKey the key to return up to.
      * @return The map meeting the input
      */
-    public java.util.SortedMap headMap(Object toKey)
+    public java.util.SortedMap headMap(K toKey)
     {
         if (useCache && isCacheLoaded)
         {
@@ -521,7 +521,7 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
      * @param toKey The end key
      * @return The map meeting the input
      */
-    public java.util.SortedMap subMap(Object fromKey, Object toKey)
+    public java.util.SortedMap subMap(K fromKey, K toKey)
     {
         if (useCache && isCacheLoaded)
         {
@@ -546,7 +546,7 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
      * @param fromKey The start key
      * @return The map meeting the input
      */
-    public java.util.SortedMap tailMap(Object fromKey)
+    public java.util.SortedMap tailMap(K fromKey)
     {
         if (useCache && isCacheLoaded)
         {
@@ -571,7 +571,7 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
      * @param key The key
      * @return The value.
      **/
-    public Object get(Object key)
+    public V get(Object key)
     {
         if (useCache)
         {
@@ -707,7 +707,7 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
      * @param value The value
      * @return The previous value for the specified key.
      **/
-    public Object put(Object key,Object value)
+    public V put(K key, V value)
     {
         // Reject inappropriate values
         if (!allowNulls)
@@ -730,7 +730,7 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
 
         makeDirty();
 
-        Object oldValue = null;
+        V oldValue = null;
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))
@@ -742,7 +742,7 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
                 oldValue = backingStore.put(ownerOP, key, value);
             }
         }
-        Object delegateOldValue = delegate.put(key, value);
+        V delegateOldValue = delegate.put(key, value);
         if (backingStore == null)
         {
             oldValue = delegateOldValue;
@@ -802,7 +802,7 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
      * @param key The key to remove
      * @return The value that was removed from this key.
      **/
-    public Object remove(Object key)
+    public V remove(Object key)
     {
         makeDirty();
 
@@ -812,8 +812,8 @@ public class SortedMap extends org.datanucleus.store.types.wrappers.SortedMap im
             loadFromStore();
         }
 
-        Object removed = null;
-        Object delegateRemoved = delegate.remove(key);
+        V removed = null;
+        V delegateRemoved = delegate.remove(key);
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))

@@ -39,14 +39,13 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class SortedSet extends java.util.AbstractSet implements java.util.SortedSet, SCOCollection<java.util.SortedSet>, Cloneable, 
-    java.io.Serializable
+public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.SortedSet<E>, SCOCollection<java.util.SortedSet<E>, E>, Cloneable, java.io.Serializable
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.SortedSet delegate;
+    protected java.util.SortedSet<E> delegate;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -59,7 +58,7 @@ public class SortedSet extends java.util.AbstractSet implements java.util.Sorted
         this.ownerMmd = mmd;
     }
 
-    public void initialise(java.util.SortedSet newValue, Object oldValue)
+    public void initialise(java.util.SortedSet<E> newValue, Object oldValue)
     {
         initialise(newValue);
     }
@@ -144,7 +143,7 @@ public class SortedSet extends java.util.AbstractSet implements java.util.Sorted
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (makeDirty)
         {
@@ -294,7 +293,7 @@ public class SortedSet extends java.util.AbstractSet implements java.util.Sorted
      * Accessor for the first element in the sorted set.
      * @return The first element
      **/
-    public Object first()
+    public E first()
     {
         return delegate.first();
     }
@@ -331,7 +330,7 @@ public class SortedSet extends java.util.AbstractSet implements java.util.Sorted
      * @param toElement the element to return up to.
      * @return The set of elements meeting the input
      */
-    public java.util.SortedSet headSet(Object toElement)
+    public java.util.SortedSet<E> headSet(E toElement)
     {
         return delegate.headSet(toElement);
     }
@@ -342,7 +341,7 @@ public class SortedSet extends java.util.AbstractSet implements java.util.Sorted
      * @param toElement The end element
      * @return The set of elements meeting the input
      */
-    public java.util.SortedSet subSet(Object fromElement, Object toElement)
+    public java.util.SortedSet<E> subSet(E fromElement, E toElement)
     {
         return delegate.subSet(fromElement, toElement);
     }
@@ -352,7 +351,7 @@ public class SortedSet extends java.util.AbstractSet implements java.util.Sorted
      * @param fromElement The start element
      * @return The set of elements meeting the input
      */
-    public java.util.SortedSet tailSet(Object fromElement)
+    public java.util.SortedSet<E> tailSet(E fromElement)
     {
         return delegate.headSet(fromElement);
     }
@@ -361,7 +360,7 @@ public class SortedSet extends java.util.AbstractSet implements java.util.Sorted
      * Accessor for the last element in the sorted set.
      * @return The last element
      **/
-    public Object last()
+    public E last()
     {
         return delegate.last();
     }
@@ -399,7 +398,7 @@ public class SortedSet extends java.util.AbstractSet implements java.util.Sorted
      * @param element The new element
      * @return Whether it was added ok.
      */
-    public boolean add(Object element)
+    public boolean add(E element)
     {
         boolean success = delegate.add(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())

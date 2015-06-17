@@ -39,13 +39,13 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class Set extends AbstractSet implements SCOCollection<java.util.Set>, Cloneable, java.io.Serializable
+public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Set<E>, E>, Cloneable, java.io.Serializable
 {
     protected transient ObjectProvider ownerOP;
     protected transient AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.Set delegate;
+    protected java.util.Set<E> delegate;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -58,7 +58,7 @@ public class Set extends AbstractSet implements SCOCollection<java.util.Set>, Cl
         this.ownerMmd = mmd;
     }
 
-    public void initialise(java.util.Set newValue, Object oldValue)
+    public void initialise(java.util.Set<E> newValue, Object oldValue)
     {
         initialise(newValue);
     }
@@ -126,7 +126,7 @@ public class Set extends AbstractSet implements SCOCollection<java.util.Set>, Cl
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (makeDirty)
         {
@@ -278,7 +278,7 @@ public class Set extends AbstractSet implements SCOCollection<java.util.Set>, Cl
      * Accessor for an iterator for the Collection.
      * @return The iterator
      **/
-    public synchronized Iterator iterator()
+    public synchronized Iterator<E> iterator()
     {
         return new SCOCollectionIterator(this, ownerOP, delegate, null, true);
     }
@@ -306,7 +306,7 @@ public class Set extends AbstractSet implements SCOCollection<java.util.Set>, Cl
      * @param a The array to write the results to
      * @return The array
      **/
-    public synchronized Object[] toArray(Object a[])
+    public synchronized <T> T[] toArray(T a[])
     {
         return delegate.toArray(a);
     }
@@ -316,7 +316,7 @@ public class Set extends AbstractSet implements SCOCollection<java.util.Set>, Cl
      * @param element The element to add
      * @return Whether it was added successfully.
      **/
-    public synchronized boolean add(Object element)
+    public synchronized boolean add(E element)
     {
         boolean success = delegate.add(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -344,7 +344,7 @@ public class Set extends AbstractSet implements SCOCollection<java.util.Set>, Cl
      * @param c The collection of elements to add.
      * @return Whether they were added successfully.
      **/
-    public synchronized boolean addAll(java.util.Collection c)
+    public synchronized boolean addAll(java.util.Collection<? extends E> c)
     {
         boolean success = delegate.addAll(c);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())

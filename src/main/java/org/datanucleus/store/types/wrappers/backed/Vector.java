@@ -65,9 +65,9 @@ import org.datanucleus.util.NucleusLogger;
  * "backing store" (where present) and does this as necessary. Some methods (<B>size()</B>) just check if 
  * everything is loaded and use the delegate if possible, otherwise going direct to the datastore.
  */
-public class Vector extends org.datanucleus.store.types.wrappers.Vector implements BackedSCO
+public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> implements BackedSCO
 {
-    protected transient ListStore backingStore;
+    protected transient ListStore<E> backingStore;
     protected transient boolean allowNulls = false;
     protected transient boolean useCache = true;
     protected transient boolean isCacheLoaded = false;
@@ -260,7 +260,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
                     ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
-            Iterator iter=backingStore.iterator(ownerOP);
+            Iterator<E> iter=backingStore.iterator(ownerOP);
             while (iter.hasNext())
             {
                 delegate.add(iter.next());
@@ -285,7 +285,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (backingStore != null)
         {
@@ -373,17 +373,12 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * Method to retrieve an element no.
      * @param index The item to retrieve
      * @return The element at that position.
-     **/
-    public synchronized Object elementAt(int index)
+     */
+    public synchronized E elementAt(int index)
     {
         return get(index);
     }
 
-    /**
-     * Equality operator.
-     * @param o The object to compare against.
-     * @return Whether this object is the same.
-     **/
     public synchronized boolean equals(Object o)
     {
         if (useCache)
@@ -446,7 +441,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * Method to return the first element in the Vector.
      * @return The first element
      */
-    public synchronized Object firstElement()
+    public synchronized E firstElement()
     {
         return get(0);
     }
@@ -456,7 +451,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param index The item to retrieve
      * @return The element at that position.
      **/
-    public synchronized Object get(int index)
+    public synchronized E get(int index)
     {
         if (useCache)
         {
@@ -551,7 +546,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * Method to return the last element in the Vector.
      * @return The last element
      */
-    public synchronized Object lastElement()
+    public synchronized E lastElement()
     {
         return get(size() - 1);
     }
@@ -708,7 +703,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param index The position
      * @param element The new element
      **/
-    public void add(int index, Object element)
+    public void add(int index, E element)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -757,7 +752,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param element The new element
      * @return Whether it was added ok.
      **/
-    public synchronized boolean add(Object element)
+    public synchronized boolean add(E element)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -905,7 +900,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * Method to add an element to the Vector.
      * @param element The new element
      **/
-    public synchronized void addElement(Object element)
+    public synchronized void addElement(E element)
     {
         // This is a historical wrapper to the Collection method
         add(element);
@@ -1003,7 +998,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param index The element position.
      * @return The object that was removed
      **/
-    public synchronized Object remove(int index)
+    public synchronized E remove(int index)
     {
         makeDirty();
  
@@ -1013,9 +1008,8 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
         }
 
         int size = (useCache ? delegate.size() : -1);
-        Object delegateObject = (useCache ? delegate.remove(index) : null);
-
-        Object backingObject = null;
+        E delegateObject = (useCache ? delegate.remove(index) : null);
+        E backingObject = null;
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))
@@ -1186,7 +1180,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param element The new element
      * @return The element previously at that position
      */
-    public Object set(int index, Object element, boolean allowDependentField)
+    public E set(int index, E element, boolean allowDependentField)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -1201,7 +1195,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
             loadFromStore();
         }
 
-        Object delegateReturn = delegate.set(index, element);
+        E delegateReturn = delegate.set(index, element);
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))
@@ -1227,7 +1221,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param element The new element
      * @return The element previously at that position
      **/
-    public synchronized Object set(int index,Object element)
+    public synchronized E set(int index, E element)
     {
         return set(index, element, true);
     }
@@ -1237,7 +1231,7 @@ public class Vector extends org.datanucleus.store.types.wrappers.Vector implemen
      * @param element The new element
      * @param index The position
      **/
-    public synchronized void setElementAt(Object element,int index)
+    public synchronized void setElementAt(E element, int index)
     {
         // This is a historical wrapper to the Collection method
         set(index,element);

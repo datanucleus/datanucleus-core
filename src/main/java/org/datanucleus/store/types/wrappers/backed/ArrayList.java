@@ -63,9 +63,9 @@ import org.datanucleus.util.NucleusLogger;
  * "backing store" (where present) and does this as necessary. Some methods (<B>size()</B>) just check if 
  * everything is loaded and use the delegate if possible, otherwise going direct to the datastore.
  */
-public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList implements BackedSCO
+public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList<E> implements BackedSCO
 {
-    protected transient ListStore backingStore;
+    protected transient ListStore<E> backingStore;
     protected transient boolean allowNulls = false;
     protected transient boolean useCache=true;
     protected transient boolean isCacheLoaded=false;
@@ -80,7 +80,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
         super(op, mmd);
 
         // Set up our delegate
-        this.delegate = new java.util.ArrayList();
+        this.delegate = new java.util.ArrayList<E>();
 
         ExecutionContext ec = op.getExecutionContext();
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
@@ -260,7 +260,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
                     ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
-            Iterator iter = backingStore.iterator(ownerOP);
+            Iterator<E> iter = backingStore.iterator(ownerOP);
             while (iter.hasNext())
             {
                 delegate.add(iter.next());
@@ -285,7 +285,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (backingStore != null)
         {
@@ -411,7 +411,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
      * @param index The item to retrieve
      * @return The element at that position.
      **/
-    public Object get(int index)
+    public E get(int index)
     {
         if (useCache)
         {
@@ -599,7 +599,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
      * @param index The position
      * @param element The new element
      */
-    public void add(int index, Object element)
+    public void add(int index, E element)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -648,7 +648,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
      * @param element The new element
      * @return Whether it was added ok.
      */
-    public boolean add(Object element)
+    public boolean add(E element)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -884,7 +884,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
      * @param index The element position.
      * @return The object that was removed
      */
-    public synchronized Object remove(int index)
+    public synchronized E remove(int index)
     {
         makeDirty();
  
@@ -894,9 +894,9 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
         }
 
         int size = (useCache ? delegate.size() : -1);
-        Object delegateObject = (useCache ? delegate.remove(index) : null);
+        E delegateObject = (useCache ? delegate.remove(index) : null);
 
-        Object backingObject = null;
+        E backingObject = null;
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))
@@ -1038,7 +1038,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
      * @param element The new element
      * @return The element previously at that position
      */
-    public Object set(int index, Object element, boolean allowDependentField)
+    public E set(int index, E element, boolean allowDependentField)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -1053,7 +1053,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
             loadFromStore();
         }
 
-        Object delegateReturn = delegate.set(index, element);
+        E delegateReturn = delegate.set(index, element);
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))
@@ -1079,7 +1079,7 @@ public class ArrayList extends org.datanucleus.store.types.wrappers.ArrayList im
      * @param element The new element
      * @return The element previously at that position
      */
-    public Object set(int index, Object element)
+    public E set(int index, E element)
     {
         return set(index, element, true);
     }

@@ -42,13 +42,13 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class List extends AbstractList implements SCOList<java.util.List>, Cloneable, java.io.Serializable
+public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E>, E>, Cloneable, java.io.Serializable
 {
     protected ObjectProvider ownerOP;
     protected AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.List delegate;
+    protected java.util.List<E> delegate;
 
     /**
      * Constructor, using the ObjectProvider of the "owner" and the field name.
@@ -61,7 +61,7 @@ public class List extends AbstractList implements SCOList<java.util.List>, Clone
         this.ownerMmd = mmd;
     }
 
-    public void initialise(java.util.List newValue, Object oldValue)
+    public void initialise(java.util.List<E> newValue, Object oldValue)
     {
         initialise(newValue);
     }
@@ -129,7 +129,7 @@ public class List extends AbstractList implements SCOList<java.util.List>, Clone
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (makeDirty)
         {
@@ -258,16 +258,12 @@ public class List extends AbstractList implements SCOList<java.util.List>, Clone
      * Method to retrieve an element no.
      * @param index The item to retrieve
      * @return The element at that position.
-     **/
-    public Object get(int index)
+     */
+    public E get(int index)
     {
         return delegate.get(index);
     }
 
-    /**
-     * Hashcode operator.
-     * @return The Hash code.
-     **/
     public synchronized int hashCode()
     {
         return delegate.hashCode();
@@ -374,7 +370,7 @@ public class List extends AbstractList implements SCOList<java.util.List>, Clone
      * @param element The element to add
      * @return Whether it was added successfully.
      **/
-    public synchronized boolean add(Object element)
+    public synchronized boolean add(E element)
     {
         boolean success = delegate.add(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -402,7 +398,7 @@ public class List extends AbstractList implements SCOList<java.util.List>, Clone
      * @param element The element to add
      * @param index The position
      **/
-    public void add(int index, Object element)
+    public void add(int index, E element)
     {
         delegate.add(index, element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -598,9 +594,9 @@ public class List extends AbstractList implements SCOList<java.util.List>, Clone
      * @param index The element position.
      * @return The object that was removed
      */
-    public Object remove(int index)
+    public E remove(int index)
     {
-        Object element = delegate.remove(index);
+        E element = delegate.remove(index);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
         {
             ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationRemove(ownerMmd.getAbsoluteFieldNumber(), element);
@@ -707,9 +703,9 @@ public class List extends AbstractList implements SCOList<java.util.List>, Clone
      * @param element The new element
      * @return The element previously at that position
      */
-    public Object set(int index, Object element, boolean allowDependentField)
+    public E set(int index, E element, boolean allowDependentField)
     {
-        Object prevElement = delegate.set(index, element);
+        E prevElement = delegate.set(index, element);
         if (ownerOP != null && allowDependentField && !delegate.contains(prevElement))
         {
             // Cascade delete
@@ -737,7 +733,7 @@ public class List extends AbstractList implements SCOList<java.util.List>, Clone
      * @param element The new element
      * @return The element previously at that position
      */
-    public Object set(int index, Object element)
+    public E set(int index, E element)
     {
         return set(index, element, true);
     }

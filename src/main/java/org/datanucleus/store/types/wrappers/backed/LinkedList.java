@@ -63,9 +63,9 @@ import org.datanucleus.util.NucleusLogger;
  * "backing store" (where present) and does this as necessary. Some methods (<B>size()</B>) just check if 
  * everything is loaded and use the delegate if possible, otherwise going direct to the datastore.
  */
-public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList implements BackedSCO
+public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedList<E> implements BackedSCO
 {
-    protected transient ListStore backingStore;
+    protected transient ListStore<E> backingStore;
     protected transient boolean allowNulls = false;
     protected transient boolean useCache=true;
     protected transient boolean isCacheLoaded=false;
@@ -257,7 +257,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
                     ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
-            Iterator iter=backingStore.iterator(ownerOP);
+            Iterator<E> iter=backingStore.iterator(ownerOP);
             while (iter.hasNext())
             {
                 delegate.add(iter.next());
@@ -282,7 +282,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (backingStore != null)
         {
@@ -410,7 +410,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
      * @param index The item to retrieve
      * @return The element at that position.
      **/
-    public Object get(int index)
+    public E get(int index)
     {
         if (useCache)
         {
@@ -428,7 +428,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
      * Method to retrieve the first element.
      * @return The first element
      **/
-    public Object getFirst()
+    public E getFirst()
     {
         return get(0);
     }
@@ -437,7 +437,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
      * Method to retrieve the last element.
      * @return The last element
      **/
-    public Object getLast()
+    public E getLast()
     {
         return get(size()-1);
     }
@@ -614,7 +614,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
      * @param index The position
      * @param element The new element
      **/
-    public void add(int index, Object element)
+    public void add(int index, E element)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -663,7 +663,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
      * @param element The new element
      * @return Whether it was added ok.
      **/
-    public boolean add(Object element)
+    public boolean add(E element)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -812,7 +812,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
      * Method to add an element as first in the LinkedList.
      * @param element The new element
      **/
-    public void addFirst(Object element)
+    public void addFirst(E element)
     {
         add(0, element);
     }
@@ -821,7 +821,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
      * Method to add an element as last in the LinkedList.
      * @param element The new element
      **/
-    public void addLast(Object element)
+    public void addLast(E element)
     {
         add(size(), element);
     }
@@ -857,7 +857,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
      * @param index The element position.
      * @return The object that was removed
      **/
-    public Object remove(int index)
+    public E remove(int index)
     {
         makeDirty();
  
@@ -867,9 +867,9 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
         }
 
         int size = (useCache ? delegate.size() : -1);
-        Object delegateObject = (useCache ? delegate.remove(index) : null);
+        E delegateObject = (useCache ? delegate.remove(index) : null);
 
-        Object backingObject = null;
+        E backingObject = null;
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))
@@ -1034,7 +1034,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
      * Method to remove the first element from the LinkedList.
      * @return The object that was removed
      **/
-    public Object removeFirst()
+    public E removeFirst()
     {
         return remove(0);
     }
@@ -1043,7 +1043,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
      * Method to remove the last element from the LinkedList.
      * @return The object that was removed
      **/
-    public Object removeLast()
+    public E removeLast()
     {
         return remove(size()-1);
     }
@@ -1090,7 +1090,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
      * @param element The new element
      * @return The element previously at that position
      */
-    public Object set(int index, Object element, boolean allowDependentField)
+    public E set(int index, E element, boolean allowDependentField)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -1105,7 +1105,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
             loadFromStore();
         }
 
-        Object delegateReturn = delegate.set(index, element);
+        E delegateReturn = delegate.set(index, element);
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))
@@ -1131,7 +1131,7 @@ public class LinkedList extends org.datanucleus.store.types.wrappers.LinkedList 
      * @param element The new element
      * @return The element previously at that position
      **/
-    public Object set(int index,Object element)
+    public E set(int index, E element)
     {
         return set(index, element, true);
     }

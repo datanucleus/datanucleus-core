@@ -25,8 +25,9 @@ import org.datanucleus.state.ObjectProvider;
 
 /**
  * Interface representation of the backing store for a Collection.
+ * @param <E> Element type for this collection
  */
-public interface CollectionStore extends Store
+public interface CollectionStore<E> extends Store
 {
     // --------------------------- Accessor Methods ----------------------------
 
@@ -45,7 +46,7 @@ public interface CollectionStore extends Store
      * @param value The new value for the field
      * @return Whether the element was modified
      */
-    boolean updateEmbeddedElement(ObjectProvider op, Object element, int fieldNumber, Object value);
+    boolean updateEmbeddedElement(ObjectProvider op, E element, int fieldNumber, Object value);
 
     // -------------------------- Collection Methods ---------------------------
  
@@ -54,7 +55,7 @@ public interface CollectionStore extends Store
      * @param op ObjectProvider for the owner of the collection. 
      * @return Iterator for the collection.
      **/
-    Iterator iterator(ObjectProvider op);
+    Iterator<E> iterator(ObjectProvider op);
 
     /**
      * Accessor for the size of the collection.
@@ -78,7 +79,7 @@ public interface CollectionStore extends Store
      * @param size Current size of the collection if known. -1 if not known
      * @return Whether the element was added ok
      */
-    boolean add(ObjectProvider op, Object element, int size);
+    boolean add(ObjectProvider op, E element, int size);
 
     /**
      * Method to add a collection of elements to the collection.

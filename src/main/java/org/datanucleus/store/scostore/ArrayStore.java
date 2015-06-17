@@ -25,22 +25,23 @@ import org.datanucleus.state.ObjectProvider;
 
 /**
  * Interface representation of the backing store for an array.
+ * @param <E> Element type for this array
  **/
-public interface ArrayStore extends Store
+public interface ArrayStore<E> extends Store
 {
     /**
      * Accessor for an iterator for the array.
      * @param op ObjectProvider for the owner of the array. 
      * @return Iterator for the array.
      **/
-    Iterator iterator(ObjectProvider op);
+    Iterator<E> iterator(ObjectProvider op);
 
     /**
      * Method to retrieve the elements of the array.
      * @param op ObjectProvider for the owner of the array
      * @return The List of elements in the array (in the same order)
      */
-    List getArray(ObjectProvider op);
+    List<E> getArray(ObjectProvider op);
 
     /**
      * Accessor for the size of the array.

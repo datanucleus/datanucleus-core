@@ -25,8 +25,10 @@ import org.datanucleus.state.ObjectProvider;
 
 /**
  * Interface representation of the backing store for a Map.
+ * @param <K> Key type for this map
+ * @param <V> Value type for this map
  */
-public interface MapStore extends Store
+public interface MapStore<K, V> extends Store
 {
     /**
      * Accessor for whether the keys are embedded.
@@ -76,7 +78,7 @@ public interface MapStore extends Store
      * @param key Key for the value.
      * @return Value for this key.
      */
-    Object get(ObjectProvider op, Object key);
+    V get(ObjectProvider op, Object key);
 
     /**
      * Method to add a value to the Map against this key.
@@ -85,14 +87,14 @@ public interface MapStore extends Store
      * @param value The value.
      * @return Value that was previously against this key.
      */
-    Object put(ObjectProvider op, Object key, Object value);
+    V put(ObjectProvider op, K key, V value);
 
     /**
      * Method to add a map of values to the Map.
      * @param op ObjectProvider for the owner of the map. 
      * @param m The map to add.
      */ 
-    void putAll(ObjectProvider op, Map m);
+    void putAll(ObjectProvider op, Map<? extends K, ? extends V> m);
 
     /**
      * Method to remove a value from the Map.
@@ -100,7 +102,7 @@ public interface MapStore extends Store
      * @param key Key whose value is to be removed.
      * @return Value that was removed.
      */
-    Object remove(ObjectProvider op, Object key);
+    V remove(ObjectProvider op, Object key);
 
     /**
      * Method to remove a value from the Map.
@@ -109,7 +111,7 @@ public interface MapStore extends Store
      * @param val Value for this key when the value is known (to save the lookup)
      * @return Value that was removed.
      */
-    Object remove(ObjectProvider op, Object key, Object val);
+    V remove(ObjectProvider op, Object key, Object val);
 
     /**
      * Method to clear the map.
@@ -136,7 +138,7 @@ public interface MapStore extends Store
     SetStore entrySetStore();
 
     /**
-     * Method to update en embedded key in the map.
+     * Method to update an embedded key in the map.
      * @param op ObjectProvider for the owner of the map
      * @param key The element
      * @param fieldNumber Field to update in the key
@@ -146,7 +148,7 @@ public interface MapStore extends Store
     boolean updateEmbeddedKey(ObjectProvider op, Object key, int fieldNumber, Object newValue);
 
     /**
-     * Method to update en embedded value in the map.
+     * Method to update an embedded value in the map.
      * @param op ObjectProvider for the owner of the map
      * @param value The element
      * @param fieldNumber Field to update in the value

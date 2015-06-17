@@ -37,13 +37,13 @@ import org.datanucleus.util.NucleusLogger;
  * This is the simplified form that intercepts mutators and marks the field as dirty.
  * It also handles cascade-delete triggering for persistable elements.
  */
-public class PriorityQueue extends java.util.PriorityQueue implements SCOCollection<java.util.PriorityQueue>, Cloneable
+public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOCollection<java.util.PriorityQueue<E>, E>, Cloneable
 {
     protected ObjectProvider ownerOP;
     protected AbstractMemberMetaData ownerMmd;
 
     /** The internal "delegate". */
-    protected java.util.PriorityQueue delegate;
+    protected java.util.PriorityQueue<E> delegate;
 
     /**
      * Constructor. 
@@ -57,7 +57,7 @@ public class PriorityQueue extends java.util.PriorityQueue implements SCOCollect
         this.ownerMmd = mmd;
     }
 
-    public void initialise(java.util.PriorityQueue newValue, Object oldValue)
+    public void initialise(java.util.PriorityQueue<E> newValue, Object oldValue)
     {
         initialise(newValue);
     }
@@ -142,7 +142,7 @@ public class PriorityQueue extends java.util.PriorityQueue implements SCOCollect
      * @param value New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
-    public void updateEmbeddedElement(Object element, int fieldNumber, Object value, boolean makeDirty)
+    public void updateEmbeddedElement(E element, int fieldNumber, Object value, boolean makeDirty)
     {
         if (makeDirty)
         {
@@ -314,7 +314,7 @@ public class PriorityQueue extends java.util.PriorityQueue implements SCOCollect
      * Method to peek at the next element in the Queue.
      * @return The element
      **/
-    public synchronized Object peek()
+    public synchronized E peek()
     {
         return delegate.peek();
     }
@@ -377,7 +377,7 @@ public class PriorityQueue extends java.util.PriorityQueue implements SCOCollect
      * @param element The element to add
      * @return Whether it was added successfully.
      **/
-    public synchronized boolean add(Object element)
+    public synchronized boolean add(E element)
     {
         boolean success = delegate.add(element);
         if (success)
@@ -463,7 +463,7 @@ public class PriorityQueue extends java.util.PriorityQueue implements SCOCollect
      * @param element The element to offer
      * @return Whether it was added successfully.
      **/
-    public synchronized boolean offer(Object element)
+    public synchronized boolean offer(E element)
     {
         return add(element);
     }
@@ -472,9 +472,9 @@ public class PriorityQueue extends java.util.PriorityQueue implements SCOCollect
      * Method to poll the next element in the Queue.
      * @return The element (now removed)
      **/
-    public synchronized Object poll()
+    public synchronized E poll()
     {
-        Object obj = delegate.poll();
+        E obj = delegate.poll();
         makeDirty();
         if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
         {

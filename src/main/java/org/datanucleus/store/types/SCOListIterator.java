@@ -30,9 +30,9 @@ import org.datanucleus.store.scostore.ListStore;
  * An iterator for a SCO List object. Operates from either a delegate or a backing store, and provides 
  * iteration through the objects.
  */
-public class SCOListIterator implements ListIterator
+public class SCOListIterator<E> implements ListIterator<E>
 {
-    private final ListIterator iter;
+    private final ListIterator<E> iter;
 
     /** The owning SCO that we are really iterating. */
     private final List ownerSCO;
@@ -87,7 +87,7 @@ public class SCOListIterator implements ListIterator
         }
     }
 
-    public void add(Object o)
+    public void add(E o)
     {
         iter.add(o);
         ownerSCO.add(iter.previousIndex(), o);
@@ -103,9 +103,9 @@ public class SCOListIterator implements ListIterator
         return iter.hasPrevious();
     }
 
-    public Object next()
+    public E next()
     {
-        Object result = iter.next();
+        E result = iter.next();
         reverse = false;
         return result;
     }
@@ -115,9 +115,9 @@ public class SCOListIterator implements ListIterator
         return iter.nextIndex();
     }
 
-    public Object previous()
+    public E previous()
     {
-        Object result = iter.previous();
+        E result = iter.previous();
         reverse = true;
         return result;
     }
@@ -133,7 +133,7 @@ public class SCOListIterator implements ListIterator
         ownerSCO.remove(iter.nextIndex());
     }
 
-    public void set(Object o)
+    public void set(E o)
     {
         iter.set(o);
 
