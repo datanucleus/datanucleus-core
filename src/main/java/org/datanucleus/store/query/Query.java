@@ -111,7 +111,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     /** From clause of the query (optional). */
     protected transient String from = null;
 
-    /** UPDATE clause of a query. */
+    /** UPDATE clause of a query (optional). */
     protected transient String update = null;
 
     /** Specification of the result of the query e.g aggregates etc. Doesn't include any "distinct". */
@@ -132,15 +132,6 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     /** The filter for the query. */
     protected String filter;
 
-    /** Any import declarations for the types used in the query, semicolon separated. */
-    protected String imports;
-
-    /** Any explicit variables defined for this query, semicolon separated. */
-    protected String explicitVariables;
-
-    /** Any explicit parameters defined for this query, comma separated. */
-    protected String explicitParameters;
-
     /** Ordering clause for the query, governing the order objects are returned. */
     protected String ordering;
 
@@ -149,6 +140,15 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
 
     /** Having clause for the query */
     protected String having;
+
+    /** Any import declarations for the types used in the query, semicolon separated. */
+    protected String imports;
+
+    /** Any explicit variables defined for this query, semicolon separated. */
+    protected String explicitVariables;
+
+    /** Any explicit parameters defined for this query, comma separated. */
+    protected String explicitParameters;
 
     /** String form of the query result range. For convenience only. */
     protected String range;
@@ -419,13 +419,33 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
             return false;
         }
 
+        if (from == null)
+        {
+            if (q.from != null)
+            {
+                return false;
+            }
+        }
+        else if (!from.equals(q.from))
+        {
+            return false;
+        }
+
+        if (update == null)
+        {
+            if (q.update != null)
+            {
+                return false;
+            }
+        }
+        else if (!update.equals(q.update))
+        {
+            return false;
+        }
+
         return true;
     }
 
-    /**
-     * Hashcode generator.
-     * @return The Hashcode for this object.
-     */
     public int hashCode()
     {
         return (candidateClass == null ? 0 : candidateClass.hashCode()) ^
@@ -438,7 +458,9 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         	(grouping == null ? 0 : grouping.hashCode()) ^
             (having == null ? 0 : having.hashCode()) ^
         	(ordering == null ? 0 : ordering.hashCode()) ^
-            (range == null ? 0 : range.hashCode());
+            (range == null ? 0 : range.hashCode()) ^
+            (from == null ? 0 : from.hashCode()) ^
+            (update == null ? 0 : update.hashCode());
     }
 
     /**
@@ -462,8 +484,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         }
         else
         {
-            throw new NucleusUserException(
-                "Query only supports types of SELECT, BULK_UPDATE, BULK_DELETE : unknown value " + type);
+            throw new NucleusUserException("Query only supports types of SELECT, BULK_UPDATE, BULK_DELETE : unknown value " + type);
         }
     }
 
@@ -497,8 +518,8 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     }
 
     /**
-     * Add a vendor-specific extension this query. The key and value are not standard.
-     * An implementation must ignore keys that are not recognized.
+     * Add a vendor-specific extension to this query. The key and value are not standard.
+     * An implementation must ignore keys that are not recognised.
      * @param key the extension key
      * @param value the extension value
      */
@@ -525,8 +546,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
 
     /**
      * Set multiple extensions, or use null to clear extensions.
-     * Map keys and values are not standard.
-     * An implementation must ignore entries that are not recognized.
+     * Map keys and values are not standard. An implementation must ignore entries that are not recognised.
      * @param extensions Any extensions
      * @see #addExtension
      */
@@ -570,8 +590,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      * Convenience accessor to return whether an extension is set (or whether the persistence property
      * of the same name is set), and what is its boolean value. Returns "resultIfNotSet" if not set.
      * @param name The extension/property name
-     * @param resultIfNotSet The value to return if there is neither an extension nor a persistence
-     *                       property of the same name
+     * @param resultIfNotSet The value to return if there is neither an extension nor a persistence property of the same name
      * @return The boolean value
      */
     public boolean getBooleanExtensionProperty(String name, boolean resultIfNotSet)
@@ -664,12 +683,11 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     {
         discardCompiled();
         assertIsModifiable();
-    
         this.update = update;
     }
 
     /**
-     * Accessor for the UPDATE clause of the JPQL query.
+     * Accessor for the UPDATE clause of the query (if any).
      * @return Update clause
      */
     public String getUpdate()
@@ -681,7 +699,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      * Accessor for the class of the candidate instances of the query.
      * @return the Class of the candidate instances.
      */
-    public Class getCandidateClass()
+    public Class<T> getCandidateClass()
     {
         return candidateClass;
     }
@@ -690,7 +708,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      * Mutator for the class of the candidate instances of the query.
      * @param candidateClass the Class of the candidate instances.
      */
-    public void setCandidateClass(Class candidateClass)
+    public void setCandidateClass(Class<T> candidateClass)
     {
         discardCompiled();
         assertIsModifiable();
@@ -751,8 +769,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     public void setFrom(String from)
     {
         discardCompiled();
-        assertIsModifiable();
-    
+        assertIsModifiable();    
         this.from = from;
     }
 
@@ -766,18 +783,6 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     }
 
     /**
-     * Set the candidate Extent to query. To be implemented by extensions.
-     * @param pcs the Candidate Extent.
-     */
-    public abstract void setCandidates(Extent pcs);
-
-    /**
-     * Set the candidate Collection to query. To be implemented by extensions.
-     * @param pcs the Candidate collection.
-     */
-    public abstract void setCandidates(Collection pcs);
-
-    /**
      * Set the filter for the query.
      * @param filter the query filter.
      */
@@ -785,10 +790,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     {
         discardCompiled();
         assertIsModifiable();
-
-        this.filter =
-            (StringUtils.isWhitespace(filter) ? null :
-                StringUtils.removeSpecialTagsFromString(filter).trim());
+        this.filter = (StringUtils.isWhitespace(filter) ? null : StringUtils.removeSpecialTagsFromString(filter).trim());
     }
 
     /**
@@ -801,25 +803,21 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     }
 
     /**
-     * Set the import statements to be used to identify the fully qualified name
-     * of variables or parameters.
+     * Set the import statements to be used to identify the fully qualified name of variables or parameters.
      * @param imports import statements separated by semicolons.
      */
     public void declareImports(String imports)
     {
         discardCompiled();
         assertIsModifiable();
-
-        this.imports =
-            (StringUtils.isWhitespace(imports) ? null :
-                StringUtils.removeSpecialTagsFromString(imports).trim());
+        this.imports = (StringUtils.isWhitespace(imports) ? null : StringUtils.removeSpecialTagsFromString(imports).trim());
     }
 
     /**
-     * Accessor for the imports specification.
-     * @return Imports specification
+     * Accessor for the imports declaration.
+     * @return Imports declaration
      */
-    public String getImports()
+    public String getImportsDeclaration()
     {
         return imports;
     }
@@ -832,19 +830,36 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     {
         discardCompiled();
         assertIsModifiable();
-
-        this.explicitParameters = 
-            (StringUtils.isWhitespace(parameters) ? null : 
-                StringUtils.removeSpecialTagsFromString(parameters).trim());
+        this.explicitParameters = (StringUtils.isWhitespace(parameters) ? null : StringUtils.removeSpecialTagsFromString(parameters).trim());
     }
 
     /**
-     * Accessor for the explicit parameters specification.
-     * @return Explicit parameters specification
+     * Accessor for the explicit parameters declaration.
+     * @return Explicit parameters declaration
      */
-    public String getExplicitParameters()
+    public String getExplicitParametersDeclaration()
     {
         return explicitParameters;
+    }
+
+    /**
+     * Method to define the explicit variables for the query.
+     * @param variables the variables separated by semicolons.
+     */
+    public void declareExplicitVariables(String variables)
+    {
+        discardCompiled();
+        assertIsModifiable();
+        this.explicitVariables = (StringUtils.isWhitespace(variables) ? null : StringUtils.removeSpecialTagsFromString(variables).trim());
+    }
+
+    /**
+     * Accessor for the explicit variables declaration.
+     * @return Explicit variables declaration
+     */
+    public String getExplicitVariablesDeclaration()
+    {
+        return explicitVariables;
     }
 
     /**
@@ -1003,29 +1018,6 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     }
 
     /**
-     * Method to define the explicit variables for the query.
-     * @param variables the variables separated by semicolons.
-     */
-    public void declareExplicitVariables(String variables)
-    {
-        discardCompiled();
-        assertIsModifiable();
-
-        this.explicitVariables =
-            (StringUtils.isWhitespace(variables) ? null :
-                StringUtils.removeSpecialTagsFromString(variables).trim());
-    }
-
-    /**
-     * Accessor for the explicit variables specification.
-     * @return Explicit variables specification
-     */
-    public String getExplicitVariables()
-    {
-        return explicitVariables;
-    }
-
-    /**
      * Set the ordering specification for the result Collection.
      * @param ordering the ordering specification.
      */
@@ -1089,16 +1081,26 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     }
 
     /**
-     * Set the uniqueness of the results. A value of true will return a single
-     * value (or null) where the application knows that there are 0 or 1
-     * objects to be returned. See JDO 2.0 specification $14.6
+     * Set the candidate Extent to query. To be implemented by extensions.
+     * @param pcs the Candidate Extent.
+     */
+    public abstract void setCandidates(Extent<T> pcs);
+
+    /**
+     * Set the candidate Collection to query. To be implemented by extensions.
+     * @param pcs the Candidate collection.
+     */
+    public abstract void setCandidates(Collection<T> pcs);
+
+    /**
+     * Set the uniqueness of the results. 
+     * A value of true will return a single value (or null) where the application knows that there are 0 or 1 objects to be returned.
      * @param unique whether the result is unique
      */
     public void setUnique(boolean unique)
     {
         discardCompiled();
         assertIsModifiable();
-
         this.unique = unique;
     }
 
@@ -1122,7 +1124,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     {
         discardCompiled();
 
-        // JDO2 spec 14.6 setRange is valid when unmodifiable so don't check it
+        // JDO spec 14.6 setRange is valid when unmodifiable so don't check it
         if (fromIncl >= 0 && fromIncl < Long.MAX_VALUE)
         {
             this.fromInclNo = fromIncl;
@@ -1137,9 +1139,8 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     }
 
     /**
-     * Set the range of the results. By default all results are returned but
-     * this allows specification of a range of elements required. See JDO 2.0
-     * specification section 14.6.8
+     * Set the range of the results.
+     * By default all results are returned but this allows specification of a range of elements required.
      * @param range Range string
      */
     public void setRange(String range)
@@ -1317,7 +1318,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
 
     /**
      * Set the result class for the results.
-     * The result class must obey various things as per the JDO 2.0 spec 14.6.12.
+     * The result class must obey various things as per the JDO spec 14.6.12.
      * @param result_cls The result class
      */
     public void setResultClass(Class result_cls)
@@ -2020,8 +2021,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     // ------------------------- Delete Persistent -----------------------------
 
     /**
-     * Method to delete all objects found by this query, catering for cascade changes and updates
-     * to in-memory objects.
+     * Method to delete all objects found by this query, catering for cascade changes and updates to in-memory objects.
      * @return The number of deleted objects.
      */
     public long deletePersistentAll()
@@ -2030,8 +2030,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     }
 
     /**
-     * Method to delete all objects found by this query, catering for cascade changes and updates
-     * to in-memory objects.
+     * Method to delete all objects found by this query, catering for cascade changes and updates to in-memory objects.
      * @param parameterValues the Object array with values of the parameters.
      * @return the filtered Collection.
      */
@@ -2041,8 +2040,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     }
 
     /**
-     * Method to delete all objects found by this query, catering for cascade changes and updates
-     * to in-memory objects.
+     * Method to delete all objects found by this query, catering for cascade changes and updates to in-memory objects.
      * @param parameters Map of parameters for the query
      * @return the number of deleted objects
      */
@@ -2235,6 +2233,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
                     throw new NucleusUserException(Localiser.msg("021101", explicitParameters));
                 }
                 t2.nextToken(); // Parameter type declaration
+
                 String parameterName = t2.nextToken();
                 if (!JDOQLQueryHelper.isValidJavaIdentifierForJDOQL(parameterName))
                 {
@@ -2358,8 +2357,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
                 {
                     // Supplied parameter value is of inconsistent type
                     throw new NucleusUserException("Parameter \"" + paramKey + "\" was specified as " +
-                        entry.getValue().getClass().getName() + " but should have been " + 
-                        expectedValueType.getName());
+                        entry.getValue().getClass().getName() + " but should have been " + expectedValueType.getName());
                 }
             }
             // TODO Also do this for positional params if not found ?
@@ -2475,8 +2473,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
 
     /**
      * Utility to resolve the declaration to a particular class.
-     * Takes the passed in name, together with the defined import declarations and returns the
-     * class represented by the declaration.
+     * Takes the passed in name, together with the defined import declarations and returns the class represented by the declaration.
      * @param classDecl The declaration
      * @return The class it resolves to (if any)
      * @throws NucleusUserException Thrown if the class cannot be resolved.
