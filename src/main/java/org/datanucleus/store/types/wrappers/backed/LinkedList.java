@@ -293,7 +293,7 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
     /**
      * Method to unset the owner and field information.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         super.unsetOwner();
         if (backingStore != null)
@@ -346,8 +346,8 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
      * Accessor for whether a collection of elements are contained here.
      * @param c The collection of elements.
      * @return Whether they are contained.
-     **/
-    public synchronized boolean containsAll(java.util.Collection c)
+     */
+    public boolean containsAll(java.util.Collection c)
     {
         if (useCache)
         {
@@ -368,12 +368,7 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
         return delegate.containsAll(c);
     }
 
-    /**
-     * Equality operator.
-     * @param o The object to compare against.
-     * @return Whether this object is the same.
-     **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         if (useCache)
         {
@@ -442,11 +437,7 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
         return get(size()-1);
     }
 
-    /**
-     * Hashcode operator.
-     * @return The Hash code.
-     **/
-    public synchronized int hashCode()
+    public int hashCode()
     {
         if (useCache)
         {
@@ -557,8 +548,8 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
      * @param from Start index (inclusive)
      * @param to End index (exclusive) 
      * @return The subList
-     **/
-    public synchronized java.util.List subList(int from,int to)
+     */
+    public java.util.List subList(int from,int to)
     {
         if (useCache)
         {
@@ -575,8 +566,8 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
     /**
      * Method to return the list as an array.
      * @return The array
-     **/
-    public synchronized Object[] toArray()
+     */
+    public Object[] toArray()
     {
         if (useCache)
         {
@@ -593,8 +584,8 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
      * Method to return the list as an array.
      * @param a The runtime types of the array being defined by this param
      * @return The array
-     **/
-    public synchronized Object[] toArray(Object a[])
+     */
+    public Object[] toArray(Object a[])
     {
         if (useCache)
         {
@@ -828,8 +819,8 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
 
     /**
      * Method to clear the LinkedList.
-     **/
-    public synchronized void clear()
+     */
+    public void clear()
     {
         makeDirty();
         delegate.clear();
@@ -904,7 +895,7 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
      * @param element The element
      * @return Whether the object was removed ok
      */
-    public synchronized boolean remove(Object element)
+    public boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -914,7 +905,7 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
      * @param element The element
      * @param allowCascadeDelete Whether to allow cascade delete
      */
-    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
+    public boolean remove(Object element, boolean allowCascadeDelete)
     {
         makeDirty();
 
@@ -1052,8 +1043,8 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
      * Method to retain a Collection of elements (and remove all others).
      * @param c The collection to retain
      * @return Whether they were retained successfully.
-     **/
-    public synchronized boolean retainAll(java.util.Collection c)
+     */
+    public boolean retainAll(java.util.Collection c)
     {
         makeDirty();
 

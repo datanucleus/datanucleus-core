@@ -172,7 +172,7 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
     /**
      * Method to unset the owner and field information.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         if (ownerOP != null)
         {
@@ -257,8 +257,8 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
      * Accessor for whether an element is contained in the Collection.
      * @param element The element
      * @return Whether the element is contained here
-     **/
-    public synchronized boolean contains(Object element)
+     */
+    public boolean contains(Object element)
     {
         return delegate.contains(element);
     }
@@ -268,26 +268,17 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
      * @param c The collection of elements.
      * @return Whether they are contained.
      **/
-    public synchronized boolean containsAll(java.util.Collection c)
+    public boolean containsAll(java.util.Collection c)
     {
         return delegate.containsAll(c);
     }
 
-    /**
-     * Equality operator.
-     * @param o The object to compare against.
-     * @return Whether this object is the same.
-     **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         return delegate.equals(o);
     }
 
-    /**
-     * Hashcode operator.
-     * @return The Hash code.
-     **/
-    public synchronized int hashCode()
+    public int hashCode()
     {
         return delegate.hashCode();
     }
@@ -295,8 +286,8 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
     /**
      * Accessor for whether the Collection is empty.
      * @return Whether it is empty.
-     **/
-    public synchronized boolean isEmpty()
+     */
+    public  boolean isEmpty()
     {
         return delegate.isEmpty();
     }
@@ -304,8 +295,8 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
     /**
      * Accessor for an iterator for the Collection.
      * @return The iterator
-     **/
-    public synchronized Iterator iterator()
+     */
+    public Iterator<E> iterator()
     {
         return new SCOCollectionIterator(this, ownerOP, delegate, null, true);
     }
@@ -313,8 +304,8 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
     /**
      * Method to peek at the next element in the Queue.
      * @return The element
-     **/
-    public synchronized E peek()
+     */
+    public E peek()
     {
         return delegate.peek();
     }
@@ -322,8 +313,8 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
     /**
      * Accessor for the size of the Collection.
      * @return The size
-     **/
-    public synchronized int size()
+     */
+    public int size()
     {
         return delegate.size();
     }
@@ -331,8 +322,8 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
     /**
      * Method to return the Collection as an array.
      * @return The array
-     **/
-    public synchronized Object[] toArray()
+     */
+    public Object[] toArray()
     {
         return delegate.toArray();
     }
@@ -341,8 +332,8 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
      * Method to return the Collection as an array.
      * @param a The array to write the results to
      * @return The array
-     **/
-    public synchronized Object[] toArray(Object a[])
+     */
+    public <T> T[] toArray(T a[])
     {
         return delegate.toArray(a);
     }
@@ -376,8 +367,8 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
      * Method to add an element to the Collection.
      * @param element The element to add
      * @return Whether it was added successfully.
-     **/
-    public synchronized boolean add(E element)
+     */
+    public boolean add(E element)
     {
         boolean success = delegate.add(element);
         if (success)
@@ -400,7 +391,7 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
      * @param elements The collection of elements to add.
      * @return Whether they were added successfully.
      */
-    public synchronized boolean addAll(java.util.Collection elements)
+    public boolean addAll(java.util.Collection elements)
     {
         boolean success = delegate.addAll(elements);
         if (success)
@@ -424,7 +415,7 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
     /**
      * Method to clear the Collection.
      */
-    public synchronized void clear()
+    public void clear()
     {
         if (ownerOP != null && !delegate.isEmpty())
         {
@@ -462,8 +453,8 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
      * Method to offer an element to the Queue.
      * @param element The element to offer
      * @return Whether it was added successfully.
-     **/
-    public synchronized boolean offer(E element)
+     */
+    public boolean offer(E element)
     {
         return add(element);
     }
@@ -471,8 +462,8 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
     /**
      * Method to poll the next element in the Queue.
      * @return The element (now removed)
-     **/
-    public synchronized E poll()
+     */
+    public E poll()
     {
         E obj = delegate.poll();
         makeDirty();
@@ -487,8 +478,8 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
      * Method to remove an element from the List
      * @param element The Element to remove
      * @return Whether it was removed successfully.
-     **/
-    public synchronized boolean remove(Object element)
+     */
+    public boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -497,8 +488,8 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
      * Method to remove an element from the List
      * @param element The Element to remove
      * @return Whether it was removed successfully.
-     **/
-    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
+     */
+    public boolean remove(Object element, boolean allowCascadeDelete)
     {
         boolean success = delegate.remove(element);
 
@@ -531,8 +522,8 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
      * Method to remove a Collection of elements.
      * @param elements The collection to remove
      * @return Whether they were removed successfully.
-     **/
-    public synchronized boolean removeAll(java.util.Collection elements)
+     */
+    public boolean removeAll(java.util.Collection elements)
     {
         boolean success = delegate.removeAll(elements);
 
@@ -573,8 +564,8 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
      * Method to retain a Collection of elements (and remove all others).
      * @param c The collection to retain
      * @return Whether they were retained successfully.
-     **/
-    public synchronized boolean retainAll(java.util.Collection c)
+     */
+    public boolean retainAll(java.util.Collection c)
     {
         boolean success = delegate.retainAll(c);
         if (success)

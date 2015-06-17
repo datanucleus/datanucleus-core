@@ -299,7 +299,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
     /**
      * Method to unset the owner and field information.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         super.unsetOwner();
         if (backingStore != null)
@@ -339,8 +339,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
      * Accessor for whether an element is contained in the Collection.
      * @param element The element
      * @return Whether the element is contained here
-     **/
-    public synchronized boolean contains(Object element)
+     */
+    public boolean contains(Object element)
     {
         if (useCache && isCacheLoaded)
         {
@@ -359,8 +359,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
      * Accessor for whether a collection of elements are contained here.
      * @param c The collection of elements.
      * @return Whether they are contained.
-     **/
-    public synchronized boolean containsAll(java.util.Collection c)
+     */
+    public boolean containsAll(java.util.Collection c)
     {
         if (useCache)
         {
@@ -381,12 +381,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
         return delegate.containsAll(c);
     }
 
-    /**
-     * Equality operator.
-     * @param o The object to compare against.
-     * @return Whether this object is the same.
-     **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         if (useCache)
         {
@@ -406,11 +401,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
         return c.size() == size() && containsAll(c);
     }
 
-    /**
-     * Hashcode operator.
-     * @return The Hash code.
-     **/
-    public synchronized int hashCode()
+    public int hashCode()
     {
         if (useCache)
         {
@@ -422,8 +413,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
     /**
      * Accessor for whether the Collection is empty.
      * @return Whether it is empty.
-     **/
-    public synchronized boolean isEmpty()
+     */
+    public boolean isEmpty()
     {
         return (size() == 0);
     }
@@ -431,8 +422,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
     /**
      * Accessor for an iterator for the Collection.
      * @return The iterator
-     **/
-    public synchronized Iterator<E> iterator()
+     */
+    public Iterator<E> iterator()
     {
         // Populate the cache if necessary
         if (useCache)
@@ -445,8 +436,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
     /**
      * Method to peek at the next element in the Queue.
      * @return The element
-     **/
-    public synchronized E peek()
+     */
+    public E peek()
     {
         if (useCache)
         {
@@ -463,8 +454,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
     /**
      * Accessor for the size of the Collection.
      * @return The size
-     **/
-    public synchronized int size()
+     */
+    public int size()
     {
         if (useCache && isCacheLoaded)
         {
@@ -482,8 +473,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
     /**
      * Method to return the Collection as an array.
      * @return The array
-     **/
-    public synchronized Object[] toArray()
+     */
+    public Object[] toArray()
     {
         if (useCache)
         {
@@ -500,8 +491,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
      * Method to return the Collection as an array.
      * @param a The array to write the results to
      * @return The array
-     **/
-    public synchronized Object[] toArray(Object a[])
+     */
+    public Object[] toArray(Object a[])
     {
         if (useCache)
         {
@@ -543,8 +534,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
      * Method to add an element to the Collection.
      * @param element The element to add
      * @return Whether it was added successfully.
-     **/
-    public synchronized boolean add(E element)
+     */
+    public boolean add(E element)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -595,8 +586,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
      * Method to add a collection of elements.
      * @param elements The collection of elements to add.
      * @return Whether they were added successfully.
-     **/
-    public synchronized boolean addAll(java.util.Collection elements)
+     */
+    public boolean addAll(java.util.Collection elements)
     {
         if (useCache)
         {
@@ -642,8 +633,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
 
     /**
      * Method to clear the Collection.
-     **/
-    public synchronized void clear()
+     */
+    public void clear()
     {
         makeDirty();
         delegate.clear();
@@ -670,8 +661,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
      * Method to offer an element to the Queue.
      * @param element The element to offer
      * @return Whether it was added successfully.
-     **/
-    public synchronized boolean offer(E element)
+     */
+    public boolean offer(E element)
     {
         return add(element);
     }
@@ -679,8 +670,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
     /**
      * Method to poll the next element in the Queue.
      * @return The element (now removed)
-     **/
-    public synchronized E poll()
+     */
+    public E poll()
     {
         makeDirty();
  
@@ -723,8 +714,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
      * Method to remove an element from the Collection.
      * @param element The Element to remove
      * @return Whether it was removed successfully.
-     **/
-    public synchronized boolean remove(Object element)
+     */
+    public boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -734,7 +725,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
      * @param element The element
      * @param allowCascadeDelete Whether to allow cascade delete
      */
-    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
+    public boolean remove(Object element, boolean allowCascadeDelete)
     {
         makeDirty();
 
@@ -784,8 +775,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
      * Method to remove a Collection of elements.
      * @param elements The collection to remove
      * @return Whether they were removed successfully.
-     **/
-    public synchronized boolean removeAll(java.util.Collection elements)
+     */
+    public boolean removeAll(java.util.Collection elements)
     {
         makeDirty();
  
@@ -854,8 +845,8 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
      * Method to retain a Collection of elements (and remove all others).
      * @param c The collection to retain
      * @return Whether they were retained successfully.
-     **/
-    public synchronized boolean retainAll(java.util.Collection c)
+     */
+    public boolean retainAll(java.util.Collection c)
     {
         makeDirty();
 

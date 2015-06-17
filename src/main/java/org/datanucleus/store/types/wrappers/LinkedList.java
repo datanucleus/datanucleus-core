@@ -157,8 +157,8 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
 
     /**
      * Method to unset the owner and field information.
-     **/
-    public synchronized void unsetOwner()
+     */
+    public void unsetOwner()
     {
         if (ownerOP != null)
         {
@@ -237,18 +237,13 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
      * Accessor for whether a collection of elements are contained here.
      * @param c The collection of elements.
      * @return Whether they are contained.
-     **/
-    public synchronized boolean containsAll(java.util.Collection c)
+     */
+    public boolean containsAll(java.util.Collection c)
     {
         return delegate.containsAll(c);
     }
 
-    /**
-     * Equality operator.
-     * @param o The object to compare against.
-     * @return Whether this object is the same.
-     **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         return delegate.equals(o);
     }
@@ -281,11 +276,7 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
         return delegate.getLast();
     }
 
-    /**
-     * Hashcode operator.
-     * @return The Hash code.
-     **/
-    public synchronized int hashCode()
+    public int hashCode()
     {
         return delegate.hashCode();
     }
@@ -313,7 +304,7 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
      * Method to retrieve an iterator for the list.
      * @return The iterator
      **/
-    public Iterator iterator()
+    public Iterator<E> iterator()
     {
         return new SCOListIterator(this, ownerOP, delegate, null, true, -1);
     }
@@ -323,7 +314,7 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
      * @param index The start point 
      * @return The iterator
      **/
-    public ListIterator listIterator(int index)
+    public ListIterator<E> listIterator(int index)
     {
         return new SCOListIterator(this, ownerOP, delegate, null, true, index);
     }
@@ -352,8 +343,8 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
      * @param from Start index (inclusive)
      * @param to End index (exclusive) 
      * @return The subList
-     **/
-    public synchronized java.util.List subList(int from,int to)
+     */
+    public java.util.List subList(int from,int to)
     {
         return delegate.subList(from,to);
     }
@@ -361,8 +352,8 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
     /**
      * Method to return the list as an array.
      * @return The array
-     **/
-    public synchronized Object[] toArray()
+     */
+    public Object[] toArray()
     {
         return delegate.toArray();
     }
@@ -371,8 +362,8 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
      * Method to return the list as an array.
      * @param a The runtime types of the array being defined by this param
      * @return The array
-     **/
-    public synchronized Object[] toArray(Object a[])
+     */
+    public <T> T[] toArray(T a[])
     {
         return delegate.toArray(a);
     }
@@ -540,7 +531,7 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
     /**
      * Method to clear the LinkedList.
      */
-    public synchronized void clear()
+    public void clear()
     {
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
         {
@@ -623,8 +614,8 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
      * Method to remove an element from the List
      * @param element The Element to remove
      * @return Whether it was removed successfully.
-     **/
-    public synchronized boolean remove(Object element)
+     */
+    public boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -633,8 +624,8 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
      * Method to remove an element from the List
      * @param element The Element to remove
      * @return Whether it was removed successfully.
-     **/
-    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
+     */
+    public boolean remove(Object element, boolean allowCascadeDelete)
     {
         boolean success = delegate.remove(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -742,8 +733,8 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
      * Method to retain a Collection of elements (and remove all others).
      * @param c The collection to retain
      * @return Whether they were retained successfully.
-     **/
-    public synchronized boolean retainAll(java.util.Collection c)
+     */
+    public boolean retainAll(java.util.Collection c)
     {
         boolean success = delegate.retainAll(c);
         if (success)
