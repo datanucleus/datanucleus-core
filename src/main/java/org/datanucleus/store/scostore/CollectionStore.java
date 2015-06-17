@@ -88,7 +88,7 @@ public interface CollectionStore<E> extends Store
      * @param size Current size of collection (if known). -1 if not known
      * @return Whether the elements were added ok
      */
-    boolean addAll(ObjectProvider op, Collection elements, int size);
+    boolean addAll(ObjectProvider op, Collection<E> elements, int size);
 
     /**
      * Method to remove an element from the collection.
