@@ -114,8 +114,9 @@ public class FetchGroupManager
      * @param name Name of the group
      * @param createIfNotPresent Whether this method should create+add a FetchGroup if on with this name isn't found.
      * @return The FetchGroup
+     * @param <T> Type that the FetchGroup is for
      */
-    public synchronized FetchGroup getFetchGroup(Class cls, String name, boolean createIfNotPresent)
+    public synchronized <T> FetchGroup<T> getFetchGroup(Class<T> cls, String name, boolean createIfNotPresent)
     {
         if (fetchGroupByName != null)
         {
@@ -125,7 +126,7 @@ public class FetchGroupManager
                 Iterator<FetchGroup> iter = coll.iterator();
                 while (iter.hasNext())
                 {
-                    FetchGroup grp = iter.next();
+                    FetchGroup<T> grp = iter.next();
                     if (grp.getType() == cls)
                     {
                         return grp;
@@ -137,7 +138,7 @@ public class FetchGroupManager
         if (createIfNotPresent)
         {
             // Create a new group and add to our managed list
-            FetchGroup grp = createFetchGroup(cls, name);
+            FetchGroup<T> grp = createFetchGroup(cls, name);
             addFetchGroup(grp);
             return grp;
         }
@@ -150,11 +151,12 @@ public class FetchGroupManager
      * @param cls The class
      * @param name Name of the group
      * @return The FetchGroup
+     * @param <T> Type that the FetchGroup is for
      */
-    public FetchGroup createFetchGroup(Class cls, String name)
+    public <T> FetchGroup<T> createFetchGroup(Class<T> cls, String name)
     {
         // Not present so create a new FetchGroup and add it
-        FetchGroup fg = new FetchGroup(nucleusCtx, name, cls);
+        FetchGroup<T> fg = new FetchGroup(nucleusCtx, name, cls);
         if (name.equals(FetchGroup.DEFAULT))
         {
             // Special case of wanting to create a group to override the DFG

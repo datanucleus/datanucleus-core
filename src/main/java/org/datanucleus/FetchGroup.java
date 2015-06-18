@@ -33,8 +33,9 @@ import org.datanucleus.util.StringUtils;
 /**
  * Group of fields for fetching, to be used by a FetchPlan.
  * Defined at runtime, via the API (aka dynamic fetch group). Shared by FetchPlan's, so can be used by multiple threads.
+ * @param <T> Class that this FetchGroup is for
  */
-public class FetchGroup implements Serializable
+public class FetchGroup<T> implements Serializable
 {
     private static final long serialVersionUID = 8238931367627119563L;
 
@@ -51,7 +52,7 @@ public class FetchGroup implements Serializable
     private String name;
 
     /** The class that this group is for. */
-    private Class cls;
+    private Class<T> cls;
 
     /** Whether the postLoad callback is to be called when this group is loaded. */
     private boolean postLoad = false;
@@ -74,7 +75,7 @@ public class FetchGroup implements Serializable
      * @param name Name of the group
      * @param cls The class
      */
-    public FetchGroup(NucleusContext nucleusCtx, String name, Class cls)
+    public FetchGroup(NucleusContext nucleusCtx, String name, Class<T> cls)
     {
         this.nucleusCtx = nucleusCtx;
         this.name = name;
@@ -85,7 +86,7 @@ public class FetchGroup implements Serializable
      * Constructor to take a copy of the supplied group, but modifiable.
      * @param grp The existing group
      */
-    public FetchGroup(FetchGroup grp)
+    public FetchGroup(FetchGroup<T> grp)
     {
         name = grp.name;
         cls = grp.cls;
@@ -116,7 +117,7 @@ public class FetchGroup implements Serializable
      * Accessor for the class that this group is for.
      * @return the class
      */
-    public Class getType()
+    public Class<T> getType()
     {
         return cls;
     }
@@ -484,7 +485,7 @@ public class FetchGroup implements Serializable
 
     public String toString()
     {
-        return "FetchGroup : " + name + " for " + cls.getName() + 
+        return "FetchGroup<" + cls.getName() + "> : " + name +
             " members=[" + StringUtils.collectionToString(memberNames) + "]" +
             ", modifiable=" + (!unmodifiable) +
             ", postLoad=" + postLoad +
