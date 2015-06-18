@@ -340,7 +340,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      * @param to End index (exclusive) 
      * @return The subList
      */
-    public java.util.List subList(int from,int to)
+    public java.util.List<E> subList(int from,int to)
     {
         return delegate.subList(from, to);
     }

@@ -341,7 +341,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * @param to End index (exclusive) 
      * @return The subList
      **/
-    public synchronized java.util.List subList(int from,int to)
+    public synchronized java.util.List<E> subList(int from,int to)
     {
         return delegate.subList(from,to);
     }

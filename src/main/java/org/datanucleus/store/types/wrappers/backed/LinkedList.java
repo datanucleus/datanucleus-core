@@ -549,7 +549,7 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
      * @param to End index (exclusive) 
      * @return The subList
      */
-    public java.util.List subList(int from,int to)
+    public java.util.List<E> subList(int from,int to)
     {
         if (useCache)
         {

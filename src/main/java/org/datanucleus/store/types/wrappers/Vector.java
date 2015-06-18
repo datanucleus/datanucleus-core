@@ -407,7 +407,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
      * @param to End index (exclusive) 
      * @return The subList
      **/
-    public synchronized java.util.List subList(int from,int to)
+    public synchronized java.util.List<E> subList(int from,int to)
     {
         return delegate.subList(from,to);
     }

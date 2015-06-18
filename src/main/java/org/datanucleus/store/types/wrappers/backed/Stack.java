@@ -537,7 +537,7 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
      * @param to End index (exclusive) 
      * @return The subList
      **/
-    public synchronized java.util.List subList(int from,int to)
+    public synchronized java.util.List<E> subList(int from,int to)
     {
         if (useCache)
         {
