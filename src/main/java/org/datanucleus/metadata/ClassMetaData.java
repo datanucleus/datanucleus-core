@@ -372,11 +372,12 @@ public class ClassMetaData extends AbstractClassMetaData
                         {
                             for (int j=0;j<declTypes.length;j++)
                             {
+                                boolean foundTypeForTypeVariable = false;
                                 if (declTypes[j].getName().equals(methodTypeVar.getName()) && cls.getGenericSuperclass() instanceof ParameterizedType)
                                 {
                                     ParameterizedType genSuperclsType = (ParameterizedType) cls.getGenericSuperclass();
                                     Type[] paramTypeArgs = genSuperclsType.getActualTypeArguments();
-                                    if (paramTypeArgs != null && paramTypeArgs.length > j)
+                                    if (paramTypeArgs != null && paramTypeArgs.length > j && paramTypeArgs[j] instanceof Class)
                                     {
                                         NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " method=" + allclsMethods[i].getName() +
                                             " declared to return " + methodTypeVar + ", namely TypeVariable(" + j + ") of " + declCls.getName() + " so using " + paramTypeArgs[j]);
@@ -389,10 +390,33 @@ public class ClassMetaData extends AbstractClassMetaData
                                             mmd.type = (Class) paramTypeArgs[j];
                                             members.add(mmd);
                                             Collections.sort(members);
+                                            foundTypeForTypeVariable = true;
                                         }
                                         else
                                         {
                                             // TODO Cater for the user overriding it
+                                        }
+                                    }
+                                }
+                                if (!foundTypeForTypeVariable)
+                                {
+                                    // Try bounds of declType
+                                    Type[] boundTypes = declTypes[j].getBounds();
+                                    if (boundTypes != null && boundTypes.length == 1 && boundTypes[0] instanceof Class)
+                                    {
+                                        // User has class declaration like "public class MyClass<T extends SomeType>" so take SomeType
+                                        NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " field=" + allclsMethods[i].getName() +
+                                            " declared to be " + methodTypeVar + ", namely TypeVariable(" + j + ") with bound, so using bound of " + boundTypes[0]);
+                                        String propertyName = allclsMethods[i].getDeclaringClass().getName() + "." + ClassUtils.getFieldNameForJavaBeanGetter(allclsMethods[i].getName());
+                                        if (Collections.binarySearch(members, propertyName) < 0)
+                                        {
+                                            // No property of this name - add a default PropertyMetaData for this method with the type set to what we need
+                                            NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, propertyName));
+                                            AbstractMemberMetaData mmd = new PropertyMetaData(this, propertyName);
+                                            mmd.type = (Class) boundTypes[0];
+                                            members.add(mmd);
+                                            Collections.sort(members);
+                                            foundTypeForTypeVariable = true;
                                         }
                                     }
                                 }
@@ -453,11 +477,12 @@ public class ClassMetaData extends AbstractClassMetaData
                         {
                             for (int j=0;j<declTypes.length;j++)
                             {
+                                boolean foundTypeForTypeVariable = false;
                                 if (declTypes[j].getName().equals(fieldTypeVar.getName()) && cls.getGenericSuperclass() instanceof ParameterizedType)
                                 {
                                     ParameterizedType genSuperclsType = (ParameterizedType) cls.getGenericSuperclass();
                                     Type[] paramTypeArgs = genSuperclsType.getActualTypeArguments();
-                                    if (paramTypeArgs != null && paramTypeArgs.length > j)
+                                    if (paramTypeArgs != null && paramTypeArgs.length > j && paramTypeArgs[j] instanceof Class)
                                     {
                                         NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " field=" + theclsFields[i].getName() +
                                             " declared to be " + fieldTypeVar + ", namely TypeVariable(" + j + ") of " + declCls.getName() + " so using " + paramTypeArgs[j]);
@@ -475,10 +500,38 @@ public class ClassMetaData extends AbstractClassMetaData
                                             mmd.type = (Class) paramTypeArgs[j];
                                             members.add(mmd);
                                             Collections.sort(members);
+                                            foundTypeForTypeVariable = true;
                                         }
                                         else
                                         {
                                             // TODO Cater for the user overriding it
+                                        }
+                                    }
+                                }
+                                if (!foundTypeForTypeVariable)
+                                {
+                                    // Try bounds of declType
+                                    Type[] boundTypes = declTypes[j].getBounds();
+                                    if (boundTypes != null && boundTypes.length == 1 && boundTypes[0] instanceof Class)
+                                    {
+                                        // User has class declaration like "public class MyClass<T extends SomeType>" so take SomeType
+                                        NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " field=" + theclsFields[i].getName() +
+                                            " declared to be " + fieldTypeVar + ", namely TypeVariable(" + j + ") with bound, so using bound of " + boundTypes[0]);
+                                        String fieldName = declCls.getName() + "." + theclsFields[i].getName();
+                                        if (Collections.binarySearch(members, fieldName) < 0)
+                                        {
+                                            // No property of this name - add a default FieldMetaData for this method with the type set to what we need
+                                            NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, fieldName));
+                                            AbstractMemberMetaData mmd = new FieldMetaData(this, fieldName);
+                                            if (hasProperties && api.equalsIgnoreCase("JPA"))
+                                            {
+                                                // JPA : Class has properties but field not present, so add as transient field (JPA)
+                                                mmd.setNotPersistent();
+                                            }
+                                            mmd.type = (Class) boundTypes[0];
+                                            members.add(mmd);
+                                            Collections.sort(members);
+                                            foundTypeForTypeVariable = true;
                                         }
                                     }
                                 }
