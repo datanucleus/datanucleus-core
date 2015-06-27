@@ -129,12 +129,12 @@ public class CandidateIdsQueryResult<E> extends AbstractQueryResult<E>
         return getObjectForIndex(index);
     }
 
-    public Iterator iterator()
+    public Iterator<E> iterator()
     {
         return new ResultIterator();
     }
 
-    public ListIterator listIterator()
+    public ListIterator<E> listIterator()
     {
         return new ResultIterator();
     }
@@ -186,7 +186,7 @@ public class CandidateIdsQueryResult<E> extends AbstractQueryResult<E>
     /**
      * Iterator for results for this query.
      */
-    public class ResultIterator extends AbstractQueryResultIterator
+    public class ResultIterator extends AbstractQueryResultIterator<E>
     {
         int next = 0;
 
@@ -206,13 +206,13 @@ public class CandidateIdsQueryResult<E> extends AbstractQueryResult<E>
             return (next >= 1);
         }
 
-        public Object next()
+        public E next()
         {
             if (next == size)
             {
                 throw new NoSuchElementException("Already at end of List");
             }
-            Object obj = getObjectForIndex(next);
+            E obj = getObjectForIndex(next);
             next++;
             return obj;
         }
@@ -222,13 +222,13 @@ public class CandidateIdsQueryResult<E> extends AbstractQueryResult<E>
             return next;
         }
 
-        public Object previous()
+        public E previous()
         {
             if (next == 0)
             {
                 throw new NoSuchElementException("Already at start of List");
             }
-            Object obj = getObjectForIndex(next-1);
+            E obj = getObjectForIndex(next-1);
             next--;
             return obj;
         }

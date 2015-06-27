@@ -24,8 +24,9 @@ import org.datanucleus.util.Localiser;
 /**
  * Abstract implementation of an iterator for query results.
  * Can be used as the base class for an iterator for the implementation of AbstractQueryResult.
+ * @param <E> Type of element returned by this iterator
  */
-public abstract class AbstractQueryResultIterator implements ListIterator
+public abstract class AbstractQueryResultIterator<E> implements ListIterator<E>
 {
     public AbstractQueryResultIterator()
     {
@@ -52,7 +53,7 @@ public abstract class AbstractQueryResultIterator implements ListIterator
     /* (non-Javadoc)
      * @see java.util.ListIterator#next()
      */
-    public abstract Object next();
+    public abstract E next();
 
     /* (non-Javadoc)
      * @see java.util.ListIterator#nextIndex()
@@ -62,7 +63,7 @@ public abstract class AbstractQueryResultIterator implements ListIterator
     /* (non-Javadoc)
      * @see java.util.ListIterator#previous()
      */
-    public abstract Object previous();
+    public abstract E previous();
 
     /* (non-Javadoc)
      * @see java.util.ListIterator#previousIndex()

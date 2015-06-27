@@ -30,7 +30,7 @@ import org.datanucleus.util.StringUtils;
  * Abstract representation of a Java-based query.
  * To be extended by Java-based query languages.
  */
-public abstract class AbstractJavaQuery extends Query
+public abstract class AbstractJavaQuery<T> extends Query<T>
 {
     private static final long serialVersionUID = 7429197167814283812L;
 
@@ -55,7 +55,7 @@ public abstract class AbstractJavaQuery extends Query
      * Passing in null clears off the current candidate Extent.
      * @param pcs the Candidate Extent.
      */
-    public void setCandidates(Extent pcs)
+    public void setCandidates(Extent<T> pcs)
     {
         discardCompiled();
         assertIsModifiable();
@@ -74,7 +74,7 @@ public abstract class AbstractJavaQuery extends Query
      * Passing in null clears off the current candidate collection.
      * @param pcs the Candidate collection.
      */
-    public void setCandidates(Collection pcs)
+    public void setCandidates(Collection<T> pcs)
     {
         discardCompiled();
         assertIsModifiable();

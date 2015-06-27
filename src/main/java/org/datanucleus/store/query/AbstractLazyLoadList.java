@@ -36,11 +36,12 @@ import org.datanucleus.util.WeakValueMap;
  * the <pre>getSize()</pre> method to return the size of the list. The "datasource" could
  * be results for a query, or a connection to a datastore, or whatever ... just a source of objects.
  * TODO Change Localised message numbers to be generic
+ * @param <E> Type of the element of this list
  */
-public abstract class AbstractLazyLoadList implements List
+public abstract class AbstractLazyLoadList<E> implements List<E>
 {
     /** Map of object, keyed by the index (0, 1, etc). */
-    private Map<Integer, Object> itemsByIndex = null;
+    private Map<Integer, E> itemsByIndex = null;
 
     /** Cached size of the list. -1 when not known. */
     protected int size = -1;
@@ -87,7 +88,7 @@ public abstract class AbstractLazyLoadList implements List
      * @param index The list index
      * @return The object
      */
-    protected abstract Object retrieveObjectForIndex(int index);
+    protected abstract E retrieveObjectForIndex(int index);
 
     /**
      * Method to return the size of the list.
@@ -165,7 +166,7 @@ public abstract class AbstractLazyLoadList implements List
     /* (non-Javadoc)
      * @see java.util.List#get(int)
      */
-    public Object get(int index)
+    public E get(int index)
     {
         // TODO Add check on isOpen() and throw exception accordingly
         if (itemsByIndex != null && itemsByIndex.containsKey(index))
@@ -173,7 +174,7 @@ public abstract class AbstractLazyLoadList implements List
             return itemsByIndex.get(index);
         }
 
-        Object obj = retrieveObjectForIndex(index);
+        E obj = retrieveObjectForIndex(index);
         itemsByIndex.put(index, obj);
         return obj;
     }
@@ -198,7 +199,7 @@ public abstract class AbstractLazyLoadList implements List
     /* (non-Javadoc)
      * @see java.util.List#iterator()
      */
-    public Iterator iterator()
+    public Iterator<E> iterator()
     {
         return listIterator(0);
     }
@@ -232,7 +233,7 @@ public abstract class AbstractLazyLoadList implements List
     /* (non-Javadoc)
      * @see java.util.List#remove(int)
      */
-    public Object remove(int index)
+    public E remove(int index)
     {
         throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
@@ -396,7 +397,7 @@ public abstract class AbstractLazyLoadList implements List
                     return itemsByIndex.get(iteratorIndex);
                 }
 
-                Object obj = retrieveObjectForIndex(iteratorIndex);
+                E obj = retrieveObjectForIndex(iteratorIndex);
                 if (itemsByIndex != null)
                 {
                     itemsByIndex.put(iteratorIndex, obj);
@@ -436,7 +437,7 @@ public abstract class AbstractLazyLoadList implements List
                     return itemsByIndex.get(iteratorIndex);
                 }
 
-                Object obj = retrieveObjectForIndex(iteratorIndex);
+                E obj = retrieveObjectForIndex(iteratorIndex);
                 if (itemsByIndex != null)
                 {
                     itemsByIndex.put(iteratorIndex, obj);

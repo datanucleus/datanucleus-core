@@ -42,9 +42,9 @@ import org.datanucleus.util.Localiser;
  * Supports the following query extensions :-
  * <ul>
  * <li><b>datanucleus.query.resultSizeMethod</b> The method used to find the size of the result set.</li>
- * <li><b>datanucleus.query.loadResultsAtCommit</b> Whether to load all results when the connection is closing.
- * Has no effect if caching is not used.</li>
+ * <li><b>datanucleus.query.loadResultsAtCommit</b> Whether to load all results when the connection is closing. Has no effect if caching is not used.</li>
  * </ul>
+ * @param <E> Type of "element" returned by this query result
  */
 public abstract class AbstractQueryResult<E> extends AbstractList<E> implements QueryResult<E>, Serializable
 {
@@ -59,7 +59,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
     /** List of listeners to notify when the query results are closed. */
     protected List<ManagedConnectionResourceListener> connectionListeners = null;
 
-    ApiAdapter api;
+    protected ApiAdapter api;
 
     /** size of the query results. Is -1 until known. */
     protected int size = -1;
@@ -508,10 +508,8 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
                 }
             }
 
-            throw new NucleusUserException("datanucleus.query.resultSizeMethod of \"COUNT\" is only valid" +
-            " for use with JDOQL or JPQL currently");
+            throw new NucleusUserException("datanucleus.query.resultSizeMethod of \"COUNT\" is only valid for use with JDOQL or JPQL currently");
         }
-        throw new NucleusUserException("DataNucleus doesnt currently support any method \"" + 
-                    resultSizeMethod + "\" for determining the size of the query results");
+        throw new NucleusUserException("DataNucleus doesnt currently support any method \"" + resultSizeMethod + "\" for determining the size of the query results");
     }
 }
