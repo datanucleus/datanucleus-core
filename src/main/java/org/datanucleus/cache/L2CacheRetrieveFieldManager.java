@@ -167,224 +167,246 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
     @Override
     public Object fetchObjectField(int fieldNumber)
     {
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         Object value = cachedPC.getFieldValue(fieldNumber);
-
-        RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
-        if (relType != RelationType.NONE)
-        {
-            if (value != null)
-            {
-                // Field stores a relation and has a value
-                if (Collection.class.isAssignableFrom(value.getClass()))
-                {
-                    // Collection field, with fieldValue being Collection<OID>
-                    Collection coll = (Collection)value;
-                    try
-                    {
-                        // Create Collection<Element> of same type as fieldValue
-                        Collection fieldColl = coll.getClass().newInstance();
-                        Iterator iter = coll.iterator();
-                        while (iter.hasNext())
-                        {
-                            Object cachedId = iter.next();
-                            if (cachedId != null)
-                            {
-                                fieldColl.add(getObjectFromCachedId(cachedId));
-                            }
-                            else
-                            {
-                                fieldColl.add(null);
-                            }
-                        }
-                        return SCOUtils.wrapSCOField(op, fieldNumber, fieldColl, true);
-                    }
-                    catch (Exception e)
-                    {
-                        // Error creating field value
-                        if (fieldsNotLoaded == null)
-                        {
-                            fieldsNotLoaded = new ArrayList<Integer>();
-                        }
-                        fieldsNotLoaded.add(fieldNumber);
-                        NucleusLogger.CACHE.error("Exception thrown creating value for" +
-                            " field " + mmd.getFullFieldName() + 
-                            " of type " + value.getClass().getName(), e);
-                        return null;
-                    }
-                }
-                else if (Map.class.isAssignableFrom(value.getClass()))
-                {
-                    // Map field, with fieldValue being Map<OID, OID>
-                    Map map = (Map)value;
-                    try
-                    {
-                        // Create Map<Key, Value> of same type as fieldValue
-                        Map fieldMap = map.getClass().newInstance();
-                        Iterator iter = map.entrySet().iterator();
-                        while (iter.hasNext())
-                        {
-                            Map.Entry entry = (Map.Entry)iter.next();
-
-                            Object mapKey = null;
-                            if (mmd.getMap().keyIsPersistent())
-                            {
-                                mapKey = getObjectFromCachedId(entry.getKey());
-                            }
-                            else
-                            {
-                                mapKey = entry.getKey();
-                            }
-
-                            Object mapValue = null;
-                            Object mapValueId = entry.getValue();
-                            if (mapValueId != null)
-                            {
-                                if (mmd.getMap().valueIsPersistent())
-                                {
-                                    mapValue = getObjectFromCachedId(entry.getValue());
-                                }
-                                else
-                                {
-                                    mapValue = entry.getValue();
-                                }
-                            }
-
-                            fieldMap.put(mapKey, mapValue);
-                        }
-                        return SCOUtils.wrapSCOField(op, fieldNumber, fieldMap, true);
-                    }
-                    catch (Exception e)
-                    {
-                        // Error creating field value
-                        if (fieldsNotLoaded == null)
-                        {
-                            fieldsNotLoaded = new ArrayList<Integer>();
-                        }
-                        fieldsNotLoaded.add(fieldNumber);
-                        NucleusLogger.CACHE.error("Exception thrown creating value for" +
-                            " field " + mmd.getFullFieldName() + 
-                            " of type " + value.getClass().getName(), e);
-                        return null;
-                    }
-                }
-                else if (value.getClass().isArray())
-                {
-                    try
-                    {
-                        Object[] elementOIDs = (Object[])value;
-                        Class componentType = mmd.getType().getComponentType();
-                        Object fieldArr = Array.newInstance(componentType, elementOIDs.length);
-                        boolean persistableElement = ec.getApiAdapter().isPersistable(componentType);
-                        for (int i=0;i<elementOIDs.length;i++)
-                        {
-                            Object element = null;
-                            if (elementOIDs[i] == null)
-                            {
-                            }
-                            else if (componentType.isInterface() || persistableElement || componentType == Object.class)
-                            {
-                                element = getObjectFromCachedId(elementOIDs[i]);
-                            }
-                            else
-                            {
-                                element = elementOIDs[i];
-                            }
-                            Array.set(fieldArr, i, element);
-                        }
-                        return fieldArr;
-                    }
-                    catch (NucleusException ne)
-                    {
-                        // Unable to find element(s) so set field to unloaded
-                        if (fieldsNotLoaded == null)
-                        {
-                            fieldsNotLoaded = new ArrayList<Integer>();
-                        }
-                        fieldsNotLoaded.add(fieldNumber);
-                        NucleusLogger.CACHE.error(
-                            "Exception thrown trying to find element of array while getting object with id " + 
-                            op.getInternalObjectId() + " from the L2 cache", ne);
-                        return null;
-                    }
-                }
-                else
-                {
-                    if (mmd.isSerialized() ||
-                        MetaDataUtils.isMemberEmbedded(mmd, relType,
-                            ec.getClassLoaderResolver(), ec.getMetaDataManager()))
-                    {
-                        if (ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CACHE_EMBEDDED))
-                        {
-                            if (value instanceof CachedPC)
-                            {
-                                // Convert the CachedPC back into a managed object loading all cached fields
-                                // TODO Perhaps only load fetch plan fields?
-                                CachedPC valueCachedPC = (CachedPC)value;
-                                AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(
-                                    valueCachedPC.getObjectClass(), ec.getClassLoaderResolver());
-                                int[] fieldsToLoad = ClassUtils.getFlagsSetTo(valueCachedPC.getLoadedFields(), cmd.getAllMemberPositions(), true);
-                                ObjectProvider valueOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, cmd, op, mmd.getAbsoluteFieldNumber());
-                                valueOP.replaceFields(fieldsToLoad, new L2CacheRetrieveFieldManager(valueOP, valueCachedPC));
-                                return valueOP.getObject();
-                            }
-                        }
-                    }
-
-                    // PC field so assume is the identity of the object
-                    try
-                    {
-                        return getObjectFromCachedId(value);
-                    }
-                    catch (NucleusObjectNotFoundException nonfe)
-                    {
-                        if (fieldsNotLoaded == null)
-                        {
-                            fieldsNotLoaded = new ArrayList<Integer>();
-                        }
-                        fieldsNotLoaded.add(fieldNumber);
-                        return null;
-                    }
-                }
-            }
-            return null;
-        }
-
         if (value == null)
         {
             return null;
         }
-        else if (value instanceof StringBuffer)
+
+        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        if (mmd.hasContainer())
         {
-            // Use our own copy of this mutable type
-            return new StringBuffer(((StringBuffer)value).toString());
-        }
-        else if (value instanceof StringBuilder)
-        {
-            // Use our own copy of this mutable type
-            return new StringBuilder(((StringBuilder)value).toString());
-        }
-        else if (value instanceof Date)
-        {
-            // Use our own copy of this mutable type
-            value = ((Date)value).clone();
-        }
-        else if (value instanceof Calendar)
-        {
-            // Use our own copy of this mutable type
-            value = ((Calendar)value).clone();
+            return processContainer(fieldNumber, mmd, value);
         }
 
-        boolean[] mutables = mmd.getAbstractClassMetaData().getSCOMutableMemberFlags();
-        if (mutables[fieldNumber])
+        return processField(fieldNumber, mmd, value);
+    }
+
+    protected Object processContainer(int fieldNumber, AbstractMemberMetaData mmd, Object value)
+    {
+        RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
+        if (mmd.hasCollection())
         {
-            return SCOUtils.wrapSCOField(op, fieldNumber, value, true);
+            if (RelationType.isRelationMultiValued(relType))
+            {
+                // Collection field, with fieldValue being Collection<OID>
+                Collection coll = (Collection)value;
+                try
+                {
+                    // Create Collection<Element> of same type as fieldValue
+                    Collection fieldColl = coll.getClass().newInstance();
+                    Iterator iter = coll.iterator();
+                    while (iter.hasNext())
+                    {
+                        Object cachedId = iter.next();
+                        if (cachedId != null)
+                        {
+                            fieldColl.add(getObjectFromCacheableId(cachedId));
+                        }
+                        else
+                        {
+                            fieldColl.add(null);
+                        }
+                    }
+                    return SCOUtils.wrapSCOField(op, fieldNumber, fieldColl, true);
+                }
+                catch (Exception e)
+                {
+                    // Error creating field value
+                    if (fieldsNotLoaded == null)
+                    {
+                        fieldsNotLoaded = new ArrayList<Integer>();
+                    }
+                    fieldsNotLoaded.add(fieldNumber);
+                    NucleusLogger.CACHE.error("Exception thrown creating value for field " + mmd.getFullFieldName() + 
+                        " of type " + value.getClass().getName(), e);
+                    return null;
+                }
+            }
+        }
+        else if (mmd.hasMap())
+        {
+            if (RelationType.isRelationMultiValued(relType))
+            {
+                // Map field, with fieldValue being Map<OID, OID>
+                Map map = (Map)value;
+                try
+                {
+                    // Create Map<Key, Value> of same type as fieldValue
+                    Map fieldMap = map.getClass().newInstance();
+                    Iterator iter = map.entrySet().iterator();
+                    while (iter.hasNext())
+                    {
+                        Map.Entry entry = (Map.Entry)iter.next();
+
+                        Object mapKey = null;
+                        if (mmd.getMap().keyIsPersistent())
+                        {
+                            mapKey = getObjectFromCacheableId(entry.getKey());
+                        }
+                        else
+                        {
+                            mapKey = entry.getKey();
+                        }
+
+                        Object mapValue = null;
+                        Object mapValueId = entry.getValue();
+                        if (mapValueId != null)
+                        {
+                            if (mmd.getMap().valueIsPersistent())
+                            {
+                                mapValue = getObjectFromCacheableId(entry.getValue());
+                            }
+                            else
+                            {
+                                mapValue = entry.getValue();
+                            }
+                        }
+
+                        fieldMap.put(mapKey, mapValue);
+                    }
+                    return SCOUtils.wrapSCOField(op, fieldNumber, fieldMap, true);
+                }
+                catch (Exception e)
+                {
+                    // Error creating field value
+                    if (fieldsNotLoaded == null)
+                    {
+                        fieldsNotLoaded = new ArrayList<Integer>();
+                    }
+                    fieldsNotLoaded.add(fieldNumber);
+                    NucleusLogger.CACHE.error("Exception thrown creating value for field " + mmd.getFullFieldName() + 
+                        " of type " + value.getClass().getName(), e);
+                    return null;
+                }
+            }
+        }
+        else if (mmd.hasArray())
+        {
+            if (RelationType.isRelationMultiValued(relType))
+            {
+                try
+                {
+                    Object[] elementOIDs = (Object[])value;
+                    Class componentType = mmd.getType().getComponentType();
+                    Object fieldArr = Array.newInstance(componentType, elementOIDs.length);
+                    boolean persistableElement = ec.getApiAdapter().isPersistable(componentType);
+                    for (int i=0;i<elementOIDs.length;i++)
+                    {
+                        Object element = null;
+                        if (elementOIDs[i] == null)
+                        {
+                        }
+                        else if (componentType.isInterface() || persistableElement || componentType == Object.class)
+                        {
+                            element = getObjectFromCacheableId(elementOIDs[i]);
+                        }
+                        else
+                        {
+                            element = elementOIDs[i];
+                        }
+                        Array.set(fieldArr, i, element);
+                    }
+                    return fieldArr;
+                }
+                catch (NucleusException ne)
+                {
+                    // Unable to find element(s) so set field to unloaded
+                    if (fieldsNotLoaded == null)
+                    {
+                        fieldsNotLoaded = new ArrayList<Integer>();
+                    }
+                    fieldsNotLoaded.add(fieldNumber);
+                    NucleusLogger.CACHE.error("Exception thrown trying to find element of array while getting object with id " + 
+                        op.getInternalObjectId() + " from the L2 cache", ne);
+                    return null;
+                }
+            }
         }
 
+        // Just return the value (Collection<NonPC>, Map<NonPC, NonPC>, NonPC[])
         return value;
     }
 
-    private Object getObjectFromCachedId(Object cachedId)
+    protected Object processField(int fieldNumber, AbstractMemberMetaData mmd, Object value)
+    {
+        RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
+        if (relType == RelationType.NONE)
+        {
+            Object fieldValue = copyValue(value);
+            boolean[] mutables = mmd.getAbstractClassMetaData().getSCOMutableMemberFlags();
+            if (mutables[fieldNumber])
+            {
+                return SCOUtils.wrapSCOField(op, fieldNumber, fieldValue, true);
+            }
+            return fieldValue;
+        }
+        
+        if (mmd.isSerialized() || MetaDataUtils.isMemberEmbedded(mmd, relType, ec.getClassLoaderResolver(), ec.getMetaDataManager()))
+        {
+            if (ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CACHE_EMBEDDED))
+            {
+                if (value instanceof CachedPC)
+                {
+                    // Convert the CachedPC back into a managed object loading all cached fields
+                    // TODO Perhaps only load fetch plan fields?
+                    CachedPC valueCachedPC = (CachedPC)value;
+                    AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(valueCachedPC.getObjectClass(), ec.getClassLoaderResolver());
+                    int[] fieldsToLoad = ClassUtils.getFlagsSetTo(valueCachedPC.getLoadedFields(), cmd.getAllMemberPositions(), true);
+                    ObjectProvider valueOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, cmd, op, mmd.getAbsoluteFieldNumber());
+                    valueOP.replaceFields(fieldsToLoad, new L2CacheRetrieveFieldManager(valueOP, valueCachedPC));
+                    return valueOP.getObject();
+                }
+            }
+        }
+
+        // PC field so assume is the identity of the object
+        try
+        {
+            return getObjectFromCacheableId(value);
+        }
+        catch (NucleusObjectNotFoundException nonfe)
+        {
+            if (fieldsNotLoaded == null)
+            {
+                fieldsNotLoaded = new ArrayList<Integer>();
+            }
+            fieldsNotLoaded.add(fieldNumber);
+            return null;
+        }
+    }
+
+    static Object copyValue(Object scoValue)
+    {
+        if (scoValue == null)
+        {
+            return null;
+        }
+        else if (scoValue instanceof StringBuffer)
+        {
+            // Use our own copy of this mutable type
+            return new StringBuffer(((StringBuffer)scoValue).toString());
+        }
+        else if (scoValue instanceof StringBuilder)
+        {
+            // Use our own copy of this mutable type
+            return new StringBuilder(((StringBuilder)scoValue).toString());
+        }
+        else if (scoValue instanceof Date)
+        {
+            // Use our own copy of this mutable type
+            return ((Date)scoValue).clone();
+        }
+        else if (scoValue instanceof Calendar)
+        {
+            // Use our own copy of this mutable type
+            return ((Calendar)scoValue).clone();
+        }
+        
+        return scoValue;
+    }
+
+    private Object getObjectFromCacheableId(Object cachedId)
     {
         Object pcId = null;
         String pcClassName = null;

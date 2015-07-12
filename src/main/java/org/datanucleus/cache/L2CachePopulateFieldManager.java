@@ -19,14 +19,14 @@ package org.datanucleus.cache;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import static org.datanucleus.cache.L2CacheRetrieveFieldManager.copyValue;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.PropertyNames;
@@ -286,7 +286,6 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
     public void storeObjectField(int fieldNumber, Object value)
     {
         AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-        RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
         if (mmd.getPersistenceModifier() == FieldPersistenceModifier.TRANSACTIONAL)
         {
             // Cannot cache transactional fields
@@ -300,320 +299,265 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
             return;
         }
 
-        ApiAdapter api = ec.getApiAdapter();
         cachedPC.setLoadedField(fieldNumber, true); // Overridden later if necessary
 
         if (value == null)
         {
             cachedPC.setFieldValue(fieldNumber, null);
+            return;
         }
-        else
+
+        if (mmd.hasContainer())
         {
-            // TODO Make use of RelationType methods here rather than "instanceof Collection" etc.
-            if (RelationType.isRelationSingleValued(relType))
-            {
-                // 1-1, N-1 persistable field
-                if (mmd.isSerialized() || MetaDataUtils.isMemberEmbedded(mmd, relType, ec.getClassLoaderResolver(), ec.getMetaDataManager()))
-                {
-                    if (ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CACHE_EMBEDDED))
-                    {
-                        // Put object in cached as (nested) CachedPC
-                        ObjectProvider valueOP = ec.findObjectProvider(value);
-                        int[] loadedFields = valueOP.getLoadedFieldNumbers();
-                        CachedPC valueCachedPC = new CachedPC(value.getClass(), valueOP.getLoadedFields(), null);
-                        valueOP.provideFields(loadedFields, new L2CachePopulateFieldManager(valueOP, valueCachedPC));
+            processContainer(fieldNumber, mmd, value);
+            return;
+        }
 
-                        cachedPC.setFieldValue(fieldNumber, valueCachedPC);
-                    }
-                    else
-                    {
-                        // TODO Support serialised/embedded PC fields
-                        cachedPC.setLoadedField(fieldNumber, false);
-                    }
+        processField(fieldNumber, mmd, value);
+    }
+
+    protected void processContainer(int fieldNumber, AbstractMemberMetaData mmd, Object inputValue)
+    {
+        Object value = inputValue;
+        if (inputValue instanceof SCOContainer)
+        {
+            if (!((SCOContainer)inputValue).isLoaded())
+            {
+                // Contents not loaded so just mark as unloaded
+                cachedPC.setLoadedField(fieldNumber, false);
+                return;
+            }
+     
+            // Use the unwrapped value
+            value = ((SCO)inputValue).getValue();
+        }
+
+        ApiAdapter api = ec.getApiAdapter();
+        RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
+        if (mmd.hasMap())
+        {
+            if (RelationType.isRelationMultiValued(relType))
+            {
+                if (mmd.isSerialized() || mmd.isEmbedded() || mmd.getMap().isSerializedKey() || mmd.getMap().isSerializedValue() || 
+                    (mmd.getMap().keyIsPersistent() && mmd.getMap().isEmbeddedKey()) || (mmd.getMap().valueIsPersistent() && mmd.getMap().isEmbeddedValue()))
+                {
+                    // TODO Support serialised/embedded keys/values
+                    cachedPC.setLoadedField(fieldNumber, false);
                     return;
                 }
 
-                // Put cacheable form of the id in CachedPC
-                cachedPC.setFieldValue(fieldNumber, getCacheableIdForId(api, value));
-            }
-            else if (value instanceof Collection)
-            {
-                // 1-N, M-N Collection
-                if (RelationType.isRelationMultiValued(relType))
+                try
                 {
-                    if (value instanceof List && mmd.getOrderMetaData() != null && !mmd.getOrderMetaData().isIndexedList())
+                    Map returnMap = null;
+                    if (value.getClass().isInterface())
                     {
-                        // Ordered list so don't cache since dependent on datastore-retrieve order
-                        cachedPC.setLoadedField(fieldNumber, false);
-                        return;
-                    }
-                    if (mmd.isSerialized() || mmd.isEmbedded() || mmd.getCollection().isSerializedElement() || mmd.getCollection().isEmbeddedElement())
-                    {
-                        // TODO Support serialised/embedded elements
-                        cachedPC.setLoadedField(fieldNumber, false);
-                        return;
-                    }
-                    Collection collValue = (Collection)value;
-                    if (collValue instanceof SCO && !((SCOContainer)value).isLoaded())
-                    {
-                        // Contents not loaded so just mark as unloaded
-                        cachedPC.setLoadedField(fieldNumber, false);
-                        return;
-                    }
-
-                    Iterator collIter = collValue.iterator();
-                    Collection returnColl = null;
-                    try
-                    {
-                        if (value.getClass().isInterface())
-                        {
-                            if (List.class.isAssignableFrom(value.getClass()) || mmd.getOrderMetaData() != null)
-                            {
-                                // List based
-                                returnColl = new ArrayList();
-                            }
-                            else
-                            {
-                                // Set based
-                                returnColl = new HashSet();
-                            }
-                        }
-                        else
-                        {
-                            if (value instanceof SCO)
-                            {
-                                returnColl = (Collection)((SCO)value).getValue().getClass().newInstance();
-                            }
-                            else
-                            {
-                                returnColl = (Collection)value.getClass().newInstance();
-                            }
-                        }
-
-                        // Recurse through elements, and put ids of elements in return value
-                        while (collIter.hasNext())
-                        {
-                            Object elem = collIter.next();
-                            if (elem == null)
-                            {
-                                returnColl.add(null); // Allow for null elements
-                            }
-                            else
-                            {
-                                returnColl.add(getCacheableIdForId(api, elem));
-                            }
-                        }
-
-                        // Put Collection<OID> in CachedPC
-                        cachedPC.setFieldValue(fieldNumber, returnColl);
-                        return;
-                    }
-                    catch (Exception e)
-                    {
-                        NucleusLogger.CACHE.warn("Unable to create object of type " + value.getClass().getName() + " for L2 caching : " + e.getMessage());
-
-                        // Contents not loaded so just mark as unloaded
-                        cachedPC.setLoadedField(fieldNumber, false);
-                        return;
-                    }
-                }
-
-                // Collection<Non-PC> so just return it
-                if (value instanceof SCOContainer)
-                {
-                    if (((SCOContainer)value).isLoaded())
-                    {
-                        // Return unwrapped collection
-                        cachedPC.setFieldValue(fieldNumber, ((SCO)value).getValue());
+                        returnMap = new HashMap();
                     }
                     else
                     {
-                        // Contents not loaded so just mark as unloaded
-                        cachedPC.setLoadedField(fieldNumber, false);
-                        return;
-                    }
-                }
-                else
-                {
-                    cachedPC.setFieldValue(fieldNumber, value);
-                }
-            }
-            else if (value instanceof Map)
-            {
-                // 1-N, M-N Map
-                if (RelationType.isRelationMultiValued(relType))
-                {
-                    if (mmd.isSerialized() || mmd.isEmbedded() || mmd.getMap().isSerializedKey() || mmd.getMap().isSerializedValue() || 
-                        (mmd.getMap().keyIsPersistent() && mmd.getMap().isEmbeddedKey()) || (mmd.getMap().valueIsPersistent() && mmd.getMap().isEmbeddedValue()))
-                    {
-                        // TODO Support serialised/embedded keys/values
-                        cachedPC.setLoadedField(fieldNumber, false);
-                        return;
-                    }
-
-                    if (value instanceof SCO && !((SCOContainer)value).isLoaded())
-                    {
-                        // Contents not loaded so just mark as unloaded
-                        cachedPC.setLoadedField(fieldNumber, false);
-                        return;
-                    }
-
-                    try
-                    {
-                        Map returnMap = null;
-                        if (value.getClass().isInterface())
+                        if (value instanceof SCO)
                         {
-                            returnMap = new HashMap();
+                            returnMap = (Map)((SCO)value).getValue().getClass().newInstance();
                         }
                         else
                         {
-                            if (value instanceof SCO)
-                            {
-                                returnMap = (Map)((SCO)value).getValue().getClass().newInstance();
-                            }
-                            else
-                            {
-                                returnMap = (Map)value.getClass().newInstance();
-                            }
+                            returnMap = (Map)value.getClass().newInstance();
                         }
-                        Iterator mapIter = ((Map)value).entrySet().iterator();
-                        while (mapIter.hasNext())
+                    }
+                    Iterator mapIter = ((Map)value).entrySet().iterator();
+                    while (mapIter.hasNext())
+                    {
+                        Map.Entry entry = (Map.Entry)mapIter.next();
+                        Object mapKey = null;
+                        Object mapValue = null;
+                        if (mmd.getMap().keyIsPersistent())
                         {
-                            Map.Entry entry = (Map.Entry)mapIter.next();
-                            Object mapKey = null;
-                            Object mapValue = null;
-                            if (mmd.getMap().keyIsPersistent())
-                            {
-                                mapKey = getCacheableIdForId(api, entry.getKey());
-                            }
-                            else
-                            {
-                                mapKey = entry.getKey();
-                            }
-                            if (mmd.getMap().valueIsPersistent())
-                            {
-                                mapValue = getCacheableIdForId(api, entry.getValue());
-                            }
-                            else
-                            {
-                                mapValue = entry.getValue();
-                            }
-                            returnMap.put(mapKey, mapValue);
-                        }
-
-                        // Put Map<X, Y> in CachedPC where X, Y can be OID if they are persistable objects
-                        cachedPC.setFieldValue(fieldNumber, returnMap);
-                        return;
-                    }
-                    catch (Exception e)
-                    {
-                        NucleusLogger.CACHE.warn("Unable to create object of type " + value.getClass().getName() + " for L2 caching : " + e.getMessage());
-
-                        // Contents not loaded so just mark as unloaded
-                        cachedPC.setLoadedField(fieldNumber, false);
-                        return;
-                    }
-                }
-
-                // Map<Non-PC, Non-PC>
-                if (value instanceof SCOContainer)
-                {
-                    if (((SCOContainer)value).isLoaded())
-                    {
-                        // Return unwrapped map
-                        cachedPC.setFieldValue(fieldNumber, ((SCO)value).getValue());
-                    }
-                    else
-                    {
-                        // Contents not loaded so just mark as unloaded
-                        cachedPC.setLoadedField(fieldNumber, false);
-                        return;
-                    }
-                }
-                else
-                {
-                    cachedPC.setFieldValue(fieldNumber, value);
-                }
-            }
-            else if (value instanceof Object[])
-            {
-                // Array, maybe of Persistable objects
-                if (MetaDataUtils.getInstance().storesPersistable(mmd, ec))
-                {
-                    if (mmd.isSerialized() || mmd.isEmbedded() ||
-                        mmd.getArray().isSerializedElement() || mmd.getArray().isEmbeddedElement())
-                    {
-                        // TODO Support serialised/embedded elements
-                        cachedPC.setLoadedField(fieldNumber, false);
-                        return;
-                    }
-
-                    Object[] returnArr = new Object[Array.getLength(value)];
-                    for (int i=0;i<Array.getLength(value);i++)
-                    {
-                        Object element = Array.get(value, i);
-                        if (element != null)
-                        {
-                            returnArr[i] = getCacheableIdForId(api, element);
+                            mapKey = getCacheableIdForId(api, entry.getKey());
                         }
                         else
                         {
-                            returnArr[i] = null;
+                            mapKey = entry.getKey();
                         }
+                        if (mmd.getMap().valueIsPersistent())
+                        {
+                            mapValue = getCacheableIdForId(api, entry.getValue());
+                        }
+                        else
+                        {
+                            mapValue = entry.getValue();
+                        }
+                        returnMap.put(mapKey, mapValue);
                     }
 
-                    // Store "id[]"
-                    cachedPC.setFieldValue(fieldNumber, returnArr);
+                    // Put Map<X, Y> in CachedPC where X, Y can be OID if they are persistable objects
+                    cachedPC.setFieldValue(fieldNumber, returnMap);
+                    return;
+                }
+                catch (Exception e)
+                {
+                    NucleusLogger.CACHE.warn("Unable to create object of type " + value.getClass().getName() + " for L2 caching : " + e.getMessage());
+
+                    // Contents not loaded so just mark as unloaded
+                    cachedPC.setLoadedField(fieldNumber, false);
+                    return;
+                }
+            }
+
+            // Map<Non-PC, Non-PC>
+            cachedPC.setFieldValue(fieldNumber, value);
+            return;
+        }
+        else if (mmd.hasCollection())
+        {
+            // 1-N, M-N Collection
+            if (RelationType.isRelationMultiValued(relType))
+            {
+                if (value instanceof List && mmd.getOrderMetaData() != null && !mmd.getOrderMetaData().isIndexedList())
+                {
+                    // Ordered list so don't cache since dependent on datastore-retrieve order
+                    cachedPC.setLoadedField(fieldNumber, false);
+                    return;
+                }
+                if (mmd.isSerialized() || mmd.isEmbedded() || mmd.getCollection().isSerializedElement() || mmd.getCollection().isEmbeddedElement())
+                {
+                    // TODO Support serialised/embedded elements
+                    cachedPC.setLoadedField(fieldNumber, false);
                     return;
                 }
 
-                // Array element type is not persistable so just return the value
-                cachedPC.setFieldValue(fieldNumber, value);
-            }
-            else if (value instanceof StringBuffer)
-            {
-                // Make a copy of a StringBuffer for the cache since it is mutable but final
-                cachedPC.setFieldValue(fieldNumber, new StringBuffer((StringBuffer)value));
-            }
-            else if (value instanceof StringBuilder)
-            {
-                // Make a copy of a StringBuilder for the cache since it is mutable but final
-                cachedPC.setFieldValue(fieldNumber, new StringBuilder((StringBuilder)value));
-            }
-            else if (value instanceof SCO)
-            {
-                // SCO wrapper - so replace with unwrapped
-                Object unwrappedValue = ((SCO)value).getValue();
-                if (unwrappedValue instanceof Date)
+                Collection collValue = (Collection)value;
+                Iterator collIter = collValue.iterator();
+                Collection returnColl = null;
+                try
                 {
-                    // Use our own copy of this mutable type
-                    cachedPC.setFieldValue(fieldNumber, ((Date)unwrappedValue).clone());
+                    if (value.getClass().isInterface())
+                    {
+                        if (List.class.isAssignableFrom(value.getClass()) || mmd.getOrderMetaData() != null)
+                        {
+                            // List based
+                            returnColl = new ArrayList();
+                        }
+                        else
+                        {
+                            // Set based
+                            returnColl = new HashSet();
+                        }
+                    }
+                    else
+                    {
+                        if (value instanceof SCO)
+                        {
+                            returnColl = (Collection)((SCO)value).getValue().getClass().newInstance();
+                        }
+                        else
+                        {
+                            returnColl = (Collection)value.getClass().newInstance();
+                        }
+                    }
+
+                    // Recurse through elements, and put ids of elements in return value
+                    while (collIter.hasNext())
+                    {
+                        Object elem = collIter.next();
+                        if (elem == null)
+                        {
+                            returnColl.add(null); // Allow for null elements
+                        }
+                        else
+                        {
+                            returnColl.add(getCacheableIdForId(api, elem));
+                        }
+                    }
+
+                    // Put Collection<OID> in CachedPC
+                    cachedPC.setFieldValue(fieldNumber, returnColl);
+                    return;
                 }
-                else if (unwrappedValue instanceof Calendar)
+                catch (Exception e)
                 {
-                    // Use our own copy of this mutable type
-                    cachedPC.setFieldValue(fieldNumber, ((Calendar)unwrappedValue).clone());
-                }
-                else
-                {
-                    cachedPC.setFieldValue(fieldNumber, unwrappedValue);
+                    NucleusLogger.CACHE.warn("Unable to create object of type " + value.getClass().getName() + " for L2 caching : " + e.getMessage());
+
+                    // Contents not loaded so just mark as unloaded
+                    cachedPC.setLoadedField(fieldNumber, false);
+                    return;
                 }
             }
-            else if (value instanceof Date)
+
+            // Collection<Non-PC> so just return it
+            cachedPC.setFieldValue(fieldNumber, value);
+            return;
+        }
+        else if (mmd.hasArray())
+        {
+            // Array, maybe of Persistable objects
+            if (MetaDataUtils.getInstance().storesPersistable(mmd, ec))
             {
-                // Use our own copy of this mutable type
-                cachedPC.setFieldValue(fieldNumber, ((Date)value).clone());
+                if (mmd.isSerialized() || mmd.isEmbedded() || mmd.getArray().isSerializedElement() || mmd.getArray().isEmbeddedElement())
+                {
+                    // TODO Support serialised/embedded elements
+                    cachedPC.setLoadedField(fieldNumber, false);
+                    return;
+                }
+
+                Object[] returnArr = new Object[Array.getLength(value)];
+                for (int i=0;i<Array.getLength(value);i++)
+                {
+                    Object element = Array.get(value, i);
+                    if (element != null)
+                    {
+                        returnArr[i] = getCacheableIdForId(api, element);
+                    }
+                    else
+                    {
+                        returnArr[i] = null;
+                    }
+                }
+
+                // Store "id[]"
+                cachedPC.setFieldValue(fieldNumber, returnArr);
+                return;
             }
-            else if (value instanceof Calendar)
+
+            // Array element type is not persistable so just return the value
+            cachedPC.setFieldValue(fieldNumber, value);
+            return;
+        }
+    }
+
+    protected void processField(int fieldNumber, AbstractMemberMetaData mmd, Object value)
+    {
+        RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
+        if (relType == RelationType.NONE)
+        {
+            Object unwrappedValue =  value instanceof SCO ? ((SCO) value).getValue() : value;
+            cachedPC.setFieldValue(fieldNumber, copyValue(unwrappedValue));
+            return;
+        }
+
+        // 1-1, N-1 persistable field
+        if (mmd.isSerialized() || MetaDataUtils.isMemberEmbedded(mmd, relType, ec.getClassLoaderResolver(), ec.getMetaDataManager()))
+        {
+            if (ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CACHE_EMBEDDED))
             {
-                // Use our own copy of this mutable type
-                cachedPC.setFieldValue(fieldNumber, ((Calendar)value).clone());
+                // Put object in cached as (nested) CachedPC
+                ObjectProvider valueOP = ec.findObjectProvider(value);
+                int[] loadedFields = valueOP.getLoadedFieldNumbers();
+                CachedPC valueCachedPC = new CachedPC(value.getClass(), valueOP.getLoadedFields(), null);
+                valueOP.provideFields(loadedFields, new L2CachePopulateFieldManager(valueOP, valueCachedPC));
+
+                cachedPC.setFieldValue(fieldNumber, valueCachedPC);
             }
             else
             {
-                cachedPC.setFieldValue(fieldNumber, value);
+                // TODO Support serialised/embedded PC fields
+                cachedPC.setLoadedField(fieldNumber, false);
             }
+            return;
         }
+
+        // Put cacheable form of the id in CachedPC
+        cachedPC.setFieldValue(fieldNumber, getCacheableIdForId(ec.getApiAdapter(), value));
+        return;
     }
 
     private Object getCacheableIdForId(ApiAdapter api, Object pc)
