@@ -193,11 +193,11 @@ public abstract class Expression implements Serializable
     /** NOTIN **/
     public static final DyadicOperator OP_NOTIN = new DyadicOperator("NOT IN", 3, false);
     /** BITWISE OR **/
-    public static final DyadicOperator OP_BIT_OR = new DyadicOperator("|", 3, false);
+    public static final DyadicOperator OP_BIT_OR = new DyadicOperator("|", 3, false); // TODO Maybe move to after AND
     /** BITWISE XOR **/
-    public static final DyadicOperator OP_BIT_XOR = new DyadicOperator("^", 3, false);
+    public static final DyadicOperator OP_BIT_XOR = new DyadicOperator("^", 3, false); // TODO Maybe move to after AND
     /** BITWISE AND **/
-    public static final DyadicOperator OP_BIT_AND = new DyadicOperator("&", 3, false);
+    public static final DyadicOperator OP_BIT_AND = new DyadicOperator("&", 3, false); // TODO Maybe move to after AND
     /** ADD **/
     public static final DyadicOperator OP_ADD = new DyadicOperator("+", 4, true);
     /** SUB **/

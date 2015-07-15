@@ -209,24 +209,21 @@ public class ExpressionCompiler
         }
         else if (isOperator(node, "|"))
         {
-            // TODO Extract BITWISE OR - use Expression.OP_BIT_OR
             Expression left = compileExpression(node.getFirstChild());
             Expression right = compileExpression(node.getNextChild());
-            return new DyadicExpression(left,Expression.OP_OR,right);
+            return new DyadicExpression(left,Expression.OP_BIT_OR,right);
         }
         else if (isOperator(node, "^"))
         {
-            // TODO Extract BITWISE XOR - use Expression.OP_BIT_XOR
             Expression left = compileExpression(node.getFirstChild());
             Expression right = compileExpression(node.getNextChild());
-            return new DyadicExpression(left,Expression.OP_OR,right);
+            return new DyadicExpression(left,Expression.OP_BIT_XOR,right);
         }
         else if (isOperator(node, "&"))
         {
-            // TODO Extract BITWISE AND - use Expression.OP_BIT_AND
             Expression left = compileExpression(node.getFirstChild());
             Expression right = compileExpression(node.getNextChild());
-            return new DyadicExpression(left,Expression.OP_AND,right);
+            return new DyadicExpression(left,Expression.OP_BIT_AND,right);
         }
         return compileRelationalExpression(node);
     }

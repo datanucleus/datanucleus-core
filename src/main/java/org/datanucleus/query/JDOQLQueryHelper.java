@@ -170,6 +170,18 @@ public class JDOQLQueryHelper
             {
                 str.append(" || ");
             }
+            else if (dyExpr.getOperator() == Expression.OP_BIT_AND)
+            {
+                str.append(" & ");
+            }
+            else if (dyExpr.getOperator() == Expression.OP_BIT_OR)
+            {
+                str.append(" | ");
+            }
+            else if (dyExpr.getOperator() == Expression.OP_BIT_XOR)
+            {
+                str.append(" ^ ");
+            }
             else if (dyExpr.getOperator() == Expression.OP_ADD)
             {
                 str.append(" + ");

@@ -63,6 +63,18 @@ public class AbstractExpressionEvaluator implements org.datanucleus.query.expres
         {
             return processAndExpression(expr);
         }
+        else if (expr.getOperator() == Expression.OP_BIT_AND)
+        {
+            return processBitAndExpression(expr);
+        }
+        else if (expr.getOperator() == Expression.OP_BIT_OR)
+        {
+            return processBitOrExpression(expr);
+        }
+        else if (expr.getOperator() == Expression.OP_BIT_XOR)
+        {
+            return processBitXorExpression(expr);
+        }
         return compileRelationalExpression(expr);
     }
 
@@ -208,7 +220,7 @@ public class AbstractExpressionEvaluator implements org.datanucleus.query.expres
     }
 
     // Methods below here should be implemented by subclasses where they require that feature
- 
+
     /**
      * Method to process the supplied OR expression.
      * To be implemented by subclasses.
@@ -229,6 +241,36 @@ public class AbstractExpressionEvaluator implements org.datanucleus.query.expres
     protected Object processAndExpression(Expression expr)
     {
         throw new NucleusException("Operation AND is not supported by this mapper");
+    }
+
+    /**
+     * Method to process the supplied BITWISE OR expression. To be implemented by subclasses.
+     * @param expr The expression
+     * @return The result
+     */
+    protected Object processBitOrExpression(Expression expr)
+    {
+        throw new NucleusException("Operation BITWISE OR is not supported by this mapper");
+    }
+
+    /**
+     * Method to process the supplied BITWISE AND expression. To be implemented by subclasses.
+     * @param expr The expression
+     * @return The result
+     */
+    protected Object processBitAndExpression(Expression expr)
+    {
+        throw new NucleusException("Operation BITWISE AND is not supported by this mapper");
+    }
+
+    /**
+     * Method to process the supplied BITWISE XOR expression. To be implemented by subclasses.
+     * @param expr The expression
+     * @return The result
+     */
+    protected Object processBitXorExpression(Expression expr)
+    {
+        throw new NucleusException("Operation BITWISE XOR is not supported by this mapper");
     }
 
     /**
