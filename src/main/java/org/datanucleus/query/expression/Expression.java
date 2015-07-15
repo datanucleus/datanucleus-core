@@ -192,6 +192,12 @@ public abstract class Expression implements Serializable
     public static final DyadicOperator OP_IN = new DyadicOperator("IN", 3, false);
     /** NOTIN **/
     public static final DyadicOperator OP_NOTIN = new DyadicOperator("NOT IN", 3, false);
+    /** BITWISE OR **/
+    public static final DyadicOperator OP_BIT_OR = new DyadicOperator("|", 3, false);
+    /** BITWISE XOR **/
+    public static final DyadicOperator OP_BIT_XOR = new DyadicOperator("^", 3, false);
+    /** BITWISE AND **/
+    public static final DyadicOperator OP_BIT_AND = new DyadicOperator("&", 3, false);
     /** ADD **/
     public static final DyadicOperator OP_ADD = new DyadicOperator("+", 4, true);
     /** SUB **/
