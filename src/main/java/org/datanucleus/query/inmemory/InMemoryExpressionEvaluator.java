@@ -141,6 +141,95 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
     }
 
     /* (non-Javadoc)
+     * @see org.datanucleus.query.evaluator.AbstractExpressionEvaluator#processOrExpression(org.datanucleus.query.expression.Expression)
+     */
+    protected Object processOrExpression(Expression expr)
+    {
+        Object right = stack.pop();
+        Object left = stack.pop();
+        stack.push((left == Boolean.TRUE || right == Boolean.TRUE) ? Boolean.TRUE : Boolean.FALSE);
+        return stack.peek();
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.query.evaluator.AbstractExpressionEvaluator#processBitOrExpression(org.datanucleus.query.expression.Expression)
+     */
+    @Override
+    protected Object processBitOrExpression(Expression expr)
+    {
+        Object right = stack.pop();
+        Object left = stack.pop();
+        if (left instanceof Boolean && right instanceof Boolean)
+        {
+            // Treat as boolean logical OR
+            stack.push(left);
+            stack.push(right);
+            return processOrExpression(expr);
+        }
+        if (right instanceof Number && left instanceof Number)
+        {
+            // Treat as integers
+            Number result = ((Number)left).intValue() | ((Number)right).intValue();
+            stack.push(result);
+            return result;
+        }
+
+        return super.processBitOrExpression(expr);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.query.evaluator.AbstractExpressionEvaluator#processBitAndExpression(org.datanucleus.query.expression.Expression)
+     */
+    @Override
+    protected Object processBitAndExpression(Expression expr)
+    {
+        Object right = stack.pop();
+        Object left = stack.pop();
+        if (left instanceof Boolean && right instanceof Boolean)
+        {
+            // Treat as boolean logical AND
+            stack.push(left);
+            stack.push(right);
+            return processAndExpression(expr);
+        }
+        if (right instanceof Number && left instanceof Number)
+        {
+            // Treat as integers
+            Number result = ((Number)left).intValue() & ((Number)right).intValue();
+            stack.push(result);
+            return result;
+        }
+
+        return super.processBitAndExpression(expr);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.query.evaluator.AbstractExpressionEvaluator#processBitXorExpression(org.datanucleus.query.expression.Expression)
+     */
+    @Override
+    protected Object processBitXorExpression(Expression expr)
+    {
+        Object right = stack.pop();
+        Object left = stack.pop();
+        if (left instanceof Boolean && right instanceof Boolean)
+        {
+            // Treat as boolean logical OR
+            stack.push(left);
+            stack.push(right);
+            return processOrExpression(expr);
+        }
+        if (right instanceof Number && left instanceof Number)
+        {
+            // Treat as integers
+            Number result = ((Number)left).intValue() ^ ((Number)right).intValue();
+            stack.push(result);
+            return result;
+        }
+
+        return super.processBitXorExpression(expr);
+    }
+
+    /* (non-Javadoc)
      * @see org.datanucleus.query.evaluator.AbstractExpressionEvaluator#processEqExpression(org.datanucleus.query.expression.Expression)
      */
     protected Object processEqExpression(Expression expr)
@@ -201,17 +290,6 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
         }
         Boolean result = QueryUtils.compareExpressionValues(left, right, expr.getOperator()) ? Boolean.TRUE : Boolean.FALSE;
         stack.push(result);
-        return stack.peek();
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.query.evaluator.AbstractExpressionEvaluator#processOrExpression(org.datanucleus.query.expression.Expression)
-     */
-    protected Object processOrExpression(Expression expr)
-    {
-        Object right = stack.pop();
-        Object left = stack.pop();
-        stack.push((left == Boolean.TRUE || right == Boolean.TRUE) ? Boolean.TRUE : Boolean.FALSE);
         return stack.peek();
     }
 
