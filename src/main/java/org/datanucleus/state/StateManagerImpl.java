@@ -4249,6 +4249,8 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         }
     }
 
+    boolean validating = false;
+
     /**
      * Validates whether the persistence capable instance exists in the datastore.
      * If the instance doesn't exist in the datastore, this method will fail raising a 
@@ -4278,18 +4280,30 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             }
             if ((fieldNumbers != null && fieldNumbers.length > 0) || versionNeedsLoading)
             {
-                transitionReadField(false);
-                // Some fetch plan fields, or the version are not loaded so try to load them, and this by itself 
-                // validates the existence. Loads the fields in the current FetchPlan (JDO2 spec 12.6.5)
-                fieldNumbers = myFP.getMemberNumbers();
-                if (fieldNumbers != null || versionNeedsLoading)
+                if (!validating)
                 {
-                    boolean callPostLoad = myFP.isToCallPostLoadFetchPlan(this.loadedFields);
-                    setTransactionalVersion(null); // Make sure we get the latest version
-                    loadFieldsFromDatastore(fieldNumbers);
-                    if (callPostLoad)
+                    try
                     {
-                        postLoad();
+                        // It is possible to get recursive validation when using things like ODF, Cassandra etc and having a bidir relation, and nontransactional.
+                        validating = true;
+                        transitionReadField(false);
+                        // Some fetch plan fields, or the version are not loaded so try to load them, and this by itself 
+                        // validates the existence. Loads the fields in the current FetchPlan (JDO2 spec 12.6.5)
+                        fieldNumbers = myFP.getMemberNumbers();
+                        if (fieldNumbers != null || versionNeedsLoading)
+                        {
+                            boolean callPostLoad = myFP.isToCallPostLoadFetchPlan(this.loadedFields);
+                            setTransactionalVersion(null); // Make sure we get the latest version
+                            loadFieldsFromDatastore(fieldNumbers);
+                            if (callPostLoad)
+                            {
+                                postLoad();
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        validating = false;
                     }
                 }
             }
