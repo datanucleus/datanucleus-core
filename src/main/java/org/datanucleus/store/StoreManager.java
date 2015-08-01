@@ -82,6 +82,7 @@ public interface StoreManager
     public static final String OPTION_TXN_ISOLATION_REPEATABLE_READ = "TransactionIsolationLevel.repeatable-read";
     public static final String OPTION_TXN_ISOLATION_SERIALIZABLE = "TransactionIsolationLevel.serializable";
     public static final String OPTION_QUERY_CANCEL = "Query.Cancel";
+    public static final String OPTION_QUERY_JDOQL_BITWISE_OPS = "Query.JDOQL.BitwiseOperations";
     public static final String OPTION_DATASTORE_TIMEOUT = "Datastore.Timeout";
 
     Collection<String> getSupportedOptions();
