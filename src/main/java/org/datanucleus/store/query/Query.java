@@ -84,6 +84,8 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     public static final String EXTENSION_MULTITHREAD = "datanucleus.query.multithread";
     public static final String EXTENSION_RESULT_CACHE_TYPE = "datanucleus.query.resultCacheType";
     public static final String EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE = "datanucleus.query.closeResultsAtManagerClose";
+    public static final String EXTENSION_JDOQL_STRICT = "datanucleus.jdoql.strict";
+    public static final String EXTENSION_JPQL_STRICT = "datanucleus.jpql.strict";
 
     protected final transient StoreManager storeMgr;
 

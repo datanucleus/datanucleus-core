@@ -268,7 +268,7 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
         }
         JavaQueryCompiler compiler = new JPQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), from, candidateClass, candidateCollection, 
             this.filter, getParsedImports(), this.ordering, this.result, this.grouping, this.having, explicitParameters, update);
-        if (getBooleanExtensionProperty("datanucleus.strictJPQL", false))
+        if (getBooleanExtensionProperty(EXTENSION_JPQL_STRICT, false))
         {
             compiler.setOption("jpql.strict", "true");
         }
@@ -361,7 +361,7 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
 
             JavaQueryCompiler subCompiler = new JPQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), subquery.from, subquery.candidateClass, null,
                 subquery.filter, getParsedImports(), subquery.ordering, subquery.result, subquery.grouping, subquery.having, null, null);
-            if (getBooleanExtensionProperty("datanucleus.strictJPQL", false))
+            if (getBooleanExtensionProperty(EXTENSION_JPQL_STRICT, false))
             {
                 subCompiler.setOption("jpql.strict", "true");
             }

@@ -355,7 +355,7 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
         }
         JDOQLCompiler compiler = new JDOQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), from, candidateClass, candidateCollection, 
             this.filter, getParsedImports(), this.ordering, this.result, this.grouping, this.having, explicitParameters, explicitVariables, this.update);
-        if (getBooleanExtensionProperty("datanucleus.strictJDOQL", false))
+        if (getBooleanExtensionProperty(EXTENSION_JDOQL_STRICT, false))
         {
             compiler.setOption("jdoql.strict", "true");
         }
@@ -440,7 +440,7 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
 
             JDOQLCompiler subCompiler = new JDOQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), subquery.from, subquery.candidateClass, null,
                 subquery.filter, getParsedImports(), subquery.ordering, subquery.result, subquery.grouping, subquery.having, subquery.explicitParameters, null, null);
-            if (getBooleanExtensionProperty("datanucleus.strictJDOQL", false))
+            if (getBooleanExtensionProperty(EXTENSION_JDOQL_STRICT, false))
             {
                 subCompiler.setOption("jdoql.strict", "true");
             }
