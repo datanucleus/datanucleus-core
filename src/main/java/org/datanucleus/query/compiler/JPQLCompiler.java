@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.query.compiler;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +57,12 @@ public class JPQLCompiler extends JavaQueryCompiler
      */
     public QueryCompilation compile(Map parameters, Map subqueryMap)
     {
-        parser = new JPQLParser(null); // TODO Add options
+        Map parseOptions = new HashMap();
+        if (options != null && options.containsKey("jpql.strict"))
+        {
+            parseOptions.put("jpql.strict", options.get("jpql.strict"));
+        }
+        parser = new JPQLParser(parseOptions);
         symtbl = new SymbolTable();
         symtbl.setSymbolResolver(this);
         if (parentCompiler != null)

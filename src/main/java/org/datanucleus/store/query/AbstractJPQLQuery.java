@@ -266,10 +266,12 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
             startTime = System.currentTimeMillis();
             NucleusLogger.QUERY.debug(Localiser.msg("021044", getLanguage(), getSingleStringQuery()));
         }
-        JavaQueryCompiler compiler = new JPQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), 
-            from, candidateClass, candidateCollection, 
-            this.filter, getParsedImports(), this.ordering, this.result, this.grouping, this.having, 
-            explicitParameters, update);
+        JavaQueryCompiler compiler = new JPQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), from, candidateClass, candidateCollection, 
+            this.filter, getParsedImports(), this.ordering, this.result, this.grouping, this.having, explicitParameters, update);
+        if (getBooleanExtensionProperty("datanucleus.strictJPQL", false))
+        {
+            compiler.setOption("jpql.strict", "true");
+        }
         compilation = compiler.compile(parameterValues, subqueries);
         if (QueryUtils.queryReturnsSingleRow(this))
         {
@@ -286,8 +288,7 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
         }
         if (NucleusLogger.QUERY.isDebugEnabled())
         {
-            NucleusLogger.QUERY.debug(Localiser.msg("021045", getLanguage(), 
-                "" + (System.currentTimeMillis() - startTime)));
+            NucleusLogger.QUERY.debug(Localiser.msg("021045", getLanguage(), "" + (System.currentTimeMillis() - startTime)));
         }
 
         if (subqueries != null)
@@ -355,14 +356,15 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
                 startTime = System.currentTimeMillis();
-                NucleusLogger.QUERY.debug(Localiser.msg("021044", getLanguage(), 
-                    ((AbstractJPQLQuery)subquery).getSingleStringQuery()));
+                NucleusLogger.QUERY.debug(Localiser.msg("021044", getLanguage(), ((AbstractJPQLQuery)subquery).getSingleStringQuery()));
             }
 
-            JavaQueryCompiler subCompiler = new JPQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(),
-                subquery.from, subquery.candidateClass, null,
-                subquery.filter, getParsedImports(), subquery.ordering, subquery.result, 
-                subquery.grouping, subquery.having, null, null);
+            JavaQueryCompiler subCompiler = new JPQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), subquery.from, subquery.candidateClass, null,
+                subquery.filter, getParsedImports(), subquery.ordering, subquery.result, subquery.grouping, subquery.having, null, null);
+            if (getBooleanExtensionProperty("datanucleus.strictJPQL", false))
+            {
+                subCompiler.setOption("jpql.strict", "true");
+            }
             subCompiler.setLinkToParentQuery(parentCompiler, null);
             QueryCompilation subqueryCompilation = subCompiler.compile(parameterValues, subquery.subqueries);
             parentCompilation.addSubqueryCompilation(entry.getKey(), subqueryCompilation);

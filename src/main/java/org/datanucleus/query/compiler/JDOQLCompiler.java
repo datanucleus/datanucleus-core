@@ -86,6 +86,10 @@ public class JDOQLCompiler extends JavaQueryCompiler
         {
             parseOptions.put("implicitParameters", true);
         }
+        if (options != null && options.containsKey("jdoql.strict"))
+        {
+            parseOptions.put("jdoql.strict", options.get("jdoql.strict"));
+        }
         parser = new JDOQLParser(parseOptions);
         symtbl = new SymbolTable();
         symtbl.setSymbolResolver(this);

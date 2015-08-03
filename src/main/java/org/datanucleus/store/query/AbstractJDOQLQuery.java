@@ -353,16 +353,20 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
             startTime = System.currentTimeMillis();
             NucleusLogger.QUERY.debug(Localiser.msg("021044", getLanguage(), getSingleStringQuery()));
         }
-        JDOQLCompiler compiler = new JDOQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), 
-            from, candidateClass, candidateCollection, 
-            this.filter, getParsedImports(), this.ordering, this.result, this.grouping, this.having, 
-            explicitParameters, explicitVariables, this.update);
+        JDOQLCompiler compiler = new JDOQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), from, candidateClass, candidateCollection, 
+            this.filter, getParsedImports(), this.ordering, this.result, this.grouping, this.having, explicitParameters, explicitVariables, this.update);
+        if (getBooleanExtensionProperty("datanucleus.strictJDOQL", false))
+        {
+            compiler.setOption("jdoql.strict", "true");
+        }
+
         boolean allowAllSyntax = ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
         if (ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL) != null)
         {
             allowAllSyntax = ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
         }
         compiler.setAllowAll(allowAllSyntax);
+
         compilation = compiler.compile(parameterValues, subqueries);
         if (QueryUtils.queryReturnsSingleRow(this))
         {
@@ -431,20 +435,23 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
                 startTime = System.currentTimeMillis();
-                NucleusLogger.QUERY.debug(Localiser.msg("021044", getLanguage(), 
-                    ((AbstractJDOQLQuery)subquery).getSingleStringQuery()));
+                NucleusLogger.QUERY.debug(Localiser.msg("021044", getLanguage(), ((AbstractJDOQLQuery)subquery).getSingleStringQuery()));
             }
 
-            JDOQLCompiler subCompiler = new JDOQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(),
-                subquery.from, subquery.candidateClass, null,
-                subquery.filter, getParsedImports(), subquery.ordering, subquery.result, 
-                subquery.grouping, subquery.having, subquery.explicitParameters, null, null);
+            JDOQLCompiler subCompiler = new JDOQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), subquery.from, subquery.candidateClass, null,
+                subquery.filter, getParsedImports(), subquery.ordering, subquery.result, subquery.grouping, subquery.having, subquery.explicitParameters, null, null);
+            if (getBooleanExtensionProperty("datanucleus.strictJDOQL", false))
+            {
+                subCompiler.setOption("jdoql.strict", "true");
+            }
+
             boolean allowAllSyntax = ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
             if (ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL) != null)
             {
                 allowAllSyntax = ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
             }
             subCompiler.setAllowAll(allowAllSyntax);
+
             subCompiler.setLinkToParentQuery(parentCompiler, subqueryDefinition.getParameterMap());
             QueryCompilation subqueryCompilation = subCompiler.compile(parameterValues, null);
             if (QueryUtils.queryReturnsSingleRow(subquery))

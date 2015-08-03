@@ -103,6 +103,8 @@ public abstract class JavaQueryCompiler implements SymbolResolver
 
     protected Map<String, String> queryMethodAliasByPrefix = null;
 
+    protected Map<String, Object> options;
+
     public JavaQueryCompiler(MetaDataManager metaDataManager, ClassLoaderResolver clr, 
             String from, Class candidateClass, Collection candidates,
             String filter, Imports imports, String ordering, String result, String grouping, String having, 
@@ -153,6 +155,15 @@ public abstract class JavaQueryCompiler implements SymbolResolver
      * @return Name of the query language.
      */
     public abstract String getLanguage();
+
+    public void setOption(String name, Object value)
+    {
+        if (options == null)
+        {
+            options = new HashMap();
+        }
+        options.put(name, value);
+    }
 
     /**
      * Method to set the linkage to the parent query.

@@ -41,12 +41,18 @@ public class JPQLParser implements Parser
     /** Characters that parameters can be prefixed by. */
     private static String paramPrefixes = ":?";
 
+    private boolean strictJPQL = false;
+
     /**
      * Constructor for a JPQL Parser.
      * @param options parser options
      */
     public JPQLParser(Map options)
     {
+        if (options != null && options.containsKey("jpql.strict"))
+        {
+            strictJPQL = Boolean.valueOf((String)options.get("jpql.strict"));
+        }
     }
 
     /* (non-Javadoc)
@@ -1174,6 +1180,39 @@ public class JPQLParser implements Parser
             subNode.appendChildNode(subqueryNode);
             stack.push(subNode);
             return;
+        }
+
+        if (!strictJPQL)
+        {
+            // Series of user-convenience methods that are not part of strict JPQL
+            if (p.parseStringIgnoreCase("COUNT(*)"))
+            {
+                // Convert to a method call of COUNTSTAR
+                Node node = new Node(NodeType.INVOKE, "COUNTSTAR");
+                stack.push(node);
+                return;
+            }
+            else if (p.parseStringIgnoreCase("CURRENT_DATE()")) // Some people put "()" in JPQL
+            {
+                // Convert to a method call of CURRENT_DATE
+                Node node = new Node(NodeType.INVOKE, "CURRENT_DATE");
+                stack.push(node);
+                return;
+            }
+            else if (p.parseStringIgnoreCase("CURRENT_TIMESTAMP()")) // Some people put "()" in JPQL
+            {
+                // Convert to a method call
+                Node node = new Node(NodeType.INVOKE, "CURRENT_TIMESTAMP");
+                stack.push(node);
+                return;
+            }
+            else if (p.parseStringIgnoreCase("CURRENT_TIME()")) // Some people put "()" in JPQL
+            {
+                // Convert to a method call
+                Node node = new Node(NodeType.INVOKE, "CURRENT_TIME");
+                stack.push(node);
+                return;
+            }
         }
 
         if (p.parseStringIgnoreCase("CURRENT_DATE"))

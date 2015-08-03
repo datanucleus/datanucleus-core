@@ -51,7 +51,7 @@ public class JDOQLParser implements Parser
 
     private ParameterType paramType = ParameterType.IMPLICIT;
 
-    private String jdoqlMode = "DataNucleus";
+    private boolean strictJDOQL = false;
 
     private Lexer p;
     private Deque<Node> stack = new ArrayDeque<Node>();
@@ -68,9 +68,9 @@ public class JDOQLParser implements Parser
      */
     public JDOQLParser(Map options)
     {
-        if (options != null && options.containsKey("jdoql.level"))
+        if (options != null && options.containsKey("jdoql.strict"))
         {
-            jdoqlMode = (String)options.get("jdoql.level");
+            strictJDOQL = Boolean.valueOf((String)options.get("jdoql.strict"));
         }
         if (options != null && options.containsKey("explicitParameters"))
         {
@@ -1043,7 +1043,7 @@ public class JDOQLParser implements Parser
             p.skipWS();
             p.parseChar('(');
 
-            if (jdoqlMode.equals("JDO2"))
+            if (strictJDOQL)
             {
                 // Enable strictness checking for levels of JDOQL
                 // Note that this only checks the method name and not the arguments/types
