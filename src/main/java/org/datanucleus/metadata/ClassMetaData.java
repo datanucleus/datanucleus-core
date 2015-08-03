@@ -430,10 +430,8 @@ public class ClassMetaData extends AbstractClassMetaData
             Field[] clsFields = cls.getDeclaredFields();
             for (int i=0;i<clsFields.length;i++)
             {
-                // Limit to fields in this class, that aren't enhancer-added fields
-                // that aren't inner class fields, and that aren't static
-                if (clsFields[i].getDeclaringClass().getName().equals(fullName) &&
-                    !clsFields[i].getName().startsWith(mmgr.getEnhancedMethodNamePrefix()) &&
+                // Limit to fields in this class, that aren't enhancer-added fields that aren't inner class fields, and that aren't static
+                if (clsFields[i].getDeclaringClass().getName().equals(fullName) && !isEnhancerField(clsFields[i].getName(), mmgr) &&
                     !ClassUtils.isInnerClass(clsFields[i].getName()) && !Modifier.isStatic(clsFields[i].getModifiers()))
                 {
                     // Find if there is metadata for this field
@@ -466,7 +464,7 @@ public class ClassMetaData extends AbstractClassMetaData
                 Field[] theclsFields = theClass.getDeclaredFields();
                 for (int i=0;i<theclsFields.length;i++)
                 {
-                    if (!theclsFields[i].getName().startsWith(mmgr.getEnhancedMethodNamePrefix()) &&
+                    if (!isEnhancerField(theclsFields[i].getName(), mmgr) &&
                         !ClassUtils.isInnerClass(theclsFields[i].getName()) && !Modifier.isStatic(theclsFields[i].getModifiers()) &&
                         theclsFields[i].getGenericType() != null && theclsFields[i].getGenericType() instanceof TypeVariable)
                     {
@@ -546,6 +544,17 @@ public class ClassMetaData extends AbstractClassMetaData
             NucleusLogger.METADATA.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    private boolean isEnhancerField(String fieldName, MetaDataManager mmgr)
+    {
+        String prefix = mmgr.getEnhancedMethodNamePrefix();
+        if (fieldName.startsWith(mmgr.getEnhancedMethodNamePrefix()) && fieldName.length() > prefix.length())
+        {
+            // TODO Improve this to allow fields that start "dn" but aren't enhancer fields
+            return true;
+        }
+        return false;
     }
 
     /**
