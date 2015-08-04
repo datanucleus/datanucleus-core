@@ -26,6 +26,12 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class TypeConverterHelper
 {
+    /**
+     * Method to return the member type for the specified TypeConverter.
+     * @param conv The converter
+     * @param datastoreType The datastore type for this converter
+     * @return The member type
+     */
     public static Class getMemberTypeForTypeConverter(TypeConverter conv, Class datastoreType)
     {
         try
@@ -49,6 +55,12 @@ public class TypeConverterHelper
         return null;
     }
 
+    /**
+     * Method to return the datastore type for the specified TypeConverter.
+     * @param conv The converter
+     * @param memberType The member type
+     * @return The datastore type
+     */
     public static Class getDatastoreTypeForTypeConverter(TypeConverter conv, Class memberType)
     {
         try
