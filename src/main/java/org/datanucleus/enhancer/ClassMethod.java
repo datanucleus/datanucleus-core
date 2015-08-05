@@ -269,7 +269,16 @@ public abstract class ClassMethod
                 {
                     sb.append(", ");
                 }
-                sb.append(argTypes[i]).append(" ").append(argNames[i]);
+                // TODO Cater for primitive arrays so we put the correct name
+                if (argTypes[i] instanceof Class)
+                {
+                    sb.append(((Class)argTypes[i]).getName());
+                }
+                else
+                {
+                    sb.append(argTypes[i]);
+                }
+                sb.append(" ").append(argNames[i]);
             }
         }
         sb.append(")");
