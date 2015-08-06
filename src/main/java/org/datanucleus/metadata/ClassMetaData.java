@@ -431,8 +431,9 @@ public class ClassMetaData extends AbstractClassMetaData
             for (int i=0;i<clsFields.length;i++)
             {
                 // Limit to fields in this class, that aren't enhancer-added fields that aren't inner class fields, and that aren't static
-                if (clsFields[i].getDeclaringClass().getName().equals(fullName) && !isEnhancerField(clsFields[i].getName(), mmgr) &&
-                    !ClassUtils.isInnerClass(clsFields[i].getName()) && !Modifier.isStatic(clsFields[i].getModifiers()))
+                if (!ClassUtils.isInnerClass(clsFields[i].getName()) && !Modifier.isStatic(clsFields[i].getModifiers()) &&
+                    !isEnhancerField(clsFields[i].getName(), mmgr) &&
+                    clsFields[i].getDeclaringClass().getName().equals(fullName))
                 {
                     // Find if there is metadata for this field
                     // TODO : This will not check if the name is a field! so we can miss field+property clashes
@@ -464,8 +465,8 @@ public class ClassMetaData extends AbstractClassMetaData
                 Field[] theclsFields = theClass.getDeclaredFields();
                 for (int i=0;i<theclsFields.length;i++)
                 {
-                    if (!isEnhancerField(theclsFields[i].getName(), mmgr) &&
-                        !ClassUtils.isInnerClass(theclsFields[i].getName()) && !Modifier.isStatic(theclsFields[i].getModifiers()) &&
+                    if (!ClassUtils.isInnerClass(theclsFields[i].getName()) && !Modifier.isStatic(theclsFields[i].getModifiers()) &&
+                        !isEnhancerField(theclsFields[i].getName(), mmgr) &&
                         theclsFields[i].getGenericType() != null && theclsFields[i].getGenericType() instanceof TypeVariable)
                     {
                         TypeVariable fieldTypeVar = (TypeVariable) theclsFields[i].getGenericType();
@@ -549,11 +550,26 @@ public class ClassMetaData extends AbstractClassMetaData
     private boolean isEnhancerField(String fieldName, MetaDataManager mmgr)
     {
         String prefix = mmgr.getEnhancedMethodNamePrefix();
-        if (fieldName.startsWith(mmgr.getEnhancedMethodNamePrefix()) && fieldName.length() > prefix.length())
+        if (!fieldName.startsWith(prefix))
         {
-            // TODO Improve this to allow fields that start "dn" but aren't enhancer fields
+            return false;
+        }
+
+        // TODO Take these from org.datanucleus.enhancer class at some point to avoid hardcoding
+        if (fieldName.equals("dnStateManager") || fieldName.equals("dnFlags") || fieldName.equals("dnDetachedState"))
+        {
             return true;
         }
+
+        // Static fields - commented out. Uncomment if we ever support persisting static fields
+        /*if (fieldName.equals("dnFieldFlags") ||
+            fieldName.equals("dnFieldNames") ||
+            fieldName.equals("dnFieldTypes") ||
+            fieldName.equals("dnPersistableSuperclass") ||
+            fieldName.equals("dnInheritedFieldCount"))
+        {
+            return true;
+        }*/
         return false;
     }
 
