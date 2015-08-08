@@ -122,6 +122,21 @@ public interface TypeManager
     Class getTypeForSecondClassWrapper(String className);
 
     /**
+     * Obtains the registered ContainerHandler for the given containerClass. ContainerHandler are specified via the plugin mechanism using the
+     * container-handler attribute of the java-type element.  
+     * @param containerClass The class of the container.
+     * @return The respective ContainerHandler if registered or null if no ContainerHandler is found for the containerClass.
+     */
+     <H extends ContainerHandler> H getContainerHandler(Class containerClass);
+    
+     /**
+     * Convenience method to obtain the ContainerAdapter using the container object instance
+     * @param container The container instance
+     * @return The ContainerAdapter for the respective container or null if it's not a supported container
+     */
+    ContainerAdapter getContainerAdapter(Object container);
+
+    /**
      * Accessor for the type converter with the provided name.
      * This is used when the user has specified metadata for a field to use a particular named converter.
      * @param converterName Name of the converter
@@ -176,4 +191,5 @@ public interface TypeManager
      * @return The available Type Converters
      */
     Collection<TypeConverter> getTypeConvertersForType(Class memberType);
+    
 }
