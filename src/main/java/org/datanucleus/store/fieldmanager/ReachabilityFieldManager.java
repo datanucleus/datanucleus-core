@@ -17,9 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.fieldmanager;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
@@ -27,6 +24,7 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -101,6 +99,26 @@ public class ReachabilityFieldManager extends AbstractFieldManager
             }
         }
     }
+    
+    private void processContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd)
+    {
+        // Process all objects of the Container that are PC
+        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+        {
+            // TODO Renato Remove 007003 from localizer
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007002", mmd.getFullFieldName()));
+        }
+        
+        ApiAdapter api = op.getExecutionContext().getApiAdapter();
+        TypeManager typeManager = op.getExecutionContext().getTypeManager();
+        for (Object object : typeManager.getContainerAdapter(container))
+        {
+            if (api.isPersistable(object))
+            {
+                processPersistable(object, mmd);
+            }    
+        }
+    }
 
     /**
      * Method to store an object field.
@@ -113,93 +131,26 @@ public class ReachabilityFieldManager extends AbstractFieldManager
         if (value != null)
         {
             boolean persistCascade = mmd.isCascadePersist();
-            RelationType relType = mmd.getRelationType(op.getExecutionContext().getClassLoaderResolver());
-            ApiAdapter api = op.getExecutionContext().getApiAdapter();
+            
             if (persistCascade)
             {
-                if (RelationType.isRelationSingleValued(relType))
-                {
-                    // Process PC fields
-                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                RelationType relType = mmd.getRelationType(op.getExecutionContext().getClassLoaderResolver());
+                if ( relType != RelationType.NONE ){
+                    
+                    if ( mmd.hasContainer() )
                     {
-                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("007004", mmd.getFullFieldName()));
+                        processContainer(fieldNumber, value, mmd);
                     }
-                    processPersistable(value, mmd);
-                }
-                else if (RelationType.isRelationMultiValued(relType))
-                {
-                    if (value instanceof Collection)
+                    else
                     {
-                        // Process all elements of the Collection that are PC
+                        // Process PC fields
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007002", mmd.getFullFieldName()));
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007004", mmd.getFullFieldName()));
                         }
-                        Collection coll = (Collection)value;
-                        Iterator iter = coll.iterator();
-                        while (iter.hasNext())
-                        {
-                            Object element = iter.next();
-                            if (api.isPersistable(element))
-                            {
-                                processPersistable(element, mmd);
-                            }
-                        }
+                        
+                        processPersistable(value, mmd);
                     }
-                    else if (value instanceof Map)
-                    {
-                        // Process all keys, values of the Map that are PC
-                        Map map = (Map)value;
-
-                        // Process any keys that are persistable
-                        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                        {
-                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007002", mmd.getFullFieldName()));
-                        }
-                        Set keys = map.keySet();
-                        Iterator iter = keys.iterator();
-                        while (iter.hasNext())
-                        {
-                            Object mapKey = iter.next();
-                            if (api.isPersistable(mapKey))
-                            {
-                                processPersistable(mapKey, mmd);
-                            }
-                        }
-
-                        // Process any values that are persistable
-                        Collection values = map.values();
-                        iter = values.iterator();
-                        while (iter.hasNext())
-                        {
-                            Object mapValue = iter.next();
-                            if (api.isPersistable(mapValue))
-                            {
-                                processPersistable(mapValue, mmd);
-                            }
-                        }
-                    }
-                    else if (value instanceof Object[])
-                    {
-                        // Process all array elements that are PC
-                        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                        {
-                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007003", mmd.getFullFieldName()));
-                        }
-                        Object[] array = (Object[]) value;
-                        for (int i=0;i<array.length;i++)
-                        {
-                            Object element = array[i];
-                            if (api.isPersistable(element))
-                            {
-                                processPersistable(element, mmd);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    // Primitive, or primitive array, or some unsupported container type
                 }
             }
         }

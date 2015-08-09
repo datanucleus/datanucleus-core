@@ -17,12 +17,11 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.fieldmanager;
 
-import java.util.Collection;
-import java.util.Map;
-
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.store.types.ContainerAdapter;
+import org.datanucleus.store.types.TypeManager;
 
 /**
  * Manager that nullifies any Collection/Map/PC fields of the object.
@@ -50,42 +49,30 @@ public class NullifyRelationFieldManager extends AbstractFieldManager
     public Object fetchObjectField(int fieldNumber)
     {
         Object value = op.provideField(fieldNumber);
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-        RelationType relType = mmd.getRelationType(op.getExecutionContext().getClassLoaderResolver());
-        if (value == null)
+        
+        if (value != null)
         {
-            return null;
-        }
-        else if (RelationType.isRelationSingleValued(relType))
-        {
-            // Process PC fields
-            op.makeDirty(fieldNumber);
-            return null;
-        }
-        else if (RelationType.isRelationMultiValued(relType))
-        {
-            if (value instanceof Collection)
+            AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            RelationType relType = mmd.getRelationType(op.getExecutionContext().getClassLoaderResolver());
+            
+            // do not need to nullify fields that are not references and resides embedded in this object
+            if (relType != RelationType.NONE)
             {
-                // Process Collection fields
+                if (mmd.hasContainer())
+                {
+                    TypeManager typeManager = op.getExecutionContext().getTypeManager();
+                    ContainerAdapter containerAdapter = typeManager.getContainerAdapter(value);
+                    containerAdapter.clear();
+
+                    return containerAdapter.getContainer();
+                }
+                
+                // Process PC fields
                 op.makeDirty(fieldNumber);
-                ((Collection)value).clear();
-                return value;
-            }
-            else if (value instanceof Map)
-            {
-                // Process Map fields
-                op.makeDirty(fieldNumber);
-                ((Map)value).clear();
-                return value;
-            }
-            else if (value.getClass().isArray() && Object.class.isAssignableFrom(value.getClass().getComponentType()))
-            {
-                // Process object array fields
-                // TODO Check if the array element is PC and nullify
+                return null;
             }
         }
 
-        //do not need to nullify fields that are not references and resides embedded in this object
         return value;
     }
 

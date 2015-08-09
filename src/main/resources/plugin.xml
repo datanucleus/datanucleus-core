@@ -163,73 +163,95 @@ Contributors:
         <java-type name="java.util.TimeZone" dfg="true" embedded="true" converter-name="dn.timezone-string"/>
 
         <java-type name="java.util.ArrayList" wrapper-type="org.datanucleus.store.types.wrappers.ArrayList"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.ArrayList"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.ArrayList" 
+            container-handler="org.datanucleus.store.types.containers.ArrayListHandler" />
         <java-type name="java.util.Arrays$ArrayList" wrapper-type="org.datanucleus.store.types.wrappers.List"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.List"/>
-        <java-type name="java.util.BitSet" wrapper-type="org.datanucleus.store.types.wrappers.BitSet" converter-name="dn.bitset-string"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.List"
+            container-handler="org.datanucleus.store.types.containers.ArrayListHandler" />
+        <java-type name="java.util.BitSet" wrapper-type="org.datanucleus.store.types.wrappers.BitSet" converter-name="dn.bitset-string" />
         <java-type name="java.util.Collection" wrapper-type="org.datanucleus.store.types.wrappers.Collection"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Collection"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Collection"
+            container-handler="org.datanucleus.store.types.containers.JDKCollectionHandler"/>
         <java-type name="java.util.HashMap" wrapper-type="org.datanucleus.store.types.wrappers.HashMap"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.HashMap"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.HashMap"
+            container-handler="org.datanucleus.store.types.containers.HashMapHandler"/>
         <java-type name="java.util.HashSet" wrapper-type="org.datanucleus.store.types.wrappers.HashSet"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.HashSet"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.HashSet" 
+            container-handler="org.datanucleus.store.types.containers.HashSetHandler"/>
         <java-type name="java.util.Hashtable" wrapper-type="org.datanucleus.store.types.wrappers.Hashtable"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Hashtable"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Hashtable"
+            container-handler="org.datanucleus.store.types.containers.HashtableHandler"/>
         <java-type name="java.util.LinkedHashMap" wrapper-type="org.datanucleus.store.types.wrappers.LinkedHashMap"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.LinkedHashMap"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.LinkedHashMap"
+            container-handler="org.datanucleus.store.types.containers.LinkedHashMapHandler"/>
         <java-type name="java.util.LinkedHashSet" wrapper-type="org.datanucleus.store.types.wrappers.LinkedHashSet"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.LinkedHashSet"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.LinkedHashSet"
+            container-handler="org.datanucleus.store.types.containers.LinkedHashSetHandler"/>
         <java-type name="java.util.LinkedList" wrapper-type="org.datanucleus.store.types.wrappers.LinkedList"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.LinkedList"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.LinkedList"
+            container-handler="org.datanucleus.store.types.containers.LinkedListHandler"/>
         <java-type name="java.util.List" wrapper-type="org.datanucleus.store.types.wrappers.List"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.List"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.List" 
+            container-handler="org.datanucleus.store.types.containers.ArrayListHandler"/>
         <java-type name="java.util.Map" wrapper-type="org.datanucleus.store.types.wrappers.Map"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Map"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Map"
+            container-handler="org.datanucleus.store.types.containers.HashMapHandler"/>
         <java-type name="java.util.PriorityQueue" wrapper-type="org.datanucleus.store.types.wrappers.PriorityQueue"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.PriorityQueue"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.PriorityQueue"
+            container-handler="org.datanucleus.store.types.containers.PriorityQueueHandler"/>
         <java-type name="java.util.Properties" wrapper-type="org.datanucleus.store.types.wrappers.Properties"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Properties"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Properties"
+            container-handler="org.datanucleus.store.types.containers.PropertiesHandler"/>
         <java-type name="java.util.Queue" wrapper-type="org.datanucleus.store.types.wrappers.Queue"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Queue"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Queue"
+            container-handler="org.datanucleus.store.types.containers.PriorityQueueHandler"/>
         <java-type name="java.util.Set" wrapper-type="org.datanucleus.store.types.wrappers.Set"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Set"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Set"
+            container-handler="org.datanucleus.store.types.containers.HashSetHandler"/>
         <java-type name="java.util.SortedSet" wrapper-type="org.datanucleus.store.types.wrappers.SortedSet"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.SortedSet"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.SortedSet"
+            container-handler="org.datanucleus.store.types.containers.TreeSetHandler"/>
         <java-type name="java.util.SortedMap" wrapper-type="org.datanucleus.store.types.wrappers.SortedMap"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.SortedMap"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.SortedMap"
+            container-handler="org.datanucleus.store.types.containers.TreeMapHandler"/>
         <java-type name="java.util.Stack" wrapper-type="org.datanucleus.store.types.wrappers.Stack"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Stack"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Stack"
+            container-handler="org.datanucleus.store.types.containers.StackHandler"/>
         <java-type name="java.util.TreeMap" wrapper-type="org.datanucleus.store.types.wrappers.TreeMap"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.TreeMap"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.TreeMap"
+            container-handler="org.datanucleus.store.types.containers.TreeMapHandler"/>
         <java-type name="java.util.TreeSet" wrapper-type="org.datanucleus.store.types.wrappers.TreeSet"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.TreeSet"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.TreeSet"
+            container-handler="org.datanucleus.store.types.containers.TreeSetHandler"/>
         <java-type name="java.util.Vector" wrapper-type="org.datanucleus.store.types.wrappers.Vector"
-            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Vector"/>
+            wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Vector"
+            container-handler="org.datanucleus.store.types.containers.VectorHandler"/>
 
         <!-- array types -->
-        <java-type name="[B" embedded="true"/>
-        <java-type name="[C" embedded="true"/>
-        <java-type name="[D" embedded="true"/>
-        <java-type name="[F" embedded="true"/>
-        <java-type name="[I" embedded="true"/>
-        <java-type name="[J" embedded="true"/>
-        <java-type name="[S" embedded="true"/>
-        <java-type name="[Z" embedded="true"/>
-        <java-type name="[Ljava.lang.Boolean;" embedded="true"/>
-        <java-type name="[Ljava.lang.Byte;" embedded="true"/>
-        <java-type name="[Ljava.lang.Character;" embedded="true"/>
-        <java-type name="[Ljava.lang.Double;" embedded="true"/>
-        <java-type name="[Ljava.lang.Float;" embedded="true"/>
-        <java-type name="[Ljava.lang.Integer;" embedded="true"/>
-        <java-type name="[Ljava.lang.Long;" embedded="true"/>
-        <java-type name="[Ljava.lang.Short;" embedded="true"/>
-        <java-type name="[Ljava.lang.Number;" embedded="true"/>
-        <java-type name="[Ljava.lang.String;" embedded="true"/>
-        <java-type name="[Ljava.math.BigInteger;" embedded="true"/>
-        <java-type name="[Ljava.math.BigDecimal;" embedded="true"/>
-        <java-type name="[Ljava.util.Date;" embedded="true"/>
-        <java-type name="[Ljava.util.Locale;" embedded="true"/>
-        <java-type name="[Ljava.lang.Enum;" embedded="true"/>
+        <java-type name="[B" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[C" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[D" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[F" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[I" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[J" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[S" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[Z" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[Ljava.lang.Boolean;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[Ljava.lang.Byte;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[Ljava.lang.Character;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[Ljava.lang.Double;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[Ljava.lang.Float;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[Ljava.lang.Integer;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[Ljava.lang.Long;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[Ljava.lang.Short;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[Ljava.lang.Number;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[Ljava.lang.String;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[Ljava.math.BigInteger;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[Ljava.math.BigDecimal;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[Ljava.util.Date;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[Ljava.util.Locale;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[Ljava.lang.Enum;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+        <java-type name="[Ljava.lang.Object;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
     </extension>
 
     <!-- TYPE CONVERTERS -->

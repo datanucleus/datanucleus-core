@@ -14,26 +14,29 @@ limitations under the License.
 
 Contributors:
     ...
-**********************************************************************/
+ **********************************************************************/
 package org.datanucleus.store.fieldmanager;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.store.types.ContainerHandler;
+import org.datanucleus.store.types.ElementContainerAdapter;
+import org.datanucleus.store.types.ElementContainerHandler;
+import org.datanucleus.store.types.MapContainerAdapter;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.store.types.SequenceAdapter;
+import org.datanucleus.store.types.TypeManager;
 
 /**
- * Field manager that perists all unpersisted PC objects referenced from the source object.
- * If any collection/map fields are not currently using SCO wrappers they will be converted to do so.
- * Effectively provides "persistence-by-reachability" (at insert/update).
+ * Field manager that perists all unpersisted PC objects referenced from the source object. If any
+ * collection/map fields are not currently using SCO wrappers they will be converted to do so. Effectively
+ * provides "persistence-by-reachability" (at insert/update).
  */
 public class PersistFieldManager extends AbstractFieldManager
 {
@@ -86,11 +89,6 @@ public class PersistFieldManager extends AbstractFieldManager
     {
         if (value != null)
         {
-            AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-            boolean persistCascade = mmd.isCascadePersist();
-            ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
-            RelationType relationType = mmd.getRelationType(clr);
-
             if (replaceSCOsWithWrappers)
             {
                 // Replace any SCO field that isn't already a wrapper, with its wrapper object
@@ -102,165 +100,162 @@ public class PersistFieldManager extends AbstractFieldManager
                 }
             }
 
-            if (persistCascade)
+            AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+
+            if (mmd.isCascadePersist())
             {
-                if (RelationType.isRelationSingleValued(relationType))
+                ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
+                RelationType relationType = mmd.getRelationType(clr);
+
+                if (relationType != RelationType.NONE)
                 {
-                    // Process PC fields
-                    if (mmd.isEmbedded() || mmd.isSerialized())
+                    if (mmd.hasContainer())
                     {
-                        processPersistable(value, fieldNumber, ObjectProvider.EMBEDDED_PC);
+                        processContainer(fieldNumber, value, mmd);
                     }
                     else
                     {
-                        processPersistable(value, -1, ObjectProvider.PC);
-                    }
-                }
-                else if (RelationType.isRelationMultiValued(relationType))
-                {
-                    ApiAdapter api = op.getExecutionContext().getApiAdapter();
-                    if (mmd.hasCollection())
-                    {
-                        // Process all elements of the Collection that are PC
-                        Collection coll = (Collection)value;
-                        Iterator iter = coll.iterator();
-                        int position = 0;
-                        while (iter.hasNext())
+                        // Process PC fields
+                        if (mmd.isEmbedded() || mmd.isSerialized())
                         {
-                            Object element = iter.next();
-                            if (api.isPersistable(element))
-                            {
-                                if (mmd.getCollection().isEmbeddedElement() || mmd.getCollection().isSerializedElement())
-                                {
-                                    processPersistable(element, fieldNumber, ObjectProvider.EMBEDDED_COLLECTION_ELEMENT_PC);
-                                }
-                                else
-                                {
-                                    Object newElement = processPersistable(element, -1, ObjectProvider.PC);
-                                    ObjectProvider elementSM = op.getExecutionContext().findObjectProvider(newElement);
-                                    if (elementSM.getReferencedPC() != null)
-                                    {
-                                        // Must be attaching this element, so swap element (detached -> attached)
-                                        if (coll instanceof List)
-                                        {
-                                            ((List) coll).set(position, newElement);
-                                        }
-                                        else
-                                        {
-                                            coll.remove(element);
-                                            coll.add(newElement);
-                                        }
-                                    }
-                                }
-                            }
-                            position++;
-                        }
-                    }
-                    else if (mmd.hasMap())
-                    {
-                        // Process all keys, values of the Map that are PC
-                        Map map = (Map)value;
-
-                        Iterator<Map.Entry> entryIter = map.entrySet().iterator();
-                        while (entryIter.hasNext())
-                        {
-                            Map.Entry entry = entryIter.next();
-                            Object mapKey = entry.getKey();
-                            Object mapValue = entry.getValue();
-                            Object newMapKey = mapKey;
-                            Object newMapValue = mapValue;
-                            if (api.isPersistable(mapKey))
-                            {
-                                // Persist (or attach) the key
-                                if (mmd.getMap().isEmbeddedKey() || mmd.getMap().isSerializedKey())
-                                {
-                                    processPersistable(mapKey, fieldNumber, ObjectProvider.EMBEDDED_MAP_KEY_PC);
-                                }
-                                else
-                                {
-                                    newMapKey = processPersistable(mapKey, -1, ObjectProvider.PC);
-                                }
-                            }
-                            if (api.isPersistable(mapValue))
-                            {
-                                // Persist (or attach) the value
-                                if (mmd.getMap().isEmbeddedValue() || mmd.getMap().isSerializedValue())
-                                {
-                                    processPersistable(mapValue, fieldNumber, ObjectProvider.EMBEDDED_MAP_VALUE_PC);
-                                }
-                                else
-                                {
-                                    newMapValue = processPersistable(mapValue, -1, ObjectProvider.PC);
-                                }
-                            }
-                            if (newMapKey != mapKey || newMapValue != mapValue)
-                            {
-                                // Maybe we have just have attached key or value
-                                boolean updateKey = false;
-                                boolean updateValue = false;
-                                if (newMapKey != mapKey)
-                                {
-                                    ObjectProvider keySM = op.getExecutionContext().findObjectProvider(newMapKey);
-                                    if (keySM.getReferencedPC() != null)
-                                    {
-                                        // Attaching the key
-                                        updateKey = true;
-                                    }
-                                }
-                                if (newMapValue != mapValue)
-                                {
-                                    ObjectProvider valSM = op.getExecutionContext().findObjectProvider(newMapValue);
-                                    if (valSM.getReferencedPC() != null)
-                                    {
-                                        // Attaching the value
-                                        updateValue = true;
-                                    }
-                                }
-                                if (updateKey)
-                                {
-                                    map.remove(mapKey);
-                                    map.put(newMapKey, updateValue ? newMapValue : mapValue);
-                                }
-                                else if (updateValue)
-                                {
-                                    map.put(mapKey, newMapValue);
-                                }
-                            }
-                        }
-                    }
-                    else if (mmd.hasArray())
-                    {
-                        if (value instanceof Object[])
-                        {
-                            Object[] array = (Object[]) value;
-                            for (int i=0;i<array.length;i++)
-                            {
-                                Object element = array[i];
-                                if (api.isPersistable(element))
-                                {
-                                    if (mmd.getArray().isEmbeddedElement() || mmd.getArray().isSerializedElement())
-                                    {
-                                        // TODO This should be ARRAY_ELEMENT_PC but we haven't got that yet
-                                        processPersistable(element, fieldNumber, ObjectProvider.EMBEDDED_COLLECTION_ELEMENT_PC);
-                                    }
-                                    else
-                                    {
-                                        Object processedElement = processPersistable(element, -1, ObjectProvider.PC);
-                                        ObjectProvider elementSM = op.getExecutionContext().findObjectProvider(processedElement);
-                                        if (elementSM.getReferencedPC() != null)
-                                        {
-                                            // Must be attaching this element, so swap element (detached -> attached)
-                                            array[i] = processedElement;
-                                        }
-                                    }
-                                }
-                            }
+                            processPersistable(value, fieldNumber, ObjectProvider.EMBEDDED_PC);
                         }
                         else
                         {
-                            // primitive array
+                            processPersistable(value, -1, ObjectProvider.PC);
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private void  processContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd)
+    {
+        if (mmd.hasMap())
+        {
+            processMapContainer(fieldNumber, container, mmd);
+        }
+        else
+        {
+            processElementContainer(fieldNumber, container, mmd);
+        }
+    }
+
+    private void processMapContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd)
+    {
+    	TypeManager typeManager = op.getExecutionContext().getTypeManager();
+    	ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler = typeManager.getContainerHandler(container.getClass());
+    	
+        ApiAdapter api = op.getExecutionContext().getApiAdapter();
+
+        // Process all keys, values of the Map that are PC
+        MapContainerAdapter<Object> mapAdapter = containerHandler.getAdapter(container);
+        for (Entry<Object, Object> entry : mapAdapter.entries())
+        {
+            Object mapKey = entry.getKey();
+            Object mapValue = entry.getValue();
+            Object newMapKey = mapKey;
+            Object newMapValue = mapValue;
+
+            if (api.isPersistable(mapKey))
+            {
+                // Persist (or attach) the key
+                int mapKeyObjectType = mmd.getMap().isEmbeddedKey() || mmd.getMap().isSerializedKey() ? ObjectProvider.EMBEDDED_MAP_KEY_PC : ObjectProvider.PC;
+                newMapKey = processPersistable(mapKey, fieldNumber, mapKeyObjectType);
+            }
+
+            if (api.isPersistable(mapValue))
+            {
+                // Persist (or attach) the value
+                int mapValueObjectType = mmd.getMap().isEmbeddedValue() || mmd.getMap().isSerializedValue() ? ObjectProvider.EMBEDDED_MAP_VALUE_PC : ObjectProvider.PC;
+                newMapValue = processPersistable(mapValue, fieldNumber, mapValueObjectType);
+            }
+
+            if (newMapKey != mapKey || newMapValue != mapValue)
+            {
+                // Maybe we have just have attached key or value
+                boolean updateKey = false;
+                boolean updateValue = false;
+                if (newMapKey != mapKey)
+                {
+                    ObjectProvider keySM = op.getExecutionContext().findObjectProvider(newMapKey);
+                    if (keySM.getReferencedPC() != null)
+                    {
+                        // Attaching the key
+                        updateKey = true;
+                    }
+                }
+                if (newMapValue != mapValue)
+                {
+                    ObjectProvider valSM = op.getExecutionContext().findObjectProvider(newMapValue);
+                    if (valSM.getReferencedPC() != null)
+                    {
+                        // Attaching the value
+                        updateValue = true;
+                    }
+                }
+                
+                if (updateKey)
+                {
+                    mapAdapter.remove(mapKey);
+                    mapAdapter.put(newMapKey, updateValue ? newMapValue : mapValue);
+                }
+                else if (updateValue)
+                {
+                    mapAdapter.put(mapKey, newMapValue);
+                }
+            }
+        }
+    }
+
+    private void processElementContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd)
+    {
+    	TypeManager typeManager = op.getExecutionContext().getTypeManager();
+    	ElementContainerHandler<Object, ElementContainerAdapter<Object>> elementContainerHandler = typeManager.getContainerHandler(container.getClass());
+
+        // Process all elements of the container that are PC
+        ElementContainerAdapter containerAdapter = elementContainerHandler.getAdapter(container);
+
+        ApiAdapter api = op.getExecutionContext().getApiAdapter();
+        
+        int objectType = elementContainerHandler.getObjectType(mmd);
+        
+        if (objectType == ObjectProvider.PC)
+        {
+            int elementPosition = 0;
+            for (Object element : containerAdapter)
+            {
+                if (api.isPersistable(element))
+                {
+                    Object newElement = processPersistable(element, fieldNumber, objectType);
+                    ObjectProvider elementSM = op.getExecutionContext().findObjectProvider(newElement);
+                    if (elementSM.getReferencedPC() != null)
+                    {
+                        // Must be attaching this element, so swap element (detached -> attached)
+                        if (containerAdapter instanceof SequenceAdapter) {
+                            
+                            ((SequenceAdapter) containerAdapter).update(newElement, elementPosition); 
+                        }
+                        else
+                        {
+                            containerAdapter.remove(elementSM);
+                            containerAdapter.add(newElement);
+                        }
+
+                    }
+                }
+                elementPosition++;
+            }
+        }
+        else
+        {
+            // Embedded/Serialized
+            for (Object element : containerAdapter)
+            {
+                if (api.isPersistable(element))
+                {
+                    processPersistable(element, -1, objectType);
                 }
             }
         }

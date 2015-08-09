@@ -38,6 +38,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -60,6 +61,9 @@ public class TypeManagerImpl implements TypeManager, Serializable
 
     /** Map of java types, keyed by the class name. */
     protected Map<String, JavaType> javaTypes = new ConcurrentHashMap();
+    
+    /** Map of ContainerHandlers, keyed by the container type class name. */
+    protected Map<Class, ? super ContainerHandler> containerHandlersByClass = new ConcurrentHashMap();
 
     /** Map of TypeConverter keyed by their symbolic name. */
     protected Map<String, TypeConverter> convertersByName = null;
@@ -69,6 +73,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
 
     /** Map of (Map of TypeConverter keyed by the datastore type), keyed by the member type. */
     protected Map<Class, Map<Class, TypeConverter>> typeConverterMap = null;
+    
 
     /**
      * Constructor, loading support for type mappings using the plugin mechanism.
@@ -367,6 +372,45 @@ public class TypeManagerImpl implements TypeManager, Serializable
         }
         return null;
     }
+    
+    @Override
+    public ContainerAdapter getContainerAdapter(Object container)
+    {
+        ContainerHandler containerHandler = getContainerHandler(container.getClass());
+
+        return containerHandler == null ? null : containerHandler.getAdapter(container);
+    }
+    
+    @Override
+    public <H extends ContainerHandler> H getContainerHandler(Class containerClass)
+    {
+        H containerHandler = (H) containerHandlersByClass.get(containerClass);
+        if (containerHandler == null)
+        {
+            // Try to find the container handler using the registered type
+            JavaType type = findJavaTypeForClass(containerClass);
+            if (type != null && type.containerHandlerType != null)
+            {
+                Class[] parameterTypes = null;
+                Object[] parameters = null;
+                
+                Class[] classParameterTypes = new Class[]{Class.class};
+
+                // Allow ContainerHandlers that receive the container type on the constructor. e.g. ArrayHandler
+                if (ClassUtils.getConstructorWithArguments(type.containerHandlerType, classParameterTypes) != null )
+                {
+                    parameterTypes = classParameterTypes;
+                    parameters = new Object[] {containerClass};
+                }
+                
+                containerHandler = (H) ClassUtils.newInstance(type.containerHandlerType, parameterTypes, parameters);
+                
+                containerHandlersByClass.put(containerClass, containerHandler);
+            }
+        }
+
+        return containerHandler;
+    }
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.types.TypeManager#getTypeConverterForName(java.lang.String)
@@ -595,9 +639,10 @@ public class TypeManagerImpl implements TypeManager, Serializable
         final Class wrapperType;
         final Class wrapperTypeBacked;
         final String typeConverterName;
+        final Class containerHandlerType;
 
         public JavaType(Class cls, Class genericType, boolean embedded, boolean dfg, 
-                Class wrapperType, Class wrapperTypeBacked, String typeConverterName)
+                Class wrapperType, Class wrapperTypeBacked, Class containerHandlerType, String typeConverterName)
         {
             this.cls = cls;
             this.genericType = genericType;
@@ -605,6 +650,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
             this.dfg = dfg;
             this.wrapperType = wrapperType;
             this.wrapperTypeBacked = (wrapperTypeBacked != null ? wrapperTypeBacked : wrapperType);
+            this.containerHandlerType = containerHandlerType;
             this.typeConverterName = typeConverterName;
         }
     }
@@ -632,6 +678,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
                 String wrapperType = elems[i].getAttribute("wrapper-type");
                 String wrapperTypeBacked = elems[i].getAttribute("wrapper-type-backed");
                 String typeConverterName = elems[i].getAttribute("converter-name");
+                String containerHandlerType = elems[i].getAttribute("container-handler");
 
                 boolean embedded = false;
                 if (embeddedString != null && embeddedString.equalsIgnoreCase("true"))
@@ -659,6 +706,14 @@ public class TypeManagerImpl implements TypeManager, Serializable
                 {
                     wrapperTypeBacked = null;
                 }
+                if (!StringUtils.isWhitespace(containerHandlerType))
+                {
+                    containerHandlerType = containerHandlerType.trim();
+                }
+                else
+                {
+                    containerHandlerType = null;
+                }
 
                 try
                 {
@@ -674,36 +729,10 @@ public class TypeManagerImpl implements TypeManager, Serializable
                     if (!javaTypes.containsKey(javaTypeName))
                     {
                         // Only add first entry for a java type (ordered by the "priority" flag)
-                        Class wrapperClass = null;
-                        if (wrapperType != null)
-                        {
-                            try
-                            {
-                                wrapperClass = mgr.loadClass(
-                                    elems[i].getExtension().getPlugin().getSymbolicName(), wrapperType);
-                            }
-                            catch (NucleusException jpe)
-                            {
-                                // Impossible to load the wrapper type from this plugin
-                                NucleusLogger.PERSISTENCE.error(Localiser.msg("016004", wrapperType));
-                                throw new NucleusException(Localiser.msg("016004", wrapperType));
-                            }
-                        }
-                        Class wrapperClassBacked = null;
-                        if (wrapperTypeBacked != null)
-                        {
-                            try
-                            {
-                                wrapperClassBacked = mgr.loadClass(
-                                    elems[i].getExtension().getPlugin().getSymbolicName(), wrapperTypeBacked);
-                            }
-                            catch (NucleusException jpe)
-                            {
-                                // Impossible to load the wrapper type from this plugin
-                                NucleusLogger.PERSISTENCE.error(Localiser.msg("016004", wrapperTypeBacked));
-                                throw new NucleusException(Localiser.msg("016004", wrapperTypeBacked));
-                            }
-                        }
+
+                        Class wrapperClass = loadClass(mgr, elems, i, wrapperType, "016005");
+                        Class wrapperClassBacked = loadClass(mgr, elems, i, wrapperTypeBacked, "016005");
+                        Class containerHandlerClass = loadClass(mgr, elems, i, containerHandlerType, "016009");
 
                         String typeName = cls.getName();
                         if (genericType != null)
@@ -711,7 +740,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
                             // "Collection<String>"
                             typeName += "<" + genericType.getName() + ">";
                         }
-                        javaTypes.put(typeName, new JavaType(cls, genericType, embedded, dfg, wrapperClass, wrapperClassBacked, typeConverterName));
+                        javaTypes.put(typeName, new JavaType(cls, genericType, embedded, dfg, wrapperClass, wrapperClassBacked, containerHandlerClass, typeConverterName));
                     }
                 }
                 catch (ClassNotResolvedException cnre)
@@ -730,6 +759,26 @@ public class TypeManagerImpl implements TypeManager, Serializable
             Collections.sort(typesList, ALPHABETICAL_ORDER_STRING);
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("016006", StringUtils.collectionToString(typesList)));
         }
+    }
+    
+    private Class loadClass(PluginManager mgr, ConfigurationElement[] elems, int i, String className, String messageKey)
+    {
+        Class result = null;
+        if (className != null)
+        {
+            try
+            {
+                result = mgr.loadClass(
+                    elems[i].getExtension().getPlugin().getSymbolicName(), className);
+            }
+            catch (NucleusException jpe)
+            {
+                // Impossible to load the class implementation from this plugin
+                NucleusLogger.PERSISTENCE.error(Localiser.msg(messageKey, className));
+                throw new NucleusException(Localiser.msg(messageKey, className));
+            }
+        }
+        return result;
     }
 
     /**
