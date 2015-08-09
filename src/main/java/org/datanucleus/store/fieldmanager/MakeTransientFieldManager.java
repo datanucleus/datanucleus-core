@@ -18,19 +18,16 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.fieldmanager;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.store.types.ContainerAdapter;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.store.types.TypeManager;
 
 /**
  * Field Manager to handle the making transient of fields.
@@ -78,96 +75,35 @@ public class MakeTransientFieldManager extends AbstractFetchDepthFieldManager
         {
             AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
             RelationType relType = mmd.getRelationType(op.getExecutionContext().getClassLoaderResolver());
-            if (RelationType.isRelationSingleValued(relType))
+            
+            if (relType != RelationType.NONE)
             {
-                // Process PC fields
-                processPersistable(value);
-            }
-            else if (RelationType.isRelationMultiValued(relType))
-            {
-                ApiAdapter api = op.getExecutionContext().getApiAdapter();
-                if (value instanceof Collection)
+                if (mmd.hasContainer())
                 {
-                    // Process all elements of the Collection that are PC
-                    if (!(value instanceof SCO))
-                    {
-                        // Replace with SCO
-                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
-                    }
-                    SCO sco = (SCO)value;
+                    // Replace with SCO, when possible
+                    value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
 
-                    Collection coll = (Collection)value;
-                    Iterator iter = coll.iterator();
-                    while (iter.hasNext())
+                    TypeManager typeManager = op.getExecutionContext().getTypeManager();
+                    ContainerAdapter containerAdapter = typeManager.getContainerAdapter(value);
+                    ApiAdapter api = op.getExecutionContext().getApiAdapter();
+
+                    // Process all elements of the Container that are PC
+                    for (Object object : containerAdapter)
                     {
-                        Object element = iter.next();
-                        if (api.isPersistable(element))
+                        if (api.isPersistable(object))
                         {
-                            processPersistable(element);
-                        }
-                    }
-                    sco.unsetOwner();
-                }
-                else if (value instanceof Map)
-                {
-                    // Process all keys, values of the Map that are PC
-                    if (!(value instanceof SCO))
-                    {
-                        // Replace with SCO
-                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
-                    }
-                    SCO sco = (SCO)value;
-
-                    Map map = (Map)value;
-
-                    // Process any keys that are persistable
-                    Set keys = map.keySet();
-                    Iterator iter = keys.iterator();
-                    while (iter.hasNext())
-                    {
-                        Object mapKey = iter.next();
-                        if (api.isPersistable(mapKey))
-                        {
-                            processPersistable(mapKey);
-                        }
-                    }
-
-                    // Process any values that are persistable
-                    Collection values = map.values();
-                    iter = values.iterator();
-                    while (iter.hasNext())
-                    {
-                        Object mapValue = iter.next();
-                        if (api.isPersistable(mapValue))
-                        {
-                            processPersistable(mapValue);
-                        }
-                    }
-
-                    sco.unsetOwner();
-                }
-                else if (value instanceof Object[])
-                {
-                    Object[] array = (Object[]) value;
-                    for (int i=0;i<array.length;i++)
-                    {
-                        Object element = array[i];
-                        if (api.isPersistable(element))
-                        {
-                            processPersistable(element);
+                            processPersistable(object);
                         }
                     }
                 }
+                else
+                {
+                    processPersistable(value);
+                }
             }
-            else if (value instanceof SCO)
-            {
-                // Other SCO field, so unset its owner
-                SCO sco = (SCO) value;
-                sco.unsetOwner();
-            }
-            else
-            {
-                // Primitive, or primitive array, or some unsupported container type
+            
+            if (value instanceof SCO){
+                ((SCO)value).unsetOwner(); 
             }
         }
 

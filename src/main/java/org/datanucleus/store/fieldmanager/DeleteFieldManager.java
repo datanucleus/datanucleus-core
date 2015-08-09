@@ -18,17 +18,18 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.fieldmanager;
 
-import java.lang.reflect.Array;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.store.types.ContainerHandler;
+import org.datanucleus.store.types.ElementContainerAdapter;
+import org.datanucleus.store.types.MapContainerAdapter;
+import org.datanucleus.store.types.TypeManager;
 
 /**
  * Field manager that deletes all "dependent" PC objects referenced from the source object.
@@ -93,142 +94,157 @@ public class DeleteFieldManager extends AbstractFieldManager
             AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
             ExecutionContext ec = op.getExecutionContext();
             RelationType relationType = mmd.getRelationType(ec.getClassLoaderResolver());
-            if (RelationType.isRelationSingleValued(relationType))
+
+            if (relationType != RelationType.NONE)
             {
-                // Process PC fields
-                if (mmd.isDependent())
+                if (mmd.hasContainer())
                 {
-                    processPersistable(value);
+                    processContainer(fieldNumber, value, mmd, ec, relationType);
                 }
-                else if (manageRelationships && RelationType.isBidirectional(relationType) && !mmd.isEmbedded())
+                else
                 {
-                    ObjectProvider valueOP = ec.findObjectProvider(value);
-                    if (valueOP != null && !valueOP.getLifecycleState().isDeleted() && !valueOP.isDeleting())
+                    processSingleValue(value, mmd, ec, relationType);
+                }
+
+            }
+        }
+    }
+
+    private void processSingleValue(Object value, AbstractMemberMetaData mmd, ExecutionContext ec, RelationType relationType)
+    {
+        // Process PC fields
+        if (mmd.isDependent())
+        {
+            processPersistable(value);
+        }
+        else if (manageRelationships && RelationType.isBidirectional(relationType) && !mmd.isEmbedded())
+        {
+            ObjectProvider valueOP = ec.findObjectProvider(value);
+            if (valueOP != null && !valueOP.getLifecycleState().isDeleted() && !valueOP.isDeleting())
+            {
+                AbstractMemberMetaData relMmd = mmd.getRelatedMemberMetaData(ec.getClassLoaderResolver())[0];
+                if (relationType == RelationType.ONE_TO_ONE_BI)
+                {
+                    valueOP.replaceFieldMakeDirty(relMmd.getAbsoluteFieldNumber(), null);
+                    valueOP.flush();
+                }
+                else if (relationType == RelationType.MANY_TO_ONE_BI)
+                {
+                    // Make sure field at other side is loaded, and remove from any Collection
+                    valueOP.loadField(relMmd.getAbsoluteFieldNumber());
+                    Object relValue = valueOP.provideField(relMmd.getAbsoluteFieldNumber());
+                    if (relValue != null)
                     {
-                        AbstractMemberMetaData relMmd = mmd.getRelatedMemberMetaData(ec.getClassLoaderResolver())[0];
-                        if (relationType == RelationType.ONE_TO_ONE_BI)
+                        if (relValue instanceof Collection)
                         {
-                            valueOP.replaceFieldMakeDirty(relMmd.getAbsoluteFieldNumber(), null);
-                            valueOP.flush();
-                        }
-                        else if (relationType == RelationType.MANY_TO_ONE_BI)
-                        {
-                            // Make sure field at other side is loaded, and remove from any Collection
-                            valueOP.loadField(relMmd.getAbsoluteFieldNumber());
-                            Object relValue = valueOP.provideField(relMmd.getAbsoluteFieldNumber());
-                            if (relValue != null)
-                            {
-                                if (relValue instanceof Collection)
-                                {
-                                    ((Collection)relValue).remove(op.getObject());
-                                }
-                            }
+                            ((Collection)relValue).remove(op.getObject());
                         }
                     }
                 }
             }
-            else if (RelationType.isRelationMultiValued(relationType))
+        }
+    }
+    
+    private void processContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd, ExecutionContext ec, RelationType relationType)
+    {
+        TypeManager typeManager = op.getExecutionContext().getTypeManager();
+        ContainerHandler containerHandler = typeManager.getContainerHandler(container.getClass());
+
+        if (mmd.hasMap())
+        {
+            processMapContainer(fieldNumber, container, mmd, containerHandler);
+        }
+        else
+        {
+            processElementContainer(fieldNumber, container, mmd, containerHandler, ec, relationType);
+        }
+    }
+    
+    private void processMapContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd,
+            ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler)
+    {
+        boolean dependentKey = mmd.getMap().isDependentKey();
+        boolean dependentValue = mmd.getMap().isDependentValue();
+        
+        if (dependentKey && dependentValue)
+        {
+            ApiAdapter api = op.getExecutionContext().getApiAdapter();
+            
+            // Process all keys and values of the Map that are PC
+            for (Entry<Object, Object> entry : containerHandler.getAdapter(container).entries())
             {
-                ApiAdapter api = ec.getApiAdapter();
-                if (value instanceof Collection)
+                Object key = entry.getKey();
+                if (api.isPersistable(key))
                 {
-                    // Process all elements of the Collection that are PC
-                    boolean dependent = mmd.getCollection().isDependentElement();
-                    if (mmd.isCascadeRemoveOrphans())
-                    {
-                        dependent = true;
-                    }
-                    if (dependent)
-                    {
-                        // Process any elements that are persistable
-                        Collection coll = (Collection)value;
-                        Iterator iter = coll.iterator();
-                        while (iter.hasNext())
-                        {
-                            Object element = iter.next();
-                            if (api.isPersistable(element))
-                            {
-                                processPersistable(element);
-                            }
-                        }
-                    }
-                    else if (manageRelationships && RelationType.isBidirectional(relationType) && !mmd.isEmbedded() && !mmd.getCollection().isEmbeddedElement())
-                    {
-                        if (relationType == RelationType.ONE_TO_MANY_BI)
-                        {
-                            Collection coll = (Collection)value;
-                            Iterator iter = coll.iterator();
-                            while (iter.hasNext())
-                            {
-                                Object element = iter.next();
-                                if (api.isPersistable(element))
-                                {
-                                    ObjectProvider elementOP = ec.findObjectProvider(element);
-                                    if (elementOP != null && !elementOP.getLifecycleState().isDeleted() && !elementOP.isDeleting())
-                                    {
-                                        AbstractMemberMetaData relMmd = mmd.getRelatedMemberMetaData(ec.getClassLoaderResolver())[0];
-                                        elementOP.replaceFieldMakeDirty(relMmd.getAbsoluteFieldNumber(), null);
-                                        elementOP.flush();
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    processPersistable(key);
                 }
-                else if (value instanceof Map)
+                Object value = entry.getValue();
+                if (api.isPersistable(value))
                 {
-                    // Process all keys, values of the Map that are PC
-                    Map map = (Map)value;
-                    if (mmd.hasMap() && mmd.getMap().isDependentKey())
-                    {
-                        // Process any keys that are persistable
-                        Set keys = map.keySet();
-                        Iterator iter = keys.iterator();
-                        while (iter.hasNext())
-                        {
-                            Object mapKey = iter.next();
-                            if (api.isPersistable(mapKey))
-                            {
-                                processPersistable(mapKey);
-                            }
-                        }
-                    }
-                    if (mmd.hasMap() && mmd.getMap().isDependentValue())
-                    {
-                        // Process any values that are persistable
-                        Collection values = map.values();
-                        Iterator iter = values.iterator();
-                        while (iter.hasNext())
-                        {
-                            Object mapValue = iter.next();
-                            if (api.isPersistable(mapValue))
-                            {
-                                processPersistable(mapValue);
-                            }
-                        }
-                    }
-                    // TODO Handle nulling of bidirs
+                    processPersistable(key);
                 }
-                else if (value instanceof Object[])
+            }
+        }
+        else if (dependentKey)
+        {
+            ApiAdapter api = op.getExecutionContext().getApiAdapter();
+            
+            // Process all keys of the Map that are PC
+            for (Object key : containerHandler.getAdapter(container).keys())
+            {
+                if (api.isPersistable(key))
                 {
-                    // Process all array elements that are PC
-                    if (mmd.hasArray() && mmd.getArray().isDependentElement())
-                    {
-                        // Process any array elements that are persistable
-                        for (int i=0;i<Array.getLength(value);i++)
-                        {
-                            Object element = Array.get(value, i);
-                            if (api.isPersistable(element))
-                            {
-                                processPersistable(element);
-                            }
-                        }
-                    }
-                    // TODO Handle nulling of bidirs
+                    processPersistable(key);
                 }
-                else
+            }
+        }
+        else if (dependentValue)
+        {
+            ApiAdapter api = op.getExecutionContext().getApiAdapter();
+            
+            // Process all values of the Map that are PC
+            for (Object value : containerHandler.getAdapter(container).values())
+            {
+                if (api.isPersistable(value))
                 {
-                    // Primitive, or primitive array, or some unsupported container type
+                    processPersistable(value);
+                }
+            }
+        }
+        // Renato: TODO Handle nulling of bidirs - Isn't being done by the relationship manager already?
+    }
+
+    private void processElementContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd,
+            ContainerHandler<Object, ElementContainerAdapter<Object>> containerHandler, ExecutionContext ec, RelationType relationType)
+    {
+        if (mmd.isCascadeRemoveOrphans() || (mmd.getCollection() != null && mmd.getCollection().isDependentElement()) || (mmd.getArray() != null && mmd
+                .getArray().isDependentElement()))
+        {
+            ApiAdapter api = op.getExecutionContext().getApiAdapter();
+
+            // Process all elements of the container that are PC
+            for (Object element : containerHandler.getAdapter(container))
+            {
+                if (api.isPersistable(element))
+                {
+                    processPersistable(element);
+                }
+            }
+        }
+        else if (manageRelationships && relationType == RelationType.ONE_TO_MANY_BI && !mmd.isEmbedded() && !mmd.getCollection().isEmbeddedElement())
+        {
+            ApiAdapter api = op.getExecutionContext().getApiAdapter();
+            for (Object element : containerHandler.getAdapter(container))
+            {
+                if (api.isPersistable(element))
+                {
+                    ObjectProvider elementOP = ec.findObjectProvider(element);
+                    if (elementOP != null && !elementOP.getLifecycleState().isDeleted() && !elementOP.isDeleting())
+                    {
+                        AbstractMemberMetaData relMmd = mmd.getRelatedMemberMetaData(ec.getClassLoaderResolver())[0];
+                        elementOP.replaceFieldMakeDirty(relMmd.getAbsoluteFieldNumber(), null);
+                        elementOP.flush();
+                    }
                 }
             }
         }
