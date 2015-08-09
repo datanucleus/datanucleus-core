@@ -126,6 +126,7 @@ public interface TypeManager
      * container-handler attribute of the java-type element.  
      * @param containerClass The class of the container.
      * @return The respective ContainerHandler if registered or null if no ContainerHandler is found for the containerClass.
+     * @param <H> Handler type
      */
      <H extends ContainerHandler> H getContainerHandler(Class containerClass);
     
