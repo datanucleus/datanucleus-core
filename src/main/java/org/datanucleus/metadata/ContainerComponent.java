@@ -42,7 +42,7 @@ class ContainerComponent implements Serializable
     protected Boolean dependent;
 
     /** Type of the component. */
-    protected String type = "java.lang.Object";
+    protected String type;
 
     /** ClassMetaData for the component. */
     protected AbstractClassMetaData classMetaData;
