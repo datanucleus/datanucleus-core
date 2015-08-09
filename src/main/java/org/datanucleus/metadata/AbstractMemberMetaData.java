@@ -24,11 +24,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,6 +36,7 @@ import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.store.types.ContainerHandler;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
@@ -538,6 +535,34 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         }
         // TODO If this field is NONE in superclass, make it NONE here too
 
+        // If type is a container, load create the metadata. The field will be handled as a container if it
+        // has a ContainerHandler registered against it.
+        TypeManager typeMgr = mmgr.getNucleusContext().getTypeManager();
+        ContainerHandler containerHandler = typeMgr.getContainerHandler(type);
+
+        if (containerHandler == null)
+        {
+            // No container handler registered for this type
+            if (hasContainer())
+            {
+                // Container metadata specified on a type that is not a valid or supported container
+                NucleusLogger.METADATA.error(Localiser.msg("044212", getClassName(), getName(), type));
+                NucleusException ne = new InvalidMemberMetaDataException("044212", getClassName(), getName(), type);
+                throw ne;
+            }
+        }
+        else
+        {
+            // Field is a container type
+            if (!hasContainer())
+            {
+                // No container metadata has not been specified yet, create a default empty one
+                setContainer(containerHandler.newMetaData());
+            }
+
+            containerHandler.populateMetaData(mmgr, this);
+        }
+
         // Update "default-fetch-group" according to type
         if (defaultFetchGroup == null && persistenceModifier.equals(FieldPersistenceModifier.NONE))
         {
@@ -552,40 +577,14 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             defaultFetchGroup = Boolean.FALSE;
             if (!primaryKey.equals(Boolean.TRUE))
             {
-                boolean foundGeneric = false;
-                TypeManager typeMgr = mmgr.getNucleusContext().getTypeManager();
-                if (Collection.class.isAssignableFrom(getType()))
+            	// TODO Renato REMOVE null check when all types are using handlers
+                if (hasContainer() && containerHandler != null)
                 {
-                    String elementTypeName = null;
-                    try
-                    {
-                        if (field != null)
-                        {
-                            elementTypeName = ClassUtils.getCollectionElementType(field);
-                        }
-                        else
-                        {
-                            elementTypeName = ClassUtils.getCollectionElementType(method);
-                        }
-                    }
-                    catch (NucleusUserException nue)
-                    {
-                        // User has put some stupid type in so ignore it. Idiots
-                    }
-                    if (elementTypeName != null)
-                    {
-                        // Try to find using generic type specialisation
-                        Class elementType = clr.classForName(elementTypeName);
-                        if (typeMgr.isDefaultFetchGroupForCollection(getType(), elementType))
-                        {
-                            foundGeneric = true;
-                            defaultFetchGroup = Boolean.TRUE;
-                        }
-                    }
+                    defaultFetchGroup = containerHandler.isDefaultFetchGroup(clr, mmgr, this);
                 }
-
-                if (!foundGeneric && typeMgr.isDefaultFetchGroup(getType()))
+                else if (typeMgr.isDefaultFetchGroup(getType()))
                 {
+                    // If still not determined rely on the type
                     defaultFetchGroup = Boolean.TRUE;
                 }
             }
@@ -628,253 +627,8 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 serialized = Boolean.TRUE;
             }
         }
-
-        if (containerMetaData == null)
-        {
-            // No container information, so generate if array/collection/map field
-            if (type.isArray())
-            {
-                // User hasn't specified <array> but the field is an array so infer it
-                Class arrayCls = type.getComponentType();
-                ArrayMetaData arrmd = new ArrayMetaData();
-                arrmd.setElementType(arrayCls.getName());
-                setContainer(arrmd);
-            }
-            else if (java.util.Collection.class.isAssignableFrom(type))
-            {
-                if (targetClassName != null)
-                {
-                    // User has specified target class name (JPA) so generate the <collection>
-                    CollectionMetaData collmd = new CollectionMetaData();
-                    collmd.setElementType(targetClassName);
-                    setContainer(collmd);
-                }
-                else
-                {
-                    // No collection element type specified but using JDK1.5 so try generics
-                    String elementType = null;
-                    if (field != null)
-                    {
-                        elementType = ClassUtils.getCollectionElementType(field);
-                    }
-                    else
-                    {
-                        elementType = ClassUtils.getCollectionElementType(method);
-                    }
-                    if (elementType != null)
-                    {
-                        // Use generics information to infer any missing parts
-                        CollectionMetaData collmd = new CollectionMetaData();
-                        collmd.setElementType(elementType);
-                        setContainer(collmd);
-                    }
-                    else
-                    {
-                        // Default to "Object" as element type
-                        CollectionMetaData collmd = new CollectionMetaData();
-                        collmd.setElementType(Object.class.getName());
-                        setContainer(collmd);
-                        NucleusLogger.METADATA.debug(Localiser.msg("044003", getClassName(), getName()));
-                    }
-                }
-            }
-            else if (java.util.Map.class.isAssignableFrom(type))
-            {
-                if (targetClassName != null)
-                {
-                    // User has specified target class name (JPA) so generate the <map>
-                    MapMetaData mapmd = new MapMetaData();
-                    mapmd.setValueType(targetClassName);
-                    setContainer(mapmd);
-                }
-                else
-                {
-                    // No map key/value type specified but using JDK1.5 so try generics
-                    String keyType = null;
-                    String valueType = null;
-                    if (field != null)
-                    {
-                        keyType = ClassUtils.getMapKeyType(field);
-                    }
-                    else
-                    {
-                        keyType = ClassUtils.getMapKeyType(method);
-                    }
-                    if (field != null)
-                    {
-                        valueType = ClassUtils.getMapValueType(field);
-                    }
-                    else
-                    {
-                        valueType = ClassUtils.getMapValueType(method);
-                    }
-                    if (keyType != null && valueType != null)
-                    {
-                        // Use generics information to infer any missing parts
-                        MapMetaData mapmd = new MapMetaData();
-                        mapmd.setKeyType(keyType);
-                        mapmd.setValueType(valueType);
-                        setContainer(mapmd);
-                    }
-                    else
-                    {
-                        // Default to "Object" as key/value type
-                        if (keyType == null)
-                        {
-                            keyType = Object.class.getName();
-                        }
-                        if (valueType == null)
-                        {
-                            valueType = Object.class.getName();
-                        }
-                        MapMetaData mapmd = new MapMetaData();
-                        mapmd.setKeyType(keyType);
-                        mapmd.setValueType(valueType);
-                        setContainer(mapmd);
-                        NucleusLogger.METADATA.debug(Localiser.msg("044004", getClassName(), getName()));
-                    }
-                }
-            }
-        }
-        else
-        {
-            if (type.isArray())
-            {
-                // Array field, so set element-type using reflection if not set
-                if (getArray().element.type == null)
-                {
-                    Class arrayCls = type.getComponentType();
-                    getArray().setElementType(arrayCls.getName());
-                }
-            }
-            else if (java.util.Collection.class.isAssignableFrom(type))
-            {
-                // Collection field, so check/update using available generics information
-                String elementType = null;
-                if (field != null)
-                {
-                    elementType = ClassUtils.getCollectionElementType(field);
-                }
-                else
-                {
-                    elementType = ClassUtils.getCollectionElementType(method);
-                }
-                if (elementType == null)
-                {
-                    // Try to use generics to furnish any missing type info
-                    Type genericType = null;
-                    if (field != null)
-                    {
-                        genericType = field.getGenericType();
-                    }
-                    else if (method != null)
-                    {
-                        genericType = method.getGenericReturnType();
-                    }
-                    if (genericType != null && genericType instanceof ParameterizedType)
-                    {
-                        ParameterizedType paramGenType = (ParameterizedType)genericType;
-                        Type elemGenericType = paramGenType.getActualTypeArguments()[0];
-                        if (elemGenericType instanceof TypeVariable)
-                        {
-                            Type elemGenTypeBound = ((TypeVariable)elemGenericType).getBounds()[0];
-                            if (elemGenTypeBound instanceof Class)
-                            {
-                                elementType = ((Class)elemGenTypeBound).getName();
-                            }
-                        }
-                    }
-                }
-
-                if (elementType != null)
-                {
-                    if (getCollection().element.type == null || 
-                        getCollection().element.type.equals(ClassNameConstants.Object))
-                    {
-                        getCollection().element.type = elementType;
-                    }
-                }
-            }
-            else if (java.util.Map.class.isAssignableFrom(type))
-            {
-                // Map field, so check/update using available generics information
-                String keyType = null;
-                String valueType = null;
-                if (field != null)
-                {
-                    keyType = ClassUtils.getMapKeyType(field);
-                }
-                else
-                {
-                    keyType = ClassUtils.getMapKeyType(method);
-                }
-                if (field != null)
-                {
-                    valueType = ClassUtils.getMapValueType(field);
-                }
-                else
-                {
-                    valueType = ClassUtils.getMapValueType(method);
-                }
-
-                if (keyType == null || valueType == null)
-                {
-                    // Try to use generics to furnish any missing type info
-                    Type genericType = null;
-                    if (field != null)
-                    {
-                        genericType = field.getGenericType();
-                    }
-                    else if (method != null)
-                    {
-                        genericType = method.getGenericReturnType();
-                    }
-                    if (genericType != null && genericType instanceof ParameterizedType)
-                    {
-                        ParameterizedType paramGenType = (ParameterizedType)genericType;
-                        if (keyType == null)
-                        {
-                            Type keyGenericType = paramGenType.getActualTypeArguments()[0];
-                            if (keyGenericType instanceof TypeVariable)
-                            {
-                                Type keyGenTypeBound = ((TypeVariable)keyGenericType).getBounds()[0];
-                                if (keyGenTypeBound instanceof Class)
-                                {
-                                    keyType = ((Class)keyGenTypeBound).getName();
-                                }
-                            }
-                        }
-                        if (valueType == null)
-                        {
-                            Type valueGenericType = paramGenType.getActualTypeArguments()[1];
-                            if (valueGenericType instanceof TypeVariable)
-                            {
-                                Type valueGenTypeBound = ((TypeVariable)valueGenericType).getBounds()[0];
-                                if (valueGenTypeBound instanceof Class)
-                                {
-                                    valueType = ((Class)valueGenTypeBound).getName();
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (keyType != null && valueType != null)
-                {
-                    if (getMap().key.type == null || getMap().key.type.equals(ClassNameConstants.Object))
-                    {
-                        // key-type not set so update key-type
-                        getMap().key.type = keyType;
-                    }
-                    if (getMap().value.type == null || getMap().value.type.equals(ClassNameConstants.Object))
-                    {
-                        // value-type not set so update value-type
-                        getMap().value.type = valueType;
-                    }
-                }
-            }
-        }
-
+        
+        // TODO Renato Move this to CollectionHandler
         if (hasCollection() && ordered && orderMetaData == null)
         {
             OrderMetaData ordmd = new OrderMetaData();
@@ -2379,6 +2133,11 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         {
             this.targetClassName = target;
         }
+    }
+
+    public String getTargetClassName()
+    {
+        return targetClassName;
     }
 
     /**
