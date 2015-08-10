@@ -50,6 +50,7 @@ import org.datanucleus.store.schema.naming.NamingFactory;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.store.types.converters.MultiColumnConverter;
 import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -592,6 +593,10 @@ public class CompleteClassTable implements Table
         {
             // User has specified the TypeConverter
             typeConv = typeMgr.getTypeConverterForName(typeConvName);
+            if (typeConv == null)
+            {
+                throw new NucleusUserException(Localiser.msg("044062", mmd.getFullFieldName(), typeConvName));
+            }
         }
         else
         {
