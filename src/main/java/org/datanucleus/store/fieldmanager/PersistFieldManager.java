@@ -228,7 +228,7 @@ public class PersistFieldManager extends AbstractFieldManager
             {
                 if (api.isPersistable(element))
                 {
-                    Object newElement = processPersistable(element, fieldNumber, objectType);
+                    Object newElement = processPersistable(element, -1, objectType);
                     ObjectProvider elementSM = op.getExecutionContext().findObjectProvider(newElement);
                     if (elementSM.getReferencedPC() != null)
                     {
@@ -255,7 +255,7 @@ public class PersistFieldManager extends AbstractFieldManager
             {
                 if (api.isPersistable(element))
                 {
-                    processPersistable(element, -1, objectType);
+                    processPersistable(element, fieldNumber, objectType);
                 }
             }
         }
