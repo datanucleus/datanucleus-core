@@ -1517,11 +1517,6 @@ public class ClassUtils
      */
     public static Class getCollectionElementType(Class type, Type genericType)
     {
-        if (!Collection.class.isAssignableFrom(type))
-        {
-            return null;
-        }
-
         return getClassForGenericType(genericType, 0);
     }
 
