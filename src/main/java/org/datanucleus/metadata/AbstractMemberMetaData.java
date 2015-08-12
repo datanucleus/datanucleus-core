@@ -2642,7 +2642,14 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 }
 
                 relatedMemberMetaData = new AbstractMemberMetaData[] {otherMmd};
-                if (hasContainer() && relatedMemberMetaData[0].hasContainer())
+                if (isSingleCollection())
+                {
+                    if (relatedMemberMetaData[0].isSingleCollection())
+                    {
+                        relationType = RelationType.ONE_TO_ONE_BI;
+                    }
+                }
+                else if (hasContainer() && relatedMemberMetaData[0].hasContainer())
                 {
                     relationType = RelationType.MANY_TO_MANY_BI;
                 }
@@ -2924,8 +2931,11 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         {
             if (relationType == RelationType.ONE_TO_ONE_BI)
             {
-                if (relatedMemberMetaData[i].getType().isAssignableFrom(thisPC.getClass()) &&
-                    getType().isAssignableFrom(otherPC.getClass()))
+                AbstractMemberMetaData relMmd = relatedMemberMetaData[i];
+                Class relatedType = relMmd.isSingleCollection() ? clr.classForName(relMmd.getCollection().getElementType()) : relMmd.getType();
+                Class type = isSingleCollection() ? clr.classForName(getCollection().getElementType()) : getType(); 
+                if (relatedType.isAssignableFrom(thisPC.getClass()) &&
+                    type.isAssignableFrom(otherPC.getClass()))
                 {
                     return relatedMemberMetaData[i];
                 }
