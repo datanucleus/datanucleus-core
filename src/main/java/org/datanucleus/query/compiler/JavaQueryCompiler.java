@@ -951,6 +951,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                 symbol = symtbl.getSymbol(firstTuple.toLowerCase());
             }
         }
+        int tupleSize = tuples.size();
         if (symbol != null)
         {
             type = symbol.getValueType();
@@ -961,24 +962,24 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                     " since symbol has no type; implicit variable?");
             }
 
-            for (int i=1; i<tuples.size(); i++)
+            for (int i=1; i<tupleSize; i++)
             {
-                type = getType(type, (String)tuples.get(i));
+                type = getType(type, (String)tuples.get(i), i == tupleSize-1);
             }
         }
         else
         {
             symbol = symtbl.getSymbol(candidateAlias);
             type = symbol.getValueType();
-            for (int i=0; i<tuples.size(); i++)
+            for (int i=0; i<tupleSize; i++)
             {
-                type = getType(type, (String)tuples.get(i));
+                type = getType(type, (String)tuples.get(i), i == tupleSize-1);
             }
         }
         return type;
     }
 
-    Class getType(Class cls, String fieldName)
+    Class getType(Class cls, String fieldName, boolean lastEntry)
     {
         AbstractClassMetaData acmd = metaDataManager.getMetaDataForClass(cls, clr);
         if (acmd != null)
@@ -988,7 +989,14 @@ public abstract class JavaQueryCompiler implements SymbolResolver
             {
                 throw new NucleusUserException("Cannot access field "+fieldName+" on type "+cls.getName());
             }
-            return fmd.getType();
+            
+            // Nested properties on single element collections can be referred as regular fields, 
+            // e.g. person.address.street, where address is a single collection. If the expression refers to 
+            // the property inside the container it returns the element type, on the other hand if
+            // the expression is resolving the collection it returns the collection type.
+            boolean nestedSingleElementProperty = !lastEntry && fmd.isSingleCollection();
+            
+            return nestedSingleElementProperty ? clr.classForName(fmd.getCollection().getElementType()) : fmd.getType();
         }
 
         Field field = ClassUtils.getFieldForClass(cls, fieldName);
