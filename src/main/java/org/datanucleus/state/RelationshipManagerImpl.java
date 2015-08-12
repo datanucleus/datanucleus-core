@@ -17,6 +17,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.state;
 
+import static org.datanucleus.store.types.SCOUtils.singleCollectionValue;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,9 +32,10 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
+import org.datanucleus.store.types.ElementContainerHandler;
 import org.datanucleus.store.types.SCOCollection;
-import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -625,6 +628,7 @@ public class RelationshipManagerImpl implements RelationshipManager
             {
                 Object oldValue = change.oldValue;
                 Object newValue = ownerOP.provideField(mmd.getAbsoluteFieldNumber()); // TODO Use change.value (JDO TCK test pm.conf can fail due to being hollow instead of transient)
+                oldValue = mmd.isSingleCollection() ? singleCollectionValue(ec.getTypeManager(), oldValue) : oldValue;
                 if (oldValue != null)
                 {
                     // Previously had "a.b = b1"; "a.b" has been changed
@@ -643,6 +647,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                                 oldOP.loadField(relatedMmd.getAbsoluteFieldNumber());
                             }
                             Object oldValueFieldValue = oldOP.provideField(relatedMmd.getAbsoluteFieldNumber());
+                            oldValueFieldValue = mmd.isSingleCollection() ? singleCollectionValue(ec.getTypeManager(), oldValueFieldValue) : oldValueFieldValue;
                             if (oldValueFieldValue == null)
                             {
                                 // Set to null so nothing to do
@@ -655,7 +660,12 @@ public class RelationshipManagerImpl implements RelationshipManager
                                     NucleusLogger.PERSISTENCE.debug(Localiser.msg("013004", StringUtils.toJVMIDString(oldValue), relatedMmd.getFullFieldName(),
                                         StringUtils.toJVMIDString(pc), StringUtils.toJVMIDString(newValue)));
                                 }
-                                oldOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), null);
+                                Object replaceValue = null;
+                                if (relatedMmd.isSingleCollection())
+                                {
+                                    replaceValue = ec.getTypeManager().getContainerHandler(relatedMmd.getType()).newContainer();
+                                }
+                                oldOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), replaceValue);
                             }
                         }
                         else
@@ -664,6 +674,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                         }
                     }
                 }
+                newValue = mmd.isSingleCollection() ? singleCollectionValue(ec.getTypeManager(), newValue) : newValue;
                 if (newValue != null)
                 {
                     // Previously had "a.b = b1"; Now have "a.b = b2"
@@ -679,6 +690,11 @@ public class RelationshipManagerImpl implements RelationshipManager
                             newOP.loadField(relatedMmd.getAbsoluteFieldNumber());
                         }
                         Object newValueFieldValue = newOP.provideField(relatedMmd.getAbsoluteFieldNumber());
+                        if (relatedMmd.isSingleCollection())
+                        {
+                            newValueFieldValue = singleCollectionValue(ec.getTypeManager(), newValueFieldValue);
+                        }
+                        
                         if (newValueFieldValue == null)
                         {
                             // Was set to null so set to our object
@@ -686,7 +702,13 @@ public class RelationshipManagerImpl implements RelationshipManager
                             {
                                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("013005", StringUtils.toJVMIDString(newValue), relatedMmd.getFullFieldName(), StringUtils.toJVMIDString(pc)));
                             }
-                            newOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), pc);
+                            Object replaceValue = pc;
+                            if (relatedMmd.isSingleCollection())
+                            {
+                            	ElementContainerHandler containerHandler = ec.getTypeManager().getContainerHandler(relatedMmd.getType());
+								replaceValue = containerHandler.newContainer(pc);
+                            }
+                            newOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), replaceValue);
                         }
                         else if (newValueFieldValue != pc)
                         {
@@ -712,7 +734,14 @@ public class RelationshipManagerImpl implements RelationshipManager
                             {
                                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("013005", StringUtils.toJVMIDString(newValue), relatedMmd.getFullFieldName(), StringUtils.toJVMIDString(pc)));
                             }
-                            newOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), pc);
+                            
+                            Object replaceValue = pc;
+                            if (relatedMmd.isSingleCollection())
+                            {
+                            	ElementContainerHandler containerHandler = ec.getTypeManager().getContainerHandler(relatedMmd.getType());
+                                replaceValue = containerHandler.newContainer(pc);
+                            }
+                            newOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), replaceValue);
                         }
                     }
                 }

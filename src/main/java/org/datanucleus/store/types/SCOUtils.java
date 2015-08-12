@@ -1731,4 +1731,13 @@ public class SCOUtils
         }
         return true;
     }
+    
+    public static Object singleCollectionValue(TypeManager typeManager, Object pc)
+    {
+        if (pc == null) {
+            return null;
+        }
+        Iterator iterator = typeManager.getContainerAdapter(pc).iterator();
+        return pc = iterator.hasNext() ? iterator.next() : null;
+    }
 }
