@@ -2061,6 +2061,15 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     }
 
     /**
+     * Accessor for whether the field has a collection that holds only one element.
+     * @return
+     */
+    public boolean isSingleCollection()
+    {
+        return containerMetaData instanceof CollectionMetaData && ((CollectionMetaData) containerMetaData).singleElement;
+    }
+
+    /**
      * Accessor for whether the field has a map.
      * @return return true if has map
      */
@@ -2670,7 +2679,11 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                                 (otherFmd.hasMap() && otherFmd.getMap().getValueType().equals(getClassName(true))))
                             {
                                 relatedFields.add(otherFmd);
-                                if (hasContainer())
+                                if(isSingleCollection())
+                                {
+                                    relationType = otherFmd.isSingleCollection() ? RelationType.ONE_TO_ONE_BI : RelationType.MANY_TO_ONE_BI;
+                                }
+                                else if (hasContainer())
                                 {
                                     // Should we mark Arrays, Lists, Maps as M-N ?
                                     relationType = RelationType.MANY_TO_MANY_BI;
@@ -2746,7 +2759,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                     // No "mapped-by" found at either end so is unidirectional
                     if (hasContainer())
                     {
-                        relationType = RelationType.ONE_TO_MANY_UNI;
+                        relationType = isSingleCollection() ? RelationType.ONE_TO_ONE_UNI : RelationType.ONE_TO_MANY_UNI;
                     }
                     else if (joinMetaData != null)
                     {

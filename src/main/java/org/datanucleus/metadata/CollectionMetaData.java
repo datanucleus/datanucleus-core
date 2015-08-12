@@ -41,6 +41,12 @@ public class CollectionMetaData extends ContainerMetaData
     protected ContainerComponent element;
 
     /**
+     * Whether this collection handles more than one element. Some collection, e.g. java.lang.Optional, will
+     * always hold only one element.
+     */
+    protected boolean singleElement = false;
+    
+    /**
      * Constructor to create a copy of the passed metadata.
      * @param collmd The metadata to copy
      */
@@ -53,6 +59,7 @@ public class CollectionMetaData extends ContainerMetaData
         element.dependent = collmd.element.dependent;
         element.type = collmd.element.type;
         element.classMetaData = collmd.element.classMetaData;
+        singleElement = collmd.singleElement;
     }
 
     /**
@@ -80,13 +87,6 @@ public class CollectionMetaData extends ContainerMetaData
         // Make sure the type in "element" is set
         element.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), 
             clr, primary, mmgr);
-
-        // Check the field type and see if it is castable to a Collection
-        Class field_type = getMemberMetaData().getType();
-        if (!java.util.Collection.class.isAssignableFrom(field_type))
-        {
-            throw new InvalidMemberMetaDataException("044132", mmd.getClassName(), mmd.getName());
-        }
 
         // "element-type"
         if (element.type == null)
@@ -321,7 +321,13 @@ public class CollectionMetaData extends ContainerMetaData
         element.setDependent(dependent);
         return this;
     }
-
+    
+    public CollectionMetaData setSingleElement(boolean singleElement)
+    {
+        this.singleElement = singleElement;
+        return this;
+    }
+    
     // ------------------------------- Utilities -------------------------------
 
     /**
@@ -362,6 +368,10 @@ public class CollectionMetaData extends ContainerMetaData
         if (element.serialized != null)
         {
             sb.append(" serialized-element=\"").append(element.serialized).append("\"");
+        }
+        if (singleElement)
+        {
+            sb.append(" single-element=\"").append(singleElement).append("\"");
         }
         sb.append(">\n");
 
