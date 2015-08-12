@@ -195,6 +195,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         return fieldValue;
     }
 
+    // TODO DELETE ME!
     private Object fetchObjectOLD(int fieldNumber, Object value, AbstractMemberMetaData mmd)
     {
         RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
