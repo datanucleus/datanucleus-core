@@ -236,6 +236,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         this.ignoreCache = ec.getBooleanProperty(PropertyNames.PROPERTY_IGNORE_CACHE);
         this.readTimeoutMillis = ec.getIntProperty(PropertyNames.PROPERTY_DATASTORE_READ_TIMEOUT);
         this.writeTimeoutMillis = ec.getIntProperty(PropertyNames.PROPERTY_DATASTORE_WRITE_TIMEOUT);
+        this.serializeRead = (ec.getTransaction() != null ? ec.getTransaction().getSerializeRead() : null);
 
         boolean closeAtEcClose = getBooleanExtensionProperty(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE, false);
         if (closeAtEcClose)
