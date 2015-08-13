@@ -236,6 +236,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         this.ignoreCache = ec.getBooleanProperty(PropertyNames.PROPERTY_IGNORE_CACHE);
         this.readTimeoutMillis = ec.getIntProperty(PropertyNames.PROPERTY_DATASTORE_READ_TIMEOUT);
         this.writeTimeoutMillis = ec.getIntProperty(PropertyNames.PROPERTY_DATASTORE_WRITE_TIMEOUT);
+        this.serializeRead = (ec.getTransaction() != null ? ec.getTransaction().getSerializeRead() : null);
 
         boolean closeAtEcClose = getBooleanExtensionProperty(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE, false);
         if (closeAtEcClose)
@@ -1397,8 +1398,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
 
     /**
      * Accessor for whether to serialise (lock) any read objects retrieved from this query.
-     * True means that we will lock them, False means don't lock them, and null implies it is left to
-     * the implementation.
+     * True means that we will lock them, False means don't lock them, and null implies it is left to the implementation.
      * @return Whether to lock
      */
     public Boolean getSerializeRead()
