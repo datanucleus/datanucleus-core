@@ -357,7 +357,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
         else 
         {
             TypeManager typeManager = op.getExecutionContext().getTypeManager();
-            ContainerHandler containerHandler = typeManager.getContainerHandler(unwrappedContainer.getClass());
+            ContainerHandler containerHandler = typeManager.getContainerHandler(mmd.getType());
 
             if (mmd.hasMap())
             {

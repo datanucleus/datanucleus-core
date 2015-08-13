@@ -195,7 +195,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         Object fieldContainer = null;
         
         TypeManager typeManager = op.getExecutionContext().getTypeManager();
-        ContainerHandler containerHandler = typeManager.getContainerHandler(container.getClass());
+        ContainerHandler containerHandler = typeManager.getContainerHandler(mmd.getType());
         
         if (mmd.hasMap())
         {

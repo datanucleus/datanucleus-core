@@ -145,7 +145,7 @@ public class PersistFieldManager extends AbstractFieldManager
     private void processMapContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd)
     {
     	TypeManager typeManager = op.getExecutionContext().getTypeManager();
-    	ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler = typeManager.getContainerHandler(container.getClass());
+    	ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler = typeManager.getContainerHandler(mmd.getType());
     	
         ApiAdapter api = op.getExecutionContext().getApiAdapter();
 
@@ -212,7 +212,7 @@ public class PersistFieldManager extends AbstractFieldManager
     private void processElementContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd)
     {
     	TypeManager typeManager = op.getExecutionContext().getTypeManager();
-    	ElementContainerHandler<Object, ElementContainerAdapter<Object>> elementContainerHandler = typeManager.getContainerHandler(container.getClass());
+    	ElementContainerHandler<Object, ElementContainerAdapter<Object>> elementContainerHandler = typeManager.getContainerHandler(mmd.getType());
 
         // Process all elements of the container that are PC
         ElementContainerAdapter containerAdapter = elementContainerHandler.getAdapter(container);
