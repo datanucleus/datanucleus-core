@@ -210,7 +210,7 @@ public class PersistenceUnitMetaData extends MetaData
 
     public void addClassNames(Set<String> classNames)
     {
-        if (classNames == null)
+        if (this.classNames == null)
         {
             this.classNames = new HashSet();
         }
