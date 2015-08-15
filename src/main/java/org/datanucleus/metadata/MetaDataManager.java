@@ -58,6 +58,8 @@ public interface MetaDataManager
     void setAllowMetaDataLoad(boolean allow);
 
     void setAllowXML(boolean allow);
+    
+    void setDefaultNullable(boolean nullable);
 
     void setAllowAnnotations(boolean allow);
 
@@ -79,6 +81,12 @@ public interface MetaDataManager
      * @return Whether we support ORM
      */
     boolean supportsORM();
+    
+    /**
+     * Acessor for the default nullability of fields.
+     * @return true if fields should be null by default and false whether it should be not-null.
+     */
+    boolean isDefaultNullable();
 
     /**
      * Accessor for whether we are managing the enhancement process.

@@ -134,6 +134,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     /** Whether we allow ORM XML metadata. */
     protected boolean allowORM = true;
 
+    /** Flag defining the default nullability for fields. */
+    protected boolean defaultNullable = true;
+    
     protected Lock updateLock = null;
 
     /** Cache of class names that are known to not have MetaData/annotations. */
@@ -227,7 +230,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         supportXMLNamespaces = nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_XML_NAMESPACE_AWARE);
         allowXML = nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_ALLOW_XML);
         allowAnnotations = nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_ALLOW_ANNOTATIONS);
-
+        defaultNullable = nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_DEFAULT_NULLABLE);
+        
         annotationManager = new AnnotationManagerImpl(this);
 
         // Register all of the types managed by the TypeManager as known second-class types (no metadata).
@@ -389,6 +393,12 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     {
         this.allowXML = allow;
     }
+    
+    @Override
+    public void setDefaultNullable(boolean defaultNullable)
+    {
+        this.defaultNullable = defaultNullable;
+    }
 
     /* (non-Javadoc)
      * @see org.datanucleus.metadata.MetaDataManager#setAllowAnnotations(boolean)
@@ -406,6 +416,12 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     public boolean supportsORM()
     {
         return allowORM;
+    }
+    
+    @Override
+    public boolean isDefaultNullable()
+    {
+        return defaultNullable;
     }
 
     /* (non-Javadoc)

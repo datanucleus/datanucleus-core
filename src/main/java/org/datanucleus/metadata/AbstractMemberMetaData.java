@@ -666,7 +666,25 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 column = null;
             }
         }
+        
+        if (!mmgr.isDefaultNullable() && !hasContainer())
+        {
+            // Find column metadata definition, creating one if not specified
+            ColumnMetaData colMmd;
 
+            if (columns == null || columns.size() == 0)
+            {
+                newColumnMetaData();
+            }
+            colMmd = getColumnMetaData()[0];
+
+            // Set column not-null by default
+            if (colMmd.getAllowsNull() == null)
+            {
+                colMmd.setAllowsNull(Boolean.FALSE);
+            }
+        }
+        
         if (this.containerMetaData != null && this.dependent != null)
         {
             // Check for invalid dependent field specifications

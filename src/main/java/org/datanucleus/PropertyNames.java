@@ -44,6 +44,7 @@ public class PropertyNames
     public static final String PROPERTY_METADATA_SCANNER = "datanucleus.metadata.scanner";
     public static final String PROPERTY_METADATA_DEFAULT_INHERITANCE_STRATEGY = "datanucleus.metadata.defaultInheritanceStrategy";
     public static final String PROPERTY_METADATA_EMBEDDED_PC_FLAT = "datanucleus.metadata.embedded.flat";
+    public static final String PROPERTY_METADATA_DEFAULT_NULLABLE = "datanucleus.metadata.defaultNullable";
 
     public static final String PROPERTY_IGNORE_CACHE = "datanucleus.IgnoreCache";
     public static final String PROPERTY_OPTIMISTIC = "datanucleus.Optimistic";

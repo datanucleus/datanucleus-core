@@ -137,6 +137,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_AUTOREGISTER, null, true, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_ALLOW_XML, null, true, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_ALLOW_ANNOTATIONS, null, true, false, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_DEFAULT_NULLABLE, null, true, true, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_ALLOW_LOAD_AT_RUNTIME, null, true, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_SUPPORT_ORM, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_METADATA_JDO_SUFFIX, null, "jdo", null, false, false);
