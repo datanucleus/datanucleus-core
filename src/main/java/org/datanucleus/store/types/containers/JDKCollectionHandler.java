@@ -1,8 +1,8 @@
 package org.datanucleus.store.types.containers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.datanucleus.store.types.ElementContainerAdapter;
 
@@ -17,12 +17,12 @@ public class JDKCollectionHandler<C extends Collection> extends CollectionHandle
     @Override
     public C newContainer()
     {
-        return (C) new ArrayList();
+        return (C) new HashSet();
     }
 
     @Override
     public C newContainer(Object... objects)
     {
-        return (C) new ArrayList(Arrays.asList(objects));
+        return (C) new HashSet(Arrays.asList(objects));
     }
 }
