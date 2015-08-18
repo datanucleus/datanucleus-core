@@ -50,6 +50,7 @@ import org.datanucleus.store.query.QueryCompilerSyntaxException;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Imports;
 import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -293,7 +294,29 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                             AbstractMemberMetaData mmd = joinedCmd.getMetaDataForMember(joinedMembers[k]);
                             if (mmd == null)
                             {
-                                throw new QueryCompilerSyntaxException("FROM clause has reference to " + joinedCmd.getFullClassName() + "." + joinedMembers[k] + " but it doesn't exist!");
+                                if (childNode.getNodeValue().equals("JOIN_OUTER"))
+                                {
+                                    // Polymorphic join, where the field exists in a subclass (doable since we have outer join)
+                                    String[] subclasses = metaDataManager.getSubclassesForClass(joinedCmd.getFullClassName(), true);
+                                    for (int l=0;l<subclasses.length;l++)
+                                    {
+                                        AbstractClassMetaData subCmd = metaDataManager.getMetaDataForClass(subclasses[l], clr);
+                                        if (subCmd != null)
+                                        {
+                                            mmd = subCmd.getMetaDataForMember(joinedMembers[k]);
+                                            if (mmd != null)
+                                            {
+                                                NucleusLogger.QUERY.debug("Polymorphic join found at " + joinedMembers[k] + " of " + subCmd.getFullClassName());
+                                                joinedCmd = subCmd;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                if (mmd == null)
+                                {
+                                    throw new QueryCompilerSyntaxException("FROM clause has reference to " + joinedCmd.getFullClassName() + "." + joinedMembers[k] + " but it doesn't exist!");
+                                }
                             }
 
                             RelationType relationType = mmd.getRelationType(clr);
