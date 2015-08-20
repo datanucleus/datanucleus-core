@@ -82,7 +82,7 @@ public class ArrayHandler extends ElementContainerHandler<Object, ArrayAdapter<O
     @Override
     public boolean isDefaultFetchGroup(ClassLoaderResolver clr, MetaDataManager mmgr, AbstractMemberMetaData mmd)
     {
-        String elementTypeName = mmd.getArray().getElementType();
+        String elementTypeName = getElementType(mmd);//mmd.getArray().getElementType();
 
         if (StringUtils.isEmpty(elementTypeName))
         {

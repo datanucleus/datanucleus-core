@@ -65,7 +65,7 @@ public abstract class CollectionHandler<C extends Object> extends ElementContain
     @Override
     public boolean isDefaultFetchGroup(ClassLoaderResolver clr, MetaDataManager mmgr, AbstractMemberMetaData mmd)
     {
-        String elementTypeName = mmd.getCollection().getElementType();
+        String elementTypeName = getElementType(mmd) ;//mmd.getCollection().getElementType();
         
         if (StringUtils.isEmpty(elementTypeName))
         {
