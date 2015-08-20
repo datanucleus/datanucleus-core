@@ -5,6 +5,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.metadata.ContainerMetaData;
@@ -20,7 +21,6 @@ import org.datanucleus.util.StringUtils;
 
 public abstract class CollectionHandler<C extends Object> extends ElementContainerHandler<C, ElementContainerAdapter<C>>
 {
-
     @Override
     public CollectionMetaData newMetaData()
     {
@@ -65,7 +65,12 @@ public abstract class CollectionHandler<C extends Object> extends ElementContain
     @Override
     public boolean isDefaultFetchGroup(ClassLoaderResolver clr, MetaDataManager mmgr, AbstractMemberMetaData mmd)
     {
-        String elementTypeName = getElementType(mmd);// mmd.getCollection().getElementType();
+        String elementTypeName = mmd.getCollection().getElementType();
+        
+        if (StringUtils.isEmpty(elementTypeName))
+        {
+            throw new NucleusException("MetaData must be populated in order to be able to determine default fetch group.");
+        }
 
         Class elementType = clr.classForName(elementTypeName);
 

@@ -33,7 +33,7 @@ import org.datanucleus.metadata.MetaDataManager;
  */
 public interface ContainerHandler<C, A extends ContainerAdapter<C>>
 {
-    C newContainer();
+    C newContainer(AbstractMemberMetaData mmm);
 
     A getAdapter(C container);
 

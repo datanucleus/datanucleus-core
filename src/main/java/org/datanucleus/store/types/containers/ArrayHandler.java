@@ -23,6 +23,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ArrayMetaData;
 import org.datanucleus.metadata.ContainerMetaData;
@@ -74,8 +75,13 @@ public class ArrayHandler extends ElementContainerHandler<Object, ArrayAdapter<O
 	@Override
 	public boolean isDefaultFetchGroup(ClassLoaderResolver clr, MetaDataManager mmgr, AbstractMemberMetaData mmd) {
 
-		String elementTypeName = getElementType(mmd);// mmd.getCollection().getElementType();
-
+		String elementTypeName = mmd.getArray().getElementType();
+		
+		if (StringUtils.isEmpty(elementTypeName))
+        {
+            throw new NucleusException("MetaData must be populated to determine default fetch group.");
+        }
+		
 		Class elementType = clr.classForName(elementTypeName);
 
 		// Try to find using generic type specialisation
@@ -115,12 +121,12 @@ public class ArrayHandler extends ElementContainerHandler<Object, ArrayAdapter<O
 	}
 
 	@Override
-	public Object newContainer() {
+	public Object newContainer(AbstractMemberMetaData mmm) {
 		return Array.newInstance(arrayClass.getComponentType(), 0);
 	}
 
 	@Override
-	public Object newContainer(Object... objects) {
+	public Object newContainer(AbstractMemberMetaData mmd, Object... objects) {
 		return objects;
 	}
 

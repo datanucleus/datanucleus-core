@@ -19,16 +19,18 @@ package org.datanucleus.store.types.containers;
 
 import java.util.Stack;
 
+import org.datanucleus.metadata.AbstractMemberMetaData;
+
 public class StackHandler extends JDKCollectionHandler<Stack>
 {
     @Override
-    public Stack newContainer()
+    public Stack newContainer(AbstractMemberMetaData mmm)
     {
         return new Stack();
     }
 
     @Override
-    public Stack newContainer(Object... objects)
+    public Stack newContainer(AbstractMemberMetaData mmd, Object... objects)
     {
         Stack stack = new Stack();
 

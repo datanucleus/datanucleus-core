@@ -383,7 +383,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
         try
         {
             ApiAdapter api = ec.getApiAdapter();
-            MapContainerAdapter<Object> mapToCacheAdapter = containerHandler.getAdapter(containerHandler.newContainer());
+            MapContainerAdapter<Object> mapToCacheAdapter = containerHandler.getAdapter(containerHandler.newContainer(mmd));
 
             boolean keyIsPersistent = mmd.getMap().keyIsPersistent();
             boolean valueIsPersistent = mmd.getMap().valueIsPersistent();
@@ -433,7 +433,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
             // TODO Renato: if (container.getClass().isInterface())?? isn't container always a concrete class
             // here?
 
-            ElementContainerAdapter containerToCacheAdapter = containerHandler.getAdapter(containerHandler.newContainer());
+            ElementContainerAdapter containerToCacheAdapter = containerHandler.getAdapter(containerHandler.newContainer(mmd));
             ApiAdapter api = ec.getApiAdapter();
             // Recurse through elements, and put ids of elements in return value
             for (Object element : containerAdapter)

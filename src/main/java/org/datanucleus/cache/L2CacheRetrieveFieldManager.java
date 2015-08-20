@@ -216,7 +216,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         {
             MapContainerAdapter<Object> cachedMapContainerAdapter = containerHandler.getAdapter(cachedMapContainer);
             // Create Map<Key, Value> of same type as fieldValue
-            MapContainerAdapter fieldMapContainerAdapter = containerHandler.getAdapter(containerHandler.newContainer());
+            MapContainerAdapter fieldMapContainerAdapter = containerHandler.getAdapter(containerHandler.newContainer(mmd));
             for (Entry<Object, Object> entry : cachedMapContainerAdapter.entries())
             {
                 Object mapKey = null;
@@ -270,7 +270,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         {
             ElementContainerAdapter<Object> cachedContainerAdapter = containerHandler.getAdapter(cachedContainer);
             // Create Container of same type as cachedContainer
-            Object newContainer = containerHandler.newContainer();
+            Object newContainer = containerHandler.newContainer(mmd);
             ElementContainerAdapter<Object> fieldContainerAdapter = containerHandler.getAdapter(newContainer);
             RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
             

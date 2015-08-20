@@ -19,10 +19,12 @@ package org.datanucleus.store.types.containers;
 
 import java.util.LinkedHashMap;
 
+import org.datanucleus.metadata.AbstractMemberMetaData;
+
 public class LinkedHashMapHandler extends JDKMapHandler<LinkedHashMap<Object, Object>>
 {
     @Override
-    public LinkedHashMap<Object, Object> newContainer()
+    public LinkedHashMap<Object, Object> newContainer(AbstractMemberMetaData mmm)
     {
         return new LinkedHashMap();
     }

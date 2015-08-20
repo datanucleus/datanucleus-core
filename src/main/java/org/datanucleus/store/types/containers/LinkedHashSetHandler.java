@@ -20,16 +20,18 @@ package org.datanucleus.store.types.containers;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 
+import org.datanucleus.metadata.AbstractMemberMetaData;
+
 public class LinkedHashSetHandler extends JDKCollectionHandler<LinkedHashSet>
 {
     @Override
-    public LinkedHashSet newContainer()
+    public LinkedHashSet newContainer(AbstractMemberMetaData mmm)
     {
         return new LinkedHashSet();
     }
 
     @Override
-    public LinkedHashSet newContainer(Object... objects)
+    public LinkedHashSet newContainer(AbstractMemberMetaData mmd, Object... objects)
     {
         return new LinkedHashSet(Arrays.asList(objects));
     }

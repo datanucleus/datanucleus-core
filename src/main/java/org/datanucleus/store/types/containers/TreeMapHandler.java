@@ -19,10 +19,12 @@ package org.datanucleus.store.types.containers;
 
 import java.util.TreeMap;
 
+import org.datanucleus.metadata.AbstractMemberMetaData;
+
 public class TreeMapHandler extends JDKMapHandler<TreeMap<Object, Object>>
 {
     @Override
-    public TreeMap newContainer()
+    public TreeMap newContainer(AbstractMemberMetaData mmm)
     {
         return new TreeMap();
     }

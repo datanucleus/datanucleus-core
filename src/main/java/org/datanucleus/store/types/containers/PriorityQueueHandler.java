@@ -21,16 +21,18 @@ import java.util.Arrays;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import org.datanucleus.metadata.AbstractMemberMetaData;
+
 public class PriorityQueueHandler extends JDKCollectionHandler<Queue>
 {
     @Override
-    public Queue newContainer()
+    public Queue newContainer(AbstractMemberMetaData mmm)
     {
         return new PriorityQueue();
     }
 
     @Override
-    public Queue newContainer(Object... objects)
+    public Queue newContainer(AbstractMemberMetaData mmd, Object... objects)
     {
         return new PriorityQueue(Arrays.asList(objects));
     }

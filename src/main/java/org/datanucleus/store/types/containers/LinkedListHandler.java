@@ -20,18 +20,19 @@ package org.datanucleus.store.types.containers;
 import java.util.Arrays;
 import java.util.LinkedList;
 
+import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.types.ElementContainerAdapter;
 
 public class LinkedListHandler extends JDKCollectionHandler<LinkedList>
 {
     @Override
-    public LinkedList newContainer()
+    public LinkedList newContainer(AbstractMemberMetaData mmm)
     {
         return new LinkedList();
     }
 
     @Override
-    public LinkedList newContainer(Object... objects)
+    public LinkedList newContainer(AbstractMemberMetaData mmd, Object... objects)
     {
         return new LinkedList(Arrays.asList(objects));
     }

@@ -20,16 +20,18 @@ package org.datanucleus.store.types.containers;
 import java.util.Arrays;
 import java.util.TreeSet;
 
+import org.datanucleus.metadata.AbstractMemberMetaData;
+
 public class TreeSetHandler extends JDKCollectionHandler<TreeSet>
 {
     @Override
-    public TreeSet newContainer()
+    public TreeSet newContainer(AbstractMemberMetaData mmm)
     {
         return new TreeSet();
     }
 
     @Override
-    public TreeSet newContainer(Object... objects)
+    public TreeSet newContainer(AbstractMemberMetaData mmd, Object... objects)
     {
         return new TreeSet(Arrays.asList(objects));
     }

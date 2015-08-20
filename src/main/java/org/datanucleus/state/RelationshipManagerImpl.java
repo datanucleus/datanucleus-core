@@ -663,7 +663,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                                 Object replaceValue = null;
                                 if (relatedMmd.isSingleCollection())
                                 {
-                                    replaceValue = ec.getTypeManager().getContainerHandler(relatedMmd.getType()).newContainer();
+                                    replaceValue = ec.getTypeManager().getContainerHandler(relatedMmd.getType()).newContainer(mmd);
                                 }
                                 oldOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), replaceValue);
                             }
@@ -706,7 +706,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                             if (relatedMmd.isSingleCollection())
                             {
                             	ElementContainerHandler containerHandler = ec.getTypeManager().getContainerHandler(relatedMmd.getType());
-								replaceValue = containerHandler.newContainer(pc);
+								replaceValue = containerHandler.newContainer(null, pc);
                             }
                             newOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), replaceValue);
                         }
@@ -739,7 +739,7 @@ public class RelationshipManagerImpl implements RelationshipManager
                             if (relatedMmd.isSingleCollection())
                             {
                             	ElementContainerHandler containerHandler = ec.getTypeManager().getContainerHandler(relatedMmd.getType());
-                                replaceValue = containerHandler.newContainer(pc);
+                                replaceValue = containerHandler.newContainer(null, pc);
                             }
                             newOP.replaceFieldValue(relatedMmd.getAbsoluteFieldNumber(), replaceValue);
                         }

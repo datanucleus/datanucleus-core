@@ -20,18 +20,19 @@ package org.datanucleus.store.types.containers;
 import java.util.Arrays;
 import java.util.Vector;
 
+import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.types.ElementContainerAdapter;
 
 public class VectorHandler extends JDKCollectionHandler<Vector>
 {
     @Override
-    public Vector newContainer()
+    public Vector newContainer(AbstractMemberMetaData mmm)
     {
         return new Vector();
     }
 
     @Override
-    public Vector newContainer(Object... objects)
+    public Vector newContainer(AbstractMemberMetaData mmd, Object... objects)
     {
         return new Vector(Arrays.asList(objects));
     }

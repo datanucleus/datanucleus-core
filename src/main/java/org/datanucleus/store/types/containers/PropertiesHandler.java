@@ -19,10 +19,12 @@ package org.datanucleus.store.types.containers;
 
 import java.util.Properties;
 
+import org.datanucleus.metadata.AbstractMemberMetaData;
+
 public class PropertiesHandler extends JDKMapHandler<Properties>
 {
     @Override
-    public Properties newContainer()
+    public Properties newContainer(AbstractMemberMetaData mmm)
     {
         return new Properties();
     }

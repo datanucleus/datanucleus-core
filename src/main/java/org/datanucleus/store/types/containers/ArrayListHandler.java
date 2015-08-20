@@ -21,18 +21,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.types.ElementContainerAdapter;
 
 public class ArrayListHandler extends JDKCollectionHandler<List>
 {
     @Override
-    public ArrayList newContainer()
+    public ArrayList newContainer(AbstractMemberMetaData mmm)
     {
         return new ArrayList();
     }
 
     @Override
-    public List newContainer(Object... objects)
+    public List newContainer(AbstractMemberMetaData mmd, Object... objects)
     {
         return new ArrayList(Arrays.asList(objects));
     }
