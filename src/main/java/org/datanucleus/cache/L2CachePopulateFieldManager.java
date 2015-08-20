@@ -383,7 +383,8 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
         try
         {
             ApiAdapter api = ec.getApiAdapter();
-            MapContainerAdapter<Object> mapToCacheAdapter = containerHandler.getAdapter(containerHandler.newContainer(mmd));
+            // See note at processElementContainer about using newInstance vs using newContainer
+            MapContainerAdapter<Object> mapToCacheAdapter = containerHandler.getAdapter(mapContainer.getClass().newInstance());
 
             boolean keyIsPersistent = mmd.getMap().keyIsPersistent();
             boolean valueIsPersistent = mmd.getMap().valueIsPersistent();
@@ -429,11 +430,14 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
 
         try
         {
-            // TODO Renato: Maybe store always as an array?
-            // TODO Renato: if (container.getClass().isInterface())?? isn't container always a concrete class
-            // here?
-
-            ElementContainerAdapter containerToCacheAdapter = containerHandler.getAdapter(containerHandler.newContainer(mmd));
+            // Copy container without using the container handler. Calling newContainer from container 
+            // handler for interfaces will return the default chosen implementation, but this causes
+            // the JDO TCK (TestCollectionCollections) to fail because it expects Collection fields 
+            // to return the same or at most a List.
+        
+            Object toCacheContainer = container.getClass().newInstance();
+            
+            ElementContainerAdapter containerToCacheAdapter = containerHandler.getAdapter(toCacheContainer);
             ApiAdapter api = ec.getApiAdapter();
             // Recurse through elements, and put ids of elements in return value
             for (Object element : containerAdapter)
