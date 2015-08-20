@@ -216,7 +216,8 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         {
             MapContainerAdapter<Object> cachedMapContainerAdapter = containerHandler.getAdapter(cachedMapContainer);
             // Create Map<Key, Value> of same type as fieldValue
-            MapContainerAdapter fieldMapContainerAdapter = containerHandler.getAdapter(cachedMapContainer.getClass().newInstance());
+            Object newContainer = newContainer(cachedMapContainer, mmd, containerHandler);
+            MapContainerAdapter fieldMapContainerAdapter = containerHandler.getAdapter(newContainer);
             for (Entry<Object, Object> entry : cachedMapContainerAdapter.entries())
             {
                 Object mapKey = null;
@@ -269,8 +270,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         try
         {
             ElementContainerAdapter<Object> cachedContainerAdapter = containerHandler.getAdapter(cachedContainer);
-            // Create Container of same type as cachedContainer, do not use newContainer. See cache populate for details.
-            Object newContainer = cachedContainer.getClass().newInstance();
+            Object newContainer = newContainer(cachedContainer, mmd, containerHandler);
             ElementContainerAdapter<Object> fieldContainerAdapter = containerHandler.getAdapter(newContainer);
             RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
             
@@ -324,7 +324,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
             return null;
         }
     }
-    
+
     private Object processField(int fieldNumber, Object value, AbstractMemberMetaData mmd)
     {
         RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
@@ -419,5 +419,28 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         }
         Class pcCls = ec.getClassLoaderResolver().classForName(pcClassName);
         return ec.findObject(pcId, null, pcCls, false, false);
+    }
+    
+    /*
+     * Copy container without using the container handler. Calling newContainer from container handler for
+     * interfaces will return the default chosen implementation, but this causes the JDO TCK
+     * (TestCollectionCollections) to fail because it expects Collection fields to return the same or at most
+     * a List.
+     */
+    static <T> T newContainer(Object container, AbstractMemberMetaData mmd, ContainerHandler containerHandler)
+    {
+        Object newContainer;
+        
+        try
+        {
+            newContainer = container.getClass().newInstance();
+        }
+        catch (Exception e)
+        {
+            // Fallback for containers that don't have a default constructor
+            newContainer = containerHandler.newContainer(mmd);
+        }
+        
+        return (T) newContainer;
     }
 }

@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.cache;
 
 import static org.datanucleus.cache.L2CacheRetrieveFieldManager.copyValue;
+import static org.datanucleus.cache.L2CacheRetrieveFieldManager.newContainer;
 
 import java.util.Map.Entry;
 
@@ -383,8 +384,8 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
         try
         {
             ApiAdapter api = ec.getApiAdapter();
-            // See note at processElementContainer about using newInstance vs using newContainer
-            MapContainerAdapter<Object> mapToCacheAdapter = containerHandler.getAdapter(mapContainer.getClass().newInstance());
+
+            MapContainerAdapter<Object> mapToCacheAdapter = newContainer(mapContainer, mmd, containerHandler);
 
             boolean keyIsPersistent = mmd.getMap().keyIsPersistent();
             boolean valueIsPersistent = mmd.getMap().valueIsPersistent();
@@ -430,12 +431,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
 
         try
         {
-            // Copy container without using the container handler. Calling newContainer from container 
-            // handler for interfaces will return the default chosen implementation, but this causes
-            // the JDO TCK (TestCollectionCollections) to fail because it expects Collection fields 
-            // to return the same or at most a List.
-        
-            Object toCacheContainer = container.getClass().newInstance();
+            Object toCacheContainer = newContainer(container, mmd, containerHandler);
             
             ElementContainerAdapter containerToCacheAdapter = containerHandler.getAdapter(toCacheContainer);
             ApiAdapter api = ec.getApiAdapter();
