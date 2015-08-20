@@ -21,9 +21,11 @@ import java.util.HashMap;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
 
-public class HashMapHandler extends JDKMapHandler<HashMap<Object, Object>> {
-	@Override
-	public HashMap<Object, Object> newContainer(AbstractMemberMetaData mmm) {
-		return new HashMap();
-	}
+public class HashMapHandler extends JDKMapHandler<HashMap<Object, Object>>
+{
+    @Override
+    public HashMap<Object, Object> newContainer(AbstractMemberMetaData mmm)
+    {
+        return new HashMap();
+    }
 }

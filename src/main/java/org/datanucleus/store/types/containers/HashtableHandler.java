@@ -4,7 +4,6 @@ import java.util.Hashtable;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
 
-
 public class HashtableHandler extends JDKMapHandler<Hashtable<Object, Object>>
 {
     @Override

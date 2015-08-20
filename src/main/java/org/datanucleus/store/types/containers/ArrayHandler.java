@@ -33,101 +33,116 @@ import org.datanucleus.store.types.ElementContainerHandler;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.util.StringUtils;
 
-public class ArrayHandler extends ElementContainerHandler<Object, ArrayAdapter<Object>> {
-	private Class arrayClass;
+public class ArrayHandler extends ElementContainerHandler<Object, ArrayAdapter<Object>>
+{
+    private Class arrayClass;
 
-	public ArrayHandler(Class arrayClass) {
-		this.arrayClass = arrayClass;
-	}
+    public ArrayHandler(Class arrayClass)
+    {
+        this.arrayClass = arrayClass;
+    }
 
-	@Override
-	public ArrayMetaData newMetaData() {
-		return new ArrayMetaData();
-	}
+    @Override
+    public ArrayMetaData newMetaData()
+    {
+        return new ArrayMetaData();
+    }
 
-	@Override
-	public void populateMetaData(MetaDataManager mmgr, AbstractMemberMetaData mmd) {
-		// Assert correct type of metaData has been defined
-		ArrayMetaData arrayMetadata = assertMetadataType(mmd.getContainer());
+    @Override
+    public void populateMetaData(MetaDataManager mmgr, AbstractMemberMetaData mmd)
+    {
+        // Assert correct type of metaData has been defined
+        ArrayMetaData arrayMetadata = assertMetadataType(mmd.getContainer());
 
-		if (StringUtils.isEmpty(arrayMetadata.getElementType()) && mmd.getMemberRepresented() != null) {
-			arrayMetadata.setElementType(getElementType(mmd));
-		}
-	}
+        if (StringUtils.isEmpty(arrayMetadata.getElementType()) && mmd.getMemberRepresented() != null)
+        {
+            arrayMetadata.setElementType(getElementType(mmd));
+        }
+    }
 
-	@Override
-	public int getObjectType(AbstractMemberMetaData mmd) {
-		// TODO This should be ARRAY_ELEMENT_PC but we haven't got that yet
-		return mmd.getArray().isEmbeddedElement() || mmd.getArray().isSerializedElement()
-				? ObjectProvider.EMBEDDED_COLLECTION_ELEMENT_PC : ObjectProvider.PC;
-	}
+    @Override
+    public int getObjectType(AbstractMemberMetaData mmd)
+    {
+        // TODO This should be ARRAY_ELEMENT_PC but we haven't got that yet
+        return mmd.getArray().isEmbeddedElement() || mmd.getArray().isSerializedElement() ? ObjectProvider.EMBEDDED_COLLECTION_ELEMENT_PC : ObjectProvider.PC;
+    }
 
-	@Override
-	public boolean isSerialised(AbstractMemberMetaData mmd) {
-		return mmd.isSerialized() || mmd.getArray().isSerializedElement();
-	}
+    @Override
+    public boolean isSerialised(AbstractMemberMetaData mmd)
+    {
+        return mmd.isSerialized() || mmd.getArray().isSerializedElement();
+    }
 
-	@Override
-	public boolean isEmbedded(AbstractMemberMetaData mmd) {
-		return mmd.isEmbedded() || mmd.getArray().isEmbeddedElement();
-	}
+    @Override
+    public boolean isEmbedded(AbstractMemberMetaData mmd)
+    {
+        return mmd.isEmbedded() || mmd.getArray().isEmbeddedElement();
+    }
 
-	@Override
-	public boolean isDefaultFetchGroup(ClassLoaderResolver clr, MetaDataManager mmgr, AbstractMemberMetaData mmd) {
+    @Override
+    public boolean isDefaultFetchGroup(ClassLoaderResolver clr, MetaDataManager mmgr, AbstractMemberMetaData mmd)
+    {
+        String elementTypeName = mmd.getArray().getElementType();
 
-		String elementTypeName = mmd.getArray().getElementType();
-		
-		if (StringUtils.isEmpty(elementTypeName))
+        if (StringUtils.isEmpty(elementTypeName))
         {
             throw new NucleusException("MetaData must be populated to determine default fetch group.");
         }
-		
-		Class elementType = clr.classForName(elementTypeName);
 
-		// Try to find using generic type specialisation
+        Class elementType = clr.classForName(elementTypeName);
 
-		TypeManager typeMgr = mmgr.getNucleusContext().getTypeManager();
+        // Try to find using generic type specialisation
 
-		return typeMgr.isDefaultFetchGroupForCollection(mmd.getType(), elementType);
-	}
+        TypeManager typeMgr = mmgr.getNucleusContext().getTypeManager();
 
-	protected String getElementType(AbstractMemberMetaData mmd) {
-		String elementType = null;
+        return typeMgr.isDefaultFetchGroupForCollection(mmd.getType(), elementType);
+    }
 
-		// Infer from generics
-		Member member = mmd.getMemberRepresented();
+    protected String getElementType(AbstractMemberMetaData mmd)
+    {
+        String elementType = null;
 
-		if (member instanceof Field) {
-			elementType = ((Field) member).getType().getComponentType().getName();
-		} else {
-			elementType = ((Method) member).getReturnType().getComponentType().getName();
-		}
+        // Infer from generics
+        Member member = mmd.getMemberRepresented();
 
-		return elementType;
-	}
+        if (member instanceof Field)
+        {
+            elementType = ((Field) member).getType().getComponentType().getName();
+        }
+        else
+        {
+            elementType = ((Method) member).getReturnType().getComponentType().getName();
+        }
 
-	private ArrayMetaData assertMetadataType(ContainerMetaData existingMetaData) {
-		if (existingMetaData instanceof ArrayMetaData) {
-			return (ArrayMetaData) existingMetaData;
-		}
+        return elementType;
+    }
 
-		// TODO Renato Improve error handling
-		throw new RuntimeException("Invalid type of metadata specified");
-	}
+    private ArrayMetaData assertMetadataType(ContainerMetaData existingMetaData)
+    {
+        if (existingMetaData instanceof ArrayMetaData)
+        {
+            return (ArrayMetaData) existingMetaData;
+        }
 
-	@Override
-	public ArrayAdapter getAdapter(Object container) {
-		return new ArrayAdapter<Object>(container);
-	}
+        // TODO Renato Improve error handling
+        throw new RuntimeException("Invalid type of metadata specified");
+    }
 
-	@Override
-	public Object newContainer(AbstractMemberMetaData mmm) {
-		return Array.newInstance(arrayClass.getComponentType(), 0);
-	}
+    @Override
+    public ArrayAdapter getAdapter(Object container)
+    {
+        return new ArrayAdapter<Object>(container);
+    }
 
-	@Override
-	public Object newContainer(AbstractMemberMetaData mmd, Object... objects) {
-		return objects;
-	}
+    @Override
+    public Object newContainer(AbstractMemberMetaData mmm)
+    {
+        return Array.newInstance(arrayClass.getComponentType(), 0);
+    }
 
+    @Override
+    public Object newContainer(AbstractMemberMetaData mmd, Object... objects)
+    {
+        return objects;
+    }
 }
