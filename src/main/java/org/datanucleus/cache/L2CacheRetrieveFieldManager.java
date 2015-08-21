@@ -276,7 +276,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
             
             if (relType == RelationType.NONE)
             {
-                String elementType = mmd.getCollection().getElementType();
+                String elementType = mmd.hasCollection() ? mmd.getCollection().getElementType() : mmd.getArray().getElementType();
                 boolean mutableType = ec.getTypeManager().isSecondClassMutableType(elementType);
                 
                 if (mutableType)

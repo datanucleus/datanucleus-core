@@ -19,7 +19,6 @@ package org.datanucleus.store.types.containers;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -44,7 +43,19 @@ public class ArrayAdapter<C extends Object> extends ElementContainerAdapter<C>im
 
     public C getContainer()
     {
-        return (C) (buffer == null ? container : buffer.toArray());
+        if (buffer == null)
+        {
+            return container;
+        }
+
+        Object newArray = Array.newInstance(container.getClass().getComponentType(), buffer.size());
+        
+        for (int i = 0; i < buffer.size(); i++)
+        {
+            Object object = buffer.get(i);
+            Array.set(newArray, i, object);
+        }
+        return (C) newArray;
     }
 
     @Override
@@ -69,7 +80,11 @@ public class ArrayAdapter<C extends Object> extends ElementContainerAdapter<C>im
     {
         if (buffer == null)
         {
-            buffer = (List<Object>) new ArrayList<>(Arrays.asList(container));
+            buffer = new ArrayList<>();
+            for (Object object : this)
+            {
+                buffer.add(object);
+            }
         }
 
         return buffer;
