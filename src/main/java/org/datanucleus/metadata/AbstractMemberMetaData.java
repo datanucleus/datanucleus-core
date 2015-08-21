@@ -560,7 +560,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 setContainer(containerHandler.newMetaData());
             }
 
-            containerHandler.populateMetaData(mmgr, this);
+            containerHandler.populateMetaData(clr, primary, mmgr, this);
         }
 
         // Update "default-fetch-group" according to type
@@ -577,8 +577,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             defaultFetchGroup = Boolean.FALSE;
             if (!primaryKey.equals(Boolean.TRUE))
             {
-            	// TODO Renato REMOVE null check when all types are using handlers
-                if (hasContainer() && containerHandler != null)
+                if (hasContainer())
                 {
                     defaultFetchGroup = containerHandler.isDefaultFetchGroup(clr, mmgr, this);
                 }
@@ -628,45 +627,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             }
         }
         
-        // TODO Renato Move this to CollectionHandler
-        if (hasCollection() && ordered && orderMetaData == null)
-        {
-            OrderMetaData ordmd = new OrderMetaData();
-            ordmd.setOrdering("#PK"); // Special value recognised by OrderMetaData
-            setOrderMetaData(ordmd);
-        }
-
-        if (!isSerialized() && !isEmbedded() && columnMetaData != null)
-        {
-            // Not serialising or embedding this field, yet column info was specified. Check for specific conditions
-            if ((hasCollection() || hasArray()) && elementMetaData == null)
-            {
-                // Collection/Array with column(s) specified on field but not on element so move all column info to element
-                ElementMetaData elemmd = new ElementMetaData();
-                setElementMetaData(elemmd);
-                for (int i=0;i<columnMetaData.length;i++)
-                {
-                    elemmd.addColumn(columnMetaData[i]);
-                }
-                columnMetaData = null;
-                columns.clear();
-                column = null;
-            }
-            else if (hasMap() && valueMetaData == null)
-            {
-                // Map with column(s) specified on field but not on value so move all column info to value
-                ValueMetaData valmd = new ValueMetaData();
-                setValueMetaData(valmd);
-                for (int i=0;i<columnMetaData.length;i++)
-                {
-                    valmd.addColumn(columnMetaData[i]);
-                }
-                columnMetaData = null;
-                columns.clear();
-                column = null;
-            }
-        }
-        
         if (!mmgr.isDefaultNullable() && !hasContainer())
         {
             // Find column metadata definition, creating one if not specified
@@ -692,34 +652,17 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             throw new InvalidMemberMetaDataException("044110", getClassName(), getName(), ((ClassMetaData)this.parent).getName());
         }
 
-        if (elementMetaData != null)
+        if (embedded == Boolean.TRUE && embeddedMetaData == null)
         {
-            // Populate any element object
-            elementMetaData.populate(clr, primary, mmgr);
-        }
-        if (keyMetaData != null)
-        {
-            // Populate any key object
-            keyMetaData.populate(clr, primary, mmgr);
-        }
-        if (valueMetaData != null)
-        {
-            // Populate any value object
-            valueMetaData.populate(clr, primary, mmgr);
-        }
-        if (embedded == Boolean.TRUE)
-        {
-            if (embeddedMetaData == null)
+            // User specified "embedded" on the member, yet no embedded definition so add one
+            AbstractClassMetaData memberCmd = mmgr.getMetaDataForClassInternal(getType(), clr);
+            if (memberCmd != null)
             {
-                // User specified "embedded" on the member, yet no embedded definition so add one
-                AbstractClassMetaData memberCmd = mmgr.getMetaDataForClassInternal(getType(), clr);
-                if (memberCmd != null)
-                {
-                    embeddedMetaData = new EmbeddedMetaData();
-                    embeddedMetaData.setParent(this);
-                }
+                embeddedMetaData = new EmbeddedMetaData();
+                embeddedMetaData.setParent(this);
             }
         }
+        
         if (embeddedMetaData != null)
         {
             // Update with any extensions (for lack of features in JPA)
@@ -736,55 +679,49 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             embeddedMetaData.populate(clr, primary, mmgr);
             embedded = Boolean.TRUE;
         }
-        if (elementMetaData != null && elementMetaData.mappedBy != null && mappedBy == null)
-        {
-            // User has specified "mapped-by" on element instead of field so pull it up to this level
-            // <element mapped-by="..."> is the same as <field mapped-by="..."> for a collection field
-            mappedBy = elementMetaData.mappedBy;
-        }
 
         if (containerMetaData != null && persistenceModifier == FieldPersistenceModifier.PERSISTENT)
         {
             // Populate any container
             if (containerMetaData instanceof CollectionMetaData)
             {
-                if (cascadeDelete)
-                {
-                    // User has set cascade-delete (JPA) so set the element as dependent
-                    getCollection().element.dependent = Boolean.TRUE;
-                }
-                getCollection().populate(clr, primary, mmgr);
+//                if (cascadeDelete)
+//                {
+//                    // User has set cascade-delete (JPA) so set the element as dependent
+//                    getCollection().element.dependent = Boolean.TRUE;
+//                }
+//                getCollection().populate(clr, primary, mmgr);
             }
             else if (containerMetaData instanceof MapMetaData)
             {
-                String keyCascadeVal = getValueForExtension("cascade-delete-key");
-                if (cascadeDelete)
-                {
-                    // User has set cascade-delete (JPA) so set the value as dependent
-                    getMap().key.dependent = Boolean.FALSE; // JPA spec doesn't define what this should be
-                    getMap().value.dependent = Boolean.TRUE;
-                }
-                if (keyCascadeVal != null)
-                {
-                    if (keyCascadeVal.equalsIgnoreCase("true"))
-                    {
-                        getMap().key.dependent = Boolean.TRUE;
-                    }
-                    else
-                    {
-                        getMap().key.dependent = Boolean.FALSE;
-                    }
-                }
-                getMap().populate(clr, primary, mmgr);
+//                String keyCascadeVal = getValueForExtension("cascade-delete-key");
+//                if (cascadeDelete)
+//                {
+//                    // User has set cascade-delete (JPA) so set the value as dependent
+//                    getMap().key.dependent = Boolean.FALSE; // JPA spec doesn't define what this should be
+//                    getMap().value.dependent = Boolean.TRUE;
+//                }
+//                if (keyCascadeVal != null)
+//                {
+//                    if (keyCascadeVal.equalsIgnoreCase("true"))
+//                    {
+//                        getMap().key.dependent = Boolean.TRUE;
+//                    }
+//                    else
+//                    {
+//                        getMap().key.dependent = Boolean.FALSE;
+//                    }
+//                }
+//                getMap().populate(clr, primary, mmgr);
             }
             else if (containerMetaData instanceof ArrayMetaData)
             {
-                if (cascadeDelete)
-                {
-                    // User has set cascade-delete (JPA) so set the element as dependent
-                    getArray().element.dependent = Boolean.TRUE;
-                }
-                getArray().populate(clr, primary, mmgr);
+//                if (cascadeDelete)
+//                {
+//                    // User has set cascade-delete (JPA) so set the element as dependent
+//                    getArray().element.dependent = Boolean.TRUE;
+//                }
+//                getArray().populate(clr, primary, mmgr);
             }
         }
 
@@ -2043,6 +1980,13 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             columnMetaData[i] = columns.get(i);
         }
     }
+    
+    public void clearColumns()
+    {
+        columnMetaData = null;
+        columns.clear();
+        column = null;
+    }
 
     public ColumnMetaData newColumnMetaData()
     {
@@ -2138,6 +2082,16 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         }
         return true;
     }
+    
+    public boolean isOrdered()
+    {
+        return ordered;
+    }
+    
+    public String getTargetClassName()
+    {
+        return targetClassName;
+    }
 
     // ------------------------------ Mutators ---------------------------------
 
@@ -2160,11 +2114,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         {
             this.targetClassName = target;
         }
-    }
-
-    public String getTargetClassName()
-    {
-        return targetClassName;
     }
 
     /**

@@ -9,7 +9,9 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.metadata.ContainerMetaData;
+import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.MetaDataManager;
+import org.datanucleus.metadata.OrderMetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.types.ElementContainerAdapter;
 import org.datanucleus.store.types.ElementContainerHandler;
@@ -31,18 +33,45 @@ public abstract class CollectionHandler<C extends Object> extends ElementContain
     }
 
     @Override
-    public void populateMetaData(MetaDataManager mmgr, AbstractMemberMetaData mmd)
+    public void populateMetaData(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr, AbstractMemberMetaData mmd)
     {
         // Assert correct type of metadata has been defined
-        CollectionMetaData collectionMetadata = validate(mmd.getContainer());
+        CollectionMetaData collectionMetadata = assertValidType(mmd.getContainer());
 
         // Populate/update element type, if not already specified
+        // TODO Renato review getMemberRepresented
         if (StringUtils.isEmpty(collectionMetadata.getElementType()) && mmd.getMemberRepresented() != null)
         {
             collectionMetadata.setElementType(getElementType(mmd));
         }
+        
+        if (mmd.isOrdered() && mmd.getOrderMetaData() == null)
+        {
+            OrderMetaData ordmd = new OrderMetaData();
+            ordmd.setOrdering("#PK"); // Special value recognised by OrderMetaData
+            mmd.setOrderMetaData(ordmd);
+        }
+
+        moveColumnsToElement(mmd);
+        copyMappedByDefinitionFromElement(mmd);
+
+        if (mmd.getElementMetaData() != null)
+        {
+            mmd.getElementMetaData().populate(clr, primary, mmgr);
+        }
+
+        if (mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
+        {
+            if (mmd.isCascadeDelete())
+            {
+                // User has set cascade-delete (JPA) so set the element as dependent
+                collectionMetadata.setDependentElement(true);
+            }
+            
+            collectionMetadata.populate(clr, primary, mmgr);
+        }
     }
-    
+
     @Override
     public int getObjectType(AbstractMemberMetaData mmd) {
 		
@@ -65,12 +94,13 @@ public abstract class CollectionHandler<C extends Object> extends ElementContain
     @Override
     public boolean isDefaultFetchGroup(ClassLoaderResolver clr, MetaDataManager mmgr, AbstractMemberMetaData mmd)
     {
-        String elementTypeName = getElementType(mmd) ;//mmd.getCollection().getElementType();
-        
-        if (StringUtils.isEmpty(elementTypeName))
+        if (!mmd.getCollection().isPopulated())
         {
+            // Require mmd to be populated since it will have the element type validated and adjusted if necessary
             throw new NucleusException("MetaData must be populated in order to be able to determine default fetch group.");
         }
+        
+        String elementTypeName = mmd.getCollection().getElementType();
 
         Class elementType = clr.classForName(elementTypeName);
 
@@ -117,7 +147,7 @@ public abstract class CollectionHandler<C extends Object> extends ElementContain
         return elementType;
     }
 
-    private CollectionMetaData validate(ContainerMetaData metaData)
+    private CollectionMetaData assertValidType(ContainerMetaData metaData)
     {
         if (metaData instanceof CollectionMetaData)
         {

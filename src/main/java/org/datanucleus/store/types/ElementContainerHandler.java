@@ -18,6 +18,8 @@ Contributors:
 package org.datanucleus.store.types;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.ColumnMetaData;
+import org.datanucleus.metadata.ElementMetaData;
 
 public abstract class ElementContainerHandler<C, A extends ElementContainerAdapter<C>>
 		implements ContainerHandler<C, A> {
@@ -25,4 +27,37 @@ public abstract class ElementContainerHandler<C, A extends ElementContainerAdapt
 	public abstract C newContainer(AbstractMemberMetaData mmd, Object... objects);
 
 	public abstract int getObjectType(AbstractMemberMetaData mmd);
+	
+	protected void moveColumnsToElement(AbstractMemberMetaData mmd)
+    {
+        ColumnMetaData[] columnMetaData = mmd.getColumnMetaData();
+        
+        if (!mmd.isSerialized() && !mmd.isEmbedded() && columnMetaData != null)
+        {
+            // Not serialising or embedding this field, yet column info was specified. Check for specific conditions
+            if (mmd.getElementMetaData() == null)
+            {
+                // Collection/Array with column(s) specified on field but not on element so move all column info to element
+                ElementMetaData elemmd = new ElementMetaData();
+                mmd.setElementMetaData(elemmd);
+                for (int i=0;i<columnMetaData.length;i++)
+                {
+                    elemmd.addColumn(columnMetaData[i]);
+                }
+                
+                mmd.clearColumns();
+            }
+        }
+    }
+	
+	protected void copyMappedByDefinitionFromElement(AbstractMemberMetaData mmd)
+    {
+        ElementMetaData elementMetaData = mmd.getElementMetaData();
+        if (elementMetaData != null && elementMetaData.getMappedBy() != null && mmd.getMappedBy() == null)
+        {
+            // User has specified "mapped-by" on element instead of field so pull it up to this level
+            // <element mapped-by="..."> is the same as <field mapped-by="..."> for a collection field
+            mmd.setMappedBy(elementMetaData.getMappedBy());
+        }
+    }
 }

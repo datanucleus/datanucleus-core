@@ -27,6 +27,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ArrayMetaData;
 import org.datanucleus.metadata.ContainerMetaData;
+import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.types.ElementContainerHandler;
@@ -49,14 +50,35 @@ public class ArrayHandler extends ElementContainerHandler<Object, ArrayAdapter<O
     }
 
     @Override
-    public void populateMetaData(MetaDataManager mmgr, AbstractMemberMetaData mmd)
+    public void populateMetaData(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr, AbstractMemberMetaData mmd)
     {
         // Assert correct type of metaData has been defined
         ArrayMetaData arrayMetadata = assertMetadataType(mmd.getContainer());
 
+        // Populate/update element type, if not already specified
+        // TODO Renato review getMemberRepresented
         if (StringUtils.isEmpty(arrayMetadata.getElementType()) && mmd.getMemberRepresented() != null)
         {
             arrayMetadata.setElementType(getElementType(mmd));
+        }
+        
+        moveColumnsToElement(mmd);
+        copyMappedByDefinitionFromElement(mmd);
+        
+        if (mmd.getElementMetaData() != null)
+        {
+            mmd.getElementMetaData().populate(clr, primary, mmgr);
+        }
+        
+        if (mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
+        {
+            if (mmd.isCascadeDelete())
+            {
+                // User has set cascade-delete (JPA) so set the element as dependent
+                arrayMetadata.setDependentElement(true);
+            }
+            
+            arrayMetadata.populate(clr, primary, mmgr);
         }
     }
 

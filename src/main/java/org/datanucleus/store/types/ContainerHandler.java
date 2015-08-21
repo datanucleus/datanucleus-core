@@ -39,7 +39,7 @@ public interface ContainerHandler<C, A extends ContainerAdapter<C>>
 
     <M extends ContainerMetaData> M newMetaData();
 
-    void populateMetaData(MetaDataManager mmgr, AbstractMemberMetaData mmd);
+    void populateMetaData(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr, AbstractMemberMetaData mmd);
 
     boolean isDefaultFetchGroup(ClassLoaderResolver clr, MetaDataManager mmgr, AbstractMemberMetaData mmd);
 

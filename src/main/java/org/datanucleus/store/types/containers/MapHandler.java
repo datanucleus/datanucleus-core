@@ -26,9 +26,12 @@ import java.lang.reflect.TypeVariable;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.ContainerMetaData;
+import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.MapMetaData;
 import org.datanucleus.metadata.MetaDataManager;
+import org.datanucleus.metadata.ValueMetaData;
 import org.datanucleus.store.types.ContainerHandler;
 import org.datanucleus.store.types.MapContainerAdapter;
 import org.datanucleus.util.ClassUtils;
@@ -44,9 +47,9 @@ public abstract class MapHandler<C> implements ContainerHandler<C, MapContainerA
     }
 
     @Override
-    public void populateMetaData(MetaDataManager mmgr, AbstractMemberMetaData mmd)
+    public void populateMetaData(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr, AbstractMemberMetaData mmd)
     {
-        MapMetaData mapMd = validate(mmd.getContainer());
+        MapMetaData mapMd = assertValidType(mmd.getContainer());
 
         if (mmd.getMemberRepresented() != null)
         {
@@ -59,6 +62,46 @@ public abstract class MapHandler<C> implements ContainerHandler<C, MapContainerA
             {
                 mapMd.setValueType(getValueType(mmd));
             }
+        }
+        
+        moveColumnsToValue(mmd);
+        
+        if (mmd.getKeyMetaData() != null)
+        {
+            // Populate any key object
+            mmd.getKeyMetaData().populate(clr, primary, mmgr);
+        }
+        
+        if (mmd.getValueMetaData() != null)
+        {
+            // Populate any value object
+            mmd.getValueMetaData().populate(clr, primary, mmgr);
+        }
+        
+        if (mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
+        {
+            String keyCascadeVal = mmd.getValueForExtension("cascade-delete-key");
+            
+            if (mmd.isCascadeDelete())
+            {
+                // User has set cascade-delete (JPA) so set the value as dependent
+                mapMd.setDependentKey(false); // JPA spec doesn't define what this should be
+                mapMd.setDependentValue(true);
+            }
+            
+            if (keyCascadeVal != null)
+            {
+                if (keyCascadeVal.equalsIgnoreCase("true"))
+                {
+                    mapMd.setDependentKey(true);
+                }
+                else
+                {
+                    mapMd.setDependentKey(false);
+                }
+            }
+            
+            mapMd.populate(clr, primary, mmgr);
         }
     }
 
@@ -164,7 +207,7 @@ public abstract class MapHandler<C> implements ContainerHandler<C, MapContainerA
         return valueType;
     }
 
-    private MapMetaData validate(ContainerMetaData metaData)
+    private MapMetaData assertValidType(ContainerMetaData metaData)
     {
         if (metaData instanceof MapMetaData)
         {
@@ -173,6 +216,28 @@ public abstract class MapHandler<C> implements ContainerHandler<C, MapContainerA
 
         // TODO Renato Improve error handling
         throw new RuntimeException("Invalid type of metadata specified");
+    }
+    
+    private void moveColumnsToValue(AbstractMemberMetaData mmd)
+    {
+        ColumnMetaData[] columnMetaData = mmd.getColumnMetaData();
+        
+        if (!mmd.isSerialized() && !mmd.isEmbedded() && columnMetaData != null)
+        {
+            // Not serialising or embedding this field, yet column info was specified. Check for specific conditions
+            if (mmd.getValueMetaData() == null)
+            {
+                // Map with column(s) specified on field but not on value so move all column info to value
+                ValueMetaData valmd = new ValueMetaData();
+                mmd.setValueMetaData(valmd);
+                for (int i=0;i<columnMetaData.length;i++)
+                {
+                    valmd.addColumn(columnMetaData[i]);
+                }
+
+                mmd.clearColumns();
+            }
+        }
     }
 
     @Override
