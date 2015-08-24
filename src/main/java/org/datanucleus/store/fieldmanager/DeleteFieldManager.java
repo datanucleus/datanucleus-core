@@ -18,7 +18,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.fieldmanager;
 
-import java.util.Collection;
 import java.util.Map.Entry;
 
 import org.datanucleus.ExecutionContext;
@@ -28,6 +27,7 @@ import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.types.ContainerHandler;
 import org.datanucleus.store.types.ElementContainerAdapter;
+import org.datanucleus.store.types.ElementContainerHandler;
 import org.datanucleus.store.types.MapContainerAdapter;
 import org.datanucleus.store.types.TypeManager;
 
@@ -135,9 +135,12 @@ public class DeleteFieldManager extends AbstractFieldManager
                     Object relValue = valueOP.provideField(relMmd.getAbsoluteFieldNumber());
                     if (relValue != null)
                     {
-                        if (relValue instanceof Collection)
+                        ContainerHandler containerHandler = ec.getTypeManager().getContainerHandler(relMmd.getType());
+                        
+                        if (containerHandler instanceof ElementContainerHandler)
                         {
-                            ((Collection)relValue).remove(op.getObject());
+                            ElementContainerAdapter adapter = (ElementContainerAdapter) containerHandler.getAdapter(relValue);
+                            adapter.remove(op.getObject());
                         }
                     }
                 }
