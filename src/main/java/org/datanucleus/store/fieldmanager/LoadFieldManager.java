@@ -18,11 +18,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.fieldmanager;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.api.ApiAdapter;
@@ -30,8 +25,10 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.store.types.ContainerHandler;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.store.types.TypeManager;
 
 /**
  * Field Manager to handle loading all fields of all objects in the fetch plan.
@@ -68,7 +65,8 @@ public class LoadFieldManager extends AbstractFetchDepthFieldManager
     }
 
     /**
-     * Method to fetch an object field whether it is SCO collection, PC, or whatever for the fetchplan process.
+     * Method to fetch an object field whether it is SCO collection, PC, or whatever for the fetchplan
+     * process.
      * @param fieldNumber Number of the field
      * @return The object
      */
@@ -81,86 +79,57 @@ public class LoadFieldManager extends AbstractFetchDepthFieldManager
         if (value != null)
         {
             AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-            RelationType relType = mmd.getRelationType(op.getExecutionContext().getClassLoaderResolver());
-            if (RelationType.isRelationSingleValued(relType))
+            RelationType relationType = mmd.getRelationType(op.getExecutionContext().getClassLoaderResolver());
+
+            if (relationType != RelationType.NONE)
             {
-                // Process PC fields
-                processPersistable(value);
-            }
-            else if (RelationType.isRelationMultiValued(relType))
-            {
-                ApiAdapter api = op.getExecutionContext().getApiAdapter();
-                if (value instanceof Collection)
+                if (mmd.hasContainer())
                 {
-                    // Process all elements of the Collection that are PC
-                    if (!(value instanceof SCO))
-                    {
-                        // Replace with SCO
-                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
-                    }
-
-                    Collection coll = (Collection)value;
-                    Iterator iter = coll.iterator();
-                    while (iter.hasNext())
-                    {
-                        Object element = iter.next();
-                        if (api.isPersistable(element))
-                        {
-                            processPersistable(element);
-                        }
-                    }
+                    value = processContainer(fieldNumber, value, mmd);
                 }
-                else if (value instanceof Map)
+                else
                 {
-                    // Process all keys, values of the Map that are PC
-                    if (!(value instanceof SCO))
-                    {
-                        // Replace with SCO
-                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
-                    }
-
-                    Map map = (Map)value;
-
-                    // Process any keys that are persistable
-                    Set keys = map.keySet();
-                    Iterator iter = keys.iterator();
-                    while (iter.hasNext())
-                    {
-                        Object mapKey = iter.next();
-                        if (api.isPersistable(mapKey))
-                        {
-                            processPersistable(mapKey);
-                        }
-                    }
-
-                    // Process any values that are persistable
-                    Collection values = map.values();
-                    iter = values.iterator();
-                    while (iter.hasNext())
-                    {
-                        Object mapValue = iter.next();
-                        if (api.isPersistable(mapValue))
-                        {
-                            processPersistable(mapValue);
-                        }
-                    }
-                }
-                else if (value instanceof Object[])
-                {
-                    Object[] array = (Object[]) value;
-                    for (int i=0;i<array.length;i++)
-                    {
-                        Object element = array[i];
-                        if (api.isPersistable(element))
-                        {
-                            processPersistable(element);
-                        }
-                    }
+                    // Process PC fields
+                    processPersistable(value);
                 }
             }
         }
 
         return value;
+    }
+    
+    private Object processContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd)
+    {
+        Object wrappedContainer = container;
+
+        if (mmd.hasArray())
+        {
+            wrappedContainer = container;
+        }
+        else
+        {
+            if (!(container instanceof SCO))
+            {
+                // Replace with SCO
+                wrappedContainer = SCOUtils.wrapSCOField(op, fieldNumber, container, true);
+            }
+        }
+
+        // Process all persistable objects in the container: elements,values and keys
+        ExecutionContext ec = op.getExecutionContext();
+        TypeManager typeManager = ec.getTypeManager();
+        ContainerHandler containerHandler = typeManager.getContainerHandler(mmd.getType());
+
+        ApiAdapter api = ec.getApiAdapter();
+        for (Object object : containerHandler.getAdapter(wrappedContainer))
+        {
+            if (api.isPersistable(object))
+            {
+                processPersistable(object);
+            }
+        }
+        
+        return wrappedContainer;
     }
 
     /**
