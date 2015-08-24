@@ -37,10 +37,8 @@ import java.io.PrintWriter;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.BitSet;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -73,6 +71,7 @@ import org.datanucleus.metadata.RelationType;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.ObjectReferencingStoreManager;
 import org.datanucleus.store.exceptions.NotYetFlushedException;
+import org.datanucleus.store.fieldmanager.AbstractFetchDepthFieldManager.EndOfFetchPlanGraphException;
 import org.datanucleus.store.fieldmanager.AttachFieldManager;
 import org.datanucleus.store.fieldmanager.DeleteFieldManager;
 import org.datanucleus.store.fieldmanager.DetachFieldManager;
@@ -81,8 +80,8 @@ import org.datanucleus.store.fieldmanager.MakeTransientFieldManager;
 import org.datanucleus.store.fieldmanager.PersistFieldManager;
 import org.datanucleus.store.fieldmanager.SingleValueFieldManager;
 import org.datanucleus.store.fieldmanager.UnsetOwnerFieldManager;
-import org.datanucleus.store.fieldmanager.AbstractFetchDepthFieldManager.EndOfFetchPlanGraphException;
 import org.datanucleus.store.objectvaluegenerator.ObjectValueGenerator;
+import org.datanucleus.store.types.ContainerHandler;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOCollection;
 import org.datanucleus.store.types.SCOContainer;
@@ -2791,17 +2790,18 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                         Object value = provideField(fieldNumbers[i]);
                         if (value != null)
                         {
-                            if (value instanceof Collection)
+                            if (fmd.hasContainer())
                             {
-                                // Refresh any PC elements in the collection
                                 // TODO This should replace the SCO wrapper with a new one, or reload the wrapper
-                                SCOUtils.refreshFetchPlanFieldsForCollection(this, ((Collection)value).toArray());
-                            }
-                            else if (value instanceof Map)
-                            {
-                                // Refresh any PC keys/values in the map
-                                // TODO This should replace the SCO wrapper with a new one, or reload the wrapper
-                                SCOUtils.refreshFetchPlanFieldsForMap(this, ((Map)value).entrySet());
+                                ApiAdapter api = getExecutionContext().getApiAdapter();
+                                ContainerHandler containerHandler = myEC.getTypeManager().getContainerHandler(fmd.getType());
+                                for (Object object : containerHandler.getAdapter(value))
+                                {
+                                    if (api.isPersistable(object))
+                                    {
+                                        getExecutionContext().refreshObject(object);
+                                    }
+                                }
                             }
                             else if (value instanceof Persistable)
                             {

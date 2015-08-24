@@ -1208,49 +1208,6 @@ public class SCOUtils
     }
 
     /**
-     * Convenience method to refresh fetch plan fields for all elements for a collection field. All elements
-     * that are persistable will be made transient.
-     * @param ownerOP ObjectProvider for the owning object with the collection
-     * @param elements The elements in the collection
-     */
-    public static void refreshFetchPlanFieldsForCollection(ObjectProvider ownerOP, Object[] elements)
-    {
-        ApiAdapter api = ownerOP.getExecutionContext().getApiAdapter();
-        for (int i = 0; i < elements.length; i++)
-        {
-            if (api.isPersistable(elements[i]))
-            {
-                ownerOP.getExecutionContext().refreshObject(elements[i]);
-            }
-        }
-    }
-
-    /**
-     * Convenience method to refresh fetch plan fields for all elements for a map field. All elements that are
-     * persistable will be made transient.
-     * @param ownerOP ObjectProvider for the owning object with the map
-     * @param entries The entries in the map
-     */
-    public static void refreshFetchPlanFieldsForMap(ObjectProvider ownerOP, Set entries)
-    {
-        ApiAdapter api = ownerOP.getExecutionContext().getApiAdapter();
-        for (Iterator it = entries.iterator(); it.hasNext();)
-        {
-            Map.Entry entry = (Map.Entry) it.next();
-            Object val = entry.getValue();
-            Object key = entry.getKey();
-            if (api.isPersistable(key))
-            {
-                ownerOP.getExecutionContext().refreshObject(key);
-            }
-            if (api.isPersistable(val))
-            {
-                ownerOP.getExecutionContext().refreshObject(val);
-            }
-        }
-    }
-
-    /**
      * Convenience method to detach (recursively) all elements for a collection field. All elements that are
      * persistable will be detached.
      * @param ownerOP ObjectProvider for the owning object with the collection
