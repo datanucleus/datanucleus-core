@@ -323,6 +323,17 @@ public class CorePropertyValidator implements PropertyValidator
                 }
             }
         }
+        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_EXECUTION_CONTEXT_CLOSE_ACTIVE_TX_ACTION))
+        {
+            if (value instanceof String)
+            {
+                String strVal = (String)value;
+                if (strVal.equalsIgnoreCase("rollback") || strVal.equalsIgnoreCase("exception"))
+                {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 }
