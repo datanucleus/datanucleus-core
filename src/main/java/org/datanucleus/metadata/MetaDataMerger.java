@@ -129,15 +129,43 @@ public class MetaDataMerger
         }
         if (ormCmd.getInheritanceMetaData() != null)
         {
+            // TODO Support merging bit by bit
             primaryCmd.setInheritanceMetaData(ormCmd.getInheritanceMetaData());
         }
         if (ormCmd.getIdentityMetaData() != null)
         {
+            // TODO Support merging bit by bit
             primaryCmd.setIdentityMetaData(ormCmd.getIdentityMetaData());
         }
         if (ormCmd.getVersionMetaData() != null)
         {
-            primaryCmd.setVersionMetaData(ormCmd.getVersionMetaData());
+            VersionMetaData primVermd = primaryCmd.getVersionMetaData();
+            VersionMetaData ormVermd = ormCmd.getVersionMetaData();
+            if (primVermd != null)
+            {
+                // Merge bit by bit
+                if (ormVermd.getVersionStrategy() != null)
+                {
+                    primVermd.setStrategy(ormVermd.getVersionStrategy());
+                }
+                if (ormVermd.getColumnName() != null)
+                {
+                    primVermd.setColumnName(ormVermd.getColumnName());
+                }
+                if (ormVermd.getColumnMetaData() != null)
+                {
+                    primVermd.setColumnMetaData(ormVermd.getColumnMetaData());
+                }
+                if (ormVermd.getIndexMetaData() != null)
+                {
+                    primVermd.setIndexMetaData(ormVermd.getIndexMetaData());
+                }
+            }
+            else
+            {
+                // Just use ORM version metadata
+                primaryCmd.setVersionMetaData(ormVermd);
+            }
         }
         if (ormCmd.listeners != null)
         {
