@@ -147,6 +147,7 @@ public class VersionMetaData extends MetaData
         return colmd;
     }
 
+    // TODO Rename to getStrategy for consistency
     public final VersionStrategy getVersionStrategy()
     {
         return versionStrategy;
@@ -235,7 +236,8 @@ public class VersionMetaData extends MetaData
     {
         // Field needs outputting so generate metadata
         StringBuilder sb = new StringBuilder();
-        sb.append(prefix).append("<version strategy=\"" + versionStrategy.toString() + "\"" +
+        sb.append(prefix).append("<version " + 
+            (versionStrategy!=null ? ("strategy=\"" + versionStrategy.toString() + "\"") : "") +
             (indexed != null ? (" indexed=\"" + indexed.toString() + "\"") : ""));
         if (columnName != null && columnMetaData == null)
         {
