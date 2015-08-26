@@ -400,9 +400,22 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             throw new NucleusUserException(Localiser.msg("010002"));
         }
+
         if (tx.getIsActive())
         {
-            throw new TransactionActiveOnCloseException(this);
+            String closeActionTxAction = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_EXECUTION_CONTEXT_CLOSE_ACTIVE_TX_ACTION);
+            if (closeActionTxAction != null)
+            {
+                if (closeActionTxAction.equalsIgnoreCase("exception"))
+                {
+                    throw new TransactionActiveOnCloseException(this);
+                }
+                else if (closeActionTxAction.equalsIgnoreCase("rollback"))
+                {
+                    NucleusLogger.GENERAL.warn("ExecutionContext closed with active transaction, so rolling back the active transaction");
+                    tx.rollback();
+                }
+            }
         }
 
         // Commit any outstanding non-tx updates
