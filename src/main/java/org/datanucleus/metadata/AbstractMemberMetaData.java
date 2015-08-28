@@ -2024,7 +2024,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     /**
      * Accessor for whether the field has a collection that holds only one element.
-     * @return
+     * @return Whether this is a collection with single element
      */
     public boolean isSingleCollection()
     {
