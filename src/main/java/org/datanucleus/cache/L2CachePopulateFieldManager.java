@@ -385,7 +385,8 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
         {
             ApiAdapter api = ec.getApiAdapter();
 
-            MapContainerAdapter<Object> mapToCacheAdapter = newContainer(mapContainer, mmd, containerHandler);
+            Object newContainer = newContainer(mapContainer, mmd, containerHandler);
+            MapContainerAdapter<Object> mapToCacheAdapter = containerHandler.getAdapter(newContainer);
 
             boolean keyIsPersistent = mmd.getMap().keyIsPersistent();
             boolean valueIsPersistent = mmd.getMap().valueIsPersistent();
