@@ -20,21 +20,23 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.fieldmanager;
 
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Map;
+import java.util.Map.Entry;
 
-import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.api.ApiAdapter;
-import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.MapMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DetachState;
 import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.store.types.ContainerHandler;
+import org.datanucleus.store.types.ElementContainerAdapter;
+import org.datanucleus.store.types.MapContainerAdapter;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.store.types.TypeManager;
 
 /**
  * FieldManager to handle the detachment of fields with persistable objects.
@@ -59,44 +61,44 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
         this.copy = copy;
     }
 
+    
+    /**
+     * Utility method to process the passed persistable object creating a copy.
+     * @param pc The PC object
+     * @return The processed object
+     */
+    protected Object processPersistableCopy(Object pc)
+    {
+        ExecutionContext ec = op.getExecutionContext();
+        ApiAdapter api = ec.getApiAdapter();
+
+        if (!api.isDetached(pc) && api.isPersistent(pc))
+        {
+            // Detach a copy and return the copy
+            return ec.detachObjectCopy(pc, state);
+        }
+        return pc;
+    }
+    
     /**
      * Utility method to process the passed persistable object.
      * @param pc The PC object
      * @return The processed object
      */
-    protected Object processPersistable(Object pc)
+    protected void processPersistable(Object pc)
     {
-        if (pc == null)
-        {
-            return null;
-        }
+        ExecutionContext ec = op.getExecutionContext();
+        ApiAdapter api = ec.getApiAdapter();
 
-        ApiAdapter api = op.getExecutionContext().getApiAdapter();
-        if (!api.isPersistable(pc))
+        if (!api.isDetached(pc) && api.isPersistent(pc))
         {
-            return pc;
+            // Persistent object that is not yet detached so detach it
+            ec.detachObject(pc, state);
         }
-
-        if (!api.isDetached(pc))
-        {
-            if (api.isPersistent(pc))
-            {
-                // Persistent object that is not yet detached so detach it
-                if (copy)
-                {
-                    // Detach a copy and return the copy
-                    return op.getExecutionContext().detachObjectCopy(pc, state);
-                }
-
-                // Detach the object
-                op.getExecutionContext().detachObject(pc, state);
-            }
-        }
-        return pc;
     }
-
+    
     /**
-     * Method to fetch an object field whether it is collection/map, PC, or whatever for the detachment 
+     * Method to fetch an object field whether it is collection/map, PC, or whatever for the detachment
      * process.
      * @param fieldNumber Number of the field
      * @return The object
@@ -106,138 +108,210 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
         SingleValueFieldManager sfv = new SingleValueFieldManager();
         op.provideFields(new int[]{fieldNumber}, sfv);
         Object value = sfv.fetchObjectField(fieldNumber);
-        if (value == null)
-        {
-            return null;
-        }
 
-        ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
-        ApiAdapter api = op.getExecutionContext().getApiAdapter();
-        AbstractMemberMetaData mmd =
-            op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-        RelationType relationType = mmd.getRelationType(clr);
-
-        if (RelationType.isRelationSingleValued(relationType))
+        Object detachedValue = null;
+        if (value != null)
         {
-            if (api.isPersistable(value))
+            AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+
+            if (mmd.hasContainer())
             {
-                // Process PC fields
-                return processPersistable(value);
+                // 1-N, M-N Container
+                detachedValue = processContainer(fieldNumber, value, mmd);
+            }
+            else
+            {
+                detachedValue = processField(fieldNumber, value, mmd);
             }
         }
-        else if (RelationType.isRelationMultiValued(relationType))
-        {
-            if (mmd.hasCollection() || mmd.hasMap())
-            {
-                // Process all elements of Collections/Maps that are PC
-                if (copy)
-                {
-                    if (!(value instanceof SCO))
-                    {
-                        // Replace with SCO so we can work with it
-                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
-                    }
-                    if (!(value instanceof SCO) && mmd.isSerialized())
-                    {
-                        // Collection/Map type not supported, but being serialised
-                        if (mmd.hasCollection())
-                        {
-                            if (mmd.getCollection().elementIsPersistent())
-                            {
-                                throw new NucleusUserException("Unable to detach " + mmd.getFullFieldName() +
-                                    " since is of an unsupported Collection type with persistent elements");
-                            }
-                            return value;
-                        }
-                        else if (mmd.hasMap())
-                        {
-                            if (mmd.getMap().keyIsPersistent() || mmd.getMap().valueIsPersistent())
-                            {
-                                throw new NucleusUserException("Unable to detach " + mmd.getFullFieldName() +
-                                    " since is of an unsupported Map type with persistent keys/values");
-                            }
-                            return value;
-                        }
-                    }
-                    return ((SCO)value).detachCopy(state);
-                }
 
+        return detachedValue;
+    }
+
+    private Object processField(int fieldNumber, Object value, AbstractMemberMetaData mmd)
+    {
+        RelationType relType = mmd.getRelationType(op.getExecutionContext().getClassLoaderResolver());
+
+        if (relType == RelationType.NONE)
+        {
+            if (secondClassMutableFields[fieldNumber])
+            {
                 if (!(value instanceof SCO))
                 {
                     // Replace with SCO so we can work with it
                     value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
                 }
-                SCO sco = (SCO)value;
 
-                if (sco instanceof Collection)
+                // Other SCO
+                if (copy)
                 {
-                    // Detach all PC elements of the collection
-                    SCOUtils.detachForCollection(op, ((Collection)sco).toArray(), state);
-                    sco.unsetOwner();
+                    return ((SCO) value).detachCopy(state);
                 }
-                else if (sco instanceof Map)
-                {
-                    // Detach all PC keys/values of the map
-                    SCOUtils.detachForMap(op, ((Map)sco).entrySet(), state);
-                    sco.unsetOwner();
-                }
+
+                SCO sco = (SCO) value;
 
                 if (SCOUtils.detachAsWrapped(op))
                 {
                     return sco;
                 }
                 return SCOUtils.unwrapSCOField(op, fieldNumber, sco);
-            }
-            else if (mmd.hasArray())
-            {
-                // Process object array
-                if (!api.isPersistable(mmd.getType().getComponentType()))
-                {
-                    // Array element type is not persistable so just return
-                    return value;
-                }
-
-                Object[] arrValue = (Object[])value;
-                Object[] arrDetached = (Object[])Array.newInstance(mmd.getType().getComponentType(), arrValue.length);
-                for (int j=0;j<arrValue.length;j++)
-                {
-                    // Detach elements as appropriate
-                    arrDetached[j] = processPersistable(arrValue[j]);
-                }
-                return arrDetached;
             }
         }
         else
         {
-            if (secondClassMutableFields[fieldNumber])
+            // 1-1 PC
+            if (copy)
             {
-                // Other SCO
-                if (copy)
-                {
-                    if (!(value instanceof SCO))
-                    {
-                        // Replace with SCO so we can work with it
-                        value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
-                    }
-                    return ((SCO)value).detachCopy(state);
-                }
-
-                if (!(value instanceof SCO))
-                {
-                    // Replace with SCO so we can work with it
-                    value = SCOUtils.wrapSCOField(op, fieldNumber, value, true);
-                }
-                SCO sco = (SCO)value;
-
-                if (SCOUtils.detachAsWrapped(op))
-                {
-                    return sco;
-                }
-                return SCOUtils.unwrapSCOField(op, fieldNumber, sco);
+                return processPersistableCopy(value);
             }
+
+            processPersistable(value);
         }
 
         return value;
+    }
+        
+    private Object processContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd)
+    {
+        Object detachedContainer;
+
+        TypeManager typeManager = op.getExecutionContext().getTypeManager();
+        ContainerHandler containerHandler = typeManager.getContainerHandler(mmd.getType());
+
+        if (mmd.hasMap())
+        {
+            detachedContainer = processMapContainer(fieldNumber, container, mmd, containerHandler);
+        }
+        else
+        {
+            detachedContainer = processElementContainer(fieldNumber, container, mmd, containerHandler);
+        }
+
+        if (!mmd.hasArray())
+        {
+            // Need to unset owner for mutable SCOs
+
+            Object wrappedContainer;
+            if (SCOUtils.detachAsWrapped(op))
+            {
+                // Try to wrap the field, if possible, replacing it since it will be returned as wrapped
+                wrappedContainer = SCOUtils.wrapSCOField(op, fieldNumber, detachedContainer, true);
+
+                // Return the wrapped, if mutable, otherwise just the immutable value
+                detachedContainer = wrappedContainer;
+            }
+            else
+            {
+                // Try to wrap the field, if possible, just to be able to unset the owner, so don't
+                // replace it
+                wrappedContainer = SCOUtils.wrapSCOField(op, fieldNumber, detachedContainer, false);
+                
+                // The container can be already an SCO so unwrap it if necessary
+                if (detachedContainer instanceof SCO)
+                {
+                    detachedContainer = SCOUtils.unwrapSCOField(op, fieldNumber, (SCO) detachedContainer);
+                }
+            }
+
+            // It still can be an immutable collection or map, so must check if has been wrapped
+            if (wrappedContainer instanceof SCO)
+            {
+                SCO sco = (SCO) wrappedContainer;
+                sco.unsetOwner();
+            }
+        }
+
+        return detachedContainer;
+    }
+        
+    private Object processElementContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd,
+            ContainerHandler<Object, ElementContainerAdapter<Object>> containerHandler)
+    {
+        Object detachedContainer;
+
+        ElementContainerAdapter containerAdapter = containerHandler.getAdapter(container);
+
+        if (copy)
+        {
+            detachedContainer = containerHandler.newContainer(mmd);
+
+            ElementContainerAdapter<Object> copyAdapter = containerHandler.getAdapter(detachedContainer);
+            for (Object element : containerAdapter)
+            {
+                copyAdapter.add(processPersistableCopy(element));
+            }
+
+            // Get the updated version of the container
+            detachedContainer = copyAdapter.getContainer();
+        }
+        else
+        {
+            detachedContainer = container;
+
+            for (Object element : containerAdapter)
+            {
+                processPersistable(element);
+            }
+        }
+
+        return detachedContainer;
+    }
+    
+    private Object processMapContainer(int fieldNumber, Object mapContainer, AbstractMemberMetaData mmd,
+            ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler)
+    {
+        Object detachedMapContainer;
+
+        MapContainerAdapter<Object> mapAdapter = containerHandler.getAdapter(mapContainer);
+
+        if (copy)
+        {
+            detachedMapContainer = containerHandler.newContainer(mmd);
+
+            MapMetaData mapMd = mmd.getMap();
+            MapContainerAdapter copyAdapter = containerHandler.getAdapter(detachedMapContainer);
+            for (Entry<Object, Object> entry : mapAdapter.entries())
+            {
+                Object key = entry.getKey();
+                if (mapMd.keyIsPersistent())
+                {
+                    key = processPersistableCopy(key);
+                }
+
+                Object value = entry.getValue();
+                if (mapMd.valueIsPersistent())
+                {
+                    value = processPersistableCopy(value);
+                }
+
+                copyAdapter.put(key, value);
+            }
+
+            // Get the updated version of the container
+            detachedMapContainer = copyAdapter.getContainer();
+        }
+        else
+        {
+            detachedMapContainer = mapContainer;
+
+            MapMetaData mapMd = mmd.getMap();
+            for (Entry<Object, Object> entry : mapAdapter.entries())
+            {
+                Object key = entry.getKey();
+                if (mapMd.keyIsPersistent())
+                {
+                    processPersistable(key);
+                }
+
+                Object value = entry.getValue();
+                if (mapMd.valueIsPersistent())
+                {
+                    processPersistable(value);
+                }
+            }
+        }
+
+        return detachedMapContainer;
     }
 
     /**

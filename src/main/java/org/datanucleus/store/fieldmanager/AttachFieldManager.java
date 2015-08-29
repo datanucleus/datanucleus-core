@@ -120,6 +120,7 @@ public class AttachFieldManager extends AbstractFieldManager
 //            }
         }
 
+        // Use ContainerHandlers to support non-JDK Collections and single element collections
         ApiAdapter api = ec.getApiAdapter();
         if (value == null)
         {
