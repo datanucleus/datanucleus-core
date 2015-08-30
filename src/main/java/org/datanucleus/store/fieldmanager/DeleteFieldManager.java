@@ -214,7 +214,7 @@ public class DeleteFieldManager extends AbstractFieldManager
                 }
             }
         }
-        // Renato: TODO Handle nulling of bidirs - Isn't being done by the relationship manager already?
+        // TODO Handle nulling of bidirs - Isn't being done by the relationship manager already?
     }
 
     private void processElementContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd,
