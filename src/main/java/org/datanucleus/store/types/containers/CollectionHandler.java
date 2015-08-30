@@ -38,9 +38,8 @@ public abstract class CollectionHandler<C extends Object> extends ElementContain
         // Assert correct type of metadata has been defined
         CollectionMetaData collectionMetadata = assertValidType(mmd.getContainer());
 
-        // Populate/update element type, if not already specified
-        // TODO Renato review getMemberRepresented
-        if (StringUtils.isEmpty(collectionMetadata.getElementType()) && mmd.getMemberRepresented() != null)
+        // Populate/update element type, if not already specified and we have the member. 
+        if (StringUtils.isEmpty(collectionMetadata.getElementType()))
         {
             collectionMetadata.setElementType(getElementType(mmd));
         }
@@ -124,12 +123,12 @@ public abstract class CollectionHandler<C extends Object> extends ElementContain
             {
                 elementType = ClassUtils.getCollectionElementType((Field) member);
             }
-            else
+            else if (member instanceof Method)
             {
                 elementType = ClassUtils.getCollectionElementType((Method) member);
             }
             
-            // TODO Renato Handle declarations with type bounds? e.g. List<? extends PC> 
+            // TODO Handle declarations with type bounds? e.g. List<? extends PC> 
         }
         else
         {

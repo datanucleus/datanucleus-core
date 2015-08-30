@@ -52,17 +52,14 @@ public abstract class MapHandler<C> implements ContainerHandler<C, MapContainerA
     {
         MapMetaData mapMd = assertValidType(mmd.getContainer());
 
-        if (mmd.getMemberRepresented() != null)
+        if (mapMd.getKeyType() == null)
         {
-            if (mapMd.getKeyType() == null)
-            {
-                mapMd.setKeyType(getKeyType(mmd));
-            }
+            mapMd.setKeyType(getKeyType(mmd));
+        }
 
-            if (mapMd.getValueType() == null)
-            {
-                mapMd.setValueType(getValueType(mmd));
-            }
+        if (mapMd.getValueType() == null)
+        {
+            mapMd.setValueType(getValueType(mmd));
         }
         
         moveColumnsToValue(mmd);
@@ -117,7 +114,7 @@ public abstract class MapHandler<C> implements ContainerHandler<C, MapContainerA
         {
             keyType = ClassUtils.getMapKeyType((Field) member);
         }
-        else
+        else if (member instanceof Method)
         {
             keyType = ClassUtils.getMapKeyType((Method) member);
         }

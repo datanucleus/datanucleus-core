@@ -56,8 +56,7 @@ public class ArrayHandler extends ElementContainerHandler<Object, ArrayAdapter<O
         ArrayMetaData arrayMetadata = assertMetadataType(mmd.getContainer());
 
         // Populate/update element type, if not already specified
-        // TODO Renato review getMemberRepresented
-        if (StringUtils.isEmpty(arrayMetadata.getElementType()) && mmd.getMemberRepresented() != null)
+        if (StringUtils.isEmpty(arrayMetadata.getElementType()))
         {
             arrayMetadata.setElementType(getElementType(mmd));
         }
@@ -104,7 +103,7 @@ public class ArrayHandler extends ElementContainerHandler<Object, ArrayAdapter<O
     @Override
     public boolean isDefaultFetchGroup(ClassLoaderResolver clr, MetaDataManager mmgr, AbstractMemberMetaData mmd)
     {
-        String elementTypeName = getElementType(mmd);//mmd.getArray().getElementType();
+        String elementTypeName = getElementType(mmd);
 
         if (StringUtils.isEmpty(elementTypeName))
         {
@@ -131,7 +130,7 @@ public class ArrayHandler extends ElementContainerHandler<Object, ArrayAdapter<O
         {
             elementType = ((Field) member).getType().getComponentType().getName();
         }
-        else
+        else if (member instanceof Method)
         {
             elementType = ((Method) member).getReturnType().getComponentType().getName();
         }
