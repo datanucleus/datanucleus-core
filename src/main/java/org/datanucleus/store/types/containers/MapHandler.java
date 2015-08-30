@@ -255,7 +255,6 @@ public abstract class MapHandler<C> implements ContainerHandler<C, MapContainerA
     @Override
     public boolean isDefaultFetchGroup(ClassLoaderResolver clr, MetaDataManager mmgr, AbstractMemberMetaData mmd)
     {
-        // TODO Renato Verify this
         return false;
     }
 }
