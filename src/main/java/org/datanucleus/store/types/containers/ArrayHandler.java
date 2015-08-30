@@ -146,8 +146,7 @@ public class ArrayHandler extends ElementContainerHandler<Object, ArrayAdapter<O
             return (ArrayMetaData) existingMetaData;
         }
 
-        // TODO Renato Improve error handling
-        throw new RuntimeException("Invalid type of metadata specified");
+        throw new NucleusException("Invalid type of metadata specified.");
     }
 
     @Override

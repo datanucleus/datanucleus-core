@@ -25,6 +25,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.ContainerMetaData;
@@ -214,8 +215,7 @@ public abstract class MapHandler<C> implements ContainerHandler<C, MapContainerA
             return (MapMetaData) metaData;
         }
 
-        // TODO Renato Improve error handling
-        throw new RuntimeException("Invalid type of metadata specified");
+        throw new NucleusException("Invalid type of metadata specified.");
     }
     
     private void moveColumnsToValue(AbstractMemberMetaData mmd)
