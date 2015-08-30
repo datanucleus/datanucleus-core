@@ -154,7 +154,6 @@ public abstract class CollectionHandler<C extends Object> extends ElementContain
             return (CollectionMetaData) metaData;
         }
 
-        // TODO Renato Improve error handling
-        throw new RuntimeException("Invalid type of metadata specified");
+        throw new NucleusException("Invalid type of metadata specified.");
     }
 }
