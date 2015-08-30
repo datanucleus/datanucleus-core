@@ -18,8 +18,6 @@ Contributors:
 package org.datanucleus.cache;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -284,9 +282,8 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                     // Container<mutable-SCO> - Create the container with a copy of the SCO mutable values
                     for (Object mutableValue : cachedContainerAdapter)
                     {
-                        // TODO Renato: Need to return the value wrapped?
-                        // Object value = SCOUtils.wrapSCOField(op, fieldNumber, copyValue(mutableValue), false);
-                        fieldContainerAdapter.add(copyValue(mutableValue));
+                        // TODO Need to return the value wrapped?
+                        fieldContainerAdapter.add(SCOUtils.copyValue(mutableValue));
                     }
                 }
                 else
@@ -331,7 +328,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         
         if (relType == RelationType.NONE)
         {
-            return SCOUtils.wrapSCOField(op, fieldNumber, copyValue(value), true);
+            return SCOUtils.wrapSCOField(op, fieldNumber, SCOUtils.copyValue(value), true);
         }
         
         if (mmd.isSerialized() ||
@@ -369,37 +366,6 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
             fieldsNotLoaded.add(fieldNumber);
             return null;
         }
-    }
-
-    // TODO: Renato Move this to SCOUtils?
-    static Object copyValue(Object scoValue)
-    {
-        if (scoValue == null)
-        {
-            return null;
-        }
-        else if (scoValue instanceof StringBuffer)
-        {
-            // Use our own copy of this mutable type
-            return new StringBuffer(((StringBuffer)scoValue).toString());
-        }
-        else if (scoValue instanceof StringBuilder)
-        {
-            // Use our own copy of this mutable type
-            return new StringBuilder(((StringBuilder)scoValue).toString());
-        }
-        else if (scoValue instanceof Date)
-        {
-            // Use our own copy of this mutable type
-            return ((Date)scoValue).clone();
-        }
-        else if (scoValue instanceof Calendar)
-        {
-            // Use our own copy of this mutable type
-            return ((Calendar)scoValue).clone();
-        }
-        
-        return scoValue;
     }
 
     private Object getObjectFromCachedId(Object cachedId)

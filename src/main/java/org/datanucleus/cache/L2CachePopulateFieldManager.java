@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.cache;
 
-import static org.datanucleus.cache.L2CacheRetrieveFieldManager.copyValue;
 import static org.datanucleus.cache.L2CacheRetrieveFieldManager.newContainer;
 
 import java.util.Map.Entry;
@@ -38,6 +37,7 @@ import org.datanucleus.store.types.ElementContainerHandler;
 import org.datanucleus.store.types.MapContainerAdapter;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOContainer;
+import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.SequenceAdapter;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.store.types.containers.MapHandler;
@@ -384,8 +384,8 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
 
             for (Entry<Object, Object> entry : containerHandler.getAdapter(mapContainer).entries())
             {
-                Object mapKey = keyIsPersistent ? getCacheableIdForId(api, entry.getKey()) : copyValue(entry.getKey());
-                Object mapValue = valueIsPersistent ? getCacheableIdForId(api, entry.getValue()) : copyValue(entry.getValue());
+                Object mapKey = keyIsPersistent ? getCacheableIdForId(api, entry.getKey()) : SCOUtils.copyValue(entry.getKey());
+                Object mapValue = valueIsPersistent ? getCacheableIdForId(api, entry.getValue()) : SCOUtils.copyValue(entry.getValue());
 
                 mapToCacheAdapter.put(mapKey, mapValue);
             }
@@ -438,7 +438,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
                 {
                     for (Object elementSCO : containerHandler.getAdapter(container))
                     {
-                        adapterToCache.add(L2CacheRetrieveFieldManager.copyValue(elementSCO));
+                        adapterToCache.add(SCOUtils.copyValue(elementSCO));
                     }
                 }
                 else
@@ -489,7 +489,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
         if (relType == RelationType.NONE)
         {
             Object unwrappedValue =  value instanceof SCO ? ((SCO) value).getValue() : value;
-            cachedPC.setFieldValue(fieldNumber, copyValue(unwrappedValue));
+            cachedPC.setFieldValue(fieldNumber, SCOUtils.copyValue(unwrappedValue));
             return;
         }
         

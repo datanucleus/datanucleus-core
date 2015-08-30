@@ -20,8 +20,10 @@ Contributors:
 package org.datanucleus.store.types;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1689,6 +1691,41 @@ public class SCOUtils
         return true;
     }
     
+    /**
+     * Copy a value if it's an *known* SCO type.
+     * @param scoValue An object that might be or not an SCO value
+     * @return Return a copy of the value if it's a know SCO type otherwise just return the value itself.
+     */
+    public static Object copyValue(Object scoValue)
+    {
+        if (scoValue == null)
+        {
+            return null;
+        }
+        else if (scoValue instanceof StringBuffer)
+        {
+            // Use our own copy of this mutable type
+            return new StringBuffer(((StringBuffer)scoValue).toString());
+        }
+        else if (scoValue instanceof StringBuilder)
+        {
+            // Use our own copy of this mutable type
+            return new StringBuilder(((StringBuilder)scoValue).toString());
+        }
+        else if (scoValue instanceof Date)
+        {
+            // Use our own copy of this mutable type
+            return ((Date)scoValue).clone();
+        }
+        else if (scoValue instanceof Calendar)
+        {
+            // Use our own copy of this mutable type
+            return ((Calendar)scoValue).clone();
+        }
+        
+        return scoValue;
+    }
+    
     public static Object singleCollectionValue(TypeManager typeManager, Object pc)
     {
         if (pc == null) {
@@ -1697,4 +1734,5 @@ public class SCOUtils
         Iterator iterator = typeManager.getContainerAdapter(pc).iterator();
         return pc = iterator.hasNext() ? iterator.next() : null;
     }
+    
 }
