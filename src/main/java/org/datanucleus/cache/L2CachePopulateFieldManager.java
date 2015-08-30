@@ -33,13 +33,14 @@ import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
-import org.datanucleus.store.types.ContainerHandler;
 import org.datanucleus.store.types.ElementContainerAdapter;
+import org.datanucleus.store.types.ElementContainerHandler;
 import org.datanucleus.store.types.MapContainerAdapter;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOContainer;
 import org.datanucleus.store.types.SequenceAdapter;
 import org.datanucleus.store.types.TypeManager;
+import org.datanucleus.store.types.containers.MapHandler;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -346,33 +347,23 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
      
             unwrappedContainer = ((SCO)container).getValue();
         }
-        
-        RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
-        
-        if (relType == RelationType.NONE)
-        {
-            // Container<Non-PC> so just return it
-            // TODO Renato Shouldn't we copy it here unless the element SCO type is immutable?
-            cachedPC.setFieldValue(fieldNumber, unwrappedContainer);
-        } 
-        else 
-        {
-            TypeManager typeManager = op.getExecutionContext().getTypeManager();
-            ContainerHandler containerHandler = typeManager.getContainerHandler(mmd.getType());
+         
+        TypeManager typeManager = op.getExecutionContext().getTypeManager();
 
-            if (mmd.hasMap())
-            {
-                processMapContainer(fieldNumber, unwrappedContainer, mmd, containerHandler);
-            }
-            else
-            {
-                processElementContainer(fieldNumber, unwrappedContainer, mmd, containerHandler);
-            }
+        if (mmd.hasMap())
+        {
+            MapHandler mapHandler = typeManager.getContainerHandler(mmd.getType());
+            processMapContainer(fieldNumber, unwrappedContainer, mmd, mapHandler);
+        }
+        else
+        {
+            ElementContainerHandler elementContainerHandler = typeManager.getContainerHandler(mmd.getType());
+            processElementContainer(fieldNumber, unwrappedContainer, mmd, elementContainerHandler);
         }
     }
 
     private void processMapContainer(int fieldNumber, Object mapContainer, AbstractMemberMetaData mmd,
-            ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler)
+            MapHandler<Object> containerHandler)
     {
         if (containerHandler.isSerialised(mmd) || containerHandler.isEmbedded(mmd))
         {
@@ -393,8 +384,8 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
 
             for (Entry<Object, Object> entry : containerHandler.getAdapter(mapContainer).entries())
             {
-                Object mapKey = keyIsPersistent ? getCacheableIdForId(api, entry.getKey()) : entry.getKey();
-                Object mapValue = valueIsPersistent ? getCacheableIdForId(api, entry.getValue()) : entry.getValue();
+                Object mapKey = keyIsPersistent ? getCacheableIdForId(api, entry.getKey()) : copyValue(entry.getKey());
+                Object mapValue = valueIsPersistent ? getCacheableIdForId(api, entry.getValue()) : copyValue(entry.getValue());
 
                 mapToCacheAdapter.put(mapKey, mapValue);
             }
@@ -412,7 +403,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
     }
 
     private void processElementContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd,
-            ContainerHandler<Object, ElementContainerAdapter<Object>> containerHandler)
+            ElementContainerHandler<Object, ElementContainerAdapter<Object>> containerHandler)
     {
         if (containerHandler.isSerialised(mmd) || containerHandler.isEmbedded(mmd))
         {
@@ -429,28 +420,65 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
             cachedPC.setLoadedField(fieldNumber, false);
             return;
         }
-
-        try
+        
+        RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
+        
+        if (relType == RelationType.NONE)
         {
-            Object toCacheContainer = newContainer(container, mmd, containerHandler);
-            
-            ElementContainerAdapter containerToCacheAdapter = containerHandler.getAdapter(toCacheContainer);
-            ApiAdapter api = ec.getApiAdapter();
-            // Recurse through elements, and put ids of elements in return value
-            for (Object element : containerAdapter)
+            // Container<Non-PC>
+            boolean isContainerMutable = ec.getTypeManager().isSecondClassMutableType(mmd.getType().getName());
+            String elementType = containerHandler.getElementTypeName(mmd.getContainer());
+            boolean isElementMutable = ec.getTypeManager().isSecondClassMutableType(elementType);
+
+            if (isContainerMutable || isElementMutable)
             {
-                containerToCacheAdapter.add(getCacheableIdForId(api, element));
+                ElementContainerAdapter<Object> adapterToCache = containerHandler.getAdapter(newContainer(container, mmd, containerHandler));
+
+                if (isElementMutable)
+                {
+                    for (Object elementSCO : containerHandler.getAdapter(container))
+                    {
+                        adapterToCache.add(L2CacheRetrieveFieldManager.copyValue(elementSCO));
+                    }
+                }
+                else
+                {
+                    for (Object element : containerHandler.getAdapter(container))
+                    {
+                        adapterToCache.add(element);
+                    }
+                }
+                cachedPC.setFieldValue(fieldNumber, adapterToCache.getContainer());
             }
-
-            // Put Container<OID> in CachedPC
-            cachedPC.setFieldValue(fieldNumber, containerToCacheAdapter.getContainer());
+            else
+            {
+                // Both container and element are immutable so we can just cache it as it is
+                cachedPC.setFieldValue(fieldNumber, container);
+            }
         }
-        catch (Exception e)
+        else
         {
-            NucleusLogger.CACHE.warn("Unable to create object of type " + container.getClass().getName() + " for L2 caching : " + e.getMessage());
+            // Container<PC>
+            try
+            {
+                ElementContainerAdapter containerToCacheAdapter = containerHandler.getAdapter(newContainer(container, mmd, containerHandler));
+                ApiAdapter api = ec.getApiAdapter();
+                // Recurse through elements, and put ids of elements in return value
+                for (Object element : containerAdapter)
+                {
+                    containerToCacheAdapter.add(getCacheableIdForId(api, element));
+                }
 
-            // Contents not loaded so just mark as unloaded
-            cachedPC.setLoadedField(fieldNumber, false);
+                // Put Container<OID> in CachedPC
+                cachedPC.setFieldValue(fieldNumber, containerToCacheAdapter.getContainer());
+            }
+            catch (Exception e)
+            {
+                NucleusLogger.CACHE.warn("Unable to create object of type " + container.getClass().getName() + " for L2 caching : " + e.getMessage());
+
+                // Contents not loaded so just mark as unloaded
+                cachedPC.setLoadedField(fieldNumber, false);
+            }
         }
     }
     

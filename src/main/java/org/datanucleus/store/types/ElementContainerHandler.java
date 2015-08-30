@@ -17,8 +17,12 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types;
 
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.ArrayMetaData;
+import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
+import org.datanucleus.metadata.ContainerMetaData;
 import org.datanucleus.metadata.ElementMetaData;
 
 public abstract class ElementContainerHandler<C, A extends ElementContainerAdapter<C>>
@@ -27,6 +31,22 @@ public abstract class ElementContainerHandler<C, A extends ElementContainerAdapt
 	public abstract C newContainer(AbstractMemberMetaData mmd, Object... objects);
 
 	public abstract int getObjectType(AbstractMemberMetaData mmd);
+
+    public String getElementTypeName(ContainerMetaData cmd)
+    {
+        if (cmd instanceof CollectionMetaData)
+        {
+            return ((CollectionMetaData) cmd).getElementType();
+        }
+        else if (cmd instanceof ArrayMetaData)
+        {
+            return ((ArrayMetaData) cmd).getElementType();
+        }
+        else
+        {
+            throw new NucleusException("Unable to determine element type name - container metadata not supported");
+        }
+    }
 	
 	protected void moveColumnsToElement(AbstractMemberMetaData mmd)
     {
