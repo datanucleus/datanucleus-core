@@ -105,7 +105,6 @@ public class ReachabilityFieldManager extends AbstractFieldManager
         // Process all objects of the Container that are PC
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            // TODO Renato Remove 007003 from localizer
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("007002", mmd.getFullFieldName()));
         }
         
