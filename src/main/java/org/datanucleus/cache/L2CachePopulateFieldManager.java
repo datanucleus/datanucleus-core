@@ -365,7 +365,9 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
     private void processMapContainer(int fieldNumber, Object mapContainer, AbstractMemberMetaData mmd,
             MapHandler<Object> containerHandler)
     {
-        if (containerHandler.isSerialised(mmd) || containerHandler.isEmbedded(mmd))
+        RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
+
+        if (relType != RelationType.NONE && (containerHandler.isSerialised(mmd) || containerHandler.isEmbedded(mmd)))
         {
             // TODO Support serialised/embedded elements
             cachedPC.setLoadedField(fieldNumber, false);
@@ -405,22 +407,6 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
     private void processElementContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd,
             ElementContainerHandler<Object, ElementContainerAdapter<Object>> containerHandler)
     {
-        if (containerHandler.isSerialised(mmd) || containerHandler.isEmbedded(mmd))
-        {
-            // TODO Support serialised/embedded elements
-            cachedPC.setLoadedField(fieldNumber, false);
-            return;
-        }
-        
-        ElementContainerAdapter containerAdapter = containerHandler.getAdapter(container);
-
-        if (containerAdapter instanceof SequenceAdapter && mmd.getOrderMetaData() != null && !mmd.getOrderMetaData().isIndexedList())
-        {
-            // Ordered list so don't cache since dependent on datastore-retrieve order
-            cachedPC.setLoadedField(fieldNumber, false);
-            return;
-        }
-        
         RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
         
         if (relType == RelationType.NONE)
@@ -459,6 +445,23 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
         else
         {
             // Container<PC>
+
+            if (containerHandler.isSerialised(mmd) || containerHandler.isEmbedded(mmd))
+            {
+                // TODO Support serialised/embedded elements
+                cachedPC.setLoadedField(fieldNumber, false);
+                return;
+            }
+
+            ElementContainerAdapter containerAdapter = containerHandler.getAdapter(container);
+
+            if (containerAdapter instanceof SequenceAdapter && mmd.getOrderMetaData() != null && !mmd.getOrderMetaData().isIndexedList())
+            {
+                // Ordered list so don't cache since dependent on datastore-retrieve order
+                cachedPC.setLoadedField(fieldNumber, false);
+                return;
+            }
+
             try
             {
                 ElementContainerAdapter containerToCacheAdapter = containerHandler.getAdapter(newContainer(container, mmd, containerHandler));
