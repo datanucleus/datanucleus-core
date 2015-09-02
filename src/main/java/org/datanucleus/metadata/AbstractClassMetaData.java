@@ -167,6 +167,7 @@ public abstract class AbstractClassMetaData extends MetaData
     /** UniqueMetaData */
     protected UniqueMetaData[] uniqueMetaData;
 
+    // TODO Would be nice to genericise by AbstractMemberMetaData but rely on binarySearch comparison of AbstractMemberMetaData with String name of property/field. See ClassMetaData
     /** List of members (fields/properties). */
     protected List members = new ArrayList();
 
