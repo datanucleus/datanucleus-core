@@ -298,6 +298,8 @@ public class ClassMetaData extends AbstractClassMetaData
 
     /**
      * Add MetaData of fields/properties not declared in MetaData.
+     * Note that if a member is defined using some generic type in the superclass and this class can use a TypeVariable to resolve it then this
+     * will add the member to "members" here since the type will be different to this class.
      * @param cls Class represented by this metadata
      * @param mmgr MetaData manager
      */
