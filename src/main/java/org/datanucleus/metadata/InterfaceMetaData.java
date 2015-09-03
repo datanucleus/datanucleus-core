@@ -23,7 +23,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.ClassNotResolvedException;
@@ -91,12 +93,12 @@ public class InterfaceMetaData extends AbstractClassMetaData
             validateObjectIdClass(clr, mmgr);
 
             // Count the fields of the relevant category
-            Iterator fields_iter = members.iterator();
+            Iterator<AbstractMemberMetaData> fields_iter = members.iterator();
             int no_of_managed_fields = 0;
             int no_of_overridden_fields = 0;
             while (fields_iter.hasNext())
             {
-                AbstractMemberMetaData fmd = (AbstractMemberMetaData)fields_iter.next();
+                AbstractMemberMetaData fmd = fields_iter.next();
 
                 // Initialise the AbstractMemberMetaData (and its sub-objects)
                 fmd.initialise(clr, mmgr);
@@ -123,7 +125,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
             memberPositionsByName = new HashMap();
             while (fields_iter.hasNext())
             {
-                AbstractMemberMetaData fmd = (AbstractMemberMetaData)fields_iter.next();
+                AbstractMemberMetaData fmd = fields_iter.next();
 
                 if (fmd.isFieldToBePersisted())
                 {
@@ -363,10 +365,10 @@ public class InterfaceMetaData extends AbstractClassMetaData
 
         // Populate the AbstractMemberMetaData with their real field values
         // This will populate any containers in these fields also
-        Iterator fields_iter = members.iterator();
+        Iterator<AbstractMemberMetaData> fields_iter = members.iterator();
         while (fields_iter.hasNext())
         {
-            AbstractMemberMetaData fmd=(AbstractMemberMetaData)fields_iter.next();
+            AbstractMemberMetaData fmd = fields_iter.next();
             if (pkFields == fmd.isPrimaryKey())
             {
                 Class fieldCls = cls;
@@ -422,6 +424,12 @@ public class InterfaceMetaData extends AbstractClassMetaData
      */
     protected void addMetaDataForMembersNotInMetaData(Class cls)
     {
+        Set<String> memberNames = new HashSet<>();
+        for (AbstractMemberMetaData mmd : members)
+        {
+            memberNames.add(mmd.getName());
+        }
+
         // Add MetaData for properties for the interface that aren't in the XML/annotations.
         // We use Reflection here since JDOImplHelper would only give use info
         // for enhanced files (and the enhancer needs unenhanced as well). 
@@ -445,7 +453,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
                     // Find if there is metadata for this property
                     String memberName = ClassUtils.getFieldNameForJavaBeanGetter(clsMethods[i].getName());
                     // TODO : This will not check if the name is a property! so we can miss field+property clashes
-                    if (Collections.binarySearch(members, memberName) < 0)
+                    if (!memberNames.contains(memberName))
                     {
                         // Check if a setter is also present
                         String setterName = ClassUtils.getJavaBeanSetterName(memberName);
@@ -457,6 +465,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
                                 NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, memberName));
                                 AbstractMemberMetaData mmd = newDefaultedProperty(memberName);
                                 members.add(mmd);
+                                memberNames.add(mmd.getName());
                                 Collections.sort(members);
                                 break;
                             }
