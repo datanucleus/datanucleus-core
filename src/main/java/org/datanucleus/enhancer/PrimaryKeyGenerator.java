@@ -82,8 +82,7 @@ public class PrimaryKeyGenerator
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 
         // TODO Parameterise the first argument to allow any JDK
-        cw.visit(EnhanceUtils.getAsmVersionForJRE(), Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, className_ASM, null,
-            "java/lang/Object", new String[] {"java/io/Serializable"});
+        cw.visit(EnhanceUtils.getAsmVersionForJRE(), Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, className_ASM, null, "java/lang/Object", new String[] {"java/io/Serializable"});
 
         // Add fields
         addFields(cw);
@@ -124,8 +123,7 @@ public class PrimaryKeyGenerator
 
     protected String getTypeNameForField(AbstractMemberMetaData mmd)
     {
-        AbstractClassMetaData fieldCmd = classEnhancer.getMetaDataManager().getMetaDataForClass(mmd.getType(),
-            classEnhancer.getClassLoaderResolver());
+        AbstractClassMetaData fieldCmd = classEnhancer.getMetaDataManager().getMetaDataForClass(mmd.getType(), classEnhancer.getClassLoaderResolver());
         String fieldTypeName = mmd.getTypeName();
         if (fieldCmd != null && fieldCmd.getIdentityType() == IdentityType.APPLICATION)
         {
@@ -192,8 +190,7 @@ public class PrimaryKeyGenerator
         mv.visitInsn(Opcodes.DUP);
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitLdcInsn(stringSeparator);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/util/StringTokenizer", "<init>",
-            "(Ljava/lang/String;Ljava/lang/String;)V");
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/util/StringTokenizer", "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
         mv.visitVarInsn(Opcodes.ASTORE, 2);
         Label l5 = new Label();
         mv.visitLabel(l5);
@@ -208,8 +205,7 @@ public class PrimaryKeyGenerator
 
             // String tokenX = tokeniser.nextToken();
             mv.visitVarInsn(Opcodes.ALOAD, 2);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/StringTokenizer", "nextToken",
-                "()Ljava/lang/String;");
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/StringTokenizer", "nextToken", "()Ljava/lang/String;");
             mv.visitVarInsn(Opcodes.ASTORE, astorePosition);
 
             fieldLabels[i] = new Label();
@@ -235,10 +231,8 @@ public class PrimaryKeyGenerator
                 }
 
                 mv.visitVarInsn(Opcodes.ALOAD, astorePosition);
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, wrapperClassName_ASM, "valueOf", 
-                    "(Ljava/lang/String;)L" + wrapperClassName_ASM + ";");
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, wrapperClassName_ASM, wrapperConverterMethod, 
-                    "()" + type_desc);
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, wrapperClassName_ASM, "valueOf", "(Ljava/lang/String;)L" + wrapperClassName_ASM + ";");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, wrapperClassName_ASM, wrapperConverterMethod, "()" + type_desc);
                 mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, mmd.getName(), type_desc);
             }
             else if (mmd.getType() == char.class)
@@ -251,8 +245,7 @@ public class PrimaryKeyGenerator
             else if (mmd.getType() == String.class)
             {
                 mv.visitVarInsn(Opcodes.ALOAD, astorePosition);
-                mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, mmd.getName(), 
-                    EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()));
+                mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, mmd.getName(), EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()));
             }
             else if (mmd.getType() == Long.class || mmd.getType() == Integer.class || 
                     mmd.getType() == Short.class || mmd.getType() == BigInteger.class)
@@ -260,32 +253,28 @@ public class PrimaryKeyGenerator
                 // Uses the following pattern (e.g for Long)
                 // fieldX = Long.valueOf(tokenX);
                 mv.visitVarInsn(Opcodes.ALOAD, astorePosition);
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, typeName_ASM, "valueOf", 
-                    "(Ljava/lang/String;)L" + typeName_ASM + ";");
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, typeName_ASM, "valueOf", "(Ljava/lang/String;)L" + typeName_ASM + ";");
                 mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, mmd.getName(), "L" + typeName_ASM + ";");
             }
             else if (mmd.getType() == Currency.class)
             {
                 // "fieldX = TypeX.newInstance(tokenX)"
                 mv.visitVarInsn(Opcodes.ALOAD, astorePosition);
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/Currency", "getInstance",
-                    "(Ljava/lang/String;)Ljava/util/Currency;");
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/Currency", "getInstance", "(Ljava/lang/String;)Ljava/util/Currency;");
                 mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, mmd.getName(), "Ljava/util/Currency;");
             }
             else if (mmd.getType() == TimeZone.class)
             {
                 // "fieldX = TimeZone.getTimeZone(tokenX)"
                 mv.visitVarInsn(Opcodes.ALOAD, astorePosition);
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/TimeZone", "getTimeZone",
-                    "(Ljava/lang/String;)Ljava/util/TimeZone;");
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/TimeZone", "getTimeZone", "(Ljava/lang/String;)Ljava/util/TimeZone;");
                 mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, mmd.getName(), "Ljava/util/TimeZone;");
             }
             else if (mmd.getType() == UUID.class)
             {
                 // "fieldX = UUID.fromString(tokenX)"
                 mv.visitVarInsn(Opcodes.ALOAD, astorePosition);
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/UUID", "fromString",
-                    "(Ljava/lang/String;)Ljava/util/UUID;");
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/UUID", "fromString", "(Ljava/lang/String;)Ljava/util/UUID;");
                 mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, mmd.getName(), "Ljava/util/UUID;");
             }
             else if (Date.class.isAssignableFrom(mmd.getType()))
@@ -325,10 +314,8 @@ public class PrimaryKeyGenerator
                 mv.visitTypeInsn(Opcodes.NEW, fieldTypeName_ASM);
                 mv.visitInsn(Opcodes.DUP);
                 mv.visitVarInsn(Opcodes.ALOAD, astorePosition);
-                mv.visitMethodInsn(Opcodes.INVOKESPECIAL, fieldTypeName_ASM, "<init>",
-                    "(Ljava/lang/String;)V");
-                mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, mmd.getName(),
-                    EnhanceUtils.getTypeDescriptorForType(fieldTypeName));
+                mv.visitMethodInsn(Opcodes.INVOKESPECIAL, fieldTypeName_ASM, "<init>", "(Ljava/lang/String;)V");
+                mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, mmd.getName(), EnhanceUtils.getTypeDescriptorForType(fieldTypeName));
             }
         }
 
@@ -426,8 +413,7 @@ public class PrimaryKeyGenerator
             }
             else
             {
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, mmd.getTypeName().replace('.', '/'), "toString",
-                    "()Ljava/lang/String;");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, mmd.getTypeName().replace('.', '/'), "toString", "()Ljava/lang/String;");
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
                     "(Ljava/lang/String;)Ljava/lang/StringBuilder;");
             }
@@ -508,11 +494,9 @@ public class PrimaryKeyGenerator
             {
                 // "fieldX == other.fieldX"
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
-                mv.visitFieldInsn(Opcodes.GETFIELD, className_ASM, mmd.getName(),
-                    EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()));
+                mv.visitFieldInsn(Opcodes.GETFIELD, className_ASM, mmd.getName(), EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()));
                 mv.visitVarInsn(Opcodes.ALOAD, 2);
-                mv.visitFieldInsn(Opcodes.GETFIELD, className_ASM, mmd.getName(),
-                    EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()));
+                mv.visitFieldInsn(Opcodes.GETFIELD, className_ASM, mmd.getName(), EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()));
 
                 mv.visitInsn(Opcodes.LCMP);
                 if (i == 0)
@@ -525,11 +509,9 @@ public class PrimaryKeyGenerator
             {
                 // "fieldX == other.fieldX"
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
-                mv.visitFieldInsn(Opcodes.GETFIELD, className_ASM, mmd.getName(),
-                    EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()));
+                mv.visitFieldInsn(Opcodes.GETFIELD, className_ASM, mmd.getName(), EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()));
                 mv.visitVarInsn(Opcodes.ALOAD, 2);
-                mv.visitFieldInsn(Opcodes.GETFIELD, className_ASM, mmd.getName(),
-                    EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()));
+                mv.visitFieldInsn(Opcodes.GETFIELD, className_ASM, mmd.getName(), EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()));
 
                 if (i == 0)
                 {
@@ -594,8 +576,7 @@ public class PrimaryKeyGenerator
         {
             AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtRelativePosition(pkPositions[i]);
             mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitFieldInsn(Opcodes.GETFIELD, className_ASM, mmd.getName(),
-                EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()));
+            mv.visitFieldInsn(Opcodes.GETFIELD, className_ASM, mmd.getName(), EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()));
             if (mmd.getType() == long.class)
             {
                 // "(int)fieldX"
