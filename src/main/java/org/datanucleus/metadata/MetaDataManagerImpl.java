@@ -372,6 +372,32 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         return "dn";
     }
 
+    public boolean isEnhancerField(String fieldName)
+    {
+        String prefix = "dn";
+        if (!fieldName.startsWith(prefix))
+        {
+            return false;
+        }
+
+        // TODO Take these from org.datanucleus.enhancer class at some point to avoid hardcoding
+        if (fieldName.equals("dnStateManager") || fieldName.equals("dnFlags") || fieldName.equals("dnDetachedState"))
+        {
+            return true;
+        }
+
+        // Static fields - commented out. Uncomment if we ever support persisting static fields
+        /*if (fieldName.equals("dnFieldFlags") ||
+            fieldName.equals("dnFieldNames") ||
+            fieldName.equals("dnFieldTypes") ||
+            fieldName.equals("dnPersistableSuperclass") ||
+            fieldName.equals("dnInheritedFieldCount"))
+        {
+            return true;
+        }*/
+        return false;
+    }
+
     /* (non-Javadoc)
      * @see org.datanucleus.metadata.MetaDataManager#setAllowMetaDataLoad(boolean)
      */
