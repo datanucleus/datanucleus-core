@@ -445,7 +445,7 @@ public class ClassMetaData extends AbstractClassMetaData
             {
                 // Limit to fields in this class, that aren't enhancer-added fields that aren't inner class fields, and that aren't static
                 if (!ClassUtils.isInnerClass(clsFields[i].getName()) && !Modifier.isStatic(clsFields[i].getModifiers()) &&
-                    !isEnhancerField(clsFields[i].getName(), mmgr) &&
+                    !mmgr.isEnhancerField(clsFields[i].getName()) &&
                     clsFields[i].getDeclaringClass().getName().equals(fullName))
                 {
                     // Find if there is metadata for this field
@@ -480,7 +480,7 @@ public class ClassMetaData extends AbstractClassMetaData
                 for (int i=0;i<theclsFields.length;i++)
                 {
                     if (!ClassUtils.isInnerClass(theclsFields[i].getName()) && !Modifier.isStatic(theclsFields[i].getModifiers()) &&
-                        !isEnhancerField(theclsFields[i].getName(), mmgr) &&
+                        !mmgr.isEnhancerField(theclsFields[i].getName()) &&
                         theclsFields[i].getGenericType() != null && theclsFields[i].getGenericType() instanceof TypeVariable)
                     {
                         TypeVariable fieldTypeVar = (TypeVariable) theclsFields[i].getGenericType();
@@ -561,32 +561,6 @@ public class ClassMetaData extends AbstractClassMetaData
             NucleusLogger.METADATA.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage());
         }
-    }
-
-    private boolean isEnhancerField(String fieldName, MetaDataManager mmgr)
-    {
-        String prefix = mmgr.getEnhancedMethodNamePrefix();
-        if (!fieldName.startsWith(prefix))
-        {
-            return false;
-        }
-
-        // TODO Take these from org.datanucleus.enhancer class at some point to avoid hardcoding
-        if (fieldName.equals("dnStateManager") || fieldName.equals("dnFlags") || fieldName.equals("dnDetachedState"))
-        {
-            return true;
-        }
-
-        // Static fields - commented out. Uncomment if we ever support persisting static fields
-        /*if (fieldName.equals("dnFieldFlags") ||
-            fieldName.equals("dnFieldNames") ||
-            fieldName.equals("dnFieldTypes") ||
-            fieldName.equals("dnPersistableSuperclass") ||
-            fieldName.equals("dnInheritedFieldCount"))
-        {
-            return true;
-        }*/
-        return false;
     }
 
     /**

@@ -43,6 +43,8 @@ public interface MetaDataManager
 
     String getEnhancedMethodNamePrefix();
 
+    boolean isEnhancerField(String memberName);
+
     /**
      * Method to register a listener to be notified when metadata for a class/interface is initialised.
      * @param listener The listener
