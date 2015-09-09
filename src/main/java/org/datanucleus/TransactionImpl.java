@@ -44,7 +44,8 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Implementation of a transaction for a datastore. {@link org.datanucleus.Transaction}
+ * Implementation of a transaction for a datastore. See {@link org.datanucleus.Transaction}.
+ * This is not thread-safe.
  */
 public class TransactionImpl implements Transaction
 {
