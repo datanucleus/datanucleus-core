@@ -19,7 +19,7 @@ package org.datanucleus;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ExecutionContext;
@@ -37,7 +37,7 @@ public class ExecutionContextPool
     private long maxIdle = 20;
     private long expirationTime;
 
-    private Map<ExecutionContext, Long> recyclableECs;
+    private Map<ExecutionContext, Long> recyclableECs = new ConcurrentHashMap<ExecutionContext, Long>();
 
     private CleanUpThread cleaner;
 
@@ -46,7 +46,6 @@ public class ExecutionContextPool
         this.maxIdle = nucCtx.getConfiguration().getIntProperty(PropertyNames.PROPERTY_EXECUTION_CONTEXT_MAX_IDLE);
         this.nucCtx = nucCtx;
         this.expirationTime = 30000; // 30 seconds
-        this.recyclableECs = new ConcurrentHashMap<ExecutionContext, Long>();
 
         // Start cleanup thread to run every 60 secs
         if (nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_EXECUTION_CONTEXT_REAPER_THREAD))
@@ -85,15 +84,15 @@ public class ExecutionContextPool
         ExecutionContext ec;
         if (recyclableECs.size() > 0)
         {
-            Set<ExecutionContext> e = recyclableECs.keySet();
-            Iterator<ExecutionContext> eIter = e.iterator();
-            while (eIter.hasNext())
+            Iterator<Entry<ExecutionContext, Long>> recycIter = recyclableECs.entrySet().iterator();
+            while (recycIter.hasNext())
             {
-                ec = eIter.next();
-                if ((now - recyclableECs.get(ec)) > expirationTime)
+                Entry<ExecutionContext, Long> recycEntry = recycIter.next();
+                ec = recycEntry.getKey();
+                if ((now - recycEntry.getValue()) > expirationTime)
                 {
                     // object has expired
-                    recyclableECs.remove(ec);
+                    recycIter.remove();
                     expire(ec);
                     ec = null;
                 }
@@ -101,13 +100,13 @@ public class ExecutionContextPool
                 {
                     if (validate(ec))
                     {
-                        recyclableECs.remove(ec);
+                        recycIter.remove();
                         ec.initialise(owner, options);
                         return (ec);
                     }
 
                     // object failed validation
-                    recyclableECs.remove(ec);
+                    recycIter.remove();
                     expire(ec);
                     ec = null;
                 }
@@ -122,20 +121,19 @@ public class ExecutionContextPool
     public synchronized void cleanUp()
     {
         ExecutionContext ec;
-        long now = System.currentTimeMillis();        
-        Set<ExecutionContext> e = recyclableECs.keySet();
-        Iterator<ExecutionContext> eIter = e.iterator();
-        while (eIter.hasNext())
+        long now = System.currentTimeMillis();
+        Iterator<Entry<ExecutionContext, Long>> recycIter = recyclableECs.entrySet().iterator();
+        while (recycIter.hasNext())
         {
-            ec = eIter.next();
-            if ((now - (recyclableECs.get(ec)).longValue()) > expirationTime)
+            Entry<ExecutionContext, Long> recycEntry = recycIter.next();
+            ec = recycEntry.getKey();
+            if ((now - recycEntry.getValue()) > expirationTime)
             {
-                recyclableECs.remove(ec);
+                recycIter.remove();
                 expire(ec);
                 ec = null;
             }
         }
-        System.gc();
     }
 
     public synchronized void checkIn(ExecutionContext ec)

@@ -144,13 +144,15 @@ public class Configuration extends PropertyStore implements Serializable
     public Map<String, Object> getDatastoreProperties()
     {
         Map<String, Object> props = new HashMap<String, Object>();
-        Iterator<String> propKeyIter = properties.keySet().iterator();
-        while (propKeyIter.hasNext())
+
+        Iterator<Map.Entry<String, Object>> propEntryIter = properties.entrySet().iterator();
+        while (propEntryIter.hasNext())
         {
-            String name = propKeyIter.next();
+            Map.Entry<String, Object> propEntry = propEntryIter.next();
+            String name = propEntry.getKey();
             if (isPropertyForDatastore(name))
             {
-                props.put(name, properties.get(name));
+                props.put(name, propEntry.getValue());
             }
         }
         return props;
