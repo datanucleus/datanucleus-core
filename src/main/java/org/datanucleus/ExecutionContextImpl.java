@@ -3906,6 +3906,20 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 if (getManageRelationsChecks())
                 {
                     // Tests for negative situations where inconsistently assigned
+                    Iterator<Map.Entry<ObjectProvider, RelationshipManager>> managedRelEntryIter = managedRelationDetails.entrySet().iterator();
+                    while (managedRelEntryIter.hasNext())
+                    {
+                        Map.Entry<ObjectProvider, RelationshipManager> managedRelEntry = managedRelEntryIter.next();
+                        ObjectProvider op = managedRelEntry.getKey();
+                        LifeCycleState lc = op.getLifecycleState();
+                        if (lc == null || lc.isDeleted())
+                        {
+                            // Has been deleted so ignore all relationship changes
+                            continue;
+                        }
+
+                        managedRelEntry.getValue().checkConsistency();
+                    }
                     for (ObjectProvider op : managedRelationDetails.keySet())
                     {
                         LifeCycleState lc = op.getLifecycleState();
