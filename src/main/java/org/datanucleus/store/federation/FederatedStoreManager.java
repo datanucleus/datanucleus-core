@@ -164,12 +164,11 @@ public class FederatedStoreManager implements StoreManager
 
         if (secondaryStoreMgrMap != null)
         {
-            Iterator<String> secondaryNameIter = secondaryStoreMgrMap.keySet().iterator();
-            while (secondaryNameIter.hasNext())
+            Iterator<Map.Entry<String, StoreManager>> secondaryStoreEntryIter = secondaryStoreMgrMap.entrySet().iterator();
+            while (secondaryStoreEntryIter.hasNext())
             {
-                String name = secondaryNameIter.next();
-                StoreManager secStoreMgr = secondaryStoreMgrMap.get(name);
-                secStoreMgr.close();
+                Map.Entry<String, StoreManager> secondaryStoreEntry = secondaryStoreEntryIter.next();
+                secondaryStoreEntry.getValue().close();
             }
             secondaryStoreMgrMap.clear();
             secondaryStoreMgrMap = null;

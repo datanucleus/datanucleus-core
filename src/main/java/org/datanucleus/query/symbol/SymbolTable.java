@@ -98,13 +98,14 @@ public class SymbolTable implements Serializable
     {
         synchronized (symbolsTable)
         {
-            Iterator<String> iter = symbols.keySet().iterator();
+            Iterator<Map.Entry<String, Symbol>> iter = symbols.entrySet().iterator();
             while (iter.hasNext())
             {
-                String key = iter.next();
+                Map.Entry<String, Symbol> symbolEntry = iter.next();
+                String key = symbolEntry.getKey();
                 if (key.equalsIgnoreCase(name))
                 {
-                    return symbols.get(key);
+                    return symbolEntry.getValue();
                 }
             }
             return null;
