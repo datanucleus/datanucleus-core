@@ -3923,17 +3923,18 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 }
 
                 // Process updates to manage the other side of the relations
-                Iterator<ObjectProvider> opIter = managedRelationDetails.keySet().iterator();
-                while (opIter.hasNext())
+                Iterator<Map.Entry<ObjectProvider, RelationshipManager>> managedRelEntryIter = managedRelationDetails.entrySet().iterator();
+                while (managedRelEntryIter.hasNext())
                 {
-                    ObjectProvider op = opIter.next();
+                    Map.Entry<ObjectProvider, RelationshipManager> managedRelEntry = managedRelEntryIter.next();
+                    ObjectProvider op = managedRelEntry.getKey();
                     LifeCycleState lc = op.getLifecycleState();
                     if (lc == null || lc.isDeleted())
                     {
                         // Has been deleted so ignore all relationship changes
                         continue;
                     }
-                    RelationshipManager relMgr = managedRelationDetails.get(op);
+                    RelationshipManager relMgr = managedRelEntry.getValue();
                     relMgr.process();
                     relMgr.clearFields();
                 }
