@@ -2156,7 +2156,16 @@ public class JPQLParser implements Parser
         }
         else if ((iLiteral = p.parseIntegerLiteral()) != null)
         {
-            litValue = Long.valueOf(iLiteral.longValue());
+            // Represent as BigInteger or Long depending on length
+            String longStr = "" + iLiteral.longValue();
+            if (longStr.length() < iLiteral.toString().length())
+            {
+                litValue = iLiteral;
+            }
+            else
+            {
+                litValue = iLiteral.longValue();
+            }
         }
         else if ((bLiteral = p.parseBooleanLiteralIgnoreCase()) != null)
         {
