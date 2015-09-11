@@ -3920,17 +3920,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
                         managedRelEntry.getValue().checkConsistency();
                     }
-                    for (ObjectProvider op : managedRelationDetails.keySet())
-                    {
-                        LifeCycleState lc = op.getLifecycleState();
-                        if (lc == null || lc.isDeleted())
-                        {
-                            // Has been deleted so ignore all relationship changes
-                            continue;
-                        }
-                        RelationshipManager relMgr = managedRelationDetails.get(op);
-                        relMgr.checkConsistency();
-                    }
                 }
 
                 // Process updates to manage the other side of the relations
