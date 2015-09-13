@@ -2016,51 +2016,50 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             return (ClassMetaData)intfMetaData;
         }
 
-        ClassMetaData cmd = null;
-
         // Search for the class required
-        Set classMetaDataClasses = classMetaDataByClass.keySet();
-        Iterator<String> classMetaDataClassesIter = classMetaDataClasses.iterator();
-        while (classMetaDataClassesIter.hasNext())
+        ClassMetaData cmd = null;
+        Iterator<Map.Entry<String, AbstractClassMetaData>> cmdByClassEntryIter = classMetaDataByClass.entrySet().iterator();
+        while (cmdByClassEntryIter.hasNext())
         {
-            String class_name = classMetaDataClassesIter.next();
-            AbstractClassMetaData cmd_cls = classMetaDataByClass.get(class_name);
+            Map.Entry<String, AbstractClassMetaData> cmdByClassEntry = cmdByClassEntryIter.next();
+            String className = cmdByClassEntry.getKey();
+            AbstractClassMetaData cmdCls = cmdByClassEntry.getValue();
 
-            if (cmd_cls instanceof ClassMetaData)
+            if (cmdCls instanceof ClassMetaData)
             {
                 try
                 {
                     // Check if class is implementation of "implValue" (in the case of java.lang.Object, all will be!)
                     // Class cls = referenceClass.getClassLoader().loadClass(class_name);
                     // if (referenceClass.isAssignableFrom(cls))
-                    if (referenceClass == Object.class || clr.isAssignableFrom(referenceClass, class_name))
+                    if (referenceClass == Object.class || clr.isAssignableFrom(referenceClass, className))
                     {
                         // Find the base class that is an implementation
-                        cmd = (ClassMetaData) cmd_cls;
+                        cmd = (ClassMetaData) cmdCls;
                         if (implValue != null && cmd.getFullClassName().equals(implValue.getClass().getName()))
                         {
                             return cmd;
                         }
 
-                        cmd_cls = cmd.getSuperAbstractClassMetaData();
-                        while (cmd_cls != null)
+                        cmdCls = cmd.getSuperAbstractClassMetaData();
+                        while (cmdCls != null)
                         {
 //                          if (!referenceClass.isAssignableFrom(clr.classForName(((ClassMetaData)cmd_superclass).getFullClassName())))
-                            if (referenceClass != Object.class && !clr.isAssignableFrom(referenceClass, ((ClassMetaData)cmd_cls).getFullClassName()))
+                            if (referenceClass != Object.class && !clr.isAssignableFrom(referenceClass, ((ClassMetaData)cmdCls).getFullClassName()))
                             {
                                 // No point going further up since no longer an implementation
                                 break;
                             }
 
-                            cmd = (ClassMetaData) cmd_cls;
+                            cmd = (ClassMetaData) cmdCls;
                             if (implValue != null && cmd.getFullClassName().equals(implValue.getClass().getName()))
                             {
                                 break;
                             }
 
                             // Go to next superclass
-                            cmd_cls = cmd_cls.getSuperAbstractClassMetaData();
-                            if (cmd_cls == null)
+                            cmdCls = cmdCls.getSuperAbstractClassMetaData();
+                            if (cmdCls == null)
                             {
                                 break;
                             }

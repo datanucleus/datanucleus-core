@@ -556,7 +556,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     public void setExtensions(Map extensions)
     {
         this.extensions = (extensions != null ? new HashMap(extensions) : null);
-        if (extensions.containsKey(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE))
+        if (extensions != null && extensions.containsKey(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE))
         {
             boolean closeAtEcClose = getBooleanExtensionProperty(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE, false);
             if (closeAtEcClose)

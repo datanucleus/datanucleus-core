@@ -344,15 +344,16 @@ public class Transaction
 
             List failures = null;
             boolean failed = false;
-            Iterator<Xid> branchKeys = branches.keySet().iterator();
             if (enlistedResources.size() == 1)
             {
                 // If we have only one resource, we don't ask to prepare, and we go with one-phase commit
                 status = STATUS_COMMITTING;
-                while (branchKeys.hasNext())
+                Iterator<Map.Entry<Xid, XAResource>> branchesEntryIter = branches.entrySet().iterator();
+                while (branchesEntryIter.hasNext())
                 {
-                    Xid key = branchKeys.next();
-                    XAResource resourceManager = branches.get(key);
+                    Map.Entry<Xid, XAResource> branchesEntry = branchesEntryIter.next();
+                    Xid key = branchesEntry.getKey();
+                    XAResource resourceManager = branchesEntry.getValue();
                     try
                     {
                         if (!failed)
@@ -390,10 +391,12 @@ public class Transaction
             {
                 // Prepare each enlisted resource
                 status = STATUS_PREPARING;
-                while ((!failed) && (branchKeys.hasNext()))
+                Iterator<Map.Entry<Xid, XAResource>> branchesEntryIter = branches.entrySet().iterator();
+                while ((!failed) && (branchesEntryIter.hasNext()))
                 {
-                    Xid key = branchKeys.next();
-                    XAResource resourceManager = branches.get(key);
+                    Map.Entry<Xid, XAResource> branchesEntry = branchesEntryIter.next();
+                    Xid key = branchesEntry.getKey();
+                    XAResource resourceManager = branchesEntry.getValue();
                     try
                     {
                         // Preparing the resource manager using its branch xid
@@ -425,11 +428,12 @@ public class Transaction
                     status = STATUS_ROLLING_BACK;
                     failed = false;
                     // Rolling back all the prepared (and unprepared) branches
-                    branchKeys = branches.keySet().iterator();
-                    while (branchKeys.hasNext())
+                    branchesEntryIter = branches.entrySet().iterator();
+                    while (branchesEntryIter.hasNext())
                     {
-                        Xid key = branchKeys.next();
-                        XAResource resourceManager = branches.get(key);
+                        Map.Entry<Xid, XAResource> branchesEntry = branchesEntryIter.next();
+                        Xid key = branchesEntry.getKey();
+                        XAResource resourceManager = branchesEntry.getValue();
                         try
                         {
                             resourceManager.rollback(key);
@@ -452,11 +456,12 @@ public class Transaction
                 {
                     status = STATUS_COMMITTING;
                     // Commit each enlisted resource
-                    branchKeys = branches.keySet().iterator();
-                    while (branchKeys.hasNext())
+                    branchesEntryIter = branches.entrySet().iterator();
+                    while (branchesEntryIter.hasNext())
                     {
-                        Xid key = branchKeys.next();
-                        XAResource resourceManager = branches.get(key);
+                        Map.Entry<Xid, XAResource> branchesEntry = branchesEntryIter.next();
+                        Xid key = branchesEntry.getKey();
+                        XAResource resourceManager = branchesEntry.getValue();
                         try
                         {
                             resourceManager.commit(key, false);
@@ -532,12 +537,13 @@ public class Transaction
             }
 
             List failures = null;
-            Iterator<Xid> branchKeys = branches.keySet().iterator();
             status = STATUS_ROLLING_BACK;
-            while (branchKeys.hasNext())
+            Iterator<Map.Entry<Xid, XAResource>> branchesEntryIter = branches.entrySet().iterator();
+            while (branchesEntryIter.hasNext())
             {
-                Xid xid = branchKeys.next();
-                XAResource resourceManager = branches.get(xid);
+                Map.Entry<Xid, XAResource> branchesEntry = branchesEntryIter.next();
+                Xid xid = branchesEntry.getKey();
+                XAResource resourceManager = branchesEntry.getValue();
                 try
                 {
                     resourceManager.rollback(xid);
