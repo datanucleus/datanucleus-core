@@ -4006,8 +4006,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             if (!dirtyOPs.isEmpty() || !indirectDirtyOPs.isEmpty())
             {
                 // If the flush caused the attach of an object it can get registered as dirty, so do second pass
-                NucleusLogger.GENERAL.info("Flush pass 1 resulted in " + (dirtyOPs.size() + indirectDirtyOPs.size()) +
-                    " additional objects being made dirty. Performing flush pass 2");
+                NucleusLogger.PERSISTENCE.debug("Flush pass 1 resulted in " + (dirtyOPs.size() + indirectDirtyOPs.size()) + " additional objects being made dirty. Performing flush pass 2");
                 flushInternal(true);
             }
 
