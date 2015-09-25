@@ -83,7 +83,6 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
     /**
      * Utility method to process the passed persistable object.
      * @param pc The PC object
-     * @return The processed object
      */
     protected void processPersistable(Object pc)
     {
