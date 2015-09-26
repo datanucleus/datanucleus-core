@@ -294,7 +294,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                             AbstractMemberMetaData mmd = joinedCmd.getMetaDataForMember(joinedMembers[k]);
                             if (mmd == null)
                             {
-                                if (childNode.getNodeValue().equals("JOIN_OUTER"))
+                                if (childNode.getNodeValue().equals("JOIN_OUTER") || childNode.getNodeValue().equals("JOIN_OUTER_FETCH"))
                                 {
                                     // Polymorphic join, where the field exists in a subclass (doable since we have outer join)
                                     String[] subclasses = metaDataManager.getSubclassesForClass(joinedCmd.getFullClassName(), true);
