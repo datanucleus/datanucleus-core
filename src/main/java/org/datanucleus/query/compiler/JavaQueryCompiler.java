@@ -65,6 +65,13 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class JavaQueryCompiler implements SymbolResolver
 {
+    public static final String JOIN_INNER = "JOIN_INNER";
+    public static final String JOIN_INNER_FETCH = "JOIN_INNER_FETCH";
+    public static final String JOIN_OUTER = "JOIN_OUTER";
+    public static final String JOIN_OUTER_FETCH = "JOIN_OUTER_FETCH";
+    public static final String JOIN_OUTER_RIGHT = "JOIN_OUTER_RIGHT";
+    public static final String JOIN_OUTER_FETCH_RIGHT = "JOIN_OUTER_FETCH_RIGHT";
+
     protected JavaQueryCompiler parentCompiler;
     protected Map<Object, String> parameterSubtitutionMap;
     protected int parameterSubstitutionNumber = 0;
@@ -294,7 +301,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                             AbstractMemberMetaData mmd = joinedCmd.getMetaDataForMember(joinedMembers[k]);
                             if (mmd == null)
                             {
-                                if (childNode.getNodeValue().equals("JOIN_OUTER"))
+                                if (childNode.getNodeValue().equals(JOIN_OUTER) || childNode.getNodeValue().equals(JOIN_OUTER_FETCH))
                                 {
                                     // Polymorphic join, where the field exists in a subclass (doable since we have outer join)
                                     String[] subclasses = metaDataManager.getSubclassesForClass(joinedCmd.getFullClassName(), true);

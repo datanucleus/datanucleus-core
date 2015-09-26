@@ -286,7 +286,7 @@ public class JPQLParser implements Parser
                 stack.push(classNode);
 
                 // Translate the "IN(...) alias" into the equivalent JOIN syntax nodes
-                Node joinNode = new Node(NodeType.OPERATOR, "JOIN_INNER");
+                Node joinNode = new Node(NodeType.OPERATOR, JavaQueryCompiler.JOIN_INNER);
                 joinNode.appendChildNode(joinedNode);
                 Node joinAliasNode = new Node(NodeType.NAME, alias);
                 joinNode.appendChildNode(joinAliasNode);
@@ -421,18 +421,18 @@ public class JPQLParser implements Parser
                     onNode = stack.pop();
                 }
 
-                String joinType = "JOIN_INNER";
+                String joinType = JavaQueryCompiler.JOIN_INNER;
                 if (innerJoin)
                 {
-                    joinType = (fetch ? "JOIN_INNER_FETCH" : "JOIN_INNER");
+                    joinType = (fetch ? JavaQueryCompiler.JOIN_INNER_FETCH : JavaQueryCompiler.JOIN_INNER);
                 }
                 else if (leftJoin)
                 {
-                    joinType = (fetch ? "JOIN_OUTER_FETCH" : "JOIN_OUTER");
+                    joinType = (fetch ? JavaQueryCompiler.JOIN_OUTER_FETCH : JavaQueryCompiler.JOIN_OUTER);
                 }
                 else if (rightJoin)
                 {
-                    joinType = (fetch ? "JOIN_OUTER_FETCH_RIGHT" : "JOIN_OUTER_RIGHT");
+                    joinType = (fetch ? JavaQueryCompiler.JOIN_OUTER_FETCH_RIGHT : JavaQueryCompiler.JOIN_OUTER_RIGHT);
                 }
                 Node joinNode = new Node(NodeType.OPERATOR, joinType);
                 joinNode.appendChildNode(joinedNode);

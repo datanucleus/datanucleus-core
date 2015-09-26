@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.datanucleus.query.compiler.JavaQueryCompiler;
 import org.datanucleus.query.compiler.Node;
 import org.datanucleus.query.compiler.NodeType;
 import org.datanucleus.query.compiler.ParameterNode;
@@ -125,23 +126,23 @@ public class ExpressionCompiler
                 {
                     String joinType = (String)childNode.getNodeValue();
                     JoinType joinTypeId = JoinType.JOIN_INNER;
-                    if (joinType.equals("JOIN_INNER_FETCH"))
+                    if (joinType.equals(JavaQueryCompiler.JOIN_INNER_FETCH))
                     {
                         joinTypeId = JoinType.JOIN_INNER_FETCH;
                     }
-                    else if (joinType.equals("JOIN_OUTER_FETCH"))
+                    else if (joinType.equals(JavaQueryCompiler.JOIN_OUTER_FETCH))
                     {
                         joinTypeId = JoinType.JOIN_LEFT_OUTER_FETCH;
                     }
-                    else if (joinType.equals("JOIN_OUTER"))
-                    {
-                        joinTypeId = JoinType.JOIN_LEFT_OUTER;
-                    }
-                    else if (joinType.equals("JOIN_OUTER_FETCH_RIGHT"))
+                    else if (joinType.equals(JavaQueryCompiler.JOIN_OUTER_FETCH_RIGHT))
                     {
                         joinTypeId = JoinType.JOIN_RIGHT_OUTER_FETCH;
                     }
-                    else if (joinType.equals("JOIN_OUTER_RIGHT"))
+                    else if (joinType.equals(JavaQueryCompiler.JOIN_OUTER))
+                    {
+                        joinTypeId = JoinType.JOIN_LEFT_OUTER;
+                    }
+                    else if (joinType.equals(JavaQueryCompiler.JOIN_OUTER_RIGHT))
                     {
                         joinTypeId = JoinType.JOIN_RIGHT_OUTER;
                     }
