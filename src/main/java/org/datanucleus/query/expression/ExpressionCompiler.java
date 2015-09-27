@@ -281,6 +281,7 @@ public class ExpressionCompiler
         }
         else if (isOperator(node, "IN"))
         {
+            // TODO Extend this so we can have multiple arguments in an IN expression, maybe using ArrayExpression
             Expression left = compileExpression(node.getFirstChild());
             Expression right = compileExpression(node.getNextChild());
             return new DyadicExpression(left, Expression.OP_IN, right);
