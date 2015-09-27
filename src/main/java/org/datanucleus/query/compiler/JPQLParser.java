@@ -872,7 +872,6 @@ public class JPQLParser implements Parser
             return;
         }
 
-        int numArgs = 0;
         List<Node> valueNodes = new ArrayList();
         do
         {
@@ -882,8 +881,6 @@ public class JPQLParser implements Parser
             {
                 throw new QueryCompilerSyntaxException("Expected literal|parameter but got " + p.remaining(), p.getIndex(), p.getInput());
             }
-
-            numArgs++;
 
             // Generate node for comparison with this value
             Node valueNode = stack.pop();
@@ -896,7 +893,7 @@ public class JPQLParser implements Parser
         {
             throw new QueryCompilerSyntaxException("Expected: ')' but got " + p.remaining(), p.getIndex(), p.getInput());
         }
-        else if (numArgs == 0)
+        else if (valueNodes.isEmpty())
         {
             throw new QueryCompilerSyntaxException("IN expression had zero arguments!");
         }
@@ -904,7 +901,7 @@ public class JPQLParser implements Parser
         // Create the returned Node representing this IN expression
         Node inNode = null;
         Node firstValueNode = valueNodes.get(0);
-        if (numArgs == 1 && firstValueNode.getNodeType() != NodeType.LITERAL)
+        if (valueNodes.size() == 1 && firstValueNode.getNodeType() != NodeType.LITERAL)
         {
             // Compile as (input IN val)
             // Note that we exclude LITERAL single args from here since they can be represented using ==, and also RDBMS needs that currently TODO Fix RDBMS query processor
