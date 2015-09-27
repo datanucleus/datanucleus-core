@@ -872,8 +872,7 @@ public class JPQLParser implements Parser
             return;
         }
 
-        Node inNode = null;
-        int numArgs = 0;
+        List<Node> valueNodes = new ArrayList();
         do
         {
             // IN ((literal|parameter) [, (literal|parameter)])
@@ -883,42 +882,55 @@ public class JPQLParser implements Parser
                 throw new QueryCompilerSyntaxException("Expected literal|parameter but got " + p.remaining(), p.getIndex(), p.getInput());
             }
 
-            numArgs++;
             // Generate node for comparison with this value
             Node valueNode = stack.pop();
+            valueNodes.add(valueNode);
             p.skipWS();
 
-            if (numArgs == 1 && !p.peekStringIgnoreCase(",") && valueNode.getNodeType() == NodeType.PARAMETER)
-            {
-                // Special case of "xxx IN (:param)" so compile as IN/NOT IN since the param could be a Collection or a single value
-                inNode = new Node(NodeType.OPERATOR, (not ? "NOT IN" : "IN"));
-                inNode.appendChildNode(inputNode);
-                inNode.appendChildNode(valueNode);
-                stack.push(inNode);
-                break;
-            }
-
-            // Compile as (input == val1 || input == val2 || input == val3) 
-            //      or as (input != val1 && input != val2 && input != val3)
-            Node compareNode = new Node(NodeType.OPERATOR, (not ? "!=" : "=="));
-            compareNode.appendChildNode(inputNode);
-            compareNode.appendChildNode(valueNode);
-            if (inNode == null)
-            {
-                inNode = compareNode;
-            }
-            else
-            {
-                Node newInNode = new Node(NodeType.OPERATOR, (not ? "&&" : "||"));
-                newInNode.appendChildNode(inNode);
-                newInNode.appendChildNode(compareNode);
-                inNode = newInNode;
-            }
         } while (p.parseChar(','));
 
         if (!p.parseChar(')'))
         {
             throw new QueryCompilerSyntaxException("Expected: ')' but got " + p.remaining(), p.getIndex(), p.getInput());
+        }
+        else if (valueNodes.isEmpty())
+        {
+            throw new QueryCompilerSyntaxException("IN expression had zero arguments!");
+        }
+
+        // Create the returned Node representing this IN expression
+        Node inNode = null;
+        Node firstValueNode = valueNodes.get(0);
+        if (valueNodes.size() == 1 && firstValueNode.getNodeType() != NodeType.LITERAL)
+        {
+            // Compile as (input IN val)
+            // Note that we exclude LITERAL single args from here since they can be represented using ==, and also RDBMS needs that currently TODO Fix RDBMS query processor
+            inNode = new Node(NodeType.OPERATOR, (not ? "NOT IN" : "IN"));
+            inNode.appendChildNode(inputNode);
+            inNode.appendChildNode(valueNodes.get(0));
+        }
+        else
+        {
+            // Compile as (input == val1 || input == val2 || input == val3) 
+            //      or as (input != val1 && input != val2 && input != val3)
+            // TODO Would be nice to do as (input IN (val1, val2, ...)) but that implies changes in datastore query processors
+            for (Node valueNode : valueNodes)
+            {
+                Node compareNode = new Node(NodeType.OPERATOR, (not ? "!=" : "=="));
+                compareNode.appendChildNode(inputNode);
+                compareNode.appendChildNode(valueNode);
+                if (inNode == null)
+                {
+                    inNode = compareNode;
+                }
+                else
+                {
+                    Node newInNode = new Node(NodeType.OPERATOR, (not ? "&&" : "||"));
+                    newInNode.appendChildNode(inNode);
+                    newInNode.appendChildNode(compareNode);
+                    inNode = newInNode;
+                }
+            }
         }
 
         stack.push(inNode);
