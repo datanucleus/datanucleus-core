@@ -34,7 +34,7 @@ public class JPQLQueryHelper
 {
     /** Keywords used in single-string JPQL. Uppercase variants specified here, but JPQL allows case-insensitive. */
     static final String[] SINGLE_STRING_KEYWORDS = {
-        "SELECT", "UPDATE", "DELETE", "FROM", "WHERE", "GROUP BY", "HAVING", "ORDER BY"
+        "SELECT", "INSERT INTO", "UPDATE", "DELETE", "FROM", "WHERE", "GROUP BY", "HAVING", "ORDER BY"
         };
 
     /** List of identifier names not allowed by JPQL. */
@@ -295,7 +295,7 @@ public class JPQLQueryHelper
                 str.append(")");
                 return str.toString();
             }
-            else if (method.equalsIgnoreCase("trimLeft"))
+            else if (method.equalsIgnoreCase("trimRight"))
             {
                 StringBuilder str = new StringBuilder("TRIM(TRAILING ");
 
