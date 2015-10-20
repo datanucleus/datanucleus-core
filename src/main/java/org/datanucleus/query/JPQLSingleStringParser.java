@@ -126,11 +126,17 @@ public class JPQLSingleStringParser
 
         private void compileQuery()
         {
+            boolean insert = false;
             boolean update = false;
             boolean delete = false;
             if (tokenizer.parseKeywordIgnoreCase("SELECT"))
             {
                 // Do nothing
+            }
+            else if (tokenizer.parseKeywordIgnoreCase("INSERT"))
+            {
+                insert = true;
+                query.setType(Query.BULK_INSERT);
             }
             else if (tokenizer.parseKeywordIgnoreCase("UPDATE"))
             {
@@ -149,24 +155,47 @@ public class JPQLSingleStringParser
 
             if (update)
             {
+                // UPDATE {entity [AS alias]} SET x1 = val1, x2 = val2, ...
                 compileUpdate();
             }
-            else if (!delete)
+            else if (insert)
             {
+                // INSERT INTO {entity} (field1, field2, ...)
+                if (!tokenizer.parseKeywordIgnoreCase("INTO"))
+                {
+                    throw new NucleusUserException("INSERT statement should start 'INSERT INTO '");
+                }
+                compileFrom();
+                // TODO Process " (...)"
+                // TODO Process "SELECT ..."
+            }
+            else if (delete)
+            {
+                // DELETE FROM {entity [AS alias]}
+                if (tokenizer.parseKeywordIgnoreCase("FROM"))
+                {
+                    compileFrom();
+                }
+            }
+            else
+            {
+                // SELECT clause : a, b, c, ...
                 compileResult();
+
+                if (tokenizer.parseKeywordIgnoreCase("FROM"))
+                {
+                    compileFrom();
+                }
             }
 
-            if (tokenizer.parseKeywordIgnoreCase("FROM"))
-            {
-                compileFrom();
-            }
             if (tokenizer.parseKeywordIgnoreCase("WHERE"))
             {
                 compileWhere();
             }
+
             if (tokenizer.parseKeywordIgnoreCase("GROUP BY"))
             {
-                if (update || delete)
+                if (insert || update || delete)
                 {
                     throw new NucleusUserException(Localiser.msg("043007"));
                 }
@@ -174,7 +203,7 @@ public class JPQLSingleStringParser
             }
             if (tokenizer.parseKeywordIgnoreCase("HAVING"))
             {
-                if (update || delete)
+                if (insert || update || delete)
                 {
                     throw new NucleusUserException(Localiser.msg("043008"));
                 }
@@ -182,7 +211,7 @@ public class JPQLSingleStringParser
             }
             if (tokenizer.parseKeywordIgnoreCase("ORDER BY"))
             {
-                if (update || delete)
+                if (insert || update || delete)
                 {
                     throw new NucleusUserException(Localiser.msg("043009"));
                 }

@@ -178,53 +178,54 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
         }
 
         StringBuilder str = new StringBuilder();
-        if (type == BULK_UPDATE)
+        if (type == BULK_INSERT)
         {
-            str.append("UPDATE " + from + " SET " + update + " ");
+            str.append("INSERT INTO ").append(from);
+            // TODO Add fields, and SELECT
+        }
+        else if (type == BULK_UPDATE)
+        {
+            str.append("UPDATE ").append(from).append(" SET ").append(update).append(' ');
+            str.append("WHERE ").append(dereferenceFilter(filter));
         }
         else if (type == BULK_DELETE)
         {
-            str.append("DELETE ");
+            str.append("DELETE FROM ").append(from).append(' ');
+            str.append("WHERE ").append(dereferenceFilter(filter));
         }
         else
         {
             str.append("SELECT ");
-        }
+            if (result != null)
+            {
+                if (resultDistinct)
+                {
+                    str.append("DISTINCT ");
+                }
+                str.append(result).append(' ');
+            }
+            else
+            {
+                if (compilation != null && compilation.getCandidateAlias() != null)
+                {
+                    str.append(compilation.getCandidateAlias()).append(' ');
+                }
+            }
 
-        if (result != null)
-        {
-            if (resultDistinct)
-            {
-                str.append("DISTINCT ");
-            }
-            str.append(result + " ");
-        }
-        else
-        {
-            if (compilation != null && compilation.getCandidateAlias() != null)
-            {
-                str.append(compilation.getCandidateAlias() + " ");
-            }
-        }
-        if (from != null && update == null)
-        {
             str.append("FROM " + from + " ");
-        }
-        if (filter != null)
-        {
-            str.append("WHERE " + dereferenceFilter(filter) + " ");
-        }
-        if (grouping != null)
-        {
-            str.append("GROUP BY " + grouping + " ");
-        }
-        if (having != null)
-        {
-            str.append("HAVING " + having + " ");
-        }
-        if (ordering != null)
-        {
-            str.append("ORDER BY " + ordering + " ");
+            str.append("WHERE " + dereferenceFilter(filter)).append(' ');
+            if (grouping != null)
+            {
+                str.append("GROUP BY ").append(grouping).append(' ');
+            }
+            if (having != null)
+            {
+                str.append("HAVING ").append(having).append(' ');
+            }
+            if (ordering != null)
+            {
+                str.append("ORDER BY ").append(ordering).append(' ');
+            }
         }
 
         singleString = str.toString().trim();
