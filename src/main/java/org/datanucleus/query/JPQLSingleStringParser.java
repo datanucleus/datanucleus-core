@@ -133,7 +133,7 @@ public class JPQLSingleStringParser
             {
                 // Do nothing
             }
-            else if (tokenizer.parseKeywordIgnoreCase("INSERT"))
+            else if (tokenizer.parseKeywordIgnoreCase("INSERT INTO"))
             {
                 insert = true;
                 query.setType(Query.BULK_INSERT);
@@ -157,17 +157,41 @@ public class JPQLSingleStringParser
             {
                 // UPDATE {entity [AS alias]} SET x1 = val1, x2 = val2, ...
                 compileUpdate();
+
+                if (tokenizer.parseKeywordIgnoreCase("WHERE"))
+                {
+                    compileWhere();
+                }
             }
             else if (insert)
             {
                 // INSERT INTO {entity} (field1, field2, ...)
-                if (!tokenizer.parseKeywordIgnoreCase("INTO"))
+                String content = tokenizer.parseContent(null, false);
+                if (content.length() > 0)
                 {
-                    throw new NucleusUserException("INSERT statement should start 'INSERT INTO '");
+                    int bracketStart = content.indexOf('(');
+                    int bracketEnd = content.indexOf(')');
+                    if (bracketStart < 0 || bracketEnd < 0)
+                    {
+                        throw new NucleusUserException("INSERT INTO {entity} should be followed by '(field1, field2, ...)' but isn't");
+                    }
+                    String entityString = content.substring(0, bracketStart).trim();
+                    String fieldString = content.substring(bracketStart+1, bracketEnd).trim();
+
+                    query.setFrom(entityString);
+                    query.setInsertFields(fieldString);
                 }
-                compileFrom();
-                // TODO Process " (...)"
-                // TODO Process "SELECT ..."
+                else
+                {
+                    throw new NucleusUserException("INSERT INTO should be followed by '{entity} (field1, field2, ...)' but isn't");
+                }
+
+                // Extract remains of query, and move to end of query
+                String selectQuery = tokenizer.queryString.substring(tokenizer.queryStringPos).trim();
+                while (tokenizer.parseKeyword() != null)
+                {
+                }
+                query.setInsertSelectQuery(selectQuery);
             }
             else if (delete)
             {
@@ -176,46 +200,37 @@ public class JPQLSingleStringParser
                 {
                     compileFrom();
                 }
+
+                if (tokenizer.parseKeywordIgnoreCase("WHERE"))
+                {
+                    compileWhere();
+                }
             }
             else
             {
-                // SELECT clause : a, b, c, ...
+                // SELECT a, b, c FROM ... WHERE ... GROUP BY ... HAVING ... ORDER BY ...
                 compileResult();
 
                 if (tokenizer.parseKeywordIgnoreCase("FROM"))
                 {
                     compileFrom();
                 }
-            }
-
-            if (tokenizer.parseKeywordIgnoreCase("WHERE"))
-            {
-                compileWhere();
-            }
-
-            if (tokenizer.parseKeywordIgnoreCase("GROUP BY"))
-            {
-                if (insert || update || delete)
+                if (tokenizer.parseKeywordIgnoreCase("WHERE"))
                 {
-                    throw new NucleusUserException(Localiser.msg("043007"));
+                    compileWhere();
                 }
-                compileGroup();
-            }
-            if (tokenizer.parseKeywordIgnoreCase("HAVING"))
-            {
-                if (insert || update || delete)
+                if (tokenizer.parseKeywordIgnoreCase("GROUP BY"))
                 {
-                    throw new NucleusUserException(Localiser.msg("043008"));
+                    compileGroup();
                 }
-                compileHaving();
-            }
-            if (tokenizer.parseKeywordIgnoreCase("ORDER BY"))
-            {
-                if (insert || update || delete)
+                if (tokenizer.parseKeywordIgnoreCase("HAVING"))
                 {
-                    throw new NucleusUserException(Localiser.msg("043009"));
+                    compileHaving();
                 }
-                compileOrder();
+                if (tokenizer.parseKeywordIgnoreCase("ORDER BY"))
+                {
+                    compileOrder();
+                }
             }
         }
 

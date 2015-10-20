@@ -181,7 +181,8 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
         if (type == BULK_INSERT)
         {
             str.append("INSERT INTO ").append(from);
-            // TODO Add fields, and SELECT
+            str.append(" (").append(insertFields).append(") ");
+            str.append(insertSelectQuery);
         }
         else if (type == BULK_UPDATE)
         {

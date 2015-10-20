@@ -117,6 +117,12 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     /** UPDATE clause of a query (optional). */
     protected transient String update = null;
 
+    /** INSERT fields of a query (optional). */
+    protected transient String insertFields = null;
+
+    /** INSERT select query (optional). */
+    protected transient String insertSelectQuery = null;
+
     /** Specification of the result of the query e.g aggregates etc. Doesn't include any "distinct". */
     protected String result = null;
 
@@ -447,6 +453,29 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
             return false;
         }
 
+        if (insertFields == null)
+        {
+            if (q.insertFields != null)
+            {
+                return false;
+            }
+        }
+        else if (!insertFields.equals(q.insertFields))
+        {
+            return false;
+        }
+        if (insertSelectQuery == null)
+        {
+            if (q.insertSelectQuery != null)
+            {
+                return false;
+            }
+        }
+        else if (!insertSelectQuery.equals(q.insertSelectQuery))
+        {
+            return false;
+        }
+
         return true;
     }
 
@@ -464,7 +493,9 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         	(ordering == null ? 0 : ordering.hashCode()) ^
             (range == null ? 0 : range.hashCode()) ^
             (from == null ? 0 : from.hashCode()) ^
-            (update == null ? 0 : update.hashCode());
+            (update == null ? 0 : update.hashCode()) ^
+            (insertFields == null ? 0 : insertFields.hashCode()) ^
+            (insertSelectQuery == null ? 0 : insertSelectQuery.hashCode());
     }
 
     /**
@@ -697,6 +728,46 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     public String getUpdate()
     {
         return update;
+    }
+
+    /**
+     * Set the INSERT fields of the query.
+     * @param insertFields the fields to insert
+     */
+    public void setInsertFields(String insertFields)
+    {
+        discardCompiled();
+        assertIsModifiable();
+        this.insertFields = insertFields;
+    }
+
+    /**
+     * Accessor for the INSERT fields of the query (if any).
+     * @return INSERT fields
+     */
+    public String getInsertFields()
+    {
+        return insertFields;
+    }
+
+    /**
+     * Set the INSERT select query.
+     * @param query the query to use for inserting
+     */
+    public void setInsertSelectQuery(String query)
+    {
+        discardCompiled();
+        assertIsModifiable();
+        this.insertSelectQuery = query;
+    }
+
+    /**
+     * Accessor for the INSERT select query (if any).
+     * @return INSERT select query
+     */
+    public String getInsertSelectQuery()
+    {
+        return insertSelectQuery;
     }
 
     /**
