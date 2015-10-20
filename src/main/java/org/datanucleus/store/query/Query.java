@@ -97,6 +97,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     public static final short BULK_UPDATE = 1;
     public static final short BULK_DELETE = 2;
     public static final short OTHER = 3;
+    public static final short BULK_INSERT = 4;
 
     /** Type of query. */
     protected short type = SELECT;
@@ -481,7 +482,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      */
     public void setType(short type)
     {
-        if (type == SELECT || type == BULK_UPDATE || type == BULK_DELETE)
+        if (type == SELECT || type == BULK_UPDATE || type == BULK_DELETE || type == BULK_INSERT)
         {
             this.type = type;
         }
@@ -1843,7 +1844,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
                 Object result = performExecute(inputParameters);
 
                 // Process the results
-                if (type == BULK_DELETE || type == BULK_UPDATE)
+                if (type == BULK_DELETE || type == BULK_UPDATE || type == BULK_INSERT)
                 {
                     // Bulk update/delete return a Long
                     return result;
@@ -2282,7 +2283,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     protected boolean useFetchPlan()
     {
         boolean useFetchPlan = getBooleanExtensionProperty(EXTENSION_USE_FETCH_PLAN, true);
-        if (type == BULK_UPDATE || type == BULK_DELETE)
+        if (type == BULK_UPDATE || type == BULK_DELETE || type == BULK_INSERT)
         {
             // Don't want anything selecting apart from the PK fields when doing updates/deletes
             useFetchPlan = false;
