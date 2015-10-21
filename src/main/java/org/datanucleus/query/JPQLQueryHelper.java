@@ -34,8 +34,9 @@ public class JPQLQueryHelper
 {
     /** Keywords used in single-string JPQL. Uppercase variants specified here, but JPQL allows case-insensitive. */
     static final String[] SINGLE_STRING_KEYWORDS = {
-        "SELECT", "INSERT INTO", "UPDATE", "DELETE", "FROM", "WHERE", "GROUP BY", "HAVING", "ORDER BY"
+        "SELECT", "INSERT", "UPDATE", "DELETE", "FROM", "WHERE", "GROUP BY", "HAVING", "ORDER BY"
         };
+    // TODO Only allow INSERT when not using strict JPQL
 
     /** List of identifier names not allowed by JPQL. */
     static final String[] RESERVED_IDENTIFIERS = {

@@ -133,7 +133,7 @@ public class JPQLSingleStringParser
             {
                 // Do nothing
             }
-            else if (tokenizer.parseKeywordIgnoreCase("INSERT INTO"))
+            else if (tokenizer.parseKeywordIgnoreCase("INSERT"))
             {
                 insert = true;
                 query.setType(Query.BULK_INSERT);
@@ -165,15 +165,21 @@ public class JPQLSingleStringParser
             }
             else if (insert)
             {
-                // INSERT INTO {entity} (field1, field2, ...)
+                // INSERT [INTO] {entity} (field1, field2, ...)
                 String content = tokenizer.parseContent(null, false);
                 if (content.length() > 0)
                 {
+                    if (content.startsWith("INTO"))
+                    {
+                        // Skip optional INTO
+                        content = content.substring(4).trim();
+                    }
+
                     int bracketStart = content.indexOf('(');
                     int bracketEnd = content.indexOf(')');
                     if (bracketStart < 0 || bracketEnd < 0)
                     {
-                        throw new NucleusUserException("INSERT INTO {entity} should be followed by '(field1, field2, ...)' but isn't");
+                        throw new NucleusUserException("INSERT [INTO] {entity} should be followed by '(field1, field2, ...)' but isn't");
                     }
                     String entityString = content.substring(0, bracketStart).trim();
                     String fieldString = content.substring(bracketStart+1, bracketEnd).trim();
@@ -183,7 +189,7 @@ public class JPQLSingleStringParser
                 }
                 else
                 {
-                    throw new NucleusUserException("INSERT INTO should be followed by '{entity} (field1, field2, ...)' but isn't");
+                    throw new NucleusUserException("INSERT [INTO] should be followed by '{entity} (field1, field2, ...)' but isn't");
                 }
 
                 // Extract remains of query, and move to end of query
