@@ -268,6 +268,12 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
             startTime = System.currentTimeMillis();
             NucleusLogger.QUERY.debug(Localiser.msg("021044", getLanguage(), getSingleStringQuery()));
         }
+        String from = this.from;
+        if (type == BULK_INSERT)
+        {
+            // Append artificial alias so the compilation passes
+            from += " this";
+        }
         JavaQueryCompiler compiler = new JPQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), from, candidateClass, candidateCollection, 
             this.filter, getParsedImports(), this.ordering, this.result, this.grouping, this.having, explicitParameters, update);
         if (getBooleanExtensionProperty(EXTENSION_JPQL_STRICT, false))
