@@ -295,7 +295,7 @@ public class JPQLQueryHelper
                 str.append(")");
                 return str.toString();
             }
-            else if (method.equalsIgnoreCase("trimLeft"))
+            else if (method.equalsIgnoreCase("trimRight"))
             {
                 StringBuilder str = new StringBuilder("TRIM(TRAILING ");
 
