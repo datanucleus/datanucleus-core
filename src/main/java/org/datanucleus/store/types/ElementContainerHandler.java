@@ -25,9 +25,8 @@ import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.ContainerMetaData;
 import org.datanucleus.metadata.ElementMetaData;
 
-public abstract class ElementContainerHandler<C, A extends ElementContainerAdapter<C>>
-		implements ContainerHandler<C, A> {
-
+public abstract class ElementContainerHandler<C, A extends ElementContainerAdapter<C>> implements ContainerHandler<C, A> 
+{
 	public abstract C newContainer(AbstractMemberMetaData mmd, Object... objects);
 
 	public abstract int getObjectType(AbstractMemberMetaData mmd);
@@ -51,10 +50,9 @@ public abstract class ElementContainerHandler<C, A extends ElementContainerAdapt
 	protected void moveColumnsToElement(AbstractMemberMetaData mmd)
     {
         ColumnMetaData[] columnMetaData = mmd.getColumnMetaData();
-        
-        if (!mmd.isSerialized() && !mmd.isEmbedded() && columnMetaData != null)
+        if (!mmd.isSerialized() && !mmd.isEmbedded() && columnMetaData != null && mmd.getTypeConverterName() == null)
         {
-            // Not serialising or embedding this field, yet column info was specified. Check for specific conditions
+            // Not serialising/embedding this field, nor converting the whole field yet column info was specified. Check for specific conditions
             if (mmd.getElementMetaData() == null)
             {
                 // Collection/Array with column(s) specified on field but not on element so move all column info to element

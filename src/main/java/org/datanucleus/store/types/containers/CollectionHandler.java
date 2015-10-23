@@ -89,11 +89,10 @@ public abstract class CollectionHandler<C extends Object> extends ElementContain
     }
 
     @Override
-    public int getObjectType(AbstractMemberMetaData mmd) {
-		
-		return mmd.getCollection().isEmbeddedElement() || mmd.getCollection().isSerializedElement() ? 
-				ObjectProvider.EMBEDDED_COLLECTION_ELEMENT_PC : ObjectProvider.PC;
-	}
+    public int getObjectType(AbstractMemberMetaData mmd) 
+    {
+        return mmd.getCollection().isEmbeddedElement() || mmd.getCollection().isSerializedElement() ? ObjectProvider.EMBEDDED_COLLECTION_ELEMENT_PC : ObjectProvider.PC;
+    }
 
     @Override
     public boolean isSerialised(AbstractMemberMetaData mmd)
