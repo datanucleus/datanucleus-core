@@ -882,9 +882,9 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             setOrderMetaData(ordmd);
         }
 
-        if (!isSerialized() && !isEmbedded() && columnMetaData != null)
+        if (!isSerialized() && !isEmbedded() && getTypeConverterName() == null && columnMetaData != null)
         {
-            // Not serialising or embedding this field, yet column info was specified. Check for specific conditions
+            // Not serialising/embedding this field, nor converting the whole field, yet column info was specified. Check for specific conditions
             if ((hasCollection() || hasArray()) && elementMetaData == null)
             {
                 // Collection/Array with column(s) specified on field but not on element so move all column info to element
