@@ -214,14 +214,13 @@ public abstract class MapHandler<C> implements ContainerHandler<C, MapContainerA
 
         throw new NucleusException("Invalid type of metadata specified.");
     }
-    
+
     private void moveColumnsToValue(AbstractMemberMetaData mmd)
     {
         ColumnMetaData[] columnMetaData = mmd.getColumnMetaData();
-        
-        if (!mmd.isSerialized() && !mmd.isEmbedded() && columnMetaData != null)
+        if (!mmd.isSerialized() && !mmd.isEmbedded() && columnMetaData != null && mmd.getTypeConverterName() == null)
         {
-            // Not serialising or embedding this field, yet column info was specified. Check for specific conditions
+            // Not serialising/embedding this field, nor converting the whole field yet column info was specified. Check for specific conditions
             if (mmd.getValueMetaData() == null)
             {
                 // Map with column(s) specified on field but not on value so move all column info to value
