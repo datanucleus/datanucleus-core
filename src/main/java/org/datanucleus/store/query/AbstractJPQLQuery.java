@@ -214,7 +214,10 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
             }
 
             str.append("FROM " + from + " ");
-            str.append("WHERE " + dereferenceFilter(filter)).append(' ');
+            if (filter != null)
+            {
+                str.append("WHERE " + dereferenceFilter(filter)).append(' ');
+            }
             if (grouping != null)
             {
                 str.append("GROUP BY ").append(grouping).append(' ');
