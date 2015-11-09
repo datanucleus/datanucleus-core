@@ -538,7 +538,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         extensions.put(key, value);
         if (key.equals(EXTENSION_EXCLUDE_SUBCLASSES))
         {
-            subclasses = getBooleanExtensionProperty(EXTENSION_EXCLUDE_SUBCLASSES, false);
+            subclasses = !getBooleanExtensionProperty(EXTENSION_EXCLUDE_SUBCLASSES, false);
         }
         else if (key.equals(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE))
         {
@@ -565,7 +565,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         this.extensions = (extensions != null ? new HashMap(extensions) : null);
         if (extensions.containsKey(EXTENSION_EXCLUDE_SUBCLASSES))
         {
-            subclasses = getBooleanExtensionProperty(EXTENSION_EXCLUDE_SUBCLASSES, false);
+            subclasses = !getBooleanExtensionProperty(EXTENSION_EXCLUDE_SUBCLASSES, false);
         }
         if (extensions.containsKey(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE))
         {
