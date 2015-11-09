@@ -81,6 +81,9 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     public static final String EXTENSION_EVALUATE_IN_MEMORY = PropertyNames.PROPERTY_QUERY_EVALUATE_IN_MEMORY;
     public static final String EXTENSION_CHECK_UNUSED_PARAMETERS = PropertyNames.PROPERTY_QUERY_CHECK_UNUSED_PARAMS;
 
+    /** Extension for the benefit of JPQL so that we can exclude subclasses (not possible with JPA API). */
+    public static final String EXTENSION_EXCLUDE_SUBCLASSES="datanucleus.query.excludeSubclasses";
+
     public static final String EXTENSION_MULTITHREAD = "datanucleus.query.multithread";
     public static final String EXTENSION_RESULT_CACHE_TYPE = "datanucleus.query.resultCacheType";
     public static final String EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE = "datanucleus.query.closeResultsAtManagerClose";
@@ -533,7 +536,11 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
             extensions = new HashMap();
         }
         extensions.put(key, value);
-        if (key.equals(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE))
+        if (key.equals(EXTENSION_EXCLUDE_SUBCLASSES))
+        {
+            subclasses = getBooleanExtensionProperty(EXTENSION_EXCLUDE_SUBCLASSES, false);
+        }
+        else if (key.equals(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE))
         {
             boolean closeAtEcClose = getBooleanExtensionProperty(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE, false);
             if (closeAtEcClose)
@@ -556,6 +563,10 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     public void setExtensions(Map extensions)
     {
         this.extensions = (extensions != null ? new HashMap(extensions) : null);
+        if (extensions.containsKey(EXTENSION_EXCLUDE_SUBCLASSES))
+        {
+            subclasses = getBooleanExtensionProperty(EXTENSION_EXCLUDE_SUBCLASSES, false);
+        }
         if (extensions.containsKey(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE))
         {
             boolean closeAtEcClose = getBooleanExtensionProperty(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE, false);
