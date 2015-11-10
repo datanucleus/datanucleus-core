@@ -25,8 +25,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.ClassNotResolvedException;
@@ -64,7 +66,7 @@ public class EmbeddedMetaData extends MetaData
     protected DiscriminatorMetaData discriminatorMetaData;
 
     /** Fields/properties of the embedded object. */
-    protected final List members = new ArrayList();
+    protected final List<AbstractMemberMetaData> members = new ArrayList();
 
     // TODO Drop this and just use "members" above
     protected AbstractMemberMetaData memberMetaData[];
@@ -83,11 +85,11 @@ public class EmbeddedMetaData extends MetaData
         {
             if (embmd.members.get(i) instanceof FieldMetaData)
             {
-                addMember(new FieldMetaData(this,(AbstractMemberMetaData)embmd.members.get(i)));
+                addMember(new FieldMetaData(this, embmd.members.get(i)));
             }
             else
             {
-                addMember(new PropertyMetaData(this,(PropertyMetaData)embmd.members.get(i)));
+                addMember(new PropertyMetaData(this, (PropertyMetaData)embmd.members.get(i)));
             }
         }
     }
@@ -195,16 +197,22 @@ public class EmbeddedMetaData extends MetaData
         }
 
         // Check that all "members" are of the correct type for the embedded object
-        Iterator memberIter = members.iterator();
+        Iterator<AbstractMemberMetaData> memberIter = members.iterator();
         while (memberIter.hasNext())
         {
-            Object fld = memberIter.next();
+            AbstractMemberMetaData fld = memberIter.next();
             // TODO Should allow PropertyMetaData here I think
             if (embCmd instanceof InterfaceMetaData && fld instanceof FieldMetaData)
             {
                 // Cannot have a field within a persistent interface
-                throw new InvalidMemberMetaDataException("044129", apmd.getClassName(), apmd.getName(), ((AbstractMemberMetaData)fld).getName());
+                throw new InvalidMemberMetaDataException("044129", apmd.getClassName(), apmd.getName(), fld.getName());
             }
+        }
+
+        Set<String> memberNames = new HashSet<String>();
+        for (AbstractMemberMetaData mmd : members)
+        {
+            memberNames.add(mmd.getName());
         }
 
         // Add fields for the class that aren't in the <embedded> block using Reflection.
@@ -234,7 +242,7 @@ public class EmbeddedMetaData extends MetaData
                 {
                     // Find if there is a AbstractMemberMetaData for this field.
                     // This is possible as AbstractMemberMetaData implements Comparable
-                    if (Collections.binarySearch(members, cls_fields[i].getName()) < 0)
+                    if (!memberNames.contains(cls_fields[i].getName()))
                     {
                         // Start from the metadata of the field in the owning class if available
                         AbstractMemberMetaData embMmd = embCmd.getMetaDataForMember(cls_fields[i].getName());
@@ -266,6 +274,7 @@ public class EmbeddedMetaData extends MetaData
                         {
                             NucleusLogger.METADATA.debug(Localiser.msg("044125", apmd.getClassName(), cls_fields[i].getName(), embeddedType));
                             members.add(omittedFmd);
+                            memberNames.add(omittedFmd.getName());
                             Collections.sort(members);
                         }
                     }
@@ -293,15 +302,16 @@ public class EmbeddedMetaData extends MetaData
                         (clsMethods[i].getName().startsWith("get") || clsMethods[i].getName().startsWith("is")) &&
                         !ClassUtils.isInnerClass(clsMethods[i].getName()))
                     {
-                        String fieldName = ClassUtils.getFieldNameForJavaBeanGetter(clsMethods[i].getName() );
+                        String fieldName = ClassUtils.getFieldNameForJavaBeanGetter(clsMethods[i].getName());
                         // Find if there is a PropertyMetaData for this field.
                         // This is possible as PropertyMetaData implements Comparable
-                        if (Collections.binarySearch(members,fieldName) < 0)
+                        if (!memberNames.contains(fieldName))
                         {
                             // Add a default PropertyMetaData for this field.
                             NucleusLogger.METADATA.debug(Localiser.msg("044060", apmd.getClassName(), fieldName));
                             PropertyMetaData pmd=new PropertyMetaData(this, fieldName);
                             members.add(pmd);
+                            memberNames.add(pmd.getName());
                             Collections.sort(members);
                         }
                     }
@@ -319,7 +329,7 @@ public class EmbeddedMetaData extends MetaData
         while (memberIter.hasNext())
         {
             Class embFmdClass = embeddedClass;
-            AbstractMemberMetaData fieldFmd = (AbstractMemberMetaData)memberIter.next();
+            AbstractMemberMetaData fieldFmd = memberIter.next();
             if (!fieldFmd.fieldBelongsToClass())
             {
                 try
@@ -383,7 +393,7 @@ public class EmbeddedMetaData extends MetaData
         memberMetaData = new AbstractMemberMetaData[members.size()];
         for (int i=0; i<memberMetaData.length; i++)
         {
-            memberMetaData[i] = (AbstractMemberMetaData) members.get(i);
+            memberMetaData[i] = members.get(i);
             memberMetaData[i].initialise(clr, mmgr);
         }
 
@@ -476,10 +486,10 @@ public class EmbeddedMetaData extends MetaData
         {
             throw new InvalidMemberMetaDataException("044108", mmd.getClassName(), mmd.getName());
         }
-        Iterator iter = members.iterator();
+        Iterator<AbstractMemberMetaData> iter = members.iterator();
         while (iter.hasNext())
         {
-            AbstractMemberMetaData md = (AbstractMemberMetaData)iter.next();
+            AbstractMemberMetaData md = iter.next();
             if (mmd.getName().equals(md.getName()))
             {
                 throw new InvalidMemberMetaDataException("044112", mmd.getClassName(), mmd.getName());
@@ -549,7 +559,7 @@ public class EmbeddedMetaData extends MetaData
         // Add fields
         for (int i=0; i<members.size(); i++)
         {
-            AbstractMemberMetaData f = (AbstractMemberMetaData)members.get(i);
+            AbstractMemberMetaData f = members.get(i);
             sb.append(f.toString(prefix + indent,indent));
         }
         

@@ -33,8 +33,10 @@ import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.ClassNotResolvedException;
@@ -306,6 +308,12 @@ public class ClassMetaData extends AbstractClassMetaData
         // Access API since we treat things differently for JPA and JDO
         String api = mmgr.getNucleusContext().getApiName();
 
+        Set<String> memberNames = new HashSet<String>();
+        for (AbstractMemberMetaData mmd : members)
+        {
+            memberNames.add(mmd.getName());
+        }
+
         // Add fields/properties for the class that don't have MetaData.
         // We use Reflection here since JDOImplHelper would only give use info
         // for enhanced files (and the enhancer needs unenhanced as well). 
@@ -341,12 +349,13 @@ public class ClassMetaData extends AbstractClassMetaData
                         // Find if there is metadata for this property
                         String propertyName = ClassUtils.getFieldNameForJavaBeanGetter(clsMethods[i].getName());
                         // TODO : This will not check if the name is a property! so we can miss field+property clashes
-                        if (Collections.binarySearch(members, propertyName) < 0)
+                        if (!memberNames.contains(propertyName))
                         {
                             // No field/property of this name - add a default PropertyMetaData for this method
                             NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, propertyName));
                             AbstractMemberMetaData mmd = new PropertyMetaData(this, propertyName);
                             members.add(mmd);
+                            memberNames.add(mmd.getName());
                             Collections.sort(members);
                         }
                         else
@@ -382,13 +391,14 @@ public class ClassMetaData extends AbstractClassMetaData
                                         NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " method=" + allclsMethods[i].getName() +
                                             " declared to return " + methodTypeVar + ", namely TypeVariable(" + j + ") of " + declCls.getName() + " so using " + paramTypeArgs[j]);
                                         String propertyName = allclsMethods[i].getDeclaringClass().getName() + "." + ClassUtils.getFieldNameForJavaBeanGetter(allclsMethods[i].getName());
-                                        if (Collections.binarySearch(members, propertyName) < 0)
+                                        if (!memberNames.contains(propertyName))
                                         {
                                             // No property of this name - add a default PropertyMetaData for this method with the type set to what we need
                                             NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, propertyName));
                                             AbstractMemberMetaData mmd = new PropertyMetaData(this, propertyName);
                                             mmd.type = (Class) paramTypeArgs[j];
                                             members.add(mmd);
+                                            memberNames.add(mmd.getName());
                                             Collections.sort(members);
                                             foundTypeForTypeVariable = true;
                                         }
@@ -408,13 +418,14 @@ public class ClassMetaData extends AbstractClassMetaData
                                         NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " field=" + allclsMethods[i].getName() +
                                             " declared to be " + methodTypeVar + ", namely TypeVariable(" + j + ") with bound, so using bound of " + boundTypes[0]);
                                         String propertyName = allclsMethods[i].getDeclaringClass().getName() + "." + ClassUtils.getFieldNameForJavaBeanGetter(allclsMethods[i].getName());
-                                        if (Collections.binarySearch(members, propertyName) < 0)
+                                        if (!memberNames.contains(propertyName))
                                         {
                                             // No property of this name - add a default PropertyMetaData for this method with the type set to what we need
                                             NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, propertyName));
                                             AbstractMemberMetaData mmd = new PropertyMetaData(this, propertyName);
                                             mmd.type = (Class) boundTypes[0];
                                             members.add(mmd);
+                                            memberNames.add(mmd.getName());
                                             Collections.sort(members);
                                             foundTypeForTypeVariable = true;
                                         }
@@ -437,7 +448,7 @@ public class ClassMetaData extends AbstractClassMetaData
                 {
                     // Find if there is metadata for this field
                     // TODO : This will not check if the name is a field! so we can miss field+property clashes
-                    if (Collections.binarySearch(members, clsFields[i].getName()) < 0)
+                    if (!memberNames.contains(clsFields[i].getName()))
                     {
                         // No field/property of this name
                         AbstractMemberMetaData mmd = new FieldMetaData(this, clsFields[i].getName());
@@ -452,6 +463,7 @@ public class ClassMetaData extends AbstractClassMetaData
                             NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, clsFields[i].getName()));
                         }
                         members.add(mmd);
+                        memberNames.add(mmd.getName());
                         Collections.sort(members);
                     }
                 }
@@ -486,7 +498,7 @@ public class ClassMetaData extends AbstractClassMetaData
                                         NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " field=" + theclsFields[i].getName() +
                                             " declared to be " + fieldTypeVar + ", namely TypeVariable(" + j + ") of " + declCls.getName() + " so using " + paramTypeArgs[j]);
                                         String fieldName = declCls.getName() + "." + theclsFields[i].getName();
-                                        if (Collections.binarySearch(members, fieldName) < 0)
+                                        if (!memberNames.contains(fieldName))
                                         {
                                             // No property of this name - add a default FieldMetaData for this method with the type set to what we need
                                             NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, fieldName));
@@ -498,6 +510,7 @@ public class ClassMetaData extends AbstractClassMetaData
                                             }
                                             mmd.type = (Class) paramTypeArgs[j];
                                             members.add(mmd);
+                                            memberNames.add(mmd.getName());
                                             Collections.sort(members);
                                             foundTypeForTypeVariable = true;
                                         }
@@ -517,7 +530,7 @@ public class ClassMetaData extends AbstractClassMetaData
                                         NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " field=" + theclsFields[i].getName() +
                                             " declared to be " + fieldTypeVar + ", namely TypeVariable(" + j + ") with bound, so using bound of " + boundTypes[0]);
                                         String fieldName = declCls.getName() + "." + theclsFields[i].getName();
-                                        if (Collections.binarySearch(members, fieldName) < 0)
+                                        if (!memberNames.contains(fieldName))
                                         {
                                             // No property of this name - add a default FieldMetaData for this method with the type set to what we need
                                             NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, fieldName));
@@ -529,6 +542,7 @@ public class ClassMetaData extends AbstractClassMetaData
                                             }
                                             mmd.type = (Class) boundTypes[0];
                                             members.add(mmd);
+                                            memberNames.add(mmd.getName());
                                             Collections.sort(members);
                                             foundTypeForTypeVariable = true;
                                         }
