@@ -136,6 +136,16 @@ public abstract class MapHandler<C> implements ContainerHandler<C, MapContainerA
                     {
                         keyType = ((Class) keyGenTypeBound).getName();
                     }
+                    else if (keyGenTypeBound instanceof ParameterizedType)
+                    {
+                        // Key type is defined as a parametrized type, e.g "Project<? extends ProjectLeader<?>>"
+                        ParameterizedType paramKeyGenType = (ParameterizedType)keyGenTypeBound;
+                        Type paramKeyGenTypeRaw = paramKeyGenType.getRawType();
+                        if (paramKeyGenTypeRaw != null && paramKeyGenTypeRaw instanceof Class)
+                        {
+                            keyType = ((Class)paramKeyGenTypeRaw).getName();
+                        }
+                    }
                 }
             }
         }
@@ -184,6 +194,16 @@ public abstract class MapHandler<C> implements ContainerHandler<C, MapContainerA
                         if (valueGenTypeBound instanceof Class)
                         {
                             valueType = ((Class) valueGenTypeBound).getName();
+                        }
+                        else if (valueGenTypeBound instanceof ParameterizedType)
+                        {
+                            // Value type is defined as a parametrized type, e.g "Project<? extends ProjectLeader<?>>"
+                            ParameterizedType paramValGenType = (ParameterizedType)valueGenTypeBound;
+                            Type paramValGenTypeRaw = paramValGenType.getRawType();
+                            if (paramValGenTypeRaw != null && paramValGenTypeRaw instanceof Class)
+                            {
+                                valueType = ((Class)paramValGenTypeRaw).getName();
+                            }
                         }
                     }
                 }

@@ -20,6 +20,9 @@ package org.datanucleus.store.types.containers;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
@@ -143,8 +146,36 @@ public abstract class CollectionHandler<C extends Object> extends ElementContain
             {
                 elementType = ClassUtils.getCollectionElementType((Method) member);
             }
-            
-            // TODO Handle declarations with type bounds? e.g. List<? extends PC> 
+
+            if (elementType == null)
+            {
+                // Try to use generics to furnish any missing type info
+                Type genericType = member instanceof Field ? ((Field) member).getGenericType() : ((Method) member).getGenericReturnType();
+
+                if (genericType != null && genericType instanceof ParameterizedType)
+                {
+                    ParameterizedType paramGenType = (ParameterizedType) genericType;
+                    Type elemGenericType = paramGenType.getActualTypeArguments()[0];
+                    if (elemGenericType instanceof TypeVariable)
+                    {
+                        Type elemGenTypeBound = ((TypeVariable) elemGenericType).getBounds()[0];
+                        if (elemGenTypeBound instanceof Class)
+                        {
+                            elementType = ((Class)elemGenTypeBound).getName();
+                        }
+                        else if (elemGenTypeBound instanceof ParameterizedType)
+                        {
+                            // Element type is defined as a parametrized type, e.g "Project<? extends ProjectLeader<?>>"
+                            ParameterizedType paramElemGenType = (ParameterizedType)elemGenTypeBound;
+                            Type paramElemGenTypeRaw = paramElemGenType.getRawType();
+                            if (paramElemGenTypeRaw != null && paramElemGenTypeRaw instanceof Class)
+                            {
+                                elementType = ((Class)paramElemGenTypeRaw).getName();
+                            }
+                        }
+                    }
+                }
+            }
         }
         else
         {
