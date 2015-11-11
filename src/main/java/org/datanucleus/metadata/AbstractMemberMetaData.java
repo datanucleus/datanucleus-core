@@ -771,6 +771,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                     {
                         genericType = method.getGenericReturnType();
                     }
+
                     if (genericType != null && genericType instanceof ParameterizedType)
                     {
                         ParameterizedType paramGenType = (ParameterizedType)genericType;
@@ -781,6 +782,16 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                             if (elemGenTypeBound instanceof Class)
                             {
                                 elementType = ((Class)elemGenTypeBound).getName();
+                            }
+                            else if (elemGenTypeBound instanceof ParameterizedType)
+                            {
+                                // Element type is defined as a parametrized type, e.g "Project<? extends ProjectLeader<?>>"
+                                ParameterizedType paramElemGenType = (ParameterizedType)elemGenTypeBound;
+                                Type paramElemGenTypeRaw = paramElemGenType.getRawType();
+                                if (paramElemGenTypeRaw != null && paramElemGenTypeRaw instanceof Class)
+                                {
+                                    elementType = ((Class)paramElemGenTypeRaw).getName();
+                                }
                             }
                         }
                     }
@@ -842,6 +853,16 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                                 {
                                     keyType = ((Class)keyGenTypeBound).getName();
                                 }
+                                else if (keyGenTypeBound instanceof ParameterizedType)
+                                {
+                                    // Key type is defined as a parametrized type, e.g "Project<? extends ProjectLeader<?>>"
+                                    ParameterizedType paramKeyGenType = (ParameterizedType)keyGenTypeBound;
+                                    Type paramKeyGenTypeRaw = paramKeyGenType.getRawType();
+                                    if (paramKeyGenTypeRaw != null && paramKeyGenTypeRaw instanceof Class)
+                                    {
+                                        keyType = ((Class)paramKeyGenTypeRaw).getName();
+                                    }
+                                }
                             }
                         }
                         if (valueType == null)
@@ -853,6 +874,16 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                                 if (valueGenTypeBound instanceof Class)
                                 {
                                     valueType = ((Class)valueGenTypeBound).getName();
+                                }
+                                else if (valueGenTypeBound instanceof ParameterizedType)
+                                {
+                                    // Value type is defined as a parametrized type, e.g "Project<? extends ProjectLeader<?>>"
+                                    ParameterizedType paramValGenType = (ParameterizedType)valueGenTypeBound;
+                                    Type paramValGenTypeRaw = paramValGenType.getRawType();
+                                    if (paramValGenTypeRaw != null && paramValGenTypeRaw instanceof Class)
+                                    {
+                                        valueType = ((Class)paramValGenTypeRaw).getName();
+                                    }
                                 }
                             }
                         }
