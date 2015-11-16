@@ -27,9 +27,13 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
+import java.util.Currency;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.UUID;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -57,7 +61,7 @@ public class TypeConversionHelper
         {
             return null;
         }
-       
+
         boolean[] a = new boolean[value.length()];
         for( int i=0; i<a.length; i++)
         {
@@ -943,10 +947,37 @@ public class TypeConversionHelper
             {
                 return value.toString();
             }
-            else
+            else if (type == UUID.class)
             {
-                return null;
+                if (value instanceof String)
+                {
+                    return UUID.fromString((String)value);
+                }
             }
+            else if (type == TimeZone.class)
+            {
+                if (value instanceof String)
+                {
+                    return TimeZone.getTimeZone((String)value);
+                }
+            }
+            else if (type == Currency.class)
+            {
+                if (value instanceof String)
+                {
+                    return Currency.getInstance((String)value);
+                }
+            }
+            else if (type == Locale.class)
+            {
+                if (value instanceof String)
+                {
+                    return I18nUtils.getLocaleFromString((String)value);
+                }
+            }
+
+            NucleusLogger.PERSISTENCE.warn("Request to convert value of type " + value.getClass().getName() + " to type " + type.getName() + " but this is not yet supported." +
+                "Raise a JIRA issue and contribute the code to support this conversion, with a testcase that demonstrates the problem");
         }
         return value;
     }
