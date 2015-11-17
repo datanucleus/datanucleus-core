@@ -372,6 +372,7 @@ Contributors:
         <valuegenerator name="uuid-hex" class-name="org.datanucleus.store.valuegenerator.UUIDHexGenerator" unique="true"/>
         <valuegenerator name="uuid-string" class-name="org.datanucleus.store.valuegenerator.UUIDStringGenerator" unique="true"/>
         <valuegenerator name="uuid" class-name="org.datanucleus.store.valuegenerator.UUIDGenerator" unique="true"/>
+        <valuegenerator name="uuid-object" class-name="org.datanucleus.store.valuegenerator.UUIDObjectGenerator" unique="true"/>
     </extension>
 
     <!-- CLASS LOADERS -->
