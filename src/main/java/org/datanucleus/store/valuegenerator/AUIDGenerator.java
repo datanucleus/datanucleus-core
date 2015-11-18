@@ -20,6 +20,9 @@ package org.datanucleus.store.valuegenerator;
 
 import java.util.Properties;
 
+import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
+
 /**
  * This generator uses a Java implementation of DCE UUIDs to create unique
  * identifiers without the overhead of additional database transactions or even
@@ -44,7 +47,7 @@ import java.util.Properties;
  * will have crashed a million times before this happens.
  * </p>
  */
-public class AUIDGenerator extends AbstractUIDGenerator
+public class AUIDGenerator extends AbstractGenerator<String>
 {
     public AUIDGenerator(String name, Properties props)
     {
@@ -53,11 +56,30 @@ public class AUIDGenerator extends AbstractUIDGenerator
     }
 
     /**
-     * Accessor for a new identifier.
-     * @return The identifier
+     * Accessor for the storage class for values generated with this generator.
+     * @return Storage class (in this case String.class)
      */
-    protected String getIdentifier()
+    public static Class getStorageClass()
     {
-        return new AUID().toString();
+        return String.class;
+    }
+
+    /**
+     * Method to reserve "size" values to the block.
+     * @param size The block size
+     * @return The reserved block
+     */
+    protected ValueGenerationBlock<String> reserveBlock(long size)
+    {
+        Object[] ids = new Object[(int) size];
+        for (int i = 0; i < size; i++)
+        {
+            ids[i] = new AUID().toString();
+        }
+        if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
+        {
+            NucleusLogger.VALUEGENERATION.debug(Localiser.msg("040004", "" + size));
+        }
+        return new ValueGenerationBlock(ids);
     }
 }

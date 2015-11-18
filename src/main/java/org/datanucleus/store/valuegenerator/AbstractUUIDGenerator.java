@@ -21,13 +21,14 @@ package org.datanucleus.store.valuegenerator;
 import java.net.InetAddress;
 import java.util.Properties;
 
+import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.TypeConversionHelper;
 
 /**
- * Value generator for a UUID format. To be extended by implementations
- * giving the UUID in particular forms.
+ * Value generator for a UUID format. To be extended by implementations giving the UUID in particular forms.
  */
-public abstract class AbstractUUIDGenerator extends AbstractUIDGenerator
+public abstract class AbstractUUIDGenerator extends AbstractGenerator<String>
 {
     /** IP Address of local machine. */
     static final int IP_ADDRESS;
@@ -62,6 +63,40 @@ public abstract class AbstractUUIDGenerator extends AbstractUIDGenerator
     {
         super(name, props);
     }
+
+    /**
+     * Accessor for the storage class for values generated with this generator.
+     * @return Storage class (in this case String.class)
+     */
+    public static Class getStorageClass()
+    {
+        return String.class;
+    }
+
+    /**
+     * Method to reserve "size" values to the block.
+     * @param size The block size
+     * @return The reserved block
+     */
+    protected ValueGenerationBlock<String> reserveBlock(long size)
+    {
+        Object[] ids = new Object[(int) size];
+        for (int i = 0; i < size; i++)
+        {
+            ids[i] = getIdentifier();
+        }
+        if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
+        {
+            NucleusLogger.VALUEGENERATION.debug(Localiser.msg("040004", "" + size));
+        }
+        return new ValueGenerationBlock(ids);
+    }
+
+    /**
+     * Create an identifier in the required UUID format required.
+     * @return The identifier
+     */
+    protected abstract String getIdentifier();
 
     /**
      * Simple counter for identities.

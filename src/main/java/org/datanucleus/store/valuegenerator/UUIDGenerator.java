@@ -20,11 +20,14 @@ package org.datanucleus.store.valuegenerator;
 import java.util.Properties;
 import java.util.UUID;
 
+import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
+
 /**
- * Value generator for a UUID utilising the JDK UUID class (128-bit, 36 character).
+ * Value generator for a String utilising the JDK UUID class (128-bit, 36 character).
  * Results in Strings of length 36 characters, like "2cdb8cee-9134-453f-9d7a-14c0ae8184c6".
  */
-public class UUIDGenerator extends AbstractUIDGenerator
+public class UUIDGenerator extends AbstractGenerator<String>
 {
     /**
      * Constructor.
@@ -37,11 +40,30 @@ public class UUIDGenerator extends AbstractUIDGenerator
     }
 
     /**
-     * Create an identifier with the form "2cdb8cee-9134-453f-9d7a-14c0ae8184c6".
-     * @return The identifier
+     * Accessor for the storage class for values generated with this generator.
+     * @return Storage class (in this case String.class)
      */
-    protected String getIdentifier()
+    public static Class getStorageClass()
     {
-        return UUID.randomUUID().toString();
+        return String.class;
+    }
+
+    /**
+     * Method to reserve "size" values to the block.
+     * @param size The block size
+     * @return The reserved block
+     */
+    protected ValueGenerationBlock<String> reserveBlock(long size)
+    {
+        Object[] ids = new Object[(int) size];
+        for (int i = 0; i < size; i++)
+        {
+            ids[i] = UUID.randomUUID().toString();
+        }
+        if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
+        {
+            NucleusLogger.VALUEGENERATION.debug(Localiser.msg("040004", "" + size));
+        }
+        return new ValueGenerationBlock(ids);
     }
 }
