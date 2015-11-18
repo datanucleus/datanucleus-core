@@ -155,9 +155,9 @@ public class AttachFieldManager extends AbstractFieldManager
         }
         else if (secondClassMutableFields[fieldNumber])
         {
-            if (mmd.isSerialized())
+            if (mmd.isSerialized() && !RelationType.isRelationMultiValued(relationType))
             {
-                // SCO Field is serialised so just update the column with this new value
+                // SCO Field is serialised, and no persistable elements so just update the column with this new value
                 attachedOP.replaceFieldMakeDirty(fieldNumber, value);
                 attachedOP.makeDirty(fieldNumber);
             }
@@ -260,7 +260,7 @@ public class AttachFieldManager extends AbstractFieldManager
             // Array of persistable objects
             if (mmd.isSerialized() || mmd.isEmbedded())
             {
-                // Field is serialised/embedded so just update the column with this new value
+                // Field is serialised/embedded so just update the column with this new value TODO Make sure they have ObjectProviders
                 attachedOP.replaceField(fieldNumber, value);
                 if (dirtyFields[fieldNumber] || !persistent)
                 {

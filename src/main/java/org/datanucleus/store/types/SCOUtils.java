@@ -250,6 +250,12 @@ public class SCOUtils
         boolean backedWrapper = storeMgr.useBackedSCOWrapperForMember(mmd, ownerOP.getExecutionContext());
         TypeManager typeMgr = ownerOP.getExecutionContext().getNucleusContext().getTypeManager();
         Class wrapperType = null;
+        if (mmd.isSerialized())
+        {
+            // If we have all elements serialised into a column then cannot have backing stores
+            backedWrapper = false;
+        }
+
         if (backedWrapper)
         {
             wrapperType = SCOUtils.getBackedWrapperTypeForType(mmd.getType(), instantiatedType, typeName, typeMgr);
@@ -1501,39 +1507,6 @@ public class SCOUtils
             }
         }
         return persisted;
-    }
-
-    /**
-     * Method to check if objects to be stored in a SCO container are already persistent, or are managed by a
-     * different ExecutionContext. If not persistent, this call will persist them.
-     * @param ec ExecutionContext
-     * @param objects The objects (array, or Collection)
-     */
-    public static void validateObjectsForWriting(ExecutionContext ec, Object objects)
-    {
-        if (objects != null)
-        {
-            if (objects.getClass().isArray())
-            {
-                if (!objects.getClass().getComponentType().isPrimitive())
-                {
-                    Object[] obj = ((Object[]) objects);
-                    for (int i = 0; i < obj.length; i++)
-                    {
-                        validateObjectForWriting(ec, obj[i], null);
-                    }
-                }
-            }
-            else if (objects instanceof Collection)
-            {
-                Collection col = (Collection) objects;
-                Iterator it = col.iterator();
-                while (it.hasNext())
-                {
-                    validateObjectForWriting(ec, it.next(), null);
-                }
-            }
-        }
     }
 
     /**
