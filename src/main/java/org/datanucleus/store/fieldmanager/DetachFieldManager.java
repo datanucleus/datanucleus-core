@@ -54,8 +54,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
      * @param state State object to hold any pertinent controls for the detachment process
      * @param copy Whether to create detached COPIES or just detach in-situ
      */
-    public DetachFieldManager(ObjectProvider op, boolean[] secondClassMutableFields, FetchPlanForClass fpClass, FetchPlanState state, 
-            boolean copy)
+    public DetachFieldManager(ObjectProvider op, boolean[] secondClassMutableFields, FetchPlanForClass fpClass, FetchPlanState state, boolean copy)
     {
         super(op, secondClassMutableFields, fpClass, state);
         this.copy = copy;
