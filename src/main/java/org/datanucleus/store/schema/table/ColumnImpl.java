@@ -52,11 +52,22 @@ public class ColumnImpl implements Column
 
     ColumnMetaData colmd = null;
 
+    boolean nested = false;
+
     public ColumnImpl(Table tbl, String identifier, ColumnType colType)
     {
         this.table = tbl;
         this.identifier = identifier;
         this.columnType = colType;
+    }
+
+    public boolean isNested()
+    {
+        return nested;
+    }
+    public void setNested(boolean nested)
+    {
+        this.nested = nested;
     }
 
     public Table getTable()
