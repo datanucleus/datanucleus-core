@@ -1101,7 +1101,7 @@ public class SCOUtils
         {
             // With Derby 10.x we can get instances where the values query returns no values yet entries is not empty TODO Maybe make this throw an exception
             NucleusLogger.DATASTORE_RETRIEVE.warn("The number of Map value objects (" + values.size() + ")" + " was different to the number of entries (" + delegate.size() + 
-                ")." + " Likely there is a bug in your datastore");
+                ")." + " Likely there is a bug in your datastore, or you have null values?");
         }
 
         keys.clear();
