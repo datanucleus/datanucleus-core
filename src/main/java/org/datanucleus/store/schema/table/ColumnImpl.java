@@ -220,10 +220,18 @@ public class ColumnImpl implements Column
 
     public String toString()
     {
+        StringBuilder str = new StringBuilder();
+        str.append("Column: ").append(identifier);
         if (mapping != null)
         {
-            return "Column: " + identifier + " member=" + mapping.getMemberMetaData().getFullFieldName() + (primaryKey ? " (PK)" : "") + (position >= 0 ? (" [" + position + "]") : "");
+            str.append(" member=").append(mapping.getMemberMetaData().getFullFieldName());
         }
-        return "Column : " + identifier + " type=" + columnType + (primaryKey ? " (PK)" : "") + (position >= 0 ? (" [" + position + "]") : "");
+        str.append((primaryKey ? " (PK)" : ""));
+        str.append((position >= 0 ? (" [" + position + "]") : ""));
+        if (nested)
+        {
+            str.append(" [NESTED]");
+        }
+        return str.toString();
     }
 }
