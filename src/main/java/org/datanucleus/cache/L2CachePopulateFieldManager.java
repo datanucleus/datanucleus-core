@@ -19,6 +19,7 @@ package org.datanucleus.cache;
 
 import static org.datanucleus.cache.L2CacheRetrieveFieldManager.newContainer;
 
+import java.lang.reflect.Array;
 import java.util.Map.Entry;
 
 import org.datanucleus.ExecutionContext;
@@ -453,34 +454,57 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
                 return;
             }
 
-            ElementContainerAdapter containerAdapter = containerHandler.getAdapter(container);
-
-            if (containerAdapter instanceof SequenceAdapter && mmd.getOrderMetaData() != null && !mmd.getOrderMetaData().isIndexedList())
+            if (mmd.hasArray())
             {
-                // Ordered list so don't cache since dependent on datastore-retrieve order
-                cachedPC.setLoadedField(fieldNumber, false);
-                return;
-            }
-
-            try
-            {
-                ElementContainerAdapter containerToCacheAdapter = containerHandler.getAdapter(newContainer(container, mmd, containerHandler));
-                ApiAdapter api = ec.getApiAdapter();
-                // Recurse through elements, and put ids of elements in return value
-                for (Object element : containerAdapter)
+                // TODO Remove this when the container/adapter code below is made to create a "Object[]" field rather than a "MyPersistableType[]"
+                Object[] returnArr = new Object[Array.getLength(container)];
+                for (int i=0;i<Array.getLength(container);i++)
                 {
-                    containerToCacheAdapter.add(getCacheableIdForId(api, element));
+                    Object element = Array.get(container, i);
+                    if (element != null)
+                    {
+                        returnArr[i] = getCacheableIdForId(ec.getApiAdapter(), element);
+                    }
+                    else
+                    {
+                        returnArr[i] = null;
+                    }
                 }
 
-                // Put Container<OID> in CachedPC
-                cachedPC.setFieldValue(fieldNumber, containerToCacheAdapter.getContainer());
+                // Store "id[]"
+                cachedPC.setFieldValue(fieldNumber, returnArr);
             }
-            catch (Exception e)
+            else
             {
-                NucleusLogger.CACHE.warn("Unable to create object of type " + container.getClass().getName() + " for L2 caching : " + e.getMessage());
+                ElementContainerAdapter containerAdapter = containerHandler.getAdapter(container);
 
-                // Contents not loaded so just mark as unloaded
-                cachedPC.setLoadedField(fieldNumber, false);
+                if (containerAdapter instanceof SequenceAdapter && mmd.getOrderMetaData() != null && !mmd.getOrderMetaData().isIndexedList())
+                {
+                    // Ordered list so don't cache since dependent on datastore-retrieve order
+                    cachedPC.setLoadedField(fieldNumber, false);
+                    return;
+                }
+
+                try
+                {
+                    ElementContainerAdapter containerToCacheAdapter = containerHandler.getAdapter(newContainer(container, mmd, containerHandler));
+                    ApiAdapter api = ec.getApiAdapter();
+                    // Recurse through elements, and put ids of elements in return value
+                    for (Object element : containerAdapter)
+                    {
+                        containerToCacheAdapter.add(getCacheableIdForId(api, element));
+                    }
+
+                    // Put Container<OID> in CachedPC
+                    cachedPC.setFieldValue(fieldNumber, containerToCacheAdapter.getContainer());
+                }
+                catch (Exception e)
+                {
+                    NucleusLogger.CACHE.warn("Unable to create object of type " + container.getClass().getName() + " for L2 caching : " + e.getMessage());
+
+                    // Contents not loaded so just mark as unloaded
+                    cachedPC.setLoadedField(fieldNumber, false);
+                }
             }
         }
     }
