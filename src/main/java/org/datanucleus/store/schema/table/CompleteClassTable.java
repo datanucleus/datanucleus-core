@@ -1113,4 +1113,26 @@ public class CompleteClassTable implements Table
     {
         return "Table: " + identifier;
     }
+
+    public String debugString()
+    {
+        StringBuilder str = new StringBuilder();
+        str.append("Table: ");
+        if (catalogName != null)
+        {
+            str.append(catalogName).append('.');
+        }
+        if (schemaName != null)
+        {
+            str.append(schemaName).append('.');
+        }
+        str.append(identifier).append("\n");
+        str.append("{\n");
+        for (Column col : columns)
+        {
+            str.append("  ").append(col.toString());
+        }
+        str.append("}");
+        return str.toString();
+    }
 }
