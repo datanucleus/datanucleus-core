@@ -157,7 +157,6 @@ public class CompleteClassTable implements Table
                         ColumnMetaData[] colmds = mmd.getColumnMetaData();
                         String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
                         ColumnImpl col = addColumn(mmd, colName, null);
-                        col.setNested(true);
                         if (colmds != null && colmds.length == 1)
                         {
                             col.setColumnMetaData(colmds[0]);
