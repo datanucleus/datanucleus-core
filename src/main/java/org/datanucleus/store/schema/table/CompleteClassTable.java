@@ -1138,7 +1138,7 @@ public class CompleteClassTable implements Table
         str.append("{\n");
         for (Column col : columns)
         {
-            str.append("  ").append(col.toString());
+            str.append("  ").append(col.toString()).append("\n");
         }
         str.append("}");
         return str.toString();
