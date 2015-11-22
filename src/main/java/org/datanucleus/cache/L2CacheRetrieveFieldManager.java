@@ -268,7 +268,8 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         try
         {
             ElementContainerAdapter<Object> cachedContainerAdapter = containerHandler.getAdapter(cachedContainer);
-            Object newContainer = newContainer(cachedContainer, mmd, containerHandler);
+            // For arrays, rely on the metadata value.
+            Object newContainer = mmd.hasArray() ? containerHandler.newContainer(mmd) : newContainer(cachedContainer, mmd, containerHandler);
             ElementContainerAdapter<Object> fieldContainerAdapter = containerHandler.getAdapter(newContainer);
             RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
             
@@ -388,10 +389,10 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
     }
     
     /*
-     * Copy container without using the container handler. Calling newContainer from container handler for
-     * interfaces will return the default chosen implementation, but this causes the JDO TCK
-     * (TestCollectionCollections) to fail because it expects Collection fields to return the same or at most
-     * a List.
+     * Copy container without using the container handler and metadata type info. Calling newContainer from
+     * container handler for interfaces will return the default chosen implementation, but this causes the JDO
+     * TCK (TestCollectionCollections) to fail because it expects Collection fields to return the same or at
+     * most a List.
      */
     static <T> T newContainer(Object container, AbstractMemberMetaData mmd, ContainerHandler containerHandler)
     {

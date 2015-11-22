@@ -19,7 +19,6 @@ package org.datanucleus.cache;
 
 import static org.datanucleus.cache.L2CacheRetrieveFieldManager.newContainer;
 
-import java.lang.reflect.Array;
 import java.util.Map.Entry;
 
 import org.datanucleus.ExecutionContext;
@@ -49,6 +48,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class L2CachePopulateFieldManager extends AbstractFieldManager
 {
+    private static final Object[] EMPTY_ARRAY = {};
+
     /** ObjectProvider of the object we are copying values from. */
     ObjectProvider op;
 
@@ -454,57 +455,38 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
                 return;
             }
 
-            if (mmd.hasArray())
-            {
-                // TODO Remove this when the container/adapter code below is made to create a "Object[]" field rather than a "MyPersistableType[]"
-                Object[] returnArr = new Object[Array.getLength(container)];
-                for (int i=0;i<Array.getLength(container);i++)
-                {
-                    Object element = Array.get(container, i);
-                    if (element != null)
-                    {
-                        returnArr[i] = getCacheableIdForId(ec.getApiAdapter(), element);
-                    }
-                    else
-                    {
-                        returnArr[i] = null;
-                    }
-                }
+            ElementContainerAdapter containerAdapter = containerHandler.getAdapter(container);
 
-                // Store "id[]"
-                cachedPC.setFieldValue(fieldNumber, returnArr);
+            if (containerAdapter instanceof SequenceAdapter && mmd.getOrderMetaData() != null && !mmd.getOrderMetaData().isIndexedList())
+            {
+                // Ordered list so don't cache since dependent on datastore-retrieve order
+                cachedPC.setLoadedField(fieldNumber, false);
+                return;
             }
-            else
+
+            try
             {
-                ElementContainerAdapter containerAdapter = containerHandler.getAdapter(container);
-
-                if (containerAdapter instanceof SequenceAdapter && mmd.getOrderMetaData() != null && !mmd.getOrderMetaData().isIndexedList())
+                // For arrays[PC] just use an Object array to store the ids because we can use the same type
+                // of the original container. Later when restoring the values it will be based on the metadata
+                // instead of the actual container type, as opposed to how it's done for non-array containers.
+                Object newContainer = mmd.hasArray() ? EMPTY_ARRAY : newContainer(container, mmd, containerHandler);
+                ElementContainerAdapter containerToCacheAdapter = containerHandler.getAdapter(newContainer);
+                ApiAdapter api = ec.getApiAdapter();
+                // Recurse through elements, and put ids of elements in return value
+                for (Object element : containerAdapter)
                 {
-                    // Ordered list so don't cache since dependent on datastore-retrieve order
-                    cachedPC.setLoadedField(fieldNumber, false);
-                    return;
+                    containerToCacheAdapter.add(getCacheableIdForId(api, element));
                 }
 
-                try
-                {
-                    ElementContainerAdapter containerToCacheAdapter = containerHandler.getAdapter(newContainer(container, mmd, containerHandler));
-                    ApiAdapter api = ec.getApiAdapter();
-                    // Recurse through elements, and put ids of elements in return value
-                    for (Object element : containerAdapter)
-                    {
-                        containerToCacheAdapter.add(getCacheableIdForId(api, element));
-                    }
+                // Put Container<OID> in CachedPC
+                cachedPC.setFieldValue(fieldNumber, containerToCacheAdapter.getContainer());
+            }
+            catch (Exception e)
+            {
+                NucleusLogger.CACHE.warn("Unable to create object of type " + container.getClass().getName() + " for L2 caching : " + e.getMessage());
 
-                    // Put Container<OID> in CachedPC
-                    cachedPC.setFieldValue(fieldNumber, containerToCacheAdapter.getContainer());
-                }
-                catch (Exception e)
-                {
-                    NucleusLogger.CACHE.warn("Unable to create object of type " + container.getClass().getName() + " for L2 caching : " + e.getMessage());
-
-                    // Contents not loaded so just mark as unloaded
-                    cachedPC.setLoadedField(fieldNumber, false);
-                }
+                // Contents not loaded so just mark as unloaded
+                cachedPC.setLoadedField(fieldNumber, false);
             }
         }
     }
