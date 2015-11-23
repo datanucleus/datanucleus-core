@@ -49,6 +49,11 @@ public class Log4JLogger extends NucleusLogger
         logger = Logger.getLogger(logName);
     }
 
+    public Object getNativeLogger()
+    {
+        return logger;
+    }
+
     /**
      * Log a debug message.
      * @param msg The message

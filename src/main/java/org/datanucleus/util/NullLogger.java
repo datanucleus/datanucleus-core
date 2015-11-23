@@ -27,6 +27,11 @@ public class NullLogger extends NucleusLogger
     {
     }
 
+    public Object getNativeLogger()
+    {
+        return null;
+    }
+
     public void debug(Object msg)
     {
     }

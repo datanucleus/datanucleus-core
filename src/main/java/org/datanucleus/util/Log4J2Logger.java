@@ -44,9 +44,12 @@ public class Log4J2Logger extends NucleusLogger
      */
     public Log4J2Logger(String logName)
     {
-        // Logging assumed to be configured by user via "log4j.configuration"
-        // Use Logger instead of LogManager so that "logback" (http://logback.qos.ch) can work
         logger = LogManager.getLogger(logName);
+    }
+
+    public Object getNativeLogger()
+    {
+        return logger;
     }
 
     /**

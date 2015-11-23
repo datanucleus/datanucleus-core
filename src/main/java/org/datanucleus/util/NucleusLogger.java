@@ -250,4 +250,10 @@ public abstract class NucleusLogger
      * @return Whether it is enabled
      */
     public abstract boolean isInfoEnabled();
+
+    /**
+     * Accessor for the native logger object.
+     * @return The native logger object
+     */
+    public abstract Object getNativeLogger();
 }
