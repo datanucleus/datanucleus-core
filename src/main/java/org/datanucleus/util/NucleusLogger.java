@@ -77,114 +77,6 @@ public abstract class NucleusLogger
     /** Log for value generation issues */
     public static final NucleusLogger VALUEGENERATION;
 
-    /*public static final NucleusLogger getPersistence()
-    {
-        if (PERSISTENCE == null)
-        {
-            PERSISTENCE = getLoggerInstance("DataNucleus.Persistence");
-        }
-        return PERSISTENCE;
-    }
-
-    public static final NucleusLogger getTransaction()
-    {
-        if (TRANSACTION == null)
-        {
-            TRANSACTION = getLoggerInstance("DataNucleus.Transaction");
-        }
-        return TRANSACTION;
-    }
-
-    public static final NucleusLogger getConnection()
-    {
-        if (CONNECTION == null)
-        {
-            CONNECTION = getLoggerInstance("DataNucleus.Connection");
-        }
-        return CONNECTION;
-    }
-
-    public static final NucleusLogger getQuery()
-    {
-        if (QUERY == null)
-        {
-            QUERY = getLoggerInstance("DataNucleus.Query");
-        }
-        return QUERY;
-    }
-
-    public static final NucleusLogger getMetadata()
-    {
-        if (METADATA == null)
-        {
-            METADATA = getLoggerInstance("DataNucleus.MetaData");
-        }
-        return METADATA;
-    }
-
-    public static final NucleusLogger getCache()
-    {
-        if (CACHE == null)
-        {
-            CACHE = getLoggerInstance("DataNucleus.Cache");
-        }
-        return CACHE;
-    }
-
-    public static final NucleusLogger getDatastore()
-    {
-        if (DATASTORE == null)
-        {
-            DATASTORE = getLoggerInstance("DataNucleus.Datastore");
-        }
-        return DATASTORE;
-    }
-
-    public static final NucleusLogger getDatastorePersist()
-    {
-        if (DATASTORE_PERSIST == null)
-        {
-            DATASTORE_PERSIST = getLoggerInstance("DataNucleus.Datastore.Persist");
-        }
-        return DATASTORE_PERSIST;
-    }
-
-    public static final NucleusLogger getDatastoreRetrieve()
-    {
-        if (DATASTORE_RETRIEVE == null)
-        {
-            DATASTORE_RETRIEVE = getLoggerInstance("DataNucleus.Datastore.Retrieve");
-        }
-        return DATASTORE_RETRIEVE;
-    }
-
-    public static final NucleusLogger getDatastoreSchema()
-    {
-        if (DATASTORE_SCHEMA == null)
-        {
-            DATASTORE_SCHEMA = getLoggerInstance("DataNucleus.Datastore.Schema");
-        }
-        return DATASTORE_SCHEMA;
-    }
-
-    public static final NucleusLogger getDatastoreNative()
-    {
-        if (DATASTORE_NATIVE == null)
-        {
-            DATASTORE_NATIVE = getLoggerInstance("DataNucleus.Datastore.Native");
-        }
-        return DATASTORE_NATIVE;
-    }
-
-    public static final NucleusLogger getLifecycle()
-    {
-        if (LIFECYCLE == null)
-        {
-            LIFECYCLE = getLoggerInstance("DataNucleus.Lifecycle");
-        }
-        return LIFECYCLE;
-    }*/
-
     static
     {
         // Set the log type to be used based on what is available from this ClassLoader
@@ -192,12 +84,23 @@ public abstract class NucleusLogger
         Class loggerClass = null;
         try
         {
+            // Default to Log4j v1 if present
             NucleusLogger.class.getClassLoader().loadClass("org.apache.log4j.Logger");
             loggerClass = org.datanucleus.util.Log4JLogger.class;
         }
         catch (Exception e)
         {
-            loggerClass = org.datanucleus.util.JDK14Logger.class;
+            try
+            {
+                // Fallback to Log4j v2. Would be nice to swap this over to be the default but code in PluginParserTest needs migrating first
+                NucleusLogger.class.getClassLoader().loadClass("org.apache.logging.log4j.Logger");
+                loggerClass = org.datanucleus.util.Log4J2Logger.class;
+            }
+            catch (Exception e2)
+            {
+                // Fallback to JRE logging
+                loggerClass = org.datanucleus.util.JDK14Logger.class;
+            }
         }
         LOGGER_CLASS = loggerClass;
 
