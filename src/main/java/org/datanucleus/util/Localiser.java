@@ -19,10 +19,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.util;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
@@ -172,7 +168,7 @@ public class Localiser
                 }
                 else if (Throwable.class.isAssignableFrom(msgArgs[i].getClass()))
                 { 
-                    msgArgs[i] = getStringFromException((Throwable)msgArgs[i]);
+                    msgArgs[i] = StringUtils.getStringFromException((Throwable)msgArgs[i]);
                 }
             }
         }
@@ -206,54 +202,5 @@ public class Localiser
             return formatter.format(msgArgs);
         }
         return stringForKey;
-    }
-
-    /**
-     * Gets a String message from Exceptions. This method transforms nested exceptions into printable messages.
-     * @param exception to be read and transformed into a messsage to print
-     * @return the message to output
-     */
-    private static String getStringFromException(java.lang.Throwable exception)
-    {
-        StringBuilder msg = new StringBuilder();
-        if (exception != null)
-        {
-            StringWriter stringWriter = new StringWriter();
-            PrintWriter printWriter = new PrintWriter(stringWriter);
-            exception.printStackTrace(printWriter);
-            printWriter.close();
-            try
-            {
-                stringWriter.close();
-            }
-            catch(Exception e)
-            {
-                //do nothing
-            }
-            msg.append(exception.getMessage());
-            msg.append('\n');
-            msg.append(stringWriter.toString());
-
-            // JDBC: SQLException
-            if (exception instanceof SQLException)
-            {
-                if (((SQLException) exception).getNextException() != null)
-                {
-                    msg.append('\n');
-                    msg.append(getStringFromException(((SQLException) exception).getNextException()));
-                }
-            }
-            // Reflection: InvocationTargetException
-            else if (exception instanceof InvocationTargetException)
-            {
-                if (((InvocationTargetException) exception).getTargetException() != null)
-                {
-                    msg.append('\n');
-                    msg.append(getStringFromException(((InvocationTargetException) exception).getTargetException()));
-                }
-            }
-            // TODO Add more exceptions here, so we can provide complete information in the log
-        }
-        return msg.toString();
     }
 }
