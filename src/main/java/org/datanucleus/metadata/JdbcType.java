@@ -25,6 +25,7 @@ import java.sql.Types;
  */
 public enum JdbcType 
 {
+    ARRAY(Types.ARRAY),
     BIGINT(Types.BIGINT),
     BINARY(Types.BINARY),
     BIT(Types.BIT),
@@ -74,6 +75,8 @@ public enum JdbcType
     {
         switch (value)
         {
+            case Types.ARRAY:
+                return ARRAY;
             case Types.BIGINT:
                 return BIGINT;
             case Types.BINARY:
