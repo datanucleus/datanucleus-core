@@ -1797,37 +1797,48 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         {
             // <embedded> is contained in a <field>, <element>, <key>, <value>
             MetaData parentMd = ((EmbeddedMetaData)parent).getParent();
+            String typeName = null;
             if (parentMd instanceof AbstractMemberMetaData)
             {
-                return ((AbstractMemberMetaData)parentMd).getTypeName();
+                typeName = ((AbstractMemberMetaData)parentMd).getTypeName();
             }
             else if (parentMd instanceof ElementMetaData)
             {
                 AbstractMemberMetaData fmd = (AbstractMemberMetaData)((ElementMetaData)parentMd).getParent();
-                return fmd.getCollection().getElementType();
+                typeName = fmd.getCollection().getElementType();
             }
             else if (parentMd instanceof KeyMetaData)
             {
                 AbstractMemberMetaData fmd = (AbstractMemberMetaData)((KeyMetaData)parentMd).getParent();
-                return fmd.getMap().getKeyType();
+                typeName = fmd.getMap().getKeyType();
             }
             else if (parentMd instanceof ValueMetaData)
             {
                 AbstractMemberMetaData fmd = (AbstractMemberMetaData)((ValueMetaData)parentMd).getParent();
-                return fmd.getMap().getValueType();
+                typeName = fmd.getMap().getValueType();
             }
             else
             {
                 // Should be impossible
                 return null;
             }
+            if (!fully_qualified && typeName.indexOf('.') > 0)
+            {
+                return typeName.substring(typeName.lastIndexOf('.')+1);
+            }
+            return typeName;
         }
         else if (parent instanceof UniqueMetaData)
         {
             MetaData grandparent = ((UniqueMetaData)parent).getParent();
             if (grandparent instanceof AbstractClassMetaData)
             {
-                return ((AbstractClassMetaData)grandparent).getFullClassName();
+                String fullClassName = ((AbstractClassMetaData)grandparent).getFullClassName();
+                if (!fully_qualified && fullClassName.indexOf('.') > 0)
+                {
+                    return fullClassName.substring(fullClassName.lastIndexOf('.')+1);
+                }
+                return fullClassName;
             }
             // TODO Cater for other parent options
         }
