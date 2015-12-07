@@ -1105,14 +1105,13 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
 
     /**
      * Convenience method to load a field from the datastore.
-     * Used in attaching fields and checking their old values (so we dont
-     * want any postLoad method being called).
+     * Used in attaching fields and checking their old values (so we don't want any postLoad method being called).
      * TODO Merge this with one of the loadXXXFields methods.
-     * @param fieldNumber The field number.
+     * @param fieldNumber The field number. If fieldNumber is -1 then this means call loadFieldsFromDatastore(null);
      */
     public void loadFieldFromDatastore(int fieldNumber)
     {
-        loadFieldsFromDatastore(new int[] {fieldNumber});
+        loadFieldsFromDatastore((fieldNumber >= 0) ? (new int[] {fieldNumber}) : null);
     }
 
     /**
