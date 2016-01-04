@@ -68,6 +68,8 @@ import org.datanucleus.metadata.IdentityStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.RelationType;
+import org.datanucleus.metadata.VersionMetaData;
+import org.datanucleus.metadata.VersionStrategy;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.ObjectReferencingStoreManager;
 import org.datanucleus.store.exceptions.NotYetFlushedException;
@@ -962,16 +964,50 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
      * Return the object representing the version of the calling instance.
      * @param pc the calling persistable instance
      * @return the object representing the version of the calling instance
-     * @since JDO 2.0
-     */    
+     */
     public Object getVersion(Persistable pc)
     {
         if (pc == myPC)
         {
-            // JIRA-2993 This used to return myVersion but now we use transactionalVersion
+            if (transactionalVersion == null && cmd.isVersioned())
+            {
+                // If the object is versioned and no version is loaded (e.g obtained via findObject without loading fields) and in a state where we need it then pull in the version
+                VersionMetaData vermd = cmd.getVersionMetaDataForClass();
+                if (vermd != null && vermd.getVersionStrategy() != VersionStrategy.NONE)
+                {
+                    if (myLC.stateType() == LifeCycleState.P_CLEAN || myLC.stateType() == LifeCycleState.HOLLOW) // Add other states?
+                    {
+                        if (vermd.getFieldName() != null)
+                        {
+                            AbstractMemberMetaData verMmd = cmd.getMetaDataForMember(vermd.getFieldName());
+                            loadFieldFromDatastore(verMmd.getAbsoluteFieldNumber());
+                        }
+                        else
+                        {
+                            loadFieldsFromDatastore(null);
+                        }
+                    }
+                }
+            }
+
             return transactionalVersion;
         }
         return null;
+    }
+
+    /**
+     * Method to return if the version is loaded.
+     * If the class represented is not versioned then returns true
+     * @return Whether it is loaded.
+     */
+    public boolean isVersionLoaded()
+    {
+        if (cmd.isVersioned())
+        {
+            return transactionalVersion != null;
+        }
+        // No version required, so return true
+        return true;
     }
 
     /**
@@ -986,7 +1022,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     /**
      * Return the transactional version of the managed object.
      * @return Version of the managed instance at this point in the transaction
-     */    
+     */
     public Object getTransactionalVersion()
     {
         return getTransactionalVersion(myPC);

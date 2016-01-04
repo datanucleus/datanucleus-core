@@ -640,6 +640,13 @@ public interface ObjectProvider<T>
     Object getVersion();
 
     /**
+     * Method to return if the version is loaded.
+     * If the class represented is not versioned then returns true
+     * @return Whether it is loaded.
+     */
+    boolean isVersionLoaded();
+
+    /**
      * Method to lock the object owned by this ObjectProvider.
      * @param lockMode Lock mode to apply
      */
