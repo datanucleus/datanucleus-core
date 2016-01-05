@@ -165,7 +165,7 @@ public class SCOUtils
             }
 
             // Create new wrapper of the required type
-            Class requiredType = newValue != null ? newValue.getClass() : (oldValue != null ? oldValue.getClass() : null);
+            Class requiredType = newValue.getClass();
             SCO sco = createSCOInstance(ownerOP, mmd, requiredType);
 
             if (replaceFieldIfChanged)

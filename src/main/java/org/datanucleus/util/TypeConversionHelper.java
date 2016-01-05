@@ -1089,10 +1089,8 @@ public class TypeConversionHelper
 
     /**
      * Converts a string in JDBC timestamp escape format to a Timestamp object.
-     * To be precise, we prefer to find a JDBC escape type sequence in the format
-     * "yyyy-mm-dd hh:mm:ss.fffffffff", but this does accept other separators
-     * of fields, so as long as the numbers are in the order
-     * year, month, day, hour, minute, second then we accept it.
+     * To be precise, we prefer to find a JDBC escape type sequence in the format "yyyy-mm-dd hh:mm:ss.fffffffff", but this does not accept
+     * other separators of fields, so as long as the numbers are in the order year, month, day, hour, minute, second then we accept it.
      * @param s Timestamp string
      * @param cal The Calendar to use for conversion
      * @return Corresponding <tt>java.sql.Timestamp</tt> value.
@@ -1116,16 +1114,16 @@ public class TypeConversionHelper
         int nanos = 0;
         if (numbers.length > 6)
         {
-            String zeroedNanos = "" + numbers[6];
+            StringBuilder zeroedNanos = new StringBuilder("" + numbers[6]);
             if (zeroedNanos.length() < 9)
             {
                 // Add trailing zeros
                 int numZerosToAdd = 9-zeroedNanos.length();
                 for (int i=0;i<numZerosToAdd;i++)
                 {
-                    zeroedNanos += "0";
+                    zeroedNanos.append("0");
                 }
-                nanos = Integer.valueOf(zeroedNanos);
+                nanos = Integer.valueOf(zeroedNanos.toString());
             }
             else
             {
