@@ -145,15 +145,15 @@ The first step is to convert these two forms into the constituent clauses. It is
 
 The two primary supported query languages have helper classes to provide this migration from the _single-string query form_ into the individual clauses. 
 These can be found in _org.datanucleus.query.JDOQLSingleStringParser_
-[![Javadoc](../../images/javadoc.gif)](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/query/JDOQLSingleStringParser.html)
+[![Javadoc]](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/query/JDOQLSingleStringParser.html)
 and _org.datanucleus.query.JPQLSingleStringParser_
-[![Javadoc](../../images/javadoc.gif)](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/query/JPQLSingleStringParser.html).
+[![Javadoc]](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/query/JPQLSingleStringParser.html).
 
 #### Query : Compilation
 
 So we have a series of clauses and we want to compile them. So what does this mean? Well, in simple terms, we are going to convert the individual clauses 
 from above into expression tree(s) so that they can be evaluated. The end result of a compilation is a _org.datanucleus.query.compiler.QueryCompilation_
-[![Javadoc](../../images/javadoc.gif)](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/query/compiler/QueryCompilation.html).
+[![Javadoc]](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/query/compiler/QueryCompilation.html).
 
 So if you think about a typical query you may have
 
@@ -166,14 +166,14 @@ The query compilation of a particular clauses has 2 stages
 2. Compilation of the Node tree into an Expression tree of supported expressions
 
 and compilation is performed by a JavaQueryCompiler, so look at _org.datanucleus.query.compiler.JDOQLCompiler_
-[![Javadoc](../../images/javadoc.gif)](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/query/compiler/JDOQLCompiler.html)
+[![Javadoc]](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/query/compiler/JDOQLCompiler.html)
 and _org.datanucleus.query.compiler.JPQLCompiler_
-[![Javadoc](../../images/javadoc.gif)](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/query/compiler/JPQLCompiler.html).
+[![Javadoc]](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/query/compiler/JPQLCompiler.html).
 These each have a Parser that performs the extraction of the different components of the clauses and generation of the Node tree. 
 Once a Node tree is generated it can then be converted into the compiled Expression tree; this is handled inside the JavaQueryCompiler.
 
 The other part of a query compilation is the _org.datanucleus.query.symbol.SymbolTable_
-[![Javadoc](../../images/javadoc.gif)](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/query/symbol/SymbolTable.html)
+[![Javadoc]](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/query/symbol/SymbolTable.html)
 which is a lookup table (map) of identifiers and their value. So, for example, an input parameter will have a name, so has an entry in 
 the table, and its value is stored there. This is then used during evaluation.
 
@@ -191,7 +191,7 @@ _in-memory_ (see below). Obviously for a datastore like RDBMS it should be possi
 
 Evaluation of queries in-memory assumes that we have a series of "candidate" objects. These are either user-input to the query itself, 
 or retrieved from the datastore. We then use the in-memory evaluator _org.datanucleus.query.evaluator.memory.InMemoryExpressionEvaluator_
-[!(Javadoc)](../../images/javadoc.gif)](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/query/evaluator/inmemory/InMemoryExpressionEvaluator.html).
+[![Javadoc]](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/query/evaluator/inmemory/InMemoryExpressionEvaluator.html).
 This takes in each candidate object one-by-one and evaluates whichever of the query clauses are desired to be evaluated. 
 For example we could just evaluate the filter clause. Evaluation makes use of the values of the fields of the candidate objects 
 (and related objects) and uses the SymbolTable for values of parameters etc. Where a candidate fails a particular clause 
