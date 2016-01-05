@@ -191,7 +191,7 @@ _in-memory_ (see below). Obviously for a datastore like RDBMS it should be possi
 
 Evaluation of queries in-memory assumes that we have a series of "candidate" objects. These are either user-input to the query itself, 
 or retrieved from the datastore. We then use the in-memory evaluator _org.datanucleus.query.evaluator.memory.InMemoryExpressionEvaluator_
-[![Javadoc](../../images/javadoc.gif)](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/query/evaluator/memory/InMemoryExpressionEvaluator.html).
+[(Javadoc)](../../images/javadoc.gif)](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/query/evaluator/inmemory/InMemoryExpressionEvaluator.html).
 This takes in each candidate object one-by-one and evaluates whichever of the query clauses are desired to be evaluated. 
 For example we could just evaluate the filter clause. Evaluation makes use of the values of the fields of the candidate objects 
 (and related objects) and uses the SymbolTable for values of parameters etc. Where a candidate fails a particular clause 
