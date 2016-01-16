@@ -20,8 +20,14 @@ package org.datanucleus.store.types.wrappers;
 import java.io.ObjectStreamException;
 import java.util.AbstractList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 import org.datanucleus.flush.CollectionAddOperation;
 import org.datanucleus.flush.CollectionRemoveOperation;
@@ -753,5 +759,68 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
     protected Object writeReplace() throws ObjectStreamException
     {
         return new java.util.ArrayList(delegate);
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Collection#stream()
+     */
+    @Override
+    public Stream stream()
+    {
+        return delegate.stream();
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Collection#parallelStream()
+     */
+    @Override
+    public Stream parallelStream()
+    {
+        return delegate.parallelStream();
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.ArrayList#forEach(java.util.function.Consumer)
+     */
+    @Override
+    public void forEach(Consumer action)
+    {
+        delegate.forEach(action);
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Iterable#spliterator()
+     */
+    @Override
+    public Spliterator spliterator()
+    {
+        return delegate.spliterator();
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Collection#removeIf(java.util.function.Predicate)
+     */
+    @Override
+    public boolean removeIf(Predicate filter)
+    {
+        return delegate.removeIf(filter);
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.ArrayList#replaceAll(java.util.function.UnaryOperator)
+     */
+    @Override
+    public void replaceAll(UnaryOperator operator)
+    {
+        delegate.replaceAll(operator);
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.ArrayList#sort(java.util.Comparator)
+     */
+    @Override
+    public void sort(Comparator c)
+    {
+        delegate.sort(c);
     }
 }

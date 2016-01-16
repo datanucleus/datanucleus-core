@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.RandomAccess;
 import java.util.Set;
+import java.util.Spliterator;
 
 import junit.framework.TestCase;
 
@@ -206,8 +207,10 @@ public class ClassUtilsTest extends TestCase
             superintfs.contains(Set.class));
     }
 
+// JDK 1.8 has issues with compiling this due to dup spliterator method
     private static abstract class ListSet<T> implements List<T>, Set<T>
     {
+        public Spliterator<T> spliterator() {return null;}
         // Class for use by testGetSuperinterfacesDiamond
     }
 

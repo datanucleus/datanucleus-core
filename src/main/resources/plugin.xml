@@ -226,6 +226,7 @@ Contributors:
         <java-type name="java.util.Vector" wrapper-type="org.datanucleus.store.types.wrappers.Vector"
             wrapper-type-backed="org.datanucleus.store.types.wrappers.backed.Vector"
             container-handler="org.datanucleus.store.types.containers.VectorHandler"/>
+        <java-type name="java.util.Optional" container-handler="org.datanucleus.store.types.containers.OptionalHandler"/>
 
         <!-- array types -->
         <java-type name="[B" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
@@ -252,6 +253,20 @@ Contributors:
         <java-type name="[Ljava.util.Locale;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
         <java-type name="[Ljava.lang.Enum;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
         <java-type name="[Ljava.lang.Object;" embedded="true" container-handler="org.datanucleus.store.types.containers.ArrayHandler"/>
+
+        <java-type name="java.time.LocalDate" dfg="true" embedded="true" converter-name="dn.localdate-sqldate"/>
+        <java-type name="java.time.LocalDateTime" dfg="true" embedded="true" converter-name="dn.localdatetime-timestamp"/>
+        <java-type name="java.time.LocalTime" dfg="true" embedded="true" converter-name="dn.localtime-sqltime"/>
+        <java-type name="java.time.OffsetTime" dfg="true" embedded="true" converter-name="dn.offsettime-sqltime"/>
+        <java-type name="java.time.OffsetDateTime" dfg="true" embedded="true" converter-name="dn.offsetdatetime-timestamp"/>
+        <java-type name="java.time.Duration" dfg="true" embedded="true" converter-name="dn.duration-long"/>
+        <java-type name="java.time.Instant" dfg="true" embedded="true" converter-name="dn.instant-timestamp"/>
+        <java-type name="java.time.Period" dfg="true" embedded="true" converter-name="dn.period-string"/>
+        <java-type name="java.time.Year" dfg="true" embedded="true" converter-name="dn.year-integer"/>
+        <java-type name="java.time.YearMonth" dfg="true" embedded="true" converter-name="dn.yearmonth-string"/>
+        <java-type name="java.time.MonthDay" dfg="true" embedded="true" converter-name="dn.monthday-string"/>
+        <java-type name="java.time.ZoneId" dfg="true" embedded="true" converter-name="dn.zoneid-string"/>
+        <java-type name="java.time.ZoneOffset" dfg="true" embedded="true" converter-name="dn.zoneoffset-string"/>
     </extension>
 
     <!-- TYPE CONVERTERS -->
@@ -362,6 +377,67 @@ Contributors:
             converter-class="org.datanucleus.store.types.converters.BigIntegerArrayByteBufferConverter"/>
         <type-converter name="dn.bigdecimalarray-bytebuffer" member-type="java.math.BigDecimal" datastore-type="java.nio.ByteBuffer"
             converter-class="org.datanucleus.store.types.converters.BigDecimalArrayByteBufferConverter"/>
+
+        <type-converter name="dn.localdate-string" member-type="java.time.LocalDate" datastore-type="java.lang.String"
+            converter-class="org.datanucleus.store.types.converters.LocalDateStringConverter"/>
+        <type-converter name="dn.localdate-sqldate" member-type="java.time.LocalDate" datastore-type="java.sql.Date"
+            converter-class="org.datanucleus.store.types.converters.LocalDateSqlDateConverter"/>
+        <type-converter name="dn.localdate-date" member-type="java.time.LocalDate" datastore-type="java.util.Date"
+            converter-class="org.datanucleus.store.types.converters.LocalDateDateConverter"/>
+        <type-converter name="dn.localtime-string" member-type="java.time.LocalTime" datastore-type="java.lang.String"
+            converter-class="org.datanucleus.store.types.converters.LocalTimeStringConverter"/>
+        <type-converter name="dn.localtime-long" member-type="java.time.LocalTime" datastore-type="java.lang.Long"
+            converter-class="org.datanucleus.store.types.converters.LocalTimeLongConverter"/>
+        <type-converter name="dn.localtime-sqltime" member-type="java.time.LocalTime" datastore-type="java.sql.Time"
+            converter-class="org.datanucleus.store.types.converters.LocalTimeSqlTimeConverter"/>
+        <type-converter name="dn.localtime-date" member-type="java.time.LocalTime" datastore-type="java.util.Date"
+            converter-class="org.datanucleus.store.types.converters.LocalTimeDateConverter"/>
+        <type-converter name="dn.localdatetime-string" member-type="java.time.LocalDateTime" datastore-type="java.lang.String"
+            converter-class="org.datanucleus.store.types.converters.LocalDateTimeStringConverter"/>
+        <type-converter name="dn.localdatetime-timestamp" member-type="java.time.LocalDateTime" datastore-type="java.sql.Timestamp"
+            converter-class="org.datanucleus.store.types.converters.LocalDateTimeTimestampConverter"/>
+        <type-converter name="dn.localdatetime-date" member-type="java.time.LocalDateTime" datastore-type="java.util.Date"
+            converter-class="org.datanucleus.store.types.converters.LocalDateTimeDateConverter"/>
+        <type-converter name="dn.offsettime-string" member-type="java.time.OffsetTime" datastore-type="java.lang.String"
+            converter-class="org.datanucleus.store.types.converters.OffsetTimeStringConverter"/>
+        <type-converter name="dn.offsettime-long" member-type="java.time.OffsetTime" datastore-type="java.lang.Long"
+            converter-class="org.datanucleus.store.types.converters.OffsetTimeLongConverter"/>
+        <type-converter name="dn.offsettime-sqltime" member-type="java.time.OffsetTime" datastore-type="java.sql.Time"
+            converter-class="org.datanucleus.store.types.converters.OffsetTimeSqlTimeConverter"/>
+        <type-converter name="dn.offsetdatetime-string" member-type="java.time.OffsetDateTime" datastore-type="java.lang.String"
+            converter-class="org.datanucleus.store.types.converters.OffsetDateTimeStringConverter"/>
+        <type-converter name="dn.offsetdatetime-timestamp" member-type="java.time.OffsetDateTime" datastore-type="java.sql.Timestamp"
+            converter-class="org.datanucleus.store.types.converters.OffsetDateTimeTimestampConverter"/>
+        <type-converter name="dn.offsetdatetime-date" member-type="java.time.OffsetDateTime" datastore-type="java.util.Date"
+            converter-class="org.datanucleus.store.types.converters.OffsetDateTimeDateConverter"/>
+        <type-converter name="dn.duration-string" member-type="java.time.Duration" datastore-type="java.lang.String"
+            converter-class="org.datanucleus.store.types.converters.DurationStringConverter"/>
+        <type-converter name="dn.duration-long" member-type="java.time.Duration" datastore-type="java.lang.Long"
+            converter-class="org.datanucleus.store.types.converters.DurationLongConverter"/>
+        <type-converter name="dn.period-string" member-type="java.time.Period" datastore-type="java.lang.String"
+            converter-class="org.datanucleus.store.types.converters.PeriodStringConverter"/>
+        <type-converter name="dn.instant-timestamp" member-type="java.time.Instant" datastore-type="java.sql.Timestamp"
+            converter-class="org.datanucleus.store.types.converters.InstantTimestampConverter"/>
+        <type-converter name="dn.instant-string" member-type="java.time.Instant" datastore-type="java.lang.String"
+            converter-class="org.datanucleus.store.types.converters.InstantStringConverter"/>
+        <type-converter name="dn.instant-long" member-type="java.time.Instant" datastore-type="java.lang.Long"
+            converter-class="org.datanucleus.store.types.converters.InstantLongConverter"/>
+        <type-converter name="dn.year-string" member-type="java.time.Year" datastore-type="java.lang.String"
+            converter-class="org.datanucleus.store.types.converters.YearStringConverter"/>
+        <type-converter name="dn.year-integer" member-type="java.time.Year" datastore-type="java.lang.Integer"
+            converter-class="org.datanucleus.store.types.converters.YearIntegerConverter"/>
+        <type-converter name="dn.yearmonth-string" member-type="java.time.YearMonth" datastore-type="java.lang.String"
+            converter-class="org.datanucleus.store.types.converters.YearMonthStringConverter"/>
+        <type-converter name="dn.yearmonth-components" member-type="java.time.YearMonth" datastore-type="[I"
+            converter-class="org.datanucleus.store.types.converters.YearMonthComponentsConverter"/>
+        <type-converter name="dn.monthday-string" member-type="java.time.MonthDay" datastore-type="java.lang.String"
+            converter-class="org.datanucleus.store.types.converters.MonthDayStringConverter"/>
+        <type-converter name="dn.monthday-components" member-type="java.time.MonthDay" datastore-type="[I"
+            converter-class="org.datanucleus.store.types.converters.MonthDayComponentsConverter"/>
+        <type-converter name="dn.zoneid-string" member-type="java.time.ZoneId" datastore-type="java.lang.String"
+            converter-class="org.datanucleus.store.types.converters.ZoneIdStringConverter"/>
+        <type-converter name="dn.zoneoffset-string" member-type="java.time.ZoneOffset" datastore-type="java.lang.String"
+            converter-class="org.datanucleus.store.types.converters.ZoneOffsetStringConverter"/>
     </extension>
 
     <!-- VALUE GENERATORS -->
@@ -496,6 +572,19 @@ Contributors:
         <query-method-evaluator class="java.util.Date" method="getHour" evaluator="org.datanucleus.query.inmemory.DateGetHoursMethod"/>
         <query-method-evaluator class="java.util.Date" method="getMinute" evaluator="org.datanucleus.query.inmemory.DateGetMinutesMethod"/>
         <query-method-evaluator class="java.util.Date" method="getSecond" evaluator="org.datanucleus.query.inmemory.DateGetSecondsMethod"/>
+
+        <query-method-evaluator class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.query.inmemory.LocalDateGetDayOfMonth"/>
+        <query-method-evaluator class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.query.inmemory.LocalDateGetMonthValue"/>
+        <query-method-evaluator class="java.time.LocalDate" method="getYear" evaluator="org.datanucleus.query.inmemory.LocalDateGetYear"/>
+        <query-method-evaluator class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.query.inmemory.LocalTimeGetHour"/>
+        <query-method-evaluator class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.query.inmemory.LocalTimeGetMinute"/>
+        <query-method-evaluator class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.query.inmemory.LocalTimeGetSecond"/>
+        <query-method-evaluator class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.query.inmemory.LocalDateTimeGetDayOfMonth"/>
+        <query-method-evaluator class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.query.inmemory.LocalDateTimeGetMonthValue"/>
+        <query-method-evaluator class="java.time.LocalDateTime" method="getYear" evaluator="org.datanucleus.query.inmemory.LocalDateTimeGetYear"/>
+        <query-method-evaluator class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.query.inmemory.LocalDateTimeGetHour"/>
+        <query-method-evaluator class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.query.inmemory.LocalDateTimeGetMinute"/>
+        <query-method-evaluator class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.query.inmemory.LocalDateTimeGetSecond"/>
     </extension>
 
     <!-- QUERY METHODS -->

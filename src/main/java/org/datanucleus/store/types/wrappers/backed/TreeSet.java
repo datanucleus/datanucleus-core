@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.SortedSet;
+import java.util.Spliterator;
+import java.util.stream.Stream;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -979,5 +981,38 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
 
         // TODO Cater for non-cached collection, load elements in a DB call.
         return new java.util.TreeSet(delegate);
+    }
+
+    @Override
+    public Spliterator spliterator()
+    {
+        if (backingStore != null && useCache && !isCacheLoaded)
+        {
+            loadFromStore();
+        }
+        // TODO If using backing store yet not caching, then this will fail
+        return delegate.spliterator();
+    }
+
+    @Override
+    public Stream stream()
+    {
+        if (backingStore != null && useCache && !isCacheLoaded)
+        {
+            loadFromStore();
+        }
+        // TODO If using backing store yet not caching, then this will fail
+        return delegate.stream();
+    }
+
+    @Override
+    public Stream parallelStream()
+    {
+        if (backingStore != null && useCache && !isCacheLoaded)
+        {
+            loadFromStore();
+        }
+        // TODO If using backing store yet not caching, then this will fail
+        return delegate.parallelStream();
     }
 }

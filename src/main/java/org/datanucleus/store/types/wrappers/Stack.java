@@ -19,8 +19,14 @@ package org.datanucleus.store.types.wrappers;
 
 import java.io.ObjectStreamException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 import org.datanucleus.flush.CollectionAddOperation;
 import org.datanucleus.flush.CollectionRemoveOperation;
@@ -841,5 +847,86 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
         java.util.Stack stack = new java.util.Stack();
         stack.addAll(delegate);
         return stack;
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Collection#stream()
+     */
+    @Override
+    public Stream stream()
+    {
+        return delegate.stream();
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Collection#parallelStream()
+     */
+    @Override
+    public Stream parallelStream()
+    {
+        return delegate.parallelStream();
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.ArrayList#trimToSize()
+     */
+    @Override
+    public synchronized void trimToSize()
+    {
+        delegate.trimToSize();
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.ArrayList#ensureCapacity(int)
+     */
+    @Override
+    public synchronized void ensureCapacity(int minCapacity)
+    {
+        delegate.ensureCapacity(minCapacity);
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.ArrayList#forEach(java.util.function.Consumer)
+     */
+    @Override
+    public synchronized void forEach(Consumer action)
+    {
+        delegate.forEach(action);
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Iterable#spliterator()
+     */
+    @Override
+    public Spliterator spliterator()
+    {
+        return delegate.spliterator();
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Collection#removeIf(java.util.function.Predicate)
+     */
+    @Override
+    public synchronized boolean removeIf(Predicate filter)
+    {
+        return delegate.removeIf(filter);
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.ArrayList#replaceAll(java.util.function.UnaryOperator)
+     */
+    @Override
+    public synchronized void replaceAll(UnaryOperator operator)
+    {
+        delegate.replaceAll(operator);
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.ArrayList#sort(java.util.Comparator)
+     */
+    @Override
+    public synchronized void sort(Comparator c)
+    {
+        delegate.sort(c);
     }
 }

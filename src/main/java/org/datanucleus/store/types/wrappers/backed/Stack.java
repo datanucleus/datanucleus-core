@@ -21,6 +21,8 @@ import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Spliterator;
+import java.util.stream.Stream;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -1236,5 +1238,38 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         java.util.Stack stack = new java.util.Stack();
         stack.addAll(delegate);
         return stack;
+    }
+
+    @Override
+    public Spliterator spliterator()
+    {
+        if (backingStore != null && useCache && !isCacheLoaded)
+        {
+            loadFromStore();
+        }
+        // TODO If using backing store yet not caching, then this will fail
+        return delegate.spliterator();
+    }
+
+    @Override
+    public Stream stream()
+    {
+        if (backingStore != null && useCache && !isCacheLoaded)
+        {
+            loadFromStore();
+        }
+        // TODO If using backing store yet not caching, then this will fail
+        return delegate.stream();
+    }
+
+    @Override
+    public Stream parallelStream()
+    {
+        if (backingStore != null && useCache && !isCacheLoaded)
+        {
+            loadFromStore();
+        }
+        // TODO If using backing store yet not caching, then this will fail
+        return delegate.parallelStream();
     }
 }

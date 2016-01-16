@@ -21,6 +21,7 @@ import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.stream.Stream;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -896,5 +897,27 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
 
         // TODO Cater for non-cached collection, load elements in a DB call.
         return new java.util.PriorityQueue(delegate);
+    }
+
+    @Override
+    public Stream stream()
+    {
+        if (backingStore != null && useCache && !isCacheLoaded)
+        {
+            loadFromStore();
+        }
+        // TODO If using backing store yet not caching, then this will fail
+        return delegate.stream();
+    }
+
+    @Override
+    public Stream parallelStream()
+    {
+        if (backingStore != null && useCache && !isCacheLoaded)
+        {
+            loadFromStore();
+        }
+        // TODO If using backing store yet not caching, then this will fail
+        return delegate.parallelStream();
     }
 }

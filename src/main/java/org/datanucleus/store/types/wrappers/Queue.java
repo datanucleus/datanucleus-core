@@ -21,6 +21,9 @@ import java.io.ObjectStreamException;
 import java.util.AbstractQueue;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.datanucleus.flush.CollectionAddOperation;
 import org.datanucleus.flush.CollectionRemoveOperation;
@@ -569,5 +572,41 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
     protected Object writeReplace() throws ObjectStreamException
     {
         return new java.util.PriorityQueue(delegate);
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Collection#stream()
+     */
+    @Override
+    public Stream stream()
+    {
+        return delegate.stream();
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Collection#parallelStream()
+     */
+    @Override
+    public Stream parallelStream()
+    {
+        return delegate.parallelStream();
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Iterable#forEach(java.util.function.Consumer)
+     */
+    @Override
+    public void forEach(Consumer action)
+    {
+        delegate.forEach(action);
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Collection#removeIf(java.util.function.Predicate)
+     */
+    @Override
+    public boolean removeIf(Predicate filter)
+    {
+        return delegate.removeIf(filter);
     }
 }
