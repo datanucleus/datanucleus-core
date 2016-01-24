@@ -69,6 +69,10 @@ public class ClassConstants
     public static final Class JAVA_UTIL_DATE = java.util.Date.class;
     public static final Class JAVA_IO_SERIALIZABLE = java.io.Serializable.class;
 
+    public static final Class JAVA_TIME_LOCALDATE = java.time.LocalDate.class;
+    public static final Class JAVA_TIME_LOCALTIME = java.time.LocalTime.class;
+    public static final Class JAVA_TIME_LOCALDATETIME = java.time.LocalDateTime.class;
+
     public static final Class PERSISTENCE_NUCLEUS_CONTEXT = PersistenceNucleusContext.class;
     public static final Class NUCLEUS_CONTEXT = NucleusContext.class;
     public static final Class CLASS_LOADER_RESOLVER = ClassLoaderResolver.class;

@@ -78,14 +78,12 @@ public class QueryUtils
      */
     public static boolean resultClassIsUserType(String className)
     {
-        return !resultClassIsSimple(className) &&
-            !className.equals(java.util.Map.class.getName()) &&
-            !className.equals(ClassNameConstants.Object);
+        return !resultClassIsSimple(className) && !className.equals(java.util.Map.class.getName()) && !className.equals(ClassNameConstants.Object);
     }
 
     /**
      * Utility to return if the passed result class is a simple type with a single value.
-     * Checks the class name against the supported "simple" JDOQL result-class types.
+     * Checks the class name against the supported "simple" query result-class types.
      * @param className the class name looked for 
      * @return Whether the result class is "simple".
      */
@@ -100,13 +98,21 @@ public class QueryUtils
             className.equals(ClassNameConstants.JAVA_LANG_LONG) ||
             className.equals(ClassNameConstants.JAVA_LANG_SHORT) ||
             className.equals(ClassNameConstants.JAVA_LANG_STRING) ||
-            className.equals(BigDecimal.class.getName()) ||
-            className.equals(BigInteger.class.getName()) ||
-            className.equals(java.util.Date.class.getName()) ||
-            className.equals(java.sql.Date.class.getName()) ||
-            className.equals(java.sql.Time.class.getName()) ||
-            className.equals(java.sql.Timestamp.class.getName()) ||
-            className.equals(ClassNameConstants.Object))
+            className.equals(ClassNameConstants.JAVA_MATH_BIGDECIMAL) ||
+            className.equals(ClassNameConstants.JAVA_MATH_BIGINTEGER) ||
+            className.equals(ClassNameConstants.JAVA_UTIL_DATE) ||
+            className.equals(ClassNameConstants.JAVA_SQL_DATE) ||
+            className.equals(ClassNameConstants.JAVA_SQL_TIME) ||
+            className.equals(ClassNameConstants.JAVA_SQL_TIMESTAMP) ||
+            className.equals(ClassNameConstants.JAVA_TIME_LOCALDATE) ||
+            className.equals(ClassNameConstants.JAVA_TIME_LOCALTIME) ||
+            className.equals(ClassNameConstants.JAVA_TIME_LOCALDATETIME) ||
+            className.equals(ClassNameConstants.Object) ||
+            className.equals("java.net.URL") || 
+            className.equals("java.net.URI") ||
+            className.equals("java.util.Calendar") ||
+            className.equals("java.util.Currency") ||
+            className.equals("java.util.UUID"))
         {
             return true;
         }

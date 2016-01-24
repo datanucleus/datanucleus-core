@@ -57,6 +57,10 @@ public class ClassNameConstants
     public static final String JAVA_UTIL_DATE = ClassConstants.JAVA_UTIL_DATE.getName();
     public static final String JAVA_IO_SERIALIZABLE = ClassConstants.JAVA_IO_SERIALIZABLE.getName();
 
+    public static final String JAVA_TIME_LOCALDATE = ClassConstants.JAVA_TIME_LOCALDATE.getName();
+    public static final String JAVA_TIME_LOCALTIME = ClassConstants.JAVA_TIME_LOCALTIME.getName();
+    public static final String JAVA_TIME_LOCALDATETIME = ClassConstants.JAVA_TIME_LOCALDATETIME.getName();
+
     public static final String BOOLEAN_ARRAY = boolean[].class.getName();
     public static final String BYTE_ARRAY = byte[].class.getName();
     public static final String CHAR_ARRAY = char[].class.getName();
