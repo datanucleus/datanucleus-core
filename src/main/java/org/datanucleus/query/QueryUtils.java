@@ -112,7 +112,11 @@ public class QueryUtils
             className.equals("java.net.URI") ||
             className.equals("java.util.Calendar") ||
             className.equals("java.util.Currency") ||
-            className.equals("java.util.UUID"))
+            className.equals("java.util.UUID") ||
+            className.equals("java.util.Optional") ||
+            className.equals("java.util.OptionalDouble") ||
+            className.equals("java.util.OptionalInt") ||
+            className.equals("java.util.OptionalLong"))
         {
             return true;
         }
