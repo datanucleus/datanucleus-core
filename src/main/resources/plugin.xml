@@ -588,12 +588,12 @@ Contributors:
         <query-method-evaluator class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.query.inmemory.LocalDateTimeGetMinute"/>
         <query-method-evaluator class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.query.inmemory.LocalDateTimeGetSecond"/>
         <query-method-evaluator class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.query.inmemory.MonthDayGetDayOfMonth"/>
-        <query-method-evaluator class="java.time.MonthDay" method="getMonth" evaluator="org.datanucleus.query.inmemory.MonthDayGetMonth"/>
+        <query-method-evaluator class="java.time.MonthDay" method="getMonthValue" evaluator="org.datanucleus.query.inmemory.MonthDayGetMonth"/>
         <query-method-evaluator class="java.time.Period" method="getDays" evaluator="org.datanucleus.query.inmemoryPeriodGetDays"/>
         <query-method-evaluator class="java.time.Period" method="getMonths" evaluator="org.datanucleus.query.inmemory.PeriodGetMonths"/>
         <query-method-evaluator class="java.time.Period" method="getYears" evaluator="org.datanucleus.query.inmemory.PeriodGetYears"/>
         <query-method-evaluator class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.query.inmemory.YearMonthGetMonth"/>
-        <query-method-evaluator class="java.time.YearMonth" method="getMonth" evaluator="org.datanucleus.query.inmemory.YearMonthGetYear"/>
+        <query-method-evaluator class="java.time.YearMonth" method="getMonthValue" evaluator="org.datanucleus.query.inmemory.YearMonthGetYear"/>
     </extension>
 
     <!-- QUERY METHODS -->
