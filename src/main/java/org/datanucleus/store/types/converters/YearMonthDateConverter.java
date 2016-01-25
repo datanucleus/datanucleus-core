@@ -18,31 +18,31 @@ Contributors:
 package org.datanucleus.store.types.converters;
 
 import java.sql.Date;
-import java.time.MonthDay;
+import java.time.YearMonth;
 
 import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
- * Class to handle the conversion between java.time.MonthDay and java.sql.Date.
+ * Class to handle the conversion between java.time.YearMonth and java.sql.Date.
  */
-public class MonthDayDateConverter implements TypeConverter<MonthDay, Date>
+public class YearMonthDateConverter implements TypeConverter<YearMonth, Date>
 {
     private static final long serialVersionUID = 8087124973147837116L;
 
     @SuppressWarnings("deprecation")
-    public MonthDay toMemberType(Date date)
+    public YearMonth toMemberType(Date date)
     {
         if (date == null)
         {
             return null;
         }
 
-        return MonthDay.of(date.getMonth()+1, date.getDate());
+        return YearMonth.of(date.getYear(), date.getMonth()+1);
     }
 
     @SuppressWarnings("deprecation")
-    public Date toDatastoreType(MonthDay md)
+    public Date toDatastoreType(YearMonth ym)
     {
-        return new Date(0, md.getMonthValue()-1, md.getDayOfMonth());
+        return new Date(ym.getYear(), ym.getMonthValue()-1, 0);
     }
 }

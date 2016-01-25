@@ -430,6 +430,8 @@ Contributors:
             converter-class="org.datanucleus.store.types.converters.YearMonthStringConverter"/>
         <type-converter name="dn.yearmonth-components" member-type="java.time.YearMonth" datastore-type="[I"
             converter-class="org.datanucleus.store.types.converters.YearMonthComponentsConverter"/>
+        <type-converter name="dn.monthday-date" member-type="java.time.YearMonth" datastore-type="java.sql.Date"
+            converter-class="org.datanucleus.store.types.converters.YearMonthDateConverter"/>
         <type-converter name="dn.monthday-string" member-type="java.time.MonthDay" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.MonthDayStringConverter"/>
         <type-converter name="dn.monthday-components" member-type="java.time.MonthDay" datastore-type="[I"
