@@ -37,12 +37,12 @@ public class YearMonthDateConverter implements TypeConverter<YearMonth, Date>
             return null;
         }
 
-        return YearMonth.of(date.getYear(), date.getMonth()+1);
+        return YearMonth.of(date.getYear()+1900, date.getMonth()+1);
     }
 
     @SuppressWarnings("deprecation")
     public Date toDatastoreType(YearMonth ym)
     {
-        return new Date(ym.getYear(), ym.getMonthValue()-1, 0);
+        return new Date(ym.getYear()-1900, ym.getMonthValue()-1, 1);
     }
 }
