@@ -434,6 +434,8 @@ Contributors:
             converter-class="org.datanucleus.store.types.converters.MonthDayStringConverter"/>
         <type-converter name="dn.monthday-components" member-type="java.time.MonthDay" datastore-type="[I"
             converter-class="org.datanucleus.store.types.converters.MonthDayComponentsConverter"/>
+        <type-converter name="dn.monthday-date" member-type="java.time.MonthDay" datastore-type="java.sql.Date"
+            converter-class="org.datanucleus.store.types.converters.MonthDayDateConverter"/>
         <type-converter name="dn.zoneid-string" member-type="java.time.ZoneId" datastore-type="java.lang.String"
             converter-class="org.datanucleus.store.types.converters.ZoneIdStringConverter"/>
         <type-converter name="dn.zoneoffset-string" member-type="java.time.ZoneOffset" datastore-type="java.lang.String"
