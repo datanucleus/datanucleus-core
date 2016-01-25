@@ -155,10 +155,8 @@ Contributors:
         <java-type name="java.util.Date" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.wrappers.Date"/>
         <java-type name="java.util.Locale" dfg="true" embedded="true" converter-name="dn.locale-string"/>
         <java-type name="java.util.Currency" dfg="true" embedded="true" converter-name="dn.currency-string"/>
-        <java-type name="java.util.Calendar" dfg="true" embedded="true"
-            wrapper-type="org.datanucleus.store.types.wrappers.GregorianCalendar" converter-name="dn.calendar-string"/>
-        <java-type name="java.util.GregorianCalendar" dfg="true" embedded="true"
-            wrapper-type="org.datanucleus.store.types.wrappers.GregorianCalendar" converter-name="dn.calendar-string"/>
+        <java-type name="java.util.Calendar" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.wrappers.GregorianCalendar" converter-name="dn.calendar-string"/>
+        <java-type name="java.util.GregorianCalendar" dfg="true" embedded="true" wrapper-type="org.datanucleus.store.types.wrappers.GregorianCalendar" converter-name="dn.calendar-string"/>
         <java-type name="java.util.UUID" dfg="true" embedded="true" converter-name="dn.uuid-string"/>
         <java-type name="java.util.TimeZone" dfg="true" embedded="true" converter-name="dn.timezone-string"/>
 
@@ -271,112 +269,63 @@ Contributors:
 
     <!-- TYPE CONVERTERS -->
     <extension point="org.datanucleus.type_converter">
-        <type-converter name="dn.boolean-yn" member-type="java.lang.Boolean" datastore-type="java.lang.Character"
-            converter-class="org.datanucleus.store.types.converters.BooleanYNConverter"/>
-        <type-converter name="dn.boolean-integer" member-type="java.lang.Boolean" datastore-type="java.lang.Integer"
-            converter-class="org.datanucleus.store.types.converters.BooleanIntegerConverter"/>
+        <type-converter name="dn.boolean-yn" member-type="java.lang.Boolean" datastore-type="java.lang.Character" converter-class="org.datanucleus.store.types.converters.BooleanYNConverter"/>
+        <type-converter name="dn.boolean-integer" member-type="java.lang.Boolean" datastore-type="java.lang.Integer" converter-class="org.datanucleus.store.types.converters.BooleanIntegerConverter"/>
 
-        <type-converter name="dn.character-string" member-type="java.lang.Character" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.CharacterStringConverter"/>
-        <type-converter name="dn.bigdecimal-string" member-type="java.math.BigDecimal" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.BigDecimalStringConverter"/>
-        <type-converter name="dn.bigdecimal-double" member-type="java.math.BigDecimal" datastore-type="java.lang.Double"
-            converter-class="org.datanucleus.store.types.converters.BigDecimalDoubleConverter"/>
-        <type-converter name="dn.biginteger-string" member-type="java.math.BigInteger" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.BigIntegerStringConverter"/>
-        <type-converter name="dn.biginteger-long" member-type="java.math.BigInteger" datastore-type="java.lang.Long"
-            converter-class="org.datanucleus.store.types.converters.BigIntegerLongConverter"/>
-        <type-converter name="dn.bitset-string" member-type="java.util.BitSet" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.BitSetStringConverter"/>
+        <type-converter name="dn.character-string" member-type="java.lang.Character" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.CharacterStringConverter"/>
+        <type-converter name="dn.bigdecimal-string" member-type="java.math.BigDecimal" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.BigDecimalStringConverter"/>
+        <type-converter name="dn.bigdecimal-double" member-type="java.math.BigDecimal" datastore-type="java.lang.Double" converter-class="org.datanucleus.store.types.converters.BigDecimalDoubleConverter"/>
+        <type-converter name="dn.biginteger-string" member-type="java.math.BigInteger" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.BigIntegerStringConverter"/>
+        <type-converter name="dn.biginteger-long" member-type="java.math.BigInteger" datastore-type="java.lang.Long" converter-class="org.datanucleus.store.types.converters.BigIntegerLongConverter"/>
+        <type-converter name="dn.bitset-string" member-type="java.util.BitSet" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.BitSetStringConverter"/>
 
-        <type-converter name="dn.calendar-string" member-type="java.util.Calendar" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.CalendarStringConverter"/>
-        <type-converter name="dn.calendar-date" member-type="java.util.Calendar" datastore-type="java.util.Date"
-            converter-class="org.datanucleus.store.types.converters.CalendarDateConverter"/>
-        <type-converter name="dn.calendar-timestamp" member-type="java.util.Calendar" datastore-type="java.sql.Timestamp"
-            converter-class="org.datanucleus.store.types.converters.CalendarTimestampConverter"/>
-        <type-converter name="dn.calendar-components" member-type="java.util.Calendar" datastore-type="[Ljava.lang.Object;"
-            converter-class="org.datanucleus.store.types.converters.CalendarComponentsConverter"/>
+        <type-converter name="dn.calendar-string" member-type="java.util.Calendar" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.CalendarStringConverter"/>
+        <type-converter name="dn.calendar-date" member-type="java.util.Calendar" datastore-type="java.util.Date" converter-class="org.datanucleus.store.types.converters.CalendarDateConverter"/>
+        <type-converter name="dn.calendar-timestamp" member-type="java.util.Calendar" datastore-type="java.sql.Timestamp" converter-class="org.datanucleus.store.types.converters.CalendarTimestampConverter"/>
+        <type-converter name="dn.calendar-components" member-type="java.util.Calendar" datastore-type="[Ljava.lang.Object;" converter-class="org.datanucleus.store.types.converters.CalendarComponentsConverter"/>
 
-        <type-converter name="dn.color-string" member-type="java.awt.Color" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.ColorStringConverter"/>
-        <type-converter name="dn.color-components" member-type="java.awt.Color" datastore-type="[I"
-            converter-class="org.datanucleus.store.types.converters.ColorComponentsConverter"/>
+        <type-converter name="dn.color-string" member-type="java.awt.Color" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.ColorStringConverter"/>
+        <type-converter name="dn.color-components" member-type="java.awt.Color" datastore-type="[I" converter-class="org.datanucleus.store.types.converters.ColorComponentsConverter"/>
 
-        <type-converter name="dn.class-string" member-type="java.lang.Class" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.ClassStringConverter"/>
-        <type-converter name="dn.integer-string" member-type="java.lang.Integer" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.IntegerStringConverter"/>
-        <type-converter name="dn.long-string" member-type="java.lang.Long" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.LongStringConverter"/>
-        <type-converter name="dn.currency-string" member-type="java.util.Currency" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.CurrencyStringConverter"/>
-        <type-converter name="dn.locale-string" member-type="java.util.Locale" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.LocaleStringConverter"/>
-        <type-converter name="dn.stringbuffer-string" member-type="java.lang.StringBuffer" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.StringBufferStringConverter"/>
-        <type-converter name="dn.stringbuilder-string" member-type="java.lang.StringBuilder" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.StringBuilderStringConverter"/>
-        <type-converter name="dn.timezone-string" member-type="java.util.TimeZone" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.TimeZoneStringConverter"/>
-        <type-converter name="dn.uri-string" member-type="java.net.URI" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.URIStringConverter"/>
-        <type-converter name="dn.url-string" member-type="java.net.URL" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.URLStringConverter"/>
-        <type-converter name="dn.uuid-string" member-type="java.util.UUID" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.UUIDStringConverter"/>
+        <type-converter name="dn.class-string" member-type="java.lang.Class" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.ClassStringConverter"/>
+        <type-converter name="dn.integer-string" member-type="java.lang.Integer" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.IntegerStringConverter"/>
+        <type-converter name="dn.long-string" member-type="java.lang.Long" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.LongStringConverter"/>
+        <type-converter name="dn.currency-string" member-type="java.util.Currency" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.CurrencyStringConverter"/>
+        <type-converter name="dn.locale-string" member-type="java.util.Locale" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.LocaleStringConverter"/>
+        <type-converter name="dn.stringbuffer-string" member-type="java.lang.StringBuffer" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.StringBufferStringConverter"/>
+        <type-converter name="dn.stringbuilder-string" member-type="java.lang.StringBuilder" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.StringBuilderStringConverter"/>
+        <type-converter name="dn.timezone-string" member-type="java.util.TimeZone" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.TimeZoneStringConverter"/>
+        <type-converter name="dn.uri-string" member-type="java.net.URI" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.URIStringConverter"/>
+        <type-converter name="dn.url-string" member-type="java.net.URL" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.URLStringConverter"/>
+        <type-converter name="dn.uuid-string" member-type="java.util.UUID" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.UUIDStringConverter"/>
 
-        <type-converter name="dn.date-long" member-type="java.util.Date" datastore-type="java.lang.Long"
-            converter-class="org.datanucleus.store.types.converters.DateLongConverter"/>
-        <type-converter name="dn.date-string" member-type="java.util.Date" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.DateStringConverter"/>
+        <type-converter name="dn.date-long" member-type="java.util.Date" datastore-type="java.lang.Long" converter-class="org.datanucleus.store.types.converters.DateLongConverter"/>
+        <type-converter name="dn.date-string" member-type="java.util.Date" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.DateStringConverter"/>
 
-        <type-converter name="dn.sqldate-long" member-type="java.sql.Date" datastore-type="java.lang.Long"
-            converter-class="org.datanucleus.store.types.converters.SqlDateLongConverter"/>
-        <type-converter name="dn.sqldate-string" member-type="java.sql.Date" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.SqlDateStringConverter"/>
-        <type-converter name="dn.sqldate-date" member-type="java.sql.Date" datastore-type="java.util.Date"
-            converter-class="org.datanucleus.store.types.converters.SqlDateDateConverter"/>
-        <type-converter name="dn.sqltime-long" member-type="java.sql.Time" datastore-type="java.lang.Long"
-            converter-class="org.datanucleus.store.types.converters.SqlTimeLongConverter"/>
-        <type-converter name="dn.sqltime-string" member-type="java.sql.Time" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.SqlTimeStringConverter"/>
-        <type-converter name="dn.sqltime-date" member-type="java.sql.Time" datastore-type="java.util.Date"
-            converter-class="org.datanucleus.store.types.converters.SqlTimeDateConverter"/>
-        <type-converter name="dn.sqltimestamp-long" member-type="java.sql.Timestamp" datastore-type="java.lang.Long"
-            converter-class="org.datanucleus.store.types.converters.SqlTimestampLongConverter"/>
-        <type-converter name="dn.sqltimestamp-date" member-type="java.sql.Timestamp" datastore-type="java.util.Date"
-            converter-class="org.datanucleus.store.types.converters.SqlTimestampDateConverter"/>
-        <type-converter name="dn.sqltimestamp-string" member-type="java.sql.Timestamp" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.SqlTimestampStringConverter"/>
+        <type-converter name="dn.sqldate-long" member-type="java.sql.Date" datastore-type="java.lang.Long" converter-class="org.datanucleus.store.types.converters.SqlDateLongConverter"/>
+        <type-converter name="dn.sqldate-string" member-type="java.sql.Date" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.SqlDateStringConverter"/>
+        <type-converter name="dn.sqldate-date" member-type="java.sql.Date" datastore-type="java.util.Date" converter-class="org.datanucleus.store.types.converters.SqlDateDateConverter"/>
+        <type-converter name="dn.sqltime-long" member-type="java.sql.Time" datastore-type="java.lang.Long" converter-class="org.datanucleus.store.types.converters.SqlTimeLongConverter"/>
+        <type-converter name="dn.sqltime-string" member-type="java.sql.Time" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.SqlTimeStringConverter"/>
+        <type-converter name="dn.sqltime-date" member-type="java.sql.Time" datastore-type="java.util.Date" converter-class="org.datanucleus.store.types.converters.SqlTimeDateConverter"/>
+        <type-converter name="dn.sqltimestamp-long" member-type="java.sql.Timestamp" datastore-type="java.lang.Long" converter-class="org.datanucleus.store.types.converters.SqlTimestampLongConverter"/>
+        <type-converter name="dn.sqltimestamp-date" member-type="java.sql.Timestamp" datastore-type="java.util.Date" converter-class="org.datanucleus.store.types.converters.SqlTimestampDateConverter"/>
+        <type-converter name="dn.sqltimestamp-string" member-type="java.sql.Timestamp" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.SqlTimestampStringConverter"/>
 
-        <type-converter name="dn.serializable-string" member-type="java.io.Serializable" datastore-type="java.lang.String"
-            converter-class="org.datanucleus.store.types.converters.SerializableStringConverter"/>
-        <type-converter name="dn.serializable-bytearray" member-type="java.io.Serializable" datastore-type="[B"
-            converter-class="org.datanucleus.store.types.converters.SerializableByteArrayConverter"/>
-        <type-converter name="dn.serializable-bytebuffer" member-type="java.io.Serializable" datastore-type="java.nio.ByteBuffer"
-            converter-class="org.datanucleus.store.types.converters.SerializableByteBufferConverter"/>
+        <type-converter name="dn.serializable-string" member-type="java.io.Serializable" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.SerializableStringConverter"/>
+        <type-converter name="dn.serializable-bytearray" member-type="java.io.Serializable" datastore-type="[B" converter-class="org.datanucleus.store.types.converters.SerializableByteArrayConverter"/>
+        <type-converter name="dn.serializable-bytebuffer" member-type="java.io.Serializable" datastore-type="java.nio.ByteBuffer" converter-class="org.datanucleus.store.types.converters.SerializableByteBufferConverter"/>
 
-        <type-converter name="dn.bytearray-bytebuffer" member-type="[B" datastore-type="java.nio.ByteBuffer"
-            converter-class="org.datanucleus.store.types.converters.ByteArrayByteBufferConverter"/>
-        <type-converter name="dn.booleanarray-bytebuffer" member-type="[Z" datastore-type="java.nio.ByteBuffer"
-            converter-class="org.datanucleus.store.types.converters.BooleanArrayByteBufferConverter"/>
-        <type-converter name="dn.chararray-bytebuffer" member-type="[C" datastore-type="java.nio.ByteBuffer"
-            converter-class="org.datanucleus.store.types.converters.CharArrayByteBufferConverter"/>
-        <type-converter name="dn.doublearray-bytebuffer" member-type="[D" datastore-type="java.nio.ByteBuffer"
-            converter-class="org.datanucleus.store.types.converters.DoubleArrayByteBufferConverter"/>
-        <type-converter name="dn.floatarray-bytebuffer" member-type="[F" datastore-type="java.nio.ByteBuffer"
-            converter-class="org.datanucleus.store.types.converters.FloatArrayByteBufferConverter"/>
-        <type-converter name="dn.intarray-bytebuffer" member-type="[I" datastore-type="java.nio.ByteBuffer"
-            converter-class="org.datanucleus.store.types.converters.IntArrayByteBufferConverter"/>
-        <type-converter name="dn.longarray-bytebuffer" member-type="[J" datastore-type="java.nio.ByteBuffer"
-            converter-class="org.datanucleus.store.types.converters.LongArrayByteBufferConverter"/>
-        <type-converter name="dn.shortarray-bytebuffer" member-type="[S" datastore-type="java.nio.ByteBuffer"
-            converter-class="org.datanucleus.store.types.converters.ShortArrayByteBufferConverter"/>
-        <type-converter name="dn.bigintegerarray-bytebuffer" member-type="java.math.BigInteger" datastore-type="java.nio.ByteBuffer"
-            converter-class="org.datanucleus.store.types.converters.BigIntegerArrayByteBufferConverter"/>
-        <type-converter name="dn.bigdecimalarray-bytebuffer" member-type="java.math.BigDecimal" datastore-type="java.nio.ByteBuffer"
-            converter-class="org.datanucleus.store.types.converters.BigDecimalArrayByteBufferConverter"/>
+        <type-converter name="dn.bytearray-bytebuffer" member-type="[B" datastore-type="java.nio.ByteBuffer" converter-class="org.datanucleus.store.types.converters.ByteArrayByteBufferConverter"/>
+        <type-converter name="dn.booleanarray-bytebuffer" member-type="[Z" datastore-type="java.nio.ByteBuffer" converter-class="org.datanucleus.store.types.converters.BooleanArrayByteBufferConverter"/>
+        <type-converter name="dn.chararray-bytebuffer" member-type="[C" datastore-type="java.nio.ByteBuffer" converter-class="org.datanucleus.store.types.converters.CharArrayByteBufferConverter"/>
+        <type-converter name="dn.doublearray-bytebuffer" member-type="[D" datastore-type="java.nio.ByteBuffer" converter-class="org.datanucleus.store.types.converters.DoubleArrayByteBufferConverter"/>
+        <type-converter name="dn.floatarray-bytebuffer" member-type="[F" datastore-type="java.nio.ByteBuffer" converter-class="org.datanucleus.store.types.converters.FloatArrayByteBufferConverter"/>
+        <type-converter name="dn.intarray-bytebuffer" member-type="[I" datastore-type="java.nio.ByteBuffer" converter-class="org.datanucleus.store.types.converters.IntArrayByteBufferConverter"/>
+        <type-converter name="dn.longarray-bytebuffer" member-type="[J" datastore-type="java.nio.ByteBuffer" converter-class="org.datanucleus.store.types.converters.LongArrayByteBufferConverter"/>
+        <type-converter name="dn.shortarray-bytebuffer" member-type="[S" datastore-type="java.nio.ByteBuffer" converter-class="org.datanucleus.store.types.converters.ShortArrayByteBufferConverter"/>
+        <type-converter name="dn.bigintegerarray-bytebuffer" member-type="java.math.BigInteger" datastore-type="java.nio.ByteBuffer" converter-class="org.datanucleus.store.types.converters.BigIntegerArrayByteBufferConverter"/>
+        <type-converter name="dn.bigdecimalarray-bytebuffer" member-type="java.math.BigDecimal" datastore-type="java.nio.ByteBuffer" converter-class="org.datanucleus.store.types.converters.BigDecimalArrayByteBufferConverter"/>
 
         <type-converter name="dn.localdate-string" member-type="java.time.LocalDate" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.LocalDateStringConverter"/>
         <type-converter name="dn.localdate-sqldate" member-type="java.time.LocalDate" datastore-type="java.sql.Date" converter-class="org.datanucleus.store.types.converters.LocalDateSqlDateConverter"/>
@@ -576,8 +525,7 @@ Contributors:
 
     <!-- METADATA HANDLERS -->
     <extension point="org.datanucleus.metadata_handler">
-        <handler class-name="org.datanucleus.metadata.xml.PersistenceFileMetaDataHandler" name="Persistence" 
-            entity-resolver="org.datanucleus.metadata.xml.PluginEntityResolver"/>
+        <handler class-name="org.datanucleus.metadata.xml.PersistenceFileMetaDataHandler" name="Persistence" entity-resolver="org.datanucleus.metadata.xml.PluginEntityResolver"/>
     </extension>
 
     <!-- METADATA RESOLVERS -->
@@ -593,10 +541,8 @@ Contributors:
 
     <!-- EXTENSION ANNOTATIONS -->
     <extension point="org.datanucleus.member_annotation_handler">
-        <member-annotation-handler annotation-class="javax.validation.constraints.NotNull" 
-            handler="org.datanucleus.metadata.annotations.ValidationNotNullAnnotationHandler"/>
-        <member-annotation-handler annotation-class="javax.validation.constraints.Size" 
-            handler="org.datanucleus.metadata.annotations.ValidationSizeAnnotationHandler"/>
+        <member-annotation-handler annotation-class="javax.validation.constraints.NotNull" handler="org.datanucleus.metadata.annotations.ValidationNotNullAnnotationHandler"/>
+        <member-annotation-handler annotation-class="javax.validation.constraints.Size" handler="org.datanucleus.metadata.annotations.ValidationSizeAnnotationHandler"/>
     </extension>
 
     <!-- JMX SERVERS -->
