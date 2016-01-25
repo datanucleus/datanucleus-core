@@ -37,12 +37,12 @@ public class MonthDayDateConverter implements TypeConverter<MonthDay, Date>
             return null;
         }
 
-        return MonthDay.of(date.getMonth()+1, date.getDate()+1);
+        return MonthDay.of(date.getMonth()+1, date.getDate());
     }
 
     @SuppressWarnings("deprecation")
     public Date toDatastoreType(MonthDay md)
     {
-        return new Date(0, md.getMonthValue()-1, md.getDayOfMonth()-1);
+        return new Date(0, md.getMonthValue()-1, md.getDayOfMonth());
     }
 }
