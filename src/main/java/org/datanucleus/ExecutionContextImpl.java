@@ -4971,6 +4971,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         for (ObjectProvider op : ops)
         {
             Object id = op.getInternalObjectId();
+            if (id == null || !nucCtx.isClassCacheable(op.getClassMetaData()))
+            {
+                continue;
+            }
+
             CachedPC currentCachedPC = l2Cache.get(id);
             CachedPC cachedPC = getL2CacheableObject(op, currentCachedPC);
             if (cachedPC != null && id != null && !(id instanceof IdentityReference))

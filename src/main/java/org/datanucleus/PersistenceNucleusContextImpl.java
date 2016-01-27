@@ -44,10 +44,12 @@ import org.datanucleus.identity.DatastoreUniqueLongId;
 import org.datanucleus.identity.IdentityManager;
 import org.datanucleus.identity.IdentityManagerImpl;
 import org.datanucleus.identity.IdentityUtils;
+import org.datanucleus.identity.SCOID;
 import org.datanucleus.management.FactoryStatistics;
 import org.datanucleus.management.jmx.ManagementManager;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.FileMetaData;
+import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaDataListener;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.QueryLanguage;
@@ -1524,14 +1526,18 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         {
             return false;
         }
-
-        AbstractClassMetaData cmd = null;
-        if (id instanceof DatastoreUniqueLongId)
+        if (id instanceof SCOID)
+        {
+            return false;
+        }
+        else if (id instanceof DatastoreUniqueLongId)
         {
             // This doesn't have the class name so can't get metadata
             return false;
         }
-        else if (IdentityUtils.isDatastoreIdentity(id) || IdentityUtils.isSingleFieldIdentity(id))
+
+        AbstractClassMetaData cmd = null;
+        if (IdentityUtils.isDatastoreIdentity(id) || IdentityUtils.isSingleFieldIdentity(id))
         {
             // Datastore id, or application single-field id
             cmd = getMetaDataManager().getMetaDataForClass(IdentityUtils.getTargetClassNameForIdentitySimple(id), getClassLoaderResolver(id.getClass().getClassLoader()));
@@ -1555,6 +1561,11 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     @Override
     public boolean isClassCacheable(AbstractClassMetaData cmd)
     {
+        if (cmd != null && cmd.getIdentityType() == IdentityType.NONDURABLE)
+        {
+            return false;
+        }
+
         String cacheMode = config.getStringProperty(PropertyNames.PROPERTY_CACHE_L2_MODE);
         if (cacheMode.equalsIgnoreCase("ALL"))
         {
