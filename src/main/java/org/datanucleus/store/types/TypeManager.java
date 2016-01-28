@@ -192,5 +192,4 @@ public interface TypeManager
      * @return The available Type Converters
      */
     Collection<TypeConverter> getTypeConvertersForType(Class memberType);
-    
 }

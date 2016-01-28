@@ -377,7 +377,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
     public ContainerAdapter getContainerAdapter(Object container)
     {
         ContainerHandler containerHandler = getContainerHandler(container.getClass());
-
         return containerHandler == null ? null : containerHandler.getAdapter(container);
     }
     
@@ -556,8 +555,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
                         javaTypes.put(cls.getName(), type); // Register this subtype for reference
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("016001",
-                                cls.getName(), type.cls.getName()));
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("016001", cls.getName(), type.cls.getName()));
                         }
                         return type;
                     }
@@ -570,8 +568,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
                         javaTypes.put(cls.getName(), type); // Register this subtype for reference
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("016001", 
-                                cls.getName(), type.cls.getName()));
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("016001", cls.getName(), type.cls.getName()));
                         }
                         return type;
                     }
@@ -768,8 +765,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         {
             try
             {
-                result = mgr.loadClass(
-                    elems[i].getExtension().getPlugin().getSymbolicName(), className);
+                result = mgr.loadClass(elems[i].getExtension().getPlugin().getSymbolicName(), className);
             }
             catch (NucleusException jpe)
             {
@@ -831,8 +827,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
                         if (memberType != null)
                         {
                             NucleusLogger.PERSISTENCE.debug("TypeConverter for " + memberTypeName + "<->" +
-                                datastoreTypeName + " using " + converterClsName +
-                            " not instantiable (missing dependencies?) so ignoring");
+                                datastoreTypeName + " using " + converterClsName + " not instantiable (missing dependencies?) so ignoring");
                         }
                         else
                         {
@@ -870,7 +865,8 @@ public class TypeManagerImpl implements TypeManager, Serializable
 
     private static Comparator<Class> ALPHABETICAL_ORDER = new Comparator<Class>() 
     {
-        public int compare(Class cls1, Class cls2) {
+        public int compare(Class cls1, Class cls2) 
+        {
             int res = String.CASE_INSENSITIVE_ORDER.compare(cls1.getName(), cls2.getName());
             if (res == 0) 
             {
@@ -882,7 +878,8 @@ public class TypeManagerImpl implements TypeManager, Serializable
 
     private static Comparator<String> ALPHABETICAL_ORDER_STRING = new Comparator<String>() 
     {
-        public int compare(String cls1, String cls2) {
+        public int compare(String cls1, String cls2) 
+        {
             int res = String.CASE_INSENSITIVE_ORDER.compare(cls1, cls2);
             if (res == 0) 
             {
