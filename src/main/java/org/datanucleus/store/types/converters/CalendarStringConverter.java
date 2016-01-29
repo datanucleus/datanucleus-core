@@ -28,8 +28,9 @@ import org.datanucleus.util.Localiser;
 
 /**
  * Class to handle the conversion between java.util.Calendar and a String form.
+ * The String form follows the format "EEE MMM dd HH:mm:ss zzz yyyy". That is, milliseconds are not retained currently.
  */
-public class CalendarStringConverter implements TypeConverter<Calendar, String>
+public class CalendarStringConverter implements TypeConverter<Calendar, String>, ColumnLengthDefiningTypeConverter
 {
     private static final long serialVersionUID = -4905708644688677004L;
     private static final ThreadLocal<FormatterInfo> formatterThreadInfo = new ThreadLocal<FormatterInfo>()
@@ -53,6 +54,19 @@ public class CalendarStringConverter implements TypeConverter<Calendar, String>
             formatInfo.formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
         }
         return formatInfo.formatter;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.types.converters.ColumnLengthDefiningTypeConverter#getDefaultColumnLength(int)
+     */
+    @Override
+    public int getDefaultColumnLength(int columnPosition)
+    {
+        if (columnPosition != 0)
+        {
+            return -1;
+        }
+        return 28;
     }
 
     public Calendar toMemberType(String str)
