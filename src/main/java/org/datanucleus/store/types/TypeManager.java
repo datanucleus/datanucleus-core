@@ -179,6 +179,13 @@ public interface TypeManager
     TypeConverter getDefaultTypeConverterForType(Class memberType);
 
     /**
+     * Method providing the ability for a datastore plugin to override the default converter type for the specified java type.
+     * @param memberType Member type
+     * @param converterName The converter to use by default. This is assumed to exist.
+     */
+    void setDefaultTypeConverterForType(Class memberType, String converterName);
+
+    /**
      * Accessor for the type converter for the provided Java type and its datastore type.
      * @param memberType Java type for the member
      * @param datastoreType Java type for the datastore

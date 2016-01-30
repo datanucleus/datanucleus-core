@@ -460,6 +460,25 @@ public class TypeManagerImpl implements TypeManager, Serializable
     }
 
     /* (non-Javadoc)
+     * @see org.datanucleus.store.types.TypeManager#setDefaultTypeConverterForType(java.lang.Class, java.lang.String)
+     */
+    @Override
+    public void setDefaultTypeConverterForType(Class memberType, String converterName)
+    {
+        JavaType javaType = javaTypes.get(memberType.getName());
+        if (javaType == null)
+        {
+            return;
+        }
+
+        String typeConverterName = javaType.typeConverterName;
+        if (typeConverterName == null || !typeConverterName.equals(converterName))
+        {
+            javaType.typeConverterName = converterName;
+        }
+    }
+
+    /* (non-Javadoc)
      * @see org.datanucleus.store.types.TypeManager#getDefaultTypeConverterForType(java.lang.Class)
      */
     @Override
@@ -635,7 +654,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         final boolean dfg;
         final Class wrapperType;
         final Class wrapperTypeBacked;
-        final String typeConverterName;
+        String typeConverterName;
         final Class containerHandlerType;
 
         public JavaType(Class cls, Class genericType, boolean embedded, boolean dfg, 
