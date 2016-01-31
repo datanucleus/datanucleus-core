@@ -18,8 +18,12 @@ Contributors:
 package org.datanucleus.store.types.converters;
 
 import java.sql.Time;
-import java.util.Calendar;
+import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 
 import org.datanucleus.store.types.converters.TypeConverter;
 
@@ -36,10 +40,7 @@ public class LocalTimeSqlTimeConverter implements TypeConverter<LocalTime, Time>
         {
             return null;
         }
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(time);
-        return LocalTime.of(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND), cal.get(Calendar.MILLISECOND)*1000000);
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(time.getTime()), ZoneId.systemDefault()).toLocalTime();
     }
 
     public Time toDatastoreType(LocalTime time)
@@ -48,9 +49,6 @@ public class LocalTimeSqlTimeConverter implements TypeConverter<LocalTime, Time>
         {
             return null;
         }
-        Calendar cal = Calendar.getInstance();
-        cal.set(0, 0, 0, time.getHour(), time.getMinute(), time.getSecond());
-        cal.set(Calendar.MILLISECOND, time.getNano()/1000000);
-        return new Time(cal.getTimeInMillis());
+        return new Time(Date.from(time.atDate(LocalDate.now()).atZone(ZoneId.systemDefault()).toInstant()).getTime());
     }
 }
