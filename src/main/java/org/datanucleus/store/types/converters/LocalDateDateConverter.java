@@ -18,8 +18,7 @@ Contributors:
 package org.datanucleus.store.types.converters;
 
 import java.util.Date;
-import java.util.TimeZone;
-import java.util.Calendar;
+import java.time.Instant;
 import java.time.LocalDate;
 
 import org.datanucleus.store.types.converters.TypeConverter;
@@ -37,11 +36,8 @@ public class LocalDateDateConverter implements TypeConverter<LocalDate, Date>
         {
             return null;
         }
-
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        cal.setTime(date);
-        LocalDate localDate = LocalDate.of(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH)+1, cal.get(Calendar.DAY_OF_MONTH));
-        return localDate;
+        Instant instant = date.toInstant();
+        return LocalDate.from(instant);
     }
 
     public Date toDatastoreType(LocalDate localDate)
@@ -50,8 +46,7 @@ public class LocalDateDateConverter implements TypeConverter<LocalDate, Date>
         {
             return null;
         }
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        cal.set(localDate.getYear(), localDate.getMonth().ordinal(), localDate.getDayOfMonth());
-        return new Date(cal.getTimeInMillis());
+        Instant instant = Instant.from(localDate);
+        return Date.from(instant);
     }
 }
