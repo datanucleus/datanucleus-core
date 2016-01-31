@@ -19,7 +19,10 @@ package org.datanucleus.store.types.converters;
 
 import java.util.Date;
 import java.util.Calendar;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 
 import org.datanucleus.store.types.converters.TypeConverter;
 
@@ -36,10 +39,7 @@ public class LocalTimeDateConverter implements TypeConverter<LocalTime, Date>
         {
             return null;
         }
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        return LocalTime.of(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND), cal.get(Calendar.MILLISECOND)*1000000);
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneId.systemDefault()).toLocalTime();
     }
 
     public Date toDatastoreType(LocalTime time)

@@ -17,9 +17,9 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.converters;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import org.datanucleus.store.types.converters.TypeConverter;
 
@@ -37,10 +37,7 @@ public class LocalDateTimeDateConverter implements TypeConverter<LocalDateTime, 
             return null;
         }
 
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        return LocalDateTime.of(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH)+1, cal.get(Calendar.DAY_OF_MONTH),
-            cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND), cal.get(Calendar.MILLISECOND)*1000000);
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
     public Date toDatastoreType(LocalDateTime datetime)
@@ -49,9 +46,6 @@ public class LocalDateTimeDateConverter implements TypeConverter<LocalDateTime, 
         {
             return null;
         }
-        Calendar cal = Calendar.getInstance();
-        cal.set(datetime.getYear(), datetime.getMonth().ordinal(), datetime.getDayOfMonth(), datetime.getHour(), datetime.getMinute(), datetime.getSecond());
-        cal.set(Calendar.MILLISECOND, datetime.getNano()/1000000);
-        return new Date(cal.getTimeInMillis());
+        return Date.from(datetime.atZone(ZoneId.systemDefault()).toInstant());
     }
 }

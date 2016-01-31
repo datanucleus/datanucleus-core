@@ -20,6 +20,8 @@ package org.datanucleus.store.types.converters;
 import java.util.Date;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import org.datanucleus.store.types.converters.TypeConverter;
 
@@ -36,8 +38,7 @@ public class LocalDateDateConverter implements TypeConverter<LocalDate, Date>
         {
             return null;
         }
-        Instant instant = date.toInstant();
-        return LocalDate.from(instant);
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneId.systemDefault()).toLocalDate();
     }
 
     public Date toDatastoreType(LocalDate localDate)
@@ -46,7 +47,6 @@ public class LocalDateDateConverter implements TypeConverter<LocalDate, Date>
         {
             return null;
         }
-        Instant instant = Instant.from(localDate);
-        return Date.from(instant);
+        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 }
