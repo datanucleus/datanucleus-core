@@ -36,7 +36,6 @@ public class LocalDateTimeDateConverter implements TypeConverter<LocalDateTime, 
         {
             return null;
         }
-
         return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 

@@ -18,8 +18,8 @@ Contributors:
 package org.datanucleus.store.types.converters;
 
 import java.util.Date;
-import java.util.Calendar;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -48,9 +48,6 @@ public class LocalTimeDateConverter implements TypeConverter<LocalTime, Date>
         {
             return null;
         }
-        Calendar cal = Calendar.getInstance();
-        cal.set(0, 0, 0, time.getHour(), time.getMinute(), time.getSecond());
-        cal.set(Calendar.MILLISECOND, time.getNano()/1000000);
-        return new Date(cal.getTimeInMillis());
+        return Date.from(time.atDate(LocalDate.now()).atZone(ZoneId.systemDefault()).toInstant());
     }
 }
