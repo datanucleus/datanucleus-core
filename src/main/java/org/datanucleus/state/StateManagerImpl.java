@@ -230,10 +230,9 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * Initialises a state manager to manage a hollow instance having the given object ID and the given
-     * (optional) field values. This constructor is used for creating new instances of existing persistent
-     * objects, and consequently shouldnt be used when the StoreManager controls the creation of such objects
-     * (such as in an ODBMS).
+     * Initialises a state manager to manage a hollow instance having the given object ID and the given (optional) field values. 
+     * This constructor is used for creating new instances of existing persistent objects, and consequently shouldn't be used 
+     * when the StoreManager controls the creation of such objects (such as in an ODBMS).
      * @param id the JDO identity of the object.
      * @param fv the initial field values of the object (optional)
      * @param pcClass Class of the object that this will manage the state for
@@ -267,9 +266,8 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
 
     /**
      * Initialises a state manager to manage a HOLLOW / P_CLEAN instance having the given FieldValues.
-     * This constructor is used for creating new instances of existing persistent objects using application 
-     * identity, and consequently shouldnt be used when the StoreManager controls the creation of such objects
-     * (such as in an ODBMS).
+     * This constructor is used for creating new instances of existing persistent objects using application identity,
+     * and consequently shouldn't be used when the StoreManager controls the creation of such objects (such as in an ODBMS).
      * @param fv the initial field values of the object.
      * @param pcClass Class of the object that this will manage the state for
      * @deprecated Remove use of this and use initialiseForHollow
@@ -357,9 +355,8 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * Initialises a state manager to manage a Persistable instance that will be EMBEDDED/SERIALISED 
-     * into another Persistable object. The instance will not be assigned an identity in the process 
-     * since it is a SCO.
+     * Initialises a state manager to manage a Persistable instance that will be EMBEDDED/SERIALISED into another Persistable object. 
+     * The instance will not be assigned an identity in the process since it is a SCO.
      * @param pc The Persistable to manage (see copyPc also)
      * @param copyPc Whether the SM should manage a copy of the passed PC or that one
      */
@@ -393,10 +390,9 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
 
     /**
      * Initialises a state manager to manage a transient instance that is becoming newly persistent.
-     * A new object ID for the instance is obtained from the store manager and the object is inserted
-     * in the data store.
-     * <p>This constructor is used for assigning state managers to existing
-     * instances that are transitioning to a persistent state.
+     * A new object ID for the instance is obtained from the store manager and the object is inserted in the data store.
+     * <p>
+     * This constructor is used for assigning state managers to existing instances that are transitioning to a persistent state.
      * @param pc the instance being make persistent.
      * @param preInsertChanges Any changes to make before inserting
      */
@@ -572,8 +568,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * Initialises the StateManager to manage a Persistable object that is not persistent but is
-     * about to be deleted.
+     * Initialises the StateManager to manage a Persistable object that is not persistent but is about to be deleted.
      * @param pc the object to delete
      */
     public void initialiseForPNewToBeDeleted(Persistable pc)
@@ -753,14 +748,15 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * Replace the current value of jdoStateManager.
-     * <P>This method is called by the Persistable whenever jdoReplaceStateManager is called and 
+     * Replace the current value of StateManager in the Persistable object.
+     * <p>
+     * This method is called by the Persistable whenever dnReplaceStateManager is called and 
      * there is already an owning StateManager. This is a security precaution to ensure that the owning 
-     * StateManager is the only source of any change to its reference in the Persistable.</p>
-     *
-     * @return the new value for the jdoStateManager
+     * StateManager is the only source of any change to its reference in the Persistable.
+     * </p>
      * @param pc the calling Persistable instance
-     * @param sm the proposed new value for the jdoStateManager
+     * @param sm the proposed new value for the StateManager
+     * @return the new value for the StateManager
      */
     public StateManager replacingStateManager(Persistable pc, StateManager sm)
     {
@@ -861,10 +857,8 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
 
     /**
      * Tests whether this object is dirty.
-     *
-     * Instances that have been modified, deleted, or newly
-     * made persistent in the current transaction return true.
-     * <P>Transient nontransactional instances return false (JDO spec).
+     * Instances that have been modified, deleted, or newly made persistent in the current transaction return true.
+     * Transient nontransactional instances return false (JDO spec).
      * @see Persistable#dnMakeDirty(String fieldName)
      * @param pc the calling persistable instance
      * @return true if this instance has been modified in current transaction.
@@ -1181,11 +1175,9 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * Called from the StoreManager after StoreManager.update() is called to obtain updated values 
-     * from the Persistable associated with this StateManager.
+     * Called from the StoreManager after StoreManager.update() is called to obtain updated values from the Persistable associated with this StateManager.
      * @param fieldNumbers An array of field numbers to be updated by the Store
-     * @param fm The updated values are stored in this object. This object is only valid
-     *   for the duration of this call.
+     * @param fm The updated values are stored in this object. This object is only valid for the duration of this call.
      */
     public void provideFields(int fieldNumbers[], FieldManager fm)
     {
@@ -1222,9 +1214,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     // -------------------------- replacingXXXField Methods ----------------------------
 
     /**
-     * This method is called by the associated Persistable when the
-     * corresponding mutator method (setXXX()) is called on the Persistable.
-     *
+     * This method is called by the associated Persistable when the corresponding mutator method (setXXX()) is called on the Persistable.
      * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
@@ -1271,9 +1261,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * This method is called by the associated Persistable when the
-     * corresponding mutator method (setXXX()) is called on the Persistable.
-     *
+     * This method is called by the associated Persistable when the corresponding mutator method (setXXX()) is called on the Persistable.
      * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
@@ -1320,9 +1308,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * This method is called by the associated Persistable when the
-     * corresponding mutator method (setXXX()) is called on the Persistable.
-     *
+     * This method is called by the associated Persistable when the corresponding mutator method (setXXX()) is called on the Persistable.
      * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
@@ -1369,9 +1355,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * This method is called by the associated Persistable when the
-     * corresponding mutator method (setXXX()) is called on the Persistable.
-     *
+     * This method is called by the associated Persistable when the corresponding mutator method (setXXX()) is called on the Persistable.
      * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
@@ -1418,9 +1402,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * This method is called by the associated Persistable when the
-     * corresponding mutator method (setXXX()) is called on the Persistable.
-     *
+     * This method is called by the associated Persistable when the corresponding mutator method (setXXX()) is called on the Persistable.
      * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
@@ -1467,9 +1449,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * This method is called by the associated Persistable when the
-     * corresponding mutator method (setXXX()) is called on the Persistable.
-     *
+     * This method is called by the associated Persistable when the corresponding mutator method (setXXX()) is called on the Persistable.
      * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
@@ -1516,9 +1496,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * This method is called by the associated Persistable when the
-     * corresponding mutator method (setXXX()) is called on the Persistable.
-     *
+     * This method is called by the associated Persistable when the corresponding mutator method (setXXX()) is called on the Persistable.
      * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
@@ -1565,8 +1543,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * This method is called by the associated Persistable when the
-     * corresponding mutator method (setXXX()) is called on the Persistable.
+     * This method is called by the associated Persistable when the corresponding mutator method (setXXX()) is called on the Persistable.
      * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
@@ -1613,8 +1590,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * This method is called by the associated Persistable when the
-     * corresponding mutator method (setXXX()) is called on the Persistable.
+     * This method is called by the associated Persistable when the corresponding mutator method (setXXX()) is called on the Persistable.
      * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
@@ -1662,8 +1638,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * This method is called by the associated Persistable when the
-     * corresponding mutator method (setXXX()) is called on the Persistable.
+     * This method is called by the associated Persistable when the corresponding mutator method (setXXX()) is called on the Persistable.
      * @param pc the calling Persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
@@ -2016,9 +1991,8 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * Method to update the "detached state" in the detached object to obtain the "detached state" 
-     * from the detached object, or to reset it (to null).
-     * @param pc The Persistable beind updated
+     * Method to update the "detached state" in the detached object to obtain the "detached state" from the detached object, or to reset it (to null).
+     * @param pc The Persistable being updated
      * @param currentState The current state values
      * @return The detached state to assign to the object
      */
@@ -2201,10 +2175,9 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * Convenience method to populate all fields in the PC object that have "value-strategy" specified
-     * and that aren't datastore attributed. This applies not just to PK fields (where it is most
-     * useful to use value-strategy) but also to any other field. Fields are populated only if they are null
-     * This is called once on a PC object, when makePersistent is called.
+     * Convenience method to populate all fields in the PC object that have "value-strategy" specified and that aren't datastore-attributed. 
+     * This applies not just to PK fields (where it is most useful to use value-strategy) but also to any other field. Fields are populated 
+     * only if they are null. This is called once on a PC object, when makePersistent is called.
      */
     private void populateStrategyFields()
     {
@@ -2444,8 +2417,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * If the id is obtained after inserting the object into the database, set
-     * new a new id for persistent classes (for example, increment).
+     * If the id is obtained after inserting the object into the database, set new a new id for persistent classes (for example, increment).
      * @param id the id received from the datastore
      */
     public void setPostStoreNewObjectId(Object id)
@@ -2739,8 +2711,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * Fetchs from the database all fields in current fetch plan that are not currently loaded as well as
-     * the version. Called by lifecycle transitions.
+     * Fetchs from the database all fields in current fetch plan that are not currently loaded as well as the version. Called by lifecycle transitions.
      */
     protected void loadUnloadedFieldsInFetchPlanAndVersion()
     {
@@ -2771,7 +2742,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * Fetchs from the database all fields in the actual fetch plan.
+     * Fetchs from the database all currently unloaded fields in the actual fetch plan.
      * Called by life-cycle transitions.
      */
     public void loadUnloadedFieldsOfClassInFetchPlan(FetchPlan fetchPlan)
@@ -3161,8 +3132,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * Called from the StoreManager to refresh data in the Persistable
-     * object associated with this StateManager.
+     * Called from the StoreManager to refresh data in the Persistable object associated with this StateManager.
      * @param fieldNumbers An array of field numbers to be refreshed by the Store
      * @param fm The updated values are stored in this object. This object is only valid
      *   for the duration of this call.
@@ -3173,12 +3143,10 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
     }
 
     /**
-     * Called from the StoreManager to refresh data in the Persistable
-     * object associated with this StateManager. Only not loaded fields are refreshed
-     *
+     * Called from the StoreManager to refresh data in the Persistable object associated with this StateManager. 
+     * Only fields that are not currently loaded are refreshed
      * @param fieldNumbers An array of field numbers to be refreshed by the Store
-     * @param fm The updated values are stored in this object. This object is only valid
-     *   for the duration of this call.
+     * @param fm The updated values are stored in this object. This object is only valid for the duration of this call.
      */
     public void replaceNonLoadedFields(int fieldNumbers[], FieldManager fm)
     {
@@ -3244,7 +3212,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
 
     /**
      * Method to replace all loaded SCO fields that have wrappers with their value.
-     * If the loaded field doesnt have a SCO wrapper nothing happens to that field.
+     * If the loaded field doesn't have a SCO wrapper nothing happens to that field.
      */
     public void replaceAllLoadedSCOFieldsWithValues()
     {
@@ -4518,10 +4486,8 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
      * Flushes any outstanding changes to the object to the datastore. 
      * This will process :-
      * <ul>
-     * <li>Any objects that have been marked as provisionally persistent yet haven't been flushed to the 
-     * datastore.</li>
-     * <li>Any objects that have been marked as provisionally deleted yet haven't been flushed to the 
-     * datastore.</li>
+     * <li>Any objects that have been marked as provisionally persistent yet haven't been flushed to the datastore.</li>
+     * <li>Any objects that have been marked as provisionally deleted yet haven't been flushed to the datastore.</li>
      * <li>Any fields that have been updated.</li>
      * </ul>
      */
