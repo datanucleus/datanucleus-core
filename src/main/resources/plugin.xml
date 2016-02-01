@@ -493,8 +493,6 @@ Contributors:
         <query-method-evaluator class="java.time.Period" method="getYears" evaluator="org.datanucleus.query.inmemory.PeriodGetYears"/>
         <query-method-evaluator class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.query.inmemory.YearMonthGetMonth"/>
         <query-method-evaluator class="java.time.YearMonth" method="getMonthValue" evaluator="org.datanucleus.query.inmemory.YearMonthGetYear"/>
-
-        <query-method-evaluator class="java.util.Optional" method="isPresent" evaluator="org.datanucleus.query.inmemory.OptionalIsPresentMethod"/>
     </extension>
 
     <!-- QUERY METHODS -->
