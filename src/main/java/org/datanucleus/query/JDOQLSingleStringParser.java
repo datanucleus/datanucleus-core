@@ -18,7 +18,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.query;
 
-import java.util.StringTokenizer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.datanucleus.ClassConstants;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -528,17 +529,55 @@ public class JDOQLSingleStringParser
             this.queryString = str;
             this.extended = extended;
 
-            StringTokenizer tokenizer = new StringTokenizer(str);
-            tokens = new String[tokenizer.countTokens()];
-            keywords = new String[tokenizer.countTokens()];
-            int i = 0;
-            while (tokenizer.hasMoreTokens())
+            // Parse into tokens, taking care to keep any String literals together
+            List<String> tokenList = new ArrayList();
+            boolean withinSingleQuote = false;
+            boolean withinDoubleQuote = false;
+            StringBuilder currentToken = new StringBuilder();
+            for (int i=0;i<str.length();i++)
             {
-                tokens[i] = tokenizer.nextToken();
-                if ((extended && JDOQLQueryHelper.isKeywordExtended(tokens[i])) ||
-                    (!extended && JDOQLQueryHelper.isKeyword(tokens[i])))
+                char chr = str.charAt(i);
+                if (chr == '"')
                 {
-                    keywords[i] = tokens[i];
+                    withinDoubleQuote = !withinDoubleQuote;
+                    currentToken.append(chr);
+                }
+                else if (chr == '\'')
+                {
+                    withinSingleQuote = !withinSingleQuote;
+                    currentToken.append(chr);
+                }
+                else if (chr == ' ')
+                {
+                    if (!withinDoubleQuote && !withinSingleQuote)
+                    {
+                        tokenList.add(currentToken.toString().trim());
+                        currentToken = new StringBuilder();
+                    }
+                    else
+                    {
+                        currentToken.append(chr);
+                    }
+                }
+                else
+                {
+                    currentToken.append(chr);
+                }
+            }
+            if (currentToken.length() > 0)
+            {
+                tokenList.add(currentToken.toString());
+            }
+
+            tokens = new String[tokenList.size()];
+            keywords = new String[tokenList.size()];
+            int i = 0;
+            for (String token : tokenList)
+            {
+                tokens[i] = token;
+                if ((extended && JDOQLQueryHelper.isKeywordExtended(token)) || (!extended && JDOQLQueryHelper.isKeyword(token)))
+                {
+                    keywords[i] = token;
                 }
                 i++;
             }

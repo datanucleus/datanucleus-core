@@ -469,7 +469,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
 
         // ========== Initialise the StoreManager contents ==========
         // A). Load any classes specified by auto-start
-        if (config.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM) != null)
+        String autoStartMechanism = config.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM);
+        if (autoStartMechanism != null && !autoStartMechanism.equals("None"))
         {
             initialiseAutoStart(clr);
         }
@@ -794,7 +795,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         }
 
         String autoStartMechanism = config.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM);
-        if (autoStartMechanism != null)
+        if (autoStartMechanism != null && !autoStartMechanism.equals("None"))
         {
             String autoStartClassNames = config.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_CLASSNAMES);
             NucleusLogger.PERSISTENCE.debug("AutoStart : mechanism=" + autoStartMechanism +
