@@ -45,6 +45,7 @@ public class YearMonthDateConverter implements TypeConverter<YearMonth, Date>
         {
             return null;
         }
-        return new Date(Date.from(ym.atDay(1).atStartOfDay(ZoneId.systemDefault()).toInstant()).getTime());
+        // Use day 2 to avoid any potential timezone rounding. Would be better using other means, but doesn't matter here
+        return new Date(Date.from(ym.atDay(2).atStartOfDay(ZoneId.systemDefault()).toInstant()).getTime());
     }
 }
