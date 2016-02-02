@@ -19,6 +19,7 @@ package org.datanucleus.store.types.converters;
 
 import java.sql.Date;
 import java.time.MonthDay;
+import java.time.ZoneId;
 
 import org.datanucleus.store.types.converters.TypeConverter;
 
@@ -29,20 +30,21 @@ public class MonthDayDateConverter implements TypeConverter<MonthDay, Date>
 {
     private static final long serialVersionUID = 8087124973147837116L;
 
-    @SuppressWarnings("deprecation")
     public MonthDay toMemberType(Date date)
     {
         if (date == null)
         {
             return null;
         }
-
-        return MonthDay.of(date.getMonth()+1, date.getDate());
+        return MonthDay.from(date.toLocalDate());
     }
 
-    @SuppressWarnings("deprecation")
     public Date toDatastoreType(MonthDay md)
     {
-        return new Date(0, md.getMonthValue()-1, md.getDayOfMonth());
+        if (md == null)
+        {
+            return null;
+        }
+        return new Date(Date.from(md.atYear(1900).atStartOfDay(ZoneId.systemDefault()).toInstant()).getTime());
     }
 }

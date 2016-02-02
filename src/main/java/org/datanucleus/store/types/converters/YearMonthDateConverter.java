@@ -19,6 +19,7 @@ package org.datanucleus.store.types.converters;
 
 import java.sql.Date;
 import java.time.YearMonth;
+import java.time.ZoneId;
 
 import org.datanucleus.store.types.converters.TypeConverter;
 
@@ -29,20 +30,21 @@ public class YearMonthDateConverter implements TypeConverter<YearMonth, Date>
 {
     private static final long serialVersionUID = 8087124973147837116L;
 
-    @SuppressWarnings("deprecation")
     public YearMonth toMemberType(Date date)
     {
         if (date == null)
         {
             return null;
         }
-
-        return YearMonth.of(date.getYear()+1900, date.getMonth()+1);
+        return YearMonth.from(date.toLocalDate());
     }
 
-    @SuppressWarnings("deprecation")
     public Date toDatastoreType(YearMonth ym)
     {
-        return new Date(ym.getYear()-1900, ym.getMonthValue()-1, 1);
+        if (ym == null)
+        {
+            return null;
+        }
+        return new Date(Date.from(ym.atDay(1).atStartOfDay(ZoneId.systemDefault()).toInstant()).getTime());
     }
 }
