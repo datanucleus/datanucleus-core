@@ -324,6 +324,7 @@ Contributors:
         <type-converter name="dn.offsetdatetime-date" member-type="java.time.OffsetDateTime" datastore-type="java.util.Date" converter-class="org.datanucleus.store.types.converters.OffsetDateTimeDateConverter"/>
         <type-converter name="dn.duration-string" member-type="java.time.Duration" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.DurationStringConverter"/>
         <type-converter name="dn.duration-long" member-type="java.time.Duration" datastore-type="java.lang.Long" converter-class="org.datanucleus.store.types.converters.DurationLongConverter"/>
+        <type-converter name="dn.duration-double" member-type="java.time.Duration" datastore-type="java.lang.Double" converter-class="org.datanucleus.store.types.converters.DurationDoubleConverter"/>
         <type-converter name="dn.period-string" member-type="java.time.Period" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.PeriodStringConverter"/>
         <type-converter name="dn.instant-timestamp" member-type="java.time.Instant" datastore-type="java.sql.Timestamp" converter-class="org.datanucleus.store.types.converters.InstantTimestampConverter"/>
         <type-converter name="dn.instant-date" member-type="java.time.Instant" datastore-type="java.util.Date" converter-class="org.datanucleus.store.types.converters.InstantDateConverter"/>
