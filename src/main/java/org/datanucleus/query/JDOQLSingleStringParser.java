@@ -18,8 +18,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.query;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.StringTokenizer;
 
 import org.datanucleus.ClassConstants;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -529,55 +528,17 @@ public class JDOQLSingleStringParser
             this.queryString = str;
             this.extended = extended;
 
-            // Parse into tokens, taking care to keep any String literals together
-            List<String> tokenList = new ArrayList();
-            boolean withinSingleQuote = false;
-            boolean withinDoubleQuote = false;
-            StringBuilder currentToken = new StringBuilder();
-            for (int i=0;i<str.length();i++)
-            {
-                char chr = str.charAt(i);
-                if (chr == '"')
-                {
-                    withinDoubleQuote = !withinDoubleQuote;
-                    currentToken.append(chr);
-                }
-                else if (chr == '\'')
-                {
-                    withinSingleQuote = !withinSingleQuote;
-                    currentToken.append(chr);
-                }
-                else if (chr == ' ')
-                {
-                    if (!withinDoubleQuote && !withinSingleQuote)
-                    {
-                        tokenList.add(currentToken.toString().trim());
-                        currentToken = new StringBuilder();
-                    }
-                    else
-                    {
-                        currentToken.append(chr);
-                    }
-                }
-                else
-                {
-                    currentToken.append(chr);
-                }
-            }
-            if (currentToken.length() > 0)
-            {
-                tokenList.add(currentToken.toString());
-            }
-
-            tokens = new String[tokenList.size()];
-            keywords = new String[tokenList.size()];
+            StringTokenizer tokenizer = new StringTokenizer(str);
+            tokens = new String[tokenizer.countTokens()];
+            keywords = new String[tokenizer.countTokens()];
             int i = 0;
-            for (String token : tokenList)
+            while (tokenizer.hasMoreTokens())
             {
-                tokens[i] = token;
-                if ((extended && JDOQLQueryHelper.isKeywordExtended(token)) || (!extended && JDOQLQueryHelper.isKeyword(token)))
+                tokens[i] = tokenizer.nextToken();
+                if ((extended && JDOQLQueryHelper.isKeywordExtended(tokens[i])) ||
+                    (!extended && JDOQLQueryHelper.isKeyword(tokens[i])))
                 {
-                    keywords[i] = token;
+                    keywords[i] = tokens[i];
                 }
                 i++;
             }

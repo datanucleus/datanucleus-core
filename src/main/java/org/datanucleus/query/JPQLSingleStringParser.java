@@ -18,8 +18,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.query;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.StringTokenizer;
 
 import org.datanucleus.ClassConstants;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -101,12 +100,12 @@ public class JPQLSingleStringParser
      */
     private class Compiler
     {
-        Parser parser;
+        Parser tokenizer;
         int subqueryNum = 1;
         
         Compiler(Parser tokenizer)
         {
-            this.parser = tokenizer;
+            this.tokenizer = tokenizer;
         }
 
         private void compile()
@@ -114,7 +113,7 @@ public class JPQLSingleStringParser
             compileQuery();
 
             // any keyword after compiling the SELECT is an error
-            String keyword = parser.parseKeyword();
+            String keyword = tokenizer.parseKeyword();
             if (keyword != null)
             {
                 if (JPQLQueryHelper.isKeyword(keyword))
@@ -130,21 +129,21 @@ public class JPQLSingleStringParser
             boolean insert = false;
             boolean update = false;
             boolean delete = false;
-            if (parser.parseKeywordIgnoreCase("SELECT"))
+            if (tokenizer.parseKeywordIgnoreCase("SELECT"))
             {
                 // Do nothing
             }
-            else if (parser.parseKeywordIgnoreCase("INSERT"))
+            else if (tokenizer.parseKeywordIgnoreCase("INSERT"))
             {
                 insert = true;
                 query.setType(Query.BULK_INSERT);
             }
-            else if (parser.parseKeywordIgnoreCase("UPDATE"))
+            else if (tokenizer.parseKeywordIgnoreCase("UPDATE"))
             {
                 update = true;
                 query.setType(Query.BULK_UPDATE);
             }
-            else if (parser.parseKeywordIgnoreCase("DELETE"))
+            else if (tokenizer.parseKeywordIgnoreCase("DELETE"))
             {
                 delete = true;
                 query.setType(Query.BULK_DELETE);
@@ -159,7 +158,7 @@ public class JPQLSingleStringParser
                 // UPDATE {entity [AS alias]} SET x1 = val1, x2 = val2, ...
                 compileUpdate();
 
-                if (parser.parseKeywordIgnoreCase("WHERE"))
+                if (tokenizer.parseKeywordIgnoreCase("WHERE"))
                 {
                     compileWhere();
                 }
@@ -167,7 +166,7 @@ public class JPQLSingleStringParser
             else if (insert)
             {
                 // INSERT [INTO] {entity} (field1, field2, ...)
-                String content = parser.parseContent(null, false);
+                String content = tokenizer.parseContent(null, false);
                 if (content.length() > 0)
                 {
                     if (content.startsWith("INTO"))
@@ -194,8 +193,8 @@ public class JPQLSingleStringParser
                 }
 
                 // Extract remains of query, and move to end of query
-                String selectQuery = parser.queryString.substring(parser.queryStringPos).trim();
-                while (parser.parseKeyword() != null)
+                String selectQuery = tokenizer.queryString.substring(tokenizer.queryStringPos).trim();
+                while (tokenizer.parseKeyword() != null)
                 {
                 }
                 query.setInsertSelectQuery(selectQuery);
@@ -203,12 +202,12 @@ public class JPQLSingleStringParser
             else if (delete)
             {
                 // DELETE FROM {entity [AS alias]}
-                if (parser.parseKeywordIgnoreCase("FROM"))
+                if (tokenizer.parseKeywordIgnoreCase("FROM"))
                 {
                     compileFrom();
                 }
 
-                if (parser.parseKeywordIgnoreCase("WHERE"))
+                if (tokenizer.parseKeywordIgnoreCase("WHERE"))
                 {
                     compileWhere();
                 }
@@ -218,23 +217,23 @@ public class JPQLSingleStringParser
                 // SELECT a, b, c FROM ... WHERE ... GROUP BY ... HAVING ... ORDER BY ...
                 compileResult();
 
-                if (parser.parseKeywordIgnoreCase("FROM"))
+                if (tokenizer.parseKeywordIgnoreCase("FROM"))
                 {
                     compileFrom();
                 }
-                if (parser.parseKeywordIgnoreCase("WHERE"))
+                if (tokenizer.parseKeywordIgnoreCase("WHERE"))
                 {
                     compileWhere();
                 }
-                if (parser.parseKeywordIgnoreCase("GROUP BY"))
+                if (tokenizer.parseKeywordIgnoreCase("GROUP BY"))
                 {
                     compileGroup();
                 }
-                if (parser.parseKeywordIgnoreCase("HAVING"))
+                if (tokenizer.parseKeywordIgnoreCase("HAVING"))
                 {
                     compileHaving();
                 }
-                if (parser.parseKeywordIgnoreCase("ORDER BY"))
+                if (tokenizer.parseKeywordIgnoreCase("ORDER BY"))
                 {
                     compileOrder();
                 }
@@ -243,7 +242,7 @@ public class JPQLSingleStringParser
 
         private void compileResult()
         {
-            String content = parser.parseContent(null, true);
+            String content = tokenizer.parseContent(null, true);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -264,7 +263,7 @@ public class JPQLSingleStringParser
 
         private void compileUpdate()
         {
-            String content = parser.parseContent(null, false);
+            String content = tokenizer.parseContent(null, false);
             if (content.length() == 0)
             {
                 // No UPDATE clause
@@ -284,7 +283,7 @@ public class JPQLSingleStringParser
 
         private void compileFrom()
         {
-            String content = parser.parseContent(null, false);
+            String content = tokenizer.parseContent(null, false);
             if (content.length() > 0)
             {
                 //content may be empty
@@ -295,7 +294,7 @@ public class JPQLSingleStringParser
         private void compileWhere()
         {
             // "TRIM" may include "FROM" keyword so ignore subsequent FROMs
-            String content = parser.parseContent("FROM", true);
+            String content = tokenizer.parseContent("FROM", true);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -316,7 +315,7 @@ public class JPQLSingleStringParser
 
         private void compileGroup()
         {
-            String content = parser.parseContent(null, false);
+            String content = tokenizer.parseContent(null, false);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -328,7 +327,7 @@ public class JPQLSingleStringParser
         private void compileHaving()
         {
             // "TRIM" may include "FROM" keyword so ignore subsequent FROMs
-            String content = parser.parseContent("FROM", true);
+            String content = tokenizer.parseContent("FROM", true);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -349,7 +348,7 @@ public class JPQLSingleStringParser
 
         private void compileOrder()
         {
-            String content = parser.parseContent(null, false);
+            String content = tokenizer.parseContent(null, false);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -477,54 +476,14 @@ public class JPQLSingleStringParser
         {
             queryString = str;
 
-            // Parse into tokens, taking care to keep any String literals together
-            List<String> tokenList = new ArrayList();
-            boolean withinSingleQuote = false;
-            boolean withinDoubleQuote = false;
-            StringBuilder currentToken = new StringBuilder();
-            for (int i=0;i<str.length();i++)
-            {
-                char chr = str.charAt(i);
-                if (chr == '"')
-                {
-                    withinDoubleQuote = !withinDoubleQuote;
-                    currentToken.append(chr);
-                }
-                else if (chr == '\'')
-                {
-                    withinSingleQuote = !withinSingleQuote;
-                    currentToken.append(chr);
-                }
-                else if (chr == ' ')
-                {
-                    if (!withinDoubleQuote && !withinSingleQuote)
-                    {
-                        tokenList.add(currentToken.toString().trim());
-                        currentToken = new StringBuilder();
-                    }
-                    else
-                    {
-                        currentToken.append(chr);
-                    }
-                }
-                else
-                {
-                    currentToken.append(chr);
-                }
-            }
-            if (currentToken.length() > 0)
-            {
-                tokenList.add(currentToken.toString());
-            }
-
-            tokens = new String[tokenList.size()];
+            StringTokenizer tokenizer = new StringTokenizer(str);
+            tokens = new String[tokenizer.countTokens()];
+            keywords = new String[tokenizer.countTokens()];
             int i = 0;
-            for (String token : tokenList)
+            while (tokenizer.hasMoreTokens())
             {
-                tokens[i++] = token;
+                tokens[i++] = tokenizer.nextToken();
             }
-
-            keywords = new String[tokenList.size()];
             for (i = 0; i < tokens.length; i++)
             {
                 if (JPQLQueryHelper.isKeyword(tokens[i]))
