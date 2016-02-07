@@ -1920,9 +1920,36 @@ public class JPQLParser implements Parser
                 stack.push(primaryRootNode);
                 return true;
             }
+            else if (method.equalsIgnoreCase("FUNCTION"))
+            {
+                // FUNCTION - Convert to be {primary}.INVOKE("SQL_function", ...)
+                // Extract sql function name
+                processExpression();
+                Node sqlFunctionNode = stack.pop();
+                Node invokeNode = new Node(NodeType.INVOKE, "SQL_function");
+                invokeNode.addProperty(sqlFunctionNode);
+                if (p.parseChar(','))
+                {
+                    // Process arguments for function "aaa[,bbb[,ccc]] etc )"
+                    do
+                    {
+                        // Argument for the method call, add as a node property
+                        processExpression();
+                        invokeNode.addProperty(stack.pop());
+                    }
+                    while (p.parseChar(','));
+                }
+                if (!p.parseChar(')'))
+                {
+                    throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
+                }
+
+                stack.push(invokeNode);
+                return true;
+            }
             else if (method.equalsIgnoreCase("YEAR"))
             {
-                // Extension MONTH - Convert to be {primary}.INVOKE(getYear)
+                // Extension YEAR - Convert to be {primary}.INVOKE(getYear)
                 Node invokeNode = new Node(NodeType.INVOKE, "getYear");
                 processExpression();
                 if (!p.parseChar(')'))
@@ -1942,6 +1969,30 @@ public class JPQLParser implements Parser
             }
             else if (method.equalsIgnoreCase("MONTH"))
             {
+                // Extension MONTH - Convert to be ({primary}.INVOKE(getMonth) + 1)
+                Node invokeNode = new Node(NodeType.INVOKE, "getMonth");
+                processExpression();
+                if (!p.parseChar(')'))
+                {
+                    throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
+                }
+
+                Node primaryNode = stack.pop(); // Could check type ? (Date)
+                while (primaryNode.getFirstChild() != null)
+                {
+                    primaryNode = primaryNode.getFirstChild();
+                }
+                primaryNode.appendChildNode(invokeNode);
+
+                Node overallNode = new Node(NodeType.OPERATOR, "+");
+                overallNode.appendChildNode(primaryNode);
+                overallNode.appendChildNode(new Node(NodeType.LITERAL, 1));
+
+                stack.push(overallNode);
+                return true;
+            }
+            else if (method.equalsIgnoreCase("MONTH_JAVA"))
+            {
                 // Extension MONTH - Convert to be {primary}.INVOKE(getMonth)
                 Node invokeNode = new Node(NodeType.INVOKE, "getMonth");
                 processExpression();
@@ -1951,13 +2002,13 @@ public class JPQLParser implements Parser
                 }
 
                 Node primaryNode = stack.pop(); // Could check type ? (Date)
-                Node primaryRootNode = primaryNode;
                 while (primaryNode.getFirstChild() != null)
                 {
                     primaryNode = primaryNode.getFirstChild();
                 }
                 primaryNode.appendChildNode(invokeNode);
-                stack.push(primaryRootNode);
+
+                stack.push(primaryNode);
                 return true;
             }
             else if (method.equalsIgnoreCase("DAY"))
@@ -2038,33 +2089,6 @@ public class JPQLParser implements Parser
                 }
                 primaryNode.appendChildNode(invokeNode);
                 stack.push(primaryRootNode);
-                return true;
-            }
-            else if (method.equalsIgnoreCase("FUNCTION"))
-            {
-                // FUNCTION - Convert to be {primary}.INVOKE("SQL_function", ...)
-                // Extract sql function name
-                processExpression();
-                Node sqlFunctionNode = stack.pop();
-                Node invokeNode = new Node(NodeType.INVOKE, "SQL_function");
-                invokeNode.addProperty(sqlFunctionNode);
-                if (p.parseChar(','))
-                {
-                    // Process arguments for function "aaa[,bbb[,ccc]] etc )"
-                    do
-                    {
-                        // Argument for the method call, add as a node property
-                        processExpression();
-                        invokeNode.addProperty(stack.pop());
-                    }
-                    while (p.parseChar(','));
-                }
-                if (!p.parseChar(')'))
-                {
-                    throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
-                }
-
-                stack.push(invokeNode);
                 return true;
             }
             else
