@@ -433,6 +433,12 @@ Contributors:
         <query-method-evaluator method="TRIM_TRAILING" evaluator="org.datanucleus.query.inmemory.TrimFunction"/>
         <query-method-evaluator method="DEGREES" evaluator="org.datanucleus.query.inmemory.DegreesFunction"/>
         <query-method-evaluator method="RADIANS" evaluator="org.datanucleus.query.inmemory.RadiansFunction"/>
+        <query-method-evaluator method="YEAR" evaluator="org.datanucleus.query.inmemory.TemporalYearMethod"/>
+        <query-method-evaluator method="MONTH" evaluator="org.datanucleus.query.inmemory.TemporalMonthMethod"/>
+        <query-method-evaluator method="DAY" evaluator="org.datanucleus.query.inmemory.TemporalDayMethod"/>
+        <query-method-evaluator method="HOUR" evaluator="org.datanucleus.query.inmemory.TemporalHourMethod"/>
+        <query-method-evaluator method="MINUTE" evaluator="org.datanucleus.query.inmemory.TemporalMinuteMethod"/>
+        <query-method-evaluator method="SECOND" evaluator="org.datanucleus.query.inmemory.TemporalSecondMethod"/>
 
         <query-method-evaluator class="java.lang.Enum" method="matches" evaluator="org.datanucleus.query.inmemory.EnumMatchesMethod"/>
         <query-method-evaluator class="java.lang.Enum" method="toString" evaluator="org.datanucleus.query.inmemory.EnumToStringMethod"/>
