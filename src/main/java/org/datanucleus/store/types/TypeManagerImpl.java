@@ -37,6 +37,7 @@ import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.PluginManager;
+import org.datanucleus.store.types.converters.ClassStringConverter;
 import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
@@ -431,6 +432,10 @@ public class TypeManagerImpl implements TypeManager, Serializable
             convertersByName = new ConcurrentHashMap<String, TypeConverter>();
         }
         convertersByName.put(name, converter);
+        if (converter instanceof ClassStringConverter)
+        {
+            ((ClassStringConverter)converter).setClassLoaderResolver(getClassLoaderResolver());
+        }
         if (autoApply)
         {
             if (autoApplyConvertersByType == null)
