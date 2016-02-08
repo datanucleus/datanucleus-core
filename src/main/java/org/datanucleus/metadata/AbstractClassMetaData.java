@@ -1033,6 +1033,12 @@ public abstract class AbstractClassMetaData extends MetaData
                         // JDO2 behaviour (root class has table, and others share it)
                         inheritanceMetaData = new InheritanceMetaData();
                         inheritanceMetaData.setStrategy(InheritanceStrategy.SUPERCLASS_TABLE);
+                        if (baseCmd.getInheritanceMetaData() != null && baseCmd.getInheritanceMetaData().getDiscriminatorMetaData() == null)
+                        {
+                            // This class has no inheritance so will share the table of its superclass, and the superclass has no discriminator defined(!)
+                            NucleusLogger.METADATA.warn("Class \"" + getFullClassName() + "\" is sharing the table of its superclass \"" + baseCmd.getFullClassName() + 
+                                "\" yet no discriminator is defined to distinguish these classes. Maybe you should define one?");
+                        }
                     }
                 }
             }
