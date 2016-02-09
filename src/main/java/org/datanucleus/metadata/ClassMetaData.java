@@ -390,7 +390,7 @@ public class ClassMetaData extends AbstractClassMetaData
                                     Type[] paramTypeArgs = genSuperclsType.getActualTypeArguments();
                                     if (paramTypeArgs != null && paramTypeArgs.length > j && paramTypeArgs[j] instanceof Class)
                                     {
-                                        NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " method=" + allclsMethods[i].getName() +
+                                        NucleusLogger.METADATA.debug("Class=" + cls.getName() + " method=" + allclsMethods[i].getName() +
                                             " declared to return " + methodTypeVar + ", namely TypeVariable(" + j + ") of " + declCls.getName() + " so using " + paramTypeArgs[j]);
                                         String propertyName = allclsMethods[i].getDeclaringClass().getName() + "." + ClassUtils.getFieldNameForJavaBeanGetter(allclsMethods[i].getName());
                                         if (!memberNames.contains(propertyName))
@@ -417,7 +417,7 @@ public class ClassMetaData extends AbstractClassMetaData
                                     if (boundTypes != null && boundTypes.length == 1 && boundTypes[0] instanceof Class)
                                     {
                                         // User has class declaration like "public class MyClass<T extends SomeType>" so take SomeType
-                                        NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " field=" + allclsMethods[i].getName() +
+                                        NucleusLogger.METADATA.debug("Class=" + cls.getName() + " field=" + allclsMethods[i].getName() +
                                             " declared to be " + methodTypeVar + ", namely TypeVariable(" + j + ") with bound, so using bound of " + boundTypes[0]);
                                         String propertyName = allclsMethods[i].getDeclaringClass().getName() + "." + ClassUtils.getFieldNameForJavaBeanGetter(allclsMethods[i].getName());
                                         if (!memberNames.contains(propertyName))
@@ -497,7 +497,7 @@ public class ClassMetaData extends AbstractClassMetaData
                                     Type[] paramTypeArgs = genSuperclsType.getActualTypeArguments();
                                     if (paramTypeArgs != null && paramTypeArgs.length > j && paramTypeArgs[j] instanceof Class)
                                     {
-                                        NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " field=" + theclsFields[i].getName() +
+                                        NucleusLogger.METADATA.debug("Class=" + cls.getName() + " field=" + theclsFields[i].getName() +
                                             " declared to be " + fieldTypeVar + ", namely TypeVariable(" + j + ") of " + declCls.getName() + " so using " + paramTypeArgs[j]);
                                         String fieldName = declCls.getName() + "." + theclsFields[i].getName();
                                         if (!memberNames.contains(fieldName))
@@ -529,7 +529,7 @@ public class ClassMetaData extends AbstractClassMetaData
                                     if (boundTypes != null && boundTypes.length == 1 && boundTypes[0] instanceof Class)
                                     {
                                         // User has class declaration like "public class MyClass<T extends SomeType>" so take SomeType
-                                        NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " field=" + theclsFields[i].getName() +
+                                        NucleusLogger.METADATA.debug("Class=" + cls.getName() + " field=" + theclsFields[i].getName() +
                                             " declared to be " + fieldTypeVar + ", namely TypeVariable(" + j + ") with bound, so using bound of " + boundTypes[0]);
                                         String fieldName = declCls.getName() + "." + theclsFields[i].getName();
                                         if (!memberNames.contains(fieldName))
