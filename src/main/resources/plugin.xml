@@ -472,6 +472,9 @@ Contributors:
         <query-method-evaluator class="java.util.Map" method="containsEntry" evaluator="org.datanucleus.query.inmemory.MapContainsEntryMethod"/>
         <query-method-evaluator class="java.util.Map" method="get" evaluator="org.datanucleus.query.inmemory.MapGetMethod"/>
 
+        <query-method-evaluator class="java.util.Optional" method="isPresent" evaluator="org.datanucleus.query.inmemory.OptionalIsPresentMethod"/>
+        <query-method-evaluator class="java.util.Optional" method="get" evaluator="org.datanucleus.query.inmemory.OptionalGetMethod"/>
+
         <query-method-evaluator class="java.util.Date" method="getTime" evaluator="org.datanucleus.query.inmemory.DateGetTimeMethod"/>
         <query-method-evaluator class="java.util.Date" method="getDay" evaluator="org.datanucleus.query.inmemory.DateGetDayMethod"/>
         <query-method-evaluator class="java.util.Date" method="getDate" evaluator="org.datanucleus.query.inmemory.DateGetDayMethod"/>
