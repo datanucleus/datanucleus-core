@@ -1033,6 +1033,11 @@ public abstract class AbstractClassMetaData extends MetaData
                         // JDO2 behaviour (root class has table, and others share it)
                         inheritanceMetaData = new InheritanceMetaData();
                         inheritanceMetaData.setStrategy(InheritanceStrategy.SUPERCLASS_TABLE);
+                        if ((baseCmd.getInheritanceMetaData() == null || baseCmd.getInheritanceMetaData().getDiscriminatorMetaData() == null) && !mmgr.isEnhancing())
+                        {
+                            NucleusLogger.METADATA.warn("Class " + getFullClassName() + " is defined to use the same table as " + baseCmd.getFullClassName() +
+                                " yet this root class has not been defined with a discriminator!!!");
+                        }
                     }
                 }
             }
