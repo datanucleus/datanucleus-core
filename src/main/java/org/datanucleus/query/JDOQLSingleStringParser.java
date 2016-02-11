@@ -18,7 +18,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.query;
 
-import java.util.StringTokenizer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.datanucleus.ClassConstants;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -105,17 +106,17 @@ public class JDOQLSingleStringParser
      */
     private class Compiler
     {
-        Parser tokenizer;
+        Parser parser;
 
         Compiler(Parser tokenizer)
         {
-            this.tokenizer = tokenizer;
+            this.parser = tokenizer;
         }
 
         private void compile()
         {
             compileSelect();
-            String keyword = tokenizer.parseKeyword();
+            String keyword = parser.parseKeyword();
             if (keyword != null && JDOQLQueryHelper.isKeyword(keyword))
             {
                 // any keyword after compiling the SELECT is an error
@@ -127,17 +128,17 @@ public class JDOQLSingleStringParser
         {
             boolean update = false;
             boolean delete = false;
-            if (allowUpdate && (tokenizer.parseKeyword("UPDATE") || tokenizer.parseKeyword("update")))
+            if (allowUpdate && (parser.parseKeyword("UPDATE") || parser.parseKeyword("update")))
             {
                 update = true;
                 query.setType(Query.BULK_UPDATE);
             }
-            else if (allowDelete && (tokenizer.parseKeyword("DELETE") || tokenizer.parseKeyword("delete")))
+            else if (allowDelete && (parser.parseKeyword("DELETE") || parser.parseKeyword("delete")))
             {
                 delete = true;
                 query.setType(Query.BULK_DELETE);
             }
-            else if (tokenizer.parseKeyword("SELECT") || tokenizer.parseKeyword("select"))
+            else if (parser.parseKeyword("SELECT") || parser.parseKeyword("select"))
             {
                 // Do nothing
             } 
@@ -152,53 +153,53 @@ public class JDOQLSingleStringParser
             }
             else if (delete)
             {
-                if (tokenizer.parseKeyword("FROM") || tokenizer.parseKeyword("from"))
+                if (parser.parseKeyword("FROM") || parser.parseKeyword("from"))
                 {
                     compileFrom();
                 }
             }
             else
             {
-                if (tokenizer.parseKeyword("UNIQUE") || tokenizer.parseKeyword("unique"))
+                if (parser.parseKeyword("UNIQUE") || parser.parseKeyword("unique"))
                 {
                     compileUnique();
                 }
                 compileResult();
-                if (tokenizer.parseKeyword("INTO") || tokenizer.parseKeyword("into"))
+                if (parser.parseKeyword("INTO") || parser.parseKeyword("into"))
                 {
                     compileInto();
                 }
-                if (tokenizer.parseKeyword("FROM") || tokenizer.parseKeyword("from"))
+                if (parser.parseKeyword("FROM") || parser.parseKeyword("from"))
                 {
                     compileFrom();
                 }
             }
 
-            if (tokenizer.parseKeyword("WHERE") || tokenizer.parseKeyword("where"))
+            if (parser.parseKeyword("WHERE") || parser.parseKeyword("where"))
             {
                 compileWhere();
             }
-            if (tokenizer.parseKeyword("VARIABLES") || tokenizer.parseKeyword("variables"))
+            if (parser.parseKeyword("VARIABLES") || parser.parseKeyword("variables"))
             {
                 compileVariables();
             }
-            if (tokenizer.parseKeyword("PARAMETERS") || tokenizer.parseKeyword("parameters"))
+            if (parser.parseKeyword("PARAMETERS") || parser.parseKeyword("parameters"))
             {
                 compileParameters();
             }
-            if (tokenizer.parseKeyword("IMPORT") || tokenizer.parseKeyword("import"))
+            if (parser.parseKeyword("IMPORT") || parser.parseKeyword("import"))
             {
                 compileImport();
             }
-            if (tokenizer.parseKeyword("GROUP") || tokenizer.parseKeyword("group")) // GROUP BY
+            if (parser.parseKeyword("GROUP") || parser.parseKeyword("group")) // GROUP BY
             {
                 compileGroup();
             }
-            if (tokenizer.parseKeyword("ORDER") || tokenizer.parseKeyword("order")) // ORDER BY
+            if (parser.parseKeyword("ORDER") || parser.parseKeyword("order")) // ORDER BY
             {
                 compileOrder();
             }
-            if (tokenizer.parseKeyword("RANGE") || tokenizer.parseKeyword("range"))
+            if (parser.parseKeyword("RANGE") || parser.parseKeyword("range"))
             {
                 compileRange();
             }
@@ -217,7 +218,7 @@ public class JDOQLSingleStringParser
                 query.setResult(content);
             }*/
 
-            String content = tokenizer.parseContent(true);
+            String content = parser.parseContent(true);
             if (content.length() > 0)
             {
                 if (content.indexOf("SELECT ") > 0 || content.indexOf("select ") > 0)
@@ -235,7 +236,7 @@ public class JDOQLSingleStringParser
 
         private void compileUpdate()
         {
-            String content = tokenizer.parseContent(false);
+            String content = parser.parseContent(false);
             if (content.length() == 0)
             {
                 // No UPDATE clause
@@ -244,9 +245,9 @@ public class JDOQLSingleStringParser
             query.setFrom(content);
             query.setCandidateClassName(content);
 
-            if (tokenizer.parseKeyword("set") || tokenizer.parseKeyword("SET"))
+            if (parser.parseKeyword("set") || parser.parseKeyword("SET"))
             {
-                content = tokenizer.parseContent(false);
+                content = parser.parseContent(false);
                 query.setUpdate(content.trim());
             }
             else
@@ -258,7 +259,7 @@ public class JDOQLSingleStringParser
 
         private void compileInto()
         {
-            String content = tokenizer.parseContent(false);
+            String content = parser.parseContent(false);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -271,7 +272,7 @@ public class JDOQLSingleStringParser
 
         private void compileFrom()
         {
-            String content = tokenizer.parseContent(false);
+            String content = parser.parseContent(false);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -289,13 +290,13 @@ public class JDOQLSingleStringParser
                 query.setCandidateClassName(content);
             }
 
-            if (tokenizer.parseKeyword("EXCLUDE") || tokenizer.parseKeyword("exclude"))
+            if (parser.parseKeyword("EXCLUDE") || parser.parseKeyword("exclude"))
             {
-                if (!tokenizer.parseKeyword("SUBCLASSES") && !tokenizer.parseKeyword("subclasses"))
+                if (!parser.parseKeyword("SUBCLASSES") && !parser.parseKeyword("subclasses"))
                 {
                     throw new NucleusUserException(Localiser.msg("042015", "SUBCLASSES", "EXCLUDE"));
                 }
-                content = tokenizer.parseContent(false);
+                content = parser.parseContent(false);
                 if (content.length() > 0)
                 {
                     throw new NucleusUserException(Localiser.msg("042013", "EXCLUDE SUBCLASSES", content));
@@ -306,7 +307,7 @@ public class JDOQLSingleStringParser
 
         private void compileWhere()
         {
-            String content = tokenizer.parseContent(true);
+            String content = parser.parseContent(true);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -421,7 +422,7 @@ public class JDOQLSingleStringParser
 
         private void compileVariables()
         {
-            String content = tokenizer.parseContent(false);
+            String content = parser.parseContent(false);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -432,7 +433,7 @@ public class JDOQLSingleStringParser
 
         private void compileParameters()
         {
-            String content = tokenizer.parseContent(false);
+            String content = parser.parseContent(false);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -443,24 +444,24 @@ public class JDOQLSingleStringParser
 
         private void compileImport()
         {
-            StringBuilder content = new StringBuilder("import " + tokenizer.parseContent(false));
-            while (tokenizer.parseKeyword("import"))
+            StringBuilder content = new StringBuilder("import " + parser.parseContent(false));
+            while (parser.parseKeyword("import"))
             {
-                content.append("import ").append(tokenizer.parseContent(false));
+                content.append("import ").append(parser.parseContent(false));
             }
             query.declareImports(content.toString());
         }
 
         private void compileGroup()
         {
-            String content = tokenizer.parseContent(false);
-            if (!tokenizer.parseKeyword("BY") && !tokenizer.parseKeyword("by"))
+            String content = parser.parseContent(false);
+            if (!parser.parseKeyword("BY") && !parser.parseKeyword("by"))
             {
                 // GROUP must be followed by BY
                 throw new NucleusUserException(Localiser.msg("042015", "BY", "GROUP"));
             }
 
-            content = tokenizer.parseContent(false);
+            content = parser.parseContent(false);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -471,14 +472,14 @@ public class JDOQLSingleStringParser
 
         private void compileOrder()
         {
-            String content = tokenizer.parseContent(false);
-            if (!tokenizer.parseKeyword("BY") && !tokenizer.parseKeyword("by"))
+            String content = parser.parseContent(false);
+            if (!parser.parseKeyword("BY") && !parser.parseKeyword("by"))
             {
                 // ORDER must be followed by BY
                 throw new NucleusUserException(Localiser.msg("042015", "BY", "ORDER"));
             }
 
-            content = tokenizer.parseContent(false);
+            content = parser.parseContent(false);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -489,7 +490,7 @@ public class JDOQLSingleStringParser
 
         private void compileRange()
         {
-            String content = tokenizer.parseContent(false);
+            String content = parser.parseContent(false);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -525,20 +526,58 @@ public class JDOQLSingleStringParser
          */
         public Parser(String str, boolean extended)
         {
-            this.queryString = str;
+            this.queryString = str.replace('\n', ' ');
             this.extended = extended;
 
-            StringTokenizer tokenizer = new StringTokenizer(str);
-            tokens = new String[tokenizer.countTokens()];
-            keywords = new String[tokenizer.countTokens()];
-            int i = 0;
-            while (tokenizer.hasMoreTokens())
+            // Parse into tokens, taking care to keep any String literals together
+            List<String> tokenList = new ArrayList();
+            boolean withinSingleQuote = false;
+            boolean withinDoubleQuote = false;
+            StringBuilder currentToken = new StringBuilder();
+            for (int i=0;i<queryString.length();i++)
             {
-                tokens[i] = tokenizer.nextToken();
-                if ((extended && JDOQLQueryHelper.isKeywordExtended(tokens[i])) ||
-                    (!extended && JDOQLQueryHelper.isKeyword(tokens[i])))
+                char chr = queryString.charAt(i);
+                if (chr == '"')
                 {
-                    keywords[i] = tokens[i];
+                    withinDoubleQuote = !withinDoubleQuote;
+                    currentToken.append(chr);
+                }
+                else if (chr == '\'')
+                {
+                    withinSingleQuote = !withinSingleQuote;
+                    currentToken.append(chr);
+                }
+                else if (chr == ' ')
+                {
+                    if (!withinDoubleQuote && !withinSingleQuote)
+                    {
+                        tokenList.add(currentToken.toString().trim());
+                        currentToken = new StringBuilder();
+                    }
+                    else
+                    {
+                        currentToken.append(chr);
+                    }
+                }
+                else
+                {
+                    currentToken.append(chr);
+                }
+            }
+            if (currentToken.length() > 0)
+            {
+                tokenList.add(currentToken.toString());
+            }
+
+            tokens = new String[tokenList.size()];
+            keywords = new String[tokenList.size()];
+            int i = 0;
+            for (String token : tokenList)
+            {
+                tokens[i] = token;
+                if ((extended && JDOQLQueryHelper.isKeywordExtended(token)) || (!extended && JDOQLQueryHelper.isKeyword(token)))
+                {
+                    keywords[i] = token;
                 }
                 i++;
             }

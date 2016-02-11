@@ -18,7 +18,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.query;
 
-import java.util.StringTokenizer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.datanucleus.ClassConstants;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -100,12 +101,12 @@ public class JPQLSingleStringParser
      */
     private class Compiler
     {
-        Parser tokenizer;
+        Parser parser;
         int subqueryNum = 1;
         
         Compiler(Parser tokenizer)
         {
-            this.tokenizer = tokenizer;
+            this.parser = tokenizer;
         }
 
         private void compile()
@@ -113,7 +114,7 @@ public class JPQLSingleStringParser
             compileQuery();
 
             // any keyword after compiling the SELECT is an error
-            String keyword = tokenizer.parseKeyword();
+            String keyword = parser.parseKeyword();
             if (keyword != null)
             {
                 if (JPQLQueryHelper.isKeyword(keyword))
@@ -128,16 +129,16 @@ public class JPQLSingleStringParser
         {
             boolean update = false;
             boolean delete = false;
-            if (tokenizer.parseKeywordIgnoreCase("SELECT"))
+            if (parser.parseKeywordIgnoreCase("SELECT"))
             {
                 // Do nothing
             }
-            else if (tokenizer.parseKeywordIgnoreCase("UPDATE"))
+            else if (parser.parseKeywordIgnoreCase("UPDATE"))
             {
                 update = true;
                 query.setType(Query.BULK_UPDATE);
             }
-            else if (tokenizer.parseKeywordIgnoreCase("DELETE"))
+            else if (parser.parseKeywordIgnoreCase("DELETE"))
             {
                 delete = true;
                 query.setType(Query.BULK_DELETE);
@@ -149,50 +150,58 @@ public class JPQLSingleStringParser
 
             if (update)
             {
+                // UPDATE {entity [AS alias]} SET x1 = val1, x2 = val2, ...
                 compileUpdate();
-            }
-            else if (!delete)
-            {
-                compileResult();
-            }
 
-            if (tokenizer.parseKeywordIgnoreCase("FROM"))
-            {
-                compileFrom();
-            }
-            if (tokenizer.parseKeywordIgnoreCase("WHERE"))
-            {
-                compileWhere();
-            }
-            if (tokenizer.parseKeywordIgnoreCase("GROUP BY"))
-            {
-                if (update || delete)
+                if (parser.parseKeywordIgnoreCase("WHERE"))
                 {
-                    throw new NucleusUserException(Localiser.msg("043007"));
+                    compileWhere();
                 }
-                compileGroup();
             }
-            if (tokenizer.parseKeywordIgnoreCase("HAVING"))
+            else if (delete)
             {
-                if (update || delete)
+                // DELETE FROM {entity [AS alias]}
+                if (parser.parseKeywordIgnoreCase("FROM"))
                 {
-                    throw new NucleusUserException(Localiser.msg("043008"));
+                    compileFrom();
                 }
-                compileHaving();
+
+                if (parser.parseKeywordIgnoreCase("WHERE"))
+                {
+                    compileWhere();
+                }
             }
-            if (tokenizer.parseKeywordIgnoreCase("ORDER BY"))
+            else
             {
-                if (update || delete)
+                // SELECT a, b, c FROM ... WHERE ... GROUP BY ... HAVING ... ORDER BY ...
+                compileResult();
+
+                if (parser.parseKeywordIgnoreCase("FROM"))
                 {
-                    throw new NucleusUserException(Localiser.msg("043009"));
+                    compileFrom();
                 }
-                compileOrder();
+                if (parser.parseKeywordIgnoreCase("WHERE"))
+                {
+                    compileWhere();
+                }
+                if (parser.parseKeywordIgnoreCase("GROUP BY"))
+                {
+                    compileGroup();
+                }
+                if (parser.parseKeywordIgnoreCase("HAVING"))
+                {
+                    compileHaving();
+                }
+                if (parser.parseKeywordIgnoreCase("ORDER BY"))
+                {
+                    compileOrder();
+                }
             }
         }
 
         private void compileResult()
         {
-            String content = tokenizer.parseContent(null, true);
+            String content = parser.parseContent(null, true);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -213,7 +222,7 @@ public class JPQLSingleStringParser
 
         private void compileUpdate()
         {
-            String content = tokenizer.parseContent(null, false);
+            String content = parser.parseContent(null, false);
             if (content.length() == 0)
             {
                 // No UPDATE clause
@@ -233,7 +242,7 @@ public class JPQLSingleStringParser
 
         private void compileFrom()
         {
-            String content = tokenizer.parseContent(null, false);
+            String content = parser.parseContent(null, false);
             if (content.length() > 0)
             {
                 //content may be empty
@@ -244,7 +253,7 @@ public class JPQLSingleStringParser
         private void compileWhere()
         {
             // "TRIM" may include "FROM" keyword so ignore subsequent FROMs
-            String content = tokenizer.parseContent("FROM", true);
+            String content = parser.parseContent("FROM", true);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -265,7 +274,7 @@ public class JPQLSingleStringParser
 
         private void compileGroup()
         {
-            String content = tokenizer.parseContent(null, false);
+            String content = parser.parseContent(null, false);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -277,7 +286,7 @@ public class JPQLSingleStringParser
         private void compileHaving()
         {
             // "TRIM" may include "FROM" keyword so ignore subsequent FROMs
-            String content = tokenizer.parseContent("FROM", true);
+            String content = parser.parseContent("FROM", true);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -298,7 +307,7 @@ public class JPQLSingleStringParser
 
         private void compileOrder()
         {
-            String content = tokenizer.parseContent(null, false);
+            String content = parser.parseContent(null, false);
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -424,16 +433,56 @@ public class JPQLSingleStringParser
          */
         public Parser(String str)
         {
-            queryString = str;
+            queryString = str.replace('\n', ' ');
 
-            StringTokenizer tokenizer = new StringTokenizer(str);
-            tokens = new String[tokenizer.countTokens()];
-            keywords = new String[tokenizer.countTokens()];
-            int i = 0;
-            while (tokenizer.hasMoreTokens())
+            // Parse into tokens, taking care to keep any String literals together
+            List<String> tokenList = new ArrayList();
+            boolean withinSingleQuote = false;
+            boolean withinDoubleQuote = false;
+            StringBuilder currentToken = new StringBuilder();
+            for (int i=0;i<queryString.length();i++)
             {
-                tokens[i++] = tokenizer.nextToken();
+                char chr = queryString.charAt(i);
+                if (chr == '"')
+                {
+                    withinDoubleQuote = !withinDoubleQuote;
+                    currentToken.append(chr);
+                }
+                else if (chr == '\'')
+                {
+                    withinSingleQuote = !withinSingleQuote;
+                    currentToken.append(chr);
+                }
+                else if (chr == ' ')
+                {
+                    if (!withinDoubleQuote && !withinSingleQuote)
+                    {
+                        tokenList.add(currentToken.toString().trim());
+                        currentToken = new StringBuilder();
+                    }
+                    else
+                    {
+                        currentToken.append(chr);
+                    }
+                }
+                else
+                {
+                    currentToken.append(chr);
+                }
             }
+            if (currentToken.length() > 0)
+            {
+                tokenList.add(currentToken.toString());
+            }
+
+            tokens = new String[tokenList.size()];
+            int i = 0;
+            for (String token : tokenList)
+            {
+                tokens[i++] = token;
+            }
+
+            keywords = new String[tokenList.size()];
             for (i = 0; i < tokens.length; i++)
             {
                 if (JPQLQueryHelper.isKeyword(tokens[i]))
