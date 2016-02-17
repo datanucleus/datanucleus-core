@@ -4956,7 +4956,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     /**
      * Method to put the passed objects into the L2 cache.
-     * Performs the "put" in batches
+     * Performs the "put" in batches.
      * @param ops The ObjectProviders whose objects are to be cached
      */
     protected void putObjectsIntoLevel2Cache(Set<ObjectProvider> ops)
@@ -4967,6 +4967,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         for (ObjectProvider op : ops)
         {
             Object id = op.getInternalObjectId();
+            if (id == null || !nucCtx.isClassCacheable(op.getClassMetaData()))
+            {
+                continue;
+            }
+
             CachedPC currentCachedPC = l2Cache.get(id);
             CachedPC cachedPC = getL2CacheableObject(op, currentCachedPC);
             if (cachedPC != null && id != null && !(id instanceof IdentityReference))
