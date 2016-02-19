@@ -100,13 +100,18 @@ public class QueryUtils
             className.equals(ClassNameConstants.JAVA_LANG_LONG) ||
             className.equals(ClassNameConstants.JAVA_LANG_SHORT) ||
             className.equals(ClassNameConstants.JAVA_LANG_STRING) ||
-            className.equals(BigDecimal.class.getName()) ||
-            className.equals(BigInteger.class.getName()) ||
-            className.equals(java.util.Date.class.getName()) ||
-            className.equals(java.sql.Date.class.getName()) ||
-            className.equals(java.sql.Time.class.getName()) ||
-            className.equals(java.sql.Timestamp.class.getName()) ||
-            className.equals(ClassNameConstants.Object))
+            className.equals(ClassNameConstants.JAVA_MATH_BIGDECIMAL) ||
+            className.equals(ClassNameConstants.JAVA_MATH_BIGINTEGER) ||
+            className.equals(ClassNameConstants.JAVA_UTIL_DATE) ||
+            className.equals(ClassNameConstants.JAVA_SQL_DATE) ||
+            className.equals(ClassNameConstants.JAVA_SQL_TIME) ||
+            className.equals(ClassNameConstants.JAVA_SQL_TIMESTAMP) ||
+            className.equals(ClassNameConstants.Object) ||
+            className.equals("java.net.URL") || 
+            className.equals("java.net.URI") ||
+            className.equals("java.util.Calendar") ||
+            className.equals("java.util.Currency") ||
+            className.equals("java.util.UUID"))
         {
             return true;
         }
