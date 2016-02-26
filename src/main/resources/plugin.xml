@@ -136,7 +136,7 @@ Contributors:
 
         <!-- "java.awt" types -->
         <java-type name="java.awt.image.BufferedImage" embedded="true"/>
-        <java-type name="java.awt.Color" embedded="true" converter-name="dn.color-string"/>
+        <java-type name="java.awt.Color" dfg="true" embedded="true" converter-name="dn.color-string"/>
 
         <!-- "java.math" types -->
         <java-type name="java.math.BigDecimal" dfg="true" embedded="true"/>
