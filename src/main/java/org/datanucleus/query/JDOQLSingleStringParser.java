@@ -24,6 +24,7 @@ import java.util.List;
 import org.datanucleus.ClassConstants;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.query.Query;
+import org.datanucleus.store.query.Query.QueryType;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -131,12 +132,12 @@ public class JDOQLSingleStringParser
             if (allowUpdate && (parser.parseKeyword("UPDATE") || parser.parseKeyword("update")))
             {
                 update = true;
-                query.setType(Query.BULK_UPDATE);
+                query.setType(QueryType.BULK_UPDATE);
             }
             else if (allowDelete && (parser.parseKeyword("DELETE") || parser.parseKeyword("delete")))
             {
                 delete = true;
-                query.setType(Query.BULK_DELETE);
+                query.setType(QueryType.BULK_DELETE);
             }
             else if (parser.parseKeyword("SELECT") || parser.parseKeyword("select"))
             {

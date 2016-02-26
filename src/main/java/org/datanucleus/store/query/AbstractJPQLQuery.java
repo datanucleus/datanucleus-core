@@ -182,18 +182,18 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
         }
 
         StringBuilder str = new StringBuilder();
-        if (type == BULK_INSERT)
+        if (type == QueryType.BULK_INSERT)
         {
             str.append("INSERT INTO ").append(from);
             str.append(" (").append(insertFields).append(") ");
             str.append(insertSelectQuery);
         }
-        else if (type == BULK_UPDATE)
+        else if (type == QueryType.BULK_UPDATE)
         {
             str.append("UPDATE ").append(from).append(" SET ").append(update).append(' ');
             str.append("WHERE ").append(dereferenceFilter(filter));
         }
-        else if (type == BULK_DELETE)
+        else if (type == QueryType.BULK_DELETE)
         {
             str.append("DELETE FROM ").append(from).append(' ');
             str.append("WHERE ").append(dereferenceFilter(filter));
@@ -276,7 +276,7 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
             NucleusLogger.QUERY.debug(Localiser.msg("021044", getLanguage(), getSingleStringQuery()));
         }
         String from = this.from;
-        if (type == BULK_INSERT)
+        if (type == QueryType.BULK_INSERT)
         {
             // Append artificial alias so the compilation passes
             from += " this";

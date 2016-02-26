@@ -230,11 +230,11 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
         }
 
         StringBuilder str = new StringBuilder();
-        if (type == BULK_UPDATE)
+        if (type == QueryType.BULK_UPDATE)
         {
             str.append("UPDATE " + from + " SET " + update + " ");
         }
-        else if (type == BULK_DELETE)
+        else if (type == QueryType.BULK_DELETE)
         {
             str.append("DELETE ");
         }

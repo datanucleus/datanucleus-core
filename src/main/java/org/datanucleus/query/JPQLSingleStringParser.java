@@ -24,6 +24,7 @@ import java.util.List;
 import org.datanucleus.ClassConstants;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.query.Query;
+import org.datanucleus.store.query.Query.QueryType;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -137,17 +138,17 @@ public class JPQLSingleStringParser
             else if (parser.parseKeywordIgnoreCase("INSERT"))
             {
                 insert = true;
-                query.setType(Query.BULK_INSERT);
+                query.setType(QueryType.BULK_INSERT);
             }
             else if (parser.parseKeywordIgnoreCase("UPDATE"))
             {
                 update = true;
-                query.setType(Query.BULK_UPDATE);
+                query.setType(QueryType.BULK_UPDATE);
             }
             else if (parser.parseKeywordIgnoreCase("DELETE"))
             {
                 delete = true;
-                query.setType(Query.BULK_DELETE);
+                query.setType(QueryType.BULK_DELETE);
             }
             else
             {

@@ -96,14 +96,17 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
 
     protected final transient ClassLoaderResolver clr;
 
-    public static final short SELECT = 0;
-    public static final short BULK_UPDATE = 1;
-    public static final short BULK_DELETE = 2;
-    public static final short OTHER = 3;
-    public static final short BULK_INSERT = 4;
+    public enum QueryType
+    {
+        SELECT,
+        BULK_UPDATE,
+        BULK_DELETE,
+        BULK_INSERT,
+        OTHER
+    }
 
     /** Type of query. */
-    protected short type = SELECT;
+    protected QueryType type = QueryType.SELECT;
 
     /** The candidate class for this query. */
     protected Class<T> candidateClass;
@@ -505,7 +508,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      * Accessor for the query type.
      * @return The query type
      */
-    public short getType()
+    public QueryType getType()
     {
         return type;
     }
@@ -514,16 +517,9 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      * Mutator to set the query type.
      * @param type The query type
      */
-    public void setType(short type)
+    public void setType(QueryType type)
     {
-        if (type == SELECT || type == BULK_UPDATE || type == BULK_DELETE || type == BULK_INSERT)
-        {
-            this.type = type;
-        }
-        else
-        {
-            throw new NucleusUserException("Query only supports types of SELECT, BULK_UPDATE, BULK_DELETE : unknown value " + type);
-        }
+        this.type = type;
     }
 
     /**
@@ -1926,12 +1922,12 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
                 Object result = performExecute(inputParameters);
 
                 // Process the results
-                if (type == BULK_DELETE || type == BULK_UPDATE || type == BULK_INSERT)
+                if (type == QueryType.BULK_DELETE || type == QueryType.BULK_UPDATE || type == QueryType.BULK_INSERT)
                 {
                     // Bulk update/delete return a Long
                     return result;
                 }
-                else if (type == SELECT)
+                else if (type == QueryType.SELECT)
                 {
                     // Select, so return the range of objects
                     Collection qr = (Collection)result;
@@ -2365,7 +2361,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     protected boolean useFetchPlan()
     {
         boolean useFetchPlan = getBooleanExtensionProperty(EXTENSION_USE_FETCH_PLAN, true);
-        if (type == BULK_UPDATE || type == BULK_DELETE || type == BULK_INSERT)
+        if (type == QueryType.BULK_UPDATE || type == QueryType.BULK_DELETE || type == QueryType.BULK_INSERT)
         {
             // Don't want anything selecting apart from the PK fields when doing updates/deletes
             useFetchPlan = false;
