@@ -26,6 +26,10 @@ import org.datanucleus.store.types.converters.TypeConverter;
  */
 public interface MemberColumnMapping
 {
+    /**
+     * Accessor for the metadata for this member.
+     * @return Metadata for the member.
+     */
     AbstractMemberMetaData getMemberMetaData();
 
     /**
@@ -48,7 +52,15 @@ public interface MemberColumnMapping
      */
     int getNumberOfColumns();
 
+    /**
+     * Method to set the TypeConverter used by this member-column.
+     * @param typeConv The TypeConverter to use
+     */
     void setTypeConverter(TypeConverter typeConv);
 
+    /**
+     * Accessor for the TypeConverter to use for this member-column (if any).
+     * @return The TypeConverter
+     */
     TypeConverter getTypeConverter();
 }
