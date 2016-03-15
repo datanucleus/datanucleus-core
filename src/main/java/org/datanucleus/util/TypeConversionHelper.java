@@ -935,13 +935,29 @@ public class TypeConversionHelper
             {
                 return new BigInteger(value.toString());
             }
-            else if (type == Timestamp.class)
+            else if (type == java.sql.Timestamp.class)
             {
                 if (value instanceof Date)
                 {
-                    return new Timestamp(((Date)value).getTime());
+                    return new java.sql.Timestamp(((Date)value).getTime());
                 }
-                return Timestamp.valueOf(value.toString());
+                return java.sql.Timestamp.valueOf(value.toString());
+            }
+            else if (type == java.sql.Date.class)
+            {
+                if (value instanceof Date)
+                {
+                    return new java.sql.Date(((Date)value).getTime());
+                }
+                return java.sql.Date.valueOf(value.toString());
+            }
+            else if (type == java.sql.Time.class)
+            {
+                if (value instanceof Date)
+                {
+                    return new java.sql.Time(((Date)value).getTime());
+                }
+                return java.sql.Time.valueOf(value.toString());
             }
             else if (type == String.class)
             {
