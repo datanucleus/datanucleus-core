@@ -44,6 +44,7 @@ public class OptionalGetMethod implements InvocationEvaluator
             throw new NucleusException(Localiser.msg("021011", method, invokedValue.getClass().getName()));
         }
 
-        return ((Optional)invokedValue).get();
+        Optional opt = (Optional)invokedValue;
+        return opt.isPresent() ? opt.get() : null;
     }
 }
