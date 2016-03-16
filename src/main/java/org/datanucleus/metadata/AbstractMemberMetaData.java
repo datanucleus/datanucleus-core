@@ -816,6 +816,12 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             }
         }
 
+        if (serialized == Boolean.TRUE && hasExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME))
+        {
+            NucleusLogger.METADATA.warn(Localiser.msg("044127", getClassName(), getName(), getValueForExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME)));
+            serialized = Boolean.FALSE;
+        }
+
         setPopulated();
     }
 
