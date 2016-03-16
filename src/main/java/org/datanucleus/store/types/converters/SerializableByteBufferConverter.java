@@ -45,6 +45,7 @@ public class SerializableByteBufferConverter implements TypeConverter<Serializab
         {
             return null;
         }
+
         byte[] bytes = null;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = null;
@@ -76,9 +77,7 @@ public class SerializableByteBufferConverter implements TypeConverter<Serializab
             throw new NucleusException("Error serialising object of type " + memberValue.getClass().getName() + " to ByteBuffer", ioe);
         }
 
-        ByteBuffer byteBuffer = ByteBuffer.allocate(bytes.length);
-        byteBuffer.put(bytes);
-        return byteBuffer;
+        return ByteBuffer.wrap(bytes);
     }
 
     /* (non-Javadoc)
@@ -86,12 +85,15 @@ public class SerializableByteBufferConverter implements TypeConverter<Serializab
      */
     public Serializable toMemberType(ByteBuffer datastoreValue)
     {
-        if (datastoreValue == null)
+        if (datastoreValue == null || datastoreValue.limit() == 0)
         {
             return null;
         }
+
         Serializable obj = null;
-        ByteArrayInputStream bais = new ByteArrayInputStream(datastoreValue.array());
+        byte [] dataStoreValueInBytes = new byte[datastoreValue.remaining()];
+        datastoreValue.get(dataStoreValueInBytes);
+        ByteArrayInputStream bais = new ByteArrayInputStream(dataStoreValueInBytes);
         ObjectInputStream ois = null;
         try
         {
@@ -121,5 +123,4 @@ public class SerializableByteBufferConverter implements TypeConverter<Serializab
         }
         return obj;
     }
-
 }

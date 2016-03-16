@@ -37,8 +37,7 @@ public class ByteArrayByteBufferConverter implements TypeConverter<byte[], ByteB
             return null;
         }
 
-        ByteBuffer byteBuffer = ByteBuffer.wrap(memberValue);
-        return byteBuffer;
+        return ByteBuffer.wrap(memberValue);
     }
 
     /* (non-Javadoc)
