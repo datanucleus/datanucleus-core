@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.api.ApiAdapterFactory;
@@ -59,7 +60,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
     protected final String classLoaderResolverClassName;
 
     /** Map of the ClassLoaderResolver, keyed by the clr class and the primaryLoader name. */
-    protected transient Map<String, ClassLoaderResolver> classLoaderResolverMap = new HashMap<String, ClassLoaderResolver>();
+    protected transient Map<String, ClassLoaderResolver> classLoaderResolverMap = new ConcurrentHashMap<String, ClassLoaderResolver>();
 
     public static final Set<String> STARTUP_PROPERTIES = new HashSet<String>();
 

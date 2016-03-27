@@ -28,6 +28,7 @@ import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
@@ -74,6 +75,8 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
     /** Hash code cache for performance improvement */
     protected int userRegisteredLoaderHashCode = 0;
 
+    protected Map<String, Class> jreClasses = new ConcurrentHashMap<String, Class>();
+
     /** Cache for loaded classes */
     protected Map<String, Class> loadedClasses = Collections.synchronizedMap(new WeakValueMap());
 
@@ -97,6 +100,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
         {
             contextLoaderHashCode = contextLoader.hashCode();
         }
+        loadJreClasses();
     }
 
     /**
@@ -106,13 +110,44 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
     public ClassLoaderResolverImpl()
     {
         contextLoader = null;
+        loadJreClasses();
+    }
+
+    protected void loadJreClasses()
+    {
+        jreClasses.put(ClassNameConstants.BOOLEAN, ClassConstants.BOOLEAN);
+        jreClasses.put(ClassNameConstants.BYTE, ClassConstants.BYTE);
+        jreClasses.put(ClassNameConstants.CHAR, ClassConstants.CHAR);
+        jreClasses.put(ClassNameConstants.DOUBLE, ClassConstants.DOUBLE);
+        jreClasses.put(ClassNameConstants.FLOAT, ClassConstants.FLOAT);
+        jreClasses.put(ClassNameConstants.INT, ClassConstants.INT);
+        jreClasses.put(ClassNameConstants.LONG, ClassConstants.LONG);
+        jreClasses.put(ClassNameConstants.SHORT, ClassConstants.SHORT);
+        jreClasses.put(ClassNameConstants.JAVA_LANG_BOOLEAN, ClassConstants.JAVA_LANG_BOOLEAN);
+        jreClasses.put(ClassNameConstants.JAVA_LANG_BYTE, ClassConstants.JAVA_LANG_BYTE);
+        jreClasses.put(ClassNameConstants.JAVA_LANG_CHARACTER, ClassConstants.JAVA_LANG_CHARACTER);
+        jreClasses.put(ClassNameConstants.JAVA_LANG_DOUBLE, ClassConstants.JAVA_LANG_DOUBLE);
+        jreClasses.put(ClassNameConstants.JAVA_LANG_FLOAT, ClassConstants.JAVA_LANG_FLOAT);
+        jreClasses.put(ClassNameConstants.JAVA_LANG_INTEGER, ClassConstants.JAVA_LANG_INTEGER);
+        jreClasses.put(ClassNameConstants.JAVA_LANG_LONG, ClassConstants.JAVA_LANG_LONG);
+        jreClasses.put(ClassNameConstants.JAVA_LANG_SHORT, ClassConstants.JAVA_LANG_SHORT);
+        jreClasses.put(ClassNameConstants.JAVA_LANG_STRING, ClassConstants.JAVA_LANG_STRING);
+        jreClasses.put(ClassNameConstants.JAVA_MATH_BIGDECIMAL, ClassConstants.JAVA_MATH_BIGDECIMAL);
+        jreClasses.put(ClassNameConstants.JAVA_MATH_BIGINTEGER, ClassConstants.JAVA_MATH_BIGINTEGER);
+        jreClasses.put(ClassNameConstants.JAVA_UTIL_DATE, ClassConstants.JAVA_UTIL_DATE);
+        jreClasses.put(ClassNameConstants.JAVA_SQL_DATE, ClassConstants.JAVA_SQL_DATE);
+        jreClasses.put(ClassNameConstants.JAVA_SQL_TIME, ClassConstants.JAVA_SQL_TIME);
+        jreClasses.put(ClassNameConstants.JAVA_SQL_TIMESTAMP, ClassConstants.JAVA_SQL_TIMESTAMP);
+        jreClasses.put(ClassNameConstants.JAVA_TIME_LOCALDATE, ClassConstants.JAVA_TIME_LOCALDATE);
+        jreClasses.put(ClassNameConstants.JAVA_TIME_LOCALTIME, ClassConstants.JAVA_TIME_LOCALTIME);
+        jreClasses.put(ClassNameConstants.JAVA_TIME_LOCALDATETIME, ClassConstants.JAVA_TIME_LOCALDATETIME);
+        jreClasses.put(ClassNameConstants.JAVA_IO_SERIALIZABLE, ClassConstants.JAVA_IO_SERIALIZABLE);
     }
 
     /**
      * JDO's Class Loading mechanism (Spec 1.0.1 Chapter 12.5).
-     * Try 3 loaders, starting with user-supplied loader, then try
-     * the current thread's loader, and finally try the PM context
-     * loader. This method does not initialize the class
+     * Try 3 loaders, starting with user-supplied loader, then try the current thread's loader, and finally try the PM context loader. 
+     * This method does not initialize the class itself.
      * @param name Name of the Class to be loaded
      * @param primary primary ClassLoader to use (or null)
      * @return The class given the name, using the required loader.
@@ -126,48 +161,19 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
             String msg = Localiser.msg("001000");
             throw new ClassNotResolvedException(msg);
         }
-        if (name.equals(ClassNameConstants.BYTE))
+
+        // Try JRE classes
+        Class cls = jreClasses.get(name);
+        if (cls != null)
         {
-            return byte.class;
-        }
-        else if (name.equals(ClassNameConstants.CHAR))
-        {
-            return char.class;
-        }
-        else if (name.equals(ClassNameConstants.INT))
-        {
-            return int.class;
-        }
-        else if (name.equals(ClassNameConstants.LONG))
-        {
-            return long.class;
-        }
-        else if (name.equals(ClassNameConstants.DOUBLE))
-        {
-            return double.class;
-        }
-        else if (name.equals(ClassNameConstants.FLOAT))
-        {
-            return float.class;
-        }
-        else if (name.equals(ClassNameConstants.SHORT))
-        {
-            return short.class;
-        }
-        else if (name.equals(ClassNameConstants.BOOLEAN))
-        {
-            return boolean.class;
-        }
-        else if (name.equals(ClassNameConstants.JAVA_LANG_STRING))
-        {
-            return String.class;
+            return cls;
         }
 
         ClassLoader threadClassLoader = Thread.currentThread().getContextClassLoader();
         String cacheKey = newCacheKey(name, primary, threadClassLoader);
 
         //lookup in loaded and unloaded classes cache
-        Class cls = loadedClasses.get(cacheKey);
+        cls = loadedClasses.get(cacheKey);
         if (cls != null)
         {
             return cls;
@@ -221,8 +227,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
 
     /**
      * JDO's Class Loading mechanism (Spec 1.0.1 Chapter 12.5).
-     * Try 3 loaders, starting with user-supplied loader, then try
-     * the current thread's loader, and finally try the PM context loader.
+     * Try 3 loaders, starting with user-supplied loader, then try the current thread's loader, and finally try the PM context loader.
      * @param name Name of the Class to be loaded
      * @param primary primary ClassLoader to use (or null)
      * @return The class given the name, using the required loader.
@@ -235,49 +240,19 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
             // Avoid the NPE and just throw a "not resolved"
             throw new ClassNotResolvedException(Localiser.msg("001000"));
         }
-        if (name.equals(ClassNameConstants.BYTE))
+
+        // Try JRE classes
+        Class cls = jreClasses.get(name);
+        if (cls != null)
         {
-            return byte.class;
-        }
-        else if (name.equals(ClassNameConstants.CHAR))
-        {
-            return char.class;
-        }
-        else if (name.equals(ClassNameConstants.INT))
-        {
-            return int.class;
-        }
-        else if (name.equals(ClassNameConstants.LONG))
-        {
-            return long.class;
-        }
-        else if (name.equals(ClassNameConstants.DOUBLE))
-        {
-            return double.class;
-        }
-        else if (name.equals(ClassNameConstants.FLOAT))
-        {
-            return float.class;
-        }
-        else if (name.equals(ClassNameConstants.SHORT))
-        {
-            return short.class;
-        }
-        else if (name.equals(ClassNameConstants.BOOLEAN))
-        {
-            return boolean.class;
-        }
-        else if (name.equals(ClassNameConstants.JAVA_LANG_STRING))
-        {
-            return String.class;
+            return cls;
         }
 
         ClassLoader threadClassLoader = Thread.currentThread().getContextClassLoader();
         String cacheKey = newCacheKey(name, primary, threadClassLoader);
 
         //only lookup in loaded classes cache
-        Class cls = loadedClasses.get(cacheKey);
-
+        cls = loadedClasses.get(cacheKey);
         if (cls != null)
         {
             return cls;
@@ -346,7 +321,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
     }
 
     /**
-     * JDO's Class Loading mechanism (Spec 1.0.1 Chapter 12.5)
+     * JDO's Class Loading mechanism (Spec 1.0.1 Chapter 12.5).
      * @param name Name of the Class to be loaded
      * @param primary the primary ClassLoader to use (or null)
      * @param initialize whether to initialize the class or not.
@@ -363,7 +338,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
     }
 
     /**
-     * JDO's Class Loading mechanism (Spec 1.0.1 Chapter 12.5). This method does not initialize the class
+     * JDO's Class Loading mechanism (Spec 1.0.1 Chapter 12.5). This method does not initialize the class itself.
      * @param name Name of the Class to be loaded
      * @return The class given the name, using the required loader.
      */
@@ -373,7 +348,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
     }
 
     /**
-     * JDO's Class Loading mechanism (Spec 1.0.1 Chapter 12.5)
+     * JDO's Class Loading mechanism (Spec 1.0.1 Chapter 12.5).
      * @param name Name of the Class to be loaded
      * @param initialize whether to initialize the class or not.
      * @return The Class given the name, using the specified ClassLoader
@@ -385,9 +360,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
     }
 
     /**
-     * Utility to check the assignability of 2 classes in accordance with JDO's
-     * Class Loading mechanism. This will check
-     * <I>class_1.isAssignableFrom(class_2);</I>
+     * Utility to check the assignability of 2 classes in accordance with JDO's Class Loading mechanism. This will check <I>class_1.isAssignableFrom(class_2);</I>
      * @param class_name_1 Name of first class
      * @param class_name_2 Name of second class
      * @return Whether Class 2 is assignable from Class 1
@@ -412,9 +385,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
     }
 
     /**
-     * Utility to check the assignability of 2 classes in accordance with JDO's
-     * Class Loading mechanism. This will check
-     * <I>class_1.isAssignableFrom(class_2);</I>
+     * Utility to check the assignability of 2 classes in accordance with JDO's Class Loading mechanism. This will check <I>class_1.isAssignableFrom(class_2);</I>
      * @param class_name_1 Name of first class
      * @param class_2 Second class
      * @return Whether Class 2 is assignable from Class 1
@@ -454,9 +425,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
     }
 
     /**
-     * Utility to check the assignability of 2 classes in accordance with JDO's
-     * Class Loading mechanism. This will check
-     * <I>class_1.isAssignableFrom(class_2);</I>
+     * Utility to check the assignability of 2 classes in accordance with JDO's Class Loading mechanism. This will check <I>class_1.isAssignableFrom(class_2);</I>
      * @param class_1 First class
      * @param class_name_2 Name of second class
      * @return Whether Class 2 is assignable from Class 1
@@ -561,9 +530,8 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
     }
 
     /**
-     * ClassLoader registered by users to load classes. One ClassLoader can
-     * be registered, and if one ClassLoader is already registered, the registered ClassLoader
-     * is replaced by <code>loader</code>.
+     * ClassLoader registered by users to load classes. 
+     * One ClassLoader can be registered, and if one ClassLoader is already registered, the registered ClassLoader is replaced by <code>loader</code>.
      * @param loader The ClassLoader in which classes are loaded
      */
     public void registerUserClassLoader(ClassLoader loader)
@@ -672,11 +640,9 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
 
     /**
      * Finds the resource with the given name.
-     * @param resourceName the path to resource name relative to the classloader root path. 
-     *     If <code>resourceName</code> starts with "/", remove it before searching.
+     * @param resourceName the path to resource name relative to the classloader root path. If <code>resourceName</code> starts with "/", remove it before searching.
      * @param primary the primary ClassLoader to use (or null)
-     * @return A URL object for reading the resource, or null if the resource could not be found or the invoker 
-     *     doesn't have adequate privileges to get the resource.
+     * @return A URL object for reading the resource, or null if the resource could not be found or the invoker doesn't have adequate privileges to get the resource.
      * @see ClassLoader#getResource(java.lang.String)
      */
     public URL getResource(final String resourceName, final ClassLoader primary)
@@ -784,9 +750,6 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
 
     public String toString()
     {
-        return "ClassLoaderResolver: primary=" + primary +
-            " contextLoader=" + contextLoader +
-            " runtimeLoader=" + runtimeLoader + 
-            " registeredLoader=" + userRegisteredLoader;
+        return "ClassLoaderResolver: primary=" + primary + " contextLoader=" + contextLoader + " runtimeLoader=" + runtimeLoader + " registeredLoader=" + userRegisteredLoader;
     }
 }
