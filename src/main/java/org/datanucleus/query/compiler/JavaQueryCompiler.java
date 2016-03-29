@@ -284,7 +284,25 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                     Symbol joinedSym = (caseSensitiveAliases ? symtbl.getSymbol(joinedAlias) : symtbl.getSymbolIgnoreCase(joinedAlias));
                     if (joinedSym == null)
                     {
-                        throw new QueryCompilerSyntaxException("FROM clause has identifier " + joinedNode.getNodeValue() + " but this is unknown");
+                        // DN Extension : Check for FROM clause including join to root
+                        if (childNode.hasNextChild())
+                        {
+                            Node next = childNode.getNextChild();
+                            joinedAlias = (String)next.getNodeValue();
+                            cls = resolveClass((String)joinedNode.getNodeValue());
+                            if (symtbl.getSymbol(joinedAlias) == null)
+                            {
+                                // Add symbol for this candidate under its alias
+                                symtbl.addSymbol(new PropertySymbol(joinedAlias, cls));
+                            }
+                            joinedSym = (caseSensitiveAliases ? symtbl.getSymbol(joinedAlias) : symtbl.getSymbolIgnoreCase(joinedAlias));
+                            NucleusLogger.QUERY.debug("Found suspected ROOT node joined to in FROM clause : attempting to process as alias=" + joinedAlias);
+                        }
+
+                        if (joinedSym == null)
+                        {
+                            throw new QueryCompilerSyntaxException("FROM clause has identifier " + joinedNode.getNodeValue() + " but this is unknown");
+                        }
                     }
 
                     AbstractClassMetaData joinedCmd = metaDataManager.getMetaDataForClass(joinedSym.getValueType(), clr);
