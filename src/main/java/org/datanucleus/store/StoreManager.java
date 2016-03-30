@@ -66,6 +66,7 @@ public interface StoreManager
     public static final String OPTION_APPLICATION_COMPOSITE_ID = "ApplicationCompositeId";
     public static final String OPTION_DATASTORE_ID = "DatastoreId";
     public static final String OPTION_NONDURABLE_ID = "NonDurableId";
+
     public static final String OPTION_ORM = "ORM";
     public static final String OPTION_ORM_EMBEDDED_PC = "ORM.EmbeddedPC";
     public static final String OPTION_ORM_EMBEDDED_COLLECTION = "ORM.EmbeddedCollection";
@@ -75,8 +76,13 @@ public interface StoreManager
     public static final String OPTION_ORM_EMBEDDED_COLLECTION_NESTED = "ORM.EmbeddedCollection.Nested"; // Whether the embedded element is storable nested like in JSON (default is in separate table)
     public static final String OPTION_ORM_EMBEDDED_MAP_NESTED = "ORM.EmbeddedMap.Nested"; // Whether the embedded element is storable nested like in JSON (default is in separate table)
     public static final String OPTION_ORM_EMBEDDED_ARRAY_NESTED = "ORM.EmbeddedArray.Nested"; // Whether the embedded key/value is storable nested like in JSON (default is in separate table)
+    public static final String OPTION_ORM_SERIALISED_COLLECTION_ELEMENT = "ORM.SerialisedCollectionElement";
+    public static final String OPTION_ORM_SERIALISED_MAP_KEY = "ORM.SerialisedMapKey";
+    public static final String OPTION_ORM_SERIALISED_MAP_VALUE = "ORM.SerialisedMapValue";
+    public static final String OPTION_ORM_SERIALISED_ARRAY_ELEMENT = "ORM.SerialisedArrayElement";
     public static final String OPTION_ORM_SECONDARY_TABLE = "ORM.SecondaryTable";
     public static final String OPTION_ORM_FOREIGN_KEYS = "ORM.ForeignKeys";
+
     public static final String OPTION_TXN_ISOLATION_READ_COMMITTED = "TransactionIsolationLevel.read-committed";
     public static final String OPTION_TXN_ISOLATION_READ_UNCOMMITTED = "TransactionIsolationLevel.read-uncommitted";
     public static final String OPTION_TXN_ISOLATION_REPEATABLE_READ = "TransactionIsolationLevel.repeatable-read";
@@ -85,6 +91,11 @@ public interface StoreManager
     public static final String OPTION_QUERY_JDOQL_BITWISE_OPS = "Query.JDOQL.BitwiseOperations";
     public static final String OPTION_DATASTORE_TIMEOUT = "Datastore.Timeout";
 
+    /**
+     * Strings representing features that are supported by this datastore.
+     * Refer to the Strings in org.datanucleus.store.StoreManager with prefix "OPTION_".
+     * @return The supported options
+     */
     Collection<String> getSupportedOptions();
 
     void close();
