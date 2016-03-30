@@ -135,7 +135,7 @@ Contributors:
         <java-type name="java.lang.Class" dfg="true" embedded="true" converter-name="dn.class-string"/>
 
         <!-- "java.awt" types -->
-        <java-type name="java.awt.image.BufferedImage" embedded="true"/>
+        <java-type name="java.awt.image.BufferedImage" embedded="true" converter-name="dn.bufferedimage-bytebuffer"/>
         <java-type name="java.awt.Color" dfg="true" embedded="true" converter-name="dn.color-string"/>
 
         <!-- "java.math" types -->
@@ -258,6 +258,8 @@ Contributors:
         <type-converter name="dn.biginteger-string" member-type="java.math.BigInteger" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.BigIntegerStringConverter"/>
         <type-converter name="dn.biginteger-long" member-type="java.math.BigInteger" datastore-type="java.lang.Long" converter-class="org.datanucleus.store.types.converters.BigIntegerLongConverter"/>
         <type-converter name="dn.bitset-string" member-type="java.util.BitSet" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.BitSetStringConverter"/>
+
+        <type-converter name="dn.bufferedimage-bytebuffer" member-type="java.awt.image.BufferedImage" datastore-type="java.nio.ByteBuffer" converter-class="org.datanucleus.store.types.converters.BufferedImageByteBufferConverter"/>
 
         <type-converter name="dn.calendar-string" member-type="java.util.Calendar" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.CalendarStringConverter"/>
         <type-converter name="dn.calendar-date" member-type="java.util.Calendar" datastore-type="java.util.Date" converter-class="org.datanucleus.store.types.converters.CalendarDateConverter"/>
