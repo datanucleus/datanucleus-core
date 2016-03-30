@@ -76,6 +76,7 @@ public interface StoreManager
     public static final String OPTION_ORM_EMBEDDED_COLLECTION_NESTED = "ORM.EmbeddedCollection.Nested"; // Whether the embedded element is storable nested like in JSON (default is in separate table)
     public static final String OPTION_ORM_EMBEDDED_MAP_NESTED = "ORM.EmbeddedMap.Nested"; // Whether the embedded element is storable nested like in JSON (default is in separate table)
     public static final String OPTION_ORM_EMBEDDED_ARRAY_NESTED = "ORM.EmbeddedArray.Nested"; // Whether the embedded key/value is storable nested like in JSON (default is in separate table)
+    public static final String OPTION_ORM_SERIALISED_PC = "ORM.SerialisedPC";
     public static final String OPTION_ORM_SERIALISED_COLLECTION_ELEMENT = "ORM.SerialisedCollectionElement";
     public static final String OPTION_ORM_SERIALISED_MAP_KEY = "ORM.SerialisedMapKey";
     public static final String OPTION_ORM_SERIALISED_MAP_VALUE = "ORM.SerialisedMapValue";
