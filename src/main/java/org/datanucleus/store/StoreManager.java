@@ -91,6 +91,8 @@ public interface StoreManager
     public static final String OPTION_QUERY_CANCEL = "Query.Cancel";
     public static final String OPTION_QUERY_JDOQL_BITWISE_OPS = "Query.JDOQL.BitwiseOperations";
     public static final String OPTION_DATASTORE_TIMEOUT = "Datastore.Timeout";
+    public static final String OPTION_DATASTORE_TIME_STORES_MILLISECS = "Datastore.Time.Millisecs";
+    public static final String OPTION_DATASTORE_TIME_STORES_NANOSECS = "Datastore.Time.Nanosecs";
 
     /**
      * Strings representing features that are supported by this datastore.
