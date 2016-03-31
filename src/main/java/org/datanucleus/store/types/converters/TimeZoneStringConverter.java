@@ -19,6 +19,8 @@ package org.datanucleus.store.types.converters;
 
 import java.util.TimeZone;
 
+import org.datanucleus.util.StringUtils;
+
 /**
  * Class to handle the conversion between java.util.TimeZone and a String form.
  */
@@ -28,7 +30,7 @@ public class TimeZoneStringConverter implements TypeConverter<TimeZone, String>,
 
     public TimeZone toMemberType(String str)
     {
-        if (str == null)
+        if (StringUtils.isWhitespace(str))
         {
             return null;
         }

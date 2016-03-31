@@ -19,6 +19,8 @@ package org.datanucleus.store.types.converters;
 
 import java.util.UUID;
 
+import org.datanucleus.util.StringUtils;
+
 /**
  * Class to handle the conversion between java.util.UUID and a String form.
  */
@@ -28,7 +30,7 @@ public class UUIDStringConverter implements TypeConverter<UUID, String>, ColumnL
 
     public UUID toMemberType(String str)
     {
-        if (str == null)
+        if (StringUtils.isWhitespace(str))
         {
             return null;
         }

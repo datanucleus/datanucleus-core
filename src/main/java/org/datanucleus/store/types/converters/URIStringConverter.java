@@ -19,6 +19,8 @@ package org.datanucleus.store.types.converters;
 
 import java.net.URI;
 
+import org.datanucleus.util.StringUtils;
+
 /**
  * Class to handle the conversion between java.net.URI and a String form.
  */
@@ -28,7 +30,7 @@ public class URIStringConverter implements TypeConverter<URI, String>
 
     public URI toMemberType(String str)
     {
-        if (str == null)
+        if (StringUtils.isWhitespace(str))
         {
             return null;
         }

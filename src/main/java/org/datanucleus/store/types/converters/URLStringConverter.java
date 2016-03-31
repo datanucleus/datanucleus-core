@@ -22,6 +22,7 @@ import java.net.URL;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.util.Localiser;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Class to handle the conversion between java.net.URL and a String form.
@@ -32,7 +33,7 @@ public class URLStringConverter implements TypeConverter<URL, String>
 
     public URL toMemberType(String str)
     {
-        if (str == null)
+        if (StringUtils.isWhitespace(str))
         {
             return null;
         }

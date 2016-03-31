@@ -19,6 +19,8 @@ package org.datanucleus.store.types.converters;
 
 import java.util.Currency;
 
+import org.datanucleus.util.StringUtils;
+
 /**
  * Class to handle the conversion between java.util.Currency and a String form.
  */
@@ -28,7 +30,7 @@ public class CurrencyStringConverter implements TypeConverter<Currency, String>,
 
     public Currency toMemberType(String str)
     {
-        if (str == null)
+        if (StringUtils.isWhitespace(str))
         {
             return null;
         }
