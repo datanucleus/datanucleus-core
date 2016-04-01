@@ -135,7 +135,7 @@ Contributors:
         <java-type name="java.lang.Class" dfg="true" embedded="true" converter-name="dn.class-string"/>
 
         <!-- "java.awt" types -->
-        <java-type name="java.awt.image.BufferedImage" embedded="true" converter-name="dn.bufferedimage-bytebuffer"/>
+        <java-type name="java.awt.image.BufferedImage" embedded="true" converter-name="dn.bufferedimage-bytearray"/>
         <java-type name="java.awt.Color" dfg="true" embedded="true" converter-name="dn.color-string"/>
 
         <!-- "java.math" types -->
