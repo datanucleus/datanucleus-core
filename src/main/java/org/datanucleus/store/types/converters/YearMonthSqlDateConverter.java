@@ -17,35 +17,35 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.converters;
 
-import java.util.Date;
-import java.time.LocalDateTime;
-import java.time.MonthDay;
+import java.sql.Date;
+import java.time.YearMonth;
 import java.time.ZoneId;
 
 import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
- * Class to handle the conversion between java.time.MonthDay and java.util.Date.
+ * Class to handle the conversion between java.time.YearMonth and java.sql.Date.
  */
-public class MonthDayDateConverter implements TypeConverter<MonthDay, Date>
+public class YearMonthSqlDateConverter implements TypeConverter<YearMonth, Date>
 {
     private static final long serialVersionUID = 8087124973147837116L;
 
-    public MonthDay toMemberType(Date date)
+    public YearMonth toMemberType(Date date)
     {
         if (date == null)
         {
             return null;
         }
-        return MonthDay.from(LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()));
+        return YearMonth.from(date.toLocalDate());
     }
 
-    public Date toDatastoreType(MonthDay md)
+    public Date toDatastoreType(YearMonth ym)
     {
-        if (md == null)
+        if (ym == null)
         {
             return null;
         }
-        return new Date(Date.from(md.atYear(1900).atStartOfDay(ZoneId.systemDefault()).toInstant()).getTime());
+        // Use day 2 to avoid any potential timezone rounding. Would be better using other means, but doesn't matter here
+        return new Date(Date.from(ym.atDay(2).atStartOfDay(ZoneId.systemDefault()).toInstant()).getTime());
     }
 }

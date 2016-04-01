@@ -338,10 +338,12 @@ Contributors:
         <type-converter name="dn.year-integer" member-type="java.time.Year" datastore-type="java.lang.Integer" converter-class="org.datanucleus.store.types.converters.YearIntegerConverter"/>
         <type-converter name="dn.yearmonth-string" member-type="java.time.YearMonth" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.YearMonthStringConverter"/>
         <type-converter name="dn.yearmonth-components" member-type="java.time.YearMonth" datastore-type="[I" converter-class="org.datanucleus.store.types.converters.YearMonthComponentsConverter"/>
-        <type-converter name="dn.yearmonth-date" member-type="java.time.YearMonth" datastore-type="java.sql.Date" converter-class="org.datanucleus.store.types.converters.YearMonthDateConverter"/>
+        <type-converter name="dn.yearmonth-sqldate" member-type="java.time.YearMonth" datastore-type="java.sql.Date" converter-class="org.datanucleus.store.types.converters.YearMonthSqlDateConverter"/>
+        <type-converter name="dn.yearmonth-date" member-type="java.time.YearMonth" datastore-type="java.util.Date" converter-class="org.datanucleus.store.types.converters.YearMonthDateConverter"/>
         <type-converter name="dn.monthday-string" member-type="java.time.MonthDay" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.MonthDayStringConverter"/>
         <type-converter name="dn.monthday-components" member-type="java.time.MonthDay" datastore-type="[I" converter-class="org.datanucleus.store.types.converters.MonthDayComponentsConverter"/>
-        <type-converter name="dn.monthday-date" member-type="java.time.MonthDay" datastore-type="java.sql.Date" converter-class="org.datanucleus.store.types.converters.MonthDayDateConverter"/>
+        <type-converter name="dn.monthday-sqldate" member-type="java.time.MonthDay" datastore-type="java.sql.Date" converter-class="org.datanucleus.store.types.converters.MonthDaySqlDateConverter"/>
+        <type-converter name="dn.monthday-date" member-type="java.time.MonthDay" datastore-type="java.util.Date" converter-class="org.datanucleus.store.types.converters.MonthDayDateConverter"/>
         <type-converter name="dn.zoneid-string" member-type="java.time.ZoneId" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.ZoneIdStringConverter"/>
         <type-converter name="dn.zoneoffset-string" member-type="java.time.ZoneOffset" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.ZoneOffsetStringConverter"/>
         <type-converter name="dn.zoneddatetime-string" member-type="java.time.ZonedDateTime" datastore-type="java.lang.String" converter-class="org.datanucleus.store.types.converters.ZonedDateTimeStringConverter"/>

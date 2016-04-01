@@ -17,14 +17,15 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.converters;
 
-import java.sql.Date;
+import java.util.Date;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
 
 import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
- * Class to handle the conversion between java.time.YearMonth and java.sql.Date.
+ * Class to handle the conversion between java.time.YearMonth and java.util.Date.
  */
 public class YearMonthDateConverter implements TypeConverter<YearMonth, Date>
 {
@@ -36,7 +37,7 @@ public class YearMonthDateConverter implements TypeConverter<YearMonth, Date>
         {
             return null;
         }
-        return YearMonth.from(date.toLocalDate());
+        return YearMonth.from(LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()));
     }
 
     public Date toDatastoreType(YearMonth ym)

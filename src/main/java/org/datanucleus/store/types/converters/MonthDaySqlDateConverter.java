@@ -17,17 +17,16 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.converters;
 
-import java.util.Date;
-import java.time.LocalDateTime;
+import java.sql.Date;
 import java.time.MonthDay;
 import java.time.ZoneId;
 
 import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
- * Class to handle the conversion between java.time.MonthDay and java.util.Date.
+ * Class to handle the conversion between java.time.MonthDay and java.sql.Date.
  */
-public class MonthDayDateConverter implements TypeConverter<MonthDay, Date>
+public class MonthDaySqlDateConverter implements TypeConverter<MonthDay, Date>
 {
     private static final long serialVersionUID = 8087124973147837116L;
 
@@ -37,7 +36,7 @@ public class MonthDayDateConverter implements TypeConverter<MonthDay, Date>
         {
             return null;
         }
-        return MonthDay.from(LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()));
+        return MonthDay.from(date.toLocalDate());
     }
 
     public Date toDatastoreType(MonthDay md)
