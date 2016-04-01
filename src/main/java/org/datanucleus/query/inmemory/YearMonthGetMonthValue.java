@@ -26,9 +26,9 @@ import org.datanucleus.query.inmemory.InvocationEvaluator;
 import org.datanucleus.util.Localiser;
 
 /**
- * Evaluator for the method "{yearMonthExpr}.getMonth()".
+ * Evaluator for the method "{yearMonthExpr}.getMonthValue()".
  */
-public class YearMonthGetMonth implements InvocationEvaluator
+public class YearMonthGetMonthValue implements InvocationEvaluator
 {
     /* (non-Javadoc)
      * @see org.datanucleus.query.evaluator.memory.InvocationEvaluator#evaluate(org.datanucleus.query.expression.InvokeExpression, org.datanucleus.query.evaluator.memory.InMemoryExpressionEvaluator)
@@ -46,6 +46,6 @@ public class YearMonthGetMonth implements InvocationEvaluator
             throw new NucleusException(Localiser.msg("021011", method, invokedValue.getClass().getName()));
         }
 
-        return ((YearMonth)invokedValue).getMonth();
+        return ((YearMonth)invokedValue).getMonthValue();
     }
 }
