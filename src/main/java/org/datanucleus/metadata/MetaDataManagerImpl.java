@@ -2736,6 +2736,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     if (nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_IGNORE_MISSING_PERSISTABLE_CLASSES, false))
                     {
                         cmd.getPackageMetaData().removeClass(cmd);
+                        classMetaDataByClass.remove(cmd.getFullClassName());
                         NucleusLogger.METADATA.warn("Attempt to load metadata for class=" + cmd.getFullClassName() + " but an exception was thrown : " + ne.getMessage());
                     }
                     else
@@ -2761,6 +2762,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     if (nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_IGNORE_MISSING_PERSISTABLE_CLASSES, false))
                     {
                         imd.getPackageMetaData().removeClass(imd);
+                        classMetaDataByClass.remove(imd.getFullClassName());
                         NucleusLogger.METADATA.warn("Attempt to load metadata for class=" + imd.getFullClassName() + " but an exception was thrown : " + ne.getMessage());
                     }
                     else
@@ -2796,8 +2798,12 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             {
                 throw new NucleusUserException(Localiser.msg("044059", cls.getName()));
             }
-            populateAbstractClassMetaData(cmd, clr, cls.getClassLoader());
-            initialiseAbstractClassMetaData(cmd, clr);
+
+            boolean populated = populateAbstractClassMetaData(cmd, clr, cls.getClassLoader());
+            if (populated)
+            {
+                initialiseAbstractClassMetaData(cmd, clr);
+            }
         }
     }
 
@@ -2814,8 +2820,11 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     {
         synchronized (imd)
         {
-            populateAbstractClassMetaData(imd, clr, primary);
-            initialiseAbstractClassMetaData(imd, clr);
+            boolean populated = populateAbstractClassMetaData(imd, clr, primary);
+            if (populated)
+            {
+                initialiseAbstractClassMetaData(imd, clr);
+            }
         }
     }
 
