@@ -1140,11 +1140,12 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             // TODO Really need a Set of unpopulated/uninitialised metadata and continue til all done
             for (AbstractClassMetaData cmd : classMetaDataByClass.values())
             {
-                if (!cmd.isPopulated())
+                boolean populated = cmd.isPopulated();
+                if (!populated)
                 {
-                    populateAbstractClassMetaData(cmd, clr, loader);
+                    populated = populateAbstractClassMetaData(cmd, clr, loader);
                 }
-                if (!cmd.isInitialised())
+                if (populated && !cmd.isInitialised())
                 {
                     initialiseAbstractClassMetaData(cmd, clr);
                 }
@@ -1662,8 +1663,11 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             if (cmd != null)
             {
                 // Make sure that anything returned is initialised
-                populateAbstractClassMetaData(cmd, clr, c.getClassLoader());
-                initialiseAbstractClassMetaData(cmd, clr);
+                boolean populated = populateAbstractClassMetaData(cmd, clr, c.getClassLoader());
+                if (populated)
+                {
+                    initialiseAbstractClassMetaData(cmd, clr);
+                }
 
                 // Make sure all FileMetaData that were subsequently loaded as a result of this call are
                 // all initialised before return
@@ -2716,7 +2720,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 {
                     if (nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_IGNORE_MISSING_PERSISTABLE_CLASSES, false))
                     {
-                        NucleusLogger.METADATA.warn("Attempt to load metadata for class=" + cmd.getFullClassName() + " but an exception was thrown", ne);
+                        cmd.getPackageMetaData().removeClass(cmd);
+                        classMetaDataByClass.remove(cmd.getFullClassName());
+                        NucleusLogger.METADATA.warn("Attempt to load metadata for class=" + cmd.getFullClassName() + " but an exception was thrown : " + ne.getMessage());
                     }
                     else
                     {
@@ -2740,7 +2746,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 {
                     if (nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_IGNORE_MISSING_PERSISTABLE_CLASSES, false))
                     {
-                        NucleusLogger.METADATA.warn("Attempt to load metadata for class=" + imd.getFullClassName() + " but an exception was thrown", ne);
+                        imd.getPackageMetaData().removeClass(imd);
+                        classMetaDataByClass.remove(imd.getFullClassName());
+                        NucleusLogger.METADATA.warn("Attempt to load metadata for class=" + imd.getFullClassName() + " but an exception was thrown : " + ne.getMessage());
                     }
                     else
                     {
@@ -2775,8 +2783,11 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             {
                 throw new NucleusUserException(Localiser.msg("044059", cls.getName()));
             }
-            populateAbstractClassMetaData(cmd, clr, cls.getClassLoader());
-            initialiseAbstractClassMetaData(cmd, clr);
+            boolean populated = populateAbstractClassMetaData(cmd, clr, cls.getClassLoader());
+            if (populated)
+            {
+                initialiseAbstractClassMetaData(cmd, clr);
+            }
         }
     }
 
@@ -2793,8 +2804,11 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     {
         synchronized (imd)
         {
-            populateAbstractClassMetaData(imd, clr, primary);
-            initialiseAbstractClassMetaData(imd, clr);
+            boolean populated = populateAbstractClassMetaData(imd, clr, primary);
+            if (populated)
+            {
+                initialiseAbstractClassMetaData(imd, clr);
+            }
         }
     }
 
@@ -2866,9 +2880,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      * @param cmd MetaData
      * @param clr ClassLoader resolver
      * @param loader The primary class loader
+     * @return Whether it was populated (false implies an error)
      */
-    protected void populateAbstractClassMetaData(final AbstractClassMetaData cmd, final ClassLoaderResolver clr, 
-            final ClassLoader loader)
+    protected boolean populateAbstractClassMetaData(final AbstractClassMetaData cmd, final ClassLoaderResolver clr, final ClassLoader loader)
     {
         if (!cmd.isPopulated() && !cmd.isInitialised())
         {
@@ -2887,12 +2901,12 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                         // Catch and rethrow exception since AccessController.doPriveleged swallows it!
                         if (nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_IGNORE_MISSING_PERSISTABLE_CLASSES, false))
                         {
-                            NucleusLogger.METADATA.warn("Attempt to load metadata for class=" + cmd.getFullClassName() + " but an exception was thrown", ne);
+                            cmd.getPackageMetaData().removeClass(cmd);
+                            classMetaDataByClass.remove(cmd.getFullClassName());
+                            NucleusLogger.METADATA.warn("Attempt to load metadata for class=" + cmd.getFullClassName() + " but an exception was thrown : " + ne.getMessage());
+                            return false;
                         }
-                        else
-                        {
-                            throw ne;
-                        }
+                        throw ne;
                     }
                     catch (Exception e)
                     {
@@ -2902,6 +2916,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 }
             });
         }
+        return true;
     }
 
     /**
