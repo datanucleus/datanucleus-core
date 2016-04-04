@@ -304,6 +304,14 @@ public class PackageMetaData extends MetaData
         return cmd;
     }
 
+    public void removeClass(AbstractClassMetaData cmd)
+    {
+        if (classes != null)
+        {
+            classes.remove(cmd);
+        }
+    }
+
     /**
      * Method to create a new class metadata, add it, and return it.
      * @param className Name of the class (in this package)
