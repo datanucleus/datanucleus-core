@@ -30,6 +30,7 @@ public class PropertyNames
     public static final String PROPERTY_CLASSLOADER_RESOLVER_NAME = "datanucleus.classLoaderResolverName";
     public static final String PROPERTY_CLASSLOADER_PRIMARY = "datanucleus.primaryClassLoader";
 
+    public static final String PROPERTY_METADATA_IGNORE_MISSING_PERSISTABLE_CLASSES = "datanucleus.metadata.ignoreMissingPersistableClasses";
     public static final String PROPERTY_METADATA_ALWAYS_DETACHABLE = "datanucleus.metadata.alwaysDetachable";
     public static final String PROPERTY_METADATA_XML_VALIDATE = "datanucleus.metadata.xml.validate";
     public static final String PROPERTY_METADATA_XML_NAMESPACE_AWARE = "datanucleus.metadata.xml.namespaceAware";

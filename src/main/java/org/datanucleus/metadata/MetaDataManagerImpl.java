@@ -2714,7 +2714,14 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 }
                 catch (NucleusException ne)
                 {
-                    throw ne;
+                    if (nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_IGNORE_MISSING_PERSISTABLE_CLASSES, false))
+                    {
+                        NucleusLogger.METADATA.warn("Attempt to load metadata for class=" + cmd.getFullClassName() + " but an exception was thrown", ne);
+                    }
+                    else
+                    {
+                        throw ne;
+                    }
                 }
                 catch (RuntimeException re)
                 {
@@ -2729,9 +2736,16 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 {
                     initialiseInterfaceMetaData(imd, clr, primary);
                 }
-                catch(NucleusException jpex)
+                catch(NucleusException ne)
                 {
-                    throw jpex;
+                    if (nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_IGNORE_MISSING_PERSISTABLE_CLASSES, false))
+                    {
+                        NucleusLogger.METADATA.warn("Attempt to load metadata for class=" + imd.getFullClassName() + " but an exception was thrown", ne);
+                    }
+                    else
+                    {
+                        throw ne;
+                    }
                 }
                 catch (RuntimeException re)
                 {
