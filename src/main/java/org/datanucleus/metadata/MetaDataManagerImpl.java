@@ -2896,10 +2896,17 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     {
                         cmd.populate(clr, loader, MetaDataManagerImpl.this);
                     }
-                    // Catch and rethrow exception since AccessController.doPriveleged swallows it!
                     catch (NucleusException ne)
                     {
-                        throw ne;
+                        // Catch and rethrow exception since AccessController.doPriveleged swallows it!
+                        if (nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_IGNORE_MISSING_PERSISTABLE_CLASSES, false))
+                        {
+                            NucleusLogger.METADATA.warn("Attempt to load metadata for class=" + cmd.getFullClassName() + " but an exception was thrown", ne);
+                        }
+                        else
+                        {
+                            throw ne;
+                        }
                     }
                     catch (Exception e)
                     {
