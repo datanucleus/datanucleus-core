@@ -147,7 +147,7 @@ class CommandLineHelper
         }
         if (cl.hasOption("ignoreMetaDataForMissingClasses"))
         {
-            props.setProperty(PropertyNames.PROPERTY_METADATA_IGNORE_FOR_MISSING_CLASSES, "true");
+            props.setProperty(PropertyNames.PROPERTY_METADATA_IGNORE_METADATA_FOR_MISSING_CLASSES, "true");
         }
 
         final DataNucleusEnhancer enhancer = new DataNucleusEnhancer(apiName, props);
