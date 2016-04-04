@@ -132,6 +132,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
         conf.addDefaultProperty(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY, null, null, null, false, false);
 
         // MetaData
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_IGNORE_FOR_MISSING_CLASSES, null, false, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_ALWAYS_DETACHABLE, null, false, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_XML_VALIDATE, null, false, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_XML_NAMESPACE_AWARE, null, true, false, false);

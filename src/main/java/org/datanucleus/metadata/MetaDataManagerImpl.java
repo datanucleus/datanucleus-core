@@ -2733,7 +2733,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 }
                 catch (NucleusException ne)
                 {
-                    if (nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_IGNORE_MISSING_PERSISTABLE_CLASSES, false))
+                    if (nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_IGNORE_FOR_MISSING_CLASSES, false))
                     {
                         cmd.getPackageMetaData().removeClass(cmd);
                         classMetaDataByClass.remove(cmd.getFullClassName());
@@ -2759,7 +2759,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 }
                 catch(NucleusException ne)
                 {
-                    if (nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_IGNORE_MISSING_PERSISTABLE_CLASSES, false))
+                    if (nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_IGNORE_FOR_MISSING_CLASSES, false))
                     {
                         imd.getPackageMetaData().removeClass(imd);
                         classMetaDataByClass.remove(imd.getFullClassName());
@@ -2913,7 +2913,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     catch (NucleusException ne)
                     {
                         // Catch and rethrow exception since AccessController.doPriveleged swallows it!
-                        if (nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_IGNORE_MISSING_PERSISTABLE_CLASSES, false))
+                        if (nucleusContext.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_IGNORE_FOR_MISSING_CLASSES, false))
                         {
                             cmd.getPackageMetaData().removeClass(cmd);
                             classMetaDataByClass.remove(cmd.getFullClassName());
