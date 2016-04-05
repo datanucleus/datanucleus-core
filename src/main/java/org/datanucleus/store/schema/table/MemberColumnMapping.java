@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.schema.table;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
@@ -59,8 +60,22 @@ public interface MemberColumnMapping
     void setTypeConverter(TypeConverter typeConv);
 
     /**
+     * Method to set a component TypeConverter for such as a collection element, map key or map value.
+     * @param role The role where this converter is used
+     * @param conv The converter
+     */
+    void setComponentTypeConverter(FieldRole role, TypeConverter conv);
+
+    /**
      * Accessor for the TypeConverter to use for this member-column (if any).
      * @return The TypeConverter
      */
     TypeConverter getTypeConverter();
+
+    /**
+     * Accessor for a component (collection element, map key, map value) converter if defined.
+     * @param role The role of the component where the converter would be used
+     * @return The converter (if any). Null is returned if nothing defined
+     */
+    TypeConverter getComponentTypeConverterForRole(FieldRole role);
 }

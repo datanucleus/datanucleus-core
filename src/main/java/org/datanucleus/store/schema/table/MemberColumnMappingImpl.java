@@ -17,7 +17,12 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.schema.table;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.util.StringUtils;
 
@@ -30,6 +35,8 @@ public class MemberColumnMappingImpl implements MemberColumnMapping
     protected AbstractMemberMetaData mmd;
 
     protected TypeConverter typeConverter;
+
+    protected Map<FieldRole, TypeConverter> componentConverters;
 
     protected Column[] columns;
 
@@ -53,6 +60,29 @@ public class MemberColumnMappingImpl implements MemberColumnMapping
     public void setTypeConverter(TypeConverter typeConv)
     {
         this.typeConverter = typeConv;
+    }
+
+    public void setComponentTypeConverter(FieldRole role, TypeConverter conv)
+    {
+        if (this.typeConverter != null)
+        {
+            // TODO Is this correct, or will there sometimes be a TypeConverter and we need to remove it if converting a collection element for example
+            throw new NucleusException("Cannot set a component converter for " + mmd.getFullFieldName() + " since already has a TypeConverter defined for the field");
+        }
+        if (role == FieldRole.ROLE_COLLECTION_ELEMENT && !mmd.hasCollection())
+        {
+            throw new NucleusException("Cannot set a TypeConverter for the collection element on member " + mmd.getFullFieldName() + " since no collection");
+        }
+        if ((role == FieldRole.ROLE_MAP_KEY || role == FieldRole.ROLE_MAP_VALUE) && !mmd.hasMap())
+        {
+            throw new NucleusException("Cannot set a TypeConverter for the map key/value on member " + mmd.getFullFieldName() + " since no map");
+        }
+
+        if (componentConverters == null)
+        {
+            componentConverters = new HashMap();
+        }
+        componentConverters.put(role, conv);
     }
 
     /* (non-Javadoc)
@@ -102,6 +132,15 @@ public class MemberColumnMappingImpl implements MemberColumnMapping
     public TypeConverter getTypeConverter()
     {
         return typeConverter;
+    }
+
+    public TypeConverter getComponentTypeConverterForRole(FieldRole role)
+    {
+        if (componentConverters != null)
+        {
+            return componentConverters.get(role);
+        }
+        return null;
     }
 
     public String toString()

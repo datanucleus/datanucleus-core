@@ -38,8 +38,10 @@ import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.EmbeddedMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
+import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.JdbcType;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
@@ -335,7 +337,7 @@ public class CompleteClassTable implements Table
                             for (int j=0;j<colJavaTypes.length;j++)
                             {
                                 String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, j);
-                                ColumnImpl col = addColumn(mmd, colName, typeConv);
+                                ColumnImpl col = addColumn(mmd, colName);
                                 if (colmds != null && colmds.length == 1)
                                 {
                                     col.setColumnMetaData(colmds[0]);
@@ -364,7 +366,7 @@ public class CompleteClassTable implements Table
                         else
                         {
                             String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
-                            ColumnImpl col = addColumn(mmd, colName, typeConv);
+                            ColumnImpl col = addColumn(mmd, colName);
                             if (colmds != null && colmds.length == 1)
                             {
                                 col.setColumnMetaData(colmds[0]);
@@ -391,7 +393,7 @@ public class CompleteClassTable implements Table
                     {
                         // Create column for basic type
                         String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
-                        ColumnImpl col = addColumn(mmd, colName, null);
+                        ColumnImpl col = addColumn(mmd, colName);
                         if (colmds != null && colmds.length == 1)
                         {
                             col.setColumnMetaData(colmds[0]);
@@ -405,6 +407,27 @@ public class CompleteClassTable implements Table
                             }
                         }
                         MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
+                        if (mmd.hasCollection())
+                        {
+                            if (mmd.getElementMetaData() != null && mmd.getElementMetaData().hasExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME))
+                            {
+                                TypeConverter elemConv = typeMgr.getTypeConverterForName(mmd.getElementMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME));
+                                mapping.setComponentTypeConverter(FieldRole.ROLE_COLLECTION_ELEMENT, elemConv);
+                            }
+                        }
+                        else if (mmd.hasMap())
+                        {
+                            if (mmd.getKeyMetaData() != null && mmd.getKeyMetaData().hasExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME))
+                            {
+                                TypeConverter keyConv = typeMgr.getTypeConverterForName(mmd.getKeyMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME));
+                                mapping.setComponentTypeConverter(FieldRole.ROLE_MAP_KEY, keyConv);
+                            }
+                            if (mmd.getValueMetaData() != null && mmd.getValueMetaData().hasExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME))
+                            {
+                                TypeConverter valConv = typeMgr.getTypeConverterForName(mmd.getValueMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME));
+                                mapping.setComponentTypeConverter(FieldRole.ROLE_MAP_VALUE, valConv);
+                            }
+                        }
                         col.setMemberColumnMapping(mapping);
                         if (schemaVerifier != null)
                         {
@@ -420,7 +443,7 @@ public class CompleteClassTable implements Table
         {
             // Add surrogate datastore-identity column
             String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.DATASTOREID_COLUMN);
-            ColumnImpl col = addColumn(null, colName, ColumnType.DATASTOREID_COLUMN, null);
+            ColumnImpl col = addColumn(null, colName, ColumnType.DATASTOREID_COLUMN);
             if (schemaVerifier != null)
             {
                 schemaVerifier.attributeMember(new MemberColumnMappingImpl(null, col));
@@ -446,7 +469,7 @@ public class CompleteClassTable implements Table
             if (vermd.getFieldName() == null)
             {
                 String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.VERSION_COLUMN);
-                ColumnImpl col = addColumn(null, colName, ColumnType.VERSION_COLUMN, null);
+                ColumnImpl col = addColumn(null, colName, ColumnType.VERSION_COLUMN);
                 if (schemaVerifier != null)
                 {
                     schemaVerifier.attributeMember(new MemberColumnMappingImpl(null, col));
@@ -470,7 +493,7 @@ public class CompleteClassTable implements Table
         {
             // Add discriminator column
             String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.DISCRIMINATOR_COLUMN);
-            ColumnImpl col = addColumn(null, colName, ColumnType.DISCRIMINATOR_COLUMN, null);
+            ColumnImpl col = addColumn(null, colName, ColumnType.DISCRIMINATOR_COLUMN);
             if (schemaVerifier != null)
             {
                 schemaVerifier.attributeMember(new MemberColumnMappingImpl(null, col));
@@ -500,7 +523,7 @@ public class CompleteClassTable implements Table
             else
             {
                 String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.MULTITENANCY_COLUMN);
-                Column col = addColumn(null, colName, ColumnType.MULTITENANCY_COLUMN, null); // TODO Support column position
+                Column col = addColumn(null, colName, ColumnType.MULTITENANCY_COLUMN); // TODO Support column position
                 col.setJdbcType(JdbcType.VARCHAR);
                 if (schemaVerifier != null)
                 {
@@ -975,12 +998,12 @@ public class CompleteClassTable implements Table
         }
     }
 
-    protected ColumnImpl addColumn(AbstractMemberMetaData mmd, String colName, TypeConverter typeConv)
+    protected ColumnImpl addColumn(AbstractMemberMetaData mmd, String colName)
     {
-        return addColumn(mmd, colName, ColumnType.COLUMN, typeConv);
+        return addColumn(mmd, colName, ColumnType.COLUMN);
     }
 
-    protected ColumnImpl addColumn(AbstractMemberMetaData mmd, String colName, ColumnType colType, TypeConverter typeConv)
+    protected ColumnImpl addColumn(AbstractMemberMetaData mmd, String colName, ColumnType colType)
     {
         // TODO Set defaultable method on Column
         ColumnImpl col = new ColumnImpl(this, colName, colType);
