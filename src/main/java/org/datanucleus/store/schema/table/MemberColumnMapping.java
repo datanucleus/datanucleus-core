@@ -64,7 +64,7 @@ public interface MemberColumnMapping
      * @param role The role where this converter is used
      * @param conv The converter
      */
-    void setComponentTypeConverter(FieldRole role, TypeConverter conv);
+    void setTypeConverterForComponent(FieldRole role, TypeConverter conv);
 
     /**
      * Accessor for the TypeConverter to use for this member-column (if any).
@@ -77,5 +77,5 @@ public interface MemberColumnMapping
      * @param role The role of the component where the converter would be used
      * @return The converter (if any). Null is returned if nothing defined
      */
-    TypeConverter getComponentTypeConverterForRole(FieldRole role);
+    TypeConverter getTypeConverterForComponent(FieldRole role);
 }

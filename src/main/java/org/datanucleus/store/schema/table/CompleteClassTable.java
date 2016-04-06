@@ -412,7 +412,7 @@ public class CompleteClassTable implements Table
                             if (mmd.getElementMetaData() != null && mmd.getElementMetaData().hasExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME))
                             {
                                 TypeConverter elemConv = typeMgr.getTypeConverterForName(mmd.getElementMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME));
-                                mapping.setComponentTypeConverter(FieldRole.ROLE_COLLECTION_ELEMENT, elemConv);
+                                mapping.setTypeConverterForComponent(FieldRole.ROLE_COLLECTION_ELEMENT, elemConv);
                             }
                         }
                         else if (mmd.hasMap())
@@ -420,12 +420,12 @@ public class CompleteClassTable implements Table
                             if (mmd.getKeyMetaData() != null && mmd.getKeyMetaData().hasExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME))
                             {
                                 TypeConverter keyConv = typeMgr.getTypeConverterForName(mmd.getKeyMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME));
-                                mapping.setComponentTypeConverter(FieldRole.ROLE_MAP_KEY, keyConv);
+                                mapping.setTypeConverterForComponent(FieldRole.ROLE_MAP_KEY, keyConv);
                             }
                             if (mmd.getValueMetaData() != null && mmd.getValueMetaData().hasExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME))
                             {
                                 TypeConverter valConv = typeMgr.getTypeConverterForName(mmd.getValueMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME));
-                                mapping.setComponentTypeConverter(FieldRole.ROLE_MAP_VALUE, valConv);
+                                mapping.setTypeConverterForComponent(FieldRole.ROLE_MAP_VALUE, valConv);
                             }
                         }
                         col.setMemberColumnMapping(mapping);

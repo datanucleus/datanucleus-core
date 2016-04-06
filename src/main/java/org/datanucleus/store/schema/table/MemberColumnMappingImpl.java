@@ -62,7 +62,7 @@ public class MemberColumnMappingImpl implements MemberColumnMapping
         this.typeConverter = typeConv;
     }
 
-    public void setComponentTypeConverter(FieldRole role, TypeConverter conv)
+    public void setTypeConverterForComponent(FieldRole role, TypeConverter conv)
     {
         if (this.typeConverter != null)
         {
@@ -134,7 +134,7 @@ public class MemberColumnMappingImpl implements MemberColumnMapping
         return typeConverter;
     }
 
-    public TypeConverter getComponentTypeConverterForRole(FieldRole role)
+    public TypeConverter getTypeConverterForComponent(FieldRole role)
     {
         if (componentConverters != null)
         {
