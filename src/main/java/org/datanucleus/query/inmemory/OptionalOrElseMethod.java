@@ -21,9 +21,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.query.QueryUtils;
+import org.datanucleus.query.expression.DyadicExpression;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.expression.InvokeExpression;
 import org.datanucleus.query.expression.Literal;
+import org.datanucleus.query.expression.ParameterExpression;
+import org.datanucleus.query.expression.PrimaryExpression;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -48,11 +52,39 @@ public class OptionalOrElseMethod implements InvocationEvaluator
         }
 
         List<Expression> args = expr.getArguments();
-        if (args == null || args.isEmpty())
+        if (args == null || args.isEmpty() || args.size() != 1)
         {
-            throw new NucleusException("NULLIF requires two arguments");
+            throw new NucleusException("orElse requires one argument");
         }
+
         Expression argExpr = args.get(0);
-        return ((Optional)invokedValue).orElse((argExpr instanceof Literal ? ((Literal)argExpr).getLiteral() : argExpr));
+        Object argument = null;
+        if (argExpr instanceof Literal)
+        {
+            argument = ((Literal)argExpr).getLiteral();
+        }
+        else if (argExpr instanceof PrimaryExpression)
+        {
+            PrimaryExpression primExpr = (PrimaryExpression)argExpr;
+            argument = eval.getValueForPrimaryExpression(primExpr);
+        }
+        else if (argExpr instanceof ParameterExpression)
+        {
+            ParameterExpression paramExpr = (ParameterExpression)argExpr;
+            argument = QueryUtils.getValueForParameterExpression(eval.getParameterValues(), paramExpr);
+        }
+        else if (argExpr instanceof InvokeExpression)
+        {
+            argument = eval.getValueForInvokeExpression((InvokeExpression)argExpr);
+        }
+        else if (argExpr instanceof DyadicExpression)
+        {
+            argument = ((DyadicExpression)argExpr).evaluate(eval);
+        }
+        else
+        {
+            throw new NucleusException(method + "(param1) where param is instanceof " + argExpr.getClass().getName() + " not supported");
+        }
+        return ((Optional)invokedValue).orElse(argument);
     }
 }
