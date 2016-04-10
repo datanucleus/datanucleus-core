@@ -23,6 +23,7 @@ import java.util.Optional;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.expression.InvokeExpression;
+import org.datanucleus.query.expression.Literal;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -51,8 +52,7 @@ public class OptionalOrElseMethod implements InvocationEvaluator
         {
             throw new NucleusException("NULLIF requires two arguments");
         }
-
-        Optional opt = (Optional)invokedValue;
-        return opt.orElse(args.get(0));
+        Expression argExpr = args.get(0);
+        return ((Optional)invokedValue).orElse((argExpr instanceof Literal ? ((Literal)argExpr).getLiteral() : argExpr));
     }
 }
