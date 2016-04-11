@@ -50,8 +50,7 @@ import org.datanucleus.ClassConstants;
  * To extend the current system to internationalise in, for example, French you would add a file 
  * "org.datanucleus.Localisation_fr.properties" and add entries with the required French text.
  * If you want to extend this to another language and contribute the files for your language
- * you need to find all files "Localisation.properties" and provide an alternative variant, raise an issue in JIRA, and
- * attach your patch to the issue.
+ * you need to find all files "Localisation.properties" and provide an alternative variant, raise an issue, and attach your patch to the issue.
  */
 public class Localiser
 {
