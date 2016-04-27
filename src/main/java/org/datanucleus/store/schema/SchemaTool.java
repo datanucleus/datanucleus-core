@@ -143,6 +143,7 @@ public class SchemaTool
         cmd.addOption("v", "verbose", null, "verbose output");
         cmd.addOption("pu", "persistenceUnit", "<persistence-unit>", "name of the persistence unit to handle the schema for");
         cmd.addOption("props", "properties", "props", "path to a properties file");
+        cmd.addOption("ignoreMetaDataForMissingClasses", "ignoreMetaDataForMissingClasses", null, "Ignore metadata for classes that are missing?");
 
         cmd.parse(args);
 
@@ -227,6 +228,12 @@ public class SchemaTool
             tool.setVerbose(true);
         }
 
+        boolean ignoreMetaDataForMissingClasses = false;
+        if (cmd.hasOption("ignoreMetaDataForMissingClasses"))
+        {
+            ignoreMetaDataForMissingClasses = true;
+        }
+
         if (cmd.hasOption("pu"))
         {
             persistenceUnitName = cmd.getOptionArg("pu");
@@ -275,17 +282,8 @@ public class SchemaTool
         StoreNucleusContext nucleusCtx = null;
         try
         {
-            if (propsFileName != null)
-            {
-                Properties props = PersistenceUtils.setPropertiesUsingFile(propsFileName);
-                nucleusCtx = getNucleusContextForMode(mode, tool.getApi(), props, persistenceUnitName, 
-                    ddlFilename, tool.isVerbose());
-            }
-            else
-            {
-                nucleusCtx = getNucleusContextForMode(mode, tool.getApi(), null, persistenceUnitName, 
-                    ddlFilename, tool.isVerbose());
-            }
+            Properties props = (propsFileName!=null) ? PersistenceUtils.setPropertiesUsingFile(propsFileName) : null;
+            nucleusCtx = getNucleusContextForMode(mode, tool.getApi(), props, persistenceUnitName, ddlFilename, tool.isVerbose(), ignoreMetaDataForMissingClasses);
         }
         catch (Exception e)
         {
@@ -520,8 +518,25 @@ public class SchemaTool
      * @return The NucleusContext to use
      * @throws NucleusException Thrown if an error occurs in creating the required NucleusContext
      */
-    public static StoreNucleusContext getNucleusContextForMode(Mode mode, String api, Map userProps, 
-            String persistenceUnitName, String ddlFile, boolean verbose)
+    public static StoreNucleusContext getNucleusContextForMode(Mode mode, String api, Map userProps, String persistenceUnitName, String ddlFile, boolean verbose)
+    {
+        return getNucleusContextForMode(mode, api, userProps, persistenceUnitName, ddlFile, verbose, false);
+    }
+
+    /**
+     * Method to create a NucleusContext for the specified mode of SchemaTool
+     * @param mode Mode of operation of SchemaTool
+     * @param api Persistence API
+     * @param userProps Map containing user provided properties (usually input via a file)
+     * @param persistenceUnitName Name of the persistence-unit (if any)
+     * @param ddlFile Name of a file to output DDL to
+     * @param verbose Verbose mode
+     * @param ignoreMetaDataForMissingClasses Whether to ignore metadata for missing classes
+     * @return The NucleusContext to use
+     * @throws NucleusException Thrown if an error occurs in creating the required NucleusContext
+     */
+    public static StoreNucleusContext getNucleusContextForMode(Mode mode, String api, Map userProps, String persistenceUnitName, String ddlFile, boolean verbose,
+            boolean ignoreMetaDataForMissingClasses)
     {
         // Extract any properties that affect NucleusContext startup
         Map startupProps = null;
@@ -678,6 +693,10 @@ public class SchemaTool
             props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS.toLowerCase(), "true");
             props.put(PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS.toLowerCase(), "true");
         }
+        if (ignoreMetaDataForMissingClasses)
+        {
+            props.put(PropertyNames.PROPERTY_METADATA_IGNORE_METADATA_FOR_MISSING_CLASSES, "true");
+        }
 
         // Apply remaining persistence properties
         propConfig.setPersistenceProperties(props);
@@ -783,7 +802,6 @@ public class SchemaTool
     {
         return schemaName;
     }
-
     public SchemaTool setSchemaName(String schemaName)
     {
         this.schemaName = schemaName;
@@ -794,7 +812,6 @@ public class SchemaTool
     {
         return ddlFilename;
     }
-
     public SchemaTool setDdlFile(String file)
     {
         this.ddlFilename = file;
@@ -806,7 +823,6 @@ public class SchemaTool
         this.completeDdl = completeDdl;
         return this;
     }
-
     public boolean getCompleteDdl()
     {
         return completeDdl;
@@ -817,7 +833,6 @@ public class SchemaTool
         this.includeAutoStart = include;
         return this;
     }
-
     public boolean getIncludeAutoStart()
     {
         return includeAutoStart;
