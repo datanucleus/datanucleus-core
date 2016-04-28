@@ -35,6 +35,8 @@ import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.flush.FlushProcess;
+import org.datanucleus.identity.DatastoreId;
+import org.datanucleus.identity.SingleFieldId;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
@@ -329,9 +331,20 @@ public class FederatedStoreManager implements StoreManager
 
     public String manageClassForIdentity(Object id, ClassLoaderResolver clr)
     {
-        NucleusLogger.PERSISTENCE.debug(">> TODO Need to allocate manageClassForIdentity(" + id + ") to correct store manager");
-        // TODO Work out if this class is in this store manager
-        return primaryStoreMgr.manageClassForIdentity(id, clr);
+        if (id instanceof SingleFieldId)
+        {
+            return  getStoreManagerForClass(((SingleFieldId)id).getTargetClassName(), clr).manageClassForIdentity(id, clr);
+        }
+        else if (id instanceof DatastoreId)
+        {
+            return  getStoreManagerForClass(((DatastoreId)id).getTargetClassName(), clr).manageClassForIdentity(id, clr);
+        }
+        else
+        {
+            // TODO User provided id. Work outwhich store manager handles this class
+            NucleusLogger.PERSISTENCE.debug(">> TODO Need to allocate manageClassForIdentity(" + id + ") to correct store manager");
+            return primaryStoreMgr.manageClassForIdentity(id, clr);
+        }
     }
 
     public boolean managesClass(String className)
