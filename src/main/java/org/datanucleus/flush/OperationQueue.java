@@ -131,7 +131,7 @@ public class OperationQueue
         while (operIter.hasNext())
         {
             Operation oper = operIter.next();
-            if (oper instanceof SCOOperation && ((SCOOperation)oper).getStore() == store)
+            if (oper.getObjectProvider() == op && oper instanceof SCOOperation && ((SCOOperation)oper).getStore() == store)
             {
                 flushOperations.add(oper);
                 operIter.remove();
