@@ -56,6 +56,7 @@ import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.store.schema.naming.NamingFactory;
 import org.datanucleus.store.valuegenerator.ValueGenerationManager;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * A federated StoreManager orchestrates the persistence/retrieval for multiple datastores.
@@ -334,16 +335,23 @@ public class FederatedStoreManager implements StoreManager
     {
         if (IdentityUtils.isSingleFieldIdentity(id))
         {
-            return  getStoreManagerForClass(((SingleFieldId)id).getTargetClassName(), clr).manageClassForIdentity(id, clr);
+            return getStoreManagerForClass(((SingleFieldId)id).getTargetClassName(), clr).manageClassForIdentity(id, clr);
         }
         else if (IdentityUtils.isDatastoreIdentity(id))
         {
-            return  getStoreManagerForClass(((DatastoreId)id).getTargetClassName(), clr).manageClassForIdentity(id, clr);
+            return getStoreManagerForClass(((DatastoreId)id).getTargetClassName(), clr).manageClassForIdentity(id, clr);
         }
         else
         {
-            // TODO User provided id. Work outwhich store manager handles this class
-            NucleusLogger.PERSISTENCE.debug(">> TODO Need to allocate manageClassForIdentity(" + id + ") to correct store manager");
+            // User provided identity
+            Collection<AbstractClassMetaData> cmds = getMetaDataManager().getClassMetaDataWithApplicationId(id.getClass().getName());
+            if (cmds != null && !cmds.isEmpty())
+            {
+                AbstractClassMetaData cmd = cmds.iterator().next();
+                return getStoreManagerForClass(cmd).manageClassForIdentity(id, clr);
+            }
+
+            NucleusLogger.PERSISTENCE.debug("Unable to find the store that manages an id of type " + StringUtils.toJVMIDString(id) + "; using primary store");
             return primaryStoreMgr.manageClassForIdentity(id, clr);
         }
     }
