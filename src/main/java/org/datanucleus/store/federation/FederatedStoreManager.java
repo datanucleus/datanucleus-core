@@ -36,6 +36,7 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.flush.FlushProcess;
 import org.datanucleus.identity.DatastoreId;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.identity.SingleFieldId;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -331,11 +332,11 @@ public class FederatedStoreManager implements StoreManager
 
     public String manageClassForIdentity(Object id, ClassLoaderResolver clr)
     {
-        if (id instanceof SingleFieldId)
+        if (IdentityUtils.isSingleFieldIdentity(id))
         {
             return  getStoreManagerForClass(((SingleFieldId)id).getTargetClassName(), clr).manageClassForIdentity(id, clr);
         }
-        else if (id instanceof DatastoreId)
+        else if (IdentityUtils.isDatastoreIdentity(id))
         {
             return  getStoreManagerForClass(((DatastoreId)id).getTargetClassName(), clr).manageClassForIdentity(id, clr);
         }
