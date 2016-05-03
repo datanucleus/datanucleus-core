@@ -168,6 +168,15 @@ public class DN2NamingFactory extends AbstractNamingFactory
             {
                 name = colmds[position].getName();
             }
+            else if (mmd.hasCollection())
+            {
+                // Try element columnMetaData
+                colmds = mmd.getElementMetaData().getColumnMetaData();
+                if (colmds != null && colmds.length > position)
+                {
+                    name = colmds[position].getName();
+                }
+            }
             if (name == null)
             {
                 name = mmd.getName();
