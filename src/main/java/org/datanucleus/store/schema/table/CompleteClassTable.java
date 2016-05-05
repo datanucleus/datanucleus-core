@@ -296,6 +296,12 @@ public class CompleteClassTable implements Table
             else
             {
                 ColumnMetaData[] colmds = mmd.getColumnMetaData();
+                if ((colmds == null || colmds.length == 0) && mmd.hasCollection())
+                {
+                    // Column is for a collection, and column info stored under <element>
+                    colmds = mmd.getElementMetaData().getColumnMetaData();
+                }
+
                 if (relationType != RelationType.NONE)
                 {
                     // 1-1/N-1 stored as single column with persistable-id
