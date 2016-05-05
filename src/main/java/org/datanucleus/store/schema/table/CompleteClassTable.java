@@ -136,6 +136,7 @@ public class CompleteClassTable implements Table
             RelationType relationType = mmd.getRelationType(clr);
             if (relationType != RelationType.NONE && MetaDataUtils.getInstance().isMemberEmbedded(storeMgr.getMetaDataManager(), clr, mmd, relationType, null))
             {
+                // EMBEDDED FIELD
                 List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>();
                 embMmds.add(mmd);
                 if (RelationType.isRelationSingleValued(relationType))
@@ -298,6 +299,12 @@ public class CompleteClassTable implements Table
             else
             {
                 ColumnMetaData[] colmds = mmd.getColumnMetaData();
+                if ((colmds == null || colmds.length == 0) && mmd.hasCollection())
+                {
+                    // Column is for a collection, and column info stored under <element>
+                    colmds = mmd.getElementMetaData().getColumnMetaData();
+                }
+
                 if (relationType != RelationType.NONE)
                 {
                     // 1-1/N-1 stored as single column with persistable-id
@@ -406,6 +413,7 @@ public class CompleteClassTable implements Table
                                 col.setJdbcType(colmds[0].getJdbcType());
                             }
                         }
+
                         MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
                         if (mmd.hasCollection())
                         {
