@@ -27,6 +27,7 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.api.ApiAdapterFactory;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.MetaDataListener;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.properties.CorePropertyValidator;
@@ -73,6 +74,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
         STARTUP_PROPERTIES.add(PropertyNames.PROPERTY_CLASSLOADER_RESOLVER_NAME);
         STARTUP_PROPERTIES.add(PropertyNames.PROPERTY_PERSISTENCE_XML_FILENAME);
         STARTUP_PROPERTIES.add(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY);
+        STARTUP_PROPERTIES.add(PropertyNames.PROPERTY_METADATA_LISTENER_OBJECT);
     }
 
     public AbstractNucleusContext(String apiName, Map startupProps, PluginManager pluginMgr)
@@ -185,6 +187,11 @@ public abstract class AbstractNucleusContext implements NucleusContext
             {
                 metaDataManager = (MetaDataManager)pluginManager.createExecutableExtension("org.datanucleus.metadata_manager", new String[]{"name"}, new String[]{apiName}, 
                     "class", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[]{this});
+                if (config.hasProperty(PropertyNames.PROPERTY_METADATA_LISTENER_OBJECT))
+                {
+                    MetaDataListener mdl = (MetaDataListener)config.getProperty(PropertyNames.PROPERTY_METADATA_LISTENER_OBJECT);
+                    metaDataManager.registerListener(mdl);
+                }
             }
             catch (Exception e)
             {
