@@ -89,7 +89,13 @@ public interface StoreManager
     public static final String OPTION_TXN_ISOLATION_REPEATABLE_READ = "TransactionIsolationLevel.repeatable-read";
     public static final String OPTION_TXN_ISOLATION_SERIALIZABLE = "TransactionIsolationLevel.serializable";
     public static final String OPTION_QUERY_CANCEL = "Query.Cancel";
+    public static final String OPTION_QUERY_JDOQL_BULK_INSERT = "Query.JDOQL.BulkInsert";
+    public static final String OPTION_QUERY_JDOQL_BULK_UPDATE = "Query.JDOQL.BulkUpdate";
+    public static final String OPTION_QUERY_JDOQL_BULK_DELETE = "Query.JDOQL.BulkDelete";
     public static final String OPTION_QUERY_JDOQL_BITWISE_OPS = "Query.JDOQL.BitwiseOperations";
+    public static final String OPTION_QUERY_JPQL_BULK_INSERT = "Query.JPQL.BulkInsert";
+    public static final String OPTION_QUERY_JPQL_BULK_UPDATE = "Query.JPQL.BulkUpdate";
+    public static final String OPTION_QUERY_JPQL_BULK_DELETE = "Query.JPQL.BulkDelete";
     public static final String OPTION_DATASTORE_TIMEOUT = "Datastore.Timeout";
     public static final String OPTION_DATASTORE_TIME_STORES_MILLISECS = "Datastore.Time.Millisecs";
     public static final String OPTION_DATASTORE_TIME_STORES_NANOSECS = "Datastore.Time.Nanosecs";
