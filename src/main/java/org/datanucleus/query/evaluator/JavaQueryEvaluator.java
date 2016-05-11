@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.query.QueryUtils;
 import org.datanucleus.query.compiler.QueryCompilation;
@@ -86,8 +87,7 @@ public abstract class JavaQueryEvaluator
      * @param clr ClassLoader resolver
      * @param candidates Candidate objects
      */
-    public JavaQueryEvaluator(String language, Query query, QueryCompilation compilation, 
-            Map parameterValues, ClassLoaderResolver clr, Collection candidates)
+    public JavaQueryEvaluator(String language, Query query, QueryCompilation compilation, Map parameterValues, ClassLoaderResolver clr, Collection candidates)
     {
         this.language = language;
         this.query = query;
@@ -95,8 +95,7 @@ public abstract class JavaQueryEvaluator
         this.parameterValues = parameterValues;
         this.clr = clr;
         this.candidates = candidates;
-        this.candidateAlias = (compilation.getCandidateAlias() != null ? 
-                compilation.getCandidateAlias() : this.candidateAlias);
+        this.candidateAlias = (compilation.getCandidateAlias() != null ? compilation.getCandidateAlias() : this.candidateAlias);
 
         state = new HashMap<String, Object>();
         state.put(this.candidateAlias, query.getCandidateClass());
@@ -715,6 +714,10 @@ public abstract class JavaQueryEvaluator
         for (int i=0; i<result.length; i++)
         {
             r[i] = result[i].evaluate(evaluator);
+            if (r[i] instanceof InMemoryFailure)
+            {
+                throw new NucleusException("Failure in in-memory result evaluation. See the log for details");
+            }
         }
     
         return r;
