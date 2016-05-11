@@ -296,7 +296,7 @@ public class CompleteClassTable implements Table
             else
             {
                 ColumnMetaData[] colmds = mmd.getColumnMetaData();
-                if ((colmds == null || colmds.length == 0) && mmd.hasCollection())
+                if ((colmds == null || colmds.length == 0) && mmd.hasCollection() && mmd.getElementMetaData() != null)
                 {
                     // Column is for a collection, and column info stored under <element>
                     colmds = mmd.getElementMetaData().getColumnMetaData();

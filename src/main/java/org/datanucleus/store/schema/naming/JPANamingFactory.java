@@ -194,7 +194,7 @@ public class JPANamingFactory extends AbstractNamingFactory
             {
                 name = colmds[position].getName();
             }
-            else if (mmd.hasCollection())
+            else if (mmd.hasCollection() && mmd.getElementMetaData() != null)
             {
                 // Try element columnMetaData
                 colmds = mmd.getElementMetaData().getColumnMetaData();
