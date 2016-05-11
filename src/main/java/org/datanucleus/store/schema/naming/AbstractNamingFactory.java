@@ -303,6 +303,10 @@ public abstract class AbstractNamingFactory implements NamingFactory
         {
             idxName = cmd.getName() + wordSeparator + "TENANT" + wordSeparator + suffix;
         }
+        else if (type == ColumnType.DISCRIMINATOR_COLUMN)
+        {
+            idxName = cmd.getName() + wordSeparator + "DISCRIM" + wordSeparator + suffix;
+        }
         else
         {
             idxName = suffix;
