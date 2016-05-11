@@ -68,39 +68,29 @@ import org.datanucleus.util.StringUtils;
  * <p>
  * Metadata can be loaded into the MetaDataManager in two ways
  * <ul>
- * <li>Load when required. When the persistence process needs a class it will ask for metadata, and we can
- * go and find its metadata from XML/annotations.</li>
- * <li>Load explicitly via API calls. This happens when handling persistence for a persistence-unit for
- * example since we know what classes/mapping is involved. It is also the case with the enhancer where
- * we know what classes to enhance so we load the metadata first</li>
+ * <li>Load when required. When the persistence process needs a class it will ask for metadata, and we can go and find its metadata from XML/annotations.</li>
+ * <li>Load explicitly via API calls. This happens when handling persistence for a persistence-unit for example since we know what classes/mapping is involved. 
+ * It is also the case with the enhancer where we know what classes to enhance so we load the metadata first</li>
  * </ul>
  * <P>
- * Acts as a registry of metadata so that metadata files don't need to be 
- * parsed multiple times. MetaData is stored as a FileMetaData, which contains
- * PackageMetaData, which contains ClassMetaData, and so on. This maps exactly
- * to the users model of their metadata. The users access point is 
- * <B>getMetaDataForClass()</B> which will check the known classes without metadata,
- * then check the existing registered metdata, then check the valid locations for 
- * metdata files. This way, the metadata is managed from this single point.
+ * Acts as a registry of metadata so that metadata files don't need to be parsed multiple times. MetaData is stored as a FileMetaData, which contains
+ * PackageMetaData, which contains ClassMetaData, and so on. This maps exactly to the users model of their metadata. The users access point is 
+ * <B>getMetaDataForClass()</B> which will check the known classes without metadata, then check the existing registered metdata, then check the 
+ * valid locations for metdata files. This way, the metadata is managed from this single point.
  * </P>
  * <P>
- * Maintains a list of all classes that have been checked for MetaData and
- * don't have any available. This avoids the needs to look up MetaData multiple
- * times finding the same result. Currently this list is for all ClassMetaData 
- * objects keyed by the class name.
+ * Maintains a list of all classes that have been checked for MetaData and don't have any available. This avoids the needs to look up MetaData multiple times 
+ * finding the same result. Currently this list is for all ClassMetaData objects keyed by the class name.
  * </P>
  * <P>
- * Users can register interest in knowing when metadata for classes are loaded by registering a listener
- * using the <i>addListener</i> method. This will then notify the listener when metadata for any class
- * is initialised. This provides the opportunity to reject the metadata where particular features are
- * not supported. For example a StoreManager could register a listener where it doesn't support
- * datastore identity and throw an InvalidMetaDataException. This would then filter back out to the user
- * for the operation they invoked
+ * Users can register interest in knowing when metadata for classes are loaded by registering a listener using the <i>addListener</i> method. 
+ * This will then notify the listener when metadata for any class is initialised. This provides the opportunity to reject the metadata where particular features are
+ * not supported. For example a StoreManager could register a listener where it doesn't support datastore identity and throw an InvalidMetaDataException. 
+ * This would then filter back out to the user for the operation they invoked
  * </P>
  * <P>
  * MetaDataManager is intended to be thread-safe. All maps are ConcurrentHashMap to provide basic multithread usage.
- * In addition all mutating methods make use of an update "lock" so that only one thread can update the metadata
- * definition at any time.
+ * In addition all mutating methods make use of an update "lock" so that only one thread can update the metadata definition at any time.
  * </P>
  */
 public abstract class MetaDataManagerImpl implements Serializable, MetaDataManager
@@ -1346,8 +1336,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      * Method to initialise the provided FileMetaData, ready for use.
      * @param fileMetaData Collection of FileMetaData
      * @param clr ClassLoader resolver
-     * @throws NucleusUserException thrown if an error occurs during the populate/initialise
-     *     of the supplied metadata.
+     * @throws NucleusUserException thrown if an error occurs during the populate/initialise of the supplied metadata.
      */
     protected void initialiseFileMetaDataForUse(Collection fileMetaData, ClassLoaderResolver clr)
     {
@@ -1815,7 +1804,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     @Override
     public String[] getClassesImplementingInterface(String interfaceName, ClassLoaderResolver clr)
     {
-        Collection classes = new HashSet();
+        Collection<Class> classes = new HashSet();
         Class intfClass = clr.classForName(interfaceName);
         Collection generatedClassNames = new HashSet();
 
@@ -1869,33 +1858,34 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
         if (isPersistentInterface && nucleusContext instanceof PersistenceNucleusContext && ((PersistenceNucleusContext)nucleusContext).getImplementationCreator() != null)
         {
-            // JDO2 "persistent interfaces" - deliberately kept separate from normal persistence since it is 
-            // largely undocumented and best left alone TODO this is very time consuming. got to do some cache
+            // JDO "persistent interfaces" - deliberately kept separate from normal persistence since it is largely undocumented and best left alone 
+            // TODO this is very time consuming. got to do some cache
             classes.add(((PersistenceNucleusContext)nucleusContext).getImplementationCreator().newInstance(intfClass, clr).getClass());
 
             int numClasses = classes.size() + generatedClassNames.size();
             String[] classNames = new String[numClasses];
-            Iterator iter = classes.iterator();
             int i = 0;
-            while (iter.hasNext())
+
+            Iterator<Class> classIter = classes.iterator();
+            while (classIter.hasNext())
             {
-                classNames[i++] = ((Class)iter.next()).getName();
+                classNames[i++] = classIter.next().getName();
             }
-            iter = generatedClassNames.iterator();
-            while (iter.hasNext())
+
+            Iterator<String> classNameIter = generatedClassNames.iterator();
+            while (classNameIter.hasNext())
             {
-                classNames[i++] = (String)iter.next();
+                classNames[i++] = classNameIter.next();
             }
             return classNames;
         }
         else if (!classes.isEmpty())
         {
             // Normal persistence
-            // Put the classes into a sorter so we make sure we get the initial implementations first followed
-            // by any subclasses of these implementations. This is needed because when generating the schema we require
-            // the subclass implementations to already have their datastore column created
-            Collection classesSorted = new TreeSet(new InterfaceClassComparator());
-            Iterator classesIter = classes.iterator();
+            // Put the classes into a sorter so we make sure we get the initial implementations first followed by any subclasses of these implementations. 
+            // This is needed because when generating the schema we require the subclass implementations to already have their datastore column created
+            Collection<Class> classesSorted = new TreeSet(new InterfaceClassComparator());
+            Iterator<Class> classesIter = classes.iterator();
             while (classesIter.hasNext())
             {
                 classesSorted.add(classesIter.next());
@@ -1903,11 +1893,11 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
             // Return the class names (in the same order)
             String[] classNames = new String[classesSorted.size()];
-            Iterator iter = classesSorted.iterator();
+            Iterator<Class> iter = classesSorted.iterator();
             int i = 0;
             while (iter.hasNext())
             {
-                classNames[i++] = ((Class)iter.next()).getName();
+                classNames[i++] = iter.next().getName();
             }
             return classNames;
         }
@@ -1915,42 +1905,35 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     }
 
     /**
-     * Simple comparator that orders the implementations of an interface so that the initial implementations
-     * are first, and the subclasses later.
+     * Simple comparator that orders the implementations of an interface so that the initial implementations are first, and the subclasses later.
      */
-    private static class InterfaceClassComparator implements Comparator, Serializable
+    private static class InterfaceClassComparator implements Comparator<Class>, Serializable
     {
         private static final long serialVersionUID = -8114305773358090763L;
 
-        /**
-         * Default constructor.
-         */
         public InterfaceClassComparator()
         {
             // Nothing to do
         }
 
         /**
-         * Method defining the ordering of objects.
-         * Places all nulls at the end.
-         * @param o1 First object
-         * @param o2 Second object
+         * Method defining the ordering of objects. Places all nulls at the end.
+         * @param cls First class
+         * @param cls2 Second class
          * @return The comparison result
          */
-        public int compare(Object o1, Object o2)
+        public int compare(Class cls1, Class cls2)
         {
-            if (o1 == null && o2 == null)
+            if (cls1 == null && cls2 == null)
             {
                 return 0;
             }
-            else if (o1 == null || o2 == null)
+            else if (cls1 == null || cls2 == null)
             {
                 return Integer.MIN_VALUE;
             }
 
             // Just order based on hashcode
-            Class cls1 = (Class)o1;
-            Class cls2 = (Class)o2;
             return cls1.hashCode() - cls2.hashCode();
         }
     }
@@ -1958,7 +1941,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     /**
      * Load up and add any O/R mapping info for the specified class to the stored ClassMetaData (if supported).
      * This implementation does nothing so if ORM files are supported then this should be overridden by subclasses.
-     * Is package-access so that is only accessable by MetaData classes
+     * Is package-access so that is only accessible by MetaData classes.
      * @param c The class
      * @param clr ClassLoader resolver
      */
@@ -1970,7 +1953,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
     /**
      * Load up and add any annotations mapping info for the specified class to the stored ClassMetaData.
-     * Is package-access so that is only accessable by MetaData classes
+     * Is package-access so that is only accessible by MetaData classes.
      * @param c The class
      * @param cmd the metadata to add annotation to
      * @param clr ClassLoader resolver
