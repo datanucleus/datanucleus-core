@@ -944,6 +944,11 @@ public class CompleteClassTable implements Table
                         String colName = namingFactory.getColumnName(embMmds, 0);
                         ColumnImpl col = addEmbeddedColumn(colName, null);
                         col.setNested(ownerNested);
+                        AbstractMemberMetaData theMmd = embMmds.get(0);
+                        if (theMmd.isPrimaryKey())
+                        {
+                            col.setPrimaryKey();
+                        }
                         if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getPosition() != null)
                         {
                             col.setPosition(embmdMmd.getColumnMetaData()[0].getPosition());
