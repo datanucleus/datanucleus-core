@@ -703,8 +703,7 @@ public class QueryUtils
         }
         else
         {
-            throw new NucleusException(
-                    "getStringValueForExpression(expr) where expr is instanceof " + expr.getClass().getName() + " not supported");
+            throw new NucleusException("getStringValueForExpression(expr) where expr is instanceof " + expr.getClass().getName() + " not supported");
         }
         return paramValue;
     }
@@ -898,10 +897,8 @@ public class QueryUtils
                 return comparison != 0 ? true : false;
             }
         }
-        else if (left instanceof Short || left instanceof Integer || left instanceof Long || left instanceof BigInteger ||
-            left instanceof Character ||
-            right instanceof Short || right instanceof Integer || right instanceof Long || right instanceof BigInteger ||
-            right instanceof Character)
+        else if (left instanceof Short || left instanceof Integer || left instanceof Long || left instanceof BigInteger || left instanceof Character ||
+            right instanceof Short || right instanceof Integer || right instanceof Long || right instanceof BigInteger || right instanceof Character)
         {
             // Not floating point based and (at least) one of numbers is integral based so compare using long
             // NOTE : Assumes long is the largest precision required
@@ -1324,8 +1321,7 @@ public class QueryUtils
      * @param clr ClassLoader resolver
      * @return The ordered list
      */
-    public static List orderCandidates(List candidates, Class type, String ordering, ExecutionContext ec, 
-            ClassLoaderResolver clr)
+    public static List orderCandidates(List candidates, Class type, String ordering, ExecutionContext ec, ClassLoaderResolver clr)
     {
         return orderCandidates(candidates, type, ordering, ec, clr, "JDOQL");
     }
@@ -1339,21 +1335,18 @@ public class QueryUtils
      * @param ec Execution Context
      * @param clr ClassLoader resolver
      * @param queryLanguage The query language in use
-     * @return The ordered list
+     * @return The ordered list. Note that this typically returns Arrays$List which may not be what you want
      */
-    public static List orderCandidates(List candidates, Class type, String ordering, ExecutionContext ec, 
-            ClassLoaderResolver clr, String queryLanguage)
+    public static List orderCandidates(List candidates, Class type, String ordering, ExecutionContext ec, ClassLoaderResolver clr, String queryLanguage)
     {
         if (candidates == null || candidates.isEmpty() || ordering == null || ordering.equals("#PK"))
         {
             return candidates;
         }
 
-        JavaQueryCompiler compiler = new JPQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), 
-            null, type, null, null, null, ordering, null, null, null, null, null);
+        JavaQueryCompiler compiler = new JPQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), null, type, null, null, null, ordering, null, null, null, null, null);
         QueryCompilation compilation = compiler.compile(null, null);
-        return QueryUtils.orderCandidates(candidates, compilation.getExprOrdering(), new HashMap(), "this", ec, clr,
-            null, null, queryLanguage);
+        return QueryUtils.orderCandidates(candidates, compilation.getExprOrdering(), new HashMap(), "this", ec, clr, null, null, queryLanguage);
     }
 
     /**
@@ -1369,8 +1362,7 @@ public class QueryUtils
      * @param queryLanguage The language of this query (JDOQL, JPQL etc)
      * @return The ordered List of candidates
      */
-    public static List orderCandidates(List candidates, final Expression[] ordering, final Map state,
-            final String candidateAlias, final ExecutionContext ec, final ClassLoaderResolver clr,
+    public static List orderCandidates(List candidates, final Expression[] ordering, final Map state, final String candidateAlias, final ExecutionContext ec, final ClassLoaderResolver clr,
             final Map parameterValues, final Imports imports, final String queryLanguage)
     {
         if (ordering == null)
