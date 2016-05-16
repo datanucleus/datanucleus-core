@@ -521,24 +521,17 @@ public class CompleteClassTable implements Table
             this.discriminatorColumn = col;
         }
 
-        if (storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID) != null)
+        if (storeMgr.getNucleusContext().isClassMultiTenant(cmd))
         {
             // Multitenancy discriminator present : Add restriction for this tenant
-            if ("true".equalsIgnoreCase(cmd.getValueForExtension("multitenancy-disable")))
+            String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.MULTITENANCY_COLUMN);
+            Column col = addColumn(null, colName, ColumnType.MULTITENANCY_COLUMN); // TODO Support column position
+            col.setJdbcType(JdbcType.VARCHAR);
+            if (schemaVerifier != null)
             {
-                // Don't bother with multitenancy for this class
+                schemaVerifier.attributeMember(new MemberColumnMappingImpl(null, col));
             }
-            else
-            {
-                String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.MULTITENANCY_COLUMN);
-                Column col = addColumn(null, colName, ColumnType.MULTITENANCY_COLUMN); // TODO Support column position
-                col.setJdbcType(JdbcType.VARCHAR);
-                if (schemaVerifier != null)
-                {
-                    schemaVerifier.attributeMember(new MemberColumnMappingImpl(null, col));
-                }
-                this.multitenancyColumn = col;
-            }
+            this.multitenancyColumn = col;
         }
 
         // Reorder all columns to respect column positioning information. Note this assumes the user has provided complete information

@@ -190,4 +190,19 @@ public interface PersistenceNucleusContext extends StoreNucleusContext
      * @return Whether this is federated
      */
     boolean isFederated();
+
+    /**
+     * Accessor for whether the supplied class is multi-tenant (i.e with a tenancy id column).
+     * @param cmd The class
+     * @return Whether it is multi-tenant
+     */
+    boolean isClassMultiTenant(AbstractClassMetaData cmd);
+
+    /**
+     * Accessor for the tenant id for the supplied class and executionContext.
+     * @param ec ExecutionContext
+     * @param cmd The class
+     * @return The tenant id for this class and context.
+     */
+    String getMultiTenancyId(ExecutionContext ec, AbstractClassMetaData cmd);
 }

@@ -1621,4 +1621,24 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             return cacheableFlag;
         }
     }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.PersistenceNucleusContext#isClassMultiTenant(org.datanucleus.metadata.AbstractClassMetaData)
+     */
+    @Override
+    public boolean isClassMultiTenant(AbstractClassMetaData cmd)
+    {
+        // TODO Improve this specification. Note we need to remove all external use of PROPERTY_MAPPING_TENANT_ID from RDBMS plugin before changing this
+        return storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID) != null && !"true".equalsIgnoreCase(cmd.getValueForExtension("multitenancy-disable"));
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.PersistenceNucleusContext#getMultiTenancyId(org.datanucleus.ExecutionContext, org.datanucleus.metadata.AbstractClassMetaData)
+     */
+    @Override
+    public String getMultiTenancyId(ExecutionContext ec, AbstractClassMetaData cmd)
+    {
+        // TODO Use input arguments. Note we need to remove all external use of PROPERTY_MAPPING_TENANT_ID from RDBMS plugin before changing this
+        return storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID);
+    }
 }
