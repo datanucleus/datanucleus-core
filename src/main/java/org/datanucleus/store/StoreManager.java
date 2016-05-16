@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.NucleusContext;
+import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -250,10 +250,10 @@ public interface StoreManager
     String getQueryCacheKey();
 
     /**
-     * Accessor for the context in which this StoreManager is running
+     * Accessor for the context in which this StoreManager is running.
      * @return Returns the context.
      */
-    NucleusContext getNucleusContext();
+    PersistenceNucleusContext getNucleusContext();
 
     /**
      * Get the date/time of the datastore.

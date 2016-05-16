@@ -28,8 +28,8 @@ import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.NucleusContext;
 import org.datanucleus.NucleusContextHelper;
+import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.Configuration;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
@@ -84,7 +84,7 @@ public class FederatedStoreManager implements StoreManager
     /** Map of secondary StoreManager keyed by their symbolic name. */
     Map<String, StoreManager> secondaryStoreMgrMap = null;
 
-    final NucleusContext nucleusContext;
+    final PersistenceNucleusContext nucleusContext;
 
     /** Persistence handler. */
     protected StorePersistenceHandler persistenceHandler = null;
@@ -92,7 +92,7 @@ public class FederatedStoreManager implements StoreManager
     /** Query Manager. Lazy initialised, so use getQueryManager() to access. */
     private QueryManager queryMgr = null;
 
-    public FederatedStoreManager(ClassLoaderResolver clr, NucleusContext nucleusContext)
+    public FederatedStoreManager(ClassLoaderResolver clr, PersistenceNucleusContext nucleusContext)
     {
         this.nucleusContext = nucleusContext;
 
@@ -138,7 +138,7 @@ public class FederatedStoreManager implements StoreManager
         this.persistenceHandler = new FederatedPersistenceHandler(this);
     }
 
-    public NucleusContext getNucleusContext()
+    public PersistenceNucleusContext getNucleusContext()
     {
         return nucleusContext;
     }
