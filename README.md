@@ -267,3 +267,12 @@ All code for the backed SCO wrappers are stored under _org.datanucleus.store.typ
 All code for the simple SCO wrappers are stored under _org.datanucleus.store.types.wrappers_.
 
 ----  
+
+### Schema
+
+#### MultiTenancy
+
+The handling for multi-tenancy code is present in each of the store plugins but is controlled from _org.datanucleus.PersistenceNucleusContextImpl_ with two methods
+* __isClassMultiTenant__ : returns whether a class should use a multi-tenancy discriminator
+* __getMultiTenancyId__ : return the tenancy id to populate for the current context.
+
