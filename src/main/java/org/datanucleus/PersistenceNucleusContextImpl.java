@@ -50,6 +50,7 @@ import org.datanucleus.management.jmx.ManagementManager;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.FileMetaData;
 import org.datanucleus.metadata.IdentityType;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataListener;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.QueryLanguage;
@@ -1628,8 +1629,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     @Override
     public boolean isClassMultiTenant(AbstractClassMetaData cmd)
     {
-        // TODO Improve this specification. Note we need to remove all external use of PROPERTY_MAPPING_TENANT_ID from RDBMS plugin before changing this
-        return storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID) != null && !"true".equalsIgnoreCase(cmd.getValueForExtension("multitenancy-disable"));
+        // TODO Improve this specification. At the moment if the user specifies the tenant id then we are running multi-tenant.
+        return storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID) != null && !"true".equalsIgnoreCase(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_DISABLE));
     }
 
     /* (non-Javadoc)
@@ -1638,7 +1639,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     @Override
     public String getMultiTenancyId(ExecutionContext ec, AbstractClassMetaData cmd)
     {
-        // TODO Use input arguments. Note we need to remove all external use of PROPERTY_MAPPING_TENANT_ID from RDBMS plugin before changing this
+        // TODO Use input arguments.
         return storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID);
     }
 }
