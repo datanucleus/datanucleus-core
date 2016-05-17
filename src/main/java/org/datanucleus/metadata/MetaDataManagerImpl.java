@@ -2879,6 +2879,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      * @param cmd MetaData
      * @param clr ClassLoader resolver
      * @param loader The primary class loader
+     * @return Whether it was successful
      */
     protected boolean populateAbstractClassMetaData(final AbstractClassMetaData cmd, final ClassLoaderResolver clr, final ClassLoader loader)
     {
