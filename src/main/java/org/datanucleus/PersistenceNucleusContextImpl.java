@@ -79,7 +79,6 @@ import org.datanucleus.transaction.jta.TransactionManagerFinder;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
-import org.datanucleus.validation.BeanValidatorHandler;
 
 /**
  * Extends the basic DataNucleus context, adding on services for
