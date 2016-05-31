@@ -134,6 +134,12 @@ public class MetaData implements Serializable
     /** Member : when this field has a value generator, only apply it when the field is not set. */
     public static final String EXTENSION_MEMBER_STRATEGY_WHEN_NOTNULL = "strategy-when-notnull";
 
+    /** Class : definition of VIEW (when mapping to a view). */
+    public static final String EXTENSION_CLASS_VIEW_DEFINITION = "view-definition";
+
+    /** Class : definition of imports for VIEW (when mapping to a view). */
+    public static final String EXTENSION_CLASS_VIEW_IMPORTS = "view-imports";
+
     /** List of extensions for this MetaData element. */
     protected Collection<ExtensionMetaData> extensions = null;
 

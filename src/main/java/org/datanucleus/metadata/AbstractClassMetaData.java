@@ -40,14 +40,12 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.MacroString;
 import org.datanucleus.util.StringUtils;
-import org.datanucleus.util.ViewUtils;
 
 /**
  * Abstract representation of the MetaData of a class/interface.
  * Has a parent PackageMetaData that can contain the metadata for several classes/interfaces. 
  * Is extended by ClassMetaData and InterfaceMetaData.
- * Of the things that it contains the main one are the "members" which are the MetaData for
- * all fields and properties that are persistable.
+ * Of the things that it contains the main one are the "members" which are the MetaData for all fields and properties that are persistable.
  */
 public abstract class AbstractClassMetaData extends MetaData
 {
@@ -888,10 +886,8 @@ public abstract class AbstractClassMetaData extends MetaData
      * Check if the inheritance MetaData is credible.
      * @param isAbstract Whether this class is abstract
      * @throws InvalidMetaDataException if the strategy is superclass-table, yet there are no super class
-     * @throws InvalidMetaDataException if the strategy is superclass-table, yet the super class has not
-     *                                  specified a discriminator
-     * @throws InvalidMetaDataException if the strategy is superclass-table and discriminator is "value-map",
-     *                                  yet no value for the discriminator has been specified
+     * @throws InvalidMetaDataException if the strategy is superclass-table, yet the super class has not specified a discriminator
+     * @throws InvalidMetaDataException if the strategy is superclass-table and discriminator is "value-map", yet no value for the discriminator has been specified
      */
     protected void validateUserInputForInheritanceMetaData(boolean isAbstract)
     {
@@ -1300,10 +1296,8 @@ public abstract class AbstractClassMetaData extends MetaData
     /**
      * Determine the object id class.
      * @param mmgr MetaData manager
-     * @throws InvalidMetaDataException if the class 0 or more that one primary key field and no <code>objectid-class</code>
-     *                                  has been declared in the MetaData
-     * @throws InvalidMetaDataException if the <code>objectid-class</code> has not been set and the primary key field does
-     *                                  not match a supported SingleFieldIdentity
+     * @throws InvalidMetaDataException if the class 0 or more that one primary key field and no <code>objectid-class</code> has been declared in the MetaData
+     * @throws InvalidMetaDataException if the <code>objectid-class</code> has not been set and the primary key field does not match a supported SingleFieldIdentity
      * @throws InvalidMetaDataException if the identity type is APPLICATION but not primary key fields have been set
      * @throws InvalidMetaDataException if the <code>objectid-class</code> cannot be loaded by the <code>clr</code>                                                                     
      */
@@ -1488,8 +1482,7 @@ public abstract class AbstractClassMetaData extends MetaData
     public abstract void initialise(ClassLoaderResolver clr, MetaDataManager mmgr);
 
     /**
-     * Method to initialise all convenience information about member positions and what role
-     * each position performs.
+     * Method to initialise all convenience information about member positions and what role each position performs.
      * @param mmgr MetaDataManager
      */
     protected void initialiseMemberPositionInformation(MetaDataManager mmgr)
@@ -1574,24 +1567,18 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
-     * Method to return the ClassMetaData records for classes referenced
-     * by this object. This adds the entries to orderedCMDs ordered by
-     * dependency, and to referencedCMDs for fast lookups.
+     * Method to return the ClassMetaData records for classes referenced by this object. 
+     * This adds the entries to orderedCMDs ordered by dependency, and to referencedCMDs for fast lookups.
      * <p>
-     * Uses recursion to add all referenced ClassMetaData for any fields,
-     * objectid classes, superclasses, and extension RDBMS "views".
+     * Uses recursion to add all referenced ClassMetaData for any fields, objectid classes, superclasses, and extension "views".
+     * This is the entry point for this process.
      * </p>
-     * <p>
-     * This is the entry point for this process, and provides the core of the
-     * "persistence-by-reachability" concept.
-     * </p> 
      * @param orderedCMDs List of ordered ClassMetaData objects (added to).
      * @param referencedCMDs Set of all ClassMetaData objects (added to).
      * @param clr the ClassLoaderResolver
      * @param mmgr MetaData manager
      */
-    void getReferencedClassMetaData(final List orderedCMDs, final Set referencedCMDs,
-            final ClassLoaderResolver clr, final MetaDataManager mmgr)
+    void getReferencedClassMetaData(final List orderedCMDs, final Set referencedCMDs, final ClassLoaderResolver clr, final MetaDataManager mmgr)
     {
         Map viewReferences = new HashMap();
         getReferencedClassMetaData(orderedCMDs, referencedCMDs, viewReferences, clr, mmgr);
@@ -1606,8 +1593,7 @@ public abstract class AbstractClassMetaData extends MetaData
      * @param clr the ClassLoaderResolver
      * @param mmgr MetaData manager
      */
-    private void getReferencedClassMetaData(final List orderedCMDs, final Set referencedCMDs,
-        final Map viewReferences, final ClassLoaderResolver clr, final MetaDataManager mmgr)
+    private void getReferencedClassMetaData(final List orderedCMDs, final Set referencedCMDs, final Map viewReferences, final ClassLoaderResolver clr, final MetaDataManager mmgr)
     {
         // Recursively call getReferencedClassMetaData(...) before adding them
         // to the orderedCmds and referenced. This will ensure that any
@@ -1644,10 +1630,10 @@ public abstract class AbstractClassMetaData extends MetaData
             }
 
             // Add on any view-definition for this class
-            String viewDefStr = getValueForExtension("view-definition");
+            String viewDefStr = getValueForExtension(MetaData.EXTENSION_CLASS_VIEW_DEFINITION);
             if (viewDefStr!= null)
             {
-                MacroString viewDef = new MacroString(fullName, getValueForExtension("view-imports"), viewDefStr);
+                MacroString viewDef = new MacroString(fullName, getValueForExtension(MetaData.EXTENSION_CLASS_VIEW_IMPORTS), viewDefStr);
                 viewDef.substituteMacros(new MacroString.MacroHandler()
                     {
                         public void onIdentifierMacro(MacroString.IdentifierMacro im)
@@ -1693,10 +1679,61 @@ public abstract class AbstractClassMetaData extends MetaData
 
             // Check to see if there is a circular dependency.  This will
             // be true if the referenced class references this class.
-            ViewUtils.checkForCircularViewReferences(viewReferences,fullName,referenced_name,null);
+            AbstractClassMetaData.checkForCircularViewReferences(viewReferences,fullName,referenced_name,null);
         }
     }
-    
+
+    /**
+     * Check for any circular view references between referencer and referencee.
+     * If one is found, throw a NucleusUserException with the chain of references.
+     * @param viewReferences The Map of view references to check.
+     * @param referencer_name Name of the class that has the reference.
+     * @param referencee_name Name of the class that is being referenced.
+     * @param referenceChain The List of class names that have been referenced
+     * @throws NucleusUserException If a circular reference is found in the view definitions.
+     */
+    protected static void checkForCircularViewReferences(Map viewReferences, String referencer_name, String referencee_name, List referenceChain)
+    {
+        Set class_names = (Set)viewReferences.get(referencee_name);
+        if (class_names != null)
+        {
+            // Initialize the chain of references if needed.  Add the referencee
+            // to the chain.
+            if (referenceChain == null)
+            {
+                referenceChain = new ArrayList();
+                referenceChain.add(referencer_name);
+            }
+            referenceChain.add(referencee_name);
+
+            // Iterate through all referenced classes from the referencee.  If
+            // any reference the referencer, throw an exception.
+            for (Iterator it=class_names.iterator(); it.hasNext(); )
+            {
+                String current_name=(String)it.next();
+                if (current_name.equals(referencer_name))
+                {
+                    StringBuilder error=new StringBuilder(Localiser.msg("031003"));
+
+                    for (Iterator chainIter=referenceChain.iterator(); chainIter.hasNext(); )
+                    {
+                        error.append(chainIter.next());
+                        if (chainIter.hasNext())
+                        {
+                            error.append(" -> ");
+                        }
+                    }
+
+                    throw new NucleusUserException(error.toString()).setFatal();
+                }
+
+                // Make recursive call to check for any nested dependencies.
+                // e.g A references B, B references C, C references A.
+                AbstractClassMetaData.checkForCircularViewReferences(viewReferences, referencer_name, current_name, referenceChain);
+            }
+        }
+    }
+
     // ------------------------------ Accessors --------------------------------
 
     /**
