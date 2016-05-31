@@ -17,7 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.management;
 
-import org.datanucleus.util.MathUtils;
+import java.util.LinkedList;
 
 /**
  * Abstract base class for a statistics object.
@@ -48,7 +48,7 @@ public abstract class AbstractStatistics
     int txnExecutionTotalTime = 0;
     int txnExecutionTimeHigh =-1;
     int txnExecutionTimeLow =-1;
-    MathUtils.SMA txnExecutionTimeAverage = new MathUtils.SMA(50);
+    SMA txnExecutionTimeAverage = new SMA(50);
 
     int queryActiveTotalCount;
     int queryErrorTotalCount;
@@ -56,7 +56,7 @@ public abstract class AbstractStatistics
     int queryExecutionTotalTime = 0;
     int queryExecutionTimeHigh =-1;
     int queryExecutionTimeLow =-1;
-    MathUtils.SMA queryExecutionTimeAverage = new MathUtils.SMA(50);
+    SMA queryExecutionTimeAverage = new SMA(50);
 
     /**
      * Constructor specifying a "name" that we want to know this by.
@@ -427,6 +427,57 @@ public abstract class AbstractStatistics
         if (parent != null)
         {
             parent.transactionStarted();
+        }
+    }
+
+    /**
+     * Simple Moving Average
+     */
+    public static class SMA
+    {
+        private LinkedList values = new LinkedList();
+
+        private int length;
+
+        private double sum = 0;
+
+        private double average = 0;
+        
+        /**
+         * 
+         * @param length the maximum length
+         */
+        public SMA(int length)
+        {
+            if (length <= 0)
+            {
+                throw new IllegalArgumentException("length must be greater than zero");
+            }
+            this.length = length;
+        }
+
+        public double currentAverage()
+        {
+            return average;
+        }
+
+        /**
+         * Compute the moving average.
+         * Synchronised so that no changes in the underlying data is made during calculation.
+         * @param value The value
+         * @return The average
+         */
+        public synchronized double compute(double value)
+        {
+            if (values.size() == length && length > 0)
+            {
+                sum -= ((Double) values.getFirst()).doubleValue();
+                values.removeFirst();
+            }
+            sum += value;
+            values.addLast(new Double(value));
+            average = sum / values.size();
+            return average;
         }
     }
 }
