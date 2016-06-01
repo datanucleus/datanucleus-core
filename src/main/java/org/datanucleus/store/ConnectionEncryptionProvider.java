@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store.encryption;
+package org.datanucleus.store;
 
 /**
  * Interface to be implemented by an decryption provider allowing encrypted passwords

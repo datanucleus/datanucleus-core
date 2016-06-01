@@ -63,7 +63,6 @@ import org.datanucleus.store.connection.ConnectionFactory;
 import org.datanucleus.store.connection.ConnectionManager;
 import org.datanucleus.store.connection.ConnectionManagerImpl;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.encryption.ConnectionEncryptionProvider;
 import org.datanucleus.store.exceptions.NoExtentException;
 import org.datanucleus.store.federation.FederatedStoreManager;
 import org.datanucleus.store.query.QueryManager;

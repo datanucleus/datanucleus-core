@@ -15,28 +15,19 @@ limitations under the License.
 Contributors:
    ...
 **********************************************************************/
-package org.datanucleus.store.encryption;
-
-import org.datanucleus.metadata.AbstractMemberMetaData;
+package org.datanucleus.store;
 
 /**
- * Interface to be implemented by any persistence encryption provider.
+ * Interface implemented by any StoreManager that wants to provide a hook to encrypt field data
+ * prior to persistence.
  */
-public interface PersistenceEncryptionProvider
+public interface EncryptionAwareStoreManager
 {
     /**
-     * Method to encrypt the provided value for persistence.
-     * @param mmd Metadata for the member (field/property).
-     * @param value Its value to encrypt.
-     * @return The encrypted value
+     * Method to set the encryption provider for persistent data.
+     * When a provider is set on the StoreManager, any persist (insert/update) or retrieval will be intercepted.
+     * This should be called before the StoreManager is used for persistence/retrieval.
+     * @param provider The provider to use.
      */
-    Object encryptValue(AbstractMemberMetaData mmd, Object value);
-
-    /**
-     * Method to decrypt the provided value from persistence.
-     * @param mmd Metadata for the member (field/property).
-     * @param value Its value to decrypt.
-     * @return The decrypted value
-     */
-    Object decryptValue(AbstractMemberMetaData mmd, Object value);
+    void setEncryptionProvider(PersistenceEncryptionProvider provider);
 }
