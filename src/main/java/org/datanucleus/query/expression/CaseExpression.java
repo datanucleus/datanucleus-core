@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.datanucleus.query.symbol.Symbol;
-import org.datanucleus.query.symbol.SymbolTable;
+import org.datanucleus.query.compiler.Symbol;
+import org.datanucleus.query.compiler.SymbolTable;
 
 /**
  * Expression representing a case series of when expressions and their action expressions.

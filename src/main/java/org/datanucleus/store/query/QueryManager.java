@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.query.cache.QueryCompilationCache;
 import org.datanucleus.query.compiler.QueryCompilation;
+import org.datanucleus.query.compiler.QueryCompilationCache;
 import org.datanucleus.query.inmemory.InvocationEvaluator;
 import org.datanucleus.store.query.cache.QueryDatastoreCompilationCache;
 import org.datanucleus.store.query.cache.QueryResultsCache;

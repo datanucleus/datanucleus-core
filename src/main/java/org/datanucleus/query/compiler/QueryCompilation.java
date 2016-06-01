@@ -25,8 +25,6 @@ import java.util.Map;
 import org.datanucleus.query.QueryUtils;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.expression.ParameterExpression;
-import org.datanucleus.query.symbol.Symbol;
-import org.datanucleus.query.symbol.SymbolTable;
 
 /**
  * Representation of the components of a compiled java "string-based" query.

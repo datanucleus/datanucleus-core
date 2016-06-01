@@ -16,7 +16,7 @@ Contributors:
 2008 Andy Jefferson - add type
     ...
 **********************************************************************/
-package org.datanucleus.query.symbol;
+package org.datanucleus.query.compiler;
 
 import java.io.Serializable;
 

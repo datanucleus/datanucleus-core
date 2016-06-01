@@ -34,9 +34,9 @@ import org.datanucleus.query.compiler.JavaQueryCompiler;
 import org.datanucleus.query.compiler.Node;
 import org.datanucleus.query.compiler.NodeType;
 import org.datanucleus.query.compiler.ParameterNode;
+import org.datanucleus.query.compiler.Symbol;
+import org.datanucleus.query.compiler.SymbolTable;
 import org.datanucleus.query.expression.JoinExpression.JoinType;
-import org.datanucleus.query.symbol.Symbol;
-import org.datanucleus.query.symbol.SymbolTable;
 import org.datanucleus.store.query.QueryCompilerSyntaxException;
 import org.datanucleus.util.NucleusLogger;
 

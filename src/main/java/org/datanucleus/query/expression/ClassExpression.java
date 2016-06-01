@@ -17,8 +17,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.query.expression;
 
-import org.datanucleus.query.symbol.Symbol;
-import org.datanucleus.query.symbol.SymbolTable;
+import org.datanucleus.query.compiler.Symbol;
+import org.datanucleus.query.compiler.SymbolTable;
 
 /**
  * Expression representing a candidate in a FROM clause.

@@ -20,8 +20,8 @@ package org.datanucleus.query.expression;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.datanucleus.query.symbol.Symbol;
-import org.datanucleus.query.symbol.SymbolTable;
+import org.datanucleus.query.compiler.Symbol;
+import org.datanucleus.query.compiler.SymbolTable;
 import org.datanucleus.util.StringUtils;
 
 /**

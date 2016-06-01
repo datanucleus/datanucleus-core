@@ -21,7 +21,6 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.MetaDataManager;
-import org.datanucleus.query.symbol.SymbolTable;
 
 /**
  * Symbol resolver for JPQL.

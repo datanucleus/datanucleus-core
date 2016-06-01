@@ -21,8 +21,6 @@ package org.datanucleus.query.compiler;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.datanucleus.query.symbol.Symbol;
-
 /**
  * Representation of a node in a tree of nodes.
  * Has a parent, and a list of children. Each node has a type and a value.

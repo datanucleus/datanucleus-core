@@ -25,9 +25,6 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
-import org.datanucleus.query.symbol.Symbol;
-import org.datanucleus.query.symbol.SymbolResolver;
-import org.datanucleus.query.symbol.SymbolTable;
 import org.datanucleus.util.ClassUtils;
 
 /**

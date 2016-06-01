@@ -23,9 +23,9 @@ import java.util.List;
 
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.query.symbol.PropertySymbol;
-import org.datanucleus.query.symbol.Symbol;
-import org.datanucleus.query.symbol.SymbolTable;
+import org.datanucleus.query.compiler.PropertySymbol;
+import org.datanucleus.query.compiler.Symbol;
+import org.datanucleus.query.compiler.SymbolTable;
 import org.datanucleus.util.StringUtils;
 
 /**

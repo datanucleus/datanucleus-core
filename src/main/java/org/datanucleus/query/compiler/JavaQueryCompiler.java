@@ -42,10 +42,6 @@ import org.datanucleus.query.expression.PrimaryExpressionIsClassLiteralException
 import org.datanucleus.query.expression.PrimaryExpressionIsClassStaticFieldException;
 import org.datanucleus.query.expression.PrimaryExpressionIsVariableException;
 import org.datanucleus.query.expression.VariableExpression;
-import org.datanucleus.query.symbol.PropertySymbol;
-import org.datanucleus.query.symbol.Symbol;
-import org.datanucleus.query.symbol.SymbolResolver;
-import org.datanucleus.query.symbol.SymbolTable;
 import org.datanucleus.store.query.QueryCompilerSyntaxException;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Imports;

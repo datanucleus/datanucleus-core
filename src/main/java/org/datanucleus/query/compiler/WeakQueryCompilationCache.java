@@ -15,19 +15,18 @@ limitations under the License.
 Contributors:
    ...
 **********************************************************************/
-package org.datanucleus.query.cache;
-
-import java.util.concurrent.ConcurrentHashMap;
+package org.datanucleus.query.compiler;
 
 import org.datanucleus.NucleusContext;
+import org.datanucleus.util.WeakValueMap;
 
 /**
- * Strong-reference implementation of a generic query compilation cache.
+ * Weak-reference implementation of a generic query compilation cache.
  */
-public class StrongQueryCompilationCache extends AbstractQueryCompilationCache implements QueryCompilationCache
+public class WeakQueryCompilationCache extends AbstractQueryCompilationCache implements QueryCompilationCache
 {
-    public StrongQueryCompilationCache(NucleusContext nucleusCtx)
+    public WeakQueryCompilationCache(NucleusContext nucleusCtx)
     {
-        cache = new ConcurrentHashMap();
+        cache = new WeakValueMap();
     }
 }

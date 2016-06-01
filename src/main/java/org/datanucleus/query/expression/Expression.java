@@ -20,8 +20,8 @@ package org.datanucleus.query.expression;
 
 import java.io.Serializable;
 
-import org.datanucleus.query.symbol.Symbol;
-import org.datanucleus.query.symbol.SymbolTable;
+import org.datanucleus.query.compiler.Symbol;
+import org.datanucleus.query.compiler.SymbolTable;
 
 /**
  * A Scalar expression in a Query. Used to compute values with a resulting type.

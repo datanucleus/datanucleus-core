@@ -21,8 +21,8 @@ package org.datanucleus.query.expression;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.datanucleus.query.symbol.Symbol;
-import org.datanucleus.query.symbol.SymbolTable;
+import org.datanucleus.query.compiler.Symbol;
+import org.datanucleus.query.compiler.SymbolTable;
 
 /**
  * Literal of some type (String, Double, Long, BigDecimal, etc).

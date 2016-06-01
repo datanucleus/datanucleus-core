@@ -16,7 +16,7 @@ Contributors:
 2009 Andy Jefferson - removed the value of the symbol so it can be thread-safe
     ...
 **********************************************************************/
-package org.datanucleus.query.symbol;
+package org.datanucleus.query.compiler;
 
 /**
  * A symbol in a query. Registers the name and the type of the symbol.

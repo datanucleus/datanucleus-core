@@ -30,9 +30,6 @@ import org.datanucleus.query.JPQLQueryHelper;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.expression.InvokeExpression;
 import org.datanucleus.query.expression.PrimaryExpression;
-import org.datanucleus.query.symbol.PropertySymbol;
-import org.datanucleus.query.symbol.Symbol;
-import org.datanucleus.query.symbol.SymbolTable;
 import org.datanucleus.util.Imports;
 
 /**

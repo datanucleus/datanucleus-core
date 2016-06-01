@@ -16,7 +16,7 @@ Contributors:
 2009 Andy Jefferson - accessor for symbol names
     ...
 **********************************************************************/
-package org.datanucleus.query.symbol;
+package org.datanucleus.query.compiler;
 
 import java.io.Serializable;
 import java.util.ArrayList;

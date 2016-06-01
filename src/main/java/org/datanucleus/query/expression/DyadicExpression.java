@@ -21,8 +21,8 @@ package org.datanucleus.query.expression;
 import java.lang.reflect.Field;
 
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.query.symbol.Symbol;
-import org.datanucleus.query.symbol.SymbolTable;
+import org.datanucleus.query.compiler.Symbol;
+import org.datanucleus.query.compiler.SymbolTable;
 
 /**
  * Expression between two other expressions and an operation.

@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
    ...
 **********************************************************************/
-package org.datanucleus.query.cache;
+package org.datanucleus.query.compiler;
 
 import org.datanucleus.NucleusContext;
 import org.datanucleus.util.SoftValueMap;

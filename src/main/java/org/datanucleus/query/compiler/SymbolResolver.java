@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.query.symbol;
+package org.datanucleus.query.compiler;
 
 import java.util.List;
 

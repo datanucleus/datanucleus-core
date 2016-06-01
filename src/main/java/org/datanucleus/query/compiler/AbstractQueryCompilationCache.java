@@ -15,11 +15,9 @@ limitations under the License.
 Contributors:
    ...
 **********************************************************************/
-package org.datanucleus.query.cache;
+package org.datanucleus.query.compiler;
 
 import java.util.Map;
-
-import org.datanucleus.query.compiler.QueryCompilation;
 
 /**
  * Abstract representation of a cache of generic query compilations.

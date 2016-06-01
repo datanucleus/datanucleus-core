@@ -39,9 +39,6 @@ import org.datanucleus.query.expression.OrderExpression;
 import org.datanucleus.query.expression.ParameterExpression;
 import org.datanucleus.query.expression.PrimaryExpression;
 import org.datanucleus.query.expression.VariableExpression;
-import org.datanucleus.query.symbol.PropertySymbol;
-import org.datanucleus.query.symbol.Symbol;
-import org.datanucleus.query.symbol.SymbolTable;
 import org.datanucleus.util.Imports;
 
 /**
