@@ -15,37 +15,28 @@ limitations under the License.
 Contributors:
     ...
 *****************************************************************/
-package org.datanucleus.store.exceptions;
+package org.datanucleus.exceptions;
 
-import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.ClassLoaderResolver;
 
 /**
- * Representation of an error encountered initialising a datastore.
- * 
- * @version $Revision: 1.5 $
+ * Exception thrown when trying to update a datastores contents when it is read-only.
+ * The ClassLoaderResolver is used when converting for associated JDO exception.
  */
-public class DatastoreInitialisationException extends NucleusUserException
+public class DatastoreReadOnlyException extends NucleusUserException
 {
-    private static final long serialVersionUID = 3704576773794574913L;
+    private static final long serialVersionUID = -4173680935945334047L;
+    ClassLoaderResolver clr;
 
-    /**
-     * Constructor for an exception with a message.
-     * @param msg the detail message
-     */
-    public DatastoreInitialisationException(String msg)
+    public DatastoreReadOnlyException(String msg, ClassLoaderResolver clr)
     {
         super(msg);
+        this.clr = clr;
         setFatal();
     }
 
-    /**
-     * Constructor for an exception with a message.
-     * @param msg the detail message
-     * @param ex the source exception
-     */
-    public DatastoreInitialisationException(String msg, Throwable ex)
+    public ClassLoaderResolver getClassLoaderResolver()
     {
-        super(msg, ex);
-        setFatal();
+        return clr;
     }
 }

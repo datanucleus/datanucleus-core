@@ -23,9 +23,9 @@ package org.datanucleus.store.autostart;
 import java.util.Collection;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.exceptions.DatastoreInitialisationException;
 import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
-import org.datanucleus.store.exceptions.DatastoreInitialisationException;
 
 /**
  * Interface defining an Auto-Start Mechanism.

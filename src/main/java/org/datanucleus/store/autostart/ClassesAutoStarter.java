@@ -24,9 +24,9 @@ import java.util.StringTokenizer;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.PropertyNames;
+import org.datanucleus.exceptions.DatastoreInitialisationException;
 import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
-import org.datanucleus.store.exceptions.DatastoreInitialisationException;
 import org.datanucleus.util.Localiser;
 
 /**

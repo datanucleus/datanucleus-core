@@ -299,7 +299,7 @@ public interface StoreManager
      * of their datastore initialization up front, rather than wait for the runtime to do it on-demand.
      * @param clr The ClassLoaderResolver
      * @param classNames The class(es) to be managed
-     * @exception org.datanucleus.store.exceptions.DatastoreValidationException
+     * @exception org.datanucleus.exceptions.DatastoreValidationException
      *      If there is some mismatch between the current datastore contents and
      *      those necessary to enable persistence of the given classes.
      */

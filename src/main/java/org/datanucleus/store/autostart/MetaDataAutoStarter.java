@@ -25,12 +25,12 @@ import java.util.Iterator;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.PropertyNames;
+import org.datanucleus.exceptions.DatastoreInitialisationException;
 import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.FileMetaData;
 import org.datanucleus.metadata.PackageMetaData;
 import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
-import org.datanucleus.store.exceptions.DatastoreInitialisationException;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -60,7 +60,7 @@ public class MetaDataAutoStarter extends AbstractAutoStartMechanism
     /**
      * Accessor for all auto start data for this starter.
      * @return The class auto start data. Collection of StoreData elements
-     * @throws org.datanucleus.store.exceptions.DatastoreInitialisationException If an error occurs in datastore init
+     * @throws org.datanucleus.exceptions.DatastoreInitialisationException If an error occurs in datastore init
      */
     public Collection getAllClassData()
     throws DatastoreInitialisationException 

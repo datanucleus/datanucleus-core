@@ -15,9 +15,8 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store.exceptions;
+package org.datanucleus.exceptions;
 
-import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.util.Localiser;
 
 /**

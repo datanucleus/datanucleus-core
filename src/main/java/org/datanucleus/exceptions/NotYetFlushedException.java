@@ -15,9 +15,7 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store.exceptions;
-
-import org.datanucleus.exceptions.NucleusException;
+package org.datanucleus.exceptions;
 
 /**
  * Exception thrown when an pc instance instance is not yet flushed to the datastore, but it was expected to already be.

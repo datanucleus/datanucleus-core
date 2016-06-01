@@ -19,12 +19,12 @@ package org.datanucleus.store;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.PropertyNames;
+import org.datanucleus.exceptions.DatastoreReadOnlyException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.exceptions.DatastoreReadOnlyException;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;

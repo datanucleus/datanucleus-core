@@ -16,9 +16,7 @@ Contributors:
     Andy Jefferson - coding standards
     ...
 **********************************************************************/
-package org.datanucleus.store.exceptions;
-
-import org.datanucleus.exceptions.NucleusDataStoreException;
+package org.datanucleus.exceptions;
 
 /**
  * A <tt>DatastoreValidationException</tt> is thrown if a mismatch is discovered
