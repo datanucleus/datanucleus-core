@@ -18,7 +18,7 @@ Contributors:
 package org.datanucleus.flush;
 
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.scostore.ListStore;
+import org.datanucleus.store.types.scostore.ListStore;
 
 /**
  * Add operation at a position for a list where we have a backing store.

@@ -8,8 +8,8 @@ import junit.framework.TestCase;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.StoreManager;
-import org.datanucleus.store.scostore.CollectionStore;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.store.types.scostore.CollectionStore;
 
 /**
  * Tests for org.datanucleus.sco.SCOUtils methods.

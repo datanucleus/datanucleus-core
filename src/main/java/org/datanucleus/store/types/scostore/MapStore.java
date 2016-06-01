@@ -17,7 +17,7 @@ Contributors:
 2004 Andy Jefferson - added query methods and comments
     ...
 **********************************************************************/
-package org.datanucleus.store.scostore;
+package org.datanucleus.store.types.scostore;
 
 import java.util.Map;
 

@@ -19,8 +19,8 @@ package org.datanucleus.flush;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.scostore.CollectionStore;
-import org.datanucleus.store.scostore.Store;
+import org.datanucleus.store.types.scostore.CollectionStore;
+import org.datanucleus.store.types.scostore.Store;
 import org.datanucleus.util.StringUtils;
 
 /**

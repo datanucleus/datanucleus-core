@@ -17,7 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.wrappers.backed;
 
-import org.datanucleus.store.scostore.Store;
+import org.datanucleus.store.types.scostore.Store;
 
 /**
  * Interface implemented by backed SCOs.

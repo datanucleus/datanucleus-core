@@ -28,11 +28,11 @@ import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.scostore.CollectionStore;
-import org.datanucleus.store.scostore.ListStore;
-import org.datanucleus.store.scostore.MapStore;
-import org.datanucleus.store.scostore.Store;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.store.types.scostore.CollectionStore;
+import org.datanucleus.store.types.scostore.ListStore;
+import org.datanucleus.store.types.scostore.MapStore;
+import org.datanucleus.store.types.scostore.Store;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;

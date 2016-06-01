@@ -19,8 +19,8 @@ package org.datanucleus.store;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.store.scostore.Store;
 import org.datanucleus.store.types.IncompatibleFieldTypeException;
+import org.datanucleus.store.types.scostore.Store;
 
 /**
  * Interface implemented by a StoreManager when it supports "backed" SCO wrappers (i.e SCO fields have a

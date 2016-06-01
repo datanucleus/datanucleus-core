@@ -35,11 +35,11 @@ import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.BackedSCOStoreManager;
-import org.datanucleus.store.scostore.SetStore;
-import org.datanucleus.store.scostore.Store;
 import org.datanucleus.store.types.SCOCollection;
 import org.datanucleus.store.types.SCOCollectionIterator;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.store.types.scostore.SetStore;
+import org.datanucleus.store.types.scostore.Store;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 

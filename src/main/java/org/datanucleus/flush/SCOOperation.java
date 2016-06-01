@@ -18,7 +18,7 @@ Contributors:
 package org.datanucleus.flush;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.store.scostore.Store;
+import org.datanucleus.store.types.scostore.Store;
 
 /**
  * (Queued) operation performed on a backing store.

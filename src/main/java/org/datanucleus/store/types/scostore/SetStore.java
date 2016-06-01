@@ -16,7 +16,7 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store.scostore;
+package org.datanucleus.store.types.scostore;
 
 /**
  * Interface representation of the backing store for a Set.

@@ -19,7 +19,7 @@ Contributors:
 2004 Andy Jefferson - added subList
     ...
 **********************************************************************/
-package org.datanucleus.store.scostore;
+package org.datanucleus.store.types.scostore;
 
 import java.util.Collection;
 import java.util.ListIterator;

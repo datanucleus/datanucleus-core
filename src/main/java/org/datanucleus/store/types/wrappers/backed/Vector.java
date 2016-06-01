@@ -39,10 +39,10 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.BackedSCOStoreManager;
-import org.datanucleus.store.scostore.ListStore;
-import org.datanucleus.store.scostore.Store;
 import org.datanucleus.store.types.SCOListIterator;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.store.types.scostore.ListStore;
+import org.datanucleus.store.types.scostore.Store;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 

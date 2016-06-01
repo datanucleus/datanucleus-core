@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.scostore.CollectionStore;
+import org.datanucleus.store.types.scostore.CollectionStore;
 
 /**
  * An iterator for a SCO Collection object. Works from either the delegate or a backing store, and provides iteration through the objects.

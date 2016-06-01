@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
    ...
 **********************************************************************/
-package org.datanucleus.store.scostore;
+package org.datanucleus.store.types.scostore;
 
 import org.datanucleus.state.ObjectProvider;
 
