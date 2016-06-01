@@ -42,7 +42,6 @@ import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.fieldmanager.LoadFieldManager;
 import org.datanucleus.store.fieldmanager.SingleTypeFieldManager;
 import org.datanucleus.store.fieldmanager.AbstractFetchDepthFieldManager.EndOfFetchPlanGraphException;
-import org.datanucleus.store.objectvaluegenerator.ObjectValueGenerator;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;

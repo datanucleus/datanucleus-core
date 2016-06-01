@@ -82,7 +82,6 @@ import org.datanucleus.store.fieldmanager.MakeTransientFieldManager;
 import org.datanucleus.store.fieldmanager.PersistFieldManager;
 import org.datanucleus.store.fieldmanager.SingleValueFieldManager;
 import org.datanucleus.store.fieldmanager.UnsetOwnerFieldManager;
-import org.datanucleus.store.objectvaluegenerator.ObjectValueGenerator;
 import org.datanucleus.store.types.ContainerHandler;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOCollection;

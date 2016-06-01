@@ -16,7 +16,7 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store.objectvaluegenerator;
+package org.datanucleus.state;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.ExtensionMetaData;
