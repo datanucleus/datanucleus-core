@@ -1132,7 +1132,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             {
                 value = QueryUtils.getValueForParameterExpression(parameterValues, (ParameterExpression)primExpr.getLeft());
             }
-            if (primExpr.getLeft() instanceof InvokeExpression)
+            else if (primExpr.getLeft() instanceof InvokeExpression)
             {
                 InvokeExpression invokeExpr = (InvokeExpression)primExpr.getLeft();
                 value = getValueForInvokeExpression(invokeExpr);
