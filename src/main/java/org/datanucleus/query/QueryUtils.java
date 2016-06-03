@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.StringTokenizer;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -719,6 +720,23 @@ public class QueryUtils
      */
     public static boolean compareExpressionValues(Object left, Object right, Operator op)
     {
+        if (left != null && left instanceof Optional)
+        {
+            if (!((Optional)left).isPresent())
+            {
+                // Equate Optional(empty) with null
+                left = null;
+            }
+        }
+        if (right != null && right instanceof Optional)
+        {
+            if (!((Optional)right).isPresent())
+            {
+                // Equate Optional(empty) with null
+                right = null;
+            }
+        }
+
         if (left == null || right == null)
         {
             // TODO Support specification of NullOrderingType

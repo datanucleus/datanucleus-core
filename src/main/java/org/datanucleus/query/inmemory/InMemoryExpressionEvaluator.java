@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -260,9 +261,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
         }
         if (!(left instanceof String))
         {
-            throw new NucleusUserException(
-                "LIKE expression can only be used on a String expression, but found on " + 
-                left.getClass().getName());
+            throw new NucleusUserException("LIKE expression can only be used on a String expression, but found on " + left.getClass().getName());
         }
         if (right instanceof String)
         {
@@ -1095,8 +1094,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                             if (!castClass.isAssignableFrom(value.getClass()))
                             {
                                 NucleusLogger.QUERY.warn("Candidate for query results in attempt to cast " +
-                                    StringUtils.toJVMIDString(value) + " to " + castClass.getName() +
-                                    " which is impossible!");
+                                    StringUtils.toJVMIDString(value) + " to " + castClass.getName() + " which is impossible!");
                                 return new InMemoryFailure();
                             }
                         }
@@ -1112,8 +1110,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                             if (!castClass.isAssignableFrom(value.getClass()))
                             {
                                 NucleusLogger.QUERY.warn("Candidate for query results in attempt to cast " +
-                                    StringUtils.toJVMIDString(value) + " to " + castClass.getName() +
-                                    " which is impossible!");
+                                    StringUtils.toJVMIDString(value) + " to " + castClass.getName() + " which is impossible!");
                                 return new InMemoryFailure();
                             }
                         }
@@ -1134,6 +1131,11 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             else if (primExpr.getLeft() instanceof ParameterExpression)
             {
                 value = QueryUtils.getValueForParameterExpression(parameterValues, (ParameterExpression)primExpr.getLeft());
+            }
+            if (primExpr.getLeft() instanceof InvokeExpression)
+            {
+                InvokeExpression invokeExpr = (InvokeExpression)primExpr.getLeft();
+                value = getValueForInvokeExpression(invokeExpr);
             }
             else if (primExpr.getLeft() instanceof VariableExpression)
             {
@@ -1176,6 +1178,12 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
         for (int i = firstTupleToProcess; i < primExpr.getTuples().size(); i++)
         {
             String fieldName = primExpr.getTuples().get(i);
+            if (value instanceof Optional)
+            {
+                // Treat Optional as the wrapped value
+                Optional opt = (Optional)value;
+                value = opt.isPresent() ? opt.get() : null;
+            }
             if (!fieldName.equals(candidateAlias))
             {
                 boolean getValueByReflection = true;
