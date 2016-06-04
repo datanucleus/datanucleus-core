@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * Abstract representation of a cache of generic query compilations.
  */
-public class AbstractQueryCompilationCache
+public abstract class AbstractQueryCompilationCache implements QueryCompilationCache
 {
     Map<String, QueryCompilation> cache;
 
