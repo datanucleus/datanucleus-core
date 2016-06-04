@@ -23,7 +23,7 @@ import org.datanucleus.util.WeakValueMap;
 /**
  * Weak-reference implementation of a generic query compilation cache.
  */
-public class WeakQueryCompilationCache extends AbstractQueryCompilationCache implements QueryCompilationCache
+public class WeakQueryCompilationCache extends AbstractQueryCompilationCache
 {
     public WeakQueryCompilationCache(NucleusContext nucleusCtx)
     {

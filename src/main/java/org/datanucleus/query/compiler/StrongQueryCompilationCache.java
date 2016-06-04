@@ -24,7 +24,7 @@ import org.datanucleus.NucleusContext;
 /**
  * Strong-reference implementation of a generic query compilation cache.
  */
-public class StrongQueryCompilationCache extends AbstractQueryCompilationCache implements QueryCompilationCache
+public class StrongQueryCompilationCache extends AbstractQueryCompilationCache
 {
     public StrongQueryCompilationCache(NucleusContext nucleusCtx)
     {

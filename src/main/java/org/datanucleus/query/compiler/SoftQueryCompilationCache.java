@@ -23,7 +23,7 @@ import org.datanucleus.util.SoftValueMap;
 /**
  * Soft-reference implementation of a generic query compilation cache.
  */
-public class SoftQueryCompilationCache extends AbstractQueryCompilationCache implements QueryCompilationCache
+public class SoftQueryCompilationCache extends AbstractQueryCompilationCache
 {
     public SoftQueryCompilationCache(NucleusContext nucleusCtx)
     {

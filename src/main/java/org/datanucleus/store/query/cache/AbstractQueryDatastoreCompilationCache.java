@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * Abstract representation of a query compilation cache for the query specific to the datastore.
  */
-public class AbstractQueryDatastoreCompilationCache implements QueryDatastoreCompilationCache
+public abstract class AbstractQueryDatastoreCompilationCache implements QueryDatastoreCompilationCache
 {
     Map<String, Object> cache;
 

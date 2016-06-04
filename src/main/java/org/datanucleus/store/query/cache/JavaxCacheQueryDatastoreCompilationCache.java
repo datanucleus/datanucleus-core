@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
      ...
  **********************************************************************/
-package org.datanucleus.query.compiler;
+package org.datanucleus.store.query.cache;
 
 import java.io.Serializable;
 
@@ -32,23 +32,23 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.util.NucleusLogger;
 
 /**
- * Query compilation cache using javax.cache for implementation.
+ * Query compilation (datastore) cache using javax.cache for implementation.
  */
-public class JavaxCacheQueryCompilationCache implements QueryCompilationCache, Serializable
+public class JavaxCacheQueryDatastoreCompilationCache implements QueryDatastoreCompilationCache, Serializable
 {
-    private static final long serialVersionUID = 6184328064337729891L;
+    private static final long serialVersionUID = 835024707422532913L;
 
     /** The cache to use. */
-    private Cache<String, QueryCompilation> cache;
+    private Cache<String, Object> cache;
 
-    public JavaxCacheQueryCompilationCache(NucleusContext nucleusCtx)
+    public JavaxCacheQueryDatastoreCompilationCache(NucleusContext nucleusCtx)
     {
         org.datanucleus.Configuration conf = nucleusCtx.getConfiguration();
-        String cacheName = conf.getStringProperty("datanucleus.cache.queryCompilation.cacheName");
+        String cacheName = conf.getStringProperty("datanucleus.cache.queryCompilationDatastore.cacheName");
         if (cacheName == null)
         {
-            cacheName = "datanucleus-query-compilation";
-            NucleusLogger.CACHE.warn("No 'datanucleus.cache.queryCompilation.cacheName' specified so using name of '" + cacheName + "'");
+            cacheName = "datanucleus-query-compilation-datastore";
+            NucleusLogger.CACHE.warn("No 'datanucleus.cache.queryCompilationDatastore.cacheName' specified so using name of '" + cacheName + "'");
         }
         try
         {
@@ -71,7 +71,7 @@ public class JavaxCacheQueryCompilationCache implements QueryCompilationCache, S
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.query.compiler.QueryCompilationCache#close()
+     * @see org.datanucleus.store.query.cache.QueryDatastoreCompilationCache#close()
      */
     @Override
     public void close()
@@ -81,7 +81,7 @@ public class JavaxCacheQueryCompilationCache implements QueryCompilationCache, S
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.query.compiler.QueryCompilationCache#evict(java.lang.String)
+     * @see org.datanucleus.store.query.cache.QueryDatastoreCompilationCache#evict(java.lang.String)
      */
     @Override
     public void evict(String queryKey)
@@ -90,7 +90,7 @@ public class JavaxCacheQueryCompilationCache implements QueryCompilationCache, S
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.query.compiler.QueryCompilationCache#clear()
+     * @see org.datanucleus.store.query.cache.QueryDatastoreCompilationCache#clear()
      */
     @Override
     public void clear()
@@ -99,7 +99,7 @@ public class JavaxCacheQueryCompilationCache implements QueryCompilationCache, S
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.query.compiler.QueryCompilationCache#isEmpty()
+     * @see org.datanucleus.store.query.cache.QueryDatastoreCompilationCache#isEmpty()
      */
     @Override
     public boolean isEmpty()
@@ -108,7 +108,7 @@ public class JavaxCacheQueryCompilationCache implements QueryCompilationCache, S
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.query.compiler.QueryCompilationCache#size()
+     * @see org.datanucleus.store.query.cache.QueryDatastoreCompilationCache#size()
      */
     @Override
     public int size()
@@ -118,19 +118,19 @@ public class JavaxCacheQueryCompilationCache implements QueryCompilationCache, S
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.query.compiler.QueryCompilationCache#get(java.lang.String)
+     * @see org.datanucleus.store.query.cache.QueryDatastoreCompilationCache#get(java.lang.String)
      */
     @Override
-    public QueryCompilation get(String queryKey)
+    public Object get(String queryKey)
     {
         return cache.get(queryKey);
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.query.compiler.QueryCompilationCache#put(java.lang.String, org.datanucleus.query.compiler.QueryCompilation)
+     * @see org.datanucleus.store.query.cache.QueryDatastoreCompilationCache#put(java.lang.String, java.lang.Object)
      */
     @Override
-    public QueryCompilation put(String queryKey, QueryCompilation compilation)
+    public Object put(String queryKey, Object compilation)
     {
         if (queryKey == null || compilation == null)
         {
@@ -150,7 +150,7 @@ public class JavaxCacheQueryCompilationCache implements QueryCompilationCache, S
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.query.compiler.QueryCompilationCache#contains(java.lang.String)
+     * @see org.datanucleus.store.query.cache.QueryDatastoreCompilationCache#contains(java.lang.String)
      */
     @Override
     public boolean contains(String queryKey)

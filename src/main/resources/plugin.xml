@@ -386,6 +386,7 @@ Contributors:
         <cache name="soft" class-name="org.datanucleus.store.query.cache.SoftQueryDatastoreCompilationCache"/>
         <cache name="weak" class-name="org.datanucleus.store.query.cache.WeakQueryDatastoreCompilationCache"/>
         <cache name="strong" class-name="org.datanucleus.store.query.cache.StrongQueryDatastoreCompilationCache"/>
+        <cache name="javax.cache" class-name="org.datanucleus.store.query.cache.JavaxCacheQueryDatastoreCompilationCache"/>
     </extension>
 
     <!-- QUERY RESULT CACHE -->
