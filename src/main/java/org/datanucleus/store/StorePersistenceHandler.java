@@ -139,4 +139,14 @@ public interface StorePersistenceHandler
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
     public Object[] findObjects(ExecutionContext ec, Object[] ids);
+
+    /**
+     * Enum for the type of a batched operation
+     */
+    public static enum PersistenceBatchType 
+    {
+        PERSIST,
+        DELETE,
+        LOCATE
+    }
 }

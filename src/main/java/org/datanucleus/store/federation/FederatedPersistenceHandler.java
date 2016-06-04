@@ -19,7 +19,6 @@ package org.datanucleus.store.federation;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.PersistenceBatchType;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.StorePersistenceHandler;
 
