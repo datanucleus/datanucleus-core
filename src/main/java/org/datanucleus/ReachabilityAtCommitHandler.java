@@ -39,16 +39,16 @@ public class ReachabilityAtCommitHandler
     private ExecutionContext ec;
 
     /** Reachability : Set of ids of objects persisted using persistObject, or known as already persistent in the current txn. */
-    private Set reachabilityPersistedIds = null;
+    private Set persistedIds = null;
 
     /** Reachability : Set of ids of objects deleted using deleteObject. */
-    private Set reachabilityDeletedIds = null;
+    private Set deletedIds = null;
 
     /** Reachability : Set of ids of objects newly persistent in the current transaction */
-    private Set reachabilityFlushedNewIds = null;
+    private Set flushedNewIds = null;
 
     /** Reachability : Set of ids for all objects enlisted in this transaction. */
-    private Set reachabilityEnlistedIds = null;
+    private Set enlistedIds = null;
 
     /**
      * Constructor for a reachability-at-commit handler.
@@ -56,10 +56,10 @@ public class ReachabilityAtCommitHandler
     public ReachabilityAtCommitHandler(ExecutionContext ec)
     {
         this.ec = ec;
-        this.reachabilityPersistedIds = new HashSet();
-        this.reachabilityDeletedIds = new HashSet();
-        this.reachabilityFlushedNewIds = new HashSet();
-        this.reachabilityEnlistedIds = new HashSet();
+        this.persistedIds = new HashSet();
+        this.deletedIds = new HashSet();
+        this.flushedNewIds = new HashSet();
+        this.enlistedIds = new HashSet();
     }
 
     /**
@@ -67,46 +67,46 @@ public class ReachabilityAtCommitHandler
      */
     public void clear()
     {
-        reachabilityPersistedIds.clear();
-        reachabilityDeletedIds.clear();
-        reachabilityFlushedNewIds.clear();
-        reachabilityEnlistedIds.clear();
+        persistedIds.clear();
+        deletedIds.clear();
+        flushedNewIds.clear();
+        enlistedIds.clear();
     }
 
     public void addEnlistedObject(Object id)
     {
-        reachabilityEnlistedIds.add(id);
+        enlistedIds.add(id);
     }
     public boolean isObjectEnlisted(Object id)
     {
-        return reachabilityEnlistedIds.contains(id);
+        return enlistedIds.contains(id);
     }
 
     public void addPersistedObject(Object id)
     {
-        reachabilityPersistedIds.add(id);
+        persistedIds.add(id);
     }
     public boolean isObjectPersisted(Object id)
     {
-        return reachabilityPersistedIds.contains(id);
+        return persistedIds.contains(id);
     }
 
     public void addDeletedObject(Object id)
     {
-        reachabilityDeletedIds.add(id);
+        deletedIds.add(id);
     }
     public boolean isObjectDeleted(Object id)
     {
-        return reachabilityDeletedIds.contains(id);
+        return deletedIds.contains(id);
     }
 
     public void addFlushedNewObject(Object id)
     {
-        reachabilityFlushedNewIds.add(id);
+        flushedNewIds.add(id);
     }
     public boolean isObjectFlushedNew(Object id)
     {
-        return reachabilityFlushedNewIds.contains(id);
+        return flushedNewIds.contains(id);
     }
 
     /**
@@ -116,21 +116,21 @@ public class ReachabilityAtCommitHandler
      */
     public void swapObjectId(Object oldID, Object newID)
     {
-        if (reachabilityEnlistedIds.remove(oldID))
+        if (enlistedIds.remove(oldID))
         {
-            reachabilityEnlistedIds.add(newID);
+            enlistedIds.add(newID);
         }
-        if (reachabilityFlushedNewIds.remove(oldID))
+        if (flushedNewIds.remove(oldID))
         {
-            reachabilityFlushedNewIds.add(newID);
+            flushedNewIds.add(newID);
         }
-        if (reachabilityPersistedIds.remove(oldID))
+        if (persistedIds.remove(oldID))
         {
-            reachabilityPersistedIds.add(newID);
+            persistedIds.add(newID);
         }
-        if (reachabilityDeletedIds.remove(oldID))
+        if (deletedIds.remove(oldID))
         {
-            reachabilityDeletedIds.add(newID);
+            deletedIds.add(newID);
         }
     }
 
@@ -146,16 +146,16 @@ public class ReachabilityAtCommitHandler
 
         // If we have some new objects in this transaction, and we have some known persisted objects (either
         // from makePersistent in this txn, or enlisted existing objects) then run reachability checks
-        if (!reachabilityPersistedIds.isEmpty() && !reachabilityFlushedNewIds.isEmpty())
+        if (!persistedIds.isEmpty() && !flushedNewIds.isEmpty())
         {
             Set currentReachables = new HashSet();
 
             // Run "reachability" on all known persistent objects for this txn
-            Object ids[] = reachabilityPersistedIds.toArray();
+            Object ids[] = persistedIds.toArray();
             Set objectNotFound = new HashSet();
             for (int i=0; i<ids.length; i++)
             {
-                if (!reachabilityDeletedIds.contains(ids[i]))
+                if (!deletedIds.contains(ids[i]))
                 {
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
@@ -198,9 +198,9 @@ public class ReachabilityAtCommitHandler
             }
 
             // Remove any of the "reachable" instances that are no longer "reachable"
-            reachabilityFlushedNewIds.removeAll(currentReachables);
+            flushedNewIds.removeAll(currentReachables);
 
-            Object nonReachableIds[] = reachabilityFlushedNewIds.toArray();
+            Object nonReachableIds[] = flushedNewIds.toArray();
             if (nonReachableIds != null && nonReachableIds.length > 0)
             {
                 // For all of instances no longer reachable we need to delete them from the datastore
