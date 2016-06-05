@@ -230,9 +230,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     protected Map<ObjectProvider, Map<?,?>> opAssociatedValuesMapByOP = null;
 
-    /** Flag for whether running "persistence-by-reachability" at commit. */
-    private boolean runningPBRAtCommit = false;
-
     /** Handler for "persistence-by-reachability" at commit. */
     private ReachabilityAtCommitHandler pbrAtCommitHandler = null;
 
@@ -1094,7 +1091,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
 
             // Add the object to those enlisted
-            if (!runningPBRAtCommit)
+            if (!pbrAtCommitHandler.isExecuting())
             {
                 // Keep a note of the id for use by persistence-by-reachability-at-commit
                 pbrAtCommitHandler.addEnlistedObject(op.getInternalObjectId());
@@ -4147,7 +4144,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 // Persistence-by-reachability at commit
                 try
                 {
-                    runningPBRAtCommit = true;
                     pbrAtCommitHandler.execute();
                 }
                 catch (Throwable t)
@@ -4158,10 +4154,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         throw (NucleusException) t;
                     }
                     throw new NucleusException("Unexpected error during precommit",t);
-                }
-                finally
-                {
-                    runningPBRAtCommit = false;
                 }
             }
 

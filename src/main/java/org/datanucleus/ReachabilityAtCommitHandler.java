@@ -38,6 +38,9 @@ public class ReachabilityAtCommitHandler
 {
     private ExecutionContext ec;
 
+    /** Flag for whether we are running "persistence-by-reachability" at commit execute() at this point in time. */
+    private boolean executing = false;
+
     /** Reachability : Set of ids of objects persisted using persistObject, or known as already persistent in the current txn. */
     private Set persistedIds = null;
 
@@ -71,6 +74,11 @@ public class ReachabilityAtCommitHandler
         deletedIds.clear();
         flushedNewIds.clear();
         enlistedIds.clear();
+    }
+
+    public boolean isExecuting()
+    {
+        return executing;
     }
 
     public void addEnlistedObject(Object id)
@@ -139,124 +147,132 @@ public class ReachabilityAtCommitHandler
      */
     public void execute()
     {
-        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+        try
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("010032"));
-        }
-
-        // If we have some new objects in this transaction, and we have some known persisted objects (either
-        // from makePersistent in this txn, or enlisted existing objects) then run reachability checks
-        if (!persistedIds.isEmpty() && !flushedNewIds.isEmpty())
-        {
-            Set currentReachables = new HashSet();
-
-            // Run "reachability" on all known persistent objects for this txn
-            Object ids[] = persistedIds.toArray();
-            Set objectNotFound = new HashSet();
-            for (int i=0; i<ids.length; i++)
+            this.executing = true;
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                if (!deletedIds.contains(ids[i]))
-                {
-                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                    {
-                        NucleusLogger.PERSISTENCE.debug("Performing reachability algorithm on object with id \""+ids[i]+"\"");
-                    }
-                    try
-                    {
-                        ObjectProvider op = ec.findObjectProvider(ec.findObject(ids[i], true, true, null));
-
-                        if (!op.isDeleted() && !currentReachables.contains(ids[i]))
-                        {
-                            // Make sure all of its relation fields are loaded before continuing. Is this necessary, since its enlisted?
-                            op.loadUnloadedRelationFields();
-
-                            // Add this object id since not yet reached
-                            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                            {
-                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007000", StringUtils.toJVMIDString(op.getObject()), ids[i], op.getLifecycleState()));
-                            }
-                            currentReachables.add(ids[i]);
-
-                            // Go through all relation fields using ReachabilityFieldManager
-                            ReachabilityFieldManager pcFM = new ReachabilityFieldManager(op, currentReachables);
-                            int[] relationFieldNums = op.getClassMetaData().getRelationMemberPositions(ec.getClassLoaderResolver(), ec.getMetaDataManager());
-                            if (relationFieldNums != null && relationFieldNums.length > 0)
-                            {
-                                op.provideFields(relationFieldNums, pcFM);
-                            }
-                        }
-                    }
-                    catch (NucleusObjectNotFoundException ex)
-                    {
-                        objectNotFound.add(ids[i]);
-                    }
-                }
-                else
-                {
-                    // Was deleted earlier so ignore
-                }
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("010032"));
             }
 
-            // Remove any of the "reachable" instances that are no longer "reachable"
-            flushedNewIds.removeAll(currentReachables);
-
-            Object nonReachableIds[] = flushedNewIds.toArray();
-            if (nonReachableIds != null && nonReachableIds.length > 0)
+            // If we have some new objects in this transaction, and we have some known persisted objects (either
+            // from makePersistent in this txn, or enlisted existing objects) then run reachability checks
+            if (!persistedIds.isEmpty() && !flushedNewIds.isEmpty())
             {
-                // For all of instances no longer reachable we need to delete them from the datastore
-                // A). Nullify all of their fields.
-                // TODO See CORE-3276 for a possible change to this
-                for (int i=0; i<nonReachableIds.length; i++)
-                {
-                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                    {
-                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("010033", nonReachableIds[i]));
-                    }
-                    try
-                    {
-                        if (!objectNotFound.contains(nonReachableIds[i]))
-                        {
-                            ObjectProvider op = ec.findObjectProvider(ec.findObject(nonReachableIds[i], true, true, null));
+                Set currentReachables = new HashSet();
 
-                            if (!op.getLifecycleState().isDeleted() && !ec.getApiAdapter().isDetached(op.getObject()))
+                // Run "reachability" on all known persistent objects for this txn
+                Object ids[] = persistedIds.toArray();
+                Set objectNotFound = new HashSet();
+                for (int i=0; i<ids.length; i++)
+                {
+                    if (!deletedIds.contains(ids[i]))
+                    {
+                        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                        {
+                            NucleusLogger.PERSISTENCE.debug("Performing reachability algorithm on object with id \""+ids[i]+"\"");
+                        }
+                        try
+                        {
+                            ObjectProvider op = ec.findObjectProvider(ec.findObject(ids[i], true, true, null));
+
+                            if (!op.isDeleted() && !currentReachables.contains(ids[i]))
                             {
-                                // Null any relationships for relation fields of this object
-                                op.replaceFields(op.getClassMetaData().getNonPKMemberPositions(), new NullifyRelationFieldManager(op));
-                                ec.flush();
+                                // Make sure all of its relation fields are loaded before continuing. Is this necessary, since its enlisted?
+                                op.loadUnloadedRelationFields();
+
+                                // Add this object id since not yet reached
+                                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                                {
+                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007000", StringUtils.toJVMIDString(op.getObject()), ids[i], op.getLifecycleState()));
+                                }
+                                currentReachables.add(ids[i]);
+
+                                // Go through all relation fields using ReachabilityFieldManager
+                                ReachabilityFieldManager pcFM = new ReachabilityFieldManager(op, currentReachables);
+                                int[] relationFieldNums = op.getClassMetaData().getRelationMemberPositions(ec.getClassLoaderResolver(), ec.getMetaDataManager());
+                                if (relationFieldNums != null && relationFieldNums.length > 0)
+                                {
+                                    op.provideFields(relationFieldNums, pcFM);
+                                }
                             }
                         }
-                    }
-                    catch (NucleusObjectNotFoundException ex)
-                    {
-                        // just ignore if the object does not exist anymore  
-                    }
-                }
-
-                // B). Remove the objects
-                for (int i=0; i<nonReachableIds.length; i++)
-                {
-                    try
-                    {
-                        if (!objectNotFound.contains(nonReachableIds[i]))
+                        catch (NucleusObjectNotFoundException ex)
                         {
-                            ObjectProvider op = ec.findObjectProvider(ec.findObject(nonReachableIds[i], true, true, null));
-                            op.deletePersistent();
+                            objectNotFound.add(ids[i]);
                         }
                     }
-                    catch (NucleusObjectNotFoundException ex)
+                    else
                     {
-                        //just ignore if the file does not exist anymore  
+                        // Was deleted earlier so ignore
                     }
                 }
+
+                // Remove any of the "reachable" instances that are no longer "reachable"
+                flushedNewIds.removeAll(currentReachables);
+
+                Object nonReachableIds[] = flushedNewIds.toArray();
+                if (nonReachableIds != null && nonReachableIds.length > 0)
+                {
+                    // For all of instances no longer reachable we need to delete them from the datastore
+                    // A). Nullify all of their fields.
+                    // TODO See CORE-3276 for a possible change to this
+                    for (int i=0; i<nonReachableIds.length; i++)
+                    {
+                        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                        {
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("010033", nonReachableIds[i]));
+                        }
+                        try
+                        {
+                            if (!objectNotFound.contains(nonReachableIds[i]))
+                            {
+                                ObjectProvider op = ec.findObjectProvider(ec.findObject(nonReachableIds[i], true, true, null));
+
+                                if (!op.getLifecycleState().isDeleted() && !ec.getApiAdapter().isDetached(op.getObject()))
+                                {
+                                    // Null any relationships for relation fields of this object
+                                    op.replaceFields(op.getClassMetaData().getNonPKMemberPositions(), new NullifyRelationFieldManager(op));
+                                    ec.flush();
+                                }
+                            }
+                        }
+                        catch (NucleusObjectNotFoundException ex)
+                        {
+                            // just ignore if the object does not exist anymore  
+                        }
+                    }
+
+                    // B). Remove the objects
+                    for (int i=0; i<nonReachableIds.length; i++)
+                    {
+                        try
+                        {
+                            if (!objectNotFound.contains(nonReachableIds[i]))
+                            {
+                                ObjectProvider op = ec.findObjectProvider(ec.findObject(nonReachableIds[i], true, true, null));
+                                op.deletePersistent();
+                            }
+                        }
+                        catch (NucleusObjectNotFoundException ex)
+                        {
+                            //just ignore if the file does not exist anymore  
+                        }
+                    }
+                }
+
+                // Make sure any updates are flushed
+                ec.flushInternal(true);
             }
 
-            // Make sure any updates are flushed
-            ec.flushInternal(true);
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            {
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("010034"));
+            }
         }
-
-        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+        finally
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("010034"));
+            this.executing = false;
         }
     }
 }
