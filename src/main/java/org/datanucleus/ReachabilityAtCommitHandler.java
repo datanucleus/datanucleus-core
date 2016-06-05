@@ -55,6 +55,7 @@ public class ReachabilityAtCommitHandler
 
     /**
      * Constructor for a reachability-at-commit handler.
+     * @param ec ExecutionContext that it is for
      */
     public ReachabilityAtCommitHandler(ExecutionContext ec)
     {

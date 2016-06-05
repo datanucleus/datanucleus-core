@@ -34,7 +34,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -78,13 +77,11 @@ import org.datanucleus.properties.BasePropertyStore;
 import org.datanucleus.state.CallbackHandler;
 import org.datanucleus.state.DetachState;
 import org.datanucleus.state.FetchPlanState;
-import org.datanucleus.state.LifeCycleState;
 import org.datanucleus.state.LockManager;
 import org.datanucleus.state.LockManagerImpl;
 import org.datanucleus.state.NullCallbackHandler;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.state.RelationshipManager;
-import org.datanucleus.state.RelationshipManagerImpl;
 import org.datanucleus.store.Extent;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.StoreManager;
@@ -185,13 +182,16 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     private Set<ObjectProvider> nontxProcessedOPs = null;
 
-    protected boolean l2CacheEnabled = false;
+    private boolean l2CacheEnabled = false;
+
+    /** Map of fields of object to update in L2 cache (when attached), keyed by the id. */
+    private Map<Object, BitSet> l2CacheTxFieldsToUpdateById = null;
 
     /** Set of ids to be Level2 cached at commit (if using L2 cache). */
     private Set l2CacheTxIds = null;
 
-    /** Map of fields of object to update in L2 cache (when attached), keyed by the id. */
-    private Map<Object, BitSet> l2CacheTxFieldsToUpdateById = null;
+    /** Objects that were updated in L2 cache before commit, which should be evicted if rollback happens */
+    private List<Object> l2CacheObjectsToEvictUponRollback = null;
 
     /** State variable for whether the context is currently flushing its operations. */
     private int flushing = 0;
@@ -208,33 +208,29 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     /** Lock object for use during commit/rollback/evict, to prevent any further field accesses. */
     protected Lock lock;
 
-    /** State indicator whether we are currently managing the relations. */
-    private boolean runningManageRelations = false;
-
-    /** Map of RelationshipManager keyed by the ObjectProvider that it is for. */
-    Map<ObjectProvider, RelationshipManager> managedRelationDetails = null;
-
     /** Lookup map of attached-detached objects when attaching/detaching. */
-    Map<ObjectProvider, Object> opAttachDetachObjectReferenceMap = null;
+    private Map<ObjectProvider, Object> opAttachDetachObjectReferenceMap = null;
 
     /** Map of embedded ObjectProvider relations, keyed by owner ObjectProvider. */
-    Map<ObjectProvider, List<EmbeddedOwnerRelation>> opEmbeddedInfoByOwner = null;
+    private Map<ObjectProvider, List<EmbeddedOwnerRelation>> opEmbeddedInfoByOwner = null;
 
     /** Map of embedded ObjectProvider relations, keyed by embedded ObjectProvider. */
-    Map<ObjectProvider, List<EmbeddedOwnerRelation>> opEmbeddedInfoByEmbedded = null;
+    private Map<ObjectProvider, List<EmbeddedOwnerRelation>> opEmbeddedInfoByEmbedded = null;
 
     /**
-     * Map of associated values for the ObjectProvider. This can contain anything really and is down
-     * to the StoreManager to define. For example RDBMS datastores typically put external FK info in here
-     * keyed by the mapping of the field to which it pertains.
+     * Map of associated values for the ObjectProvider. This can contain anything really and is down to the StoreManager to define. 
+     * For example RDBMS datastores typically put external FK info in here keyed by the mapping of the field to which it pertains.
      */
     protected Map<ObjectProvider, Map<?,?>> opAssociatedValuesMapByOP = null;
+
+    /** Handler for "managed relations" at flush/commit. */
+    private ManagedRelationsHandler managedRelationsHandler = null;
 
     /** Handler for "persistence-by-reachability" at commit. */
     private ReachabilityAtCommitHandler pbrAtCommitHandler = null;
 
     /** Statistics gatherer for this context. */
-    ManagerStatistics statistics = null;
+    private ManagerStatistics statistics = null;
 
     /** Set of listeners who need to know when this ExecutionContext is closing, so they can clean up. */
     private Set<ExecutionContextListener> ecListeners = null;
@@ -244,9 +240,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * to pass information down through a large number of method calls.
      */
     private ThreadLocal contextInfoThreadLocal;
-    
-    /** Objects that were updated in L2 cache before commit, which should be evicted if rollback happens */
-    private List<Object> objectsToEvictUponRollback = null;
 
     /**
      * Constructor.
@@ -363,14 +356,18 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         };
 
+        if (properties.getBooleanProperty(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS))
+        {
+            managedRelationsHandler = new ManagedRelationsHandler(properties.getBooleanProperty(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS_CHECKS));
+        }
+
         if (properties.getFrequentProperties().getReachabilityAtCommit())
         {
-            // Create temporary storage to handle PBR at commit
             pbrAtCommitHandler = new ReachabilityAtCommitHandler(this);
         }
 
-        objectsToEvictUponRollback = null;
-        
+        l2CacheObjectsToEvictUponRollback = null;
+
         setLevel2Cache(true);
     }
 
@@ -551,10 +548,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             nontxProcessedOPs.clear();
             nontxProcessedOPs = null;
         }
-        if (managedRelationDetails != null)
+        if (managedRelationsHandler != null)
         {
-            managedRelationDetails.clear();
-            managedRelationDetails = null;
+            managedRelationsHandler.clear();
         }
         if (l2CacheTxIds != null)
         {
@@ -584,7 +580,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             opAssociatedValuesMapByOP = null;
         }
 
-        objectsToEvictUponRollback = null;
+        l2CacheObjectsToEvictUponRollback = null;
 
         closing = false;
         closed = true;
@@ -907,6 +903,35 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
             return;
         }*/
+        if (name.equalsIgnoreCase(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS))
+        {
+            if ("false".equalsIgnoreCase((String)value))
+            {
+                // Turn off managed relations if enabled
+                managedRelationsHandler = null;
+            }
+            else if ("true".equalsIgnoreCase((String)value))
+            {
+                managedRelationsHandler = new ManagedRelationsHandler(properties.getBooleanProperty(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS_CHECKS));
+            }
+        }
+        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS_CHECKS))
+        {
+            if (managedRelationsHandler != null)
+            {
+                Boolean checks = Boolean.valueOf((String)value);
+                if (checks == Boolean.TRUE)
+                {
+                    managedRelationsHandler.setPerformChecks(true);
+                }
+                else if (checks == Boolean.FALSE)
+                {
+                    managedRelationsHandler.setPerformChecks(false);
+                }
+            }
+        }
+        // TODO Do same for PBR at commit
+
         if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
         {
             String intName = getNucleusContext().getConfiguration().getInternalNameForProperty(name);
@@ -3817,36 +3842,18 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public boolean getManageRelations()
     {
-        return properties.getBooleanProperty(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS);
+        return managedRelationsHandler != null;
     }
 
     /**
-     * Accessor for whether to manage relationships checks at flush/commit.
-     * @return Whether to manage relationships checks at flush/commit.
+     * Method to return the RelationshipManager for the ObjectProvider.
+     * If we are currently managing relations and the ObjectProvider has no RelationshipManager allocated then one is created.
+     * @param op ObjectProvider
+     * @return The RelationshipManager
      */
-    public boolean getManageRelationsChecks()
-    {
-        return properties.getBooleanProperty(PropertyNames.PROPERTY_MANAGE_RELATIONSHIPS_CHECKS);
-    }
-
     public RelationshipManager getRelationshipManager(ObjectProvider op)
     {
-        if (!getManageRelations())
-        {
-            return null;
-        }
-
-        if (managedRelationDetails == null)
-        {
-            managedRelationDetails = new ConcurrentHashMap();
-        }
-        RelationshipManager relMgr = managedRelationDetails.get(op);
-        if (relMgr == null)
-        {
-            relMgr = new RelationshipManagerImpl(op);
-            managedRelationDetails.put(op, relMgr);
-        }
-        return relMgr;
+        return managedRelationsHandler != null ? managedRelationsHandler.getRelationshipManagerForObjectProvider(op) : null;
     }
 
     /**
@@ -3855,72 +3862,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public boolean isManagingRelations()
     {
-        return runningManageRelations;
-    }
-
-    /**
-     * Method to perform managed relationships tasks.
-     * @throws NucleusUserException if a consistency check fails
-     */
-    protected void performManagedRelationships()
-    {
-        if (getManageRelations() && managedRelationDetails != null && !managedRelationDetails.isEmpty())
-        {
-            try
-            {
-                runningManageRelations = true;
-                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("013000"));
-                }
-
-                if (getManageRelationsChecks())
-                {
-                    // Tests for negative situations where inconsistently assigned
-                    Iterator<Map.Entry<ObjectProvider, RelationshipManager>> managedRelEntryIter = managedRelationDetails.entrySet().iterator();
-                    while (managedRelEntryIter.hasNext())
-                    {
-                        Map.Entry<ObjectProvider, RelationshipManager> managedRelEntry = managedRelEntryIter.next();
-                        ObjectProvider op = managedRelEntry.getKey();
-                        LifeCycleState lc = op.getLifecycleState();
-                        if (lc == null || lc.isDeleted())
-                        {
-                            // Has been deleted so ignore all relationship changes
-                            continue;
-                        }
-
-                        managedRelEntry.getValue().checkConsistency();
-                    }
-                }
-
-                // Process updates to manage the other side of the relations
-                Iterator<Map.Entry<ObjectProvider, RelationshipManager>> managedRelEntryIter = managedRelationDetails.entrySet().iterator();
-                while (managedRelEntryIter.hasNext())
-                {
-                    Map.Entry<ObjectProvider, RelationshipManager> managedRelEntry = managedRelEntryIter.next();
-                    ObjectProvider op = managedRelEntry.getKey();
-                    LifeCycleState lc = op.getLifecycleState();
-                    if (lc == null || lc.isDeleted())
-                    {
-                        // Has been deleted so ignore all relationship changes
-                        continue;
-                    }
-                    RelationshipManager relMgr = managedRelEntry.getValue();
-                    relMgr.process();
-                    relMgr.clearFields();
-                }
-                managedRelationDetails.clear();
-
-                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("013001"));
-                }
-            }
-            finally
-            {
-                runningManageRelations = false;
-            }
-        }
+        return (managedRelationsHandler != null) ? managedRelationsHandler.isExecuting() : false;
     }
 
     /**
@@ -3969,7 +3911,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (tx.isActive())
         {
             // Managed Relationships
-            performManagedRelationships();
+            if (managedRelationsHandler != null)
+            {
+                managedRelationsHandler.execute();
+            }
 
             // Perform internal flush
             flushInternal(true);
@@ -4292,11 +4237,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         opsToCache = new HashSet<ObjectProvider>();
                     }
                     opsToCache.add(op);
-                    if (objectsToEvictUponRollback == null) 
+                    if (l2CacheObjectsToEvictUponRollback == null) 
                     {
-                        objectsToEvictUponRollback = new LinkedList<Object>();
+                        l2CacheObjectsToEvictUponRollback = new LinkedList<Object>();
                     } 
-                    objectsToEvictUponRollback.add(id);
+                    l2CacheObjectsToEvictUponRollback.add(id);
                 }
             }
         }
@@ -4591,10 +4536,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 performDetachAllOnTxnEnd();
             }
 
-            if (objectsToEvictUponRollback != null)
+            if (l2CacheObjectsToEvictUponRollback != null)
             {
-                nucCtx.getLevel2Cache().evictAll(objectsToEvictUponRollback);
-                objectsToEvictUponRollback = null;
+                nucCtx.getLevel2Cache().evictAll(l2CacheObjectsToEvictUponRollback);
+                l2CacheObjectsToEvictUponRollback = null;
             }
         }
         finally
@@ -4620,9 +4565,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         dirtyOPs.clear();
         indirectDirtyOPs.clear();
         fetchPlan.resetDetachmentRoots();
-        if (getManageRelations() && managedRelationDetails != null)
+        if (managedRelationsHandler != null)
         {
-            managedRelationDetails.clear();
+            managedRelationsHandler.clear();
         }
 
         // L2 cache processing
