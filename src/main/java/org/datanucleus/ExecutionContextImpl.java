@@ -89,8 +89,6 @@ import org.datanucleus.store.Extent;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.StorePersistenceHandler.PersistenceBatchType;
-import org.datanucleus.store.fieldmanager.NullifyRelationFieldManager;
-import org.datanucleus.store.fieldmanager.ReachabilityFieldManager;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.store.types.scostore.Store;
 import org.datanucleus.util.Localiser;
@@ -232,20 +230,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     protected Map<ObjectProvider, Map<?,?>> opAssociatedValuesMapByOP = null;
 
-    /** Flag for whether running persistence-by-reachability-at-commit */
+    /** Flag for whether running "persistence-by-reachability" at commit. */
     private boolean runningPBRAtCommit = false;
 
-    /** Reachability : Set of ids of objects persisted using persistObject, or known as already persistent in the current txn. */
-    private Set reachabilityPersistedIds = null;
-
-    /** Reachability : Set of ids of objects deleted using deleteObject. */
-    private Set reachabilityDeletedIds = null;
-
-    /** Reachability : Set of ids of objects newly persistent in the current transaction */
-    private Set reachabilityFlushedNewIds = null;
-
-    /** Reachability : Set of ids for all objects enlisted in this transaction. */
-    private Set reachabilityEnlistedIds = null;
+    /** Handler for "persistence-by-reachability" at commit. */
+    private ReachabilityAtCommitHandler pbrAtCommitHandler = null;
 
     /** Statistics gatherer for this context. */
     ManagerStatistics statistics = null;
@@ -377,13 +366,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         };
 
-        if (getReachabilityAtCommit())
+        if (properties.getFrequentProperties().getReachabilityAtCommit())
         {
             // Create temporary storage to handle PBR at commit
-            reachabilityPersistedIds = new HashSet();
-            reachabilityDeletedIds = new HashSet();
-            reachabilityFlushedNewIds = new HashSet();
-            reachabilityEnlistedIds = new HashSet();
+            pbrAtCommitHandler = new ReachabilityAtCommitHandler(this);
         }
 
         objectsToEvictUponRollback = null;
@@ -581,12 +567,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             l2CacheTxFieldsToUpdateById.clear();
         }
-        if (getReachabilityAtCommit())
+        if (pbrAtCommitHandler != null)
         {
-            reachabilityPersistedIds.clear();
-            reachabilityDeletedIds.clear();
-            reachabilityFlushedNewIds.clear();
-            reachabilityEnlistedIds.clear();
+            pbrAtCommitHandler.clear();
         }
         if (opEmbeddedInfoByOwner != null)
         {
@@ -1029,15 +1012,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Accessor for whether to run the reachability algorithm at commit time.
-     * @return Whether to run PBR at commit
-     */
-    protected boolean getReachabilityAtCommit()
-    {
-    	return properties.getFrequentProperties().getReachabilityAtCommit();
-    }
-
-    /**
      * Whether the datastore operations are delayed until commit/flush. 
      * In optimistic transactions this is automatically enabled. In datastore transactions there is a
      * persistence property to enable it.
@@ -1103,19 +1077,19 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         assertActiveTransaction();
 
-        if (getReachabilityAtCommit() && tx.isActive())
+        if (pbrAtCommitHandler != null && tx.isActive())
         {
             if (getApiAdapter().isNew(op.getObject()))
             {
                 // Add this object to the list of new objects in this transaction
-                reachabilityFlushedNewIds.add(op.getInternalObjectId());
+                pbrAtCommitHandler.addFlushedNewObject(op.getInternalObjectId());
             }
             else if (getApiAdapter().isPersistent(op.getObject()) && !getApiAdapter().isDeleted(op.getObject()))
             {
                 // Add this object to the list of known valid persisted objects (unless it is a known new object)
-                if (!reachabilityFlushedNewIds.contains(op.getInternalObjectId()))
+                if (!pbrAtCommitHandler.isObjectFlushedNew(op.getInternalObjectId()))
                 {
-                    reachabilityPersistedIds.add(op.getInternalObjectId());
+                    pbrAtCommitHandler.addPersistedObject(op.getInternalObjectId());
                 }
             }
 
@@ -1123,7 +1097,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             if (!runningPBRAtCommit)
             {
                 // Keep a note of the id for use by persistence-by-reachability-at-commit
-                reachabilityEnlistedIds.add(op.getInternalObjectId());
+                pbrAtCommitHandler.addEnlistedObject(op.getInternalObjectId());
             }
         }
 
@@ -1158,7 +1132,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public boolean isEnlistedInTransaction(Object id)
     {
-        if (!getReachabilityAtCommit() || !tx.isActive())
+        if (pbrAtCommitHandler == null || !tx.isActive())
         {
             return false;
         }
@@ -1167,7 +1141,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             return false;
         }
-        return reachabilityEnlistedIds.contains(id);
+        return pbrAtCommitHandler.isObjectEnlisted(id);
     }
 
     /**
@@ -1940,11 +1914,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 }
             }
 
-            if (getReachabilityAtCommit() && tx.isActive())
+            if (pbrAtCommitHandler != null && tx.isActive())
             {
                 if (detached || getApiAdapter().isNew(persistedPc))
                 {
-                    reachabilityPersistedIds.add(op.getInternalObjectId());
+                    pbrAtCommitHandler.addPersistedObject(op.getInternalObjectId());
                 }
             }
         }
@@ -2316,13 +2290,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         // Delete the object
         deleteObjectInternal(obj);
 
-        if (getReachabilityAtCommit() && tx.isActive())
+        if (pbrAtCommitHandler != null && tx.isActive())
         {
             if (op != null)
             {
                 if (getApiAdapter().isDeleted(obj))
                 {
-                    reachabilityDeletedIds.add(op.getInternalObjectId());
+                    pbrAtCommitHandler.addDeletedObject(op.getInternalObjectId());
                 }
             }
         }
@@ -4168,13 +4142,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Make sure all is flushed before we start
             flush();
 
-            if (getReachabilityAtCommit())
+            if (pbrAtCommitHandler != null)
             {
                 // Persistence-by-reachability at commit
                 try
                 {
                     runningPBRAtCommit = true;
-                    performReachabilityAtCommit();
+                    pbrAtCommitHandler.execute();
                 }
                 catch (Throwable t)
                 {
@@ -4348,134 +4322,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         l2CacheTxIds.clear();
         l2CacheTxFieldsToUpdateById.clear();
-    }
-
-    /**
-     * Method to perform persistence-by-reachability at commit.
-     * Utilises txKnownPersistedIds, and txFlushedNewIds, together with txKnownDeletedIds
-     * and runs reachability, performing any necessary delettions of no longer reachable objects.
-     */
-    private void performReachabilityAtCommit()
-    {
-        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-        {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("010032"));
-        }
-
-        // If we have some new objects in this transaction, and we have some known persisted objects (either
-        // from makePersistent in this txn, or enlisted existing objects) then run reachability checks
-        if (!reachabilityPersistedIds.isEmpty() && !reachabilityFlushedNewIds.isEmpty())
-        {
-            Set currentReachables = new HashSet();
-
-            // Run "reachability" on all known persistent objects for this txn
-            Object ids[] = reachabilityPersistedIds.toArray();
-            Set objectNotFound = new HashSet();
-            for (int i=0; i<ids.length; i++)
-            {
-                if (!reachabilityDeletedIds.contains(ids[i]))
-                {
-                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                    {
-                        NucleusLogger.PERSISTENCE.debug("Performing reachability algorithm on object with id \""+ids[i]+"\"");
-                    }
-                    try
-                    {
-                        ObjectProvider op = findObjectProvider(findObject(ids[i], true, true, null));
-
-                        if (!op.isDeleted() && !currentReachables.contains(ids[i]))
-                        {
-                            // Make sure all of its relation fields are loaded before continuing. Is this necessary, since its enlisted?
-                            op.loadUnloadedRelationFields();
-
-                            // Add this object id since not yet reached
-                            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                            {
-                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007000", StringUtils.toJVMIDString(op.getObject()), ids[i], op.getLifecycleState()));
-                            }
-                            currentReachables.add(ids[i]);
-
-                            // Go through all relation fields using ReachabilityFieldManager
-                            ReachabilityFieldManager pcFM = new ReachabilityFieldManager(op, currentReachables);
-                            int[] relationFieldNums = op.getClassMetaData().getRelationMemberPositions(getClassLoaderResolver(), getMetaDataManager());
-                            if (relationFieldNums != null && relationFieldNums.length > 0)
-                            {
-                                op.provideFields(relationFieldNums, pcFM);
-                            }
-                        }
-                    }
-                    catch (NucleusObjectNotFoundException ex)
-                    {
-                        objectNotFound.add(ids[i]);
-                    }
-                }
-                else
-                {
-                    // Was deleted earlier so ignore
-                }
-            }
-
-            // Remove any of the "reachable" instances that are no longer "reachable"
-            reachabilityFlushedNewIds.removeAll(currentReachables);
-
-            Object nonReachableIds[] = reachabilityFlushedNewIds.toArray();
-            if (nonReachableIds != null && nonReachableIds.length > 0)
-            {
-                // For all of instances no longer reachable we need to delete them from the datastore
-                // A). Nullify all of their fields.
-                // TODO See CORE-3276 for a possible change to this
-                for (int i=0; i<nonReachableIds.length; i++)
-                {
-                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                    {
-                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("010033", nonReachableIds[i]));
-                    }
-                    try
-                    {
-                        if (!objectNotFound.contains(nonReachableIds[i]))
-                        {
-                            ObjectProvider op = findObjectProvider(findObject(nonReachableIds[i], true, true, null));
-
-                            if (!op.getLifecycleState().isDeleted() && !getApiAdapter().isDetached(op.getObject()))
-                            {
-                                // Null any relationships for relation fields of this object
-                                op.replaceFields(op.getClassMetaData().getNonPKMemberPositions(), new NullifyRelationFieldManager(op));
-                                flush();
-                            }
-                        }
-                    }
-                    catch (NucleusObjectNotFoundException ex)
-                    {
-                        // just ignore if the object does not exist anymore  
-                    }
-                }
-
-                // B). Remove the objects
-                for (int i=0; i<nonReachableIds.length; i++)
-                {
-                    try
-                    {
-                        if (!objectNotFound.contains(nonReachableIds[i]))
-                        {
-                            ObjectProvider op = findObjectProvider(findObject(nonReachableIds[i], true, true, null));
-                            op.deletePersistent();
-                        }
-                    }
-                    catch (NucleusObjectNotFoundException ex)
-                    {
-                        //just ignore if the file does not exist anymore  
-                    }
-                }
-            }
-
-            // Make sure any updates are flushed
-            flushInternal(true);
-        }
-
-        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-        {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("010034"));
-        }
     }
 
     /**
@@ -4773,12 +4619,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     private void resetTransactionalVariables()
     {
-        if (getReachabilityAtCommit())
+        if (pbrAtCommitHandler != null)
         {
-            reachabilityEnlistedIds.clear();
-            reachabilityPersistedIds.clear();
-            reachabilityDeletedIds.clear();
-            reachabilityFlushedNewIds.clear();
+            pbrAtCommitHandler.clear();
         }
 
         enlistedOPCache.clear();
@@ -5366,24 +5209,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         }
 
-        if (getReachabilityAtCommit() && tx.isActive())
+        if (pbrAtCommitHandler != null && tx.isActive())
         {
-            if (reachabilityEnlistedIds.remove(oldID))
-            {
-                reachabilityEnlistedIds.add(newID);
-            }
-            if (reachabilityFlushedNewIds.remove(oldID))
-            {
-                reachabilityFlushedNewIds.add(newID);
-            }
-            if (reachabilityPersistedIds.remove(oldID))
-            {
-                reachabilityPersistedIds.add(newID);
-            }
-            if (reachabilityDeletedIds.remove(oldID))
-            {
-                reachabilityDeletedIds.add(newID);
-            }
+            pbrAtCommitHandler.swapObjectId(oldID, newID);
         }
     }
 
