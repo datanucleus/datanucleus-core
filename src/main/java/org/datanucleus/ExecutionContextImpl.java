@@ -196,9 +196,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     /** State variable for whether the context is currently flushing its operations. */
     private int flushing = 0;
 
-    /** State variable for whether we are currently running detachAllOnCommit/detachAllOnRollback. */
-    private boolean runningDetachAllOnTxnEnd = false;
-
     /** Manager for dynamic fetch groups. */
     private FetchGroupManager fetchGrpMgr;
 
@@ -228,6 +225,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     /** Handler for "persistence-by-reachability" at commit. */
     private ReachabilityAtCommitHandler pbrAtCommitHandler = null;
+
+    /** State variable for whether we are currently running detachAllOnCommit/detachAllOnRollback. */
+    private boolean runningDetachAllOnTxnEnd = false;
+
+    /**
+     * Temporary array of ObjectProviders to detach at commit (to prevent garbage collection). 
+     * Set up in preCommit() and used in postCommit().
+     */
+    private ObjectProvider[] detachAllOnTxnEndOPs = null;
 
     /** Statistics gatherer for this context. */
     private ManagerStatistics statistics = null;
@@ -1148,7 +1154,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     /**
      * Method to return if an object is enlisted in the current transaction.
-     * This is only of use when running "persistence-by-reachability-at-commit"
+     * This is only of use when running "persistence-by-reachability" at commit.
      * @param id Identity for the object
      * @return Whether it is enlisted in the current transaction
      */
@@ -4260,12 +4266,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         l2CacheTxIds.clear();
         l2CacheTxFieldsToUpdateById.clear();
     }
-
-    /**
-     * Temporary array of ObjectProviders to detach at commit (to prevent garbage collection). 
-     * Set up in preCommit() and used in postCommit().
-     */
-    private ObjectProvider[] detachAllOnTxnEndOPs = null;
 
     /**
      * Method to perform all necessary preparation for detach-all-on-commit/detach-all-on-rollback.
