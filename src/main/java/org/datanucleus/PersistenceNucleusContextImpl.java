@@ -47,7 +47,7 @@ import org.datanucleus.identity.IdentityManagerImpl;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.identity.SCOID;
 import org.datanucleus.management.FactoryStatistics;
-import org.datanucleus.management.jmx.ManagementManager;
+import org.datanucleus.management.ManagementManager;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.FileMetaData;
 import org.datanucleus.metadata.IdentityType;

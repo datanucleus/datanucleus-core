@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
      ...
 ***********************************************************************/
-package org.datanucleus.management.jmx;
+package org.datanucleus.management;
 
 /**
  * Management Server for MBeans.

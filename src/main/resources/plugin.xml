@@ -549,7 +549,7 @@ Contributors:
 
     <!-- JMX SERVERS -->
     <extension point="org.datanucleus.management_server">
-        <management-server class="org.datanucleus.management.jmx.PlatformManagementServer" name="default"/>
-        <management-server class="org.datanucleus.management.jmx.Mx4jManagementServer" name="mx4j"/>
+        <management-server class="org.datanucleus.management.PlatformManagementServer" name="default"/>
+        <management-server class="org.datanucleus.management.Mx4jManagementServer" name="mx4j"/>
     </extension>
 </plugin>

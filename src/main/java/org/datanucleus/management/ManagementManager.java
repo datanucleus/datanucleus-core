@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
      ...
 ***********************************************************************/
-package org.datanucleus.management.jmx;
+package org.datanucleus.management;
 
 import org.datanucleus.NucleusContext;
 import org.datanucleus.NucleusContextHelper;
@@ -25,37 +25,34 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Management interface for DataNucleus. Management operations and attributes
- * are exposed through this interface that holds statistics linked to an OMF instance.
+ * Management interface for DataNucleus.
+ * Management operations and attributes are exposed through this interface that holds statistics linked to a NucleusContext instance.
  * <p>
- * The mechanics for starting and stopping JMX servers are not defined here,
- * and must be done by plug-ins, by providing the implementation of
- * {@link ManagementServer}.
+ * The mechanics for starting and stopping JMX servers are not defined here, and must be done by plug-ins, by providing the implementation of {@link ManagementServer}.
  * This Manager controls the lifecycle of management servers.
- * A management server is started when an instance of this class is created,
- * and its shutdown when the close operation is invoked
+ * A management server is started when an instance of this class is created, and its shutdown when the close operation is invoked
  * The management server startup is triggered when the Manager gets enabled.
  * </p>
  */
 public class ManagementManager
 {
-    /** the NucleusContext that owns this management **/
+    /** NucleusContext that we are managing. **/
     final private NucleusContext nucleusContext;
     
-    /** whether this is closed **/
+    /** Whether this is closed. **/
     private boolean closed = false;
 
-    /** the Management Server **/
+    /** The Management Server. **/
     private ManagementServer mgmtServer;
 
-    /** domain name for this configuration **/
+    /** Domain name for this configuration. **/
     private String domainName;
 
-    /** instance name for this configuration **/
+    /** Instance name for this configuration. **/
     private String instanceName;
 
     /**
-     * Constructor for Management
+     * Constructor for Management.
      * @param ctxt the NucleusContext that we are operating for
      */
     public ManagementManager(NucleusContext ctxt)
@@ -136,7 +133,7 @@ public class ManagementManager
     {
         if (this.closed)
         {
-            throw new NucleusException("Management instance is closed and cannot be used. You must adquire a new context").setFatal();
+            throw new NucleusException("Management instance is closed and cannot be used. You must acquire a new context").setFatal();
         }
     }
 
@@ -150,8 +147,7 @@ public class ManagementManager
             String jmxType = nucleusContext.getConfiguration().getStringProperty(PropertyNames.PROPERTY_JMX_TYPE);
             try
             {
-                mgmtServer = (ManagementServer) nucleusContext.getPluginManager().createExecutableExtension(
-                    "org.datanucleus.management_server", "name", jmxType, "class", null, null);
+                mgmtServer = (ManagementServer) nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.management_server", "name", jmxType, "class", null, null);
                 if (mgmtServer != null)
                 {
                     NucleusLogger.GENERAL.info("Starting Management Server");
@@ -161,12 +157,11 @@ public class ManagementManager
             catch (Exception e)
             {
                 mgmtServer = null;
-                NucleusLogger.GENERAL.error("Error instantiating or connecting to Management Server : " + 
-                    StringUtils.getStringFromStackTrace(e));
+                NucleusLogger.GENERAL.error("Error instantiating or connecting to Management Server : " + StringUtils.getStringFromStackTrace(e));
             }
         }
     }
-    
+
     /**
      * Shutdown Management Server
      */

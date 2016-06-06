@@ -24,7 +24,7 @@ import org.datanucleus.cache.Level2Cache;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityManager;
 import org.datanucleus.management.FactoryStatistics;
-import org.datanucleus.management.jmx.ManagementManager;
+import org.datanucleus.management.ManagementManager;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.state.CallbackHandler;
 import org.datanucleus.state.ObjectProviderFactory;
