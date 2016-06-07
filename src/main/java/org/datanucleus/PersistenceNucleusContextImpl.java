@@ -67,6 +67,7 @@ import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.autostart.AutoStartMechanism;
 import org.datanucleus.store.federation.FederatedStoreManager;
+import org.datanucleus.store.schema.MultiTenancyProvider;
 import org.datanucleus.store.schema.SchemaAwareStoreManager;
 import org.datanucleus.store.schema.SchemaScriptAwareStoreManager;
 import org.datanucleus.store.schema.SchemaTool;
@@ -145,6 +146,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
 
     /** Factory for ObjectProviders for managing persistable objects. */
     private ObjectProviderFactory opFactory = null;
+
+    private MultiTenancyProvider multiTenancyProvider = null;
 
     /**
      * Constructor for the context.
@@ -342,7 +345,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING, null, null, StringPropertyValidator.class.getName(), true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_CATALOG, null, null, null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_SCHEMA, null, null, null, true, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID, null, null, null, true, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID, null, null, null, false, true);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_TENANT_PROVIDER, null, null, null, false, false);
 
         // Auto-Start Mechanism
         conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM, null, "None", null, true, false);
@@ -503,6 +507,18 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         if (opFactory == null)
         {
             opFactory = new ObjectProviderFactoryImpl(this);
+        }
+
+        if (config.hasProperty(PropertyNames.PROPERTY_MAPPING_TENANT_PROVIDER))
+        {
+            try
+            {
+                multiTenancyProvider = (MultiTenancyProvider)config.getProperty(PropertyNames.PROPERTY_MAPPING_TENANT_PROVIDER); 
+            }
+            catch (Throwable thr)
+            {
+                NucleusLogger.PERSISTENCE.warn("Error accessing property " + PropertyNames.PROPERTY_MAPPING_TENANT_PROVIDER + "; should be an instance of MultiTenancyProvider but isnt! Ignored");
+            }
         }
 
         super.initialise();
@@ -1628,8 +1644,12 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     @Override
     public boolean isClassMultiTenant(AbstractClassMetaData cmd)
     {
-        // TODO Improve this specification. At the moment if the user specifies the tenant id then we are running multi-tenant.
-        return storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID) != null && !"true".equalsIgnoreCase(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_DISABLE));
+        if (multiTenancyProvider != null || config.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID) != null)
+        {
+            // User has either provided a multiTenancyProvider, or specified the TenantId for the PMF/EMF
+            return !"true".equalsIgnoreCase(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_DISABLE));
+        }
+        return false;
     }
 
     /* (non-Javadoc)
@@ -1638,7 +1658,10 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     @Override
     public String getMultiTenancyId(ExecutionContext ec, AbstractClassMetaData cmd)
     {
-        // TODO Use input arguments.
-        return storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID);
+        if (multiTenancyProvider != null)
+        {
+            return multiTenancyProvider.getTenantId(ec);
+        }
+        return ec.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID);
     }
 }
