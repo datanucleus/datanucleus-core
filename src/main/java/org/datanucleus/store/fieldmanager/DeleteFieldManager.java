@@ -105,7 +105,6 @@ public class DeleteFieldManager extends AbstractFieldManager
                 {
                     processSingleValue(value, mmd, ec, relationType);
                 }
-
             }
         }
     }
@@ -136,7 +135,6 @@ public class DeleteFieldManager extends AbstractFieldManager
                     if (relValue != null)
                     {
                         ContainerHandler containerHandler = ec.getTypeManager().getContainerHandler(relMmd.getType());
-                        
                         if (containerHandler instanceof ElementContainerHandler)
                         {
                             ElementContainerAdapter adapter = (ElementContainerAdapter) containerHandler.getAdapter(relValue);
@@ -163,8 +161,7 @@ public class DeleteFieldManager extends AbstractFieldManager
         }
     }
     
-    private void processMapContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd,
-            ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler)
+    private void processMapContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd, ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler)
     {
         boolean dependentKey = mmd.getMap().isDependentKey();
         boolean dependentValue = mmd.getMap().isDependentValue();
@@ -220,12 +217,11 @@ public class DeleteFieldManager extends AbstractFieldManager
     private void processElementContainer(int fieldNumber, Object container, AbstractMemberMetaData mmd,
             ContainerHandler<Object, ElementContainerAdapter<Object>> containerHandler, ExecutionContext ec, RelationType relationType)
     {
-        if (mmd.isCascadeRemoveOrphans() || (mmd.getCollection() != null && mmd.getCollection().isDependentElement()) || (mmd.getArray() != null && mmd
-                .getArray().isDependentElement()))
+        if (mmd.isCascadeRemoveOrphans() || (mmd.getCollection() != null && mmd.getCollection().isDependentElement()) || 
+            (mmd.getArray() != null && mmd.getArray().isDependentElement()))
         {
-            ApiAdapter api = op.getExecutionContext().getApiAdapter();
-
             // Process all elements of the container that are PC
+            ApiAdapter api = op.getExecutionContext().getApiAdapter();
             for (Object element : containerHandler.getAdapter(container))
             {
                 if (api.isPersistable(element))

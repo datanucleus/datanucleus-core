@@ -34,9 +34,9 @@ import org.datanucleus.store.types.SequenceAdapter;
 import org.datanucleus.store.types.TypeManager;
 
 /**
- * Field manager that perists all unpersisted PC objects referenced from the source object. If any
- * collection/map fields are not currently using SCO wrappers they will be converted to do so. Effectively
- * provides "persistence-by-reachability" (at insert/update).
+ * Field manager that persists all unpersisted PC objects referenced from the source object. 
+ * If any collection/map fields are not currently using SCO wrappers they will be converted to do so. 
+ * Effectively provides "persistence-by-reachability" (at insert/update).
  */
 public class PersistFieldManager extends AbstractFieldManager
 {
@@ -146,7 +146,6 @@ public class PersistFieldManager extends AbstractFieldManager
     {
     	TypeManager typeManager = op.getExecutionContext().getTypeManager();
     	ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler = typeManager.getContainerHandler(mmd.getType());
-    	
         ApiAdapter api = op.getExecutionContext().getApiAdapter();
 
         // Process all keys, values of the Map that are PC
@@ -179,8 +178,8 @@ public class PersistFieldManager extends AbstractFieldManager
                 boolean updateValue = false;
                 if (newMapKey != mapKey)
                 {
-                    ObjectProvider keySM = op.getExecutionContext().findObjectProvider(newMapKey);
-                    if (keySM.getReferencedPC() != null)
+                    ObjectProvider keyOP = op.getExecutionContext().findObjectProvider(newMapKey);
+                    if (keyOP.getReferencedPC() != null)
                     {
                         // Attaching the key
                         updateKey = true;
@@ -188,8 +187,8 @@ public class PersistFieldManager extends AbstractFieldManager
                 }
                 if (newMapValue != mapValue)
                 {
-                    ObjectProvider valSM = op.getExecutionContext().findObjectProvider(newMapValue);
-                    if (valSM.getReferencedPC() != null)
+                    ObjectProvider valOP = op.getExecutionContext().findObjectProvider(newMapValue);
+                    if (valOP.getReferencedPC() != null)
                     {
                         // Attaching the value
                         updateValue = true;
@@ -218,9 +217,7 @@ public class PersistFieldManager extends AbstractFieldManager
         ElementContainerAdapter containerAdapter = elementContainerHandler.getAdapter(container);
 
         ApiAdapter api = op.getExecutionContext().getApiAdapter();
-        
         int objectType = elementContainerHandler.getObjectType(mmd);
-        
         if (objectType == ObjectProvider.PC)
         {
             int elementPosition = 0;
@@ -233,8 +230,8 @@ public class PersistFieldManager extends AbstractFieldManager
                     if (elementSM.getReferencedPC() != null)
                     {
                         // Must be attaching this element, so swap element (detached -> attached)
-                        if (containerAdapter instanceof SequenceAdapter) {
-                            
+                        if (containerAdapter instanceof SequenceAdapter) 
+                        {
                             ((SequenceAdapter) containerAdapter).update(newElement, elementPosition); 
                         }
                         else
@@ -242,7 +239,6 @@ public class PersistFieldManager extends AbstractFieldManager
                             containerAdapter.remove(elementSM);
                             containerAdapter.add(newElement);
                         }
-
                     }
                 }
                 elementPosition++;
