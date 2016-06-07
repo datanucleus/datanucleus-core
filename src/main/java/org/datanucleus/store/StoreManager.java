@@ -340,7 +340,7 @@ public interface StoreManager
      * @param subclasses Whether to include subclasses of 'c'
      * @return The Extent.
      */
-    Extent getExtent(ExecutionContext ec, Class c, boolean subclasses);
+    <T> Extent<T> getExtent(ExecutionContext ec, Class<T> c, boolean subclasses);
 
     /**
      * Accessor for whether this query language is supported.

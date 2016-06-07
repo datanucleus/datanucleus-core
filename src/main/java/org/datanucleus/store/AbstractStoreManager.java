@@ -965,7 +965,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#getExtent(org.datanucleus.ExecutionContext, java.lang.Class, boolean)
      */
-    public Extent getExtent(ExecutionContext ec, Class c, boolean subclasses)
+    public <T> Extent<T> getExtent(ExecutionContext ec, Class<T> c, boolean subclasses)
     {
         AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(c, ec.getClassLoaderResolver());
         if (!cmd.isRequiresExtent())
@@ -1431,8 +1431,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      * Will define the following properties "class-name", "root-class-name", "field-name" (if for a field),
      * "sequence-name", "key-initial-value", "key-cache-size", "sequence-table-name", "sequence-schema-name",
      * "sequence-catalog-name", "sequence-name-column-name", "sequence-nextval-column-name".
-     * In addition any extension properties on the respective field or datastore-identity are also passed through 
-     * as properties.
+     * In addition any extension properties on the respective field or datastore-identity are also passed through as properties.
      * @param cmd MetaData for the class
      * @param absoluteFieldNumber Number of the field (-1 = datastore identity)
      * @param ec execution context
@@ -1440,8 +1439,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      * @param tablegenmd Any table generator metadata
      * @return The properties to use for this field
      */
-    protected Properties getPropertiesForGenerator(AbstractClassMetaData cmd, int absoluteFieldNumber,
-            ExecutionContext ec, SequenceMetaData seqmd, TableGeneratorMetaData tablegenmd)
+    protected Properties getPropertiesForGenerator(AbstractClassMetaData cmd, int absoluteFieldNumber, ExecutionContext ec, SequenceMetaData seqmd, TableGeneratorMetaData tablegenmd)
     {
         // Set up the default properties available for all value generators
         Properties properties = new Properties();
