@@ -61,6 +61,10 @@ public class ParameterExpression extends Expression
         return position;
     }
 
+    public void setType(Class type)
+    {
+        this.type = type;
+    }
     public Class getType()
     {
         return type;
