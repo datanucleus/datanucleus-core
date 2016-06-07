@@ -182,7 +182,7 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
 
     /**
      * Method to return a detached copy of the container.
-     * Recurse sthrough the elements so that they are likewise detached.
+     * Recurses through the elements so that they are likewise detached.
      * @param state State for detachment process
      * @return The detached container
      */
@@ -194,27 +194,15 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
     }
 
     /**
-     * Method to return an attached copy of the passed (detached) value. The returned attached copy
-     * is a SCO wrapper. Goes through the existing elements in the store for this owner field and
-     * removes ones no longer present, and adds new elements. All elements in the (detached)
-     * value are attached.
+     * Method to return an attached copy of the passed (detached) value. 
+     * The returned attached copy is a SCO wrapper. 
+     * Goes through the existing elements in the store for this owner field and removes ones no longer present, and adds new elements. 
+     * All elements in the (detached) value are attached.
      * @param value The new (collection) value
      */
     public void attachCopy(java.util.HashSet value)
     {
-        boolean elementsWithoutIdentity = SCOUtils.collectionHasElementsWithoutIdentity(ownerMmd);
-
-        SCOUtils.attachCopyElements(ownerOP, this, value, elementsWithoutIdentity);
-/*        // Remove any no-longer-needed elements from this collection
-        SCOUtils.attachRemoveDeletedElements(ownerOP.getExecutionContext().getApiAdapter(), this, c, elementsWithoutIdentity);
-
-        // Persist any new elements and form the attached elements collection
-        java.util.Collection attachedElements = new java.util.HashSet(c.size());
-        SCOUtils.attachCopyForCollection(ownerOP, c.toArray(), attachedElements, elementsWithoutIdentity);
-
-        // Add any new elements to this collection
-        SCOUtils.attachAddNewElements(ownerOP.getExecutionContext().getApiAdapter(), this, attachedElements,
-            elementsWithoutIdentity);*/
+        SCOUtils.attachCopyElements(ownerOP, this, value, SCOUtils.collectionHasElementsWithoutIdentity(ownerMmd));
     }
 
     // ------------------ Implementation of HashSet methods --------------------
@@ -232,7 +220,7 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
      * Accessor for whether an element is contained in this set.
      * @param element The element
      * @return Whether it is contained.
-     **/
+     */
     public boolean contains(Object element)
     {
         return delegate.contains(element);
@@ -242,7 +230,7 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
      * Accessor for whether a collection is contained in this set.
      * @param c The collection
      * @return Whether it is contained.
-     **/
+     */
     public boolean containsAll(java.util.Collection c)
     {
         return delegate.containsAll(c);
@@ -261,7 +249,7 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
     /**
      * Accessor for whether the HashSet is empty.
      * @return Whether it is empty.
-     **/
+     */
     public boolean isEmpty()
     {
         return delegate.isEmpty();
@@ -270,7 +258,7 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
     /**
      * Accessor for an iterator for the Set.
      * @return The iterator
-     **/
+     */
     public Iterator<E> iterator()
     {
         return new SCOCollectionIterator(this, ownerOP, delegate, null, true);
