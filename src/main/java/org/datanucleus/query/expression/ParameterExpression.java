@@ -88,9 +88,14 @@ public class ParameterExpression extends Expression
         }
         else
         {
-            // No symbol for this parameter yet, so add one, but valueType is unknown still
+            // No symbol for this parameter yet, so add one
             symbol = new PropertySymbol(getId());
             symbol.setType(Symbol.PARAMETER);
+            if (type != null)
+            {
+                // Add valueType if known
+                symbol.setValueType(type);
+            }
             symtbl.addSymbol(symbol);
         }
         return symbol;
