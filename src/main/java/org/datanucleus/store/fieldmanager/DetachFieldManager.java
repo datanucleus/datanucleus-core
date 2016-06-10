@@ -60,7 +60,6 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
         this.copy = copy;
     }
 
-    
     /**
      * Utility method to process the passed persistable object creating a copy.
      * @param pc The PC object
@@ -122,14 +121,12 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                 detachedValue = processField(fieldNumber, value, mmd);
             }
         }
-
         return detachedValue;
     }
 
     private Object processField(int fieldNumber, Object value, AbstractMemberMetaData mmd)
     {
         RelationType relType = mmd.getRelationType(op.getExecutionContext().getClassLoaderResolver());
-
         if (relType == RelationType.NONE)
         {
             if (secondClassMutableFields[fieldNumber])
@@ -146,13 +143,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                     return ((SCO) value).detachCopy(state);
                 }
 
-                SCO sco = (SCO) value;
-
-                if (SCOUtils.detachAsWrapped(op))
-                {
-                    return sco;
-                }
-                return SCOUtils.unwrapSCOField(op, fieldNumber, sco);
+                return (SCOUtils.detachAsWrapped(op)) ? value : SCOUtils.unwrapSCOField(op, fieldNumber, (SCO)value);
             }
         }
         else
@@ -188,7 +179,6 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
         if (!mmd.hasArray())
         {
             // Need to unset owner for mutable SCOs
-
             Object wrappedContainer;
             if (SCOUtils.detachAsWrapped(op))
             {
@@ -214,8 +204,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
             // It still can be an immutable collection or map, so must check if has been wrapped
             if (wrappedContainer instanceof SCO)
             {
-                SCO sco = (SCO) wrappedContainer;
-                sco.unsetOwner();
+                ((SCO)wrappedContainer).unsetOwner();
             }
         }
 
@@ -228,11 +217,9 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
         Object detachedContainer;
 
         ElementContainerAdapter containerAdapter = containerHandler.getAdapter(container);
-
         if (copy)
         {
             detachedContainer = containerHandler.newContainer(mmd);
-
             ElementContainerAdapter<Object> copyAdapter = containerHandler.getAdapter(detachedContainer);
             for (Object element : containerAdapter)
             {
@@ -245,7 +232,6 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
         else
         {
             detachedContainer = container;
-
             for (Object element : containerAdapter)
             {
                 processPersistable(element);
@@ -265,7 +251,6 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
         if (copy)
         {
             detachedMapContainer = containerHandler.newContainer(mmd);
-
             MapMetaData mapMd = mmd.getMap();
             MapContainerAdapter copyAdapter = containerHandler.getAdapter(detachedMapContainer);
             for (Entry<Object, Object> entry : mapAdapter.entries())
@@ -291,7 +276,6 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
         else
         {
             detachedMapContainer = mapContainer;
-
             MapMetaData mapMd = mmd.getMap();
             for (Entry<Object, Object> entry : mapAdapter.entries())
             {
@@ -332,8 +316,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                 DetachState.Entry entry = ((DetachState)state).getDetachedCopyEntry(value);
                 if (entry != null)
                 {
-                    // While we are at the end of a branch and this would go beyond the depth limits,
-                    // the object here *is* already detached so just return it
+                    // While we are at the end of a branch and this would go beyond the depth limits, the object here *is* already detached so just return it
                     return entry.getDetachedCopyObject();
                 }
             }
