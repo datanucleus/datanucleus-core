@@ -21,9 +21,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.expression.InvokeExpression;
 import org.datanucleus.util.Localiser;
 
@@ -37,6 +39,18 @@ public class TemporalDayMethod implements InvocationEvaluator
      */
     public Object evaluate(InvokeExpression expr, Object invokedValue, InMemoryExpressionEvaluator eval)
     {
+        if (invokedValue == null && expr.getArguments() != null)
+        {
+            // Specified as static function, so use argument of InvokeExpression
+            List<Expression> argExprs = expr.getArguments();
+            if (argExprs.size() > 1)
+            {
+                throw new NucleusUserException("Incorrect number of arguments to DAY");
+            }
+            Expression argExpr = argExprs.get(0);
+            invokedValue = eval.getValueForExpression(argExpr);
+        }
+
         if (invokedValue == null)
         {
             return Boolean.FALSE;

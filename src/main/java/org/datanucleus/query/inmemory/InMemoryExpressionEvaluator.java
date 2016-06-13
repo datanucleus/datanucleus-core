@@ -1032,6 +1032,20 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
         return value;
     }
 
+    public Object getValueForExpression(Expression expr)
+    {
+        if (expr instanceof PrimaryExpression)
+        {
+            return getValueForPrimaryExpression((PrimaryExpression) expr);
+        }
+        else if (expr instanceof ParameterExpression)
+        {
+            return QueryUtils.getValueForParameterExpression(parameterValues, (ParameterExpression)expr);
+        }
+        // TODO Support other expression types as args to methods
+        return null;
+    }
+
     /**
      * Convenience method to get an int value from the supplied literal.
      * Returns a value if it is convertible into an int.
