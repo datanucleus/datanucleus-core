@@ -98,7 +98,7 @@ public abstract class JavaQueryEvaluator
         this.candidateAlias = (compilation.getCandidateAlias() != null ? compilation.getCandidateAlias() : this.candidateAlias);
 
         state = new HashMap<String, Object>();
-        state.put(this.candidateAlias, query.getCandidateClass());
+        state.put(this.candidateAlias, query.getCandidateClass()); // TODO Why put the CLASS in here?! it should be a candidate
 
         evaluator = new InMemoryExpressionEvaluator(query.getExecutionContext(), parameterValues, state, query.getParsedImports(), clr, this.candidateAlias, query.getLanguage());
     }
@@ -246,8 +246,8 @@ public abstract class JavaQueryEvaluator
             {
                 s = sortByGrouping(resultSet);
             }
-
             aggregateList = s;
+            // TODO Move this to within sortByGrouping
             if (grouping != null)
             {
                 aggregateList = handleAggregates(s);
@@ -421,6 +421,7 @@ public abstract class JavaQueryEvaluator
     private List sortByGrouping(List set)
     {
         Object[] o = set.toArray();
+        // TODO Shouldn't we handle "having" within this?
         final Expression[] grouping = compilation.getExprGrouping();
         Arrays.sort(o, new Comparator()
         {
