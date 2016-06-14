@@ -644,6 +644,82 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
     }
 
     /* (non-Javadoc)
+     * @see org.datanucleus.query.evaluator.AbstractExpressionEvaluator#processInExpression(org.datanucleus.query.expression.Expression)
+     */
+    @Override
+    protected Object processInExpression(Expression expr)
+    {
+        if (expr instanceof DyadicExpression)
+        {
+            DyadicExpression dyExpr = (DyadicExpression)expr;
+            Expression left = dyExpr.getLeft();
+            Expression right = dyExpr.getRight();
+            Object leftVal = getValueForExpression(left);
+            Object rightVal = getValueForExpression(right);
+            if (rightVal instanceof Collection)
+            {
+                Boolean result = Boolean.FALSE;
+                Iterator rightValIter = ((Collection)rightVal).iterator();
+                while (rightValIter.hasNext())
+                {
+                    Object rightElem = rightValIter.next();
+                    if (leftVal.equals(rightElem))
+                    {
+                        result = Boolean.TRUE;
+                        break;
+                    }
+                }
+                stack.push(result);
+                return result;
+            }
+
+            Boolean result = leftVal.equals(rightVal) ? Boolean.TRUE : Boolean.FALSE;
+            stack.push(result);
+            return result;
+        }
+        // TODO Auto-generated method stub
+        return super.processInExpression(expr);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.query.evaluator.AbstractExpressionEvaluator#processNotInExpression(org.datanucleus.query.expression.Expression)
+     */
+    @Override
+    protected Object processNotInExpression(Expression expr)
+    {
+        if (expr instanceof DyadicExpression)
+        {
+            DyadicExpression dyExpr = (DyadicExpression)expr;
+            Expression left = dyExpr.getLeft();
+            Expression right = dyExpr.getRight();
+            Object leftVal = getValueForExpression(left);
+            Object rightVal = getValueForExpression(right);
+            if (rightVal instanceof Collection)
+            {
+                Boolean result = Boolean.TRUE;
+                Iterator rightValIter = ((Collection)rightVal).iterator();
+                while (rightValIter.hasNext())
+                {
+                    Object rightElem = rightValIter.next();
+                    if (leftVal.equals(rightElem))
+                    {
+                        result = Boolean.FALSE;
+                        break;
+                    }
+                }
+                stack.push(result);
+                return result;
+            }
+
+            Boolean result = leftVal.equals(rightVal) ? Boolean.FALSE : Boolean.TRUE;
+            stack.push(result);
+            return result;
+        }
+        // TODO Auto-generated method stub
+        return super.processNotInExpression(expr);
+    }
+
+    /* (non-Javadoc)
      * @see org.datanucleus.query.evaluator.AbstractExpressionEvaluator#processLiteral(org.datanucleus.query.expression.Literal)
      */
     protected Object processLiteral(Literal expr)
