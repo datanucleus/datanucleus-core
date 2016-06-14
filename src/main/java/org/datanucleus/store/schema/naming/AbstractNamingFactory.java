@@ -172,7 +172,11 @@ public abstract class AbstractNamingFactory implements NamingFactory
             while (!checked)
             {
                 AbstractMemberMetaData[] embMmds = embmd.getMemberMetaData();
-                if (embMmds != null)
+                if (embMmds == null || embMmds.length == 0)
+                {
+                    checked = true;
+                }
+                else
                 {
                     boolean checkedEmbmd = false;
                     for (int i=0;i<embMmds.length;i++)
@@ -203,6 +207,7 @@ public abstract class AbstractNamingFactory implements NamingFactory
                                         embmd = embMmds[i].getElementMetaData().getEmbeddedMetaData();
                                     }
                                 }
+                                // TODO Cater for embedded map key/values
                                 else
                                 {
                                     embmd = embMmds[i].getEmbeddedMetaData();
