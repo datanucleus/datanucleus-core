@@ -166,7 +166,7 @@ public abstract class AbstractNamingFactory implements NamingFactory
 
         if (embmd != null && mmds.size() > 1)
         {
-            // try to find a user-provided column name in <embedded> metadata
+            // Try to find a user-provided column name in <embedded> metadata for this member
             boolean checked = false;
             int mmdNo = 1;
             while (!checked)
@@ -228,7 +228,20 @@ public abstract class AbstractNamingFactory implements NamingFactory
             }
         }
 
-        // EmbeddedMetaData doesn't specify this members column, so generate one based on the names of the member(s).
+        if (mmds.size() >= 1)
+        {
+            // EmbeddedMetaData didn't provide the column name, so check for a column specified for the metadata of the member itself
+            AbstractMemberMetaData lastMmd = mmds.get(mmds.size()-1);
+            ColumnMetaData[] colmds = lastMmd.getColumnMetaData();
+            if (colmds != null && colmds.length > colPosition && !StringUtils.isWhitespace(colmds[colPosition].getName()))
+            {
+                String colName = colmds[colPosition].getName();
+                return prepareIdentifierNameForUse(colName, SchemaComponent.COLUMN);
+            }
+        }
+
+        // EmbeddedMetaData and Member don't specify the column, so generate one based on the names of the member(s).
+        // TODO If columnPosition is >= 1 maybe we should append "_{colPosition}" on the column name
         StringBuilder str = new StringBuilder(mmds.get(0).getName());
         for (int i=1;i<mmds.size();i++)
         {
