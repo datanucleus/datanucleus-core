@@ -259,7 +259,8 @@ public class CompleteClassTable implements Table
                             }
                             mappingByMember.put(mmd, mapping);
                         }
-                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not yet supported. Ignoring");
+
+                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded map. Not yet supported. Ignoring");
                         continue;
                     }
                     else if (mmd.hasArray())
@@ -290,9 +291,16 @@ public class CompleteClassTable implements Table
                                 schemaVerifier.attributeMember(mapping, mmd);
                             }
                             mappingByMember.put(mmd, mapping);
+
+                            // TODO Consider adding the embedded info under the above column as related information
+                            EmbeddedMetaData embmd = (mmd.getElementMetaData() != null ? mmd.getElementMetaData().getEmbeddedMetaData() : null);
+                            processEmbeddedMember(embMmds, clr, embmd, true);
                         }
-                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded array. Not yet supported. Ignoring");
-                        continue;
+                        else
+                        {
+                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded array. Not yet supported. Ignoring");
+                            continue;
+                        }
                     }
                 }
             }
