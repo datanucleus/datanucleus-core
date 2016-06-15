@@ -28,7 +28,7 @@ The primary classes involved in the persistence process are
     MyClass myObj = (MyClass)pm.getObjectById(id);
     myObj.getSomeSet().add(newVal);
 
-* calls backing store wrapper (see _org.datanucleus.store.types.backed.XXX_ or _org.datanucleus.store.types.simple.XXX_)
+* calls wrapper (see _org.datanucleus.store.types.wrappers.XXX_ or _org.datanucleus.store.types.wrappers.backed.XXX_)
 * if optimistic txns then queues up til flush/commit
 * otherwise will call backing store for the wrapper (RDBMS) which updates the DB, or will mark the field as dirty (non-RDBMS) and the field is sent to the datastore at the next convenient place.
 
