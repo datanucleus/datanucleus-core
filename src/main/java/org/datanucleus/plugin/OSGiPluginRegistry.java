@@ -163,11 +163,11 @@ public class OSGiPluginRegistry implements PluginRegistry
         {
             String name1 = o1.getPlugin().getSymbolicName();
             String name2 = o2.getPlugin().getSymbolicName();
-            if (name1.startsWith("org.datanucleus") && !name2.startsWith("org.datanucleus"))
+            if (name1.startsWith(DATANUCLEUS_PKG) && !name2.startsWith(DATANUCLEUS_PKG))
             {
                 return -1;
             }
-            else if (!name1.startsWith("org.datanucleus") && name2.startsWith("org.datanucleus"))
+            else if (!name1.startsWith(DATANUCLEUS_PKG) && name2.startsWith(DATANUCLEUS_PKG))
             {
                 return 1;
             }
@@ -304,7 +304,7 @@ public class OSGiPluginRegistry implements PluginRegistry
     }
 
     /**
-     * Accessor for all registered bundles
+     * Accessor for all registered bundles.
      * @return the bundles
      * @throws UnsupportedOperationException if this operation is not supported by the implementation
      */
@@ -321,7 +321,9 @@ public class OSGiPluginRegistry implements PluginRegistry
         for (org.osgi.framework.Bundle osgiBundle : osgiBundles)
         {
             if (symbolicName.equals(osgiBundle.getSymbolicName()))
+            {
                 return osgiBundle;
+            }
         }
         return null;
     }

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A Plug-in (OSGi Bundle) definition. Represents the XML declaration
+ * A Plug-in (OSGi Bundle) definition. Represents the XML declaration.
  */
 public class Bundle
 {
@@ -127,11 +127,11 @@ public class Bundle
     }
     
     /**
-     * Description of bundles
+     * Description of bundles.
+     * <pre>
      * bundle-description = symbolic-name (';' parameter )*
-     * 
+     * </pre>
      * See OSGI 3.0 $ 1.4.2
-     * 
      */
     public static class BundleDescription
     {
@@ -230,7 +230,7 @@ public class Bundle
     }
 
     /**
-     * Bundle Range - according to OSGi spec 3.0 �3.2.5
+     * Bundle Range - according to OSGi spec 3.0 $3.2.5
      */
     public static class BundleVersionRange
     {

@@ -25,13 +25,12 @@ import org.datanucleus.util.Localiser;
 
 /**
  * Factory for PluginRegistry. 
- * Creates an instance of PluginRegistry based on the available PluginRegistry implementation in the classpath.
+ * Creates an instance of PluginRegistry based on the available PluginRegistry implementation in the CLASSPATH.
  */
 public class PluginRegistryFactory
 {
     /**
-     * Instantiates a PluginRegistry. Will typically use NonManagedPluginRegistry in non-OSGi environments and
-     * OSGiPluginRegistry otherwise, subject to user input.
+     * Instantiates a PluginRegistry. Will typically use NonManagedPluginRegistry in non-OSGi environments and OSGiPluginRegistry otherwise, subject to user input.
      * @param registryClassName Name of the registry
      * @param registryBundleCheck What to do on check of bundles (Only for Non-OSGi)
      * @param allowUserBundles Whether to only load DataNucleus bundles (org.datanucleus) (Only for Non-OSGi)
