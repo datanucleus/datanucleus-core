@@ -85,8 +85,7 @@ public class ApiAdapterFactory
         {
             try
             {
-                api = (ApiAdapter) pluginMgr.createExecutableExtension("org.datanucleus.api_adapter", "name", 
-                    name, "class-name", null, null);
+                api = (ApiAdapter) pluginMgr.createExecutableExtension("org.datanucleus.api_adapter", "name", name, "class-name", null, null);
                 if (api == null)
                 {
                     String msg = Localiser.msg("022001", name);
@@ -97,16 +96,14 @@ public class ApiAdapterFactory
             }
             catch (Error err) // NoClassDefFoundError for some dependent class?
             {
-                String className = pluginMgr.getAttributeValueForExtension("org.datanucleus.api_adapter", 
-                    "name", name, "class-name");
+                String className = pluginMgr.getAttributeValueForExtension("org.datanucleus.api_adapter", "name", name, "class-name");
                 String msg = Localiser.msg("022000", className, err.getMessage());
                 NucleusLogger.PERSISTENCE.error(msg, err);
                 throw new NucleusUserException(msg);
             }
             catch (InvocationTargetException e)
             {
-                String className = pluginMgr.getAttributeValueForExtension("org.datanucleus.api_adapter", 
-                    "name", name, "class-name");
+                String className = pluginMgr.getAttributeValueForExtension("org.datanucleus.api_adapter", "name", name, "class-name");
                 String msg = Localiser.msg("022000", className, e.getTargetException());
                 NucleusLogger.PERSISTENCE.error(msg, e);
                 throw new NucleusUserException(msg);
@@ -117,8 +114,7 @@ public class ApiAdapterFactory
             }
             catch (Exception e)
             {
-                String className = pluginMgr.getAttributeValueForExtension("org.datanucleus.api_adapter", 
-                    "name", name, "class-name");
+                String className = pluginMgr.getAttributeValueForExtension("org.datanucleus.api_adapter", "name", name, "class-name");
                 String msg = Localiser.msg("022000", className, e.getMessage());
                 NucleusLogger.PERSISTENCE.error(msg, e);
                 throw new NucleusUserException(msg);
