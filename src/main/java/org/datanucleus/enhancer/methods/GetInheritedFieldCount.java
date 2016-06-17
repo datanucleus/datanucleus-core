@@ -17,9 +17,9 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.enhancer.methods;
 
-import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
+import org.datanucleus.enhancer.asm.Opcodes;
 import org.datanucleus.metadata.ClassMetaData;
 
 /**

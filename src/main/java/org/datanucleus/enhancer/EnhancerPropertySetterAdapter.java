@@ -17,16 +17,16 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.enhancer;
 
-import org.datanucleus.asm.AnnotationVisitor;
-import org.datanucleus.asm.Attribute;
-import org.datanucleus.asm.ClassVisitor;
-import org.datanucleus.asm.Handle;
-import org.datanucleus.asm.Label;
-import org.datanucleus.asm.MethodVisitor;
-import org.datanucleus.asm.Opcodes;
-import org.datanucleus.asm.Type;
-import org.datanucleus.asm.TypePath;
 import org.datanucleus.enhancement.Persistable;
+import org.datanucleus.enhancer.asm.AnnotationVisitor;
+import org.datanucleus.enhancer.asm.Attribute;
+import org.datanucleus.enhancer.asm.ClassVisitor;
+import org.datanucleus.enhancer.asm.Handle;
+import org.datanucleus.enhancer.asm.Label;
+import org.datanucleus.enhancer.asm.MethodVisitor;
+import org.datanucleus.enhancer.asm.Opcodes;
+import org.datanucleus.enhancer.asm.Type;
+import org.datanucleus.enhancer.asm.TypePath;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.PropertyMetaData;

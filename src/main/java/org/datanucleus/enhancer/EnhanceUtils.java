@@ -19,9 +19,9 @@ package org.datanucleus.enhancer;
 
 import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassNameConstants;
-import org.datanucleus.asm.MethodVisitor;
-import org.datanucleus.asm.Opcodes;
-import org.datanucleus.asm.Type;
+import org.datanucleus.enhancer.asm.MethodVisitor;
+import org.datanucleus.enhancer.asm.Opcodes;
+import org.datanucleus.enhancer.asm.Type;
 
 /**
  * Utility class for bytecode enhancement using ASM.

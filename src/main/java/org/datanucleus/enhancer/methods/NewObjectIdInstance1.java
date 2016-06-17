@@ -17,11 +17,11 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.enhancer.methods;
 
-import org.datanucleus.asm.Label;
-import org.datanucleus.asm.Opcodes;
-import org.datanucleus.asm.Type;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
+import org.datanucleus.enhancer.asm.Label;
+import org.datanucleus.enhancer.asm.Opcodes;
+import org.datanucleus.enhancer.asm.Type;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;

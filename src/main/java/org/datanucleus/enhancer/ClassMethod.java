@@ -19,9 +19,9 @@ package org.datanucleus.enhancer;
 
 import java.util.Arrays;
 
-import org.datanucleus.asm.ClassVisitor;
-import org.datanucleus.asm.MethodVisitor;
-import org.datanucleus.asm.Type;
+import org.datanucleus.enhancer.asm.ClassVisitor;
+import org.datanucleus.enhancer.asm.MethodVisitor;
+import org.datanucleus.enhancer.asm.Type;
 import org.datanucleus.util.Localiser;
 
 /**

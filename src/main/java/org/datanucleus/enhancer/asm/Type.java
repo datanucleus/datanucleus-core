@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.datanucleus.asm;
+package org.datanucleus.enhancer.asm;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -286,6 +286,7 @@ public class Type {
                 return LONG_TYPE;
             }
         }
+
         return getType(getDescriptor(c));
     }
 
@@ -624,7 +625,7 @@ public class Type {
      * @return the descriptor corresponding to this Java type.
      */
     public String getDescriptor() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         getDescriptor(buf);
         return buf.toString();
     }
@@ -642,7 +643,7 @@ public class Type {
      */
     public static String getMethodDescriptor(final Type returnType,
             final Type... argumentTypes) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append('(');
         for (int i = 0; i < argumentTypes.length; ++i) {
             argumentTypes[i].getDescriptor(buf);
@@ -659,7 +660,7 @@ public class Type {
      * @param buf
      *            the string buffer to which the descriptor must be appended.
      */
-    private void getDescriptor(final StringBuffer buf) {
+    private void getDescriptor(final StringBuilder buf) {
         if (this.buf == null) {
             // descriptor is in byte 3 of 'off' for primitive types (buf ==
             // null)
@@ -699,7 +700,7 @@ public class Type {
      * @return the descriptor corresponding to the given class.
      */
     public static String getDescriptor(final Class<?> c) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         getDescriptor(buf, c);
         return buf.toString();
     }
@@ -713,7 +714,7 @@ public class Type {
      */
     public static String getConstructorDescriptor(final Constructor<?> c) {
         Class<?>[] parameters = c.getParameterTypes();
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append('(');
         for (int i = 0; i < parameters.length; ++i) {
             getDescriptor(buf, parameters[i]);
@@ -730,7 +731,7 @@ public class Type {
      */
     public static String getMethodDescriptor(final Method m) {
         Class<?>[] parameters = m.getParameterTypes();
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append('(');
         for (int i = 0; i < parameters.length; ++i) {
             getDescriptor(buf, parameters[i]);
@@ -748,7 +749,7 @@ public class Type {
      * @param c
      *            the class whose descriptor must be computed.
      */
-    private static void getDescriptor(final StringBuffer buf, final Class<?> c) {
+    private static void getDescriptor(final StringBuilder buf, final Class<?> c) {
         Class<?> d = c;
         while (true) {
             if (d.isPrimitive()) {
@@ -825,6 +826,7 @@ public class Type {
             // primitive types (buf == null)
             return opcode + (buf == null ? (off & 0xFF00) >> 8 : 4);
         }
+
         // the offset for other instructions is in byte 2 of 'off' for
         // primitive types (buf == null)
         return opcode + (buf == null ? (off & 0xFF0000) >> 16 : 4);

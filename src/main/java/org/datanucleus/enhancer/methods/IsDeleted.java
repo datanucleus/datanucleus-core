@@ -17,8 +17,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.enhancer.methods;
 
-import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
+import org.datanucleus.enhancer.asm.Opcodes;
 
 /**
  * Method to generate the method "dnIsDeleted" using ASM.

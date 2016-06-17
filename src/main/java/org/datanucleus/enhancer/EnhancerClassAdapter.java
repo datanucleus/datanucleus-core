@@ -24,12 +24,12 @@ import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.List;
 
-import org.datanucleus.asm.ClassVisitor;
-import org.datanucleus.asm.FieldVisitor;
-import org.datanucleus.asm.MethodVisitor;
-import org.datanucleus.asm.Opcodes;
-import org.datanucleus.asm.Type;
 import org.datanucleus.enhancement.Persistable;
+import org.datanucleus.enhancer.asm.ClassVisitor;
+import org.datanucleus.enhancer.asm.FieldVisitor;
+import org.datanucleus.enhancer.asm.MethodVisitor;
+import org.datanucleus.enhancer.asm.Opcodes;
+import org.datanucleus.enhancer.asm.Type;
 import org.datanucleus.enhancer.methods.DefaultConstructor;
 import org.datanucleus.enhancer.methods.InitClass;
 import org.datanucleus.enhancer.methods.GetNormal;

@@ -20,10 +20,10 @@ package org.datanucleus.enhancer.methods;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import org.datanucleus.asm.Label;
-import org.datanucleus.asm.Opcodes;
 import org.datanucleus.enhancer.ClassEnhancer;
 import org.datanucleus.enhancer.ClassMethod;
+import org.datanucleus.enhancer.asm.Label;
+import org.datanucleus.enhancer.asm.Opcodes;
 
 /**
  * Method to generate the method "writeObject" using ASM.

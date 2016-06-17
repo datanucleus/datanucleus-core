@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.asm.Opcodes;
+import org.datanucleus.enhancer.asm.Opcodes;
 import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 

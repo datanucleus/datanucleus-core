@@ -17,9 +17,9 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.enhancer;
 
-import org.datanucleus.asm.Label;
-import org.datanucleus.asm.MethodVisitor;
-import org.datanucleus.asm.Opcodes;
+import org.datanucleus.enhancer.asm.Label;
+import org.datanucleus.enhancer.asm.MethodVisitor;
+import org.datanucleus.enhancer.asm.Opcodes;
 import org.datanucleus.enhancer.methods.InitClass;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;

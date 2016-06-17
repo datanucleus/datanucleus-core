@@ -24,11 +24,11 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
 
-import org.datanucleus.asm.ClassWriter;
-import org.datanucleus.asm.FieldVisitor;
-import org.datanucleus.asm.Label;
-import org.datanucleus.asm.MethodVisitor;
-import org.datanucleus.asm.Opcodes;
+import org.datanucleus.enhancer.asm.ClassWriter;
+import org.datanucleus.enhancer.asm.FieldVisitor;
+import org.datanucleus.enhancer.asm.Label;
+import org.datanucleus.enhancer.asm.MethodVisitor;
+import org.datanucleus.enhancer.asm.Opcodes;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;

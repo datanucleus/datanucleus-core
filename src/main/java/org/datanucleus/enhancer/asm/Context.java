@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.datanucleus.asm;
+package org.datanucleus.enhancer.asm;
 
 /**
  * Information about a class being parsed in a {@link ClassReader}.

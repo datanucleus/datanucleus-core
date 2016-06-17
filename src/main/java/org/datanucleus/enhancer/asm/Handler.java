@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.datanucleus.asm;
+package org.datanucleus.enhancer.asm;
 
 /**
  * Information about an exception handler block.
@@ -84,7 +84,9 @@ class Handler {
         if (h == null) {
             return null;
         }
+
         h.next = remove(h.next, start, end);
+
         int hstart = h.start.position;
         int hend = h.end.position;
         int s = start.position;

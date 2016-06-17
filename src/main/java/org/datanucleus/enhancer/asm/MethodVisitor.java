@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.datanucleus.asm;
+package org.datanucleus.enhancer.asm;
 
 /**
  * A visitor to visit a Java method. The methods of this class must be called in
@@ -440,7 +440,7 @@ public abstract class MethodVisitor {
      * @param desc
      *            the method's descriptor (see {@link Type Type}).
      */
-//    @Deprecated // DATANUCLEUS COMMENTED THIS OUT SO WE AVOID COMPILER WARNINGS
+//  @Deprecated // DATANUCLEUS COMMENTED THIS OUT SO WE AVOID COMPILER WARNINGS
     public void visitMethodInsn(int opcode, String owner, String name,
             String desc) {
         if (api >= Opcodes.ASM5) {

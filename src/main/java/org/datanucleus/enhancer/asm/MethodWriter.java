@@ -27,7 +27,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.datanucleus.asm;
+package org.datanucleus.enhancer.asm;
 
 /**
  * A {@link MethodVisitor} that generates methods in bytecode form. Each visit
@@ -656,6 +656,7 @@ class MethodWriter extends MethodVisitor {
                     if (type == Opcodes.F_SAME) {
                         return;
                     }
+
                     throw new IllegalStateException();
                 }
             }
@@ -2031,7 +2032,7 @@ class MethodWriter extends MethodVisitor {
         }
         int size = 8;
         if (code.length > 0) {
-            if (code.length > 65536) {
+            if (code.length > 65535) {
                 throw new RuntimeException("Method code too large!");
             }
             cw.newUTF8("Code");
