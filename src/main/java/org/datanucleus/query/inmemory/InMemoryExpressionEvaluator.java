@@ -42,8 +42,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.query.QueryUtils;
-import org.datanucleus.query.evaluator.AbstractExpressionEvaluator;
-import org.datanucleus.query.evaluator.JavaQueryEvaluator;
+import org.datanucleus.query.expression.AbstractExpressionEvaluator;
 import org.datanucleus.query.expression.ArrayExpression;
 import org.datanucleus.query.expression.CaseExpression;
 import org.datanucleus.query.expression.CaseExpression.ExpressionPair;
@@ -846,7 +845,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             // Static function
             if (method.toLowerCase().equals("count"))
             {
-                Collection coll = (Collection)state.get(JavaQueryEvaluator.RESULTS_SET);
+                Collection coll = (Collection)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
                 SetExpression setexpr = new SetExpression(coll, candidateAlias);
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
@@ -866,7 +865,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             }
             else if (method.toLowerCase().equals("sum"))
             {
-                Collection coll = (Collection)state.get(JavaQueryEvaluator.RESULTS_SET);
+                Collection coll = (Collection)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
                 SetExpression setexpr = new SetExpression(coll, candidateAlias);
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
@@ -886,7 +885,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             }
             else if (method.toLowerCase().equals("avg"))
             {
-                Collection coll = (Collection)state.get(JavaQueryEvaluator.RESULTS_SET);
+                Collection coll = (Collection)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
                 SetExpression setexpr = new SetExpression(coll, candidateAlias);
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
@@ -906,7 +905,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             }
             else if (method.toLowerCase().equals("min"))
             {
-                Collection coll = (Collection)state.get(JavaQueryEvaluator.RESULTS_SET);
+                Collection coll = (Collection)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
                 SetExpression setexpr = new SetExpression(coll, candidateAlias);
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
@@ -926,7 +925,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             }
             else if (method.toLowerCase().equals("max"))
             {
-                Collection coll = (Collection)state.get(JavaQueryEvaluator.RESULTS_SET);
+                Collection coll = (Collection)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
                 SetExpression setexpr = new SetExpression(coll, candidateAlias);
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
