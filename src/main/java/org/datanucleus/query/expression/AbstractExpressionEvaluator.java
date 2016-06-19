@@ -22,10 +22,9 @@ import org.datanucleus.exceptions.NucleusException;
 /**
  * Abstract evaluator for an expression.
  * Provides a stack-like process, working its way through the expression tree.
- * Provides methods processXXX that should be implemented by the subclass where it supports
- * the particular operator or expression.
+ * Provides methods processXXX that should be implemented by the subclass where it supports the particular operator or expression.
  */
-public class AbstractExpressionEvaluator implements org.datanucleus.query.expression.ExpressionEvaluator
+public class AbstractExpressionEvaluator implements ExpressionEvaluator
 {
     /**
      * Method to "evaluate" the expression.

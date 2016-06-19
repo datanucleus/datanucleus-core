@@ -23,13 +23,14 @@ import org.datanucleus.query.compiler.SymbolTable;
 
 /**
  * Expression representing a variable.
- * The variable can be explicit (declared as input to the query) or implicit (implied based on
- * the query).
+ * The variable can be explicit (declared as input to the query) or implicit (implied based on the query).
  */
 public class VariableExpression extends Expression
 {
     private static final long serialVersionUID = 5353841370656870816L;
+
     String name;
+
     Class type;
 
     public VariableExpression(String name)

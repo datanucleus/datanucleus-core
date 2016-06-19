@@ -46,6 +46,7 @@ import org.datanucleus.util.NucleusLogger;
 public class ExpressionCompiler
 {
     SymbolTable symtbl;
+
     Map<String, String> aliasByPrefix = null;
 
     public void setMethodAliases(Map<String, String> aliasByPrefix)

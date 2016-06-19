@@ -23,15 +23,17 @@ import org.datanucleus.query.compiler.SymbolTable;
 
 /**
  * Expression representing a parameter.
- * The parameter can be explicit (declared as input to the query) or implicit (implied based on
- * the syntax in the query).
+ * The parameter can be explicit (declared as input to the query) or implicit (implied based on the syntax in the query).
  */
 public class ParameterExpression extends Expression
 {
     private static final long serialVersionUID = -2170413163550042263L;
-    String name;
-    int position; // Position in the query (when name not specified in execution parameters)
-    Class type;
+
+    private String name;
+
+    private int position; // Position in the query (when name not specified in execution parameters)
+
+    private Class type;
 
     public ParameterExpression(String name, int position)
     {

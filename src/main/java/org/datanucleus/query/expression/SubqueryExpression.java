@@ -22,8 +22,7 @@ import org.datanucleus.query.compiler.SymbolTable;
 
 /**
  * Expression containing a subquery.
- * A subquery is formed from a keyword and a variable expression representing the subquery, so
- * something like
+ * A subquery is formed from a keyword and a variable expression representing the subquery, so something like
  * <pre>KEYWORD(subquery)</pre>
  * e.g
  * <pre>EXISTS (SELECT 1 FROM MYTABLE WHERE MYID = 4)</pre>
@@ -31,6 +30,7 @@ import org.datanucleus.query.compiler.SymbolTable;
 public class SubqueryExpression extends Expression
 {
     private static final long serialVersionUID = 833340286814838655L;
+
     String keyword;
 
     /**

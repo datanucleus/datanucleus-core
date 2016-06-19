@@ -43,8 +43,8 @@ import org.datanucleus.util.StringUtils;
 
 /**
  * Class to evaluate a Java "string-based" query in whole or part.
- * Takes in a list of instances and applies the required restrictions to the input giving a final result.
- * Typically extended for JDOQL, JPQL, SQL specifics.
+ * Takes in the "generic" compilation, a list of instances and applies the required restrictions to the input giving a final result.
+ * Typically extended for JDOQL, JPQL specifics.
  */
 public abstract class JavaQueryInMemoryEvaluator
 {

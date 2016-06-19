@@ -30,6 +30,7 @@ import org.datanucleus.util.StringUtils;
 public class ArrayExpression extends Expression
 {
     private static final long serialVersionUID = -1145090859293765860L;
+
     /** Elements of the array. */
     List<Expression> elements;
 
