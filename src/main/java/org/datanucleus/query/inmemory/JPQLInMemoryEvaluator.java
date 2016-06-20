@@ -132,7 +132,6 @@ public class JPQLInMemoryEvaluator extends JavaQueryInMemoryEvaluator
      */
     Collection mapResultClass(Collection resultSet)
     {
-        Expression[] result = compilation.getExprResult();
-        return new JPQLResultClassMapper(query.getResultClass()).map(resultSet, result);
+        return new JPQLResultClassMapper(query.getResultClass()).map(resultSet, compilation.getExprResult());
     }
 }

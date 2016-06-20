@@ -101,8 +101,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
      * @param candidateAlias Alias for the candidate class. With JDOQL this is "this".
      * @param queryLang Query language (JDOQL, JPQL etc)
      */
-    public InMemoryExpressionEvaluator(ExecutionContext ec, Map params, Map<String, Object> state, 
-            Imports imports, ClassLoaderResolver clr, String candidateAlias, String queryLang)
+    public InMemoryExpressionEvaluator(ExecutionContext ec, Map params, Map<String, Object> state, Imports imports, ClassLoaderResolver clr, String candidateAlias, String queryLang)
     {
         this.ec = ec;
         this.queryMgr = ec.getStoreManager().getQueryManager();
@@ -340,8 +339,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
         }
         if (!(right instanceof Class))
         {
-            throw new NucleusException("Attempt to invoke instanceof with argument of type " + 
-                right.getClass().getName() + " has to be Class");
+            throw new NucleusException("Attempt to invoke instanceof with argument of type " + right.getClass().getName() + " has to be Class");
         }
         try
         {
@@ -351,8 +349,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
         }
         catch (ClassNotResolvedException cnre)
         {
-            throw new NucleusException("Attempt to invoke instanceof with " + 
-                right + " yet class was not found!");
+            throw new NucleusException("Attempt to invoke instanceof with " + right + " yet class was not found!");
         }
     }
 
@@ -519,8 +516,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             }
             else
             {
-                throw new NucleusException("No current support for negation of dyadic expression on type " + 
-                    dyExpr.getLeft().getClass().getName());
+                throw new NucleusException("No current support for negation of dyadic expression on type " + dyExpr.getLeft().getClass().getName());
             }
         }
         else if (expr instanceof Literal)
@@ -529,8 +525,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
         }
         else
         {
-            throw new NucleusException("No current support for negation of expression of type " + 
-                expr.getClass().getName());
+            throw new NucleusException("No current support for negation of expression of type " + expr.getClass().getName());
         }
 
         // Other types?
@@ -676,7 +671,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             stack.push(result);
             return result;
         }
-        // TODO Auto-generated method stub
+
         return super.processInExpression(expr);
     }
 
@@ -714,7 +709,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             stack.push(result);
             return result;
         }
-        // TODO Auto-generated method stub
+
         return super.processNotInExpression(expr);
     }
 
@@ -751,9 +746,8 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
 
         try
         {
-            Object varExprValue = getValueForVariableExpression(expr);
             // Variable has a value that is available so use that
-            return varExprValue;
+            return getValueForVariableExpression(expr);
         }
         catch (VariableNotSetException vnse)
         {
@@ -850,8 +844,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
                 {
-                    Collection processable = new HashSet(coll); // No dups in HashSet
-                    coll = processable;
+                    coll = new HashSet(coll); // No dups in HashSet
                 }
 
                 int stackSizeOrig = stack.size();
@@ -870,8 +863,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
                 {
-                    Collection processable = new HashSet(coll); // No dups in HashSet
-                    coll = processable;
+                    coll = new HashSet(coll); // No dups in HashSet
                 }
 
                 int stackSizeOrig = stack.size();
@@ -890,8 +882,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
                 {
-                    Collection processable = new HashSet(coll); // No dups in HashSet
-                    coll = processable;
+                    coll = new HashSet(coll); // No dups in HashSet
                 }
 
                 int stackSizeOrig = stack.size();
@@ -910,8 +901,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
                 {
-                    Collection processable = new HashSet(coll); // No dups in HashSet
-                    coll = processable;
+                    coll = new HashSet(coll); // No dups in HashSet
                 }
 
                 int stackSizeOrig = stack.size();
@@ -930,8 +920,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
                 {
-                    Collection processable = new HashSet(coll); // No dups in HashSet
-                    coll = processable;
+                    coll = new HashSet(coll); // No dups in HashSet
                 }
 
                 int stackSizeOrig = stack.size();
@@ -952,8 +941,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                     return methodEval.evaluate(invokeExpr, null, this);
                 }
 
-                NucleusLogger.QUERY.warn("Query contains call to static method " + method + 
-                        " yet no support is available for in-memory evaluation of this");
+                NucleusLogger.QUERY.warn("Query contains call to static method " + method + " yet no support is available for in-memory evaluation of this");
                 return new InMemoryFailure();
             }
         }
@@ -971,8 +959,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                 return methodEval.evaluate(invokeExpr, invokedValue, this);
             }
 
-            NucleusLogger.QUERY.warn("Query contains call to method " + 
-                    invokedValue.getClass().getName() + "." + method + " yet no support is available for this");
+            NucleusLogger.QUERY.warn("Query contains call to method " + invokedValue.getClass().getName() + "." + method + " yet no support is available for this");
             return new InMemoryFailure();
         }
         else if (invokeExpr.getLeft() instanceof PrimaryExpression)
@@ -992,8 +979,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                 return methodEval.evaluate(invokeExpr, invokedValue, this);
             }
 
-            NucleusLogger.QUERY.warn("Query contains call to method " + 
-                    invokedType.getName() + "." + method + " yet no support is available for this");
+            NucleusLogger.QUERY.warn("Query contains call to method " + invokedType.getName() + "." + method + " yet no support is available for this");
             return new InMemoryFailure();
         }
         else if (invokeExpr.getLeft() instanceof InvokeExpression)
@@ -1014,8 +1000,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                 return methodEval.evaluate(invokeExpr, invokedValue, this);
             }
 
-            NucleusLogger.QUERY.warn("Query contains call to method " + 
-                    invokedType.getName() + "." + method + " yet no support is available for this");
+            NucleusLogger.QUERY.warn("Query contains call to method " + invokedType.getName() + "." + method + " yet no support is available for this");
             return new InMemoryFailure();
         }
         else if (invokeExpr.getLeft() instanceof VariableExpression)
@@ -1031,8 +1016,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                 return methodEval.evaluate(invokeExpr, invokedValue, this);
             }
 
-            NucleusLogger.QUERY.warn("Query contains call to method " + 
-                    invokedType.getName() + "." + method + " yet no support is available for this");
+            NucleusLogger.QUERY.warn("Query contains call to method " + invokedType.getName() + "." + method + " yet no support is available for this");
             return new InMemoryFailure();
         }
         else if (invokeExpr.getLeft() instanceof Literal)
@@ -1048,8 +1032,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                 return methodEval.evaluate(invokeExpr, invokedValue, this);
             }
 
-            NucleusLogger.QUERY.warn("Query contains call to method " + 
-                    invokedType.getName() + "." + method + " yet no support is available for this");
+            NucleusLogger.QUERY.warn("Query contains call to method " + invokedType.getName() + "." + method + " yet no support is available for this");
             return new InMemoryFailure();
         }
         else if (invokeExpr.getLeft() instanceof ArrayExpression)
@@ -1064,8 +1047,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             {
                 return methodEval.evaluate(invokeExpr, invokedValue, this);
             }
-            NucleusLogger.QUERY.warn("Query contains call to method " + 
-                    invokedType.getName() + "." + method + " yet no support is available for this");
+            NucleusLogger.QUERY.warn("Query contains call to method " + invokedType.getName() + "." + method + " yet no support is available for this");
             return new InMemoryFailure();
         }
         else
@@ -1093,13 +1075,11 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             }
             else if (elem instanceof ParameterExpression)
             {
-                Array.set(value, i, 
-                    QueryUtils.getValueForParameterExpression(parameterValues, (ParameterExpression)elem));
+                Array.set(value, i, QueryUtils.getValueForParameterExpression(parameterValues, (ParameterExpression)elem));
             }
             else
             {
-                NucleusLogger.QUERY.warn("No support is available for array expression with element of type " +
-                    elem.getClass().getName());
+                NucleusLogger.QUERY.warn("No support is available for array expression with element of type " + elem.getClass().getName());
                 return new InMemoryFailure();
             }
         }
@@ -1117,7 +1097,13 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
         {
             return QueryUtils.getValueForParameterExpression(parameterValues, (ParameterExpression)expr);
         }
+        else if (expr instanceof Literal)
+        {
+            return ((Literal)expr).getLiteral();
+        }
+
         // TODO Support other expression types as args to methods
+        NucleusLogger.QUERY.warn("No support is available for getting value of expression " + expr);
         return null;
     }
 
@@ -1151,8 +1137,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
         {
             return ((Short)val).intValue();
         }
-        throw new NucleusException("Attempt to convert literal with value " + val + " (" + 
-            val.getClass().getName() + ") into an int failed");
+        throw new NucleusException("Attempt to convert literal with value " + val + " (" + val.getClass().getName() + ") into an int failed");
     }
 
     /**

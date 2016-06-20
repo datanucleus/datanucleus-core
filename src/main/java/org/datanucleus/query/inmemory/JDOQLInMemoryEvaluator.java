@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.query.compiler.QueryCompilation;
-import org.datanucleus.query.expression.Expression;
 import org.datanucleus.store.query.Query;
 
 /**
@@ -40,8 +39,7 @@ public class JDOQLInMemoryEvaluator extends JavaQueryInMemoryEvaluator
      * @param parameterValues Input parameter values keyed by the param name
      * @param clr ClassLoader resolver
      */
-    public JDOQLInMemoryEvaluator(Query query, Collection candidates, QueryCompilation compilation, 
-            Map parameterValues, ClassLoaderResolver clr)
+    public JDOQLInMemoryEvaluator(Query query, Collection candidates, QueryCompilation compilation, Map parameterValues, ClassLoaderResolver clr)
     {
         super("JDOQL", query, compilation, parameterValues, clr, candidates);
     }
@@ -54,8 +52,7 @@ public class JDOQLInMemoryEvaluator extends JavaQueryInMemoryEvaluator
      * @param outerCandidate Current candidate in the outer query (for use when linking back)
      * @return The result
      */
-    protected Collection evaluateSubquery(Query query, QueryCompilation compilation, Collection candidates,
-            Object outerCandidate)
+    protected Collection evaluateSubquery(Query query, QueryCompilation compilation, Collection candidates, Object outerCandidate)
     {
         JDOQLInMemoryEvaluator eval = new JDOQLInMemoryEvaluator(query, candidates, compilation, parameterValues, clr);
         // TODO Make use of outer candidate
@@ -83,7 +80,6 @@ public class JDOQLInMemoryEvaluator extends JavaQueryInMemoryEvaluator
      */
     Collection mapResultClass(Collection resultSet)
     {
-        Expression[] result = compilation.getExprResult();
-        return new JDOQLResultClassMapper(query.getResultClass()).map(resultSet, result);
+        return new JDOQLResultClassMapper(query.getResultClass()).map(resultSet, compilation.getExprResult());
     }
 }
