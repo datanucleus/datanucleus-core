@@ -82,7 +82,7 @@ public class MetaDataAutoStarter extends AbstractAutoStartMechanism
                 for (int j = 0; j < pmd.getNoOfClasses(); j++) 
                 {
                     ClassMetaData cmd = pmd.getClass(j);
-                    classes.add(new StoreData(cmd.getFullClassName().trim(), null, StoreData.FCO_TYPE, null));
+                    classes.add(new StoreData(cmd.getFullClassName().trim(), null, StoreData.Type.FCO, null));
                 }
             }
         }

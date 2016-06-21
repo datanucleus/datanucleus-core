@@ -889,7 +889,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      */
     protected StoreData newStoreData(ClassMetaData cmd, ClassLoaderResolver clr) 
     {
-        return new StoreData(cmd.getFullClassName(), cmd, StoreData.FCO_TYPE, null);
+        return new StoreData(cmd.getFullClassName(), cmd, StoreData.Type.FCO, null);
     }
 
     /* (non-Javadoc)

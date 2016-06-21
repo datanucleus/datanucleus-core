@@ -32,17 +32,17 @@ import org.datanucleus.util.Localiser;
  */
 public class StoreData
 {
-    /** First class object (FCO) type */
-    public static final int FCO_TYPE = 1;
-
-    /** Second class object (SCO) type */
-    public static final int SCO_TYPE = 2;
+    public enum Type
+    {
+        FCO,
+        SCO
+    }
 
     /** Name of the class/field. */
     protected final String name;
 
     /** Type of data being stored (FCO, SCO). */
-    protected final int type;
+    protected final Type type;
 
     /** Metadata for the class, or member (join table) depending on what this represents. */
     protected MetaData metadata;
@@ -57,22 +57,22 @@ public class StoreData
 
     /**
      * Constructor.
-     * @param name Name of the class/field
+     * @param name Fully-qualified ame of the class/member.
      * @param type Type of data (FCO/SCO)
      */
-    public StoreData(String name, int type)
+    public StoreData(String name, Type type)
     {
         this(name, null, type, null);
     }
 
     /**
      * Constructor.
-     * @param name Name of the class/field
+     * @param name Fully-qualified name of the class/member.
      * @param metadata MetaData for the class or field (if available)
      * @param type Type of data (FCO/SCO)
      * @param interfaceName Name of persistent-interface being implemented
      */
-    public StoreData(String name, MetaData metadata, int type, String interfaceName)
+    public StoreData(String name, MetaData metadata, Type type, String interfaceName)
     {
         this.name = name;
         this.type = type;
@@ -81,7 +81,7 @@ public class StoreData
     }
 
     /**
-     * Accessor for class/field name.
+     * Accessor for fully-qualified class/member name.
      * @return Returns the class/field name.
      */
     public String getName()
@@ -113,7 +113,7 @@ public class StoreData
      */
     public boolean isFCO()
     {
-        return type == FCO_TYPE;
+        return type == Type.FCO;
     }
 
     /**
@@ -122,14 +122,14 @@ public class StoreData
      */
     public boolean isSCO()
     {
-        return type == SCO_TYPE;
+        return type == Type.SCO;
     }
 
     /**
      * Accessor for type.
      * @return Returns the type.
      */
-    public int getType()
+    public Type getType()
     {
         return type;
     }
@@ -194,6 +194,7 @@ public class StoreData
         }
         else
         {
+            // TODO What is this situation?
             return Localiser.msg("035002", name, null);
         }
     }

@@ -64,7 +64,7 @@ public class ClassesAutoStarter extends AbstractAutoStartMechanism
         StringTokenizer tokeniser = new StringTokenizer(classNames, ",");
         while (tokeniser.hasMoreTokens())
         {
-            classes.add(new StoreData(tokeniser.nextToken().trim(), null, StoreData.FCO_TYPE, null));
+            classes.add(new StoreData(tokeniser.nextToken().trim(), null, StoreData.Type.FCO, null));
         }
 
         return classes;

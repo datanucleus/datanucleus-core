@@ -35,10 +35,10 @@ import org.datanucleus.util.NucleusLogger;
 public class StoreDataManager
 {
     /** Map of all managed store data, keyed by the class/field name. */
-    protected Map<Object, StoreData> storeDataByClass = new ConcurrentHashMap<Object, StoreData>();
+    protected Map<String, StoreData> storeDataByClass = new ConcurrentHashMap<String, StoreData>();
 
     /** the memory image of schema data before running it **/
-    protected Map<Object, StoreData> savedStoreDataByClass;
+    protected Map<String, StoreData> savedStoreDataByClass;
 
     /**
      * Clear the cache
@@ -80,7 +80,7 @@ public class StoreDataManager
             {
                 return;
             }
-            storeDataByClass.put(data.getMetaData(), data); // Keyed by AbstractMemberMetaData
+            storeDataByClass.put(data.getName(), data); // Keyed by AbstractMemberMetaData
         }
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
@@ -165,7 +165,7 @@ public class StoreDataManager
      */
     public StoreData get(AbstractMemberMetaData mmd)
     {
-        return storeDataByClass.get(mmd);
+        return storeDataByClass.get(mmd.getFullFieldName());
     }
 
     /**
@@ -182,7 +182,7 @@ public class StoreDataManager
      */
     public void begin()
     {
-        savedStoreDataByClass = new ConcurrentHashMap<Object, StoreData>(storeDataByClass);
+        savedStoreDataByClass = new ConcurrentHashMap<String, StoreData>(storeDataByClass);
     }
     
     /**
