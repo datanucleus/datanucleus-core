@@ -3108,8 +3108,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     }*/
 
     /**
-     * Comparator method. This allows the ClassMetaData to search for a
-     * FieldMetaData with a particular name.
+     * Comparator method. This allows the ClassMetaData to search for an AbstractMemberMetaData with a particular name.
      * @param o The object to compare against
      * @return The comparison result
      */ 
@@ -3117,16 +3116,9 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     {
         if (o instanceof AbstractMemberMetaData)
         {
+            // TODO Currently only uses the name since we only use sorting from ClassMetaData; maybe an idea to use the className also (see equals/hashCode).
             AbstractMemberMetaData c = (AbstractMemberMetaData)o;
             return this.name.compareTo(c.name);
-        }
-        else if (o instanceof String)
-        {
-            return this.name.compareTo((String)o);
-        }
-        else if (o == null)
-        {
-            throw new ClassCastException("object is null");
         }
         throw new ClassCastException(this.getClass().getName() + " != " + o.getClass().getName());
     }
