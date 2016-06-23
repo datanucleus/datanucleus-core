@@ -3050,6 +3050,12 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             {
                 return columnMetaData[0].getInsertable();
             }
+
+            String insertVal = getValueForExtension(MetaData.EXTENSION_MEMBER_INSERTABLE);
+            if (!StringUtils.isWhitespace(insertVal))
+            {
+                return Boolean.parseBoolean(insertVal);
+            }
         }
         return true;
     }
@@ -3076,6 +3082,12 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             if (columnMetaData != null && columnMetaData.length > 0)
             {
                 return columnMetaData[0].getUpdateable();
+            }
+
+            String updateVal = getValueForExtension(MetaData.EXTENSION_MEMBER_UPDATEABLE);
+            if (!StringUtils.isWhitespace(updateVal))
+            {
+                return Boolean.parseBoolean(updateVal);
             }
         }
         return true;

@@ -58,10 +58,10 @@ public class ColumnMetaData extends MetaData
     /** value to use when inserting this column in the datastore (the column is not mapped to a field/property) */
     protected String insertValue;
 
-    /** Whether this column is to be inserted when the owning object is inserted. */
+    /** Whether this column is to be inserted when the owning object is inserted. TODO Merge this with AbstractMemberMetaData.isInsertable. */
     protected boolean insertable = true;
 
-    /** Whether this column can be updated when the owning object is updated. */
+    /** Whether this column can be updated when the owning object is updated. TODO Merge this with AbstractMemberMetaData.isUpdateable. */
     protected boolean updateable = true;
 
     /** Whether this column should be marked as UNIQUE. */
