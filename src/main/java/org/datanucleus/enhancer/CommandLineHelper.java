@@ -70,6 +70,7 @@ class CommandLineHelper
         cl.addOption("v", "verbose", null, "verbose output");
         cl.addOption("api", "api", "<api-name>", "API Name (JDO, JPA, etc)");
 
+        cl.addOption("ignoreMetaDataForMissingClasses", "ignoreMetaDataForMissingClasses", null, "Ignore metadata for classes that are missing?");
         cl.addOption("alwaysDetachable", "alwaysDetachable", null, "Always detachable?");
 
         cl.addOption("generatePK", "generatePK", "<generate-pk>", "Generate PK class where needed?");
@@ -143,6 +144,10 @@ class CommandLineHelper
         if (cl.hasOption("alwaysDetachable"))
         {
             props.setProperty(PropertyNames.PROPERTY_METADATA_ALWAYS_DETACHABLE, "true");
+        }
+        if (cl.hasOption("ignoreMetaDataForMissingClasses"))
+        {
+            props.setProperty(PropertyNames.PROPERTY_METADATA_IGNORE_METADATA_FOR_MISSING_CLASSES, "true");
         }
 
         final DataNucleusEnhancer enhancer = new DataNucleusEnhancer(apiName, props);
