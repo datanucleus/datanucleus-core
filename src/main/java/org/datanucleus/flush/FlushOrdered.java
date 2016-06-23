@@ -104,7 +104,7 @@ public class FlushOrdered implements FlushProcess
                 try
                 {
                     op.flush();
-                    if (classesToFlush != null)
+                    if (classesToFlush != null && op.getObject() != null)
                     {
                         classesToFlush.add(op.getObject().getClass());
                     }
@@ -129,7 +129,7 @@ public class FlushOrdered implements FlushProcess
                 try
                 {
                     op.flush();
-                    if (classesToFlush != null)
+                    if (classesToFlush != null && op.getObject() != null)
                     {
                         classesToFlush.add(op.getObject().getClass());
                     }
