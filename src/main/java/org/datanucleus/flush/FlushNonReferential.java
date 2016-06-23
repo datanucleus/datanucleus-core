@@ -104,7 +104,7 @@ public class FlushNonReferential implements FlushProcess
             }
             else
             {
-                if (classesToFlush != null)
+                if (classesToFlush != null && op.getObject() != null)
                 {
                     classesToFlush.add(op.getObject().getClass());
                 }
