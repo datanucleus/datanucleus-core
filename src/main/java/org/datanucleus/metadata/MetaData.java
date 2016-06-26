@@ -134,6 +134,15 @@ public class MetaData implements Serializable
     /** Member : when this field has a value generator, only apply it when the field is not set. */
     public static final String EXTENSION_MEMBER_STRATEGY_WHEN_NOTNULL = "strategy-when-notnull";
 
+    /** Member : shared relation, column name for relation discriminator column. */
+    public static final String EXTENSION_MEMBER_RELATION_DISCRIM_COLUMN = "relation-discriminator-column";
+
+    /** Member : shared relation, value for this class for relation discriminator column. */
+    public static final String EXTENSION_MEMBER_RELATION_DISCRIM_VALUE = "relation-discriminator-value";
+
+    /** Member : shared relation, where the relation discriminator column is part of the PK. */
+    public static final String EXTENSION_MEMBER_RELATION_DISCRIM_PK = "relation-discriminator-pk";
+
     /** Class : definition of VIEW (when mapping to a view). */
     public static final String EXTENSION_CLASS_VIEW_DEFINITION = "view-definition";
 
