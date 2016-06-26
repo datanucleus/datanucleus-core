@@ -105,11 +105,14 @@ public class DiscriminatorMetaData extends MetaData
         }
 
         // Interpret the "indexed" value to create our IndexMetaData where it wasn't specified that way
-        if (indexMetaData == null && columnMetaData != null && indexed != null && indexed != IndexedValue.FALSE)
+        if (indexMetaData == null && (indexed == IndexedValue.UNIQUE || indexed == IndexedValue.TRUE))
         {
             indexMetaData = new IndexMetaData();
             indexMetaData.setUnique(indexed == IndexedValue.UNIQUE);
-            indexMetaData.addColumn(columnMetaData.getName());
+            if (columnMetaData != null)
+            {
+                indexMetaData.addColumn(columnMetaData.getName());
+            }
             indexMetaData.parent = this;
         }
 
