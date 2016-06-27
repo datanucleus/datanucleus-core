@@ -2962,7 +2962,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 if (getApiAdapter().getObjectState(op.getObject()).equals(states[i]))
                 {
-                    for (int j=0;i<classes.length;i++)
+                    for (int j=0;j<classes.length;j++)
                     {
                         if (classes[j] == op.getObject().getClass())
                         {
