@@ -50,7 +50,6 @@ public class EntityResolverFactory
      * @throws InstantiationException if an error occurs
      * @throws NoSuchMethodException if an error occurs
      * @throws ClassNotFoundException if an error occurs
-     * @throws IllegalArgumentException if an error occurs
      * @throws SecurityException if an error occurs
      */
     public static EntityResolver getInstance(PluginManager pluginManager, String handlerName) 

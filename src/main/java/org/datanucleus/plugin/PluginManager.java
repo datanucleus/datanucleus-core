@@ -287,13 +287,12 @@ public class PluginManager
      * @throws ClassNotFoundException if an error occurs
      * @throws SecurityException if an error occurs
      * @throws NoSuchMethodException if an error occurs
-     * @throws IllegalArgumentException if an error occurs
      * @throws InstantiationException if an error occurs
      * @throws IllegalAccessException if an error occurs
      * @throws InvocationTargetException if an error occurs
      */
     public Object createExecutableExtension(String extensionPoint, String discrimAttrName, String discrimAttrValue, String attributeName, Class[] argsClass, Object[] args) 
-    throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException
+    throws ClassNotFoundException, SecurityException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
         ConfigurationElement elem = getConfigurationElementForExtension(extensionPoint, discrimAttrName, discrimAttrValue);
         if (elem != null)
@@ -315,13 +314,12 @@ public class PluginManager
      * @throws ClassNotFoundException if an error occurs
      * @throws SecurityException if an error occurs
      * @throws NoSuchMethodException if an error occurs
-     * @throws IllegalArgumentException if an error occurs
      * @throws InstantiationException if an error occurs
      * @throws IllegalAccessException if an error occurs
      * @throws InvocationTargetException if an error occurs
      */
     public Object createExecutableExtension(String extensionPoint, String[] discrimAttrName, String[] discrimAttrValue, String attributeName, Class[] argsClass, Object[] args) 
-    throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException
+    throws ClassNotFoundException, SecurityException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
         ConfigurationElement elem = getConfigurationElementForExtension(extensionPoint, 
             discrimAttrName, discrimAttrValue);

@@ -26,7 +26,8 @@ import org.datanucleus.ClassLoaderResolver;
 public class DatastoreReadOnlyException extends NucleusUserException
 {
     private static final long serialVersionUID = -4173680935945334047L;
-    ClassLoaderResolver clr;
+
+    private final ClassLoaderResolver clr;
 
     public DatastoreReadOnlyException(String msg, ClassLoaderResolver clr)
     {
