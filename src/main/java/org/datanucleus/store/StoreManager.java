@@ -339,6 +339,7 @@ public interface StoreManager
      * @param c  The class requiring the Extent
      * @param subclasses Whether to include subclasses of 'c'
      * @return The Extent.
+     * @param <T> Type of the extent
      */
     <T> Extent<T> getExtent(ExecutionContext ec, Class<T> c, boolean subclasses);
 
