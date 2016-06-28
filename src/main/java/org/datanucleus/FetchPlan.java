@@ -76,7 +76,7 @@ public class FetchPlan implements Serializable
     transient final ClassLoaderResolver clr; // Defined as transient to avoid Serializable problems
 
     /** The "defined" fetch groups in the current FetchPlan. */
-    final Set<String> groups = new HashSet();
+    final Set<String> groups = new HashSet<>();
 
     /** The "dynamic" fetch groups in the current FetchPlan. */
     transient Set<FetchGroup> dynamicGroups = null; // Defined as transient to avoid Serializable problems
@@ -88,7 +88,7 @@ public class FetchPlan implements Serializable
     int detachmentOptions = FetchPlan.DETACH_LOAD_FIELDS;
 
     /** Managed class keyed by ClassMetaData **/
-    final transient Map<String, FetchPlanForClass> managedClass = new HashMap();
+    final transient Map<String, FetchPlanForClass> managedClass = new HashMap<>();
 
     /** Maximum depth to fetch from the root object. */
     int maxFetchDepth = 1;
@@ -335,7 +335,7 @@ public class FetchPlan implements Serializable
         {
             if (dynamicGroups == null)
             {
-                dynamicGroups = new HashSet();
+                dynamicGroups = new HashSet<>();
             }
             Iterator<FetchGroup> grpIter = ecGrpsWithName.iterator();
             while (grpIter.hasNext())
@@ -355,7 +355,7 @@ public class FetchPlan implements Serializable
             {
                 if (dynamicGroups == null)
                 {
-                    dynamicGroups = new HashSet();
+                    dynamicGroups = new HashSet<>();
                 }
                 Iterator<FetchGroup> grpIter = grpsWithName.iterator();
                 while (grpIter.hasNext())
@@ -571,7 +571,7 @@ public class FetchPlan implements Serializable
         fp.groups.addAll(this.groups);
         if (dynamicGroups != null)
         {
-            fp.dynamicGroups = new HashSet(dynamicGroups);
+            fp.dynamicGroups = new HashSet<>(dynamicGroups);
         }
 
         for (Iterator<Map.Entry<String, FetchPlanForClass>> it = this.managedClass.entrySet().iterator(); it.hasNext();)

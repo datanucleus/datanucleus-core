@@ -69,13 +69,13 @@ public class TransactionImpl implements Transaction
     protected Boolean serializeRead = null;
 
     /** Listeners for the lifecycle of the active transaction. **/
-    private Set<TransactionEventListener> listenersPerTransaction = new HashSet();
+    private Set<TransactionEventListener> listenersPerTransaction = new HashSet<>();
 
     /** Listener to inform the ExecutionContext of transaction events. */
     private TransactionEventListener ecListener;
 
     /** Listeners that apply to all transactions. **/
-    private List<TransactionEventListener> userListeners = new ArrayList<TransactionEventListener>();
+    private List<TransactionEventListener> userListeners = new ArrayList<>();
 
     private Map<String, Object> options = null;
 
@@ -858,7 +858,7 @@ public class TransactionImpl implements Transaction
     {
         if (options == null)
         {
-            options = new HashMap<String, Object>();
+            options = new HashMap<>();
         }
         options.put(option, Integer.valueOf(value));
     }
@@ -867,7 +867,7 @@ public class TransactionImpl implements Transaction
     {
         if (options == null)
         {
-            options = new HashMap<String, Object>();
+            options = new HashMap<>();
         }
         options.put(option, Boolean.valueOf(value));
     }
@@ -876,7 +876,7 @@ public class TransactionImpl implements Transaction
     {
         if (options == null)
         {
-            options = new HashMap<String, Object>();
+            options = new HashMap<>();
         }
         options.put(option, value);
     }
@@ -885,7 +885,7 @@ public class TransactionImpl implements Transaction
     {
         if (options == null)
         {
-            options = new HashMap<String, Object>();
+            options = new HashMap<>();
         }
         options.put(option, value);
     }

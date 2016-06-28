@@ -75,7 +75,7 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
     /** Hash code cache for performance improvement */
     protected int userRegisteredLoaderHashCode = 0;
 
-    protected Map<String, Class> jreClasses = new ConcurrentHashMap<String, Class>();
+    protected Map<String, Class> jreClasses = new ConcurrentHashMap<>();
 
     /** Cache for loaded classes */
     protected Map<String, Class> loadedClasses = Collections.synchronizedMap(new WeakValueMap());

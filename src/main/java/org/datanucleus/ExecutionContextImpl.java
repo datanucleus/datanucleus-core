@@ -173,10 +173,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     private Map<Object, ObjectProvider> enlistedOPCache = new WeakValueMap();
 
     /** List of ObjectProviders for all current dirty objects managed by this context. */
-    private List<ObjectProvider> dirtyOPs = new ArrayList();
+    private List<ObjectProvider> dirtyOPs = new ArrayList<>();
 
     /** List of ObjectProviders for all current dirty objects made dirty by reachability. */
-    private List<ObjectProvider> indirectDirtyOPs = new ArrayList();
+    private List<ObjectProvider> indirectDirtyOPs = new ArrayList<>();
 
     private OperationQueue operationQueue = null;
 
@@ -436,7 +436,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // "detach-on-close", detaching all currently cached objects.
             // Note that this will delete each object from the L1 cache one-by-one TODO Can we optimise this in terms of cache clearance?
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("010011"));
-            List<ObjectProvider> toDetach = new ArrayList(cache.values());
+            List<ObjectProvider> toDetach = new ArrayList<>(cache.values());
 
             try
             {
@@ -494,7 +494,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (cache != null && !cache.isEmpty())
         {
             // Clear out the cache (use separate list since sm.disconnect will remove the object from "cache" so we avoid any ConcurrentModification issues)
-            Collection<ObjectProvider> cachedOPsClone = new HashSet(cache.values());
+            Collection<ObjectProvider> cachedOPsClone = new HashSet<>(cache.values());
             Iterator<ObjectProvider> iter = cachedOPsClone.iterator();
             while (iter.hasNext())
             {
@@ -523,7 +523,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (ecListeners != null)
         {
             // Inform all interested parties that we are about to close
-            Set<ExecutionContextListener> listeners = new HashSet(ecListeners);
+            Set<ExecutionContextListener> listeners = new HashSet<>(ecListeners);
             for (ExecutionContextListener lstr : listeners)
             {
                 lstr.executionContextClosing(this);
@@ -610,7 +610,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         if (ecListeners == null)
         {
-            ecListeners = new HashSet<ExecutionContextListener>();
+            ecListeners = new HashSet<>();
         }
         ecListeners.add(listener);
     }
@@ -638,7 +638,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             // Create temporary storage to handle objects needing L2 caching after txn
             l2CacheTxIds = new HashSet();
-            l2CacheTxFieldsToUpdateById = new HashMap<Object, BitSet>();
+            l2CacheTxFieldsToUpdateById = new HashMap<>();
             l2CacheEnabled = true;
         }
         else if (!flag && l2CacheEnabled)
@@ -1658,7 +1658,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void refreshAllObjects()
     {
-        Set<ObjectProvider> toRefresh = new HashSet();
+        Set<ObjectProvider> toRefresh = new HashSet<>();
         toRefresh.addAll(enlistedOPCache.values());
         toRefresh.addAll(dirtyOPs);
         toRefresh.addAll(indirectDirtyOPs);
@@ -2759,7 +2759,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void detachAll()
     {
-        Collection<ObjectProvider> opsToDetach = new HashSet(this.enlistedOPCache.values());
+        Collection<ObjectProvider> opsToDetach = new HashSet<>(this.enlistedOPCache.values());
         if (cache != null)
         {
             opsToDetach.addAll(this.cache.values());
@@ -3206,7 +3206,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         boolean performValidationWhenCached = (nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED));
-        List<ObjectProvider> opsToValidate = new ArrayList<ObjectProvider>();
+        List<ObjectProvider> opsToValidate = new ArrayList<>();
         if (validate)
         {
             if (performValidationWhenCached)
@@ -3877,7 +3877,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public List<ObjectProvider> getObjectsToBeFlushed()
     {
-        List<ObjectProvider> ops = new ArrayList();
+        List<ObjectProvider> ops = new ArrayList<>();
         try
         {
             if (getMultithreaded())
@@ -3960,7 +3960,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Non transactional flush, so store the ids for later
             if (nontxProcessedOPs == null)
             {
-                nontxProcessedOPs = new HashSet();
+                nontxProcessedOPs = new HashSet<>();
             }
             nontxProcessedOPs.addAll(dirtyOPs);
             nontxProcessedOPs.addAll(indirectDirtyOPs);
@@ -4240,7 +4240,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     // Object has been added/modified so update in L2 cache
                     if (opsToCache == null)
                     {
-                        opsToCache = new HashSet<ObjectProvider>();
+                        opsToCache = new HashSet<>();
                     }
                     opsToCache.add(op);
                     if (l2CacheObjectsToEvictUponRollback == null) 
@@ -4279,7 +4279,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         // the user via the FetchPlan property DetachmentRoots or DetachmentRootClasses. 
         // If not set explicitly, the detachment roots consist of the union of all root instances of
         // methods executed since the last commit or rollback."
-        Collection<ObjectProvider> ops = new ArrayList();
+        Collection<ObjectProvider> ops = new ArrayList<>();
         Collection roots = fetchPlan.getDetachmentRoots();
         Class[] rootClasses = fetchPlan.getDetachmentRootClasses();
         if (roots != null && !roots.isEmpty())
@@ -5484,7 +5484,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         List<EmbeddedOwnerRelation> relations = opEmbeddedInfoByEmbedded.get(embOP);
         if (relations == null)
         {
-            relations = new ArrayList<ExecutionContext.EmbeddedOwnerRelation>();
+            relations = new ArrayList<>();
         }
         relations.add(relation);
         opEmbeddedInfoByEmbedded.put(embOP, relations);
@@ -5496,7 +5496,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         relations = opEmbeddedInfoByOwner.get(ownerOP);
         if (relations == null)
         {
-            relations = new ArrayList<ExecutionContext.EmbeddedOwnerRelation>();
+            relations = new ArrayList<>();
         }
         relations.add(relation);
         opEmbeddedInfoByOwner.put(ownerOP, relations);

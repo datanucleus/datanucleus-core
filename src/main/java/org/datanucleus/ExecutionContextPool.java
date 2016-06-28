@@ -37,7 +37,7 @@ public class ExecutionContextPool
     private long maxIdle = 20;
     private long expirationTime;
 
-    private Map<ExecutionContext, Long> recyclableECs = new ConcurrentHashMap<ExecutionContext, Long>();
+    private Map<ExecutionContext, Long> recyclableECs = new ConcurrentHashMap<>();
 
     private CleanUpThread cleaner;
 
