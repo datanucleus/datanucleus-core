@@ -25,6 +25,35 @@ package org.datanucleus.store.valuegenerator;
  */
 public interface ValueGenerator<T>
 {
+    /** Name of any sequence to be used (when using SEQUENCE strategy). */
+    public static final String PROPERTY_SEQUENCE_NAME = "sequence-name";
+
+    /** Name of a table to use when using values stored in a table - JPA "table"/JDO "increment" strategy. */
+    public static final String PROPERTY_SEQUENCETABLE_TABLE = "sequence-table-name";
+    public static final String PROPERTY_SEQUENCETABLE_CATALOG = "sequence-catalog-name";
+    public static final String PROPERTY_SEQUENCETABLE_SCHEMA = "sequence-schema-name";
+    public static final String PROPERTY_SEQUENCETABLE_NAME_COLUMN = "sequence-name-column-name";
+    public static final String PROPERTY_SEQUENCETABLE_NEXTVAL_COLUMN = "sequence-nextval-column-name";
+
+    public static final String PROPERTY_KEY_INITIAL_VALUE = "key-initial-value";
+    public static final String PROPERTY_KEY_CACHE_SIZE = "key-cache-size";
+    public static final String PROPERTY_KEY_MIN_VALUE = "key-min-value";
+    public static final String PROPERTY_KEY_MAX_VALUE = "key-max-value";
+    public static final String PROPERTY_KEY_DATABASE_CACHE_SIZE = "key-database-cache-size";
+
+    /** Catalog that the value is for. */
+    public static final String PROPERTY_CATALOG_NAME = "catalog-name";
+    /** Schema that the value is for. */
+    public static final String PROPERTY_SCHEMA_NAME = "schema-name";
+    /** Table that the value is for. */
+    public static final String PROPERTY_TABLE_NAME = "table-name";
+    /** Class that the value is for. */
+    public static final String PROPERTY_CLASS_NAME = "class-name";
+    /** Class that the value is for. */
+    public static final String PROPERTY_ROOT_CLASS_NAME = "root-class-name";
+    /** Field that the value is for. */
+    public static final String PROPERTY_FIELD_NAME = "field-name";
+
     /**
      * Returns the fully qualified name of the <code>Sequence</code>.
      * @return the name of the sequence
