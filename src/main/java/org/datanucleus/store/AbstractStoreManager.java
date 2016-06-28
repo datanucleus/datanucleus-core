@@ -1465,16 +1465,15 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             extensions = idmd.getExtensions();
         }
 
-        properties.setProperty("class-name", cmd.getFullClassName());
-        properties.put("root-class-name", cmd.getBaseAbstractClassMetaData().getFullClassName());
+        properties.setProperty(ValueGenerator.PROPERTY_CLASS_NAME, cmd.getFullClassName());
+        properties.put(ValueGenerator.PROPERTY_ROOT_CLASS_NAME, cmd.getBaseAbstractClassMetaData().getFullClassName());
         if (mmd != null)
         {
-            properties.setProperty("field-name", mmd.getFullFieldName());
+            properties.setProperty(ValueGenerator.PROPERTY_FIELD_NAME, mmd.getFullFieldName());
         }
-
         if (sequence != null)
         {
-            properties.setProperty("sequence-name", sequence);
+            properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, sequence);
         }
 
         // Add any extension properties
@@ -1495,39 +1494,41 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         if (strategy == IdentityStrategy.INCREMENT && tablegenmd != null)
         {
             // User has specified a TableGenerator (JPA)
-            properties.put("key-initial-value", "" + tablegenmd.getInitialValue());
-            properties.put("key-cache-size", "" + tablegenmd.getAllocationSize());
+            properties.put(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + tablegenmd.getInitialValue());
+            properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + tablegenmd.getAllocationSize());
+
             if (tablegenmd.getTableName() != null)
             {
-                properties.put("sequence-table-name", tablegenmd.getTableName());
+                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_TABLE, tablegenmd.getTableName());
             }
             if (tablegenmd.getCatalogName() != null)
             {
-                properties.put("sequence-catalog-name", tablegenmd.getCatalogName());
+                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, tablegenmd.getCatalogName());
             }
             if (tablegenmd.getSchemaName() != null)
             {
-                properties.put("sequence-schema-name", tablegenmd.getSchemaName());
+                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, tablegenmd.getSchemaName());
             }
             if (tablegenmd.getPKColumnName() != null)
             {
-                properties.put("sequence-name-column-name", tablegenmd.getPKColumnName());
+                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_NAME_COLUMN, tablegenmd.getPKColumnName());
             }
             if (tablegenmd.getPKColumnName() != null)
             {
-                properties.put("sequence-nextval-column-name", tablegenmd.getValueColumnName());
+                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_NEXTVAL_COLUMN, tablegenmd.getValueColumnName());
             }
+
             if (tablegenmd.getPKColumnValue() != null)
             {
-                properties.put("sequence-name", tablegenmd.getPKColumnValue());
+                properties.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, tablegenmd.getPKColumnValue());
             }
         }
         else if (strategy == IdentityStrategy.INCREMENT && tablegenmd == null)
         {
-            if (!properties.containsKey("key-cache-size"))
+            if (!properties.containsKey(ValueGenerator.PROPERTY_KEY_CACHE_SIZE))
             {
                 // Use default allocation size
-                properties.put("key-cache-size", "" + getIntProperty(PropertyNames.PROPERTY_VALUEGEN_INCREMENT_ALLOCSIZE));
+                properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + getIntProperty(PropertyNames.PROPERTY_VALUEGEN_INCREMENT_ALLOCSIZE));
             }
         }
         else if (strategy == IdentityStrategy.SEQUENCE && seqmd != null)
@@ -1537,18 +1538,18 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             {
                 if (seqmd.getInitialValue() >= 0)
                 {
-                    properties.put("key-initial-value", "" + seqmd.getInitialValue());
+                    properties.put(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + seqmd.getInitialValue());
                 }
                 if (seqmd.getAllocationSize() > 0)
                 {
-                    properties.put("key-cache-size", "" + seqmd.getAllocationSize());
+                    properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + seqmd.getAllocationSize());
                 }
                 else
                 {
                     // Use default allocation size
-                    properties.put("key-cache-size", "" + getIntProperty(PropertyNames.PROPERTY_VALUEGEN_SEQUENCE_ALLOCSIZE));
+                    properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + getIntProperty(PropertyNames.PROPERTY_VALUEGEN_SEQUENCE_ALLOCSIZE));
                 }
-                properties.put("sequence-name", "" + seqmd.getDatastoreSequence());
+                properties.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, "" + seqmd.getDatastoreSequence());
 
                 // Add on any extensions specified on the sequence
                 ExtensionMetaData[] seqExtensions = seqmd.getExtensions();
@@ -1574,7 +1575,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      */
     public Collection<String> getSubClassesForClass(String className, boolean includeDescendents, ClassLoaderResolver clr)
     {
-        Collection<String> subclasses = new HashSet<String>();
+        Collection<String> subclasses = new HashSet<>();
 
         String[] subclassNames = getMetaDataManager().getSubclassesForClass(className, includeDescendents);
         if (subclassNames != null)

@@ -25,7 +25,7 @@ package org.datanucleus.store.valuegenerator;
  */
 public interface ValueGenerator<T>
 {
-    /** Name of any sequence to be used (when using SEQUENCE strategy). */
+    /** Name of any sequence to be used (when using JPA/JDO "sequence" strategy). */
     public static final String PROPERTY_SEQUENCE_NAME = "sequence-name";
 
     /** Name of a table to use when using values stored in a table - JPA "table"/JDO "increment" strategy. */
@@ -51,7 +51,8 @@ public interface ValueGenerator<T>
     public static final String PROPERTY_ROOT_CLASS_NAME = "root-class-name";
     /** Field that the value is for. */
     public static final String PROPERTY_FIELD_NAME = "field-name";
-    /** Table that the value is for. */
+
+    /** Table that the value is for (see also column-name). */
     public static final String PROPERTY_TABLE_NAME = "table-name";
     /** Column that the value is for (i.e which column will have the value applied to it, so we can check for MAX(col)). */
     public static final String PROPERTY_COLUMN_NAME = "column-name";

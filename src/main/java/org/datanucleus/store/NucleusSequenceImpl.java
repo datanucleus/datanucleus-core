@@ -87,11 +87,11 @@ public class NucleusSequenceImpl implements NucleusSequence
         props.put("sequence-name", seqMetaData.getDatastoreSequence());
         if (seqMetaData.getAllocationSize() > 0)
         {
-            props.put("key-cache-size", "" + seqMetaData.getAllocationSize());
+            props.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + seqMetaData.getAllocationSize());
         }
         if (seqMetaData.getInitialValue() > 0)
         {
-            props.put("key-initial-value", "" + seqMetaData.getInitialValue());
+            props.put(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + seqMetaData.getInitialValue());
         }
 
         // Get a ValueGenerationManager to create the generator
