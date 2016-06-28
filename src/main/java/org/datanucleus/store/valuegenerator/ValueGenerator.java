@@ -45,14 +45,16 @@ public interface ValueGenerator<T>
     public static final String PROPERTY_CATALOG_NAME = "catalog-name";
     /** Schema that the value is for. */
     public static final String PROPERTY_SCHEMA_NAME = "schema-name";
-    /** Table that the value is for. */
-    public static final String PROPERTY_TABLE_NAME = "table-name";
     /** Class that the value is for. */
     public static final String PROPERTY_CLASS_NAME = "class-name";
     /** Class that the value is for. */
     public static final String PROPERTY_ROOT_CLASS_NAME = "root-class-name";
     /** Field that the value is for. */
     public static final String PROPERTY_FIELD_NAME = "field-name";
+    /** Table that the value is for. */
+    public static final String PROPERTY_TABLE_NAME = "table-name";
+    /** Column that the value is for (i.e which column will have the value applied to it, so we can check for MAX(col)). */
+    public static final String PROPERTY_COLUMN_NAME = "column-name";
 
     /**
      * Returns the fully qualified name of the <code>Sequence</code>.
