@@ -64,7 +64,7 @@ public class OptionalHandler extends CollectionHandler<Optional>
             }
         }.getColumns();
 
-        if (columns == null || columns.size() == 0)
+        if (columns == null || columns.isEmpty())
         {
             // Optional should allow nullable by default
             ColumnMetaData colmd = new ColumnMetaData();

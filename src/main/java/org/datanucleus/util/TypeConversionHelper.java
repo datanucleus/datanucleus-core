@@ -1205,7 +1205,7 @@ public class TypeConversionHelper
             }
         }
 
-        if (list.size() > 0)
+        if (!list.isEmpty())
         {
             values = new int[list.size()];
             Iterator iter = list.iterator();

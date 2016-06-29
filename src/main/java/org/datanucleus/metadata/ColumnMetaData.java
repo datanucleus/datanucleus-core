@@ -476,7 +476,7 @@ public class ColumnMetaData extends MetaData
             sb.append(" position=\"" + position + "\"");
         }
 
-        if (extensions != null && extensions.size() > 0)
+        if (extensions != null && !extensions.isEmpty())
         {
             sb.append(">\n");
 

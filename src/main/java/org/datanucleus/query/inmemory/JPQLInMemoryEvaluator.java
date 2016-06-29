@@ -47,7 +47,7 @@ public class JPQLInMemoryEvaluator extends JavaQueryInMemoryEvaluator
     {
         super("JPQL", query, compilation, parameterValues, clr, candidates);
 
-        if (this.parameterValues != null && this.parameterValues.size() > 0)
+        if (this.parameterValues != null && !this.parameterValues.isEmpty())
         {
             Set keys = this.parameterValues.keySet();
             boolean numericKeys = false;

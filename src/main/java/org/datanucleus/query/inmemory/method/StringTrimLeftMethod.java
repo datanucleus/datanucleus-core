@@ -38,7 +38,7 @@ public class StringTrimLeftMethod implements InvocationEvaluator
         String method = expr.getOperation();
         List args = expr.getArguments();
         char trimChar = ' ';
-        if (args != null && args.size() > 0)
+        if (args != null && !args.isEmpty())
         {
             trimChar = (Character)args.get(0);
         }

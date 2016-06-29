@@ -117,7 +117,7 @@ public class InvokeExpression extends Expression
         }
         // TODO Set symbol using the invoked method so we represent what the type really is
 
-        if (arguments != null && arguments.size() > 0)
+        if (arguments != null && !arguments.isEmpty())
         {
             for (int i=0;i<arguments.size();i++)
             {

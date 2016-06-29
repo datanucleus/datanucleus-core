@@ -641,7 +641,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 starter.open();
             }
             Collection existingData = starter.getAllClassData();
-            if (existingData != null && existingData.size() > 0)
+            if (existingData != null && !existingData.isEmpty())
             {
                 List classesNeedingAdding = new ArrayList();
                 Iterator existingDataIter = existingData.iterator();

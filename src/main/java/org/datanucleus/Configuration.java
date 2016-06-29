@@ -283,7 +283,7 @@ public class Configuration extends PropertyStore implements Serializable
      */
     public void setDefaultProperties(Map props)
     {
-        if (props != null && props.size() > 0)
+        if (props != null && !props.isEmpty())
         {
             Iterator<Map.Entry> entryIter = props.entrySet().iterator();
             while (entryIter.hasNext())
@@ -523,7 +523,7 @@ public class Configuration extends PropertyStore implements Serializable
             {
                 // Unknown property so just add it.
                 setPropertyInternal(propertyName, value);
-                if (propertyMappings.size() > 0)
+                if (!propertyMappings.isEmpty())
                 {
                     NucleusLogger.PERSISTENCE.info(Localiser.msg("008015", propertyName));
                 }

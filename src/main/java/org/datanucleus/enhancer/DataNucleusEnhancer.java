@@ -373,7 +373,7 @@ public class DataNucleusEnhancer
             }
         }
 
-        if (names.size() > 0)
+        if (!names.isEmpty())
         {
             componentsToEnhance.add(new EnhanceComponent(EnhanceComponent.CLASS, names.toArray(new String[names.size()])));
         }
@@ -412,15 +412,15 @@ public class DataNucleusEnhancer
             }
         }
 
-        if (mappingFiles.size() > 0)
+        if (!mappingFiles.isEmpty())
         {
             componentsToEnhance.add(new EnhanceComponent(EnhanceComponent.MAPPING_FILE, mappingFiles.toArray(new String[mappingFiles.size()])));
         }
-        if (jarFiles.size() > 0)
+        if (!jarFiles.isEmpty())
         {
             componentsToEnhance.add(new EnhanceComponent(EnhanceComponent.JAR_FILE, jarFiles.toArray(new String[jarFiles.size()])));
         }
-        if (classFiles.size() > 0)
+        if (!classFiles.isEmpty())
         {
             componentsToEnhance.add(new EnhanceComponent(EnhanceComponent.CLASS_FILE, classFiles.toArray(new String[classFiles.size()])));
         }

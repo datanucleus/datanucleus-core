@@ -288,7 +288,7 @@ public class Node
             sb.append(indent(indentation)).append(")");
         }
 
-        if (childNodes.size() > 0)
+        if (!childNodes.isEmpty())
         {
             if (nodeType == NodeType.LITERAL || nodeType == NodeType.IDENTIFIER)
             { 

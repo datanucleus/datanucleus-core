@@ -103,7 +103,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                         nucleusContext.getStatistics().decrementActiveConnections();
                     }
 
-                    if (connectionsForPool.size() == 0)
+                    if (connectionsForPool.isEmpty())
                     {
                         // No connections remaining for this OM so remove the entry for the ExecutionContext
                         connectionsPool.remove(poolKey);

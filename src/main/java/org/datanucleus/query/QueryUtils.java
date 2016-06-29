@@ -1321,7 +1321,7 @@ public class QueryUtils
      */
     public static String getKeyForQueryResultsCache(Query query, Map params)
     {
-        if (params != null && params.size() > 0)
+        if (params != null && !params.isEmpty())
         {
             // TODO Check if the params hashCode is adequate to use as a defining key
             return query.getLanguage() + ":" + query.toString() + ":" + params.hashCode();

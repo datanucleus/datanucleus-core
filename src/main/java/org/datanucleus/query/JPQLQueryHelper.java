@@ -269,7 +269,7 @@ public class JPQLQueryHelper
                 StringBuilder str = new StringBuilder("TRIM(BOTH ");
 
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
-                if (args.size() > 0)
+                if (!args.isEmpty())
                 {
                     Expression trimChrExpr = args.get(0);
                     str.append(JPQLQueryHelper.getJPQLForExpression(trimChrExpr));
@@ -285,7 +285,7 @@ public class JPQLQueryHelper
                 StringBuilder str = new StringBuilder("TRIM(LEADING ");
 
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
-                if (args.size() > 0)
+                if (!args.isEmpty())
                 {
                     Expression trimChrExpr = args.get(0);
                     str.append(JPQLQueryHelper.getJPQLForExpression(trimChrExpr));
@@ -301,7 +301,7 @@ public class JPQLQueryHelper
                 StringBuilder str = new StringBuilder("TRIM(TRAILING ");
 
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
-                if (args.size() > 0)
+                if (!args.isEmpty())
                 {
                     Expression trimChrExpr = args.get(0);
                     str.append(JPQLQueryHelper.getJPQLForExpression(trimChrExpr));

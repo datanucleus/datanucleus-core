@@ -487,7 +487,7 @@ public class ExpressionCompiler
                 }
             }
 
-            if (currentExpr != null && tupple.size() > 0)
+            if (currentExpr != null && !tupple.isEmpty())
             {
                 // We have a trailing identifier expression 
                 // e.g "((B)a).c" where we have a CastExpression and trailing "c"

@@ -285,14 +285,13 @@ public class PluginManager
      * @param args The arguments
      * @return The value of the attribute
      * @throws ClassNotFoundException if an error occurs
-     * @throws SecurityException if an error occurs
      * @throws NoSuchMethodException if an error occurs
      * @throws InstantiationException if an error occurs
      * @throws IllegalAccessException if an error occurs
      * @throws InvocationTargetException if an error occurs
      */
     public Object createExecutableExtension(String extensionPoint, String discrimAttrName, String discrimAttrValue, String attributeName, Class[] argsClass, Object[] args) 
-    throws ClassNotFoundException, SecurityException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+    throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
         ConfigurationElement elem = getConfigurationElementForExtension(extensionPoint, discrimAttrName, discrimAttrValue);
         if (elem != null)
@@ -312,14 +311,13 @@ public class PluginManager
      * @param args The arguments
      * @return The value of the attribute
      * @throws ClassNotFoundException if an error occurs
-     * @throws SecurityException if an error occurs
      * @throws NoSuchMethodException if an error occurs
      * @throws InstantiationException if an error occurs
      * @throws IllegalAccessException if an error occurs
      * @throws InvocationTargetException if an error occurs
      */
     public Object createExecutableExtension(String extensionPoint, String[] discrimAttrName, String[] discrimAttrValue, String attributeName, Class[] argsClass, Object[] args) 
-    throws ClassNotFoundException, SecurityException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+    throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
         ConfigurationElement elem = getConfigurationElementForExtension(extensionPoint, 
             discrimAttrName, discrimAttrValue);

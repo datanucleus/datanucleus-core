@@ -387,7 +387,7 @@ public class Transaction
                     status = STATUS_ROLLEDBACK;
                 }
             }
-            else if (enlistedResources.size() > 0)
+            else if (!enlistedResources.isEmpty())
             {
                 // Prepare each enlisted resource
                 status = STATUS_PREPARING;

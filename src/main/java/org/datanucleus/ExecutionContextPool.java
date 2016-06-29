@@ -82,7 +82,7 @@ public class ExecutionContextPool
     {
         long now = System.currentTimeMillis();
         ExecutionContext ec;
-        if (recyclableECs.size() > 0)
+        if (!recyclableECs.isEmpty())
         {
             Iterator<Entry<ExecutionContext, Long>> recycIter = recyclableECs.entrySet().iterator();
             while (recycIter.hasNext())

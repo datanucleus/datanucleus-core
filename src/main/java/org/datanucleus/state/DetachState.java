@@ -130,10 +130,14 @@ public class DetachState extends FetchPlanState
 
         private boolean dominates(List<String> candidate, List<String> target)
         {
-            if (candidate.size() == 0)
+            if (candidate.isEmpty())
+            {
                 return true;
+            }
             if (candidate.size() > target.size())
+            {
                 return false;
+            }
             String fieldName = target.get(target.size() - 1);
             // TODO If fieldName is not a recursive field, then return true;
             return calculateObjectDepthForMember(candidate, fieldName) <= calculateObjectDepthForMember(target, fieldName);

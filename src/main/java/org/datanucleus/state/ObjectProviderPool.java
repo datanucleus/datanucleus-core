@@ -91,7 +91,7 @@ public class ObjectProviderPool
     {
         long now = System.currentTimeMillis();
         ObjectProvider op;
-        if (recyclableOps.size() > 0)
+        if (!recyclableOps.isEmpty())
         {
             Set<ObjectProvider> ops = recyclableOps.keySet();
             Iterator<ObjectProvider> opIter = ops.iterator();

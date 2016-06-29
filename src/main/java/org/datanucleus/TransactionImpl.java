@@ -349,7 +349,7 @@ public class TransactionImpl implements Transaction
                 }
             }
         }
-        if (errors.size() > 0)
+        if (!errors.isEmpty())
         {
             throw new NucleusTransactionException(Localiser.msg("015007"), errors.toArray(new Throwable[errors.size()]));
         }

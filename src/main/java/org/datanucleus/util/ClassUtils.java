@@ -317,7 +317,7 @@ public class ClassUtils
                 {
                     // Check for classes in subdirectories
                     Collection child_classes=getClassFilesForDirectory(files[i],normal_classes,inner_classes);
-                    if (child_classes != null && child_classes.size() > 0)
+                    if (child_classes != null && !child_classes.isEmpty())
                     {
                         classes.addAll(child_classes);
                     }
@@ -354,7 +354,7 @@ public class ClassUtils
                 {
                     // Check for files in subdirectories
                     Collection childFiles = getFilesForDirectory(dirFiles[i]);
-                    if (childFiles != null && childFiles.size() > 0)
+                    if (childFiles != null && !childFiles.isEmpty())
                     {
                         files.addAll(childFiles);
                     }

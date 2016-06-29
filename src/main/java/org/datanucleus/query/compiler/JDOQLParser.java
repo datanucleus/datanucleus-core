@@ -146,7 +146,7 @@ public class JDOQLParser implements Parser
         processExpression();
         Node id = stack.pop();
         StringBuilder className = new StringBuilder(id.getNodeValue().toString());
-        while (id.getChildNodes().size() > 0)
+        while (!id.getChildNodes().isEmpty())
         {
             id = id.getFirstChild();
             className.append(".").append(id.getNodeValue().toString());

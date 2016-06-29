@@ -619,7 +619,7 @@ public abstract class JavaQueryInMemoryEvaluator
     
             List groups = new ArrayList();
             List group = new ArrayList();
-            if (resultSet.size() > 0)
+            if (!resultSet.isEmpty())
             {
                 groups.add(group);
             }
@@ -691,7 +691,7 @@ public abstract class JavaQueryInMemoryEvaluator
             }
         }
 
-        if (result.size() > 0 && ((Object[])result.get(0)).length == 1)
+        if (!result.isEmpty() && ((Object[])result.get(0)).length == 1)
         {
             List r = result;
             result = new ArrayList();
@@ -729,7 +729,7 @@ public abstract class JavaQueryInMemoryEvaluator
         Expression[] result = compilation.getExprResult();
 
         // Use first element only (if there are any). Should be same in other "group-by" components
-        Object element = (set != null && set.size() > 0 ? set.get(0) : null);
+        Object element = (set != null && !set.isEmpty() ? set.get(0) : null);
         state.put(candidateAlias, element);
 
         Object[] r = new Object[result.length];

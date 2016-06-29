@@ -1119,7 +1119,7 @@ public class ClassMetaData extends AbstractClassMetaData
                 sb.append(managedMembers[i].toString(prefix + indent,indent));
             }
         }
-        else if (members != null && members.size() > 0)
+        else if (members != null && !members.isEmpty())
         {
             // Not yet initialised so use input members
             Iterator iter = members.iterator();

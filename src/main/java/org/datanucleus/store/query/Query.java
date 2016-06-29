@@ -1938,7 +1938,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
                         // Single row only needed (unique specified, or using aggregates etc), so just take first row
                         try
                         {
-                            if (qr == null || qr.size() == 0)
+                            if (qr == null || qr.isEmpty())
                             {
                                 throw new NoQueryResultsException("No query results were returned");
                             }
@@ -2473,7 +2473,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         }
 
         boolean namedParametersSupplied = true;
-        if (parameterValues.size() > 0)
+        if (!parameterValues.isEmpty())
         {
             Object key = parameterValues.keySet().iterator().next();
             if (!(key instanceof String))

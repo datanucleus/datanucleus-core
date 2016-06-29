@@ -1194,7 +1194,7 @@ public abstract class AbstractClassMetaData extends MetaData
     protected void validateUnmappedColumns()
     {
         // Validate any unmapped columns
-        if (unmappedColumns != null && unmappedColumns.size() > 0)
+        if (unmappedColumns != null && !unmappedColumns.isEmpty())
         {
             Iterator unmappedIter = unmappedColumns.iterator();
             while (unmappedIter.hasNext())
@@ -2540,7 +2540,7 @@ public abstract class AbstractClassMetaData extends MetaData
             }
         }
 
-        if (memberNames.size() > 0)
+        if (!memberNames.isEmpty())
         {
             return (String[])memberNames.toArray(new String[memberNames.size()]);
         }

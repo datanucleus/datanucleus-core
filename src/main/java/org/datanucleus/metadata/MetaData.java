@@ -310,7 +310,7 @@ public class MetaData implements Serializable
 
     public ExtensionMetaData[] getExtensions()
     {
-        if (extensions == null || extensions.size() == 0)
+        if (extensions == null || extensions.isEmpty())
         {
             return null;
         }
@@ -405,7 +405,7 @@ public class MetaData implements Serializable
      */
     public String toString(String prefix, String indent)
     {
-        if (extensions == null || extensions.size() == 0)
+        if (extensions == null || extensions.isEmpty())
         {
             return "";
         }

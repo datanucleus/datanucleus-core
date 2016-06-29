@@ -221,8 +221,7 @@ public class ClassUtilsTest extends TestCase
     {
         Collection<Class<?>> superintfs = ClassUtils.getSuperinterfaces(MyArrayList.class);
 
-        assertTrue("java.util.ArrayList should have had 0 superinterfaces, but had " + superintfs.size(),
-            superintfs.size() == 0);
+        assertTrue("java.util.ArrayList should have had 0 superinterfaces, but had " + superintfs.size(), superintfs.isEmpty());
 
         // TODO Include interfaces of superclasses? (see ClassUtils.collectSuperinterfaces)
 

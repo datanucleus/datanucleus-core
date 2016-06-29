@@ -219,7 +219,7 @@ public class CommandLine
             i++;
         }
 
-        if (defaultArg.size() == 0)
+        if (defaultArg.isEmpty())
         {
             this.defaultArg = new String[0];
         }
@@ -276,7 +276,7 @@ public class CommandLine
      */
     public String toString()
     {
-        if (optionList.size() == 0)
+        if (optionList.isEmpty())
         {
             return "[NO OPTIONS]";
         }

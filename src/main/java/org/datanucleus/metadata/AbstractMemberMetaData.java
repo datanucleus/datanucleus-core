@@ -607,7 +607,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 (type.isArray() && type.getComponentType() == Character.class) || (type.isArray() && type.getComponentType() == char.class))
             {
                 useClob = true;
-                if (columns == null || columns.size() == 0)
+                if (columns == null || columns.isEmpty())
                 {
                     // Create a CLOB column. What if the RDBMS doesn't support CLOB ?
                     ColumnMetaData colmd = new ColumnMetaData();
@@ -632,7 +632,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             // Find column metadata definition, creating one if not specified
             ColumnMetaData colMmd;
 
-            if (columns == null || columns.size() == 0)
+            if (columns == null || columns.isEmpty())
             {
                 newColumnMetaData();
             }
@@ -892,7 +892,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         }
 
         // Cater for user specifying column name, or columns
-        if (columns.size() == 0 && column != null)
+        if (columns.isEmpty() && column != null)
         {
             columnMetaData = new ColumnMetaData[1];
             columnMetaData[0] = new ColumnMetaData();
@@ -2739,7 +2739,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                         }
                     }
                 }
-                if (relatedFields.size() > 0)
+                if (!relatedFields.isEmpty())
                 {
                     relatedMemberMetaData = (AbstractMemberMetaData[])relatedFields.toArray(new AbstractMemberMetaData[relatedFields.size()]);
                     relatedFields.clear();

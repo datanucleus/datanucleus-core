@@ -53,8 +53,7 @@ public class EntityResolverFactory
      * @throws SecurityException if an error occurs
      */
     public static EntityResolver getInstance(PluginManager pluginManager, String handlerName) 
-    throws SecurityException, IllegalArgumentException, ClassNotFoundException, NoSuchMethodException, 
-        InstantiationException, IllegalAccessException, InvocationTargetException
+    throws SecurityException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
         EntityResolver resolver = (EntityResolver) resolvers.get(handlerName);
         if (resolver == null)
