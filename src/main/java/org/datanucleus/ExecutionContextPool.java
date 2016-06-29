@@ -102,7 +102,7 @@ public class ExecutionContextPool
                     {
                         recycIter.remove();
                         ec.initialise(owner, options);
-                        return (ec);
+                        return ec;
                     }
 
                     // object failed validation
@@ -115,7 +115,7 @@ public class ExecutionContextPool
 
         // no objects available, create a new one
         ec = create(owner, options);
-        return (ec);
+        return ec;
     }
 
     public synchronized void cleanUp()

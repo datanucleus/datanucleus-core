@@ -1781,7 +1781,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
             threadInfo.nontxPersistDelete = true;
             boolean success = true;
-            Set cachedIds = (cache != null ? new HashSet(cache.keySet()) : null);
+            Set cachedIds = cache != null ? new HashSet(cache.keySet()) : null;
             try
             {
                 return persistObjectWork(obj);
@@ -3059,7 +3059,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (pc == null)
         {
             // Determine the class details for this "id" if not provided, including checking of inheritance level
-            String className = (cls != null ? cls.getName() : null);
+            String className = cls != null ? cls.getName() : null;
             if (!(id instanceof SCOID))
             {
                 ClassDetailsForId details = getClassDetailsForId(id, className, checkInheritance);
@@ -3205,7 +3205,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         }
 
-        boolean performValidationWhenCached = (nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED));
+        boolean performValidationWhenCached = nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED);
         List<ObjectProvider> opsToValidate = new ArrayList<>();
         if (validate)
         {
@@ -3397,7 +3397,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (checkInheritance)
         {
             // Validate the inheritance level
-            className = (checkedClassName ? originalClassName : getClassNameForObjectId(id));
+            className = checkedClassName ? originalClassName : getClassNameForObjectId(id);
             if (className == null)
             {
                 throw new NucleusObjectNotFoundException(Localiser.msg("010026"), id);
@@ -3607,7 +3607,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         }
 
-        boolean performValidationWhenCached = (nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED));
+        boolean performValidationWhenCached = nucCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_FIND_OBJECT_VALIDATE_WHEN_CACHED);
         if (validate && (!fromCache || performValidationWhenCached))
         {
             // User requests validation of the instance so go to the datastore to validate it
@@ -5359,7 +5359,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return false;
         }
         
-        if ((getMetaDataManager().getMetaDataForClass(cls, clr) != null))
+        if (getMetaDataManager().getMetaDataForClass(cls, clr) != null)
         {
             return true;
         }
@@ -5642,7 +5642,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return null;
         }
         Map opMap = opAssociatedValuesMapByOP.get(op);
-        return (opMap == null ? null : opMap.get(key));
+        return opMap == null ? null : opMap.get(key);
     }
 
     /* (non-Javadoc)

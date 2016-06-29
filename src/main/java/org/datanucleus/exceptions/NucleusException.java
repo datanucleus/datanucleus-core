@@ -162,7 +162,7 @@ public class NucleusException extends RuntimeException
      */
     public synchronized Throwable getCause()
     {
-        return ((nested == null || nested.length == 0) ? null : nested[0]);
+        return (nested == null || nested.length == 0) ? null : nested[0];
     }
     
     /**

@@ -92,7 +92,7 @@ public class JavaxCacheQueryResultCache implements QueryResultsCache
      */
     public boolean contains(String queryKey)
     {
-        return (get(queryKey) != null);
+        return get(queryKey) != null;
     }
 
     /* (non-Javadoc)

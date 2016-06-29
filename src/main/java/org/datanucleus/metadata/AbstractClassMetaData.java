@@ -474,14 +474,14 @@ public abstract class AbstractClassMetaData extends MetaData
         else
         {
             AbstractClassMetaData rootCmd = pcSuperclassMetaData.getRootInstantiableClass();
-            return ((rootCmd == null && instantiable) ? this : rootCmd);
+            return (rootCmd == null && instantiable) ? this : rootCmd;
         }
         return null;
     }
 
     public boolean isRootInstantiableClass()
     {
-        return (getRootInstantiableClass() == this);
+        return getRootInstantiableClass() == this;
     }
 
     /**
@@ -1751,7 +1751,7 @@ public abstract class AbstractClassMetaData extends MetaData
      */
     public QueryMetaData[] getQueries()
     {
-        return (queries == null ? null : ((QueryMetaData[])queries.toArray(new QueryMetaData[queries.size()])));
+        return queries == null ? null : ((QueryMetaData[])queries.toArray(new QueryMetaData[queries.size()]));
     }
 
     /**
@@ -1769,8 +1769,8 @@ public abstract class AbstractClassMetaData extends MetaData
      */
     public StoredProcQueryMetaData[] getStoredProcQueries()
     {
-        return (storedProcQueries == null ? null : 
-            ((StoredProcQueryMetaData[])storedProcQueries.toArray(new StoredProcQueryMetaData[storedProcQueries.size()])));
+        return storedProcQueries == null ? null : 
+            ((StoredProcQueryMetaData[])storedProcQueries.toArray(new StoredProcQueryMetaData[storedProcQueries.size()]));
     }
 
     /**
@@ -1906,7 +1906,7 @@ public abstract class AbstractClassMetaData extends MetaData
         }
 
         // Nothing in superclasses sharing our table so return ours
-        return (inheritanceMetaData != null ? inheritanceMetaData.getDiscriminatorMetaData() : null);
+        return inheritanceMetaData != null ? inheritanceMetaData.getDiscriminatorMetaData() : null;
     }
 
     /**
@@ -1977,7 +1977,7 @@ public abstract class AbstractClassMetaData extends MetaData
         }
         if (dismd == null)
         {
-            dismd = (inheritanceMetaData != null ? inheritanceMetaData.getDiscriminatorMetaData() : null);
+            dismd = inheritanceMetaData != null ? inheritanceMetaData.getDiscriminatorMetaData() : null;
         }
         return dismd;
     }
@@ -2133,7 +2133,7 @@ public abstract class AbstractClassMetaData extends MetaData
      */
     public FetchGroupMetaData getFetchGroupMetaData(String groupname)
     {
-        FetchGroupMetaData fgmd = (fetchGroupMetaDataByName != null ? fetchGroupMetaDataByName.get(groupname) : null);
+        FetchGroupMetaData fgmd = fetchGroupMetaDataByName != null ? fetchGroupMetaDataByName.get(groupname) : null;
         if (fgmd == null && pcSuperclassMetaData != null)
         {
             return pcSuperclassMetaData.getFetchGroupMetaData(groupname);
@@ -2214,7 +2214,7 @@ public abstract class AbstractClassMetaData extends MetaData
 
     public AbstractClassMetaData setObjectIdClass(String objectidClass)
     {
-        this.objectidClass = (StringUtils.isWhitespace(objectidClass) ? this.objectidClass : objectidClass);
+        this.objectidClass = StringUtils.isWhitespace(objectidClass) ? this.objectidClass : objectidClass;
         return this;
     }
 
@@ -2225,7 +2225,7 @@ public abstract class AbstractClassMetaData extends MetaData
 
     public AbstractClassMetaData setEntityName(String name)
     {
-        this.entityName = (StringUtils.isWhitespace(name) ? this.entityName : name);
+        this.entityName = StringUtils.isWhitespace(name) ? this.entityName : name;
         return this;
     }
 
@@ -2242,7 +2242,7 @@ public abstract class AbstractClassMetaData extends MetaData
 
     public AbstractClassMetaData setCatalog(String catalog)
     {
-        this.catalog = (StringUtils.isWhitespace(catalog) ? this.catalog : catalog);
+        this.catalog = StringUtils.isWhitespace(catalog) ? this.catalog : catalog;
         return this;
     }
 
@@ -2259,7 +2259,7 @@ public abstract class AbstractClassMetaData extends MetaData
 
     public AbstractClassMetaData setSchema(String schema)
     {
-        this.schema = (StringUtils.isWhitespace(schema) ? this.schema : schema);
+        this.schema = StringUtils.isWhitespace(schema) ? this.schema : schema;
         return this;
     }
 
@@ -2270,7 +2270,7 @@ public abstract class AbstractClassMetaData extends MetaData
 
     public AbstractClassMetaData setTable(String table)
     {
-        this.table = (StringUtils.isWhitespace(table) ? this.table : table);
+        this.table = StringUtils.isWhitespace(table) ? this.table : table;
         return this;
     }
 
@@ -3228,7 +3228,7 @@ public abstract class AbstractClassMetaData extends MetaData
     {
         if (hasRelations == null)
         {
-            hasRelations = (getRelationMemberPositions(clr, mmgr).length > 0);
+            hasRelations = getRelationMemberPositions(clr, mmgr).length > 0;
         }
         return hasRelations.booleanValue();
     }
@@ -3286,8 +3286,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 superclassRelationPositions = pcSuperclassMetaData.getRelationMemberPositions(clr, mmgr);
             }
 
-            int numRelationsSuperclass = 
-                (superclassRelationPositions != null ? superclassRelationPositions.length : 0);
+            int numRelationsSuperclass = superclassRelationPositions != null ? superclassRelationPositions.length : 0;
             int numRelations = numRelationsSuperclass;
             for (int i=0;i<managedMembers.length;i++)
             {
@@ -3650,7 +3649,7 @@ public abstract class AbstractClassMetaData extends MetaData
             }
 
             String existingName = md.getName();
-            boolean existingIsProperty = (md instanceof PropertyMetaData);
+            boolean existingIsProperty = md instanceof PropertyMetaData;
             if (existingIsProperty)
             {
                 existingName = ((PropertyMetaData)md).getFieldName();
@@ -3661,7 +3660,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 }
             }
             String newName = mmd.getName();
-            boolean newIsProperty = (mmd instanceof PropertyMetaData);
+            boolean newIsProperty = mmd instanceof PropertyMetaData;
             if (newIsProperty)
             {
                 newName = ((PropertyMetaData)mmd).getFieldName();

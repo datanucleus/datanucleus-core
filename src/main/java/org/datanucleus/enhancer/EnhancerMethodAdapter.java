@@ -144,7 +144,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
                         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
                         {
                             DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005023",
-                                enhancer.getClassName() + "." + methodName, (fmd.getClassName(true) + "." + name), 
+                                enhancer.getClassName() + "." + methodName, fmd.getClassName(true) + "." + name, 
                                 enhancer.getNamer().getGetMethodPrefixMethodName() + name + "()"));
                         }
                         return;
@@ -156,7 +156,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
                         if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
                         {
                             DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005023",
-                                enhancer.getClassName() + "." + methodName, (fmd.getClassName(true) + "." + name),
+                                enhancer.getClassName() + "." + methodName, fmd.getClassName(true) + "." + name,
                                 enhancer.getNamer().getSetMethodPrefixMethodName() + name + "()"));
                         }
                         return;
@@ -166,7 +166,7 @@ public class EnhancerMethodAdapter extends MethodVisitor
             else
             {
                 DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005024",
-                    enhancer.getClassName() + "." + methodName, (opcode == Opcodes.GETFIELD ? "get" : "set"), (ownerName + "." + name)));
+                    enhancer.getClassName() + "." + methodName, opcode == Opcodes.GETFIELD ? "get" : "set", ownerName + "." + name));
             }
         }
 

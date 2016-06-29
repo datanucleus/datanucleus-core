@@ -119,9 +119,9 @@ public class Configuration extends PropertyStore implements Serializable
                 String value = propElements[i].getAttribute("value");
                 String datastoreString = propElements[i].getAttribute("datastore");
                 String validatorName = propElements[i].getAttribute("validator");
-                boolean datastore = (datastoreString != null && datastoreString.equalsIgnoreCase("true"));
+                boolean datastore = datastoreString != null && datastoreString.equalsIgnoreCase("true");
                 String mgrOverrideString = propElements[i].getAttribute("manager-overrideable");
-                boolean mgrOverride = (mgrOverrideString != null && mgrOverrideString.equalsIgnoreCase("true"));
+                boolean mgrOverride = mgrOverrideString != null && mgrOverrideString.equalsIgnoreCase("true");
 
                 addDefaultProperty(name, intName, value, validatorName, datastore, mgrOverride);
             }
@@ -182,13 +182,13 @@ public class Configuration extends PropertyStore implements Serializable
     private boolean isPropertyForDatastore(String name)
     {
         PropertyMapping mapping = propertyMappings.get(name.toLowerCase(Locale.ENGLISH));
-        return (mapping != null ? mapping.datastore : false);
+        return mapping != null ? mapping.datastore : false;
     }
 
     public String getInternalNameForProperty(String name)
     {
         PropertyMapping mapping = propertyMappings.get(name.toLowerCase(Locale.ENGLISH));
-        return (mapping != null && mapping.internalName != null ? mapping.internalName : name);
+        return mapping != null && mapping.internalName != null ? mapping.internalName : name;
     }
 
     /**
@@ -210,7 +210,7 @@ public class Configuration extends PropertyStore implements Serializable
             PropertyMapping mapping = entry.getValue();
             if (mapping.managerOverride)
             {
-                String propName = (mapping.internalName != null ? mapping.internalName.toLowerCase(Locale.ENGLISH) : mapping.name.toLowerCase(Locale.ENGLISH));
+                String propName = mapping.internalName != null ? mapping.internalName.toLowerCase(Locale.ENGLISH) : mapping.name.toLowerCase(Locale.ENGLISH);
                 props.put(propName, getProperty(propName));
             }
             else if (mapping.internalName != null)

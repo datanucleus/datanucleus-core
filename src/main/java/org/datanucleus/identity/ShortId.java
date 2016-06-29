@@ -95,7 +95,7 @@ public class ShortId extends SingleFieldId<Short>
             int result = super.compare(other);
             if (result == 0)
             {
-                return (key - other.key);
+                return key - other.key;
             }
             return result;
         }

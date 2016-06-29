@@ -53,13 +53,13 @@ public class IdentityUtils
         {
             return false;
         }
-        return (className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_BYTE) || 
-                className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_CHAR) || 
-                className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_INT) ||
-                className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_LONG) || 
-                className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_OBJECT) || 
-                className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_SHORT) ||
-                className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_STRING));
+        return className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_BYTE) || 
+               className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_CHAR) || 
+               className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_INT) ||
+               className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_LONG) || 
+               className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_OBJECT) || 
+               className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_SHORT) ||
+               className.equals(ClassNameConstants.IDENTITY_SINGLEFIELD_STRING);
     }
 
     /**
@@ -93,7 +93,7 @@ public class IdentityUtils
      */
     public static boolean isSingleFieldIdentity(Object id)
     {
-        return (id instanceof SingleFieldId);
+        return id instanceof SingleFieldId;
     }
 
     /* (non-Javadoc)
@@ -101,7 +101,7 @@ public class IdentityUtils
      */
     public static boolean isDatastoreIdentity(Object id)
     {
-        return (id != null && id instanceof DatastoreId);
+        return id != null && id instanceof DatastoreId;
     }
 
     /**
@@ -111,7 +111,7 @@ public class IdentityUtils
      */
     public static Object getTargetKeyForSingleFieldIdentity(Object id)
     {
-        return (id instanceof SingleFieldId ? ((SingleFieldId)id).getKeyAsObject() : null);
+        return id instanceof SingleFieldId ? ((SingleFieldId)id).getKeyAsObject() : null;
     }
 
     /**
@@ -121,7 +121,7 @@ public class IdentityUtils
      */
     public static Object getTargetKeyForDatastoreIdentity(Object id)
     {
-        return (id instanceof DatastoreId ? ((DatastoreId)id).getKeyAsObject() : null);
+        return id instanceof DatastoreId ? ((DatastoreId)id).getKeyAsObject() : null;
     }
 
     /**

@@ -356,7 +356,7 @@ public class TransactionImpl implements Transaction
 
         if (NucleusLogger.TRANSACTION.isDebugEnabled())
         {
-            NucleusLogger.TRANSACTION.debug(Localiser.msg("015022", (System.currentTimeMillis() - startTime)));
+            NucleusLogger.TRANSACTION.debug(Localiser.msg("015022", System.currentTimeMillis() - startTime));
         }
     }
 
@@ -490,7 +490,7 @@ public class TransactionImpl implements Transaction
 
         if (NucleusLogger.TRANSACTION.isDebugEnabled())
         {
-            NucleusLogger.TRANSACTION.debug(Localiser.msg("015023", (System.currentTimeMillis() - startTime)));
+            NucleusLogger.TRANSACTION.debug(Localiser.msg("015023", System.currentTimeMillis() - startTime));
         }
     }
 

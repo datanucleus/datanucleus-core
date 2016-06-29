@@ -121,7 +121,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
 
     public boolean isJoined()
     {
-        return (joinStatus == JoinStatus.JOINED);
+        return joinStatus == JoinStatus.JOINED;
     }
 
     private int getTransactionStatus()
@@ -164,7 +164,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
                     if (jtaTx == null)
                     {
                         jtaTx = txn;
-                        boolean allow_join = (txnstat == Status.STATUS_ACTIVE);
+                        boolean allow_join = txnstat == Status.STATUS_ACTIVE;
                         if (allow_join)
                         {
                             joinStatus = JoinStatus.IMPOSSIBLE;

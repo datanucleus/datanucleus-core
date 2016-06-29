@@ -116,7 +116,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
      */
     public boolean containsOid(Object oid)
     {
-        return (get(oid) != null);
+        return get(oid) != null;
     }
 
     /**

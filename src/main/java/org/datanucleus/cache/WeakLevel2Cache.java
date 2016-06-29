@@ -573,7 +573,7 @@ public class WeakLevel2Cache implements Level2Cache
      */
     public boolean containsOid(Object oid)
     {
-        return (pinnedCache.containsKey(oid) || unpinnedCache.containsKey(oid));
+        return pinnedCache.containsKey(oid) || unpinnedCache.containsKey(oid);
     }
 
     /**
@@ -582,7 +582,7 @@ public class WeakLevel2Cache implements Level2Cache
      */
     public boolean isEmpty()
     {
-        return (pinnedCache.isEmpty() && unpinnedCache.isEmpty());
+        return pinnedCache.isEmpty() && unpinnedCache.isEmpty();
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException

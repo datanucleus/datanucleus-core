@@ -165,7 +165,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
 
     public String getApiName()
     {
-        return (apiAdapter != null ? apiAdapter.getName() : null);
+        return apiAdapter != null ? apiAdapter.getName() : null;
     }
 
     public Configuration getConfiguration()
@@ -228,7 +228,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
     {
         // Set the key we will refer to this loader by
         String resolverName = config.getStringProperty(PropertyNames.PROPERTY_CLASSLOADER_RESOLVER_NAME);
-        String key = (resolverName!=null ? resolverName : "datanucleus");
+        String key = resolverName!=null ? resolverName : "datanucleus";
         if (primaryLoader != null)
         {
             key += ":[" + StringUtils.toJVMIDString(primaryLoader) + "]"; 

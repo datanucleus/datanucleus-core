@@ -259,7 +259,7 @@ public class ClassEnhancerImpl implements ClassEnhancer
     protected boolean requiresDetachable()
     {
         boolean isDetachable = cmd.isDetachable();
-        boolean hasPcsc = (cmd.getPersistableSuperclass() != null);
+        boolean hasPcsc = cmd.getPersistableSuperclass() != null;
 
         if (!hasPcsc && isDetachable)
         {
