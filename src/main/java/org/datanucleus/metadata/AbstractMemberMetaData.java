@@ -419,7 +419,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             clr = mmgr.getNucleusContext().getClassLoaderResolver(null);
         }
 
-        memberRepresented = (field != null ? field : method);
+        memberRepresented = field != null ? field : method;
         if (type == null)
         {
             // Type not yet set so set from field/method (will only be set if we are imposing the type due to Java generics TypeVariable usage)
@@ -521,17 +521,15 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             {
                 if (getType().isArray() && getType().getComponentType().isInterface())
                 {
-                    isPcClass = 
-                        (mmgr.getMetaDataForClassInternal(getType().getComponentType(), clr) != null);
+                    isPcClass = mmgr.getMetaDataForClassInternal(getType().getComponentType(), clr) != null;
                 }
                 else if (getType().isInterface())
                 {
-                    isPcClass = (mmgr.getMetaDataForClassInternal(getType(), clr) != null);
+                    isPcClass = mmgr.getMetaDataForClassInternal(getType(), clr) != null;
                 }
             }
 
-            persistenceModifier = getDefaultFieldPersistenceModifier(getType(), memberRepresented.getModifiers(),
-                isPcClass, mmgr);
+            persistenceModifier = getDefaultFieldPersistenceModifier(getType(), memberRepresented.getModifiers(), isPcClass, mmgr);
         }
         // TODO If this field is NONE in superclass, make it NONE here too
 
@@ -1218,7 +1216,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     public void setValueStrategy(String strategy)
     {
-        this.valueStrategy = (strategy == null ? null : IdentityStrategy.getIdentityStrategy(strategy));
+        this.valueStrategy = strategy == null ? null : IdentityStrategy.getIdentityStrategy(strategy);
     }
 
     /**
@@ -1247,7 +1245,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      */
     public void setSequence(String sequence)
     {
-        this.sequence = (StringUtils.isWhitespace(sequence) ? null : sequence);
+        this.sequence = StringUtils.isWhitespace(sequence) ? null : sequence;
     }
 
     public boolean isCacheable()
@@ -1430,7 +1428,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      */
     public boolean fieldBelongsToClass()
     {
-        return (className == null);
+        return className == null;
     }
 
     /**
@@ -1674,7 +1672,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     public AbstractMemberMetaData setColumn(String col)
     {
-        this.column = (StringUtils.isWhitespace(col) ? null : col);
+        this.column = StringUtils.isWhitespace(col) ? null : col;
         return this;
     }
 
@@ -1685,7 +1683,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     public AbstractMemberMetaData setTable(String table)
     {
-        this.table = (StringUtils.isWhitespace(table) ? null : table);
+        this.table = StringUtils.isWhitespace(table) ? null : table;
         return this;
     }
 
@@ -1696,7 +1694,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     public AbstractMemberMetaData setCatalog(String catalog)
     {
-        this.catalog = (StringUtils.isWhitespace(catalog) ? null : catalog);
+        this.catalog = StringUtils.isWhitespace(catalog) ? null : catalog;
         return this;
     }
 
@@ -1707,7 +1705,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     public AbstractMemberMetaData setSchema(String schema)
     {
-        this.schema = (StringUtils.isWhitespace(schema) ? null : schema);
+        this.schema = StringUtils.isWhitespace(schema) ? null : schema;
         return this;
     }
 
@@ -1890,7 +1888,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     public void setMappedBy(String mappedBy)
     {
-        this.mappedBy = (StringUtils.isWhitespace(mappedBy) ? null : mappedBy);
+        this.mappedBy = StringUtils.isWhitespace(mappedBy) ? null : mappedBy;
     }
 
     /**
@@ -2018,7 +2016,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      */
     public boolean hasContainer()
     {
-        return (containerMetaData != null);
+        return containerMetaData != null;
     }
 
     /**
@@ -2862,7 +2860,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         else if (relationType == RelationType.MANY_TO_MANY_BI || relationType == RelationType.MANY_TO_ONE_BI ||
             relationType == RelationType.ONE_TO_MANY_BI || relationType == RelationType.ONE_TO_ONE_BI)
         {
-            return (mappedBy == null);
+            return mappedBy == null;
         }
         else if (relationType == RelationType.MANY_TO_ONE_UNI)
         {

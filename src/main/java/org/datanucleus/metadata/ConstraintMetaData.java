@@ -82,7 +82,7 @@ public class ConstraintMetaData extends MetaData
 
     public void setName(String name)
     {
-        this.name = (StringUtils.isWhitespace(name) ? null : name);
+        this.name = StringUtils.isWhitespace(name) ? null : name;
     }
 
     public String getTable()
@@ -92,7 +92,7 @@ public class ConstraintMetaData extends MetaData
 
     public void setTable(String table)
     {
-        this.table = (StringUtils.isWhitespace(table) ? null : table);
+        this.table = StringUtils.isWhitespace(table) ? null : table;
     }
 
     /**
@@ -119,7 +119,7 @@ public class ConstraintMetaData extends MetaData
 
     public int getNumberOfMembers()
     {
-        return (memberNames != null ? memberNames.size() : 0);
+        return memberNames != null ? memberNames.size() : 0;
     }
 
     /**
@@ -146,6 +146,6 @@ public class ConstraintMetaData extends MetaData
 
     public int getNumberOfColumns()
     {
-        return (columnNames != null ? columnNames.size() : 0);
+        return columnNames != null ? columnNames.size() : 0;
     }
 }

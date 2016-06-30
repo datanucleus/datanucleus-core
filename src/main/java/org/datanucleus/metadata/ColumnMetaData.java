@@ -110,7 +110,7 @@ public class ColumnMetaData extends MetaData
 
     public ColumnMetaData setDefaultValue(String defaultValue)
     {
-        this.defaultValue = (StringUtils.isWhitespace(defaultValue) ? null : defaultValue);
+        this.defaultValue = StringUtils.isWhitespace(defaultValue) ? null : defaultValue;
         return this;
     }
 
@@ -151,7 +151,7 @@ public class ColumnMetaData extends MetaData
 
     public ColumnMetaData setInsertValue(String insertValue)
     {
-        this.insertValue = (StringUtils.isWhitespace(insertValue) ? null : insertValue);
+        this.insertValue = StringUtils.isWhitespace(insertValue) ? null : insertValue;
         return this;
     }
 
@@ -230,7 +230,7 @@ public class ColumnMetaData extends MetaData
 
     public ColumnMetaData setName(String name)
     {
-        this.name = (StringUtils.isWhitespace(name) ? null : name);
+        this.name = StringUtils.isWhitespace(name) ? null : name;
         return this;
     }
 
@@ -274,7 +274,7 @@ public class ColumnMetaData extends MetaData
 
     public ColumnMetaData setSqlType(String sqlType)
     {
-        this.sqlType = (StringUtils.isWhitespace(sqlType) ? null : sqlType);
+        this.sqlType = StringUtils.isWhitespace(sqlType) ? null : sqlType;
         return this;
     }
 
@@ -285,7 +285,7 @@ public class ColumnMetaData extends MetaData
 
     public ColumnMetaData setTarget(String target)
     {
-        this.target = (StringUtils.isWhitespace(target) ? null : target);
+        this.target = StringUtils.isWhitespace(target) ? null : target;
         return this;
     }
 
@@ -296,7 +296,7 @@ public class ColumnMetaData extends MetaData
 
     public ColumnMetaData setTargetMember(String targetMember)
     {
-        this.targetMember = (StringUtils.isWhitespace(targetMember) ? null : targetMember);
+        this.targetMember = StringUtils.isWhitespace(targetMember) ? null : targetMember;
         return this;
     }
 

@@ -46,9 +46,9 @@ public class ExtensionMetaData implements Serializable
      */
     public ExtensionMetaData(String vendorName, String key, String value)
     {
-        this.vendorName = (StringUtils.isWhitespace(vendorName) ? null : vendorName);
-        this.key = (StringUtils.isWhitespace(key) ? null : key);
-        this.value = (StringUtils.isWhitespace(value) ? null : value);
+        this.vendorName = StringUtils.isWhitespace(vendorName) ? null : vendorName;
+        this.key = StringUtils.isWhitespace(key) ? null : key;
+        this.value = StringUtils.isWhitespace(value) ? null : value;
     }
 
     /**

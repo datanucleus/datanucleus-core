@@ -426,7 +426,7 @@ public class MapMetaData extends ContainerMetaData
 
     public boolean keyIsPersistent()
     {
-        return (key.classMetaData != null);
+        return key.classMetaData != null;
     }
 
     /**
@@ -470,7 +470,7 @@ public class MapMetaData extends ContainerMetaData
 
     public boolean valueIsPersistent()
     {
-        return (value.classMetaData != null);
+        return value.classMetaData != null;
     }
 
     /**

@@ -142,8 +142,7 @@ public class FileMetaData extends MetaData
      */
     public QueryMetaData[] getQueries()
     {
-        return (queries == null ? null : 
-            (QueryMetaData[])queries.toArray(new QueryMetaData[queries.size()]));
+        return queries == null ? null : (QueryMetaData[])queries.toArray(new QueryMetaData[queries.size()]);
     }
 
     /**
@@ -161,8 +160,7 @@ public class FileMetaData extends MetaData
      */
     public StoredProcQueryMetaData[] getStoredProcQueries()
     {
-        return (storedProcs == null ? null : 
-            (StoredProcQueryMetaData[])storedProcs.toArray(new StoredProcQueryMetaData[storedProcs.size()]));
+        return storedProcs == null ? null : (StoredProcQueryMetaData[])storedProcs.toArray(new StoredProcQueryMetaData[storedProcs.size()]);
     }
 
     /**
@@ -180,8 +178,7 @@ public class FileMetaData extends MetaData
      */
     public FetchPlanMetaData[] getFetchPlans()
     {
-        return (fetchPlans == null ? null : 
-            (FetchPlanMetaData[])fetchPlans.toArray(new FetchPlanMetaData[fetchPlans.size()]));
+        return fetchPlans == null ? null : (FetchPlanMetaData[])fetchPlans.toArray(new FetchPlanMetaData[fetchPlans.size()]);
     }
 
     /**

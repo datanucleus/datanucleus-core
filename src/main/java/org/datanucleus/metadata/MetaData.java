@@ -290,22 +290,22 @@ public class MetaData implements Serializable
 
     public boolean isPopulated()
     {
-        return (metaDataState >= METADATA_POPULATED_STATE);
+        return metaDataState >= METADATA_POPULATED_STATE;
     }
 
     public boolean isInitialised()
     {
-        return (metaDataState >= METADATA_INITIALISED_STATE);
+        return metaDataState >= METADATA_INITIALISED_STATE;
     }
 
     public boolean isUsed()
     {
-        return (metaDataState == METADATA_USED_STATE);
+        return metaDataState == METADATA_USED_STATE;
     }
 
     public int getNoOfExtensions()
     {
-        return (extensions != null ? extensions.size() : 0);
+        return extensions != null ? extensions.size() : 0;
     }
 
     public ExtensionMetaData[] getExtensions()
@@ -361,9 +361,8 @@ public class MetaData implements Serializable
     }
 
     /**
-     * Accessor for the value of a particular extension, but
-     * splitting it into separate parts. This is for extension tags that have a
-     * value as comma separated.
+     * Accessor for the value of a particular extension, but splitting it into separate parts. 
+     * This is for extension tags that have a value as comma separated.
      * @param key The key of the extension
      * @return The value(s) of the extension (null if not existing)
      */

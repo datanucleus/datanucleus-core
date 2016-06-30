@@ -92,7 +92,7 @@ class ContainerComponent implements Serializable
 
     public void setType(String type)
     {
-        this.type = (StringUtils.isWhitespace(type) ? null : type);
+        this.type = StringUtils.isWhitespace(type) ? null : type;
     }
 
     /**

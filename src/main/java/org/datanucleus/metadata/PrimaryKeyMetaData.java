@@ -50,7 +50,7 @@ public class PrimaryKeyMetaData extends MetaData implements ColumnMetaDataContai
 
     public PrimaryKeyMetaData setName(String name)
     {
-        this.name = (StringUtils.isWhitespace(name) ? null : name);
+        this.name = StringUtils.isWhitespace(name) ? null : name;
         return this;
     }
 
@@ -58,7 +58,7 @@ public class PrimaryKeyMetaData extends MetaData implements ColumnMetaDataContai
     {
         if (!StringUtils.isWhitespace(name))
         {
-            this.columnName = (StringUtils.isWhitespace(name) ? null : name);
+            this.columnName = StringUtils.isWhitespace(name) ? null : name;
             if (columns == null)
             {
                 ColumnMetaData colmd = newColumnMetadata();

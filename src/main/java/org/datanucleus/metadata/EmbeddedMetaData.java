@@ -415,7 +415,7 @@ public class EmbeddedMetaData extends MetaData
 
     public EmbeddedMetaData setOwnerMember(String ownerMember)
     {
-        this.ownerMember = (StringUtils.isWhitespace(ownerMember) ? null : ownerMember);
+        this.ownerMember = StringUtils.isWhitespace(ownerMember) ? null : ownerMember;
         return this;
     }
 
@@ -426,7 +426,7 @@ public class EmbeddedMetaData extends MetaData
 
     public EmbeddedMetaData setNullIndicatorColumn(String column)
     {
-        this.nullIndicatorColumn = (StringUtils.isWhitespace(column) ? null : column);
+        this.nullIndicatorColumn = StringUtils.isWhitespace(column) ? null : column;
         return this;
     }
 
@@ -437,7 +437,7 @@ public class EmbeddedMetaData extends MetaData
 
     public EmbeddedMetaData setNullIndicatorValue(String value)
     {
-        this.nullIndicatorValue = (StringUtils.isWhitespace(value) ? null : value);
+        this.nullIndicatorValue = StringUtils.isWhitespace(value) ? null : value;
         return this;
     }
 

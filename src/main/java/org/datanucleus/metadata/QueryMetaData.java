@@ -69,7 +69,7 @@ public class QueryMetaData extends MetaData
 
     public QueryMetaData setScope(String scope)
     {
-        this.scope = (StringUtils.isWhitespace(scope) ? null : scope);
+        this.scope = StringUtils.isWhitespace(scope) ? null : scope;
         return this;
     }
 
@@ -135,7 +135,7 @@ public class QueryMetaData extends MetaData
 
     public QueryMetaData setResultClass(String resultClass)
     {
-        this.resultClass = (StringUtils.isWhitespace(resultClass) ? null : resultClass);
+        this.resultClass = StringUtils.isWhitespace(resultClass) ? null : resultClass;
         return this;
     }
 
@@ -146,7 +146,7 @@ public class QueryMetaData extends MetaData
 
     public QueryMetaData setResultMetaDataName(String mdName)
     {
-        this.resultMetaDataName = (StringUtils.isWhitespace(mdName) ? null : mdName);
+        this.resultMetaDataName = StringUtils.isWhitespace(mdName) ? null : mdName;
         return this;
     }
 
@@ -177,7 +177,7 @@ public class QueryMetaData extends MetaData
 
     public QueryMetaData setFetchPlanName(String fpName)
     {
-        this.fetchPlanName = (StringUtils.isWhitespace(fpName) ? null : fpName);
+        this.fetchPlanName = StringUtils.isWhitespace(fpName) ? null : fpName;
         return this;
     }
 

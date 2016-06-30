@@ -1472,7 +1472,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         {
             return false;
         }
-        return (acmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE);
+        return acmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE;
     }
 
     /* (non-Javadoc)
@@ -1510,8 +1510,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         {
             return false;
         }
-        
-        return (classMetaDataByClass.get(className) != null);
+
+        return classMetaDataByClass.get(className) != null;
     }
 
 
@@ -1779,7 +1779,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     public AbstractMemberMetaData readMetaDataForMember(String className, String memberName)
     {
         AbstractClassMetaData cmd = readMetaDataForClass(className);
-        return (cmd != null ? cmd.getMetaDataForMember(memberName) : null);
+        return cmd != null ? cmd.getMetaDataForMember(memberName) : null;
     }
 
     /* (non-Javadoc)
@@ -3009,7 +3009,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     public String[] getConcreteSubclassesForClass(String className)
     {
         Set<String> concreteSubclasses = concreteSubclassNamesByClassName.get(className);
-        return (concreteSubclasses == null ? null : concreteSubclasses.toArray(new String[concreteSubclasses.size()]));
+        return concreteSubclasses == null ? null : concreteSubclasses.toArray(new String[concreteSubclasses.size()]);
     }
 
     /* (non-Javadoc)

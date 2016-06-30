@@ -164,7 +164,7 @@ public class OrderMetaData extends MetaData implements ColumnMetaDataContainer
 
     public OrderMetaData setMappedBy(String mappedby)
     {
-        this.mappedBy = (StringUtils.isWhitespace(mappedby) ? null : mappedby);
+        this.mappedBy = StringUtils.isWhitespace(mappedby) ? null : mappedby;
         return this;
     }
 
@@ -253,8 +253,7 @@ public class OrderMetaData extends MetaData implements ColumnMetaDataContainer
             // "ordered List", so split the ordering into its components
             FieldOrder[] theOrders = null;
             AbstractMemberMetaData fmd = (AbstractMemberMetaData)parent;
-            AbstractClassMetaData elementCmd =
-                (fmd.hasCollection() ? fmd.getCollection().element.classMetaData : fmd.getArray().element.classMetaData);
+            AbstractClassMetaData elementCmd = fmd.hasCollection() ? fmd.getCollection().element.classMetaData : fmd.getArray().element.classMetaData;
             if (elementCmd != null && ordering.equals("#PK"))
             {
                 // Order using the PK of the element PC

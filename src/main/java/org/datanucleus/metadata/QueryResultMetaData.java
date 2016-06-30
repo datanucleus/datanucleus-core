@@ -81,7 +81,7 @@ public class QueryResultMetaData extends MetaData
         }
         PersistentTypeMapping m = new PersistentTypeMapping();
         m.className = className;
-        m.discriminatorColumn = (StringUtils.isWhitespace(discrimColumn) ? null : discrimColumn);
+        m.discriminatorColumn = StringUtils.isWhitespace(discrimColumn) ? null : discrimColumn;
         m.fieldColumnMap = fieldColumnMap;
         persistentTypeMappings.add(m);
     }

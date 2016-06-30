@@ -72,7 +72,7 @@ public class SequenceMetaData extends MetaData
 
     public SequenceMetaData setName(String name)
     {
-        this.name = (StringUtils.isWhitespace(name) ? this.name : name);
+        this.name = StringUtils.isWhitespace(name) ? this.name : name;
         return this;
     }
 
@@ -94,7 +94,7 @@ public class SequenceMetaData extends MetaData
 
     public SequenceMetaData setDatastoreSequence(String datastoreSequence)
     {
-        this.datastoreSequence = (StringUtils.isWhitespace(datastoreSequence) ? null : datastoreSequence);
+        this.datastoreSequence = StringUtils.isWhitespace(datastoreSequence) ? null : datastoreSequence;
         return this;
     }
 
@@ -105,7 +105,7 @@ public class SequenceMetaData extends MetaData
 
     public SequenceMetaData setFactoryClass(String factoryClass)
     {
-        this.factoryClass = (StringUtils.isWhitespace(factoryClass) ? null : factoryClass);
+        this.factoryClass = StringUtils.isWhitespace(factoryClass) ? null : factoryClass;
         return this;
     }
 

@@ -102,7 +102,7 @@ public class FetchGroupMetaData extends MetaData
 
     public int getNumberOfMembers()
     {
-        return (members != null ? members.size() : 0);
+        return members != null ? members.size() : 0;
     }
 
     /**
@@ -113,7 +113,7 @@ public class FetchGroupMetaData extends MetaData
     {
         if (fetchGroups == null)
         {
-            fetchGroups = new HashSet<FetchGroupMetaData>();
+            fetchGroups = new HashSet<>();
         }
         fetchGroups.add(fgmd);
         fgmd.parent = this;
@@ -127,7 +127,7 @@ public class FetchGroupMetaData extends MetaData
     {
         if (members == null)
         {
-            members = new HashSet<FetchGroupMemberMetaData>();
+            members = new HashSet<>();
         }
         members.add(fgmmd);
         fgmmd.parent = this;

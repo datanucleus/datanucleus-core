@@ -190,7 +190,7 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
 
     public void setMappedBy(String mappedBy)
     {
-        this.mappedBy = (StringUtils.isWhitespace(mappedBy) ? null : mappedBy);
+        this.mappedBy = StringUtils.isWhitespace(mappedBy) ? null : mappedBy;
     }
 
     public IndexedValue getIndexed()

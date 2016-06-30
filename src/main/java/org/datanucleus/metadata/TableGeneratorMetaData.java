@@ -89,7 +89,7 @@ public class TableGeneratorMetaData extends MetaData
 
     public TableGeneratorMetaData setTableName(String tableName)
     {
-        this.tableName = (StringUtils.isWhitespace(tableName) ? null : tableName);
+        this.tableName = StringUtils.isWhitespace(tableName) ? null : tableName;
         return this;
     }
 
@@ -100,7 +100,7 @@ public class TableGeneratorMetaData extends MetaData
 
     public TableGeneratorMetaData setCatalogName(String catalogName)
     {
-        this.catalogName = (StringUtils.isWhitespace(catalogName) ? null : catalogName);
+        this.catalogName = StringUtils.isWhitespace(catalogName) ? null : catalogName;
         return this;
     }
 
@@ -111,7 +111,7 @@ public class TableGeneratorMetaData extends MetaData
 
     public TableGeneratorMetaData setSchemaName(String schemaName)
     {
-        this.schemaName = (StringUtils.isWhitespace(schemaName) ? null : schemaName);
+        this.schemaName = StringUtils.isWhitespace(schemaName) ? null : schemaName;
         return this;
     }
 
@@ -122,7 +122,7 @@ public class TableGeneratorMetaData extends MetaData
 
     public TableGeneratorMetaData setPKColumnName(String pkColumnName)
     {
-        this.pkColumnName = (StringUtils.isWhitespace(pkColumnName) ? null : pkColumnName);
+        this.pkColumnName = StringUtils.isWhitespace(pkColumnName) ? null : pkColumnName;
         return this;
     }
 
@@ -133,7 +133,7 @@ public class TableGeneratorMetaData extends MetaData
 
     public TableGeneratorMetaData setValueColumnName(String valueColumnName)
     {
-        this.valueColumnName = (StringUtils.isWhitespace(valueColumnName) ? null : valueColumnName);
+        this.valueColumnName = StringUtils.isWhitespace(valueColumnName) ? null : valueColumnName;
         return this;
     }
 
@@ -144,7 +144,7 @@ public class TableGeneratorMetaData extends MetaData
 
     public TableGeneratorMetaData setPKColumnValue(String pkColumnValue)
     {
-        this.pkColumnValue = (StringUtils.isWhitespace(pkColumnValue) ? null : pkColumnValue);
+        this.pkColumnValue = StringUtils.isWhitespace(pkColumnValue) ? null : pkColumnValue;
         return this;
     }
 

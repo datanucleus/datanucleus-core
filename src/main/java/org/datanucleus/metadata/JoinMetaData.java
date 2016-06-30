@@ -237,7 +237,7 @@ public class JoinMetaData extends MetaData implements ColumnMetaDataContainer
 
     public JoinMetaData setTable(String table)
     {
-        this.table = (StringUtils.isWhitespace(table) ? null : table);
+        this.table = StringUtils.isWhitespace(table) ? null : table;
         return this;
     }
 
@@ -248,7 +248,7 @@ public class JoinMetaData extends MetaData implements ColumnMetaDataContainer
 
     public JoinMetaData setCatalog(String catalog)
     {
-        this.catalog = (StringUtils.isWhitespace(catalog) ? null : catalog);
+        this.catalog = StringUtils.isWhitespace(catalog) ? null : catalog;
         return this;
     }
 
@@ -259,7 +259,7 @@ public class JoinMetaData extends MetaData implements ColumnMetaDataContainer
 
     public JoinMetaData setSchema(String schema)
     {
-        this.schema = (StringUtils.isWhitespace(schema) ? null : schema);
+        this.schema = StringUtils.isWhitespace(schema) ? null : schema;
         return this;
     }
 

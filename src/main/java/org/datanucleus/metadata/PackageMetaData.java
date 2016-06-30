@@ -60,7 +60,7 @@ public class PackageMetaData extends MetaData
      */
     PackageMetaData(final String name)
     {
-        this.name = (name != null ? name : "");
+        this.name = name != null ? name : "";
     }
 
     public void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
@@ -209,7 +209,7 @@ public class PackageMetaData extends MetaData
      */
     public SequenceMetaData[] getSequences()
     {
-        return (sequences == null ? null : (SequenceMetaData[])sequences.toArray(new SequenceMetaData[sequences.size()]));
+        return sequences == null ? null : (SequenceMetaData[])sequences.toArray(new SequenceMetaData[sequences.size()]);
     }
 
     /**
@@ -246,7 +246,7 @@ public class PackageMetaData extends MetaData
      */
     public TableGeneratorMetaData[] getTableGenerators()
     {
-        return (tableGenerators == null ? null : (TableGeneratorMetaData[])tableGenerators.toArray(new TableGeneratorMetaData[tableGenerators.size()]));
+        return tableGenerators == null ? null : (TableGeneratorMetaData[])tableGenerators.toArray(new TableGeneratorMetaData[tableGenerators.size()]);
     }
 
     /**
@@ -444,13 +444,13 @@ public class PackageMetaData extends MetaData
 
     public PackageMetaData setCatalog(String catalog)
     {
-        this.catalog = (StringUtils.isWhitespace(catalog) ? null : catalog);
+        this.catalog = StringUtils.isWhitespace(catalog) ? null : catalog;
         return this;
     }
 
     public PackageMetaData setSchema(String schema)
     {
-        this.schema = (StringUtils.isWhitespace(schema) ? null : schema);
+        this.schema = StringUtils.isWhitespace(schema) ? null : schema;
         return this;
     }
 

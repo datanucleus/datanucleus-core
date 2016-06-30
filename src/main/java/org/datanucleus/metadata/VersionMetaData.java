@@ -200,7 +200,7 @@ public class VersionMetaData extends MetaData
 
     public VersionMetaData setColumnName(String columnName)
     {
-        this.columnName = (StringUtils.isWhitespace(columnName) ? null : columnName);
+        this.columnName = StringUtils.isWhitespace(columnName) ? null : columnName;
         return this;
     }
 
