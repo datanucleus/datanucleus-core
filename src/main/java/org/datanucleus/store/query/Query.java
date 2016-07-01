@@ -249,7 +249,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         this.ignoreCache = ec.getBooleanProperty(PropertyNames.PROPERTY_IGNORE_CACHE);
         this.readTimeoutMillis = ec.getIntProperty(PropertyNames.PROPERTY_DATASTORE_READ_TIMEOUT);
         this.writeTimeoutMillis = ec.getIntProperty(PropertyNames.PROPERTY_DATASTORE_WRITE_TIMEOUT);
-        this.serializeRead = (ec.getTransaction() != null ? ec.getTransaction().getSerializeRead() : null);
+        this.serializeRead = ec.getTransaction() != null ? ec.getTransaction().getSerializeRead() : null;
 
         boolean closeAtEcClose = getBooleanExtensionProperty(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE, false);
         if (closeAtEcClose)
@@ -590,7 +590,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      */
     public void setExtensions(Map extensions)
     {
-        this.extensions = (extensions != null ? new HashMap(extensions) : null);
+        this.extensions = extensions != null ? new HashMap(extensions) : null;
         if (extensions != null && extensions.containsKey(EXTENSION_EXCLUDE_SUBCLASSES))
         {
             subclasses = !getBooleanExtensionProperty(EXTENSION_EXCLUDE_SUBCLASSES, false);
@@ -616,7 +616,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      */
     public Object getExtension(String key)
     {
-        return (extensions != null ? extensions.get(key) : null);
+        return extensions != null ? extensions.get(key) : null;
     }
 
     /**
@@ -665,7 +665,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         }
 
         String value = ec.getNucleusContext().getConfiguration().getStringProperty(name);
-        return (value != null ? value : resultIfNotSet);
+        return value != null ? value : resultIfNotSet;
     }
 
     /**
@@ -795,7 +795,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         discardCompiled();
         assertIsModifiable();
 
-        this.candidateClassName = (candidateClass != null ? candidateClass.getName() : null);
+        this.candidateClassName = candidateClass != null ? candidateClass.getName() : null;
         this.candidateClass = candidateClass;
     }
 
@@ -805,7 +805,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      */
     public void setCandidateClassName(String candidateClassName)
     {
-        this.candidateClassName = (candidateClassName != null ? candidateClassName.trim() : null);
+        this.candidateClassName = candidateClassName != null ? candidateClassName.trim() : null;
     }
 
     /**
@@ -872,7 +872,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     {
         discardCompiled();
         assertIsModifiable();
-        this.filter = (StringUtils.isWhitespace(filter) ? null : StringUtils.removeSpecialTagsFromString(filter).trim());
+        this.filter = StringUtils.isWhitespace(filter) ? null : StringUtils.removeSpecialTagsFromString(filter).trim();
     }
 
     /**
@@ -892,7 +892,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     {
         discardCompiled();
         assertIsModifiable();
-        this.imports = (StringUtils.isWhitespace(imports) ? null : StringUtils.removeSpecialTagsFromString(imports).trim());
+        this.imports = StringUtils.isWhitespace(imports) ? null : StringUtils.removeSpecialTagsFromString(imports).trim();
     }
 
     /**
@@ -912,7 +912,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     {
         discardCompiled();
         assertIsModifiable();
-        this.explicitParameters = (StringUtils.isWhitespace(parameters) ? null : StringUtils.removeSpecialTagsFromString(parameters).trim());
+        this.explicitParameters = StringUtils.isWhitespace(parameters) ? null : StringUtils.removeSpecialTagsFromString(parameters).trim();
     }
 
     /**
@@ -932,7 +932,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     {
         discardCompiled();
         assertIsModifiable();
-        this.explicitVariables = (StringUtils.isWhitespace(variables) ? null : StringUtils.removeSpecialTagsFromString(variables).trim());
+        this.explicitVariables = StringUtils.isWhitespace(variables) ? null : StringUtils.removeSpecialTagsFromString(variables).trim();
     }
 
     /**
@@ -1108,7 +1108,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         discardCompiled();
         assertIsModifiable();
 
-        this.ordering = (ordering != null ? ordering.trim() : null);
+        this.ordering = ordering != null ? ordering.trim() : null;
     }
 
     /**
@@ -1129,7 +1129,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         discardCompiled();
         assertIsModifiable();
 
-        this.grouping = (grouping != null ? grouping.trim() : null);
+        this.grouping = grouping != null ? grouping.trim() : null;
     }
 
     /**
@@ -1150,7 +1150,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         discardCompiled();
         assertIsModifiable();
 
-        this.having = (having != null ? having.trim() : null);
+        this.having = having != null ? having.trim() : null;
     }
 
     /**
@@ -1338,7 +1338,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         assertIsModifiable();
 
         // Should be overridden if wanting specific handling of result "distinct"
-        this.result = (result != null ? result.trim() : null);
+        this.result = result != null ? result.trim() : null;
     }
 
     /**
@@ -1688,7 +1688,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      */
     public boolean hasSubqueryForVariable(String variableName)
     {
-        return (subqueries == null ? false : subqueries.containsKey(variableName));
+        return subqueries == null ? false : subqueries.containsKey(variableName);
     }
 
     /**
@@ -2563,8 +2563,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     {
         try
         {
-            return getParsedImports().resolveClassDeclaration(classDecl, ec.getClassLoaderResolver(), 
-                (candidateClass == null ? null : candidateClass.getClassLoader()));
+            return getParsedImports().resolveClassDeclaration(classDecl, ec.getClassLoaderResolver(), candidateClass == null ? null : candidateClass.getClassLoader());
         }
         catch (ClassNotResolvedException e)
         {

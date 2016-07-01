@@ -61,25 +61,25 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
     {
         super(storeMgr, ec);
 
-        candidateClass = (q!=null ? q.candidateClass : null);
-        candidateClassName = (q!=null ? q.candidateClassName : null);
-        from = (q!=null ? q.from : null);
-        subclasses = (q!=null ? q.subclasses : true);
-        filter = (q!=null ? q.filter : null);
-        imports = (q!=null ? q.imports : null);
-        explicitVariables = (q!=null ? q.explicitVariables : null);
-        explicitParameters = (q!=null ? q.explicitParameters : null);
-        grouping = (q!=null ? q.grouping : null);
-        ordering = (q!=null ? q.ordering : null);
-        update = (q!=null ? q.update : null);
-        result = (q!=null ? q.result : null);
-        resultClass = (q!=null ? q.resultClass : null);
-        resultDistinct = (q!=null ? q.resultDistinct : false);
-        range = (q!=null ? q.range : null);
-        fromInclNo = (q!=null ? q.fromInclNo : 0);
-        toExclNo = (q!=null ? q.toExclNo : Long.MAX_VALUE);
-        fromInclParam = (q!=null ? q.fromInclParam : null);
-        toExclParam = (q!=null ? q.toExclParam : null);
+        candidateClass = q!=null ? q.candidateClass : null;
+        candidateClassName = q!=null ? q.candidateClassName : null;
+        from = q!=null ? q.from : null;
+        subclasses = q!=null ? q.subclasses : true;
+        filter = q!=null ? q.filter : null;
+        imports = q!=null ? q.imports : null;
+        explicitVariables = q!=null ? q.explicitVariables : null;
+        explicitParameters = q!=null ? q.explicitParameters : null;
+        grouping = q!=null ? q.grouping : null;
+        ordering = q!=null ? q.ordering : null;
+        update = q!=null ? q.update : null;
+        result = q!=null ? q.result : null;
+        resultClass = q!=null ? q.resultClass : null;
+        resultDistinct = q!=null ? q.resultDistinct : false;
+        range = q!=null ? q.range : null;
+        fromInclNo = q!=null ? q.fromInclNo : 0;
+        toExclNo = q!=null ? q.toExclNo : Long.MAX_VALUE;
+        fromInclParam = q!=null ? q.fromInclParam : null;
+        toExclParam = q!=null ? q.toExclParam : null;
         if (q != null)
         {
             ignoreCache = q.ignoreCache;

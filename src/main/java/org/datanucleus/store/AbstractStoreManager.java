@@ -838,7 +838,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     {
         if (category.equalsIgnoreCase("DATASTORE"))
         {
-            ps.println(Localiser.msg("032020", storeManagerKey, getConnectionURL(), (getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY) ? "read-only" : "read-write")));
+            ps.println(Localiser.msg("032020", storeManagerKey, getConnectionURL(), getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY) ? "read-only" : "read-write"));
         }
     }
 
@@ -994,7 +994,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         // Find if datastore=storeManagerKey has an extension for name="{language}"
         String name = getNucleusContext().getPluginManager().getAttributeValueForExtension("org.datanucleus.store_query_query",
             new String[] {"name", "datastore"}, new String[]{language, storeManagerKey}, "name");
-        return (name != null);
+        return name != null;
     }
 
     /* (non-Javadoc)

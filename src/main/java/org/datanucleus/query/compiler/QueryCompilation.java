@@ -143,7 +143,7 @@ public class QueryCompilation implements Serializable
      */
     public QueryCompilation getCompilationForSubquery(String alias)
     {
-        return (subqueryCompilations != null ? subqueryCompilations.get(alias) : null);
+        return subqueryCompilations != null ? subqueryCompilations.get(alias) : null;
     }
 
     /**

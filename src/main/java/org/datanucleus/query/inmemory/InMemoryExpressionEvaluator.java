@@ -105,7 +105,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
     {
         this.ec = ec;
         this.queryMgr = ec.getStoreManager().getQueryManager();
-        this.parameterValues = (params != null ? params : new HashMap());
+        this.parameterValues = params != null ? params : new HashMap();
         this.state = state;
         this.imports = imports;
         this.clr = clr;
@@ -602,7 +602,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
         }
 
         Boolean leftExpr = (Boolean)left;
-        Boolean result = (leftExpr.booleanValue() ? Boolean.FALSE : Boolean.TRUE);
+        Boolean result = leftExpr.booleanValue() ? Boolean.FALSE : Boolean.TRUE;
         stack.push(result);
         return stack.peek();
     }
@@ -770,7 +770,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
      */
     protected Object processPrimaryExpression(PrimaryExpression expr)
     {
-        Object paramValue = (parameterValues != null ? parameterValues.get(expr.getId()) : null);
+        Object paramValue = parameterValues != null ? parameterValues.get(expr.getId()) : null;
         if (expr.getLeft() == null && paramValue != null)
         {
             // Explicit Parameter
@@ -952,7 +952,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                 QueryUtils.getValueForParameterExpression(parameterValues, (ParameterExpression)invokeExpr.getLeft());
 
             // Invoke method on this object
-            Class invokedType = (invokedValue != null ? invokedValue.getClass() : invokeExpr.getLeft().getSymbol().getValueType());
+            Class invokedType = invokedValue != null ? invokedValue.getClass() : invokeExpr.getLeft().getSymbol().getValueType();
             InvocationEvaluator methodEval = queryMgr.getInMemoryEvaluatorForMethod(invokedType, method);
             if (methodEval != null)
             {
@@ -972,7 +972,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             }
 
             // Invoke method on this object
-            Class invokedType = (invokedValue != null ? invokedValue.getClass() : invokeExpr.getLeft().getSymbol().getValueType());
+            Class invokedType = invokedValue != null ? invokedValue.getClass() : invokeExpr.getLeft().getSymbol().getValueType();
             InvocationEvaluator methodEval = queryMgr.getInMemoryEvaluatorForMethod(invokedType, method);
             if (methodEval != null)
             {
@@ -988,8 +988,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             Object invokedValue = getValueForInvokeExpression((InvokeExpression)invokeExpr.getLeft());
 
             // Invoke method on this object
-            Class invokedType = (invokedValue != null ? invokedValue.getClass() : 
-                (invokeExpr.getLeft().getSymbol() != null ? invokeExpr.getLeft().getSymbol().getValueType() : null));
+            Class invokedType = invokedValue != null ? invokedValue.getClass() : (invokeExpr.getLeft().getSymbol() != null ? invokeExpr.getLeft().getSymbol().getValueType() : null);
             if (invokedType == null)
             {
                 return new InMemoryFailure();
@@ -1009,7 +1008,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             Object invokedValue = getValueForVariableExpression((VariableExpression)invokeExpr.getLeft());
 
             // Invoke method on this object
-            Class invokedType = (invokedValue != null ? invokedValue.getClass() : invokeExpr.getLeft().getSymbol().getValueType());
+            Class invokedType = invokedValue != null ? invokedValue.getClass() : invokeExpr.getLeft().getSymbol().getValueType();
             InvocationEvaluator methodEval = queryMgr.getInMemoryEvaluatorForMethod(invokedType, method);
             if (methodEval != null)
             {
@@ -1025,7 +1024,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             Object invokedValue = ((Literal)invokeExpr.getLeft()).getLiteral();
 
             // Invoke method on this object
-            Class invokedType = (invokedValue != null ? invokedValue.getClass() : invokeExpr.getLeft().getSymbol().getValueType());
+            Class invokedType = invokedValue != null ? invokedValue.getClass() : invokeExpr.getLeft().getSymbol().getValueType();
             InvocationEvaluator methodEval = queryMgr.getInMemoryEvaluatorForMethod(invokedType, method);
             if (methodEval != null)
             {

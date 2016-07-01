@@ -55,7 +55,7 @@ public class PluginManager
             bundleCheckAction = props.getProperty("bundle-check-action");
         }
         String allowUserBundles = props.getProperty("allow-user-bundles");
-        boolean userBundles = (allowUserBundles != null ? Boolean.valueOf(allowUserBundles) : true);
+        boolean userBundles = allowUserBundles != null ? Boolean.valueOf(allowUserBundles) : true;
 
         registry = PluginRegistryFactory.newPluginRegistry(registryClassName, bundleCheckAction, userBundles, clr);
 
@@ -63,7 +63,7 @@ public class PluginManager
         registry.registerExtensionPoints();
         registry.registerExtensions();
 
-        String validateStr = (props.containsKey("validate-plugins") ? props.getProperty("validate-plugins") : "false");
+        String validateStr = props.containsKey("validate-plugins") ? props.getProperty("validate-plugins") : "false";
         if (validateStr.equalsIgnoreCase("true"))
         {
             registry.resolveConstraints();
@@ -398,7 +398,7 @@ public class PluginManager
      */
     public static PluginManager createPluginManager(Map props, ClassLoader loader)
     {
-        ClassLoaderResolver clr = (loader != null ? new ClassLoaderResolverImpl(loader) : new ClassLoaderResolverImpl());
+        ClassLoaderResolver clr = loader != null ? new ClassLoaderResolverImpl(loader) : new ClassLoaderResolverImpl();
         if (props != null)
         {
             clr.registerUserClassLoader((ClassLoader)props.get(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY));

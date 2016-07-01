@@ -327,7 +327,7 @@ public class AttachFieldManager extends AbstractFieldManager
             if (cascadeAttach)
             {
                 // Determine if field is persisted into the owning object (embedded/serialised)
-                boolean sco = (mmd.getEmbeddedMetaData() != null || mmd.isSerialized() || mmd.isEmbedded());
+                boolean sco = mmd.getEmbeddedMetaData() != null || mmd.isSerialized() || mmd.isEmbedded();
                 if (copy)
                 {
                     // Attach copy of the PC

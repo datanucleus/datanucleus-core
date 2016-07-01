@@ -72,7 +72,7 @@ public class ExpressionCompiler
             if (node.getChildNodes().size() > 1)
             {
                 String node1Value = (String)node.getNextChild().getNodeValue();
-                String node2Value = (node.hasNextChild() ? (String)node.getNextChild().getNodeValue() : null);
+                String node2Value = node.hasNextChild() ? (String)node.getNextChild().getNodeValue() : null;
                 String ordering = null;
                 String nullOrdering = null;
                 if (node1Value.equalsIgnoreCase("ascending") || node1Value.equalsIgnoreCase("descending"))

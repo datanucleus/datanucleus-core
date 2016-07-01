@@ -96,7 +96,7 @@ public abstract class AbstractEmulatedXAResource implements XAResource
     @Override
     public boolean isSameRM(XAResource xares) throws XAException
     {
-        return (this == xares);
+        return this == xares;
     }
 
     /* (non-Javadoc)

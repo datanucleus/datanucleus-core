@@ -164,7 +164,7 @@ public abstract class PropertyStore
         {
             if (obj instanceof Boolean)
             {
-                return ((Boolean)obj);
+                return (Boolean)obj;
             }
             else if (obj instanceof String)
             {
@@ -194,7 +194,7 @@ public abstract class PropertyStore
         {
             if (obj instanceof String)
             {
-                return ((String)obj);
+                return (String)obj;
             }
         }
         else

@@ -1610,8 +1610,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 loadUnloadedFieldsInFetchPlanAndVersion();
             }
 
-            if (!loadedFields[fieldNumber] || 
-                !(currentValue == null ? (newValue == null) : (currentValue.equals(newValue))))
+            if (!loadedFields[fieldNumber] || !(currentValue == null ? (newValue == null) : currentValue.equals(newValue)))
             {
                 if (cmd.getIdentityType() == IdentityType.NONDURABLE)
                 {

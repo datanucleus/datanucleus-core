@@ -491,8 +491,7 @@ public class QueryUtils
             }
             if (!fieldSet && NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(Localiser.msg("021207", 
-                    obj.getClass().getName(), setMethodName, (argType != null ? argType.getName() : null)));
+                NucleusLogger.QUERY.debug(Localiser.msg("021207", obj.getClass().getName(), setMethodName, argType != null ? argType.getName() : null));
             }
         }
 
@@ -1053,32 +1052,32 @@ public class QueryUtils
             if (op == Expression.OP_EQ)
             {
                 // Use equals()
-                return (leftStr != null ? leftStr.equals(rightStr) : (rightStr == null));
+                return leftStr != null ? leftStr.equals(rightStr) : (rightStr == null);
             }
             else if (op == Expression.OP_NOTEQ)
             {
                 // Use equals()
-                return (leftStr != null ? !leftStr.equals(rightStr) : (rightStr != null));
+                return leftStr != null ? !leftStr.equals(rightStr) : (rightStr != null);
             }
             else if (op == Expression.OP_GT)
             {
                 // Use Lexicographic comparison
-                return (leftStr != null ? leftStr.compareTo(rightStr) > 0 : false);
+                return leftStr != null ? leftStr.compareTo(rightStr) > 0 : false;
             }
             else if (op == Expression.OP_GTEQ)
             {
                 // Use Lexicographic comparison
-                return (leftStr != null ? leftStr.compareTo(rightStr) >= 0 : false);
+                return leftStr != null ? leftStr.compareTo(rightStr) >= 0 : false;
             }
             else if (op == Expression.OP_LT)
             {
                 // Use Lexicographic comparison
-                return (leftStr != null ? leftStr.compareTo(rightStr) < 0 : false);
+                return leftStr != null ? leftStr.compareTo(rightStr) < 0 : false;
             }
             else if (op == Expression.OP_LTEQ)
             {
                 // Use Lexicographic comparison
-                return (leftStr != null ? leftStr.compareTo(rightStr) <= 0 : false);
+                return leftStr != null ? leftStr.compareTo(rightStr) <= 0 : false;
             }
             else
             {
@@ -1150,19 +1149,19 @@ public class QueryUtils
                     Comparable rightC = (Comparable)right;
                     if (op == Expression.OP_GT)
                     {
-                        return (leftC.compareTo(rightC) > 0);
+                        return leftC.compareTo(rightC) > 0;
                     }
                     else if (op == Expression.OP_LT)
                     {
-                        return (leftC.compareTo(rightC) < 0);
+                        return leftC.compareTo(rightC) < 0;
                     }
                     else if (op == Expression.OP_LTEQ)
                     {
-                        return (leftC.compareTo(rightC) < 0 || leftC.compareTo(rightC) == 0);
+                        return leftC.compareTo(rightC) < 0 || leftC.compareTo(rightC) == 0;
                     }
                     else if (op == Expression.OP_GTEQ)
                     {
-                        return (leftC.compareTo(rightC) > 0 || leftC.compareTo(rightC) == 0);
+                        return leftC.compareTo(rightC) > 0 || leftC.compareTo(rightC) == 0;
                     }
                 }
 
@@ -1420,7 +1419,7 @@ public class QueryUtils
                         if (orderExpr.getNullOrder() != null)
                         {
                             // Use specified null handling
-                            return (orderExpr.getNullOrder() == NullOrderingType.NULLS_FIRST ? 1 : -1);
+                            return orderExpr.getNullOrder() == NullOrderingType.NULLS_FIRST ? 1 : -1;
                         }
                         return -1; // Default to putting nulls at the end
                     }
@@ -1429,7 +1428,7 @@ public class QueryUtils
                         if (orderExpr.getNullOrder() != null)
                         {
                             // Use specified null handling
-                            return (orderExpr.getNullOrder() == NullOrderingType.NULLS_FIRST ? -1 : 1);
+                            return orderExpr.getNullOrder() == NullOrderingType.NULLS_FIRST ? -1 : 1;
                         }
                         return 1; // Default to putting nulls at the end
                     }

@@ -49,7 +49,7 @@ public class SetExpression
      */
     public SetExpression(Collection items, String alias)
     {
-        this.itemIterator = (items != null ? items.iterator() : null);
+        this.itemIterator = items != null ? items.iterator() : null;
         this.alias = alias;
     }
     

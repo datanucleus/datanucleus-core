@@ -764,7 +764,7 @@ class PluginParser
         public boolean nextIsSingleQuote()
         {
             skipWS();
-            return (ci.current() == '\'');
+            return ci.current() == '\'';
         }
 
         /**
@@ -773,7 +773,7 @@ class PluginParser
          */
         public boolean nextIsDot()
         {
-            return (ci.current() == '.');
+            return ci.current() == '.';
         }
 
         /**
@@ -782,7 +782,7 @@ class PluginParser
          */
         public boolean nextIsComma()
         {
-            return (ci.current() == ',');
+            return ci.current() == ',';
         }
         
         /**
@@ -791,7 +791,7 @@ class PluginParser
          */
         public boolean nextIsSemiColon()
         {
-            return (ci.current() == ';');
+            return ci.current() == ';';
         }
 
         /**
@@ -844,7 +844,7 @@ class PluginParser
 
             if (isOctDigit(c = ci.next()))
             {
-                int i = (c - '0');
+                int i = c - '0';
 
                 if (isOctDigit(c = ci.next()))
                 {

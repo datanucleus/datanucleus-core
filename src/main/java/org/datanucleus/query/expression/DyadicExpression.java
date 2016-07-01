@@ -195,8 +195,8 @@ public class DyadicExpression extends Expression
         if (op == Expression.OP_EQ || op == Expression.OP_NOTEQ || op == Expression.OP_GT ||
             op == Expression.OP_GTEQ || op == Expression.OP_LT || op == Expression.OP_LTEQ)
         {
-            Class leftType = (left.getSymbol() != null ? left.getSymbol().getValueType() : null);
-            Class rightType = (right.getSymbol() != null ? right.getSymbol().getValueType() : null);
+            Class leftType = left.getSymbol() != null ? left.getSymbol().getValueType() : null;
+            Class rightType = right.getSymbol() != null ? right.getSymbol().getValueType() : null;
             if (left instanceof ParameterExpression && leftType == null && rightType != null)
             {
                 // parameter {op} primary
@@ -207,8 +207,8 @@ public class DyadicExpression extends Expression
                 // primary {op} parameter
                 right.getSymbol().setValueType(leftType);
             }
-            leftType = (left.getSymbol() != null ? left.getSymbol().getValueType() : null);
-            rightType = (right.getSymbol() != null ? right.getSymbol().getValueType() : null);
+            leftType = left.getSymbol() != null ? left.getSymbol().getValueType() : null;
+            rightType = right.getSymbol() != null ? right.getSymbol().getValueType() : null;
         }
 
         return null;

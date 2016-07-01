@@ -47,7 +47,7 @@ public class ObjectProviderPool
     {
         this.maxIdle = maxIdle;
         this.expirationTime = 30000; // 30 seconds
-        this.recyclableOps = new ConcurrentHashMap<ObjectProvider, Long>();
+        this.recyclableOps = new ConcurrentHashMap<>();
         this.opClass = opClass;
 
         if (reaperThread)
@@ -111,7 +111,7 @@ public class ObjectProviderPool
                     {
                         recyclableOps.remove(op);
                         op.connect(ec, cmd);
-                        return (op);
+                        return op;
                     }
 
                     // object failed validation
@@ -124,7 +124,7 @@ public class ObjectProviderPool
 
         // no objects available, create a new one
         op = create(ec, cmd);
-        return (op);
+        return op;
     }
 
     public synchronized void cleanUp()

@@ -53,7 +53,7 @@ public class CandidateIdsQueryResult<E> extends AbstractQueryResult<E>
     {
         super(query);
         this.ids = ids;
-        size = (ids != null ? ids.size() : 0); // Size is known
+        size = ids != null ? ids.size() : 0; // Size is known
 
         // Allow override of validate setting
         validateObjects = query.getBooleanExtensionProperty("datanucleus.query.resultCache.validateObjects", true);
@@ -198,12 +198,12 @@ public class CandidateIdsQueryResult<E> extends AbstractQueryResult<E>
                 return false;
             }
 
-            return (size - next > 0);
+            return size - next > 0;
         }
 
         public boolean hasPrevious()
         {
-            return (next >= 1);
+            return next >= 1;
         }
 
         public E next()
@@ -235,7 +235,7 @@ public class CandidateIdsQueryResult<E> extends AbstractQueryResult<E>
 
         public int previousIndex()
         {
-            return (next-1);
+            return next-1;
         }
     }
 

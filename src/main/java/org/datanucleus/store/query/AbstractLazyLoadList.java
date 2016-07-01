@@ -358,7 +358,7 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
                 }
 
                 // When we aren't at size()-1 we have at least one more element
-                return (iteratorIndex <= (size() - 1));
+                return iteratorIndex <= (size() - 1);
             }
         }
 
@@ -373,7 +373,7 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
                 }
 
                 // A List has indices starting at 0 so when we have > 0 we have a previous
-                return (iteratorIndex > 0);
+                return iteratorIndex > 0;
             }
         }
 

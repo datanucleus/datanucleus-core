@@ -221,7 +221,7 @@ public class CompleteClassTable implements Table
                             mappingByMember.put(mmd, mapping);
 
                             // TODO Consider adding the embedded info under the above column as related information
-                            EmbeddedMetaData embmd = (mmd.getElementMetaData() != null ? mmd.getElementMetaData().getEmbeddedMetaData() : null);
+                            EmbeddedMetaData embmd = mmd.getElementMetaData() != null ? mmd.getElementMetaData().getEmbeddedMetaData() : null;
                             processEmbeddedMember(embMmds, clr, embmd, true);
                         }
                         else
@@ -293,7 +293,7 @@ public class CompleteClassTable implements Table
                             mappingByMember.put(mmd, mapping);
 
                             // TODO Consider adding the embedded info under the above column as related information
-                            EmbeddedMetaData embmd = (mmd.getElementMetaData() != null ? mmd.getElementMetaData().getEmbeddedMetaData() : null);
+                            EmbeddedMetaData embmd = mmd.getElementMetaData() != null ? mmd.getElementMetaData().getEmbeddedMetaData() : null;
                             processEmbeddedMember(embMmds, clr, embmd, true);
                         }
                         else
@@ -670,7 +670,7 @@ public class CompleteClassTable implements Table
             else
             {
                 // Single column, so try to match the JDBC type if provided
-                JdbcType jdbcType = (colmds != null && colmds.length > 0 ? colmds[0].getJdbcType() : null);
+                JdbcType jdbcType = colmds != null && colmds.length > 0 ? colmds[0].getJdbcType() : null;
                 if (jdbcType != null)
                 {
                     // JDBC type specified so don't just take the default
@@ -819,12 +819,12 @@ public class CompleteClassTable implements Table
                         mappingByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(embMmds), mapping);
 
                         // TODO Create mapping for the related info under the above column
-                        processEmbeddedMember(embMmds, clr, (embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null), true);
+                        processEmbeddedMember(embMmds, clr, embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null, true);
                     }
                     else
                     {
                         // Embedded object stored flat into this table, with columns at same level as owner columns
-                        processEmbeddedMember(embMmds, clr, (embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null), false);
+                        processEmbeddedMember(embMmds, clr, embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null, false);
                     }
                 }
                 else

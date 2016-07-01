@@ -155,6 +155,6 @@ public class JavaxCacheQueryDatastoreCompilationCache implements QueryDatastoreC
     @Override
     public boolean contains(String queryKey)
     {
-        return (get(queryKey) != null);
+        return get(queryKey) != null;
     }
 }

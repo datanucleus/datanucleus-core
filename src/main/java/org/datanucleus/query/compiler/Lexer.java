@@ -614,7 +614,7 @@ public class Lexer
     public boolean nextIsSingleQuote()
     {
         skipWS();
-        return (ci.current() == '\'');
+        return ci.current() == '\'';
     }
 
     /**
@@ -623,7 +623,7 @@ public class Lexer
      */
     public boolean nextIsDot()
     {
-        return (ci.current() == '.');
+        return ci.current() == '.';
     }
 
     /**
@@ -714,7 +714,7 @@ public class Lexer
 
         if (isOctDigit(c = ci.next()))
         {
-            int i = (c - '0');
+            int i = c - '0';
 
             if (isOctDigit(c = ci.next()))
             {

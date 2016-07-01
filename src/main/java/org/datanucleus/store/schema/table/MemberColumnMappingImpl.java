@@ -122,7 +122,7 @@ public class MemberColumnMappingImpl implements MemberColumnMapping
     @Override
     public int getNumberOfColumns()
     {
-        return (columns != null ? columns.length : 0);
+        return columns != null ? columns.length : 0;
     }
 
     /* (non-Javadoc)

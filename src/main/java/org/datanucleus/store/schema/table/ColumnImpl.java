@@ -226,8 +226,8 @@ public class ColumnImpl implements Column
         {
             str.append(" member=").append(mapping.getMemberMetaData().getFullFieldName());
         }
-        str.append((primaryKey ? " (PK)" : ""));
-        str.append((position >= 0 ? (" [" + position + "]") : ""));
+        str.append(primaryKey ? " (PK)" : "");
+        str.append(position >= 0 ? (" [" + position + "]") : "");
         if (nested)
         {
             str.append(" [NESTED]");

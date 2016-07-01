@@ -298,7 +298,7 @@ public class JDOQLQueryHelper
             }
             else if (value instanceof Boolean)
             {
-                return ((Boolean)value ? "TRUE" : "FALSE");
+                return (Boolean)value ? "TRUE" : "FALSE";
             }
             else
             {

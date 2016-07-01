@@ -424,15 +424,15 @@ public class JPQLParser implements Parser
                 String joinType = JavaQueryCompiler.JOIN_INNER;
                 if (innerJoin)
                 {
-                    joinType = (fetch ? JavaQueryCompiler.JOIN_INNER_FETCH : JavaQueryCompiler.JOIN_INNER);
+                    joinType = fetch ? JavaQueryCompiler.JOIN_INNER_FETCH : JavaQueryCompiler.JOIN_INNER;
                 }
                 else if (leftJoin)
                 {
-                    joinType = (fetch ? JavaQueryCompiler.JOIN_OUTER_FETCH : JavaQueryCompiler.JOIN_OUTER);
+                    joinType = fetch ? JavaQueryCompiler.JOIN_OUTER_FETCH : JavaQueryCompiler.JOIN_OUTER;
                 }
                 else if (rightJoin)
                 {
-                    joinType = (fetch ? JavaQueryCompiler.JOIN_OUTER_FETCH_RIGHT : JavaQueryCompiler.JOIN_OUTER_RIGHT);
+                    joinType = fetch ? JavaQueryCompiler.JOIN_OUTER_FETCH_RIGHT : JavaQueryCompiler.JOIN_OUTER_RIGHT;
                 }
                 Node joinNode = new Node(NodeType.OPERATOR, joinType);
                 joinNode.appendChildNode(joinedNode);
@@ -740,7 +740,7 @@ public class JPQLParser implements Parser
 
                 if (p.parseStringIgnoreCase("NULL"))
                 {
-                    Node isNode = new Node(NodeType.OPERATOR, (not ? "!=" : "=="));
+                    Node isNode = new Node(NodeType.OPERATOR, not ? "!=" : "==");
                     Node compareNode = new Node(NodeType.LITERAL, null);
                     isNode.insertChildNode(compareNode);
                     isNode.insertChildNode(inputRootNode);
@@ -861,7 +861,7 @@ public class JPQLParser implements Parser
         if (!p.parseChar('('))
         {
             // Subquery
-            Node inNode = new Node(NodeType.OPERATOR, (not ? "NOT IN" : "IN"));
+            Node inNode = new Node(NodeType.OPERATOR, not ? "NOT IN" : "IN");
             inNode.appendChildNode(inputNode);
 
             // Get variable name that was substituted for the subquery
@@ -905,7 +905,7 @@ public class JPQLParser implements Parser
         {
             // Compile as (input IN val)
             // Note that we exclude LITERAL single args from here since they can be represented using ==, and also RDBMS needs that currently TODO Fix RDBMS query processor
-            inNode = new Node(NodeType.OPERATOR, (not ? "NOT IN" : "IN"));
+            inNode = new Node(NodeType.OPERATOR, not ? "NOT IN" : "IN");
             inNode.appendChildNode(inputNode);
             inNode.appendChildNode(valueNodes.get(0));
         }
@@ -916,7 +916,7 @@ public class JPQLParser implements Parser
             // TODO Would be nice to do as (input IN (val1, val2, ...)) but that implies changes in datastore query processors
             for (Node valueNode : valueNodes)
             {
-                Node compareNode = new Node(NodeType.OPERATOR, (not ? "!=" : "=="));
+                Node compareNode = new Node(NodeType.OPERATOR, not ? "!=" : "==");
                 compareNode.appendChildNode(inputNode);
                 compareNode.appendChildNode(valueNode);
                 if (inNode == null)
@@ -925,7 +925,7 @@ public class JPQLParser implements Parser
                 }
                 else
                 {
-                    Node newInNode = new Node(NodeType.OPERATOR, (not ? "&&" : "||"));
+                    Node newInNode = new Node(NodeType.OPERATOR, not ? "&&" : "||");
                     newInNode.appendChildNode(inNode);
                     newInNode.appendChildNode(compareNode);
                     inNode = newInNode;

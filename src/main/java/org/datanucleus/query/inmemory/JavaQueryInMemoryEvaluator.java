@@ -92,7 +92,7 @@ public abstract class JavaQueryInMemoryEvaluator
         this.parameterValues = parameterValues;
         this.clr = clr;
         this.candidates = candidates;
-        this.candidateAlias = (compilation.getCandidateAlias() != null ? compilation.getCandidateAlias() : this.candidateAlias);
+        this.candidateAlias = compilation.getCandidateAlias() != null ? compilation.getCandidateAlias() : this.candidateAlias;
 
         state = new HashMap<String, Object>();
         state.put(this.candidateAlias, query.getCandidateClass()); // TODO Why put the CLASS in here?! it should be a candidate
@@ -340,7 +340,7 @@ public abstract class JavaQueryInMemoryEvaluator
         try
         {
             Object result = expr.evaluate(eval);
-            return ((result instanceof InMemoryFailure) ? Boolean.FALSE : (Boolean)result);
+            return (result instanceof InMemoryFailure) ? Boolean.FALSE : (Boolean)result;
         }
         catch (VariableNotSetException vnse)
         {
@@ -729,7 +729,7 @@ public abstract class JavaQueryInMemoryEvaluator
         Expression[] result = compilation.getExprResult();
 
         // Use first element only (if there are any). Should be same in other "group-by" components
-        Object element = (set != null && !set.isEmpty() ? set.get(0) : null);
+        Object element = set != null && !set.isEmpty() ? set.get(0) : null;
         state.put(candidateAlias, element);
 
         Object[] r = new Object[result.length];

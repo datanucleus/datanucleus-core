@@ -48,7 +48,7 @@ public class OrderExpression extends Expression
         this.sortOrder = sortOrder;
         if (!StringUtils.isWhitespace(nullOrder))
         {
-            this.nullOrder = (nullOrder.equalsIgnoreCase("nulls first") ? NullOrderingType.NULLS_FIRST : NullOrderingType.NULLS_LAST);
+            this.nullOrder = nullOrder.equalsIgnoreCase("nulls first") ? NullOrderingType.NULLS_FIRST : NullOrderingType.NULLS_LAST;
         }
     }
 
@@ -97,9 +97,7 @@ public class OrderExpression extends Expression
 
     public String toString()
     {
-        String nullOrderString = (this.nullOrder!=null ? 
-                ((this.nullOrder==NullOrderingType.NULLS_FIRST) ? "NULLS FIRST" : "NULLS LAST") : null);
-        return "OrderExpression{" + left + " " + sortOrder + 
-                (nullOrderString != null ? (" [" + nullOrderString + "]") : "") + "}";
+        String nullOrderString = this.nullOrder != null ? ((this.nullOrder==NullOrderingType.NULLS_FIRST) ? "NULLS FIRST" : "NULLS LAST") : null;
+        return "OrderExpression{" + left + " " + sortOrder + (nullOrderString != null ? (" [" + nullOrderString + "]") : "") + "}";
     }
 }

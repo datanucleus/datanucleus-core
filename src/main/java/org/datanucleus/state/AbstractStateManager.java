@@ -56,32 +56,32 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     protected static final SingleTypeFieldManager HOLLOWFIELDMANAGER = new SingleTypeFieldManager();
 
     /** Flag to signify that we are currently storing the persistable object, so we don't detach it on serialisation. */
-    protected static final int FLAG_STORING_PC = (2<<15);
+    protected static final int FLAG_STORING_PC = 2<<15;
     /** Whether the managed object needs the inheritance level validating before loading fields. */
-    protected static final int FLAG_NEED_INHERITANCE_VALIDATION = (2<<14);
-    protected static final int FLAG_POSTINSERT_UPDATE = (2<<13);
-    protected static final int FLAG_LOADINGFPFIELDS = (2<<12);
-    protected static final int FLAG_POSTLOAD_PENDING = (2<<11);
-    protected static final int FLAG_CHANGING_STATE = (2<<10);
+    protected static final int FLAG_NEED_INHERITANCE_VALIDATION = 2<<14;
+    protected static final int FLAG_POSTINSERT_UPDATE = 2<<13;
+    protected static final int FLAG_LOADINGFPFIELDS = 2<<12;
+    protected static final int FLAG_POSTLOAD_PENDING = 2<<11;
+    protected static final int FLAG_CHANGING_STATE = 2<<10;
     /** if the persistable object is new and was flushed to the datastore. */
-    protected static final int FLAG_FLUSHED_NEW = (2<<9);
-    protected static final int FLAG_BECOMING_DELETED = (2<<8);
+    protected static final int FLAG_FLUSHED_NEW = 2<<9;
+    protected static final int FLAG_BECOMING_DELETED = 2<<8;
     /** Flag whether this SM is updating the ownership of its embedded/serialised field(s). */
-    protected static final int FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER = (2<<7);
+    protected static final int FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER = 2<<7;
     /** Flag for {@link #flags} whether we are retrieving detached state from the detached object. */
-    protected static final int FLAG_RETRIEVING_DETACHED_STATE = (2<<6);
+    protected static final int FLAG_RETRIEVING_DETACHED_STATE = 2<<6;
     /** Flag for {@link #flags} whether we are resetting the detached state. */
-    protected static final int FLAG_RESETTING_DETACHED_STATE = (2<<5);
+    protected static final int FLAG_RESETTING_DETACHED_STATE = 2<<5;
     /** Flag for {@link #flags} whether we are in the process of attaching the object. */
-    protected static final int FLAG_ATTACHING = (2<<4);
+    protected static final int FLAG_ATTACHING = 2<<4;
     /** Flag for {@link #flags} whether we are in the process of detaching the object. */
-    protected static final int FLAG_DETACHING = (2<<3);
+    protected static final int FLAG_DETACHING = 2<<3;
     /** Flag for {@link #flags} whether we are in the process of making transient the object. */
-    protected static final int FLAG_MAKING_TRANSIENT = (2<<2);
+    protected static final int FLAG_MAKING_TRANSIENT = 2<<2;
     /** Flag for {@link #flags} whether we are in the process of flushing changes to the object. */
-    protected static final int FLAG_FLUSHING = (2<<1);
+    protected static final int FLAG_FLUSHING = 2<<1;
     /** Flag for {@link #flags} whether we are in the process of disconnecting the object. */
-    protected static final int FLAG_DISCONNECTING = (2<<0);
+    protected static final int FLAG_DISCONNECTING = 2<<0;
 
     /** The persistable instance managed by this ObjectProvider. */
     protected T myPC;
@@ -209,7 +209,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
 
     public StoreManager getStoreManager()
     {
-        return (myEC.getNucleusContext().isFederated() ? ((FederatedStoreManager)myEC.getStoreManager()).getStoreManagerForClass(cmd) : myEC.getStoreManager());
+        return myEC.getNucleusContext().isFederated() ? ((FederatedStoreManager)myEC.getStoreManager()).getStoreManagerForClass(cmd) : myEC.getStoreManager();
     }
 
     /**
@@ -275,7 +275,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
      */
     public boolean isInserting()
     {
-        return (activity == ActivityState.INSERTING);
+        return activity == ActivityState.INSERTING;
     }
 
     /**
@@ -404,7 +404,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
 
     public boolean isDeleting()
     {
-        return (activity == ActivityState.DELETING);
+        return activity == ActivityState.DELETING;
     }
 
     void setBecomingDeleted(boolean flag)
@@ -443,7 +443,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
 
     public boolean isDetaching()
     {
-        return ((flags&FLAG_DETACHING)!=0);
+        return (flags&FLAG_DETACHING) != 0;
     }
 
     void setAttaching(boolean flag)
@@ -460,7 +460,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
 
     public boolean isAttaching()
     {
-        return ((flags&FLAG_ATTACHING)!=0);
+        return (flags&FLAG_ATTACHING) != 0;
     }
 
     /**

@@ -123,7 +123,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
         this.clr = clr;
         extensionPoints = new ExtensionPoint[0];
 
-        this.bundleCheckType = (bundleCheckType != null ? bundleCheckType : "EXCEPTION");
+        this.bundleCheckType = bundleCheckType != null ? bundleCheckType : "EXCEPTION";
         this.allowUserBundles = allowUserBundles;
     }
 

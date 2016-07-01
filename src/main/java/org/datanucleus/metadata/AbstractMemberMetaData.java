@@ -1253,7 +1253,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         if (hasExtension(MetaData.EXTENSION_MEMBER_CACHEABLE))
         {
             // JPA doesn't have way of specifying field cacheability so use extension
-            return (getValueForExtension(MetaData.EXTENSION_MEMBER_CACHEABLE).equalsIgnoreCase("false") ? false : true);
+            return getValueForExtension(MetaData.EXTENSION_MEMBER_CACHEABLE).equalsIgnoreCase("false") ? false : true;
         }
         return cacheable;
     }

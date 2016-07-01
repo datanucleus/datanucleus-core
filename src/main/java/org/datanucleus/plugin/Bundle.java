@@ -194,7 +194,7 @@ public class Bundle
             {
                 return false;
             }
-            return (this.compareTo(object) == 0);
+            return this.compareTo(object) == 0;
         }
         public int compareTo(Object object)
         {

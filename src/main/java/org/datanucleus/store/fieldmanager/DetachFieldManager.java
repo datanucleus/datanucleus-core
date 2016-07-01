@@ -143,7 +143,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                     return ((SCO) value).detachCopy(state);
                 }
 
-                return (SCOUtils.detachAsWrapped(op)) ? value : SCOUtils.unwrapSCOField(op, fieldNumber, (SCO)value);
+                return SCOUtils.detachAsWrapped(op) ? value : SCOUtils.unwrapSCOField(op, fieldNumber, (SCO)value);
             }
         }
         else
