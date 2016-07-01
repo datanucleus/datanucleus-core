@@ -44,6 +44,7 @@ import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.MetaDataUtils;
+import org.datanucleus.metadata.PropertyMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.store.StoreManager;
@@ -607,10 +608,17 @@ public class CompleteClassTable implements Table
                         }
                         else
                         {
-                            NucleusLogger.DATASTORE_SCHEMA.error("Unable to add column with name=" + col.getName() + " to table=" + getName() + " for class=" + cmd.getFullClassName() + 
-                                    " since one with same name already exists.");
-                            throw new NucleusUserException("Unable to add column with name=" + col.getName() + " to table=" + getName() + " for class=" + cmd.getFullClassName() + 
-                                    " since one with same name already exists.");
+                            if (mapping.getMemberMetaData() instanceof PropertyMetaData && otherCol.getMemberColumnMapping().getMemberMetaData() instanceof PropertyMetaData)
+                            {
+                                // We allow re-use of property names, since the subclass can override the superclass
+                            }
+                            else
+                            {
+                                NucleusLogger.DATASTORE_SCHEMA.error("Unable to add column with name=" + col.getName() + " to table=" + getName() + " for class=" + cmd.getFullClassName() + 
+                                        " since one with same name already exists (superclass?).");
+                                throw new NucleusUserException("Unable to add column with name=" + col.getName() + " to table=" + getName() + " for class=" + cmd.getFullClassName() + 
+                                        " since one with same name already exists (superclass?).");
+                            }
                         }
                     }
                     columns.add(col);
