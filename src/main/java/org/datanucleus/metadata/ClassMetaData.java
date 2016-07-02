@@ -211,6 +211,62 @@ public class ClassMetaData extends AbstractClassMetaData
             determineInheritanceMetaData(mmgr);
             applyDefaultDiscriminatorValueWhenNotSpecified(mmgr);
 
+            // Process all members marked as UNKNOWN (i.e override from JPA) and eliminate clashes with any generic overrides from addMetaDataForMembersNotInMetaData(...)
+            Iterator<AbstractMemberMetaData> memberIter = members.iterator();
+            Set<AbstractMemberMetaData> membersToDelete = null;
+            while (memberIter.hasNext())
+            {
+                AbstractMemberMetaData mmd = memberIter.next();
+                if (mmd.className != null && mmd.className.equals("#UNKNOWN"))
+                {
+                    // Field is for a superclass but we didn't know which at creation so resolve it
+                    if (pcSuperclassMetaData == null)
+                    {
+                        // No superclass so it doesn't make sense so assume to be for this class
+                        mmd.className = null;
+                    }
+                    else
+                    {
+                        AbstractMemberMetaData superFmd = pcSuperclassMetaData.getMetaDataForMember(mmd.getName());
+                        if (superFmd != null)
+                        {
+                            // Field is for a superclass so set its "className"
+                            mmd.className = (superFmd.className != null) ? superFmd.className : superFmd.getClassName();
+
+                            // Copy across other attributes of the original definition
+                            mmd.primaryKey = superFmd.primaryKey;
+                            mmd.persistenceModifier = superFmd.persistenceModifier;
+                            mmd.valueStrategy = superFmd.valueStrategy;
+                            mmd.valueGeneratorName = superFmd.valueGeneratorName;
+                            mmd.sequence = superFmd.sequence;
+                            mmd.cacheable = superFmd.cacheable;
+                            mmd.storeInLob = superFmd.storeInLob;
+                            // TODO Copy across more attributes
+
+                            Iterator<AbstractMemberMetaData> existingMemberIter = members.iterator();
+                            while (existingMemberIter.hasNext())
+                            {
+                                AbstractMemberMetaData existingMmd = existingMemberIter.next();
+                                if (existingMmd.getName().equals(mmd.getName()) && existingMmd != mmd)
+                                {
+                                    mmd.type = existingMmd.getType();
+                                    if (membersToDelete == null)
+                                    {
+                                        membersToDelete = new HashSet<>();
+                                    }
+                                    membersToDelete.add(existingMmd);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (membersToDelete != null)
+            {
+                members.removeAll(membersToDelete);
+            }
+
             if (objectidClass == null)
             {
                 // No user-defined objectid-class but potentially have SingleFieldIdentity so make sure PK fields are set
@@ -576,33 +632,15 @@ public class ClassMetaData extends AbstractClassMetaData
     protected void populateMemberMetaData(ClassLoaderResolver clr, Class cls, boolean pkMembers, ClassLoader primary, MetaDataManager mmgr)
     {
         Collections.sort(members);
-        
+
         // Populate the real field values. This will populate any containers in these members also
-        Iterator memberIter = members.iterator();
+        Iterator<AbstractMemberMetaData> memberIter = members.iterator();
         while (memberIter.hasNext())
         {
-            AbstractMemberMetaData mmd = (AbstractMemberMetaData)memberIter.next();
+            AbstractMemberMetaData mmd = memberIter.next();
             if (pkMembers == mmd.isPrimaryKey())
             {
                 Class fieldCls = cls;
-                if (mmd.className != null && mmd.className.equals("#UNKNOWN"))
-                {
-                    // Field is for a superclass but we didn't know which at creation so resolve it
-                    if (pcSuperclassMetaData != null)
-                    {
-                        AbstractMemberMetaData superFmd = pcSuperclassMetaData.getMetaDataForMember(mmd.getName());
-                        if (superFmd != null)
-                        {
-                            // Field is for a superclass so set its "className"
-                            mmd.className = (superFmd.className != null) ? superFmd.className : superFmd.getClassName();
-                        }
-                    }
-                    else
-                    {
-                        // No superclass so it doesn't make sense so assume to be for this class
-                        mmd.className = null;
-                    }
-                }
                 if (!mmd.fieldBelongsToClass())
                 {
                     // Field overrides a field in a superclass, so find the class
@@ -698,8 +736,7 @@ public class ClassMetaData extends AbstractClassMetaData
                         populated = true;
                     }
                 }
-                // TODO Why is this next block capable of processing things declared as property?
-                if (!populated)
+                else
                 {
                     Field cls_field = null;
                     try
