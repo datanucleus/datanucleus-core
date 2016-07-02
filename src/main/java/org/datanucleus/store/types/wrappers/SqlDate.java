@@ -84,7 +84,7 @@ public class SqlDate extends java.sql.Date implements SCO<java.sql.Date>
      */
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

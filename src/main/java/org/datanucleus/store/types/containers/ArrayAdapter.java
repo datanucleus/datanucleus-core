@@ -131,7 +131,7 @@ public class ArrayAdapter<C extends Object> extends ElementContainerAdapter<C>im
          */
         public boolean hasNext()
         {
-            return (this.index < this.endIndex);
+            return this.index < this.endIndex;
         }
 
         /**
@@ -192,7 +192,7 @@ public class ArrayAdapter<C extends Object> extends ElementContainerAdapter<C>im
          */
         public boolean hasNext()
         {
-            return (index < endIndex);
+            return index < endIndex;
         }
 
         /**

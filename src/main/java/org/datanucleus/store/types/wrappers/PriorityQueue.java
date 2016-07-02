@@ -169,7 +169,7 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
      */
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

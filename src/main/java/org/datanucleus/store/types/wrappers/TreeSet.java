@@ -174,7 +174,7 @@ public class TreeSet<E> extends java.util.TreeSet<E> implements SCOCollection<ja
      */
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

@@ -164,7 +164,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      **/
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

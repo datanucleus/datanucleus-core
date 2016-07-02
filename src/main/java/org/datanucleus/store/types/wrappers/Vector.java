@@ -162,7 +162,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
      **/
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

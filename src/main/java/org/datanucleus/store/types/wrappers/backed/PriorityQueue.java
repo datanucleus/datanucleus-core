@@ -152,7 +152,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
 
                     try
                     {
-                        backingStore.addAll(ownerOP, newValue, (useCache ? 0 : -1));
+                        backingStore.addAll(ownerOP, newValue, useCache ? 0 : -1);
                     }
                     catch (NucleusDataStoreException dse)
                     {
@@ -560,7 +560,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
             {
                 try
                 {
-                    backingStore.add(ownerOP, element, (useCache ? delegate.size() : -1));
+                    backingStore.add(ownerOP, element, useCache ? delegate.size() : -1);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -580,7 +580,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
         {
             ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
-        return (backingStore != null ? backingSuccess : delegateSuccess);
+        return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
     /**
@@ -609,7 +609,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
             {
                 try
                 {
-                    backingSuccess = backingStore.addAll(ownerOP, elements, (useCache ? delegate.size() : -1));
+                    backingSuccess = backingStore.addAll(ownerOP, elements, useCache ? delegate.size() : -1);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -629,7 +629,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
         {
             ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
-        return (backingStore != null ? backingSuccess : delegateSuccess);
+        return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
     /**
@@ -681,7 +681,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
             loadFromStore();
         }
 
-        int size = (useCache ? delegate.size() : -1);
+        int size = useCache ? delegate.size() : -1;
         E delegateObject = delegate.poll();
         E backingObject = null;
         if (backingStore != null)
@@ -708,7 +708,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
             ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
 
-        return (backingStore != null ? backingObject : delegateObject);
+        return backingStore != null ? backingObject : delegateObject;
     }
 
     /**
@@ -735,7 +735,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
             loadFromStore();
         }
 
-        int size = (useCache ? delegate.size() : -1);
+        int size = useCache ? delegate.size() : -1;
         boolean contained = delegate.contains(element);
         boolean delegateSuccess = delegate.remove(element);
 
@@ -769,7 +769,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
             ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
 
-        return (backingStore != null ? backingSuccess : delegateSuccess);
+        return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
     /**
@@ -786,7 +786,7 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
             loadFromStore();
         }
 
-        int size = (useCache ? delegate.size() : -1);
+        int size = useCache ? delegate.size() : -1;
         Collection contained = null;
         if (backingStore != null && SCOUtils.useQueuedUpdate(ownerOP))
         {

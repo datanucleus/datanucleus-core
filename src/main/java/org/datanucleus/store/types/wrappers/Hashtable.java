@@ -162,7 +162,7 @@ public class Hashtable<K, V> extends java.util.Hashtable<K, V> implements SCOMap
      */
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

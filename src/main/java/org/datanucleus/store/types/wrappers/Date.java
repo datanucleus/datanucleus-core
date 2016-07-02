@@ -84,7 +84,7 @@ public class Date extends java.util.Date implements SCO<java.util.Date>
      **/
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

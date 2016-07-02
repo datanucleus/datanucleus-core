@@ -171,7 +171,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      */
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

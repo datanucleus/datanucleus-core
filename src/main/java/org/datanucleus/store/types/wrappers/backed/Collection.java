@@ -254,7 +254,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
 
                         try
                         {
-                            backingStore.addAll(ownerOP, newValue, (useCache ? 0 : -1));
+                            backingStore.addAll(ownerOP, newValue, useCache ? 0 : -1);
                         }
                         catch (NucleusDataStoreException dse)
                         {
@@ -530,7 +530,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      **/
     public synchronized boolean isEmpty()
     {
-        return (size() == 0);
+        return size() == 0;
     }
 
     /**
@@ -665,7 +665,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
             {
                 try
                 {
-                    backingSuccess = backingStore.add(ownerOP, element, (useCache ? delegate.size() : -1));
+                    backingSuccess = backingStore.add(ownerOP, element, useCache ? delegate.size() : -1);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -684,7 +684,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         {
             ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
-        return (backingStore != null ? backingSuccess : delegateSuccess);
+        return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
     /**
@@ -723,7 +723,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
             {
                 try
                 {
-                    backingSuccess = backingStore.addAll(ownerOP, c, (useCache ? delegate.size() : -1));
+                    backingSuccess = backingStore.addAll(ownerOP, c, useCache ? delegate.size() : -1);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -742,7 +742,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
         {
             ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
-        return (backingStore != null ? backingSuccess : delegateSuccess);
+        return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
     /**
@@ -795,7 +795,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
             loadFromStore();
         }
 
-        int size = (useCache ? delegate.size() : -1);
+        int size = useCache ? delegate.size() : -1;
         boolean contained = delegate.contains(element);
         boolean delegateSuccess = delegate.remove(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
@@ -833,7 +833,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
             ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
 
-        return (backingStore != null ? backingSuccess : delegateSuccess);
+        return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
     /**
@@ -850,7 +850,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
             loadFromStore();
         }
 
-        int size = (useCache ? delegate.size() : -1);
+        int size = useCache ? delegate.size() : -1;
         java.util.Collection contained = null;
         if (backingStore != null && SCOUtils.useQueuedUpdate(ownerOP))
         {

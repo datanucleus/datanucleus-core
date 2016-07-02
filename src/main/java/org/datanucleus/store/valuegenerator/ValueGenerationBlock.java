@@ -94,7 +94,7 @@ public class ValueGenerationBlock<T> implements Serializable
      */
     public boolean hasNext()
     {
-        return (nextIndex < valueList.size());
+        return nextIndex < valueList.size();
     }
 
     /**

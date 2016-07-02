@@ -267,8 +267,7 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", 
-                    ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
             Iterator<E> iter=backingStore.iterator(ownerOP);
@@ -525,7 +524,7 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
             {
                 try
                 {
-                    backingSuccess = backingStore.add(ownerOP, element, (useCache ? delegate.size() : -1));
+                    backingSuccess = backingStore.add(ownerOP, element, useCache ? delegate.size() : -1);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -544,7 +543,7 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
         {
             ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
-        return (backingStore != null ? backingSuccess : delegateSuccess);
+        return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
     /**
@@ -584,7 +583,7 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
             {
                 try
                 {
-                    backingSuccess = backingStore.addAll(ownerOP, c, (useCache ? delegate.size() : -1));
+                    backingSuccess = backingStore.addAll(ownerOP, c, useCache ? delegate.size() : -1);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -603,7 +602,7 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
         {
             ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
-        return (backingStore != null ? backingSuccess : delegateSuccess);
+        return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
     /**
@@ -656,7 +655,7 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
             loadFromStore();
         }
 
-        int size = (useCache ? delegate.size() : -1);
+        int size = useCache ? delegate.size() : -1;
         boolean contained = delegate.contains(element);
         boolean delegateSuccess = delegate.remove(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
@@ -694,7 +693,7 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
             ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
 
-        return (backingStore != null ? backingSuccess : delegateSuccess);
+        return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
     /**
@@ -711,7 +710,7 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
             loadFromStore();
         }
 
-        int size = (useCache ? delegate.size() : -1);
+        int size = useCache ? delegate.size() : -1;
         Collection contained = null;
         if (backingStore != null && SCOUtils.useQueuedUpdate(ownerOP))
         {

@@ -175,7 +175,7 @@ public class CommandLine
     public void parse(String args[])
     {
         List<String> defaultArg = new ArrayList();
-        if ((args == null || (args.length == 0)))
+        if (args == null || (args.length == 0))
         {
             return;
         }
@@ -384,7 +384,7 @@ public class CommandLine
                 }
                 else
                 {
-                    basePos = (shortMax + longMax + argNameMax);
+                    basePos = shortMax + longMax + argNameMax;
                 }
                 int pos = basePos;
                 for (j = 0; j < o.description.length(); j++)

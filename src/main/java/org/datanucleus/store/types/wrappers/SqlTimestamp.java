@@ -86,7 +86,7 @@ public class SqlTimestamp extends java.sql.Timestamp implements SCO<java.sql.Tim
      **/
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

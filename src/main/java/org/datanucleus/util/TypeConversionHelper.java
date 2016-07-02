@@ -1263,7 +1263,7 @@ public class TypeConversionHelper
             nanosString = nanosString.substring(0, truncIndex + 1);
         }
 
-        return (yearString + "-" + monthString + "-" + dayString + " " + hourString + ":" + minuteString + ":" + secondString + "." + nanosString);
+        return yearString + "-" + monthString + "-" + dayString + " " + hourString + ":" + minuteString + ":" + secondString + "." + nanosString;
     }
 
     /**

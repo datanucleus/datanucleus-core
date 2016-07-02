@@ -154,7 +154,7 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
      */
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

@@ -180,7 +180,7 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
      **/
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

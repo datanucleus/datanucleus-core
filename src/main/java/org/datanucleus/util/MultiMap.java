@@ -122,7 +122,7 @@ public class MultiMap extends HashMap
         }
         boolean results = c.add(value);
 
-        return (results ? value : null);
+        return results ? value : null;
     }
 
     /**
@@ -175,7 +175,7 @@ public class MultiMap extends HashMap
     public Collection values()
     {
         Collection vs = values;
-        return (vs != null ? vs : (values = new ValueElement()));
+        return vs != null ? vs : (values = new ValueElement());
     }
 
     /**

@@ -122,7 +122,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
             {
                 Class cls = getClassLoaderResolver().classForName(className);
                 type = findJavaTypeForClass(cls);
-                return (type != null);
+                return type != null;
             }
             catch (Exception e)
             {
@@ -290,7 +290,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
     @Override
     public boolean isSecondClassMutableType(String className)
     {
-        return (getWrapperTypeForType(className) != null);
+        return getWrapperTypeForType(className) != null;
     }
 
     /* (non-Javadoc)
@@ -570,7 +570,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
             }
             if (!type.cls.getName().equals("java.lang.Object") && !type.cls.getName().equals("java.io.Serializable"))
             {
-                Class componentCls = (cls.isArray() ? cls.getComponentType() : null);
+                Class componentCls = cls.isArray() ? cls.getComponentType() : null;
                 if (componentCls != null)
                 {
                     // Array type
@@ -662,15 +662,14 @@ public class TypeManagerImpl implements TypeManager, Serializable
         String typeConverterName;
         final Class containerHandlerType;
 
-        public JavaType(Class cls, Class genericType, boolean embedded, boolean dfg, 
-                Class wrapperType, Class wrapperTypeBacked, Class containerHandlerType, String typeConverterName)
+        public JavaType(Class cls, Class genericType, boolean embedded, boolean dfg, Class wrapperType, Class wrapperTypeBacked, Class containerHandlerType, String typeConverterName)
         {
             this.cls = cls;
             this.genericType = genericType;
             this.embedded = embedded;
             this.dfg = dfg;
             this.wrapperType = wrapperType;
-            this.wrapperTypeBacked = (wrapperTypeBacked != null ? wrapperTypeBacked : wrapperType);
+            this.wrapperTypeBacked = wrapperTypeBacked != null ? wrapperTypeBacked : wrapperType;
             this.containerHandlerType = containerHandlerType;
             this.typeConverterName = typeConverterName;
         }

@@ -165,7 +165,7 @@ public class HashMap<K, V> extends java.util.HashMap<K, V> implements SCOMap<jav
      **/
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

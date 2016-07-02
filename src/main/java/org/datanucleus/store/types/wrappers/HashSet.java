@@ -154,7 +154,7 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
      */
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

@@ -153,7 +153,7 @@ public class Collection<E> extends AbstractCollection<E> implements SCOCollectio
      */
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

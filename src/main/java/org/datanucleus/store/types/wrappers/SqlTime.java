@@ -82,7 +82,7 @@ public class SqlTime extends java.sql.Time implements SCO<java.sql.Time>
      **/
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

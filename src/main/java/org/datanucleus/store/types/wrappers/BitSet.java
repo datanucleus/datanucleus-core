@@ -91,7 +91,7 @@ public class BitSet extends java.util.BitSet implements SCO<java.util.BitSet>
      **/
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

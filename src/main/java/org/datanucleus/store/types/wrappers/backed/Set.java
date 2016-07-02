@@ -578,7 +578,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
             {
                 try
                 {
-                    backingSuccess = backingStore.add(ownerOP, element, (useCache ? delegate.size() : -1));
+                    backingSuccess = backingStore.add(ownerOP, element, useCache ? delegate.size() : -1);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -597,7 +597,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
         {
             ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
-        return (backingStore != null ? backingSuccess : delegateSuccess);
+        return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
     /**
@@ -636,7 +636,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
             {
                 try
                 {
-                    backingSuccess = backingStore.addAll(ownerOP, c, (useCache ? delegate.size() : -1));
+                    backingSuccess = backingStore.addAll(ownerOP, c, useCache ? delegate.size() : -1);
                 }
                 catch (NucleusDataStoreException dse)
                 {
@@ -655,7 +655,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
         {
             ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
-        return (backingStore != null ? backingSuccess : delegateSuccess);
+        return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
     /**
@@ -708,7 +708,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
             loadFromStore();
         }
 
-        int size = (useCache ? delegate.size() : -1);
+        int size = useCache ? delegate.size() : -1;
         boolean contained = delegate.contains(element);
         boolean delegateSuccess = delegate.remove(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations() && !initialising)
@@ -746,7 +746,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
             ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
 
-        return (backingStore != null ? backingSuccess : delegateSuccess);
+        return backingStore != null ? backingSuccess : delegateSuccess;
     }
 
     /**
@@ -763,7 +763,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
             loadFromStore();
         }
 
-        int size = (useCache ? delegate.size() : -1);
+        int size = useCache ? delegate.size() : -1;
         Collection contained = null;
         if (backingStore != null && SCOUtils.useQueuedUpdate(ownerOP))
         {

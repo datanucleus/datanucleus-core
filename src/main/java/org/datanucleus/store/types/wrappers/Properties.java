@@ -162,7 +162,7 @@ public class Properties extends java.util.Properties implements SCOMap<java.util
      **/
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

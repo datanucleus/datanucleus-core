@@ -89,7 +89,7 @@ public class GregorianCalendar extends java.util.GregorianCalendar implements SC
      **/
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

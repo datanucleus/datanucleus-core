@@ -182,7 +182,7 @@ public class TreeMap<K, V> extends java.util.TreeMap<K, V> implements SCOMap<jav
      **/
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

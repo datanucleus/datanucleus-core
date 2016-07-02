@@ -154,7 +154,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      */
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

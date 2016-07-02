@@ -162,7 +162,7 @@ public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V> implement
      **/
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

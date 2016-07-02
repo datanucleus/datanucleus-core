@@ -158,7 +158,7 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
      **/
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

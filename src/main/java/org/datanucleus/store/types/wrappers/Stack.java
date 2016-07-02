@@ -161,7 +161,7 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
      **/
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

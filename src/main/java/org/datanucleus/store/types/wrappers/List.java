@@ -159,7 +159,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      */
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

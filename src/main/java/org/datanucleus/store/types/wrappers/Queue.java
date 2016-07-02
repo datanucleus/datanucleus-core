@@ -169,7 +169,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      */
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

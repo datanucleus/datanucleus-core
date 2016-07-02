@@ -575,7 +575,7 @@ public class StringUtils
      */
     public static boolean isEmpty(String s)
     {
-        return ((s == null) || (s.length() == 0));
+        return (s == null) || (s.length() == 0);
     }
 
     /**
@@ -585,7 +585,7 @@ public class StringUtils
      */
     public static boolean notEmpty(String s)
     {
-        return ((s != null) && (s.length() > 0));
+        return (s != null) && (s.length() > 0);
     }
 
     /**

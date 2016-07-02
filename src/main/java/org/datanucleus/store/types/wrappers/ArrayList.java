@@ -159,7 +159,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      */
     public Object getOwner()
     {
-        return (ownerOP != null ? ownerOP.getObject() : null);
+        return ownerOP != null ? ownerOP.getObject() : null;
     }
 
     /**

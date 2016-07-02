@@ -981,7 +981,7 @@ class AUID implements Comparable
      */
     public final long getTimeHighAndVersion()
     {
-        return (firstHalf >>> 48);
+        return firstHalf >>> 48;
     }
 
     /**
@@ -1136,7 +1136,7 @@ class AUID implements Comparable
                 }
             }
         }
-        return (cmp == 0 ? 0 : (cmp < 0 ? -1 : 1));
+        return cmp == 0 ? 0 : (cmp < 0 ? -1 : 1);
     }
 
     /*
