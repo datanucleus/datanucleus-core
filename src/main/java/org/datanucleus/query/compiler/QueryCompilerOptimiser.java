@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.query.expression.DyadicExpression;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.expression.InvokeExpression;
@@ -35,18 +36,29 @@ import org.datanucleus.util.NucleusLogger;
  * Attempts to detect and correct common input problems to give a more efficiently evaluated query.
  * Currently handles the following
  * <ul>
- * <li>When the user specifies "var == this", this means nothing since the variable is the same as the candidate
- * so replaces all instances of the variable with the candidate</li>
+ * <li>When the user specifies "var == this", this means nothing since the variable is the same as the candidate so replaces all instances of the variable with the candidate</li>
  * </ul>
  */
 public class QueryCompilerOptimiser
 {
+    /** Option to check for "var == this", and replace all var with this. */
+    public static final String OPTION_VAR_THIS = "var_this";
+
+    /** Option to add a null check when navigating through relations. */
+    public static final String OPTION_NAVIGATION_NULL_CHECK = "navigation_null_check";
+
+    MetaDataManager mmgr;
+
     /** The compilation that we are optimising. */
     QueryCompilation compilation;
 
-    public QueryCompilerOptimiser(QueryCompilation compilation)
+    Set<String> options = new HashSet<>();
+
+    public QueryCompilerOptimiser(QueryCompilation compilation, MetaDataManager mmgr, Set<String> options)
     {
+        this.mmgr = mmgr;
         this.compilation = compilation;
+        this.options.addAll(options);
     }
 
     /**
@@ -58,45 +70,53 @@ public class QueryCompilerOptimiser
         {
             return;
         }
+
         if (compilation.getExprFilter() != null)
         {
-            // Check for redundant variables in the filter, an expression of the form "var == this"
-            Set<String> redundantVariables = new HashSet<String>();
-            findRedundantFilterVariables(compilation.getExprFilter(), redundantVariables);
-            if (!redundantVariables.isEmpty())
+            if (options.contains(OPTION_VAR_THIS))
             {
-                Iterator<String> redundantVarIter = redundantVariables.iterator();
-                while (redundantVarIter.hasNext())
+                // Check for redundant variables in the filter, an expression of the form "var == this"
+                Set<String> redundantVariables = new HashSet<String>();
+                findRedundantFilterVariables(compilation.getExprFilter(), redundantVariables);
+                if (!redundantVariables.isEmpty())
                 {
-                    String var = redundantVarIter.next();
-                    if (NucleusLogger.QUERY.isDebugEnabled())
+                    Iterator<String> redundantVarIter = redundantVariables.iterator();
+                    while (redundantVarIter.hasNext())
                     {
-                        NucleusLogger.QUERY.debug("Query was defined with variable " + var + 
-                        " yet this was redundant, so has been replaced by the candidate");
-                    }
-
-                    compilation.setExprFilter(replaceVariableWithCandidateInExpression(var, compilation.getExprFilter()));
-                    compilation.setExprHaving(replaceVariableWithCandidateInExpression(var, compilation.getExprHaving()));
-                    Expression[] exprResult = compilation.getExprResult();
-                    if (exprResult != null)
-                    {
-                        for (int i=0;i<exprResult.length;i++)
+                        String var = redundantVarIter.next();
+                        if (NucleusLogger.QUERY.isDebugEnabled())
                         {
-                            exprResult[i] = replaceVariableWithCandidateInExpression(var, exprResult[i]);
+                            NucleusLogger.QUERY.debug("Query was defined with variable " + var + " yet this was redundant, so has been replaced by the candidate");
                         }
-                    }
-                    Expression[] exprGrouping = compilation.getExprGrouping();
-                    if (exprGrouping != null)
-                    {
-                        for (int i=0;i<exprGrouping.length;i++)
-                        {
-                            exprGrouping[i] = replaceVariableWithCandidateInExpression(var, exprGrouping[i]);
-                        }
-                    }
 
-                    compilation.getSymbolTable().removeSymbol(compilation.getSymbolTable().getSymbol(var));
-                    // TODO Remove from input variables if explicit
+                        compilation.setExprFilter(replaceVariableWithCandidateInExpression(var, compilation.getExprFilter()));
+                        compilation.setExprHaving(replaceVariableWithCandidateInExpression(var, compilation.getExprHaving()));
+                        Expression[] exprResult = compilation.getExprResult();
+                        if (exprResult != null)
+                        {
+                            for (int i=0;i<exprResult.length;i++)
+                            {
+                                exprResult[i] = replaceVariableWithCandidateInExpression(var, exprResult[i]);
+                            }
+                        }
+                        Expression[] exprGrouping = compilation.getExprGrouping();
+                        if (exprGrouping != null)
+                        {
+                            for (int i=0;i<exprGrouping.length;i++)
+                            {
+                                exprGrouping[i] = replaceVariableWithCandidateInExpression(var, exprGrouping[i]);
+                            }
+                        }
+
+                        compilation.getSymbolTable().removeSymbol(compilation.getSymbolTable().getSymbol(var));
+                        // TODO Remove from input variables if explicit
+                    }
                 }
+            }
+
+            if (options.contains(OPTION_NAVIGATION_NULL_CHECK))
+            {
+                // TODO Implement this
             }
         }
     }

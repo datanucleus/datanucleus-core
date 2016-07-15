@@ -21,9 +21,11 @@ package org.datanucleus.query.compiler;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.PropertyNames;
@@ -40,6 +42,7 @@ import org.datanucleus.query.expression.ParameterExpression;
 import org.datanucleus.query.expression.PrimaryExpression;
 import org.datanucleus.query.expression.VariableExpression;
 import org.datanucleus.util.Imports;
+import org.datanucleus.util.Localiser;
 
 /**
  * Implementation of a compiler for JDOQL (JSR0012, JSR0243).
@@ -48,13 +51,10 @@ public class JDOQLCompiler extends JavaQueryCompiler
 {
     boolean allowAll = false;
 
-    public JDOQLCompiler(MetaDataManager metaDataManager, ClassLoaderResolver clr, 
-            String from, Class candidateClass, Collection candidates, 
-            String filter, Imports imports, String ordering, String result, String grouping, String having, 
-            String params, String variables, String update)
+    public JDOQLCompiler(MetaDataManager metaDataManager, ClassLoaderResolver clr, String from, Class candidateClass, Collection candidates, 
+            String filter, Imports imports, String ordering, String result, String grouping, String having, String params, String variables, String update)
     {
-        super(metaDataManager, clr, from, candidateClass, candidates, 
-            filter, imports, ordering, result, grouping, having, params, variables, update);
+        super(metaDataManager, clr, from, candidateClass, candidates, filter, imports, ordering, result, grouping, having, params, variables, update);
     }
 
     /**
@@ -130,9 +130,7 @@ public class JDOQLCompiler extends JavaQueryCompiler
                 {
                     if (!isExpressionGroupingOrAggregate(exprResult[i], exprGrouping))
                     {
-                        throw new NucleusUserException("JDOQL query has result clause " + exprResult[i] + 
-                                " but this is invalid (see JDO spec 14.6.10)." +
-                                " When specified with grouping should be aggregate, or grouping expression");
+                        throw new NucleusUserException(Localiser.msg("021086", exprResult[i]));
                     }
                 }
             }
@@ -147,9 +145,7 @@ public class JDOQLCompiler extends JavaQueryCompiler
                 {
                     if (!isExpressionGroupingOrAggregate(exprOrdering[i], exprGrouping))
                     {
-                        throw new NucleusUserException("JDOQL query has ordering clause " + exprOrdering[i] + 
-                                " but this is invalid (see JDO spec 14.6.10)." +
-                                " When specified with grouping should be aggregate, or grouping expression");
+                        throw new NucleusUserException(Localiser.msg("021087", exprOrdering[i]));
                     }
                 }
             }
@@ -162,9 +158,7 @@ public class JDOQLCompiler extends JavaQueryCompiler
             // grouping expression.
             if (!containsOnlyGroupingOrAggregates(exprHaving, exprGrouping))
             {
-                throw new NucleusUserException("JDOQL query has having clause " + exprHaving + 
-                    " but this is invalid (see JDO spec 14.6.10)." +
-                    " Should contain only aggregates, or grouping expressions");
+                throw new NucleusUserException(Localiser.msg("021088", exprHaving));
             }
         }
         if (exprResult != null)
@@ -180,23 +174,25 @@ public class JDOQLCompiler extends JavaQueryCompiler
                         List<Expression> args = invokeExpr.getArguments();
                         if (args == null || args.size() != 1)
                         {
-                            throw new NucleusUserException("JDOQL query has result clause using aggregate (" + invokeExpr.getOperation() + ") but this needs 1 argument");
+                            throw new NucleusUserException(Localiser.msg("021089", invokeExpr.getOperation()));
                         }
                     }
                 }
             }
         }
 
-        QueryCompilation compilation = new QueryCompilation(candidateClass, candidateAlias, symtbl,
-            exprResult, exprFrom, exprFilter, exprGrouping, exprHaving, exprOrdering, exprUpdate);
+        QueryCompilation compilation = new QueryCompilation(candidateClass, candidateAlias, symtbl, exprResult, exprFrom, exprFilter, exprGrouping, exprHaving, exprOrdering, exprUpdate);
         compilation.setQueryLanguage(getLanguage());
 
         // Apply compilation optimisations
-        boolean optimise = metaDataManager.getNucleusContext().getConfiguration().getBooleanProperty(
-            PropertyNames.PROPERTY_QUERY_COMPILE_OPTIMISED);
+        boolean optimise = metaDataManager.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_QUERY_COMPILE_OPTIMISED);
         if (optimise)
         {
-            QueryCompilerOptimiser optimiser = new QueryCompilerOptimiser(compilation);
+            // TODO Add handling of relation navigation implying "relation != null".
+            // i.e if we have "this.field1.field2 = val" this is equivalent to "this.field1 != null && this.field1.field2 = val"
+            Set<String> options = new HashSet<>();
+            options.add(QueryCompilerOptimiser.OPTION_VAR_THIS);
+            QueryCompilerOptimiser optimiser = new QueryCompilerOptimiser(compilation, metaDataManager, options);
             optimiser.optimise();
         }
 
