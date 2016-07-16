@@ -1,5 +1,5 @@
 /**********************************************************************
-Copyright (c) 2010 Andy Jefferson and others. All rights reserved.
+Copyright (c) 2016 Andy Jefferson and others. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 Contributors:
-   ...
-**********************************************************************/
+     ...
+ **********************************************************************/
 package org.datanucleus.query.compiler;
 
 import java.util.ArrayList;
@@ -32,38 +32,25 @@ import org.datanucleus.query.expression.VariableExpression;
 import org.datanucleus.util.NucleusLogger;
 
 /**
- * Optimiser for a query compilation.
- * Attempts to detect and correct common input problems to give a more efficiently evaluated query.
- * Currently handles the following
- * <ul>
- * <li>When the user specifies "var == this", this means nothing since the variable is the same as the candidate so replaces all instances of the variable with the candidate</li>
- * </ul>
+ * Optimiser for query compilation that searches for variable equality like "var == this".
+ * Since the variable is the same as the candidate it will replace all instances of the variable with the candidate.
+ * TODO We should only update "var == this" in the same branch of the filter (i.e not if used in other branches of the filter)
+ * Applies to the FILTER only.
  */
-public class QueryCompilerOptimiser
+public class VarThisCompilationOptimiser implements CompilationOptimiser
 {
-    /** Option to check for "var == this", and replace all var with this. */
-    public static final String OPTION_VAR_THIS = "var_this";
-
-    /** Option to add a null check when navigating through relations. */
-    public static final String OPTION_NAVIGATION_NULL_CHECK = "navigation_null_check";
-
-    MetaDataManager mmgr;
-
     /** The compilation that we are optimising. */
     QueryCompilation compilation;
 
-    Set<String> options = new HashSet<>();
-
-    public QueryCompilerOptimiser(QueryCompilation compilation, MetaDataManager mmgr, Set<String> options)
+    public VarThisCompilationOptimiser(QueryCompilation compilation, MetaDataManager unused)
     {
-        this.mmgr = mmgr;
         this.compilation = compilation;
-        this.options.addAll(options);
     }
 
-    /**
-     * Method to perform the optimisation.
+    /* (non-Javadoc)
+     * @see org.datanucleus.query.compiler.CompilationOptimiser#optimise()
      */
+    @Override
     public void optimise()
     {
         if (compilation == null)
@@ -73,50 +60,42 @@ public class QueryCompilerOptimiser
 
         if (compilation.getExprFilter() != null)
         {
-            if (options.contains(OPTION_VAR_THIS))
+            // Check for redundant variables in the filter, an expression of the form "var == this"
+            Set<String> redundantVariables = new HashSet<>();
+            findRedundantFilterVariables(compilation.getExprFilter(), redundantVariables);
+            if (!redundantVariables.isEmpty())
             {
-                // Check for redundant variables in the filter, an expression of the form "var == this"
-                Set<String> redundantVariables = new HashSet<String>();
-                findRedundantFilterVariables(compilation.getExprFilter(), redundantVariables);
-                if (!redundantVariables.isEmpty())
+                Iterator<String> redundantVarIter = redundantVariables.iterator();
+                while (redundantVarIter.hasNext())
                 {
-                    Iterator<String> redundantVarIter = redundantVariables.iterator();
-                    while (redundantVarIter.hasNext())
+                    String var = redundantVarIter.next();
+                    if (NucleusLogger.QUERY.isDebugEnabled())
                     {
-                        String var = redundantVarIter.next();
-                        if (NucleusLogger.QUERY.isDebugEnabled())
-                        {
-                            NucleusLogger.QUERY.debug("Query was defined with variable " + var + " yet this was redundant, so has been replaced by the candidate");
-                        }
-
-                        compilation.setExprFilter(replaceVariableWithCandidateInExpression(var, compilation.getExprFilter()));
-                        compilation.setExprHaving(replaceVariableWithCandidateInExpression(var, compilation.getExprHaving()));
-                        Expression[] exprResult = compilation.getExprResult();
-                        if (exprResult != null)
-                        {
-                            for (int i=0;i<exprResult.length;i++)
-                            {
-                                exprResult[i] = replaceVariableWithCandidateInExpression(var, exprResult[i]);
-                            }
-                        }
-                        Expression[] exprGrouping = compilation.getExprGrouping();
-                        if (exprGrouping != null)
-                        {
-                            for (int i=0;i<exprGrouping.length;i++)
-                            {
-                                exprGrouping[i] = replaceVariableWithCandidateInExpression(var, exprGrouping[i]);
-                            }
-                        }
-
-                        compilation.getSymbolTable().removeSymbol(compilation.getSymbolTable().getSymbol(var));
-                        // TODO Remove from input variables if explicit
+                        NucleusLogger.QUERY.debug("JDOQL Optimiser : Query was defined with variable " + var + " yet this was redundant, so has been replaced by the candidate");
                     }
-                }
-            }
 
-            if (options.contains(OPTION_NAVIGATION_NULL_CHECK))
-            {
-                // TODO Implement this
+                    compilation.setExprFilter(replaceVariableWithCandidateInExpression(var, compilation.getExprFilter()));
+                    compilation.setExprHaving(replaceVariableWithCandidateInExpression(var, compilation.getExprHaving()));
+                    Expression[] exprResult = compilation.getExprResult();
+                    if (exprResult != null)
+                    {
+                        for (int i=0;i<exprResult.length;i++)
+                        {
+                            exprResult[i] = replaceVariableWithCandidateInExpression(var, exprResult[i]);
+                        }
+                    }
+                    Expression[] exprGrouping = compilation.getExprGrouping();
+                    if (exprGrouping != null)
+                    {
+                        for (int i=0;i<exprGrouping.length;i++)
+                        {
+                            exprGrouping[i] = replaceVariableWithCandidateInExpression(var, exprGrouping[i]);
+                        }
+                    }
+
+                    compilation.getSymbolTable().removeSymbol(compilation.getSymbolTable().getSymbol(var));
+                    // TODO Remove from input variables if explicit
+                }
             }
         }
     }

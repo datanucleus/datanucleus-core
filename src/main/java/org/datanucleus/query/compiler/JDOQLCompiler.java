@@ -21,11 +21,9 @@ package org.datanucleus.query.compiler;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.PropertyNames;
@@ -188,12 +186,12 @@ public class JDOQLCompiler extends JavaQueryCompiler
         boolean optimise = metaDataManager.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_QUERY_COMPILE_OPTIMISED);
         if (optimise)
         {
-            // TODO Add handling of relation navigation implying "relation != null".
-            // i.e if we have "this.field1.field2 = val" this is equivalent to "this.field1 != null && this.field1.field2 = val"
-            Set<String> options = new HashSet<>();
-            options.add(QueryCompilerOptimiser.OPTION_VAR_THIS);
-            QueryCompilerOptimiser optimiser = new QueryCompilerOptimiser(compilation, metaDataManager, options);
+            // Perform "var == this" optimisation TODO Enable this using a query extension
+            CompilationOptimiser optimiser = new VarThisCompilationOptimiser(compilation, metaDataManager);
             optimiser.optimise();
+
+            // TODO Add handling of relation navigation implying "relation != null". See NavigationNullCompilationOptimiser for a start point
+            // i.e if we have "this.field1.field2 = val" this is equivalent to "this.field1 != null && this.field1.field2 = val"
         }
 
         return compilation;
