@@ -23,6 +23,10 @@ package org.datanucleus.query.compiler;
  */
 public interface Parser
 {
+    void setStrict(boolean flag);
+
+    void setExplicitParameters(boolean flag);
+
     Node parse(String expression);
 
     Node[] parseFrom(String expression);

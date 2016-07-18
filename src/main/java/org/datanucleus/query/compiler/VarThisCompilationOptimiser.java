@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.query.expression.DyadicExpression;
 import org.datanucleus.query.expression.Expression;
@@ -42,7 +43,7 @@ public class VarThisCompilationOptimiser implements CompilationOptimiser
     /** The compilation that we are optimising. */
     QueryCompilation compilation;
 
-    public VarThisCompilationOptimiser(QueryCompilation compilation, MetaDataManager unused)
+    public VarThisCompilationOptimiser(QueryCompilation compilation, MetaDataManager unused, ClassLoaderResolver clr)
     {
         this.compilation = compilation;
     }

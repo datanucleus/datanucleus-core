@@ -18,7 +18,6 @@ Contributors:
 package org.datanucleus.query.compiler;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +29,7 @@ import org.datanucleus.query.JPQLQueryHelper;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.expression.InvokeExpression;
 import org.datanucleus.query.expression.PrimaryExpression;
+import org.datanucleus.store.query.Query;
 import org.datanucleus.util.Imports;
 
 /**
@@ -40,8 +40,7 @@ public class JPQLCompiler extends JavaQueryCompiler
     public JPQLCompiler(MetaDataManager metaDataManager, ClassLoaderResolver clr, String from, Class candidateClass, Collection candidates,
             String filter, Imports imports, String ordering, String result, String grouping, String having, String params, String update)
     {
-        super(metaDataManager, clr, from, candidateClass, candidates,
-            filter, imports, ordering, result, grouping, having, params, null, update);
+        super(metaDataManager, clr, from, candidateClass, candidates, filter, imports, ordering, result, grouping, having, params, null, update);
         this.from = from;
         this.caseSensitiveAliases = false;
     }
@@ -54,12 +53,12 @@ public class JPQLCompiler extends JavaQueryCompiler
      */
     public QueryCompilation compile(Map parameters, Map subqueryMap)
     {
-        Map parseOptions = new HashMap();
-        if (options != null && options.containsKey("jpql.strict"))
+        parser = new JPQLParser();
+        if (options != null && options.containsKey(Query.EXTENSION_JPQL_STRICT))
         {
-            parseOptions.put("jpql.strict", options.get("jpql.strict"));
+            parser.setStrict(Boolean.parseBoolean((String)options.get(Query.EXTENSION_JPQL_STRICT)));
         }
-        parser = new JPQLParser(parseOptions);
+
         symtbl = new SymbolTable();
         symtbl.setSymbolResolver(this);
         if (parentCompiler != null)

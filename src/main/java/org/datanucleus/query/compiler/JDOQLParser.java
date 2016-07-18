@@ -24,9 +24,7 @@ import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Deque;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.datanucleus.exceptions.NucleusException;
@@ -40,21 +38,17 @@ import org.datanucleus.util.StringUtils;
  * Implementation of a parser for JDOQL query language.
  * Generates Node tree(s) by use of the various parseXXX() methods.
  */
-public class JDOQLParser implements Parser
+public class JDOQLParser extends AbstractParser
 {
-    private static String[] jdoqlMethodNames = {"contains", "get", "containsKey", "containsValue", "isEmpty",
-        "size", "toLowerCase", "toUpperCase", "indexOf", "matches", "substring", "startsWith", "endsWith",
-        "getObjectId", "abs", "sqrt"
+    private static String[] jdoqlMethodNames = {"contains", "get", "containsKey", "containsValue", "isEmpty", // Containers
+        "size", "toLowerCase", "toUpperCase", "indexOf", "matches", "substring", "startsWith", "endsWith", "trim", "length", // String
+        "getObjectId", "abs", "sqrt",
+        "getDate", "getMonth", "getYear", "getHour", "getMinute", "getSecond", "getDayOfMonth", "getMonthValue", "getDays", "getMonths", "getYears", // Temporal
+        "ordinal", "toString", // Enum
+        "isPresent", "get", "orElse", // Optional
     };
 
-    private enum ParameterType { IMPLICIT, EXPLICIT }
-
-    private ParameterType paramType = ParameterType.IMPLICIT;
-
-    private boolean strictJDOQL = false;
-
-    private Lexer p;
-    private Deque<Node> stack = new ArrayDeque<Node>();
+    private boolean explicitParams = false;
 
     /** Characters that parameters can be prefixed by. */
     private static String paramPrefixes = ":";
@@ -63,21 +57,24 @@ public class JDOQLParser implements Parser
 
     /**
      * Constructor for a JDOQL Parser.
-     * Supports "jdoql.level" option so can have strict JDO2 syntax, or flexible.
-     * @param options parser options
      */
-    public JDOQLParser(Map options)
+    public JDOQLParser()
     {
-        if (options != null && options.containsKey("jdoql.strict"))
-        {
-            strictJDOQL = Boolean.valueOf((String)options.get("jdoql.strict"));
-        }
-        if (options != null && options.containsKey("explicitParameters"))
-        {
-            paramType = ParameterType.EXPLICIT;
-        }
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.query.compiler.AbstractParser#setExplicitParameters(boolean)
+     */
+    @Override
+    public void setExplicitParameters(boolean flag)
+    {
+        this.explicitParams = flag;
+    }
+
+    /**
+     * Method to set whether "=" is allowed. It is valid in an UPDATE clause, but not in a WHERE clause, for example.
+     * @param flag Whether to allow it
+     */
     public void allowSingleEquals(boolean flag)
     {
         allowSingleEquals = flag;
@@ -88,14 +85,14 @@ public class JDOQLParser implements Parser
      */
     public Node parse(String expression)
     {
-        p = new Lexer(expression, paramPrefixes, true);
+        lexer = new Lexer(expression, paramPrefixes, true);
         stack = new ArrayDeque<Node>();
         Node result = processExpression();
 
-        if (p.ci.getIndex() != p.ci.getEndIndex())
+        if (lexer.ci.getIndex() != lexer.ci.getEndIndex())
         {
             // Error occurred in the JDOQL processing due to syntax error(s)
-            String unparsed = p.getInput().substring(p.ci.getIndex());
+            String unparsed = lexer.getInput().substring(lexer.ci.getIndex());
             throw new QueryCompilerSyntaxException("Portion of expression could not be parsed: " + unparsed);
         }
         return result;
@@ -106,15 +103,15 @@ public class JDOQLParser implements Parser
      */
     public Node parseVariable(String expression)
     {
-        p = new Lexer(expression, paramPrefixes, true);
+        lexer = new Lexer(expression, paramPrefixes, true);
         stack = new ArrayDeque<Node>();
         if (!processIdentifier())
         {
-            throw new QueryCompilerSyntaxException("expected identifier", p.getIndex(), p.getInput());
+            throw new QueryCompilerSyntaxException("expected identifier", lexer.getIndex(), lexer.getInput());
         }
         if (!processIdentifier())
         {
-            throw new QueryCompilerSyntaxException("expected identifier", p.getIndex(), p.getInput());
+            throw new QueryCompilerSyntaxException("expected identifier", lexer.getIndex(), lexer.getInput());
         }
         Node nodeVariable = stack.pop();
         Node nodeType = stack.pop();
@@ -127,7 +124,7 @@ public class JDOQLParser implements Parser
      */
     public Node[] parseFrom(String expression)
     {
-        p = new Lexer(expression, paramPrefixes, true);
+        lexer = new Lexer(expression, paramPrefixes, true);
         stack = new ArrayDeque<Node>();
         return processFromExpression();
     }
@@ -152,10 +149,10 @@ public class JDOQLParser implements Parser
             className.append(".").append(id.getNodeValue().toString());
         }
 
-        String alias = p.parseIdentifier();
+        String alias = lexer.parseIdentifier();
         if (alias != null && alias.equalsIgnoreCase("AS"))
         {
-            alias = p.parseIdentifier();
+            alias = lexer.parseIdentifier();
         }
         if (alias == null)
         {
@@ -185,7 +182,7 @@ public class JDOQLParser implements Parser
      */
     public Node[] parseOrder(String expression)
     {
-        p = new Lexer(expression, paramPrefixes, true);
+        lexer = new Lexer(expression, paramPrefixes, true);
         stack = new ArrayDeque<Node>();
         return processOrderExpression();
     }
@@ -205,7 +202,7 @@ public class JDOQLParser implements Parser
      */
     public Node[] parseResult(String expression)
     {
-        p = new Lexer(expression, paramPrefixes, true);
+        lexer = new Lexer(expression, paramPrefixes, true);
         stack = new ArrayDeque<Node>();
         List nodes = new ArrayList();
         do
@@ -213,10 +210,10 @@ public class JDOQLParser implements Parser
             processExpression();
             Node expr = stack.pop();
 
-            String alias = p.parseIdentifier();
+            String alias = lexer.parseIdentifier();
             if (alias != null && alias.equalsIgnoreCase("AS"))
             {
-                alias = p.parseIdentifier();
+                alias = lexer.parseIdentifier();
             }
             if (alias != null)
             {
@@ -226,7 +223,7 @@ public class JDOQLParser implements Parser
 
             nodes.add(expr);
         }
-        while (p.parseString(","));
+        while (lexer.parseString(","));
         return (Node[])nodes.toArray(new Node[nodes.size()]);
     }
 
@@ -235,7 +232,7 @@ public class JDOQLParser implements Parser
      */
     public Node[] parseTuple(String expression)
     {
-        p = new Lexer(expression, paramPrefixes, true);
+        lexer = new Lexer(expression, paramPrefixes, true);
         stack = new ArrayDeque<Node>();
         List nodes = new ArrayList();
         do
@@ -244,7 +241,7 @@ public class JDOQLParser implements Parser
             Node expr = stack.pop();
             nodes.add(expr);
         }
-        while (p.parseString(","));
+        while (lexer.parseString(","));
         return (Node[])nodes.toArray(new Node[nodes.size()]);
     }
 
@@ -253,11 +250,11 @@ public class JDOQLParser implements Parser
      */
     public Node[][] parseVariables(String expression)
     {
-        p = new Lexer(expression, paramPrefixes, true);
+        lexer = new Lexer(expression, paramPrefixes, true);
         List nodes = new ArrayList();
         do
         {
-            if (StringUtils.isWhitespace(p.remaining()))
+            if (StringUtils.isWhitespace(lexer.remaining()))
             {
                 break;
             }
@@ -266,12 +263,12 @@ public class JDOQLParser implements Parser
             if (stack.isEmpty())
             {
                 throw new QueryCompilerSyntaxException("Parsing variable list and expected variable type", 
-                    p.getIndex(), p.getInput());
+                    lexer.getIndex(), lexer.getInput());
             }
             if (!processIdentifier())
             {
                 throw new QueryCompilerSyntaxException("Parsing variable list and expected variable name",
-                    p.getIndex(), p.getInput());
+                    lexer.getIndex(), lexer.getInput());
             }
 
             Node nodeVariable = stack.pop();
@@ -284,7 +281,7 @@ public class JDOQLParser implements Parser
             Node nodeType = stack.pop();
             nodes.add(new Node[]{nodeType, nodeVariable});
         }
-        while (p.parseString(";"));
+        while (lexer.parseString(";"));
         return (Node[][]) nodes.toArray(new Node[nodes.size()][2]);
     }
 
@@ -320,13 +317,13 @@ public class JDOQLParser implements Parser
         {
             processExpression();
             Node directionNode = null;
-            if (p.parseString("ascending") || p.parseString("asc") ||
-                p.parseString("ASCENDING") || p.parseString("ASC"))
+            if (lexer.parseString("ascending") || lexer.parseString("asc") ||
+                lexer.parseString("ASCENDING") || lexer.parseString("ASC"))
             {
                 directionNode = new Node(NodeType.OPERATOR, "ascending");
             }
-            else if (p.parseString("descending") || p.parseString("desc") ||
-                     p.parseString("DESCENDING") || p.parseString("DESC"))
+            else if (lexer.parseString("descending") || lexer.parseString("desc") ||
+                     lexer.parseString("DESCENDING") || lexer.parseString("DESC"))
             {
                 directionNode = new Node(NodeType.OPERATOR, "descending");
             }
@@ -338,11 +335,11 @@ public class JDOQLParser implements Parser
 
             // Nulls positioning
             Node nullsNode = null;
-            if (p.parseString("NULLS FIRST") || p.parseString("nulls first"))
+            if (lexer.parseString("NULLS FIRST") || lexer.parseString("nulls first"))
             {
                 nullsNode = new Node(NodeType.OPERATOR, "nulls first");
             }
-            else if (p.parseString("NULLS LAST") || p.parseString("nulls last"))
+            else if (lexer.parseString("NULLS LAST") || lexer.parseString("nulls last"))
             {
                 nullsNode = new Node(NodeType.OPERATOR, "nulls last");
             }
@@ -360,7 +357,7 @@ public class JDOQLParser implements Parser
             }
             nodes.add(expr);
         }
-        while (p.parseChar(','));
+        while (lexer.parseChar(','));
 
         return (Node[]) nodes.toArray(new Node[nodes.size()]);
     }
@@ -380,7 +377,7 @@ public class JDOQLParser implements Parser
     {
         processConditionalAndExpression();
 
-        while (p.parseString("||"))
+        while (lexer.parseString("||"))
         {
             processConditionalAndExpression();
             Node expr = new Node(NodeType.OPERATOR, "||");
@@ -399,7 +396,7 @@ public class JDOQLParser implements Parser
     {
         processInclusiveOrExpression();
 
-        while (p.parseString("&&"))
+        while (lexer.parseString("&&"))
         {
             processInclusiveOrExpression();
             Node expr = new Node(NodeType.OPERATOR, "&&");
@@ -413,7 +410,7 @@ public class JDOQLParser implements Parser
     {
         processExclusiveOrExpression();
 
-        while (p.parseChar('|', '|'))
+        while (lexer.parseChar('|', '|'))
         {
             processExclusiveOrExpression();
             Node expr = new Node(NodeType.OPERATOR, "|");
@@ -427,7 +424,7 @@ public class JDOQLParser implements Parser
     {
         processAndExpression();
 
-        while (p.parseChar('^'))
+        while (lexer.parseChar('^'))
         {
             processAndExpression();
             Node expr = new Node(NodeType.OPERATOR, "^");
@@ -441,7 +438,7 @@ public class JDOQLParser implements Parser
     {
         processRelationalExpression();
 
-        while (p.parseChar('&', '&'))
+        while (lexer.parseChar('&', '&'))
         {
             processRelationalExpression();
             Node expr = new Node(NodeType.OPERATOR, "&");
@@ -460,7 +457,7 @@ public class JDOQLParser implements Parser
 
         for (;;)
         {
-            if (p.parseString("=="))
+            if (lexer.parseString("=="))
             {
                 processAdditiveExpression();
                 Node expr = new Node(NodeType.OPERATOR, "==");
@@ -468,7 +465,7 @@ public class JDOQLParser implements Parser
                 expr.insertChildNode(stack.pop());
                 stack.push(expr);
             }
-            else if (p.parseString("!="))
+            else if (lexer.parseString("!="))
             {
                 processAdditiveExpression();
                 Node expr = new Node(NodeType.OPERATOR, "!=");
@@ -476,7 +473,7 @@ public class JDOQLParser implements Parser
                 expr.insertChildNode(stack.pop());
                 stack.push(expr);
             }
-            else if (p.parseString("="))
+            else if (lexer.parseString("="))
             {
                 if (allowSingleEquals)
                 {
@@ -493,7 +490,7 @@ public class JDOQLParser implements Parser
                     throw new QueryCompilerSyntaxException("Invalid operator \"=\". Did you mean to use \"==\"?");
                 }
             }
-            else if (p.parseString("<="))
+            else if (lexer.parseString("<="))
             {
                 processAdditiveExpression();
                 Node expr = new Node(NodeType.OPERATOR, "<=");
@@ -501,7 +498,7 @@ public class JDOQLParser implements Parser
                 expr.insertChildNode(stack.pop());
                 stack.push(expr);
             }
-            else if (p.parseString(">="))
+            else if (lexer.parseString(">="))
             {
                 processAdditiveExpression();
                 Node expr = new Node(NodeType.OPERATOR, ">=");
@@ -509,7 +506,7 @@ public class JDOQLParser implements Parser
                 expr.insertChildNode(stack.pop());
                 stack.push(expr);
             }
-            else if (p.parseChar('<'))
+            else if (lexer.parseChar('<'))
             {
                 processAdditiveExpression();
                 Node expr = new Node(NodeType.OPERATOR, "<");
@@ -517,7 +514,7 @@ public class JDOQLParser implements Parser
                 expr.insertChildNode(stack.pop());
                 stack.push(expr);
             }
-            else if (p.parseChar('>'))
+            else if (lexer.parseChar('>'))
             {
                 processAdditiveExpression();
                 Node expr = new Node(NodeType.OPERATOR, ">");
@@ -525,7 +522,7 @@ public class JDOQLParser implements Parser
                 expr.insertChildNode(stack.pop());
                 stack.push(expr);
             }
-            else if (p.parseString("instanceof"))
+            else if (lexer.parseString("instanceof"))
             {
                 processAdditiveExpression();
                 Node expr = new Node(NodeType.OPERATOR, "instanceof");
@@ -546,7 +543,7 @@ public class JDOQLParser implements Parser
 
         for (;;)
         {
-            if (p.parseChar('+'))
+            if (lexer.parseChar('+'))
             {
                 processMultiplicativeExpression();
                 Node expr = new Node(NodeType.OPERATOR, "+");
@@ -554,7 +551,7 @@ public class JDOQLParser implements Parser
                 expr.insertChildNode(stack.pop());
                 stack.push(expr);
             }
-            else if (p.parseChar('-'))
+            else if (lexer.parseChar('-'))
             {
                 processMultiplicativeExpression();
                 Node expr = new Node(NodeType.OPERATOR, "-");
@@ -575,7 +572,7 @@ public class JDOQLParser implements Parser
 
         for (;;)
         {
-            if (p.parseChar('*'))
+            if (lexer.parseChar('*'))
             {
                 processUnaryExpression();
                 Node expr = new Node(NodeType.OPERATOR, "*");
@@ -583,7 +580,7 @@ public class JDOQLParser implements Parser
                 expr.insertChildNode(stack.pop());
                 stack.push(expr);
             }
-            else if (p.parseChar('/'))
+            else if (lexer.parseChar('/'))
             {
                 processUnaryExpression();
                 Node expr = new Node(NodeType.OPERATOR, "/");
@@ -591,7 +588,7 @@ public class JDOQLParser implements Parser
                 expr.insertChildNode(stack.pop());
                 stack.push(expr);
             }
-            else if (p.parseChar('%'))
+            else if (lexer.parseChar('%'))
             {
                 processUnaryExpression();
                 Node expr = new Node(NodeType.OPERATOR, "%");
@@ -608,35 +605,35 @@ public class JDOQLParser implements Parser
 
     protected void processUnaryExpression()
     {
-        if (p.parseString("++"))
+        if (lexer.parseString("++"))
         {
             throw new QueryCompilerSyntaxException("Unsupported operator '++'");
         }
-        else if (p.parseString("--"))
+        else if (lexer.parseString("--"))
         {
             throw new QueryCompilerSyntaxException("Unsupported operator '--'");
         }
 
-        if (p.parseChar('+'))
+        if (lexer.parseChar('+'))
         {
             // Just swallow + and leave remains on the stack
             processUnaryExpression();
         }
-        else if (p.parseChar('-'))
+        else if (lexer.parseChar('-'))
         {
             processUnaryExpression();
             Node expr = new Node(NodeType.OPERATOR, "-");
             expr.insertChildNode(stack.pop());
             stack.push(expr);
         }
-        else if (p.parseChar('~'))
+        else if (lexer.parseChar('~'))
         {
             processUnaryExpression();
             Node expr = new Node(NodeType.OPERATOR, "~");
             expr.insertChildNode(stack.pop());
             stack.push(expr);
         }
-        else if (p.parseChar('!'))
+        else if (lexer.parseChar('!'))
         {
             processUnaryExpression();
             Node expr = new Node(NodeType.OPERATOR, "!");
@@ -656,7 +653,7 @@ public class JDOQLParser implements Parser
      */
     protected void processPrimary()
     {
-        if (p.parseString("DISTINCT ") || p.parseString("distinct"))
+        if (lexer.parseString("DISTINCT ") || lexer.parseString("distinct"))
         {
             // Aggregates can have "count(DISTINCT field1)"
             Node distinctNode = new Node(NodeType.OPERATOR, "DISTINCT");
@@ -674,7 +671,7 @@ public class JDOQLParser implements Parser
             castNode = stack.pop();
         }
 
-        if (p.peekString("IF(") || p.peekString("if(") || p.peekString("IF (") || p.peekString("if ("))
+        if (lexer.peekString("IF(") || lexer.peekString("if(") || lexer.peekString("IF (") || lexer.peekString("if ("))
         {
             processIfElseExpression();
             return;
@@ -685,7 +682,7 @@ public class JDOQLParser implements Parser
             boolean endOfChain = false;
             while (!endOfChain)
             {
-                if (p.parseChar('.'))
+                if (lexer.parseChar('.'))
                 {
                     if (processMethod())
                     {
@@ -713,7 +710,7 @@ public class JDOQLParser implements Parser
             boolean endOfChain = false;
             while (!endOfChain)
             {
-                if (p.parseChar('.'))
+                if (lexer.parseChar('.'))
                 {
                     if (processMethod())
                     {
@@ -751,7 +748,7 @@ public class JDOQLParser implements Parser
             boolean endOfChain = false;
             while (!endOfChain)
             {
-                if (p.parseChar('.'))
+                if (lexer.parseChar('.'))
                 {
                     if (processMethod())
                     {
@@ -776,16 +773,16 @@ public class JDOQLParser implements Parser
 
         int sizeBeforeBraceProcessing = stack.size();
         boolean braceProcessing = false;
-        if (p.parseChar('('))
+        if (lexer.parseChar('('))
         {
             // "({expr1})"
             processExpression();
-            if (!p.parseChar(')'))
+            if (!lexer.parseChar(')'))
             {
-                throw new QueryCompilerSyntaxException("expected ')'", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("expected ')'", lexer.getIndex(), lexer.getInput());
             }
 
-            if (!p.parseChar('.'))
+            if (!lexer.parseChar('.'))
             {
                 // TODO If we have a cast, then apply to the current node (with the brackets)
                 return;
@@ -804,7 +801,7 @@ public class JDOQLParser implements Parser
         }
         else
         {
-            throw new QueryCompilerSyntaxException("Method/Identifier expected", p.getIndex(), p.getInput());
+            throw new QueryCompilerSyntaxException("Method/Identifier expected", lexer.getIndex(), lexer.getInput());
         }
 
         // Save the stack size just before this component for use later in squashing all nodes
@@ -815,7 +812,7 @@ public class JDOQLParser implements Parser
             size = sizeBeforeBraceProcessing+1;
         }
 
-        while (p.parseChar('.'))
+        while (lexer.parseChar('.'))
         {
             if (processMethod())
             {
@@ -827,7 +824,7 @@ public class JDOQLParser implements Parser
             }
             else
             {
-                throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("Identifier expected", lexer.getIndex(), lexer.getInput());
             }
         }
 
@@ -905,21 +902,21 @@ public class JDOQLParser implements Parser
         Node caseNode = new Node(NodeType.CASE);
 
         // Process "IF (expr) actionExpr"
-        if (!p.parseString("IF") || p.parseString("if"))
+        if (!lexer.parseString("IF") || lexer.parseString("if"))
         {
-            throw new QueryCompilerSyntaxException("Expected IF or if", p.getIndex(), p.getInput());
+            throw new QueryCompilerSyntaxException("Expected IF or if", lexer.getIndex(), lexer.getInput());
         }
 
-        if (!p.parseChar('('))
+        if (!lexer.parseChar('('))
         {
-            throw new QueryCompilerSyntaxException("Expected '(' as part of IF (...)", p.getIndex(), p.getInput());
+            throw new QueryCompilerSyntaxException("Expected '(' as part of IF (...)", lexer.getIndex(), lexer.getInput());
         }
         processExpression();
         Node whenNode = stack.pop();
         caseNode.appendChildNode(whenNode);
-        if (!p.parseChar(')'))
+        if (!lexer.parseChar(')'))
         {
-            throw new QueryCompilerSyntaxException("Expected ')' as part of IF (...)", p.getIndex(), p.getInput());
+            throw new QueryCompilerSyntaxException("Expected ')' as part of IF (...)", lexer.getIndex(), lexer.getInput());
         }
 
         processExpression();
@@ -929,22 +926,22 @@ public class JDOQLParser implements Parser
         // Process "ELSE IF (expr) actionExpr ELSE actionExpr"
         // TODO Detect lack of ELSE with no IF and throw exception
         boolean elseClause = false;
-        while (p.parseString("ELSE") || p.parseString("else"))
+        while (lexer.parseString("ELSE") || lexer.parseString("else"))
         {
             boolean hasIf = false;
-            if (p.parseString("IF") || p.parseString("if"))
+            if (lexer.parseString("IF") || lexer.parseString("if"))
             {
                 hasIf = true;
-                if (!p.parseChar('('))
+                if (!lexer.parseChar('('))
                 {
-                    throw new QueryCompilerSyntaxException("Expected '(' as part of IF (...)", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("Expected '(' as part of IF (...)", lexer.getIndex(), lexer.getInput());
                 }
                 processExpression();
                 whenNode = stack.pop();
                 caseNode.appendChildNode(whenNode);
-                if (!p.parseChar(')'))
+                if (!lexer.parseChar(')'))
                 {
-                    throw new QueryCompilerSyntaxException("Expected ')' as part of IF (...)", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("Expected ')' as part of IF (...)", lexer.getIndex(), lexer.getInput());
                 }
             }
 
@@ -959,7 +956,7 @@ public class JDOQLParser implements Parser
 
         if (!elseClause)
         {
-            throw new QueryCompilerSyntaxException("Use of IF {expr} ELSE IF {expr} structure should always terminate with ELSE {expr} but doesn't", p.getIndex(), p.getInput());
+            throw new QueryCompilerSyntaxException("Use of IF {expr} ELSE IF {expr} structure should always terminate with ELSE {expr} but doesn't", lexer.getIndex(), lexer.getInput());
         }
         stack.push(caseNode);
     }
@@ -971,7 +968,7 @@ public class JDOQLParser implements Parser
      */
     private boolean processCast()
     {
-        String typeName = p.parseCast();
+        String typeName = lexer.parseCast();
         if (typeName == null)
         {
             return false;
@@ -989,17 +986,17 @@ public class JDOQLParser implements Parser
      */
     private boolean processCreator()
     {
-        if (p.parseString("new "))
+        if (lexer.parseString("new "))
         {
             int size = stack.size();
             if (!processMethod())
             {
                 if (!processIdentifier())
                 {
-                    throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("Identifier expected", lexer.getIndex(), lexer.getInput());
                 }
 
-                while (p.parseChar('.'))
+                while (lexer.parseChar('.'))
                 {
                     if (processMethod())
                     {
@@ -1011,7 +1008,7 @@ public class JDOQLParser implements Parser
                     }
                     else
                     {
-                        throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
+                        throw new QueryCompilerSyntaxException("Identifier expected", lexer.getIndex(), lexer.getInput());
                     }
                 }
             }
@@ -1037,13 +1034,13 @@ public class JDOQLParser implements Parser
      */
     private boolean processMethod()
     {
-        String method = p.parseMethod();
+        String method = lexer.parseMethod();
         if (method != null)
         {
-            p.skipWS();
-            p.parseChar('(');
+            lexer.skipWS();
+            lexer.parseChar('(');
 
-            if (strictJDOQL)
+            if (strict)
             {
                 // Enable strictness checking for levels of JDOQL
                 // Note that this only checks the method name and not the arguments/types
@@ -1056,7 +1053,7 @@ public class JDOQLParser implements Parser
 
             // Found syntax for a method, so invoke the method
             Node expr = new Node(NodeType.INVOKE, method);
-            if (!p.parseChar(')'))
+            if (!lexer.parseChar(')'))
             {
                 do
                 {
@@ -1064,11 +1061,11 @@ public class JDOQLParser implements Parser
                     processExpression();
                     expr.addProperty(stack.pop());
                 }
-                while (p.parseChar(','));
+                while (lexer.parseChar(','));
 
-                if (!p.parseChar(')'))
+                if (!lexer.parseChar(')'))
                 {
-                    throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
                 }
             }
 
@@ -1086,23 +1083,23 @@ public class JDOQLParser implements Parser
      */
     private boolean processArray()
     {
-        if (p.parseChar('{'))
+        if (lexer.parseChar('{'))
         {
             // Array
             List<Node> elements = new ArrayList();
-            while (!p.parseChar('}'))
+            while (!lexer.parseChar('}'))
             {
                 processPrimary();
                 Node elementNode = stack.pop();
                 elements.add(elementNode);
 
-                if (p.parseChar('}'))
+                if (lexer.parseChar('}'))
                 {
                     break;
                 }
-                else if (!p.parseChar(','))
+                else if (!lexer.parseChar(','))
                 {
-                    throw new QueryCompilerSyntaxException("',' or '}' expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("',' or '}' expected", lexer.getIndex(), lexer.getInput());
                 }
             }
 
@@ -1110,7 +1107,7 @@ public class JDOQLParser implements Parser
             stack.push(arrayNode);
 
             // Check for "length" since won't be picked up by processMethod
-            if (p.parseString(".length"))
+            if (lexer.parseString(".length"))
             {
                 Node lengthMethod = new Node(NodeType.INVOKE, "length");
                 arrayNode.appendChildNode(lengthMethod);
@@ -1136,8 +1133,8 @@ public class JDOQLParser implements Parser
         BigInteger iLiteral;
         Boolean bLiteral;
 
-        boolean single_quote_next = p.nextIsSingleQuote();
-        if ((sLiteral = p.parseStringLiteral()) != null)
+        boolean single_quote_next = lexer.nextIsSingleQuote();
+        if ((sLiteral = lexer.parseStringLiteral()) != null)
         {
             // Both String and Character are allowed to use single-quotes
             // so we need to check if it was single-quoted and
@@ -1151,11 +1148,11 @@ public class JDOQLParser implements Parser
                 litValue = sLiteral;
             }
         }
-        else if ((fLiteral = p.parseFloatingPointLiteral()) != null)
+        else if ((fLiteral = lexer.parseFloatingPointLiteral()) != null)
         {
             litValue = fLiteral;
         }
-        else if ((iLiteral = p.parseIntegerLiteral()) != null)
+        else if ((iLiteral = lexer.parseIntegerLiteral()) != null)
         {
             // Represent as BigInteger or Long depending on length
             String longStr = "" + iLiteral.longValue();
@@ -1168,11 +1165,11 @@ public class JDOQLParser implements Parser
                 litValue = iLiteral.longValue();
             }
         }
-        else if ((bLiteral = p.parseBooleanLiteral()) != null)
+        else if ((bLiteral = lexer.parseBooleanLiteral()) != null)
         {
             litValue = bLiteral;
         }
-        else if (p.parseNullLiteral())
+        else if (lexer.parseNullLiteral())
         {
         }
         else
@@ -1191,7 +1188,7 @@ public class JDOQLParser implements Parser
      */
     private boolean processIdentifier()
     {
-        String id = p.parseIdentifier();
+        String id = lexer.parseIdentifier();
         if (id == null)
         {
             return false;
@@ -1199,7 +1196,7 @@ public class JDOQLParser implements Parser
         char first = id.charAt(0);
         if (first == ':')
         {
-            if (paramType == ParameterType.EXPLICIT)
+            if (explicitParams)
             {
                 throw new QueryCompilerSyntaxException("Explicit parameters defined for query, yet implicit parameter syntax (\"" + id + "\") found");
             }

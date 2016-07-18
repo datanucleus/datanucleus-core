@@ -355,9 +355,13 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
         }
         JDOQLCompiler compiler = new JDOQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), from, candidateClass, candidateCollection, 
             this.filter, getParsedImports(), this.ordering, this.result, this.grouping, this.having, explicitParameters, explicitVariables, this.update);
+        if (getBooleanExtensionProperty(PropertyNames.PROPERTY_QUERY_COMPILE_OPTIMISE_VAR_THIS, false))
+        {
+            compiler.setOption(PropertyNames.PROPERTY_QUERY_COMPILE_OPTIMISE_VAR_THIS, true);
+        }
         if (getBooleanExtensionProperty(EXTENSION_JDOQL_STRICT, false))
         {
-            compiler.setOption("jdoql.strict", "true");
+            compiler.setOption(EXTENSION_JDOQL_STRICT, "true");
         }
 
         boolean allowAllSyntax = ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);
@@ -442,7 +446,7 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
                 subquery.filter, getParsedImports(), subquery.ordering, subquery.result, subquery.grouping, subquery.having, subquery.explicitParameters, null, null);
             if (getBooleanExtensionProperty(EXTENSION_JDOQL_STRICT, false))
             {
-                subCompiler.setOption("jdoql.strict", "true");
+                subCompiler.setOption(EXTENSION_JDOQL_STRICT, "true");
             }
 
             boolean allowAllSyntax = ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL);

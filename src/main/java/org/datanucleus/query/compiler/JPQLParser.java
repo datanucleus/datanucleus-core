@@ -22,8 +22,6 @@ import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Deque;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -33,26 +31,16 @@ import org.datanucleus.store.query.QueryCompilerSyntaxException;
  * Implementation of a parser for JPQL query language.
  * Generates Node tree(s) by use of the various parseXXX() methods.
  */
-public class JPQLParser implements Parser
+public class JPQLParser extends AbstractParser
 {
-    private Lexer p;
-    private Deque<Node> stack = new ArrayDeque<Node>();
-
     /** Characters that parameters can be prefixed by. */
     private static String paramPrefixes = ":?";
 
-    private boolean strictJPQL = false;
-
     /**
      * Constructor for a JPQL Parser.
-     * @param options parser options
      */
-    public JPQLParser(Map options)
+    public JPQLParser()
     {
-        if (options != null && options.containsKey("jpql.strict"))
-        {
-            strictJPQL = Boolean.valueOf((String)options.get("jpql.strict"));
-        }
     }
 
     /* (non-Javadoc)
@@ -60,14 +48,14 @@ public class JPQLParser implements Parser
      */
     public Node parse(String expression)
     {
-        p = new Lexer(expression, paramPrefixes, false);
+        lexer = new Lexer(expression, paramPrefixes, false);
         stack = new ArrayDeque<Node>();
         Node result = processExpression();
 
-        if (p.ci.getIndex() != p.ci.getEndIndex())
+        if (lexer.ci.getIndex() != lexer.ci.getEndIndex())
         {
             // Error occurred in the JDOQL processing due to syntax error(s)
-            throw new QueryCompilerSyntaxException("Portion of expression could not be parsed: " + p.getInput().substring(p.ci.getIndex()));
+            throw new QueryCompilerSyntaxException("Portion of expression could not be parsed: " + lexer.getInput().substring(lexer.ci.getIndex()));
         }
         return result;
     }
@@ -77,15 +65,15 @@ public class JPQLParser implements Parser
      */
     public Node parseVariable(String expression)
     {
-        p = new Lexer(expression, paramPrefixes, false);
+        lexer = new Lexer(expression, paramPrefixes, false);
         stack = new ArrayDeque<Node>();
         if (!processIdentifier())
         {
-            throw new QueryCompilerSyntaxException("expected identifier", p.getIndex(), p.getInput());
+            throw new QueryCompilerSyntaxException("expected identifier", lexer.getIndex(), lexer.getInput());
         }
         if (!processIdentifier())
         {
-            throw new QueryCompilerSyntaxException("expected identifier", p.getIndex(), p.getInput());
+            throw new QueryCompilerSyntaxException("expected identifier", lexer.getIndex(), lexer.getInput());
         }
         Node nodeVariable = stack.pop();
         Node nodeType = stack.pop();
@@ -98,7 +86,7 @@ public class JPQLParser implements Parser
      */
     public Node[] parseFrom(String expression)
     {
-        p = new Lexer(expression, paramPrefixes, false);
+        lexer = new Lexer(expression, paramPrefixes, false);
         stack = new ArrayDeque<Node>();
         return processFromExpression();
     }
@@ -108,7 +96,7 @@ public class JPQLParser implements Parser
      */
     public Node[] parseUpdate(String expression)
     {
-        p = new Lexer(expression, paramPrefixes, false);
+        lexer = new Lexer(expression, paramPrefixes, false);
         stack = new ArrayDeque<Node>();
         return parseTuple(expression);
     }
@@ -118,7 +106,7 @@ public class JPQLParser implements Parser
      */
     public Node[] parseOrder(String expression)
     {
-        p = new Lexer(expression, paramPrefixes, false);
+        lexer = new Lexer(expression, paramPrefixes, false);
         stack = new ArrayDeque<Node>();
         return processOrderExpression();
     }
@@ -128,7 +116,7 @@ public class JPQLParser implements Parser
      */
     public Node[] parseResult(String expression)
     {
-        p = new Lexer(expression, paramPrefixes, false);
+        lexer = new Lexer(expression, paramPrefixes, false);
         stack = new ArrayDeque<Node>();
         List nodes = new ArrayList();
         do
@@ -136,10 +124,10 @@ public class JPQLParser implements Parser
             processExpression();
             Node node = stack.pop();
 
-            String alias = p.parseIdentifier();
+            String alias = lexer.parseIdentifier();
             if (alias != null && alias.equalsIgnoreCase("AS"))
             {
-                alias = p.parseIdentifier();
+                alias = lexer.parseIdentifier();
             }
             if (alias != null)
             {
@@ -149,7 +137,7 @@ public class JPQLParser implements Parser
 
             nodes.add(node);
         }
-        while (p.parseString(","));
+        while (lexer.parseString(","));
         return (Node[])nodes.toArray(new Node[nodes.size()]);
     }
 
@@ -158,7 +146,7 @@ public class JPQLParser implements Parser
      */
     public Node[] parseTuple(String expression)
     {
-        p = new Lexer(expression, paramPrefixes, false);
+        lexer = new Lexer(expression, paramPrefixes, false);
         stack = new ArrayDeque<Node>();
         List nodes = new ArrayList();
         do
@@ -167,7 +155,7 @@ public class JPQLParser implements Parser
             Node node = stack.pop();
             nodes.add(node);
         }
-        while (p.parseString(","));
+        while (lexer.parseString(","));
         return (Node[])nodes.toArray(new Node[nodes.size()]);
     }
 
@@ -176,24 +164,24 @@ public class JPQLParser implements Parser
      */
     public Node[][] parseVariables(String expression)
     {
-        p = new Lexer(expression, paramPrefixes, false);
+        lexer = new Lexer(expression, paramPrefixes, false);
         List nodes = new ArrayList();
         do
         {
             processPrimary();
             if (stack.isEmpty())
             {
-                throw new QueryCompilerSyntaxException("expected identifier", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("expected identifier", lexer.getIndex(), lexer.getInput());
             }
             if (!processIdentifier())
             {
-                throw new QueryCompilerSyntaxException("expected identifier", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("expected identifier", lexer.getIndex(), lexer.getInput());
             }
             Node nodeVariable = stack.pop();
             Node nodeType = stack.pop();
             nodes.add(new Node[]{nodeType, nodeVariable});
         }
-        while (p.parseString(";"));
+        while (lexer.parseString(";"));
         return (Node[][]) nodes.toArray(new Node[nodes.size()][2]);
     }
 
@@ -202,24 +190,24 @@ public class JPQLParser implements Parser
      */
     public Node[][] parseParameters(String expression)
     {
-        p = new Lexer(expression, paramPrefixes, false);
+        lexer = new Lexer(expression, paramPrefixes, false);
         List nodes = new ArrayList();
         do
         {
             processPrimary();
             if (stack.isEmpty())
             {
-                throw new QueryCompilerSyntaxException("expected identifier", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("expected identifier", lexer.getIndex(), lexer.getInput());
             }
             if (!processIdentifier())
             {
-                throw new QueryCompilerSyntaxException("expected identifier", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("expected identifier", lexer.getIndex(), lexer.getInput());
             }
             Node nodeVariable = stack.pop();
             Node nodeType = stack.pop();
             nodes.add(new Node[]{nodeType, nodeVariable});
         }
-        while (p.parseString(","));
+        while (lexer.parseString(","));
         return (Node[][]) nodes.toArray(new Node[nodes.size()][2]);
     }
 
@@ -238,9 +226,9 @@ public class JPQLParser implements Parser
         List nodes = new ArrayList();
         do
         {
-            if (p.peekStringIgnoreCase("IN(") || p.peekStringIgnoreCase("IN "))
+            if (lexer.peekStringIgnoreCase("IN(") || lexer.peekStringIgnoreCase("IN "))
             {
-                p.parseStringIgnoreCase("IN");
+                lexer.parseStringIgnoreCase("IN");
                 // IN expression
                 // This will create a node of type "Node.CLASS" (candidate) and child of type "Node.NAME" (alias)
                 // Any IN/JOINs will be child nodes of type "Node.OPERATOR"
@@ -252,32 +240,32 @@ public class JPQLParser implements Parser
                 // +--- Node(OPERATOR, "JOIN_INNER")
                 //    +--- Node(IDENTIFIER, "f.myField2")
                 //    +--- Node(NAME, "g")
-                if (!p.parseChar('('))
+                if (!lexer.parseChar('('))
                 {
-                    throw new QueryCompilerSyntaxException("Expected: '(' but got " + p.remaining(), 
-                        p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("Expected: '(' but got " + lexer.remaining(), 
+                        lexer.getIndex(), lexer.getInput());
                 }
 
                 // Find what we are joining to
-                String name = p.parseIdentifier();
+                String name = lexer.parseIdentifier();
                 Node joinedNode = new Node(NodeType.IDENTIFIER, name);
                 Node parentNode = joinedNode;
-                while (p.nextIsDot())
+                while (lexer.nextIsDot())
                 {
-                    p.parseChar('.');
-                    String subName = p.parseIdentifier();
+                    lexer.parseChar('.');
+                    String subName = lexer.parseIdentifier();
                     Node subNode = new Node(NodeType.IDENTIFIER, subName);
                     parentNode.appendChildNode(subNode);
                     parentNode = subNode;
                 }
 
-                if (!p.parseChar(')'))
+                if (!lexer.parseChar(')'))
                 {
-                    throw new QueryCompilerSyntaxException("Expected: ')' but got " + p.remaining(), 
-                        p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("Expected: ')' but got " + lexer.remaining(), 
+                        lexer.getIndex(), lexer.getInput());
                 }
-                p.parseStringIgnoreCase("AS"); // Optional
-                String alias = p.parseIdentifier();
+                lexer.parseStringIgnoreCase("AS"); // Optional
+                String alias = lexer.parseIdentifier();
 
                 // Create candidate class node with alias, and put at top of stack
                 Node classNode = new Node(NodeType.CLASS, candidateClassName);
@@ -311,10 +299,10 @@ public class JPQLParser implements Parser
                     className.append(".").append(id.getNodeValue().toString());
                 }
 
-                String alias = p.parseIdentifier();
+                String alias = lexer.parseIdentifier();
                 if (alias != null && alias.equalsIgnoreCase("AS"))
                 {
-                    alias = p.parseIdentifier();
+                    alias = lexer.parseIdentifier();
                 }
                 if (candidateClassName == null)
                 {
@@ -334,7 +322,7 @@ public class JPQLParser implements Parser
                 nodes.add(classNode);
             }
         }
-        while (p.parseString(","));
+        while (lexer.parseString(","));
 
         return (Node[]) nodes.toArray(new Node[nodes.size()]);
     }
@@ -367,24 +355,24 @@ public class JPQLParser implements Parser
             boolean leftJoin = false;
             boolean rightJoin = false; // extension to JPA
             boolean innerJoin = false;
-            if (p.parseStringIgnoreCase("INNER "))
+            if (lexer.parseStringIgnoreCase("INNER "))
             {
                 innerJoin = true;
             }
-            else if (p.parseStringIgnoreCase("LEFT "))
+            else if (lexer.parseStringIgnoreCase("LEFT "))
             {
                 //optional and useless (for parser) outer keyword
-                p.parseStringIgnoreCase("OUTER");
+                lexer.parseStringIgnoreCase("OUTER");
                 leftJoin = true;
             }
-            else if (p.parseStringIgnoreCase("RIGHT "))
+            else if (lexer.parseStringIgnoreCase("RIGHT "))
             {
                 //optional and useless (for parser) outer keyword
-                p.parseStringIgnoreCase("OUTER");
+                lexer.parseStringIgnoreCase("OUTER");
                 rightJoin = true;
             }
 
-            if (p.parseStringIgnoreCase("JOIN "))
+            if (lexer.parseStringIgnoreCase("JOIN "))
             {
                 if (!innerJoin && !leftJoin && !rightJoin)
                 {
@@ -392,29 +380,29 @@ public class JPQLParser implements Parser
                 }
                 // Process the join
                 boolean fetch = false;
-                if (p.parseStringIgnoreCase("FETCH"))
+                if (lexer.parseStringIgnoreCase("FETCH"))
                 {
                     fetch = true;
                 }
 
                 // Find what we are joining to
-                String id = p.parseIdentifier();
+                String id = lexer.parseIdentifier();
                 Node joinedNode = new Node(NodeType.IDENTIFIER, id);
                 Node parentNode = joinedNode;
-                while (p.nextIsDot())
+                while (lexer.nextIsDot())
                 {
-                    p.parseChar('.');
-                    Node subNode = new Node(NodeType.IDENTIFIER, p.parseName());
+                    lexer.parseChar('.');
+                    Node subNode = new Node(NodeType.IDENTIFIER, lexer.parseName());
                     parentNode.appendChildNode(subNode);
                     parentNode = subNode;
                 }
 
                 // And the alias we know this joined field by
-                p.parseStringIgnoreCase("AS "); // Optional
-                String alias = p.parseName();
+                lexer.parseStringIgnoreCase("AS "); // Optional
+                String alias = lexer.parseName();
 
                 Node onNode = null;
-                if (p.parseStringIgnoreCase("ON "))
+                if (lexer.parseStringIgnoreCase("ON "))
                 {
                     // JPA2.1 : Process "ON {cond_expr}"
                     processExpression();
@@ -448,7 +436,7 @@ public class JPQLParser implements Parser
             {
                 if (innerJoin || leftJoin)
                 {
-                    throw new NucleusUserException("Expected JOIN after INNER/LEFT keyword at"+p.remaining());
+                    throw new NucleusUserException("Expected JOIN after INNER/LEFT keyword at"+lexer.remaining());
                 }
                 moreJoins = false;
             }
@@ -463,11 +451,11 @@ public class JPQLParser implements Parser
         {
             processExpression();
             Node directionNode = null;
-            if (p.parseStringIgnoreCase("asc"))
+            if (lexer.parseStringIgnoreCase("asc"))
             {
                 directionNode = new Node(NodeType.OPERATOR, "ascending");
             }
-            else if (p.parseStringIgnoreCase("desc"))
+            else if (lexer.parseStringIgnoreCase("desc"))
             {
                 directionNode = new Node(NodeType.OPERATOR, "descending");
             }
@@ -479,11 +467,11 @@ public class JPQLParser implements Parser
 
             // Nulls positioning
             Node nullsNode = null;
-            if (p.parseString("NULLS FIRST") || p.parseString("nulls first"))
+            if (lexer.parseString("NULLS FIRST") || lexer.parseString("nulls first"))
             {
                 nullsNode = new Node(NodeType.OPERATOR, "nulls first");
             }
-            else if (p.parseString("NULLS LAST") || p.parseString("nulls last"))
+            else if (lexer.parseString("NULLS LAST") || lexer.parseString("nulls last"))
             {
                 nullsNode = new Node(NodeType.OPERATOR, "nulls last");
             }
@@ -501,7 +489,7 @@ public class JPQLParser implements Parser
             }
             nodes.add(expr);
         }
-        while (p.parseString(","));
+        while (lexer.parseString(","));
         return (Node[]) nodes.toArray(new Node[nodes.size()]);
     }
 
@@ -520,7 +508,7 @@ public class JPQLParser implements Parser
     {
         processAndExpression();
 
-        while (p.parseStringIgnoreCase("OR "))
+        while (lexer.parseStringIgnoreCase("OR "))
         {
             processAndExpression();
             Node expr = new Node(NodeType.OPERATOR, "||");
@@ -539,7 +527,7 @@ public class JPQLParser implements Parser
     {
         processRelationalExpression();
 
-        while (p.parseStringIgnoreCase("AND "))
+        while (lexer.parseStringIgnoreCase("AND "))
         {
             processRelationalExpression();
             Node expr = new Node(NodeType.OPERATOR, "&&");
@@ -558,7 +546,7 @@ public class JPQLParser implements Parser
 
         for (;;)
         {
-            if (p.parseString("="))
+            if (lexer.parseString("="))
             {
                 processAdditiveExpression();
                 Node right = stack.pop();
@@ -589,7 +577,7 @@ public class JPQLParser implements Parser
                     stack.push(expr);
                 }
             }
-            else if (p.parseString("<>"))
+            else if (lexer.parseString("<>"))
             {
                 processAdditiveExpression();
                 Node right = stack.pop();
@@ -624,15 +612,15 @@ public class JPQLParser implements Parser
                     stack.push(expr);
                 }
             }
-            else if (p.parseStringIgnoreCase("NOT "))
+            else if (lexer.parseStringIgnoreCase("NOT "))
             {
-                if (p.parseStringIgnoreCase("BETWEEN "))
+                if (lexer.parseStringIgnoreCase("BETWEEN "))
                 {
                     // {expression} NOT BETWEEN {lower} AND {upper}
                     Node inputNode = stack.pop();
                     processAdditiveExpression();
                     Node lowerNode = stack.pop();
-                    if (p.parseStringIgnoreCase("AND "))
+                    if (lexer.parseStringIgnoreCase("AND "))
                     {
                         processAdditiveExpression();
                         Node upperNode = stack.pop();
@@ -655,19 +643,19 @@ public class JPQLParser implements Parser
                         throw new NucleusUserException("Query has BETWEEN keyword with no AND clause");
                     }
                 }
-                else if (p.parseStringIgnoreCase("LIKE "))
+                else if (lexer.parseStringIgnoreCase("LIKE "))
                 {
                     processLikeExpression();
                     Node notNode = new Node(NodeType.OPERATOR, "!");
                     notNode.insertChildNode(stack.pop());
                     stack.push(notNode);
                 }
-                else if (p.parseStringIgnoreCase("IN"))
+                else if (lexer.parseStringIgnoreCase("IN"))
                 {
                     // {expression} NOT IN (expr1 [,expr2[,expr3]])
                     processInExpression(true);
                 }
-                else if (p.parseStringIgnoreCase("MEMBER "))
+                else if (lexer.parseStringIgnoreCase("MEMBER "))
                 {
                     processMemberExpression(true);
                 }
@@ -676,13 +664,13 @@ public class JPQLParser implements Parser
                     throw new NucleusException("Unsupported query syntax NOT followed by unsupported keyword");
                 }
             }
-            else if (p.parseStringIgnoreCase("BETWEEN "))
+            else if (lexer.parseStringIgnoreCase("BETWEEN "))
             {
                 // {expression} BETWEEN {lower} AND {upper}
                 Node inputNode = stack.pop();
                 processAdditiveExpression();
                 Node lowerNode = stack.pop();
-                if (p.parseStringIgnoreCase("AND "))
+                if (lexer.parseStringIgnoreCase("AND "))
                 {
                     processAdditiveExpression();
                     Node upperNode = stack.pop();
@@ -704,21 +692,21 @@ public class JPQLParser implements Parser
                     throw new NucleusUserException("Query has BETWEEN keyword with no AND clause");
                 }
             }
-            else if (p.parseStringIgnoreCase("LIKE "))
+            else if (lexer.parseStringIgnoreCase("LIKE "))
             {
                 // {expression} LIKE {pattern_value} [ESCAPE {escape_char}]
                 processLikeExpression();
             }
-            else if (p.parseStringIgnoreCase("IN"))
+            else if (lexer.parseStringIgnoreCase("IN"))
             {
                 // {expression} IN (expr1 [,expr2[,expr3]])
                 processInExpression(false);
             }
-            else if (p.parseStringIgnoreCase("MEMBER "))
+            else if (lexer.parseStringIgnoreCase("MEMBER "))
             {
                 processMemberExpression(false);
             }
-            else if (p.parseStringIgnoreCase("IS "))
+            else if (lexer.parseStringIgnoreCase("IS "))
             {
                 // {expression} IS [NOT] [NULL | EMPTY]
                 Node inputNode = stack.pop();
@@ -733,12 +721,12 @@ public class JPQLParser implements Parser
                 }
 
                 boolean not = false;
-                if (p.parseStringIgnoreCase("NOT "))
+                if (lexer.parseStringIgnoreCase("NOT "))
                 {
                     not = true;
                 }
 
-                if (p.parseStringIgnoreCase("NULL"))
+                if (lexer.parseStringIgnoreCase("NULL"))
                 {
                     Node isNode = new Node(NodeType.OPERATOR, not ? "!=" : "==");
                     Node compareNode = new Node(NodeType.LITERAL, null);
@@ -746,7 +734,7 @@ public class JPQLParser implements Parser
                     isNode.insertChildNode(inputRootNode);
                     stack.push(isNode);
                 }
-                else if (p.parseStringIgnoreCase("EMPTY"))
+                else if (lexer.parseStringIgnoreCase("EMPTY"))
                 {
                     // Convert IS EMPTY to a method call of "size()==0" on collection/map
                     Node sizeNode = new Node(NodeType.INVOKE, "size");
@@ -762,7 +750,7 @@ public class JPQLParser implements Parser
                     throw new NucleusException("Encountered IS " + (not ? "NOT " : " ") + " that should be followed by NULL | EMPTY but isnt");
                 }
             }
-            else if (p.parseString("<="))
+            else if (lexer.parseString("<="))
             {
                 processAdditiveExpression();
                 Node expr = new Node(NodeType.OPERATOR, "<=");
@@ -770,7 +758,7 @@ public class JPQLParser implements Parser
                 expr.insertChildNode(stack.pop());
                 stack.push(expr);
             }
-            else if (p.parseString(">="))
+            else if (lexer.parseString(">="))
             {
                 processAdditiveExpression();
                 Node expr = new Node(NodeType.OPERATOR, ">=");
@@ -778,7 +766,7 @@ public class JPQLParser implements Parser
                 expr.insertChildNode(stack.pop());
                 stack.push(expr);
             }
-            else if (p.parseChar('<'))
+            else if (lexer.parseChar('<'))
             {
                 processAdditiveExpression();
                 Node expr = new Node(NodeType.OPERATOR, "<");
@@ -786,7 +774,7 @@ public class JPQLParser implements Parser
                 expr.insertChildNode(stack.pop());
                 stack.push(expr);
             }
-            else if (p.parseChar('>'))
+            else if (lexer.parseChar('>'))
             {
                 processAdditiveExpression();
                 Node expr = new Node(NodeType.OPERATOR, ">");
@@ -823,7 +811,7 @@ public class JPQLParser implements Parser
         processAdditiveExpression();
         Node likeExprNode = stack.pop();
 
-        if (p.parseStringIgnoreCase("ESCAPE"))
+        if (lexer.parseStringIgnoreCase("ESCAPE"))
         {
             // Return matchesNode with 2 property nodes - the pattern expression, and the escape char
             processAdditiveExpression();
@@ -858,7 +846,7 @@ public class JPQLParser implements Parser
         // TODO Cater for TYPE as the inputNode
         Node inputNode = stack.pop(); // The left hand side expression
 
-        if (!p.parseChar('('))
+        if (!lexer.parseChar('('))
         {
             // Subquery
             Node inNode = new Node(NodeType.OPERATOR, not ? "NOT IN" : "IN");
@@ -879,19 +867,19 @@ public class JPQLParser implements Parser
             processPrimary();
             if (stack.peek() == null)
             {
-                throw new QueryCompilerSyntaxException("Expected literal|parameter but got " + p.remaining(), p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("Expected literal|parameter but got " + lexer.remaining(), lexer.getIndex(), lexer.getInput());
             }
 
             // Generate node for comparison with this value
             Node valueNode = stack.pop();
             valueNodes.add(valueNode);
-            p.skipWS();
+            lexer.skipWS();
 
-        } while (p.parseChar(','));
+        } while (lexer.parseChar(','));
 
-        if (!p.parseChar(')'))
+        if (!lexer.parseChar(')'))
         {
-            throw new QueryCompilerSyntaxException("Expected: ')' but got " + p.remaining(), p.getIndex(), p.getInput());
+            throw new QueryCompilerSyntaxException("Expected: ')' but got " + lexer.remaining(), lexer.getIndex(), lexer.getInput());
         }
         else if (valueNodes.isEmpty())
         {
@@ -944,7 +932,7 @@ public class JPQLParser implements Parser
     private void processMemberExpression(boolean not)
     {
         Node inputNode = stack.pop(); // The left hand side expression
-        p.parseStringIgnoreCase("OF"); // Ignore any "OF" keyword here (optional)
+        lexer.parseStringIgnoreCase("OF"); // Ignore any "OF" keyword here (optional)
         processPrimary(); // Container node at top of stack
         Node containerNode = stack.peek();
 
@@ -980,7 +968,7 @@ public class JPQLParser implements Parser
     {
         Node caseNode = new Node(NodeType.CASE);
         boolean simple = true;
-        if (p.peekStringIgnoreCase("WHEN "))
+        if (lexer.peekStringIgnoreCase("WHEN "))
         {
             simple = false;
         }
@@ -990,7 +978,7 @@ public class JPQLParser implements Parser
             Node exprNode = processExpression();
             stack.pop();
 
-            while (p.parseStringIgnoreCase("WHEN "))
+            while (lexer.parseStringIgnoreCase("WHEN "))
             {
                 processExpression();
                 Node eqCondNode = stack.pop(); // exprNode == eqCondNode
@@ -999,53 +987,53 @@ public class JPQLParser implements Parser
                 whenNode.insertChildNode(eqCondNode);
                 caseNode.appendChildNode(whenNode);
 
-                boolean hasThen = p.parseStringIgnoreCase("THEN ");
+                boolean hasThen = lexer.parseStringIgnoreCase("THEN ");
                 if (!hasThen)
                 {
-                    throw new QueryCompilerSyntaxException("expected 'THEN' as part of CASE", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("expected 'THEN' as part of CASE", lexer.getIndex(), lexer.getInput());
                 }
                 processExpression();
                 Node actionNode = stack.pop();
                 caseNode.appendChildNode(actionNode);
             }
-            if (p.parseStringIgnoreCase("ELSE "))
+            if (lexer.parseStringIgnoreCase("ELSE "))
             {
                 processExpression();
                 Node elseNode = stack.pop();
                 caseNode.appendChildNode(elseNode);
             }
-            if (!p.parseStringIgnoreCase("END")) 
+            if (!lexer.parseStringIgnoreCase("END")) 
             {
-                throw new QueryCompilerSyntaxException("expected 'END' as part of CASE", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("expected 'END' as part of CASE", lexer.getIndex(), lexer.getInput());
             }
         }
         else
         {
             // General CASE 
-            while (p.parseStringIgnoreCase("WHEN "))
+            while (lexer.parseStringIgnoreCase("WHEN "))
             {
                 processExpression();
                 Node whenNode = stack.pop();
                 caseNode.appendChildNode(whenNode);
 
-                boolean hasThen = p.parseStringIgnoreCase("THEN ");
+                boolean hasThen = lexer.parseStringIgnoreCase("THEN ");
                 if (!hasThen)
                 {
-                    throw new QueryCompilerSyntaxException("expected 'THEN' as part of CASE", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("expected 'THEN' as part of CASE", lexer.getIndex(), lexer.getInput());
                 }
                 processExpression();
                 Node actionNode = stack.pop();
                 caseNode.appendChildNode(actionNode);
             }
-            if (p.parseStringIgnoreCase("ELSE "))
+            if (lexer.parseStringIgnoreCase("ELSE "))
             {
                 processExpression();
                 Node elseNode = stack.pop();
                 caseNode.appendChildNode(elseNode);
             }
-            if (!p.parseStringIgnoreCase("END")) 
+            if (!lexer.parseStringIgnoreCase("END")) 
             {
-                throw new QueryCompilerSyntaxException("expected 'END' as part of CASE", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("expected 'END' as part of CASE", lexer.getIndex(), lexer.getInput());
             }
         }
         stack.push(caseNode);
@@ -1057,7 +1045,7 @@ public class JPQLParser implements Parser
 
         for (;;)
         {
-            if (p.parseChar('+'))
+            if (lexer.parseChar('+'))
             {
                 processMultiplicativeExpression();
                 Node expr = new Node(NodeType.OPERATOR, "+");
@@ -1065,7 +1053,7 @@ public class JPQLParser implements Parser
                 expr.insertChildNode(stack.pop());
                 stack.push(expr);
             }
-            else if (p.parseChar('-'))
+            else if (lexer.parseChar('-'))
             {
                 processMultiplicativeExpression();
                 Node expr = new Node(NodeType.OPERATOR, "-");
@@ -1086,7 +1074,7 @@ public class JPQLParser implements Parser
 
         for (;;)
         {
-            if (p.parseChar('*'))
+            if (lexer.parseChar('*'))
             {
                 processUnaryExpression();
                 Node expr = new Node(NodeType.OPERATOR, "*");
@@ -1094,7 +1082,7 @@ public class JPQLParser implements Parser
                 expr.insertChildNode(stack.pop());
                 stack.push(expr);
             }
-            else if (p.parseChar('/'))
+            else if (lexer.parseChar('/'))
             {
                 processUnaryExpression();
                 Node expr = new Node(NodeType.OPERATOR, "/");
@@ -1102,7 +1090,7 @@ public class JPQLParser implements Parser
                 expr.insertChildNode(stack.pop());
                 stack.push(expr);
             }
-            else if (p.parseChar('%'))
+            else if (lexer.parseChar('%'))
             {
                 processUnaryExpression();
                 Node expr = new Node(NodeType.OPERATOR, "%");
@@ -1119,28 +1107,28 @@ public class JPQLParser implements Parser
 
     protected void processUnaryExpression()
     {
-        if (p.parseString("++"))
+        if (lexer.parseString("++"))
         {
             throw new NucleusUserException("Unsupported operator '++'");
         }
-        else if (p.parseString("--"))
+        else if (lexer.parseString("--"))
         {
             throw new NucleusUserException("Unsupported operator '--'");
         }
 
-        if (p.parseChar('+'))
+        if (lexer.parseChar('+'))
         {
             // Just swallow + and leave remains on the stack
             processUnaryExpression();
         }
-        else if (p.parseChar('-'))
+        else if (lexer.parseChar('-'))
         {
             processUnaryExpression();
             Node expr = new Node(NodeType.OPERATOR, "-");
             expr.insertChildNode(stack.pop());
             stack.push(expr);
         }
-        else if (p.parseStringIgnoreCase("NOT "))
+        else if (lexer.parseStringIgnoreCase("NOT "))
         {
             processRelationalExpression();
             Node expr = new Node(NodeType.OPERATOR, "!");
@@ -1162,25 +1150,25 @@ public class JPQLParser implements Parser
         String subqueryKeyword = null;
         Node subqueryNode = null;
 
-        if (p.parseStringIgnoreCase("SOME "))
+        if (lexer.parseStringIgnoreCase("SOME "))
         {
             subqueryKeyword = "SOME";
             processExpression(); // subquery variable
             subqueryNode = stack.pop();
         }
-        else if (p.parseStringIgnoreCase("ALL "))
+        else if (lexer.parseStringIgnoreCase("ALL "))
         {
             subqueryKeyword = "ALL";
             processExpression(); // subquery variable
             subqueryNode = stack.pop();
         }
-        else if (p.parseStringIgnoreCase("ANY "))
+        else if (lexer.parseStringIgnoreCase("ANY "))
         {
             subqueryKeyword = "ANY";
             processExpression(); // subquery variable
             subqueryNode = stack.pop();
         }
-        else if (p.parseStringIgnoreCase("EXISTS "))
+        else if (lexer.parseStringIgnoreCase("EXISTS "))
         {
             subqueryKeyword = "EXISTS";
             processExpression(); // subquery variable
@@ -1194,31 +1182,31 @@ public class JPQLParser implements Parser
             return;
         }
 
-        if (!strictJPQL)
+        if (!strict)
         {
             // Series of user-convenience methods that are not part of strict JPQL
-            if (p.parseStringIgnoreCase("COUNT(*)"))
+            if (lexer.parseStringIgnoreCase("COUNT(*)"))
             {
                 // Convert to a method call of COUNTSTAR
                 Node node = new Node(NodeType.INVOKE, "COUNTSTAR");
                 stack.push(node);
                 return;
             }
-            else if (p.parseStringIgnoreCase("CURRENT_DATE()")) // Some people put "()" in JPQL
+            else if (lexer.parseStringIgnoreCase("CURRENT_DATE()")) // Some people put "()" in JPQL
             {
                 // Convert to a method call of CURRENT_DATE
                 Node node = new Node(NodeType.INVOKE, "CURRENT_DATE");
                 stack.push(node);
                 return;
             }
-            else if (p.parseStringIgnoreCase("CURRENT_TIMESTAMP()")) // Some people put "()" in JPQL
+            else if (lexer.parseStringIgnoreCase("CURRENT_TIMESTAMP()")) // Some people put "()" in JPQL
             {
                 // Convert to a method call
                 Node node = new Node(NodeType.INVOKE, "CURRENT_TIMESTAMP");
                 stack.push(node);
                 return;
             }
-            else if (p.parseStringIgnoreCase("CURRENT_TIME()")) // Some people put "()" in JPQL
+            else if (lexer.parseStringIgnoreCase("CURRENT_TIME()")) // Some people put "()" in JPQL
             {
                 // Convert to a method call
                 Node node = new Node(NodeType.INVOKE, "CURRENT_TIME");
@@ -1227,33 +1215,33 @@ public class JPQLParser implements Parser
             }
         }
 
-        if (p.parseStringIgnoreCase("CURRENT_DATE"))
+        if (lexer.parseStringIgnoreCase("CURRENT_DATE"))
         {
             // Convert to a method call
             Node node = new Node(NodeType.INVOKE, "CURRENT_DATE");
             stack.push(node);
             return;
         }
-        else if (p.parseStringIgnoreCase("CURRENT_TIMESTAMP"))
+        else if (lexer.parseStringIgnoreCase("CURRENT_TIMESTAMP"))
         {
             // Convert to a method call
             Node node = new Node(NodeType.INVOKE, "CURRENT_TIMESTAMP");
             stack.push(node);
             return;
         }
-        else if (p.parseStringIgnoreCase("CURRENT_TIME"))
+        else if (lexer.parseStringIgnoreCase("CURRENT_TIME"))
         {
             // Convert to a method call
             Node node = new Node(NodeType.INVOKE, "CURRENT_TIME");
             stack.push(node);
             return;
         }
-        else if (p.parseStringIgnoreCase("CASE "))
+        else if (lexer.parseStringIgnoreCase("CASE "))
         {
             processCaseExpression();
             return;
         }
-        else if (p.parseStringIgnoreCase("DISTINCT "))
+        else if (lexer.parseStringIgnoreCase("DISTINCT "))
         {
             // Aggregates can have "count(DISTINCT field1)"
             Node distinctNode = new Node(NodeType.OPERATOR, "DISTINCT");
@@ -1263,7 +1251,7 @@ public class JPQLParser implements Parser
             stack.push(distinctNode);
             return;
         }
-        else if (p.parseString("TREAT("))
+        else if (lexer.parseString("TREAT("))
         {
             // "TREAT(p AS Employee)" will create a Node tree as
             // [IDENTIFIER : p.
@@ -1274,7 +1262,7 @@ public class JPQLParser implements Parser
 //            String identifier = p.parseIdentifier();
 //            Node identifierNode = new Node(NodeType.IDENTIFIER, identifier);
 
-            String typeName = p.parseIdentifier();
+            String typeName = lexer.parseIdentifier();
             if (typeName != null && typeName.equalsIgnoreCase("AS"))
             {
                 processExpression();
@@ -1288,25 +1276,25 @@ public class JPQLParser implements Parser
             Node castNode = new Node(NodeType.CAST, typeName);
             castNode.setParent(identifierNode);
             identifierNode.appendChildNode(castNode);
-            if (!p.parseChar(')'))
+            if (!lexer.parseChar(')'))
             {
-                throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
             }
 
             stack.push(castNode);
             return;
         }
-        else if (p.parseString("KEY"))
+        else if (lexer.parseString("KEY"))
         {
             // KEY(identification_variable)
             // Convert to be {primary}.INVOKE(mapKey)
-            p.skipWS();
-            p.parseChar('(');
+            lexer.skipWS();
+            lexer.parseChar('(');
             Node invokeNode = new Node(NodeType.INVOKE, "mapKey");
             processExpression();
-            if (!p.parseChar(')'))
+            if (!lexer.parseChar(')'))
             {
-                throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
             }
 
             Node primaryNode = stack.pop(); // Could check type ? (Map)
@@ -1320,7 +1308,7 @@ public class JPQLParser implements Parser
 
             // Allow referral to chain of field(s) of key
             int size = stack.size();
-            while (p.parseChar('.'))
+            while (lexer.parseChar('.'))
             {
                 if (processIdentifier())
                 {
@@ -1328,7 +1316,7 @@ public class JPQLParser implements Parser
                 }
                 else
                 {
-                    throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("Identifier expected", lexer.getIndex(), lexer.getInput());
                 }
             }
             // For all added nodes, step back and chain them so we have
@@ -1347,17 +1335,17 @@ public class JPQLParser implements Parser
             }
             return;
         }
-        else if (p.parseString("VALUE"))
+        else if (lexer.parseString("VALUE"))
         {
             // VALUE(identification_variable)
             // Convert to be {primary}.INVOKE(mapValue)
-            p.skipWS();
-            p.parseChar('(');
+            lexer.skipWS();
+            lexer.parseChar('(');
             Node invokeNode = new Node(NodeType.INVOKE, "mapValue");
             processExpression();
-            if (!p.parseChar(')'))
+            if (!lexer.parseChar(')'))
             {
-                throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("',' expected", lexer.getIndex(), lexer.getInput());
             }
 
             Node primaryNode = stack.pop(); // Could check type ? (Map)
@@ -1371,7 +1359,7 @@ public class JPQLParser implements Parser
 
             // Allow referral to chain of field(s) of key
             int size = stack.size();
-            while (p.parseChar('.'))
+            while (lexer.parseChar('.'))
             {
                 if (processIdentifier())
                 {
@@ -1379,7 +1367,7 @@ public class JPQLParser implements Parser
                 }
                 else
                 {
-                    throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("Identifier expected", lexer.getIndex(), lexer.getInput());
                 }
             }
             // For all added nodes, step back and chain them so we have
@@ -1398,17 +1386,17 @@ public class JPQLParser implements Parser
             }
             return;
         }
-        else if (p.parseString("ENTRY"))
+        else if (lexer.parseString("ENTRY"))
         {
             // ENTRY(identification_variable)
             // Convert to be {primary}.INVOKE(mapEntry)
-            p.skipWS();
-            p.parseChar('(');
+            lexer.skipWS();
+            lexer.parseChar('(');
             Node invokeNode = new Node(NodeType.INVOKE, "mapEntry");
             processExpression();
-            if (!p.parseChar(')'))
+            if (!lexer.parseChar(')'))
             {
-                throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("',' expected", lexer.getIndex(), lexer.getInput());
             }
 
             Node primaryNode = stack.pop(); // Could check type ? (Map)
@@ -1427,12 +1415,12 @@ public class JPQLParser implements Parser
         }
 
         Node castNode = null;
-        if (p.parseChar('('))
+        if (lexer.parseChar('('))
         {
             processExpression();
-            if (!p.parseChar(')'))
+            if (!lexer.parseChar(')'))
             {
-                throw new QueryCompilerSyntaxException("expected ')'", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("expected ')'", lexer.getIndex(), lexer.getInput());
             }
             Node peekNode = stack.peek();
             if (peekNode.getNodeType() == NodeType.CAST)
@@ -1449,7 +1437,7 @@ public class JPQLParser implements Parser
         // We will have an identifier (variable, parameter, or field of candidate class)
         if (castNode == null && !processIdentifier())
         {
-            throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
+            throw new QueryCompilerSyntaxException("Identifier expected", lexer.getIndex(), lexer.getInput());
         }
         int size = stack.size();
 
@@ -1458,7 +1446,7 @@ public class JPQLParser implements Parser
         //     -> node (IDENTIFIER) with child (INVOKE), with child (INVOKE), with child (INVOKE)
         // e.g identifier.fieldX.fieldY.fieldZ
         //     -> node (IDENTIFIER) with child (IDENTIFIER), with child (IDENTIFIER), with child (IDENTIFIER)
-        while (p.parseChar('.'))
+        while (lexer.parseChar('.'))
         {
             if (processMethod())
             {
@@ -1470,7 +1458,7 @@ public class JPQLParser implements Parser
             }
             else
             {
-                throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("Identifier expected", lexer.getIndex(), lexer.getInput());
             }
         }
 
@@ -1501,7 +1489,7 @@ public class JPQLParser implements Parser
      */
     private boolean processCreator()
     {
-        if (p.parseStringIgnoreCase("NEW "))
+        if (lexer.parseStringIgnoreCase("NEW "))
         {
             // "new MyClass(arg1, arg2)"
             int size = stack.size();
@@ -1509,11 +1497,11 @@ public class JPQLParser implements Parser
             {
                 if (!processIdentifier())
                 {
-                    throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("Identifier expected", lexer.getIndex(), lexer.getInput());
                 }
 
                 // run function on literals or identifiers e.g. "primary.runMethod(arg)"
-                while (p.parseChar('.'))
+                while (lexer.parseChar('.'))
                 {
                     if (processMethod())
                     {
@@ -1525,7 +1513,7 @@ public class JPQLParser implements Parser
                     }
                     else
                     {
-                        throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
+                        throw new QueryCompilerSyntaxException("Identifier expected", lexer.getIndex(), lexer.getInput());
                     }
                 }
             }
@@ -1551,11 +1539,11 @@ public class JPQLParser implements Parser
      */
     private boolean processMethod()
     {
-        String method = p.parseMethod();
+        String method = lexer.parseMethod();
         if (method != null)
         {
-            p.skipWS();
-            p.parseChar('(');
+            lexer.skipWS();
+            lexer.parseChar('(');
 
             // Use uppercase forms of aggregate methods in generic compilation
             if (method.equalsIgnoreCase("COUNT"))
@@ -1596,9 +1584,9 @@ public class JPQLParser implements Parser
             {
                 // "Object(p)", so interpret as "p"
                 processExpression(); // identifier at top of stack
-                if (!p.parseChar(')'))
+                if (!lexer.parseChar(')'))
                 {
-                    throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
                 }
                 return true;
             }
@@ -1608,18 +1596,18 @@ public class JPQLParser implements Parser
                 Node modNode = new Node(NodeType.OPERATOR, "%");
                 processExpression(); // argument 1
                 Node firstNode = stack.pop();
-                if (!p.parseChar(','))
+                if (!lexer.parseChar(','))
                 {
-                    throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("',' expected", lexer.getIndex(), lexer.getInput());
                 }
                 processExpression(); // argument 2
                 Node secondNode = stack.pop();
                 modNode.appendChildNode(firstNode);
                 modNode.appendChildNode(secondNode);
                 stack.push(modNode);
-                if (!p.parseChar(')'))
+                if (!lexer.parseChar(')'))
                 {
-                    throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
                 }
                 return true;
             }
@@ -1631,9 +1619,9 @@ public class JPQLParser implements Parser
                 Node typePrimaryNode = stack.pop();
                 typeNode.appendChildNode(typePrimaryNode);
                 stack.push(typeNode);
-                if (!p.parseChar(')'))
+                if (!lexer.parseChar(')'))
                 {
-                    throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
                 }
                 return true;
             }
@@ -1644,9 +1632,9 @@ public class JPQLParser implements Parser
                 Node invokeNode = new Node(NodeType.INVOKE, "substring");
                 processExpression();
                 Node primaryNode = stack.pop();
-                if (!p.parseChar(','))
+                if (!lexer.parseChar(','))
                 {
-                    throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("',' expected", lexer.getIndex(), lexer.getInput());
                 }
 
                 // First arg to substring(...) has origin 0, but JPQL has origin 1!
@@ -1657,7 +1645,7 @@ public class JPQLParser implements Parser
                 arg1Node.insertChildNode(arg1);
                 arg1Node.appendChildNode(oneNode);
 
-                if (p.parseChar(','))
+                if (lexer.parseChar(','))
                 {
                     // String.substring(arg1, arg2)
                     // Second arg to substring(...) has origin 0, but in JPQL is length of result!
@@ -1666,9 +1654,9 @@ public class JPQLParser implements Parser
                     Node arg2Node = new Node(NodeType.OPERATOR, "+");
                     arg2Node.appendChildNode(arg2);
                     arg2Node.appendChildNode(arg1Node);
-                    if (!p.parseChar(')'))
+                    if (!lexer.parseChar(')'))
                     {
-                        throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
+                        throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
                     }
 
                     primaryNode.appendChildNode(invokeNode);
@@ -1677,7 +1665,7 @@ public class JPQLParser implements Parser
                     stack.push(primaryNode);
                     return true;
                 }
-                else if (p.parseChar(')'))
+                else if (lexer.parseChar(')'))
                 {
                     // String.substring(arg1)
                     primaryNode.appendChildNode(invokeNode);
@@ -1687,7 +1675,7 @@ public class JPQLParser implements Parser
                 }
                 else
                 {
-                    throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
                 }
             }
             else if (method.equalsIgnoreCase("UPPER"))
@@ -1696,9 +1684,9 @@ public class JPQLParser implements Parser
                 // Convert to be {primary}.INVOKE(toUpper)
                 Node invokeNode = new Node(NodeType.INVOKE, "toUpperCase");
                 processExpression();
-                if (!p.parseChar(')'))
+                if (!lexer.parseChar(')'))
                 {
-                    throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("',' expected", lexer.getIndex(), lexer.getInput());
                 }
 
                 Node primaryNode = stack.pop();
@@ -1717,9 +1705,9 @@ public class JPQLParser implements Parser
                 // Convert to be {primary}.INVOKE(toLower)
                 Node invokeNode = new Node(NodeType.INVOKE, "toLowerCase");
                 processExpression();
-                if (!p.parseChar(')'))
+                if (!lexer.parseChar(')'))
                 {
-                    throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("',' expected", lexer.getIndex(), lexer.getInput());
                 }
 
                 Node primaryNode = stack.pop();
@@ -1738,9 +1726,9 @@ public class JPQLParser implements Parser
                 // Convert to be {primary}.INVOKE(length)
                 Node invokeNode = new Node(NodeType.INVOKE, "length");
                 processExpression();
-                if (!p.parseChar(')'))
+                if (!lexer.parseChar(')'))
                 {
-                    throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("',' expected", lexer.getIndex(), lexer.getInput());
                 }
 
                 Node primaryNode = stack.pop();
@@ -1762,9 +1750,9 @@ public class JPQLParser implements Parser
 
                 while (true)
                 {
-                    if (!p.parseChar(','))
+                    if (!lexer.parseChar(','))
                     {
-                        throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
+                        throw new QueryCompilerSyntaxException("',' expected", lexer.getIndex(), lexer.getInput());
                     }
 
                     processExpression();
@@ -1773,7 +1761,7 @@ public class JPQLParser implements Parser
                     Node currentNode = new Node(NodeType.OPERATOR, "+");
                     currentNode.appendChildNode(prevNode);
                     currentNode.appendChildNode(thisNode);
-                    if (p.parseChar(')'))
+                    if (lexer.parseChar(')'))
                     {
                         stack.push(currentNode);
                         return true;
@@ -1790,9 +1778,9 @@ public class JPQLParser implements Parser
                 Node searchNode = stack.pop();
                 Node invokeNode = new Node(NodeType.INVOKE, "indexOf");
                 invokeNode.addProperty(searchNode);
-                if (!p.parseChar(','))
+                if (!lexer.parseChar(','))
                 {
-                    throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("',' expected", lexer.getIndex(), lexer.getInput());
                 }
 
                 processExpression();
@@ -1805,7 +1793,7 @@ public class JPQLParser implements Parser
                 primaryNode.appendChildNode(invokeNode);
 
                 Node oneNode = new Node(NodeType.LITERAL, 1);
-                if (p.parseChar(','))
+                if (lexer.parseChar(','))
                 {
                     processExpression();
                     Node fromPosNode = stack.pop();
@@ -1814,9 +1802,9 @@ public class JPQLParser implements Parser
                     positionNode.appendChildNode(oneNode);
                     invokeNode.addProperty(positionNode);
                 }
-                if (!p.parseChar(')'))
+                if (!lexer.parseChar(')'))
                 {
-                    throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
                 }
 
                 Node locateNode = new Node(NodeType.OPERATOR, "+");
@@ -1830,15 +1818,15 @@ public class JPQLParser implements Parser
                 // TRIM([[LEADING | TRAILING | BOTH] [trim_character] FROM] string_primary)
                 // Convert to be {primary}.INVOKE(trim|trimLeft|trimRight, [{trimChar}])
                 String methodName = "trim";
-                if (p.parseStringIgnoreCase("LEADING"))
+                if (lexer.parseStringIgnoreCase("LEADING"))
                 {
                     methodName = "trimLeft";
                 }
-                else if (p.parseStringIgnoreCase("TRAILING"))
+                else if (lexer.parseStringIgnoreCase("TRAILING"))
                 {
                     methodName = "trimRight";
                 }
-                else if (p.parseStringIgnoreCase("BOTH"))
+                else if (lexer.parseStringIgnoreCase("BOTH"))
                 {
                     // Default
                 }
@@ -1847,7 +1835,7 @@ public class JPQLParser implements Parser
                 Node trimCharNode = null;
                 processExpression();
                 Node next = stack.pop();
-                if (p.parseChar(')'))
+                if (lexer.parseChar(')'))
                 {
                     // TRIM(string_primary)
                     next.appendChildNode(invokeNode);
@@ -1859,7 +1847,7 @@ public class JPQLParser implements Parser
                 {
                     // TRIM(dir trimChar FROM string_primary)
                     trimCharNode = next;
-                    if (p.parseStringIgnoreCase("FROM "))
+                    if (lexer.parseStringIgnoreCase("FROM "))
                     {
                         // Ignore the FROM
                     }
@@ -1878,7 +1866,7 @@ public class JPQLParser implements Parser
                     }
                     else
                     {
-                        throw new QueryCompilerSyntaxException("Unexpected expression", p.getIndex(), p.getInput());
+                        throw new QueryCompilerSyntaxException("Unexpected expression", lexer.getIndex(), lexer.getInput());
                     }
                 }
                 else
@@ -1886,9 +1874,9 @@ public class JPQLParser implements Parser
                     // No "trimChar" or FROM, so "next" is the string expression node
                 }
 
-                if (!p.parseChar(')'))
+                if (!lexer.parseChar(')'))
                 {
-                    throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
                 }
 
                 next.appendChildNode(invokeNode);
@@ -1905,9 +1893,9 @@ public class JPQLParser implements Parser
                 // Convert to be {primary}.INVOKE(size)
                 Node invokeNode = new Node(NodeType.INVOKE, "size");
                 processExpression();
-                if (!p.parseChar(')'))
+                if (!lexer.parseChar(')'))
                 {
-                    throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("',' expected", lexer.getIndex(), lexer.getInput());
                 }
 
                 Node primaryNode = stack.pop(); // Could check type ? (Collection/Map/array)
@@ -1928,7 +1916,7 @@ public class JPQLParser implements Parser
                 Node sqlFunctionNode = stack.pop();
                 Node invokeNode = new Node(NodeType.INVOKE, "SQL_function");
                 invokeNode.addProperty(sqlFunctionNode);
-                if (p.parseChar(','))
+                if (lexer.parseChar(','))
                 {
                     // Process arguments for function "aaa[,bbb[,ccc]] etc )"
                     do
@@ -1937,11 +1925,11 @@ public class JPQLParser implements Parser
                         processExpression();
                         invokeNode.addProperty(stack.pop());
                     }
-                    while (p.parseChar(','));
+                    while (lexer.parseChar(','));
                 }
-                if (!p.parseChar(')'))
+                if (!lexer.parseChar(')'))
                 {
-                    throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
+                    throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
                 }
 
                 stack.push(invokeNode);
@@ -1952,7 +1940,7 @@ public class JPQLParser implements Parser
                 // Found syntax for a method, so invoke the method
                 // TODO What if the method is not supported for JPQL?
                 Node node = new Node(NodeType.INVOKE, method);
-                if (!p.parseChar(')'))
+                if (!lexer.parseChar(')'))
                 {
                     do
                     {
@@ -1960,11 +1948,11 @@ public class JPQLParser implements Parser
                         processExpression();
                         node.addProperty(stack.pop());
                     }
-                    while (p.parseChar(','));
+                    while (lexer.parseChar(','));
 
-                    if (!p.parseChar(')'))
+                    if (!lexer.parseChar(')'))
                     {
-                        throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
+                        throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
                     }
                 }
                 stack.push(node);
@@ -1982,44 +1970,44 @@ public class JPQLParser implements Parser
      */
     protected boolean processLiteral()
     {
-        if (p.parseChar('{'))
+        if (lexer.parseChar('{'))
         {
             // JDBC escape syntax
             // {d '...'}
             // {ts '...'}
             // {t '...'}
             StringBuilder jdbcLiteralStr = new StringBuilder("{");
-            if (p.parseChar('d'))
+            if (lexer.parseChar('d'))
             {
                 jdbcLiteralStr.append("d ");
             }
-            else if (p.parseString("ts"))
+            else if (lexer.parseString("ts"))
             {
                 jdbcLiteralStr.append("ts ");
             }
-            else if (p.parseChar('t'))
+            else if (lexer.parseChar('t'))
             {
                 jdbcLiteralStr.append("t ");
             }
             else
             {
-                throw new QueryCompilerSyntaxException("d, ts or t expected after { (JDBC escape syntax)", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("d, ts or t expected after { (JDBC escape syntax)", lexer.getIndex(), lexer.getInput());
             }
 
-            if (p.nextIsSingleQuote())
+            if (lexer.nextIsSingleQuote())
             {
-                String datetimeLit = p.parseStringLiteral();
+                String datetimeLit = lexer.parseStringLiteral();
                 jdbcLiteralStr.append("'").append(datetimeLit).append("'");
-                if (p.parseChar('}'))
+                if (lexer.parseChar('}'))
                 {
                     jdbcLiteralStr.append('}');
                     stack.push(new Node(NodeType.LITERAL, jdbcLiteralStr.toString()));
                     return true;
                 }
 
-                throw new QueryCompilerSyntaxException("} expected in JDBC escape syntax", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("} expected in JDBC escape syntax", lexer.getIndex(), lexer.getInput());
             }
-            throw new QueryCompilerSyntaxException("'...' expected in JDBC escape syntax", p.getIndex(), p.getInput());
+            throw new QueryCompilerSyntaxException("'...' expected in JDBC escape syntax", lexer.getIndex(), lexer.getInput());
         }
 
         Object litValue = null;
@@ -2027,8 +2015,8 @@ public class JPQLParser implements Parser
         BigDecimal fLiteral;
         BigInteger iLiteral;
         Boolean bLiteral;
-        boolean single_quote_next = p.nextIsSingleQuote();
-        if ((sLiteral = p.parseStringLiteral()) != null)
+        boolean single_quote_next = lexer.nextIsSingleQuote();
+        if ((sLiteral = lexer.parseStringLiteral()) != null)
         {
             // Both String and Character are allowed to use single-quotes
             // so we need to check if it was single-quoted and
@@ -2042,11 +2030,11 @@ public class JPQLParser implements Parser
                 litValue = sLiteral;
             }
         }
-        else if ((fLiteral = p.parseFloatingPointLiteral()) != null)
+        else if ((fLiteral = lexer.parseFloatingPointLiteral()) != null)
         {
             litValue = fLiteral;
         }
-        else if ((iLiteral = p.parseIntegerLiteral()) != null)
+        else if ((iLiteral = lexer.parseIntegerLiteral()) != null)
         {
             // Represent as BigInteger or Long depending on length
             String longStr = "" + iLiteral.longValue();
@@ -2059,11 +2047,11 @@ public class JPQLParser implements Parser
                 litValue = iLiteral.longValue();
             }
         }
-        else if ((bLiteral = p.parseBooleanLiteralIgnoreCase()) != null)
+        else if ((bLiteral = lexer.parseBooleanLiteralIgnoreCase()) != null)
         {
             litValue = bLiteral;
         }
-        else if (p.parseNullLiteralIgnoreCase())
+        else if (lexer.parseNullLiteralIgnoreCase())
         {
         }
         else
@@ -2084,7 +2072,7 @@ public class JPQLParser implements Parser
      */
     private boolean processIdentifier()
     {
-        String id = p.parseIdentifier();
+        String id = lexer.parseIdentifier();
         if (id == null || id.length() == 0)
         {
             return false;

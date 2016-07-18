@@ -20,7 +20,6 @@ Contributors:
 package org.datanucleus.query.compiler;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +38,7 @@ import org.datanucleus.query.expression.OrderExpression;
 import org.datanucleus.query.expression.ParameterExpression;
 import org.datanucleus.query.expression.PrimaryExpression;
 import org.datanucleus.query.expression.VariableExpression;
+import org.datanucleus.store.query.Query;
 import org.datanucleus.util.Imports;
 import org.datanucleus.util.Localiser;
 
@@ -72,20 +72,13 @@ public class JDOQLCompiler extends JavaQueryCompiler
      */
     public QueryCompilation compile(Map parameters, Map subqueryMap)
     {
-        Map parseOptions = new HashMap();
-        if (this.parameters != null)
+        parser = new JDOQLParser();
+        parser.setExplicitParameters(this.parameters != null);
+        if (options != null && options.containsKey(Query.EXTENSION_JDOQL_STRICT))
         {
-            parseOptions.put("explicitParameters", true);
+            parser.setStrict(Boolean.parseBoolean((String)options.get(Query.EXTENSION_JDOQL_STRICT)));
         }
-        else
-        {
-            parseOptions.put("implicitParameters", true);
-        }
-        if (options != null && options.containsKey("jdoql.strict"))
-        {
-            parseOptions.put("jdoql.strict", options.get("jdoql.strict"));
-        }
-        parser = new JDOQLParser(parseOptions);
+
         symtbl = new SymbolTable();
         symtbl.setSymbolResolver(this);
         if (parentCompiler != null)
@@ -183,13 +176,18 @@ public class JDOQLCompiler extends JavaQueryCompiler
         compilation.setQueryLanguage(getLanguage());
 
         // Apply compilation optimisations
-        boolean optimise = metaDataManager.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_QUERY_COMPILE_OPTIMISED);
-        if (optimise)
+        if (options != null)
         {
-            // Perform "var == this" optimisation TODO Enable this using a query extension
-            CompilationOptimiser optimiser = new VarThisCompilationOptimiser(compilation, metaDataManager);
-            optimiser.optimise();
-
+            if (options.containsKey(PropertyNames.PROPERTY_QUERY_COMPILE_OPTIMISE_VAR_THIS))
+            {
+                Boolean val = (Boolean)options.get(PropertyNames.PROPERTY_QUERY_COMPILE_OPTIMISE_VAR_THIS);
+                if (val == Boolean.TRUE)
+                {
+                    // Perform "var == this" optimisation TODO Enable this using a query extension
+                    CompilationOptimiser optimiser = new VarThisCompilationOptimiser(compilation, metaDataManager, clr);
+                    optimiser.optimise();
+                }
+            }
             // TODO Add handling of relation navigation implying "relation != null". See NavigationNullCompilationOptimiser for a start point
             // i.e if we have "this.field1.field2 = val" this is equivalent to "this.field1 != null && this.field1.field2 = val"
         }

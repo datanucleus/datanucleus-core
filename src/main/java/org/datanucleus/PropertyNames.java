@@ -211,7 +211,7 @@ public class PropertyNames
     public static final String PROPERTY_QUERY_FLUSH_BEFORE_EXECUTE = "datanucleus.query.flushBeforeExecution";
     public static final String PROPERTY_QUERY_USE_FETCHPLAN = "datanucleus.query.useFetchPlan";
     public static final String PROPERTY_QUERY_CHECK_UNUSED_PARAMS = "datanucleus.query.checkUnusedParameters";
-    public static final String PROPERTY_QUERY_COMPILE_OPTIMISED = "datanucleus.query.compileOptimised";
+    public static final String PROPERTY_QUERY_COMPILE_OPTIMISE_VAR_THIS = "datanucleus.query.compileOptimiseVarThis";
     public static final String PROPERTY_QUERY_LOAD_RESULTS_AT_COMMIT = "datanucleus.query.loadResultsAtCommit";
     public static final String PROPERTY_QUERY_COMPILATION_CACHED = "datanucleus.query.compilation.cached";
     public static final String PROPERTY_QUERY_RESULTS_CACHED = "datanucleus.query.results.cached";
