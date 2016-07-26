@@ -166,15 +166,12 @@ public class PropertyNames
 
     public static final String PROPERTY_STORE_ALLOW_REFS_WITHOUT_IMPLS = "datanucleus.store.allowReferencesWithNoImplementations";
 
-    public static final String PROPERTY_SCHEMA_GENERATE_CREATE_SCHEMAS = "datanucleus.generateSchema.create-schemas";
     public static final String PROPERTY_SCHEMA_GENERATE_DATABASE_MODE = "datanucleus.generateSchema.database.mode";
     public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_MODE = "datanucleus.generateSchema.scripts.mode";
     public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_TARGET = "datanucleus.generateSchema.scripts.create.target";
     public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_TARGET = "datanucleus.generateSchema.scripts.drop.target";
     public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_SOURCE = "datanucleus.generateSchema.scripts.create.source";
-    public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_ORDER = "datanucleus.generateSchema.scripts.create.order";
     public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_SOURCE = "datanucleus.generateSchema.scripts.drop.source";
-    public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_ORDER = "datanucleus.generateSchema.scripts.drop.order";
     public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_LOAD_SOURCE = "datanucleus.generateSchema.scripts.load";
 
     public static final String PROPERTY_SCHEMA_AUTOCREATE_ALL = "datanucleus.schema.autoCreateAll";
