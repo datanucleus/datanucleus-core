@@ -124,6 +124,12 @@ public class TransactionImpl implements Transaction
 
     public void close()
     {
+        userListeners = null;
+        listenersPerTransaction = null;
+        options = null;
+        txnMgr = null;
+        ec = null;
+
         closed = true;
     }
 
