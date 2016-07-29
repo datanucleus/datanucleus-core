@@ -79,18 +79,18 @@ public class FederatedStoreManager implements StoreManager
     public static final String PROPERTY_DATA_FEDERATION_DATASTORE_NAME = "DATA_FEDERATION_DATASTORE_NAME";
 
     /** Primary StoreManager. */
-    StoreManager primaryStoreMgr;
+    protected StoreManager primaryStoreMgr;
 
     /** Map of secondary StoreManager keyed by their symbolic name. */
-    Map<String, StoreManager> secondaryStoreMgrMap = null;
+    protected Map<String, StoreManager> secondaryStoreMgrMap = null;
 
-    final PersistenceNucleusContext nucleusContext;
+    protected PersistenceNucleusContext nucleusContext;
 
     /** Persistence handler. */
     protected StorePersistenceHandler persistenceHandler = null;
 
     /** Query Manager. Lazy initialised, so use getQueryManager() to access. */
-    private QueryManager queryMgr = null;
+    protected QueryManager queryMgr = null;
 
     public FederatedStoreManager(ClassLoaderResolver clr, PersistenceNucleusContext nucleusContext)
     {
@@ -185,6 +185,7 @@ public class FederatedStoreManager implements StoreManager
             queryMgr.close();
             queryMgr = null;
         }
+        nucleusContext = null;
     }
 
     /**

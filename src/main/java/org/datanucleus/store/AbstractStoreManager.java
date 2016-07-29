@@ -102,7 +102,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     protected final String storeManagerKey;
 
     /** Nucleus Context. */
-    protected final PersistenceNucleusContext nucleusContext;
+    protected PersistenceNucleusContext nucleusContext;
 
     /** Manager for value generation. Lazy initialised, so use getValueGenerationManager() to access. */
     protected ValueGenerationManager valueGenerationMgr;
@@ -286,6 +286,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             queryMgr.close();
             queryMgr = null;
         }
+        nucleusContext = null;
     }
 
     /* (non-Javadoc)
