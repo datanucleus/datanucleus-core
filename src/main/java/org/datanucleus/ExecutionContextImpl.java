@@ -592,6 +592,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         closed = true;
         tx.close(); // Close the transaction
         tx = null;
+        owner = null;
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
