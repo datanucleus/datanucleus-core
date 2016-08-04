@@ -238,24 +238,27 @@ public class EnhancerClassAdapter extends ClassVisitor
             return mv;
         }
 
-        String propGetterName = ClassUtils.getFieldNameForJavaBeanGetter(name);
-        String propSetterName = ClassUtils.getFieldNameForJavaBeanSetter(name);
-        if (propGetterName != null)
+        if ((access & Opcodes.ACC_BRIDGE) != Opcodes.ACC_BRIDGE) // Ignore bridge methods and treat as normal methods
         {
-            AbstractMemberMetaData mmd = enhancer.getClassMetaData().getMetaDataForMember(propGetterName);
-            if (mmd != null && mmd instanceof PropertyMetaData && mmd.getPersistenceModifier() != FieldPersistenceModifier.NONE)
+            String propGetterName = ClassUtils.getFieldNameForJavaBeanGetter(name);
+            String propSetterName = ClassUtils.getFieldNameForJavaBeanSetter(name);
+            if (propGetterName != null)
             {
-                // Property getter method "getXXX" - generated dnGetXXX
-                return new EnhancerPropertyGetterAdapter(mv, enhancer, name, desc, mmd, cv);
+                AbstractMemberMetaData mmd = enhancer.getClassMetaData().getMetaDataForMember(propGetterName);
+                if (mmd != null && mmd instanceof PropertyMetaData && mmd.getPersistenceModifier() != FieldPersistenceModifier.NONE)
+                {
+                    // Property getter method "getXXX" - generated dnGetXXX
+                    return new EnhancerPropertyGetterAdapter(mv, enhancer, name, desc, mmd, cv);
+                }
             }
-        }
-        else if (propSetterName != null)
-        {
-            AbstractMemberMetaData mmd = enhancer.getClassMetaData().getMetaDataForMember(propSetterName);
-            if (mmd != null && mmd instanceof PropertyMetaData && mmd.getPersistenceModifier() != FieldPersistenceModifier.NONE)
+            else if (propSetterName != null)
             {
-                // Property setter method "setXXX" - generates dnSetXXX
-                return new EnhancerPropertySetterAdapter(mv, enhancer, name, desc, mmd, cv);
+                AbstractMemberMetaData mmd = enhancer.getClassMetaData().getMetaDataForMember(propSetterName);
+                if (mmd != null && mmd instanceof PropertyMetaData && mmd.getPersistenceModifier() != FieldPersistenceModifier.NONE)
+                {
+                    // Property setter method "setXXX" - generates dnSetXXX
+                    return new EnhancerPropertySetterAdapter(mv, enhancer, name, desc, mmd, cv);
+                }
             }
         }
 
