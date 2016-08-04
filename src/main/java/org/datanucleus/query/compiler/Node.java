@@ -290,15 +290,7 @@ public class Node
 
         if (!childNodes.isEmpty())
         {
-            if (nodeType == NodeType.LITERAL || nodeType == NodeType.IDENTIFIER)
-            { 
-                sb.append(".");
-            }
-            else
-            {
-                sb.append(indent(indentation));
-                sb.append("{");
-            }
+            sb.append(".");
 
             for (int i=0; i<childNodes.size(); i++)
             {
@@ -307,12 +299,6 @@ public class Node
                 {
                     sb.append(",");
                 }
-            }
-
-            if (nodeType != NodeType.LITERAL && nodeType != NodeType.IDENTIFIER)
-            {
-                sb.append(indent(indentation));
-                sb.append("}");
             }
         }
         sb.append("]");
