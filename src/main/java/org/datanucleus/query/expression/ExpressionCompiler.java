@@ -806,7 +806,7 @@ public class ExpressionCompiler
         }
         else
         {
-            NucleusLogger.QUERY.warn("ExpressionCompiler.compilePrimary " + node + " ignored by ExpressionCompiler");
+            NucleusLogger.QUERY.warn("ExpressionCompiler.compilePrimaryExpression node=" + node + " ignored by ExpressionCompiler since not of a supported type");
         }
         return null;
     }
