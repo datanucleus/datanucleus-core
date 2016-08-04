@@ -317,8 +317,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
     }
 
     /**
-     * Method returning a Map containing an array of the annotations for each Java Bean accessor method of the
-     * passed class, keyed by the method name.
+     * Method returning a Map containing an array of the annotations for each Java Bean accessor method of the passed class, keyed by the method name.
      * @param cls The class
      * @return Collection of the annotated methods (with supported annotations)
      */
@@ -333,15 +332,14 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
         {
             // Restrict to Java Bean accessor methods
             String methodName = methods[i].getName();
-            if ((methodName.startsWith("get") && methodName.length() > 3) || 
-                (methodName.startsWith("is") && methodName.length() > 2))
+            if (!methods[i].isBridge() && ((methodName.startsWith("get") && methodName.length() > 3) || (methodName.startsWith("is") && methodName.length() > 2)))
             {
                 // For each Method get the annotations and convert into AnnotationObjects
                 Annotation[] annotations = methods[i].getAnnotations();
-                List<Annotation> supportedAnnots = new ArrayList();
                 if (annotations != null && annotations.length > 0)
                 {
                     // Strip out unsupported annotations
+                    List<Annotation> supportedAnnots = new ArrayList();
                     AnnotationManager annMgr = mgr.getAnnotationManager();
                     for (int j=0;j<annotations.length;j++)
                     {
@@ -351,14 +349,14 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                             supportedAnnots.add(annotations[j]);
                         }
                     }
-                }
 
-                if (!supportedAnnots.isEmpty())
-                {
-                    AnnotationObject[] objects = getAnnotationObjectsForAnnotations(cls.getName(),
-                        supportedAnnots.toArray(new Annotation[supportedAnnots.size()]));
-                    AnnotatedMember annMember = new AnnotatedMember(new Member(methods[i]), objects);
-                    annotatedMethods.add(annMember);
+                    if (!supportedAnnots.isEmpty())
+                    {
+                        AnnotationObject[] objects = getAnnotationObjectsForAnnotations(cls.getName(),
+                            supportedAnnots.toArray(new Annotation[supportedAnnots.size()]));
+                        AnnotatedMember annMember = new AnnotatedMember(new Member(methods[i]), objects);
+                        annotatedMethods.add(annMember);
+                    }
                 }
             }
         }

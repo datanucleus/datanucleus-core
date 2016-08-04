@@ -343,7 +343,7 @@ public class ClassMetaData extends AbstractClassMetaData
                 for (int i=0;i<clsMethods.length;i++)
                 {
                     // Limit to valid java bean getter methods in this class (don't allow inner class methods)
-                    if (clsMethods[i].getDeclaringClass().getName().equals(fullName) &&
+                    if (clsMethods[i].getDeclaringClass().getName().equals(fullName) && !clsMethods[i].isBridge() &&
                         ClassUtils.isJavaBeanGetterMethod(clsMethods[i]) && !ClassUtils.isInnerClass(clsMethods[i].getName()))
                     {
                         // Find if there is metadata for this property
@@ -672,7 +672,7 @@ public class ClassMetaData extends AbstractClassMetaData
                             methods = fieldCls.getDeclaredMethods(); // Also try protected/private of this class
                             for (int i=0;i<methods.length;i++)
                             {
-                                if (methods[i].getName().equals(setterName) && methods[i].getParameterTypes() != null && methods[i].getParameterTypes().length == 1)
+                                if (methods[i].getName().equals(setterName) && methods[i].getParameterTypes() != null && methods[i].getParameterTypes().length == 1 && !methods[i].isBridge())
                                 {
                                     setMethod = methods[i];
                                     break;
