@@ -297,6 +297,7 @@ public class EmbeddedMetaData extends MetaData
                     // that aren't inner class fields, and that aren't static
                     if (clsMethods[i].getDeclaringClass().getName().equals(embeddedType) &&
                         (clsMethods[i].getName().startsWith("get") || clsMethods[i].getName().startsWith("is")) &&
+                        !clsMethods[i].isBridge() &&
                         !ClassUtils.isInnerClass(clsMethods[i].getName()))
                     {
                         // Find if there is a PropertyMetaData for this field

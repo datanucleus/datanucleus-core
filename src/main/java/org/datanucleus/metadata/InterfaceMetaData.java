@@ -448,6 +448,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
                 if (clsMethods[i].getDeclaringClass().getName().equals(fullName) &&
                     (clsMethods[i].getName().startsWith("get") || clsMethods[i].getName().startsWith("is")) &&
                     !ClassUtils.isInnerClass(clsMethods[i].getName()) &&
+                    !clsMethods[i].isBridge() &&
                     !Modifier.isStatic(clsMethods[i].getModifiers()))
                 {
                     // Find if there is metadata for this property
