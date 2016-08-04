@@ -387,6 +387,11 @@ public class JPQLParser extends AbstractParser
 
                 // Find what we are joining to
                 String id = lexer.parseIdentifier();
+                if (id.equalsIgnoreCase("TREAT"))
+                {
+                    // TODO Support TREAT
+                    throw new NucleusException("We do not currently support JOIN to TREAT");
+                }
                 Node joinedNode = new Node(NodeType.IDENTIFIER, id);
                 Node parentNode = joinedNode;
                 while (lexer.nextIsDot())
@@ -1150,6 +1155,7 @@ public class JPQLParser extends AbstractParser
         String subqueryKeyword = null;
         Node subqueryNode = null;
 
+        // Process all syntax that cannot chain off subfield references from
         if (lexer.parseStringIgnoreCase("SOME "))
         {
             subqueryKeyword = "SOME";
@@ -1251,162 +1257,20 @@ public class JPQLParser extends AbstractParser
             stack.push(distinctNode);
             return;
         }
-        else if (lexer.parseString("TREAT("))
+        else if (lexer.peekStringIgnoreCase("TREAT("))
         {
-            // "TREAT(p AS Employee)" will create a Node tree as
-            // [IDENTIFIER : p.
-            //     [CAST : Employee]]
-
-            processExpression();
-            Node identifierNode = stack.pop();
-//            String identifier = p.parseIdentifier();
-//            Node identifierNode = new Node(NodeType.IDENTIFIER, identifier);
-
-            String typeName = lexer.parseIdentifier();
-            if (typeName != null && typeName.equalsIgnoreCase("AS"))
-            {
-                processExpression();
-                Node typeNode = stack.pop();
-                typeName = typeNode.getNodeChildId();
-            }
-            else
-            {
-                throw new QueryCompilerSyntaxException("TREAT should always be structured as 'TREAT(id AS typeName)'");
-            }
-            Node castNode = new Node(NodeType.CAST, typeName);
-            castNode.setParent(identifierNode);
-            identifierNode.appendChildNode(castNode);
-            if (!lexer.parseChar(')'))
-            {
-                throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
-            }
-
-            stack.push(castNode);
+            // So we don't get interpreted as a method. Processed later
+        }
+        else if (processKey()) // TODO Can we chain fields/methods off a KEY ?
+        {
             return;
         }
-        else if (lexer.parseString("KEY"))
+        else if (processValue()) // TODO Can we chain fields/methods off a VALUE ?
         {
-            // KEY(identification_variable)
-            // Convert to be {primary}.INVOKE(mapKey)
-            lexer.skipWS();
-            lexer.parseChar('(');
-            Node invokeNode = new Node(NodeType.INVOKE, "mapKey");
-            processExpression();
-            if (!lexer.parseChar(')'))
-            {
-                throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
-            }
-
-            Node primaryNode = stack.pop(); // Could check type ? (Map)
-            Node primaryRootNode = primaryNode;
-            while (primaryNode.getFirstChild() != null)
-            {
-                primaryNode = primaryNode.getFirstChild();
-            }
-            primaryNode.appendChildNode(invokeNode);
-            stack.push(primaryRootNode);
-
-            // Allow referral to chain of field(s) of key
-            int size = stack.size();
-            while (lexer.parseChar('.'))
-            {
-                if (processIdentifier())
-                {
-                    // "a.field"
-                }
-                else
-                {
-                    throw new QueryCompilerSyntaxException("Identifier expected", lexer.getIndex(), lexer.getInput());
-                }
-            }
-            // For all added nodes, step back and chain them so we have
-            // Node[IDENTIFIER, a]
-            // +--- Node[IDENTIFIER, b]
-            //      +--- Node[IDENTIFIER, c]
-            if (size != stack.size())
-            {
-                Node lastNode = invokeNode;
-                while (stack.size() > size)
-                {
-                    Node top = stack.pop();
-                    lastNode.insertChildNode(top);
-                    lastNode = top;
-                }
-            }
             return;
         }
-        else if (lexer.parseString("VALUE"))
+        else if (processEntry())
         {
-            // VALUE(identification_variable)
-            // Convert to be {primary}.INVOKE(mapValue)
-            lexer.skipWS();
-            lexer.parseChar('(');
-            Node invokeNode = new Node(NodeType.INVOKE, "mapValue");
-            processExpression();
-            if (!lexer.parseChar(')'))
-            {
-                throw new QueryCompilerSyntaxException("',' expected", lexer.getIndex(), lexer.getInput());
-            }
-
-            Node primaryNode = stack.pop(); // Could check type ? (Map)
-            Node primaryRootNode = primaryNode;
-            while (primaryNode.getFirstChild() != null)
-            {
-                primaryNode = primaryNode.getFirstChild();
-            }
-            primaryNode.appendChildNode(invokeNode);
-            stack.push(primaryRootNode);
-
-            // Allow referral to chain of field(s) of key
-            int size = stack.size();
-            while (lexer.parseChar('.'))
-            {
-                if (processIdentifier())
-                {
-                    // "a.field"
-                }
-                else
-                {
-                    throw new QueryCompilerSyntaxException("Identifier expected", lexer.getIndex(), lexer.getInput());
-                }
-            }
-            // For all added nodes, step back and chain them so we have
-            // Node[IDENTIFIER, a]
-            // +--- Node[IDENTIFIER, b]
-            //      +--- Node[IDENTIFIER, c]
-            if (size != stack.size())
-            {
-                Node lastNode = invokeNode;
-                while (stack.size() > size)
-                {
-                    Node top = stack.pop();
-                    lastNode.insertChildNode(top);
-                    lastNode = top;
-                }
-            }
-            return;
-        }
-        else if (lexer.parseString("ENTRY"))
-        {
-            // ENTRY(identification_variable)
-            // Convert to be {primary}.INVOKE(mapEntry)
-            lexer.skipWS();
-            lexer.parseChar('(');
-            Node invokeNode = new Node(NodeType.INVOKE, "mapEntry");
-            processExpression();
-            if (!lexer.parseChar(')'))
-            {
-                throw new QueryCompilerSyntaxException("',' expected", lexer.getIndex(), lexer.getInput());
-            }
-
-            Node primaryNode = stack.pop(); // Could check type ? (Map)
-            Node primaryRootNode = primaryNode;
-            while (primaryNode.getFirstChild() != null)
-            {
-                primaryNode = primaryNode.getFirstChild();
-            }
-            primaryNode.appendChildNode(invokeNode);
-            stack.push(primaryRootNode);
             return;
         }
         else if (processCreator() || processLiteral() || processMethod())
@@ -1414,32 +1278,49 @@ public class JPQLParser extends AbstractParser
             return;
         }
 
-        Node castNode = null;
+        int sizeBeforeBraceProcessing = stack.size();
+        boolean braceProcessing = false;
         if (lexer.parseChar('('))
         {
+            // "({expr1})"
             processExpression();
             if (!lexer.parseChar(')'))
             {
                 throw new QueryCompilerSyntaxException("expected ')'", lexer.getIndex(), lexer.getInput());
             }
-            Node peekNode = stack.peek();
-            if (peekNode.getNodeType() == NodeType.CAST)
+
+            if (!lexer.parseChar('.'))
             {
-                castNode = peekNode;
-            }
-            else
-            {
+                // TODO If we have a cast, then apply to the current node (with the brackets)
                 return;
             }
+
+            // Has follow on expression "({expr1}).{expr2}" so continue
+            braceProcessing = true;
         }
 
-        // if primary == null, literal not found...
         // We will have an identifier (variable, parameter, or field of candidate class)
-        if (castNode == null && !processIdentifier())
+        if (processTreat())
         {
-            throw new QueryCompilerSyntaxException("Identifier expected", lexer.getIndex(), lexer.getInput());
         }
+        else if (processMethod())
+        {
+        }
+        else if (processIdentifier())
+        {
+        }
+        else
+        {
+            throw new QueryCompilerSyntaxException("Method/Identifier expected", lexer.getIndex(), lexer.getInput());
+        }
+
+        // Save the stack size just before this component for use later in squashing all nodes
+        // down to a single Node in the stack with all others chained off from it
         int size = stack.size();
+        if (braceProcessing)
+        {
+            size = sizeBeforeBraceProcessing+1;
+        }
 
         // Generate Node tree, including chained operations
         // e.g identifier.methodX().methodY().methodZ() 
@@ -1450,7 +1331,7 @@ public class JPQLParser extends AbstractParser
         {
             if (processMethod())
             {
-                // "a.method(...)"
+                // "a.method()" Note this is invalid in JPQL, where they have FUNCTIONs, but we allow it
             }
             else if (processIdentifier())
             {
@@ -1466,19 +1347,26 @@ public class JPQLParser extends AbstractParser
         // Node[IDENTIFIER, a]
         // +--- Node[IDENTIFIER, b]
         //      +--- Node[IDENTIFIER, c]
-        while (stack.size() > size)
+        while (stack.size() > size) // Nodes added
         {
             Node top = stack.pop();
             Node peek = stack.peek();
-            peek.insertChildNode(top);
-        }
+            Node lastDescendant = getLastDescendantNodeForNode(peek);
+            if (lastDescendant != null)
+            {
+                lastDescendant.appendChildNode(top);
+            }
+            else
+            {
+                // The peek node has multiple children, so cannot just put the top Node after the last child
+                Node primNode = new Node(NodeType.PRIMARY);
+                primNode.appendChildNode(peek);
+                primNode.appendChildNode(top);
 
-        if (castNode != null)
-        {
-            // When we have a cast (TREAT), make sure we put the parent node (the identifier that is cast) as the node on the stack
-            stack.pop();
-            Node castParentNode = castNode.getParent();
-            stack.push(castParentNode);
+                // Remove "peek" node and replace with primNode
+                stack.pop();
+                stack.push(primNode);
+            }
         }
     }
 
@@ -1527,6 +1415,158 @@ public class JPQLParser extends AbstractParser
             Node newNode = new Node(NodeType.CREATOR);
             newNode.insertChildNode(node);
             stack.push(newNode);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Process an ENTRY construct. Puts the ENTRY Node on the stack.
+     * @return Whether a ENTRY construct was found by the lexer.
+     */
+    protected boolean processEntry()
+    {
+        if (lexer.parseString("ENTRY"))
+        {
+            // ENTRY(identification_variable)
+            // Convert to be {primary}.INVOKE(mapEntry)
+            lexer.skipWS();
+            lexer.parseChar('(');
+            Node invokeNode = new Node(NodeType.INVOKE, "mapEntry");
+            processExpression();
+            if (!lexer.parseChar(')'))
+            {
+                throw new QueryCompilerSyntaxException("',' expected", lexer.getIndex(), lexer.getInput());
+            }
+
+            Node primaryNode = stack.pop(); // Could check type ? (Map)
+            Node primaryRootNode = primaryNode;
+            while (primaryNode.getFirstChild() != null)
+            {
+                primaryNode = primaryNode.getFirstChild();
+            }
+            primaryNode.appendChildNode(invokeNode);
+            stack.push(primaryRootNode);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Process a KEY construct. Puts the KEY Node on the stack.
+     * @return Whether a KEY construct was found by the lexer.
+     */
+    protected boolean processKey()
+    {
+        if (lexer.parseString("KEY"))
+        {
+            // KEY(identification_variable)
+            // Convert to be {primary}.INVOKE(mapKey)
+            lexer.skipWS();
+            lexer.parseChar('(');
+            Node invokeNode = new Node(NodeType.INVOKE, "mapKey");
+            processExpression();
+            if (!lexer.parseChar(')'))
+            {
+                throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
+            }
+
+            Node primaryNode = stack.pop(); // Could check type ? (Map)
+            Node primaryRootNode = primaryNode;
+            while (primaryNode.getFirstChild() != null)
+            {
+                primaryNode = primaryNode.getFirstChild();
+            }
+            primaryNode.appendChildNode(invokeNode);
+            stack.push(primaryRootNode);
+
+            // Allow referral to chain of field(s) of key
+            int size = stack.size();
+            while (lexer.parseChar('.'))
+            {
+                if (processIdentifier())
+                {
+                    // "a.field"
+                }
+                else
+                {
+                    throw new QueryCompilerSyntaxException("Identifier expected", lexer.getIndex(), lexer.getInput());
+                }
+            }
+            // For all added nodes, step back and chain them so we have
+            // Node[IDENTIFIER, a]
+            // +--- Node[IDENTIFIER, b]
+            //      +--- Node[IDENTIFIER, c]
+            if (size != stack.size())
+            {
+                Node lastNode = invokeNode;
+                while (stack.size() > size)
+                {
+                    Node top = stack.pop();
+                    lastNode.insertChildNode(top);
+                    lastNode = top;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Process a VALUE construct. Puts the VALUE Node on the stack.
+     * @return Whether a VALUE construct was found by the lexer.
+     */
+    protected boolean processValue()
+    {
+        if (lexer.parseString("VALUE"))
+        {
+            // VALUE(identification_variable)
+            // Convert to be {primary}.INVOKE(mapValue)
+            lexer.skipWS();
+            lexer.parseChar('(');
+            Node invokeNode = new Node(NodeType.INVOKE, "mapValue");
+            processExpression();
+            if (!lexer.parseChar(')'))
+            {
+                throw new QueryCompilerSyntaxException("',' expected", lexer.getIndex(), lexer.getInput());
+            }
+
+            Node primaryNode = stack.pop(); // Could check type ? (Map)
+            Node primaryRootNode = primaryNode;
+            while (primaryNode.getFirstChild() != null)
+            {
+                primaryNode = primaryNode.getFirstChild();
+            }
+            primaryNode.appendChildNode(invokeNode);
+            stack.push(primaryRootNode);
+
+            // Allow referral to chain of field(s) of key
+            int size = stack.size();
+            while (lexer.parseChar('.'))
+            {
+                if (processIdentifier())
+                {
+                    // "a.field"
+                }
+                else
+                {
+                    throw new QueryCompilerSyntaxException("Identifier expected", lexer.getIndex(), lexer.getInput());
+                }
+            }
+            // For all added nodes, step back and chain them so we have
+            // Node[IDENTIFIER, a]
+            // +--- Node[IDENTIFIER, b]
+            //      +--- Node[IDENTIFIER, c]
+            if (size != stack.size())
+            {
+                Node lastNode = invokeNode;
+                while (stack.size() > size)
+                {
+                    Node top = stack.pop();
+                    lastNode.insertChildNode(top);
+                    lastNode = top;
+                }
+            }
             return true;
         }
         return false;
@@ -1963,9 +2003,51 @@ public class JPQLParser extends AbstractParser
     }
 
     /**
+     * Process a TREAT construct, and put the node on the stack.
+     * @return Whether TREAT was found by the lexer.
+     */
+    protected boolean processTreat()
+    {
+        if (lexer.parseString("TREAT("))
+        {
+            // "TREAT(p AS Employee)" will create a Node tree as
+            // [IDENTIFIER : p.
+            //     [CAST : Employee]]
+            // with the "p" node on the stack.
+            processExpression();
+            Node identifierNode = stack.pop();
+
+            String typeName = lexer.parseIdentifier();
+            if (typeName != null && typeName.equalsIgnoreCase("AS"))
+            {
+                processExpression();
+                Node typeNode = stack.pop();
+                typeName = typeNode.getNodeChildId();
+            }
+            else
+            {
+                throw new QueryCompilerSyntaxException("TREAT should always be structured as 'TREAT(id AS typeName)'");
+            }
+
+            Node castNode = new Node(NodeType.CAST, typeName);
+            Node endNode = getLastDescendantNodeForNode(identifierNode);
+            castNode.setParent(endNode);
+            endNode.appendChildNode(castNode);
+            if (!lexer.parseChar(')'))
+            {
+                throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
+            }
+
+            stack.push(identifierNode);
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * A literal is one value of any type.
-     * Supported literals are of types String, Floating Point, Integer,
-     * Character, Boolean and null e.g. 'J', "String", 1, 1.8, true, false, null.
+     * Supported literals are of types String, Floating Point, Integer, Character, Boolean and null e.g. 'J', "String", 1, 1.8, true, false, null.
+     * Also supports JDBC "escape syntax" for literals.
      * @return The compiled literal
      */
     protected boolean processLiteral()
@@ -2018,9 +2100,7 @@ public class JPQLParser extends AbstractParser
         boolean single_quote_next = lexer.nextIsSingleQuote();
         if ((sLiteral = lexer.parseStringLiteral()) != null)
         {
-            // Both String and Character are allowed to use single-quotes
-            // so we need to check if it was single-quoted and
-            // use CharacterLiteral if length is 1.
+            // Both String and Character are allowed to use single-quotes so we need to check if it was single-quoted and use CharacterLiteral if length is 1.
             if (sLiteral.length() == 1 && single_quote_next)
             {
                 litValue = Character.valueOf(sLiteral.charAt(0));

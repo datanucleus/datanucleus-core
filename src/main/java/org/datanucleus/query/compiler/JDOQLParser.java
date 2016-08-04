@@ -866,33 +866,6 @@ public class JDOQLParser extends AbstractParser
     }
 
     /**
-     * Convenience method to navigate down through descendants to find the last one.
-     * Uses the first child node each time, so doesn't cope if there are multiple.
-     * @param node The node
-     * @return The last descendant
-     */
-    private Node getLastDescendantNodeForNode(Node node)
-    {
-        if (node == null)
-        {
-            return null;
-        }
-        if (node.getChildNodes() == null)
-        {
-            return node;
-        }
-        else if (node.getChildNodes().size() > 1)
-        {
-            return null;
-        }
-        if (!node.hasNextChild())
-        {
-            return node;
-        }
-        return getLastDescendantNodeForNode(node.getChildNode(0));
-    }
-
-    /**
      * Method to parse the query syntax for an "IF ... ELSE ..." expression.
      * Creates a Node of type "CASE" with children in the order 
      * <pre>ifNode, ifActionNode [, ifNode, ifActionNode]*, elseActionNode</pre>

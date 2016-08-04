@@ -48,4 +48,31 @@ public abstract class AbstractParser implements Parser
         // Override if you want to allow explicit parameters
         throw new NucleusException("Explicit parameters are not supported by this query parser");
     }
+
+    /**
+     * Convenience method to navigate down through descendants to find the last one.
+     * Uses the first child node each time, so doesn't cope if there are multiple.
+     * @param node The node
+     * @return The last descendant
+     */
+    protected static Node getLastDescendantNodeForNode(Node node)
+    {
+        if (node == null)
+        {
+            return null;
+        }
+        if (node.getChildNodes() == null)
+        {
+            return node;
+        }
+        else if (node.getChildNodes().size() > 1)
+        {
+            return null;
+        }
+        if (!node.hasNextChild())
+        {
+            return node;
+        }
+        return getLastDescendantNodeForNode(node.getChildNode(0));
+    }
 }
