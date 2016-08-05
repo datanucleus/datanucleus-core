@@ -399,6 +399,11 @@ public class JPQLParser implements Parser
 
                 // Find what we are joining to
                 String id = p.parseIdentifier();
+                if (id.equalsIgnoreCase("TREAT"))
+                {
+                    // TODO Support TREAT
+                    throw new NucleusException("We do not currently support JOIN to TREAT");
+                }
                 Node joinedNode = new Node(NodeType.IDENTIFIER, id);
                 Node parentNode = joinedNode;
                 while (p.nextIsDot())
@@ -1263,40 +1268,235 @@ public class JPQLParser implements Parser
             stack.push(distinctNode);
             return;
         }
-        else if (p.parseString("TREAT("))
+        else if (p.peekStringIgnoreCase("TREAT("))
         {
-            // "TREAT(p AS Employee)" will create a Node tree as
-            // [IDENTIFIER : p.
-            //     [CAST : Employee]]
+            // So we don't get interpreted as a method. Processed later
+        }
+        else if (processKey()) // TODO Can we chain fields/methods off a KEY ?
+        {
+            return;
+        }
+        else if (processValue()) // TODO Can we chain fields/methods off a VALUE ?
+        {
+            return;
+        }
+        else if (processEntry())
+        {
+            return;
+        }
+        else if (processCreator() || processLiteral() || processMethod())
+        {
+            return;
+        }
 
+        int sizeBeforeBraceProcessing = stack.size();
+        boolean braceProcessing = false;
+        if (p.parseChar('('))
+        {
+            // "({expr1})"
             processExpression();
-            Node identifierNode = stack.pop();
-//            String identifier = p.parseIdentifier();
-//            Node identifierNode = new Node(NodeType.IDENTIFIER, identifier);
-
-            String typeName = p.parseIdentifier();
-            if (typeName != null && typeName.equalsIgnoreCase("AS"))
+            if (!p.parseChar(')'))
             {
-                processExpression();
-                Node typeNode = stack.pop();
-                typeName = typeNode.getNodeChildId();
+                throw new QueryCompilerSyntaxException("expected ')'", p.getIndex(), p.getInput());
+            }
+
+            if (!p.parseChar('.'))
+            {
+                // TODO If we have a cast, then apply to the current node (with the brackets)
+                return;
+            }
+
+            // Has follow on expression "({expr1}).{expr2}" so continue
+            braceProcessing = true;
+        }
+
+        // We will have an identifier (variable, parameter, or field of candidate class)
+        if (processTreat())
+        {
+        }
+        else if (processMethod())
+        {
+        }
+        else if (processIdentifier())
+        {
+        }
+        else
+        {
+            throw new QueryCompilerSyntaxException("Method/Identifier expected", p.getIndex(), p.getInput());
+        }
+
+        // Save the stack size just before this component for use later in squashing all nodes
+        // down to a single Node in the stack with all others chained off from it
+        int size = stack.size();
+        if (braceProcessing)
+        {
+            size = sizeBeforeBraceProcessing+1;
+        }
+
+        // Generate Node tree, including chained operations
+        // e.g identifier.methodX().methodY().methodZ() 
+        //     -> node (IDENTIFIER) with child (INVOKE), with child (INVOKE), with child (INVOKE)
+        // e.g identifier.fieldX.fieldY.fieldZ
+        //     -> node (IDENTIFIER) with child (IDENTIFIER), with child (IDENTIFIER), with child (IDENTIFIER)
+        while (p.parseChar('.'))
+        {
+            if (processMethod())
+            {
+                // "a.method(...)"
+            }
+            else if (processIdentifier())
+            {
+                // "a.field"
             }
             else
             {
-                throw new QueryCompilerSyntaxException("TREAT should always be structured as 'TREAT(id AS typeName)'");
+                throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
             }
-            Node castNode = new Node(NodeType.CAST, typeName);
-            castNode.setParent(identifierNode);
-            identifierNode.appendChildNode(castNode);
+        }
+
+        // For all added nodes, step back and chain them so we have
+        // Node[IDENTIFIER, a]
+        // +--- Node[IDENTIFIER, b]
+        //      +--- Node[IDENTIFIER, c]
+        while (stack.size() > size) // Nodes added
+        {
+            Node top = stack.pop();
+            Node peek = stack.peek();
+            Node lastDescendant = getLastDescendantNodeForNode(peek);
+            if (lastDescendant != null)
+            {
+                lastDescendant.appendChildNode(top);
+            }
+            else
+            {
+                // The peek node has multiple children, so cannot just put the top Node after the last child
+                Node primNode = new Node(NodeType.PRIMARY);
+                primNode.appendChildNode(peek);
+                primNode.appendChildNode(top);
+
+                // Remove "peek" node and replace with primNode
+                stack.pop();
+                stack.push(primNode);
+            }
+        }
+    }
+
+    /**
+     * Convenience method to navigate down through descendants to find the last one.
+     * Uses the first child node each time, so doesn't cope if there are multiple.
+     * @param node The node
+     * @return The last descendant
+     */
+    private Node getLastDescendantNodeForNode(Node node)
+    {
+        if (node == null)
+        {
+            return null;
+        }
+        if (node.getChildNodes() == null)
+        {
+            return node;
+        }
+        else if (node.getChildNodes().size() > 1)
+        {
+            return null;
+        }
+        if (!node.hasNextChild())
+        {
+            return node;
+        }
+        return getLastDescendantNodeForNode(node.getChildNode(0));
+    }
+
+    /**
+     * Method to parse "new a.b.c(param1[,param2], ...)" and create a Node of type CREATOR.
+     * The Node at the top of the stack after this call will have any arguments defined in its "properties".
+     * @return whether method syntax was found.
+     */
+    private boolean processCreator()
+    {
+        if (p.parseStringIgnoreCase("NEW "))
+        {
+            // "new MyClass(arg1, arg2)"
+            int size = stack.size();
+            if (!processMethod())
+            {
+                if (!processIdentifier())
+                {
+                    throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
+                }
+
+                // run function on literals or identifiers e.g. "primary.runMethod(arg)"
+                while (p.parseChar('.'))
+                {
+                    if (processMethod())
+                    {
+                        // "a.method(...)"
+                    }
+                    else if (processIdentifier())
+                    {
+                        // "a.field"
+                    }
+                    else
+                    {
+                        throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
+                    }
+                }
+            }
+            while (stack.size() - 1 > size)
+            {
+                Node top =  stack.pop();
+                Node peek = stack.peek();
+                peek.insertChildNode(top);
+            }
+            Node node = stack.pop();
+            Node newNode = new Node(NodeType.CREATOR);
+            newNode.insertChildNode(node);
+            stack.push(newNode);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Process an ENTRY construct. Puts the ENTRY Node on the stack.
+     * @return Whether a ENTRY construct was found by the lexer.
+     */
+    protected boolean processEntry()
+    {
+        if (p.parseString("ENTRY"))
+        {
+            // ENTRY(identification_variable)
+            // Convert to be {primary}.INVOKE(mapEntry)
+            p.skipWS();
+            p.parseChar('(');
+            Node invokeNode = new Node(NodeType.INVOKE, "mapEntry");
+            processExpression();
             if (!p.parseChar(')'))
             {
-                throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
+                throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
             }
 
-            stack.push(castNode);
-            return;
+            Node primaryNode = stack.pop(); // Could check type ? (Map)
+            Node primaryRootNode = primaryNode;
+            while (primaryNode.getFirstChild() != null)
+            {
+                primaryNode = primaryNode.getFirstChild();
+            }
+            primaryNode.appendChildNode(invokeNode);
+            stack.push(primaryRootNode);
+            return true;
         }
-        else if (p.parseString("KEY"))
+        return false;
+    }
+
+    /**
+     * Process a KEY construct. Puts the KEY Node on the stack.
+     * @return Whether a KEY construct was found by the lexer.
+     */
+    protected boolean processKey()
+    {
+        if (p.parseString("KEY"))
         {
             // KEY(identification_variable)
             // Convert to be {primary}.INVOKE(mapKey)
@@ -1345,9 +1545,18 @@ public class JPQLParser implements Parser
                     lastNode = top;
                 }
             }
-            return;
+            return true;
         }
-        else if (p.parseString("VALUE"))
+        return false;
+    }
+
+    /**
+     * Process a VALUE construct. Puts the VALUE Node on the stack.
+     * @return Whether a VALUE construct was found by the lexer.
+     */
+    protected boolean processValue()
+    {
+        if (p.parseString("VALUE"))
         {
             // VALUE(identification_variable)
             // Convert to be {primary}.INVOKE(mapValue)
@@ -1396,149 +1605,6 @@ public class JPQLParser implements Parser
                     lastNode = top;
                 }
             }
-            return;
-        }
-        else if (p.parseString("ENTRY"))
-        {
-            // ENTRY(identification_variable)
-            // Convert to be {primary}.INVOKE(mapEntry)
-            p.skipWS();
-            p.parseChar('(');
-            Node invokeNode = new Node(NodeType.INVOKE, "mapEntry");
-            processExpression();
-            if (!p.parseChar(')'))
-            {
-                throw new QueryCompilerSyntaxException("',' expected", p.getIndex(), p.getInput());
-            }
-
-            Node primaryNode = stack.pop(); // Could check type ? (Map)
-            Node primaryRootNode = primaryNode;
-            while (primaryNode.getFirstChild() != null)
-            {
-                primaryNode = primaryNode.getFirstChild();
-            }
-            primaryNode.appendChildNode(invokeNode);
-            stack.push(primaryRootNode);
-            return;
-        }
-        else if (processCreator() || processLiteral() || processMethod())
-        {
-            return;
-        }
-
-        Node castNode = null;
-        if (p.parseChar('('))
-        {
-            processExpression();
-            if (!p.parseChar(')'))
-            {
-                throw new QueryCompilerSyntaxException("expected ')'", p.getIndex(), p.getInput());
-            }
-            Node peekNode = stack.peek();
-            if (peekNode.getNodeType() == NodeType.CAST)
-            {
-                castNode = peekNode;
-            }
-            else
-            {
-                return;
-            }
-        }
-
-        // if primary == null, literal not found...
-        // We will have an identifier (variable, parameter, or field of candidate class)
-        if (castNode == null && !processIdentifier())
-        {
-            throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
-        }
-        int size = stack.size();
-
-        // Generate Node tree, including chained operations
-        // e.g identifier.methodX().methodY().methodZ() 
-        //     -> node (IDENTIFIER) with child (INVOKE), with child (INVOKE), with child (INVOKE)
-        // e.g identifier.fieldX.fieldY.fieldZ
-        //     -> node (IDENTIFIER) with child (IDENTIFIER), with child (IDENTIFIER), with child (IDENTIFIER)
-        while (p.parseChar('.'))
-        {
-            if (processMethod())
-            {
-                // "a.method(...)"
-            }
-            else if (processIdentifier())
-            {
-                // "a.field"
-            }
-            else
-            {
-                throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
-            }
-        }
-
-        // For all added nodes, step back and chain them so we have
-        // Node[IDENTIFIER, a]
-        // +--- Node[IDENTIFIER, b]
-        //      +--- Node[IDENTIFIER, c]
-        while (stack.size() > size)
-        {
-            Node top = stack.pop();
-            Node peek = stack.peek();
-            peek.insertChildNode(top);
-        }
-
-        if (castNode != null)
-        {
-            // When we have a cast (TREAT), make sure we put the parent node (the identifier that is cast) as the node on the stack
-            stack.pop();
-            Node castParentNode = castNode.getParent();
-            stack.push(castParentNode);
-        }
-    }
-
-    /**
-     * Method to parse "new a.b.c(param1[,param2], ...)" and create a Node of type CREATOR.
-     * The Node at the top of the stack after this call will have any arguments defined in its "properties".
-     * @return whether method syntax was found.
-     */
-    private boolean processCreator()
-    {
-        if (p.parseStringIgnoreCase("NEW "))
-        {
-            // "new MyClass(arg1, arg2)"
-            int size = stack.size();
-            if (!processMethod())
-            {
-                if (!processIdentifier())
-                {
-                    throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
-                }
-
-                // run function on literals or identifiers e.g. "primary.runMethod(arg)"
-                while (p.parseChar('.'))
-                {
-                    if (processMethod())
-                    {
-                        // "a.method(...)"
-                    }
-                    else if (processIdentifier())
-                    {
-                        // "a.field"
-                    }
-                    else
-                    {
-                        throw new QueryCompilerSyntaxException("Identifier expected", p.getIndex(), p.getInput());
-                    }
-                }
-            }
-            while (stack.size() - 1 > size)
-            {
-                Node top =  stack.pop();
-                Node peek = stack.peek();
-                peek.insertChildNode(top);
-            }
-            Node node = stack.pop();
-            Node newNode = new Node(NodeType.CREATOR);
-            newNode.insertChildNode(node);
-            stack.push(newNode);
             return true;
         }
         return false;
@@ -2090,6 +2156,48 @@ public class JPQLParser implements Parser
                 stack.push(node);
                 return true;
             }
+        }
+        return false;
+    }
+
+    /**
+     * Process a TREAT construct, and put the node on the stack.
+     * @return Whether TREAT was found by the lexer.
+     */
+    protected boolean processTreat()
+    {
+        if (p.parseString("TREAT("))
+        {
+            // "TREAT(p AS Employee)" will create a Node tree as
+            // [IDENTIFIER : p.
+            //     [CAST : Employee]]
+            // with the "p" node on the stack.
+            processExpression();
+            Node identifierNode = stack.pop();
+
+            String typeName = p.parseIdentifier();
+            if (typeName != null && typeName.equalsIgnoreCase("AS"))
+            {
+                processExpression();
+                Node typeNode = stack.pop();
+                typeName = typeNode.getNodeChildId();
+            }
+            else
+            {
+                throw new QueryCompilerSyntaxException("TREAT should always be structured as 'TREAT(id AS typeName)'");
+            }
+
+            Node castNode = new Node(NodeType.CAST, typeName);
+            Node endNode = getLastDescendantNodeForNode(identifierNode);
+            castNode.setParent(endNode);
+            endNode.appendChildNode(castNode);
+            if (!p.parseChar(')'))
+            {
+                throw new QueryCompilerSyntaxException("')' expected", p.getIndex(), p.getInput());
+            }
+
+            stack.push(identifierNode);
+            return true;
         }
         return false;
     }
