@@ -2957,33 +2957,30 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     /**
      * Accessor for all ClassMetaData referenced by this Field.
      * Part of the "persistence-by-reachability" concept. 
-     * @param orderedCMDs List of ordered ClassMetaData objects (added to).
-     * @param referencedCMDs Set of referenced ClassMetaData objects (added to)
+     * @param orderedCmds List of ordered ClassMetaData objects (added to).
+     * @param referencedCmds Set of referenced ClassMetaData objects (added to)
      * @param clr the ClassLoaderResolver
      * @param mmgr MetaData manager
      */
-    void getReferencedClassMetaData(final List orderedCMDs, final Set referencedCMDs, final ClassLoaderResolver clr, final MetaDataManager mmgr)
+    void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final ClassLoaderResolver clr, final MetaDataManager mmgr)
     {
-        AbstractClassMetaData type_cmd = mmgr.getMetaDataForClass(getType(), clr);
-        if (type_cmd != null)
+        AbstractClassMetaData theTypeCmd = mmgr.getMetaDataForClass(getType(), clr);
+        if (theTypeCmd != null)
         {
-            type_cmd.getReferencedClassMetaData(orderedCMDs, referencedCMDs, clr, mmgr);
+            theTypeCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr, mmgr);
         }
 
-        if (containerMetaData != null)
+        if (hasCollection())
         {
-            if (containerMetaData instanceof CollectionMetaData)
-            {
-                ((CollectionMetaData)containerMetaData).getReferencedClassMetaData(orderedCMDs, referencedCMDs, clr, mmgr);
-            }
-            else if (containerMetaData instanceof MapMetaData)
-            {
-                ((MapMetaData)containerMetaData).getReferencedClassMetaData(orderedCMDs, referencedCMDs, clr, mmgr);
-            }
-            else if (containerMetaData instanceof ArrayMetaData)
-            {
-                ((ArrayMetaData)containerMetaData).getReferencedClassMetaData(orderedCMDs, referencedCMDs, clr, mmgr);
-            }
+            getCollection().getReferencedClassMetaData(orderedCmds, referencedCmds, clr, mmgr);
+        }
+        else if (hasMap())
+        {
+            getMap().getReferencedClassMetaData(orderedCmds, referencedCmds, clr, mmgr);
+        }
+        else if (hasArray())
+        {
+            getArray().getReferencedClassMetaData(orderedCmds, referencedCmds, clr, mmgr);
         }
     }
     

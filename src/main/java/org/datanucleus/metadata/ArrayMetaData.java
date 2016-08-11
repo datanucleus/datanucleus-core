@@ -352,18 +352,17 @@ public class ArrayMetaData extends ContainerMetaData
 
     /**
      * Accessor for all AbstractClassMetaData referenced by this array.
-     * @param orderedCMDs List of ordered AbstractClassMetaData objects (added to).
-     * @param referencedCMDs Set of all AbstractClassMetaData objects (added to).
+     * @param orderedCmds List of ordered AbstractClassMetaData objects (added to).
+     * @param referencedCmds Set of all AbstractClassMetaData objects (added to).
      * @param clr the ClassLoaderResolver
      * @param mmgr MetaData manager
      */
-    void getReferencedClassMetaData(final List orderedCMDs, final Set referencedCMDs, final ClassLoaderResolver clr, final MetaDataManager mmgr)
+    void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final ClassLoaderResolver clr, final MetaDataManager mmgr)
     {
-        AbstractClassMetaData element_cmd = 
-            mmgr.getMetaDataForClass(getMemberMetaData().getType().getComponentType(), clr);
-        if (element_cmd != null)
+        AbstractClassMetaData elementCmd = mmgr.getMetaDataForClass(getMemberMetaData().getType().getComponentType(), clr);
+        if (elementCmd != null)
         {
-            element_cmd.getReferencedClassMetaData(orderedCMDs, referencedCMDs, clr, mmgr);
+            elementCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr, mmgr);
         }
     }
 

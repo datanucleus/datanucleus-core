@@ -3100,13 +3100,12 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             return null;
         }
 
-        List<AbstractClassMetaData> orderedCMDs = new ArrayList();
-        Set referencedCMDs = new HashSet();
-
         // Use the ClassMetaData to tell us about its classes
-        cmd.getReferencedClassMetaData(orderedCMDs, referencedCMDs, clr, this);
+        List<AbstractClassMetaData> orderedCmds = new ArrayList<>();
+        Set<AbstractClassMetaData> referencedCmds = new HashSet<>();
+        cmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr, this);
 
-        return orderedCMDs;
+        return orderedCmds;
     }
 
     /* (non-Javadoc)

@@ -620,23 +620,23 @@ public class MapMetaData extends ContainerMetaData
  
     /**
      * Accessor for all ClassMetaData referenced by this array.
-     * @param orderedCMDs List of ordered ClassMetaData objects (added to).
-     * @param referencedCMDs Set of all ClassMetaData objects (added to).
+     * @param orderedCmds List of ordered ClassMetaData objects (added to).
+     * @param referencedCmds Set of all ClassMetaData objects (added to).
      * @param clr the ClassLoaderResolver
      * @param mmgr MetaData manager
      */
-    void getReferencedClassMetaData(final List orderedCMDs, final Set referencedCMDs, final ClassLoaderResolver clr, final MetaDataManager mmgr)
+    void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final ClassLoaderResolver clr, final MetaDataManager mmgr)
     {
-        AbstractClassMetaData key_cmd = mmgr.getMetaDataForClass(key.type,clr);
-        if (key_cmd != null)
+        AbstractClassMetaData keyCmd = mmgr.getMetaDataForClass(key.type, clr);
+        if (keyCmd != null)
         {
-            key_cmd.getReferencedClassMetaData(orderedCMDs, referencedCMDs, clr, mmgr);
+            keyCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr, mmgr);
         }
 
-        AbstractClassMetaData value_cmd = mmgr.getMetaDataForClass(value.type,clr);
-        if (value_cmd != null)
+        AbstractClassMetaData valueCmd = mmgr.getMetaDataForClass(value.type, clr);
+        if (valueCmd != null)
         {
-            value_cmd.getReferencedClassMetaData(orderedCMDs, referencedCMDs, clr, mmgr);
+            valueCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr, mmgr);
         }
     }
 
