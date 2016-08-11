@@ -37,7 +37,7 @@ import org.datanucleus.exceptions.NucleusException;
  * <LI>MetaData object is initialised (any internal arrays are set up, and additions of data is blocked from this point).
  * <LI>MetaData object is added to with runtime information like actual column names and types in use.</LI> 
  * </OL>
- * <h3>MetaData Extensability</h3>
+ * <h3>MetaData Extensibility</h3>
  * <p>
  * All MetaData elements are extensible with extensions for a "vendor-name". Extensions take the form of a key and a value.
  */
