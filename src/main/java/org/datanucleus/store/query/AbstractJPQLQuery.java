@@ -31,6 +31,7 @@ import org.datanucleus.query.compiler.QueryCompilation;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Abstract representation of a JPQL query used by DataNucleus.
@@ -191,12 +192,18 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
         else if (type == QueryType.BULK_UPDATE)
         {
             str.append("UPDATE ").append(from).append(" SET ").append(update).append(' ');
-            str.append("WHERE ").append(dereferenceFilter(filter));
+            if (!StringUtils.isWhitespace(filter))
+            {
+                str.append("WHERE ").append(dereferenceFilter(filter));
+            }
         }
         else if (type == QueryType.BULK_DELETE)
         {
             str.append("DELETE FROM ").append(from).append(' ');
-            str.append("WHERE ").append(dereferenceFilter(filter));
+            if (!StringUtils.isWhitespace(filter))
+            {
+                str.append("WHERE ").append(dereferenceFilter(filter));
+            }
         }
         else
         {
