@@ -219,7 +219,7 @@ public class JDOQLSingleStringParser
                 query.setResult(content);
             }*/
 
-            String content = parser.parseContent(true);
+            String content = parser.parseContent(true); // Allow subqueries, see below also search for SELECT
             if (content.length() > 0)
             {
                 if (content.indexOf("SELECT ") > 0 || content.indexOf("select ") > 0)
@@ -308,7 +308,7 @@ public class JDOQLSingleStringParser
 
         private void compileWhere()
         {
-            String content = parser.parseContent(true);
+            String content = parser.parseContent(true); // Allow subqueries, see below also search for SELECT
             if (content.length() == 0)
             {
                 // content cannot be empty

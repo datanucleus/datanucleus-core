@@ -244,7 +244,7 @@ public class JPQLSingleStringParser
 
         private void compileResult()
         {
-            String content = parser.parseContent(null, true);
+            String content = parser.parseContent(null, true); // Allow subqueries, see below also search for SELECT
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -265,7 +265,7 @@ public class JPQLSingleStringParser
 
         private void compileUpdate()
         {
-            String content = parser.parseContent(null, true);
+            String content = parser.parseContent(null, true); // Allow subqueries, see below also search for SELECT
             if (content.length() == 0)
             {
                 // No UPDATE clause
@@ -313,7 +313,7 @@ public class JPQLSingleStringParser
         private void compileWhere()
         {
             // "TRIM" may include "FROM" keyword so ignore subsequent FROMs
-            String content = parser.parseContent("FROM", true);
+            String content = parser.parseContent("FROM", true); // Allow subqueries, see below also search for SELECT
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -346,7 +346,7 @@ public class JPQLSingleStringParser
         private void compileHaving()
         {
             // "TRIM" may include "FROM" keyword so ignore subsequent FROMs
-            String content = parser.parseContent("FROM", true);
+            String content = parser.parseContent("FROM", true); // Allow subqueries, see below also search for SELECT
             if (content.length() == 0)
             {
                 // content cannot be empty
