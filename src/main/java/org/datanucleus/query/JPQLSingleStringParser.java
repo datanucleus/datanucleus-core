@@ -222,22 +222,39 @@ public class JPQLSingleStringParser
 
         private void compileUpdate()
         {
-            String content = parser.parseContent(null, false);
+            String content = parser.parseContent(null, true);
             if (content.length() == 0)
             {
                 // No UPDATE clause
                 throw new NucleusUserException(Localiser.msg("043010"));
             }
 
-            String contentUpper = content.toUpperCase();
-            int setIndex = contentUpper.indexOf("SET");
-            if (setIndex < 0)
+            if (content.toUpperCase().indexOf("SELECT ") > 0) // Case insensitive search
             {
-                // UPDATE clause has no "SET ..." !
-                throw new NucleusUserException(Localiser.msg("043011"));
+                // Subquery (or subqueries) present so split them out and just apply the filter for this query
+                String substitutedContent = processContentWithSubqueries(content);
+                String contentUpper = substitutedContent.toUpperCase();
+                int setIndex = contentUpper.indexOf("SET");
+                if (setIndex < 0)
+                {
+                    // UPDATE clause has no "SET ..." !
+                    throw new NucleusUserException(Localiser.msg("043011"));
+                }
+                query.setFrom(substitutedContent.substring(0, setIndex).trim());
+                query.setUpdate(substitutedContent.substring(setIndex+3).trim());
             }
-            query.setFrom(content.substring(0, setIndex).trim());
-            query.setUpdate(content.substring(setIndex+3).trim());
+            else
+            {
+                String contentUpper = content.toUpperCase();
+                int setIndex = contentUpper.indexOf("SET");
+                if (setIndex < 0)
+                {
+                    // UPDATE clause has no "SET ..." !
+                    throw new NucleusUserException(Localiser.msg("043011"));
+                }
+                query.setFrom(content.substring(0, setIndex).trim());
+                query.setUpdate(content.substring(setIndex+3).trim());
+            }
         }
 
         private void compileFrom()
