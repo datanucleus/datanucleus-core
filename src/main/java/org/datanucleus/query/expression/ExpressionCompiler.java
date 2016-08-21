@@ -147,6 +147,8 @@ public class ExpressionCompiler
                     {
                         joinTypeId = JoinType.JOIN_RIGHT_OUTER;
                     }
+
+                    // TODO Support TREAT
                     Node joinedNode = childNode.getFirstChild();
                     Node joinedAliasNode = childNode.getNextChild();
                     PrimaryExpression primExpr = (PrimaryExpression)compilePrimaryExpression(joinedNode);
