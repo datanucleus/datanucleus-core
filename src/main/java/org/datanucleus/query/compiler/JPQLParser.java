@@ -385,35 +385,6 @@ public class JPQLParser extends AbstractParser
                     fetch = true;
                 }
 
-                // Find what we are joining to
-                String id = lexer.parseIdentifier();
-                if (id.equalsIgnoreCase("TREAT"))
-                {
-                    // TODO Support TREAT
-                    throw new NucleusException("We do not currently support JOIN to TREAT");
-                }
-                Node joinedNode = new Node(NodeType.IDENTIFIER, id);
-                Node parentNode = joinedNode;
-                while (lexer.nextIsDot())
-                {
-                    lexer.parseChar('.');
-                    Node subNode = new Node(NodeType.IDENTIFIER, lexer.parseName());
-                    parentNode.appendChildNode(subNode);
-                    parentNode = subNode;
-                }
-
-                // And the alias we know this joined field by
-                lexer.parseStringIgnoreCase("AS "); // Optional
-                String alias = lexer.parseName();
-
-                Node onNode = null;
-                if (lexer.parseStringIgnoreCase("ON "))
-                {
-                    // JPA2.1 : Process "ON {cond_expr}"
-                    processExpression();
-                    onNode = stack.pop();
-                }
-
                 String joinType = JavaQueryCompiler.JOIN_INNER;
                 if (innerJoin)
                 {
@@ -428,12 +399,43 @@ public class JPQLParser extends AbstractParser
                     joinType = fetch ? JavaQueryCompiler.JOIN_OUTER_FETCH_RIGHT : JavaQueryCompiler.JOIN_OUTER_RIGHT;
                 }
                 Node joinNode = new Node(NodeType.OPERATOR, joinType);
-                joinNode.appendChildNode(joinedNode);
-                Node joinedAliasNode = new Node(NodeType.NAME, alias);
-                joinNode.appendChildNode(joinedAliasNode);
-                candidateNode.appendChildNode(joinNode);
-                if (onNode != null)
+
+                // Find what we are joining to
+                String id = lexer.parseIdentifier();
+                if (id.equalsIgnoreCase("TREAT"))
                 {
+                    // Joining to a TREAT expression with alias : "TREAT (path_expression AS subtype) [AS alias]" TODO Support TREAT
+                    throw new NucleusException("We do not currently support JOIN to TREAT");
+                }
+                /*else
+                {*/
+                    // Joining to an identifier with alias : "path_expression [AS alias]"
+                    Node joinedNode = new Node(NodeType.IDENTIFIER, id);
+                    Node parentNode = joinedNode;
+                    while (lexer.nextIsDot())
+                    {
+                        lexer.parseChar('.');
+                        Node subNode = new Node(NodeType.IDENTIFIER, lexer.parseName());
+                        parentNode.appendChildNode(subNode);
+                        parentNode = subNode;
+                    }
+
+                    // And the alias we know this joined field by
+                    lexer.parseStringIgnoreCase("AS "); // Optional
+                    String alias = lexer.parseName();
+
+                    joinNode.appendChildNode(joinedNode);
+                    Node joinedAliasNode = new Node(NodeType.NAME, alias);
+                    joinNode.appendChildNode(joinedAliasNode);
+                    candidateNode.appendChildNode(joinNode);
+                /*}*/
+
+                // Optional ON clause
+                if (lexer.parseStringIgnoreCase("ON "))
+                {
+                    // JPA2.1 : Process "ON {cond_expr}"
+                    processExpression();
+                    Node onNode = stack.pop();
                     joinNode.appendChildNode(onNode);
                 }
             }
