@@ -307,67 +307,79 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                     {
                         joinedNode = joinedNode.getFirstChild();
                         String joinedMember = (String)joinedNode.getNodeValue();
-
-                        // Allow for multi-field joins
-                        String[] joinedMembers = joinedMember.contains(".") ? StringUtils.split(joinedMember, ".") : new String[] {joinedMember};
-                        for (int k=0;k<joinedMembers.length;k++)
+                        if (joinedNode.getNodeType() == NodeType.CAST)
                         {
-                            AbstractMemberMetaData mmd = joinedCmd.getMetaDataForMember(joinedMembers[k]);
-                            if (mmd == null)
+                            // JOIN to "TREAT(identifier AS subcls)"
+                            String castTypeName = (String)joinedNode.getNodeValue();
+                            if (castTypeName.indexOf('.') < 0)
                             {
-                                if (childNode.getNodeValue().equals(JOIN_OUTER) || childNode.getNodeValue().equals(JOIN_OUTER_FETCH))
+                                castTypeName = ClassUtils.createFullClassName(joinedCmd.getPackageName(), castTypeName);
+                            }
+                            joinedCls = clr.classForName(castTypeName);
+                        }
+                        else
+                        {
+                            // Allow for multi-field joins
+                            String[] joinedMembers = joinedMember.contains(".") ? StringUtils.split(joinedMember, ".") : new String[] {joinedMember};
+                            for (int k=0;k<joinedMembers.length;k++)
+                            {
+                                AbstractMemberMetaData mmd = joinedCmd.getMetaDataForMember(joinedMembers[k]);
+                                if (mmd == null)
                                 {
-                                    // Polymorphic join, where the field exists in a subclass (doable since we have outer join)
-                                    String[] subclasses = metaDataManager.getSubclassesForClass(joinedCmd.getFullClassName(), true);
-                                    for (int l=0;l<subclasses.length;l++)
+                                    if (childNode.getNodeValue().equals(JOIN_OUTER) || childNode.getNodeValue().equals(JOIN_OUTER_FETCH))
                                     {
-                                        AbstractClassMetaData subCmd = metaDataManager.getMetaDataForClass(subclasses[l], clr);
-                                        if (subCmd != null)
+                                        // Polymorphic join, where the field exists in a subclass (doable since we have outer join)
+                                        String[] subclasses = metaDataManager.getSubclassesForClass(joinedCmd.getFullClassName(), true);
+                                        for (int l=0;l<subclasses.length;l++)
                                         {
-                                            mmd = subCmd.getMetaDataForMember(joinedMembers[k]);
-                                            if (mmd != null)
+                                            AbstractClassMetaData subCmd = metaDataManager.getMetaDataForClass(subclasses[l], clr);
+                                            if (subCmd != null)
                                             {
-                                                NucleusLogger.QUERY.debug("Polymorphic join found at " + joinedMembers[k] + " of " + subCmd.getFullClassName());
-                                                joinedCmd = subCmd;
-                                                break;
+                                                mmd = subCmd.getMetaDataForMember(joinedMembers[k]);
+                                                if (mmd != null)
+                                                {
+                                                    NucleusLogger.QUERY.debug("Polymorphic join found at " + joinedMembers[k] + " of " + subCmd.getFullClassName());
+                                                    joinedCmd = subCmd;
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
-                                }
-                                if (mmd == null)
-                                {
-                                    throw new QueryCompilerSyntaxException("FROM clause has reference to " + joinedCmd.getFullClassName() + "." + joinedMembers[k] + " but it doesn't exist!");
-                                }
-                            }
-
-                            RelationType relationType = mmd.getRelationType(clr);
-                            if (RelationType.isRelationSingleValued(relationType))
-                            {
-                                joinedCls = mmd.getType();
-                                joinedCmd = metaDataManager.getMetaDataForClass(joinedCls, clr);
-                            }
-                            else if (RelationType.isRelationMultiValued(relationType))
-                            {
-                                if (mmd.hasCollection())
-                                {
-                                    // TODO Don't currently allow interface field navigation
-                                    joinedCmd = mmd.getCollection().getElementClassMetaData(clr, metaDataManager);
-                                    joinedCls = clr.classForName(joinedCmd.getFullClassName());
-                                }
-                                else if (mmd.hasMap())
-                                {
-                                    joinedCmd = mmd.getMap().getValueClassMetaData(clr, metaDataManager);
-                                    if (joinedCmd != null)
+                                    if (mmd == null)
                                     {
-                                        // JPA assumption that the value is an entity ... but it may not be!
-                                        joinedCls = clr.classForName(joinedCmd.getFullClassName());
+                                        throw new QueryCompilerSyntaxException("FROM clause has reference to " + joinedCmd.getFullClassName() + "." + joinedMembers[k] + " but it doesn't exist!");
                                     }
                                 }
-                                else if (mmd.hasArray())
+
+                                RelationType relationType = mmd.getRelationType(clr);
+                                if (RelationType.isRelationSingleValued(relationType))
                                 {
-                                    // TODO Don't currently allow interface field navigation
-                                    joinedCmd = mmd.getArray().getElementClassMetaData(clr, metaDataManager);
-                                    joinedCls = clr.classForName(joinedCmd.getFullClassName());
+                                    joinedCls = mmd.getType();
+                                    joinedCmd = metaDataManager.getMetaDataForClass(joinedCls, clr);
+                                }
+                                else if (RelationType.isRelationMultiValued(relationType))
+                                {
+                                    if (mmd.hasCollection())
+                                    {
+                                        // TODO Don't currently allow interface field navigation
+                                        joinedCmd = mmd.getCollection().getElementClassMetaData(clr, metaDataManager);
+                                        joinedCls = clr.classForName(joinedCmd.getFullClassName());
+                                    }
+                                    else if (mmd.hasMap())
+                                    {
+                                        joinedCmd = mmd.getMap().getValueClassMetaData(clr, metaDataManager);
+                                        if (joinedCmd != null)
+                                        {
+                                            // JPA assumption that the value is an entity ... but it may not be!
+                                            joinedCls = clr.classForName(joinedCmd.getFullClassName());
+                                        }
+                                    }
+                                    else if (mmd.hasArray())
+                                    {
+                                        // TODO Don't currently allow interface field navigation
+                                        joinedCmd = mmd.getArray().getElementClassMetaData(clr, metaDataManager);
+                                        joinedCls = clr.classForName(joinedCmd.getFullClassName());
+                                    }
                                 }
                             }
                         }
@@ -376,8 +388,10 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                     Node aliasNode = childNode.getNextChild();
                     if (aliasNode.getNodeType() == NodeType.NAME)
                     {
+                        // Add JOIN alias to symbol table
                         symtbl.addSymbol(new PropertySymbol((String)aliasNode.getNodeValue(), joinedCls));
                     }
+
                     Node nextNode = childNode.getNextChild();
                     if (nextNode != null)
                     {

@@ -401,15 +401,23 @@ public class JPQLParser extends AbstractParser
                 Node joinNode = new Node(NodeType.OPERATOR, joinType);
 
                 // Find what we are joining to
-                String id = lexer.parseIdentifier();
-                if (id.equalsIgnoreCase("TREAT"))
+                if (processTreat())
                 {
-                    // Joining to a TREAT expression with alias : "TREAT (path_expression AS subtype) [AS alias]" TODO Support TREAT
-                    throw new NucleusException("We do not currently support JOIN to TREAT");
+                    // Joining to a TREAT expression with alias : "TREAT (path_expression AS subtype) [AS alias]" TODO Support nested TREAT?
+                    Node treatNode = stack.pop();
+                    joinNode.appendChildNode(treatNode);
+
+                    // And the alias we know this joined field by
+                    lexer.parseStringIgnoreCase("AS "); // Optional
+                    String alias = lexer.parseName();
+                    Node joinedAliasNode = new Node(NodeType.NAME, alias);
+                    joinNode.appendChildNode(joinedAliasNode);
                 }
-                /*else
-                {*/
+                else
+                {
                     // Joining to an identifier with alias : "path_expression [AS alias]"
+                    String id = lexer.parseIdentifier();
+
                     Node joinedNode = new Node(NodeType.IDENTIFIER, id);
                     Node parentNode = joinedNode;
                     while (lexer.nextIsDot())
@@ -419,16 +427,14 @@ public class JPQLParser extends AbstractParser
                         parentNode.appendChildNode(subNode);
                         parentNode = subNode;
                     }
+                    joinNode.appendChildNode(joinedNode);
 
                     // And the alias we know this joined field by
                     lexer.parseStringIgnoreCase("AS "); // Optional
                     String alias = lexer.parseName();
-
-                    joinNode.appendChildNode(joinedNode);
                     Node joinedAliasNode = new Node(NodeType.NAME, alias);
                     joinNode.appendChildNode(joinedAliasNode);
-                    candidateNode.appendChildNode(joinNode);
-                /*}*/
+                }
 
                 // Optional ON clause
                 if (lexer.parseStringIgnoreCase("ON "))
@@ -438,6 +444,8 @@ public class JPQLParser extends AbstractParser
                     Node onNode = stack.pop();
                     joinNode.appendChildNode(onNode);
                 }
+
+                candidateNode.appendChildNode(joinNode);
             }
             else
             {
