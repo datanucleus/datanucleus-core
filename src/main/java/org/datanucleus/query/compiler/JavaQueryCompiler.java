@@ -313,9 +313,11 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                             String castTypeName = (String)joinedNode.getNodeValue();
                             if (castTypeName.indexOf('.') < 0)
                             {
+                                // Fully-qualify with the current class name?
                                 castTypeName = ClassUtils.createFullClassName(joinedCmd.getPackageName(), castTypeName);
                             }
                             joinedCls = clr.classForName(castTypeName);
+                            joinedNode.setNodeValue(castTypeName); // Update cast type now that we have resolved it
                         }
                         else
                         {
