@@ -31,7 +31,7 @@ import org.datanucleus.store.query.QueryResult;
 /**
  * Extent that does a simple JDOQL query for the candidate with/without subclasses.
  */
-public class DefaultCandidateExtent<T> extends AbstractExtent<T>
+public class DefaultCandidateExtent<T> extends AbstractExtent<T> implements AutoCloseable
 {
     /** FetchPlan for use with this Extent. */
     private FetchPlan fetchPlan = null;
@@ -90,6 +90,11 @@ public class DefaultCandidateExtent<T> extends AbstractExtent<T>
     public FetchPlan getFetchPlan()
     {
         return fetchPlan;
+    }
+
+    public void close()
+    {
+        this.closeAll();
     }
 
     public void closeAll()

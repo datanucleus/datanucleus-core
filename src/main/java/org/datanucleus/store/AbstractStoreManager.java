@@ -267,18 +267,26 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 cf.close();
             }
         }
+        connectionMgr = null;
 
         if (valueGenerationMgr != null)
         {
             valueGenerationMgr.clear();
+            valueGenerationMgr = null;
         }
 
         storeDataMgr.clear();
+        storeDataMgr = null;
 
         if (persistenceHandler != null)
         {
             persistenceHandler.close();
             persistenceHandler = null;
+        }
+
+        if (schemaHandler != null)
+        {
+            schemaHandler = null;
         }
 
         if (queryMgr != null)
