@@ -61,6 +61,12 @@ public abstract class AbstractManagedConnection implements ManagedConnection
         useCount = useCount + 1;
     }
 
+    public void close()
+    {
+        this.listeners.clear();
+        this.conn = null;
+    }
+
     /**
      * Release this connection back to us so we can pool it if required. In the case of a transactional
      * connection it is allocated and released and always pooled (not committed) during the transaction. 
