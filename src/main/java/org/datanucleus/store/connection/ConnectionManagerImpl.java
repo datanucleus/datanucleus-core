@@ -52,7 +52,7 @@ public class ConnectionManagerImpl implements ConnectionManager
     PersistenceNucleusContext nucleusContext;
 
     /** Registry of factories for connections, keyed by their symbolic name. */
-    Map<String, ConnectionFactory> factories = new HashMap<String, ConnectionFactory>();
+    Map<String, ConnectionFactory> factories = new HashMap<>();
 
     ManagedConnectionPool connectionPool = new ManagedConnectionPool();
 
