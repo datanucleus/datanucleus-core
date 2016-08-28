@@ -91,6 +91,7 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory
      */
     public void close()
     {
+        this.storeMgr = null;
     }
 
     /**
