@@ -149,6 +149,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
         conf.addDefaultProperty(PropertyNames.PROPERTY_METADATA_JDOQUERY_SUFFIX, null, "jdoquery", null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_METADATA_DEFAULT_INHERITANCE_STRATEGY, null, "JDO2", CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_EMBEDDED_PC_FLAT, null, true, false, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_USE_DISCRIMINATOR_FOR_SINGLE_TABLE, null, true, false, false);
     }
 
     public synchronized void initialise()

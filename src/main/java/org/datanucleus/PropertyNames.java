@@ -47,6 +47,7 @@ public class PropertyNames
     public static final String PROPERTY_METADATA_EMBEDDED_PC_FLAT = "datanucleus.metadata.embedded.flat";
     public static final String PROPERTY_METADATA_DEFAULT_NULLABLE = "datanucleus.metadata.defaultNullable";
     public static final String PROPERTY_METADATA_LISTENER_OBJECT = "datanucleus.metadata.listener.object";
+    public static final String PROPERTY_METADATA_USE_DISCRIMINATOR_FOR_SINGLE_TABLE = "datanucleus.metadata.useDiscriminatorForSingleTable";
 
     public static final String PROPERTY_IGNORE_CACHE = "datanucleus.IgnoreCache";
     public static final String PROPERTY_OPTIMISTIC = "datanucleus.Optimistic";
