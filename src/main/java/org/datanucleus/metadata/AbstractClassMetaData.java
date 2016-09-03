@@ -894,8 +894,7 @@ public abstract class AbstractClassMetaData extends MetaData
         if (mappedSuperclass)
         {
             String baseInhStrategy = getBaseInheritanceStrategy();
-            if (baseInhStrategy != null && baseInhStrategy.equalsIgnoreCase("SINGLE_TABLE") &&
-                getSuperclassManagingTable() != null)
+            if (baseInhStrategy != null && baseInhStrategy.equalsIgnoreCase("SINGLE_TABLE") && getSuperclassManagingTable() != null)
             {
                 // We have a mapped-superclass part way down an inheritance tree but with a class with table above it
                 // and the tree is defined to use single-table strategy, so change the inheritance strategy to persist
@@ -1001,8 +1000,7 @@ public abstract class AbstractClassMetaData extends MetaData
                     }
                 }
 
-                if (baseCmd.getInheritanceMetaData() != null &&
-                    baseCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
+                if (baseCmd.getInheritanceMetaData() != null && baseCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
                 {
                     // Root class in tree is set to use COMPLETE_TABLE so all subclasses have own table
                     inheritanceMetaData = new InheritanceMetaData();
@@ -1070,6 +1068,12 @@ public abstract class AbstractClassMetaData extends MetaData
                     }
                     else
                     {
+                        if (inheritanceMetaData.getDiscriminatorMetaData() == null)
+                        {
+                            // JPA : When using SINGLE_TABLE at the root, then we must have a Discriminator (JPA spec says default length 31)
+                            NucleusLogger.METADATA.info("Class " + getFullClassName() + " defined to use SINGLE_TABLE for the inheritance tree but no discriminator defined, so adding one");
+                            inheritanceMetaData.newDiscriminatorMetadata().setStrategy(DiscriminatorStrategy.CLASS_NAME).newColumnMetaData().setLength(31);
+                        }
                         inheritanceMetaData.strategy = InheritanceStrategy.NEW_TABLE;
                     }
                 }
@@ -1144,8 +1148,7 @@ public abstract class AbstractClassMetaData extends MetaData
 
     protected void applyDefaultDiscriminatorValueWhenNotSpecified(MetaDataManager mmgr)
     {
-        if (inheritanceMetaData != null &&
-            inheritanceMetaData.getStrategy() == InheritanceStrategy.SUPERCLASS_TABLE)
+        if (inheritanceMetaData != null && inheritanceMetaData.getStrategy() == InheritanceStrategy.SUPERCLASS_TABLE)
         {
             AbstractClassMetaData superCmd = getClassManagingTable();
             if (superCmd == null)
@@ -1157,8 +1160,7 @@ public abstract class AbstractClassMetaData extends MetaData
             {
                 DiscriminatorMetaData superDismd = superCmd.getInheritanceMetaData().getDiscriminatorMetaData();
                 DiscriminatorMetaData dismd = inheritanceMetaData.getDiscriminatorMetaData();
-                if (superDismd != null && superDismd.getStrategy() == DiscriminatorStrategy.VALUE_MAP &&
-                    (dismd == null || dismd.getValue() == null))
+                if (superDismd != null && superDismd.getStrategy() == DiscriminatorStrategy.VALUE_MAP && (dismd == null || dismd.getValue() == null))
                 {
                     // Impose the full class name as the discriminator value since not set
                     if (dismd == null)
@@ -1167,8 +1169,7 @@ public abstract class AbstractClassMetaData extends MetaData
                     }
                     if (NucleusLogger.METADATA.isDebugEnabled())
                     {
-                        NucleusLogger.METADATA.debug("No discriminator value specified for " + getFullClassName() +
-                        " so using fully-qualified class name");
+                        NucleusLogger.METADATA.debug("No discriminator value specified for " + getFullClassName() + " so using fully-qualified class name");
                     }
                     dismd.setValue(getFullClassName());
                 }
@@ -1179,8 +1180,7 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             // Register the discriminator value if using VALUE_MAP and a value is defined
             DiscriminatorMetaData dismd = inheritanceMetaData.getDiscriminatorMetaData();
-            if (dismd != null && getDiscriminatorStrategy() == DiscriminatorStrategy.VALUE_MAP &&
-                dismd.getValue() != null)
+            if (dismd != null && getDiscriminatorStrategy() == DiscriminatorStrategy.VALUE_MAP && dismd.getValue() != null)
             {
                 mmgr.registerDiscriminatorValueForClass(this, dismd.getValue());
             }
