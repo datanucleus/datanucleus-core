@@ -24,7 +24,8 @@ public enum DiscriminatorStrategy
 {
     NONE("none"),
     VALUE_MAP("value-map"),
-    CLASS_NAME("class-name");
+    CLASS_NAME("class-name"),
+    ENTITY_NAME("entity-name");
 
     String name;
 
@@ -60,6 +61,10 @@ public enum DiscriminatorStrategy
         else if (DiscriminatorStrategy.CLASS_NAME.toString().equals(value))
         {
             return DiscriminatorStrategy.CLASS_NAME;
+        }
+        else if (DiscriminatorStrategy.ENTITY_NAME.toString().equals(value))
+        {
+            return DiscriminatorStrategy.ENTITY_NAME;
         }
         return null;
     }

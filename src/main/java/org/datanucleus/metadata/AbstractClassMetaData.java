@@ -2044,7 +2044,7 @@ public abstract class AbstractClassMetaData extends MetaData
 
     /**
      * Method returning the discriminator value to apply to an instance of this class.
-     * If using "class-name" then returns the class name, otherwise if using "value-map" returns the value
+     * If using "class-name" then returns the class name, and if using the "entity-name" returns the entity name, otherwise if using "value-map" returns the value
      * specified directly against this class metadata. The returned value is a String unless the user defined
      * the column as holding integer-based values, in which case a Long is returned
      * @return The discriminator value
@@ -2057,6 +2057,10 @@ public abstract class AbstractClassMetaData extends MetaData
             if (str == DiscriminatorStrategy.CLASS_NAME)
             {
                 return getFullClassName();
+            }
+            else if (str == DiscriminatorStrategy.ENTITY_NAME)
+            {
+                return getEntityName();
             }
             else if (str == DiscriminatorStrategy.VALUE_MAP)
             {
