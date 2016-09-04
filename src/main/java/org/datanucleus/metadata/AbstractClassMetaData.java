@@ -1073,7 +1073,14 @@ public abstract class AbstractClassMetaData extends MetaData
                         {
                             // JPA : When using SINGLE_TABLE at the root, then we must have a Discriminator (JPA spec says default length 31)
                             NucleusLogger.METADATA.info("Class " + getFullClassName() + " defined to use SINGLE_TABLE for the inheritance tree but no discriminator defined, so adding one");
-                            inheritanceMetaData.newDiscriminatorMetadata().setStrategy(DiscriminatorStrategy.CLASS_NAME).newColumnMetaData().setLength(31);
+                            if (mmgr.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_USE_DISCRIMINATOR_DEFAULT_CLASS_NAME))
+                            {
+                                inheritanceMetaData.newDiscriminatorMetadata().setStrategy(DiscriminatorStrategy.CLASS_NAME).setIndexed("true").newColumnMetaData().setLength(31);
+                            }
+                            else
+                            {
+                                inheritanceMetaData.newDiscriminatorMetadata().setStrategy(DiscriminatorStrategy.ENTITY_NAME).setIndexed("true").newColumnMetaData().setLength(31);
+                            }
                         }
                         inheritanceMetaData.strategy = InheritanceStrategy.NEW_TABLE;
                     }
