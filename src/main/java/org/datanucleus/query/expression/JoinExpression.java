@@ -37,12 +37,12 @@ public class JoinExpression extends Expression
     }
 
     JoinType type;
-    PrimaryExpression primExpr; // Expression for the field we are joining to
+    Expression joinedExpr; // Expression for the field we are joining to
     Expression onExpr; // Optional ON expression to add to the join clause
 
-    public JoinExpression(PrimaryExpression expr, String alias, JoinType type)
+    public JoinExpression(Expression expr, String alias, JoinType type)
     {
-        this.primExpr = expr;
+        this.joinedExpr = expr;
         this.alias = alias;
         this.type = type;
     }
@@ -57,9 +57,9 @@ public class JoinExpression extends Expression
         this.onExpr = expr;
     }
 
-    public PrimaryExpression getPrimaryExpression()
+    public Expression getJoinedExpression()
     {
-        return primExpr;
+        return joinedExpr;
     }
 
     public Expression getOnExpression()
@@ -92,8 +92,8 @@ public class JoinExpression extends Expression
     {
         if (right != null)
         {
-            return "JoinExpression{" + type + " " + primExpr + " alias=" + alias + " join=" + right + (onExpr != null ? (" on=" + onExpr) : "") + "}";
+            return "JoinExpression{" + type + " " + joinedExpr + " alias=" + alias + " join=" + right + (onExpr != null ? (" on=" + onExpr) : "") + "}";
         }
-        return "JoinExpression{" + type + " " + primExpr + " alias=" + alias + (onExpr != null ? (" on=" + onExpr) : "") + "}";
+        return "JoinExpression{" + type + " " + joinedExpr + " alias=" + alias + (onExpr != null ? (" on=" + onExpr) : "") + "}";
     }
 }
