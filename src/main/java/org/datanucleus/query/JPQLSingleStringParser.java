@@ -302,17 +302,24 @@ public class JPQLSingleStringParser
 
         private void compileFrom()
         {
-            String content = parser.parseContent(null, false);
+            String content = parser.parseContent(null, true); // Allow subqueries, see below also search for SELECT
             if (content.length() > 0)
             {
-                //content may be empty
-                query.setFrom(content);
+                if (content.toUpperCase().indexOf("SELECT ") > 0) // Case insensitive search
+                {
+                    // Subquery (or subqueries) present so split them out and just apply the filter for this query
+                    String substitutedContent = processContentWithSubqueries(content);
+                    query.setFrom(substitutedContent);
+                }
+                else
+                {
+                    query.setFrom(content);
+                }
             }
         }
 
         private void compileWhere()
         {
-            // "TRIM" may include "FROM" keyword so ignore subsequent FROMs
             String content = parser.parseContent("FROM", true); // Allow subqueries, see below also search for SELECT
             if (content.length() == 0)
             {
@@ -345,7 +352,6 @@ public class JPQLSingleStringParser
 
         private void compileHaving()
         {
-            // "TRIM" may include "FROM" keyword so ignore subsequent FROMs
             String content = parser.parseContent("FROM", true); // Allow subqueries, see below also search for SELECT
             if (content.length() == 0)
             {
