@@ -134,6 +134,7 @@ public class CompleteClassTable implements Table
                 continue;
             }
 
+            // TODO Make use of cmd.overriddenMembers
             RelationType relationType = mmd.getRelationType(clr);
             if (relationType != RelationType.NONE && MetaDataUtils.getInstance().isMemberEmbedded(storeMgr.getMetaDataManager(), clr, mmd, relationType, null))
             {
