@@ -31,12 +31,11 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * Parser for handling JPQL Single-String queries.
- * Takes a JPQLQuery and the query string and parses it into its constituent parts, updating
- * the JPQLQuery accordingly with the result that after calling the parse() method the JPQLQuery
- * is populated.
+ * Takes a JPQLQuery and the query string and parses it into its constituent parts, updating the JPQLQuery accordingly with the result that, 
+ * after calling the parse() method, the JPQLQuery is populated.
  * <pre>
- * SELECT [ {result} ]
- *        [FROM {candidate-classes} ]
+ * SELECT [{result} ]
+ *        [FROM {from-clause} ]
  *        [WHERE {filter}]
  *        [GROUP BY {grouping-clause} ]
  *        [HAVING {having-clause} ]
@@ -47,22 +46,23 @@ import org.datanucleus.util.NucleusLogger;
  * <pre>
  * UPDATE {update-clause}
  * WHERE {filter}
- * and update-clause is of the form
- * "Entity [[AS] identifier] SET {field = new_value}, ..."
  * </pre>
+ * and <i>update-clause</i> is of the form "Entity [[AS] identifier] SET {field = new_value}, ..."
  * or
  * <pre>
  * DELETE {delete-clause}
  * WHERE {filter}
- * and delete-clause is of the form
- * "FROM Entity [[AS] identifier]"
  * </pre>
+ * and <i>delete-clause</i> is of the form "FROM Entity [[AS] identifier]"
  * <p>
- * Note that {filter} and {having-clause} can contain subqueries in JPQL, hence containing keywords
+ * Note that only the {filter} and {having-clause} can strictly contain subqueries in JPQL, hence containing keywords
  * <pre>
  * SELECT c FROM Customer c WHERE NOT EXISTS (SELECT o1 FROM c.orders o1)
  * </pre>
- * So the "filter" for the outer query is "NOT EXISTS (SELECT o1 FROM c.orders o1)"
+ * So the "filter" for the outer query is "NOT EXISTS (SELECT o1 FROM c.orders o1)".
+ * Note also that we allow subqueries in {result}, {from}, and {having} clauses as well (vendor extension).
+ * If a subquery is contained we extract the subquery and then set it as a variable in the symbol table, and add the subquery separately.
+ * </p>
  */
 public class JPQLSingleStringParser
 {
