@@ -59,8 +59,8 @@ import org.datanucleus.util.StringUtils;
  * SchemaTool providing an interface for the maintenance of schemas.
  * These utilities include:-
  * <ul>
- * <li>creation of a schema in the datastore</li>
- * <li>deletion of a schema in the datastore</li>
+ * <li>creation of a schema/catalog in the datastore</li>
+ * <li>deletion of a schema/catalog in the datastore</li>
  * <li>creation of tables representing classes specified in input data</li>
  * <li>deletion of tables representing classes specified in input data</li>
  * <li>validation of tables representing classes specified in input data</li>

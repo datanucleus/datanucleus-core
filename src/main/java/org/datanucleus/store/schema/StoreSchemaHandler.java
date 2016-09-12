@@ -47,6 +47,7 @@ public interface StoreSchemaHandler
 
     /**
      * Method to create the specified schema.
+     * TODO Support catalog also, and rename this as createDatabase
      * @param schemaName Name of the schema
      * @param props Any properties controlling the schema generation
      * @param connection Connection to use (null implies this will obtain its own connection)
@@ -55,6 +56,7 @@ public interface StoreSchemaHandler
 
     /**
      * Method to delete the specified schema.
+     * TODO Support catalog also, and rename this as deleteDatabase
      * @param schemaName Name of the schema
      * @param props Any properties controlling the schema deletion
      * @param connection Connection to use (null implies this will obtain its own connection)
