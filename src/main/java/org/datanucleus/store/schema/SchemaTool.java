@@ -197,12 +197,12 @@ public class SchemaTool
         else if (cmd.hasOption(OPTION_CREATE_DATABASE))
         {
             mode = Mode.CREATE_DATABASE;
-            msg = Localiser.msg("014034", tool.getSchemaName());
+            msg = Localiser.msg("014034", tool.getCatalogName(), tool.getSchemaName());
         }
         else if (cmd.hasOption(OPTION_DELETE_DATABASE))
         {
             mode = Mode.DELETE_DATABASE;
-            msg = Localiser.msg("014035", tool.getSchemaName());
+            msg = Localiser.msg("014035", tool.getCatalogName(), tool.getSchemaName());
         }
         else if (cmd.hasOption(OPTION_DBINFO))
         {
