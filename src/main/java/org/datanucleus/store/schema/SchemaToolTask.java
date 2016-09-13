@@ -49,9 +49,6 @@ public class SchemaToolTask extends Java
     /** Operating mode */
     private Mode mode = Mode.CREATE;
 
-    /** Schema name (optional, for when using CREATE_SCHEMA, DELETE_SCHEMA). */
-    private String schemaName;
-
     /** Filesets of files (mapping or class) to be used in generating the schema. */
     List<FileSet> filesets = new ArrayList<FileSet>();
 
@@ -71,21 +68,13 @@ public class SchemaToolTask extends Java
     public void execute()
     throws BuildException
     {
-        if (mode == Mode.CREATE_SCHEMA)
+        if (mode == Mode.CREATE_DATABASE)
         {
-            if (schemaName == null)
-            {
-                throw new BuildException("If using 'create schema' then need to set schemaName");
-            }
-            createArg().setValue("-createSchema " + schemaName);
+            createArg().setValue("-createDatabase");
         }
-        else if (mode == Mode.DELETE_SCHEMA)
+        else if (mode == Mode.DELETE_DATABASE)
         {
-            if (schemaName == null)
-            {
-                throw new BuildException("If using 'create schema' then need to set schemaName");
-            }
-            createArg().setValue("-deleteSchema " + schemaName);
+            createArg().setValue("-deleteDatabase");
         }
         else if (mode == Mode.CREATE)
         {
@@ -193,15 +182,6 @@ public class SchemaToolTask extends Java
     }
 
     /**
-     * Set the schema name (for use with CREATE_SCHEMA/DELETE_SCHEMA methods).
-     * @param schemaName Name of the schema
-     */
-    public void setSchemaName(String schemaName)
-    {
-        this.schemaName = schemaName;
-    }
-
-    /**
      * Mutator for whether to output complete DDL.
      * @param complete Whether to give complete DDL
      */
@@ -255,6 +235,34 @@ public class SchemaToolTask extends Java
     }
 
     /**
+     * Set the Catalog Name.
+     * @param name Catalog name
+     */
+    public void setCatalog(String name)
+    {
+        if (name != null && name.length() > 0)
+        {
+            createArg().setValue("-catalog");
+            createArg().setValue(name);
+            log("SchemaTool catalog: " + name, Project.MSG_VERBOSE);
+        }
+    }
+
+    /**
+     * Set the Schema Name.
+     * @param name Schema name
+     */
+    public void setSchema(String name)
+    {
+        if (name != null && name.length() > 0)
+        {
+            createArg().setValue("-schema");
+            createArg().setValue(name);
+            log("SchemaTool schema: " + name, Project.MSG_VERBOSE);
+        }
+    }
+
+    /**
      * Sets the mode of operation.
      * @param mode The mode of operation ("create", "delete", "deletecreate", "validate", "dbinfo", "schemainfo")
      */
@@ -264,13 +272,13 @@ public class SchemaToolTask extends Java
         {
             return;
         }
-        if (mode.equalsIgnoreCase("createSchema"))
+        if (mode.equalsIgnoreCase("createDatabase"))
         {
-            this.mode = Mode.CREATE_SCHEMA;
+            this.mode = Mode.CREATE_DATABASE;
         }
-        else if (mode.equalsIgnoreCase("deleteSchema"))
+        else if (mode.equalsIgnoreCase("deleteDatabase"))
         {
-            this.mode = Mode.DELETE_SCHEMA;
+            this.mode = Mode.DELETE_DATABASE;
         }
         else if (mode.equalsIgnoreCase("create"))
         {

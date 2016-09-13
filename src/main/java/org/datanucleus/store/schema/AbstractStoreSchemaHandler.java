@@ -176,21 +176,21 @@ public abstract class AbstractStoreSchemaHandler implements StoreSchemaHandler
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.StoreSchemaHandler#createSchema(java.lang.String, java.util.Properties, java.lang.Object)
+     * @see org.datanucleus.store.schema.StoreSchemaHandler#createDatabase(java.lang.String, java.lang.String, java.util.Properties, java.lang.Object)
      */
     @Override
-    public void createSchema(String schemaName, Properties props, Object connection)
+    public void createDatabase(String catalogName, String schemaName, Properties props, Object connection)
     {
-        throw new UnsupportedOperationException("This datastore doesn't support creation of schema");
+        throw new UnsupportedOperationException("This datastore doesn't support creation of database");
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.StoreSchemaHandler#deleteSchema(java.lang.String, java.util.Properties, java.lang.Object)
+     * @see org.datanucleus.store.schema.StoreSchemaHandler#deleteDatabase(java.lang.String, java.lang.String, java.util.Properties, java.lang.Object)
      */
     @Override
-    public void deleteSchema(String schemaName, Properties props, Object connection)
+    public void deleteDatabase(String catalogName, String schemaName, Properties props, Object connection)
     {
-        throw new UnsupportedOperationException("This datastore doesn't support deletion of schema");
+        throw new UnsupportedOperationException("This datastore doesn't support deletion of database");
     }
 
     /* (non-Javadoc)

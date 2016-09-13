@@ -71,8 +71,8 @@ public class SchemaTool
 {
     public static final NucleusLogger LOGGER = NucleusLogger.getLoggerInstance("DataNucleus.SchemaTool");
 
-    public static final String OPTION_CREATE_SCHEMA = "createSchema";
-    public static final String OPTION_DELETE_SCHEMA = "deleteSchema";
+    public static final String OPTION_CREATE_DATABASE = "createDatabase";
+    public static final String OPTION_DELETE_DATABASE = "deleteDatabase";
     public static final String OPTION_CREATE_TABLES_FOR_CLASSES = "create";
     public static final String OPTION_DELETE_TABLES_FOR_CLASSES = "delete";
     public static final String OPTION_DELETE_CREATE_TABLES_FOR_CLASSES = "deletecreate";
@@ -83,11 +83,13 @@ public class SchemaTool
     public static final String OPTION_COMPLETE_DDL = "completeDdl";
     public static final String OPTION_INCLUDE_AUTO_START = "includeAutoStart";
     public static final String OPTION_API = "api";
+    public static final String OPTION_CATALOG_NAME = "catalog";
+    public static final String OPTION_SCHEMA_NAME = "schema";
 
     public enum Mode
     {
-        CREATE_SCHEMA,
-        DELETE_SCHEMA,
+        CREATE_DATABASE,
+        DELETE_DATABASE,
         CREATE,
         DELETE,
         DELETE_CREATE,
@@ -101,6 +103,9 @@ public class SchemaTool
 
     /** Name of the schema (for use with createSchema, deleteSchema modes). */
     private String schemaName = null;
+
+    /** Name of the schema (for use with createSchema, deleteSchema modes). */
+    private String catalogName = null;
 
     /** Name of a file in which to put the DDL (or null if wanting to execute in the datastore). */
     private String ddlFilename = null;
@@ -124,8 +129,8 @@ public class SchemaTool
         SchemaTool tool = new SchemaTool();
 
         CommandLine cmd = new CommandLine();
-        cmd.addOption(OPTION_CREATE_SCHEMA, OPTION_CREATE_SCHEMA, OPTION_CREATE_SCHEMA, Localiser.msg("014024"));
-        cmd.addOption(OPTION_DELETE_SCHEMA, OPTION_DELETE_SCHEMA, OPTION_DELETE_SCHEMA, Localiser.msg("014025"));
+        cmd.addOption(OPTION_CREATE_DATABASE, OPTION_CREATE_DATABASE, null, Localiser.msg("014024"));
+        cmd.addOption(OPTION_DELETE_DATABASE, OPTION_DELETE_DATABASE, null, Localiser.msg("014025"));
 
         cmd.addOption(OPTION_CREATE_TABLES_FOR_CLASSES, OPTION_CREATE_TABLES_FOR_CLASSES, null, Localiser.msg("014026"));
         cmd.addOption(OPTION_DELETE_TABLES_FOR_CLASSES, OPTION_DELETE_TABLES_FOR_CLASSES, null, Localiser.msg("014027"));
@@ -140,6 +145,8 @@ public class SchemaTool
         cmd.addOption(OPTION_COMPLETE_DDL, OPTION_COMPLETE_DDL, null, Localiser.msg("014032"));
         cmd.addOption(OPTION_INCLUDE_AUTO_START, OPTION_INCLUDE_AUTO_START, null, "Include Auto-Start Mechanisms");
         cmd.addOption(OPTION_API, OPTION_API, "api", "API Adapter (JDO, JPA, etc)");
+        cmd.addOption(OPTION_CATALOG_NAME, OPTION_CATALOG_NAME, "catalog", "CatalogName");
+        cmd.addOption(OPTION_SCHEMA_NAME, OPTION_SCHEMA_NAME, "schema", "SchemaName");
         cmd.addOption("v", "verbose", null, "verbose output");
         cmd.addOption("pu", "persistenceUnit", "<persistence-unit>", "name of the persistence unit to handle the schema for");
         cmd.addOption("props", "properties", "props", "path to a properties file");
@@ -153,6 +160,15 @@ public class SchemaTool
         if (cmd.hasOption("api"))
         {
             tool.setApi(cmd.getOptionArg("api"));
+        }
+        if (cmd.hasOption(OPTION_CATALOG_NAME))
+        {
+            tool.setCatalogName(cmd.getOptionArg(OPTION_CATALOG_NAME));
+        }
+        if (cmd.hasOption(OPTION_SCHEMA_NAME))
+        {
+            NucleusLogger.GENERAL.info(">> sch input = " + cmd.getOptionArg(OPTION_SCHEMA_NAME));
+            tool.setSchemaName(cmd.getOptionArg(OPTION_SCHEMA_NAME));
         }
 
         // Determine the mode of operation required
@@ -178,16 +194,14 @@ public class SchemaTool
             mode = Mode.VALIDATE;
             msg = Localiser.msg("014002");
         }
-        else if (cmd.hasOption(OPTION_CREATE_SCHEMA))
+        else if (cmd.hasOption(OPTION_CREATE_DATABASE))
         {
-            mode = Mode.CREATE_SCHEMA;
-            tool.setSchemaName(cmd.getOptionArg(OPTION_CREATE_SCHEMA));
+            mode = Mode.CREATE_DATABASE;
             msg = Localiser.msg("014034", tool.getSchemaName());
         }
-        else if (cmd.hasOption(OPTION_DELETE_SCHEMA))
+        else if (cmd.hasOption(OPTION_DELETE_DATABASE))
         {
-            mode = Mode.DELETE_SCHEMA;
-            tool.setSchemaName(cmd.getOptionArg(OPTION_DELETE_SCHEMA));
+            mode = Mode.DELETE_DATABASE;
             msg = Localiser.msg("014035", tool.getSchemaName());
         }
         else if (cmd.hasOption(OPTION_DBINFO))
@@ -391,8 +405,7 @@ public class SchemaTool
         StoreManager storeMgr = nucleusCtx.getStoreManager();
         if (!(storeMgr instanceof SchemaAwareStoreManager))
         {
-            LOGGER.error("StoreManager of type " + storeMgr.getClass().getName() +
-                " is not schema-aware so cannot be used with SchemaTool");
+            LOGGER.error("StoreManager of type " + storeMgr.getClass().getName() + " is not schema-aware so cannot be used with SchemaTool");
             System.exit(2);
             return;
         }
@@ -400,13 +413,13 @@ public class SchemaTool
 
         try
         {
-            if (mode == Mode.CREATE_SCHEMA)
+            if (mode == Mode.CREATE_DATABASE)
             {
-                tool.createSchema(schemaStoreMgr, tool.getSchemaName());
+                tool.createDatabase(schemaStoreMgr, tool.getCatalogName(), tool.getSchemaName());
             }
-            else if (mode == Mode.DELETE_SCHEMA)
+            else if (mode == Mode.DELETE_DATABASE)
             {
-                tool.deleteSchema(schemaStoreMgr, tool.getSchemaName());
+                tool.deleteDatabase(schemaStoreMgr, tool.getCatalogName(), tool.getSchemaName());
             }
             else if (mode == Mode.CREATE)
             {
@@ -482,14 +495,14 @@ public class SchemaTool
         return props;
     }
 
-    public void createSchema(SchemaAwareStoreManager storeMgr, String schemaName)
+    public void createDatabase(SchemaAwareStoreManager storeMgr, String catalogName, String schemaName)
     {
-        storeMgr.createSchema(schemaName, getPropertiesForSchemaTool());
+        storeMgr.createDatabase(catalogName, schemaName, getPropertiesForSchemaTool());
     }
 
-    public void deleteSchema(SchemaAwareStoreManager storeMgr, String schemaName)
+    public void deleteDatabase(SchemaAwareStoreManager storeMgr, String catalogName, String schemaName)
     {
-        storeMgr.deleteSchema(schemaName, getPropertiesForSchemaTool());
+        storeMgr.deleteDatabase(catalogName, schemaName, getPropertiesForSchemaTool());
     }
 
     public void createSchemaForClasses(SchemaAwareStoreManager storeMgr, Set<String> classNames)
@@ -805,6 +818,16 @@ public class SchemaTool
     public SchemaTool setSchemaName(String schemaName)
     {
         this.schemaName = schemaName;
+        return this;
+    }
+
+    public String getCatalogName()
+    {
+        return catalogName;
+    }
+    public SchemaTool setCatalogName(String catalogName)
+    {
+        this.catalogName = catalogName;
         return this;
     }
 

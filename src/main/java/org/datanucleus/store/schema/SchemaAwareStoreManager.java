@@ -27,13 +27,22 @@ import java.util.Set;
 public interface SchemaAwareStoreManager
 {
     /**
-     * Method that will create an actual schema in the datastore (if the datastore supports it).
+     * Method that will create a database (catalog/schema) in the datastore (if the datastore supports it).
+     * @param catalogName Name of the catalog to create
      * @param schemaName Name of the schema to create
      * @param props Any optional properties
      * @throws UnsupportedOperationException If not supported
-     * @since 4.0
      */
-    void createSchema(String schemaName, Properties props);
+    void createDatabase(String catalogName, String schemaName, Properties props);
+
+    /**
+     * Method that will delete a database (catalog/schema) from the datastore (if the datastore supports it).
+     * @param catalogName Name of the catalog to delete
+     * @param schemaName Name of the schema to delete
+     * @param props Any optional properties
+     * @throws UnsupportedOperationException If not supported
+     */
+    void deleteDatabase(String catalogName, String schemaName, Properties props);
 
     /**
      * Create the schema (tables/constraints) for the specified classes (if supported by this datastore).
@@ -42,15 +51,6 @@ public interface SchemaAwareStoreManager
      * @throws UnsupportedOperationException If not supported
      */
     void createSchemaForClasses(Set<String> classNames, Properties props);
-
-    /**
-     * Method that will delete a schema from the datastore (if the datastore supports it).
-     * @param schemaName Name of the schema to delete
-     * @param props Any optional properties
-     * @throws UnsupportedOperationException If not supported
-     * @since 4.0
-     */
-    void deleteSchema(String schemaName, Properties props);
 
     /**
      * Delete the schema (tables/constraints) for the specified classes (if supported by this datastore).

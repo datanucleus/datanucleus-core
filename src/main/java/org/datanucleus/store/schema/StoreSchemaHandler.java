@@ -46,22 +46,22 @@ public interface StoreSchemaHandler
     void clear();
 
     /**
-     * Method to create the specified schema.
-     * TODO Support catalog also, and rename this as createDatabase
+     * Method to create the specified catalog/schema.
+     * @param catalogName Name of the catalog
      * @param schemaName Name of the schema
      * @param props Any properties controlling the schema generation
      * @param connection Connection to use (null implies this will obtain its own connection)
      */
-    void createSchema(String schemaName, Properties props, Object connection);
+    void createDatabase(String catalogName, String schemaName, Properties props, Object connection);
 
     /**
-     * Method to delete the specified schema.
-     * TODO Support catalog also, and rename this as deleteDatabase
+     * Method to delete the specified catalog/schema.
+     * @param catalogName Name of the catalog
      * @param schemaName Name of the schema
      * @param props Any properties controlling the schema deletion
      * @param connection Connection to use (null implies this will obtain its own connection)
      */
-    void deleteSchema(String schemaName, Properties props, Object connection);
+    void deleteDatabase(String catalogName, String schemaName, Properties props, Object connection);
 
     /**
      * Method to generate the required schema for the supplied classes.
