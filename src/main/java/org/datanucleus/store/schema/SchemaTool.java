@@ -101,10 +101,10 @@ public class SchemaTool
     /** Name of the persistence API to use. */
     private String apiName = "JDO";
 
-    /** Name of the schema (for use with createSchema, deleteSchema modes). */
+    /** Name of the schema (for use with createDatabase, deleteDatabase modes). */
     private String schemaName = null;
 
-    /** Name of the schema (for use with createSchema, deleteSchema modes). */
+    /** Name of the schema (for use with createDatabase, deleteDatabase modes). */
     private String catalogName = null;
 
     /** Name of a file in which to put the DDL (or null if wanting to execute in the datastore). */
