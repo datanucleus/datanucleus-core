@@ -66,7 +66,7 @@ public abstract class AbstractClassMetaData extends MetaData
     /** 
      * Whether the class is fully defined, and hence instantiable. This is false when it is a JPA MappedSuperclass
      * and has no PK fields defined (will be defined in the derived Entity). 
-     * This is different to whether the class is abstract - use isAbstract() for that.
+     * This is different to whether the class is abstract - use ClassMetaData.isAbstract() for that.
      */
     protected boolean instantiable = true;
 
@@ -125,7 +125,7 @@ public abstract class AbstractClassMetaData extends MetaData
     protected PrimaryKeyMetaData primaryKeyMetaData;
 
     /** EventListeners. Use a list to preserve ordering. */
-    protected List listeners = null;
+    protected List<EventListenerMetaData> listeners = null;
 
     /** Flag to exclude superclass listeners. */
     protected Boolean excludeSuperClassListeners = null;
@@ -154,9 +154,6 @@ public abstract class AbstractClassMetaData extends MetaData
     /** List of query result MetaData defined for this file. */
     protected Collection<QueryResultMetaData> queryResultMetaData = null;
 
-    /** List of members (fields/properties). */
-    protected List<AbstractMemberMetaData> members = new ArrayList<>();
-
     /** The columns that are present in the datastore yet not mapped to fields in this class. */
     protected List<ColumnMetaData> unmappedColumns = null;
 
@@ -174,13 +171,10 @@ public abstract class AbstractClassMetaData extends MetaData
     /** List of joins */
     protected List<JoinMetaData> joins = null;
 
-    // Fields below here are not represented in the output MetaData. They are for use internally in the operation of the system.
-    // The majority are for convenience to save iterating through the fields since the fields are fixed once initialised.
+    /** List of all members (fields/properties). */
+    protected List<AbstractMemberMetaData> members = new ArrayList<>();
 
-    /**
-     * Managed fields/properties of this class. Contains the same AbstractMemberMetaData objects as are in "members".
-     * Doesn't include any overridden members which are stored separately.
-     */
+    /** Managed fields/properties of this class. Subset of the AbstractMemberMetaData objects that are in "members", excluding "overriddenMembers". */
     protected AbstractMemberMetaData[] managedMembers;
 
     /** Fields/properties for superclasses that are overridden in this class. */
@@ -294,7 +288,12 @@ public abstract class AbstractClassMetaData extends MetaData
 
         if (copyMembers)
         {
-            copyMembersFromInterface(imd);
+            // Adds FieldMetaData for each PropertyMetaData on the persistent-interface.
+            for (int i=0; i<imd.getMemberCount(); i++)
+            {
+                FieldMetaData fmd = new FieldMetaData(this, imd.getMetaDataForManagedMemberAtAbsolutePosition(i));
+                addMember(fmd);
+            }
         }
 
         setVersionMetaData(imd.versionMetaData);
@@ -403,7 +402,7 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             if (listeners == null)
             {
-                listeners = new ArrayList();
+                listeners = new ArrayList<>();
             }
             listeners.addAll(imd.listeners);
         }
@@ -477,21 +476,6 @@ public abstract class AbstractClassMetaData extends MetaData
     public boolean isImplementationOfPersistentDefinition()
     {
         return implementationOfPersistentDefinition;
-    }
-
-    /**
-     * Convenience method to copy the properties from an existing interface.
-     * Adds FieldMetaData for each PropertyMetaData on the persistent-interface.
-     * @param imd The interface that we copy from
-     */
-    protected void copyMembersFromInterface(InterfaceMetaData imd)
-    {
-        for (int i=0; i<imd.getMemberCount(); i++)
-        {
-            // generate FieldMetaData out of PropertyMetaData
-            FieldMetaData fmd = new FieldMetaData(this, imd.getMetaDataForManagedMemberAtAbsolutePosition(i));
-            addMember(fmd);
-        }
     }
 
     /**
@@ -593,16 +577,7 @@ public abstract class AbstractClassMetaData extends MetaData
                         noOfPkKeys++;
                     }
                 }
-                if (noOfPkKeys > 0)
-                {
-                    // Use application-identity since there are primary-key field(s) defined
-                    identityType = IdentityType.APPLICATION; // SingleFieldIdentity
-                }
-                else
-                {
-                    // Use datastore-identity
-                    identityType = IdentityType.DATASTORE;
-                }
+                identityType = (noOfPkKeys > 0) ? IdentityType.APPLICATION : IdentityType.DATASTORE;
             }
         }
     }
@@ -725,8 +700,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 throw new InvalidClassMetaDataException("044094", fullName, identityMetaData.getValueStrategy(), baseImd.getValueStrategy());
             }
 
-            if (baseCmd.identitySpecified && identityMetaData != null && 
-                baseImd.getValueStrategy() != identityMetaData.getValueStrategy())
+            if (baseCmd.identitySpecified && identityMetaData != null && baseImd.getValueStrategy() != identityMetaData.getValueStrategy())
             {
                 // Make sure the strategy matches the parent (likely just took the default "native" schema)
                 identityMetaData.setValueStrategy(baseImd.getValueStrategy());
@@ -1427,7 +1401,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 }
 
                 boolean validated = false;
-                Set errors = new HashSet();
+                Set<Throwable> errors = new HashSet<>();
                 try
                 {
                     // Check against the API Adapter in use for this MetaData
@@ -1444,21 +1418,17 @@ public abstract class AbstractClassMetaData extends MetaData
                 {
                     // Why is this wrapping all exceptions into 1 single exception? 
                     // This needs coordinating with the test expectations in the enhancer unit tests.
-                    throw new NucleusUserException(Localiser.msg("019016", getFullClassName(), obj_cls.getName()), (Throwable[]) errors.toArray(new Throwable[errors.size()]));
+                    throw new NucleusUserException(Localiser.msg("019016", getFullClassName(), obj_cls.getName()), errors.toArray(new Throwable[errors.size()]));
                 }
             }
         }
     }
 
     /**
-     * Method to provide the details of the class being represented by this
-     * MetaData. This can be used to firstly provide defaults for attributes
-     * that aren't specified in the MetaData, and secondly to report any errors
-     * with attributes that have been specifed that are inconsistent with the
-     * class being represented.
-     * <P>
-     * This method must be invoked by subclasses during populate operations  
-     * </P>
+     * Method to provide the details of the class being represented by this MetaData. 
+     * This can be used to firstly provide defaults for attributes that aren't specified in the MetaData, and secondly to report any errors
+     * with attributes that have been specified that are inconsistent with the class being represented.
+     * This method must be invoked by subclasses during populate operations.
      * @param clr ClassLoaderResolver to use in loading any classes
      * @param primary the primary ClassLoader to use (or null)
      * @param mmgr MetaData manager
@@ -1679,7 +1649,7 @@ public abstract class AbstractClassMetaData extends MetaData
      * @param referenceChain The List of class names that have been referenced
      * @throws NucleusUserException If a circular reference is found in the view definitions.
      */
-    protected static void checkForCircularViewReferences(Map<String, Set<String>> viewReferences, String referencerName, String referenceeName, List referenceChain)
+    protected static void checkForCircularViewReferences(Map<String, Set<String>> viewReferences, String referencerName, String referenceeName, List<String> referenceChain)
     {
         Set<String> classNames = viewReferences.get(referenceeName);
         if (classNames != null)
@@ -1687,7 +1657,7 @@ public abstract class AbstractClassMetaData extends MetaData
             // Initialize the chain of references if needed.  Add the referencee to the chain.
             if (referenceChain == null)
             {
-                referenceChain = new ArrayList();
+                referenceChain = new ArrayList<>();
                 referenceChain.add(referencerName);
             }
             referenceChain.add(referenceeName);
@@ -1715,155 +1685,6 @@ public abstract class AbstractClassMetaData extends MetaData
                 AbstractClassMetaData.checkForCircularViewReferences(viewReferences, referencerName, currentName, referenceChain);
             }
         }
-    }
-
-    // ------------------------------ Accessors --------------------------------
-
-    /**
-     * Accessor for the number of named queries.
-     * @return no of named queries
-     */
-    public int getNoOfQueries()
-    {
-        return queries.size();
-    }
-
-    /**
-     * Accessor for the metadata of the named queries.
-     * @return Meta-Data for the named queries.
-     */
-    public QueryMetaData[] getQueries()
-    {
-        return queries == null ? null : ((QueryMetaData[])queries.toArray(new QueryMetaData[queries.size()]));
-    }
-
-    /**
-     * Accessor for the number of named stored proc queries.
-     * @return no of named stored proc queries
-     */
-    public int getNoOfStoredProcQueries()
-    {
-        return storedProcQueries.size();
-    }
-
-    /**
-     * Accessor for the metadata of the named stored proc queries.
-     * @return Meta-Data for the named stored proc queries.
-     */
-    public StoredProcQueryMetaData[] getStoredProcQueries()
-    {
-        return storedProcQueries == null ? null : 
-            ((StoredProcQueryMetaData[])storedProcQueries.toArray(new StoredProcQueryMetaData[storedProcQueries.size()]));
-    }
-
-    /**
-     * Get the query result MetaData registered for this class.
-     * @return Query Result MetaData defined for this class
-     */
-    public QueryResultMetaData[] getQueryResultMetaData()
-    {
-        if (queryResultMetaData == null)
-        {
-            return null;
-        }
-        return queryResultMetaData.toArray(new QueryResultMetaData[queryResultMetaData.size()]);
-    }
-
-    /**
-     * Accessor for Version MetaData for this class specifically.
-     * Note that this just returns what this class had defined, and if this has no version info then
-     * you really need what the superclass has (if there is one). Consider using getVersionMetaDataForClass().
-     * @return Returns the versionMetaData.
-     */
-    public final VersionMetaData getVersionMetaData()
-    {
-        return versionMetaData;
-    }
-
-    /**
-     * Convenience accessor for the version metadata applying to this class.
-     * Differs from getVersionMetaData by searching superclasses.
-     * @return The version metadata
-     */
-    public final VersionMetaData getVersionMetaDataForClass()
-    {
-        if (versionMetaData != null)
-        {
-            // Version information specified at this level
-            return versionMetaData;
-        }
-        else if (getSuperAbstractClassMetaData() != null)
-        {
-            // Use superclass version information
-            return getSuperAbstractClassMetaData().getVersionMetaDataForClass();
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    /**
-     * Returns whether objects of this type are versioned.
-     * A return of true means that either this class has version information, or a superclass does, and that
-     * the version information is required to be stored.
-     * @return Whether it is versioned.
-     */
-    public final boolean isVersioned()
-    {
-        VersionMetaData vermd = getVersionMetaDataForClass();
-        if (vermd != null && vermd.getVersionStrategy() != null && vermd.getVersionStrategy() != VersionStrategy.NONE)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Convenience method to find the version MetaData defining versioning for the same 'table'
-     * as this class is using. Traverses up the inheritance tree to find the highest class that uses
-     * "subclass-table" that has version metadata defined, or the class that owns the 'table' where
-     * this class uses "superclass-table", and returns the MetaData.
-     * @return Version MetaData for the highest class in this tree using subclass-table
-     */
-    public final VersionMetaData getVersionMetaDataForTable()
-    {
-        if (pcSuperclassMetaData != null)
-        {
-            if (getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUPERCLASS_TABLE &&
-                pcSuperclassMetaData.getInheritanceMetaData().getStrategy() == InheritanceStrategy.NEW_TABLE)
-            {
-                // Superclass owns the table that we use so relay up to superclass
-                VersionMetaData vermd = pcSuperclassMetaData.getVersionMetaDataForTable();
-                if (vermd != null)
-                {
-                    return vermd;
-                }
-            }
-            if (getInheritanceMetaData().getStrategy() == InheritanceStrategy.NEW_TABLE &&
-                pcSuperclassMetaData.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
-            {
-                // We own the table but the superclass uses it too, so relay up to superclass
-                VersionMetaData vermd = pcSuperclassMetaData.getVersionMetaDataForTable();
-                if (vermd != null)
-                {
-                    // Superclass has versioning info so return that
-                    return vermd;
-                }
-            }
-            if (getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
-            {
-                VersionMetaData vermd = pcSuperclassMetaData.getVersionMetaDataForTable();
-                if (vermd != null)
-                {
-                    // Superclass is persisted into this table, so use its version
-                    return vermd;
-                }
-            }
-        }
-
-        // Nothing in superclasses sharing our table so return ours
-        return versionMetaData;
     }
 
     /**
@@ -1903,8 +1724,7 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             return null;
         }
-        else if (inheritanceMetaData.getStrategy() == InheritanceStrategy.NEW_TABLE &&
-            inheritanceMetaData.getDiscriminatorMetaData() != null)
+        else if (inheritanceMetaData.getStrategy() == InheritanceStrategy.NEW_TABLE && inheritanceMetaData.getDiscriminatorMetaData() != null)
         {
             // Discriminator information specified at this level
             return inheritanceMetaData.getDiscriminatorMetaData().getStrategy();
@@ -1983,8 +1803,7 @@ public abstract class AbstractClassMetaData extends MetaData
      */
     public final DiscriminatorStrategy getDiscriminatorStrategy()
     {
-        if (inheritanceMetaData != null && inheritanceMetaData.getDiscriminatorMetaData() != null &&
-            inheritanceMetaData.getDiscriminatorMetaData().getStrategy() != null)
+        if (inheritanceMetaData != null && inheritanceMetaData.getDiscriminatorMetaData() != null && inheritanceMetaData.getDiscriminatorMetaData().getStrategy() != null)
         {
             return inheritanceMetaData.getDiscriminatorMetaData().getStrategy();
         }
@@ -2022,8 +1841,7 @@ public abstract class AbstractClassMetaData extends MetaData
      */
     public ColumnMetaData getDiscriminatorColumnMetaData()
     {
-        if (inheritanceMetaData != null && inheritanceMetaData.getDiscriminatorMetaData() != null && 
-            inheritanceMetaData.getDiscriminatorMetaData().getColumnMetaData() != null)
+        if (inheritanceMetaData != null && inheritanceMetaData.getDiscriminatorMetaData() != null && inheritanceMetaData.getDiscriminatorMetaData().getColumnMetaData() != null)
         {
             return inheritanceMetaData.getDiscriminatorMetaData().getColumnMetaData();
         }
@@ -2073,57 +1891,6 @@ public abstract class AbstractClassMetaData extends MetaData
         return null;
     }
 
-    public final List<JoinMetaData> getJoinMetaData()
-    {
-        return joins;
-    }
-
-    /**
-     * Accessor for all MetaData defined for fetch groups for this class.
-     * This doesn't include superclasses.
-     * @return Returns the Fetch Group metadata registered on this class
-     */
-    public final Set<FetchGroupMetaData> getFetchGroupMetaData()
-    {
-        return fetchGroups;
-    }
-
-    /**
-     * Accessor for fetch group metadata for the specified groups (if present).
-     * The returned metadata is what is defined for this class that matches any of the names in the input set.
-     * @param groupNames Names of the fetch groups
-     * @return MetaData for the groups
-     */
-    public Set<FetchGroupMetaData> getFetchGroupMetaData(Collection groupNames)
-    {
-        Set<FetchGroupMetaData> results = new HashSet();
-        for (Iterator iter = groupNames.iterator(); iter.hasNext();)
-        {
-            String groupname = (String) iter.next();
-            FetchGroupMetaData fgmd = getFetchGroupMetaData(groupname);
-            if (fgmd != null)
-            {
-                results.add(fgmd);
-            }
-        }
-        return results;
-    }
-
-    /**
-     * Accessor for the fetch group metadata for the group specified.
-     * @param groupname Name of the fetch group
-     * @return MetaData for this group
-     */
-    public FetchGroupMetaData getFetchGroupMetaData(String groupname)
-    {
-        FetchGroupMetaData fgmd = fetchGroupMetaDataByName != null ? fetchGroupMetaDataByName.get(groupname) : null;
-        if (fgmd == null && pcSuperclassMetaData != null)
-        {
-            return pcSuperclassMetaData.getFetchGroupMetaData(groupname);
-        }
-        return fgmd;
-    }
-
     public IdentityType getIdentityType()
     {
         return identityType;
@@ -2134,30 +1901,6 @@ public abstract class AbstractClassMetaData extends MetaData
         checkNotYetPopulated();
 
         this.identityType = type;
-    }
-
-    public final List<IndexMetaData> getIndexMetaData()
-    {
-        return indexes;
-    }
-
-    public final List<ForeignKeyMetaData> getForeignKeyMetaData()
-    {
-        return foreignKeys;
-    }
-
-    public final List<UniqueMetaData> getUniqueMetaData()
-    {
-        return uniqueConstraints;
-    }
-
-    /**
-     * Accessor for the unmapped columns required for the datastore table.
-     * @return The list of unmapped columns
-     */
-    public final List<ColumnMetaData> getUnmappedColumns()
-    {
-        return unmappedColumns;
     }
 
     /**
@@ -2326,46 +2069,6 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
-     * Accessor for identityMetaData
-     * @return Returns the identityMetaData.
-     */
-    public final IdentityMetaData getIdentityMetaData()
-    {
-        return identityMetaData;
-    }
-
-    /**
-     * Convenience method to return the root identity metadata for this inheritance tree.
-     * @return IdentityMetaData at the base
-     */
-    public final IdentityMetaData getBaseIdentityMetaData()
-    {
-        if (pcSuperclassMetaData != null)
-        {
-            return pcSuperclassMetaData.getBaseIdentityMetaData();
-        }
-        return identityMetaData;
-    }
-
-    /**
-     * Accessor for inheritanceMetaData
-     * @return Returns the inheritanceMetaData.
-     */
-    public final InheritanceMetaData getInheritanceMetaData()
-    {
-        return inheritanceMetaData;
-    }
-
-    /**
-     * Accessor for primaryKeyMetaData
-     * @return Returns the primaryKey MetaData.
-     */
-    public final PrimaryKeyMetaData getPrimaryKeyMetaData()
-    {
-        return primaryKeyMetaData;
-    }
-
-    /**
      * Convenience accessor for the parent Package MetaData.
      * @return MetaData for parent package.
      */
@@ -2438,25 +2141,6 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
-     * Accessor for whether this class is fully specified by this metadata and that any annotations should be ignored.
-     * @return Whether we should ignore any annotations
-     */
-    public boolean isMetaDataComplete()
-    {
-        return metaDataComplete;
-    }
-
-    public boolean isMappedSuperclass()
-    {
-        return mappedSuperclass;
-    }
-
-    public boolean isSerializeRead()
-    {
-        return serializeRead;
-    }
-
-    /**
      * Check if the argument cmd is the same as this or a descedent.
      * @param cmd the AbstractClassMetaData to be verify if this is an ancestor
      * @return true if the argument is a child or same as this
@@ -2499,7 +2183,7 @@ public abstract class AbstractClassMetaData extends MetaData
             return null;
         }
 
-        List memberNames = new ArrayList(); // Use list to preserve ordering
+        List<String> memberNames = new ArrayList<>(); // Use list to preserve ordering
         Iterator<AbstractMemberMetaData> iter = members.iterator();
         while (iter.hasNext())
         {
@@ -2512,7 +2196,7 @@ public abstract class AbstractClassMetaData extends MetaData
 
         if (!memberNames.isEmpty())
         {
-            return (String[])memberNames.toArray(new String[memberNames.size()]);
+            return memberNames.toArray(new String[memberNames.size()]);
         }
         memberNames = null;
         return pcSuperclassMetaData.getPrimaryKeyMemberNames();
@@ -3240,8 +2924,7 @@ public abstract class AbstractClassMetaData extends MetaData
             int numRelations = numRelationsSuperclass;
             for (int i=0;i<managedMembers.length;i++)
             {
-                if (managedMembers[i].getRelationType(clr) != RelationType.NONE ||
-                    managedMembers[i].isPersistentInterface(clr, mmgr))
+                if (managedMembers[i].getRelationType(clr) != RelationType.NONE || managedMembers[i].isPersistentInterface(clr, mmgr))
                 {
                     numRelations++;
                 }
@@ -3260,8 +2943,7 @@ public abstract class AbstractClassMetaData extends MetaData
             {
                 for (int i=0;i<managedMembers.length;i++)
                 {
-                    if (managedMembers[i].getRelationType(clr) != RelationType.NONE ||
-                        managedMembers[i].isPersistentInterface(clr, mmgr))
+                    if (managedMembers[i].getRelationType(clr) != RelationType.NONE || managedMembers[i].isPersistentInterface(clr, mmgr))
                     {
                         relationPositions[num++] = managedMembers[i].getAbsoluteFieldNumber();
                     }
@@ -3290,8 +2972,7 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePosition(relationPositions[i]);
             RelationType relationType = mmd.getRelationType(clr);
-            if (relationType == RelationType.ONE_TO_ONE_BI || relationType == RelationType.ONE_TO_MANY_BI ||
-                relationType == RelationType.MANY_TO_ONE_BI || relationType == RelationType.MANY_TO_MANY_BI)
+            if (RelationType.isBidirectional(relationType))
             {
                 numBidirs++;
             }
@@ -3303,16 +2984,13 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePosition(relationPositions[i]);
             RelationType relationType = mmd.getRelationType(clr);
-            if (relationType == RelationType.ONE_TO_ONE_BI || relationType == RelationType.ONE_TO_MANY_BI ||
-                relationType == RelationType.MANY_TO_ONE_BI || relationType == RelationType.MANY_TO_MANY_BI)
+            if (RelationType.isBidirectional(relationType))
             {
                 bidirRelations[numBidirs] = mmd.getAbsoluteFieldNumber();
             }
         }
         return bidirRelations;
     }
-
-    // ------------------------------- Mutators --------------------------------
 
     public void setAccessViaField(boolean flag)
     {
@@ -3328,9 +3006,19 @@ public abstract class AbstractClassMetaData extends MetaData
         this.mappedSuperclass = mapped;
     }
 
+    public boolean isMappedSuperclass()
+    {
+        return mappedSuperclass;
+    }
+
     public void setSerializeRead(boolean serialise)
     {
         serializeRead = serialise;
+    }
+
+    public boolean isSerializeRead()
+    {
+        return serializeRead;
     }
 
     /**
@@ -3340,6 +3028,15 @@ public abstract class AbstractClassMetaData extends MetaData
     public void setMetaDataComplete()
     {
         metaDataComplete = true;
+    }
+
+    /**
+     * Accessor for whether this class is fully specified by this metadata and that any annotations should be ignored.
+     * @return Whether we should ignore any annotations
+     */
+    public boolean isMetaDataComplete()
+    {
+        return metaDataComplete;
     }
 
     /**
@@ -3353,13 +3050,31 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             return;
         }
+
         if (queries == null)
         {
-            queries = new HashSet();
+            queries = new HashSet<>();
         }
-
         queries.add(qmd);
         qmd.parent = this;
+    }
+
+    /**
+     * Accessor for the number of named queries.
+     * @return no of named queries
+     */
+    public int getNoOfQueries()
+    {
+        return queries.size();
+    }
+
+    /**
+     * Accessor for the metadata of the named queries.
+     * @return Meta-Data for the named queries.
+     */
+    public QueryMetaData[] getQueries()
+    {
+        return queries == null ? null : ((QueryMetaData[])queries.toArray(new QueryMetaData[queries.size()]));
     }
 
     /**
@@ -3389,13 +3104,31 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             return;
         }
+
         if (storedProcQueries == null)
         {
-            storedProcQueries = new HashSet();
+            storedProcQueries = new HashSet<>();
         }
-
         storedProcQueries.add(qmd);
         qmd.parent = this;
+    }
+
+    /**
+     * Accessor for the number of named stored proc queries.
+     * @return no of named stored proc queries
+     */
+    public int getNoOfStoredProcQueries()
+    {
+        return storedProcQueries.size();
+    }
+
+    /**
+     * Accessor for the metadata of the named stored proc queries.
+     * @return Meta-Data for the named stored proc queries.
+     */
+    public StoredProcQueryMetaData[] getStoredProcQueries()
+    {
+        return storedProcQueries == null ? null : ((StoredProcQueryMetaData[])storedProcQueries.toArray(new StoredProcQueryMetaData[storedProcQueries.size()]));
     }
 
     /**
@@ -3422,13 +3155,26 @@ public abstract class AbstractClassMetaData extends MetaData
     {
         if (queryResultMetaData == null)
         {
-            queryResultMetaData = new HashSet();
+            queryResultMetaData = new HashSet<>();
         }
         if (!queryResultMetaData.contains(resultMetaData))
         {
             queryResultMetaData.add(resultMetaData);
             resultMetaData.parent = this;
         }
+    }
+
+    /**
+     * Get the query result MetaData registered for this class.
+     * @return Query Result MetaData defined for this class
+     */
+    public QueryResultMetaData[] getQueryResultMetaData()
+    {
+        if (queryResultMetaData == null)
+        {
+            return null;
+        }
+        return queryResultMetaData.toArray(new QueryResultMetaData[queryResultMetaData.size()]);
     }
 
     /**
@@ -3452,6 +3198,11 @@ public abstract class AbstractClassMetaData extends MetaData
         }
         indexes.add(idxmd);
         idxmd.parent = this;
+    }
+
+    public final List<IndexMetaData> getIndexMetaData()
+    {
+        return indexes;
     }
 
     /**
@@ -3488,6 +3239,11 @@ public abstract class AbstractClassMetaData extends MetaData
         fkmd.parent = this;
     }
 
+    public final List<ForeignKeyMetaData> getForeignKeyMetaData()
+    {
+        return foreignKeys;
+    }
+
     /**
      * Method to create a new FK metadata, add it, and return it.
      * @return The FK metadata
@@ -3522,6 +3278,11 @@ public abstract class AbstractClassMetaData extends MetaData
         unimd.parent = this;
     }
 
+    public final List<UniqueMetaData> getUniqueMetaData()
+    {
+        return uniqueConstraints;
+    }
+
     /**
      * Method to create a new unique metadata, add it, and return it.
      * @return The unique metadata
@@ -3541,10 +3302,19 @@ public abstract class AbstractClassMetaData extends MetaData
     {
         if (unmappedColumns == null)
         {
-            unmappedColumns = new ArrayList();
+            unmappedColumns = new ArrayList<>();
         }
         unmappedColumns.add(colmd);
         colmd.parent = this;
+    }
+
+    /**
+     * Accessor for the unmapped columns required for the datastore table.
+     * @return The list of unmapped columns
+     */
+    public final List<ColumnMetaData> getUnmappedColumns()
+    {
+        return unmappedColumns;
     }
 
     public ColumnMetaData newUnmappedColumnMetaData()
@@ -3699,6 +3469,81 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
+     * Accessor for fetch group metadata for the specified groups (if present).
+     * The returned metadata is what is defined for this class that matches any of the names in the input set.
+     * @param groupNames Names of the fetch groups
+     * @return MetaData for the groups
+     */
+    public Set<FetchGroupMetaData> getFetchGroupMetaData(Collection groupNames)
+    {
+        Set<FetchGroupMetaData> results = new HashSet<>();
+        for (Iterator iter = groupNames.iterator(); iter.hasNext();)
+        {
+            String groupname = (String) iter.next();
+            FetchGroupMetaData fgmd = getFetchGroupMetaData(groupname);
+            if (fgmd != null)
+            {
+                results.add(fgmd);
+            }
+        }
+        return results;
+    }
+
+    /**
+     * Accessor for the fetch group metadata for the group specified.
+     * @param groupname Name of the fetch group
+     * @return MetaData for this group
+     */
+    public FetchGroupMetaData getFetchGroupMetaData(String groupname)
+    {
+        FetchGroupMetaData fgmd = fetchGroupMetaDataByName != null ? fetchGroupMetaDataByName.get(groupname) : null;
+        if (fgmd == null && pcSuperclassMetaData != null)
+        {
+            return pcSuperclassMetaData.getFetchGroupMetaData(groupname);
+        }
+        return fgmd;
+    }
+
+    /**
+     * Accessor for all MetaData defined for fetch groups for this class.
+     * This doesn't include superclasses.
+     * @return Returns the Fetch Group metadata registered on this class
+     */
+    public final Set<FetchGroupMetaData> getFetchGroupMetaData()
+    {
+        return fetchGroups;
+    }
+
+    /**
+     * Whether this class or any super class has any fetch group definition
+     * with {@link FetchGroupMetaData#getPostLoad()}==true.
+     * @return Whether there is a fetch-group definition with post-load
+     */
+    public final boolean hasFetchGroupWithPostLoad()  
+    {
+        if (fetchGroupMetaWithPostLoad == null)
+        {
+            fetchGroupMetaWithPostLoad = Boolean.FALSE;
+            if (fetchGroups != null)
+            {
+                for (FetchGroupMetaData fgmd : fetchGroups)
+                {
+                    if (fgmd.getPostLoad().booleanValue())
+                    {
+                        fetchGroupMetaWithPostLoad = Boolean.TRUE;
+                        break;
+                    }
+                }
+            }
+        }
+        if (getSuperAbstractClassMetaData()!=null)
+        {
+            return getSuperAbstractClassMetaData().hasFetchGroupWithPostLoad() || fetchGroupMetaWithPostLoad.booleanValue();
+        }
+        return fetchGroupMetaWithPostLoad.booleanValue();
+    }
+
+    /**
      * Method to add a join to this class.
      * Rejects the addition of duplicate named fields.
      * @param jnmd Meta-Data for the join.
@@ -3722,6 +3567,11 @@ public abstract class AbstractClassMetaData extends MetaData
         jnmd.parent = this;
     }
 
+    public final List<JoinMetaData> getJoinMetaData()
+    {
+        return joins;
+    }
+
     /**
      * Method to create a new join metadata, add it, and return it.
      * @return The join metadata
@@ -3741,7 +3591,7 @@ public abstract class AbstractClassMetaData extends MetaData
     {
         if (listeners == null)
         {
-            listeners = new ArrayList();
+            listeners = new ArrayList<>();
         }
         if (!listeners.contains(listener))
         {
@@ -3764,7 +3614,7 @@ public abstract class AbstractClassMetaData extends MetaData
 
         for (int i=0;i<listeners.size();i++)
         {
-            EventListenerMetaData elmd = (EventListenerMetaData)listeners.get(i);
+            EventListenerMetaData elmd = listeners.get(i);
             if (elmd.getClassName().equals(className))
             {
                 return elmd;
@@ -3839,6 +3689,103 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
+     * Accessor for Version MetaData for this class specifically.
+     * Note that this just returns what this class had defined, and if this has no version info then
+     * you really need what the superclass has (if there is one). Consider using getVersionMetaDataForClass().
+     * @return Returns the versionMetaData.
+     */
+    public final VersionMetaData getVersionMetaData()
+    {
+        return versionMetaData;
+    }
+
+    /**
+     * Convenience accessor for the version metadata applying to this class.
+     * Differs from getVersionMetaData by searching superclasses.
+     * @return The version metadata
+     */
+    public final VersionMetaData getVersionMetaDataForClass()
+    {
+        if (versionMetaData != null)
+        {
+            // Version information specified at this level
+            return versionMetaData;
+        }
+        else if (getSuperAbstractClassMetaData() != null)
+        {
+            // Use superclass version information
+            return getSuperAbstractClassMetaData().getVersionMetaDataForClass();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    /**
+     * Returns whether objects of this type are versioned.
+     * A return of true means that either this class has version information, or a superclass does, and that
+     * the version information is required to be stored.
+     * @return Whether it is versioned.
+     */
+    public final boolean isVersioned()
+    {
+        VersionMetaData vermd = getVersionMetaDataForClass();
+        if (vermd != null && vermd.getVersionStrategy() != null && vermd.getVersionStrategy() != VersionStrategy.NONE)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Convenience method to find the version MetaData defining versioning for the same 'table'
+     * as this class is using. Traverses up the inheritance tree to find the highest class that uses
+     * "subclass-table" that has version metadata defined, or the class that owns the 'table' where
+     * this class uses "superclass-table", and returns the MetaData.
+     * @return Version MetaData for the highest class in this tree using subclass-table
+     */
+    public final VersionMetaData getVersionMetaDataForTable()
+    {
+        if (pcSuperclassMetaData != null)
+        {
+            if (getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUPERCLASS_TABLE &&
+                pcSuperclassMetaData.getInheritanceMetaData().getStrategy() == InheritanceStrategy.NEW_TABLE)
+            {
+                // Superclass owns the table that we use so relay up to superclass
+                VersionMetaData vermd = pcSuperclassMetaData.getVersionMetaDataForTable();
+                if (vermd != null)
+                {
+                    return vermd;
+                }
+            }
+            if (getInheritanceMetaData().getStrategy() == InheritanceStrategy.NEW_TABLE &&
+                pcSuperclassMetaData.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
+            {
+                // We own the table but the superclass uses it too, so relay up to superclass
+                VersionMetaData vermd = pcSuperclassMetaData.getVersionMetaDataForTable();
+                if (vermd != null)
+                {
+                    // Superclass has versioning info so return that
+                    return vermd;
+                }
+            }
+            if (getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
+            {
+                VersionMetaData vermd = pcSuperclassMetaData.getVersionMetaDataForTable();
+                if (vermd != null)
+                {
+                    // Superclass is persisted into this table, so use its version
+                    return vermd;
+                }
+            }
+        }
+
+        // Nothing in superclasses sharing our table so return ours
+        return versionMetaData;
+    }
+
+    /**
      * Method to create a new version metadata, set to use it, and return it.
      * @return The version metadata
      */
@@ -3861,6 +3808,28 @@ public abstract class AbstractClassMetaData extends MetaData
             this.identityMetaData.parent = this;
         }
         identitySpecified = true;
+    }
+
+    /**
+     * Accessor for identityMetaData
+     * @return Returns the identityMetaData.
+     */
+    public final IdentityMetaData getIdentityMetaData()
+    {
+        return identityMetaData;
+    }
+
+    /**
+     * Convenience method to return the root identity metadata for this inheritance tree.
+     * @return IdentityMetaData at the base
+     */
+    public final IdentityMetaData getBaseIdentityMetaData()
+    {
+        if (pcSuperclassMetaData != null)
+        {
+            return pcSuperclassMetaData.getBaseIdentityMetaData();
+        }
+        return identityMetaData;
     }
 
     /**
@@ -3888,6 +3857,15 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
+     * Accessor for inheritanceMetaData
+     * @return Returns the inheritanceMetaData.
+     */
+    public final InheritanceMetaData getInheritanceMetaData()
+    {
+        return inheritanceMetaData;
+    }
+
+    /**
      * Method to create a new inheritance metadata, set to use it, and return it.
      * @return The inheritance metadata
      */
@@ -3912,6 +3890,15 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
+     * Accessor for primaryKeyMetaData
+     * @return Returns the primaryKey MetaData.
+     */
+    public final PrimaryKeyMetaData getPrimaryKeyMetaData()
+    {
+        return primaryKeyMetaData;
+    }
+
+    /**
      * Method to create a new primary key metadata, set to use it, and return it.
      * @return The primary key metadata
      */
@@ -3920,34 +3907,5 @@ public abstract class AbstractClassMetaData extends MetaData
         PrimaryKeyMetaData pkmd = new PrimaryKeyMetaData();
         setPrimaryKeyMetaData(pkmd);
         return pkmd;
-    }
-    
-    /**
-     * Whether this class or any super class has any fetch group definition
-     * with {@link FetchGroupMetaData#getPostLoad()}==true.
-     * @return Whether there is a fetch-group definition with post-load
-     */
-    public final boolean hasFetchGroupWithPostLoad()  
-    {
-        if (fetchGroupMetaWithPostLoad == null)
-        {
-            fetchGroupMetaWithPostLoad = Boolean.FALSE;
-            if (fetchGroups != null)
-            {
-                for (FetchGroupMetaData fgmd : fetchGroups)
-                {
-                    if (fgmd.getPostLoad().booleanValue())
-                    {
-                        fetchGroupMetaWithPostLoad = Boolean.TRUE;
-                        break;
-                    }
-                }
-            }
-        }
-        if (getSuperAbstractClassMetaData()!=null)
-        {
-            return getSuperAbstractClassMetaData().hasFetchGroupWithPostLoad() || fetchGroupMetaWithPostLoad.booleanValue();
-        }
-        return fetchGroupMetaWithPostLoad.booleanValue();
     }
 }
