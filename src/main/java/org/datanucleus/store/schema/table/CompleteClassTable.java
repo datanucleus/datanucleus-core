@@ -138,7 +138,7 @@ public class CompleteClassTable implements Table
             RelationType relationType = mmd.getRelationType(clr);
             if (relationType != RelationType.NONE && MetaDataUtils.getInstance().isMemberEmbedded(storeMgr.getMetaDataManager(), clr, mmd, relationType, null))
             {
-                // EMBEDDED FIELD
+                // EMBEDDED MEMBER
                 List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>();
                 embMmds.add(mmd);
                 if (RelationType.isRelationSingleValued(relationType))
@@ -308,6 +308,7 @@ public class CompleteClassTable implements Table
             }
             else
             {
+                // STANDARD MEMBER
                 ColumnMetaData[] colmds = mmd.getColumnMetaData();
                 if ((colmds == null || colmds.length == 0) && mmd.hasCollection() && mmd.getElementMetaData() != null)
                 {

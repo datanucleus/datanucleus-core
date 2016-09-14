@@ -83,6 +83,9 @@ public interface StoreManager
     public static final String OPTION_ORM_SERIALISED_ARRAY_ELEMENT = "ORM.SerialisedArrayElement";
     public static final String OPTION_ORM_SECONDARY_TABLE = "ORM.SecondaryTable";
     public static final String OPTION_ORM_FOREIGN_KEYS = "ORM.ForeignKeys";
+    public static final String OPTION_ORM_INHERITANCE_COMPLETE_TABLE = "ORM.Inheritance.CompleteTable";
+    public static final String OPTION_ORM_INHERITANCE_SINGLE_TABLE = "ORM.Inheritance.SingleTable";
+    public static final String OPTION_ORM_INHERITANCE_JOINED_TABLE = "ORM.Inheritance.JoinedTable";
 
     public static final String OPTION_TXN_ISOLATION_READ_COMMITTED = "TransactionIsolationLevel.read-committed";
     public static final String OPTION_TXN_ISOLATION_READ_UNCOMMITTED = "TransactionIsolationLevel.read-uncommitted";
