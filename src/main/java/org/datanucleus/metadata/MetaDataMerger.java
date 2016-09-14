@@ -187,45 +187,45 @@ public class MetaDataMerger
             }
             primaryCmd.queries.addAll(ormCmd.queries);
         }
-        if (!ormCmd.joins.isEmpty())
+        if (ormCmd.joins != null)
         {
-            primaryCmd.joins.clear();
+            primaryCmd.joins = null;
             Iterator iter = ormCmd.joins.iterator();
             while (iter.hasNext())
             {
                 primaryCmd.addJoin((JoinMetaData)iter.next());
             }
         }
-        if (!ormCmd.indexes.isEmpty())
+        if (ormCmd.indexes != null)
         {
-            primaryCmd.indexes.clear();
+            primaryCmd.indexes = null;
             Iterator iter = ormCmd.indexes.iterator();
             while (iter.hasNext())
             {
                 primaryCmd.addIndex((IndexMetaData)iter.next());
             }
         }
-        if (!ormCmd.foreignKeys.isEmpty())
+        if (ormCmd.foreignKeys != null)
         {
-            primaryCmd.foreignKeys.clear();
+            primaryCmd.foreignKeys = null;
             Iterator iter = ormCmd.foreignKeys.iterator();
             while (iter.hasNext())
             {
                 primaryCmd.addForeignKey((ForeignKeyMetaData)iter.next());
             }
         }
-        if (!ormCmd.uniqueConstraints.isEmpty())
+        if (ormCmd.uniqueConstraints != null)
         {
-            primaryCmd.uniqueConstraints.clear();
+            primaryCmd.uniqueConstraints = null;
             Iterator iter = ormCmd.uniqueConstraints.iterator();
             while (iter.hasNext())
             {
                 primaryCmd.addUniqueConstraint((UniqueMetaData)iter.next());
             }
         }
-        if (!ormCmd.fetchGroups.isEmpty())
+        if (ormCmd.fetchGroups != null)
         {
-            primaryCmd.fetchGroups.clear();
+            primaryCmd.fetchGroups = null;
             Iterator iter = ormCmd.fetchGroups.iterator();
             while (iter.hasNext())
             {
@@ -650,7 +650,7 @@ public class MetaDataMerger
                 primaryCmd.addQuery((QueryMetaData)iter.next());
             }
         }
-        if (primaryCmd.joins.isEmpty() && !annotCmd.joins.isEmpty())
+        if (primaryCmd.joins == null && annotCmd.joins != null)
         {
             Iterator iter = annotCmd.joins.iterator();
             while (iter.hasNext())
@@ -658,7 +658,7 @@ public class MetaDataMerger
                 primaryCmd.addJoin((JoinMetaData)iter.next());
             }
         }
-        if (primaryCmd.indexes.isEmpty() && !annotCmd.indexes.isEmpty())
+        if (primaryCmd.indexes == null && annotCmd.indexes != null)
         {
             Iterator iter = annotCmd.indexes.iterator();
             while (iter.hasNext())
@@ -666,7 +666,7 @@ public class MetaDataMerger
                 primaryCmd.addIndex((IndexMetaData)iter.next());
             }
         }
-        if (primaryCmd.foreignKeys.isEmpty() && !annotCmd.foreignKeys.isEmpty())
+        if (primaryCmd.foreignKeys == null && annotCmd.foreignKeys != null)
         {
             Iterator iter = annotCmd.foreignKeys.iterator();
             while (iter.hasNext())
@@ -674,7 +674,7 @@ public class MetaDataMerger
                 primaryCmd.addForeignKey((ForeignKeyMetaData)iter.next());
             }
         }
-        if (primaryCmd.uniqueConstraints.isEmpty() && !annotCmd.uniqueConstraints.isEmpty())
+        if (primaryCmd.uniqueConstraints == null && annotCmd.uniqueConstraints != null)
         {
             Iterator iter = annotCmd.uniqueConstraints.iterator();
             while (iter.hasNext())
@@ -682,7 +682,7 @@ public class MetaDataMerger
                 primaryCmd.addUniqueConstraint((UniqueMetaData)iter.next());
             }
         }
-        if (primaryCmd.fetchGroups.isEmpty() && !annotCmd.fetchGroups.isEmpty())
+        if (primaryCmd.fetchGroups == null && annotCmd.fetchGroups != null)
         {
             Iterator iter = annotCmd.fetchGroups.iterator();
             while (iter.hasNext())

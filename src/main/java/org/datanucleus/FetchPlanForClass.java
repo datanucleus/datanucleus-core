@@ -387,7 +387,7 @@ public class FetchPlanForClass
         {
             if (cmd.getMetaDataForManagedMemberAtRelativePosition(i).getPersistenceModifier() != FieldPersistenceModifier.NONE)
             {
-                memberNums.set(cmd.getAbsoluteMemberPositionForRelativePosition(i));
+                memberNums.set(cmd.getNoOfInheritedManagedMembers() + i);
             }
         }
     }
@@ -400,7 +400,7 @@ public class FetchPlanForClass
     {
         for (int i = 0; i < cmd.getNoOfManagedMembers(); i++)
         {
-            AbstractMemberMetaData fmd = cmd.getMetaDataForMemberAtRelativePosition(i);
+            AbstractMemberMetaData fmd = cmd.getManagedMembers()[i];
             if (fmd.isPrimaryKey())
             {
                 memberNums.set(fmd.getAbsoluteFieldNumber());

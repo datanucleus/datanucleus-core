@@ -155,27 +155,33 @@ public class InterfaceMetaData extends AbstractClassMetaData
             // Set up the various convenience arrays of field numbers
             initialiseMemberPositionInformation(mmgr);
 
-            joinMetaData = new JoinMetaData[joins.size()];
-            for (int i=0; i<joinMetaData.length; i++)
+            if (joins != null)
             {
-                joinMetaData[i] = joins.get(i);
-                joinMetaData[i].initialise(clr, mmgr);
+                for (JoinMetaData joinmd : joins)
+                {
+                    joinmd.initialise(clr, mmgr);
+                }
             }
-
-            indexMetaData = new IndexMetaData[indexes.size()];
-            for (int i=0; i<indexMetaData.length; i++)
+            if (foreignKeys != null)
             {
-                indexMetaData[i] = indexes.get(i);
+                for (ForeignKeyMetaData fkmd : foreignKeys)
+                {
+                    fkmd.initialise(clr, mmgr);
+                }
             }
-            foreignKeyMetaData = new ForeignKeyMetaData[foreignKeys.size()];
-            for (int i=0; i<foreignKeyMetaData.length; i++)
+            if (indexes != null)
             {
-                foreignKeyMetaData[i] = foreignKeys.get(i);
+                for (IndexMetaData idxmd : indexes)
+                {
+                    idxmd.initialise(clr, mmgr);
+                }
             }
-            uniqueMetaData = new UniqueMetaData[uniqueConstraints.size()];
-            for (int i=0; i<uniqueMetaData.length; i++)
+            if (uniqueConstraints != null)
             {
-                uniqueMetaData[i] = uniqueConstraints.get(i);
+                for (UniqueMetaData unimd : uniqueConstraints)
+                {
+                    unimd.initialise(clr, mmgr);
+                }
             }
 
             if (fetchGroups != null)
@@ -224,15 +230,6 @@ public class InterfaceMetaData extends AbstractClassMetaData
                 usesSingleFieldIdentityClass = IdentityUtils.isSingleFieldIdentityClass(getObjectidClass());
             }
 
-            // Clear out the collections that we used when loading the MetaData
-            joins.clear();
-            joins = null;
-            foreignKeys.clear();
-            foreignKeys = null;
-            indexes.clear();
-            indexes = null;
-            uniqueConstraints.clear();
-            uniqueConstraints = null;
             setInitialised();
         }
         finally
@@ -358,8 +355,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
      * @throws InvalidMetaDataException if the Class for a declared type in a field cannot be loaded by the <code>clr</code>
      * @throws InvalidMetaDataException if a field declared in the MetaData does not exist in the Class
      */
-    protected void populatePropertyMetaData(ClassLoaderResolver clr, Class cls, boolean pkFields, 
-            ClassLoader primary, MetaDataManager mmgr)
+    protected void populatePropertyMetaData(ClassLoaderResolver clr, Class cls, boolean pkFields, ClassLoader primary, MetaDataManager mmgr)
     {
         Collections.sort(members);
 
@@ -548,23 +544,19 @@ public class InterfaceMetaData extends AbstractClassMetaData
         // Add joins
         if (joins != null)
         {
-            for (int i=0; i<joins.size(); i++)
+            for (JoinMetaData joinmd : joins)
             {
-                JoinMetaData jmd = joins.get(i);
-                sb.append(jmd.toString(prefix + indent, indent));
+                sb.append(joinmd.toString(prefix + indent, indent));
             }
         }
-
         // Add foreign-keys
         if (foreignKeys != null)
         {
-            for (int i=0; i<foreignKeys.size(); i++)
+            for (ForeignKeyMetaData fkmd : foreignKeys)
             {
-                ForeignKeyMetaData fkmd = foreignKeys.get(i);
-                sb.append(fkmd.toString(prefix + indent, indent));
+                sb.append(fkmd.toString(prefix + indent,indent));
             }
         }
-        
         // Add indexes
         if (indexes != null)
         {
@@ -574,17 +566,15 @@ public class InterfaceMetaData extends AbstractClassMetaData
                 sb.append(imd.toString(prefix + indent, indent));
             }
         }
-        
         // Add unique constraints
         if (uniqueConstraints != null)
         {
-            for (int i=0; i<uniqueConstraints.size(); i++)
+            for (UniqueMetaData unimd : uniqueConstraints)
             {
-                UniqueMetaData unimd = uniqueConstraints.get(i);
-                sb.append(unimd.toString(prefix + indent, indent));
+                sb.append(unimd.toString(prefix + indent,indent));
             }
         }
-        
+
         // Add properties
         if (members != null)
         {

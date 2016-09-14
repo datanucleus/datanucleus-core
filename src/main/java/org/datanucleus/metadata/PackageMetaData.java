@@ -304,6 +304,11 @@ public class PackageMetaData extends MetaData
         return cmd;
     }
 
+    /**
+     * Method to remove a class from this metadata definition.
+     * This is of use where we read in metadata only to find that the class that it pertains to is not in the CLASSPATH.
+     * @param cmd Metadata for the class to remove
+     */
     public void removeClass(AbstractClassMetaData cmd)
     {
         if (classes != null)

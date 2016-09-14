@@ -93,15 +93,6 @@ public class ClassMetaData extends AbstractClassMetaData
     /** List of implements. */
     protected List<ImplementsMetaData> implementations = null;
 
-    // -------------------------------------------------------------------------
-    // Fields below here are not represented in the output MetaData. They are
-    // for use internally in the operation of the JDO system. The majority are
-    // for convenience to save iterating through the fields since the fields
-    // are fixed once initialised.
-
-    /*** ImplementsMetaData */
-    protected ImplementsMetaData[] implementsMetaData;
-
     /** is the persistable class abstract. */
     protected boolean isAbstract;
 
@@ -286,9 +277,9 @@ public class ClassMetaData extends AbstractClassMetaData
             // populate the implements
             if (implementations != null)
             {
-                for (int i=0; i<implementations.size(); i++)
+                for (ImplementsMetaData implmd : implementations)
                 {
-                    implementations.get(i).populate(clr, primary, mmgr);
+                    implmd.populate(clr, primary, mmgr);
                 }
             }
 
@@ -881,36 +872,38 @@ public class ClassMetaData extends AbstractClassMetaData
             // Initialise any sub-objects
             if (implementations != null)
             {
-                implementsMetaData = new ImplementsMetaData[implementations.size()];
-                for (int i=0; i<implementations.size(); i++)
+                for (ImplementsMetaData implmd : implementations)
                 {
-                    implementsMetaData[i] = implementations.get(i);
-                    implementsMetaData[i].initialise(clr, mmgr);
+                    implmd.initialise(clr, mmgr);
                 }
-                implementations.clear();
-                implementations = null;
             }
-            joinMetaData = new JoinMetaData[joins.size()];
-            for (int i=0; i<joinMetaData.length; i++)
+            if (joins != null)
             {
-                joinMetaData[i] = joins.get(i);
-                joinMetaData[i].initialise(clr, mmgr);
+                for (JoinMetaData joinmd : joins)
+                {
+                    joinmd.initialise(clr, mmgr);
+                }
             }
-
-            indexMetaData = new IndexMetaData[indexes.size()];
-            for (int i=0; i<indexMetaData.length; i++)
+            if (foreignKeys != null)
             {
-                indexMetaData[i] = indexes.get(i);
+                for (ForeignKeyMetaData fkmd : foreignKeys)
+                {
+                    fkmd.initialise(clr, mmgr);
+                }
             }
-            foreignKeyMetaData = new ForeignKeyMetaData[foreignKeys.size()];
-            for (int i=0; i<foreignKeyMetaData.length; i++)
+            if (indexes != null)
             {
-                foreignKeyMetaData[i] = foreignKeys.get(i);
+                for (IndexMetaData idxmd : indexes)
+                {
+                    idxmd.initialise(clr, mmgr);
+                }
             }
-            uniqueMetaData = new UniqueMetaData[uniqueConstraints.size()];
-            for (int i=0; i<uniqueMetaData.length; i++)
+            if (uniqueConstraints != null)
             {
-                uniqueMetaData[i] = uniqueConstraints.get(i);
+                for (UniqueMetaData unimd : uniqueConstraints)
+                {
+                    unimd.initialise(clr, mmgr);
+                }
             }
     
             if (fetchGroups != null)
@@ -965,15 +958,6 @@ public class ClassMetaData extends AbstractClassMetaData
                 usesSingleFieldIdentityClass = IdentityUtils.isSingleFieldIdentityClass(getObjectidClass());
             }
 
-            // Clear out the collections that we used when loading the MetaData
-            joins.clear();
-            joins = null;
-            foreignKeys.clear();
-            foreignKeys = null;
-            indexes.clear();
-            indexes = null;
-            uniqueConstraints.clear();
-            uniqueConstraints = null;
             setInitialised();
         }
         finally
@@ -1008,9 +992,9 @@ public class ClassMetaData extends AbstractClassMetaData
      * Accessor for the implements MetaData
      * @return Returns the implements MetaData.
      */
-    public final ImplementsMetaData[] getImplementsMetaData()
+    public final List<ImplementsMetaData> getImplementsMetaData()
     {
-        return implementsMetaData;
+        return implementations;
     }
 
     /**
@@ -1113,38 +1097,35 @@ public class ClassMetaData extends AbstractClassMetaData
         }
 
         // Add joins
-        if (joinMetaData != null)
+        if (joins != null)
         {
-            for (int i=0; i<joinMetaData.length; i++)
+            for (JoinMetaData joinmd : joins)
             {
-                sb.append(joinMetaData[i].toString(prefix + indent,indent));
+                sb.append(joinmd.toString(prefix + indent, indent));
             }
         }
-
         // Add foreign-keys
-        if (foreignKeyMetaData != null)
+        if (foreignKeys != null)
         {
-            for (int i=0; i<foreignKeyMetaData.length; i++)
+            for (ForeignKeyMetaData fkmd : foreignKeys)
             {
-                sb.append(foreignKeyMetaData[i].toString(prefix + indent,indent));
+                sb.append(fkmd.toString(prefix + indent,indent));
             }
         }
-
         // Add indexes
-        if (indexMetaData != null)
+        if (indexes != null)
         {
-            for (int i=0; i<indexMetaData.length; i++)
+            for (IndexMetaData idxmd : indexes)
             {
-                sb.append(indexMetaData[i].toString(prefix + indent,indent));
+                sb.append(idxmd.toString(prefix + indent,indent));
             }
         }
-
         // Add unique constraints
-        if (uniqueMetaData != null)
+        if (uniqueConstraints != null)
         {
-            for (int i=0; i<uniqueMetaData.length; i++)
+            for (UniqueMetaData unimd : uniqueConstraints)
             {
-                sb.append(uniqueMetaData[i].toString(prefix + indent,indent));
+                sb.append(unimd.toString(prefix + indent,indent));
             }
         }
 

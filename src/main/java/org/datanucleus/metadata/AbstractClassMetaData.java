@@ -70,6 +70,7 @@ public abstract class AbstractClassMetaData extends MetaData
      */
     protected boolean instantiable = true;
 
+    /** Whether the class has been explicitly marked as using FIELD access (JPA). */
     protected Boolean accessViaField = null;
 
     /** Identity-type tag value. */
@@ -153,48 +154,32 @@ public abstract class AbstractClassMetaData extends MetaData
     /** List of query result MetaData defined for this file. */
     protected Collection<QueryResultMetaData> queryResultMetaData = null;
 
-    /** JoinMetaData */
-    protected JoinMetaData[] joinMetaData;
-
-    /** IndexMetaData */
-    protected IndexMetaData[] indexMetaData;
-
-    /** ForeignKeyMetaData */
-    protected ForeignKeyMetaData[] foreignKeyMetaData;
-
-    /** UniqueMetaData */
-    protected UniqueMetaData[] uniqueMetaData;
-
     /** List of members (fields/properties). */
-    protected List<AbstractMemberMetaData> members = new ArrayList();
+    protected List<AbstractMemberMetaData> members = new ArrayList<>();
 
     /** The columns that are present in the datastore yet not mapped to fields in this class. */
     protected List<ColumnMetaData> unmappedColumns = null;
 
-    protected Set<FetchGroupMetaData> fetchGroups = new HashSet();
+    protected Set<FetchGroupMetaData> fetchGroups = null;
 
-    // These fields are only used when the MetaData is read by the parser and elements are dynamically added to 
-    // the other elements. At initialise() they are cleared and nulled so shouldn't be used internally.
-
-    /** List of joins */
-    protected List<JoinMetaData> joins = new ArrayList();
-
-    /** List of foreign-key */
-    protected List<ForeignKeyMetaData> foreignKeys = new ArrayList();
+    /** List of foreign-keys */
+    protected List<ForeignKeyMetaData> foreignKeys = null;
 
     /** List of indexes */
-    protected List<IndexMetaData> indexes = new ArrayList();
+    protected List<IndexMetaData> indexes = null;
 
     /** List of uniqueConstraints */
-    protected List<UniqueMetaData> uniqueConstraints = new ArrayList();
+    protected List<UniqueMetaData> uniqueConstraints = null;
+
+    /** List of joins */
+    protected List<JoinMetaData> joins = null;
 
     // Fields below here are not represented in the output MetaData. They are for use internally in the operation of the system.
     // The majority are for convenience to save iterating through the fields since the fields are fixed once initialised.
 
     /**
      * Managed fields/properties of this class. Contains the same AbstractMemberMetaData objects as are in "members".
-     * Doesnt include any overridden members which are stored separately. All fields will return true to
-     * "fmd.isJdoField()".
+     * Doesn't include any overridden members which are stored separately.
      */
     protected AbstractMemberMetaData[] managedMembers;
 
@@ -364,32 +349,32 @@ public abstract class AbstractClassMetaData extends MetaData
             setInheritanceMetaData(inhmd);
         }
         
-        if (imd.joinMetaData != null)
+        if (imd.joins != null)
         {
-            for (int i=0;i<imd.joinMetaData.length;i++)
+            for (JoinMetaData joinmd : imd.joins)
             {
-                addJoin(imd.joinMetaData[i]);
+                addJoin(joinmd);
             }
         }
-        if (imd.foreignKeyMetaData != null)
+        if (imd.foreignKeys != null)
         {
-            for (int i=0;i<imd.foreignKeyMetaData.length;i++)
+            for (ForeignKeyMetaData fkmd : imd.foreignKeys)
             {
-                addForeignKey(imd.foreignKeyMetaData[i]);
+                addForeignKey(fkmd);
             }
         }
-        if (imd.indexMetaData != null)
+        if (imd.indexes != null)
         {
-            for (int i=0;i<imd.indexMetaData.length;i++)
+            for (IndexMetaData idxmd : imd.indexes)
             {
-                addIndex(imd.indexMetaData[i]);
+                addIndex(idxmd);
             }
         }
-        if (imd.uniqueMetaData != null)
+        if (imd.uniqueConstraints != null)
         {
-            for (int i=0;i<imd.uniqueMetaData.length;i++)
+            for (UniqueMetaData unimd : imd.uniqueConstraints)
             {
-                addUniqueConstraint(imd.uniqueMetaData[i]);
+                addUniqueConstraint(unimd);
             }
         }
         if (imd.fetchGroups != null)
@@ -2088,13 +2073,9 @@ public abstract class AbstractClassMetaData extends MetaData
         return null;
     }
 
-    /**
-     * Accessor for joinMetaData
-     * @return Returns the joinMetaData.
-     */
-    public final JoinMetaData[] getJoinMetaData()
+    public final List<JoinMetaData> getJoinMetaData()
     {
-        return joinMetaData;
+        return joins;
     }
 
     /**
@@ -2155,35 +2136,23 @@ public abstract class AbstractClassMetaData extends MetaData
         this.identityType = type;
     }
 
-    /**
-     * Accessor for indexMetaData
-     * @return Returns the indexMetaData.
-     */
-    public final IndexMetaData[] getIndexMetaData()
+    public final List<IndexMetaData> getIndexMetaData()
     {
-        return indexMetaData;
+        return indexes;
+    }
+
+    public final List<ForeignKeyMetaData> getForeignKeyMetaData()
+    {
+        return foreignKeys;
+    }
+
+    public final List<UniqueMetaData> getUniqueMetaData()
+    {
+        return uniqueConstraints;
     }
 
     /**
-     * Accessor for foreignKeyMetaData
-     * @return Returns the foreignKeyMetaData.
-     */
-    public final ForeignKeyMetaData[] getForeignKeyMetaData()
-    {
-        return foreignKeyMetaData;
-    }
-
-    /**
-     * Accessor for UniqueMetaData
-     * @return Returns the UniqueMetaData.
-     */
-    public final UniqueMetaData[] getUniqueMetaData()
-    {
-        return uniqueMetaData;
-    }
-
-    /**
-     * Accessor for the unmapped columns require for the datastore table.
+     * Accessor for the unmapped columns required for the datastore table.
      * @return The list of unmapped columns
      */
     public final List<ColumnMetaData> getUnmappedColumns()
@@ -2469,8 +2438,7 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
-     * Accessor for whether this class is fully specified by this metadata and that any
-     * annotations should be ignored.
+     * Accessor for whether this class is fully specified by this metadata and that any annotations should be ignored.
      * @return Whether we should ignore any annotations
      */
     public boolean isMetaDataComplete()
@@ -2596,6 +2564,13 @@ public abstract class AbstractClassMetaData extends MetaData
             }
         }
 
+        /*AbstractMemberMetaData overrideMmd = getOverriddenMember(name);
+        if (overrideMmd != null)
+        {
+            NucleusLogger.GENERAL.info(">> CMD.getMetaDataForMember " + getFullClassName() + " field=" + name + " but this has been OVERRIDDEN");
+            // TODO Allow for overridden members and return a merged AbstractMemberMetaData
+        }*/
+
         // Check superclass for the field/property with this name
         if (pcSuperclassMetaData != null)
         {
@@ -2628,19 +2603,6 @@ public abstract class AbstractClassMetaData extends MetaData
         checkInitialised();
 
         return managedMembers;
-    }
-
-    /**
-     * Accessor for the number of overridden fields/properties (this class only).
-     * @return no of overridden fields/properties in this class
-     */
-    public int getNoOfOverriddenMembers()
-    {
-        if (overriddenMembers == null)
-        {
-            return 0;
-        }
-        return overriddenMembers.length;
     }
 
     /**
@@ -2721,8 +2683,8 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
-     * Accessor for MetaData for a managed field/property in this class. The position is relative to
-     * the first field in this class (ignores superclasses).
+     * Accessor for MetaData for a managed field/property in this class. 
+     * The position is relative to the first field in this class (ignores superclasses).
      * @param position The position of the managed field. 0 = first in the class
      * @return The managed member at that position
      */
@@ -2744,8 +2706,7 @@ public abstract class AbstractClassMetaData extends MetaData
 
     /**
      * Accessor for a managed field/property including superclass fields.
-     * @param abs_position The position of the managed member including the
-     * superclass. Fields are numbered from 0 in the root superclass.
+     * @param abs_position The position of the managed member including the superclass. Fields are numbered from 0 in the root superclass.
      * @return The managed field/property at this "absolute" position.
      */
     public AbstractMemberMetaData getMetaDataForManagedMemberAtAbsolutePosition(int abs_position)
@@ -2757,10 +2718,8 @@ public abstract class AbstractClassMetaData extends MetaData
 
     /**
      * Internal method to get the field/property for an absolute field number.
-     * If the field for that absolute field position is overridden by a field in this class
-     * then this field/property will be returned.
-     * @param abs_position The position of the managed field including the
-     * superclass. Fields are numbered from 0 in the root superclass.
+     * If the field for that absolute field position is overridden by a field in this class then this field/property will be returned.
+     * @param abs_position The position of the managed field including the superclass. Fields are numbered from 0 in the root superclass.
      * @return The managed field at this "absolute" position.
      */
     protected AbstractMemberMetaData getMetaDataForManagedMemberAtAbsolutePositionInternal(int abs_position)
@@ -2776,12 +2735,13 @@ public abstract class AbstractClassMetaData extends MetaData
             AbstractMemberMetaData mmd = pcSuperclassMetaData.getMetaDataForManagedMemberAtAbsolutePositionInternal(abs_position);
             if (mmd != null)
             {
+                // Check for override(s) in this class or superclasses
                 for (int i=0;i<overriddenMembers.length;i++)
                 {
-                    if (overriddenMembers[i].getName().equals(mmd.getName()) &&
-                            overriddenMembers[i].getClassName().equals(mmd.getClassName()))
+                    if (overriddenMembers[i].getName().equals(mmd.getName()) && overriddenMembers[i].getClassName().equals(mmd.getClassName()))
                     {
                         // Return the overriding field if we have one (class and field name is the safest comparison)
+                        // TODO This doesn't do a merge of the base metadata with the override info. It should!
                         return overriddenMembers[i];
                     }
                 }
@@ -2790,32 +2750,20 @@ public abstract class AbstractClassMetaData extends MetaData
             }
             return null;
         }
+
         // If the field is in this class, return it
-        else if (abs_position - noOfInheritedManagedMembers >= managedMembers.length)
+        if (abs_position - noOfInheritedManagedMembers >= managedMembers.length)
         {
             return null;
         }
-        else
-        {
-            return managedMembers[abs_position - noOfInheritedManagedMembers];
-        }
-    }
-    
-    /**
-     * Accessor for the absolute position for a relative position.
-     * @param relativePosition The relative field number
-     * @return The absolute position
-     */
-    public int getAbsoluteMemberPositionForRelativePosition(int relativePosition)
-    {
-        return noOfInheritedManagedMembers + relativePosition;
+        return managedMembers[abs_position - noOfInheritedManagedMembers];
     }
 
     /**
-     * Accessor for the position of the field/property with the specified name.
-     * The returned position is relative to this class only.
-     * @param memberName Name of the field/property
-     * @return Position of the field/property in this class.
+     * Accessor for the (relative) position of the field/property with the specified name.
+     * <b>The returned position is relative to this class only</b>
+     * @param memberName Name of the member
+     * @return Relative position of the member in this class
      */
     public int getRelativePositionOfMember(String memberName)
     {
@@ -2832,9 +2780,9 @@ public abstract class AbstractClassMetaData extends MetaData
 
     /**
      * Accessor for the absolute position of the field/property with the specified name.
-     * The absolute position has origin of the root superclass, starting at 0.
-     * @param memberName Name of the field/property
-     * @return Absolute position of the field/property.
+     * The absolute position has origin in the root persistable superclass, starting at 0.
+     * @param memberName Name of the member
+     * @return Absolute position of the member
      */
     public int getAbsolutePositionOfMember(String memberName)
     {
@@ -3493,10 +3441,14 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             return;
         }
-
         if (isInitialised())
         {
             throw new NucleusUserException("Already initialised");
+        }
+
+        if (indexes == null)
+        {
+            indexes = new ArrayList<>();
         }
         indexes.add(idxmd);
         idxmd.parent = this;
@@ -3523,10 +3475,14 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             return;
         }
-
         if (isInitialised())
         {
             throw new NucleusUserException("Already initialised");
+        }
+
+        if (foreignKeys == null)
+        {
+            foreignKeys = new ArrayList<>();
         }
         foreignKeys.add(fkmd);
         fkmd.parent = this;
@@ -3553,10 +3509,14 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             return;
         }
-
         if (isInitialised())
         {
             throw new NucleusUserException("Already initialised");
+        }
+
+        if (uniqueConstraints == null)
+        {
+            uniqueConstraints = new ArrayList<>();
         }
         uniqueConstraints.add(unimd);
         unimd.parent = this;
@@ -3713,10 +3673,14 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             return;
         }
-
         if (isInitialised())
         {
             throw new NucleusUserException("Already initialised");
+        }
+
+        if (fetchGroups == null)
+        {
+            fetchGroups = new HashSet<>();
         }
         fetchGroups.add(fgmd);
         fgmd.parent = this;
@@ -3745,10 +3709,14 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             return;
         }
-
         if (isInitialised())
         {
             throw new NucleusUserException("Already initialised");
+        }
+
+        if (joins == null)
+        {
+            joins = new ArrayList<>();
         }
         joins.add(jnmd);
         jnmd.parent = this;
