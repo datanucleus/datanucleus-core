@@ -81,7 +81,7 @@ public abstract class AbstractStoreSchemaHandler implements StoreSchemaHandler
             }
             else
             {
-            	autoCreateSchema = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_SCHEMA);
+            	autoCreateSchema = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_DATABASE);
                 autoCreateTables = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES);
                 autoCreateColumns = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS);
                 autoCreateConstraints = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS);
