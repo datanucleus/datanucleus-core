@@ -33,7 +33,21 @@ public class JoinExpression extends Expression
 
     public enum JoinType
     {
-        JOIN_INNER, JOIN_LEFT_OUTER, JOIN_RIGHT_OUTER, JOIN_INNER_FETCH, JOIN_LEFT_OUTER_FETCH, JOIN_RIGHT_OUTER_FETCH
+        JOIN_INNER, 
+        JOIN_LEFT_OUTER, 
+        JOIN_RIGHT_OUTER, 
+        JOIN_INNER_FETCH, 
+        JOIN_LEFT_OUTER_FETCH, 
+        JOIN_RIGHT_OUTER_FETCH;
+
+        public static boolean isFetch(JoinType type)
+        {
+            if (type == JoinType.JOIN_INNER_FETCH || type == JoinType.JOIN_LEFT_OUTER_FETCH || type == JOIN_RIGHT_OUTER_FETCH)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 
     JoinType type;
