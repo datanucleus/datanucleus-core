@@ -380,21 +380,21 @@ public class EmbeddedMetaData extends MetaData
     }
 
     /**
-     * Method to initialise the object, creating all internal convenience
-     * arrays.
+     * Method to initialise the object, creating all internal convenience arrays.
+     * @param clr ClassLoader resolver
      */
-    public void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
+    public void initialise(ClassLoaderResolver clr)
     {
         memberMetaData = new AbstractMemberMetaData[members.size()];
         for (int i=0; i<memberMetaData.length; i++)
         {
             memberMetaData[i] = members.get(i);
-            memberMetaData[i].initialise(clr, mmgr);
+            memberMetaData[i].initialise(clr);
         }
 
         if (discriminatorMetaData != null)
         {
-            discriminatorMetaData.initialise(clr, mmgr);
+            discriminatorMetaData.initialise(clr);
         }
 
         setInitialised();

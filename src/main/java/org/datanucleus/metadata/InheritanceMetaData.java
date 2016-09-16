@@ -49,16 +49,17 @@ public class InheritanceMetaData extends MetaData
     /**
      * Method to initialise the object, creating internal convenience arrays.
      * Initialises all sub-objects.
+     * @param clr Not used
      */
-    public void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
+    public void initialise(ClassLoaderResolver clr)
     {
         if (joinMetaData != null)
         {
-            joinMetaData.initialise(clr, mmgr);
+            joinMetaData.initialise(clr);
         }
         if (discriminatorMetaData != null)
         {
-            discriminatorMetaData.initialise(clr, mmgr);
+            discriminatorMetaData.initialise(clr);
         }
 
         setInitialised();

@@ -62,11 +62,11 @@ public class ElementMetaData extends AbstractElementMetaData
         AbstractMemberMetaData fmd = (AbstractMemberMetaData)parent;
         if (fmd.hasCollection())
         {
-            fmd.getCollection().element.populate(fmd.getAbstractClassMetaData().getPackageName(), clr, primary, mmgr);
+            fmd.getCollection().element.populate(fmd.getAbstractClassMetaData().getPackageName(), clr, primary);
         }
         else if (fmd.hasArray())
         {
-            fmd.getArray().element.populate(fmd.getAbstractClassMetaData().getPackageName(), clr, primary, mmgr);
+            fmd.getArray().element.populate(fmd.getAbstractClassMetaData().getPackageName(), clr, primary);
         }
         if (embeddedMetaData == null && 
             ((AbstractMemberMetaData)parent).hasCollection() && 

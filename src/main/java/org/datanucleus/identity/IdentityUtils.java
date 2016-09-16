@@ -506,19 +506,19 @@ public class IdentityUtils
             AbstractClassMetaData cmd = null;
             if (fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT)
             {
-                cmd = mmd.getCollection().getElementClassMetaData(clr, ec.getMetaDataManager());
+                cmd = mmd.getCollection().getElementClassMetaData(clr);
             }
             else if (fieldRole == FieldRole.ROLE_ARRAY_ELEMENT)
             {
-                cmd = mmd.getArray().getElementClassMetaData(clr, ec.getMetaDataManager());
+                cmd = mmd.getArray().getElementClassMetaData(clr);
             }
             else if (fieldRole == FieldRole.ROLE_MAP_KEY)
             {
-                cmd = mmd.getMap().getKeyClassMetaData(clr, ec.getMetaDataManager());
+                cmd = mmd.getMap().getKeyClassMetaData(clr);
             }
             else if (fieldRole == FieldRole.ROLE_MAP_KEY)
             {
-                cmd = mmd.getMap().getKeyClassMetaData(clr, ec.getMetaDataManager());
+                cmd = mmd.getMap().getKeyClassMetaData(clr);
             }
             else
             {

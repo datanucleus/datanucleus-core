@@ -106,8 +106,8 @@ public class MapMetaData extends ContainerMetaData
         }
 
         // Make sure the type in "key", "value" is set
-        key.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), clr, primary, mmgr);
-        value.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), clr, primary, mmgr);
+        key.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), clr, primary);
+        value.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), clr, primary);
 
         // Check the field type and see if it is castable to a Map
         Class field_type = getMemberMetaData().getType();
@@ -356,7 +356,7 @@ public class MapMetaData extends ContainerMetaData
         }
 
         // Make sure anything in the superclass is populated too
-        super.populate(clr, primary, mmgr);
+        super.populate();
 
         setPopulated();
     }
@@ -403,10 +403,9 @@ public class MapMetaData extends ContainerMetaData
     /**
      * Convenience accessor for the Key ClassMetaData.
      * @param clr ClassLoader resolver (in case we need to initialise it)
-     * @param mmgr MetaData manager (in case we need to initialise it)
      * @return key ClassMetaData
      */
-    public AbstractClassMetaData getKeyClassMetaData(final ClassLoaderResolver clr, final MetaDataManager mmgr)
+    public AbstractClassMetaData getKeyClassMetaData(final ClassLoaderResolver clr)
     {
         if (key.classMetaData != null && !key.classMetaData.isInitialised())
         {
@@ -416,7 +415,7 @@ public class MapMetaData extends ContainerMetaData
             {
                 public Object run()
                 {
-                    key.classMetaData.initialise(clr, mmgr);
+                    key.classMetaData.initialise(clr);
                     return null;
                 }
             });
@@ -447,10 +446,9 @@ public class MapMetaData extends ContainerMetaData
     /**
      * Convenience accessor for the Value ClassMetaData
      * @param clr ClassLoader resolver (in case we need to initialise it)
-     * @param mmgr MetaData manager (in case we need to initialise it)
      * @return value ClassMetaData
      */
-    public AbstractClassMetaData getValueClassMetaData(final ClassLoaderResolver clr, final MetaDataManager mmgr)
+    public AbstractClassMetaData getValueClassMetaData(final ClassLoaderResolver clr)
     {
         if (value.classMetaData != null && !value.classMetaData.isInitialised())
         {
@@ -460,7 +458,7 @@ public class MapMetaData extends ContainerMetaData
             {
                 public Object run()
                 {
-                    value.classMetaData.initialise(clr, mmgr);
+                    value.classMetaData.initialise(clr);
                     return null;
                 }
             });
@@ -623,20 +621,20 @@ public class MapMetaData extends ContainerMetaData
      * @param orderedCmds List of ordered ClassMetaData objects (added to).
      * @param referencedCmds Set of all ClassMetaData objects (added to).
      * @param clr the ClassLoaderResolver
-     * @param mmgr MetaData manager
      */
-    void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final ClassLoaderResolver clr, final MetaDataManager mmgr)
+    void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final ClassLoaderResolver clr)
     {
+        MetaDataManager mmgr = ((AbstractMemberMetaData)getParent()).getAbstractClassMetaData().getMetaDataManager();
         AbstractClassMetaData keyCmd = mmgr.getMetaDataForClass(key.type, clr);
         if (keyCmd != null)
         {
-            keyCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr, mmgr);
+            keyCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
         }
 
         AbstractClassMetaData valueCmd = mmgr.getMetaDataForClass(value.type, clr);
         if (valueCmd != null)
         {
-            valueCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr, mmgr);
+            valueCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
         }
     }
 

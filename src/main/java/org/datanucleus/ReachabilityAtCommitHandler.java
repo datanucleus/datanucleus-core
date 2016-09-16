@@ -191,7 +191,7 @@ public class ReachabilityAtCommitHandler
 
                                 // Go through all relation fields using ReachabilityFieldManager
                                 ReachabilityFieldManager pcFM = new ReachabilityFieldManager(op, currentReachables);
-                                int[] relationFieldNums = op.getClassMetaData().getRelationMemberPositions(ec.getClassLoaderResolver(), ec.getMetaDataManager());
+                                int[] relationFieldNums = op.getClassMetaData().getRelationMemberPositions(ec.getClassLoaderResolver());
                                 if (relationFieldNums != null && relationFieldNums.length > 0)
                                 {
                                     op.provideFields(relationFieldNums, pcFM);

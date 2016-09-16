@@ -59,9 +59,8 @@ public class ImplementsMetaData extends MetaData
      * Method to populate the details of the implements.
      * @param clr ClassLoaderResolver to use in loading any classes
      * @param primary the primary ClassLoader to use (or null)
-     * @param mmgr MetaData manager
      */
-    public synchronized void populate(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr)
+    public synchronized void populate(ClassLoaderResolver clr, ClassLoader primary)
     {
         // Check the class that we're modelling exists
         try

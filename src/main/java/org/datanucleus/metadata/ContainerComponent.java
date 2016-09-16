@@ -101,9 +101,8 @@ class ContainerComponent implements Serializable
      * @param packageName The package of the owning class
      * @param clr ClassLoader resolver
      * @param primary Primary class loader
-     * @param mmgr MetaData manager
      */
-    void populate(String packageName, ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr)
+    void populate(String packageName, ClassLoaderResolver clr, ClassLoader primary)
     {
         if (type == null)
         {

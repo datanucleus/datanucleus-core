@@ -65,7 +65,7 @@ public class ValueMetaData extends AbstractElementMetaData
         }
 
         // Make sure value type is set and is valid
-        fmd.getMap().value.populate(fmd.getAbstractClassMetaData().getPackageName(), clr, primary, mmgr);
+        fmd.getMap().value.populate(fmd.getAbstractClassMetaData().getPackageName(), clr, primary);
         String valueType = fmd.getMap().getValueType();
         Class valueTypeClass = null;
         try

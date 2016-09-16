@@ -491,7 +491,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         {
             // Managed Relations : register non-null bidir fields for later processing
             ClassLoaderResolver clr = myEC.getClassLoaderResolver();
-            int[] relationPositions = cmd.getRelationMemberPositions(clr, myEC.getMetaDataManager());
+            int[] relationPositions = cmd.getRelationMemberPositions(clr);
             if (relationPositions != null)
             {
                 for (int i=0;i<relationPositions.length;i++)
@@ -2588,7 +2588,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
 
     public void loadUnloadedRelationFields()
     {
-        int[] fieldsConsidered = cmd.getRelationMemberPositions(myEC.getClassLoaderResolver(), myEC.getMetaDataManager());
+        int[] fieldsConsidered = cmd.getRelationMemberPositions(myEC.getClassLoaderResolver());
         int[] fieldNumbers = ClassUtils.getFlagsSetTo(loadedFields, fieldsConsidered, false);
         if (fieldNumbers == null || fieldNumbers.length == 0)
         {
@@ -2782,7 +2782,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             setTransactionalVersion(null); // Make sure that the version is reset upon fetch
             loadFieldsFromDatastore(fieldNumbers);
 
-            if (cmd.hasRelations(myEC.getClassLoaderResolver(), myEC.getMetaDataManager()))
+            if (cmd.hasRelations(myEC.getClassLoaderResolver()))
             {
                 // Check for cascade refreshes to related objects
                 for (int i=0;i<fieldNumbers.length;i++)
@@ -3281,7 +3281,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         {
             // Already provisionally persistent, but delaying til commit so just re-run reachability
             // to bring in any new objects that are now reachable
-            if (cmd.hasRelations(myEC.getClassLoaderResolver(), myEC.getMetaDataManager()))
+            if (cmd.hasRelations(myEC.getClassLoaderResolver()))
             {
                 provideFields(cmd.getAllMemberPositions(), new PersistFieldManager(this, false));
             }
@@ -3329,7 +3329,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 myLC = myLC.transitionMakePersistent(this);
             }
 
-            if (cmd.hasRelations(myEC.getClassLoaderResolver(), myEC.getMetaDataManager()))
+            if (cmd.hasRelations(myEC.getClassLoaderResolver()))
             {
                 // Run reachability on all fields of this PC - JDO2 [12.6.7]
                 provideFields(cmd.getAllMemberPositions(), new PersistFieldManager(this, false));
@@ -4189,7 +4189,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 setBecomingDeleted(true);
 
                 // Run reachability for relations
-                if (cmd.hasRelations(myEC.getClassLoaderResolver(), myEC.getMetaDataManager()))
+                if (cmd.hasRelations(myEC.getClassLoaderResolver()))
                 {
                     provideFields(cmd.getAllMemberPositions(), new DeleteFieldManager(this));
                 }

@@ -75,11 +75,12 @@ public class DiscriminatorMetaData extends MetaData
     }
 
     /**
-     * Initialisation method. This should be called AFTER using the populate
-     * method if you are going to use populate. It creates the internal
-     * convenience arrays etc needed for normal operation.
+     * Initialisation method. 
+     * This should be called AFTER using the populate method if you are going to use populate. 
+     * It creates the internal convenience arrays etc needed for normal operation.
+     * @param clr Not used
      */
-    public void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
+    public void initialise(ClassLoaderResolver clr)
     {
         if (value != null && strategy == null)
         {

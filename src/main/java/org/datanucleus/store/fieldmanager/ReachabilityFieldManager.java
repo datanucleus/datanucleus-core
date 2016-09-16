@@ -83,7 +83,7 @@ public class ReachabilityFieldManager extends AbstractFieldManager
 
                 // Recurse through relation fields of this object
                 ReachabilityFieldManager pcFM = new ReachabilityFieldManager(objOP, reachables);
-                int[] relationFieldNums = objOP.getClassMetaData().getRelationMemberPositions(ec.getClassLoaderResolver(), ec.getMetaDataManager());
+                int[] relationFieldNums = objOP.getClassMetaData().getRelationMemberPositions(ec.getClassLoaderResolver());
                 int[] loadedFieldNumbers = ClassUtils.getFlagsSetTo(objOP.getLoadedFields(), relationFieldNums, true);
                 if (loadedFieldNumbers != null && loadedFieldNumbers.length > 0)
                 {

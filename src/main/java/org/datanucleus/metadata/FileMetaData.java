@@ -32,10 +32,6 @@ public class FileMetaData extends MetaData
 {
     private static final long serialVersionUID = 6622356672262681288L;
 
-    // TODO Remove this, and pass in to populate/initialise as required
-    /** Manager for this MetaData object. Used in AbstractMemberMetaData.setRelation process. */
-    transient protected MetaDataManager metaDataManager;
-
     /** Type of file (JDO, ORM, JDOQUERY, etc) */
     protected MetadataFileType type;
 
@@ -66,21 +62,12 @@ public class FileMetaData extends MetaData
     /** List of event listeners defined for this file. */
     protected List<EventListenerMetaData> listeners = null;
 
-    /**
-     * Constructor.
-     */
     public FileMetaData()
     {
     }
-
-    /**
-     * Method to set the MetaDataManager in use.
-     * TODO Remove this
-     * @param mmgr MetaDataManager to use
-     */
-    public void setMetaDataManager(MetaDataManager mmgr)
+    public FileMetaData(String filename)
     {
-        this.metaDataManager = mmgr;
+        this.filename = filename;
     }
 
     public String getFilename()

@@ -45,8 +45,7 @@ public class FieldMetaData extends AbstractMemberMetaData
 
     /**
      * Convenience constructor to copy the specification from the passed field.
-     * This is used when we have an overriding field and we make a copy of the baseline
-     * field as a starting point.
+     * This is used when we have an overriding field and we make a copy of the baseline field as a starting point.
      * @param parent The parent
      * @param fmd The field to copy
      */
@@ -56,10 +55,9 @@ public class FieldMetaData extends AbstractMemberMetaData
     }
 
     /**
-     * Constructor. Saves the MetaData with the specified values. The object is
-     * then in an "unpopulated" state. It can become "populated" by calling the
-     * <B>populate()</B> method which compares it against the field it is to
-     * represent and updates any unset attributes and flags up any errors.
+     * Constructor. Saves the MetaData with the specified values.
+     * The object is then in an "unpopulated" state. It can become "populated" by calling the <B>populate()</B> method which 
+     * compares it against the field it is to represent and updates any unset attributes and flags up any errors.
      * @param parent parent MetaData instance
      * @param name field name 
      */

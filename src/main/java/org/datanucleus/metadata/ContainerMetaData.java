@@ -24,8 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import org.datanucleus.ClassLoaderResolver;
-
 /**
  * Representation of the Meta-Data for a container.
  * This is subclassed by Array, Collection, and Map.
@@ -54,11 +52,8 @@ public class ContainerMetaData extends MetaData
 
     /**
      * Method to populate any defaults, and check the validity of the MetaData.
-     * @param clr ClassLoaderResolver to use for any loading operations
-     * @param primary the primary ClassLoader to use (or null)
-     * @param mmgr MetaData manager
      */
-    public void populate(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr)
+    public void populate()
     {
         // Set the default for allowNulls if not set, based on the java type
         if (parent != null && parent.hasExtension(MetaData.EXTENSION_MEMBER_CONTAINER_ALLOW_NULLS))

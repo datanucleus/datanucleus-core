@@ -364,12 +364,12 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                                     if (mmd.hasCollection())
                                     {
                                         // TODO Don't currently allow interface field navigation
-                                        joinedCmd = mmd.getCollection().getElementClassMetaData(clr, metaDataManager);
+                                        joinedCmd = mmd.getCollection().getElementClassMetaData(clr);
                                         joinedCls = clr.classForName(joinedCmd.getFullClassName());
                                     }
                                     else if (mmd.hasMap())
                                     {
-                                        joinedCmd = mmd.getMap().getValueClassMetaData(clr, metaDataManager);
+                                        joinedCmd = mmd.getMap().getValueClassMetaData(clr);
                                         if (joinedCmd != null)
                                         {
                                             // JPA assumption that the value is an entity ... but it may not be!
@@ -379,7 +379,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                                     else if (mmd.hasArray())
                                     {
                                         // TODO Don't currently allow interface field navigation
-                                        joinedCmd = mmd.getArray().getElementClassMetaData(clr, metaDataManager);
+                                        joinedCmd = mmd.getArray().getElementClassMetaData(clr);
                                         joinedCls = clr.classForName(joinedCmd.getFullClassName());
                                     }
                                 }

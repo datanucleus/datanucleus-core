@@ -335,6 +335,11 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         }
     }
 
+    public MetaDataManager getMetaDataManager()
+    {
+        return getAbstractClassMetaData().getMetaDataManager();
+    }
+
     /**
      * Constructor for a fields metadata. Set the fields using setters, before populate().
      * @param parent parent MetaData instance TODO Remove this
@@ -877,17 +882,19 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     }
 
     /**
-     * Initialisation method. This should be called AFTER using the populate
-     * method if you are going to use populate. It creates the internal
-     * convenience arrays etc needed for normal operation.
+     * Initialisation method.
+     * This should be called AFTER using the populate method if you are going to use populate.
+     * It creates the internal convenience arrays etc needed for normal operation.
      */
-    public synchronized void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
+    public synchronized void initialise(ClassLoaderResolver clr)
     {
         if (persistenceModifier == FieldPersistenceModifier.NONE)
         {
             setInitialised();
             return;
         }
+
+        MetaDataManager mmgr = getMetaDataManager();
 
         // Cater for user specifying column name, or columns
         if (columns.isEmpty() && column != null)
@@ -896,7 +903,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             columnMetaData[0] = new ColumnMetaData();
             columnMetaData[0].setName(column);
             columnMetaData[0].parent = this;
-            columnMetaData[0].initialise(clr, mmgr);
+            columnMetaData[0].initialise(clr);
         }
         else if (columns.size() == 1 && column != null)
         {
@@ -907,7 +914,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             {
                 columnMetaData[0].setName(column);
             }
-            columnMetaData[0].initialise(clr, mmgr);
+            columnMetaData[0].initialise(clr);
         }
         else
         {
@@ -915,13 +922,13 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             for (int i=0; i<columnMetaData.length; i++)
             {
                 columnMetaData[i] = columns.get(i);
-                columnMetaData[i].initialise(clr, mmgr);
+                columnMetaData[i].initialise(clr);
             }
         }
         // Initialise all sub-objects
         if (containerMetaData != null)
         {
-            containerMetaData.initialise(clr, mmgr);
+            containerMetaData.initialise(clr);
             if (containerMetaData instanceof CollectionMetaData)
             {
                 CollectionMetaData collmd = (CollectionMetaData)containerMetaData;
@@ -988,23 +995,23 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
         if (embeddedMetaData != null)
         {
-            embeddedMetaData.initialise(clr, mmgr);
+            embeddedMetaData.initialise(clr);
         }
         if (joinMetaData != null)
         {
-            joinMetaData.initialise(clr, mmgr);
+            joinMetaData.initialise(clr);
         }
         if (elementMetaData != null)
         {
-            elementMetaData.initialise(clr, mmgr);
+            elementMetaData.initialise(clr);
         }
         if (keyMetaData != null)
         {
-            keyMetaData.initialise(clr, mmgr);
+            keyMetaData.initialise(clr);
         }
         if (valueMetaData != null)
         {
-            valueMetaData.initialise(clr, mmgr);
+            valueMetaData.initialise(clr);
         }
 
         // Interpret the "indexed" value to create our IndexMetaData where it wasn't specified that way
@@ -1034,7 +1041,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
         if (orderMetaData != null)
         {
-            orderMetaData.initialise(clr, mmgr);
+            orderMetaData.initialise(clr);
         }
 
         if (hasExtension(MetaData.EXTENSION_MEMBER_CASCADE_PERSIST))
@@ -2504,8 +2511,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             return;
         }
 
-        // Get MetaDataManager (from "file"). TODO Remove this and pass it in
-        MetaDataManager mmgr = getAbstractClassMetaData().getPackageMetaData().getFileMetaData().metaDataManager;
+        MetaDataManager mmgr = getMetaDataManager();
 
         // Find the metadata for the field object
         AbstractClassMetaData otherCmd = null;
@@ -2545,13 +2551,13 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         }
         else if (hasMap())
         {
-            otherCmd = ((MapMetaData) containerMetaData).getValueClassMetaData(clr, mmgr);
+            otherCmd = ((MapMetaData) containerMetaData).getValueClassMetaData(clr);
             //TODO [CORE-2585] valueCMD may be null because its type is an interface (non persistent interface), 
             //so we should handle the implementation classes
             if (otherCmd == null)
             {
                 // Value not PC so use the Key if it is specified
-                otherCmd = ((MapMetaData)containerMetaData).getKeyClassMetaData(clr, mmgr);
+                otherCmd = ((MapMetaData)containerMetaData).getKeyClassMetaData(clr);
             }
             if (otherCmd == null)
             {
@@ -2560,7 +2566,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         }
         else if (hasArray())
         {
-            otherCmd = ((ArrayMetaData)containerMetaData).getElementClassMetaData(clr, mmgr);
+            otherCmd = ((ArrayMetaData)containerMetaData).getElementClassMetaData(clr);
         }
         else
         {
@@ -2784,11 +2790,11 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      * accessed through here.
      * TODO Merge this with relation methods so we only need the relationType/relatedMemberMetaData.
      * @param clr ClassLoader resolver
-     * @param mmgr MetaData manager
      * @return Whether it is for a persistent interface
      */
-    public boolean isPersistentInterface(ClassLoaderResolver clr, MetaDataManager mmgr)
+    public boolean isPersistentInterface(ClassLoaderResolver clr)
     {
+        MetaDataManager mmgr = getMetaDataManager();
         if (hasCollection())
         {
             if (mmgr.isPersistentInterface(getCollection().getElementType()))
@@ -2960,27 +2966,28 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      * @param orderedCmds List of ordered ClassMetaData objects (added to).
      * @param referencedCmds Set of referenced ClassMetaData objects (added to)
      * @param clr the ClassLoaderResolver
-     * @param mmgr MetaData manager
      */
-    void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final ClassLoaderResolver clr, final MetaDataManager mmgr)
+    void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final ClassLoaderResolver clr)
     {
+        MetaDataManager mmgr = getMetaDataManager();
+
         AbstractClassMetaData theTypeCmd = mmgr.getMetaDataForClass(getType(), clr);
         if (theTypeCmd != null)
         {
-            theTypeCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr, mmgr);
+            theTypeCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
         }
 
         if (hasCollection())
         {
-            getCollection().getReferencedClassMetaData(orderedCmds, referencedCmds, clr, mmgr);
+            getCollection().getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
         }
         else if (hasMap())
         {
-            getMap().getReferencedClassMetaData(orderedCmds, referencedCmds, clr, mmgr);
+            getMap().getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
         }
         else if (hasArray())
         {
-            getArray().getReferencedClassMetaData(orderedCmds, referencedCmds, clr, mmgr);
+            getArray().getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
         }
     }
     

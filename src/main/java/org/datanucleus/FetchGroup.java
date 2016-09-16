@@ -271,11 +271,11 @@ public class FetchGroup<T> implements Serializable
         }
         else if (categoryName.equals(BASIC))
         {
-            memberPositions = cmd.getBasicMemberPositions(nucleusCtx.getClassLoaderResolver(null), nucleusCtx.getMetaDataManager());
+            memberPositions = cmd.getBasicMemberPositions(nucleusCtx.getClassLoaderResolver(null));
         }
         else if (categoryName.equals(RELATIONSHIP))
         {
-            memberPositions = cmd.getRelationMemberPositions(nucleusCtx.getClassLoaderResolver(null), nucleusCtx.getMetaDataManager());
+            memberPositions = cmd.getRelationMemberPositions(nucleusCtx.getClassLoaderResolver(null));
         }
         else if (categoryName.equals(MULTIVALUED))
         {

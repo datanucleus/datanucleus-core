@@ -24,6 +24,7 @@ package org.datanucleus.metadata;
 public class UniqueMetaData extends ConstraintMetaData
 {
     private static final long serialVersionUID = -707369332288973459L;
+
     /** Whether the unique is initially deferred. */
     boolean deferred = false;
 

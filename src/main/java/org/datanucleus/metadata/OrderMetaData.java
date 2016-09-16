@@ -94,8 +94,9 @@ public class OrderMetaData extends MetaData implements ColumnMetaDataContainer
     /**
      * Method to initialise the object, creating internal convenience arrays.
      * Initialises all sub-objects.
+     * @param clr Not used
      */
-    public void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
+    public void initialise(ClassLoaderResolver clr)
     {
         if (hasExtension(MetaData.EXTENSION_MEMBER_LIST_ORDERING))
         {

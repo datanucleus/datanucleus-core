@@ -70,11 +70,11 @@ public class VersionMetaData extends MetaData
     }
 
     /**
-     * Initialisation method. This should be called AFTER using the populate
-     * method if you are going to use populate. It creates the internal
-     * convenience arrays etc needed for normal operation.
+     * Initialisation method. 
+     * This should be called AFTER using the populate method if you are going to use populate.
+     * It creates the internal convenience arrays etc needed for normal operation.
      */
-    public void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
+    public void initialise(ClassLoaderResolver clr)
     {
         if (hasExtension(MetaData.EXTENSION_CLASS_VERSION_FIELD_NAME))
         {

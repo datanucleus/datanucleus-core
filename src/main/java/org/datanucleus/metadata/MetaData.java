@@ -184,7 +184,7 @@ public class MetaData implements Serializable
         }
     }
 
-    public void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
+    public void initialise(ClassLoaderResolver clr)
     {
         setInitialised();
     }

@@ -65,7 +65,7 @@ public class KeyMetaData extends AbstractElementMetaData
         }
 
         // Make sure key type is set and is valid
-        fmd.getMap().key.populate(fmd.getAbstractClassMetaData().getPackageName(), clr, primary, mmgr);
+        fmd.getMap().key.populate(fmd.getAbstractClassMetaData().getPackageName(), clr, primary);
         String keyType = fmd.getMap().getKeyType();
         Class keyTypeClass = null;
         try
@@ -76,8 +76,7 @@ public class KeyMetaData extends AbstractElementMetaData
         {
             throw new InvalidMemberMetaDataException("044147", fmd.getClassName(), fmd.getName(), keyType);
         }
-        if (embeddedMetaData != null &&
-            (keyTypeClass.isInterface() || keyTypeClass.getName().equals("java.lang.Object")))
+        if (embeddedMetaData != null && (keyTypeClass.isInterface() || keyTypeClass.getName().equals("java.lang.Object")))
         {
             throw new InvalidMemberMetaDataException("044152", fmd.getClassName(), fmd.getName(), keyTypeClass.getName());
         }

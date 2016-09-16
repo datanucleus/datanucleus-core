@@ -127,7 +127,7 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
      * Method to initialise the object, creating any convenience arrays needed.
      * Initialises all sub-objects. 
      */
-    public void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
+    public void initialise(ClassLoaderResolver clr)
     {
         // Cater for user specifying column name, or columns
         if (columns == null && columnName != null)
@@ -167,7 +167,7 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
 
         if (embeddedMetaData != null)
         {
-            embeddedMetaData.initialise(clr, mmgr);
+            embeddedMetaData.initialise(clr);
         }
 
         setInitialised();

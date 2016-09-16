@@ -129,21 +129,18 @@ public class ClassMetaData extends AbstractClassMetaData
     }
 
     /**
-     * Method to provide the details of the class being represented by this
-     * MetaData. This can be used to firstly provide defaults for attributes
-     * that aren't specified in the MetaData, and secondly to report any errors
-     * with attributes that have been specified that are inconsistent with the
+     * Method to provide the details of the class being represented by this MetaData.
+     * This can be used to firstly provide defaults for attributes that aren't specified in the MetaData, 
+     * and secondly to report any errors with attributes that have been specified that are inconsistent with the
      * class being represented.
      * <P>
-     * One possible use of this method would be to take a basic ClassMetaData
-     * for a class and call this, passing in the users class. This would then
-     * add FieldMetaData for all fields in this class providing defaults for
-     * all of these.
+     * One possible use of this method would be to take a basic ClassMetaData for a class and call this, passing in the users class. 
+     * This would then add AbstractMemberMetaData for all fields in this class providing defaults for all of these.
      * @param clr ClassLoaderResolver to use in loading any classes
      * @param primary the primary ClassLoader to use (or null)
-     * @param mmgr MetaData manager
+     * @param mgr MetaData manager
      */
-    public synchronized void populate(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr)
+    public synchronized void populate(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mgr)
     {
         if (isInitialised() || isPopulated())
         {
@@ -155,6 +152,7 @@ public class ClassMetaData extends AbstractClassMetaData
             return;
         }
 
+        this.mmgr = mgr;
         try
         {
             if (NucleusLogger.METADATA.isDebugEnabled())
@@ -163,7 +161,7 @@ public class ClassMetaData extends AbstractClassMetaData
             }
             populating = true;
 
-            Class cls = loadClass(clr, primary, mmgr);
+            Class cls = loadClass(clr, primary);
 
             isAbstract = Modifier.isAbstract(cls.getModifiers());
 
@@ -189,18 +187,18 @@ public class ClassMetaData extends AbstractClassMetaData
                 this.entityName = name;
             }
 
-            determineSuperClassName(clr, cls, mmgr);
+            determineSuperClassName(clr, cls);
 
             inheritIdentity();
             determineIdentity();
             validateUserInputForIdentity();
 
-            addMetaDataForMembersNotInMetaData(cls, mmgr);
+            addMetaDataForMembersNotInMetaData(cls);
 
             // Set inheritance
             validateUserInputForInheritanceMetaData(isAbstract());
-            determineInheritanceMetaData(mmgr);
-            applyDefaultDiscriminatorValueWhenNotSpecified(mmgr);
+            determineInheritanceMetaData();
+            applyDefaultDiscriminatorValueWhenNotSpecified();
 
             // Process all members marked as UNKNOWN (i.e override from JPA) and eliminate clashes with any generic overrides from addMetaDataForMembersNotInMetaData(...)
             Iterator<AbstractMemberMetaData> memberIter = members.iterator();
@@ -261,15 +259,15 @@ public class ClassMetaData extends AbstractClassMetaData
             if (objectidClass == null)
             {
                 // No user-defined objectid-class but potentially have SingleFieldIdentity so make sure PK fields are set
-                populateMemberMetaData(clr, cls, true, primary, mmgr); // PK fields
-                determineObjectIdClass(mmgr);
-                populateMemberMetaData(clr, cls, false, primary, mmgr); // Non-PK fields
+                populateMemberMetaData(clr, cls, true, primary); // PK fields
+                determineObjectIdClass();
+                populateMemberMetaData(clr, cls, false, primary); // Non-PK fields
             }
             else
             {
-                populateMemberMetaData(clr, cls, true, primary, mmgr);
-                populateMemberMetaData(clr, cls, false, primary, mmgr);
-                determineObjectIdClass(mmgr);
+                populateMemberMetaData(clr, cls, true, primary);
+                populateMemberMetaData(clr, cls, false, primary);
+                determineObjectIdClass();
             }
 
             validateUnmappedColumns();
@@ -279,7 +277,7 @@ public class ClassMetaData extends AbstractClassMetaData
             {
                 for (ImplementsMetaData implmd : implementations)
                 {
-                    implmd.populate(clr, primary, mmgr);
+                    implmd.populate(clr, primary);
                 }
             }
 
@@ -287,7 +285,7 @@ public class ClassMetaData extends AbstractClassMetaData
             {
                 // Need to go up to next superinterface and make sure its metadata is populated
                 // until we find the next interface with metadata with inheritance strategy of "new-table".
-                AbstractClassMetaData acmd = getMetaDataForSuperinterfaceManagingTable(cls, clr, mmgr);
+                AbstractClassMetaData acmd = getMetaDataForSuperinterfaceManagingTable(cls, clr);
                 if (acmd != null)
                 {
                     table = acmd.table;
@@ -319,11 +317,9 @@ public class ClassMetaData extends AbstractClassMetaData
      * Method to find a superinterface with MetaData that specifies NEW_TABLE inheritance strategy
      * @param cls The class
      * @param clr ClassLoader resolver
-     * @param mmgr MetaData manager
      * @return The AbstractClassMetaData for the class managing the table
      */
-    private AbstractClassMetaData getMetaDataForSuperinterfaceManagingTable(Class cls, 
-            ClassLoaderResolver clr, MetaDataManager mmgr)
+    private AbstractClassMetaData getMetaDataForSuperinterfaceManagingTable(Class cls, ClassLoaderResolver clr)
     {
         for (Class<?> superintf : ClassUtils.getSuperinterfaces(cls))
         {
@@ -338,7 +334,7 @@ public class ClassMetaData extends AbstractClassMetaData
                 else if (acmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUPERCLASS_TABLE)
                 {
                     // Try further up the hierarchy
-                    return getMetaDataForSuperinterfaceManagingTable(superintf, clr, mmgr);
+                    return getMetaDataForSuperinterfaceManagingTable(superintf, clr);
                 }
             }
         }
@@ -350,9 +346,8 @@ public class ClassMetaData extends AbstractClassMetaData
      * Note that if a member is defined using some generic type in the superclass and this class can use a TypeVariable to resolve it then this
      * will add the member to "members" here since the type will be different to this class.
      * @param cls Class represented by this metadata
-     * @param mmgr MetaData manager
      */
-    protected void addMetaDataForMembersNotInMetaData(Class cls, MetaDataManager mmgr)
+    protected void addMetaDataForMembersNotInMetaData(Class cls)
     {
         // Access API since we treat things differently for JPA and JDO
         String api = mmgr.getNucleusContext().getApiName();
@@ -616,11 +611,10 @@ public class ClassMetaData extends AbstractClassMetaData
      * @param cls This class
      * @param pkMembers Process pk fields/properties (or non-PK if false)
      * @param primary the primary ClassLoader to use (or null)
-     * @param mmgr MetaData manager
      * @throws InvalidMetaDataException if the Class for a declared type in a field cannot be loaded by the <code>clr</code>
      * @throws InvalidMetaDataException if a field declared in the MetaData does not exist in the Class
      */
-    protected void populateMemberMetaData(ClassLoaderResolver clr, Class cls, boolean pkMembers, ClassLoader primary, MetaDataManager mmgr)
+    protected void populateMemberMetaData(ClassLoaderResolver clr, Class cls, boolean pkMembers, ClassLoader primary)
     {
         Collections.sort(members);
 
@@ -756,9 +750,8 @@ public class ClassMetaData extends AbstractClassMetaData
      * Method to initialise the object, creating internal convenience arrays.
      * Initialises all sub-objects. populate() should be called BEFORE calling this.
      * @param clr ClassLoader resolver
-     * @param mmgr MetaData manager
      */
-    public synchronized void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
+    public synchronized void initialise(ClassLoaderResolver clr)
     {
         if (initialising || isInitialised())
         {
@@ -776,7 +769,7 @@ public class ClassMetaData extends AbstractClassMetaData
                 // We need our superclass to be initialised before us because we rely on information there
                 if (!pcSuperclassMetaData.isInitialised())
                 {
-                    pcSuperclassMetaData.initialise(clr, mmgr);
+                    pcSuperclassMetaData.initialise(clr);
                 }
             }
 
@@ -787,7 +780,7 @@ public class ClassMetaData extends AbstractClassMetaData
 
             // Validate the objectid-class
             // This must be in initialise() since can be dependent on other classes being populated
-            validateObjectIdClass(clr, mmgr);
+            validateObjectIdClass(clr);
 
             // Count the fields/properties of the relevant category
             Iterator membersIter = members.iterator();
@@ -798,7 +791,7 @@ public class ClassMetaData extends AbstractClassMetaData
                 AbstractMemberMetaData mmd = (AbstractMemberMetaData)membersIter.next();
     
                 // Initialise the FieldMetaData (and its sub-objects)
-                mmd.initialise(clr, mmgr);
+                mmd.initialise(clr);
                 if (mmd.isFieldToBePersisted())
                 {
                     if (mmd.fieldBelongsToClass())
@@ -861,48 +854,48 @@ public class ClassMetaData extends AbstractClassMetaData
             {
                 if (!pcSuperclassMetaData.isInitialised())
                 {
-                    pcSuperclassMetaData.initialise(clr, mmgr);
+                    pcSuperclassMetaData.initialise(clr);
                 }
                 noOfInheritedManagedMembers = pcSuperclassMetaData.getNoOfInheritedManagedMembers() + pcSuperclassMetaData.getNoOfManagedMembers();
             }
     
             // Set up the various convenience arrays of field numbers
-            initialiseMemberPositionInformation(mmgr);
+            initialiseMemberPositionInformation();
     
             // Initialise any sub-objects
             if (implementations != null)
             {
                 for (ImplementsMetaData implmd : implementations)
                 {
-                    implmd.initialise(clr, mmgr);
+                    implmd.initialise(clr);
                 }
             }
             if (joins != null)
             {
                 for (JoinMetaData joinmd : joins)
                 {
-                    joinmd.initialise(clr, mmgr);
+                    joinmd.initialise(clr);
                 }
             }
             if (foreignKeys != null)
             {
                 for (ForeignKeyMetaData fkmd : foreignKeys)
                 {
-                    fkmd.initialise(clr, mmgr);
+                    fkmd.initialise(clr);
                 }
             }
             if (indexes != null)
             {
                 for (IndexMetaData idxmd : indexes)
                 {
-                    idxmd.initialise(clr, mmgr);
+                    idxmd.initialise(clr);
                 }
             }
             if (uniqueConstraints != null)
             {
                 for (UniqueMetaData unimd : uniqueConstraints)
                 {
-                    unimd.initialise(clr, mmgr);
+                    unimd.initialise(clr);
                 }
             }
     
@@ -911,7 +904,7 @@ public class ClassMetaData extends AbstractClassMetaData
                 fetchGroupMetaDataByName = new HashMap();
                 for (FetchGroupMetaData fgmd : fetchGroups)
                 {
-                    fgmd.initialise(clr, mmgr);
+                    fgmd.initialise(clr);
                     fetchGroupMetaDataByName.put(fgmd.getName(), fgmd);
                 }
             }
@@ -938,19 +931,19 @@ public class ClassMetaData extends AbstractClassMetaData
     
             if (primaryKeyMetaData != null)
             {
-                primaryKeyMetaData.initialise(clr, mmgr);
+                primaryKeyMetaData.initialise(clr);
             }
             if (versionMetaData != null)
             {
-                versionMetaData.initialise(clr, mmgr);
+                versionMetaData.initialise(clr);
             }
             if (identityMetaData != null)
             {
-                identityMetaData.initialise(clr, mmgr);
+                identityMetaData.initialise(clr);
             }
             if (inheritanceMetaData != null)
             {
-                inheritanceMetaData.initialise(clr, mmgr);
+                inheritanceMetaData.initialise(clr);
             }
 
             if (identityType == IdentityType.APPLICATION)

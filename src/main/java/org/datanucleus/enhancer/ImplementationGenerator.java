@@ -263,7 +263,7 @@ public class ImplementationGenerator
             public Object run()
             {
                 implementationCmd.populate(genclr, null, metaDataMgr);
-                implementationCmd.initialise(genclr, metaDataMgr);
+                implementationCmd.initialise(genclr);
                 return null;
             }
         });

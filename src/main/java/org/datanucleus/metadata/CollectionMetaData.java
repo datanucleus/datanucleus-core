@@ -85,8 +85,7 @@ public class CollectionMetaData extends ContainerMetaData
         }
 
         // Make sure the type in "element" is set
-        element.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), 
-            clr, primary, mmgr);
+        element.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), clr, primary);
 
         // "element-type"
         if (element.type == null)
@@ -200,7 +199,7 @@ public class CollectionMetaData extends ContainerMetaData
         }
 
         // Make sure anything in the superclass is populated too
-        super.populate(clr, primary, mmgr);
+        super.populate();
 
         setPopulated();
     }
@@ -228,10 +227,9 @@ public class CollectionMetaData extends ContainerMetaData
     /**
      * Convenience accessor for the Element ClassMetaData.
      * @param clr ClassLoader resolver (in case we need to initialise it)
-     * @param mmgr MetaData manager
      * @return element ClassMetaData
      */
-    public AbstractClassMetaData getElementClassMetaData(final ClassLoaderResolver clr, final MetaDataManager mmgr)
+    public AbstractClassMetaData getElementClassMetaData(final ClassLoaderResolver clr)
     {
         if (element.classMetaData != null && !element.classMetaData.isInitialised())
         {
@@ -241,7 +239,7 @@ public class CollectionMetaData extends ContainerMetaData
             {
                 public Object run()
                 {
-                    element.classMetaData.initialise(clr, mmgr);
+                    element.classMetaData.initialise(clr);
                     return null;
                 }
             });
@@ -335,14 +333,14 @@ public class CollectionMetaData extends ContainerMetaData
      * @param orderedCmds List of ordered ClassMetaData objects (added to).
      * @param referencedCmds Set of all ClassMetaData objects (added to).
      * @param clr the ClassLoaderResolver
-     * @param mmgr MetaData manager
      */
-    void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final ClassLoaderResolver clr, final MetaDataManager mmgr)
-    { 
+    void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final ClassLoaderResolver clr)
+    {
+        MetaDataManager mmgr = ((AbstractMemberMetaData)getParent()).getAbstractClassMetaData().getMetaDataManager();
         AbstractClassMetaData elementCmd = mmgr.getMetaDataForClass(element.type, clr);
         if (elementCmd != null)
         {
-            elementCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr, mmgr);
+            elementCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
         }
     }
 

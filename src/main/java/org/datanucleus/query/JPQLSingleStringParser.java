@@ -62,7 +62,6 @@ import org.datanucleus.util.NucleusLogger;
  * So the "filter" for the outer query is "NOT EXISTS (SELECT o1 FROM c.orders o1)".
  * Note also that we allow subqueries in {result}, {from}, and {having} clauses as well (vendor extension).
  * If a subquery is contained we extract the subquery and then set it as a variable in the symbol table, and add the subquery separately.
- * </p>
  */
 public class JPQLSingleStringParser
 {

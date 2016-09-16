@@ -63,7 +63,7 @@ public class PackageMetaData extends MetaData
         this.name = name != null ? name : "";
     }
 
-    public void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
+    public void initialise(ClassLoaderResolver clr)
     {
         if (this.catalog == null && ((FileMetaData)parent).getCatalog() != null)
         {
@@ -75,7 +75,7 @@ public class PackageMetaData extends MetaData
             // Nothing specified for this package, but file has a value
             this.schema = ((FileMetaData)parent).getSchema();
         }
-        super.initialise(clr, mmgr);
+        super.initialise(clr);
     }
 
     /**

@@ -54,6 +54,9 @@ public abstract class AbstractClassMetaData extends MetaData
     /** Suffix to add on to the class name for any generated primary key class. */
     public static final String GENERATED_PK_SUFFIX = "_PK";
 
+    /** Manager for this metadata. Set at populate. */
+    protected transient MetaDataManager mmgr;
+
     /** Class name */
     protected final String name;
 
@@ -236,7 +239,7 @@ public abstract class AbstractClassMetaData extends MetaData
     /** Cached result of {@link #pkIsDatastoreAttributed(StoreManager)} */
     protected Boolean pkIsDatastoreAttributed = null;
 
-    /** Cached result of {@link #hasRelations(ClassLoaderResolver, MetaDataManager)} */
+    /** Cached result of {@link #hasRelations(ClassLoaderResolver)} */
     protected Boolean hasRelations = null;
 
     /** Implementation of "persistent-interface" needing table setting from superclass. */
@@ -441,6 +444,11 @@ public abstract class AbstractClassMetaData extends MetaData
         }
     }
 
+    public MetaDataManager getMetaDataManager()
+    {
+        return mmgr;
+    }
+
     public boolean isInstantiable()
     {
         return instantiable;
@@ -519,10 +527,9 @@ public abstract class AbstractClassMetaData extends MetaData
      * Load the persistent interface/class
      * @param clr the ClassLoader
      * @param primary the primary ClassLoader to use (or null)
-     * @param mmgr MetaData manager
      * @return the loaded class
      */
-    protected Class loadClass(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr)
+    protected Class loadClass(ClassLoaderResolver clr, ClassLoader primary)
     {
         // No class loader, so use default
         if (clr == null)
@@ -586,12 +593,11 @@ public abstract class AbstractClassMetaData extends MetaData
      * Determine the nearest superclass that is persistable (if any).
      * @param clr The ClassLoaderResolver
      * @param cls This class
-     * @param mmgr MetaData manager
      * @throws InvalidMetaDataException if the super class cannot be loaded by the <code>clr</code>. 
      * @throws InvalidMetaDataException if the declared <code>persistence-capable-superclass</code> is not actually assignable from <code>cls</code> 
      * @throws InvalidMetaDataException if any of the super classes is persistable, but the MetaData says that class is not persistent. 
      */
-    protected void determineSuperClassName(ClassLoaderResolver clr, Class cls, MetaDataManager mmgr)
+    protected void determineSuperClassName(ClassLoaderResolver clr, Class cls)
     {
         // Find the true superclass name (using reflection)
         String realPcSuperclassName = null;
@@ -925,9 +931,8 @@ public abstract class AbstractClassMetaData extends MetaData
     /**
      * Impose a default inheritance strategy when one is not already specified.
      * Uses the persistence property for defaultInheritanceStrategy and works to the JDO2 spec etc.
-     * @param mmgr MetaData manager
      */
-    protected void determineInheritanceMetaData(MetaDataManager mmgr)
+    protected void determineInheritanceMetaData()
     {
         if (inheritanceMetaData == null)
         {
@@ -1113,7 +1118,7 @@ public abstract class AbstractClassMetaData extends MetaData
         }
     }
 
-    protected void applyDefaultDiscriminatorValueWhenNotSpecified(MetaDataManager mmgr)
+    protected void applyDefaultDiscriminatorValueWhenNotSpecified()
     {
         if (inheritanceMetaData != null && inheritanceMetaData.getStrategy() == InheritanceStrategy.SUPERCLASS_TABLE)
         {
@@ -1262,13 +1267,12 @@ public abstract class AbstractClassMetaData extends MetaData
 
     /**
      * Determine the object id class.
-     * @param mmgr MetaData manager
      * @throws InvalidMetaDataException if the class 0 or more that one primary key field and no <code>objectid-class</code> has been declared in the MetaData
      * @throws InvalidMetaDataException if the <code>objectid-class</code> has not been set and the primary key field does not match a supported SingleFieldIdentity
      * @throws InvalidMetaDataException if the identity type is APPLICATION but not primary key fields have been set
      * @throws InvalidMetaDataException if the <code>objectid-class</code> cannot be loaded by the <code>clr</code>                                                                     
      */
-    protected void determineObjectIdClass(MetaDataManager mmgr)
+    protected void determineObjectIdClass()
     {
         if (identityType != IdentityType.APPLICATION || objectidClass != null)
         {
@@ -1378,9 +1382,8 @@ public abstract class AbstractClassMetaData extends MetaData
     /**
      * Validate the objectid-class of this class.
      * @param clr ClassLoader resolver
-     * @param mmgr MetaData manager
      */
-    protected void validateObjectIdClass(ClassLoaderResolver clr, MetaDataManager mmgr)
+    protected void validateObjectIdClass(ClassLoaderResolver clr)
     {
         if (getPersistableSuperclass() == null)
         {
@@ -1436,19 +1439,9 @@ public abstract class AbstractClassMetaData extends MetaData
     abstract public void populate(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr);
 
     /**
-     * Method to initialise the sub-objects of this class metadata.
-     * If populate() is going to be used it should be used BEFORE calling this method.
-     * Subclasses must overwrite this method and invoke this
-     * @param clr ClassLoader resolver
-     * @param mmgr MetaData manager
-     */
-    public abstract void initialise(ClassLoaderResolver clr, MetaDataManager mmgr);
-
-    /**
      * Method to initialise all convenience information about member positions and what role each position performs.
-     * @param mmgr MetaDataManager
      */
-    protected void initialiseMemberPositionInformation(MetaDataManager mmgr)
+    protected void initialiseMemberPositionInformation()
     {
         memberCount = noOfInheritedManagedMembers + managedMembers.length;
         dfgMemberFlags = new boolean[memberCount];
@@ -1539,12 +1532,11 @@ public abstract class AbstractClassMetaData extends MetaData
      * @param orderedCmds List of ordered ClassMetaData objects (added to).
      * @param referencedCmds Set of all ClassMetaData objects (added to).
      * @param clr the ClassLoaderResolver
-     * @param mmgr MetaData manager
      */
-    void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final ClassLoaderResolver clr, final MetaDataManager mmgr)
+    void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final ClassLoaderResolver clr)
     {
         Map<String, Set<String>> viewReferences = new HashMap<>();
-        getReferencedClassMetaData(orderedCmds, referencedCmds, viewReferences, clr, mmgr);
+        getReferencedClassMetaData(orderedCmds, referencedCmds, viewReferences, clr);
     }
 
     /**
@@ -1553,10 +1545,9 @@ public abstract class AbstractClassMetaData extends MetaData
      * @param referencedCmds Set of all ClassMetaData objects (added to).
      * @param viewReferences Map, mapping class name to set of referenced class for all views.
      * @param clr the ClassLoaderResolver
-     * @param mmgr MetaData manager
      */
     private void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final Map<String, Set<String>> viewReferences, 
-            final ClassLoaderResolver clr, final MetaDataManager mmgr)
+            final ClassLoaderResolver clr)
     {
         // Recursively call getReferencedClassMetaData(...) before adding them to the orderedCmds and referenced. 
         // This will ensure that any classes with dependencies on them are put in the orderedCmds List in the correct order.
@@ -1567,13 +1558,13 @@ public abstract class AbstractClassMetaData extends MetaData
 
             for (int i=0;i<managedMembers.length;i++)
             {
-                managedMembers[i].getReferencedClassMetaData(orderedCmds, referencedCmds, clr, mmgr);
+                managedMembers[i].getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
             }
 
             // Add on any superclass
             if (persistableSuperclass != null)
             {
-                getSuperAbstractClassMetaData().getReferencedClassMetaData(orderedCmds, referencedCmds, clr, mmgr);
+                getSuperAbstractClassMetaData().getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
             }
 
             // Add on any objectid class
@@ -1582,7 +1573,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 AbstractClassMetaData idCmd = mmgr.getMetaDataForClass(objectidClass, clr);
                 if (idCmd != null)
                 {
-                    idCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr, mmgr);
+                    idCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
                 }
             }
 
@@ -1599,7 +1590,7 @@ public abstract class AbstractClassMetaData extends MetaData
                             {
                                 addViewReference(viewReferences, im.className);
                                 AbstractClassMetaData viewCmd = mmgr.getMetaDataForClass(im.className, clr);
-                                viewCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, viewReferences, clr, mmgr);
+                                viewCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, viewReferences, clr);
                             }
                         }
 
@@ -2649,10 +2640,9 @@ public abstract class AbstractClassMetaData extends MetaData
      * Includes all inherited multivalued positions.
      * WARNING : this includes transient fields. DO NOT USE as a way of getting the persistent fields in the class.
      * @param clr ClassLoader resolver
-     * @param mmgr MetaData manager
      * @return The absolute positions
      */
-    public int[] getBasicMemberPositions(ClassLoaderResolver clr, MetaDataManager mmgr)
+    public int[] getBasicMemberPositions(ClassLoaderResolver clr)
     {
         // Do double pass on members - first pass to get number of members, and second to set up array
         // Could do single pass with ArrayList but want primitives and in JDK1.3/4 can't put direct in ArrayList
@@ -2661,7 +2651,7 @@ public abstract class AbstractClassMetaData extends MetaData
         while (iter.hasNext())
         {
             AbstractMemberMetaData mmd = iter.next();
-            if (mmd.getRelationType(clr) == RelationType.NONE && !mmd.isPersistentInterface(clr, mmgr) &&
+            if (mmd.getRelationType(clr) == RelationType.NONE && !mmd.isPersistentInterface(clr) &&
                 !Collection.class.isAssignableFrom(mmd.getType()) &&
                 !Map.class.isAssignableFrom(mmd.getType()) &&
                 !mmd.getType().isArray())
@@ -2672,7 +2662,7 @@ public abstract class AbstractClassMetaData extends MetaData
         int[] inheritedBasicPositions = null;
         if (pcSuperclassMetaData != null)
         {
-            inheritedBasicPositions = pcSuperclassMetaData.getBasicMemberPositions(clr, mmgr);
+            inheritedBasicPositions = pcSuperclassMetaData.getBasicMemberPositions(clr);
         }
 
         int[] basicPositions = new int[numBasics + 
@@ -2690,7 +2680,7 @@ public abstract class AbstractClassMetaData extends MetaData
         while (iter.hasNext())
         {
             AbstractMemberMetaData mmd = iter.next();
-            if (mmd.getRelationType(clr) == RelationType.NONE && !mmd.isPersistentInterface(clr, mmgr) &&
+            if (mmd.getRelationType(clr) == RelationType.NONE && !mmd.isPersistentInterface(clr) &&
                 !Collection.class.isAssignableFrom(mmd.getType()) &&
                 !Map.class.isAssignableFrom(mmd.getType()) &&
                 !mmd.getType().isArray())
@@ -2855,21 +2845,20 @@ public abstract class AbstractClassMetaData extends MetaData
     /**
      * Convenience method to return if the class has relations to other objects. Includes superclasses.
      * @param clr ClassLoader resolver
-     * @param mmgr MetaData manager
      * @return Whether the class has any relations (that it knows about)
      */
-    public boolean hasRelations(ClassLoaderResolver clr, MetaDataManager mmgr)
+    public boolean hasRelations(ClassLoaderResolver clr)
     {
         if (hasRelations == null)
         {
-            hasRelations = getRelationMemberPositions(clr, mmgr).length > 0;
+            hasRelations = getRelationMemberPositions(clr).length > 0;
         }
         return hasRelations.booleanValue();
     }
 
-    public int[] getNonRelationMemberPositions(ClassLoaderResolver clr, MetaDataManager mmgr)
+    public int[] getNonRelationMemberPositions(ClassLoaderResolver clr)
     {
-        int[] relPositions = getRelationMemberPositions(clr, mmgr);
+        int[] relPositions = getRelationMemberPositions(clr);
         if (relPositions == null || relPositions.length == 0)
         {
             return getAllMemberPositions();
@@ -2907,24 +2896,23 @@ public abstract class AbstractClassMetaData extends MetaData
     /**
      * Convenience method to return the absolute positions of all fields/properties that have relations.
      * @param clr ClassLoader resolver
-     * @param mmgr MetaData manager
      * @return The absolute positions of all fields/properties that have relations
      */
-    public int[] getRelationMemberPositions(ClassLoaderResolver clr, MetaDataManager mmgr)
+    public int[] getRelationMemberPositions(ClassLoaderResolver clr)
     {
         if (relationPositions == null)
         {
             int[] superclassRelationPositions = null;
             if (pcSuperclassMetaData != null)
             {
-                superclassRelationPositions = pcSuperclassMetaData.getRelationMemberPositions(clr, mmgr);
+                superclassRelationPositions = pcSuperclassMetaData.getRelationMemberPositions(clr);
             }
 
             int numRelationsSuperclass = superclassRelationPositions != null ? superclassRelationPositions.length : 0;
             int numRelations = numRelationsSuperclass;
             for (int i=0;i<managedMembers.length;i++)
             {
-                if (managedMembers[i].getRelationType(clr) != RelationType.NONE || managedMembers[i].isPersistentInterface(clr, mmgr))
+                if (managedMembers[i].getRelationType(clr) != RelationType.NONE || managedMembers[i].isPersistentInterface(clr))
                 {
                     numRelations++;
                 }
@@ -2943,7 +2931,7 @@ public abstract class AbstractClassMetaData extends MetaData
             {
                 for (int i=0;i<managedMembers.length;i++)
                 {
-                    if (managedMembers[i].getRelationType(clr) != RelationType.NONE || managedMembers[i].isPersistentInterface(clr, mmgr))
+                    if (managedMembers[i].getRelationType(clr) != RelationType.NONE || managedMembers[i].isPersistentInterface(clr))
                     {
                         relationPositions[num++] = managedMembers[i].getAbsoluteFieldNumber();
                     }
@@ -2957,14 +2945,13 @@ public abstract class AbstractClassMetaData extends MetaData
      * Convenience method to return the absolute positions of fields/properties that have bidirectional
      * relations.
      * @param clr ClassLoader resolver
-     * @param mmgr MetaData manager
      * @return Absolute positions of bidirectional relation fields/properties
      */
-    public int[] getBidirectionalRelationMemberPositions(ClassLoaderResolver clr, MetaDataManager mmgr)
+    public int[] getBidirectionalRelationMemberPositions(ClassLoaderResolver clr)
     {
         if (relationPositions == null)
         {
-            getRelationMemberPositions(clr, mmgr);
+            getRelationMemberPositions(clr);
         }
 
         int numBidirs = 0;

@@ -55,13 +55,106 @@ public class InterfaceMetaData extends AbstractClassMetaData
     }
 
     /**
-     * Method to initialise the object, creating internal convenience arrays.
-     * Initialises all sub-objects. If populate() is going to be used it should
-     * be used BEFORE calling this method.
-     * @param clr ClassLoader resolver
-     * @param mmgr MetaData manager
+     * Method to provide the details of the class being represented by this
+     * MetaData. This can be used to firstly provide defaults for attributes
+     * that aren't specified in the MetaData, and secondly to report any errors
+     * with attributes that have been specified that are inconsistent with the
+     * class being represented.
+     * <P>
+     * One possible use of this method would be to take a basic ClassMetaData
+     * for a class and call this, passing in the users class. This would then
+     * add AbstractMemberMetaData for all fields in this class providing defaults for all of these.
+     *
+     * @param clr ClassLoaderResolver to use in loading any classes
+     * @param primary the primary ClassLoader to use (or null)
+     * @param mgr MetaData manager
      */
-    public synchronized void initialise(ClassLoaderResolver clr, MetaDataManager mmgr)
+    public synchronized void populate(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mgr)
+    {
+        if (isInitialised() || isPopulated())
+        {
+            NucleusLogger.METADATA.error(Localiser.msg("044068", name));
+            throw new NucleusException(Localiser.msg("044068", fullName)).setFatal();
+        }
+        if (populating)
+        {
+            return;
+        }
+
+        this.mmgr = mgr;
+        try
+        {
+            if (NucleusLogger.METADATA.isDebugEnabled())
+            {
+                NucleusLogger.METADATA.debug(Localiser.msg("044075", fullName));
+            }
+            populating = true;
+
+            Class cls = loadClass(clr, primary);
+
+            // Load any Annotations definition for this class
+            if (!isMetaDataComplete())
+            {
+                mmgr.addAnnotationsDataToClass(cls, this, clr);
+            }
+
+            // Load any ORM definition for this class
+            mmgr.addORMDataToClass(cls, clr);
+
+            // If a class is an inner class and is non-static it is invalid
+            if (ClassUtils.isInnerClass(fullName) && !Modifier.isStatic(cls.getModifiers()) &&
+                persistenceModifier == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
+            {
+                throw new InvalidClassMetaDataException("044063", fullName);
+            }
+
+            determineSuperClassName(clr, cls);
+
+            inheritIdentity();
+            determineIdentity();
+            validateUserInputForIdentity();
+
+            addMetaDataForMembersNotInMetaData(cls);
+
+            // Set inheritance
+            validateUserInputForInheritanceMetaData(false);
+            determineInheritanceMetaData();
+            applyDefaultDiscriminatorValueWhenNotSpecified();
+
+            if (objectidClass == null)
+            {
+                // No user-defined objectid-class but potentially have SingleFieldIdentity so make sure PK fields are set
+                populatePropertyMetaData(clr, cls, true, primary); // PK fields
+                determineObjectIdClass();
+                populatePropertyMetaData(clr, cls, false, primary); // Non-PK fields
+            }
+            else
+            {
+                populatePropertyMetaData(clr, cls, true, primary);
+                populatePropertyMetaData(clr, cls, false, primary);
+                determineObjectIdClass();
+            }
+
+            setPopulated();
+        }
+        catch (RuntimeException e)
+        {
+            NucleusLogger.METADATA.debug(e);
+            throw e;
+        }
+        finally
+        {
+            populating = false;
+        }
+    }
+
+    /**
+     * Method to initialise the object, creating internal convenience arrays.
+     * Initialises all sub-objects. 
+     * If populate() is going to be used it should be used BEFORE calling this method.
+     * @param clr ClassLoader resolver
+     */
+    public synchronized void initialise(ClassLoaderResolver clr)
     {
         if (initialising || isInitialised())
         {
@@ -79,7 +172,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
                 // We need our superclass to be initialised before us because we rely on information there
                 if (!pcSuperclassMetaData.isInitialised())
                 {
-                    pcSuperclassMetaData.initialise(clr, mmgr);
+                    pcSuperclassMetaData.initialise(clr);
                 }
             }
 
@@ -90,7 +183,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
 
             // Validate the objectid-class
             // This must be in initialise() since can be dependent on other classes being populated
-            validateObjectIdClass(clr, mmgr);
+            validateObjectIdClass(clr);
 
             // Count the fields of the relevant category
             Iterator<AbstractMemberMetaData> fields_iter = members.iterator();
@@ -101,7 +194,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
                 AbstractMemberMetaData fmd = fields_iter.next();
 
                 // Initialise the AbstractMemberMetaData (and its sub-objects)
-                fmd.initialise(clr, mmgr);
+                fmd.initialise(clr);
                 if (fmd.isFieldToBePersisted())
                 {
                     if (fmd.fieldBelongsToClass())
@@ -147,40 +240,40 @@ public class InterfaceMetaData extends AbstractClassMetaData
             {
                 if (!pcSuperclassMetaData.isInitialised())
                 {
-                    pcSuperclassMetaData.initialise(clr, mmgr);
+                    pcSuperclassMetaData.initialise(clr);
                 }
                 noOfInheritedManagedMembers = pcSuperclassMetaData.getNoOfInheritedManagedMembers() + pcSuperclassMetaData.getNoOfManagedMembers();
             }
 
             // Set up the various convenience arrays of field numbers
-            initialiseMemberPositionInformation(mmgr);
+            initialiseMemberPositionInformation();
 
             if (joins != null)
             {
                 for (JoinMetaData joinmd : joins)
                 {
-                    joinmd.initialise(clr, mmgr);
+                    joinmd.initialise(clr);
                 }
             }
             if (foreignKeys != null)
             {
                 for (ForeignKeyMetaData fkmd : foreignKeys)
                 {
-                    fkmd.initialise(clr, mmgr);
+                    fkmd.initialise(clr);
                 }
             }
             if (indexes != null)
             {
                 for (IndexMetaData idxmd : indexes)
                 {
-                    idxmd.initialise(clr, mmgr);
+                    idxmd.initialise(clr);
                 }
             }
             if (uniqueConstraints != null)
             {
                 for (UniqueMetaData unimd : uniqueConstraints)
                 {
-                    unimd.initialise(clr, mmgr);
+                    unimd.initialise(clr);
                 }
             }
 
@@ -189,7 +282,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
                 fetchGroupMetaDataByName = new HashMap();
                 for (FetchGroupMetaData fgmd : fetchGroups)
                 {
-                    fgmd.initialise(clr, mmgr);
+                    fgmd.initialise(clr);
                     fetchGroupMetaDataByName.put(fgmd.getName(), fgmd);
                 }
             }
@@ -214,15 +307,15 @@ public class InterfaceMetaData extends AbstractClassMetaData
 
             if (versionMetaData != null)
             {
-                versionMetaData.initialise(clr, mmgr);
+                versionMetaData.initialise(clr);
             }
             if (identityMetaData != null)
             {
-                identityMetaData.initialise(clr, mmgr);
+                identityMetaData.initialise(clr);
             }
             if (inheritanceMetaData != null)
             {
-                inheritanceMetaData.initialise(clr, mmgr);
+                inheritanceMetaData.initialise(clr);
             }
 
             if (identityType == IdentityType.APPLICATION)
@@ -241,100 +334,6 @@ public class InterfaceMetaData extends AbstractClassMetaData
     }
 
     /**
-     * Method to provide the details of the class being represented by this
-     * MetaData. This can be used to firstly provide defaults for attributes
-     * that aren't specified in the MetaData, and secondly to report any errors
-     * with attributes that have been specified that are inconsistent with the
-     * class being represented.
-     * <P>
-     * One possible use of this method would be to take a basic ClassMetaData
-     * for a class and call this, passing in the users class. This would then
-     * add AbstractMemberMetaData for all fields in this class providing defaults for
-     * all of these.
-     *
-     * @param clr ClassLoaderResolver to use in loading any classes
-     * @param primary the primary ClassLoader to use (or null)
-     * @param mmgr MetaData manager
-     */
-    public synchronized void populate(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr)
-    {
-        if (isInitialised() || isPopulated())
-        {
-            NucleusLogger.METADATA.error(Localiser.msg("044068", name));
-            throw new NucleusException(Localiser.msg("044068", fullName)).setFatal();
-        }
-        if (populating)
-        {
-            return;
-        }
-
-        try
-        {
-            if (NucleusLogger.METADATA.isDebugEnabled())
-            {
-                NucleusLogger.METADATA.debug(Localiser.msg("044075", fullName));
-            }
-            populating = true;
-
-            Class cls = loadClass(clr, primary, mmgr);
-
-            // Load any Annotations definition for this class
-            if (!isMetaDataComplete())
-            {
-                mmgr.addAnnotationsDataToClass(cls, this, clr);
-            }
-
-            // Load any ORM definition for this class
-            mmgr.addORMDataToClass(cls, clr);
-
-            // If a class is an inner class and is non-static it is invalid
-            if (ClassUtils.isInnerClass(fullName) && !Modifier.isStatic(cls.getModifiers()) &&
-                persistenceModifier == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
-            {
-                throw new InvalidClassMetaDataException("044063", fullName);
-            }
-
-            determineSuperClassName(clr, cls, mmgr);
-
-            inheritIdentity();
-            determineIdentity();
-            validateUserInputForIdentity();
-
-            addMetaDataForMembersNotInMetaData(cls);
-
-            // Set inheritance
-            validateUserInputForInheritanceMetaData(false);
-            determineInheritanceMetaData(mmgr);
-            applyDefaultDiscriminatorValueWhenNotSpecified(mmgr);
-
-            if (objectidClass == null)
-            {
-                // No user-defined objectid-class but potentially have SingleFieldIdentity so make sure PK fields are set
-                populatePropertyMetaData(clr, cls, true, primary, mmgr); // PK fields
-                determineObjectIdClass(mmgr);
-                populatePropertyMetaData(clr, cls, false, primary, mmgr); // Non-PK fields
-            }
-            else
-            {
-                populatePropertyMetaData(clr, cls, true, primary, mmgr);
-                populatePropertyMetaData(clr, cls, false, primary, mmgr);
-                determineObjectIdClass(mmgr);
-            }
-
-            setPopulated();
-        }
-        catch (RuntimeException e)
-        {
-            NucleusLogger.METADATA.debug(e);
-            throw e;
-        }
-        finally
-        {
-            populating = false;
-        }
-    }
-   
-    /**
      * Utility to add a defaulted PropertyMetaData to the class. 
      * Provided as a method since then any derived classes can override it.
      * @param name name of field
@@ -351,11 +350,10 @@ public class InterfaceMetaData extends AbstractClassMetaData
      * @param cls This class
      * @param pkFields Process pk fields (or non-PK fields if false)
      * @param primary the primary ClassLoader to use (or null)
-     * @param mmgr MetaData manager
      * @throws InvalidMetaDataException if the Class for a declared type in a field cannot be loaded by the <code>clr</code>
      * @throws InvalidMetaDataException if a field declared in the MetaData does not exist in the Class
      */
-    protected void populatePropertyMetaData(ClassLoaderResolver clr, Class cls, boolean pkFields, ClassLoader primary, MetaDataManager mmgr)
+    protected void populatePropertyMetaData(ClassLoaderResolver clr, Class cls, boolean pkFields, ClassLoader primary)
     {
         Collections.sort(members);
 
