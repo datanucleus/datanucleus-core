@@ -364,48 +364,4 @@ public class ArrayMetaData extends ContainerMetaData
             elementCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
         }
     }
-
-    /**
-     * Returns a string representation of the object.
-     * @param prefix The prefix string 
-     * @param indent The indent string 
-     * @return a string representation of the object.
-     */
-    public String toString(String prefix,String indent)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix).append("<array");
-        if (element.type != null)
-        {
-            sb.append(" element-type=\"").append(element.type).append("\"");
-        }
-        if (element.embedded != null)
-        {
-            sb.append(" embedded-element=\"").append(element.embedded).append("\"");
-        }
-        if (element.serialized != null)
-        {
-            sb.append(" serialized-element=\"").append(element.serialized).append("\"");
-        }
-        if (element.dependent != null)
-        {
-            sb.append(" dependent-element=\"").append(element.dependent).append("\"");
-        }
-        
-        if (getNoOfExtensions() > 0)
-        {
-            sb.append(">\n");
-
-            // Add extensions
-            sb.append(super.toString(prefix + indent,indent));
-
-            sb.append(prefix).append("</array>\n");
-        }
-        else
-        {
-            sb.append(prefix).append("/>\n");
-        }
-
-        return sb.toString();
-    }
 }

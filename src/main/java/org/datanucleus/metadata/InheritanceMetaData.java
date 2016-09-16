@@ -139,37 +139,4 @@ public class InheritanceMetaData extends MetaData
         setDiscriminatorMetaData(dismd);
         return dismd;
     }
-
-    // ----------------------------- Utilities ---------------------------------
-
-    /**
-     * Returns a string representation of the object using a prefix
-     * @param prefix prefix string
-     * @param indent indent string
-     * @return a string representation of the object.
-     */
-    public String toString(String prefix,String indent)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix).append("<inheritance strategy=\"" + strategy + "\">\n");
-
-        // Add join
-        if (joinMetaData != null)
-        {
-            sb.append(joinMetaData.toString(prefix + indent,indent));
-        }
-
-        // Add discriminator
-        if (discriminatorMetaData != null)
-        {
-            sb.append(discriminatorMetaData.toString(prefix + indent,indent));
-        }
-
-        // Add extensions
-        sb.append(super.toString(prefix + indent,indent));
-
-        sb.append(prefix).append("</inheritance>\n");
-
-        return sb.toString();
-    }
 }

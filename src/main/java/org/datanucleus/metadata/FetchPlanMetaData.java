@@ -18,7 +18,6 @@ Contributors:
 package org.datanucleus.metadata;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.datanucleus.util.StringUtils;
@@ -150,33 +149,5 @@ public class FetchPlanMetaData extends MetaData
         FetchGroupMetaData fgmd = new FetchGroupMetaData(name);
         addFetchGroup(fgmd);
         return fgmd;
-    }
-
-    // ----------------------------- Utilities ------------------------------------
-
-    /**
-     * Returns a string representation of the object.
-     * This can be used as part of a facility to output a MetaData file. 
-     * @param prefix prefix string
-     * @param indent indent string
-     * @return a string representation of the object.
-     */
-    public String toString(String prefix, String indent)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix).append("<fetch-plan name=\"" + name + "\"" + 
-            " max-fetch-depth=\"" + maxFetchDepth + "\"" +
-            " fetch-size=\"" + fetchSize + "\">\n");
-
-        // Add fetch-groups
-        Iterator iter = fetchGroups.iterator();
-        while (iter.hasNext())
-        {
-            FetchGroupMetaData fgmd = (FetchGroupMetaData)iter.next();
-            sb.append(fgmd.toString(prefix + indent, indent));
-        }
-
-        sb.append(prefix + "</fetch-plan>\n");
-        return sb.toString();
     }
 }

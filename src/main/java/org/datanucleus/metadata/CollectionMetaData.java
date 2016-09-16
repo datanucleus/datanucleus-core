@@ -343,39 +343,4 @@ public class CollectionMetaData extends ContainerMetaData
             elementCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
         }
     }
-
-    /**
-     * Returns a string representation of the object.
-     * @param prefix prefix string
-     * @param indent indent string
-     * @return a string representation of the object.
-     */
-    public String toString(String prefix,String indent)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix).append("<collection element-type=\"").append(element.type).append("\"");
-        if (element.embedded != null)
-        {
-            sb.append(" embedded-element=\"").append(element.embedded).append("\"");
-        }
-        if (element.dependent != null)
-        {
-            sb.append(" dependent-element=\"").append(element.dependent).append("\"");
-        }
-        if (element.serialized != null)
-        {
-            sb.append(" serialized-element=\"").append(element.serialized).append("\"");
-        }
-        if (singleElement)
-        {
-            sb.append(" single-element=\"").append(singleElement).append("\"");
-        }
-        sb.append(">\n");
-
-        // Add extensions
-        sb.append(super.toString(prefix + indent,indent)); 
- 
-        sb.append(prefix).append("</collection>\n");
-        return sb.toString();
-    }
 }

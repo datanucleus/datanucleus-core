@@ -225,45 +225,4 @@ public class VersionMetaData extends MetaData
         this.fieldName = fieldName;
         return this;
     }
-
-    // ------------------------------ Utilities --------------------------------
-
-    /**
-     * Returns a string representation of the object using a prefix
-     * This can be used as part of a facility to output a MetaData file. 
-     * @param prefix prefix string
-     * @param indent indent string
-     * @return a string representation of the object.
-     */
-    public String toString(String prefix,String indent)
-    {
-        // Field needs outputting so generate metadata
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix).append("<version " + 
-            (versionStrategy!=null ? ("strategy=\"" + versionStrategy.toString() + "\"") : "") +
-            (indexed != null ? (" indexed=\"" + indexed.toString() + "\"") : ""));
-        if (columnName != null && columnMetaData == null)
-        {
-            sb.append(" column=\"" + columnName + "\"");
-        }
-        sb.append(">\n");
-
-        // Column MetaData
-        if (columnMetaData != null)
-        {
-            sb.append(columnMetaData.toString(prefix + indent,indent));
-        }
-
-        // Add index
-        if (indexMetaData != null)
-        {
-            sb.append(indexMetaData.toString(prefix + indent,indent));
-        }
-
-        // Add extensions
-        sb.append(super.toString(prefix + indent,indent));
-
-        sb.append(prefix).append("</version>\n");
-        return sb.toString();
-    }
 }

@@ -199,22 +199,4 @@ public class TableGeneratorMetaData extends MetaData
         }
         return this;
     }
-
-    /**
-     * Returns a string representation of the object.
-     * @param prefix prefix string
-     * @param indent indent string
-     * @return a string representation of the object.
-     */
-    public String toString(String prefix, String indent)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix).append("<table-generator name=\"" + name + "\"\n");
-
-        // Add extensions
-        sb.append(super.toString(prefix + indent,indent));
-
-        sb.append(prefix + "</table-generator>\n");
-        return sb.toString();
-    }
 }

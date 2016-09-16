@@ -160,43 +160,4 @@ public class SequenceMetaData extends MetaData
         }
         return this;
     }
-
-    /**
-     * Returns a string representation of the object.
-     * @param prefix prefix string
-     * @param indent indent string
-     * @return a string representation of the object.
-     */
-    public String toString(String prefix, String indent)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix).append("<sequence name=\"" + name + "\"");
-        if (datastoreSequence != null)
-        {
-            sb.append(" datastore-sequence=\"" + datastoreSequence + "\"");
-        }
-        if (factoryClass != null)
-        {
-            sb.append(" factory-class=\"" + factoryClass + "\"");
-        }
-        if (initialValue >= 0)
-        {
-            sb.append(" initial-value=\"" + initialValue + "\"");
-        }
-        if (allocationSize >= 0)
-        {
-            sb.append(" allocation-size=\"" + allocationSize + "\"");
-        }
-        if (strategy != null)
-        {
-            sb.append(" strategy=\"" + strategy.toString() + "\">");
-        }
-        sb.append(">\n");
-
-        // Add extensions
-        sb.append(super.toString(prefix + indent,indent));
-
-        sb.append(prefix + "</sequence>\n");
-        return sb.toString();
-    }
 }

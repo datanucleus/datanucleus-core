@@ -180,37 +180,4 @@ public class QueryMetaData extends MetaData
         this.fetchPlanName = StringUtils.isWhitespace(fpName) ? null : fpName;
         return this;
     }
-
-    /**
-     * Returns a string representation of the object.
-     * @param prefix prefix string
-     * @param indent indent string
-     * @return a string representation of the object.
-     */
-    public String toString(String prefix,String indent)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix).append("<query name=\"" + name + "\"\n");
-        sb.append(prefix).append("       language=\"" + language + "\"\n");
-        if (unique)
-        {
-            sb.append(prefix).append("       unique=\"true\"\n");
-        }
-        if (resultClass != null)
-        {
-            sb.append(prefix).append("       result-class=\"" + resultClass + "\"\n");
-        }
-        if (fetchPlanName != null)
-        {
-            sb.append(prefix).append("       fetch-plan=\"" + fetchPlanName + "\"\n");
-        }
-        sb.append(prefix).append("       unmodifiable=\"" + unmodifiable + "\">\n");
-        sb.append(prefix).append(query).append("\n");
-
-        // Add extensions
-        sb.append(super.toString(prefix + indent,indent));
-
-        sb.append(prefix + "</query>\n");
-        return sb.toString();
-    }
 }

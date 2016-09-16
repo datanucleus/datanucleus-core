@@ -3095,18 +3095,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         return true;
     }
 
-    /**
-     * Returns a string representation of the object using a prefix
-     * This can be used as part of a facility to output a MetaData file. 
-     * @param prefix prefix string
-     * @param indent indent string
-     * @return a string representation of the object.
-     */
-    public String toString(String prefix, String indent)
-    {
-        return super.toString(prefix, indent);
-    }
-
     // TODO Enable these and fix compareTo() to do the equivalent
     /*public boolean equals(Object o)
     {

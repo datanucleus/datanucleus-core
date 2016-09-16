@@ -77,13 +77,4 @@ public class ExtensionMetaData implements Serializable
     {
         return vendorName;
     }
-
-    /**
-     * Returns a string representation of the object.
-     * @return a string representation of the object.
-     */
-    public String toString()
-    {
-        return "<extension vendor-name=\"" + vendorName + "\" key=\"" + key + "\" value=\"" + value + "\"/>";
-    }
 }

@@ -384,38 +384,4 @@ public class MetaData implements Serializable
         }
         return null;
     }
-
-    // -------------------------------- Utilities ------------------------------
- 
-    /**
-     * Accessor for a string representation of the object.
-     * @return a string representation of the object.
-     */
-    public String toString()
-    {
-        return toString("","");
-    }
-
-    /**
-     * Returns a string representation of the object.
-     * @param prefix prefix string
-     * @param indent indent string
-     * @return a string representation of the object.
-     */
-    public String toString(String prefix, String indent)
-    {
-        if (extensions == null || extensions.isEmpty())
-        {
-            return "";
-        }
-
-        StringBuilder sb = new StringBuilder();
-        Iterator iter = extensions.iterator();
-        while (iter.hasNext())
-        {
-            ExtensionMetaData ex = (ExtensionMetaData)iter.next();
-            sb.append(prefix).append(ex.toString()).append("\n");
-        }
-        return sb.toString();
-    }
 }

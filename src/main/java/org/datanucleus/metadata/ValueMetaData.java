@@ -23,7 +23,6 @@ package org.datanucleus.metadata;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusFatalUserException;
-import org.datanucleus.util.StringUtils;
 
 /**
  * This element specifies the mapping for the value component of maps.
@@ -99,73 +98,5 @@ public class ValueMetaData extends AbstractElementMetaData
         }
 
         super.populate(clr, primary, mmgr);
-    }
-
-    // ------------------------------- Utilities -------------------------------
-
-    /**
-     * Returns a string representation of the object using a prefix
-     * This can be used as part of a facility to output a MetaData file. 
-     * @param prefix prefix string
-     * @param indent indent string
-     * @return a string representation of the object.
-     */
-    public String toString(String prefix, String indent)
-    {
-        // Field needs outputting so generate metadata
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix).append("<value");
-        if (mappedBy != null)
-        {
-            sb.append(" mapped-by=\"" + mappedBy + "\"");
-        }
-        if (!StringUtils.isWhitespace(table))
-        {
-            sb.append(" table=\"" + table + "\"");
-        }
-        if (!StringUtils.isWhitespace(columnName))
-        {
-            sb.append(" column=\"" + columnName + "\"");
-        }
-        sb.append(">\n");
-
-        // Add columns
-        if (columns != null)
-        {
-            for (ColumnMetaData colmd : columns)
-            {
-                sb.append(colmd.toString(prefix + indent,indent));
-            }
-        }
-
-        // Add index metadata
-        if (indexMetaData != null)
-        {
-            sb.append(indexMetaData.toString(prefix + indent,indent));
-        }
-
-        // Add unique metadata
-        if (uniqueMetaData != null)
-        {
-            sb.append(uniqueMetaData.toString(prefix + indent,indent));
-        }
-
-        // Add embedded metadata
-        if (embeddedMetaData != null)
-        {
-            sb.append(embeddedMetaData.toString(prefix + indent,indent));
-        }
-
-        // Add foreign-key metadata
-        if (foreignKeyMetaData != null)
-        {
-            sb.append(foreignKeyMetaData.toString(prefix + indent,indent));
-        }
-
-        // Add extensions
-        sb.append(super.toString(prefix + indent,indent));
-
-        sb.append(prefix).append("</value>\n");
-        return sb.toString();
     }
 }

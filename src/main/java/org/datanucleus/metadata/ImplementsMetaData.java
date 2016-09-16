@@ -108,32 +108,4 @@ public class ImplementsMetaData extends MetaData
         properties.add(pmd);
         pmd.parent = this;
     }
-    
-    // ------------------------------ Utilities --------------------------------
-
-    /**
-     * Returns a string representation of the object.
-     * This can be used as part of a facility to output a MetaData file. 
-     * @param prefix prefix string
-     * @param indent indent string
-     * @return a string representation of the object.
-     */
-    public String toString(String prefix,String indent)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix).append("<implements name=\"" + name + "\">\n");
-
-        // Add properties
-        for (int i=0;i<properties.size();i++)
-        {
-            PropertyMetaData pmd = properties.get(i);
-            sb.append(pmd.toString(prefix + indent, indent));
-        }
-
-        // Add extensions
-        sb.append(super.toString(prefix + indent, indent)); 
-
-        sb.append(prefix + "</implements>\n");
-        return sb.toString();
-    }
 }

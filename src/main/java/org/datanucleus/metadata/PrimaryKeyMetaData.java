@@ -119,37 +119,4 @@ public class PrimaryKeyMetaData extends MetaData implements ColumnMetaDataContai
         }
         return columns.toArray(new ColumnMetaData[columns.size()]);
     }
-
-    //  ----------------------------- Utilities ---------------------------------
-
-    /**
-     * Returns a string representation of the object using a prefix
-     * @param prefix prefix string
-     * @param indent indent string
-     * @return a string representation of the object.
-     */
-    public String toString(String prefix,String indent)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix).append("<primary-key" + 
-            (name != null ? (" name=\"" + name + "\"") : "") +
-            (columnName != null ? (" column=\"" + columnName + "\"") : "") +
-            ">\n");
-
-        // Add columns
-        if (columns != null)
-        {
-            for (ColumnMetaData colmd : columns)
-            {
-                sb.append(colmd.toString(prefix + indent,indent));
-            }
-        }
-
-        // Add extensions
-        sb.append(super.toString(prefix + indent,indent));
-
-        sb.append(prefix).append("</primary-key>\n");
-
-        return sb.toString();
-    }
 }

@@ -144,40 +144,4 @@ public class FetchGroupMetaData extends MetaData
         addMember(fgmmd);
         return fgmmd;
     }
-
-    // ----------------------------- Utilities ------------------------------------
-
-    /**
-     * Returns a string representation of the object.
-     * This can be used as part of a facility to output a MetaData file. 
-     * @param prefix prefix string
-     * @param indent indent string
-     * @return a string representation of the object.
-     */
-    public String toString(String prefix, String indent)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix).append("<fetch-group name=\"" + name + "\">\n");
-
-        // Add fetch-groups
-        if (fetchGroups != null)
-        {
-            for (FetchGroupMetaData fgmd : fetchGroups)
-            {
-                sb.append(fgmd.toString(prefix + indent, indent));
-            }
-        }
-
-        // Add fields
-        if (members != null)
-        {
-            for (FetchGroupMemberMetaData fgmmd : members)
-            {
-                sb.append(fgmmd.toString(prefix + indent, indent));
-            }
-        }
-
-        sb.append(prefix + "</fetch-group>\n");
-        return sb.toString();
-    }
 }

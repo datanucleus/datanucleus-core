@@ -637,47 +637,4 @@ public class MapMetaData extends ContainerMetaData
             valueCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
         }
     }
-
-    /**
-     * Returns a string representation of the object.
-     * @param prefix prefix string
-     * @param indent indent string
-     * @return a string representation of the object.
-     */
-    public String toString(String prefix,String indent)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix).append("<map key-type=\"").append(key.type).append("\" value-type=\"").append(value.type).append("\"");
-        if (key.embedded != null)
-        {
-            sb.append(" embedded-key=\"").append(key.embedded).append("\"");
-        }
-        if (value.embedded != null)
-        {
-            sb.append(" embedded-value=\"").append(value.embedded).append("\"");
-        }
-        if (key.dependent != null)
-        {
-            sb.append(" dependent-key=\"").append(key.dependent).append("\"");
-        }
-        if (value.dependent != null)
-        {
-            sb.append(" dependent-value=\"").append(value.dependent).append("\"");
-        }
-        if (key.serialized != null)
-        {
-            sb.append(" serialized-key=\"").append(key.serialized).append("\"");
-        }
-        if (value.serialized != null)
-        {
-            sb.append(" serialized-value=\"").append(value.serialized).append("\"");
-        }
-        sb.append(">\n");
-
-        // Add extensions
-        sb.append(super.toString(prefix + indent,indent));
-
-        sb.append(prefix).append("</map>\n");
-        return sb.toString();
-    }
 }

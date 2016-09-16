@@ -76,27 +76,4 @@ public class FetchGroupMemberMetaData extends MetaData
             }
         }
     }
-
-    public String toString(String prefix, String indent)
-    {
-        StringBuilder sb = new StringBuilder();
-        if (isProperty)
-        {
-            sb.append(prefix).append("<property ");
-        }
-        else
-        {
-            sb.append(prefix).append("<field ");
-        }
-
-        if (recursionDepth != 1)
-        {
-            sb.append("name=\"" + name + "\" recursion-depth=\"" + recursionDepth + "\"/>\n");
-        }
-        else
-        {
-            sb.append("name=\"" + name + "\"/>\n");
-        }
-        return sb.toString();
-    }
 }

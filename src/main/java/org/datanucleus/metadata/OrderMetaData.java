@@ -140,6 +140,11 @@ public class OrderMetaData extends MetaData implements ColumnMetaDataContainer
         return this;
     }
 
+    public IndexedValue getIndexed()
+    {
+        return indexed;
+    }
+
     public final OrderMetaData setIndexMetaData(IndexMetaData indexMetaData)
     {
         this.indexMetaData = indexMetaData;
@@ -322,57 +327,6 @@ public class OrderMetaData extends MetaData implements ColumnMetaDataContainer
             this.fieldOrders = theOrders;
         }
         return fieldOrders;
-    }
-
-    // ------------------------------ Utilities --------------------------------
-
-    /**
-     * Returns a string representation of the object using a prefix
-     * This can be used as part of a facility to output a MetaData file. 
-     * @param prefix prefix string
-     * @param indent indent string
-     * @return a string representation of the object.
-     */
-    public String toString(String prefix,String indent)
-    {
-        // Field needs outputting so generate metadata
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix).append("<order");
-        if (columnName != null)
-        {
-            sb.append(" column=\"" + columnName + "\"");
-        }
-        if (indexed != null)
-        {
-            sb.append(" indexed=\"" + indexed.toString() + "\"");
-        }
-        if (mappedBy != null)
-        {
-            sb.append(" mapped-by=\"" + mappedBy + "\"");
-        }
-        sb.append(">\n");
-
-        // Add columns
-        if (columns != null)
-        {
-            for (int i=0; i<columns.size(); i++)
-            {
-                ColumnMetaData c = columns.get(i);
-                sb.append(c.toString(prefix + indent,indent));
-            }
-        }
-
-        // Add index
-        if (indexMetaData != null)
-        {
-            sb.append(indexMetaData.toString(prefix + indent,indent));
-        }
-
-        // Add extensions
-        sb.append(super.toString(prefix + indent,indent));
-
-        sb.append(prefix).append("</order>\n");
-        return sb.toString();
     }
 
     /**
