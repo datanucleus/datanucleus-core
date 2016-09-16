@@ -109,6 +109,15 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
     {
     }
 
+    public MetaDataManager getMetaDataManager()
+    {
+        if (parent instanceof AbstractMemberMetaData)
+        {
+            return ((AbstractMemberMetaData)parent).getMetaDataManager();
+        }
+        return null;
+    }
+
     /**
      * Populate the metadata.
      * @param clr the ClassLoaderResolver
