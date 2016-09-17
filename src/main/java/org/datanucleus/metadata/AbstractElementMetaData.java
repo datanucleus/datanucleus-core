@@ -122,12 +122,12 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
      * Populate the metadata.
      * @param clr the ClassLoaderResolver
      * @param primary the primary ClassLoader to use (or null)
-     * @param mmgr MetaData manager
      */
-    public void populate(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr)
+    public void populate(ClassLoaderResolver clr, ClassLoader primary)
     {
         if (embeddedMetaData != null)
         {
+            MetaDataManager mmgr = ((AbstractMemberMetaData)parent).getMetaDataManager();
             embeddedMetaData.populate(clr, primary, mmgr);
         }
     }

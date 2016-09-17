@@ -66,7 +66,7 @@ public class ArrayHandler extends ElementContainerHandler<Object, ArrayAdapter<O
         
         if (mmd.getElementMetaData() != null)
         {
-            mmd.getElementMetaData().populate(clr, primary, mmgr);
+            mmd.getElementMetaData().populate(clr, primary);
         }
         
         if (mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
@@ -77,7 +77,7 @@ public class ArrayHandler extends ElementContainerHandler<Object, ArrayAdapter<O
                 arrayMetadata.setDependentElement(true);
             }
             
-            arrayMetadata.populate(clr, primary, mmgr);
+            arrayMetadata.populate(clr, primary);
         }
     }
 

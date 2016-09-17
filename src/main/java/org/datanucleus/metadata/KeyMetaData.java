@@ -52,9 +52,8 @@ public class KeyMetaData extends AbstractElementMetaData
      * Populate the MetaData.
      * @param clr Class loader to use
      * @param primary the primary ClassLoader to use (or null)
-     * @param mmgr MetaData manager
      */
-    public void populate(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr)
+    public void populate(ClassLoaderResolver clr, ClassLoader primary)
     {
         AbstractMemberMetaData fmd = (AbstractMemberMetaData)parent;
         if (fmd.getMap() == null)
@@ -95,6 +94,6 @@ public class KeyMetaData extends AbstractElementMetaData
             embeddedMetaData.parent = this;
         }        
 
-        super.populate(clr, primary, mmgr);
+        super.populate(clr, primary);
     }
 }

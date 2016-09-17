@@ -18,8 +18,9 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.state;
 
+import java.util.Map;
+
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.metadata.ExtensionMetaData;
 
 /**
  * Interface providing value generation based on an input (persistable) object.
@@ -35,5 +36,5 @@ public interface ObjectValueGenerator
      * @param extensions Extensions on the field being generated
      * @return The value
      */
-    Object generate(ExecutionContext ec, Object obj, ExtensionMetaData[] extensions);
+    Object generate(ExecutionContext ec, Object obj, Map<String, String> extensions);
 }

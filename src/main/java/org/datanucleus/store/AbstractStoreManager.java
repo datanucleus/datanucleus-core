@@ -47,7 +47,6 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.ClassPersistenceModifier;
-import org.datanucleus.metadata.ExtensionMetaData;
 import org.datanucleus.metadata.IdentityMetaData;
 import org.datanucleus.metadata.IdentityStrategy;
 import org.datanucleus.metadata.IdentityType;
@@ -1455,7 +1454,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         AbstractMemberMetaData mmd = null;
         IdentityStrategy strategy = null;
         String sequence = null;
-        ExtensionMetaData[] extensions = null;
+        Map<String, String> extensions = null;
         if (absoluteFieldNumber >= 0)
         {
             // real field
@@ -1488,10 +1487,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         // Add any extension properties
         if (extensions != null)
         {
-            for (int i=0;i<extensions.length;i++)
-            {
-                properties.put(extensions[i].getKey(), extensions[i].getValue());
-            }
+            properties.putAll(extensions);
         }
 
         if (strategy.equals(IdentityStrategy.NATIVE))
@@ -1561,13 +1557,10 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 properties.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, "" + seqmd.getDatastoreSequence());
 
                 // Add on any extensions specified on the sequence
-                ExtensionMetaData[] seqExtensions = seqmd.getExtensions();
+                Map<String, String> seqExtensions = seqmd.getExtensions();
                 if (seqExtensions != null)
                 {
-                    for (int i=0;i<seqExtensions.length;i++)
-                    {
-                        properties.put(seqExtensions[i].getKey(), seqExtensions[i].getValue());
-                    }
+                    properties.putAll(seqExtensions);
                 }
             }
             else

@@ -768,7 +768,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                     }
                 }
             }
-            addExtension(VENDOR_NAME, "implementation-classes", str.toString()); // Replace with this new value
+            addExtension("implementation-classes", str.toString()); // Replace with this new value
         }
 
         // Set up persistence flags for enhancement process
@@ -939,7 +939,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                     {
                         elementMetaData = new ElementMetaData();
                         elementMetaData.parent = this;
-                        elementMetaData.populate(clr, null, mmgr);
+                        elementMetaData.populate(clr, null);
                     }
                     if (elementMetaData.getEmbeddedMetaData() == null)
                     {
@@ -961,7 +961,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                     {
                         keyMetaData = new KeyMetaData();
                         keyMetaData.parent = this;
-                        keyMetaData.populate(clr, null, mmgr);
+                        keyMetaData.populate(clr, null);
                     }
                     if (keyMetaData.getEmbeddedMetaData() == null)
                     {
@@ -979,7 +979,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                     {
                         valueMetaData = new ValueMetaData();
                         valueMetaData.parent = this;
-                        valueMetaData.populate(clr, null, mmgr);
+                        valueMetaData.populate(clr, null);
                     }
                     if (valueMetaData.getEmbeddedMetaData() == null)
                     {

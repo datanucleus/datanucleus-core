@@ -91,9 +91,8 @@ public class MapMetaData extends ContainerMetaData
      * Method to populate any defaults, and check the validity of the MetaData.
      * @param clr ClassLoaderResolver to use for loading any key/value types 
      * @param primary the primary ClassLoader to use (or null)
-     * @param mmgr MetaData manager
      */
-    public void populate(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr)
+    public void populate(ClassLoaderResolver clr, ClassLoader primary)
     {
         AbstractMemberMetaData mmd = (AbstractMemberMetaData)parent;
         if (!StringUtils.isWhitespace(key.type) && key.type.indexOf(',') > 0)
@@ -104,6 +103,7 @@ public class MapMetaData extends ContainerMetaData
         {
             throw new InvalidMemberMetaDataException("044144", mmd.getClassName(), mmd.getName());
         }
+        MetaDataManager mmgr = mmd.getMetaDataManager();
 
         // Make sure the type in "key", "value" is set
         key.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), clr, primary);
@@ -231,7 +231,7 @@ public class MapMetaData extends ContainerMetaData
                     }
                 }
             }
-            addExtension(VENDOR_NAME, "key-implementation-classes", str.toString()); // Replace with this new value
+            addExtension("key-implementation-classes", str.toString()); // Replace with this new value
         }
 
         // "value-type"
@@ -336,7 +336,7 @@ public class MapMetaData extends ContainerMetaData
                     }
                 }
             }
-            addExtension(VENDOR_NAME, "value-implementation-classes", str.toString()); // Replace with this new value
+            addExtension("value-implementation-classes", str.toString()); // Replace with this new value
         }
 
         key.classMetaData = mmgr.getMetaDataForClassInternal(keyTypeClass, clr);

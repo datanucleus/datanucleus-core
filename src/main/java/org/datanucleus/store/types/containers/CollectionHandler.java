@@ -76,7 +76,7 @@ public abstract class CollectionHandler<C extends Object> extends ElementContain
 
         if (mmd.getElementMetaData() != null)
         {
-            mmd.getElementMetaData().populate(clr, primary, mmgr);
+            mmd.getElementMetaData().populate(clr, primary);
         }
 
         if (mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
@@ -87,7 +87,7 @@ public abstract class CollectionHandler<C extends Object> extends ElementContain
                 collectionMetadata.setDependentElement(true);
             }
             
-            collectionMetadata.populate(clr, primary, mmgr);
+            collectionMetadata.populate(clr, primary);
         }
     }
 

@@ -67,13 +67,13 @@ public abstract class MapHandler<C> implements ContainerHandler<C, MapContainerA
         if (mmd.getKeyMetaData() != null)
         {
             // Populate any key object
-            mmd.getKeyMetaData().populate(clr, primary, mmgr);
+            mmd.getKeyMetaData().populate(clr, primary);
         }
         
         if (mmd.getValueMetaData() != null)
         {
             // Populate any value object
-            mmd.getValueMetaData().populate(clr, primary, mmgr);
+            mmd.getValueMetaData().populate(clr, primary);
         }
         
         if (mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
@@ -99,7 +99,7 @@ public abstract class MapHandler<C> implements ContainerHandler<C, MapContainerA
                 }
             }
             
-            mapMd.populate(clr, primary, mmgr);
+            mapMd.populate(clr, primary);
         }
     }
 

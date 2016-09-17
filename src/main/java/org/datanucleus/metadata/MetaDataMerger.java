@@ -20,6 +20,7 @@ package org.datanucleus.metadata;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -321,13 +322,10 @@ public class MetaDataMerger
         }
 
         // Add any extensions supplied in the ORM MetaData
-        ExtensionMetaData[] ormExtensions = ormCmd.getExtensions();
+        Map<String, String> ormExtensions = ormCmd.getExtensions();
         if (ormExtensions != null)
         {
-            for (int i=0;i<ormExtensions.length;i++)
-            {
-                primaryCmd.addExtension(ormExtensions[i].vendorName, ormExtensions[i].key, ormExtensions[i].value);
-            }
+            primaryCmd.addExtensions(ormExtensions);
         }
     }
 
@@ -478,13 +476,10 @@ public class MetaDataMerger
         }
 
         // Add any extensions supplied in the ORM file
-        ExtensionMetaData[] ormExtensions = ormFmd.getExtensions();
+        Map<String, String> ormExtensions = ormFmd.getExtensions();
         if (ormExtensions != null)
         {
-            for (int i=0;i<ormExtensions.length;i++)
-            {
-                primaryFmd.addExtension(ormExtensions[i].vendorName, ormExtensions[i].key, ormExtensions[i].value);
-            }
+            primaryFmd.addExtensions(ormExtensions);
         }
     }
 
@@ -768,13 +763,10 @@ public class MetaDataMerger
         }
 
         // Add any extensions supplied in the annotations
-        ExtensionMetaData[] ormExtensions = annotCmd.getExtensions();
+        Map<String, String> ormExtensions = annotCmd.getExtensions();
         if (ormExtensions != null)
         {
-            for (int i=0;i<ormExtensions.length;i++)
-            {
-                primaryCmd.addExtension(ormExtensions[i].vendorName, ormExtensions[i].key, ormExtensions[i].value);
-            }
+            primaryCmd.addExtensions(ormExtensions);
         }
     }
 
@@ -942,13 +934,10 @@ public class MetaDataMerger
         }
 
         // Add any extensions supplied in the annotations
-        ExtensionMetaData[] annotExtensions = annotFmd.getExtensions();
+        Map<String, String> annotExtensions = annotFmd.getExtensions();
         if (annotExtensions != null)
         {
-            for (int i=0;i<annotExtensions.length;i++)
-            {
-                primaryFmd.addExtension(annotExtensions[i].vendorName, annotExtensions[i].key, annotExtensions[i].value);
-            }
+            primaryFmd.addExtensions(annotExtensions);
         }
     }
 }

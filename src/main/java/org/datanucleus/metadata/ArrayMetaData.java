@@ -72,15 +72,15 @@ public class ArrayMetaData extends ContainerMetaData
      * Method to populate any defaults, and check the validity of the MetaData.
      * @param clr ClassLoaderResolver to use in loading any classes 
      * @param primary the primary ClassLoader to use (or null)
-     * @param mmgr MetaData manager
      */
-    public void populate(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr)
+    public void populate(ClassLoaderResolver clr, ClassLoader primary)
     {
         AbstractMemberMetaData mmd = (AbstractMemberMetaData)parent;
         if (!StringUtils.isWhitespace(element.type) && element.type.indexOf(',') > 0)
         {
             throw new InvalidMemberMetaDataException("044140", mmd.getClassName(), mmd.getName());
         }
+        MetaDataManager mmgr = mmd.getMetaDataManager();
 
         // Make sure the type in "element" is set
         element.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), clr, primary);
@@ -214,7 +214,7 @@ public class ArrayMetaData extends ContainerMetaData
                     }
                 }
             }
-            addExtension(VENDOR_NAME, "implementation-classes", str.toString()); // Replace with this new value
+            addExtension("implementation-classes", str.toString()); // Replace with this new value
         }
 
         // Make sure anything in the superclass is populated too

@@ -17,11 +17,11 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store;
 
+import java.util.Map;
 import java.util.Properties;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.metadata.ExtensionMetaData;
 import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -74,14 +74,10 @@ public class NucleusSequenceImpl implements NucleusSequence
 
         // Create the controlling properties for this sequence
         Properties props = new Properties();
-        ExtensionMetaData[] seqExtensions = seqMetaData.getExtensions();
-        if (seqExtensions != null && seqExtensions.length > 0)
+        Map<String, String> seqExtensions = seqMetaData.getExtensions();
+        if (seqExtensions != null && seqExtensions.size() > 0)
         {
-            // Add all MetaData extension properties provided
-            for (int i=0;i<seqExtensions.length;i++)
-            {
-                props.put(seqExtensions[i].getKey(), seqExtensions[i].getValue());
-            }
+            props.putAll(seqExtensions);
         }
         props.put("sequence-name", seqMetaData.getDatastoreSequence());
         props.put("sequence-name", seqMetaData.getDatastoreSequence());
