@@ -38,7 +38,7 @@ import org.datanucleus.exceptions.NucleusException;
  * </OL>
  * <h3>MetaData Extensibility</h3>
  * <p>
- * All MetaData elements are extensible with extensions for a "vendor-name". Extensions take the form of a key and a value.
+ * All MetaData elements are extensible with extensions. We only store the DataNucleus vendor extensions here.
  */
 public class MetaData implements Serializable
 {
@@ -55,12 +55,6 @@ public class MetaData implements Serializable
 
     /** State reflecting that MetaData object has been modified with usage information (e.g defaulted column names). */
     public static final int METADATA_USED_STATE = 3;
-
-    /** State of the MetaData. */
-    protected int metaDataState = METADATA_CREATED_STATE;
-
-    /** Parent MetaData object, allowing hierarchical MetaData structure. */
-    protected MetaData parent;
 
     /** Vendor name (DataNucleus) used for extensions. */
     public static final String VENDOR_NAME = "datanucleus";
@@ -147,6 +141,12 @@ public class MetaData implements Serializable
 
     /** Class : definition of imports for VIEW (when mapping to a view). */
     public static final String EXTENSION_CLASS_VIEW_IMPORTS = "view-imports";
+
+    /** State of the MetaData. */
+    protected int metaDataState = METADATA_CREATED_STATE;
+
+    /** Parent MetaData object, allowing hierarchical MetaData structure. */
+    protected MetaData parent;
 
     /** Extensions for this MetaData element. */
     protected Map<String, String> extensions = null;
