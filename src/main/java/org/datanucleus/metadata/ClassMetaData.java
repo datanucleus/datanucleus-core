@@ -553,6 +553,13 @@ public class ClassMetaData extends AbstractClassMetaData
                                                 mmd.setNotPersistent();
                                             }
                                             mmd.type = (Class) paramTypeArgs[j];
+                                            AbstractMemberMetaData overriddenMmd = getMemberBeingOverridden(mmd.getName());
+                                            if (overriddenMmd.isPrimaryKey())
+                                            {
+                                                // Note that if we override a single PK field we will have objectIdClass=ObjectId in the generics superclass, and still ObjectId here
+                                                // We have to keep to continue like this since the superclass will have been enhanced to have ObjectId in its bytecode contract.
+                                                mmd.setPrimaryKey(true);
+                                            }
                                             members.add(mmd);
                                             memberNames.add(mmd.getName());
                                             Collections.sort(members);
