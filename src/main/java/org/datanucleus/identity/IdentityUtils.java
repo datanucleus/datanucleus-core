@@ -215,7 +215,16 @@ public class IdentityUtils
             {
                 String className = persistableId.substring(0, persistableId.indexOf(':'));
                 cmd = ec.getMetaDataManager().getMetaDataForClass(className, clr);
+
                 String idStr = persistableId.substring(persistableId.indexOf(':')+1);
+                if (cmd.getObjectidClass().equals(ClassNameConstants.IDENTITY_SINGLEFIELD_OBJECT))
+                {
+                    // For ObjectId we need to pass "PkFieldType:{id}" - see ObjectId.toString()
+                    // For all other SingleFieldId we pass "{id}" - see XXXId.toString()
+                    int[] pkMemberPositions = cmd.getPKMemberPositions();
+                    AbstractMemberMetaData pkMmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkMemberPositions[0]);
+                    idStr = pkMmd.getTypeName() + ":" + idStr;
+                }
                 id = ec.getNucleusContext().getIdentityManager().getApplicationId(clr, cmd, idStr);
             }
             else
