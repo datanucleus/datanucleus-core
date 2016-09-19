@@ -37,16 +37,16 @@ public class DiscriminatorMetaData extends MetaData
     /** Column name of discriminator */
     protected String columnName = null;
 
-    /** Value for discriminator column */
+    /** Discriminator column */
+    protected ColumnMetaData columnMetaData=null;
+
+    /** Value for discriminator column, when using VALUE_MAP. */
     protected String value = null;
 
     /** Whether the discriminator is indexed or not and whether it is unique */
     protected IndexedValue indexed = null;
 
-    /** Discriminator column */
-    protected ColumnMetaData columnMetaData=null;
-
-    /** Definition of any indexing of the discriminator column. */
+    /** Definition of any indexing of the discriminator column. TODO Drop this since it doesn't add to what we already have. */
     protected IndexMetaData indexMetaData;
 
     public DiscriminatorMetaData()

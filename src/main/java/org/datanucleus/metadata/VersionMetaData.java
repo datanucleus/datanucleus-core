@@ -56,7 +56,7 @@ public class VersionMetaData extends MetaData
     /** Contains the metadata for column. */
     protected ColumnMetaData columnMetaData;
 
-    /** IndexMetaData for the version column. */
+    /** IndexMetaData for the version column. TODO Drop this since it doesn't add to what we already have. */
     protected IndexMetaData indexMetaData;
 
     /** Indexed value. */
