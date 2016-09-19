@@ -20,6 +20,7 @@ Contributors:
 package org.datanucleus.store.types;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -67,14 +68,19 @@ public class TypeManagerImpl implements TypeManager, Serializable
     protected Map<Class, ? super ContainerHandler> containerHandlersByClass = new ConcurrentHashMap();
 
     /** Map of TypeConverter keyed by their symbolic name. */
-    protected Map<String, TypeConverter> convertersByName = null;
+    protected Map<String, TypeConverter> typeConverterByName = null;
 
     /** Map of TypeConverter keyed by type name that we should default to for this type (user-defined). */
     protected Map<String, TypeConverter> autoApplyConvertersByType = null;
 
     /** Map of (Map of TypeConverter keyed by the datastore type), keyed by the member type. */
     protected Map<Class, Map<Class, TypeConverter>> typeConverterMap = null;
-    
+
+    /** Cache of TypeConverter datastore type, keyed by the converter. */
+    protected Map<TypeConverter, Class> typeConverterDatastoreTypeByConverter = null;
+
+    /** Cache of TypeConverter member type, keyed by the converter. */
+    protected Map<TypeConverter, Class> typeConverterMemberTypeByConverter = null;
 
     /**
      * Constructor, loading support for type mappings using the plugin mechanism.
@@ -85,6 +91,17 @@ public class TypeManagerImpl implements TypeManager, Serializable
         this.nucCtx = nucCtx;
         loadJavaTypes(nucCtx.getPluginManager());
         loadTypeConverters(nucCtx.getPluginManager());
+    }
+
+    public void close()
+    {
+        containerHandlersByClass = null;
+        javaTypes = null;
+        typeConverterByName = null;
+        typeConverterMap = null;
+        typeConverterMemberTypeByConverter = null;
+        typeConverterDatastoreTypeByConverter = null;
+        autoApplyConvertersByType = null;
     }
 
     protected ClassLoaderResolver getClassLoaderResolver()
@@ -418,26 +435,60 @@ public class TypeManagerImpl implements TypeManager, Serializable
     @Override
     public TypeConverter getTypeConverterForName(String converterName)
     {
-        return (convertersByName == null || converterName == null) ? null : convertersByName.get(converterName);
+        return (typeConverterByName == null || converterName == null) ? null : typeConverterByName.get(converterName);
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.types.TypeManager#registerConverter(java.lang.String, org.datanucleus.store.types.converters.TypeConverter, boolean, java.lang.String)
+     * @see org.datanucleus.store.types.TypeManager#registerConverter(java.lang.String, org.datanucleus.store.types.converters.TypeConverter, java.lang.Class, java.lang.Class, boolean, java.lang.String)
      */
     @Override
-    public void registerConverter(String name, TypeConverter converter, boolean autoApply, String autoApplyType)
+    public void registerConverter(String name, TypeConverter converter, Class memberType, Class dbType, boolean autoApply, String autoApplyType)
     {
-        if (convertersByName == null)
+        // Add to lookup name -> converter
+        if (name != null)
         {
-            convertersByName = new ConcurrentHashMap<String, TypeConverter>();
+            if (typeConverterByName == null)
+            {
+                typeConverterByName = new ConcurrentHashMap<String, TypeConverter>();
+            }
+            typeConverterByName.put(name, converter);
         }
-        convertersByName.put(name, converter);
+
+        // Add to lookup converter -> memberType
+        if (typeConverterDatastoreTypeByConverter == null)
+        {
+            typeConverterDatastoreTypeByConverter = new ConcurrentHashMap<>();
+        }
+        typeConverterDatastoreTypeByConverter.put(converter, dbType);
+
+        // Add to lookup converter -> dbType
+        if (typeConverterMemberTypeByConverter == null)
+        {
+            typeConverterMemberTypeByConverter = new ConcurrentHashMap<>();
+        }
+        typeConverterMemberTypeByConverter.put(converter, memberType);
+
+        // Add to lookup by memberType and dbType
+        if (typeConverterMap == null)
+        {
+            typeConverterMap = new ConcurrentHashMap<Class, Map<Class,TypeConverter>>();
+        }
+        Map<Class, TypeConverter> convertersForMember = typeConverterMap.get(memberType);
+        if (convertersForMember == null)
+        {
+            convertersForMember = new ConcurrentHashMap<Class, TypeConverter>();
+            typeConverterMap.put(memberType, convertersForMember);
+        }
+        convertersForMember.put(dbType, converter);
+
         if (converter instanceof ClassStringConverter)
         {
             ((ClassStringConverter)converter).setClassLoaderResolver(getClassLoaderResolver());
         }
+
         if (autoApply)
         {
+            // Register converter to auto-apply
             if (autoApplyConvertersByType == null)
             {
                 autoApplyConvertersByType = new ConcurrentHashMap<String, TypeConverter>();
@@ -452,7 +503,12 @@ public class TypeManagerImpl implements TypeManager, Serializable
     @Override
     public void registerConverter(String name, TypeConverter converter)
     {
-        registerConverter(name, converter, false, null);
+        // Add to lookup name -> converter
+        if (typeConverterByName == null)
+        {
+            typeConverterByName = new ConcurrentHashMap<String, TypeConverter>();
+        }
+        typeConverterByName.put(name, converter);
     }
 
     /* (non-Javadoc)
@@ -538,6 +594,126 @@ public class TypeManagerImpl implements TypeManager, Serializable
             return null;
         }
         return convertersForMember.values();
+    }
+
+    /**
+     * Method to return the datastore type for the specified TypeConverter.
+     * @param conv The converter
+     * @param memberType The member type
+     * @return The datastore type
+     */
+    public Class getDatastoreTypeForTypeConverter(TypeConverter conv, Class memberType)
+    {
+        if (typeConverterDatastoreTypeByConverter != null)
+        {
+            // Try the cache
+            if (typeConverterDatastoreTypeByConverter.containsKey(conv))
+            {
+                return typeConverterDatastoreTypeByConverter.get(conv);
+            }
+        }
+        else
+        {
+            typeConverterDatastoreTypeByConverter = new ConcurrentHashMap<TypeConverter, Class>();
+        }
+
+        try
+        {
+            Method m = conv.getClass().getMethod("toDatastoreType", new Class[] {memberType});
+            Class type = m.getReturnType();
+            typeConverterDatastoreTypeByConverter.put(conv, type);
+            return type;
+        }
+        catch (Exception e)
+        {
+            // This will fail if we have a TypeConverter converting an interface, and the field is of the implementation type
+        }
+
+        try
+        {
+            // Maybe is a wrapper to a converter, like for JDO/JPA AttributeConverter
+            Method m = conv.getClass().getMethod("getDatastoreClass");
+            Class type = (Class)m.invoke(conv);
+            typeConverterDatastoreTypeByConverter.put(conv, type);
+            return type;
+        }
+        catch (Exception e2)
+        {
+            // Not a JDO/JPA wrapper type
+        }
+
+        // Maybe there is a toDatastoreType but not precise member type so just find the toDatastoreType method
+        try
+        {
+            Method[] methods = conv.getClass().getMethods();
+            if (methods != null)
+            {
+                // Note that with reflection we can get duplicated methods here, so if we have a method "String toDatastoreType(Serializable)" then
+                // reflection returns 1 method as "String toDatastoreType(Serializable)" and another as "Object toDatastoreType(Object)"
+                for (int i=0;i<methods.length;i++)
+                {
+                    Class[] paramTypes = methods[i].getParameterTypes();
+                    if (methods[i].getName().equals("toDatastoreType") && methods[i].getReturnType() != Object.class && paramTypes != null && paramTypes.length == 1)
+                    {
+                        Class type = methods[i].getReturnType();
+                        typeConverterDatastoreTypeByConverter.put(conv, type);
+                        return type;
+                    }
+                }
+            }
+        }
+        catch (Exception e3)
+        {
+            NucleusLogger.GENERAL.warn("Converter " + conv + " didn't have adequate information from toDatastoreType nor from getDatastoreClass");
+        }
+
+        return null;
+    }
+
+    /**
+     * Method to return the member type for the specified TypeConverter.
+     * @param conv The converter
+     * @param datastoreType The datastore type for this converter
+     * @return The member type
+     */
+    public Class getMemberTypeForTypeConverter(TypeConverter conv, Class datastoreType)
+    {
+        if (typeConverterMemberTypeByConverter != null)
+        {
+            // Try the cache
+            if (typeConverterMemberTypeByConverter.containsKey(conv))
+            {
+                return typeConverterMemberTypeByConverter.get(conv);
+            }
+        }
+        else
+        {
+            typeConverterMemberTypeByConverter = new ConcurrentHashMap<TypeConverter, Class>();
+        }
+
+        try
+        {
+            Method m = conv.getClass().getMethod("toMemberType", new Class[] {datastoreType});
+            Class memberType = m.getReturnType();
+            typeConverterMemberTypeByConverter.put(conv, memberType);
+            return memberType;
+        }
+        catch (Exception e)
+        {
+            try
+            {
+                // Maybe is a wrapper to a converter, like for JPA/JDO AttributeConverter
+                Method m = conv.getClass().getMethod("getMemberClass");
+                Class memberType = (Class)m.invoke(conv);
+                typeConverterMemberTypeByConverter.put(conv, memberType);
+                return memberType;
+            }
+            catch (Exception e2)
+            {
+                NucleusLogger.GENERAL.warn("Converter " + conv + " didn't have adequate information from toMemberType nor from getMemberClass");
+            }
+        }
+        return null;
     }
 
     /**
@@ -826,22 +1002,10 @@ public class TypeManagerImpl implements TypeManager, Serializable
                 try
                 {
                     // Use plugin manager to instantiate the converter in case its in separate plugin
-                    TypeConverter conv = (TypeConverter) mgr.createExecutableExtension("org.datanucleus.type_converter", 
-                        "name", name, "converter-class", null, null);
-                    registerConverter(name, conv);
-                    if (typeConverterMap == null)
-                    {
-                        typeConverterMap = new ConcurrentHashMap<Class, Map<Class,TypeConverter>>();
-                    }
+                    TypeConverter conv = (TypeConverter) mgr.createExecutableExtension("org.datanucleus.type_converter", "name", name, "converter-class", null, null);
                     memberType = clr.classForName(memberTypeName);
                     Class datastoreType = clr.classForName(datastoreTypeName);
-                    Map<Class, TypeConverter> convertersForMember = typeConverterMap.get(memberType);
-                    if (convertersForMember == null)
-                    {
-                        convertersForMember = new ConcurrentHashMap<Class, TypeConverter>();
-                        typeConverterMap.put(memberType, convertersForMember);
-                    }
-                    convertersForMember.put(datastoreType, conv);
+                    registerConverter(name, conv, memberType, datastoreType, false, null);
                 }
                 catch (Exception e)
                 {

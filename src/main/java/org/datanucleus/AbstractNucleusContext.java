@@ -158,7 +158,13 @@ public abstract class AbstractNucleusContext implements NucleusContext
         logConfiguration();
     }
 
-    public abstract void close();
+    public void close()
+    {
+        if (typeManager != null)
+        {
+            typeManager.close();
+        }
+    }
 
     public ApiAdapter getApiAdapter()
     {

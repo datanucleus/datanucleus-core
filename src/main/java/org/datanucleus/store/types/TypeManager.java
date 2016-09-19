@@ -32,6 +32,8 @@ import org.datanucleus.store.types.converters.TypeConverter;
  */
 public interface TypeManager
 {
+    void close();
+
     /**
      * Accessor for the supported second-class Types.
      * This may or may not be a complete list, just that it provides the principal ones.
@@ -146,22 +148,24 @@ public interface TypeManager
     TypeConverter getTypeConverterForName(String converterName);
 
     /**
-     * Register a TypeConverter with the TypeManager process.
-     * @param name The name to register the converter under
-     * @param converter The converter
-     * @param autoApply Whether this should be used as an auto-apply converter
-     * @param autoApplyType Java type to auto apply this for
-     */
-    void registerConverter(String name, TypeConverter converter, boolean autoApply, String autoApplyType);
-
-    /**
+     * Register a TypeConverter against a specific name.
      * TypeConverters are registered either from the contents of "plugin.xml" (i.e the builtin types) where the
-     * name is of the form "dn.*", or from user-registered metadata (e.g JPA Annotations) where the name is
-     * the class name of the converter.
+     * name is of the form "dn.*", or from user-registered metadata (e.g JPA Annotations) where the name is the class name of the converter.
      * @param name The name to register the converter under
      * @param converter The converter
      */
     void registerConverter(String name, TypeConverter converter);
+
+    /**
+     * Register a TypeConverter with the TypeManager process for specific attribute/db types.
+     * @param name The name to register the converter under
+     * @param converter The converter
+     * @param memberType Type of the java member
+     * @param dbType Type of the database column
+     * @param autoApply Whether this should be used as an auto-apply converter
+     * @param autoApplyType Java type to auto apply this for
+     */
+    void registerConverter(String name, TypeConverter converter, Class memberType, Class dbType, boolean autoApply, String autoApplyType);
 
     /**
      * Method to return a TypeConverter that should be applied by default for the specified java (member) type.
@@ -199,4 +203,20 @@ public interface TypeManager
      * @return The available Type Converters
      */
     Collection<TypeConverter> getTypeConvertersForType(Class memberType);
+
+    /**
+     * Method to return the datastore type for the specified TypeConverter.
+     * @param conv The converter
+     * @param memberType The member type
+     * @return The datastore type
+     */
+    Class getDatastoreTypeForTypeConverter(TypeConverter conv, Class memberType);
+
+    /**
+     * Method to return the member type for the specified TypeConverter.
+     * @param conv The converter
+     * @param datastoreType The datastore type for this converter
+     * @return The member type
+     */
+    Class getMemberTypeForTypeConverter(TypeConverter conv, Class datastoreType);
 }

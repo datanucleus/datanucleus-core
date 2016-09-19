@@ -64,6 +64,8 @@ public class EnhancementNucleusContextImpl extends AbstractNucleusContext
         {
             typeManager = null;
         }
+
+        super.close();
     }
 
     /* (non-Javadoc)

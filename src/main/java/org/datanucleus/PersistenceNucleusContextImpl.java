@@ -580,6 +580,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         }
 
         identityManager = null;
+
+        super.close();
     }
 
     /**
