@@ -329,8 +329,7 @@ public abstract class AbstractClassMetaData extends MetaData
                         {
                             if (acmd.getInheritanceMetaData().getDiscriminatorMetaData() != null)
                             {
-                                inhmd.setDiscriminatorMetaData(
-                                    new DiscriminatorMetaData(acmd.getInheritanceMetaData().getDiscriminatorMetaData()));
+                                inhmd.setDiscriminatorMetaData(new DiscriminatorMetaData(acmd.getInheritanceMetaData().getDiscriminatorMetaData()));
                             }
                             inhmd.setJoinMetaData(acmd.getInheritanceMetaData().getJoinMetaData());
                             break;
@@ -343,8 +342,7 @@ public abstract class AbstractClassMetaData extends MetaData
             {
                 if (imd.getInheritanceMetaData().getDiscriminatorMetaData() != null)
                 {
-                    inhmd.setDiscriminatorMetaData(
-                        new DiscriminatorMetaData(imd.getInheritanceMetaData().getDiscriminatorMetaData()));
+                    inhmd.setDiscriminatorMetaData(new DiscriminatorMetaData(imd.getInheritanceMetaData().getDiscriminatorMetaData()));
                 }
                 inhmd.setJoinMetaData(imd.getInheritanceMetaData().getJoinMetaData());
             }
@@ -1448,15 +1446,15 @@ public abstract class AbstractClassMetaData extends MetaData
         scoMutableMemberFlags = new boolean[memberCount];
         nonPkMemberFlags = new boolean[memberCount];
 
-        int pk_field_count=0;
-        int dfg_field_count=0;
-        int scm_field_count=0;
+        int pkFieldCount=0;
+        int dfgFieldCount=0;
+        int scmFieldCount=0;
         for (int i=0;i<memberCount;i++)
         {
             AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePositionInternal(i);
             if (mmd.isPrimaryKey())
             {
-                pk_field_count++;
+                pkFieldCount++;
             }
             else
             {
@@ -1465,23 +1463,23 @@ public abstract class AbstractClassMetaData extends MetaData
             if (mmd.isDefaultFetchGroup())
             {
                 dfgMemberFlags[i] = true;
-                dfg_field_count++;
+                dfgFieldCount++;
             }
             if (mmd.calcIsSecondClassMutable(mmgr))
             {
                 scoMutableMemberFlags[i] = true;
-                scm_field_count++;
+                scmFieldCount++;
             }
         }
  
-        if (pk_field_count > 0 && identityType != IdentityType.APPLICATION)
+        if (pkFieldCount > 0 && identityType != IdentityType.APPLICATION)
         {
             // primary key fields found, but not using application identity
-            throw new InvalidClassMetaDataException("044078", fullName, Integer.valueOf(pk_field_count), identityType);
+            throw new InvalidClassMetaDataException("044078", fullName, Integer.valueOf(pkFieldCount), identityType);
         }
-        else if (pk_field_count > 0)
+        else if (pkFieldCount > 0)
         {
-            pkMemberPositions = new int[pk_field_count];
+            pkMemberPositions = new int[pkFieldCount];
             for (int i=0,pk_num=0;i<memberCount;i++)
             {
                 AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePositionInternal(i);
@@ -1491,13 +1489,13 @@ public abstract class AbstractClassMetaData extends MetaData
                 }
             }
         }
-        else if (instantiable && pk_field_count == 0 && identityType == IdentityType.APPLICATION)
+        else if (instantiable && pkFieldCount == 0 && identityType == IdentityType.APPLICATION)
         {
             // No primary key fields found even though it does permit instances
             throw new InvalidClassMetaDataException("044077", fullName, objectidClass);
         }
 
-        nonPkMemberPositions = new int[memberCount-pk_field_count];
+        nonPkMemberPositions = new int[memberCount-pkFieldCount];
         for (int i=0,npkf=0;i<memberCount;i++)
         {
             AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePositionInternal(i);
@@ -1507,173 +1505,17 @@ public abstract class AbstractClassMetaData extends MetaData
             }
         }
 
-        dfgMemberPositions = new int[dfg_field_count];
-        scoMutableMemberPositions = new int[scm_field_count];
-        for (int i=0,dfg_num=0,scm_num=0;i<memberCount;i++)
+        dfgMemberPositions = new int[dfgFieldCount];
+        scoMutableMemberPositions = new int[scmFieldCount];
+        for (int i=0,dfgNum=0,scmNum=0;i<memberCount;i++)
         {
             if (dfgMemberFlags[i])
             {
-                dfgMemberPositions[dfg_num++] = i;
+                dfgMemberPositions[dfgNum++] = i;
             }
             if (scoMutableMemberFlags[i])
             {
-                scoMutableMemberPositions[scm_num++] = i;
-            }
-        }
-    }
-
-    /**
-     * Method to return the ClassMetaData records for classes referenced by this object. 
-     * This adds the entries to orderedCmds ordered by dependency, and to referencedCmds for fast lookups.
-     * <p>
-     * Uses recursion to add all referenced ClassMetaData for any fields, objectid classes, superclasses, and extension "views".
-     * This is the entry point for this process.
-     * </p>
-     * @param orderedCmds List of ordered ClassMetaData objects (added to).
-     * @param referencedCmds Set of all ClassMetaData objects (added to).
-     * @param clr the ClassLoaderResolver
-     */
-    void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final ClassLoaderResolver clr)
-    {
-        Map<String, Set<String>> viewReferences = new HashMap<>();
-        getReferencedClassMetaData(orderedCmds, referencedCmds, viewReferences, clr);
-    }
-
-    /**
-     * Method to return the ClassMetaData for classes referenced by this object. This method does the actual work of addition.
-     * @param orderedCmds List of ordered ClassMetaData objects (added to).
-     * @param referencedCmds Set of all ClassMetaData objects (added to).
-     * @param viewReferences Map, mapping class name to set of referenced class for all views.
-     * @param clr the ClassLoaderResolver
-     */
-    private void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final Map<String, Set<String>> viewReferences, 
-            final ClassLoaderResolver clr)
-    {
-        // Recursively call getReferencedClassMetaData(...) before adding them to the orderedCmds and referenced. 
-        // This will ensure that any classes with dependencies on them are put in the orderedCmds List in the correct order.
-        if (!referencedCmds.contains(this))
-        {
-            // Go ahead and add this class to the referenced Set, it will get added to the orderedCmds List after all classes that this depends on have been added.
-            referencedCmds.add(this);
-
-            for (int i=0;i<managedMembers.length;i++)
-            {
-                managedMembers[i].getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
-            }
-
-            // Add on any superclass
-            if (persistableSuperclass != null)
-            {
-                getSuperAbstractClassMetaData().getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
-            }
-
-            // Add on any objectid class
-            if (objectidClass != null && !usesSingleFieldIdentityClass())
-            {
-                AbstractClassMetaData idCmd = mmgr.getMetaDataForClass(objectidClass, clr);
-                if (idCmd != null)
-                {
-                    idCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
-                }
-            }
-
-            // Add on any view-definition for this class
-            String viewDefStr = getValueForExtension(MetaData.EXTENSION_CLASS_VIEW_DEFINITION);
-            if (viewDefStr!= null)
-            {
-                MacroString viewDef = new MacroString(fullName, getValueForExtension(MetaData.EXTENSION_CLASS_VIEW_IMPORTS), viewDefStr);
-                viewDef.substituteMacros(new MacroString.MacroHandler()
-                    {
-                        public void onIdentifierMacro(MacroString.IdentifierMacro im)
-                        {
-                            if (!getFullClassName().equals(im.className)) //ignore itself
-                            {
-                                addViewReference(viewReferences, im.className);
-                                AbstractClassMetaData viewCmd = mmgr.getMetaDataForClass(im.className, clr);
-                                viewCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, viewReferences, clr);
-                            }
-                        }
-
-                        public void onParameterMacro(MacroString.ParameterMacro pm)
-                        {
-                            throw new NucleusUserException("Parameter macros not allowed in view definitions: " + pm);
-                        }
-                    },clr);
-            }
-
-            orderedCmds.add(this);
-        }
-    }
-
-    /**
-     * Method to add a reference for views. Check the view references for circular
-     * dependencies. If there are any circular dependencies, throw a NucleusUserException.
-     * @param viewReferences The Map of classname to Set of referenced Classes to add the reference to.
-     * @param referencedName Class name of the referenced class
-     * @throws NucleusUserException Thrown if a circular reference is found
-     */
-    private void addViewReference(Map<String, Set<String>> viewReferences, String referencedName)
-    {
-        if (fullName.equals(referencedName))
-        {
-            // Add this reference to the Map.
-            Set<String> referencedSet = viewReferences.get(referencedName);
-            if (referencedSet == null)
-            {
-                referencedSet = new HashSet<>();
-                viewReferences.put(fullName, referencedSet);
-            }
-            referencedSet.add(referencedName);
-
-            // Check to see if there is a circular dependency.  This will
-            // be true if the referenced class references this class.
-            AbstractClassMetaData.checkForCircularViewReferences(viewReferences, fullName, referencedName, null);
-        }
-    }
-
-    /**
-     * Check for any circular view references between referencer and referencee.
-     * If one is found, throw a NucleusUserException with the chain of references.
-     * @param viewReferences The Map of view references to check.
-     * @param referencerName Name of the class that has the reference.
-     * @param referenceeName Name of the class that is being referenced.
-     * @param referenceChain The List of class names that have been referenced
-     * @throws NucleusUserException If a circular reference is found in the view definitions.
-     */
-    protected static void checkForCircularViewReferences(Map<String, Set<String>> viewReferences, String referencerName, String referenceeName, List<String> referenceChain)
-    {
-        Set<String> classNames = viewReferences.get(referenceeName);
-        if (classNames != null)
-        {
-            // Initialize the chain of references if needed.  Add the referencee to the chain.
-            if (referenceChain == null)
-            {
-                referenceChain = new ArrayList<>();
-                referenceChain.add(referencerName);
-            }
-            referenceChain.add(referenceeName);
-
-            // Iterate through all referenced classes from the referencee.  If any reference the referencer, throw an exception.
-            for (Iterator<String> it=classNames.iterator(); it.hasNext(); )
-            {
-                String currentName = it.next();
-                if (currentName.equals(referencerName))
-                {
-                    StringBuilder error = new StringBuilder(Localiser.msg("031003"));
-                    for (Iterator chainIter=referenceChain.iterator(); chainIter.hasNext(); )
-                    {
-                        error.append(chainIter.next());
-                        if (chainIter.hasNext())
-                        {
-                            error.append(" -> ");
-                        }
-                    }
-
-                    throw new NucleusUserException(error.toString()).setFatal();
-                }
-
-                // Make recursive call to check for any nested dependencies. e.g A references B, B references C, C references A.
-                AbstractClassMetaData.checkForCircularViewReferences(viewReferences, referencerName, currentName, referenceChain);
+                scoMutableMemberPositions[scmNum++] = i;
             }
         }
     }
@@ -1788,8 +1630,7 @@ public abstract class AbstractClassMetaData extends MetaData
 
     /**
      * Method to return the discriminator strategy being used by this class.
-     * Returns the strategy defined on this class (if any), otherwise goes up to the superclass etc
-     * until it finds a defined strategy.
+     * Returns the strategy defined on this class (if any), otherwise goes up to the superclass etc until it finds a defined strategy.
      * @return The discriminator strategy
      */
     public final DiscriminatorStrategy getDiscriminatorStrategy()
@@ -1941,7 +1782,6 @@ public abstract class AbstractClassMetaData extends MetaData
             // Nothing defined here for catalog, so get from package
             return ((PackageMetaData)parent).getCatalog();
         }
-       
         return catalog;
     }
 
@@ -1958,7 +1798,6 @@ public abstract class AbstractClassMetaData extends MetaData
             // Nothing defined here for schema, so get from package
             return ((PackageMetaData)parent).getSchema();
         }
-
         return schema;
     }
 
@@ -2081,31 +1920,6 @@ public abstract class AbstractClassMetaData extends MetaData
         return getPackageMetaData().getName();
     }
 
-    /**
-     * Accessor for the number of fields/properties.
-     * This is the total number of fields/properties (inc static, final etc) in this class 
-     * @return no of fields/properties.
-     */
-    public int getNoOfMembers()
-    {
-        return members.size();
-    }
-
-    /**
-     * Accessor for the metadata of a field/property. Does not include superclasses.
-     * <B>In general this should never be used; always use "getMetaDataForManagedMemberAtAbsolutePosition".</B>
-     * @param index field index relative to this class only starting from 0
-     * @return Meta-Data for the field/property
-     */
-    public AbstractMemberMetaData getMetaDataForMemberAtRelativePosition(int index)
-    {
-        if (index < 0 || index >= members.size())
-        {
-            return null;
-        }
-        return members.get(index);
-    }
-
     public ClassPersistenceModifier getPersistenceModifier()
     {
         return persistenceModifier;
@@ -2194,9 +2008,9 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
-     * Method to check if a field/property exists in this classes definition.
+     * Method to check if a member exists in this classes definition.
      * Will include any superclasses in the check.
-     * @param memberName Name of field/property
+     * @param memberName Name of member
      * @return return true if exists.
      */
     public boolean hasMember(String memberName)
@@ -2210,6 +2024,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 return true;
             }
         }
+
         if (pcSuperclassMetaData != null)
         {
             return pcSuperclassMetaData.hasMember(memberName);
@@ -2218,9 +2033,19 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
-     * Accessor for the Meta-Data for a field/property. Include superclasses.
-     * @param name the name of the field/property
-     * @return Meta-Data for the field.
+     * Accessor for the number of members defined for this class (including overrides).
+     * This is the total number of members (inc static, final etc) in this class 
+     * @return no of fields/properties.
+     */
+    public int getNoOfMembers()
+    {
+        return members.size();
+    }
+
+    /**
+     * Accessor for the Meta-Data for a member. Include superclasses.
+     * @param name the name of the member
+     * @return Meta-Data for the member
      */
     public AbstractMemberMetaData getMetaDataForMember(String name)
     {
@@ -2239,13 +2064,6 @@ public abstract class AbstractClassMetaData extends MetaData
             }
         }
 
-        /*AbstractMemberMetaData overrideMmd = getOverriddenMember(name);
-        if (overrideMmd != null)
-        {
-            NucleusLogger.GENERAL.info(">> CMD.getMetaDataForMember " + getFullClassName() + " field=" + name + " but this has been OVERRIDDEN");
-            // TODO Allow for overridden members and return a merged AbstractMemberMetaData
-        }*/
-
         // Check superclass for the field/property with this name
         if (pcSuperclassMetaData != null)
         {
@@ -2255,8 +2073,8 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
-     * Accessor for the number of managed fields/properties (this class only).
-     * @return no of managed fields/properties in this class
+     * Accessor for the number of managed members (this class only).
+     * @return no of managed members in this class
      */
     public int getNoOfManagedMembers()
     {
@@ -2315,9 +2133,9 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
-     * Convenience method that navigates up a MetaData inheritance tree until it finds the base field/property definition.
-     * @param name Name of the field/property we require
-     * @return The AbstractMemberMetaData
+     * Convenience method that navigates up a MetaData inheritance tree until it finds the base member definition for the specified name.
+     * @param name Name of the member we require
+     * @return The metadata for the member
      */
     protected AbstractMemberMetaData getMemberBeingOverridden(String name)
     {
@@ -2330,6 +2148,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 return mmd;
             }
         }
+
         if (pcSuperclassMetaData != null)
         {
             return pcSuperclassMetaData.getMemberBeingOverridden(name);
@@ -2338,8 +2157,8 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
-     * Accessor for the number of inherited managed fields/properties in superclasses.
-     * @return No of inherited managed fields/properties in superclasses.
+     * Accessor for the number of inherited managed members in superclasses.
+     * @return No of inherited managed members in superclasses.
      */
     public int getNoOfInheritedManagedMembers()
     {
@@ -2349,8 +2168,8 @@ public abstract class AbstractClassMetaData extends MetaData
     }
     
     /**
-     * Accessor for the number of managed fields/properties from this class plus inherited classes.
-     * @return The number of managed fields/properties from this class plus inherited classes.
+     * Accessor for the number of managed members from this class plus inherited classes.
+     * @return The number of managed members from this class plus inherited classes.
      */
     public int getMemberCount()
     {
@@ -2358,8 +2177,23 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
-     * Accessor for MetaData for a managed field/property in this class. 
-     * The position is relative to the first field in this class (ignores superclasses).
+     * Accessor for the metadata of a member. Does not include superclasses.
+     * <B>In general this should never be used; always use "getMetaDataForManagedMemberAtAbsolutePosition".</B>
+     * @param index field index relative to this class only starting from 0
+     * @return Meta-Data for the member
+     */
+    public AbstractMemberMetaData getMetaDataForMemberAtRelativePosition(int index)
+    {
+        if (index < 0 || index >= members.size())
+        {
+            return null;
+        }
+        return members.get(index);
+    }
+
+    /**
+     * Accessor for MetaData for a managed member in this class. 
+     * The position is relative to the first member in this class (i.e ignores superclasses).
      * @param position The position of the managed field. 0 = first in the class
      * @return The managed member at that position
      */
@@ -2380,15 +2214,16 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
-     * Accessor for a managed field/property including superclass fields.
-     * @param abs_position The position of the managed member including the superclass. Fields are numbered from 0 in the root superclass.
-     * @return The managed field/property at this "absolute" position.
+     * Accessor for a managed member including superclass members.
+     * Allows for overriding of superclass members in this class and superclasses.
+     * @param position The position of the managed member including the superclass. Fields are numbered from 0 in the root persistable superclass.
+     * @return The managed member at this "absolute" position.
      */
-    public AbstractMemberMetaData getMetaDataForManagedMemberAtAbsolutePosition(int abs_position)
+    public AbstractMemberMetaData getMetaDataForManagedMemberAtAbsolutePosition(int position)
     {
         checkInitialised();
 
-        return getMetaDataForManagedMemberAtAbsolutePositionInternal(abs_position);
+        return getMetaDataForManagedMemberAtAbsolutePositionInternal(position);
     }
 
     /**
@@ -2484,44 +2319,6 @@ public abstract class AbstractClassMetaData extends MetaData
         return i;
     }
 
-    /**
-     * Accessor for the absolute position of the field/property with the specified name.
-     * The absolute position has origin of the root superclass, starting at 0.
-     * Will only retrieve the absolute field number if the <code>field_name</code>
-     * is of type given by <code>class_name</code>.
-     * @param className Name of the class
-     * @param memberName Name of the field/property
-     * @return Absolute position of the field/property.
-     */
-    public int getAbsolutePositionOfMember(String className, String memberName)
-    {
-        checkInitialised();
-
-        if (memberName == null)
-        {
-            return -1;
-        }
-        
-        int i=-1;
-        if (className.equals(getFullClassName()))
-        {
-            i=getRelativePositionOfMember(memberName);
-        }
-        if (i < 0)
-        {
-            if (pcSuperclassMetaData != null)
-            {
-                i = pcSuperclassMetaData.getAbsolutePositionOfMember(className,memberName);
-            }
-        }
-        else
-        {
-            i += noOfInheritedManagedMembers;
-        }
-
-        return i;
-    }
-    
     /**
      * Convenience method to check the number of fields/properties in this class that have been populated and
      * that are primary key members. This is only ever called during populate() since the accessor
@@ -3894,5 +3691,161 @@ public abstract class AbstractClassMetaData extends MetaData
         PrimaryKeyMetaData pkmd = new PrimaryKeyMetaData();
         setPrimaryKeyMetaData(pkmd);
         return pkmd;
+    }
+
+    /**
+     * Method to return the ClassMetaData records for classes referenced by this object. 
+     * This adds the entries to orderedCmds ordered by dependency, and to referencedCmds for fast lookups.
+     * <p>
+     * Uses recursion to add all referenced ClassMetaData for any fields, objectid classes, superclasses, and extension "views".
+     * This is the entry point for this process.
+     * </p>
+     * @param orderedCmds List of ordered ClassMetaData objects (added to).
+     * @param referencedCmds Set of all ClassMetaData objects (added to).
+     * @param clr the ClassLoaderResolver
+     */
+    void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final ClassLoaderResolver clr)
+    {
+        Map<String, Set<String>> viewReferences = new HashMap<>();
+        getReferencedClassMetaData(orderedCmds, referencedCmds, viewReferences, clr);
+    }
+
+    /**
+     * Method to return the ClassMetaData for classes referenced by this object. This method does the actual work of addition.
+     * @param orderedCmds List of ordered ClassMetaData objects (added to).
+     * @param referencedCmds Set of all ClassMetaData objects (added to).
+     * @param viewReferences Map, mapping class name to set of referenced class for all views.
+     * @param clr the ClassLoaderResolver
+     */
+    private void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final Map<String, Set<String>> viewReferences, 
+            final ClassLoaderResolver clr)
+    {
+        // Recursively call getReferencedClassMetaData(...) before adding them to the orderedCmds and referenced. 
+        // This will ensure that any classes with dependencies on them are put in the orderedCmds List in the correct order.
+        if (!referencedCmds.contains(this))
+        {
+            // Go ahead and add this class to the referenced Set, it will get added to the orderedCmds List after all classes that this depends on have been added.
+            referencedCmds.add(this);
+
+            for (int i=0;i<managedMembers.length;i++)
+            {
+                managedMembers[i].getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
+            }
+
+            // Add on any superclass
+            if (persistableSuperclass != null)
+            {
+                getSuperAbstractClassMetaData().getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
+            }
+
+            // Add on any objectid class
+            if (objectidClass != null && !usesSingleFieldIdentityClass())
+            {
+                AbstractClassMetaData idCmd = mmgr.getMetaDataForClass(objectidClass, clr);
+                if (idCmd != null)
+                {
+                    idCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
+                }
+            }
+
+            // Add on any view-definition for this class
+            String viewDefStr = getValueForExtension(MetaData.EXTENSION_CLASS_VIEW_DEFINITION);
+            if (viewDefStr!= null)
+            {
+                MacroString viewDef = new MacroString(fullName, getValueForExtension(MetaData.EXTENSION_CLASS_VIEW_IMPORTS), viewDefStr);
+                viewDef.substituteMacros(new MacroString.MacroHandler()
+                    {
+                        public void onIdentifierMacro(MacroString.IdentifierMacro im)
+                        {
+                            if (!getFullClassName().equals(im.className)) //ignore itself
+                            {
+                                addViewReference(viewReferences, im.className);
+                                AbstractClassMetaData viewCmd = mmgr.getMetaDataForClass(im.className, clr);
+                                viewCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, viewReferences, clr);
+                            }
+                        }
+
+                        public void onParameterMacro(MacroString.ParameterMacro pm)
+                        {
+                            throw new NucleusUserException("Parameter macros not allowed in view definitions: " + pm);
+                        }
+                    },clr);
+            }
+
+            orderedCmds.add(this);
+        }
+    }
+
+    /**
+     * Method to add a reference for views. Check the view references for circular
+     * dependencies. If there are any circular dependencies, throw a NucleusUserException.
+     * @param viewReferences The Map of classname to Set of referenced Classes to add the reference to.
+     * @param referencedName Class name of the referenced class
+     * @throws NucleusUserException Thrown if a circular reference is found
+     */
+    private void addViewReference(Map<String, Set<String>> viewReferences, String referencedName)
+    {
+        if (fullName.equals(referencedName))
+        {
+            // Add this reference to the Map.
+            Set<String> referencedSet = viewReferences.get(referencedName);
+            if (referencedSet == null)
+            {
+                referencedSet = new HashSet<>();
+                viewReferences.put(fullName, referencedSet);
+            }
+            referencedSet.add(referencedName);
+
+            // Check to see if there is a circular dependency.  This will
+            // be true if the referenced class references this class.
+            AbstractClassMetaData.checkForCircularViewReferences(viewReferences, fullName, referencedName, null);
+        }
+    }
+
+    /**
+     * Check for any circular view references between referencer and referencee.
+     * If one is found, throw a NucleusUserException with the chain of references.
+     * @param viewReferences The Map of view references to check.
+     * @param referencerName Name of the class that has the reference.
+     * @param referenceeName Name of the class that is being referenced.
+     * @param referenceChain The List of class names that have been referenced
+     * @throws NucleusUserException If a circular reference is found in the view definitions.
+     */
+    protected static void checkForCircularViewReferences(Map<String, Set<String>> viewReferences, String referencerName, String referenceeName, List<String> referenceChain)
+    {
+        Set<String> classNames = viewReferences.get(referenceeName);
+        if (classNames != null)
+        {
+            // Initialize the chain of references if needed.  Add the referencee to the chain.
+            if (referenceChain == null)
+            {
+                referenceChain = new ArrayList<>();
+                referenceChain.add(referencerName);
+            }
+            referenceChain.add(referenceeName);
+
+            // Iterate through all referenced classes from the referencee.  If any reference the referencer, throw an exception.
+            for (Iterator<String> it=classNames.iterator(); it.hasNext(); )
+            {
+                String currentName = it.next();
+                if (currentName.equals(referencerName))
+                {
+                    StringBuilder error = new StringBuilder(Localiser.msg("031003"));
+                    for (Iterator chainIter=referenceChain.iterator(); chainIter.hasNext(); )
+                    {
+                        error.append(chainIter.next());
+                        if (chainIter.hasNext())
+                        {
+                            error.append(" -> ");
+                        }
+                    }
+
+                    throw new NucleusUserException(error.toString()).setFatal();
+                }
+
+                // Make recursive call to check for any nested dependencies. e.g A references B, B references C, C references A.
+                AbstractClassMetaData.checkForCircularViewReferences(viewReferences, referencerName, currentName, referenceChain);
+            }
+        }
     }
 }

@@ -479,13 +479,19 @@ public class InterfaceMetaData extends AbstractClassMetaData
     public String toString()
     {
         StringBuilder str = new StringBuilder(super.toString()).append(" [").append(this.getFullClassName()).append("]");
-        str.append(" identity=").append(identityType.toString());
-        if (identityType == IdentityType.APPLICATION)
+        if (identityType != null)
         {
-            str.append("(").append(getNoOfPrimaryKeyMembers()).append(" pkFields, id=").append(objectidClass).append(")");
+            str.append(" identity=").append(identityType.toString());
+            if (identityType == IdentityType.APPLICATION)
+            {
+                str.append("(").append(getNoOfPrimaryKeyMembers()).append(" pkFields, id=").append(objectidClass).append(")");
+            }
         }
-        str.append(", managedMembers.size=").append(managedMembers.length);
-        str.append(", overriddenMembers.size=").append(overriddenMembers.length);
+        if (isInitialised())
+        {
+            str.append(", managedMembers.size=").append(managedMembers.length);
+            str.append(", overriddenMembers.size=").append(overriddenMembers.length);
+        }
         if (inheritanceMetaData != null)
         {
             str.append(", inheritance=").append(inheritanceMetaData.getStrategy().toString());

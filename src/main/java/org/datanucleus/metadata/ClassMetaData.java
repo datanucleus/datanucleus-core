@@ -730,17 +730,17 @@ public class ClassMetaData extends AbstractClassMetaData
                 }
                 else
                 {
-                    Field cls_field = null;
+                    Field clsField = null;
                     try
                     {
-                        cls_field = fieldCls.getDeclaredField(mmd.getName());
+                        clsField = fieldCls.getDeclaredField(mmd.getName());
                     }
                     catch (Exception e)
                     {
                     }
-                    if (cls_field != null)
+                    if (clsField != null)
                     {
-                        mmd.populate(clr, cls_field, null, primary, mmgr);
+                        mmd.populate(clr, clsField, null, primary, mmgr);
                         populated = true;
                     }
                 }
@@ -785,8 +785,7 @@ public class ClassMetaData extends AbstractClassMetaData
                 NucleusLogger.METADATA.debug(Localiser.msg("044076",fullName));
             }
 
-            // Validate the objectid-class
-            // This must be in initialise() since can be dependent on other classes being populated
+            // Validate the objectid-class : this must be in initialise() since can be dependent on other classes being populated
             validateObjectIdClass(clr);
 
             // Count the fields/properties of the relevant category
@@ -817,8 +816,8 @@ public class ClassMetaData extends AbstractClassMetaData
             overriddenMembers = new AbstractMemberMetaData[numOverridden];
 
             membersIter = members.iterator();
-            int field_id = 0;
-            int overridden_field_id = 0;
+            int memberId = 0;
+            int overriddenMemberId = 0;
             memberPositionsByName = new HashMap();
             while (membersIter.hasNext())
             {
@@ -827,24 +826,26 @@ public class ClassMetaData extends AbstractClassMetaData
                 {
                     if (mmd.fieldBelongsToClass())
                     {
-                        mmd.setFieldId(field_id);
-                        managedMembers[field_id] = mmd;
-                        memberPositionsByName.put(mmd.getName(), Integer.valueOf(field_id));
-                        field_id++;
+                        // Definition of a member in this class
+                        mmd.setFieldId(memberId);
+                        managedMembers[memberId] = mmd;
+                        memberPositionsByName.put(mmd.getName(), Integer.valueOf(memberId));
+                        memberId++;
                     }
                     else
                     {
-                        overriddenMembers[overridden_field_id++] = mmd;
+                        // Definition of override of a member in a superclass
+                        overriddenMembers[overriddenMemberId++] = mmd;
                         if (pcSuperclassMetaData == null)
                         {
                             // User specified override yet no superclass!
                             throw new InvalidClassMetaDataException("044162", fullName, mmd.getFullFieldName());
                         }
-                        AbstractMemberMetaData superFmd = pcSuperclassMetaData.getMemberBeingOverridden(mmd.getName());
-                        if (superFmd != null)
+                        AbstractMemberMetaData superMmd = pcSuperclassMetaData.getMemberBeingOverridden(mmd.getName());
+                        if (superMmd != null)
                         {
-                            // Merge in any additional info not specified in the overridden field
-                            if (superFmd.isPrimaryKey())
+                            // Merge in any additional info not specified in the overridden field TODO Use MetaDataMerger to merge in better than this
+                            if (superMmd.isPrimaryKey())
                             {
                                 mmd.setPrimaryKey(true);
                             }
@@ -1024,13 +1025,19 @@ public class ClassMetaData extends AbstractClassMetaData
     public String toString()
     {
         StringBuilder str = new StringBuilder(super.toString()).append(" [").append(this.getFullClassName()).append("]");
-        str.append(" identity=").append(identityType.toString());
-        if (identityType == IdentityType.APPLICATION)
+        if (identityType != null)
         {
-            str.append("(").append(getNoOfPrimaryKeyMembers()).append(" pkFields, id=").append(objectidClass).append(")");
+            str.append(" identity=").append(identityType.toString());
+            if (identityType == IdentityType.APPLICATION)
+            {
+                str.append("(").append(getNoOfPrimaryKeyMembers()).append(" pkFields, id=").append(objectidClass).append(")");
+            }
         }
-        str.append(", managedMembers.size=").append(managedMembers.length);
-        str.append(", overriddenMembers.size=").append(overriddenMembers.length);
+        if (isInitialised())
+        {
+            str.append(", managedMembers.size=").append(managedMembers.length);
+            str.append(", overriddenMembers.size=").append(overriddenMembers.length);
+        }
         if (inheritanceMetaData != null)
         {
             str.append(", inheritance=").append(inheritanceMetaData.getStrategy().toString());
