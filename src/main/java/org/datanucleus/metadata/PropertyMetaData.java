@@ -80,4 +80,27 @@ public class PropertyMetaData extends AbstractMemberMetaData
         this.fieldName = name;
         return this;
     }
+
+    public String toString()
+    {
+        StringBuilder str = new StringBuilder(super.toString()).append(" [").append(this.getFullFieldName()).append("]");
+        str.append(" type=").append(getTypeName());
+        if (primaryKey == Boolean.TRUE)
+        {
+            str.append(", primary-key");
+        }
+        if (embedded == Boolean.TRUE)
+        {
+            str.append(", embedded");
+        }
+        if (serialized == Boolean.TRUE)
+        {
+            str.append(", serialised");
+        }
+        if (valueStrategy != null)
+        {
+            str.append(", valueStrategy=").append(valueStrategy.toString());
+        }
+        return str.toString();
+    }
 }
