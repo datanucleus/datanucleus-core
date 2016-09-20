@@ -20,7 +20,6 @@ Contributors:
 package org.datanucleus.store.types;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -77,10 +76,10 @@ public class TypeManagerImpl implements TypeManager, Serializable
     protected Map<Class, Map<Class, TypeConverter>> typeConverterMap = null;
 
     /** Cache of TypeConverter datastore type, keyed by the converter. */
-    protected Map<TypeConverter, Class> typeConverterDatastoreTypeByConverter = null;
+    protected Map<TypeConverter, Class> typeConverterDatastoreTypeByConverter = new ConcurrentHashMap<>();
 
     /** Cache of TypeConverter member type, keyed by the converter. */
-    protected Map<TypeConverter, Class> typeConverterMemberTypeByConverter = null;
+    protected Map<TypeConverter, Class> typeConverterMemberTypeByConverter = new ConcurrentHashMap<>();
 
     /**
      * Constructor, loading support for type mappings using the plugin mechanism.
@@ -455,17 +454,9 @@ public class TypeManagerImpl implements TypeManager, Serializable
         }
 
         // Add to lookup converter -> memberType
-        if (typeConverterDatastoreTypeByConverter == null)
-        {
-            typeConverterDatastoreTypeByConverter = new ConcurrentHashMap<>();
-        }
         typeConverterDatastoreTypeByConverter.put(converter, dbType);
 
         // Add to lookup converter -> dbType
-        if (typeConverterMemberTypeByConverter == null)
-        {
-            typeConverterMemberTypeByConverter = new ConcurrentHashMap<>();
-        }
         typeConverterMemberTypeByConverter.put(converter, memberType);
 
         // Add to lookup by memberType and dbType
@@ -591,19 +582,8 @@ public class TypeManagerImpl implements TypeManager, Serializable
      */
     public Class getDatastoreTypeForTypeConverter(TypeConverter conv, Class memberType)
     {
-        if (typeConverterDatastoreTypeByConverter != null)
-        {
-            // Try the cache
-            if (typeConverterDatastoreTypeByConverter.containsKey(conv))
-            {
-                return typeConverterDatastoreTypeByConverter.get(conv);
-            }
-        }
-        else
-        {
-            typeConverterDatastoreTypeByConverter = new ConcurrentHashMap<TypeConverter, Class>();
-        }
-
+        return typeConverterDatastoreTypeByConverter.get(conv);
+/*
         // Note that all TypeConverters should have had the memberType and dbType cached on registration, so this code is redundant now
         try
         {
@@ -655,7 +635,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
             NucleusLogger.GENERAL.warn("Converter " + conv + " didn't have adequate information from toDatastoreType nor from getDatastoreClass");
         }
 
-        return null;
+        return null;*/
     }
 
     /**
@@ -666,21 +646,10 @@ public class TypeManagerImpl implements TypeManager, Serializable
      */
     public Class getMemberTypeForTypeConverter(TypeConverter conv, Class datastoreType)
     {
-        if (typeConverterMemberTypeByConverter != null)
-        {
-            // Try the cache
-            if (typeConverterMemberTypeByConverter.containsKey(conv))
-            {
-                return typeConverterMemberTypeByConverter.get(conv);
-            }
-        }
-        else
-        {
-            typeConverterMemberTypeByConverter = new ConcurrentHashMap<TypeConverter, Class>();
-        }
+        return typeConverterMemberTypeByConverter.get(conv);
 
         // Note that all TypeConverters should have had the memberType and dbType cached on registration, so this code is redundant now
-        try
+        /*try
         {
             Method m = conv.getClass().getMethod("toMemberType", new Class[] {datastoreType});
             Class memberType = m.getReturnType();
@@ -702,7 +671,8 @@ public class TypeManagerImpl implements TypeManager, Serializable
                 NucleusLogger.GENERAL.warn("Converter " + conv + " didn't have adequate information from toMemberType nor from getMemberClass");
             }
         }
-        return null;
+        
+        return null;*/
     }
 
     /**
