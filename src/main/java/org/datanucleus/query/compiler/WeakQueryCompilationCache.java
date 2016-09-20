@@ -18,7 +18,8 @@ Contributors:
 package org.datanucleus.query.compiler;
 
 import org.datanucleus.NucleusContext;
-import org.datanucleus.util.WeakValueMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
  * Weak-reference implementation of a generic query compilation cache.
@@ -27,6 +28,6 @@ public class WeakQueryCompilationCache extends AbstractQueryCompilationCache
 {
     public WeakQueryCompilationCache(NucleusContext nucleusCtx)
     {
-        cache = new WeakValueMap();
+        cache = new ConcurrentReferenceHashMap<String, QueryCompilation>(1, ReferenceType.STRONG, ReferenceType.WEAK);
     }
 }

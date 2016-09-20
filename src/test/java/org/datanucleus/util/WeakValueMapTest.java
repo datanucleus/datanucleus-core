@@ -1,10 +1,11 @@
 package org.datanucleus.util;
 
-import org.datanucleus.util.ReferenceValueMap;
-import org.datanucleus.util.WeakValueMap;
+import java.util.Map;
+
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
- * Tests the functionality of {@link WeakValueMap}.
+ * Tests the functionality of weak-value reference map.
  */
 public class WeakValueMapTest extends ReferenceValueMapTestCase
 {
@@ -21,8 +22,8 @@ public class WeakValueMapTest extends ReferenceValueMapTestCase
     }
 
 
-    protected ReferenceValueMap newReferenceValueMap()
+    protected Map newReferenceValueMap()
     {
-        return new WeakValueMap();
+        return new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
     }
 }

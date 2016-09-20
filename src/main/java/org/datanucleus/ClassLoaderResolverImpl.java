@@ -32,8 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.util.ConcurrentReferenceHashMap;
 import org.datanucleus.util.Localiser;
-import org.datanucleus.util.WeakValueMap;
 
 /**
  * A basic implementation of a ClassLoaderResolver. 
@@ -78,13 +78,13 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
     protected Map<String, Class> jreClasses = new ConcurrentHashMap<>();
 
     /** Cache for loaded classes */
-    protected Map<String, Class> loadedClasses = Collections.synchronizedMap(new WeakValueMap());
+    protected Map<String, Class> loadedClasses = new ConcurrentReferenceHashMap<>();
 
     /** Cache for loaded classes */
-    protected Map<String, Class> unloadedClasses = Collections.synchronizedMap(new WeakValueMap());
+    protected Map<String, Class> unloadedClasses = new ConcurrentReferenceHashMap<>();
 
     /** Cache for resources */
-    protected Map<String, URL> resources = Collections.synchronizedMap(new WeakValueMap());
+    protected Map<String, URL> resources = new ConcurrentReferenceHashMap<>();
 
     /** The primary class */
     ThreadLocal primary = new ThreadLocal();

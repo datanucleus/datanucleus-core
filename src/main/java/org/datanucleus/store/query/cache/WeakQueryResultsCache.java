@@ -18,7 +18,8 @@ Contributors:
 package org.datanucleus.store.query.cache;
 
 import org.datanucleus.NucleusContext;
-import org.datanucleus.util.WeakValueMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
  * Weak-reference implementation of a query results cache.
@@ -30,6 +31,6 @@ public class WeakQueryResultsCache extends AbstractQueryResultsCache
     public WeakQueryResultsCache(NucleusContext ctx)
     {
         super(ctx);
-        cache = new WeakValueMap();
+        cache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
     }
 }

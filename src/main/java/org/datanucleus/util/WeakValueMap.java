@@ -26,8 +26,9 @@ import java.util.Map;
 
 /**
  * A <code>java.util.Map</code> implementation using weak reference values.
- * <p>The values are stored in the map as weak references.  If the garbage
- * collector clears the reference, the corresponding key is automatically removed from the map.
+ * <p>The values are stored in the map as weak references.
+ * If the garbage collector clears the reference, the corresponding key is automatically removed from the map.
+ * @deprecated Use ConcurrentReferenceHashMap instead
  * @see WeakReference
  */
 public class WeakValueMap extends ReferenceValueMap

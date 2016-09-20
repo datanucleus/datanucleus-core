@@ -25,9 +25,10 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.datanucleus.util.ConcurrentReferenceHashMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.SoftValueMap;
-import org.datanucleus.util.WeakValueMap;
 
 /**
  * Abstract implementation of a lazy loaded list of (persistent) objects.
@@ -61,7 +62,7 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
             }
             else if (cacheType.equalsIgnoreCase("weak"))
             {
-                itemsByIndex = new WeakValueMap();
+                itemsByIndex = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
             }
             else if (cacheType.equalsIgnoreCase("strong"))
             {
@@ -73,12 +74,12 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
             }
             else
             {
-                itemsByIndex = new WeakValueMap();
+                itemsByIndex = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
             }
         }
         else
         {
-            itemsByIndex = new WeakValueMap();
+            itemsByIndex = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
         }
     }
 

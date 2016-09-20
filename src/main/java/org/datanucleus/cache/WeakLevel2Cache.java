@@ -31,8 +31,9 @@ import org.datanucleus.NucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.ConcurrentReferenceHashMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 import org.datanucleus.util.Localiser;
-import org.datanucleus.util.WeakValueMap;
 
 /**
  * Weak referenced implementation of a Level 2 cache.
@@ -84,7 +85,7 @@ public class WeakLevel2Cache implements Level2Cache
     {
         apiAdapter = nucleusCtx.getApiAdapter();
         pinnedCache = new HashMap();
-        unpinnedCache = new WeakValueMap();
+        unpinnedCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
         maxSize = nucleusCtx.getConfiguration().getIntProperty(PropertyNames.PROPERTY_CACHE_L2_MAXSIZE);
     }
 
@@ -594,6 +595,6 @@ public class WeakLevel2Cache implements Level2Cache
     {
         // our "pseudo-constructor"
         in.defaultReadObject();
-        unpinnedCache = new WeakValueMap();
+        unpinnedCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
     }
 }

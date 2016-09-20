@@ -88,11 +88,12 @@ import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.StorePersistenceHandler.PersistenceBatchType;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.store.types.scostore.Store;
+import org.datanucleus.util.ConcurrentReferenceHashMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 import org.datanucleus.util.TypeConversionHelper;
-import org.datanucleus.util.WeakValueMap;
 
 /**
  * Manager for persistence/retrieval of objects within an execution context, equating to the work
@@ -170,7 +171,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     private Transaction tx;
 
     /** Cache of ObjectProviders enlisted in the current transaction, keyed by the object id. */
-    private Map<Object, ObjectProvider> enlistedOPCache = new WeakValueMap();
+    private Map<Object, ObjectProvider> enlistedOPCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
 
     /** List of ObjectProviders for all current dirty objects managed by this context. */
     private List<ObjectProvider> dirtyOPs = new ArrayList<>();

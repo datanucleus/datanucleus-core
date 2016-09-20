@@ -10,29 +10,26 @@ import junit.framework.TestCase;
 import org.datanucleus.util.ReferenceValueMap;
 
 /**
- * Abstract base class for tests that test the functionality of a
- * {@link ReferenceValueMap}.
+ * Abstract base class for tests that test the functionality of a {@link ReferenceValueMap}.
  */
 public abstract class ReferenceValueMapTestCase extends TestCase
 {
     private static final int NUM_TEST_ENTRIES = 50;
 
     /**
-     * Used by the JUnit framework to construct tests.  Normally, programmers
-     * would never explicitly use this constructor.
-     *
-     * @param name   Name of the <tt>TestCase</tt>.
+     * Used by the JUnit framework to construct tests.  Normally, programmers would never explicitly use this constructor.
+     * @param name Name of the <tt>TestCase</tt>.
      */
     public ReferenceValueMapTestCase(String name)
     {
         super(name);
     }
 
-    protected abstract ReferenceValueMap newReferenceValueMap();
+    protected abstract Map newReferenceValueMap();
 
     public void testMemoryReclamation()
     {
-        ReferenceValueMap map = newReferenceValueMap();
+        Map map = newReferenceValueMap();
         Runtime rt = Runtime.getRuntime();
 
         rt.gc();
@@ -64,7 +61,7 @@ public abstract class ReferenceValueMapTestCase extends TestCase
 
     public void testBasicFunction()
     {
-        ReferenceValueMap map = newReferenceValueMap();
+        Map map = newReferenceValueMap();
         String[] keyArray = new String[NUM_TEST_ENTRIES];
         Integer[] valueArray = new Integer[NUM_TEST_ENTRIES];
 
@@ -78,7 +75,8 @@ public abstract class ReferenceValueMapTestCase extends TestCase
 
         checkMapContents(map, keyArray, valueArray);
 
-        Map map2 = (Map)map.clone();
+        Map map2 = newReferenceValueMap();
+        map2.putAll(map);
         map.clear();
 
         assertEquals(0, map.size());
@@ -100,8 +98,7 @@ public abstract class ReferenceValueMapTestCase extends TestCase
 
 
     /**
-     * Tests Map.get(), Map.containsKey(), Map.containsValue(), Map.entrySet(),
-     * Map.keySet(), Map.values()
+     * Tests Map.get(), Map.containsKey(), Map.containsValue(), Map.entrySet(), Map.keySet(), Map.values()
      */
     protected void checkMapContents(Map map, String[] keyArray, Integer[] valueArray)
     {

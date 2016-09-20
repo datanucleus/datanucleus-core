@@ -27,9 +27,10 @@ import java.util.NoSuchElementException;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.util.ConcurrentReferenceHashMap;
 import org.datanucleus.util.SoftValueMap;
 import org.datanucleus.util.StringUtils;
-import org.datanucleus.util.WeakValueMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
  * QueryResult taking in the list of identities of the objects of candidate type.
@@ -72,7 +73,7 @@ public class CandidateIdsQueryResult<E> extends AbstractQueryResult<E>
             }
             else if (ext.equalsIgnoreCase("weak"))
             {
-                results = new WeakValueMap();
+                results = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
             }
             else if (ext.equalsIgnoreCase("none"))
             {

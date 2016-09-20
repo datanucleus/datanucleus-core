@@ -23,7 +23,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.util.WeakValueMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
  * Level 1 Cache using Weak referenced objects in a Map.
@@ -34,7 +35,7 @@ import org.datanucleus.util.WeakValueMap;
  */
 public class WeakRefCache implements Level1Cache
 {
-    private Map<Object, ObjectProvider> weakCache = new WeakValueMap();
+    private Map<Object, ObjectProvider> weakCache = new ConcurrentReferenceHashMap<Object, ObjectProvider>(1, ReferenceType.STRONG, ReferenceType.WEAK);
 
     /**
      * Default constructor (required)
