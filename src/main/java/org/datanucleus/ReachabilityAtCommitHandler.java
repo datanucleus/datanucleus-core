@@ -19,6 +19,7 @@ package org.datanucleus;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.state.ObjectProvider;
@@ -33,7 +34,6 @@ import org.datanucleus.util.StringUtils;
  * This is a feature of the JDO spec that is enabled by default for that API.
  * It runs a cursory check for objects that have been pulled in to be persisted by "persistence-by-reachability" (cascading) but that are no longer needing to be persisted
  * maybe due to the cascading origin object being deleted.
- * This is not thread-safe.
  */
 public class ReachabilityAtCommitHandler
 {
@@ -61,10 +61,10 @@ public class ReachabilityAtCommitHandler
     public ReachabilityAtCommitHandler(ExecutionContext ec)
     {
         this.ec = ec;
-        this.persistedIds = new HashSet();
-        this.deletedIds = new HashSet();
-        this.flushedNewIds = new HashSet();
-        this.enlistedIds = new HashSet();
+        this.persistedIds = ec.getMultithreaded() ? ConcurrentHashMap.newKeySet() : new HashSet();
+        this.deletedIds = ec.getMultithreaded() ? ConcurrentHashMap.newKeySet() : new HashSet();
+        this.flushedNewIds = ec.getMultithreaded() ? ConcurrentHashMap.newKeySet() : new HashSet();
+        this.enlistedIds = ec.getMultithreaded() ? ConcurrentHashMap.newKeySet() : new HashSet();
     }
 
     /**
