@@ -148,16 +148,9 @@ public interface TypeManager
     TypeConverter getTypeConverterForName(String converterName);
 
     /**
-     * Register a TypeConverter against a specific name.
-     * TypeConverters are registered either from the contents of "plugin.xml" (i.e the builtin types) where the
-     * name is of the form "dn.*", or from user-registered metadata (e.g JPA Annotations) where the name is the class name of the converter.
-     * @param name The name to register the converter under
-     * @param converter The converter
-     */
-    void registerConverter(String name, TypeConverter converter);
-
-    /**
      * Register a TypeConverter with the TypeManager process for specific attribute/db types.
+     * TypeConverters are registered either from the contents of "plugin.xml" (i.e the builtin types) where the name is of the form "dn.*",
+     * or from user-registered metadata (e.g JPA Annotations) where the name is the class name of the converter or a user supplied name.
      * @param name The name to register the converter under
      * @param converter The converter
      * @param memberType Type of the java member

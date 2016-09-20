@@ -483,6 +483,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
 
         if (converter instanceof ClassStringConverter)
         {
+            // ClassStringConverter is a special case that needs the CLR injecting. TODO Find a general way for converters to use this
             ((ClassStringConverter)converter).setClassLoaderResolver(getClassLoaderResolver());
         }
 
@@ -495,20 +496,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
             }
             autoApplyConvertersByType.put(autoApplyType, converter);
         }
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.types.TypeManager#registerConverter(java.lang.String, org.datanucleus.store.types.converters.TypeConverter)
-     */
-    @Override
-    public void registerConverter(String name, TypeConverter converter)
-    {
-        // Add to lookup name -> converter
-        if (typeConverterByName == null)
-        {
-            typeConverterByName = new ConcurrentHashMap<String, TypeConverter>();
-        }
-        typeConverterByName.put(name, converter);
     }
 
     /* (non-Javadoc)
@@ -617,6 +604,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
             typeConverterDatastoreTypeByConverter = new ConcurrentHashMap<TypeConverter, Class>();
         }
 
+        // Note that all TypeConverters should have had the memberType and dbType cached on registration, so this code is redundant now
         try
         {
             Method m = conv.getClass().getMethod("toDatastoreType", new Class[] {memberType});
@@ -691,6 +679,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
             typeConverterMemberTypeByConverter = new ConcurrentHashMap<TypeConverter, Class>();
         }
 
+        // Note that all TypeConverters should have had the memberType and dbType cached on registration, so this code is redundant now
         try
         {
             Method m = conv.getClass().getMethod("toMemberType", new Class[] {datastoreType});
