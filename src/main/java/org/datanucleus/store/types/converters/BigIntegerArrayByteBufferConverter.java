@@ -40,7 +40,7 @@ public class BigIntegerArrayByteBufferConverter implements TypeConverter<BigInte
             return null;
         }
         byte[] bytes = TypeConversionHelper.getByteArrayFromBigIntegerArray(memberValue);
-        ByteBuffer byteBuffer = ByteBuffer.allocate(memberValue.length);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(bytes.length);
         byteBuffer.put(bytes);
         return byteBuffer;
     }

@@ -40,7 +40,7 @@ public class BigDecimalArrayByteBufferConverter implements TypeConverter<BigDeci
             return null;
         }
         byte[] bytes = TypeConversionHelper.getByteArrayFromBigDecimalArray(memberValue);
-        ByteBuffer byteBuffer = ByteBuffer.allocate(memberValue.length);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(bytes.length);
         byteBuffer.put(bytes);
         return byteBuffer;
     }

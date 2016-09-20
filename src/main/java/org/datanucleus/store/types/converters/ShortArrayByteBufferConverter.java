@@ -39,7 +39,7 @@ public class ShortArrayByteBufferConverter implements TypeConverter<short[], Byt
             return null;
         }
         byte[] bytes = TypeConversionHelper.getByteArrayFromShortArray(memberValue);
-        ByteBuffer byteBuffer = ByteBuffer.allocate(memberValue.length);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(bytes.length);
         byteBuffer.put(bytes);
         return byteBuffer;
     }
