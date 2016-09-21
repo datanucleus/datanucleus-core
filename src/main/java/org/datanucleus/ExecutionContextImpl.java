@@ -3509,6 +3509,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * Accessor for an object given the object id. If validate is false, we return the object
      * if found in the cache, or otherwise a Hollow object with that id. If validate is true
      * we check with the datastore and return an object with the FetchPlan fields loaded.
+     * TODO Would be nice, when using checkInheritance, to be able to specify the "id" is an instance of class X or subclass. See IdentityUtils where we have the min class
      * @param id Id of the object.
      * @param validate Whether to validate the object state
      * @param checkInheritance Whether look to the database to determine which class this object is.
