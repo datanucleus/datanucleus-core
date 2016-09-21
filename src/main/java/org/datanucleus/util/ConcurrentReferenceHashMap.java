@@ -38,10 +38,10 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * An advanced hash table supporting configurable garbage collection semantics of keys and values, optional
  * referential-equality, full concurrency of retrievals, and adjustable expected concurrency for updates.
- * <p/>
+ * <p>
  * This table is designed around specific advanced use-cases. If there is any doubt whether this table is for
  * you, you most likely should be using {@link java.util.concurrent.ConcurrentHashMap} instead.
- * <p/>
+ * <p>
  * This table supports strong, weak, and soft keys and values. By default keys are weak, and values are
  * strong. Such a configuration offers similar behavior to {@link java.util.WeakHashMap}, entries of this
  * table are periodically removed once their corresponding keys are no longer referenced outside of this
@@ -51,30 +51,29 @@ import java.util.concurrent.locks.ReentrantLock;
  * summary functions such as <tt>size</tt> and <tt>isEmpty</tt> might return a value greater than the observed
  * number of entries. In order to support a high level of concurrency, stale entries are only reclaimed during
  * blocking (usually mutating) operations.
- * <p/>
+ * <p>
  * Enabling soft keys allows entries in this table to remain until their space is absolutely needed by the
  * garbage collector. This is unlike weak keys which can be reclaimed as soon as they are no longer referenced
  * by a normal strong reference. The primary use case for soft keys is a cache, which ideally occupies memory
  * that is not in use for as long as possible.
- * <p/>
+ * <p>
  * By default, values are held using a normal strong reference. This provides the commonly desired guarantee
  * that a value will always have at least the same life-span as it's key. For this reason, care should be
  * taken to ensure that a value never refers, either directly or indirectly, to its key, thereby preventing
  * reclamation. If this is unavoidable, then it is recommended to use the same reference type in use for the
  * key. However, it should be noted that non-strong values may disappear beforeQuery their corresponding key.
- * <p/>
+ * <p>
  * While this table does allow the use of both strong keys and values, it is recommended to use
  * {@link java.util.concurrent.ConcurrentHashMap} for such a configuration, since it is optimized for that
  * case.
- * <p/>
+ * <p>
  * Just like {@link java.util.concurrent.ConcurrentHashMap}, this class obeys the same functional
  * specification as {@link java.util.Hashtable}, and includes versions of methods corresponding to each method
  * of <tt>Hashtable</tt>. However, even though all operations are thread-safe, retrieval operations do
  * <em>not</em> entail locking, and there is <em>not</em> any support for locking the entire table in a way
  * that prevents all access. This class is fully interoperable with <tt>Hashtable</tt> in programs that rely
  * on its thread safety but not on its synchronization details.
- * <p/>
- * <p/>
+ * <p>
  * Retrieval operations (including <tt>get</tt>) generally do not block, so may overlap with update operations
  * (including <tt>put</tt> and <tt>remove</tt>). Retrievals reflect the results of the most recently
  * <em>completed</em> update operations holding upon their onset. For aggregate operations such as
@@ -83,8 +82,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * some point at or since the creation of the iterator/enumeration. They do <em>not</em> throw
  * {@link java.util.ConcurrentModificationException}. However, iterators are designed to be used by only one
  * thread at a time.
- * <p/>
- * <p/>
+ * <p>
  * The allowed concurrency among update operations is guided by the optional <tt>concurrencyLevel</tt>
  * constructor argument (default <tt>16</tt>), which is used as a hint for internal sizing. The table is
  * internally partitioned to try to permit the indicated number of concurrent updates without contention.
@@ -95,16 +93,13 @@ import java.util.concurrent.locks.ReentrantLock;
  * much noticeable impact. A value of one is appropriate when it is known that only one thread will modify and
  * all others will only read. Also, resizing this or any other kind of hash table is a relatively slow
  * operation, so, when possible, it is a good idea to provide estimates of expected table sizes in constructors.
- * <p/>
- * <p/>
+ * <p>
  * This class and its views and iterators implement all of the <em>optional</em> methods of the {@link Map}
  * and {@link Iterator} interfaces.
- * <p/>
- * <p/>
+ * <p>
  * Like {@link java.util.Hashtable} but unlike {@link java.util.HashMap}, this class does <em>not</em> allow
  * <tt>null</tt> to be used as a key or value.
- * <p/>
- * <p/>
+ * <p>
  * This class is a member of the <a href="{@docRoot}/../technotes/guides/collections/index.html"> Java Collections Framework</a>.
  * 
  * <b>Written by Doug Lea with assistance from members of JCP JSR-166 Expert Group and released to the public domain, as explained at http://creativecommons.org/licenses/publicdomain</b>
@@ -943,7 +938,7 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
     /**
      * Creates a new, empty map with the specified initial capacity, reference types, load factor and
      * concurrency level.
-     * <p/>
+     * <p>
      * Behavioral changing options such as {@link Option#IDENTITY_COMPARISONS} can also be specified.
      * @param initialCapacity the initial capacity. The implementation performs internal sizing to accommodate
      * this many elements.
@@ -1207,7 +1202,6 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
     /**
      * Returns the value to which the specified key is mapped, or {@code null} if this map contains no mapping
      * for the key.
-     * <p/>
      * <p>
      * More formally, if this map contains a mapping from a key {@code k} to a value {@code v} such that
      * {@code key.equals(k)}, then this method returns {@code v}; otherwise it returns {@code null}. (There
@@ -1338,14 +1332,11 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
 
     /**
      * Maps the specified key to the specified value in this table. Neither the key nor the value can be null.
-     * <p/>
      * <p>
-     * The value can be retrieved by calling the <tt>get</tt> method with a key that is equal to the original
-     * key.
+     * The value can be retrieved by calling the <tt>get</tt> method with a key that is equal to the original key.
      * @param key key with which the specified value is to be associated
      * @param value value to be associated with the specified key
-     * @return the previous value associated with <tt>key</tt>, or <tt>null</tt> if there was no mapping for
-     * <tt>key</tt>
+     * @return the previous value associated with <tt>key</tt>, or <tt>null</tt> if there was no mapping for <tt>key</tt>
      * @throws NullPointerException if the specified key or value is null
      */
     @Override
@@ -1361,8 +1352,7 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
 
     /**
      * {@inheritDoc}
-     * @return the previous value associated with the specified key, or <tt>null</tt> if there was no mapping
-     * for the key
+     * @return the previous value associated with the specified key, or <tt>null</tt> if there was no mapping for the key
      * @throws NullPointerException if the specified key or value is null
      */
     @Override
@@ -1391,11 +1381,9 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
     }
 
     /**
-     * Removes the key (and its corresponding value) from this map. This method does nothing if the key is not
-     * in the map.
+     * Removes the key (and its corresponding value) from this map. This method does nothing if the key is not in the map.
      * @param key the key that needs to be removed
-     * @return the previous value associated with <tt>key</tt>, or <tt>null</tt> if there was no mapping for
-     * <tt>key</tt>
+     * @return the previous value associated with <tt>key</tt>, or <tt>null</tt> if there was no mapping for <tt>key</tt>
      * @throws NullPointerException if the specified key is null
      */
     @Override
@@ -1441,8 +1429,7 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
 
     /**
      * {@inheritDoc}
-     * @return the previous value associated with the specified key, or <tt>null</tt> if there was no mapping
-     * for the key
+     * @return the previous value associated with the specified key, or <tt>null</tt> if there was no mapping for the key
      * @throws NullPointerException if the specified key or value is null
      */
     @Override
@@ -1473,7 +1460,7 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
      * since stale entries are automatically removed lazily, when blocking operations are required. However,
      * there are some cases where this operation should be performed eagerly, such as cleaning up old
      * references to a ClassLoader in a multi-classloader environment.
-     * <p/>
+     * <p>
      * Note: this method will acquire locks, one at a time, across all segments of this table, so if it is to
      * be used, it should be used sparingly.
      */
@@ -1491,7 +1478,6 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
      * the corresponding mapping from this map, via the <tt>Iterator.remove</tt>, <tt>Set.remove</tt>,
      * <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt> operations. It does not support the
      * <tt>add</tt> or <tt>addAll</tt> operations.
-     * <p/>
      * <p>
      * The view's <tt>iterator</tt> is a "weakly consistent" iterator that will never throw
      * {@link java.util.ConcurrentModificationException}, and guarantees to traverse elements as they existed
@@ -1511,7 +1497,6 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
      * element removal, which removes the corresponding mapping from this map, via the
      * <tt>Iterator.remove</tt>, <tt>Collection.remove</tt>, <tt>removeAll</tt>, <tt>retainAll</tt>, and
      * <tt>clear</tt> operations. It does not support the <tt>add</tt> or <tt>addAll</tt> operations.
-     * <p/>
      * <p>
      * The view's <tt>iterator</tt> is a "weakly consistent" iterator that will never throw
      * {@link java.util.ConcurrentModificationException}, and guarantees to traverse elements as they existed
@@ -1531,7 +1516,6 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
      * removes the corresponding mapping from the map, via the <tt>Iterator.remove</tt>, <tt>Set.remove</tt>,
      * <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt> operations. It does not support the
      * <tt>add</tt> or <tt>addAll</tt> operations.
-     * <p/>
      * <p>
      * The view's <tt>iterator</tt> is a "weakly consistent" iterator that will never throw
      * {@link java.util.ConcurrentModificationException}, and guarantees to traverse elements as they existed
@@ -1669,12 +1653,7 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
         }
     }
 
-    final class KeyIterator
-            extends
-                HashIterator
-            implements
-                Iterator<K>,
-                Enumeration<K>
+    final class KeyIterator extends HashIterator implements Iterator<K>, Enumeration<K>
     {
         @Override
         public K next()
@@ -1689,12 +1668,7 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
         }
     }
 
-    final class ValueIterator
-            extends
-                HashIterator
-            implements
-                Iterator<V>,
-                Enumeration<V>
+    final class ValueIterator extends HashIterator implements Iterator<V>, Enumeration<V>
     {
         @Override
         public V next()
@@ -1956,6 +1930,7 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
      * @param s the stream
      * @serialData the key (Object) and value (Object) for each key-value mapping, followed by a null pair.
      * The key-value mappings are emitted in no particular order.
+     * @throws IOException if an i/o error occurs
      */
     private void writeObject(java.io.ObjectOutputStream s) throws IOException
     {
@@ -1996,11 +1971,11 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
     /**
      * Reconstitute the <tt>ConcurrentReferenceHashMap</tt> instance from a stream (i.e., deserialize it).
      * @param s the stream
+     * @throws IOException if an i/o error occurs
+     * @throws ClassNotFoundException if a class is not found
      */
     @SuppressWarnings("unchecked")
-    private void readObject(java.io.ObjectInputStream s)
-        throws IOException,
-        ClassNotFoundException
+    private void readObject(java.io.ObjectInputStream s) throws IOException, ClassNotFoundException
     {
         s.defaultReadObject();
 
