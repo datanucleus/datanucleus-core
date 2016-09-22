@@ -2621,8 +2621,34 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             // Field is bidirectional
             if (mappedBy != null)
             {
-                // This class has the "mapped-by" specified
-                AbstractMemberMetaData otherMmd = otherCmd.getMetaDataForMember(mappedBy);
+                // This class has the "mapped-by" specified, so find the related member
+                AbstractMemberMetaData otherMmd = null;
+                if (mappedBy.indexOf('.') > 0)
+                {
+                    NucleusLogger.METADATA.warn("Member " + getFullFieldName() + " has mappedBy using DOT NOTATION. This is not yet supported");
+                    // TODO Cater for dot notation mappedBy where (final) field is embedded, navigate to final (embedded) member
+                    String remainingMappedBy = mappedBy;
+                    while (remainingMappedBy.indexOf('.') > 0)
+                    {
+                        int dotPosition = remainingMappedBy.indexOf('.');
+                        String thisMappedBy = remainingMappedBy.substring(0, dotPosition);
+                        otherMmd = otherCmd.getMetaDataForMember(thisMappedBy);
+                        if (otherMmd == null)
+                        {
+                            throw new NucleusUserException(Localiser.msg("044115", 
+                                getAbstractClassMetaData().getFullClassName(), name, remainingMappedBy, otherCmd.getFullClassName())).setFatal();
+                        }
+
+                        remainingMappedBy = remainingMappedBy.substring(dotPosition+1);
+                        otherCmd = getMetaDataManager().getMetaDataForClass(otherMmd.getTypeName(), clr); // TODO Cater for N-1
+                    }
+
+                    otherMmd = otherCmd.getMetaDataForMember(remainingMappedBy);
+                }
+                else
+                {
+                    otherMmd = otherCmd.getMetaDataForMember(mappedBy);
+                }
                 if (otherMmd == null)
                 {
                     throw new NucleusUserException(Localiser.msg("044115", 
@@ -2636,6 +2662,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                     {
                         relationType = RelationType.ONE_TO_ONE_BI;
                     }
+                    // TODO And if the related is not single-collection???
                 }
                 else if (hasContainer() && relatedMemberMetaData[0].hasContainer())
                 {
