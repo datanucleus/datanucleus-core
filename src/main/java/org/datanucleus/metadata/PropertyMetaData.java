@@ -97,9 +97,18 @@ public class PropertyMetaData extends AbstractMemberMetaData
         {
             str.append(", serialised");
         }
+        str.append(", persistence-modifier=").append(persistenceModifier.toString());
         if (valueStrategy != null)
         {
             str.append(", valueStrategy=").append(valueStrategy.toString());
+        }
+        if (parent instanceof AbstractClassMetaData)
+        {
+            AbstractClassMetaData parentAsCmd = (AbstractClassMetaData)parent;
+            if (!parentAsCmd.getFullClassName().equals(getClassName()))
+            {
+                str.append(" OVERRIDE");
+            }
         }
         return str.toString();
     }

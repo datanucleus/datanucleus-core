@@ -487,14 +487,41 @@ public class InterfaceMetaData extends AbstractClassMetaData
                 str.append("(").append(getNoOfPrimaryKeyMembers()).append(" pkFields, id=").append(objectidClass).append(")");
             }
         }
+        str.append(", modifier=" + persistenceModifier);
+        if (inheritanceMetaData != null && inheritanceMetaData.getStrategy() != null)
+        {
+            str.append(", inheritance=").append(inheritanceMetaData.getStrategy().toString());
+        }
         if (isInitialised())
         {
             str.append(", managedMembers.size=").append(managedMembers.length);
             str.append(", overriddenMembers.size=").append(overriddenMembers.length);
+            str.append("\n");
+            str.append("    managed=[");
+            for (int i=0;i<managedMembers.length;i++)
+            {
+                if (i != 0)
+                {
+                    str.append(",");
+                }
+                str.append(managedMembers[i] instanceof PropertyMetaData ? "Property(" : "Field(").append(managedMembers[i].getFullFieldName()).append(")");
+            }
+            str.append("]");
+            str.append("\n");
+            str.append("    overridden=[");
+            for (int i=0;i<overriddenMembers.length;i++)
+            {
+                if (i != 0)
+                {
+                    str.append(",");
+                }
+                str.append(overriddenMembers[i] instanceof PropertyMetaData ? "Property(" : "Field(").append(overriddenMembers[i].getFullFieldName()).append(")");
+            }
+            str.append("]");
         }
-        if (inheritanceMetaData != null)
+        else
         {
-            str.append(", inheritance=").append(inheritanceMetaData.getStrategy().toString());
+            str.append(", members.size=").append(members.size());
         }
         return str.toString();
     }
