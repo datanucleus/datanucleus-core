@@ -505,12 +505,12 @@ public class ClassMetaData extends AbstractClassMetaData
 
                                             memberNames.add(mmd.getName());
                                             Collections.sort(members);
-                                            foundTypeForTypeVariable = true;
                                         }
                                         else
                                         {
                                             // TODO Cater for the user overriding it
                                         }
+                                        foundTypeForTypeVariable = true;
                                     }
                                 }
                                 if (!foundTypeForTypeVariable)
@@ -548,13 +548,13 @@ public class ClassMetaData extends AbstractClassMetaData
 
                                                 memberNames.add(mmd.getName());
                                                 Collections.sort(members);
-                                                foundTypeForTypeVariable = true;
                                             }
                                             else
                                             {
                                                 // TODO Cater for the user overriding it
                                             }
                                         }
+                                        foundTypeForTypeVariable = true;
                                     }
                                 }
                             }
@@ -610,7 +610,6 @@ public class ClassMetaData extends AbstractClassMetaData
                                                 members.add(mmd);
                                                 memberNames.add(mmd.getName());
                                                 Collections.sort(members);
-                                                foundTypeForTypeVariable = true;
                                             }
                                             else
                                             {
@@ -618,6 +617,7 @@ public class ClassMetaData extends AbstractClassMetaData
                                                 AbstractMemberMetaData overrideMmd = getMetaDataForMember(fieldName);
                                                 overrideMmd.type = (Class) paramTypeArgs[j];
                                             }
+                                            foundTypeForTypeVariable = true;
                                         }
                                     }
                                     if (!foundTypeForTypeVariable)
@@ -643,7 +643,6 @@ public class ClassMetaData extends AbstractClassMetaData
 
                                                 memberNames.add(mmd.getName());
                                                 Collections.sort(members);
-                                                foundTypeForTypeVariable = true;
                                             }
                                             else
                                             {
@@ -651,6 +650,7 @@ public class ClassMetaData extends AbstractClassMetaData
                                                 AbstractMemberMetaData overrideMmd = getMetaDataForMember(fieldName);
                                                 overrideMmd.type = (Class) boundTypes[0];
                                             }
+                                            foundTypeForTypeVariable = true;
                                         }
                                     }
                                 }
