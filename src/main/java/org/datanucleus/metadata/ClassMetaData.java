@@ -308,7 +308,7 @@ public class ClassMetaData extends AbstractClassMetaData
         // Access API since we treat things differently for JPA and JDO
         String api = mmgr.getNucleusContext().getApiName();
 
-        Set<String> memberNames = new HashSet<String>();
+        Set<String> memberNames = new HashSet<>();
         for (AbstractMemberMetaData mmd : members)
         {
             memberNames.add(mmd.getName());
@@ -324,7 +324,7 @@ public class ClassMetaData extends AbstractClassMetaData
         Collections.sort(members);
         try
         {
-            // check if we have any persistent properties
+            // check if we have any persistent properties in this class
             boolean hasProperties = false;
             for (int i=0; i<members.size(); i++)
             {
@@ -334,106 +334,57 @@ public class ClassMetaData extends AbstractClassMetaData
                     break;
                 }
             }
-
-            if (hasProperties && api.equalsIgnoreCase("JPA"))
+            if (members.size() == 0)
             {
-                // JPA : when we are using properties go through and add properties for those not specified.
-                // Process all (reflected) methods in the populating class
-                Method[] clsMethods = cls.getDeclaredMethods();
-                for (int i=0;i<clsMethods.length;i++)
+                // Nothing specified in this class so check superclasses and default to the same as those
+                if (pcSuperclassMetaData != null)
                 {
-                    // Limit to valid java bean getter methods in this class (don't allow inner class methods)
-                    if (clsMethods[i].getDeclaringClass().getName().equals(fullName) && !clsMethods[i].isBridge() &&
-                        ClassUtils.isJavaBeanGetterMethod(clsMethods[i]) && !ClassUtils.isInnerClass(clsMethods[i].getName()))
+                    for (int i=0; i<pcSuperclassMetaData.members.size(); i++)
                     {
-                        // Find if there is metadata for this property
-                        String propertyName = ClassUtils.getFieldNameForJavaBeanGetter(clsMethods[i].getName());
-                        // TODO : This will not check if the name is a property! so we can miss field+property clashes
-                        if (!memberNames.contains(propertyName))
+                        if (pcSuperclassMetaData.members.get(i) instanceof PropertyMetaData)
                         {
-                            // No field/property of this name - add a default PropertyMetaData for this method
-                            NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, propertyName));
-                            AbstractMemberMetaData mmd = new PropertyMetaData(this, propertyName);
-                            members.add(mmd);
-                            memberNames.add(mmd.getName());
-                            Collections.sort(members);
-                        }
-                        else
-                        {
-                            // Field/property exists
+                            hasProperties = true;
+                            break;
                         }
                     }
                 }
+            }
 
-                // Check for any TypeVariables used with Java bean getter/setter methods in superclass(es) and override the metadata in the superclass to use the right type
-                Method[] allclsMethods = cls.getMethods();
-                for (int i=0;i<allclsMethods.length;i++)
+            // Add fields/properties in the current class that have been omitted by the user (subject to the API default handling)
+            if (hasProperties)
+            {
+                if (api.equalsIgnoreCase("JPA"))
                 {
-                    // Limit to valid java bean getter methods in this class (don't allow inner class methods)
-                    if (!allclsMethods[i].getDeclaringClass().getName().equals(fullName) && 
-                        ClassUtils.isJavaBeanGetterMethod(allclsMethods[i]) && !ClassUtils.isInnerClass(allclsMethods[i].getName()) &&
-                        allclsMethods[i].getGenericReturnType() != null && allclsMethods[i].getGenericReturnType() instanceof TypeVariable)
+                    // JPA : when we are using properties go through and add properties for those not specified in the populating class.
+                    Method[] clsMethods = cls.getDeclaredMethods();
+                    for (int i=0;i<clsMethods.length;i++)
                     {
-                        TypeVariable methodTypeVar = (TypeVariable) allclsMethods[i].getGenericReturnType();
-                        Class declCls = allclsMethods[i].getDeclaringClass();
-                        TypeVariable[] declTypes = declCls.getTypeParameters();
-                        if (declTypes != null)
+                        // Limit to valid java bean getter methods in this class (don't allow inner class methods)
+                        if (clsMethods[i].getDeclaringClass().getName().equals(fullName) && !clsMethods[i].isBridge() &&
+                            ClassUtils.isJavaBeanGetterMethod(clsMethods[i]) && !ClassUtils.isInnerClass(clsMethods[i].getName()))
                         {
-                            for (int j=0;j<declTypes.length;j++)
+                            // Find if there is metadata for this property
+                            String propertyName = ClassUtils.getFieldNameForJavaBeanGetter(clsMethods[i].getName());
+                            // TODO : This will not check if the name is a property! so we can miss field+property clashes
+                            if (!memberNames.contains(propertyName))
                             {
-                                boolean foundTypeForTypeVariable = false;
-                                if (declTypes[j].getName().equals(methodTypeVar.getName()) && cls.getGenericSuperclass() instanceof ParameterizedType)
-                                {
-                                    ParameterizedType genSuperclsType = (ParameterizedType) cls.getGenericSuperclass();
-                                    Type[] paramTypeArgs = genSuperclsType.getActualTypeArguments();
-                                    if (paramTypeArgs != null && paramTypeArgs.length > j && paramTypeArgs[j] instanceof Class)
-                                    {
-                                        NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " method=" + allclsMethods[i].getName() +
-                                            " declared to return " + methodTypeVar + ", namely TypeVariable(" + j + ") of " + declCls.getName() + " so using " + paramTypeArgs[j]);
-                                        String propertyName = allclsMethods[i].getDeclaringClass().getName() + "." + ClassUtils.getFieldNameForJavaBeanGetter(allclsMethods[i].getName());
-                                        if (!memberNames.contains(propertyName))
-                                        {
-                                            // No property of this name - add a default PropertyMetaData for this method with the type set to what we need
-                                            NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, propertyName));
-                                            AbstractMemberMetaData mmd = new PropertyMetaData(this, propertyName);
-                                            mmd.type = (Class) paramTypeArgs[j];
-                                            members.add(mmd);
-                                            memberNames.add(mmd.getName());
-                                            Collections.sort(members);
-                                            foundTypeForTypeVariable = true;
-                                        }
-                                        else
-                                        {
-                                            // TODO Cater for the user overriding it
-                                        }
-                                    }
-                                }
-                                if (!foundTypeForTypeVariable)
-                                {
-                                    // Try bounds of declType
-                                    Type[] boundTypes = declTypes[j].getBounds();
-                                    if (boundTypes != null && boundTypes.length == 1 && boundTypes[0] instanceof Class)
-                                    {
-                                        // User has class declaration like "public class MyClass<T extends SomeType>" so take SomeType
-                                        NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " field=" + allclsMethods[i].getName() +
-                                            " declared to be " + methodTypeVar + ", namely TypeVariable(" + j + ") with bound, so using bound of " + boundTypes[0]);
-                                        String propertyName = allclsMethods[i].getDeclaringClass().getName() + "." + ClassUtils.getFieldNameForJavaBeanGetter(allclsMethods[i].getName());
-                                        if (!memberNames.contains(propertyName))
-                                        {
-                                            // No property of this name - add a default PropertyMetaData for this method with the type set to what we need
-                                            NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, propertyName));
-                                            AbstractMemberMetaData mmd = new PropertyMetaData(this, propertyName);
-                                            mmd.type = (Class) boundTypes[0];
-                                            members.add(mmd);
-                                            memberNames.add(mmd.getName());
-                                            Collections.sort(members);
-                                            foundTypeForTypeVariable = true;
-                                        }
-                                    }
-                                }
+                                // No field/property of this name - add a default PropertyMetaData for this method
+                                NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, propertyName));
+                                AbstractMemberMetaData mmd = new PropertyMetaData(this, propertyName);
+                                members.add(mmd);
+                                memberNames.add(mmd.getName());
+                                Collections.sort(members);
+                            }
+                            else
+                            {
+                                // Field/property exists
                             }
                         }
                     }
+                }
+                else
+                {
+                    // With JDO we only use properties when defined explicitly
                 }
             }
 
@@ -451,73 +402,72 @@ public class ClassMetaData extends AbstractClassMetaData
                     if (!memberNames.contains(clsFields[i].getName()))
                     {
                         // No field/property of this name
-                        AbstractMemberMetaData mmd = new FieldMetaData(this, clsFields[i].getName());
-                        if (hasProperties && api.equalsIgnoreCase("JPA"))
+                        if (hasProperties && api.equalsIgnoreCase("JPA")) // With JPA, if using props then don't add a field as well (since a PropertyMetaData will be present by default)
                         {
-                            // JPA : Class has properties but field not present, so add as transient field (JPA)
-                            mmd.setNotPersistent();
+                            // Do nothing
                         }
                         else
                         {
                             // Class has fields but field not present, so add as field
+                            AbstractMemberMetaData mmd = new FieldMetaData(this, clsFields[i].getName());
                             NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, clsFields[i].getName()));
+                            members.add(mmd);
+
+                            memberNames.add(mmd.getName());
+                            Collections.sort(members);
                         }
-                        members.add(mmd);
-                        memberNames.add(mmd.getName());
-                        Collections.sort(members);
                     }
                 }
             }
 
-            // Check for any TypeVariables used with fields in superclass(es) and override the metadata in the superclass to use the right type
-            Class theClass = cls;
-            while (theClass.getSuperclass() != null)
+            // Process any generic TypeVariables adding member overrides where this class defines the type of the generic in a superclass
+            if (hasProperties)
             {
-                theClass = theClass.getSuperclass();
-                Field[] theclsFields = theClass.getDeclaredFields();
-                for (int i=0;i<theclsFields.length;i++)
+                // Check for any TypeVariables used with Java bean getter/setter methods in superclass(es) and override the metadata in the superclass to use the right type
+                Method[] allclsMethods = cls.getMethods();
+                for (int i=0;i<allclsMethods.length;i++)
                 {
-                    if (!ClassUtils.isInnerClass(theclsFields[i].getName()) && !Modifier.isStatic(theclsFields[i].getModifiers()) &&
-                        !mmgr.isEnhancerField(theclsFields[i].getName()) &&
-                        theclsFields[i].getGenericType() != null && theclsFields[i].getGenericType() instanceof TypeVariable)
+                    // Limit to valid java bean getter methods in this class (don't allow inner class methods)
+                    if (!allclsMethods[i].getDeclaringClass().getName().equals(fullName) && 
+                        ClassUtils.isJavaBeanGetterMethod(allclsMethods[i]) && !ClassUtils.isInnerClass(allclsMethods[i].getName()) &&
+                        allclsMethods[i].getGenericReturnType() != null && allclsMethods[i].getGenericReturnType() instanceof TypeVariable)
                     {
-                        TypeVariable fieldTypeVar = (TypeVariable) theclsFields[i].getGenericType();
-                        Class declCls = theclsFields[i].getDeclaringClass();
+                        TypeVariable methodTypeVar = (TypeVariable) allclsMethods[i].getGenericReturnType();
+                        Class declCls = allclsMethods[i].getDeclaringClass();
                         TypeVariable[] declTypes = declCls.getTypeParameters();
+                        String propertyName = ClassUtils.getFieldNameForJavaBeanGetter(allclsMethods[i].getName());
+                        String propertyNameFull = allclsMethods[i].getDeclaringClass().getName() + "." + propertyName;
                         if (declTypes != null)
                         {
                             for (int j=0;j<declTypes.length;j++)
                             {
                                 boolean foundTypeForTypeVariable = false;
-                                if (declTypes[j].getName().equals(fieldTypeVar.getName()) && cls.getGenericSuperclass() instanceof ParameterizedType)
+                                if (declTypes[j].getName().equals(methodTypeVar.getName()) && cls.getGenericSuperclass() instanceof ParameterizedType)
                                 {
                                     ParameterizedType genSuperclsType = (ParameterizedType) cls.getGenericSuperclass();
                                     Type[] paramTypeArgs = genSuperclsType.getActualTypeArguments();
                                     if (paramTypeArgs != null && paramTypeArgs.length > j && paramTypeArgs[j] instanceof Class)
                                     {
-                                        NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " field=" + theclsFields[i].getName() +
-                                            " declared to be " + fieldTypeVar + ", namely TypeVariable(" + j + ") of " + declCls.getName() + " so using " + paramTypeArgs[j]);
-                                        String fieldName = declCls.getName() + "." + theclsFields[i].getName();
-                                        if (!memberNames.contains(fieldName))
+                                        NucleusLogger.METADATA.debug("Class=" + cls.getName() + " property=" + propertyName +
+                                            " declared to return " + methodTypeVar + ", namely TypeVariable(" + j + ") of " + declCls.getName() + " so using " + paramTypeArgs[j]);
+                                        if (!memberNames.contains(propertyName))
                                         {
-                                            // No property of this name - add a default FieldMetaData for this method with the type set to what we need
-                                            NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, fieldName));
-                                            AbstractMemberMetaData mmd = new FieldMetaData(this, fieldName);
-                                            if (hasProperties && api.equalsIgnoreCase("JPA"))
-                                            {
-                                                // JPA : Class has properties but field not present, so add as transient field (JPA)
-                                                mmd.setNotPersistent();
-                                            }
-                                            mmd.type = (Class) paramTypeArgs[j];
+                                            // No property of this name - add a default PropertyMetaData for this method with the type set to what we need
+                                            NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, propertyNameFull));
+                                            AbstractMemberMetaData overriddenMmd = getMemberBeingOverridden(propertyName);
+
+                                            AbstractMemberMetaData mmd = new PropertyMetaData(this, propertyNameFull);
+                                            mergeMemberMetaDataForOverrideOfType((Class) paramTypeArgs[j], mmd, overriddenMmd);
                                             members.add(mmd);
+
                                             memberNames.add(mmd.getName());
                                             Collections.sort(members);
-                                            foundTypeForTypeVariable = true;
                                         }
                                         else
                                         {
                                             // TODO Cater for the user overriding it
                                         }
+                                        foundTypeForTypeVariable = true;
                                     }
                                 }
                                 if (!foundTypeForTypeVariable)
@@ -527,23 +477,136 @@ public class ClassMetaData extends AbstractClassMetaData
                                     if (boundTypes != null && boundTypes.length == 1 && boundTypes[0] instanceof Class)
                                     {
                                         // User has class declaration like "public class MyClass<T extends SomeType>" so take SomeType
-                                        NucleusLogger.GENERAL.debug(">> Class=" + cls.getName() + " field=" + theclsFields[i].getName() +
-                                            " declared to be " + fieldTypeVar + ", namely TypeVariable(" + j + ") with bound, so using bound of " + boundTypes[0]);
-                                        String fieldName = declCls.getName() + "." + theclsFields[i].getName();
-                                        if (!memberNames.contains(fieldName))
+                                        boolean overrideIfNotPresent = true;
+                                        AbstractMemberMetaData overriddenMmd = getMetaDataForMember(propertyName);
+                                        if (overriddenMmd != null)
                                         {
-                                            // No property of this name - add a default FieldMetaData for this method with the type set to what we need
-                                            NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, fieldName));
-                                            AbstractMemberMetaData mmd = new FieldMetaData(this, fieldName);
-                                            if (hasProperties && api.equalsIgnoreCase("JPA"))
+                                            if (!overriddenMmd.getTypeName().equals(((Class)boundTypes[0]).getName()))
                                             {
-                                                // JPA : Class has properties but field not present, so add as transient field (JPA)
-                                                mmd.setNotPersistent();
+                                                // Already overridden the type in a superclass, so ignore
+                                                overrideIfNotPresent = false;
                                             }
-                                            mmd.type = (Class) boundTypes[0];
-                                            members.add(mmd);
-                                            memberNames.add(mmd.getName());
-                                            Collections.sort(members);
+                                        }
+
+                                        // TODO Maybe should use just the declTypes for this specific class?
+                                        if (overrideIfNotPresent)
+                                        {
+                                            NucleusLogger.METADATA.debug("Class=" + cls.getName() + " property=" + propertyName +
+                                                " declared to return " + methodTypeVar + ", namely TypeVariable(" + j + ") with bound, so using bound of " + boundTypes[0]);
+                                            if (!memberNames.contains(propertyName))
+                                            {
+                                                // No property of this name - add a default PropertyMetaData for this method with the type set to what we need
+                                                NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, propertyNameFull));
+
+                                                // TODO Use MetaDataMerger to merge with the overridden
+                                                AbstractMemberMetaData mmd = new PropertyMetaData(this, propertyNameFull);
+                                                mmd.type = (Class) boundTypes[0];
+                                                members.add(mmd);
+
+                                                memberNames.add(mmd.getName());
+                                                Collections.sort(members);
+                                            }
+                                            else
+                                            {
+                                                // TODO Cater for the user overriding it
+                                            }
+                                        }
+                                        foundTypeForTypeVariable = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Check for any TypeVariables used with fields in superclass(es) and override the metadata in the superclass to use the right type
+                Class theClass = cls;
+                // TODO We should look at TypeVariables of THIS class not of the superclass
+                while (theClass.getSuperclass() != null)
+                {
+                    theClass = theClass.getSuperclass();
+                    Field[] theclsFields = theClass.getDeclaredFields();
+                    for (int i=0;i<theclsFields.length;i++)
+                    {
+                        if (!ClassUtils.isInnerClass(theclsFields[i].getName()) && !Modifier.isStatic(theclsFields[i].getModifiers()) &&
+                            !mmgr.isEnhancerField(theclsFields[i].getName()) &&
+                            theclsFields[i].getGenericType() != null && theclsFields[i].getGenericType() instanceof TypeVariable)
+                        {
+                            TypeVariable fieldTypeVar = (TypeVariable) theclsFields[i].getGenericType();
+                            Class declCls = theclsFields[i].getDeclaringClass();
+                            TypeVariable[] declTypes = declCls.getTypeParameters();
+                            String fieldName = theclsFields[i].getName();
+                            String fieldNameFull = declCls.getName() + "." + theclsFields[i].getName();
+                            if (declTypes != null)
+                            {
+                                for (int j=0;j<declTypes.length;j++)
+                                {
+                                    boolean foundTypeForTypeVariable = false;
+                                    if (declTypes[j].getName().equals(fieldTypeVar.getName()) && cls.getGenericSuperclass() instanceof ParameterizedType)
+                                    {
+                                        ParameterizedType genSuperclsType = (ParameterizedType) cls.getGenericSuperclass();
+                                        Type[] paramTypeArgs = genSuperclsType.getActualTypeArguments();
+                                        if (paramTypeArgs != null && paramTypeArgs.length > j && paramTypeArgs[j] instanceof Class)
+                                        {
+                                            NucleusLogger.METADATA.debug("Class=" + cls.getName() + " field=" + fieldName +
+                                                " declared to be " + fieldTypeVar + ", namely TypeVariable(" + j + ") of " + declCls.getName() + " so using " + paramTypeArgs[j]);
+                                            if (!memberNames.contains(fieldName))
+                                            {
+                                                // No member of this name - add a default FieldMetaData for this field with the type set to what we need
+                                                NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, fieldNameFull));
+                                                AbstractMemberMetaData overriddenMmd = getMemberBeingOverridden(fieldName);
+
+                                                // Merge the overridden member with the limited info specified in this override
+                                                AbstractMemberMetaData mmd = new FieldMetaData(this, fieldNameFull);
+                                                // Note that if we override a single PK field we will have objectIdClass=ObjectId in the generics superclass, and still ObjectId here
+                                                // We have to keep to continue like this since the superclass will have been enhanced to have ObjectId in its bytecode contract.
+                                                mergeMemberMetaDataForOverrideOfType((Class) paramTypeArgs[j], mmd, overriddenMmd);
+
+                                                members.add(mmd);
+                                                memberNames.add(mmd.getName());
+                                                Collections.sort(members);
+                                            }
+                                            else
+                                            {
+                                                // User has overridden the field, so update the type on their definition
+                                                AbstractMemberMetaData overrideMmd = getMetaDataForMember(fieldName);
+                                                overrideMmd.type = (Class) paramTypeArgs[j];
+                                            }
+                                            foundTypeForTypeVariable = true;
+                                        }
+                                    }
+                                    if (!foundTypeForTypeVariable)
+                                    {
+                                        // Try bounds of declType
+                                        Type[] boundTypes = declTypes[j].getBounds();
+                                        // TODO Maybe should use just the declTypes for this specific class?
+                                        if (boundTypes != null && boundTypes.length == 1 && boundTypes[0] instanceof Class)
+                                        {
+                                            // User has class declaration like "public class MyClass<T extends SomeType>" so take SomeType
+                                            // TODO What if a superclass has already resolved the type? Do like with properties above?
+                                            NucleusLogger.METADATA.debug("Class=" + cls.getName() + " field=" + fieldName +
+                                                " declared to be " + fieldTypeVar + ", namely TypeVariable(" + j + ") with bound, so using bound of " + boundTypes[0]);
+                                            if (!memberNames.contains(fieldName))
+                                            {
+                                                // Field defined as generic but not found a meta-data definition, so use boundTypes to add override meta-data with the correct type
+                                                NucleusLogger.METADATA.debug(Localiser.msg("044060", fullName, fieldNameFull));
+
+                                                // TODO Use MetaDataMerger to merge with superclass
+                                                AbstractMemberMetaData mmd = new FieldMetaData(this, fieldNameFull);
+                                                mmd.type = (Class) boundTypes[0];
+                                                members.add(mmd);
+
+                                                memberNames.add(mmd.getName());
+                                                Collections.sort(members);
+                                            }
+                                            else
+                                            {
+                                                // User has overridden the field, so update the type on their definition
+                                                AbstractMemberMetaData overrideMmd = getMetaDataForMember(fieldName);
+                                                overrideMmd.type = (Class) boundTypes[0];
+                                            }
                                             foundTypeForTypeVariable = true;
                                         }
                                     }
@@ -559,6 +622,23 @@ public class ClassMetaData extends AbstractClassMetaData
             NucleusLogger.METADATA.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    /**
+     * Method to merge in an overridden member details into the overriding meta-data, updating the type.
+     * @param type The type to use
+     * @param mmd The overriding member meta-data
+     * @param overriddenMmd The (base) overridden meta-data
+     */
+    private void mergeMemberMetaDataForOverrideOfType(Class type, AbstractMemberMetaData mmd, AbstractMemberMetaData overriddenMmd)
+    {
+        // TODO Use MetaDataMerger to merge in everything else specified in the member
+        mmd.type = type;
+        mmd.primaryKey = overriddenMmd.primaryKey;
+        mmd.embedded = overriddenMmd.embedded;
+        mmd.serialized = overriddenMmd.serialized;
+        mmd.persistenceModifier = overriddenMmd.persistenceModifier;
+        mmd.valueStrategy = overriddenMmd.valueStrategy;
     }
 
     /**
