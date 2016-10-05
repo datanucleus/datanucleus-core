@@ -428,7 +428,7 @@ public class FetchPlan implements Serializable
      * Accessor for the roots of the detachment graph for DetachAllOnCommit.
      * @return The roots of the detachment graph.
      */
-    public Collection getDetachmentRoots()
+    public Collection<Object> getDetachmentRoots()
     {
         if (detachmentRoots == null)
         {
