@@ -95,28 +95,25 @@ import org.datanucleus.util.StringUtils;
 import org.datanucleus.util.TypeConversionHelper;
 
 /**
- * Manager for persistence/retrieval of objects within an execution context, equating to the work
- * required by JDO PersistenceManager and JPA EntityManager.
+ * Manager for persistence/retrieval of objects within an execution context, equating to the work required by JDO PersistenceManager and JPA EntityManager.
  * <h3>Caching</h3>
  * <p>
- * An ExecutionContext has its own Level 1 cache. This stores objects against their identity. The Level 1 cache
- * is typically a weak referenced map and so cached objects can be garbage collected. Objects are placed in the
- * Level 1 cache during the transaction. 
- * The NucleusContext also has a Level 2 cache. This is used to allow cross-communication between
- * ExecutionContexts. Objects are placed in the Level 2 cache during commit() of a transaction. If an object is
- * deleted during a transaction then it will be removed from the Level 2 cache at commit(). If an object is
- * no longer enlisted in the transaction at commit then it will be removed from the Level 2 cache (so we
- * remove the chance of handing out old data).
+ * An ExecutionContext has its own Level 1 cache. This stores objects against their identity. 
+ * The Level 1 cache is typically a weak referenced map and so cached objects can be garbage collected. 
+ * Objects are placed in the Level 1 cache during the transaction. 
+ * The NucleusContext also has a Level 2 cache. This is used to allow cross-communication between ExecutionContexts. 
+ * Objects are placed in the Level 2 cache during commit() of a transaction. If an object is deleted during a transaction then it will be removed 
+ * from the Level 2 cache at commit(). If an object is no longer enlisted in the transaction at commit then it will be removed from the Level 2 cache 
+ * (so we remove the chance of handing out old data).
  * </p>
  * <h3>Transactions</h3>
  * <p>
- * An ExecutionContext has a single transaction (the "current" transaction). The transaction can be
- * "active" (if begin() has been called on it) or "inactive".
+ * An ExecutionContext has a single transaction (the "current" transaction). The transaction can be "active" (if begin() has been called on it) or "inactive".
  * </p>
  * <h3>Persisted Objects</h3>
  * <p>
  * When an object involved in the current transaction it is <i>enlisted</i> (calling enlistInTransaction()).
- * Its' identity is saved (in "txEnlistedIds") for use later in any "persistenceByReachability" process run at commit.
+ * Its identity is saved (in "txEnlistedIds") for use later in any "persistenceByReachability" process run at commit.
  * Any object that is passed via makePersistent() will be stored (as an identity) in "txKnownPersistedIds" and objects 
  * persisted due to reachability from these objects will also have their identity stored (in "txFlushedNewIds").
  * All of this information is used in the "persistence-by-reachability-at-commit" process which detects if some objects
@@ -124,12 +121,13 @@ import org.datanucleus.util.TypeConversionHelper;
  * </p>
  * <h3>ObjectProvider-based storage</h3>
  * <p>
- * You may note that we have various fields here storing ObjectProvider-related information such as which
- * ObjectProvider is embedded into which ObjectProvider etc, or the managed relations for an ObjectProvider.
- * These are stored here to avoid adding a reference to the storage of each and every ObjectProvider, since
- * we could potentially have a very large number of ObjectProviders (and they may not use that field in the
- * majority, but it still needs the reference). The same should be followed as a general rule when considering
- * storing something in the ObjectProvider.
+ * You may note that we have various fields here storing ObjectProvider-related information such as which ObjectProvider is embedded into which ObjectProvider etc, 
+ * or the managed relations for an ObjectProvider. These are stored here to avoid adding a reference to the storage of each and every ObjectProvider, since
+ * we could potentially have a very large number of ObjectProviders (and they may not use that field in the majority, but it still needs the reference). 
+ * The same should be followed as a general rule when considering storing something in the ObjectProvider.
+ * </p>
+ * <p>
+ * This class is NOT thread-safe. Use ExecutionContextThreadedImpl if you want to *attempt* to have multithreaded PM/EMs.
  * </p>
  */
 public class ExecutionContextImpl implements ExecutionContext, TransactionEventListener

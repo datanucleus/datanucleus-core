@@ -33,6 +33,9 @@ import org.datanucleus.store.Extent;
  * Note also that having thread-safe ExecutionContext usage depends on much more than having this class, since SCO wrappers would need to coordinate
  * with such locks, as would the Transaction for the ExecutionContext.
  * TODO Evaluate all of the places we currently lock (when multithreaded) to find corner cases not caught.
+ * <p>
+ * This class *tries to be* thread-safe, but there is no guarantee. You are better advised to design your application to use ExecutionContextImpl for a single thread.
+ * </p>
  */
 public class ExecutionContextThreadedImpl extends ExecutionContextImpl
 {
