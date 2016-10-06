@@ -17,9 +17,10 @@ Contributors:
 **********************************************************************/
 package org.datanucleus;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
@@ -35,6 +36,9 @@ import org.datanucleus.store.Extent;
  */
 public class ExecutionContextThreadedImpl extends ExecutionContextImpl
 {
+    /** Lock object for use during commit/rollback/evict, to prevent any further field accesses. */
+    protected Lock lock;
+
     /**
      * @param ctx NucleusContext
      * @param owner Owner object (PM, EM)
@@ -43,11 +47,21 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
     public ExecutionContextThreadedImpl(PersistenceNucleusContext ctx, Object owner, Map<String, Object> options)
     {
         super(ctx, owner, options);
+        this.lock = new ReentrantLock();
     }
 
     /**
-     * Accessor for whether the object manager is multithreaded.
-     * @return Whether to run multithreaded.
+     * Accessor for the context lock object. 
+     * @return The lock object
+     */
+    public Lock getLock()
+    {
+        return lock;
+    }
+
+    /**
+     * Accessor for whether the usage is multi-threaded.
+     * @return True
      */
     public boolean getMultithreaded()
     {
@@ -387,25 +401,7 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         {
             lock.lock();
 
-            synchronized (cache)
-            {
-                // All persistent non-transactional instances should be evicted here, but not yet supported
-                ArrayList<ObjectProvider> opsToEvict = new ArrayList();
-                opsToEvict.addAll(cache.values());
-
-                // Evict ObjectProviders and remove objects from cache
-                // Performed in separate loop to avoid ConcurrentModificationException
-                Iterator<ObjectProvider> opIter = opsToEvict.iterator();
-                while (opIter.hasNext())
-                {
-                    ObjectProvider op = opIter.next();
-                    Object pc = op.getObject();
-                    op.evict();
-
-                    // Evict from L1
-                    removeObjectFromLevel1Cache(getApiAdapter().getIdForObject(pc));
-                }
-            }
+            super.evictAllObjects();
         }
         finally
         {
@@ -476,6 +472,118 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
             lock.lock();
 
             return super.getExtent(pcClass, subclasses);
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    public void evictObjects(Class cls, boolean subclasses)
+    {
+        try
+        {
+            lock.lock();
+
+            super.evictObjects(cls, subclasses);
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    public void refreshAllObjects()
+    {
+        try
+        {
+            lock.lock();
+
+            super.refreshAllObjects();
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    public List<ObjectProvider> getObjectsToBeFlushed()
+    {
+        try
+        {
+            lock.lock();
+
+            return super.getObjectsToBeFlushed();
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    public void postBegin()
+    {
+        try
+        {
+            lock.lock();
+
+            super.postBegin();
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    public void preCommit()
+    {
+        try
+        {
+            lock.lock();
+
+            super.preCommit();
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    public void postCommit()
+    {
+        try
+        {
+            lock.lock();
+
+            super.postCommit();
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    public void preRollback()
+    {
+        try
+        {
+            lock.lock();
+
+            super.preRollback();
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    public void postRollback()
+    {
+        try
+        {
+            lock.lock();
+
+            super.postRollback();
         }
         finally
         {

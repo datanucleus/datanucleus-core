@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.cache.CachedPC;
@@ -203,9 +202,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     /** Lock manager for object-based locking. */
     private LockManager lockMgr = null;
 
-    /** Lock object for use during commit/rollback/evict, to prevent any further field accesses. */
-    protected Lock lock;
-
     /** Lookup map of attached-detached objects when attaching/detaching. */
     private Map<ObjectProvider, Object> opAttachDetachObjectReferenceMap = null;
 
@@ -259,10 +255,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     public ExecutionContextImpl(PersistenceNucleusContext ctx, Object owner, Map<String, Object> options)
     {
         this.nucCtx = ctx;
-        if (ctx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_MULTITHREADED))
-        {
-            this.lock = new ReentrantLock();
-        }
 
         initialise(owner, options);
 
@@ -1033,8 +1025,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Accessor for whether the object manager is multithreaded.
-     * @return Whether to run multithreaded.
+     * Accessor for whether the usage is multi-threaded.
+     * @return False
      */
     public boolean getMultithreaded()
     {
@@ -1546,42 +1538,26 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         if (cache != null)
         {
-            try
+            Set<ObjectProvider> opsToEvict = new HashSet(cache.values());
+            Iterator<ObjectProvider> opIter = opsToEvict.iterator();
+            while (opIter.hasNext())
             {
-                if (getMultithreaded())
+                ObjectProvider op = opIter.next();
+                Object pc = op.getObject();
+                boolean evict = false;
+                if (!subclasses && pc.getClass() == cls)
                 {
-                    // Lock since updates fields in object(s)
-                    lock.lock();
+                    evict = true;
+                }
+                else if (subclasses && cls.isAssignableFrom(pc.getClass()))
+                {
+                    evict = true;
                 }
 
-                Set<ObjectProvider> opsToEvict = new HashSet(cache.values());
-                Iterator<ObjectProvider> opIter = opsToEvict.iterator();
-                while (opIter.hasNext())
+                if (evict)
                 {
-                    ObjectProvider op = opIter.next();
-                    Object pc = op.getObject();
-                    boolean evict = false;
-                    if (!subclasses && pc.getClass() == cls)
-                    {
-                        evict = true;
-                    }
-                    else if (subclasses && cls.isAssignableFrom(pc.getClass()))
-                    {
-                        evict = true;
-                    }
-
-                    if (evict)
-                    {
-                        op.evict();
-                        removeObjectFromLevel1Cache(getApiAdapter().getIdForObject(pc));
-                    }
-                }
-            }
-            finally
-            {
-                if (getMultithreaded())
-                {
-                    lock.unlock();
+                    op.evict();
+                    removeObjectFromLevel1Cache(getApiAdapter().getIdForObject(pc));
                 }
             }
         }
@@ -1669,42 +1645,26 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             toRefresh.addAll(cache.values());
         }
 
-        try
+        List failures = null;
+        for (ObjectProvider op : toRefresh)
         {
-            if (getMultithreaded())
+            try
             {
-                // Lock since updates fields in object(s)
-                lock.lock();
+                op.refresh();
             }
-
-            List failures = null;
-            for (ObjectProvider op : toRefresh)
+            catch (RuntimeException e)
             {
-                try
+                if (failures == null)
                 {
-                    op.refresh();
+                    failures = new ArrayList();
                 }
-                catch (RuntimeException e)
-                {
-                    if (failures == null)
-                    {
-                        failures = new ArrayList();
-                    }
-                    failures.add(e);
-                }
-            }
-
-            if (failures != null && !failures.isEmpty())
-            {
-                throw new NucleusUserException(Localiser.msg("010037"), (Exception[]) failures.toArray(new Exception[failures.size()]));
+                failures.add(e);
             }
         }
-        finally
+
+        if (failures != null && !failures.isEmpty())
         {
-            if (getMultithreaded())
-            {
-                lock.unlock();
-            }
+            throw new NucleusUserException(Localiser.msg("010037"), (Exception[]) failures.toArray(new Exception[failures.size()]));
         }
     }
 
@@ -3881,23 +3841,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     public List<ObjectProvider> getObjectsToBeFlushed()
     {
         List<ObjectProvider> ops = new ArrayList<>();
-        try
-        {
-            if (getMultithreaded())
-            {
-                lock.lock();
-            }
-
-            ops.addAll(dirtyOPs);
-            ops.addAll(indirectDirtyOPs);
-        }
-        finally
-        {
-            if (getMultithreaded())
-            {
-                lock.unlock();
-            }
-        }
+        ops.addAll(dirtyOPs);
+        ops.addAll(indirectDirtyOPs);
         return ops;
     }
 
@@ -4050,30 +3995,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void postBegin()
     {
-        try
+        ObjectProvider[] ops = dirtyOPs.toArray(new ObjectProvider[dirtyOPs.size()]);
+        for (int i=0; i<ops.length; i++)
         {
-            if (getMultithreaded())
-            {
-                lock.lock();
-            }
-
-            ObjectProvider[] ops = dirtyOPs.toArray(new ObjectProvider[dirtyOPs.size()]);
-            for (int i=0; i<ops.length; i++)
-            {
-                ops[i].preBegin(tx);
-            }
-            ops = indirectDirtyOPs.toArray(new ObjectProvider[indirectDirtyOPs.size()]);
-            for (int i=0; i<ops.length; i++)
-            {
-                ops[i].preBegin(tx);
-            }
+            ops[i].preBegin(tx);
         }
-        finally
+        ops = indirectDirtyOPs.toArray(new ObjectProvider[indirectDirtyOPs.size()]);
+        for (int i=0; i<ops.length; i++)
         {
-            if (getMultithreaded())
-            {
-                lock.unlock();
-            }
+            ops[i].preBegin(tx);
         }
     }
 
@@ -4082,53 +4012,37 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void preCommit()
     {
-        try
+        // Make sure all is flushed before we start
+        flush();
+
+        if (pbrAtCommitHandler != null)
         {
-            if (getMultithreaded())
+            // Persistence-by-reachability at commit
+            try
             {
-                // Lock since updates fields in object(s)
-                lock.lock();
+                pbrAtCommitHandler.execute();
             }
-
-            // Make sure all is flushed before we start
-            flush();
-
-            if (pbrAtCommitHandler != null)
+            catch (Throwable t)
             {
-                // Persistence-by-reachability at commit
-                try
+                NucleusLogger.PERSISTENCE.error(t);
+                if (t instanceof NucleusException)
                 {
-                    pbrAtCommitHandler.execute();
+                    throw (NucleusException) t;
                 }
-                catch (Throwable t)
-                {
-                    NucleusLogger.PERSISTENCE.error(t);
-                    if (t instanceof NucleusException)
-                    {
-                        throw (NucleusException) t;
-                    }
-                    throw new NucleusException("Unexpected error during precommit",t);
-                }
-            }
-
-            if (l2CacheEnabled)
-            {
-                // L2 caching of enlisted objects
-                performLevel2CacheUpdateAtCommit();
-            }
-
-            if (properties.getFrequentProperties().getDetachAllOnCommit())
-            {
-                // "detach-on-commit"
-                performDetachAllOnTxnEndPreparation();
+                throw new NucleusException("Unexpected error during precommit",t);
             }
         }
-        finally
+
+        if (l2CacheEnabled)
         {
-            if (getMultithreaded())
-            {
-                lock.unlock();
-            }
+            // L2 caching of enlisted objects
+            performLevel2CacheUpdateAtCommit();
+        }
+
+        if (properties.getFrequentProperties().getDetachAllOnCommit())
+        {
+            // "detach-on-commit"
+            performDetachAllOnTxnEndPreparation();
         }
     }
 
@@ -4392,70 +4306,54 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void postCommit()
     {
+        if (properties.getFrequentProperties().getDetachAllOnCommit())
+        {
+            // Detach-all-on-commit
+            performDetachAllOnTxnEnd();
+        }
+
+        List failures = null;
         try
         {
-            if (getMultithreaded())
+            // Commit all enlisted ObjectProviders
+            ApiAdapter api = getApiAdapter();
+            ObjectProvider[] ops = enlistedOPCache.values().toArray(new ObjectProvider[enlistedOPCache.size()]);
+            for (int i = 0; i < ops.length; ++i)
             {
-                // Lock since don't want any changes to objects during this step
-                lock.lock();
-            }
-
-            if (properties.getFrequentProperties().getDetachAllOnCommit())
-            {
-                // Detach-all-on-commit
-                performDetachAllOnTxnEnd();
-            }
-
-            List failures = null;
-            try
-            {
-                // Commit all enlisted ObjectProviders
-                ApiAdapter api = getApiAdapter();
-                ObjectProvider[] ops = enlistedOPCache.values().toArray(new ObjectProvider[enlistedOPCache.size()]);
-                for (int i = 0; i < ops.length; ++i)
+                try
                 {
-                    try
-                    {
-                        // Perform any operations required after committing
-                        //TODO this if is due to sms that can have lc == null, why?, should not be here then
-                        if (ops[i] != null && ops[i].getObject() != null &&
+                    // Perform any operations required after committing
+                    //TODO this if is due to sms that can have lc == null, why?, should not be here then
+                    if (ops[i] != null && ops[i].getObject() != null &&
                             (api.isPersistent(ops[i].getObject()) || api.isTransactional(ops[i].getObject())))
-                        {
-                            ops[i].postCommit(getTransaction());
-
-                            // TODO Change this check so that we remove all objects that are no longer suitable for caching
-                            if (properties.getFrequentProperties().getDetachAllOnCommit() && api.isDetachable(ops[i].getObject()))
-                            {
-                                // "DetachAllOnCommit" - Remove the object from the L1 cache since it is now detached
-                                removeObjectProvider(ops[i]);
-                            }
-                        }
-                    }
-                    catch (RuntimeException e)
                     {
-                        if (failures == null)
+                        ops[i].postCommit(getTransaction());
+
+                        // TODO Change this check so that we remove all objects that are no longer suitable for caching
+                        if (properties.getFrequentProperties().getDetachAllOnCommit() && api.isDetachable(ops[i].getObject()))
                         {
-                            failures = new ArrayList();
+                            // "DetachAllOnCommit" - Remove the object from the L1 cache since it is now detached
+                            removeObjectProvider(ops[i]);
                         }
-                        failures.add(e);
                     }
                 }
-            }
-            finally
-            {
-                resetTransactionalVariables();
-            }
-            if (failures != null && !failures.isEmpty())
-            {
-                throw new CommitStateTransitionException((Exception[]) failures.toArray(new Exception[failures.size()]));
+                catch (RuntimeException e)
+                {
+                    if (failures == null)
+                    {
+                        failures = new ArrayList();
+                    }
+                    failures.add(e);
+                }
             }
         }
         finally
         {
-            if (getMultithreaded())
-            {
-                lock.unlock();
-            }
+            resetTransactionalVariables();
+        }
+        if (failures != null && !failures.isEmpty())
+        {
+            throw new CommitStateTransitionException((Exception[]) failures.toArray(new Exception[failures.size()]));
         }
     }
 
@@ -4464,59 +4362,43 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void preRollback()
     {
+        List<Exception> failures = null;
         try
         {
-            if (getMultithreaded())
+            Collection<ObjectProvider> ops = enlistedOPCache.values();
+            Iterator<ObjectProvider> opsIter = ops.iterator();
+            while (opsIter.hasNext())
             {
-                // Lock since updates fields in object(s)
-                lock.lock();
-            }
-
-            List<Exception> failures = null;
-            try
-            {
-                Collection<ObjectProvider> ops = enlistedOPCache.values();
-                Iterator<ObjectProvider> opsIter = ops.iterator();
-                while (opsIter.hasNext())
+                ObjectProvider op = opsIter.next();
+                try
                 {
-                    ObjectProvider op = opsIter.next();
-                    try
-                    {
-                        op.preRollback(getTransaction());
-                    }
-                    catch (RuntimeException e)
-                    {
-                        if (failures == null)
-                        {
-                            failures = new ArrayList();
-                        }
-                        failures.add(e);
-                    }
+                    op.preRollback(getTransaction());
                 }
-                clearDirty();
+                catch (RuntimeException e)
+                {
+                    if (failures == null)
+                    {
+                        failures = new ArrayList();
+                    }
+                    failures.add(e);
+                }
             }
-            finally
-            {
-                resetTransactionalVariables();
-            }
-
-            if (failures != null && !failures.isEmpty())
-            {
-                throw new RollbackStateTransitionException(failures.toArray(new Exception[failures.size()]));
-            }
-
-            if (getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_ROLLBACK))
-            {
-                // "detach-on-rollback"
-                performDetachAllOnTxnEndPreparation();
-            }
+            clearDirty();
         }
         finally
         {
-            if (getMultithreaded())
-            {
-                lock.unlock();
-            }
+            resetTransactionalVariables();
+        }
+
+        if (failures != null && !failures.isEmpty())
+        {
+            throw new RollbackStateTransitionException(failures.toArray(new Exception[failures.size()]));
+        }
+
+        if (getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_ROLLBACK))
+        {
+            // "detach-on-rollback"
+            performDetachAllOnTxnEndPreparation();
         }
     }
 
@@ -4525,32 +4407,16 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void postRollback()
     {
-        try
+        if (getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_ROLLBACK))
         {
-            if (getMultithreaded())
-            {
-                // Lock since updates fields in object(s)
-                lock.lock();
-            }
-
-            if (getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_ROLLBACK))
-            {
-                // "detach-on-rollback"
-                performDetachAllOnTxnEnd();
-            }
-
-            if (l2CacheObjectsToEvictUponRollback != null)
-            {
-                nucCtx.getLevel2Cache().evictAll(l2CacheObjectsToEvictUponRollback);
-                l2CacheObjectsToEvictUponRollback = null;
-            }
+            // "detach-on-rollback"
+            performDetachAllOnTxnEnd();
         }
-        finally
+
+        if (l2CacheObjectsToEvictUponRollback != null)
         {
-            if (getMultithreaded())
-            {
-                lock.unlock();
-            }
+            nucCtx.getLevel2Cache().evictAll(l2CacheObjectsToEvictUponRollback);
+            l2CacheObjectsToEvictUponRollback = null;
         }
     }
 
@@ -5104,32 +4970,31 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         ObjectProvider op = findObjectProvider(pc);
-
-        // Update L1 cache
-        if (cache != null)
+        if (oldID != null)
         {
-            Object o = cache.get(oldID); //use get() because a cache.remove operation returns a weakReference instance
-            if (o != null)
+            // Update L1 cache
+            if (cache != null)
             {
-                // Remove the old variant
-                if (NucleusLogger.CACHE.isDebugEnabled())
+                Object o = cache.get(oldID); //use get() because a cache.remove operation returns a weakReference instance
+                if (o != null)
                 {
-                    NucleusLogger.CACHE.debug(Localiser.msg("003012", StringUtils.toJVMIDString(pc), 
-                        IdentityUtils.getPersistableIdentityForId(oldID), IdentityUtils.getPersistableIdentityForId(newID)));
+                    // Remove the old variant
+                    if (NucleusLogger.CACHE.isDebugEnabled())
+                    {
+                        NucleusLogger.CACHE.debug(Localiser.msg("003012", StringUtils.toJVMIDString(pc), 
+                            IdentityUtils.getPersistableIdentityForId(oldID), IdentityUtils.getPersistableIdentityForId(newID)));
+                    }
+                    cache.remove(oldID);
                 }
-                cache.remove(oldID);
+                if (op != null)
+                {
+                    putObjectIntoLevel1Cache(op);
+                }
             }
-            if (op != null)
-            {
-                putObjectIntoLevel1Cache(op);
-            }
-        }
 
-        if (enlistedOPCache.get(oldID) != null)
-        {
-            // Swap the enlisted object identity
-            if (op != null)
+            if (enlistedOPCache.get(oldID) != null && op != null)
             {
+                // Swap the enlisted object identity
                 enlistedOPCache.remove(oldID);
                 enlistedOPCache.put(newID, op);
                 if (NucleusLogger.TRANSACTION.isDebugEnabled())
@@ -5138,20 +5003,29 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         IdentityUtils.getPersistableIdentityForId(oldID), IdentityUtils.getPersistableIdentityForId(newID)));
                 }
             }
-        }
 
-        if (l2CacheTxIds != null)
-        {
-            if (l2CacheTxIds.contains(oldID))
+            if (l2CacheTxIds != null && l2CacheTxIds.contains(oldID))
             {
+                // Update L2 cache
                 l2CacheTxIds.remove(oldID);
                 l2CacheTxIds.add(newID);
             }
-        }
 
-        if (pbrAtCommitHandler != null && tx.isActive())
+            if (pbrAtCommitHandler != null && tx.isActive())
+            {
+                // Update PBR at commit
+                pbrAtCommitHandler.swapObjectId(oldID, newID);
+            }
+        }
+        else
         {
-            pbrAtCommitHandler.swapObjectId(oldID, newID);
+            if (cache != null)
+            {
+                if (op != null)
+                {
+                    putObjectIntoLevel1Cache(op);
+                }
+            }
         }
     }
 
@@ -5470,7 +5344,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public Lock getLock()
     {
-        return lock;
+        // No locking with this ExecutionContext. All single-threaded
+        return null;
     }
 
     /* (non-Javadoc)

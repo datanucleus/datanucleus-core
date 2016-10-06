@@ -121,26 +121,29 @@ public class ReachabilityAtCommitHandler
 
     /**
      * Method that will allow swapping of an "id", for example when an object has recently been assigned its true "id".
-     * @param oldID The old id that it is registered with
+     * @param oldID The old id that it is registered with. If this is null then we do nothing
      * @param newID The new id to use in place
      */
     public void swapObjectId(Object oldID, Object newID)
     {
-        if (enlistedIds.remove(oldID))
+        if (oldID != null)
         {
-            enlistedIds.add(newID);
-        }
-        if (flushedNewIds.remove(oldID))
-        {
-            flushedNewIds.add(newID);
-        }
-        if (persistedIds.remove(oldID))
-        {
-            persistedIds.add(newID);
-        }
-        if (deletedIds.remove(oldID))
-        {
-            deletedIds.add(newID);
+            if (enlistedIds.remove(oldID))
+            {
+                enlistedIds.add(newID);
+            }
+            if (flushedNewIds.remove(oldID))
+            {
+                flushedNewIds.add(newID);
+            }
+            if (persistedIds.remove(oldID))
+            {
+                persistedIds.add(newID);
+            }
+            if (deletedIds.remove(oldID))
+            {
+                deletedIds.add(newID);
+            }
         }
     }
 
