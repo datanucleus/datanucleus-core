@@ -158,12 +158,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     /** Properties controlling runtime behaviour (detach on commit, multithreaded, etc). */
     private BasePropertyStore properties = new BasePropertyStore();
 
-    /** State variable used when searching for the ObjectProvider for an object, representing the object. */
-    private Object objectLookingForOP = null;
-
-    /** State variable used when searching for the ObjectProvider for an object, representing the ObjectProvider. */
-    private ObjectProvider foundOP = null;
-
     /** Current transaction */
     private Transaction tx;
 
@@ -1252,39 +1246,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Method to find the ObjectProvider for an object.
-     * @param pc The object we are checking
-     * @return The ObjectProvider, null if not found.
-     */
-    public ObjectProvider findObjectProvider(Object pc)
-    {
-        ObjectProvider op = null;
-        Object previousLookingFor = objectLookingForOP;
-        ObjectProvider previousFound = foundOP;
-        try
-        {
-            objectLookingForOP = pc;
-            foundOP = null;
-            // We call "ApiAdapter.getExecutionContext(pc)".
-            // This then calls "JDOHelper.getPersistenceManager(pc)".
-            // Which calls "StateManager.getExecutionContext(pc)".
-            // That then calls "hereIsObjectProvider(sm, pc)" which sets "foundOP".
-            ExecutionContext ec = getApiAdapter().getExecutionContext(pc);
-            if (ec != null && this != ec)
-            {
-                throw new NucleusUserException(Localiser.msg("010007", getApiAdapter().getIdForObject(pc)));
-            }
-            op = foundOP;
-        }
-        finally
-        {
-            objectLookingForOP = previousLookingFor;
-            foundOP = previousFound;
-        }
-        return op;
-    }
-
-    /**
      * @param persist persists the object if not yet persisted. 
      */
     public ObjectProvider findObjectProvider(Object pc, boolean persist)
@@ -1336,19 +1297,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         finally
         {
             releaseThreadContextInfo();
-        }
-    }
-
-    /**
-     * Method to add the ObjectProvider for an object to this context's list.
-     * @param op The ObjectProvider
-     * @param pc The object managed by the ObjectProvider
-     */
-    public void hereIsObjectProvider(ObjectProvider op, Object pc)
-    {
-        if (objectLookingForOP == pc)
-        {
-            foundOP = op;
         }
     }
 
@@ -5546,5 +5494,55 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return opAssociatedValuesMapByOP.get(op).containsKey(key);
         }
         return false;
+    }
+
+    /** State variable used when searching for the ObjectProvider for an object, representing the object. */
+    private Object objectLookingForOP = null;
+
+    /** State variable used when searching for the ObjectProvider for an object, representing the ObjectProvider. */
+    private ObjectProvider foundOP = null;
+
+    /**
+     * Method to find the ObjectProvider for an object.
+     * This will access "dnGetExecutionContext" on the Persistable object, which in turn will call StateManager.getExecutionContext(pc), which
+     * leads to it calling ExecutionContext.hereIsObjectProvider(...), and populating foundOP.
+     * TODO If the enhancement contract had a simple dnGetStateManager() then this would be simple and no need for "foundOP" and "objectLookingForOP". See core-142
+     * @param pc The object we are checking
+     * @return The ObjectProvider, null if not found.
+     */
+    public ObjectProvider findObjectProvider(Object pc)
+    {
+        ObjectProvider op = null;
+        Object previousLookingFor = objectLookingForOP;
+        ObjectProvider previousFound = foundOP;
+        try
+        {
+            objectLookingForOP = pc;
+            ExecutionContext ec = getApiAdapter().getExecutionContext(pc);
+            if (ec != null && this != ec)
+            {
+                throw new NucleusUserException(Localiser.msg("010007", getApiAdapter().getIdForObject(pc)));
+            }
+            op = foundOP; // Populated via hereIsObjectProvider(...)
+        }
+        finally
+        {
+            objectLookingForOP = previousLookingFor;
+            foundOP = previousFound;
+        }
+        return op;
+    }
+
+    /**
+     * Method to add the ObjectProvider for an object to this context's list.
+     * @param op The ObjectProvider
+     * @param pc The object managed by the ObjectProvider
+     */
+    public void hereIsObjectProvider(ObjectProvider op, Object pc)
+    {
+        if (objectLookingForOP == pc)
+        {
+            foundOP = op;
+        }
     }
 }
