@@ -64,6 +64,12 @@ public interface Persistable
     ExecutionContextReference dnGetExecutionContext();
 
     /**
+     * Return the associated StateManager if there is one.
+     * @return The StateManager managing this object
+     */
+   // StateManager dnGetStateManager();
+
+    /**
      * This method sets the StateManager instance that manages the state of this instance. This method is
      * normally used by the StateManager during the process of making an instance persistent, transient, or
      * transactional. The caller of this method must have JDOPermission for the instance, if the instance is

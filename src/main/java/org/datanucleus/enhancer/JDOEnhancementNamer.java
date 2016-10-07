@@ -265,6 +265,15 @@ public class JDOEnhancementNamer implements EnhancementNamer
     }
 
     /* (non-Javadoc)
+     * @see org.datanucleus.enhancer.EnhancementNamer#getGetStateManagerMethodName()
+     */
+    @Override
+    public String getGetStateManagerMethodName()
+    {
+        return "dnGetStateManager";
+    }
+
+    /* (non-Javadoc)
      * @see org.datanucleus.enhancer.ClassEnhancer#getPreSerializeMethodName()
      */
     public String getPreSerializeMethodName()

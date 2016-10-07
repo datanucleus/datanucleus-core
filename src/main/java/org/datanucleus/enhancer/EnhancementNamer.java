@@ -68,6 +68,8 @@ public interface EnhancementNamer
 
     String getGetExecutionContextMethodName();
 
+    String getGetStateManagerMethodName();
+
     String getPreSerializeMethodName();
 
     String getGetInheritedFieldCountMethodName();

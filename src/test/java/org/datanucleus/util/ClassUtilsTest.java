@@ -377,6 +377,11 @@ public class ClassUtilsTest extends TestCase
             return null;
         }
 
+        public StateManager dnGetStateManager()
+        {
+            return null;
+        }
+
         public void dnReplaceStateManager(StateManager arg0) throws SecurityException
         {
         }

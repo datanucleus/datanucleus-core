@@ -5512,6 +5512,16 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public ObjectProvider findObjectProvider(Object pc)
     {
+        /*ObjectProvider op = (ObjectProvider) getApiAdapter().getStateManager(pc);
+        if (op != null)
+        {
+            ExecutionContext ec = op.getExecutionContext();
+            if (ec != null && this != ec)
+            {
+                throw new NucleusUserException(Localiser.msg("010007", getApiAdapter().getIdForObject(pc)));
+            }
+        }
+        return op;*/
         ObjectProvider op = null;
         Object previousLookingFor = objectLookingForOP;
         ObjectProvider previousFound = foundOP;

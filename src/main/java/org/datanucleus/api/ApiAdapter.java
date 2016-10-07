@@ -56,6 +56,13 @@ public interface ApiAdapter extends Serializable
     boolean isManaged(Object pc);
 
     /**
+     * Accessor for the state manager for the object.
+     * @param pc The object
+     * @return The StateManager managing this object
+     */
+//    StateManager getStateManager(Object pc);
+
+    /**
      * Method to return the ExecutionContext (if any) associated with the passed object.
      * Supports persistable objects, and PersistenceManager.
      * @param pc The object

@@ -117,16 +117,16 @@ public class ClassEnhancerImpl implements ClassEnhancer
     protected boolean update = false;
 
     /** List of fields to be added to the class. */
-    protected List<ClassField> fieldsToAdd = new ArrayList<ClassField>();
+    protected List<ClassField> fieldsToAdd = new ArrayList<>();
 
     /** List of methods to be added to the class. */
-    protected List<ClassMethod> methodsToAdd = new ArrayList<ClassMethod>();
+    protected List<ClassMethod> methodsToAdd = new ArrayList<>();
 
     /** Flag for whether we are initialised. */
     protected boolean initialised = false;
 
     /** Options for enhancement. */
-    protected Collection<String> options = new HashSet<String>();
+    protected Collection<String> options = new HashSet<>();
 
     /** Resource name of the input class (only when the class exists in a class file). */
     protected String inputResourceName;
@@ -531,6 +531,7 @@ public class ClassEnhancerImpl implements ClassEnhancer
             methodsToAdd.add(GetVersion.getInstance(this));
             methodsToAdd.add(PreSerialize.getInstance(this));
             methodsToAdd.add(GetExecutionContext.getInstance(this));
+//            methodsToAdd.add(GetStateManager.getInstance(this));
             methodsToAdd.add(GetTransactionalObjectId.getInstance(this));
             methodsToAdd.add(IsDeleted.getInstance(this));
             methodsToAdd.add(IsDirty.getInstance(this));
@@ -591,29 +592,21 @@ public class ClassEnhancerImpl implements ClassEnhancer
         if (cmd.getPersistableSuperclass() == null)
         {
             // Root persistent class fields
-            fieldsToAdd.add(new ClassField(this, namer.getStateManagerFieldName(), 
-                Opcodes.ACC_PROTECTED | Opcodes.ACC_TRANSIENT, namer.getStateManagerClass()));
-            fieldsToAdd.add(new ClassField(this, namer.getFlagsFieldName(),
-                Opcodes.ACC_PROTECTED | Opcodes.ACC_TRANSIENT, byte.class));
+            fieldsToAdd.add(new ClassField(this, namer.getStateManagerFieldName(), Opcodes.ACC_PROTECTED | Opcodes.ACC_TRANSIENT, namer.getStateManagerClass()));
+            fieldsToAdd.add(new ClassField(this, namer.getFlagsFieldName(), Opcodes.ACC_PROTECTED | Opcodes.ACC_TRANSIENT, byte.class));
         }
 
         if (requiresDetachable())
         {
             // Detachable fields
-            fieldsToAdd.add(new ClassField(this, namer.getDetachedStateFieldName(), 
-                Opcodes.ACC_PROTECTED, Object[].class));
+            fieldsToAdd.add(new ClassField(this, namer.getDetachedStateFieldName(), Opcodes.ACC_PROTECTED, Object[].class));
         }
 
-        fieldsToAdd.add(new ClassField(this, namer.getFieldFlagsFieldName(), 
-            Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, byte[].class));
-        fieldsToAdd.add(new ClassField(this, namer.getPersistableSuperclassFieldName(),
-            Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, Class.class));
-        fieldsToAdd.add(new ClassField(this, namer.getFieldTypesFieldName(),
-            Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, Class[].class));
-        fieldsToAdd.add(new ClassField(this, namer.getFieldNamesFieldName(),
-            Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, String[].class));
-        fieldsToAdd.add(new ClassField(this, namer.getInheritedFieldCountFieldName(),
-            Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, int.class));
+        fieldsToAdd.add(new ClassField(this, namer.getFieldFlagsFieldName(), Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, byte[].class));
+        fieldsToAdd.add(new ClassField(this, namer.getPersistableSuperclassFieldName(), Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, Class.class));
+        fieldsToAdd.add(new ClassField(this, namer.getFieldTypesFieldName(), Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, Class[].class));
+        fieldsToAdd.add(new ClassField(this, namer.getFieldNamesFieldName(), Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, String[].class));
+        fieldsToAdd.add(new ClassField(this, namer.getInheritedFieldCountFieldName(), Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, int.class));
     }
 
     /**
@@ -640,8 +633,7 @@ public class ClassEnhancerImpl implements ClassEnhancer
         try
         {
             // Check for generation of PK
-            if (cmd.getIdentityType() == IdentityType.APPLICATION &&
-                cmd.getObjectidClass() == null && cmd.getNoOfPrimaryKeyMembers() > 1)
+            if (cmd.getIdentityType() == IdentityType.APPLICATION && cmd.getObjectidClass() == null && cmd.getNoOfPrimaryKeyMembers() > 1)
             {
                 if (hasOption(OPTION_GENERATE_PK))
                 {
