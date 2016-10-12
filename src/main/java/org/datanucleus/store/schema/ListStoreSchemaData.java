@@ -52,7 +52,7 @@ public interface ListStoreSchemaData extends StoreSchemaData
      * Accessor for a List of child metadata components (if stored in a List).
      * @return Child components.
      */
-    public List getChildren();
+    public List<StoreSchemaData> getChildren();
 
     /**
      * Accessor for a child store metadata component at a position (if stored in a List).

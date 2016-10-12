@@ -2628,6 +2628,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                     NucleusLogger.METADATA.warn("Member " + getFullFieldName() + " has mappedBy using DOT NOTATION. This is not yet supported");
                     // TODO Cater for dot notation mappedBy where (final) field is embedded, navigate to final (embedded) member
                     String remainingMappedBy = mappedBy;
+                    boolean first = true;
                     while (remainingMappedBy.indexOf('.') > 0)
                     {
                         int dotPosition = remainingMappedBy.indexOf('.');
@@ -2638,8 +2639,15 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                             throw new NucleusUserException(Localiser.msg("044115", 
                                 getAbstractClassMetaData().getFullClassName(), name, remainingMappedBy, otherCmd.getFullClassName())).setFatal();
                         }
+                        if (!first && !otherMmd.isEmbedded())
+                        {
+                            // TODO Localise this
+                            throw new NucleusUserException("Member " + getFullFieldName() + " has mappedBy using DOT notation but intermediate member " + otherMmd.getFullFieldName() + 
+                                " is not embedded");
+                        }
 
                         remainingMappedBy = remainingMappedBy.substring(dotPosition+1);
+                        first = false;
                         otherCmd = getMetaDataManager().getMetaDataForClass(otherMmd.getTypeName(), clr); // TODO Cater for N-1
                     }
 
