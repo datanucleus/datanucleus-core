@@ -4920,16 +4920,19 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         // Update L1 cache
         if (cache != null)
         {
-            Object o = cache.get(oldID); //use get() because a cache.remove operation returns a weakReference instance
-            if (o != null)
+            if (oldID != null)
             {
-                // Remove the old variant
-                if (NucleusLogger.CACHE.isDebugEnabled())
+                Object o = cache.get(oldID); //use get() because a cache.remove operation returns a weakReference instance
+                if (o != null)
                 {
-                    NucleusLogger.CACHE.debug(Localiser.msg("003012", StringUtils.toJVMIDString(pc), 
-                        IdentityUtils.getPersistableIdentityForId(oldID), IdentityUtils.getPersistableIdentityForId(newID)));
+                    // Remove the old variant
+                    if (NucleusLogger.CACHE.isDebugEnabled())
+                    {
+                        NucleusLogger.CACHE.debug(Localiser.msg("003012", StringUtils.toJVMIDString(pc), 
+                            IdentityUtils.getPersistableIdentityForId(oldID), IdentityUtils.getPersistableIdentityForId(newID)));
+                    }
+                    cache.remove(oldID);
                 }
-                cache.remove(oldID);
             }
             if (op != null)
             {
@@ -4937,7 +4940,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         }
 
-        if (enlistedOPCache.get(oldID) != null)
+        if (oldID != null && enlistedOPCache.get(oldID) != null)
         {
             // Swap the enlisted object identity
             if (op != null)
@@ -4952,7 +4955,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         }
 
-        if (l2CacheTxIds != null)
+        if (oldID != null && l2CacheTxIds != null)
         {
             if (l2CacheTxIds.contains(oldID))
             {
@@ -4961,7 +4964,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         }
 
-        if (pbrAtCommitHandler != null && tx.isActive())
+        if (oldID != null && pbrAtCommitHandler != null && tx.isActive())
         {
             pbrAtCommitHandler.swapObjectId(oldID, newID);
         }
