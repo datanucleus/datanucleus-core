@@ -256,7 +256,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     public void initialise(Object owner, Map<String, Object> options)
     {
-    	// TODO Make use of the username+password (for JDO). How? need new StoreManager maybe?
+        // TODO Make use of the username+password (for JDO). How? need new StoreManager maybe?
         /*String userName = (String)options.get(ExecutionContext.OPTION_USERNAME);
         String password = (String)options.get(ExecutionContext.OPTION_PASSWORD);*/
         this.owner = owner;
@@ -4916,31 +4916,32 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         ObjectProvider op = findObjectProvider(pc);
-        if (oldID != null)
-        {
-            // Update L1 cache
-            if (cache != null)
-            {
-                Object o = cache.get(oldID); //use get() because a cache.remove operation returns a weakReference instance
-                if (o != null)
-                {
-                    // Remove the old variant
-                    if (NucleusLogger.CACHE.isDebugEnabled())
-                    {
-                        NucleusLogger.CACHE.debug(Localiser.msg("003012", StringUtils.toJVMIDString(pc), 
-                            IdentityUtils.getPersistableIdentityForId(oldID), IdentityUtils.getPersistableIdentityForId(newID)));
-                    }
-                    cache.remove(oldID);
-                }
-                if (op != null)
-                {
-                    putObjectIntoLevel1Cache(op);
-                }
-            }
 
-            if (enlistedOPCache.get(oldID) != null && op != null)
+        // Update L1 cache
+        if (cache != null)
+        {
+            Object o = cache.get(oldID); //use get() because a cache.remove operation returns a weakReference instance
+            if (o != null)
             {
-                // Swap the enlisted object identity
+                // Remove the old variant
+                if (NucleusLogger.CACHE.isDebugEnabled())
+                {
+                    NucleusLogger.CACHE.debug(Localiser.msg("003012", StringUtils.toJVMIDString(pc), 
+                        IdentityUtils.getPersistableIdentityForId(oldID), IdentityUtils.getPersistableIdentityForId(newID)));
+                }
+                cache.remove(oldID);
+            }
+            if (op != null)
+            {
+                putObjectIntoLevel1Cache(op);
+            }
+        }
+
+        if (enlistedOPCache.get(oldID) != null)
+        {
+            // Swap the enlisted object identity
+            if (op != null)
+            {
                 enlistedOPCache.remove(oldID);
                 enlistedOPCache.put(newID, op);
                 if (NucleusLogger.TRANSACTION.isDebugEnabled())
@@ -4949,29 +4950,20 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         IdentityUtils.getPersistableIdentityForId(oldID), IdentityUtils.getPersistableIdentityForId(newID)));
                 }
             }
+        }
 
-            if (l2CacheTxIds != null && l2CacheTxIds.contains(oldID))
+        if (l2CacheTxIds != null)
+        {
+            if (l2CacheTxIds.contains(oldID))
             {
-                // Update L2 cache
                 l2CacheTxIds.remove(oldID);
                 l2CacheTxIds.add(newID);
             }
-
-            if (pbrAtCommitHandler != null && tx.isActive())
-            {
-                // Update PBR at commit
-                pbrAtCommitHandler.swapObjectId(oldID, newID);
-            }
         }
-        else
+
+        if (pbrAtCommitHandler != null && tx.isActive())
         {
-            if (cache != null)
-            {
-                if (op != null)
-                {
-                    putObjectIntoLevel1Cache(op);
-                }
-            }
+            pbrAtCommitHandler.swapObjectId(oldID, newID);
         }
     }
 
@@ -5512,7 +5504,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public ObjectProvider findObjectProvider(Object pc)
     {
-        /*ObjectProvider op = (ObjectProvider) getApiAdapter().getStateManager(pc);
+/*        ObjectProvider op = (ObjectProvider) getApiAdapter().getStateManager(pc);
         if (op != null)
         {
             ExecutionContext ec = op.getExecutionContext();
@@ -5528,6 +5520,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         try
         {
             objectLookingForOP = pc;
+            foundOP = null;
+            // We call "ApiAdapter.getExecutionContext(pc)".
+            // This then calls "JDOHelper.getPersistenceManager(pc)".
+            // Which calls "StateManager.getExecutionContext(pc)".
+            // That then calls "hereIsObjectProvider(sm, pc)" which sets "foundOP".
             ExecutionContext ec = getApiAdapter().getExecutionContext(pc);
             if (ec != null && this != ec)
             {
