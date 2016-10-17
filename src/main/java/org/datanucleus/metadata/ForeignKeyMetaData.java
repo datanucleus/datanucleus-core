@@ -108,7 +108,7 @@ public class ForeignKeyMetaData extends ConstraintMetaData
     {
         if (columns == null)
         {
-            columns = new ArrayList<ColumnMetaData>();
+            columns = new ArrayList<>();
         }
         columns.add(colmd);
         addColumn(colmd.getName());
@@ -128,11 +128,7 @@ public class ForeignKeyMetaData extends ConstraintMetaData
 
     public final ColumnMetaData[] getColumnMetaData()
     {
-        if (columns == null)
-        {
-            return null;
-        }
-        return columns.toArray(new ColumnMetaData[columns.size()]);
+        return (columns == null) ? null : columns.toArray(new ColumnMetaData[columns.size()]);
     }
 
     public final boolean isDeferred()

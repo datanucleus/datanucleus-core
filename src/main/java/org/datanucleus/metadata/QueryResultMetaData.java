@@ -77,7 +77,7 @@ public class QueryResultMetaData extends MetaData
     {
         if (persistentTypeMappings == null)
         {
-            persistentTypeMappings = new ArrayList();
+            persistentTypeMappings = new ArrayList<>();
         }
         PersistentTypeMapping m = new PersistentTypeMapping();
         m.className = className;
@@ -97,7 +97,7 @@ public class QueryResultMetaData extends MetaData
         PersistentTypeMapping m = null;
         if (persistentTypeMappings == null)
         {
-            persistentTypeMappings = new ArrayList();
+            persistentTypeMappings = new ArrayList<>();
         }
         else
         {
@@ -172,7 +172,7 @@ public class QueryResultMetaData extends MetaData
     {
         if (scalarColumns == null)
         {
-            scalarColumns = new ArrayList();
+            scalarColumns = new ArrayList<>();
         }
         scalarColumns.add(columnName);
     }
@@ -194,11 +194,11 @@ public class QueryResultMetaData extends MetaData
     {
         if (ctrTypeMappings == null)
         {
-            ctrTypeMappings = new ArrayList<ConstructorTypeMapping>();
+            ctrTypeMappings = new ArrayList<>();
         }
         ConstructorTypeMapping m = new ConstructorTypeMapping();
         m.className = className;
-        m.ctrColumns = new ArrayList<ConstructorTypeColumn>(colNames);
+        m.ctrColumns = new ArrayList<>(colNames);
         ctrTypeMappings.add(m);
     }
 

@@ -24,7 +24,7 @@ import org.datanucleus.util.StringUtils;
 
 /**
  * Representation of an ORM constraint.
- * This will be extended for indexes, unique keys, and foreign keys (and any otehr type of constraint).
+ * This will be extended for indexes, unique keys, and foreign keys.
  */
 public class ConstraintMetaData extends MetaData
 {
@@ -103,18 +103,14 @@ public class ConstraintMetaData extends MetaData
     {
         if (memberNames == null)
         {
-            memberNames = new ArrayList<String>();
+            memberNames = new ArrayList<>();
         }
         memberNames.add(memberName);
     }
 
     public final String[] getMemberNames()
     {
-        if (memberNames == null)
-        {
-            return null;
-        }
-        return memberNames.toArray(new String[memberNames.size()]);
+        return (memberNames == null) ? null : memberNames.toArray(new String[memberNames.size()]);
     }
 
     public int getNumberOfMembers()
@@ -130,18 +126,14 @@ public class ConstraintMetaData extends MetaData
     {
         if (columnNames == null)
         {
-            columnNames = new ArrayList<String>();
+            columnNames = new ArrayList<>();
         }
         columnNames.add(columnName);
     }
 
     public final String[] getColumnNames()
     {
-        if (columnNames == null)
-        {
-            return null;
-        }
-        return columnNames.toArray(new String[columnNames.size()]);
+        return (columnNames == null) ? null : columnNames.toArray(new String[columnNames.size()]);
     }
 
     public int getNumberOfColumns()
