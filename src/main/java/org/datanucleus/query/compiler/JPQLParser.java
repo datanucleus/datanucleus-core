@@ -851,26 +851,49 @@ public class JPQLParser extends AbstractParser
 
     /**
      * Convenience handler to parse an IN expression.
-     * Expression is of the form "{expression} IN (expr1 [,expr2 [,expr3]] | subquery)".
-     * Generates a node tree like
+     * Expression is typically of the form "{expression} IN (expr1 [,expr2 [,expr3]] | subquery)".
+     * Can generate a node tree like
      * <pre>({expression} == expr1) || ({expression} == expr2) || ({expression} == expr3)</pre> 
+     * depending on the precise situation.
      * @param not Whether this is an expression "NOT IN"
      */
     private void processInExpression(boolean not)
     {
-        // TODO Cater for TYPE as the inputNode
         Node inputNode = stack.pop(); // The left hand side expression
+        boolean usesType = false;
+        if (inputNode.getNodeType() == NodeType.TYPE)
+        {
+            usesType = true;
+        }
 
         if (!lexer.parseChar('('))
         {
-            // Subquery
-            Node inNode = new Node(NodeType.OPERATOR, not ? "NOT IN" : "IN");
-            inNode.appendChildNode(inputNode);
-
-            // Get variable name that was substituted for the subquery
+            // "{expr} IN value" : Subquery/Parameter
             processPrimary();
             Node subqueryNode = stack.pop();
-            inNode.appendChildNode(subqueryNode);
+
+            Node inNode;
+            if (usesType)
+            {
+                // "TYPE(p) IN :collectionClasses". Convert TYPE into "(p instanceof :collectionClasses)"
+                inNode = new Node(NodeType.OPERATOR, "instanceof");
+                inNode.appendChildNode(inputNode.getFirstChild());
+                inNode.appendChildNode(subqueryNode);
+
+                if (not)
+                {
+                    Node notNode = new Node(NodeType.OPERATOR, "!");
+                    notNode.appendChildNode(inNode);
+                    inNode = notNode;
+                }
+            }
+            else
+            {
+                inNode = new Node(NodeType.OPERATOR, not ? "NOT IN" : "IN");
+                inNode.appendChildNode(inputNode);
+                inNode.appendChildNode(subqueryNode);
+            }
+
             stack.push(inNode);
             return;
         }
@@ -878,7 +901,7 @@ public class JPQLParser extends AbstractParser
         List<Node> valueNodes = new ArrayList();
         do
         {
-            // IN ((literal|parameter) [, (literal|parameter)])
+            // "IN ((literal|parameter) [, (literal|parameter)])"
             processPrimary();
             if (stack.peek() == null)
             {
@@ -899,6 +922,27 @@ public class JPQLParser extends AbstractParser
         else if (valueNodes.isEmpty())
         {
             throw new QueryCompilerSyntaxException("IN expression had zero arguments!");
+        }
+
+        if (usesType)
+        {
+            // "TYPE(a) in (b1,b2,b3)". Convert TYPE into "a instanceof (b1,b2,b3)"
+            Node inNode = new Node(NodeType.OPERATOR, "instanceof");
+            inNode.appendChildNode(inputNode.getFirstChild());
+            for (Node valueNode : valueNodes)
+            {
+                inNode.appendChildNode(valueNode);
+            }
+
+            if (not)
+            {
+                Node notNode = new Node(NodeType.OPERATOR, "!");
+                notNode.appendChildNode(inNode);
+                inNode = notNode;
+            }
+
+            stack.push(inNode);
+            return;
         }
 
         // Create the returned Node representing this IN expression
