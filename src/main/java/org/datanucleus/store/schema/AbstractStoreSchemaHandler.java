@@ -30,8 +30,8 @@ public abstract class AbstractStoreSchemaHandler implements StoreSchemaHandler
 {
     protected StoreManager storeMgr;
 
-    /** Whether to auto create any schema. */
-    protected final boolean autoCreateSchema;
+    /** Whether to auto create any database (catalog/schema). */
+    protected final boolean autoCreateDatabase;
 
     /** Whether to auto create any tables. */
     protected final boolean autoCreateTables;
@@ -64,7 +64,7 @@ public abstract class AbstractStoreSchemaHandler implements StoreSchemaHandler
         boolean readOnlyDatastore = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY);
         if (readOnlyDatastore)
         {
-        	autoCreateSchema = false;
+        	autoCreateDatabase = false;
             autoCreateTables = false;
             autoCreateColumns = false;
             autoCreateConstraints = false;
@@ -74,14 +74,14 @@ public abstract class AbstractStoreSchemaHandler implements StoreSchemaHandler
             boolean autoCreateAll = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL);
             if (autoCreateAll)
             {
-            	autoCreateSchema = true;
+            	autoCreateDatabase = true;
                 autoCreateTables = true;
                 autoCreateColumns = true;
                 autoCreateConstraints = true;
             }
             else
             {
-            	autoCreateSchema = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_DATABASE);
+            	autoCreateDatabase = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_DATABASE);
                 autoCreateTables = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES);
                 autoCreateColumns = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS);
                 autoCreateConstraints = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS);
@@ -121,9 +121,9 @@ public abstract class AbstractStoreSchemaHandler implements StoreSchemaHandler
         return storeMgr;
     }
 
-    public boolean isAutoCreateSchema()
+    public boolean isAutoCreateDatabase()
     {
-    	return autoCreateSchema;
+    	return autoCreateDatabase;
     }
 
     public boolean isAutoCreateTables()

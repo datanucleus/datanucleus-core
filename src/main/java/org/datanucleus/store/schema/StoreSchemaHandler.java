@@ -29,7 +29,7 @@ public interface StoreSchemaHandler
 {
     StoreManager getStoreManager();
 
-    boolean isAutoCreateSchema();
+    boolean isAutoCreateDatabase();
     boolean isAutoCreateTables();
     boolean isAutoCreateConstraints();
     boolean isAutoCreateColumns();
