@@ -96,8 +96,7 @@ public class PluginManager
      * @param discrimAttrValue Value for discriminator attribute
      * @return The configuration element
      */
-    public ConfigurationElement getConfigurationElementForExtension(String extensionPointName,
-            String discrimAttrName, String discrimAttrValue)
+    public ConfigurationElement getConfigurationElementForExtension(String extensionPointName, String discrimAttrName, String discrimAttrValue)
     {
       return getConfigurationElementForExtension(extensionPointName,
           discrimAttrName != null ? new String[] {discrimAttrName} : new String[0],
@@ -111,8 +110,7 @@ public class PluginManager
      * @param discrimAttrValue Value for discriminator attribute
      * @return Configuration elements
      */
-    public ConfigurationElement[] getConfigurationElementsForExtension(String extensionPointName,
-            String discrimAttrName, String discrimAttrValue)
+    public ConfigurationElement[] getConfigurationElementsForExtension(String extensionPointName, String discrimAttrName, String discrimAttrValue)
     {
         List<ConfigurationElement> elems = getConfigurationElementsForExtension(extensionPointName,
             discrimAttrName != null ? new String[] {discrimAttrName} : new String[0],
@@ -131,13 +129,12 @@ public class PluginManager
      * @param discrimAttrValue Value for discriminator1 attribute
      * @return Configuration Element
      */
-    public ConfigurationElement getConfigurationElementForExtension(String extensionPointName,
-            String[] discrimAttrName, String[] discrimAttrValue)
+    public ConfigurationElement getConfigurationElementForExtension(String extensionPointName, String[] discrimAttrName, String[] discrimAttrValue)
     {
-        List matchingConfigElements = getConfigurationElementsForExtension(extensionPointName, discrimAttrName, discrimAttrValue);
+        List<ConfigurationElement> matchingConfigElements = getConfigurationElementsForExtension(extensionPointName, discrimAttrName, discrimAttrValue);
         if (!matchingConfigElements.isEmpty())
         {
-            return (ConfigurationElement) matchingConfigElements.get(0);
+            return matchingConfigElements.get(0);
         }
         return null;
     }
@@ -150,9 +147,9 @@ public class PluginManager
      * @param discrimAttrValue Values for discriminator attributes
      * @return Configuration elements
      */
-    private List getConfigurationElementsForExtension(String extensionPointName, String[] discrimAttrName, String[] discrimAttrValue)
+    private List<ConfigurationElement> getConfigurationElementsForExtension(String extensionPointName, String[] discrimAttrName, String[] discrimAttrValue)
     {
-        List matchingConfigElements = new LinkedList();
+        List<ConfigurationElement> matchingConfigElements = new LinkedList<>();
 
         ExtensionPoint extensionPoint = getExtensionPoint(extensionPointName);
         if (extensionPoint!=null)
@@ -266,8 +263,7 @@ public class PluginManager
      */
     public String getAttributeValueForExtension(String extensionPoint, String[] discrimAttrName, String[] discrimAttrValue, String attributeName)
     {
-        ConfigurationElement elem = getConfigurationElementForExtension(extensionPoint, 
-            discrimAttrName, discrimAttrValue);
+        ConfigurationElement elem = getConfigurationElementForExtension(extensionPoint, discrimAttrName, discrimAttrValue);
         if (elem != null)
         {
             return elem.getAttribute(attributeName);
@@ -319,8 +315,7 @@ public class PluginManager
     public Object createExecutableExtension(String extensionPoint, String[] discrimAttrName, String[] discrimAttrValue, String attributeName, Class[] argsClass, Object[] args) 
     throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
-        ConfigurationElement elem = getConfigurationElementForExtension(extensionPoint, 
-            discrimAttrName, discrimAttrValue);
+        ConfigurationElement elem = getConfigurationElementForExtension(extensionPoint, discrimAttrName, discrimAttrValue);
         if (elem != null)
         {
             return registry.createExecutableExtension(elem, attributeName, argsClass, args);

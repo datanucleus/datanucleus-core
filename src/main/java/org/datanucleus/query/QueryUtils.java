@@ -70,7 +70,7 @@ import org.datanucleus.util.TypeConversionHelper;
 public class QueryUtils
 {
     /** Convenience Class[] for parameter types in getMethod call. */
-    final static Class[] classArrayObjectObject = new Class[]{Object.class, Object.class};
+    final static Class[] MAP_PUT_METHOD_ARG_TYPES = new Class[]{Object.class, Object.class};
 
     /**
      * Utility to return if the passed result class is a user-type, and so requires fields matching up.
@@ -217,8 +217,7 @@ public class QueryUtils
      * @param fieldTypes The field types (optional). If specified needs same number as fieldValues
      * @return The result class object
      */
-    public static Object createResultObjectUsingArgumentedConstructor(Class resultClass, Object[] fieldValues,
-            Class[] fieldTypes)
+    public static Object createResultObjectUsingArgumentedConstructor(Class resultClass, Object[] fieldValues, Class[] fieldTypes)
     {
         Object obj = null;
         Class[] ctrTypes = new Class[fieldValues.length];
@@ -273,10 +272,7 @@ public class QueryUtils
      * @param fieldValues The field values
      * @return The result class object
      */
-    public static Object createResultObjectUsingDefaultConstructorAndSetters(Class resultClass,
-            String[] resultFieldNames,
-            Map resultClassFieldNames,
-            Object[] fieldValues)
+    public static Object createResultObjectUsingDefaultConstructorAndSetters(Class resultClass, String[] resultFieldNames, Map resultClassFieldNames, Object[] fieldValues)
     {
         Object obj = null;
         try
@@ -322,8 +318,7 @@ public class QueryUtils
      * @param fieldValues The field values
      * @return The result class object
      */
-    public static Object createResultObjectUsingDefaultConstructorAndSetters(Class resultClass,
-            String[] resultFieldNames, Field[] resultFields, Object[] fieldValues)
+    public static Object createResultObjectUsingDefaultConstructorAndSetters(Class resultClass, String[] resultFieldNames, Field[] resultFields, Object[] fieldValues)
     {
         Object obj = null;
         try
@@ -558,7 +553,7 @@ public class QueryUtils
             {
                 try
                 {
-                    return resultClass.getMethod("put", classArrayObjectObject);
+                    return resultClass.getMethod("put", MAP_PUT_METHOD_ARG_TYPES);
                 }
                 catch (NoSuchMethodException ex)
                 {

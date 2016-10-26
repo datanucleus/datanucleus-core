@@ -170,13 +170,13 @@ public class PluginParserTest extends TestCase
         Bundle bundle4 = mgr.registerBundle(clr.getResource("/org/datanucleus/samples/plugin/MANIFEST4.MF",null)); 
         Bundle bundle5 = mgr.registerBundle(clr.getResource("/org/datanucleus/samples/plugin/MANIFEST5.MF",null));
         assertEquals(1,bundle3.getRequireBundle().size());
-        assertEquals("org.datanucleus.plugin.test4",((Bundle.BundleDescription)bundle3.getRequireBundle().iterator().next()).getBundleSymbolicName());
+        assertEquals("org.datanucleus.plugin.test4",(bundle3.getRequireBundle().iterator().next()).getBundleSymbolicName());
         assertEquals(0,bundle4.getRequireBundle().size());
         assertEquals(2,bundle5.getRequireBundle().size());
-        assertEquals("org.datanucleus.plugin.test6",((Bundle.BundleDescription)bundle5.getRequireBundle().get(0)).getBundleSymbolicName());
-        assertEquals("org.datanucleus.plugin.test7",((Bundle.BundleDescription)bundle5.getRequireBundle().get(1)).getBundleSymbolicName());
-        assertEquals("org.datanucleus.plugin.test7",((Bundle.BundleDescription)bundle5.getRequireBundle().get(1)).getBundleSymbolicName());
-        assertEquals("optional",((Bundle.BundleDescription)bundle5.getRequireBundle().get(1)).getParameter("resolution"));
+        assertEquals("org.datanucleus.plugin.test6",(bundle5.getRequireBundle().get(0)).getBundleSymbolicName());
+        assertEquals("org.datanucleus.plugin.test7",(bundle5.getRequireBundle().get(1)).getBundleSymbolicName());
+        assertEquals("org.datanucleus.plugin.test7",(bundle5.getRequireBundle().get(1)).getBundleSymbolicName());
+        assertEquals("optional",(bundle5.getRequireBundle().get(1)).getParameter("resolution"));
     }
 
     public void testRequireBundleLogged()

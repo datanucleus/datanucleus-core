@@ -44,8 +44,8 @@ public class Bundle
     final private URL manifestLocation;
 
     /** Set of BundleDescription objects representing Require-Bundle entries **/
-    private List requireBundle;
-    
+    private List<BundleDescription> requireBundle;
+
     /**
      * Constructor
      * @param symbolicName the unique id - bundle symbolic name
@@ -112,7 +112,7 @@ public class Bundle
      * Acessor for the RequireBundle.
      * @param requireBundle A List of {@link Bundle.BundleDescription} elements
      */
-    public void setRequireBundle(List requireBundle)
+    public void setRequireBundle(List<BundleDescription> requireBundle)
     {
         this.requireBundle = requireBundle;
     }
@@ -121,7 +121,7 @@ public class Bundle
      * Acessor for the RequireBundle
      * @return A List of {@link Bundle.BundleDescription} elements
      */
-    public List getRequireBundle()
+    public List<BundleDescription> getRequireBundle()
     {
         return requireBundle;
     }

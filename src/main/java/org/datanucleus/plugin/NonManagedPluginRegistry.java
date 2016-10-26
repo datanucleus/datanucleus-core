@@ -52,6 +52,7 @@ import javax.xml.parsers.DocumentBuilder;
 import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.plugin.Bundle.BundleDescription;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
@@ -640,11 +641,11 @@ public class NonManagedPluginRegistry implements PluginRegistry
         while (it.hasNext())
         {
             Bundle bundle = it.next();
-            List set = bundle.getRequireBundle();
-            Iterator requiredBundles = set.iterator();
+            List<BundleDescription> set = bundle.getRequireBundle();
+            Iterator<BundleDescription> requiredBundles = set.iterator();
             while (requiredBundles.hasNext())
             {
-                Bundle.BundleDescription bd = (Bundle.BundleDescription) requiredBundles.next();
+                BundleDescription bd = requiredBundles.next();
                 String symbolicName = bd.getBundleSymbolicName();
 
                 Bundle requiredBundle = registeredPluginByPluginId.get(symbolicName);
