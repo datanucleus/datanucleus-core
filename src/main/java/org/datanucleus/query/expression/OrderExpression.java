@@ -87,6 +87,17 @@ public class OrderExpression extends Expression
             VariableExpression ve = (VariableExpression)this.left;
             ve.bind(symtbl);
         }
+        else if (this.left instanceof DyadicExpression)
+        {
+            DyadicExpression de = (DyadicExpression)this.left;
+            de.bind(symtbl);
+        }
+        else if (this.left instanceof InvokeExpression)
+        {
+            InvokeExpression de = (InvokeExpression)this.left;
+            de.bind(symtbl);
+        }
+        // TODO Support other types of OrderExpression and call bind on them
         return null;
     }
 
