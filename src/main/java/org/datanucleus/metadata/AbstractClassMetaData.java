@@ -653,12 +653,12 @@ public abstract class AbstractClassMetaData extends MetaData
             {
                 // The enhancer doesn't need MetaDataManager so just navigate to FileMetaData and find it.
                 // NOTE : assumes that the class is specified in the same file 
-                String superclass_pkg_name = persistableSuperclass.substring(0,persistableSuperclass.lastIndexOf('.'));
-                PackageMetaData pmd = getPackageMetaData().getFileMetaData().getPackage(superclass_pkg_name);
+                String superclassPkgName = persistableSuperclass.substring(0,persistableSuperclass.lastIndexOf('.'));
+                PackageMetaData pmd = getPackageMetaData().getFileMetaData().getPackage(superclassPkgName);
                 if (pmd != null)
                 {
-                    String superclass_class_name = persistableSuperclass.substring(persistableSuperclass.lastIndexOf('.')+1);
-                    pcSuperclassMetaData = pmd.getClass(superclass_class_name);
+                    String superclassClsName = persistableSuperclass.substring(persistableSuperclass.lastIndexOf('.')+1);
+                    pcSuperclassMetaData = pmd.getClass(superclassClsName);
                 }
             }
             if (pcSuperclassMetaData == null)
@@ -672,13 +672,10 @@ public abstract class AbstractClassMetaData extends MetaData
             }
         }
 
-        if (persistableSuperclass != null)
+        if (persistableSuperclass != null && !isDetachable() && pcSuperclassMetaData.isDetachable())
         {
             // Inherit detachable flag from superclass
-            if (!isDetachable() && pcSuperclassMetaData.isDetachable())
-            {
-                detachable = true;
-            }
+            detachable = true;
         }
     }
 
@@ -794,15 +791,10 @@ public abstract class AbstractClassMetaData extends MetaData
             {
                 this.identityType = pcSuperclassMetaData.getIdentityType();
             }
-
-            if (this.identityType != null) 
+            if (this.identityType != null && !this.identityType.equals(pcSuperclassMetaData.getIdentityType())) 
             {
-                // Identity of parent set (some situations exist where due to complicated relations it hasn't yet been)
-                if (!this.identityType.equals(pcSuperclassMetaData.getIdentityType())) 
-                {
-                    // We can't change the identity type from what was specified in the base class
-                    throw new InvalidClassMetaDataException("044093", fullName);
-                }
+                // Identity of parent set, but we can't change the identity type from what was specified in the base class
+                throw new InvalidClassMetaDataException("044093", fullName);
             }
 
             if (pcSuperclassMetaData.getIdentityType() == IdentityType.APPLICATION && pcSuperclassMetaData.getNoOfPopulatedPKMembers() > 0)
@@ -857,7 +849,7 @@ public abstract class AbstractClassMetaData extends MetaData
         if (mappedSuperclass)
         {
             String baseInhStrategy = getBaseInheritanceStrategy();
-            if (baseInhStrategy != null && baseInhStrategy.equalsIgnoreCase("SINGLE_TABLE") && getSuperclassManagingTable() != null)
+            if (baseInhStrategy != null && baseInhStrategy.equalsIgnoreCase(InheritanceMetaData.INHERITANCE_TREE_STRATEGY_SINGLE_TABLE) && getSuperclassManagingTable() != null)
             {
                 // We have a mapped-superclass part way down an inheritance tree but with a class with table above it
                 // and the tree is defined to use single-table strategy, so change the inheritance strategy to persist
@@ -942,19 +934,19 @@ public abstract class AbstractClassMetaData extends MetaData
                 {
                     // A strategy for the full inheritance tree is defined (like in JPA) so use that
                     String treeStrategy = getBaseInheritanceStrategy();
-                    if (treeStrategy.equals("JOINED"))
+                    if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_JOINED.equals(treeStrategy))
                     {
                         inheritanceMetaData = new InheritanceMetaData();
                         inheritanceMetaData.setStrategy(InheritanceStrategy.NEW_TABLE);
                         return;
                     }
-                    else if (treeStrategy.equals("SINGLE_TABLE"))
+                    else if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_SINGLE_TABLE.equals(treeStrategy))
                     {
                         inheritanceMetaData = new InheritanceMetaData();
                         inheritanceMetaData.setStrategy(InheritanceStrategy.SUPERCLASS_TABLE);
                         return;
                     }
-                    else if (treeStrategy.equals("TABLE_PER_CLASS"))
+                    else if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_TABLE_PER_CLASS.equals(treeStrategy))
                     {
                         inheritanceMetaData = new InheritanceMetaData();
                         inheritanceMetaData.setStrategy(InheritanceStrategy.COMPLETE_TABLE);
@@ -1012,7 +1004,7 @@ public abstract class AbstractClassMetaData extends MetaData
             {
                 // They set a tree strategy for this level (applying to this and all levels below)
                 String treeStrategy = getBaseInheritanceStrategy();
-                if (treeStrategy.equalsIgnoreCase("SINGLE_TABLE"))
+                if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_SINGLE_TABLE.equalsIgnoreCase(treeStrategy))
                 {
                     if (pcSuperclassMetaData != null)
                     {
@@ -1047,11 +1039,11 @@ public abstract class AbstractClassMetaData extends MetaData
                         inheritanceMetaData.strategy = InheritanceStrategy.NEW_TABLE;
                     }
                 }
-                else if (treeStrategy.equalsIgnoreCase("TABLE_PER_CLASS"))
+                else if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_TABLE_PER_CLASS.equalsIgnoreCase(treeStrategy))
                 {
                     inheritanceMetaData.strategy = InheritanceStrategy.COMPLETE_TABLE;
                 }
-                else if (treeStrategy.equalsIgnoreCase("JOINED"))
+                else if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_JOINED.equalsIgnoreCase(treeStrategy))
                 {
                     inheritanceMetaData.strategy = InheritanceStrategy.NEW_TABLE;
                 }
@@ -1062,15 +1054,15 @@ public abstract class AbstractClassMetaData extends MetaData
             {
                 String treeStrategy = getBaseInheritanceStrategy();
                 InheritanceStrategy baseStrategy = null;
-                if (treeStrategy != null && treeStrategy.equalsIgnoreCase("SINGLE_TABLE"))
+                if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_SINGLE_TABLE.equalsIgnoreCase(treeStrategy))
                 {
                     baseStrategy = InheritanceStrategy.SUPERCLASS_TABLE;
                 }
-                else if (treeStrategy != null && treeStrategy.equalsIgnoreCase("TABLE_PER_CLASS"))
+                else if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_TABLE_PER_CLASS.equalsIgnoreCase(treeStrategy))
                 {
                     baseStrategy = InheritanceStrategy.COMPLETE_TABLE;
                 }
-                else if (treeStrategy != null && treeStrategy.equalsIgnoreCase("JOINED"))
+                else if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_JOINED.equalsIgnoreCase(treeStrategy))
                 {
                     baseStrategy = InheritanceStrategy.NEW_TABLE;
                 }

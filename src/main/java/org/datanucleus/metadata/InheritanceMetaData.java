@@ -27,6 +27,10 @@ public class InheritanceMetaData extends MetaData
 {
     private static final long serialVersionUID = -3645685751605920718L;
 
+    public static final String INHERITANCE_TREE_STRATEGY_JOINED = "JOINED";
+    public static final String INHERITANCE_TREE_STRATEGY_TABLE_PER_CLASS = "TABLE_PER_CLASS";
+    public static final String INHERITANCE_TREE_STRATEGY_SINGLE_TABLE = "SINGLE_TABLE";
+
     /** strategy tag value. */
     protected InheritanceStrategy strategy = null;
 

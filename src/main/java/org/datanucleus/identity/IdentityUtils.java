@@ -96,8 +96,10 @@ public class IdentityUtils
         return id instanceof SingleFieldId;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.api.ApiAdapter#isDatastoreIdentity(java.lang.Object)
+    /**
+     * Accessor for whether the provided id is datastore identity.
+     * @param id The identity to check
+     * @return Whether it is datastore identity
      */
     public static boolean isDatastoreIdentity(Object id)
     {
