@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.datanucleus.FetchPlanState;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.util.StringUtils;
 

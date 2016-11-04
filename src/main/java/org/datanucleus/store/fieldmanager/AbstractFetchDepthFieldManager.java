@@ -18,9 +18,9 @@ Contributors:
 package org.datanucleus.store.fieldmanager;
 
 import org.datanucleus.FetchPlanForClass;
+import org.datanucleus.FetchPlanState;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataUtils;
-import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
 
 /**

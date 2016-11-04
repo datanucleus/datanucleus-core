@@ -20,6 +20,7 @@ package org.datanucleus.state;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
+import org.datanucleus.FetchPlanState;
 import org.datanucleus.Transaction;
 import org.datanucleus.cache.CachedPC;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;

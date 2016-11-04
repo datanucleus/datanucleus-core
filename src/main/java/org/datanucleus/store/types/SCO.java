@@ -17,7 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types;
 
-import org.datanucleus.state.FetchPlanState;
+import org.datanucleus.FetchPlanState;
 
 /**
  * Representation of a wrapper/proxy for a mutable SCO type (e.g Date, Collection, Map).

@@ -21,10 +21,10 @@ import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.datanucleus.FetchPlanState;
 import org.datanucleus.flush.MapPutOperation;
 import org.datanucleus.flush.MapRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.types.SCOMap;
 import org.datanucleus.store.types.SCOUtils;

@@ -45,6 +45,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.ExecutionContext.EmbeddedOwnerRelation;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.FetchPlanForClass;
+import org.datanucleus.FetchPlanState;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.cache.CachedPC;

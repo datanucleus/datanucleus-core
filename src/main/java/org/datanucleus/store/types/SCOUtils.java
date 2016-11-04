@@ -37,6 +37,7 @@ import java.util.TreeSet;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.FetchPlanState;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusException;
@@ -47,7 +48,6 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataManager;
-import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.StoreManager;

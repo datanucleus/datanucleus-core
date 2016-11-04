@@ -35,7 +35,6 @@ import org.datanucleus.management.ManagerStatistics;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.state.CallbackHandler;
-import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.LockManager;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.state.RelationshipManager;

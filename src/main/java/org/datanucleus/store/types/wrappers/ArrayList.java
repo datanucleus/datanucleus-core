@@ -28,12 +28,12 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
+import org.datanucleus.FetchPlanState;
 import org.datanucleus.flush.CollectionAddOperation;
 import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.flush.ListAddAtOperation;
 import org.datanucleus.flush.ListRemoveAtOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.types.SCOList;

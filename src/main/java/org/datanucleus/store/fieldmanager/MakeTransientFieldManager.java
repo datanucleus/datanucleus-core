@@ -19,10 +19,10 @@ Contributors:
 package org.datanucleus.store.fieldmanager;
 
 import org.datanucleus.FetchPlanForClass;
+import org.datanucleus.FetchPlanState;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.types.ContainerAdapter;
 import org.datanucleus.store.types.SCO;

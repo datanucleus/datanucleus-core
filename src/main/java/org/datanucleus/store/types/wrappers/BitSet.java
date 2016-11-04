@@ -20,8 +20,8 @@ package org.datanucleus.store.types.wrappers;
 
 import java.io.ObjectStreamException;
 
+import org.datanucleus.FetchPlanState;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.types.SCO;
 

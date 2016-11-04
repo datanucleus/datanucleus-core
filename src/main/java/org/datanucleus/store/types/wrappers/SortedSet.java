@@ -26,10 +26,10 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.datanucleus.FetchPlanState;
 import org.datanucleus.flush.CollectionAddOperation;
 import org.datanucleus.flush.CollectionRemoveOperation;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.FetchPlanState;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.types.SCOCollection;

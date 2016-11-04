@@ -16,7 +16,7 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.state;
+package org.datanucleus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +31,8 @@ import java.util.ListIterator;
  */
 public class FetchPlanState
 {
-    /**
-     * List of member names in the graph. The first is the root of the tree, and members are added as 
-     * they are encountered and removed when they are finished with.
-     */
-    protected List<String> memberNames = new ArrayList<String>();
+    /** List of member names in the graph. The first is the root of the tree, and members are added as they are encountered and removed when they are finished with. */
+    protected List<String> memberNames = new ArrayList<>();
 
     /**
      * Method to add a member name to the list since it is being processed
