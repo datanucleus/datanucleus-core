@@ -41,6 +41,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.DetachState;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.ExecutionContext.EmbeddedOwnerRelation;
 import org.datanucleus.FetchPlan;

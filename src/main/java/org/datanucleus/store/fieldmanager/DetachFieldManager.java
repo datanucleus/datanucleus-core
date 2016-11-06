@@ -22,6 +22,7 @@ package org.datanucleus.store.fieldmanager;
 
 import java.util.Map.Entry;
 
+import org.datanucleus.DetachState;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.FetchPlanState;
@@ -29,7 +30,6 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MapMetaData;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.DetachState;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.types.ContainerHandler;
 import org.datanucleus.store.types.ElementContainerAdapter;

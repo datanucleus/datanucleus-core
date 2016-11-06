@@ -16,7 +16,7 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.state;
+package org.datanucleus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.datanucleus.FetchPlanState;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.util.StringUtils;
 

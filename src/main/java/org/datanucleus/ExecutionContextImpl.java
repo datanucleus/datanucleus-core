@@ -74,7 +74,6 @@ import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.TransactionType;
 import org.datanucleus.properties.BasePropertyStore;
 import org.datanucleus.state.CallbackHandler;
-import org.datanucleus.state.DetachState;
 import org.datanucleus.state.LockManager;
 import org.datanucleus.state.LockManagerImpl;
 import org.datanucleus.state.NullCallbackHandler;
