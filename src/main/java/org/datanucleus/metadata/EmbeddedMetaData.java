@@ -517,4 +517,23 @@ public class EmbeddedMetaData extends MetaData
         addMember(pmd);
         return pmd;
     }
+
+    public String toString()
+    {
+        StringBuilder str = new StringBuilder(super.toString());
+        if (memberMetaData != null)
+        {
+            str.append(" [" + memberMetaData.length + " members] (");
+            for (int i=0;i<memberMetaData.length;i++)
+            {
+                if (i > 0)
+                {
+                    str.append(", ");
+                }
+                str.append(memberMetaData[i].getName());
+            }
+            str.append(")");
+        }
+        return str.toString();
+    }
 }

@@ -637,4 +637,40 @@ public class MapMetaData extends ContainerMetaData
             valueCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
         }
     }
+
+    public String toString()
+    {
+        StringBuilder str = new StringBuilder(super.toString());
+
+        str.append(" key=" + key.getType() + " (");
+        if (key.getEmbedded() == Boolean.TRUE)
+        {
+            str.append("embedded ");
+        }
+        if (key.getSerialized() == Boolean.TRUE)
+        {
+            str.append("serialised ");
+        }
+        if (key.getDependent() == Boolean.TRUE)
+        {
+            str.append("dependent");
+        }
+        str.append(")");
+
+        str.append(" value=" + value.getType() + " (");
+        if (value.getEmbedded() == Boolean.TRUE)
+        {
+            str.append("embedded ");
+        }
+        if (value.getSerialized() == Boolean.TRUE)
+        {
+            str.append("serialised ");
+        }
+        if (value.getDependent() == Boolean.TRUE)
+        {
+            str.append("dependent");
+        }
+        str.append(")");
+        return str.toString();
+    }
 }

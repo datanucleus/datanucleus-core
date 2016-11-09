@@ -325,8 +325,6 @@ public class CollectionMetaData extends ContainerMetaData
         this.singleElement = singleElement;
         return this;
     }
-    
-    // ------------------------------- Utilities -------------------------------
 
     /**
      * Accessor for all ClassMetaData referenced by this array.
@@ -342,5 +340,23 @@ public class CollectionMetaData extends ContainerMetaData
         {
             elementCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
         }
+    }
+
+    public String toString()
+    {
+        StringBuilder str = new StringBuilder(super.toString()).append(" [" + element.getType() + "]");
+        if (element.getEmbedded() == Boolean.TRUE)
+        {
+            str.append(" embedded");
+        }
+        if (element.getSerialized() == Boolean.TRUE)
+        {
+            str.append(" serialised");
+        }
+        if (element.getDependent() == Boolean.TRUE)
+        {
+            str.append(" dependent");
+        }
+        return str.toString();
     }
 }
