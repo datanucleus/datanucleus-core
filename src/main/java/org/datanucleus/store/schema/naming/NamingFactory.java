@@ -117,6 +117,7 @@ public interface NamingFactory
      * @param mmds MetaData for the field(s) with the column. The first value is the original field that is embedded, followed by fields of the embedded object(s).
      * @param position The position of the column (where this field has multiple columns)
      * @return The column name
+     * TODO Pass in something that distinguishes between map key and map value
      */
     String getColumnName(List<AbstractMemberMetaData> mmds, int position);
 

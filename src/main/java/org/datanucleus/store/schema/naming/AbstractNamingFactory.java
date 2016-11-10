@@ -159,7 +159,14 @@ public abstract class AbstractNamingFactory implements NamingFactory
                 embmd = rootMmd.getElementMetaData().getEmbeddedMetaData();
             }
         }
-        // TODO Allow for map key/value embedded
+        else if (rootMmd.hasMap())
+        {
+            // TODO Cater for embedded map key OR values ... this just assumes the value, but could be the key
+            if (rootMmd.getValueMetaData() != null)
+            {
+                embmd = rootMmd.getValueMetaData().getEmbeddedMetaData();
+            }
+        }
         else
         {
             embmd = mmds.get(0).getEmbeddedMetaData();
@@ -208,11 +215,19 @@ public abstract class AbstractNamingFactory implements NamingFactory
                                     embmd = embMmds[i].getElementMetaData().getEmbeddedMetaData();
                                 }
                             }
-                            // TODO Cater for embedded map key/values
+                            else if (embMmds[i].hasMap())
+                            {
+                                // TODO Cater for embedded map key OR values ... this just assumes the value, but could be the key
+                                if (embMmds[i].getValueMetaData() != null)
+                                {
+                                    embmd = embMmds[i].getValueMetaData().getEmbeddedMetaData();
+                                }
+                            }
                             else
                             {
                                 embmd = embMmds[i].getEmbeddedMetaData();
                             }
+
                             if (embmd == null)
                             {
                                 // No more info specified so drop out here
