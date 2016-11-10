@@ -39,7 +39,7 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class AbstractNamingFactory implements NamingFactory
 {
-    protected Set<String> reservedWords = new HashSet<String>();
+    protected Set<String> reservedWords = new HashSet<>();
 
     /** Separator to use for words in the identifiers. */
     protected String wordSeparator = "_";
@@ -54,7 +54,7 @@ public abstract class AbstractNamingFactory implements NamingFactory
     protected ClassLoaderResolver clr;
 
     /** Map of max name length, keyed by the schema component type */
-    Map<SchemaComponent, Integer> maxLengthByComponent = new HashMap<SchemaComponent, Integer>();
+    Map<SchemaComponent, Integer> maxLengthByComponent = new HashMap<>();
 
     public AbstractNamingFactory(NucleusContext nucCtx)
     {
@@ -149,6 +149,7 @@ public abstract class AbstractNamingFactory implements NamingFactory
      */
     public String getColumnName(List<AbstractMemberMetaData> mmds, int colPosition)
     {
+        // Extract any root EmbeddedMetaData definition in case user has provided overrides
         EmbeddedMetaData embmd = null;
         AbstractMemberMetaData rootMmd = mmds.get(0);
         if (rootMmd.hasCollection() || rootMmd.hasArray())
@@ -163,10 +164,9 @@ public abstract class AbstractNamingFactory implements NamingFactory
         {
             embmd = mmds.get(0).getEmbeddedMetaData();
         }
-
         if (embmd != null && mmds.size() > 1)
         {
-            // Try to find a user-provided column name in <embedded> metadata for this member
+            // Try to find a user-provided column name in EmbeddedMetaData for this member
             boolean checked = false;
             int mmdNo = 1;
             while (!checked)
@@ -174,63 +174,68 @@ public abstract class AbstractNamingFactory implements NamingFactory
                 AbstractMemberMetaData[] embMmds = embmd.getMemberMetaData();
                 if (embMmds == null || embMmds.length == 0)
                 {
-                    checked = true;
+                    break;
                 }
-                else
+
+                boolean checkedEmbmd = false;
+                boolean foundEmbmd = false;
+                for (int i=0;i<embMmds.length;i++)
                 {
-                    boolean checkedEmbmd = false;
-                    for (int i=0;i<embMmds.length;i++)
+                    if (embMmds[i].getFullFieldName().equals(mmds.get(mmdNo).getFullFieldName()))
                     {
-                        if (embMmds[i].getFullFieldName().equals(mmds.get(mmdNo).getFullFieldName()))
+                        foundEmbmd = true;
+                        if (mmds.size() == mmdNo+1)
                         {
-                            if (mmds.size() == mmdNo+1)
+                            // Found last embedded field, so use column data if present
+                            checked = true;
+                            ColumnMetaData[] colmds = embMmds[i].getColumnMetaData();
+                            if (colmds != null && colmds.length > colPosition && !StringUtils.isWhitespace(colmds[colPosition].getName()))
                             {
-                                // Found last embedded field, so use column data if present
-                                checked = true;
-                                ColumnMetaData[] colmds = embMmds[i].getColumnMetaData();
-                                if (colmds != null && colmds.length > colPosition && !StringUtils.isWhitespace(colmds[colPosition].getName()))
+                                String colName = colmds[colPosition].getName();
+                                return prepareIdentifierNameForUse(colName, SchemaComponent.COLUMN);
+                            }
+                        }
+                        else
+                        {
+                            // Go to next level in embMmds if present
+                            checkedEmbmd = true;
+                            mmdNo++;
+                            embmd = null;
+                            if (embMmds[i].hasCollection() || embMmds[i].hasArray())
+                            {
+                                if (embMmds[i].getElementMetaData() != null)
                                 {
-                                    String colName = colmds[colPosition].getName();
-                                    return prepareIdentifierNameForUse(colName, SchemaComponent.COLUMN);
+                                    embmd = embMmds[i].getElementMetaData().getEmbeddedMetaData();
                                 }
                             }
+                            // TODO Cater for embedded map key/values
                             else
                             {
-                                // Go to next level in embMmds if present
-                                checkedEmbmd = true;
-                                mmdNo++;
-                                embmd = null;
-                                if (embMmds[i].hasCollection() || embMmds[i].hasArray())
-                                {
-                                    if (embMmds[i].getElementMetaData() != null)
-                                    {
-                                        embmd = embMmds[i].getElementMetaData().getEmbeddedMetaData();
-                                    }
-                                }
-                                // TODO Cater for embedded map key/values
-                                else
-                                {
-                                    embmd = embMmds[i].getEmbeddedMetaData();
-                                }
-                                if (embmd == null)
-                                {
-                                    // No more info specified so drop out here
-                                    checked = true;
-                                }
+                                embmd = embMmds[i].getEmbeddedMetaData();
+                            }
+                            if (embmd == null)
+                            {
+                                // No more info specified so drop out here
+                                checked = true;
                             }
                         }
-                        if (checked || checkedEmbmd)
-                        {
-                            break;
-                        }
                     }
+                    if (checked || checkedEmbmd)
+                    {
+                        break;
+                    }
+                }
+                if (!foundEmbmd)
+                {
+                    // No EmbeddedMetaData definition for this member, so break out and use fallback naming
+                    checked = true;
                 }
             }
         }
 
+        // EmbeddedMetaData not available for defining this column, so check for column info for the member itself
         if (mmds.size() >= 1)
         {
-            // EmbeddedMetaData didn't provide the column name, so check for a column specified for the metadata of the member itself
             AbstractMemberMetaData lastMmd = mmds.get(mmds.size()-1);
             ColumnMetaData[] colmds = lastMmd.getColumnMetaData();
             if (colmds != null && colmds.length > colPosition && !StringUtils.isWhitespace(colmds[colPosition].getName()))
@@ -240,7 +245,7 @@ public abstract class AbstractNamingFactory implements NamingFactory
             }
         }
 
-        // EmbeddedMetaData and Member don't specify the column, so generate one based on the names of the member(s).
+        // EmbeddedMetaData and member don't specify the column, so generate one based on the names of the member(s).
         // TODO If columnPosition is >= 1 maybe we should append "_{colPosition}" on the column name
         StringBuilder str = new StringBuilder(mmds.get(0).getName());
         for (int i=1;i<mmds.size();i++)
@@ -248,7 +253,6 @@ public abstract class AbstractNamingFactory implements NamingFactory
             str.append(wordSeparator);
             str.append(mmds.get(i).getName());
         }
-
         return prepareIdentifierNameForUse(str.toString(), SchemaComponent.COLUMN);
     }
 
