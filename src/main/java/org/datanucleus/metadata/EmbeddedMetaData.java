@@ -200,12 +200,12 @@ public class EmbeddedMetaData extends MetaData
         Iterator<AbstractMemberMetaData> memberIter = members.iterator();
         while (memberIter.hasNext())
         {
-            Object fld = memberIter.next();
+            AbstractMemberMetaData mmd = memberIter.next();
             // TODO Should allow PropertyMetaData here I think
-            if (embCmd instanceof InterfaceMetaData && fld instanceof FieldMetaData)
+            if (embCmd instanceof InterfaceMetaData && mmd instanceof FieldMetaData)
             {
                 // Cannot have a field within a persistent interface
-                throw new InvalidMemberMetaDataException("044129", apmd.getClassName(), apmd.getName(), ((AbstractMemberMetaData)fld).getName());
+                throw new InvalidMemberMetaDataException("044129", apmd.getClassName(), apmd.getName(), mmd.getName());
             }
         }
 
@@ -236,8 +236,7 @@ public class EmbeddedMetaData extends MetaData
                 // Limit to fields in this class, that aren't enhanced fields that aren't inner class fields, and that aren't static
                 if (cls_fields[i].getDeclaringClass().getName().equals(embeddedType) &&
                     !mmgr.isEnhancerField(cls_fields[i].getName()) &&
-                    !ClassUtils.isInnerClass(cls_fields[i].getName()) &&
-                    !Modifier.isStatic(cls_fields[i].getModifiers()))
+                    !ClassUtils.isInnerClass(cls_fields[i].getName()) && !Modifier.isStatic(cls_fields[i].getModifiers()))
                 {
                     // Find if there is a AbstractMemberMetaData for this field.
                     if (!memberNames.contains(cls_fields[i].getName()))
@@ -375,6 +374,23 @@ public class EmbeddedMetaData extends MetaData
                     }
                 }
                 fieldFmd.populate(clr, null, cls_method, primary, mmgr);
+            }
+        }
+
+        if (embCmd.isEmbeddedOnly())
+        {
+            // Check for recursive embedding of the same type and throw exception if so.
+            // We do not support recursive embedding since if a 1-1 this would result in adding embedded columns infinite times, and for 1-N infinite join tables.
+            for (AbstractMemberMetaData mmd : members)
+            {
+                if (mmd.getTypeName().equals(embCmd.getFullClassName()))
+                {
+                    throw new InvalidMetaDataException("044128", embCmd.getFullClassName(), mmd.getName());
+                }
+                else if (mmd.hasCollection() && mmd.getCollection().getElementType().equals(embCmd.getFullClassName()))
+                {
+                    throw new InvalidMetaDataException("044128", embCmd.getFullClassName(), mmd.getName());
+                }
             }
         }
     }
