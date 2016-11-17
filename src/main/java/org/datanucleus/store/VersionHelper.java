@@ -29,9 +29,13 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * Helper methods for handling optimistic versioning.
+ * TODO Make the Version initial value configurable on the PMF/EMF. This would involve moving these methods into NucleusContext maybe.
  */
 public class VersionHelper
 {
+    /** Initial version value when persisting a versioned object for the first time. */
+    public static final int VERSION_INITIAL_VALUE = 1;
+
     /**
      * Perform an optimistic version check on the passed object, against the passed version in the datastore.
      * @param op ObjectProvider of the object to check
@@ -69,27 +73,23 @@ public class VersionHelper
         else if (versionMetaData.getVersionStrategy() == VersionStrategy.STATE_IMAGE)
         {
             // TODO Support state-image strategy
-            throw new NucleusUserException(Localiser.msg("032017",
-                op.getClassMetaData().getFullClassName(), versionMetaData.getVersionStrategy()));
+            throw new NucleusUserException(Localiser.msg("032017", op.getClassMetaData().getFullClassName(), versionMetaData.getVersionStrategy()));
         }
         else
         {
-            throw new NucleusUserException(Localiser.msg("032017",
-                op.getClassMetaData().getFullClassName(), versionMetaData.getVersionStrategy()));
+            throw new NucleusUserException(Localiser.msg("032017", op.getClassMetaData().getFullClassName(), versionMetaData.getVersionStrategy()));
         }
 
         if (!valid)
         {
-            String msg = Localiser.msg("032016", 
-                op.getObjectAsPrintable(), op.getInternalObjectId(), "" + versionDatastore, "" + versionObject);
+            String msg = Localiser.msg("032016", op.getObjectAsPrintable(), op.getInternalObjectId(), "" + versionDatastore, "" + versionObject);
             NucleusLogger.PERSISTENCE.error(msg);
             throw new NucleusOptimisticException(msg, op.getObject());
         }
     }
 
     /**
-     * Convenience method to provide the next version, using the version strategy given the
-     * supplied current version.
+     * Convenience method to provide the next version, using the version strategy given the supplied current version.
      * @param versionStrategy Version strategy
      * @param currentVersion The current version
      * @return The next version
@@ -106,7 +106,7 @@ public class VersionHelper
             // Just increment the version - is this really necessary?
             if (currentVersion == null)
             {
-                return Long.valueOf(1);
+                return Long.valueOf(VERSION_INITIAL_VALUE);
             }
             if (currentVersion instanceof Integer)
             {
@@ -122,7 +122,7 @@ public class VersionHelper
         {
             if (currentVersion == null)
             {
-                return Long.valueOf(1);
+                return Long.valueOf(VERSION_INITIAL_VALUE);
             }
             if (currentVersion instanceof Integer)
             {
