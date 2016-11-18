@@ -216,6 +216,7 @@ public class EmbeddedMetaData extends MetaData
         }
 
         // Add fields for the class that aren't in the <embedded> block using Reflection.
+        // TODO Consider getting rid of this ... should fall back to the ClassMetaData for the embedded class
         // NOTE 1 : We ignore fields in superclasses
         // NOTE 2 : We ignore "enhanced" fields (added by the JDO enhancer)
         // NOTE 3 : We ignore inner class fields (containing "$") 
