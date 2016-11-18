@@ -382,6 +382,23 @@ public class EmbeddedMetaData extends MetaData
                 fieldFmd.populate(clr, null, cls_method, primary, mmgr);
             }
         }
+
+        if (embCmd.isEmbeddedOnly())
+        {
+            // Check for recursive embedding of the same type and throw exception if so.
+            // We do not support recursive embedding since if a 1-1 this would result in adding embedded columns infinite times, and for 1-N infinite join tables.
+            for (AbstractMemberMetaData mmd : members)
+            {
+                if (mmd.getTypeName().equals(embCmd.getFullClassName()))
+                {
+                    throw new InvalidMetaDataException("044128", embCmd.getFullClassName(), mmd.getName());
+                }
+                else if (mmd.hasCollection() && mmd.getCollection().getElementType().equals(embCmd.getFullClassName()))
+                {
+                    throw new InvalidMetaDataException("044128", embCmd.getFullClassName(), mmd.getName());
+                }
+            }
+        }
     }
 
     /**
