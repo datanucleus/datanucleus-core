@@ -118,6 +118,12 @@ public interface Transaction
     boolean getIsActive();
 
     /**
+     * Accessor for the time (millisecs) from System.currentTimeMillis when the transaction started.
+     * @return Time at which the transaction started. -1 implies not yet started.
+     */
+    long getBeginTime();
+
+    /**
      * Method to notify that flush is started.
      */
     void preFlush();

@@ -80,7 +80,7 @@ public class TransactionImpl implements Transaction
     private Map<String, Object> options = null;
 
     /** start time of the transaction */
-    long beginTime;
+    long beginTime = -1;
 
     boolean closed = false;
     
@@ -120,6 +120,11 @@ public class TransactionImpl implements Transaction
                 serializeRead = serialiseReadProp;
             }            
         }
+    }
+
+    public long getBeginTime()
+    {
+        return beginTime;
     }
 
     public void close()
@@ -550,6 +555,7 @@ public class TransactionImpl implements Transaction
     {
         try
         {
+            beginTime = -1;
             active = false;
             if (ec.getStatistics() != null)
             {

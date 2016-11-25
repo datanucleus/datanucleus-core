@@ -85,6 +85,8 @@ public class CompleteClassTable implements Table
 
     Column multitenancyColumn;
 
+    // TODO Support create-timestamp surrogate
+    // TODO Support update-timestamp surrogate
     /** Map of member-column mapping, keyed by the metadata for the member. */
     Map<String, MemberColumnMapping> mappingByMember = new HashMap<>();
 
