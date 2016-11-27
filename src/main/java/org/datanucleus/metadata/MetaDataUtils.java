@@ -1017,22 +1017,54 @@ public class MetaDataUtils
             else if (RelationType.isRelationMultiValued(relationType))
             {
                 // Is this an embedded element/key/value?
-                if (mmd.hasCollection() && mmd.getElementMetaData() != null && mmd.getElementMetaData().getEmbeddedMetaData() != null)
+                if (mmd.hasCollection() && mmd.getElementMetaData() != null)
                 {
-                    // Embedded collection element
-                    return true;
+                    if (mmd.getElementMetaData().getEmbeddedMetaData() != null)
+                    {
+                        // Full embedded definition for element provided
+                        return true;
+                    }
+                    else if (mmd.getCollection().elementIsPersistent() && mmd.getCollection().isEmbeddedElement())
+                    {
+                        // Element simply marked as embedded, but is persistent
+                        return true;
+                    }
                 }
-                else if (mmd.hasArray() && mmd.getElementMetaData() != null && mmd.getElementMetaData().getEmbeddedMetaData() != null)
+                else if (mmd.hasArray() && mmd.getElementMetaData() != null)
                 {
-                    // Embedded array element
-                    return true;
+                    if (mmd.getElementMetaData().getEmbeddedMetaData() != null)
+                    {
+                        // Full embedded definition for element provided
+                        return true;
+                    }
+                    else if (mmd.getArray().elementIsPersistent() && mmd.getArray().isEmbeddedElement())
+                    {
+                        // Element simply marked as embedded, but is persistent
+                        return true;
+                    }
                 }
-                else if (mmd.hasMap() && 
-                        ((mmd.getKeyMetaData() != null && mmd.getKeyMetaData().getEmbeddedMetaData() != null) || 
-                        (mmd.getValueMetaData() != null && mmd.getValueMetaData().getEmbeddedMetaData() != null)))
+                else if (mmd.hasMap())
                 {
-                    // Embedded map key/value
-                    return true;
+                    if (mmd.getKeyMetaData() != null && mmd.getKeyMetaData().getEmbeddedMetaData() != null)
+                    {
+                        // Full embedded definition for key provided
+                        return true; 
+                    }
+                    else if (mmd.getMap().keyIsPersistent() && mmd.getMap().isEmbeddedKey())
+                    {
+                        // Key simply marked as embedded, but is persistent
+                        return true;
+                    }
+                    if (mmd.getValueMetaData() != null && mmd.getValueMetaData().getEmbeddedMetaData() != null)
+                    {
+                        // Full embedded definition for value provided
+                        return true;
+                    }
+                    else if (mmd.getMap().valueIsPersistent() && mmd.getMap().isEmbeddedValue())
+                    {
+                        // Value simply marked as embedded, but is persistent
+                        return true;
+                    }
                 }
             }
 
