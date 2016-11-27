@@ -894,7 +894,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             return;
         }
 
-        MetaDataManager mmgr = getMetaDataManager();
+//        MetaDataManager mmgr = getMetaDataManager();
 
         // Cater for user specifying column name, or columns
         if (columns.isEmpty() && column != null)
@@ -932,62 +932,82 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             if (containerMetaData instanceof CollectionMetaData)
             {
                 CollectionMetaData collmd = (CollectionMetaData)containerMetaData;
-                if (collmd.element.classMetaData != null && collmd.element.classMetaData.isEmbeddedOnly())
+                if (collmd.element.classMetaData != null)
                 {
-                    // Element is persistent yet embedded only so mark as embedded in metadata
-                    if (elementMetaData == null)
+                    if (collmd.element.classMetaData.isEmbeddedOnly())
                     {
-                        elementMetaData = new ElementMetaData();
-                        elementMetaData.parent = this;
-                        elementMetaData.populate(clr, null);
+                        // Element is persistent yet embedded only so mark as embedded in metadata
+                        if (elementMetaData == null)
+                        {
+                            elementMetaData = new ElementMetaData();
+                            elementMetaData.parent = this;
+                            elementMetaData.populate(clr, null);
+                        }
+                        collmd.setEmbeddedElement(true);
                     }
-                    if (elementMetaData.getEmbeddedMetaData() == null)
+                    if (embedded == Boolean.TRUE)
                     {
-                        EmbeddedMetaData elemEmbmd = new EmbeddedMetaData();
-                        elemEmbmd.parent = elementMetaData;
-                        elemEmbmd.populate(clr, null, mmgr);
-                        elementMetaData.setEmbeddedMetaData(elemEmbmd);
-                        collmd.element.embedded = Boolean.TRUE;
+                        // User has set field as embedded, so assume they mean the element
+                        collmd.setEmbeddedElement(true);
+                        this.embedded = null;
+                        this.embeddedMetaData = null;
+                    }
+                }
+            }
+            else if (containerMetaData instanceof ArrayMetaData)
+            {
+                ArrayMetaData arrmd = (ArrayMetaData)containerMetaData;
+                if (arrmd.element.classMetaData != null)
+                {
+                    if (arrmd.element.classMetaData.isEmbeddedOnly())
+                    {
+                        // Element is persistent yet embedded only so mark as embedded in metadata
+                        if (elementMetaData == null)
+                        {
+                            elementMetaData = new ElementMetaData();
+                            elementMetaData.parent = this;
+                            elementMetaData.populate(clr, null);
+                        }
+                        arrmd.setEmbeddedElement(true);
+                    }
+                    if (embedded == Boolean.TRUE)
+                    {
+                        // User has set field as embedded, so assume they mean the element
+                        arrmd.setEmbeddedElement(true);
+                        this.embedded = null;
+                        this.embeddedMetaData = null;
                     }
                 }
             }
             else if (containerMetaData instanceof MapMetaData)
             {
                 MapMetaData mapmd = (MapMetaData)containerMetaData;
-                if (mapmd.key.classMetaData != null && mapmd.key.classMetaData.isEmbeddedOnly())
+                if (mapmd.key.classMetaData != null)
                 {
-                    // Key is persistent yet embedded only so mark as embedded in metadata
-                    if (keyMetaData == null)
+                    if (mapmd.key.classMetaData.isEmbeddedOnly())
                     {
-                        keyMetaData = new KeyMetaData();
-                        keyMetaData.parent = this;
-                        keyMetaData.populate(clr, null);
-                    }
-                    if (keyMetaData.getEmbeddedMetaData() == null)
-                    {
-                        EmbeddedMetaData keyEmbmd = new EmbeddedMetaData();
-                        keyEmbmd.parent = keyMetaData;
-                        keyEmbmd.populate(clr, null, mmgr);
-                        keyMetaData.setEmbeddedMetaData(keyEmbmd);
-                        mapmd.key.embedded = Boolean.TRUE;
+                        // Key is persistent yet embedded only so mark as embedded in metadata
+                        if (keyMetaData == null)
+                        {
+                            keyMetaData = new KeyMetaData();
+                            keyMetaData.parent = this;
+                            keyMetaData.populate(clr, null);
+                        }
+                        mapmd.setEmbeddedKey(true);
                     }
                 }
-                if (mapmd.value.classMetaData != null && mapmd.value.classMetaData.isEmbeddedOnly())
+                if (mapmd.value.classMetaData != null)
                 {
-                    // Value is persistent yet embedded only so mark as embedded in metadata
-                    if (valueMetaData == null)
+                    if (mapmd.value.classMetaData.isEmbeddedOnly())
                     {
-                        valueMetaData = new ValueMetaData();
-                        valueMetaData.parent = this;
-                        valueMetaData.populate(clr, null);
-                    }
-                    if (valueMetaData.getEmbeddedMetaData() == null)
-                    {
-                        EmbeddedMetaData valueEmbmd = new EmbeddedMetaData();
-                        valueEmbmd.parent = valueMetaData;
-                        valueEmbmd.populate(clr, null, mmgr);
-                        valueMetaData.setEmbeddedMetaData(valueEmbmd);
-                        mapmd.value.embedded = Boolean.TRUE;
+                        // Value is persistent yet embedded only so mark as embedded in metadata
+                        if (valueMetaData == null)
+                        {
+                            valueMetaData = new ValueMetaData();
+                            valueMetaData.parent = this;
+                            valueMetaData.populate(clr, null);
+                        }
+                        mapmd.setEmbeddedValue(true);
                     }
                 }
             }
