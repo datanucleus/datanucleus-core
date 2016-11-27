@@ -55,7 +55,7 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
     /** ForeignKeyMetaData */
     protected ForeignKeyMetaData foreignKeyMetaData;
 
-    /** EmbeddedMetaData */
+    /** Definition of embedding of the element/key/value. Only present if defined by user. */
     protected EmbeddedMetaData embeddedMetaData;
 
     protected String table;

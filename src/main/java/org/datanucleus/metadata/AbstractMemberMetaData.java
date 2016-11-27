@@ -67,7 +67,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     /** Meta-Data of any container. */
     protected ContainerMetaData containerMetaData;
 
-    /** EmbeddedMetaData. */
+    /** Definition of embedding. Only present if defined by user. */
     protected EmbeddedMetaData embeddedMetaData;
 
     /** JoinMetaData. */
@@ -657,7 +657,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
         if (embedded == Boolean.TRUE && embeddedMetaData == null)
         {
-            // User specified "embedded" on the member, yet no embedded definition so add one
+            // User specified "embedded" on the member, yet no embedded definition so add one TODO Omit this, since we should only use when provided
             AbstractClassMetaData memberCmd = mmgr.getMetaDataForClassInternal(getType(), clr);
             if (memberCmd != null)
             {
@@ -665,7 +665,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 embeddedMetaData.setParent(this);
             }
         }
-        
         if (embeddedMetaData != null)
         {
             // Update with any extensions (for lack of features in JPA)
