@@ -1436,6 +1436,22 @@ public class ClassUtils
     }
 
     /**
+     * Utility to return the package name for a class name.
+     * @param cls The class
+     * @return The name of its package (or null if no package e.g a primitive)
+     */
+    public static String getPackageNameForClassName(String clsName)
+    {
+        // Check getPackage and use that if specified.
+        int separator = clsName.lastIndexOf('.');
+        if (separator < 0)
+        {
+            return null;
+        }
+        return clsName.substring(0, separator);
+    }
+
+    /**
      * Utility to return the class name without the package name for a class.
      * @param cls The class
      * @return The name of the class without its package
