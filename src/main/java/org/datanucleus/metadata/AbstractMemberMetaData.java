@@ -335,11 +335,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         }
     }
 
-    public MetaDataManager getMetaDataManager()
-    {
-        return getAbstractClassMetaData().getMetaDataManager();
-    }
-
     /**
      * Constructor for a fields metadata. Set the fields using setters, before populate().
      * @param parent parent MetaData instance TODO Remove this

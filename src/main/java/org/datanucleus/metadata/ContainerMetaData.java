@@ -51,15 +51,6 @@ public class ContainerMetaData extends MetaData
         super(null, contmd);
     }
 
-    public MetaDataManager getMetaDataManager()
-    {
-        if (parent instanceof AbstractMemberMetaData)
-        {
-            return ((AbstractMemberMetaData)parent).getMetaDataManager();
-        }
-        return null;
-    }
-
     /**
      * Method to populate any defaults, and check the validity of the MetaData.
      */

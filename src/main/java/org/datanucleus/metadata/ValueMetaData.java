@@ -55,16 +55,16 @@ public class ValueMetaData extends AbstractElementMetaData
      */
     public void populate(ClassLoaderResolver clr, ClassLoader primary)
     {
-        AbstractMemberMetaData fmd = (AbstractMemberMetaData)parent;
-        if (fmd.getMap() == null)
+        AbstractMemberMetaData mmd = (AbstractMemberMetaData)parent;
+        if (mmd.getMap() == null)
         {
             // TODO Change this to InvalidMetaDataException
-            throw new NucleusFatalUserException("The field "+fmd.getFullFieldName()+" is defined with <value>, however no <map> definition was found.");
+            throw new NucleusFatalUserException("The field "+mmd.getFullFieldName()+" is defined with <value>, however no <map> definition was found.");
         }
 
         // Make sure value type is set and is valid
-        fmd.getMap().value.populate(fmd.getAbstractClassMetaData().getPackageName(), clr, primary);
-        String valueType = fmd.getMap().getValueType();
+        mmd.getMap().value.populate(mmd.getAbstractClassMetaData().getPackageName(), clr, primary);
+        String valueType = mmd.getMap().getValueType();
         Class valueTypeClass = null;
         try
         {
@@ -72,13 +72,12 @@ public class ValueMetaData extends AbstractElementMetaData
         }
         catch (ClassNotResolvedException cnre)
         {
-            throw new InvalidMemberMetaDataException("044150", fmd.getClassName(), fmd.getName(), 
-                valueType);
+            throw new InvalidMemberMetaDataException("044150", mmd.getClassName(), mmd.getName(), valueType);
         }
         if (embeddedMetaData != null &&
             (valueTypeClass.isInterface() || valueTypeClass.getName().equals("java.lang.Object")))
         {
-            throw new InvalidMemberMetaDataException("044152", fmd.getClassName(), fmd.getName(), valueTypeClass.getName());
+            throw new InvalidMemberMetaDataException("044152", mmd.getClassName(), mmd.getName(), valueTypeClass.getName());
         }
 
         // TODO This will not work currently since MapMetaData is populated *after* ValueMetaData and so the

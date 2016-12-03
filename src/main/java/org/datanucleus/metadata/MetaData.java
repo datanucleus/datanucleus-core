@@ -221,6 +221,11 @@ public class MetaData implements Serializable
         return metaDataState == METADATA_USED_STATE;
     }
 
+    public MetaDataManager getMetaDataManager()
+    {
+        return parent != null ? parent.getMetaDataManager() : null;
+    }
+
     public void setParent(MetaData md)
     {
         if (isPopulated() || isInitialised())

@@ -66,6 +66,7 @@ public class ElementMetaData extends AbstractElementMetaData
         {
             fmd.getArray().element.populate(fmd.getAbstractClassMetaData().getPackageName(), clr, primary);
         }
+
         if (embeddedMetaData == null && 
             ((AbstractMemberMetaData)parent).hasCollection() && 
             ((AbstractMemberMetaData)parent).getCollection().isEmbeddedElement() &&

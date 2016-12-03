@@ -82,7 +82,7 @@ public class CollectionMetaData extends ContainerMetaData
         {
             throw new InvalidMemberMetaDataException("044131", mmd.getClassName(), mmd.getName());
         }
-        MetaDataManager mmgr = mmd.getMetaDataManager();
+        MetaDataManager mmgr = getMetaDataManager();
 
         // Make sure the type in "element" is set
         element.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), clr, primary);
