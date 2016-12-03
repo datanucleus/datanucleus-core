@@ -115,28 +115,48 @@ public class CollectionMetaData extends ContainerMetaData
         if (element.embedded == null)
         {
             // Assign default for "embedded-element" based on 18.13.1 of JDO 2 spec
-            // Note : this fails when using in the enhancer since not yet PC
             if (mmgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(elementTypeClass))
             {
                 element.embedded = Boolean.TRUE;
             }
-            else if (mmgr.getApiAdapter().isPersistable(elementTypeClass) ||
-                Object.class.isAssignableFrom(elementTypeClass) ||
-                elementTypeClass.isInterface())
-            {
-                element.embedded = Boolean.FALSE;
-            }
             else
             {
-                element.embedded = Boolean.TRUE;
+                // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the element
+                AbstractClassMetaData elemCmd = mmgr.readMetaDataForClass(elementTypeClass.getName());
+                if (elemCmd != null)
+                {
+                    if (elemCmd.isEmbeddedOnly())
+                    {
+                        element.embedded = Boolean.TRUE;
+                    }
+                    else
+                    {
+                        element.embedded = Boolean.FALSE;
+                    }
+                }
+                else
+                {
+                    if (Object.class.isAssignableFrom(elementTypeClass) || elementTypeClass.isInterface())
+                    {
+                        element.embedded = Boolean.FALSE;
+                    }
+                    else
+                    {
+                        element.embedded = Boolean.TRUE;
+                    }
+                }
             }
         }
-        if (Boolean.FALSE.equals(element.embedded))
+        else if (Boolean.FALSE.equals(element.embedded))
         {
-            // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
-            // Note : this fails when using in the enhancer since not yet PC
-            if (!mmgr.getApiAdapter().isPersistable(elementTypeClass) && !elementTypeClass.isInterface() && elementTypeClass != java.lang.Object.class)
+            // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the element
+            AbstractClassMetaData elemCmd = mmgr.readMetaDataForClass(elementTypeClass.getName());
+            if (elemCmd == null && !elementTypeClass.isInterface() && elementTypeClass != java.lang.Object.class)
             {
+                // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
+                // Note : this fails when using in the enhancer since not yet PC
+                NucleusLogger.METADATA.debug("Member with collection of element type " + elementTypeClass.getName() +
+                    " marked as not embedded, but only persistable as embedded, so resetting");
                 element.embedded = Boolean.TRUE;
             }
         }

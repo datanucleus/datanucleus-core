@@ -171,21 +171,44 @@ public class MapMetaData extends ContainerMetaData
             {
                 key.embedded = Boolean.TRUE;
             }
-            else if (mmgr.getApiAdapter().isPersistable(keyTypeClass) || Object.class.isAssignableFrom(keyTypeClass) || keyTypeClass.isInterface())
-            {
-                key.embedded = Boolean.FALSE;
-            }
             else
             {
-                key.embedded = Boolean.TRUE;
+                // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the key
+                AbstractClassMetaData keyCmd = mmgr.readMetaDataForClass(keyTypeClass.getName());
+                if (keyCmd != null)
+                {
+                    if (keyCmd.isEmbeddedOnly())
+                    {
+                        key.embedded = Boolean.TRUE;
+                    }
+                    else
+                    {
+                        key.embedded = Boolean.FALSE;
+                    }
+                }
+                else
+                {
+                    if (Object.class.isAssignableFrom(keyTypeClass) || keyTypeClass.isInterface())
+                    {
+                        key.embedded = Boolean.FALSE;
+                    }
+                    else
+                    {
+                        key.embedded = Boolean.TRUE;
+                    }
+                }
             }
         }
         if (Boolean.FALSE.equals(key.embedded))
         {
-            // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
-            // Note : this fails when using in the enhancer since not yet PC
-            if (!mmgr.getApiAdapter().isPersistable(keyTypeClass) && !keyTypeClass.isInterface() && keyTypeClass != java.lang.Object.class)
+            // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the key
+            AbstractClassMetaData elemCmd = mmgr.readMetaDataForClass(keyTypeClass.getName());
+            if (elemCmd == null && !keyTypeClass.isInterface() && keyTypeClass != java.lang.Object.class)
             {
+                // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
+                // Note : this fails when using in the enhancer since not yet PC
+                NucleusLogger.METADATA.debug("Member with map with key type " + keyTypeClass.getName() +
+                    " marked as not embedded, but only persistable as embedded, so resetting");
                 key.embedded = Boolean.TRUE;
             }
         }
@@ -276,21 +299,44 @@ public class MapMetaData extends ContainerMetaData
             {
                 value.embedded = Boolean.TRUE;
             }
-            else if (mmgr.getApiAdapter().isPersistable(valueTypeClass) || Object.class.isAssignableFrom(valueTypeClass) || valueTypeClass.isInterface())
-            {
-                value.embedded = Boolean.FALSE;
-            }
             else
             {
-                value.embedded = Boolean.TRUE;
+                // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the value
+                AbstractClassMetaData valueCmd = mmgr.readMetaDataForClass(valueTypeClass.getName());
+                if (valueCmd != null)
+                {
+                    if (valueCmd.isEmbeddedOnly())
+                    {
+                        value.embedded = Boolean.TRUE;
+                    }
+                    else
+                    {
+                        value.embedded = Boolean.FALSE;
+                    }
+                }
+                else
+                {
+                    if (Object.class.isAssignableFrom(valueTypeClass) || valueTypeClass.isInterface())
+                    {
+                        value.embedded = Boolean.FALSE;
+                    }
+                    else
+                    {
+                        value.embedded = Boolean.TRUE;
+                    }
+                }
             }
         }
         if (value.embedded == Boolean.FALSE)
         {
-            // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
-            // Note : this fails when using in the enhancer since not yet PC
-            if (!mmgr.getApiAdapter().isPersistable(valueTypeClass) && !valueTypeClass.isInterface() && valueTypeClass != java.lang.Object.class)
+            // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the value
+            AbstractClassMetaData valCmd = mmgr.readMetaDataForClass(valueTypeClass.getName());
+            if (valCmd == null && !valueTypeClass.isInterface() && valueTypeClass != java.lang.Object.class)
             {
+                // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
+                // Note : this fails when using in the enhancer since not yet PC
+                NucleusLogger.METADATA.debug("Member with map with value type " + valueTypeClass.getName() +
+                    " marked as not embedded, but only persistable as embedded, so resetting");
                 value.embedded = Boolean.TRUE;
             }
         }

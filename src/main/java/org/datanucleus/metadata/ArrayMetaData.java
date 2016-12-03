@@ -102,22 +102,45 @@ public class ArrayMetaData extends ContainerMetaData
             {
                 element.embedded = Boolean.TRUE;
             }
-            else if (mmgr.getApiAdapter().isPersistable(component_type) || Object.class.isAssignableFrom(component_type) || component_type.isInterface())
-            {
-                element.embedded = Boolean.FALSE;
-            }
             else
             {
-                element.embedded = Boolean.TRUE;
+                // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the element
+                AbstractClassMetaData elemCmd = mmgr.readMetaDataForClass(component_type.getName());
+                if (elemCmd != null)
+                {
+                    if (elemCmd.isEmbeddedOnly())
+                    {
+                        element.embedded = Boolean.TRUE;
+                    }
+                    else
+                    {
+                        element.embedded = Boolean.FALSE;
+                    }
+                }
+                else
+                {
+                    if (Object.class.isAssignableFrom(component_type) || component_type.isInterface())
+                    {
+                        element.embedded = Boolean.FALSE;
+                    }
+                    else
+                    {
+                        element.embedded = Boolean.TRUE;
+                    }
+                }
             }
         }
         if (Boolean.FALSE.equals(element.embedded))
         {
-            // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
-            // Note : this fails when using in the enhancer since not yet PC
+            // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the element
             Class component_type = field_type.getComponentType();
-            if (!mmgr.getApiAdapter().isPersistable(component_type) && !component_type.isInterface() && component_type != java.lang.Object.class)
+            AbstractClassMetaData elemCmd = mmgr.readMetaDataForClass(component_type.getName());
+            if (elemCmd == null && !component_type.isInterface() && component_type != java.lang.Object.class)
             {
+                // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
+                // Note : this fails when using in the enhancer since not yet PC
+                NucleusLogger.METADATA.debug("Member with array of element type " + component_type.getName() +
+                    " marked as not embedded, but only persistable as embedded, so resetting");
                 element.embedded = Boolean.TRUE;
             }
         }
