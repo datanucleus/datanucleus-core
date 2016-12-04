@@ -108,25 +108,19 @@ public class ArrayMetaData extends ContainerMetaData
                 AbstractClassMetaData elemCmd = mmgr.readMetaDataForClass(component_type.getName());
                 if (elemCmd != null)
                 {
-                    if (elemCmd.isEmbeddedOnly())
-                    {
-                        element.embedded = Boolean.TRUE;
-                    }
-                    else
-                    {
-                        element.embedded = Boolean.FALSE;
-                    }
+                    element.embedded = (elemCmd.isEmbeddedOnly() ? Boolean.TRUE : Boolean.FALSE);
+                }
+                else if (component_type.isInterface() || component_type == Object.class)
+                {
+                    // Collection<interface> or Object not explicitly marked as embedded defaults to false
+                    element.embedded = Boolean.FALSE;
                 }
                 else
                 {
-                    if (Object.class.isAssignableFrom(component_type) || component_type.isInterface())
-                    {
-                        element.embedded = Boolean.FALSE;
-                    }
-                    else
-                    {
-                        element.embedded = Boolean.TRUE;
-                    }
+                    // Fallback to true
+                    NucleusLogger.METADATA.debug("Member with collection of elementType=" + component_type.getName()+
+                        " not explicitly marked as embedded, so defaulting to embedded since not persistable");
+                    element.embedded = Boolean.TRUE;
                 }
             }
         }
