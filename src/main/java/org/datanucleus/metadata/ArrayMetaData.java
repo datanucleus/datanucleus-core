@@ -104,8 +104,20 @@ public class ArrayMetaData extends ContainerMetaData
             }
             else
             {
+                // TODO If we have extension for type converter then default to embedded
                 // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the element
                 AbstractClassMetaData elemCmd = mmgr.readMetaDataForClass(component_type.getName());
+                if (elemCmd == null)
+                {
+                    // Try to load it just in case using annotations and only pulled in one side of the relation
+                    try
+                    {
+                        elemCmd = mmgr.getMetaDataForClass(component_type, clr);
+                    }
+                    catch (Throwable thr)
+                    {
+                    }
+                }
                 if (elemCmd != null)
                 {
                     element.embedded = (elemCmd.isEmbeddedOnly() ? Boolean.TRUE : Boolean.FALSE);

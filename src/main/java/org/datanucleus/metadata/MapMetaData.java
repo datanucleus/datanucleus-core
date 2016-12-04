@@ -173,8 +173,20 @@ public class MapMetaData extends ContainerMetaData
             }
             else
             {
+                // TODO If we have extension for type converter then default to embedded
                 // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the key
                 AbstractClassMetaData keyCmd = mmgr.readMetaDataForClass(keyTypeClass.getName());
+                if (keyCmd == null)
+                {
+                    // Try to load it just in case using annotations and only pulled in one side of the relation
+                    try
+                    {
+                        keyCmd = mmgr.getMetaDataForClass(keyTypeClass, clr);
+                    }
+                    catch (Throwable thr)
+                    {
+                    }
+                }
                 if (keyCmd != null)
                 {
                     key.embedded = (keyCmd.isEmbeddedOnly() ? Boolean.TRUE : Boolean.FALSE);
@@ -295,8 +307,20 @@ public class MapMetaData extends ContainerMetaData
             }
             else
             {
+                // TODO If we have extension for type converter then default to embedded
                 // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the value
                 AbstractClassMetaData valCmd = mmgr.readMetaDataForClass(valueTypeClass.getName());
+                if (valCmd == null)
+                {
+                    // Try to load it just in case using annotations and only pulled in one side of the relation
+                    try
+                    {
+                        valCmd = mmgr.getMetaDataForClass(valueTypeClass, clr);
+                    }
+                    catch (Throwable thr)
+                    {
+                    }
+                }
                 if (valCmd != null)
                 {
                     value.embedded = (valCmd.isEmbeddedOnly() ? Boolean.TRUE : Boolean.FALSE);
