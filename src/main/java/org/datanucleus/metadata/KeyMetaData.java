@@ -55,16 +55,26 @@ public class KeyMetaData extends AbstractElementMetaData
      */
     public void populate(ClassLoaderResolver clr, ClassLoader primary)
     {
-        AbstractMemberMetaData fmd = (AbstractMemberMetaData)parent;
-        if (fmd.getMap() == null)
+        AbstractMemberMetaData mmd = (AbstractMemberMetaData)parent;
+        if (mmd.getMap() == null)
         {
             // TODO Use InvalidMemberMetaDataException
-            throw new NucleusUserException("The field "+fmd.getFullFieldName()+" is defined with <key>, however no <map> definition was found.").setFatal();
+            throw new NucleusUserException("The field "+mmd.getFullFieldName()+" is defined with <key>, however no <map> definition was found.").setFatal();
         }
 
+        // Populate the key metadata
+        if (hasExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME))
+        {
+            if (mmd.getMap().key.embedded == null)
+            {
+                // Default to embedded since the converter process requires it
+                mmd.getMap().key.embedded = Boolean.TRUE;
+            }
+        }
+        mmd.getMap().key.populate(mmd.getAbstractClassMetaData().getPackageName(), clr, primary);
+
         // Make sure key type is set and is valid
-        fmd.getMap().key.populate(fmd.getAbstractClassMetaData().getPackageName(), clr, primary);
-        String keyType = fmd.getMap().getKeyType();
+        String keyType = mmd.getMap().getKeyType();
         Class keyTypeClass = null;
         try
         {
@@ -72,21 +82,19 @@ public class KeyMetaData extends AbstractElementMetaData
         }
         catch (ClassNotResolvedException cnre)
         {
-            throw new InvalidMemberMetaDataException("044147", fmd.getClassName(), fmd.getName(), keyType);
+            throw new InvalidMemberMetaDataException("044147", mmd.getClassName(), mmd.getName(), keyType);
         }
         if (embeddedMetaData != null && (keyTypeClass.isInterface() || keyTypeClass.getName().equals("java.lang.Object")))
         {
-            throw new InvalidMemberMetaDataException("044152", fmd.getClassName(), fmd.getName(), keyTypeClass.getName());
+            throw new InvalidMemberMetaDataException("044152", mmd.getClassName(), mmd.getName(), keyTypeClass.getName());
         }
 
+        // TODO Remove this since we should only have <embedded> when the user defines it
         // TODO This will not work currently since MapMetaData is populated *after* KeyMetaData and so the
         // keyClassMetaData is not yet populated. What we should do is provide a postPopulate() method here
         // that MapMetaData can call when it is populated
-        if (embeddedMetaData == null &&
-            ((AbstractMemberMetaData)parent).hasMap() &&
-            ((AbstractMemberMetaData)parent).getMap().isEmbeddedKey() &&
-            ((AbstractMemberMetaData)parent).getJoinMetaData() != null &&
-            ((AbstractMemberMetaData)parent).getMap().keyIsPersistent())
+        if (embeddedMetaData == null && mmd.hasMap() && mmd.getMap().isEmbeddedKey() &&
+            mmd.getJoinMetaData() != null && mmd.getMap().keyIsPersistent())
         {
             // User has specified that the key is embedded in a join table but not how we embed it
             // so add a dummy definition

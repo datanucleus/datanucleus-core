@@ -106,11 +106,11 @@ public class MapMetaData extends ContainerMetaData
         MetaDataManager mmgr = mmd.getMetaDataManager();
 
         // Make sure the type in "key", "value" is set
-        key.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), clr, primary);
-        value.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), clr, primary);
+        key.populate(mmd.getAbstractClassMetaData().getPackageName(), clr, primary);
+        value.populate(mmd.getAbstractClassMetaData().getPackageName(), clr, primary);
 
         // Check the field type and see if it is castable to a Map
-        Class field_type = getMemberMetaData().getType();
+        Class field_type = mmd.getType();
         if (!java.util.Map.class.isAssignableFrom(field_type))
         {
             throw new InvalidMemberMetaDataException("044145",  mmd.getClassName(), mmd.getName());
@@ -159,7 +159,7 @@ public class MapMetaData extends ContainerMetaData
         {
             // The value-type has been resolved from what was specified in the MetaData - update to the fully-qualified name
             NucleusLogger.METADATA.info(Localiser.msg("044148", getFieldName(),
-                getMemberMetaData().getClassName(false), key.type, keyTypeClass.getName()));
+                mmd.getClassName(false), key.type, keyTypeClass.getName()));
             key.type = keyTypeClass.getName();
         }
 
@@ -173,7 +173,6 @@ public class MapMetaData extends ContainerMetaData
             }
             else
             {
-                // TODO If we have extension for type converter then default to embedded
                 // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the key
                 AbstractClassMetaData keyCmd = mmgr.readMetaDataForClass(keyTypeClass.getName());
                 if (keyCmd == null)
@@ -218,7 +217,7 @@ public class MapMetaData extends ContainerMetaData
                 key.embedded = Boolean.TRUE;
             }
         }
-        KeyMetaData keymd = ((AbstractMemberMetaData)parent).getKeyMetaData();
+        KeyMetaData keymd = mmd.getKeyMetaData();
         if (keymd != null && keymd.getEmbeddedMetaData() != null)
         {
             // If the user has specified <embedded>, set to true
@@ -232,7 +231,7 @@ public class MapMetaData extends ContainerMetaData
             String[] implTypes = getValuesForExtension("key-implementation-classes");
             for (int i=0;i<implTypes.length;i++)
             {
-                String implTypeName = ClassUtils.createFullClassName(getMemberMetaData().getPackageName(), implTypes[i]);
+                String implTypeName = ClassUtils.createFullClassName(mmd.getPackageName(), implTypes[i]);
                 if (i > 0)
                 {
                     str.append(",");
@@ -256,7 +255,7 @@ public class MapMetaData extends ContainerMetaData
                     catch (ClassNotResolvedException cnre2)
                     {
                         // Implementation type not found
-                        throw new InvalidMemberMetaDataException("044116", getMemberMetaData().getClassName(), getMemberMetaData().getName(), implTypes[i]);
+                        throw new InvalidMemberMetaDataException("044116", mmd.getClassName(), mmd.getName(), implTypes[i]);
                     }
                 }
             }
@@ -293,7 +292,7 @@ public class MapMetaData extends ContainerMetaData
         {
             // The value-type has been resolved from what was specified in the MetaData - update to the fully-qualified name
             NucleusLogger.METADATA.info(Localiser.msg("044151", getFieldName(),
-                getMemberMetaData().getClassName(false), value.type, valueTypeClass.getName()));
+                mmd.getClassName(false), value.type, valueTypeClass.getName()));
             value.type = valueTypeClass.getName();
         }
 
@@ -307,7 +306,6 @@ public class MapMetaData extends ContainerMetaData
             }
             else
             {
-                // TODO If we have extension for type converter then default to embedded
                 // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the value
                 AbstractClassMetaData valCmd = mmgr.readMetaDataForClass(valueTypeClass.getName());
                 if (valCmd == null)
@@ -352,7 +350,7 @@ public class MapMetaData extends ContainerMetaData
                 value.embedded = Boolean.TRUE;
             }
         }
-        ValueMetaData valuemd = ((AbstractMemberMetaData)parent).getValueMetaData();
+        ValueMetaData valuemd = mmd.getValueMetaData();
         if (valuemd != null && valuemd.getEmbeddedMetaData() != null)
         {
             // If the user has specified <embedded>, set to true
@@ -366,7 +364,7 @@ public class MapMetaData extends ContainerMetaData
             String[] implTypes = getValuesForExtension("value-implementation-classes");
             for (int i=0;i<implTypes.length;i++)
             {
-                String implTypeName = ClassUtils.createFullClassName(getMemberMetaData().getPackageName(), implTypes[i]);
+                String implTypeName = ClassUtils.createFullClassName(mmd.getPackageName(), implTypes[i]);
                 if (i > 0)
                 {
                     str.append(",");
@@ -390,7 +388,7 @@ public class MapMetaData extends ContainerMetaData
                     catch (ClassNotResolvedException cnre2)
                     {
                         // Implementation type not found
-                        throw new InvalidMemberMetaDataException("044116", getMemberMetaData().getClassName(), getMemberMetaData().getName(), implTypes[i]);
+                        throw new InvalidMemberMetaDataException("044116", mmd.getClassName(), mmd.getName(), implTypes[i]);
                     }
                 }
             }

@@ -85,7 +85,7 @@ public class CollectionMetaData extends ContainerMetaData
         MetaDataManager mmgr = getMetaDataManager();
 
         // Make sure the type in "element" is set
-        element.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), clr, primary);
+        element.populate(mmd.getAbstractClassMetaData().getPackageName(), clr, primary);
 
         // "element-type"
         if (element.type == null)
@@ -101,13 +101,13 @@ public class CollectionMetaData extends ContainerMetaData
         }
         catch (ClassNotResolvedException cnre)
         {
-            throw new InvalidMemberMetaDataException("044134", getMemberMetaData().getClassName(), getFieldName(), element.type);
+            throw new InvalidMemberMetaDataException("044134", mmd.getClassName(), getFieldName(), element.type);
         }
 
         if (!elementTypeClass.getName().equals(element.type))
         {
             // The element-type has been resolved from what was specified in the MetaData - update to the fully-qualified name
-            NucleusLogger.METADATA.info(Localiser.msg("044135", getFieldName(), getMemberMetaData().getClassName(false), element.type, elementTypeClass.getName()));
+            NucleusLogger.METADATA.info(Localiser.msg("044135", getFieldName(), mmd.getClassName(false), element.type, elementTypeClass.getName()));
             element.type = elementTypeClass.getName();
         }
 
@@ -121,7 +121,6 @@ public class CollectionMetaData extends ContainerMetaData
             }
             else
             {
-                // TODO If we have extension for type converter then default to embedded
                 // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the element
                 AbstractClassMetaData elemCmd = mmgr.readMetaDataForClass(elementTypeClass.getName());
                 if (elemCmd == null)
@@ -167,7 +166,7 @@ public class CollectionMetaData extends ContainerMetaData
             }
         }
 
-        ElementMetaData elemmd = ((AbstractMemberMetaData)parent).getElementMetaData();
+        ElementMetaData elemmd = mmd.getElementMetaData();
         if (elemmd != null && elemmd.getEmbeddedMetaData() != null)
         {
             element.embedded = Boolean.TRUE;
@@ -193,7 +192,7 @@ public class CollectionMetaData extends ContainerMetaData
             String[] implTypes = getValuesForExtension("implementation-classes");
             for (int i=0;i<implTypes.length;i++)
             {
-                String implTypeName = ClassUtils.createFullClassName(getMemberMetaData().getPackageName(), implTypes[i]);
+                String implTypeName = ClassUtils.createFullClassName(mmd.getPackageName(), implTypes[i]);
                 if (i > 0)
                 {
                     str.append(",");
@@ -217,7 +216,7 @@ public class CollectionMetaData extends ContainerMetaData
                     catch (ClassNotResolvedException cnre2)
                     {
                         // Implementation type not found
-                        throw new InvalidMemberMetaDataException("044116", getMemberMetaData().getClassName(), getMemberMetaData().getName(), implTypes[i]);
+                        throw new InvalidMemberMetaDataException("044116", mmd.getClassName(), mmd.getName(), implTypes[i]);
                     }
                 }
             }

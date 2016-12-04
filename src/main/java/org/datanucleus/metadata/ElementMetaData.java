@@ -56,22 +56,37 @@ public class ElementMetaData extends AbstractElementMetaData
      */
     public void populate(ClassLoaderResolver clr, ClassLoader primary)
     {
-        // Make sure element type is set and is valid
-        AbstractMemberMetaData fmd = (AbstractMemberMetaData)parent;
-        if (fmd.hasCollection())
+        // Populate the element metadata
+        AbstractMemberMetaData mmd = (AbstractMemberMetaData)parent;
+        if (mmd.hasCollection())
         {
-            fmd.getCollection().element.populate(fmd.getAbstractClassMetaData().getPackageName(), clr, primary);
+            if (hasExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME))
+            {
+                if (mmd.getCollection().element.embedded == null)
+                {
+                    // Default to embedded since the converter process requires it
+                    mmd.getCollection().element.embedded = Boolean.TRUE;
+                }
+            }
+            mmd.getCollection().element.populate(mmd.getAbstractClassMetaData().getPackageName(), clr, primary);
         }
-        else if (fmd.hasArray())
+        else if (mmd.hasArray())
         {
-            fmd.getArray().element.populate(fmd.getAbstractClassMetaData().getPackageName(), clr, primary);
+            if (hasExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME))
+            {
+                if (mmd.getArray().element.embedded == null)
+                {
+                    // Default to embedded since the converter process requires it
+                    mmd.getArray().element.embedded = Boolean.TRUE;
+                }
+            }
+            mmd.getArray().element.populate(mmd.getAbstractClassMetaData().getPackageName(), clr, primary);
         }
 
+        // TODO Remove this since we should only have <embedded> when the user defines it
         if (embeddedMetaData == null && 
-            ((AbstractMemberMetaData)parent).hasCollection() && 
-            ((AbstractMemberMetaData)parent).getCollection().isEmbeddedElement() &&
-            ((AbstractMemberMetaData)parent).getJoinMetaData() != null &&
-            ((AbstractMemberMetaData)parent).getCollection().elementIsPersistent())
+            mmd.hasCollection() && mmd.getCollection().isEmbeddedElement() &&
+            mmd.getJoinMetaData() != null && mmd.getCollection().elementIsPersistent())
         {
             // User has specified that the element is embedded in a join table but not how we embed it
             // so add a dummy definition

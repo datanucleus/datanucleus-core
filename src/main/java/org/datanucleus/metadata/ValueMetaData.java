@@ -62,8 +62,18 @@ public class ValueMetaData extends AbstractElementMetaData
             throw new NucleusFatalUserException("The field "+mmd.getFullFieldName()+" is defined with <value>, however no <map> definition was found.");
         }
 
-        // Make sure value type is set and is valid
+        // Populate the value metadata
+        if (hasExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME))
+        {
+            if (mmd.getMap().value.embedded == null)
+            {
+                // Default to embedded since the converter process requires it
+                mmd.getMap().value.embedded = Boolean.TRUE;
+            }
+        }
         mmd.getMap().value.populate(mmd.getAbstractClassMetaData().getPackageName(), clr, primary);
+
+        // Make sure value type is set and is valid
         String valueType = mmd.getMap().getValueType();
         Class valueTypeClass = null;
         try
@@ -80,14 +90,13 @@ public class ValueMetaData extends AbstractElementMetaData
             throw new InvalidMemberMetaDataException("044152", mmd.getClassName(), mmd.getName(), valueTypeClass.getName());
         }
 
+        // TODO Remove this since we should only have <embedded> when the user defines it
         // TODO This will not work currently since MapMetaData is populated *after* ValueMetaData and so the
         // valueClassMetaData is not yet populated. What we should do is provide a postPopulate() method here
         // that MapMetaData can call when it is populated
         if (embeddedMetaData == null && 
-            ((AbstractMemberMetaData)parent).hasMap() && 
-            ((AbstractMemberMetaData)parent).getMap().isEmbeddedValue() &&
-            ((AbstractMemberMetaData)parent).getJoinMetaData() != null &&
-            ((AbstractMemberMetaData)parent).getMap().valueIsPersistent())
+            mmd.hasMap() && mmd.getMap().isEmbeddedValue() &&
+            mmd.getJoinMetaData() != null && mmd.getMap().valueIsPersistent())
         {
             // User has specified that the value is embedded in a join table but not how we embed it
             // so add a dummy definition

@@ -83,10 +83,10 @@ public class ArrayMetaData extends ContainerMetaData
         MetaDataManager mmgr = mmd.getMetaDataManager();
 
         // Make sure the type in "element" is set
-        element.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), clr, primary);
+        element.populate(mmd.getAbstractClassMetaData().getPackageName(), clr, primary);
 
         // Check the field type and see if it is an array type
-        Class field_type = getMemberMetaData().getType();
+        Class field_type = mmd.getType();
         if (!field_type.isArray())
         {
             throw new InvalidMemberMetaDataException("044141", mmd.getClassName(), getFieldName());
@@ -104,7 +104,6 @@ public class ArrayMetaData extends ContainerMetaData
             }
             else
             {
-                // TODO If we have extension for type converter then default to embedded
                 // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the element
                 AbstractClassMetaData elemCmd = mmgr.readMetaDataForClass(component_type.getName());
                 if (elemCmd == null)
@@ -154,8 +153,8 @@ public class ArrayMetaData extends ContainerMetaData
         if (!mmgr.isEnhancing() && !getMemberMetaData().isSerialized())
         {
             // Catch situations that we don't support
-            if (getMemberMetaData().getJoinMetaData() == null &&
-                !mmgr.getApiAdapter().isPersistable(getMemberMetaData().getType().getComponentType()) &&
+            if (mmd.getJoinMetaData() == null &&
+                !mmgr.getApiAdapter().isPersistable(mmd.getType().getComponentType()) &&
                 mmgr.supportsORM())
             {
                 // We only support persisting particular array types as byte-streams (non-Java-serialised)
@@ -181,7 +180,7 @@ public class ArrayMetaData extends ContainerMetaData
                 {
                     // Impossible to persist an array of a non-PC element without a join table or without serialising the array
                     // TODO Should this be an exception?
-                    String msg = Localiser.msg("044142", mmd.getClassName(), getFieldName(), getMemberMetaData().getType().getComponentType().getName());
+                    String msg = Localiser.msg("044142", mmd.getClassName(), getFieldName(), mmd.getType().getComponentType().getName());
                     NucleusLogger.METADATA.warn(msg);
                 }
             }
@@ -215,7 +214,7 @@ public class ArrayMetaData extends ContainerMetaData
             String[] implTypes = getValuesForExtension("implementation-classes");
             for (int i=0;i<implTypes.length;i++)
             {
-                String implTypeName = ClassUtils.createFullClassName(getMemberMetaData().getPackageName(), implTypes[i]);
+                String implTypeName = ClassUtils.createFullClassName(mmd.getPackageName(), implTypes[i]);
                 if (i > 0)
                 {
                     str.append(",");
@@ -239,7 +238,7 @@ public class ArrayMetaData extends ContainerMetaData
                     catch (ClassNotResolvedException cnre2)
                     {
                         // Implementation type not found
-                        throw new InvalidMemberMetaDataException("044116", getMemberMetaData().getClassName(), getMemberMetaData().getName(), implTypes[i]);
+                        throw new InvalidMemberMetaDataException("044116", mmd.getClassName(), mmd.getName(), implTypes[i]);
                     }
                 }
             }
