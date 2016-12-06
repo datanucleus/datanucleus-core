@@ -543,7 +543,11 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
                 ObjectProvider valueOP = ec.findObjectProvider(value);
                 int[] loadedFields = valueOP.getLoadedFieldNumbers();
                 CachedPC valueCachedPC = new CachedPC(value.getClass(), valueOP.getLoadedFields(), null);
-                valueOP.provideFields(loadedFields, new L2CachePopulateFieldManager(valueOP, valueCachedPC));
+                if (loadedFields != null && loadedFields.length > 0)
+                {
+                    // Set the values of any fields that are loaded
+                    valueOP.provideFields(loadedFields, new L2CachePopulateFieldManager(valueOP, valueCachedPC));
+                }
 
                 cachedPC.setFieldValue(fieldNumber, valueCachedPC);
             }
