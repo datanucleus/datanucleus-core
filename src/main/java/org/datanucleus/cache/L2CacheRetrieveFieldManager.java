@@ -352,9 +352,12 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                     // TODO Perhaps only load fetch plan fields?
                     CachedPC valueCachedPC = (CachedPC)value;
                     AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(valueCachedPC.getObjectClass(), ec.getClassLoaderResolver());
-                    int[] fieldsToLoad = ClassUtils.getFlagsSetTo(valueCachedPC.getLoadedFields(), cmd.getAllMemberPositions(), true);
                     ObjectProvider valueOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, cmd, op, mmd.getAbsoluteFieldNumber());
-                    valueOP.replaceFields(fieldsToLoad, new L2CacheRetrieveFieldManager(valueOP, valueCachedPC));
+                    int[] fieldsToLoad = ClassUtils.getFlagsSetTo(valueCachedPC.getLoadedFields(), cmd.getAllMemberPositions(), true);
+                    if (fieldsToLoad != null && fieldsToLoad.length > 0)
+                    {
+                        valueOP.replaceFields(fieldsToLoad, new L2CacheRetrieveFieldManager(valueOP, valueCachedPC));
+                    }
                     return valueOP.getObject();
                 }
             }
