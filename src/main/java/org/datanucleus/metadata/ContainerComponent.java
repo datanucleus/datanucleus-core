@@ -42,7 +42,7 @@ class ContainerComponent implements Serializable
     protected Boolean dependent;
 
     /** Type of the component. */
-    protected String type;
+    protected String typeName;
 
     /** ClassMetaData for the component. */
     protected AbstractClassMetaData classMetaData;
@@ -85,14 +85,14 @@ class ContainerComponent implements Serializable
         this.dependent = dependent;
     }
 
-    public String getType()
+    public String getTypeName()
     {
-        return type;
+        return typeName;
     }
 
-    public void setType(String type)
+    public void setTypeName(String type)
     {
-        this.type = StringUtils.isWhitespace(type) ? null : type;
+        this.typeName = StringUtils.isWhitespace(type) ? null : type;
     }
 
     /**
@@ -104,15 +104,12 @@ class ContainerComponent implements Serializable
      */
     void populate(String packageName, ClassLoaderResolver clr, ClassLoader primary)
     {
-        if (type == null)
+        // TODO Store the type itself to avoid subsequent lookups
+        if (typeName == null)
         {
             // Do nothing
         }
-        else if (ClassUtils.isPrimitiveArrayType(type))
-        {
-            // Do nothing since valid
-        }
-        else if (ClassUtils.isPrimitiveType(type))
+        else if (ClassUtils.isPrimitiveType(typeName) || ClassUtils.isPrimitiveArrayType(typeName))
         {
             // Do nothing since valid
         }
@@ -121,23 +118,23 @@ class ContainerComponent implements Serializable
             // Make sure it is resolved
             try
             {
-                clr.classForName(type, primary, false);
+                clr.classForName(typeName, primary, false);
             }
             catch (ClassNotResolvedException cnre)
             {
                 // Type is invalid so try with parent package
-                String name = ClassUtils.createFullClassName(packageName, type);
+                String name = ClassUtils.createFullClassName(packageName, typeName);
                 try
                 {
                     clr.classForName(name, primary, false);
-                    type = name; // Update to be in parent package
+                    typeName = name; // Update to be in parent package
                 }
                 catch (ClassNotResolvedException cnre2)
                 {
                     // Type is invalid so try as java.lang
-                    name = ClassUtils.getJavaLangClassForType(type);
+                    name = ClassUtils.getJavaLangClassForType(typeName);
                     clr.classForName(name, primary, false);
-                    type = name; // Update to be in java.lang
+                    typeName = name; // Update to be in java.lang
                 }
             }
         }
@@ -145,7 +142,6 @@ class ContainerComponent implements Serializable
 
     public String toString()
     {
-        return "Type=" + type + " embedded=" + embedded + " serialized=" + serialized + " dependent=" + dependent + 
-            " cmd=" + classMetaData;
+        return "Type=" + typeName + " embedded=" + embedded + " serialized=" + serialized + " dependent=" + dependent + " cmd=" + classMetaData;
     }
 }

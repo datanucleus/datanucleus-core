@@ -673,7 +673,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             }
 
             // Populate any embedded object
-            embeddedMetaData.populate(clr, primary, mmgr);
+            embeddedMetaData.populate(clr, primary);
             embedded = Boolean.TRUE;
         }
 

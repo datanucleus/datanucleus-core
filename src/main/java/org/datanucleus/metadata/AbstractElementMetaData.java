@@ -118,8 +118,7 @@ public abstract class AbstractElementMetaData extends MetaData implements Column
     {
         if (embeddedMetaData != null)
         {
-            MetaDataManager mmgr = ((AbstractMemberMetaData)parent).getMetaDataManager();
-            embeddedMetaData.populate(clr, primary, mmgr);
+            embeddedMetaData.populate(clr, primary);
         }
     }
 

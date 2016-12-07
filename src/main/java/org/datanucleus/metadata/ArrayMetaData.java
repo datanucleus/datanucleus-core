@@ -56,7 +56,7 @@ public class ArrayMetaData extends ContainerMetaData
         element.embedded = arrmd.element.embedded;
         element.serialized = arrmd.element.serialized;
         element.dependent = arrmd.element.dependent;
-        element.type = arrmd.element.type;
+        element.typeName = arrmd.element.typeName;
         element.classMetaData = arrmd.element.classMetaData;
     }
 
@@ -76,42 +76,41 @@ public class ArrayMetaData extends ContainerMetaData
     public void populate(ClassLoaderResolver clr, ClassLoader primary)
     {
         AbstractMemberMetaData mmd = (AbstractMemberMetaData)parent;
-        if (!StringUtils.isWhitespace(element.type) && element.type.indexOf(',') > 0)
+        if (!StringUtils.isWhitespace(element.typeName) && element.typeName.indexOf(',') > 0)
         {
             throw new InvalidMemberMetaDataException("044140", mmd.getClassName(), mmd.getName());
         }
-        MetaDataManager mmgr = mmd.getMetaDataManager();
 
         // Make sure the type in "element" is set
         element.populate(mmd.getAbstractClassMetaData().getPackageName(), clr, primary);
 
         // Check the field type and see if it is an array type
-        Class field_type = mmd.getType();
-        if (!field_type.isArray())
+        Class fieldType = mmd.getType();
+        if (!fieldType.isArray())
         {
             throw new InvalidMemberMetaDataException("044141", mmd.getClassName(), getFieldName());
         }
+        Class componentType = fieldType.getComponentType();
 
         // "embedded-element"
+        MetaDataManager mmgr = mmd.getMetaDataManager();
         if (element.embedded == null)
         {
             // Assign default for "embedded-element" based on 18.13.1 of JDO 2 spec
-            // Note : this fails when using in the enhancer since not yet PC
-            Class component_type = field_type.getComponentType();
-            if (mmgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(component_type))
+            if (mmgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(componentType))
             {
                 element.embedded = Boolean.TRUE;
             }
             else
             {
                 // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the element
-                AbstractClassMetaData elemCmd = mmgr.readMetaDataForClass(component_type.getName());
+                AbstractClassMetaData elemCmd = mmgr.readMetaDataForClass(componentType.getName());
                 if (elemCmd == null)
                 {
                     // Try to load it just in case using annotations and only pulled in one side of the relation
                     try
                     {
-                        elemCmd = mmgr.getMetaDataForClass(component_type, clr);
+                        elemCmd = mmgr.getMetaDataForClass(componentType, clr);
                     }
                     catch (Throwable thr)
                     {
@@ -121,7 +120,7 @@ public class ArrayMetaData extends ContainerMetaData
                 {
                     element.embedded = (elemCmd.isEmbeddedOnly() ? Boolean.TRUE : Boolean.FALSE);
                 }
-                else if (component_type.isInterface() || component_type == Object.class)
+                else if (componentType.isInterface() || componentType == Object.class)
                 {
                     // Collection<interface> or Object not explicitly marked as embedded defaults to false
                     element.embedded = Boolean.FALSE;
@@ -129,7 +128,7 @@ public class ArrayMetaData extends ContainerMetaData
                 else
                 {
                     // Fallback to true
-                    NucleusLogger.METADATA.debug("Member with collection of elementType=" + component_type.getName()+
+                    NucleusLogger.METADATA.debug("Member with collection of elementType=" + componentType.getName()+
                         " not explicitly marked as embedded, so defaulting to embedded since not persistable");
                     element.embedded = Boolean.TRUE;
                 }
@@ -138,13 +137,12 @@ public class ArrayMetaData extends ContainerMetaData
         if (Boolean.FALSE.equals(element.embedded))
         {
             // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the element
-            Class component_type = field_type.getComponentType();
-            AbstractClassMetaData elemCmd = mmgr.readMetaDataForClass(component_type.getName());
-            if (elemCmd == null && !component_type.isInterface() && component_type != java.lang.Object.class)
+            AbstractClassMetaData elemCmd = mmgr.readMetaDataForClass(componentType.getName());
+            if (elemCmd == null && !componentType.isInterface() && componentType != java.lang.Object.class)
             {
                 // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
                 // Note : this fails when using in the enhancer since not yet PC
-                NucleusLogger.METADATA.debug("Member with array of element type " + component_type.getName() +
+                NucleusLogger.METADATA.debug("Member with array of element type " + componentType.getName() +
                     " marked as not embedded, but only persistable as embedded, so resetting");
                 element.embedded = Boolean.TRUE;
             }
@@ -153,12 +151,10 @@ public class ArrayMetaData extends ContainerMetaData
         if (!mmgr.isEnhancing() && !getMemberMetaData().isSerialized())
         {
             // Catch situations that we don't support
-            if (mmd.getJoinMetaData() == null &&
-                !mmgr.getApiAdapter().isPersistable(mmd.getType().getComponentType()) &&
-                mmgr.supportsORM())
+            if (mmd.getJoinMetaData() == null && !mmgr.getApiAdapter().isPersistable(componentType) && mmgr.supportsORM())
             {
                 // We only support persisting particular array types as byte-streams (non-Java-serialised)
-                String arrayComponentType = getMemberMetaData().getType().getComponentType().getName();
+                String arrayComponentType = componentType.getName();
                 if (!arrayComponentType.equals(ClassNameConstants.BOOLEAN) &&
                     !arrayComponentType.equals(ClassNameConstants.BYTE) &&
                     !arrayComponentType.equals(ClassNameConstants.CHAR) &&
@@ -180,16 +176,16 @@ public class ArrayMetaData extends ContainerMetaData
                 {
                     // Impossible to persist an array of a non-PC element without a join table or without serialising the array
                     // TODO Should this be an exception?
-                    String msg = Localiser.msg("044142", mmd.getClassName(), getFieldName(), mmd.getType().getComponentType().getName());
+                    String msg = Localiser.msg("044142", mmd.getClassName(), getFieldName(), arrayComponentType);
                     NucleusLogger.METADATA.warn(msg);
                 }
             }
         }
 
         // Keep a reference to the MetaData for the element
-        if (element.type != null)
+        if (element.typeName != null)
         {
-            Class elementCls = clr.classForName(element.type, primary);
+            Class elementCls = clr.classForName(element.typeName, primary);
             if (mmgr.getApiAdapter().isPersistable(elementCls))
             {
                 mayContainPersistableElements = true;
@@ -198,8 +194,8 @@ public class ArrayMetaData extends ContainerMetaData
         }
         else
         {
-            element.type = field_type.getComponentType().getName();
-            element.classMetaData = mmgr.getMetaDataForClassInternal(field_type.getComponentType(), clr);
+            element.typeName = componentType.getName();
+            element.classMetaData = mmgr.getMetaDataForClassInternal(componentType, clr);
         }
 
         if (element.classMetaData != null)
@@ -257,7 +253,7 @@ public class ArrayMetaData extends ContainerMetaData
      */
     public String getElementType()
     {
-        return element.type;
+        return element.typeName;
     }
 
     public String[] getElementTypes()
@@ -347,14 +343,15 @@ public class ArrayMetaData extends ContainerMetaData
 
     public ArrayMetaData setElementType(String type)
     {
+        // This is only valid pre-populate
         if (StringUtils.isWhitespace(type))
         {
             // Arrays don't default to Object
-            element.type = null;
+            element.setTypeName(null);
         }
         else
         {
-            element.setType(type);
+            element.setTypeName(type);
         }
         return this;
     }
@@ -385,8 +382,7 @@ public class ArrayMetaData extends ContainerMetaData
      */
     void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final ClassLoaderResolver clr)
     {
-        MetaDataManager mmgr = ((AbstractMemberMetaData)getParent()).getAbstractClassMetaData().getMetaDataManager();
-        AbstractClassMetaData elementCmd = mmgr.getMetaDataForClass(getMemberMetaData().getType().getComponentType(), clr);
+        AbstractClassMetaData elementCmd = getMetaDataManager().getMetaDataForClass(getMemberMetaData().getType().getComponentType(), clr);
         if (elementCmd != null)
         {
             elementCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
@@ -395,7 +391,7 @@ public class ArrayMetaData extends ContainerMetaData
 
     public String toString()
     {
-        StringBuilder str = new StringBuilder(super.toString()).append(" [" + element.getType() + "]");
+        StringBuilder str = new StringBuilder(super.toString()).append(" [" + element.typeName + "]");
         if (element.getEmbedded() == Boolean.TRUE)
         {
             str.append(" embedded");

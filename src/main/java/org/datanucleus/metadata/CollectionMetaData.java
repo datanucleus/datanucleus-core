@@ -57,7 +57,7 @@ public class CollectionMetaData extends ContainerMetaData
         element.embedded = collmd.element.embedded;
         element.serialized = collmd.element.serialized;
         element.dependent = collmd.element.dependent;
-        element.type = collmd.element.type;
+        element.typeName = collmd.element.typeName;
         element.classMetaData = collmd.element.classMetaData;
         singleElement = collmd.singleElement;
     }
@@ -78,40 +78,39 @@ public class CollectionMetaData extends ContainerMetaData
     public void populate(ClassLoaderResolver clr, ClassLoader primary)
     {
         AbstractMemberMetaData mmd = (AbstractMemberMetaData)parent;
-        if (!StringUtils.isWhitespace(element.type) && element.type.indexOf(',') > 0)
+        if (!StringUtils.isWhitespace(element.typeName) && element.typeName.indexOf(',') > 0)
         {
             throw new InvalidMemberMetaDataException("044131", mmd.getClassName(), mmd.getName());
         }
-        MetaDataManager mmgr = getMetaDataManager();
 
         // Make sure the type in "element" is set
         element.populate(mmd.getAbstractClassMetaData().getPackageName(), clr, primary);
 
         // "element-type"
-        if (element.type == null)
+        if (element.typeName == null)
         {
             throw new InvalidMemberMetaDataException("044133",  mmd.getClassName(), mmd.getName());
         }
 
-        // Check that the element type exists
+        // Check that the element type exists TODO Remove this since performed in element.populate
         Class elementTypeClass = null;
         try
         {
-            elementTypeClass = clr.classForName(element.type, primary);
+            elementTypeClass = clr.classForName(element.typeName, primary);
+            if (!elementTypeClass.getName().equals(element.typeName))
+            {
+                // The element-type has been resolved from what was specified in the MetaData - update to the fully-qualified name
+                NucleusLogger.METADATA.info(Localiser.msg("044135", getFieldName(), mmd.getClassName(false), element.typeName, elementTypeClass.getName()));
+                element.typeName = elementTypeClass.getName();
+            }
         }
         catch (ClassNotResolvedException cnre)
         {
-            throw new InvalidMemberMetaDataException("044134", mmd.getClassName(), getFieldName(), element.type);
-        }
-
-        if (!elementTypeClass.getName().equals(element.type))
-        {
-            // The element-type has been resolved from what was specified in the MetaData - update to the fully-qualified name
-            NucleusLogger.METADATA.info(Localiser.msg("044135", getFieldName(), mmd.getClassName(false), element.type, elementTypeClass.getName()));
-            element.type = elementTypeClass.getName();
+            throw new InvalidMemberMetaDataException("044134", mmd.getClassName(), getFieldName(), element.typeName);
         }
 
 		// "embedded-element"
+        MetaDataManager mmgr = getMetaDataManager();
         if (element.embedded == null)
         {
             // Assign default for "embedded-element" based on 18.13.1 of JDO 2 spec
@@ -236,7 +235,7 @@ public class CollectionMetaData extends ContainerMetaData
      */
     public String getElementType()
     {
-        return element.type;
+        return element.typeName;
     }
 
     public String[] getElementTypes()
@@ -323,7 +322,8 @@ public class CollectionMetaData extends ContainerMetaData
 
     public CollectionMetaData setElementType(String type)
     {
-        element.setType(type);
+        // This is only valid pre-populate
+        element.setTypeName(type);
         return this;
     }
 
@@ -359,8 +359,7 @@ public class CollectionMetaData extends ContainerMetaData
      */
     void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final ClassLoaderResolver clr)
     {
-        MetaDataManager mmgr = ((AbstractMemberMetaData)getParent()).getAbstractClassMetaData().getMetaDataManager();
-        AbstractClassMetaData elementCmd = mmgr.getMetaDataForClass(element.type, clr);
+        AbstractClassMetaData elementCmd = getMetaDataManager().getMetaDataForClass(element.typeName, clr);
         if (elementCmd != null)
         {
             elementCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
@@ -369,7 +368,7 @@ public class CollectionMetaData extends ContainerMetaData
 
     public String toString()
     {
-        StringBuilder str = new StringBuilder(super.toString()).append(" [" + element.getType() + "]");
+        StringBuilder str = new StringBuilder(super.toString()).append(" [" + element.typeName + "]");
         if (element.getEmbedded() == Boolean.TRUE)
         {
             str.append(" embedded");

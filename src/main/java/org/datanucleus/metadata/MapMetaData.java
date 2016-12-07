@@ -67,14 +67,14 @@ public class MapMetaData extends ContainerMetaData
         key.embedded = mapmd.key.embedded;
         key.serialized = mapmd.key.serialized;
         key.dependent = mapmd.key.dependent;
-        key.type = mapmd.key.type;
+        key.typeName = mapmd.key.typeName;
         key.classMetaData = mapmd.key.classMetaData;
 
         value = new ContainerComponent();
         value.embedded = mapmd.value.embedded;
         value.serialized = mapmd.value.serialized;
         value.dependent = mapmd.value.dependent;
-        value.type = mapmd.value.type;
+        value.typeName = mapmd.value.typeName;
         value.classMetaData = mapmd.value.classMetaData;
     }
 
@@ -95,15 +95,14 @@ public class MapMetaData extends ContainerMetaData
     public void populate(ClassLoaderResolver clr, ClassLoader primary)
     {
         AbstractMemberMetaData mmd = (AbstractMemberMetaData)parent;
-        if (!StringUtils.isWhitespace(key.type) && key.type.indexOf(',') > 0)
+        if (!StringUtils.isWhitespace(key.typeName) && key.typeName.indexOf(',') > 0)
         {
             throw new InvalidMemberMetaDataException("044143", mmd.getClassName(), mmd.getName());
         }
-        if (!StringUtils.isWhitespace(value.type) && value.type.indexOf(',') > 0)
+        if (!StringUtils.isWhitespace(value.typeName) && value.typeName.indexOf(',') > 0)
         {
             throw new InvalidMemberMetaDataException("044144", mmd.getClassName(), mmd.getName());
         }
-        MetaDataManager mmgr = mmd.getMetaDataManager();
 
         // Make sure the type in "key", "value" is set
         key.populate(mmd.getAbstractClassMetaData().getPackageName(), clr, primary);
@@ -119,27 +118,27 @@ public class MapMetaData extends ContainerMetaData
         if (java.util.Properties.class.isAssignableFrom(field_type))
         {
             // Properties defaults to <String, String>
-            if (key.type == null)
+            if (key.typeName == null)
             {
-                key.type = String.class.getName();
+                key.typeName = String.class.getName();
             }
-            if (value.type == null)
+            if (value.typeName == null)
             {
-                value.type = String.class.getName();
+                value.typeName = String.class.getName();
             }
         }
 
         // "key-type"
-        if (key.type == null)
+        if (key.typeName == null)
         {
             throw new InvalidMemberMetaDataException("044146",  mmd.getClassName(), mmd.getName());
         }
 
-        // Check that the key type exists
+        // Check that the key type exists TODO Remove this since performed in key.populate
         Class keyTypeClass = null;
         try
         {
-            keyTypeClass = clr.classForName(key.type, primary);
+            keyTypeClass = clr.classForName(key.typeName, primary);
         }
         catch (ClassNotResolvedException cnre)
         {
@@ -147,23 +146,22 @@ public class MapMetaData extends ContainerMetaData
             {
                 // Maybe the user specified a java.lang class without fully-qualifying it
                 // This is beyond the scope of the JDO spec which expects java.lang cases to be fully-qualified
-                keyTypeClass = clr.classForName(ClassUtils.getJavaLangClassForType(key.type), primary);
+                keyTypeClass = clr.classForName(ClassUtils.getJavaLangClassForType(key.typeName), primary);
             }
             catch (ClassNotResolvedException cnre2)
             {
-                throw new InvalidMemberMetaDataException("044147", mmd.getClassName(), mmd.getName(), key.type);
+                throw new InvalidMemberMetaDataException("044147", mmd.getClassName(), mmd.getName(), key.typeName);
             }
         }
-
-        if (!keyTypeClass.getName().equals(key.type))
+        if (!keyTypeClass.getName().equals(key.typeName))
         {
             // The value-type has been resolved from what was specified in the MetaData - update to the fully-qualified name
-            NucleusLogger.METADATA.info(Localiser.msg("044148", getFieldName(),
-                mmd.getClassName(false), key.type, keyTypeClass.getName()));
-            key.type = keyTypeClass.getName();
+            NucleusLogger.METADATA.info(Localiser.msg("044148", getFieldName(), mmd.getClassName(false), key.typeName, keyTypeClass.getName()));
+            key.typeName = keyTypeClass.getName();
         }
 
         // "embedded-key"
+        MetaDataManager mmgr = mmd.getMetaDataManager();
         if (key.embedded == null)
         {
             // Assign default for "embedded-key" based on 18.13.2 of JDO 2 spec
@@ -261,18 +259,19 @@ public class MapMetaData extends ContainerMetaData
             }
             addExtension("key-implementation-classes", str.toString()); // Replace with this new value
         }
+        key.classMetaData = mmgr.getMetaDataForClassInternal(keyTypeClass, clr);
 
         // "value-type"
-        if (value.type == null)
+        if (value.typeName == null)
         {
             throw new InvalidMemberMetaDataException("044149", mmd.getClassName(), mmd.getName());
         }
 
-        // Check that the value-type exists
+        // Check that the value-type exists TODO Remove this since performed in value.populate
         Class valueTypeClass = null;
         try
         {
-            valueTypeClass = clr.classForName(value.type);
+            valueTypeClass = clr.classForName(value.typeName);
         }
         catch (ClassNotResolvedException cnre)
         {
@@ -280,20 +279,18 @@ public class MapMetaData extends ContainerMetaData
             {
                 // Maybe the user specified a java.lang class without fully-qualifying it
                 // This is beyond the scope of the JDO spec which expects java.lang cases to be fully-qualified
-                valueTypeClass = clr.classForName(ClassUtils.getJavaLangClassForType(value.type));
+                valueTypeClass = clr.classForName(ClassUtils.getJavaLangClassForType(value.typeName));
             }
             catch (ClassNotResolvedException cnre2)
             {
-                throw new InvalidMemberMetaDataException("044150", mmd.getClassName(), mmd.getName(), value.type);
+                throw new InvalidMemberMetaDataException("044150", mmd.getClassName(), mmd.getName(), value.typeName);
             }
         }
-
-        if (!valueTypeClass.getName().equals(value.type))
+        if (!valueTypeClass.getName().equals(value.typeName))
         {
             // The value-type has been resolved from what was specified in the MetaData - update to the fully-qualified name
-            NucleusLogger.METADATA.info(Localiser.msg("044151", getFieldName(),
-                mmd.getClassName(false), value.type, valueTypeClass.getName()));
-            value.type = valueTypeClass.getName();
+            NucleusLogger.METADATA.info(Localiser.msg("044151", getFieldName(), mmd.getClassName(false), value.typeName, valueTypeClass.getName()));
+            value.typeName = valueTypeClass.getName();
         }
 
         // "embedded-value"
@@ -394,8 +391,6 @@ public class MapMetaData extends ContainerMetaData
             }
             addExtension("value-implementation-classes", str.toString()); // Replace with this new value
         }
-
-        key.classMetaData = mmgr.getMetaDataForClassInternal(keyTypeClass, clr);
         value.classMetaData = mmgr.getMetaDataForClassInternal(valueTypeClass, clr);
 
         // Cater for Key with mapped-by needing to be PK (for JPA)
@@ -448,7 +443,7 @@ public class MapMetaData extends ContainerMetaData
      */
     public String getKeyType()
     {
-        return key.type;
+        return key.typeName;
     }
 
     public String[] getKeyTypes()
@@ -491,7 +486,7 @@ public class MapMetaData extends ContainerMetaData
      */
     public String getValueType()
     {
-        return value.type;
+        return value.typeName;
     }
 
     public String[] getValueTypes()
@@ -624,7 +619,8 @@ public class MapMetaData extends ContainerMetaData
 
     public MapMetaData setKeyType(String type)
     {
-        key.setType(type);
+        // This is only valid pre-populate
+        key.setTypeName(type);
         return this;
     }
 
@@ -648,7 +644,8 @@ public class MapMetaData extends ContainerMetaData
 
     public MapMetaData setValueType(String type)
     {
-        value.setType(type);
+        // This is only valid pre-populate
+        value.setTypeName(type);
         return this;
     }
 
@@ -680,14 +677,14 @@ public class MapMetaData extends ContainerMetaData
      */
     void getReferencedClassMetaData(final List<AbstractClassMetaData> orderedCmds, final Set<AbstractClassMetaData> referencedCmds, final ClassLoaderResolver clr)
     {
-        MetaDataManager mmgr = ((AbstractMemberMetaData)getParent()).getAbstractClassMetaData().getMetaDataManager();
-        AbstractClassMetaData keyCmd = mmgr.getMetaDataForClass(key.type, clr);
+        MetaDataManager mmgr = getMetaDataManager();
+        AbstractClassMetaData keyCmd = mmgr.getMetaDataForClass(key.typeName, clr);
         if (keyCmd != null)
         {
             keyCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
         }
 
-        AbstractClassMetaData valueCmd = mmgr.getMetaDataForClass(value.type, clr);
+        AbstractClassMetaData valueCmd = mmgr.getMetaDataForClass(value.typeName, clr);
         if (valueCmd != null)
         {
             valueCmd.getReferencedClassMetaData(orderedCmds, referencedCmds, clr);
@@ -698,7 +695,7 @@ public class MapMetaData extends ContainerMetaData
     {
         StringBuilder str = new StringBuilder(super.toString());
 
-        str.append(" key=" + key.getType() + " (");
+        str.append(" key=" + key.typeName + " (");
         if (key.getEmbedded() == Boolean.TRUE)
         {
             str.append("embedded ");
@@ -713,7 +710,7 @@ public class MapMetaData extends ContainerMetaData
         }
         str.append(")");
 
-        str.append(" value=" + value.getType() + " (");
+        str.append(" value=" + value.typeName + " (");
         if (value.getEmbedded() == Boolean.TRUE)
         {
             str.append("embedded ");

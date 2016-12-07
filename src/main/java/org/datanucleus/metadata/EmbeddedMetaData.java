@@ -108,13 +108,15 @@ public class EmbeddedMetaData extends MetaData
      * @param primary the primary ClassLoader to use (or null)
      * @param mmgr MetaData manager
      */
-    public void populate(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr)
+    public void populate(ClassLoaderResolver clr, ClassLoader primary)
     {
         // Find the class that the embedded fields apply to
-        MetaData md = getParent();
+        MetaDataManager mmgr = getMetaDataManager();
         AbstractMemberMetaData apmd = null; // Field that has <embedded>
         AbstractClassMetaData embCmd = null; // Definition for the embedded class
         String embeddedType = null; // Name of the embedded type
+
+        MetaData md = getParent();
         if (md instanceof AbstractMemberMetaData)
         {
             // PC embedded in PC object
