@@ -558,7 +558,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 setContainer(containerHandler.newMetaData());
             }
 
-            containerHandler.populateMetaData(clr, primary, mmgr, this);
+            containerHandler.populateMetaData(clr, primary, this);
         }
 
         // Update "default-fetch-group" according to type
@@ -577,7 +577,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             {
                 if (hasContainer())
                 {
-                    defaultFetchGroup = containerHandler.isDefaultFetchGroup(clr, mmgr, this);
+                    defaultFetchGroup = containerHandler.isDefaultFetchGroup(clr, typeMgr, this);
                 }
                 else if (typeMgr.isDefaultFetchGroup(getType()))
                 {

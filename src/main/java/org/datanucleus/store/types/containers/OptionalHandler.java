@@ -23,7 +23,6 @@ import java.util.Optional;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
-import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.store.types.ElementContainerAdapter;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.store.types.containers.CollectionHandler;
@@ -49,7 +48,7 @@ public class OptionalHandler extends CollectionHandler<Optional>
     }
 
     @Override
-    public void populateMetaData(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr, AbstractMemberMetaData mmd)
+    public void populateMetaData(ClassLoaderResolver clr, ClassLoader primary, AbstractMemberMetaData mmd)
     {
         mmd.getCollection().setSingleElement(true);
 
@@ -72,19 +71,15 @@ public class OptionalHandler extends CollectionHandler<Optional>
             mmd.addColumn(colmd);
         }
         
-        super.populateMetaData(clr, primary, mmgr, mmd);
+        super.populateMetaData(clr, primary, mmd);
     }
 
     /**
      * Default fetch group is defined by the type of the element.
      */
     @Override
-    public boolean isDefaultFetchGroup(ClassLoaderResolver clr, MetaDataManager mmgr, AbstractMemberMetaData mmd)
+    public boolean isDefaultFetchGroup(ClassLoaderResolver clr, TypeManager typeMgr, AbstractMemberMetaData mmd)
     {
-        String elementTypeName = mmd.getCollection().getElementType();
-        Class elementClass = clr.classForName(elementTypeName);
-        TypeManager typeMgr = mmgr.getNucleusContext().getTypeManager();
-
-        return typeMgr.isDefaultFetchGroup(elementClass);
+        return typeMgr.isDefaultFetchGroup(clr.classForName(mmd.getCollection().getElementType()));
     }
 }

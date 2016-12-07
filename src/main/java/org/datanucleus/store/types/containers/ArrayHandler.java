@@ -28,7 +28,6 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ArrayMetaData;
 import org.datanucleus.metadata.ContainerMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
-import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.types.ElementContainerHandler;
 import org.datanucleus.store.types.TypeManager;
@@ -50,7 +49,7 @@ public class ArrayHandler extends ElementContainerHandler<Object, ArrayAdapter<O
     }
 
     @Override
-    public void populateMetaData(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr, AbstractMemberMetaData mmd)
+    public void populateMetaData(ClassLoaderResolver clr, ClassLoader primary, AbstractMemberMetaData mmd)
     {
         // Assert correct type of metaData has been defined
         ArrayMetaData arrayMetadata = assertMetadataType(mmd.getContainer());
@@ -101,22 +100,16 @@ public class ArrayHandler extends ElementContainerHandler<Object, ArrayAdapter<O
     }
 
     @Override
-    public boolean isDefaultFetchGroup(ClassLoaderResolver clr, MetaDataManager mmgr, AbstractMemberMetaData mmd)
+    public boolean isDefaultFetchGroup(ClassLoaderResolver clr, TypeManager typeMgr, AbstractMemberMetaData mmd)
     {
         String elementTypeName = getElementType(mmd);
-
         if (StringUtils.isEmpty(elementTypeName))
         {
             throw new NucleusException("MetaData must be populated to determine default fetch group.");
         }
 
-        Class elementType = clr.classForName(elementTypeName);
-
         // Try to find using generic type specialisation
-
-        TypeManager typeMgr = mmgr.getNucleusContext().getTypeManager();
-
-        return typeMgr.isDefaultFetchGroupForCollection(mmd.getType(), elementType);
+        return typeMgr.isDefaultFetchGroupForCollection(mmd.getType(), clr.classForName(elementTypeName));
     }
 
     protected String getElementType(AbstractMemberMetaData mmd)

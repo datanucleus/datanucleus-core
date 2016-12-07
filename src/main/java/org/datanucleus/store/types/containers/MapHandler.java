@@ -31,10 +31,10 @@ import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.ContainerMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.MapMetaData;
-import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.ValueMetaData;
 import org.datanucleus.store.types.ContainerHandler;
 import org.datanucleus.store.types.MapContainerAdapter;
+import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -48,7 +48,7 @@ public abstract class MapHandler<C> implements ContainerHandler<C, MapContainerA
     }
 
     @Override
-    public void populateMetaData(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr, AbstractMemberMetaData mmd)
+    public void populateMetaData(ClassLoaderResolver clr, ClassLoader primary, AbstractMemberMetaData mmd)
     {
         MapMetaData mapMd = assertValidType(mmd.getContainer());
 
@@ -269,7 +269,7 @@ public abstract class MapHandler<C> implements ContainerHandler<C, MapContainerA
     }
 
     @Override
-    public boolean isDefaultFetchGroup(ClassLoaderResolver clr, MetaDataManager mmgr, AbstractMemberMetaData mmd)
+    public boolean isDefaultFetchGroup(ClassLoaderResolver clr, TypeManager typeMgr, AbstractMemberMetaData mmd)
     {
         return false;
     }

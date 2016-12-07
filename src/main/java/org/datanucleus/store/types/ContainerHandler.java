@@ -20,7 +20,6 @@ package org.datanucleus.store.types;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ContainerMetaData;
-import org.datanucleus.metadata.MetaDataManager;
 
 /**
  * Provides support for SCO Containers types in DN. SCO Containers contain other FCOs or SCOs objects e.g.:
@@ -39,9 +38,9 @@ public interface ContainerHandler<C, A extends ContainerAdapter<C>>
 
     <M extends ContainerMetaData> M newMetaData();
 
-    void populateMetaData(ClassLoaderResolver clr, ClassLoader primary, MetaDataManager mmgr, AbstractMemberMetaData mmd);
+    void populateMetaData(ClassLoaderResolver clr, ClassLoader primary, AbstractMemberMetaData mmd);
 
-    boolean isDefaultFetchGroup(ClassLoaderResolver clr, MetaDataManager mmgr, AbstractMemberMetaData mmd);
+    boolean isDefaultFetchGroup(ClassLoaderResolver clr, TypeManager typeMgr, AbstractMemberMetaData mmd);
 
     boolean isSerialised(AbstractMemberMetaData mmd);
 
