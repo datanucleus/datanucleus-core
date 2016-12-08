@@ -121,51 +121,53 @@ public abstract class AbstractLevel2Cache implements Level2Cache
 
     public int getNumberOfPinnedObjects()
     {
-        throw new UnsupportedOperationException("getNumberOfPinnedObjects() method not supported by this plugin");
+        // Not supported
+        return 0;
     }
 
     public int getNumberOfUnpinnedObjects()
     {
-        throw new UnsupportedOperationException("getNumberOfUnpinnedObjects() method not supported by this plugin");
+        // Not supported
+        return 0;
     }
 
     public void pin(Object arg0)
     {
-        throw new UnsupportedOperationException("pin(Object) method not supported by this plugin");
+        // Not supported
     }
 
     public void pinAll(Collection arg0)
     {
-        throw new UnsupportedOperationException("pinAll(Collection) method not supported by this plugin");
+        // Not supported
     }
 
     public void pinAll(Object[] arg0)
     {
-        throw new UnsupportedOperationException("pinAll(Object[]) method not supported by this plugin");
+        // Not supported
     }
 
     public void pinAll(Class arg0, boolean arg1)
     {
-        throw new UnsupportedOperationException("pinAll(Class,boolean) method not supported by this plugin");
+        // Not supported
     }
 
     public void unpin(Object arg0)
     {
-        throw new UnsupportedOperationException("unpin(Object) method not supported by this plugin");
+        // Not supported
     }
 
     public void unpinAll(Collection arg0)
     {
-        throw new UnsupportedOperationException("unpinAll(Collection) method not supported by this plugin");
+        // Not supported
     }
 
     public void unpinAll(Object[] arg0)
     {
-        throw new UnsupportedOperationException("unpinAll(Object[]) method not supported by this plugin");
+        // Not supported
     }
 
     public void unpinAll(Class arg0, boolean arg1)
     {
-        throw new UnsupportedOperationException("unpinAll(Class,boolean) method not supported by this plugin");
+        // Not supported
     }
 }
