@@ -86,38 +86,64 @@ public class ArrayMetaData extends ContainerMetaData
         element.populate(((AbstractMemberMetaData)parent).getAbstractClassMetaData().getPackageName(), clr, primary, mmgr);
 
         // Check the field type and see if it is an array type
-        Class field_type = getMemberMetaData().getType();
-        if (!field_type.isArray())
+        Class fieldType = getMemberMetaData().getType();
+        if (!fieldType.isArray())
         {
             throw new InvalidMemberMetaDataException("044141", mmd.getClassName(), getFieldName());
         }
+        Class componentType = fieldType.getComponentType();
 
         // "embedded-element"
         if (element.embedded == null)
         {
             // Assign default for "embedded-element" based on 18.13.1 of JDO 2 spec
-            // Note : this fails when using in the enhancer since not yet PC
-            Class component_type = field_type.getComponentType();
-            if (mmgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(component_type))
+            if (mmgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(componentType))
             {
                 element.embedded = Boolean.TRUE;
-            }
-            else if (mmgr.getApiAdapter().isPersistable(component_type) || Object.class.isAssignableFrom(component_type) || component_type.isInterface())
-            {
-                element.embedded = Boolean.FALSE;
             }
             else
             {
-                element.embedded = Boolean.TRUE;
+                // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the element
+                AbstractClassMetaData elemCmd = mmgr.readMetaDataForClass(componentType.getName());
+                if (elemCmd == null)
+                {
+                    // Try to load it just in case using annotations and only pulled in one side of the relation
+                    try
+                    {
+                        elemCmd = mmgr.getMetaDataForClass(componentType, clr);
+                    }
+                    catch (Throwable thr)
+                    {
+                    }
+                }
+                if (elemCmd != null)
+                {
+                    element.embedded = (elemCmd.isEmbeddedOnly() ? Boolean.TRUE : Boolean.FALSE);
+                }
+                else if (componentType.isInterface() || componentType == Object.class)
+                {
+                    // Collection<interface> or Object not explicitly marked as embedded defaults to false
+                    element.embedded = Boolean.FALSE;
+                }
+                else
+                {
+                    // Fallback to true
+                    NucleusLogger.METADATA.debug("Member with collection of elementType=" + componentType.getName()+
+                        " not explicitly marked as embedded, so defaulting to embedded since not persistable");
+                    element.embedded = Boolean.TRUE;
+                }
             }
         }
-        if (Boolean.FALSE.equals(element.embedded))
+        else if (Boolean.FALSE.equals(element.embedded))
         {
-            // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
-            // Note : this fails when using in the enhancer since not yet PC
-            Class component_type = field_type.getComponentType();
-            if (!mmgr.getApiAdapter().isPersistable(component_type) && !component_type.isInterface() && component_type != java.lang.Object.class)
+            // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the element
+            AbstractClassMetaData elemCmd = mmgr.readMetaDataForClass(componentType.getName());
+            if (elemCmd == null && !componentType.isInterface() && componentType != java.lang.Object.class)
             {
+                // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
+                // Note : this fails when using in the enhancer since not yet PC
+                NucleusLogger.METADATA.debug("Member with array of element type " + componentType.getName() +
+                    " marked as not embedded, but only persistable as embedded, so resetting");
                 element.embedded = Boolean.TRUE;
             }
         }
@@ -170,8 +196,8 @@ public class ArrayMetaData extends ContainerMetaData
         }
         else
         {
-            element.type = field_type.getComponentType().getName();
-            element.classMetaData = mmgr.getMetaDataForClassInternal(field_type.getComponentType(), clr);
+            element.type = fieldType.getComponentType().getName();
+            element.classMetaData = mmgr.getMetaDataForClassInternal(fieldType.getComponentType(), clr);
         }
 
         if (element.classMetaData != null)

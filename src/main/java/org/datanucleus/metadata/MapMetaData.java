@@ -171,24 +171,53 @@ public class MapMetaData extends ContainerMetaData
             {
                 key.embedded = Boolean.TRUE;
             }
-            else if (mmgr.getApiAdapter().isPersistable(keyTypeClass) || Object.class.isAssignableFrom(keyTypeClass) || keyTypeClass.isInterface())
-            {
-                key.embedded = Boolean.FALSE;
-            }
             else
             {
-                key.embedded = Boolean.TRUE;
+                // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the key
+                AbstractClassMetaData keyCmd = mmgr.readMetaDataForClass(keyTypeClass.getName());
+                if (keyCmd == null)
+                {
+                    // Try to load it just in case using annotations and only pulled in one side of the relation
+                    try
+                    {
+                        keyCmd = mmgr.getMetaDataForClass(keyTypeClass, clr);
+                    }
+                    catch (Throwable thr)
+                    {
+                    }
+                }
+                if (keyCmd != null)
+                {
+                    key.embedded = (keyCmd.isEmbeddedOnly() ? Boolean.TRUE : Boolean.FALSE);
+                }
+                else if (keyTypeClass.isInterface() || keyTypeClass == Object.class)
+                {
+                    // Map<interface> or Object not explicitly marked as embedded defaults to false
+                    key.embedded = Boolean.FALSE;
+                }
+                else
+                {
+                    // Fallback to true
+                    NucleusLogger.METADATA.debug("Member with map of keyType=" + keyTypeClass.getName()+
+                        " not explicitly marked as embedded, so defaulting to embedded since not persistable");
+                    key.embedded = Boolean.TRUE;
+                }
             }
         }
-        if (Boolean.FALSE.equals(key.embedded))
+        else if (Boolean.FALSE.equals(key.embedded))
         {
-            // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
-            // Note : this fails when using in the enhancer since not yet PC
-            if (!mmgr.getApiAdapter().isPersistable(keyTypeClass) && !keyTypeClass.isInterface() && keyTypeClass != java.lang.Object.class)
+            // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the key
+            AbstractClassMetaData elemCmd = mmgr.readMetaDataForClass(keyTypeClass.getName());
+            if (elemCmd == null && !keyTypeClass.isInterface() && keyTypeClass != java.lang.Object.class)
             {
+                // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
+                // Note : this fails when using in the enhancer since not yet PC
+                NucleusLogger.METADATA.debug("Member with map with keyType=" + keyTypeClass.getName() +
+                    " marked as not embedded, but only persistable as embedded, so resetting");
                 key.embedded = Boolean.TRUE;
             }
         }
+
         KeyMetaData keymd = ((AbstractMemberMetaData)parent).getKeyMetaData();
         if (keymd != null && keymd.getEmbeddedMetaData() != null)
         {
@@ -276,24 +305,53 @@ public class MapMetaData extends ContainerMetaData
             {
                 value.embedded = Boolean.TRUE;
             }
-            else if (mmgr.getApiAdapter().isPersistable(valueTypeClass) || Object.class.isAssignableFrom(valueTypeClass) || valueTypeClass.isInterface())
-            {
-                value.embedded = Boolean.FALSE;
-            }
             else
             {
-                value.embedded = Boolean.TRUE;
+                // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the value
+                AbstractClassMetaData valCmd = mmgr.readMetaDataForClass(valueTypeClass.getName());
+                if (valCmd == null)
+                {
+                    // Try to load it just in case using annotations and only pulled in one side of the relation
+                    try
+                    {
+                        valCmd = mmgr.getMetaDataForClass(valueTypeClass, clr);
+                    }
+                    catch (Throwable thr)
+                    {
+                    }
+                }
+                if (valCmd != null)
+                {
+                    value.embedded = (valCmd.isEmbeddedOnly() ? Boolean.TRUE : Boolean.FALSE);
+                }
+                else if (valueTypeClass.isInterface() || valueTypeClass == Object.class)
+                {
+                    // Map<interface> or Object not explicitly marked as embedded defaults to false
+                    value.embedded = Boolean.FALSE;
+                }
+                else
+                {
+                    // Fallback to true
+                    NucleusLogger.METADATA.debug("Member with map of valueType=" + valueTypeClass.getName()+
+                        " not explicitly marked as embedded, so defaulting to embedded since not persistable");
+                    value.embedded = Boolean.TRUE;
+                }
             }
         }
-        if (value.embedded == Boolean.FALSE)
+        else if (value.embedded == Boolean.FALSE)
         {
-            // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
-            // Note : this fails when using in the enhancer since not yet PC
-            if (!mmgr.getApiAdapter().isPersistable(valueTypeClass) && !valueTypeClass.isInterface() && valueTypeClass != java.lang.Object.class)
+            // Use "readMetaDataForClass" in case we havent yet initialised the metadata for the value
+            AbstractClassMetaData valCmd = mmgr.readMetaDataForClass(valueTypeClass.getName());
+            if (valCmd == null && !valueTypeClass.isInterface() && valueTypeClass != java.lang.Object.class)
             {
+                // If the user has set a non-PC/non-Interface as not embedded, correct it since not supported.
+                // Note : this fails when using in the enhancer since not yet PC
+                NucleusLogger.METADATA.debug("Member with map with valueType=" + valueTypeClass.getName() +
+                    " marked as not embedded, but only persistable as embedded, so resetting");
                 value.embedded = Boolean.TRUE;
             }
         }
+
         ValueMetaData valuemd = ((AbstractMemberMetaData)parent).getValueMetaData();
         if (valuemd != null && valuemd.getEmbeddedMetaData() != null)
         {
