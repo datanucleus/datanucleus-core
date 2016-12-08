@@ -143,7 +143,7 @@ public class JavaxCacheQueryResultCache implements QueryResultsCache
      */
     public void pin(Query query, Map params)
     {
-        throw new UnsupportedOperationException("This cache doesn't support pinning/unpinning");
+        return;
     }
 
     /* (non-Javadoc)
@@ -151,7 +151,7 @@ public class JavaxCacheQueryResultCache implements QueryResultsCache
      */
     public void pin(Query query)
     {
-        throw new UnsupportedOperationException("This cache doesn't support pinning/unpinning");
+        return;
     }
 
     /* (non-Javadoc)
@@ -159,7 +159,7 @@ public class JavaxCacheQueryResultCache implements QueryResultsCache
      */
     public void unpin(Query query, Map params)
     {
-        throw new UnsupportedOperationException("This cache doesn't support pinning/unpinning");
+        return;
     }
 
     /* (non-Javadoc)
@@ -167,7 +167,7 @@ public class JavaxCacheQueryResultCache implements QueryResultsCache
      */
     public void unpin(Query query)
     {
-        throw new UnsupportedOperationException("This cache doesn't support pinning/unpinning");
+        return;
     }
 
     /* (non-Javadoc)
