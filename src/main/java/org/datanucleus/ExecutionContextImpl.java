@@ -4692,6 +4692,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public Object getObjectFromCache(Object id)
     {
+        if (id instanceof SCOID)
+        {
+            // Not cached
+            return null;
+        }
+
         // Try Level 1 first
         Object pc = getObjectFromLevel1Cache(id);
         if (pc != null)
