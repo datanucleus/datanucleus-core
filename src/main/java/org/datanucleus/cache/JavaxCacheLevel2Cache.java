@@ -125,7 +125,15 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
      */
     public CachedPC get(Object oid)
     {
-        return (CachedPC) cache.get(oid);
+        try
+        {
+            return (CachedPC) cache.get(oid);
+        }
+        catch (Exception e)
+        {
+            NucleusLogger.CACHE.info("Object with id " + oid +" not retrieved from cache due to : " + e.getMessage());
+            return null;
+        }
     }
 
     /* (non-Javadoc)
@@ -134,11 +142,19 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
     @Override
     public Map<Object, CachedPC> getAll(Collection oids)
     {
-        if (oids instanceof Set)
+        try
         {
-            return cache.getAll((Set)oids);
+            if (oids instanceof Set)
+            {
+                return cache.getAll((Set)oids);
+            }
+            return cache.getAll(new HashSet(oids));
         }
-        return cache.getAll(new HashSet(oids));
+        catch (Exception e)
+        {
+            NucleusLogger.CACHE.info("Objects not retrieved from cache due to : " + e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -180,10 +196,10 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
         {
             cache.put(oid, pc);
         }
-        catch (RuntimeException re)
+        catch (Exception e)
         {
             // Not cached due to some problem. Not serializable?
-            NucleusLogger.CACHE.info("Object with id " + oid +" not cached due to : " + re.getMessage());
+            NucleusLogger.CACHE.info("Object with id " + oid +" not cached due to : " + e.getMessage());
         }
         return pc;
     }
@@ -216,7 +232,14 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
      */
     public synchronized void evict(Object oid)
     {
-        cache.remove(oid);
+        try
+        {
+            cache.remove(oid);
+        }
+        catch (RuntimeException re)
+        {
+            NucleusLogger.CACHE.info("Object with id=" + oid + " not evicted from cache due to : " + re.getMessage());
+        }
     }
 
     /**
@@ -226,7 +249,14 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
      */
     public synchronized void evictAll()
     {
-        cache.removeAll();
+        try
+        {
+            cache.removeAll();
+        }
+        catch (RuntimeException re)
+        {
+            NucleusLogger.CACHE.info("Objects not evicted from cache due to : " + re.getMessage());
+        }
     }
 
     /**
@@ -240,13 +270,20 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
             return;
         }
 
-        if (oids instanceof Set)
+        try
         {
-            cache.removeAll((Set)oids);
+            if (oids instanceof Set)
+            {
+                cache.removeAll((Set)oids);
+            }
+            else
+            {
+                cache.removeAll(new HashSet(oids));
+            }
         }
-        else
+        catch (RuntimeException re)
         {
-            cache.removeAll(new HashSet(oids));
+            NucleusLogger.CACHE.info("Objects not evicted from cache due to : " + re.getMessage());
         }
     }
 
@@ -261,8 +298,15 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
             return;
         }
 
-        Set oidSet = new HashSet(Arrays.asList(oids));
-        cache.removeAll(oidSet);
+        try
+        {
+            Set oidSet = new HashSet(Arrays.asList(oids));
+            cache.removeAll(oidSet);
+        }
+        catch (RuntimeException re)
+        {
+            NucleusLogger.CACHE.info("Objects not evicted from cache due to : " + re.getMessage());
+        }
     }
 
     /**
@@ -294,29 +338,35 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
 
     void evictAllOfClass(String className)
     {
-        AbstractClassMetaData cmd =
-            nucleusCtx.getMetaDataManager().getMetaDataForClass(className, nucleusCtx.getClassLoaderResolver(null));
-        Iterator<Cache.Entry> entryIter = cache.iterator();
-        while (entryIter.hasNext())
+        try
         {
-            Cache.Entry entry = entryIter.next();
-            Object key = entry.getKey();
-            if (cmd.getIdentityType() == IdentityType.APPLICATION)
+            AbstractClassMetaData cmd = nucleusCtx.getMetaDataManager().getMetaDataForClass(className, nucleusCtx.getClassLoaderResolver(null));
+            Iterator<Cache.Entry> entryIter = cache.iterator();
+            while (entryIter.hasNext())
             {
-                String targetClassName = IdentityUtils.getTargetClassNameForIdentitySimple(key);
-                if (className.equals(targetClassName))
+                Cache.Entry entry = entryIter.next();
+                Object key = entry.getKey();
+                if (cmd.getIdentityType() == IdentityType.APPLICATION)
                 {
-                    entryIter.remove();
+                    String targetClassName = IdentityUtils.getTargetClassNameForIdentitySimple(key);
+                    if (className.equals(targetClassName))
+                    {
+                        entryIter.remove();
+                    }
+                }
+                else if (cmd.getIdentityType() == IdentityType.DATASTORE)
+                {
+                    String targetClassName = IdentityUtils.getTargetClassNameForIdentitySimple(key);
+                    if (className.equals(targetClassName))
+                    {
+                        entryIter.remove();
+                    }
                 }
             }
-            else if (cmd.getIdentityType() == IdentityType.DATASTORE)
-            {
-                String targetClassName = IdentityUtils.getTargetClassNameForIdentitySimple(key);
-                if (className.equals(targetClassName))
-                {
-                    entryIter.remove();
-                }
-            }
+        }
+        catch (RuntimeException re)
+        {
+            NucleusLogger.CACHE.info("Objects not evicted from cache due to : " + re.getMessage());
         }
     }
 }
