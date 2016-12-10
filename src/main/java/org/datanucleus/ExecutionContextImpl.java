@@ -4692,12 +4692,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public Object getObjectFromCache(Object id)
     {
-        if (id instanceof SCOID)
-        {
-            // Not cached
-            return null;
-        }
-
         // Try Level 1 first
         Object pc = getObjectFromLevel1Cache(id);
         if (pc != null)
@@ -4794,6 +4788,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     protected Object getObjectFromLevel2Cache(Object id)
     {
         Object pc = null;
+
+        if (id instanceof SCOID)
+        {
+            // Not L2 cached
+            return null;
+        }
 
         if (l2CacheEnabled)
         {
