@@ -5193,6 +5193,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         Object pc = null;
 
+        if (id instanceof SCOID)
+        {
+            // We do not L2 cache objects with no real identity
+            return null;
+        }
+
         if (l2CacheEnabled)
         {
             if (!nucCtx.isClassWithIdentityCacheable(id))
