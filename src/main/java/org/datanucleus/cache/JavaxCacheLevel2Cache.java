@@ -163,8 +163,8 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
      */
     public int getSize()
     {
-        // TODO Implement this
-        throw new UnsupportedOperationException("size() method not supported by this plugin");
+        // Not supported
+        return 0;
     }
 
     /**
@@ -219,10 +219,10 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
         {
             cache.putAll(objs);
         }
-        catch (RuntimeException re)
+        catch (Exception e)
         {
             // Not cached due to some problem. Not serializable?
-            NucleusLogger.CACHE.info("Objects not cached due to : " + re.getMessage());
+            NucleusLogger.CACHE.info("Objects not cached due to : " + e.getMessage());
         }
     }
 
@@ -236,7 +236,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
         {
             cache.remove(oid);
         }
-        catch (RuntimeException re)
+        catch (Exception re)
         {
             NucleusLogger.CACHE.info("Object with id=" + oid + " not evicted from cache due to : " + re.getMessage());
         }
@@ -253,7 +253,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
         {
             cache.removeAll();
         }
-        catch (RuntimeException re)
+        catch (Exception re)
         {
             NucleusLogger.CACHE.info("Objects not evicted from cache due to : " + re.getMessage());
         }
@@ -281,7 +281,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
                 cache.removeAll(new HashSet(oids));
             }
         }
-        catch (RuntimeException re)
+        catch (Exception re)
         {
             NucleusLogger.CACHE.info("Objects not evicted from cache due to : " + re.getMessage());
         }
@@ -303,7 +303,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
             Set oidSet = new HashSet(Arrays.asList(oids));
             cache.removeAll(oidSet);
         }
-        catch (RuntimeException re)
+        catch (Exception re)
         {
             NucleusLogger.CACHE.info("Objects not evicted from cache due to : " + re.getMessage());
         }
@@ -364,7 +364,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
                 }
             }
         }
-        catch (RuntimeException re)
+        catch (Exception re)
         {
             NucleusLogger.CACHE.info("Objects not evicted from cache due to : " + re.getMessage());
         }
