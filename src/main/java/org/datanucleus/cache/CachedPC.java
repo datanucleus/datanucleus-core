@@ -75,7 +75,7 @@ public class CachedPC<T> implements Serializable
     {
         if (fieldValues == null)
         {
-            fieldValues = new HashMap<Integer, Object>();
+            fieldValues = new HashMap<>();
         }
         fieldValues.put(fieldNumber, value);
     }
@@ -144,19 +144,45 @@ public class CachedPC<T> implements Serializable
      */
     public String toString()
     {
-        return toString(false);
+        return toString("", false);
     }
 
     /**
-     * Method to return a sting form of the cached object. Returns something like
+     * Method to return a string form of the cached object. Returns something like
      * "CachedPC : version=1 loadedFlags=[YY]".
+     * @param indent Indent for this CachedPC
      * @param debug Whether to include the field values in the return
      * @return The string form
      */
-    public String toString(boolean debug)
+    public String toString(String indent, boolean debug)
     {
-        return "CachedPC : cls=" + cls.getName() + " version=" + version + " loadedFlags=" + StringUtils.booleanArrayToString(loadedFields) + 
-                (debug ? (" vals=" + StringUtils.mapToString(fieldValues)) : "");
+        StringBuilder str = new StringBuilder();
+        str.append(indent).append("CachedPC : cls=").append(cls.getName()).append(" version=").append(version).append(" loadedFlags=").append(StringUtils.booleanArrayToString(loadedFields));
+        if (debug && fieldValues != null)
+        {
+            str.append(" numValues=").append(fieldValues != null ? fieldValues.size() : 0).append("\n");
+
+            Iterator<Map.Entry<Integer, Object>> fieldValuesIter = fieldValues.entrySet().iterator();
+            while (fieldValuesIter.hasNext())
+            {
+                Map.Entry<Integer, Object> fieldValuesEntry = fieldValuesIter.next();
+                str.append(indent).append("  ").append("field=").append(fieldValuesEntry.getKey()).append(" value=");
+                if (fieldValuesEntry.getValue() instanceof CachedPC)
+                {
+                    str.append("\n");
+                    str.append(((CachedPC)fieldValuesEntry.getValue()).toString(indent + "  ", debug));
+                }
+                else
+                {
+                    str.append(fieldValuesEntry.getValue());
+                }
+                if (fieldValuesIter.hasNext())
+                {
+                    str.append("\n");
+                }
+            }
+        }
+        return str.toString();
     }
 
     public static class CachedId implements Serializable, Comparable<CachedId>
