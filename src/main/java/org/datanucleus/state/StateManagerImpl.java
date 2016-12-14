@@ -2906,6 +2906,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 // Field not loaded, so load it
                 if (objectType != ObjectProvider.PC)
                 {
+                    // TODO When we have nested embedded objects that can have relations to non-embedded then this needs to change
                     // Embedded object so we assume that all was loaded before (when it was read)
                     return true;
                 }
