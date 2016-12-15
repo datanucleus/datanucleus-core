@@ -106,7 +106,6 @@ public class EmbeddedMetaData extends MetaData
      * This performs checks on the validity of the field types for embedding.
      * @param clr The class loader to use where necessary
      * @param primary the primary ClassLoader to use (or null)
-     * @param mmgr MetaData manager
      */
     public void populate(ClassLoaderResolver clr, ClassLoader primary)
     {

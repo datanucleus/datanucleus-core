@@ -1437,7 +1437,7 @@ public class ClassUtils
 
     /**
      * Utility to return the package name for a class name.
-     * @param cls The class
+     * @param clsName The class
      * @return The name of its package (or null if no package e.g a primitive)
      */
     public static String getPackageNameForClassName(String clsName)
