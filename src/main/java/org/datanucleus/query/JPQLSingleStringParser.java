@@ -238,6 +238,10 @@ public class JPQLSingleStringParser
                 {
                     compileOrder();
                 }
+//                if (parser.parseKeywordIgnoreCase("RANGE"))
+//                {
+//                    compileRange();
+//                }
             }
         }
 
@@ -379,6 +383,18 @@ public class JPQLSingleStringParser
                 throw new NucleusUserException(Localiser.msg("043004", "ORDER BY", "<ordering>"));
             }
             query.setOrdering(content);
+        }
+
+        @SuppressWarnings("unused")
+        private void compileRange()
+        {
+            String content = parser.parseContent(null, false);
+            if (content.length() == 0)
+            {
+                // content cannot be empty
+                throw new NucleusUserException(Localiser.msg("042014", "RANGE", "<range>"));
+            }
+            query.setRange(content);
         }
 
         /**
@@ -669,8 +685,7 @@ public class JPQLSingleStringParser
         }
 
         /**
-         * Parse the next token looking for a keyword. The cursor position is
-         * skipped in one tick if a keyword is found
+         * Parse the next token looking for a keyword. The cursor position is skipped in one tick if a keyword is found
          * @return the parsed keyword or null
          */
         public String parseKeyword()
