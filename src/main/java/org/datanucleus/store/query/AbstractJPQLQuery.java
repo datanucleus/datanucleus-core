@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.query.JPQLSingleStringParser;
@@ -108,7 +109,13 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
     {
         super(storeMgr, ec);
 
-        new JPQLSingleStringParser(this, query).parse();
+        JPQLSingleStringParser parser = new JPQLSingleStringParser(this, query);
+        if (ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_JPQL_ALLOW_RANGE))
+        {
+            // Allow RANGE to be used in the JPQL
+            parser.allowRange();
+        }
+        parser.parse();
     }
 
     /**

@@ -34,8 +34,14 @@ public class JPQLQueryHelper
 {
     /** Keywords used in single-string JPQL. Uppercase variants specified here, but JPQL allows case-insensitive. */
     static final String[] SINGLE_STRING_KEYWORDS = {
-        "SELECT", "INSERT", "UPDATE", "DELETE", "FROM", "WHERE", "GROUP BY", "HAVING", "ORDER BY"
+        "SELECT", "INSERT", "UPDATE", "DELETE", "FROM", "WHERE", "GROUP BY", "HAVING", "ORDER BY", "RANGE"
         };
+
+    /** JPQL single-string keywords when allowing RANGE. */
+    static final String[] SINGLE_STRING_KEYWORDS_INCLUDING_RANGE = {
+        "SELECT", "INSERT", "UPDATE", "DELETE", "FROM", "WHERE", "GROUP BY", "HAVING", "ORDER BY", "RANGE"
+        };
+
     // TODO Only allow INSERT when not using strict JPQL
 
     /** List of identifier names not allowed by JPQL. */
@@ -59,6 +65,29 @@ public class JPQLQueryHelper
         {
             // JPQL is case-insensitive
             if (name.equalsIgnoreCase(SINGLE_STRING_KEYWORDS[i]))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Convenience method returning if the supplied name is a keyword for this query language (including RANGE).
+     * @param name Name to check
+     * @return Whether it is a keyword
+     */
+    public static boolean isKeyword(String name, boolean allowRange)
+    {
+        if (!allowRange)
+        {
+            return isKeyword(name);
+        }
+
+        for (int i=0;i<SINGLE_STRING_KEYWORDS_INCLUDING_RANGE.length;i++)
+        {
+            // JPQL is case-insensitive
+            if (name.equalsIgnoreCase(SINGLE_STRING_KEYWORDS_INCLUDING_RANGE[i]))
             {
                 return true;
             }

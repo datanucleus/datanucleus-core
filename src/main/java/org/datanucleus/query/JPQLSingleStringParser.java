@@ -40,6 +40,7 @@ import org.datanucleus.util.NucleusLogger;
  *        [GROUP BY {grouping-clause} ]
  *        [HAVING {having-clause} ]
  *        [ORDER BY {ordering-clause}]
+ *        [RANGE x,y]
  * e.g SELECT c FROM Customer c INNER JOIN c.orders o WHERE c.status = 1
  * </pre>
  * or
@@ -62,6 +63,8 @@ import org.datanucleus.util.NucleusLogger;
  * So the "filter" for the outer query is "NOT EXISTS (SELECT o1 FROM c.orders o1)".
  * Note also that we allow subqueries in {result}, {from}, and {having} clauses as well (vendor extension).
  * If a subquery is contained we extract the subquery and then set it as a variable in the symbol table, and add the subquery separately.
+ * Note that the <pre>[RANGE x,y]</pre> is a DataNucleus extension syntax to allow for specification of firstResult/maxResults in the query string and hence in subqueries
+ * and is dependent on enabling <i>datanucleus.query.jpql.allowRange</i>.
  */
 public class JPQLSingleStringParser
 {
@@ -70,6 +73,9 @@ public class JPQLSingleStringParser
 
     /** The single-string query string. */
     private String queryString;
+
+    /** Standard JPQL does not allow RANGE keyword in the JPQL. */
+    private boolean allowRange = false;
 
     /**
      * Constructor for the Single-String parser.
@@ -86,12 +92,18 @@ public class JPQLSingleStringParser
         this.queryString = queryString;
     }
 
+    public JPQLSingleStringParser allowRange()
+    {
+        allowRange = true;
+        return this;
+    }
+
     /**
      * Method to parse the Single-String query
      */
     public void parse()
     {
-        new Compiler(new Parser(queryString)).compile();
+        new Compiler(new Parser(queryString, allowRange)).compile();
     }
 
     /**
@@ -215,7 +227,7 @@ public class JPQLSingleStringParser
             }
             else
             {
-                // SELECT a, b, c FROM ... WHERE ... GROUP BY ... HAVING ... ORDER BY ...
+                // SELECT a, b, c FROM ... WHERE ... GROUP BY ... HAVING ... ORDER BY ... [RANGE ...]
                 compileResult();
 
                 if (parser.parseKeywordIgnoreCase("FROM"))
@@ -238,10 +250,11 @@ public class JPQLSingleStringParser
                 {
                     compileOrder();
                 }
-//                if (parser.parseKeywordIgnoreCase("RANGE"))
-//                {
-//                    compileRange();
-//                }
+                if (allowRange && parser.parseKeywordIgnoreCase("RANGE"))
+                {
+                    // DN extension
+                    compileRange();
+                }
             }
         }
 
@@ -385,7 +398,6 @@ public class JPQLSingleStringParser
             query.setOrdering(content);
         }
 
-        @SuppressWarnings("unused")
         private void compileRange()
         {
             String content = parser.parseContent(null, false);
@@ -508,12 +520,15 @@ public class JPQLSingleStringParser
         /** current token cursor position */
         int tokenIndex = -1;
 
+        boolean allowRange = false;
+
         /**
          * Constructor
          * @param str Query string
          */
-        public Parser(String str)
+        public Parser(String str, boolean allowRange)
         {
+            this.allowRange = allowRange;
             queryString = str.replace('\n', ' ');
 
             // Parse into tokens, taking care to keep any String literals together
@@ -566,11 +581,11 @@ public class JPQLSingleStringParser
             keywords = new String[tokenList.size()];
             for (i = 0; i < tokens.length; i++)
             {
-                if (JPQLQueryHelper.isKeyword(tokens[i]))
+                if (JPQLQueryHelper.isKeyword(tokens[i], allowRange))
                 {
                     keywords[i] = tokens[i];
                 }
-                else if (i < tokens.length - 1 && JPQLQueryHelper.isKeyword(tokens[i] + ' ' + tokens[i + 1]))
+                else if (i < tokens.length - 1 && JPQLQueryHelper.isKeyword(tokens[i] + ' ' + tokens[i + 1], allowRange))
                 {
                     keywords[i] = tokens[i];
                     i++;
@@ -616,13 +631,13 @@ public class JPQLSingleStringParser
                     }
                 }
 
-                if (level == 0 && JPQLQueryHelper.isKeyword(tokens[tokenIndex]) && !tokens[tokenIndex].equals(keywordToIgnore))
+                if (level == 0 && JPQLQueryHelper.isKeyword(tokens[tokenIndex], allowRange) && !tokens[tokenIndex].equals(keywordToIgnore))
                 {
                     // Invalid keyword encountered and not currently in subquery block
                     tokenIndex--;
                     break;
                 }
-                else if (level == 0 && tokenIndex < tokens.length - 1 && JPQLQueryHelper.isKeyword(tokens[tokenIndex] + ' ' + tokens[tokenIndex + 1]))
+                else if (level == 0 && tokenIndex < tokens.length - 1 && JPQLQueryHelper.isKeyword(tokens[tokenIndex] + ' ' + tokens[tokenIndex + 1], allowRange))
                 {
                     // Invalid keyword entered ("GROUP BY", "ORDER BY") and not currently in subquery block
                     tokenIndex--;
