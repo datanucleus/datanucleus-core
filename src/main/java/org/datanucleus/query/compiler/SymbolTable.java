@@ -15,16 +15,14 @@ limitations under the License.
 Contributors:
 2009 Andy Jefferson - accessor for symbol names
     ...
-**********************************************************************/
+ **********************************************************************/
 package org.datanucleus.query.compiler;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.datanucleus.exceptions.NucleusException;
@@ -37,11 +35,10 @@ public class SymbolTable implements Serializable
 {
     private static final long serialVersionUID = -4839286733223290900L;
 
-    /** SymbolTable for the parent query when this is a subquery, otherwise null. */
+    /** SymbolTable for the parent query (when this is a subquery), otherwise null. */
     SymbolTable parentSymbolTable = null;
 
-    Map<String, Symbol> symbols = new HashMap();
-    List<Symbol> symbolsTable = new ArrayList();
+    Map<String, Symbol> symbols = new HashMap<>();
 
     /**
      * Resolver for symbols.
@@ -59,22 +56,22 @@ public class SymbolTable implements Serializable
         return resolver;
     }
 
+    /**
+     * Set the symbol table for any parent query, so that if this query refers to an expression from the parent query then it is resolvable.
+     * @param tbl The parent symbol table
+     */
     public void setParentSymbolTable(SymbolTable tbl)
     {
         this.parentSymbolTable = tbl;
     }
 
+    /**
+     * Accessor for the parent symbol table (if any).
+     * @return The parent symbol table
+     */
     public SymbolTable getParentSymbolTable()
     {
         return parentSymbolTable;
-    }
-
-    Symbol getSymbol(int index)
-    {
-        synchronized (symbolsTable)
-        {
-            return symbolsTable.get(index);
-        }
     }
 
     /**
@@ -86,65 +83,77 @@ public class SymbolTable implements Serializable
         return new HashSet<String>(symbols.keySet());
     }
 
+    /**
+     * Return the Symbol for the specified name if known.
+     * If there is a parent symbol table then looks up in that after if not found here (unless the name is "this").
+     * @param name The name to look up
+     * @return The symbol for this name
+     */
     public Symbol getSymbol(String name)
     {
-        synchronized (symbolsTable)
+        if (symbols.containsKey(name))
         {
             return symbols.get(name);
         }
-    }    
+        if (parentSymbolTable != null && !name.equals("this"))
+        {
+            return parentSymbolTable.getSymbol(name);
+        }
+        return null;
+    }
 
+    /**
+     * Return the Symbol for the specified name if known, treating the name as case-insensitive.
+     * If there is a parent symbol table then looks up in that after if not found here (unless the name is "this").
+     * @param name The name to look up
+     * @return The symbol for this name
+     */
     public Symbol getSymbolIgnoreCase(String name)
     {
-        synchronized (symbolsTable)
+        Iterator<Map.Entry<String, Symbol>> iter = symbols.entrySet().iterator();
+        while (iter.hasNext())
         {
-            Iterator<Map.Entry<String, Symbol>> iter = symbols.entrySet().iterator();
-            while (iter.hasNext())
+            Map.Entry<String, Symbol> symbolEntry = iter.next();
+            String key = symbolEntry.getKey();
+            if (key.equalsIgnoreCase(name))
             {
-                Map.Entry<String, Symbol> symbolEntry = iter.next();
-                String key = symbolEntry.getKey();
-                if (key.equalsIgnoreCase(name))
-                {
-                    return symbolEntry.getValue();
-                }
+                return symbolEntry.getValue();
             }
-            return null;
         }
+        if (parentSymbolTable != null && !name.equals("this"))
+        {
+            return parentSymbolTable.getSymbolIgnoreCase(name);
+        }
+        return null;
     }    
 
+    /**
+     * Accessor for whether this symbol table has a particular symbol name. Does not make any use of parent symbol table(s).
+     * @param name The name of the symbol we require
+     * @return Whether it is present here
+     */
     public boolean hasSymbol(String name)
     {
-        synchronized (symbolsTable)
-        {
-            return symbols.containsKey(name);
-        }
+        return symbols.containsKey(name);
     }    
-    
+
     public int addSymbol(Symbol symbol)
     {
-        synchronized (symbolsTable)
+        if (symbols.containsKey(symbol.getQualifiedName()))
         {
-            if (symbols.containsKey(symbol.getQualifiedName()))
-            {
-                throw new NucleusException("Symbol " + symbol.getQualifiedName() + " already exists.");
-            }
-            symbols.put(symbol.getQualifiedName(), symbol);
-            symbolsTable.add(symbol);
-            return symbolsTable.size();
+            throw new NucleusException("Symbol " + symbol.getQualifiedName() + " already exists.");
         }
+        symbols.put(symbol.getQualifiedName(), symbol);
+        return symbols.size();
     }
 
     public void removeSymbol(Symbol symbol)
     {
-        synchronized (symbolsTable)
+        if (!symbols.containsKey(symbol.getQualifiedName()))
         {
-            if (!symbols.containsKey(symbol.getQualifiedName()))
-            {
-                throw new NucleusException("Symbol " + symbol.getQualifiedName() + " doesnt exist.");
-            }
-            symbols.remove(symbol.getQualifiedName());
-            symbolsTable.remove(symbol);
+            throw new NucleusException("Symbol " + symbol.getQualifiedName() + " doesnt exist.");
         }
+        symbols.remove(symbol.getQualifiedName());
     }
 
     public String toString()
