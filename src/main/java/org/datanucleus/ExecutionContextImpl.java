@@ -1244,7 +1244,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
+     * Find the ObjectProvider for the specified object, persisting it if required.
+     * @param pc The persistable object
      * @param persist persists the object if not yet persisted. 
+     * @return The ObjectProvider
      */
     public ObjectProvider findObjectProvider(Object pc, boolean persist)
     {
@@ -1296,6 +1299,26 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             releaseThreadContextInfo();
         }
+    }
+
+    /**
+     * Method to return the ObjectProvider for an object (if managed).
+     * @param pc The object we are checking
+     * @return The ObjectProvider, null if not found.
+     * @throws NucleusUserException if the persistable object is managed by a different ExecutionContext
+     */
+    public ObjectProvider findObjectProvider(Object pc)
+    {
+        ObjectProvider op = (ObjectProvider) getApiAdapter().getStateManager(pc);
+        if (op != null)
+        {
+            ExecutionContext ec = op.getExecutionContext();
+            if (ec != null && this != ec)
+            {
+                throw new NucleusUserException(Localiser.msg("010007", getApiAdapter().getIdForObject(pc)));
+            }
+        }
+        return op;
     }
 
     /**
@@ -5492,48 +5515,5 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return opAssociatedValuesMapByOP.get(op).containsKey(key);
         }
         return false;
-    }
-
-    /**
-     * Method to return the ObjectProvider for an object (if managed).
-     * @param pc The object we are checking
-     * @return The ObjectProvider, null if not found.
-     */
-    public ObjectProvider findObjectProvider(Object pc)
-    {
-        ObjectProvider op = (ObjectProvider) getApiAdapter().getStateManager(pc);
-        if (op != null)
-        {
-            ExecutionContext ec = op.getExecutionContext();
-            if (ec != null && this != ec)
-            {
-                throw new NucleusUserException(Localiser.msg("010007", getApiAdapter().getIdForObject(pc)));
-            }
-        }
-        return op;
-/*        ObjectProvider op = null;
-        Object previousLookingFor = objectLookingForOP;
-        ObjectProvider previousFound = foundOP;
-        try
-        {
-            objectLookingForOP = pc;
-            foundOP = null;
-            // We call "ApiAdapter.getExecutionContext(pc)".
-            // This then calls "JDOHelper.getPersistenceManager(pc)".
-            // Which calls "StateManager.getExecutionContext(pc)".
-            // That then calls "hereIsObjectProvider(sm, pc)" which sets "foundOP".
-            ExecutionContext ec = getApiAdapter().getExecutionContext(pc);
-            if (ec != null && this != ec)
-            {
-                throw new NucleusUserException(Localiser.msg("010007", getApiAdapter().getIdForObject(pc)));
-            }
-            op = foundOP; // Populated via hereIsObjectProvider(...)
-        }
-        finally
-        {
-            objectLookingForOP = previousLookingFor;
-            foundOP = previousFound;
-        }
-        return op;*/
     }
 }
