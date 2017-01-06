@@ -154,20 +154,6 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void hereIsObjectProvider(ObjectProvider sm, Object pc)
-    {
-        try
-        {
-            lock.lock();
-
-            super.hereIsObjectProvider(sm, pc);
-        }
-        finally
-        {
-            lock.unlock();
-        }
-    }
-
     public void close()
     {
         try

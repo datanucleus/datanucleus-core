@@ -67,7 +67,7 @@ public interface Persistable
      * Return the associated StateManager if there is one.
      * @return The StateManager managing this object
      */
-   // StateManager dnGetStateManager();
+    StateManager dnGetStateManager();
 
     /**
      * This method sets the StateManager instance that manages the state of this instance. This method is

@@ -847,12 +847,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         {
             return null;
         }
-        else
-        {
-            // TODO Remove this when we implement core-142
-            myEC.hereIsObjectProvider(this, myPC);
-            return myEC;
-        }
+        return myEC;
     }
 
     // -------------------------- Lifecycle Methods ---------------------------

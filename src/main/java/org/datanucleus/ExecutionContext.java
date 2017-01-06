@@ -237,14 +237,6 @@ public interface ExecutionContext extends ExecutionContextReference
     ObjectProvider findObjectProviderOfOwnerForAttachingObject(Object pc);
 
     /**
-     * Method to register the ObjectProvider as being for the passed object.
-     * Used during the process of identifying ObjectProvider for persistable object.
-     * @param op The ObjectProvider
-     * @param pc The object managed by the ObjectProvider
-     */
-    void hereIsObjectProvider(ObjectProvider op, Object pc);
-
-    /**
      * Method to add the object managed by the specified ObjectProvider to the cache.
      * @param op The ObjectProvider
      */

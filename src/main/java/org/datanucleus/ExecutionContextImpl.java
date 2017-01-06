@@ -5494,23 +5494,14 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return false;
     }
 
-    /** State variable used when searching for the ObjectProvider for an object, representing the object. */
-    private Object objectLookingForOP = null;
-
-    /** State variable used when searching for the ObjectProvider for an object, representing the ObjectProvider. */
-    private ObjectProvider foundOP = null;
-
     /**
-     * Method to find the ObjectProvider for an object.
-     * This will access "dnGetExecutionContext" on the Persistable object, which in turn will call StateManager.getExecutionContext(pc), which
-     * leads to it calling ExecutionContext.hereIsObjectProvider(...), and populating foundOP.
-     * TODO If the enhancement contract had a simple dnGetStateManager() then this would be simple and no need for "foundOP" and "objectLookingForOP". See core-142
+     * Method to return the ObjectProvider for an object (if managed).
      * @param pc The object we are checking
      * @return The ObjectProvider, null if not found.
      */
     public ObjectProvider findObjectProvider(Object pc)
     {
-/*        ObjectProvider op = (ObjectProvider) getApiAdapter().getStateManager(pc);
+        ObjectProvider op = (ObjectProvider) getApiAdapter().getStateManager(pc);
         if (op != null)
         {
             ExecutionContext ec = op.getExecutionContext();
@@ -5519,8 +5510,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 throw new NucleusUserException(Localiser.msg("010007", getApiAdapter().getIdForObject(pc)));
             }
         }
-        return op;*/
-        ObjectProvider op = null;
+        return op;
+/*        ObjectProvider op = null;
         Object previousLookingFor = objectLookingForOP;
         ObjectProvider previousFound = foundOP;
         try
@@ -5543,19 +5534,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             objectLookingForOP = previousLookingFor;
             foundOP = previousFound;
         }
-        return op;
-    }
-
-    /**
-     * Method to add the ObjectProvider for an object to this context's list.
-     * @param op The ObjectProvider
-     * @param pc The object managed by the ObjectProvider
-     */
-    public void hereIsObjectProvider(ObjectProvider op, Object pc)
-    {
-        if (objectLookingForOP == pc)
-        {
-            foundOP = op;
-        }
+        return op;*/
     }
 }
