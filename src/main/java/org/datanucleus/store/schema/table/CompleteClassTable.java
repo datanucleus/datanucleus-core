@@ -1141,28 +1141,15 @@ public class CompleteClassTable implements Table
         {
             return multitenancyColumn;
         }
-        // TODO Support other types
+        else if (colType == SurrogateColumnType.CREATE_TIMESTAMP)
+        {
+            // TODO Support this
+        }
+        else if (colType == SurrogateColumnType.UPDATE_TIMESTAMP)
+        {
+            // TODO Support this
+        }
         return null;
-    }
-
-    public Column getDatastoreIdColumn()
-    {
-        return datastoreIdColumn;
-    }
-
-    public Column getVersionColumn()
-    {
-        return versionColumn;
-    }
-
-    public Column getDiscriminatorColumn()
-    {
-        return discriminatorColumn;
-    }
-
-    public Column getMultitenancyColumn()
-    {
-        return multitenancyColumn;
     }
 
     public Column getColumnForName(String name)
