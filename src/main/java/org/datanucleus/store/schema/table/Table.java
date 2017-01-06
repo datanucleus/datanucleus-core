@@ -59,28 +59,11 @@ public interface Table
     Column getColumnForPosition(int pos);
 
     /**
-     * Accessor for the surrogate datastore id column (if present).
-     * @return The surrogate datastore id column (if present)
+     * Accessor for the surrogate column of the specified type.
+     * @param colType The type of surrogate column
+     * @return The column definition, if it exists for this table
      */
-    Column getDatastoreIdColumn();
-
-    /**
-     * Accessor for the surrogate version column (if present). If the version is persisted into a persistable field, or no version then this will be null.
-     * @return The surrogate version column (if present)
-     */
-    Column getVersionColumn();
-
-    /**
-     * Accessor for the surrogate discriminator column (if present).
-     * @return The surrogate discriminator column (if present)
-     */
-    Column getDiscriminatorColumn();
-
-    /**
-     * Accessor for the surrogate multitenancy column (if present).
-     * @return The surrogate multitenancy column (if present)
-     */
-    Column getMultitenancyColumn();
+    Column getSurrogateColumn(SurrogateColumnType colType);
 
     /**
      * Accessor for the column with the supplied name (if present).

@@ -1119,6 +1119,32 @@ public class CompleteClassTable implements Table
         return columns.get(pos);
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getSurrogateColumn(org.datanucleus.store.schema.table.SurrogateColumnType)
+     */
+    @Override
+    public Column getSurrogateColumn(SurrogateColumnType colType)
+    {
+        if (colType == SurrogateColumnType.DATASTORE_ID)
+        {
+            return datastoreIdColumn;
+        }
+        else if (colType == SurrogateColumnType.DISCRIMINATOR)
+        {
+            return discriminatorColumn;
+        }
+        else if (colType == SurrogateColumnType.VERSION)
+        {
+            return versionColumn;
+        }
+        else if (colType == SurrogateColumnType.MULTITENANCY)
+        {
+            return multitenancyColumn;
+        }
+        // TODO Support other types
+        return null;
+    }
+
     public Column getDatastoreIdColumn()
     {
         return datastoreIdColumn;
