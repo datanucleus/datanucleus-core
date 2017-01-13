@@ -1920,13 +1920,20 @@ public class JPQLParser implements Parser
                 }
                 Node invokeNode = new Node(NodeType.INVOKE, methodName);
 
-                Node trimCharNode = null;
                 processExpression();
                 Node next = stack.pop();
+
                 if (lexer.parseChar(')'))
                 {
                     // TRIM(string_primary)
-                    next.appendChildNode(invokeNode);
+                    // Find the last part of the identifier node and append the invoke
+                    Node primaryNode = next;
+                    while (primaryNode.getFirstChild() != null)
+                    {
+                        primaryNode = primaryNode.getFirstChild();
+                    }
+                    primaryNode.appendChildNode(invokeNode);
+
                     stack.push(next);
                     return true;
                 }
@@ -1934,13 +1941,19 @@ public class JPQLParser implements Parser
                 if (next.getNodeType() == NodeType.LITERAL)
                 {
                     // TRIM(dir trimChar FROM string_primary)
-                    trimCharNode = next;
+                    Node trimCharNode = next;
                     if (lexer.parseStringIgnoreCase("FROM "))
                     {
                         // Ignore the FROM
                     }
                     processExpression();
                     next = stack.pop();
+
+                    if (trimCharNode != null)
+                    {
+                        // Append the trim character to the invoke node
+                        invokeNode.addProperty(trimCharNode);
+                    }
                 }
                 else if (next.getNodeType() == NodeType.IDENTIFIER)
                 {
@@ -1967,11 +1980,14 @@ public class JPQLParser implements Parser
                     throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
                 }
 
-                next.appendChildNode(invokeNode);
-                if (trimCharNode != null)
+                // Find the last part of the identifier node and append the invoke
+                Node primaryNode = next;
+                while (primaryNode.getFirstChild() != null)
                 {
-                    invokeNode.addProperty(trimCharNode);
+                    primaryNode = primaryNode.getFirstChild();
                 }
+                primaryNode.appendChildNode(invokeNode);
+
                 stack.push(next);
                 return true;
             }

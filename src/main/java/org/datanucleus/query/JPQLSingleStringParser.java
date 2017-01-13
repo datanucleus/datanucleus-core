@@ -299,13 +299,23 @@ public class JPQLSingleStringParser
 
         private void compileGroup()
         {
-            String content = parser.parseContent(null, false);
+            String content = parser.parseContent("FROM", true); // Allow subqueries (see below also search for SELECT), and "TRIM(... FROM ...)"
             if (content.length() == 0)
             {
                 // content cannot be empty
                 throw new NucleusUserException(Localiser.msg("043004", "GROUP BY", "<grouping>"));
             }
-            query.setGrouping(content);
+
+            if (content.toUpperCase().indexOf("SELECT ") > 0) // Case insensitive search
+            {
+                // Subquery (or subqueries) present so split them out and just apply the grouping for this query
+                String substitutedContent = processContentWithSubqueries(content);
+                query.setGrouping(substitutedContent);
+            }
+            else
+            {
+                query.setGrouping(content);
+            }
         }
 
         private void compileHaving()
@@ -331,13 +341,23 @@ public class JPQLSingleStringParser
 
         private void compileOrder()
         {
-            String content = parser.parseContent(null, false);
+            String content = parser.parseContent("FROM", true); // Allow subqueries (see below also search for SELECT), and "TRIM(... FROM ...)"
             if (content.length() == 0)
             {
                 // content cannot be empty
-                throw new NucleusUserException(Localiser.msg("043004", "ORDER BY", "<ordering>"));
+                throw new NucleusUserException(Localiser.msg("043004", "ORDER", "<ordering>"));
             }
-            query.setOrdering(content);
+
+            if (content.toUpperCase().indexOf("SELECT ") > 0)
+            {
+                // Subquery (or subqueries) present so split them out and just apply the having for this query
+                String substitutedContent = processContentWithSubqueries(content);
+                query.setOrdering(substitutedContent);
+            }
+            else
+            {
+                query.setOrdering(content);
+            }
         }
 
         /**
