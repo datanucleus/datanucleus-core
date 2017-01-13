@@ -65,6 +65,8 @@ import org.datanucleus.util.NucleusLogger;
  * If a subquery is contained we extract the subquery and then set it as a variable in the symbol table, and add the subquery separately.
  * Note that the <pre>[RANGE x,y]</pre> is a DataNucleus extension syntax to allow for specification of firstResult/maxResults in the query string and hence in subqueries
  * and is dependent on enabling <i>datanucleus.query.jpql.allowRange</i>.
+ *
+ * TODO Need to better cater for the construct "TRIM(... FROM ...)" since it reuses the FROM keyword and we don't handle that explicitly here, just working around it
  */
 public class JPQLSingleStringParser
 {
@@ -260,7 +262,7 @@ public class JPQLSingleStringParser
 
         private void compileResult()
         {
-            String content = parser.parseContent(null, true); // Allow subqueries, see below also search for SELECT
+            String content = parser.parseContent(null, true); // Allow subqueries (see below also search for SELECT), and "TRIM(... FROM ...)"
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -281,7 +283,7 @@ public class JPQLSingleStringParser
 
         private void compileUpdate()
         {
-            String content = parser.parseContent(null, true); // Allow subqueries, see below also search for SELECT
+            String content = parser.parseContent(null, true); // Allow subqueries (see below also search for SELECT), and "TRIM(... FROM ...)"
             if (content.length() == 0)
             {
                 // No UPDATE clause
@@ -318,7 +320,7 @@ public class JPQLSingleStringParser
 
         private void compileFrom()
         {
-            String content = parser.parseContent(null, true); // Allow subqueries, see below also search for SELECT
+            String content = parser.parseContent(null, true); // Allow subqueries (see below also search for SELECT), and "TRIM(... FROM ...)"
             if (content.length() > 0)
             {
                 if (content.toUpperCase().indexOf("SELECT ") > 0) // Case insensitive search
@@ -336,7 +338,7 @@ public class JPQLSingleStringParser
 
         private void compileWhere()
         {
-            String content = parser.parseContent("FROM", true); // Allow subqueries, see below also search for SELECT
+            String content = parser.parseContent("FROM", true); // Allow subqueries (see below also search for SELECT), and "TRIM(... FROM ...)"
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -357,18 +359,28 @@ public class JPQLSingleStringParser
 
         private void compileGroup()
         {
-            String content = parser.parseContent(null, false);
+            String content = parser.parseContent("FROM", true); // Allow subqueries (see below also search for SELECT), and "TRIM(... FROM ...)"
             if (content.length() == 0)
             {
                 // content cannot be empty
                 throw new NucleusUserException(Localiser.msg("043004", "GROUP BY", "<grouping>"));
             }
-            query.setGrouping(content);
+
+            if (content.toUpperCase().indexOf("SELECT ") > 0) // Case insensitive search
+            {
+                // Subquery (or subqueries) present so split them out and just apply the grouping for this query
+                String substitutedContent = processContentWithSubqueries(content);
+                query.setGrouping(substitutedContent);
+            }
+            else
+            {
+                query.setGrouping(content);
+            }
         }
 
         private void compileHaving()
         {
-            String content = parser.parseContent("FROM", true); // Allow subqueries, see below also search for SELECT
+            String content = parser.parseContent("FROM", true); // Allow subqueries (see below also search for SELECT), and "TRIM(... FROM ...)"
             if (content.length() == 0)
             {
                 // content cannot be empty
@@ -389,13 +401,23 @@ public class JPQLSingleStringParser
 
         private void compileOrder()
         {
-            String content = parser.parseContent(null, false);
+            String content = parser.parseContent("FROM", true); // Allow subqueries (see below also search for SELECT), and "TRIM(... FROM ...)"
             if (content.length() == 0)
             {
                 // content cannot be empty
-                throw new NucleusUserException(Localiser.msg("043004", "ORDER BY", "<ordering>"));
+                throw new NucleusUserException(Localiser.msg("043004", "ORDER", "<ordering>"));
             }
-            query.setOrdering(content);
+
+            if (content.toUpperCase().indexOf("SELECT ") > 0)
+            {
+                // Subquery (or subqueries) present so split them out and just apply the having for this query
+                String substitutedContent = processContentWithSubqueries(content);
+                query.setOrdering(substitutedContent);
+            }
+            else
+            {
+                query.setOrdering(content);
+            }
         }
 
         private void compileRange()
