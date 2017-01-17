@@ -22,6 +22,7 @@ package org.datanucleus;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -72,6 +73,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.TransactionType;
+import org.datanucleus.metadata.VersionStrategy;
 import org.datanucleus.properties.BasePropertyStore;
 import org.datanucleus.state.CallbackHandler;
 import org.datanucleus.state.LockManager;
@@ -5515,5 +5517,113 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return opAssociatedValuesMapByOP.get(op).containsKey(key);
         }
         return false;
+    }
+
+    /**
+     * Perform an optimistic version check on the passed object, against the passed version in the datastore.
+     * @param op ObjectProvider of the object to check
+     * @param versionStrategy Version strategy
+     * @param versionDatastore Version of the object in the datastore
+     * @throws NucleusUserException thrown when an invalid strategy is specified
+     * @throws NucleusOptimisticException thrown when the version check fails
+     */
+    public void performVersionCheck(ObjectProvider op, VersionStrategy versionStrategy, Object versionDatastore)
+    {
+        // Extract the version of the object (that we are updating)
+        Object versionObject = op.getTransactionalVersion();
+        if (versionObject == null)
+        {
+            return;
+        }
+
+        if (versionStrategy == null)
+        {
+            // No version specification so no check needed
+            NucleusLogger.PERSISTENCE.info(op.getClassMetaData().getFullClassName() + 
+                " has no version metadata so no check of version is required, since this will not have the version flag in its table");
+            return;
+        }
+
+        boolean valid;
+        if (versionStrategy == VersionStrategy.DATE_TIME)
+        {
+            valid = ((Timestamp)versionObject).getTime() == ((Timestamp)versionDatastore).getTime();
+        }
+        else if (versionStrategy == VersionStrategy.VERSION_NUMBER)
+        {
+            valid = ((Number)versionObject).longValue() == ((Number)versionDatastore).longValue();
+        }
+        else if (versionStrategy == VersionStrategy.STATE_IMAGE)
+        {
+            // TODO Support state-image strategy
+            throw new NucleusUserException(Localiser.msg("032017", op.getClassMetaData().getFullClassName(), versionStrategy));
+        }
+        else
+        {
+            throw new NucleusUserException(Localiser.msg("032017", op.getClassMetaData().getFullClassName(), versionStrategy));
+        }
+
+        if (!valid)
+        {
+            String msg = Localiser.msg("032016", op.getObjectAsPrintable(), op.getInternalObjectId(), "" + versionDatastore, "" + versionObject);
+            NucleusLogger.PERSISTENCE.error(msg);
+            throw new NucleusOptimisticException(msg, op.getObject());
+        }
+    }
+
+    /** Initial version value when persisting a versioned object for the first time. */
+    public static final int VERSION_INITIAL_VALUE = 1;
+
+    /**
+     * Convenience method to provide the next version, using the version strategy given the supplied current version.
+     * @param versionStrategy Version strategy
+     * @param currentVersion The current version
+     * @return The next version
+     * @throws NucleusUserException Thrown if the strategy is not supported.
+     */
+    public Object getNextVersion(VersionStrategy versionStrategy, Object currentVersion)
+    {
+        if (versionStrategy == null)
+        {
+            return null;
+        }
+        else if (versionStrategy == VersionStrategy.NONE)
+        {
+            // Just increment the version - is this really necessary?
+            if (currentVersion == null)
+            {
+                return Long.valueOf(VERSION_INITIAL_VALUE);
+            }
+            if (currentVersion instanceof Integer)
+            {
+                return Integer.valueOf(((Integer)currentVersion).intValue()+1);
+            }
+            return Long.valueOf(((Long)currentVersion).longValue()+1);
+        }
+        else if (versionStrategy == VersionStrategy.DATE_TIME)
+        {
+            return new Timestamp(System.currentTimeMillis());
+        }
+        else if (versionStrategy == VersionStrategy.VERSION_NUMBER)
+        {
+            if (currentVersion == null)
+            {
+                return Long.valueOf(VERSION_INITIAL_VALUE);
+            }
+            if (currentVersion instanceof Integer)
+            {
+                return Integer.valueOf(((Integer)currentVersion).intValue()+1);
+            }
+            return Long.valueOf(((Long)currentVersion).longValue()+1);
+        }
+        else if (versionStrategy == VersionStrategy.STATE_IMAGE)
+        {
+            // TODO Support state-image strategy
+            throw new NucleusUserException("DataNucleus doesnt currently support version strategy \"state-image\"");
+        }
+        else
+        {
+            throw new NucleusUserException("Unknown version strategy - not supported");
+        }
     }
 }

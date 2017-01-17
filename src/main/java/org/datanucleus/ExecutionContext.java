@@ -29,11 +29,13 @@ import org.datanucleus.exceptions.ClassNotPersistableException;
 import org.datanucleus.exceptions.NoPersistenceInformationException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusOptimisticException;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.flush.Operation;
 import org.datanucleus.flush.OperationQueue;
 import org.datanucleus.management.ManagerStatistics;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
+import org.datanucleus.metadata.VersionStrategy;
 import org.datanucleus.state.CallbackHandler;
 import org.datanucleus.state.LockManager;
 import org.datanucleus.state.ObjectProvider;
@@ -931,9 +933,25 @@ public interface ExecutionContext extends ExecutionContextReference
      */
     void deregisterExecutionContextListener(ExecutionContextListener listener);
 
-    /**
-     * Close the callback handler, and disconnect any registered instance listeners.
-     * Used by JCA.
-     */
+    /** Close the callback handler, and disconnect any registered instance listeners. Used by JCA. */
     void closeCallbackHandler();
+
+    /**
+     * Convenience method to provide the next version, using the version strategy given the supplied current version.
+     * @param versionStrategy Version strategy
+     * @param currentVersion The current version
+     * @return The next version
+     * @throws NucleusUserException Thrown if the strategy is not supported.
+     */
+    Object getNextVersion(VersionStrategy versionStrategy, Object currentVersion);
+
+    /**
+     * Perform an optimistic version check on the passed object, against the passed version in the datastore.
+     * @param op ObjectProvider of the object to check
+     * @param versionDatastore Version of the object in the datastore
+     * @param versionMetaData VersionMetaData to use for checking
+     * @throws NucleusUserException thrown when an invalid strategy is specified
+     * @throws NucleusOptimisticException thrown when the version check fails
+     */
+    void performVersionCheck(ObjectProvider op, VersionStrategy versionStrategy, Object versionDatastore);
 }
