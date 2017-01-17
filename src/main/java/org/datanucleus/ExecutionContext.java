@@ -35,6 +35,7 @@ import org.datanucleus.flush.OperationQueue;
 import org.datanucleus.management.ManagerStatistics;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
+import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.metadata.VersionStrategy;
 import org.datanucleus.state.CallbackHandler;
 import org.datanucleus.state.LockManager;
@@ -938,12 +939,12 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Convenience method to provide the next version, using the version strategy given the supplied current version.
-     * @param versionStrategy Version strategy
+     * @param vermd Metadata defining the version and its strategy
      * @param currentVersion The current version
      * @return The next version
      * @throws NucleusUserException Thrown if the strategy is not supported.
      */
-    Object getNextVersion(VersionStrategy versionStrategy, Object currentVersion);
+    Object getNextVersion(VersionMetaData vermd, Object currentVersion);
 
     /**
      * Perform an optimistic version check on the passed object, against the passed version in the datastore.

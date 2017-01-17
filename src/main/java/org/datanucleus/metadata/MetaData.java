@@ -77,6 +77,9 @@ public class MetaData implements Serializable
     /** Class : define the name of a field that will store the version of this class. */
     public static final String EXTENSION_CLASS_VERSION_FIELD_NAME = "field-name";
 
+    /** Class : initial value to use for this class for versioning (when using version-number strategy). */
+    public static final String EXTENSION_VERSION_NUMBER_INITIAL_VALUE = "version-initial-value";
+
     /** Member : name of type converter to use. */
     public final static String EXTENSION_MEMBER_TYPE_CONVERTER_NAME = "type-converter-name";
 

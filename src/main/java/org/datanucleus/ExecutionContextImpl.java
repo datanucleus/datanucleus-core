@@ -71,8 +71,10 @@ import org.datanucleus.management.ManagerStatistics;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.TransactionType;
+import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.metadata.VersionStrategy;
 import org.datanucleus.properties.BasePropertyStore;
 import org.datanucleus.state.CallbackHandler;
@@ -5571,29 +5573,32 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
-    /** Initial version value when persisting a versioned object for the first time. */
-    public static final int VERSION_INITIAL_VALUE = 1;
-
     /**
      * Convenience method to provide the next version, using the version strategy given the supplied current version.
-     * @param versionStrategy Version strategy
      * @param currentVersion The current version
      * @return The next version
      * @throws NucleusUserException Thrown if the strategy is not supported.
      */
-    public Object getNextVersion(VersionStrategy versionStrategy, Object currentVersion)
+    public Object getNextVersion(VersionMetaData vermd, Object currentVersion)
     {
+        if (vermd == null)
+        {
+            return null;
+        }
+
+        VersionStrategy versionStrategy = vermd.getVersionStrategy();
         if (versionStrategy == null)
         {
             return null;
         }
         else if (versionStrategy == VersionStrategy.NONE)
         {
-            // Just increment the version - is this really necessary?
+            // Just increment the version. TODO Remove this, the user has specified NONE as strategy, so don't update anything.
             if (currentVersion == null)
             {
-                return Long.valueOf(VERSION_INITIAL_VALUE);
+                return Long.valueOf(1);
             }
+
             if (currentVersion instanceof Integer)
             {
                 return Integer.valueOf(((Integer)currentVersion).intValue()+1);
@@ -5608,8 +5613,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             if (currentVersion == null)
             {
-                return Long.valueOf(VERSION_INITIAL_VALUE);
+                // Get the initial value from the VersionMetaData extension if provided, otherwise the global default (for the context)
+                Integer initValue = getIntProperty(PropertyNames.PROPERTY_VERSION_NUMBER_INITIAL_VALUE);
+                if (vermd.hasExtension(MetaData.EXTENSION_VERSION_NUMBER_INITIAL_VALUE))
+                {
+                    initValue = Integer.valueOf(vermd.getValueForExtension(MetaData.EXTENSION_VERSION_NUMBER_INITIAL_VALUE));
+                }
+                return Long.valueOf(initValue); // TODO If using field then return in same type as field
             }
+
             if (currentVersion instanceof Integer)
             {
                 return Integer.valueOf(((Integer)currentVersion).intValue()+1);

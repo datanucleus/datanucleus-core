@@ -305,6 +305,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultProperty(PropertyNames.PROPERTY_DETACH_DETACHED_STATE, null, "fetch-groups", CorePropertyValidator.class.getName(), false, false); // TODO Change last arg to true
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_MAX_FETCH_DEPTH, null, 1, false, true);
 
+        conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_VERSION_NUMBER_INITIAL_VALUE, null, 1, false, true);
+
         // ========================= Generally all properties below here are specified at the StoreManager level =============================
 
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL, null, false, true, false);
