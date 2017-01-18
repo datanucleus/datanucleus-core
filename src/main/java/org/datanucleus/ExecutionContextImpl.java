@@ -5593,17 +5593,20 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
         else if (versionStrategy == VersionStrategy.NONE)
         {
-            // Just increment the version. TODO Remove this, the user has specified NONE as strategy, so don't update anything.
+            // Set an initial value, otherwise return the current value
             if (currentVersion == null)
             {
-                return Long.valueOf(1);
+                if (vermd.getFieldName() != null)
+                {
+                    AbstractMemberMetaData verMmd = ((AbstractClassMetaData)vermd.getParent()).getMetaDataForMember(vermd.getFieldName());
+                    if (verMmd.getType() == Integer.class || verMmd.getType() == int.class)
+                    {
+                        return Integer.valueOf(1);
+                    }
+                }
+                return Long.valueOf(1); // Assumed to be numeric
             }
-
-            if (currentVersion instanceof Integer)
-            {
-                return Integer.valueOf(((Integer)currentVersion).intValue()+1);
-            }
-            return Long.valueOf(((Long)currentVersion).longValue()+1);
+            return currentVersion;
         }
         else if (versionStrategy == VersionStrategy.DATE_TIME)
         {
@@ -5619,7 +5622,16 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     initValue = Integer.valueOf(vermd.getValueForExtension(MetaData.EXTENSION_VERSION_NUMBER_INITIAL_VALUE));
                 }
-                return Long.valueOf(initValue); // TODO If using field then return in same type as field
+
+                if (vermd.getFieldName() != null)
+                {
+                    AbstractMemberMetaData verMmd = ((AbstractClassMetaData)vermd.getParent()).getMetaDataForMember(vermd.getFieldName());
+                    if (verMmd.getType() == Integer.class || verMmd.getType() == int.class)
+                    {
+                        return initValue;
+                    }
+                }
+                return Long.valueOf(initValue);
             }
 
             if (currentVersion instanceof Integer)
