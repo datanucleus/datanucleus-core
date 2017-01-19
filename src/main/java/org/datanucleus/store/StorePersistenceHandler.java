@@ -21,6 +21,7 @@ package org.datanucleus.store;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
+import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.state.ObjectProvider;
 
 /**
@@ -121,8 +122,7 @@ public interface StorePersistenceHandler
      * objects directly (such as ODBMS). With other types of datastores (e.g RDBMS) this method returns null.
      * @param ec The ExecutionContext
      * @param id the id of the object in question.
-     * @return a persistable object with a valid object state (for example: hollow) or null, 
-     *     indicating that the implementation leaves the instantiation work to DataNucleus.
+     * @return a persistable object with a valid object state (for example: hollow) or null, indicating that the implementation leaves the instantiation work to DataNucleus.
      * @throws NucleusObjectNotFoundException if this route is supported yet the object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
@@ -139,6 +139,18 @@ public interface StorePersistenceHandler
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
     public Object[] findObjects(ExecutionContext ec, Object[] ids);
+
+    /**
+     * Method to find the object with the specified value(s) for the member(s) of the specified type.
+     * @param ec ExecutionContext
+     * @param cmd Metadata for the class in question
+     * @param memberNames Member(s) that define the object
+     * @param values Value(s) for the member(s)
+     * @return The object with these member value(s)
+     * @throws NucleusObjectNotFoundException if an object doesn't exist
+     * @throws NucleusDataStoreException when an error occurs in the datastore communication
+     */
+    public Object findObjectForKeys(ExecutionContext ec, AbstractClassMetaData cmd, String[] memberNames, Object[] values);
 
     /**
      * Enum for the type of a batched operation

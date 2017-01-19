@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.federation;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.StorePersistenceHandler;
@@ -165,7 +166,17 @@ public class FederatedPersistenceHandler implements StorePersistenceHandler
      */
     public Object[] findObjects(ExecutionContext ec, Object[] ids)
     {
-        // TODO Auto-generated method stub
+        // TODO Find the class of the object(s) and then hand to the appropriate datastore
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.StorePersistenceHandler#findObjectForKeys(org.datanucleus.ExecutionContext, org.datanucleus.metadata.AbstractClassMetaData, java.lang.String[], java.lang.Object[])
+     */
+    @Override
+    public Object findObjectForKeys(ExecutionContext ec, AbstractClassMetaData cmd, String[] memberNames, Object[] values)
+    {
+        // TODO Find the appropriate datastore and process there
         return null;
     }
 }

@@ -21,6 +21,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.DatastoreReadOnlyException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.MetaData;
@@ -132,9 +133,18 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
         return objects;
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.StorePersistenceHandler#findObjectForKeys(org.datanucleus.ExecutionContext, org.datanucleus.metadata.AbstractClassMetaData, java.lang.String[], java.lang.Object[])
+     */
+    @Override
+    public Object findObjectForKeys(ExecutionContext ec, AbstractClassMetaData cmd, String[] memberNames, Object[] values)
+    {
+        // TODO Implement this in subclasses
+        throw new NucleusException("Finding object(s) by key values is not yet supported by this datastore");
+    }
+
     /**
-     * Convenience method to assert when this StoreManager is read-only and the specified object
-     * is attempting to be updated.
+     * Convenience method to assert when this StoreManager is read-only and the specified object is attempting to be updated.
      * @param op ObjectProvider for the object
      */
     public void assertReadOnlyForUpdateOfObject(ObjectProvider op)
