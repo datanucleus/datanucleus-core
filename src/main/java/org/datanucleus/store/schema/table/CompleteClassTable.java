@@ -549,7 +549,18 @@ public class CompleteClassTable implements Table
             this.multitenancyColumn = col;
         }
 
-        // TODO Add soft delete column when required
+        if (cmd.hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE))
+        {
+            // Add surrogate soft-delete column TODO Cater for this specified in superclass applying to this class also?
+            String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.SOFTDELETE_COLUMN);
+            Column col = addColumn(null, colName, ColumnType.SOFTDELETE_COLUMN);
+            col.setJdbcType(JdbcType.BOOLEAN);
+            if (schemaVerifier != null)
+            {
+                schemaVerifier.attributeMember(new MemberColumnMappingImpl(null, col));
+            }
+            this.softDeleteColumn = col;
+        }
 
         // Reorder all columns to respect column positioning information. Note this assumes the user has provided complete information
         List<Column> unorderedCols = new ArrayList();

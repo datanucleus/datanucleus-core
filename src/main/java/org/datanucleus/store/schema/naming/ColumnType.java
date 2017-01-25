@@ -39,5 +39,7 @@ public enum ColumnType
     /** 1-N join table column back to owner. */
     JOIN_OWNER_COLUMN,
     /** Adapter column (for join table primary-key). */
-    ADAPTER_COLUMN
+    ADAPTER_COLUMN,
+    /** Column for soft-delete. */
+    SOFTDELETE_COLUMN,
 }
