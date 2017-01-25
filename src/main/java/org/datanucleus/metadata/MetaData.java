@@ -74,6 +74,12 @@ public class MetaData implements Serializable
     /** Class : when using multitenancy, defines the jdbc-type used for the mutitenancy discriminator column. */
     public static final String EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE = "multitenancy-jdbc-type";
 
+    /** Class : when the class will use soft deletion (deletion flag column) rather than actually deleting objects. */
+    public static final String EXTENSION_CLASS_SOFTDELETE = "softdelete";
+
+    /** Class : when the class will use soft deletion, specifies the column name to use. */
+    public static final String EXTENSION_CLASS_SOFTDELETE_COLUMN_NAME = "softdelete-column-name";
+
     /** Class : define the name of a field that will store the version of this class. */
     public static final String EXTENSION_CLASS_VERSION_FIELD_NAME = "field-name";
 

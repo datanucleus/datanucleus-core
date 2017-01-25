@@ -85,6 +85,8 @@ public class CompleteClassTable implements Table
 
     Column multitenancyColumn;
 
+    Column softDeleteColumn;
+
     // TODO Support create-timestamp surrogate
     // TODO Support update-timestamp surrogate
     /** Map of member-column mapping, keyed by the metadata for the member. */
@@ -546,6 +548,8 @@ public class CompleteClassTable implements Table
             }
             this.multitenancyColumn = col;
         }
+
+        // TODO Add soft delete column when required
 
         // Reorder all columns to respect column positioning information. Note this assumes the user has provided complete information
         List<Column> unorderedCols = new ArrayList();
@@ -1148,6 +1152,10 @@ public class CompleteClassTable implements Table
         else if (colType == SurrogateColumnType.UPDATE_TIMESTAMP)
         {
             // TODO Support this
+        }
+        else if (colType == SurrogateColumnType.SOFTDELETE)
+        {
+            return softDeleteColumn;
         }
         return null;
     }
