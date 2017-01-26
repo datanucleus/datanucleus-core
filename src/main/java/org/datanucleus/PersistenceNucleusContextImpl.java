@@ -306,6 +306,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_MAX_FETCH_DEPTH, null, 1, false, true);
 
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_VERSION_NUMBER_INITIAL_VALUE, null, 1, false, true);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_RELATION_IDENTITY_STORAGE_MODE, null, StoreManager.RELATION_IDENTITY_STORAGE_PERSISTABLE_IDENTITY, null, false, false);
 
         // ========================= Generally all properties below here are specified at the StoreManager level =============================
 

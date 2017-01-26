@@ -75,6 +75,8 @@ public class PropertyNames
     public static final String PROPERTY_IDENTITY_KEY_TRANSLATOR_TYPE = "datanucleus.identityKeyTranslatorType";
     public static final String PROPERTY_USE_IMPLEMENTATION_CREATOR = "datanucleus.useImplementationCreator";
 
+    public static final String PROPERTY_RELATION_IDENTITY_STORAGE_MODE = "datanucleus.relation.identityStorageMode";
+
     public static final String PROPERTY_VERSION_NUMBER_INITIAL_VALUE = "datanucleus.version.versionNumber.initialValue";
 
     public static final String PROPERTY_JMX_TYPE = "datanucleus.jmxType";

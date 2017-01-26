@@ -103,6 +103,8 @@ public interface StoreManager
     public static final String OPTION_DATASTORE_TIME_STORES_MILLISECS = "Datastore.Time.Millisecs";
     public static final String OPTION_DATASTORE_TIME_STORES_NANOSECS = "Datastore.Time.Nanosecs";
 
+    public static final String RELATION_IDENTITY_STORAGE_PERSISTABLE_IDENTITY = "PersistableIdentity";
+
     /**
      * Strings representing features that are supported by this datastore.
      * Refer to the Strings in org.datanucleus.store.StoreManager with prefix "OPTION_".
