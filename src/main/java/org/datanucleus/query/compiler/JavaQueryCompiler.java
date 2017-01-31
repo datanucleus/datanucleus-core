@@ -305,6 +305,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                     Class joinedCls = joinedSym.getValueType();
                     while (joinedNode.getFirstChild() != null)
                     {
+                        Node prevNode = joinedNode;
                         joinedNode = joinedNode.getFirstChild();
                         String joinedMember = (String)joinedNode.getNodeValue();
                         if (joinedNode.getNodeType() == NodeType.CAST)
@@ -318,6 +319,22 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                             }
                             joinedCls = clr.classForName(castTypeName);
                             joinedNode.setNodeValue(castTypeName); // Update cast type now that we have resolved it
+                        }
+                        else if (joinedNode.getNodeType() == NodeType.INVOKE)
+                        {
+                            if (joinedNode.getNodeValue().equals("mapKey"))
+                            {
+                                // JOIN to KEY(...)
+                                NucleusLogger.GENERAL.info(">> mapKey found! joinedMember=" + joinedMember + " prevNode=" + prevNode);
+                                throw new NucleusUserException("We do not currently support use of KEY(...) in the FROM clause : " + joinedNode);
+                            }
+                            else if (joinedNode.getNodeValue().equals("mapValue"))
+                            {
+                                // JOIN to VALUE(...)
+                                NucleusLogger.GENERAL.info(">> mapValue found! joinedMember=" + joinedMember + " prevNode=" + prevNode);
+                                throw new NucleusUserException("We do not currently support use of VALUE(...) in the FROM clause : " + joinedNode);
+                            }
+                            throw new NucleusUserException("We do not currently support method invocation in the FROM clause : " + joinedNode);
                         }
                         else
                         {

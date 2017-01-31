@@ -413,6 +413,28 @@ public class JPQLParser extends AbstractParser
                     Node joinedAliasNode = new Node(NodeType.NAME, alias);
                     joinNode.appendChildNode(joinedAliasNode);
                 }
+                else if (processKey()) // TODO Can we chain fields/methods off a KEY ?
+                {
+                    Node keyNode = stack.pop();
+                    joinNode.appendChildNode(keyNode);
+
+                    // And the alias we know this joined field by
+                    lexer.parseStringIgnoreCase("AS "); // Optional
+                    String alias = lexer.parseName();
+                    Node joinedAliasNode = new Node(NodeType.NAME, alias);
+                    joinNode.appendChildNode(joinedAliasNode);
+                }
+                else if (processValue()) // TODO Can we chain fields/methods off a VALUE ?
+                {
+                    Node valNode = stack.pop();
+                    joinNode.appendChildNode(valNode);
+
+                    // And the alias we know this joined field by
+                    lexer.parseStringIgnoreCase("AS "); // Optional
+                    String alias = lexer.parseName();
+                    Node joinedAliasNode = new Node(NodeType.NAME, alias);
+                    joinNode.appendChildNode(joinedAliasNode);
+                }
                 else
                 {
                     // Joining to an identifier with alias : "path_expression [AS alias]"
@@ -1561,6 +1583,7 @@ public class JPQLParser extends AbstractParser
                     lastNode = top;
                 }
             }
+
             return true;
         }
         return false;
