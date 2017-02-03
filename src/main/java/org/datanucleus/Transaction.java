@@ -26,13 +26,13 @@ import javax.transaction.Synchronization;
 import org.datanucleus.exceptions.NucleusUserException;
 
 /**
- * Representation of a transaction within DataNucleus. This interface is not user application visible.
+ * Representation of an ExecutionContext transaction within DataNucleus. This interface is not user application visible.
  * 
  * Handling of transactions in DataNucleus is split into 4 layers:
  * <ul>
  * <li>API - The User Visible Transaction API</li>
  * <li>ExecutionContext Transaction - The Transaction assigned to an ExecutionContext</li>
- * <li>X/Open/JTA - The Transaction Manager associated to the underlying datastore transaction</li>
+ * <li>X/Open/JTA - The ResourcedTransactionManager managing ResourcedTransaction associated to the underlying datastore transaction</li>
  * <li>Resource - The Transaction handled by the datastore</li>
  * </ul>
  *
@@ -43,26 +43,24 @@ import org.datanucleus.exceptions.NucleusUserException;
  * <li>{@link javax.transaction.UserTransaction} - the JTA API interface</li>
  * </ul>
  *
- * In the ExecutionContext layer, the {@link org.datanucleus.Transaction} interface defines the contract
- * for handling transactions for the ExecutionContext.
- * 
+ * In the ExecutionContext layer, the {@link org.datanucleus.Transaction} interface defines the contract for handling transactions for the ExecutionContext.
+ * <p>
  * In the X/Open/JTA layer the handling of XA resources is done. It means, XAResources are
  * obtained and enlisted to a TransactionManager. The TransactionManager will commit or rollback the resources
  * at the end of the transactions. There are two kinds of TransactionManager: DataNucleus and JTA. A
  * JTA TransactionManager is external to DataNucleus, while the DataNucleus TransactionManager is implemented
  * by DataNucleus as {@link org.datanucleus.transaction}. The DataNucleus TransactionManager is used when the DataSource used
  * to obtain connections to the underlying database is not enlisted in an external JTA TransactionManager.
- * The JTA TransactionManager is usually found when running in J2EE application servers, however
- * nowadays there are many JTA containers that can be used in J2SE.
- * 
+ * The JTA TransactionManager is usually found when running in JavaEE application servers, however
+ * nowadays there are many JTA containers that can be used in JavaSE.
+ * <p>
  * The scenarios where a JTA TransactionManager is used is:
  * When an JTA TransactionManager exists, and the connections to the underlying databases
  * are acquired via transactional DataSources. That means, when you ask a connection to the DataSource,
  * it will automatically enlist it in a JTA TransactionManager.
- *   
- * The Resource layer is handled by the datastore. For example, with RDBMS databases,
- * the javax.sql.Connection is the API used to demarcate the database transactions. In The RBDMS database,
- * the resource layer, it is handling the database transaction.
+ * <p>
+ * The Resource layer is handled by the datastore. For example, with RDBMS databases, the javax.sql.Connection is the API used to demarcate the database transactions. 
+ * In an RBDMS database, the resource layer is handling the database transaction.
  * 
  * For a treatment of isolation levels, refer to http://www.cs.umb.edu/~poneil/iso.pdf
  */ 

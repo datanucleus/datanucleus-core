@@ -34,30 +34,21 @@ import org.datanucleus.util.NucleusLogger;
 import org.omg.CORBA.SystemException;
 
 /**
- * Transaction.
- * The Global Transaction ID is formed as: TX-{final static random int}-{static seq}-{current time millis}
+ * Transaction allowing resources to be enlisted, with branches and phased commit, following the style of an Open/XA transaction.
+ * Enlisted resources are typically datastore resources which, in turn, need committing.
  */
-public class Transaction
+public class ResourcedTransaction
 {
-    public final static int STATUS_ACTIVE = 0;
-
-    public final static int STATUS_MARKED_ROLLBACK = 1;
-
-    public final static int STATUS_PREPARED = 2;
-
-    public final static int STATUS_COMMITTED = 3;
-
-    public final static int STATUS_ROLLEDBACK = 4;
-
-    public final static int STATUS_UNKNOWN = 5;
-
-    public final static int STATUS_NO_TRANSACTION = 6;
-
-    public final static int STATUS_PREPARING = 7;
-
-    public final static int STATUS_COMMITTING = 8;
-
-    public final static int STATUS_ROLLING_BACK = 9;
+    final static int STATUS_ACTIVE = 0;
+    final static int STATUS_MARKED_ROLLBACK = 1;
+    final static int STATUS_PREPARED = 2;
+    final static int STATUS_COMMITTED = 3;
+    final static int STATUS_ROLLEDBACK = 4;
+    final static int STATUS_UNKNOWN = 5;
+    final static int STATUS_NO_TRANSACTION = 6;
+    final static int STATUS_PREPARING = 7;
+    final static int STATUS_COMMITTING = 8;
+    final static int STATUS_ROLLING_BACK = 9;
 
     /** id of this instance **/
     private static final int NODE_ID = NucleusContextHelper.random.nextInt();
@@ -92,9 +83,12 @@ public class Transaction
     /** suspended branches **/
     private Map<XAResource, Xid> suspendedResources = new HashMap();
 
-    Transaction()
+    private final String idString;
+
+    ResourcedTransaction()
     {
         xid = new XidImpl(NODE_ID, 0, NEXT_GLOBAL_TRANSACTION_ID++);
+        idString = "" + NODE_ID + "-" + (NEXT_GLOBAL_TRANSACTION_ID-1);
         if (NucleusLogger.TRANSACTION.isDebugEnabled())
         {
             NucleusLogger.TRANSACTION.debug("Transaction created " + toString());
@@ -146,7 +140,8 @@ public class Transaction
         return false;
     }
 
-    public boolean enlistResource(XAResource xaRes) throws RollbackException, IllegalStateException, SystemException
+    public boolean enlistResource(XAResource xaRes) 
+    throws RollbackException, IllegalStateException, SystemException
     {
         if (xaRes == null)
         {
@@ -164,8 +159,7 @@ public class Transaction
             throw new IllegalStateException();
         }
 
-        // Preventing two branches from being active at the same time on the
-        // same resource manager
+        // Preventing two branches from being active at the same time on the same resource manager
         Xid activeXid = activeBranches.get(xaRes);
         if (activeXid != null)
         {
@@ -230,7 +224,8 @@ public class Transaction
         return true;
     }
 
-    public boolean delistResource(XAResource xaRes, int flag) throws IllegalStateException, SystemException
+    public boolean delistResource(XAResource xaRes, int flag) 
+    throws IllegalStateException, SystemException
     {
         if (xaRes == null)
         {
@@ -278,7 +273,8 @@ public class Transaction
         return true;
     }
 
-    public void registerSynchronization(Synchronization sync) throws RollbackException, IllegalStateException, SystemException
+    public void registerSynchronization(Synchronization sync)
+    throws RollbackException, IllegalStateException, SystemException
     {
         if (sync == null)
         {
@@ -300,12 +296,7 @@ public class Transaction
     }
 
     public void commit()
-        throws RollbackException,
-        HeuristicMixedException,
-        HeuristicRollbackException,
-        SecurityException,
-        IllegalStateException,
-        SystemException
+    throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException
     {
         if (completing)
         {
@@ -516,7 +507,8 @@ public class Transaction
         }
     }
 
-    public void rollback() throws IllegalStateException, SystemException
+    public void rollback() 
+    throws IllegalStateException, SystemException
     {
         if (completing)
         {
@@ -577,7 +569,8 @@ public class Transaction
         }
     }
 
-    public void setRollbackOnly() throws IllegalStateException, SystemException
+    public void setRollbackOnly()
+    throws IllegalStateException, SystemException
     {
         status = STATUS_MARKED_ROLLBACK;
     }
@@ -676,6 +669,6 @@ public class Transaction
         {
             resString = enlistedResources.toString();
         }
-        return "[DataNucleus Transaction, ID=" + xid.toString() + ", enlisted resources=" + resString + "]";
+        return "[DataNucleus Transaction, ID=" + idString + ", enlisted resources=" + resString + "]";
     }
 }

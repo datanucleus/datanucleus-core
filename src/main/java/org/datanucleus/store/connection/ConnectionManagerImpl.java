@@ -29,7 +29,7 @@ import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.TransactionEventListener;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.federation.FederatedStoreManager;
-import org.datanucleus.transaction.Transaction;
+import org.datanucleus.transaction.ResourcedTransaction;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -269,7 +269,7 @@ public class ConnectionManagerImpl implements ConnectionManager
 
                         // Enlist the connection resource if is not enlisted and has enlistable resource
                         XAResource res = mconnFromPool.getXAResource();
-                        Transaction tx = nucleusContext.getTransactionManager().getTransaction(ec);
+                        ResourcedTransaction tx = nucleusContext.getTransactionManager().getTransaction(ec);
                         if (res != null && tx != null && !tx.isEnlisted(res))
                         {
                             String cfResourceType = factory.getResourceType();
@@ -308,7 +308,7 @@ public class ConnectionManagerImpl implements ConnectionManager
             {
                 // Connection is "managed", and enlist with txn
                 configureTransactionEventListener(transaction, mconn);
-                Transaction tx = nucleusContext.getTransactionManager().getTransaction(ec);
+                ResourcedTransaction tx = nucleusContext.getTransactionManager().getTransaction(ec);
                 mconn.setCommitOnRelease(false); //must be set before getting the XAResource
                 mconn.setCloseOnRelease(false); //must be set before getting the XAResource
 

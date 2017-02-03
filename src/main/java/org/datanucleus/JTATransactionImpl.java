@@ -29,7 +29,6 @@ import javax.transaction.NotSupportedException;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
 import org.datanucleus.exceptions.NucleusException;
@@ -64,9 +63,10 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         NO_TXN, IMPOSSIBLE, JOINED
     }
 
-    private TransactionManager jtaTM;
+    /** JTA TransactionManager. */
+    private javax.transaction.TransactionManager jtaTM;
 
-    /** Underlying JTA txn we are currently synced with. Null when no JTA transaction active or not yet joined. */
+    /** JTA Transaction that we are currently synced with. Null when no JTA transaction active or not yet joined. */
     private javax.transaction.Transaction jtaTx;
 
     private JTASyncRegistry jtaSyncRegistry;
@@ -91,10 +91,8 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
 
         // we only make sense in combination with ResourceType.JTA. Verify this has been set.
         Configuration conf = ec.getNucleusContext().getConfiguration();
-        if (!(ConnectionResourceType.JTA.toString().equalsIgnoreCase(conf.getStringProperty(
-                ConnectionFactory.DATANUCLEUS_CONNECTION_RESOURCE_TYPE)) && 
-            ConnectionResourceType.JTA.toString().equalsIgnoreCase(conf.getStringProperty(
-                ConnectionFactory.DATANUCLEUS_CONNECTION2_RESOURCE_TYPE))))
+        if (!(ConnectionResourceType.JTA.toString().equalsIgnoreCase(conf.getStringProperty(ConnectionFactory.DATANUCLEUS_CONNECTION_RESOURCE_TYPE)) && 
+            ConnectionResourceType.JTA.toString().equalsIgnoreCase(conf.getStringProperty(ConnectionFactory.DATANUCLEUS_CONNECTION2_RESOURCE_TYPE))))
         {
             throw new NucleusException("Internal error: either " +
                 ConnectionFactory.DATANUCLEUS_CONNECTION_RESOURCE_TYPE + " or " +
@@ -146,7 +144,6 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
             try
             {
                 javax.transaction.Transaction txn = jtaTM.getTransaction();
-                int txnstat = jtaTM.getStatus();
                 if (jtaTx != null && !jtaTx.equals(txn))
                 {
                     // changed transaction, clear saved jtaTxn, reset join status and reprocess
@@ -164,7 +161,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
                     if (jtaTx == null)
                     {
                         jtaTx = txn;
-                        boolean allow_join = txnstat == Status.STATUS_ACTIVE;
+                        boolean allow_join = (jtaTM.getStatus() == Status.STATUS_ACTIVE);
                         if (allow_join)
                         {
                             joinStatus = JoinStatus.IMPOSSIBLE;
@@ -180,8 +177,8 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
                                     // Register via Transaction
                                     jtaTx.registerSynchronization(this);
                                 }
-                                boolean was_active = super.isActive();
-                                if (!was_active)
+
+                                if (!super.isActive())
                                 {
                                     // the transaction is active here
                                     internalBegin();
@@ -216,6 +213,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         {
             return false;
         }
+
         int txnStatus = getTransactionStatus();
         if (txnStatus == Status.STATUS_COMMITTED || txnStatus == Status.STATUS_ROLLEDBACK)
         {
@@ -266,7 +264,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         try
         {
             Context ctx = new InitialContext();
-            if (JBOSS_SERVER)
+            if (JBOSS_SERVER) // TODO If JBoss starts using the JavaEE standard location, we need to cater for it
             {
                 // JBoss unfortunately doesn't always provide UserTransaction at the JavaEE standard location, see e.g. http://docs.jboss.org/admin-devel/Chap4.html
                 utx = (UserTransaction) ctx.lookup("UserTransaction");
@@ -278,7 +276,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         }
         catch (NamingException e)
         {
-            throw ec.getApiAdapter().getUserExceptionForException("Failed to obtain UserTransaction", e);
+            throw ec.getApiAdapter().getUserExceptionForException("Failed to obtain JTA UserTransaction", e);
         }
 
         try
@@ -287,13 +285,13 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         }
         catch (NotSupportedException|SystemException e)
         {
-            throw ec.getApiAdapter().getUserExceptionForException("Failed to begin UserTransaction", e);
+            throw ec.getApiAdapter().getUserExceptionForException("Failed to begin JTA UserTransaction", e);
         }
 
         joinTransaction();
         if (joinStatus != JoinStatus.JOINED)
         {
-            throw new NucleusTransactionException("Cannot join an auto started UserTransaction");
+            throw new NucleusTransactionException("Cannot join an auto started JTA UserTransaction");
         }
         userTransaction = utx;
     }
@@ -305,7 +303,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
     {
         if (userTransaction == null)
         {
-            throw new NucleusTransactionException("No internal UserTransaction");
+            throw new NucleusTransactionException("No internal JTA UserTransaction");
         }
 
         try
@@ -314,7 +312,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         }
         catch (Exception e)
         {
-            throw ec.getApiAdapter().getUserExceptionForException("Failed to commit UserTransaction", e);
+            throw ec.getApiAdapter().getUserExceptionForException("Failed to commit JTA UserTransaction", e);
         }
         finally
         {
@@ -329,7 +327,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
     {
         if (userTransaction == null)
         {
-            throw new NucleusTransactionException("No internal UserTransaction");
+            throw new NucleusTransactionException("No internal JTA UserTransaction");
         }
 
         try
@@ -338,7 +336,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         }
         catch (Exception e)
         {
-            throw ec.getApiAdapter().getUserExceptionForException("Failed to rollback UserTransaction", e);
+            throw ec.getApiAdapter().getUserExceptionForException("Failed to rollback JTA UserTransaction", e);
         }
         finally
         {
@@ -354,7 +352,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
     {
         if (userTransaction == null)
         {
-            throw new NucleusTransactionException("No internal UserTransaction");
+            throw new NucleusTransactionException("No internal JTA UserTransaction");
         }
 
         try
@@ -363,7 +361,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         }
         catch (Exception e)
         {
-            throw ec.getApiAdapter().getUserExceptionForException("Failed to rollback-only UserTransaction", e);
+            throw ec.getApiAdapter().getUserExceptionForException("Failed to rollback-only JTA UserTransaction", e);
         }
     }
 

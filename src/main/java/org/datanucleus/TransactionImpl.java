@@ -37,21 +37,21 @@ import org.datanucleus.transaction.HeuristicMixedException;
 import org.datanucleus.transaction.HeuristicRollbackException;
 import org.datanucleus.transaction.NucleusTransactionException;
 import org.datanucleus.transaction.RollbackException;
-import org.datanucleus.transaction.TransactionManager;
+import org.datanucleus.transaction.ResourcedTransactionManager;
 import org.datanucleus.transaction.TransactionUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Implementation of a transaction for a datastore. See {@link org.datanucleus.Transaction}.
+ * Implementation of a transaction for an ExecutionContext, for a datastore. See {@link org.datanucleus.Transaction}.
  * This is not thread-safe.
  */
 public class TransactionImpl implements Transaction
 {
     ExecutionContext ec;
 
-    TransactionManager txnMgr;
+    ResourcedTransactionManager txnMgr;
 
     /** Whether the transaction is active. */
     boolean active = false;
@@ -524,7 +524,7 @@ public class TransactionImpl implements Transaction
      */
     protected void internalRollback()
     {
-        org.datanucleus.transaction.Transaction tx = txnMgr.getTransaction(ec);
+        org.datanucleus.transaction.ResourcedTransaction tx = txnMgr.getTransaction(ec);
         if (tx != null)
         {
             if (ec.getMultithreaded())

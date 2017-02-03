@@ -25,15 +25,15 @@ import org.datanucleus.ExecutionContext;
 /**
  * TransactionManager is facade for creating (Open/XA) transactions.
  * A cache of transactions is held with each transaction for a user object.
- * If using with a multithreaded PM/EM then you must lock access external to TransactionManager since
- * this is for a PMF/EMF.
+ * If using with a multithreaded PM/EM then you must lock access external to TransactionManager since this is for a PMF/EMF.
+ * TODO Consider merging this into org.datanucleus.TransactionImpl.
  */
-public class TransactionManager
+public class ResourcedTransactionManager
 {
     private boolean containerManagedConnections = false;
 
     /** Map of transaction keyed by the ExecutionContext that it is for. */
-    private Map<ExecutionContext, Transaction> txnForExecutionContext = new ConcurrentHashMap<ExecutionContext, Transaction>();
+    private Map<ExecutionContext, ResourcedTransaction> txnForExecutionContext = new ConcurrentHashMap<ExecutionContext, ResourcedTransaction>();
 
     public void setContainerManagedConnections(boolean flag)
     {
@@ -46,12 +46,12 @@ public class TransactionManager
         {
             throw new NucleusTransactionException("Invalid state. Transaction has already started");
         }
-        txnForExecutionContext.put(ec, new Transaction());
+        txnForExecutionContext.put(ec, new ResourcedTransaction());
     }
 
     public void commit(ExecutionContext ec)
     {
-        Transaction tx = txnForExecutionContext.get(ec);
+        ResourcedTransaction tx = txnForExecutionContext.get(ec);
         if (tx == null)
         {
             throw new NucleusTransactionException("Invalid state. Transaction does not exist");
@@ -72,7 +72,7 @@ public class TransactionManager
 
     public void rollback(ExecutionContext ec)
     {
-        Transaction tx = txnForExecutionContext.get(ec);
+        ResourcedTransaction tx = txnForExecutionContext.get(ec);
         if (tx == null)
         {
             throw new NucleusTransactionException("Invalid state. Transaction does not exist");
@@ -91,7 +91,7 @@ public class TransactionManager
         }
     }
 
-    public Transaction getTransaction(ExecutionContext ec)
+    public ResourcedTransaction getTransaction(ExecutionContext ec)
     {
         if (ec == null)
         {
@@ -102,7 +102,7 @@ public class TransactionManager
 
     public void setRollbackOnly(ExecutionContext ec)
     {
-        Transaction tx = txnForExecutionContext.get(ec);
+        ResourcedTransaction tx = txnForExecutionContext.get(ec);
         if (tx == null)
         {
             throw new NucleusTransactionException("Invalid state. Transaction does not exist");
@@ -115,12 +115,12 @@ public class TransactionManager
         throw new UnsupportedOperationException();        
     }
 
-    public void resume(ExecutionContext ec, Transaction tx)
+    public void resume(ExecutionContext ec, ResourcedTransaction tx)
     {
         throw new UnsupportedOperationException();        
     }
 
-    public Transaction suspend(ExecutionContext ec)
+    public ResourcedTransaction suspend(ExecutionContext ec)
     {
         throw new UnsupportedOperationException();        
     }

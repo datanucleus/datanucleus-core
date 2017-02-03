@@ -73,7 +73,7 @@ import org.datanucleus.store.schema.SchemaScriptAwareStoreManager;
 import org.datanucleus.store.schema.SchemaTool;
 import org.datanucleus.store.schema.SchemaTool.Mode;
 import org.datanucleus.transaction.NucleusTransactionException;
-import org.datanucleus.transaction.TransactionManager;
+import org.datanucleus.transaction.ResourcedTransactionManager;
 import org.datanucleus.transaction.jta.JTASyncRegistry;
 import org.datanucleus.transaction.jta.JTASyncRegistryUnavailableException;
 import org.datanucleus.transaction.jta.TransactionManagerFinder;
@@ -110,7 +110,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     private Level2Cache cache;
 
     /** Transaction Manager. */
-    private transient TransactionManager txManager = null;
+    private transient ResourcedTransactionManager txManager = null;
 
     /** JTA Transaction Manager (if using JTA). */
     private transient javax.transaction.TransactionManager jtaTxManager = null;
@@ -1221,11 +1221,11 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
      * @see org.datanucleus.NucleusContext#getTransactionManager()
      */
     @Override
-    public synchronized TransactionManager getTransactionManager()
+    public synchronized ResourcedTransactionManager getTransactionManager()
     {
         if (txManager == null)
         {
-            txManager = new TransactionManager();
+            txManager = new ResourcedTransactionManager();
         }
         return txManager;
     }

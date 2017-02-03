@@ -23,7 +23,6 @@ import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
 
 import org.datanucleus.properties.PropertyStore;
 import org.datanucleus.transaction.NucleusTransactionException;
@@ -37,7 +36,7 @@ import org.datanucleus.util.StringUtils;
  */
 public class JTAJCATransactionImpl extends TransactionImpl implements Synchronization 
 {
-    private TransactionManager jtaTM;
+    private javax.transaction.TransactionManager jtaTM;
 
     /** JTA transaction we currently are synchronized with. Null when there is no JTA transaction active or not yet detected. */
     private javax.transaction.Transaction jtaTx;
@@ -114,8 +113,7 @@ public class JTAJCATransactionImpl extends TransactionImpl implements Synchroniz
             {
                 if (!ec.getNucleusContext().isJcaMode()) // TODO Aren't we always in JCA mode with this class?
                 {
-                    //in JCA mode, we do not register Synchronization
-                    // TODO Use JtaSyncRegistry if available?
+                    //in JCA mode, we do not register Synchronization TODO Use JtaSyncRegistry if available?
                     jtaTx.registerSynchronization(this);
                 }                
 
@@ -125,18 +123,12 @@ public class JTAJCATransactionImpl extends TransactionImpl implements Synchroniz
             else
             {
                 // jtaTx can be null when there is no active transaction.
-                // There is no app-server agnostic way of getting notified
-                // when a global transaction has started. Instead, we
-                // poll for jtaTx' status in getConnection() and isActive()
+                // There is no app-server agnostic way of getting notified when a global transaction has started. Instead, we poll for jtaTx' status in getConnection() and isActive()
 
-                // If a transaction was marked for rollback before we could
-                // register synchronisation, we won't be called back when it
-                // is rolled back
+                // If a transaction was marked for rollback before we could register synchronisation, we won't be called back when it is rolled back
                 if (markedForRollback)
                 {
-                    // as jtaTx is null there is no active transaction, meaning
-                    // that the jtaTx was actually rolled back after it had
-                    // been marked for rollback: catch up
+                    // as jtaTx is null there is no active transaction, meaning that the jtaTx was actually rolled back after it had been marked for rollback: catch up
                     rollback();
                     markedForRollback = false;
                 }
@@ -149,8 +141,7 @@ public class JTAJCATransactionImpl extends TransactionImpl implements Synchroniz
         catch (RollbackException e)
         {
             NucleusLogger.TRANSACTION.error("Exception while joining transaction: " + StringUtils.getStringFromStackTrace(e));
-            // tx is marked for rollback: leave registeredSynchronizationOnJtaTx==false
-            // so that we try to register again next time we're called
+            // tx is marked for rollback: leave registeredSynchronizationOnJtaTx==false so that we try to register again next time we're called
         }
     }
 
