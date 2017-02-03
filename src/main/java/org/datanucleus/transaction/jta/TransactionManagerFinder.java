@@ -49,29 +49,12 @@ public class TransactionManagerFinder
      */
     public TransactionManager getTransactionManager(ClassLoaderResolver clr)
     {
-        String jtaLocatorName = nucleusContext.getConfiguration().getStringProperty(
-            PropertyNames.PROPERTY_TRANSACTION_JTA_LOCATOR);
+        String jtaLocatorName = nucleusContext.getConfiguration().getStringProperty(PropertyNames.PROPERTY_TRANSACTION_JTA_LOCATOR);
         PluginManager pluginMgr = nucleusContext.getPluginManager();
-        if (jtaLocatorName != null)
-        {
-            // User has specified which locator to use
-            try
-            {
-                TransactionManagerLocator locator = (TransactionManagerLocator)pluginMgr.createExecutableExtension(
-                        "org.datanucleus.jta_locator", "name", jtaLocatorName, 
-                        "class-name", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusContext});
-                return locator.getTransactionManager(clr);
-            }
-            catch (Exception e)
-            {
-                // Ignore any errors
-            }
-        }
-        else
+        if ("autodetect".equalsIgnoreCase(jtaLocatorName) || jtaLocatorName == null)
         {
             // Cycle through all available locators and find one that returns a TransactionManager
-            String[] locatorNames = pluginMgr.getAttributeValuesForExtension(
-                "org.datanucleus.jta_locator", null, null, "name");
+            String[] locatorNames = pluginMgr.getAttributeValuesForExtension("org.datanucleus.jta_locator", null, null, "name");
             if (locatorNames != null)
             {
                 for (int i=0;i<locatorNames.length;i++)
@@ -95,6 +78,21 @@ public class TransactionManagerFinder
                         // Ignore any errors
                     }
                 }
+            }
+        }
+        else
+        {
+            // User has specified which locator to use
+            try
+            {
+                TransactionManagerLocator locator = (TransactionManagerLocator)pluginMgr.createExecutableExtension(
+                        "org.datanucleus.jta_locator", "name", jtaLocatorName, 
+                        "class-name", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusContext});
+                return locator.getTransactionManager(clr);
+            }
+            catch (Exception e)
+            {
+                // Ignore any errors
             }
         }
         return null;

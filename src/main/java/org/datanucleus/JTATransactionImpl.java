@@ -268,8 +268,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
             Context ctx = new InitialContext();
             if (JBOSS_SERVER)
             {
-                // JBoss unfortunately doesn't always provide UserTransaction at the JavaEE standard location
-                // see e.g. http://docs.jboss.org/admin-devel/Chap4.html
+                // JBoss unfortunately doesn't always provide UserTransaction at the JavaEE standard location, see e.g. http://docs.jboss.org/admin-devel/Chap4.html
                 utx = (UserTransaction) ctx.lookup("UserTransaction");
             }
             else
@@ -286,11 +285,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         {
             utx.begin();
         }
-        catch (NotSupportedException e)
-        {
-            throw ec.getApiAdapter().getUserExceptionForException("Failed to begin UserTransaction", e);
-        }
-        catch (SystemException e)
+        catch (NotSupportedException|SystemException e)
         {
             throw ec.getApiAdapter().getUserExceptionForException("Failed to begin UserTransaction", e);
         }
@@ -385,9 +380,10 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         try
         {
             flush();
-            // internalPreCommit() can lead to new updates performed by usercode  
-            // in the Synchronization.beforeCompletion() callback
+
+            // internalPreCommit() can lead to new updates performed by usercode in the Synchronization.beforeCompletion() callback
             internalPreCommit();
+
             flush();
             success = true;
         }

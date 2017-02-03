@@ -203,7 +203,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
 
         // Transactions
         conf.addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_TYPE, null, null, CorePropertyValidator.class.getName(), false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_JTA_LOCATOR, null, null, null, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_JTA_LOCATOR, null, "autodetect", null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_JTA_JNDI_LOCATION, null, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION, null, "read-committed", CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_NONTX_READ, null, true, false, true);

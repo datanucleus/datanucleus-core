@@ -2750,13 +2750,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 return cls.newInstance();
             }
-            catch (IllegalAccessException iae)
+            catch (IllegalAccessException|InstantiationException e)
             {
-                throw new NucleusUserException(iae.toString(), iae);
-            }
-            catch (InstantiationException ie)
-            {
-                throw new NucleusUserException(ie.toString(), ie);
+                throw new NucleusUserException(e.toString(), e);
             }
         }
 
