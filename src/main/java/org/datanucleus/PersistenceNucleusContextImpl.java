@@ -1221,7 +1221,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
      * @see org.datanucleus.NucleusContext#getTransactionManager()
      */
     @Override
-    public synchronized ResourcedTransactionManager getTransactionManager()
+    public synchronized ResourcedTransactionManager getResourcedTransactionManager()
     {
         if (txManager == null)
         {

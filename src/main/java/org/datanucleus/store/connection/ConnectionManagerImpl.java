@@ -269,7 +269,7 @@ public class ConnectionManagerImpl implements ConnectionManager
 
                         // Enlist the connection resource if is not enlisted and has enlistable resource
                         XAResource res = mconnFromPool.getXAResource();
-                        ResourcedTransaction tx = nucleusContext.getTransactionManager().getTransaction(ec);
+                        ResourcedTransaction tx = nucleusContext.getResourcedTransactionManager().getTransaction(ec);
                         if (res != null && tx != null && !tx.isEnlisted(res))
                         {
                             String cfResourceType = factory.getResourceType();
@@ -308,7 +308,7 @@ public class ConnectionManagerImpl implements ConnectionManager
             {
                 // Connection is "managed", and enlist with txn
                 configureTransactionEventListener(transaction, mconn);
-                ResourcedTransaction tx = nucleusContext.getTransactionManager().getTransaction(ec);
+                ResourcedTransaction tx = nucleusContext.getResourcedTransactionManager().getTransaction(ec);
                 mconn.setCommitOnRelease(false); //must be set before getting the XAResource
                 mconn.setCloseOnRelease(false); //must be set before getting the XAResource
 

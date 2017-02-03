@@ -95,7 +95,7 @@ public class TransactionImpl implements Transaction
     {
         this.ec = ec;
         this.ecListener = (TransactionEventListener) ec;
-        this.txnMgr = ec.getNucleusContext().getTransactionManager();
+        this.txnMgr = ec.getNucleusContext().getResourcedTransactionManager();
         this.properties = properties;
         
         Configuration config = ec.getNucleusContext().getConfiguration();

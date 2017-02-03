@@ -75,7 +75,7 @@ public interface PersistenceNucleusContext extends StoreNucleusContext
 
     ImplementationCreator getImplementationCreator();
 
-    ResourcedTransactionManager getTransactionManager();
+    ResourcedTransactionManager getResourcedTransactionManager();
 
     /**
      * Accessor for the JTA transaction manager (if using JTA).
