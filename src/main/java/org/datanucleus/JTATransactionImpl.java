@@ -188,6 +188,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
                             {
                                 throw new NucleusTransactionException("Cannot register Synchronization to a valid JTA Transaction", e);
                             }
+                            NucleusLogger.TRANSACTION.debug("JTA transaction for ExecutionContext=" + ec + " has JOINED to its UserTransaction");
                             joinStatus = JoinStatus.JOINED;
                         }
                         else
@@ -264,10 +265,18 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         try
         {
             Context ctx = new InitialContext();
-            if (JBOSS_SERVER) // TODO If JBoss starts using the JavaEE standard location, we need to cater for it
+            if (JBOSS_SERVER) // TODO If JBoss starts using the JavaEE standard location, we need to remove this alternative location
             {
                 // JBoss unfortunately doesn't always provide UserTransaction at the JavaEE standard location, see e.g. http://docs.jboss.org/admin-devel/Chap4.html
-                utx = (UserTransaction) ctx.lookup("UserTransaction");
+                try
+                {
+                    utx = (UserTransaction) ctx.lookup("UserTransaction");
+                }
+                catch (NamingException e)
+                {
+                    // Fallback to standard location
+                    utx = (UserTransaction) ctx.lookup("java:comp/UserTransaction");
+                }
             }
             else
             {
