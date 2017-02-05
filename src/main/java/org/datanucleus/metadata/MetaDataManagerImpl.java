@@ -957,6 +957,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 {
                     classNames.addAll(pumd.getClassNames());
                 }
+                // TODO Process pumd.getConverters
                 if (getNucleusContext() instanceof PersistenceNucleusContextImpl) // TODO Why not when enhancing? document it
                 {
                     Set jarFileNames = pumd.getJarFiles();

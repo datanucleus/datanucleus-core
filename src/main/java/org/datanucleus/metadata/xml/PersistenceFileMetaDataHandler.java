@@ -133,11 +133,15 @@ public class PersistenceFileMetaDataHandler extends AbstractMetaDataHandler
             {
                 // Processed elsewhere
             }
+            else if (localName.equals("jar-file"))
+            {
+                // Processed elsewhere
+            }
             else if (localName.equals("class"))
             {
                 // Processed elsewhere
             }
-            else if (localName.equals("jar-file"))
+            else if (localName.equals("converter"))
             {
                 // Processed elsewhere
             }
@@ -223,11 +227,6 @@ public class PersistenceFileMetaDataHandler extends AbstractMetaDataHandler
                 // Non-JTA data source
                 ((PersistenceUnitMetaData)md).setNonJtaDataSource(currentString);
             }
-            else if (localName.equals("class"))
-            {
-                // New persistent class
-                ((PersistenceUnitMetaData)md).addClassName(currentString);
-            }
             else if (localName.equals("mapping-file"))
             {
                 // New mapping file
@@ -237,6 +236,16 @@ public class PersistenceFileMetaDataHandler extends AbstractMetaDataHandler
             {
                 // New jar file
                 ((PersistenceUnitMetaData)md).addJarFile(currentString);
+            }
+            else if (localName.equals("class"))
+            {
+                // New persistent class
+                ((PersistenceUnitMetaData)md).addClassName(currentString);
+            }
+            else if (localName.equals("converter"))
+            {
+                // New converter class
+                ((PersistenceUnitMetaData)md).addConverter(currentString);
             }
             else if (localName.equals("shared-cache-mode"))
             {
