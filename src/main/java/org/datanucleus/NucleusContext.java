@@ -59,12 +59,28 @@ public interface NucleusContext
      */
     String getApiName();
 
+    /**
+     * Accessor for the overall configuration for DataNucleus.
+     * @return The Configuration
+     */
     Configuration getConfiguration();
 
+    /**
+     * Accessor for the manager for DataNucleus plugins.
+     * @return The PluginManager
+     */
     PluginManager getPluginManager();
 
+    /**
+     * Accessor for the manager for persistence metadata information.
+     * @return The MetaDataManager
+     */
     MetaDataManager getMetaDataManager();
 
+    /**
+     * Accessor for manager for java types.
+     * @return The TypeManager
+     */
     TypeManager getTypeManager();
 
     /**

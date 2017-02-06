@@ -84,8 +84,7 @@ import org.datanucleus.util.StringUtils;
 /**
  * Extends the basic DataNucleus context, adding on services for
  * <ul>
- * <li>creating <i>ExecutionContext</i> objects to handle persistence. Uses a pool of
- *     <i>ExecutionContext</i> objects, reusing them as required.</li>
+ * <li>creating <i>ExecutionContext</i> objects to handle persistence. Uses a pool of <i>ExecutionContext</i> objects, reusing them as required.</li>
  * <li>providing a cache across <i>ExecutionContext</i> objects (the "Level 2" cache).</li>
  * <li>provides a factory for creating <i>ObjectProviders</i>. This factory makes use of pooling, allowing reuse.</li>
  * <li>provides access to the datastore via a <i>StoreManager</i></li>
@@ -109,7 +108,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     /** Level 2 Cache, caching across ExecutionContexts. */
     private Level2Cache cache;
 
-    /** Transaction Manager. */
+    /** ResourcedTransaction Manager. */
     private transient ResourcedTransactionManager txManager = null;
 
     /** JTA Transaction Manager (if using JTA). */
@@ -1201,7 +1200,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getImplementationCreator()
+     * @see org.datanucleus.PersistenceNucleusContext#getImplementationCreator()
      */
     @Override
     public synchronized ImplementationCreator getImplementationCreator()
@@ -1218,7 +1217,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getTransactionManager()
+     * @see org.datanucleus.PersistenceNucleusContext#getResourcedTransactionManager()
      */
     @Override
     public synchronized ResourcedTransactionManager getResourcedTransactionManager()
@@ -1231,15 +1230,15 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getJtaTransactionManager()
+     * @see org.datanucleus.PersistenceNucleusContext#getJtaTransactionManager()
      */
     @Override
     public synchronized javax.transaction.TransactionManager getJtaTransactionManager()
     {
         if (jtaTxManager == null)
         {
-            // Find the JTA transaction manager - before J2EE 5 there is no standard way to do this so use the finder process.
-            // See http://www.onjava.com/pub/a/onjava/2005/07/20/transactions.html
+            // Find the JTA transaction manager - there is no standard way to do this so use the finder process.
+            // See also http://www.onjava.com/pub/a/onjava/2005/07/20/transactions.html
             jtaTxManager = new TransactionManagerFinder(this).getTransactionManager(getClassLoaderResolver((ClassLoader)config.getProperty(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY)));
             if (jtaTxManager == null)
             {
@@ -1250,7 +1249,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getJtaSyncRegistry()
+     * @see org.datanucleus.PersistenceNucleusContext#getJtaSyncRegistry()
      */
     @Override
     public JTASyncRegistry getJtaSyncRegistry()
@@ -1298,7 +1297,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getValidationHandler(org.datanucleus.ExecutionContext)
+     * @see org.datanucleus.PersistenceNucleusContext#getValidationHandler(org.datanucleus.ExecutionContext)
      */
     @Override
     public CallbackHandler getValidationHandler(ExecutionContext ec)
@@ -1458,7 +1457,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     // --------------------------- Fetch Groups ---------------------------------
 
     /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getFetchGroupManager()
+     * @see org.datanucleus.PersistenceNucleusContext#getFetchGroupManager()
      */
     @Override
     public synchronized FetchGroupManager getFetchGroupManager()
@@ -1471,7 +1470,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#addInternalFetchGroup(org.datanucleus.FetchGroup)
+     * @see org.datanucleus.PersistenceNucleusContext#addInternalFetchGroup(org.datanucleus.FetchGroup)
      */
     @Override
     public void addInternalFetchGroup(FetchGroup grp)
@@ -1480,7 +1479,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#removeInternalFetchGroup(org.datanucleus.FetchGroup)
+     * @see org.datanucleus.PersistenceNucleusContext#removeInternalFetchGroup(org.datanucleus.FetchGroup)
      */
     @Override
     public void removeInternalFetchGroup(FetchGroup grp)
@@ -1489,7 +1488,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#createInternalFetchGroup(java.lang.Class, java.lang.String)
+     * @see org.datanucleus.PersistenceNucleusContext#createInternalFetchGroup(java.lang.Class, java.lang.String)
      */
     @Override
     public FetchGroup createInternalFetchGroup(Class cls, String name)
@@ -1508,7 +1507,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getInternalFetchGroup(java.lang.Class, java.lang.String, boolean)
+     * @see org.datanucleus.PersistenceNucleusContext#getInternalFetchGroup(java.lang.Class, java.lang.String, boolean)
      */
     @Override
     public FetchGroup getInternalFetchGroup(Class cls, String name, boolean createIfNotPresent)
@@ -1530,7 +1529,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#getFetchGroupsWithName(java.lang.String)
+     * @see org.datanucleus.PersistenceNucleusContext#getFetchGroupsWithName(java.lang.String)
      */
     @Override
     public Set<FetchGroup> getFetchGroupsWithName(String name)
@@ -1578,7 +1577,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.NucleusContext#isClassCacheable(org.datanucleus.metadata.AbstractClassMetaData)
+     * @see org.datanucleus.PersistenceNucleusContext#isClassCacheable(org.datanucleus.metadata.AbstractClassMetaData)
      */
     @Override
     public boolean isClassCacheable(AbstractClassMetaData cmd)
