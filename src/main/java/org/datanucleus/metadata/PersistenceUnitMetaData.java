@@ -428,8 +428,7 @@ public class PersistenceUnitMetaData extends MetaData
             while (iter.hasNext())
             {
                 Map.Entry entry = (Map.Entry)iter.next();
-                sb.append(prefix).append(indent).append(indent).append("<property name=" + entry.getKey() + 
-                    " value=" + entry.getValue() + "</property>\n");
+                sb.append(prefix).append(indent).append(indent).append("<property name=\"" + entry.getKey() + "\" value=\"" + entry.getValue() + "\"/>\n");
             }
             sb.append(prefix).append(indent).append("</properties>\n");
         }
