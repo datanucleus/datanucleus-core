@@ -202,12 +202,12 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
 
         // Transactions
         conf.addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_TYPE, null, null, CorePropertyValidator.class.getName(), false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION, null, "read-committed", CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_JTA_LOCATOR, null, "autodetect", null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_JTA_JNDI_LOCATION, null, null, null, false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION, null, "read-committed", CorePropertyValidator.class.getName(), false, false);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_NONTX_READ, null, true, false, true);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_NONTX_WRITE, null, true, false, true);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_NONTX_ATOMIC, null, true, false, true);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_TRANSACTION_NONTX_READ, null, true, false, true);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_TRANSACTION_NONTX_WRITE, null, true, false, true);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_TRANSACTION_NONTX_ATOMIC, null, true, false, true);
 
         // Flush process
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_FLUSH_AUTO_OBJECT_LIMIT, null, 1, false, false);
@@ -788,8 +788,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 (config.getBooleanProperty(PropertyNames.PROPERTY_MULTITHREADED) ? "pm-multithreaded" : "pm-singlethreaded") +
                 (config.getBooleanProperty(PropertyNames.PROPERTY_RETAIN_VALUES) ? ", retain-values" : "") +
                 (config.getBooleanProperty(PropertyNames.PROPERTY_RESTORE_VALUES) ? ", restore-values" : "") +
-                (config.getBooleanProperty(PropertyNames.PROPERTY_NONTX_READ) ? ", nontransactional-read" : "") +
-                (config.getBooleanProperty(PropertyNames.PROPERTY_NONTX_WRITE) ? ", nontransactional-write" : "") +
+                (config.getBooleanProperty(PropertyNames.PROPERTY_TRANSACTION_NONTX_READ) ? ", nontransactional-read" : "") +
+                (config.getBooleanProperty(PropertyNames.PROPERTY_TRANSACTION_NONTX_WRITE) ? ", nontransactional-write" : "") +
                 (config.getBooleanProperty(PropertyNames.PROPERTY_PERSISTENCE_BY_REACHABILITY_AT_COMMIT) ? ", reachability-at-commit" : "") +
                 (config.getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_COMMIT) ? ", detach-all-on-commit" : "") +
                 (config.getBooleanProperty(PropertyNames.PROPERTY_DETACH_ALL_ON_ROLLBACK) ? ", detach-all-on-rollback" : "") +

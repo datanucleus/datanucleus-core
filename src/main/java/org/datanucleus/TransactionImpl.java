@@ -629,7 +629,7 @@ public class TransactionImpl implements Transaction
      */
     public boolean getNontransactionalRead()
     {
-        return ec.getBooleanProperty(PropertyNames.PROPERTY_NONTX_READ);
+        return ec.getBooleanProperty(PropertyNames.PROPERTY_TRANSACTION_NONTX_READ);
     }
 
     /**
@@ -638,7 +638,7 @@ public class TransactionImpl implements Transaction
      */
     public boolean getNontransactionalWrite()
     {
-        return ec.getBooleanProperty(PropertyNames.PROPERTY_NONTX_WRITE);
+        return ec.getBooleanProperty(PropertyNames.PROPERTY_TRANSACTION_NONTX_WRITE);
     }
 
     /**
@@ -647,7 +647,7 @@ public class TransactionImpl implements Transaction
      */
     public boolean getNontransactionalWriteAutoCommit()
     {
-        return ec.getBooleanProperty(PropertyNames.PROPERTY_NONTX_ATOMIC);
+        return ec.getBooleanProperty(PropertyNames.PROPERTY_TRANSACTION_NONTX_ATOMIC);
     }
 
     /**
@@ -705,7 +705,7 @@ public class TransactionImpl implements Transaction
      */
     public void setNontransactionalRead(boolean nontransactionalRead)
     {
-        ec.setProperty(PropertyNames.PROPERTY_NONTX_READ, nontransactionalRead);
+        ec.setProperty(PropertyNames.PROPERTY_TRANSACTION_NONTX_READ, nontransactionalRead);
     }
 
     /**
@@ -714,7 +714,7 @@ public class TransactionImpl implements Transaction
      */
     public void setNontransactionalWrite(boolean nontransactionalWrite)
     {
-        ec.setProperty(PropertyNames.PROPERTY_NONTX_WRITE, nontransactionalWrite);
+        ec.setProperty(PropertyNames.PROPERTY_TRANSACTION_NONTX_WRITE, nontransactionalWrite);
     }
 
     /**
@@ -723,7 +723,7 @@ public class TransactionImpl implements Transaction
      */
     public void setNontransactionalWriteAutoCommit(boolean autoCommit)
     {
-        ec.setProperty(PropertyNames.PROPERTY_NONTX_ATOMIC, autoCommit);
+        ec.setProperty(PropertyNames.PROPERTY_TRANSACTION_NONTX_ATOMIC, autoCommit);
     }
 
     /**

@@ -51,6 +51,7 @@ public class TransactionManagerFinder
     {
         String jtaLocatorName = nucleusContext.getConfiguration().getStringProperty(PropertyNames.PROPERTY_TRANSACTION_JTA_LOCATOR);
         PluginManager pluginMgr = nucleusContext.getPluginManager();
+        // TODO If the transactionManagerJNDI is specified then use that and don't look at transactionManagerLocator
         if ("autodetect".equalsIgnoreCase(jtaLocatorName) || jtaLocatorName == null)
         {
             // Cycle through all available locators and find one that returns a TransactionManager

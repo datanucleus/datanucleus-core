@@ -1331,7 +1331,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     private boolean isNonTxAtomic()
     {
-        return getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_NONTX_ATOMIC);
+        return getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_TRANSACTION_NONTX_ATOMIC);
     }
 
     /**

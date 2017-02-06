@@ -89,13 +89,13 @@ public class PropertyNames
     public static final String PROPERTY_OBJECT_PROVIDER_MAX_IDLE = "datanucleus.objectProvider.maxIdle";
     public static final String PROPERTY_OBJECT_PROVIDER_CLASS_NAME = "datanucleus.objectProvider.className";
 
-    public static final String PROPERTY_TRANSACTION_TYPE = "datanucleus.TransactionType";
-    public static final String PROPERTY_TRANSACTION_JTA_LOCATOR = "datanucleus.jtaLocator";
-    public static final String PROPERTY_TRANSACTION_JTA_JNDI_LOCATION = "datanucleus.jtaJndiLocation";
-    public static final String PROPERTY_TRANSACTION_ISOLATION = "datanucleus.transactionIsolation";
-    public static final String PROPERTY_NONTX_READ = "datanucleus.NontransactionalRead";
-    public static final String PROPERTY_NONTX_WRITE = "datanucleus.NontransactionalWrite";
-    public static final String PROPERTY_NONTX_ATOMIC = "datanucleus.nontx.atomic";
+    public static final String PROPERTY_TRANSACTION_TYPE = "datanucleus.transaction.type";
+    public static final String PROPERTY_TRANSACTION_ISOLATION = "datanucleus.transaction.isolation";
+    public static final String PROPERTY_TRANSACTION_JTA_LOCATOR = "datanucleus.transaction.jta.transactionManagerLocator";
+    public static final String PROPERTY_TRANSACTION_JTA_JNDI_LOCATION = "datanucleus.transaction.jta.transactionManagerJNDI";
+    public static final String PROPERTY_TRANSACTION_NONTX_READ = "datanucleus.transaction.nontx.read";
+    public static final String PROPERTY_TRANSACTION_NONTX_WRITE = "datanucleus.transaction.nontx.write";
+    public static final String PROPERTY_TRANSACTION_NONTX_ATOMIC = "datanucleus.transaction.nontx.atomic";
 
     public static final String PROPERTY_FLUSH_MODE = "datanucleus.flush.mode";
     public static final String PROPERTY_FLUSH_AUTO_OBJECT_LIMIT = "datanucleus.datastoreTransactionFlushLimit";
