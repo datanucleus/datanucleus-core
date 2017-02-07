@@ -60,9 +60,6 @@ public class PersistenceUnitMetaData extends MetaData
     /** Names of the classes specified. */
     Set<String> classNames = null;
 
-    /** Names of the converter classes specified. */
-    Set<String> converters = null;
-
     /** Names/URLs of the JAR files specified. */
     Set jarFiles = null;
 
@@ -220,24 +217,6 @@ public class PersistenceUnitMetaData extends MetaData
         this.classNames.addAll(classNames);
     }
 
-    public void addConverter(String className)
-    {
-        if (converters == null)
-        {
-            this.converters = new HashSet();
-        }
-        this.converters.add(className);
-    }
-
-    public void addConverters(Set<String> converterClassNames)
-    {
-        if (this.converters == null)
-        {
-            this.converters = new HashSet();
-        }
-        this.converters.addAll(converterClassNames);
-    }
-
     public void addJarFile(String jarName)
     {
         if (jarFiles == null)
@@ -307,11 +286,6 @@ public class PersistenceUnitMetaData extends MetaData
     public Set<String> getClassNames()
     {
         return classNames;
-    }
-
-    public Set<String> getConverters()
-    {
-        return converters;
     }
 
     public Set<String> getMappingFiles()
@@ -402,15 +376,6 @@ public class PersistenceUnitMetaData extends MetaData
             for (String className : classNames)
             {
                 sb.append(prefix).append(indent).append("<class>" + className + "</class>\n");
-            }
-        }
-
-        // Add converter classes
-        if (converters != null)
-        {
-            for (String className : converters)
-            {
-                sb.append(prefix).append(indent).append("<converter>" + className + "</converter>\n");
             }
         }
 

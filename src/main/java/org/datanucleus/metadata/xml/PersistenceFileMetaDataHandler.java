@@ -141,10 +141,6 @@ public class PersistenceFileMetaDataHandler extends AbstractMetaDataHandler
             {
                 // Processed elsewhere
             }
-            else if (localName.equals("converter"))
-            {
-                // Processed elsewhere
-            }
             else if (localName.equals("jta-data-source"))
             {
                 // Processed elsewhere
@@ -241,11 +237,6 @@ public class PersistenceFileMetaDataHandler extends AbstractMetaDataHandler
             {
                 // New persistent class
                 ((PersistenceUnitMetaData)md).addClassName(currentString);
-            }
-            else if (localName.equals("converter"))
-            {
-                // New converter class
-                ((PersistenceUnitMetaData)md).addConverter(currentString);
             }
             else if (localName.equals("shared-cache-mode"))
             {
