@@ -44,6 +44,10 @@ public class SequenceMetaData extends MetaData
     /** Allocation size for the sequence. */
     protected int allocationSize = -1;
 
+    protected String schemaName;
+
+    protected String catalogName;
+
     /**
      * Constructor.
      * @param name The sequence name
@@ -73,6 +77,26 @@ public class SequenceMetaData extends MetaData
     public SequenceMetaData setName(String name)
     {
         this.name = StringUtils.isWhitespace(name) ? this.name : name;
+        return this;
+    }
+
+    public String getCatalogName()
+    {
+        return catalogName;
+    }
+    public SequenceMetaData setCatalogName(String name)
+    {
+        this.catalogName = StringUtils.isWhitespace(name) ? this.catalogName : name;
+        return this;
+    }
+
+    public String getSchemaName()
+    {
+        return schemaName;
+    }
+    public SequenceMetaData setSchemaName(String name)
+    {
+        this.schemaName = StringUtils.isWhitespace(name) ? this.schemaName : name;
         return this;
     }
 
