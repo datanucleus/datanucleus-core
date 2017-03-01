@@ -116,64 +116,14 @@ public class NucleusContextHelper
 
         StoreManager storeMgr = null;
 
-        String storeManagerType = (String) props.get(PropertyNames.PROPERTY_STORE_MANAGER_TYPE.toLowerCase());
-        if (storeManagerType != null)
+        // Try using the URL of the data source
+        String url = (String) props.get(PropertyNames.PROPERTY_CONNECTION_URL.toLowerCase());
+        if (url != null)
         {
-            // User defined the store manager type, so find the appropriate plugin
-            for (int e=0; storeMgr == null && e<exts.length; e++)
+            int idx = url.indexOf(':');
+            if (idx > -1)
             {
-                ConfigurationElement[] confElm = exts[e].getConfigurationElements();
-                for (int c=0; storeMgr == null && c<confElm.length; c++)
-                {
-                    String key = confElm[c].getAttribute("key");
-                    if (key.equalsIgnoreCase(storeManagerType))
-                    {
-                        try
-                        {
-                            storeMgr = (StoreManager)nucCtx.getPluginManager().createExecutableExtension("org.datanucleus.store_manager", "key", storeManagerType, "class-name", 
-                                ctrArgTypes, ctrArgs);
-                        }
-                        catch (InvocationTargetException ex)
-                        {
-                            Throwable t = ex.getTargetException();
-                            if (t instanceof RuntimeException)
-                            {
-                                throw (RuntimeException) t;
-                            }
-                            else if (t instanceof Error)
-                            {
-                                throw (Error) t;
-                            }
-                            else
-                            {
-                                throw new NucleusException(t.getMessage(), t).setFatal();
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            throw new NucleusException(ex.getMessage(), ex).setFatal();
-                        }
-                    }
-                }
-            }
-            if (storeMgr == null)
-            {
-                // No StoreManager of the specified type exists in the CLASSPATH!
-                throw new NucleusUserException(Localiser.msg("008004", storeManagerType)).setFatal();
-            }
-        }
-
-        if (storeMgr == null)
-        {
-            // Try using the URL of the data source
-            String url = (String) props.get(PropertyNames.PROPERTY_CONNECTION_URL.toLowerCase());
-            if (url != null)
-            {
-                int idx = url.indexOf(':');
-                if (idx > -1)
-                {
-                    url = url.substring(0, idx);
-                }
+                url = url.substring(0, idx);
             }
 
             for (int e=0; storeMgr == null && e<exts.length; e++)
@@ -187,8 +137,8 @@ public class NucleusContextHelper
                         // Either no URL, or url defined so take this StoreManager
                         try
                         {
-                            storeMgr = (StoreManager)nucCtx.getPluginManager().createExecutableExtension("org.datanucleus.store_manager", "url-key", url == null ? urlKey : url, 
-                                "class-name", ctrArgTypes, ctrArgs);
+                            storeMgr = (StoreManager)nucCtx.getPluginManager().createExecutableExtension("org.datanucleus.store_manager", "url-key", 
+                                url == null ? urlKey : url, "class-name", ctrArgTypes, ctrArgs);
                         }
                         catch (InvocationTargetException ex)
                         {
@@ -213,11 +163,39 @@ public class NucleusContextHelper
                     }
                 }
             }
-
-            if (storeMgr == null)
+        }
+        else
+        {
+            // Assumed to be using RDBMS since only that allows ConnectionFactory/ConnectionFactoryName TODO If any other stores start supporting ConnectionFactory then update this
+            try
             {
-                throw new NucleusUserException(Localiser.msg("008004", url)).setFatal();
+                storeMgr = (StoreManager)nucCtx.getPluginManager().createExecutableExtension("org.datanucleus.store_manager", "key", "rdbms", "class-name", ctrArgTypes, ctrArgs);
             }
+            catch (InvocationTargetException ex)
+            {
+                Throwable t = ex.getTargetException();
+                if (t instanceof RuntimeException)
+                {
+                    throw (RuntimeException) t;
+                }
+                else if (t instanceof Error)
+                {
+                    throw (Error) t;
+                }
+                else
+                {
+                    throw new NucleusException(t.getMessage(), t).setFatal();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new NucleusException(ex.getMessage(), ex).setFatal();
+            }
+        }
+
+        if (storeMgr == null)
+        {
+            throw new NucleusUserException(Localiser.msg("008004", url)).setFatal();
         }
 
         return storeMgr;

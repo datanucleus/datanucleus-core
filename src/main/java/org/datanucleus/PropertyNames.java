@@ -165,7 +165,6 @@ public class PropertyNames
     public static final String PROPERTY_IDENTIFIER_WORD_SEPARATOR = "datanucleus.identifier.wordSeparator";
     public static final String PROPERTY_IDENTIFIER_FACTORY = "datanucleus.identifierFactory"; // TODO Drop this when RDBMS uses NamingFactory
 
-    public static final String PROPERTY_STORE_MANAGER_TYPE = "datanucleus.storeManagerType";
     public static final String PROPERTY_DATASTORE_READ_TIMEOUT = "datanucleus.datastoreReadTimeout";
     public static final String PROPERTY_DATASTORE_WRITE_TIMEOUT = "datanucleus.datastoreWriteTimeout";
     public static final String PROPERTY_DATASTORE_READONLY = "datanucleus.readOnlyDatastore";
