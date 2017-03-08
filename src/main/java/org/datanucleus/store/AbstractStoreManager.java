@@ -19,6 +19,7 @@ Contributors:
 package org.datanucleus.store;
 
 import java.io.PrintStream;
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -1345,7 +1346,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             {
                 return "uuid-hex";
             }
-            else if (type == Long.class || type == Integer.class || type == Short.class || type == long.class || type == int.class || type == short.class)
+            else if (type == Long.class || type == Integer.class || type == Short.class || type == long.class || type == int.class || type == short.class || type== BigInteger.class)
             {
                 if (supportsValueStrategy("identity"))
                 {
