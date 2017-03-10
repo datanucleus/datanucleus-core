@@ -17,8 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.state;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -30,7 +28,6 @@ import org.datanucleus.cache.CachedPC;
 import org.datanucleus.cache.L2CachePopulateFieldManager;
 import org.datanucleus.cache.L2CacheRetrieveFieldManager;
 import org.datanucleus.cache.Level2Cache;
-import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityReference;
@@ -1667,42 +1664,5 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
     public boolean containsAssociatedValue(Object key)
     {
         return myEC.containsObjectProviderAssociatedValue(this, key);
-    }
-
-    /** Cache of object-value-generators, keyed by their symbolic name. */
-    public static final Map<String, ObjectValueGenerator> objectValGenerators = new HashMap(1);
-
-    /**
-     * Method to find an object value generator based on its name. Caches the generators once generated.
-     * @param ec ExecutionContext
-     * @param genName The generator name
-     * @return The value generator (if any)
-     * @throws NucleusException if no generator of that name is found
-     */
-    protected static ObjectValueGenerator getObjectValueGenerator(ExecutionContext ec, String genName)
-    {
-        if (!objectValGenerators.isEmpty())
-        {
-            ObjectValueGenerator valGen = objectValGenerators.get(genName);
-            if (valGen != null)
-            {
-                return valGen;
-            }
-        }
-    
-        try
-        {
-            ObjectValueGenerator valGen = (ObjectValueGenerator)
-                ec.getNucleusContext().getPluginManager().createExecutableExtension(
-                    "org.datanucleus.store_objectvaluegenerator", new String[] {"name"},
-                    new String[] {genName}, "class-name", null, null);
-            objectValGenerators.put(genName, valGen);
-            return valGen;
-        }
-        catch (Exception e)
-        {
-            NucleusLogger.VALUEGENERATION.info("Exception thrown generating value using objectvaluegenerator " + genName, e);
-            throw new NucleusException("Exception thrown generating value for object", e);
-        }
     }
 }

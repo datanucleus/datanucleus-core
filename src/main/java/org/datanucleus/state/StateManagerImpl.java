@@ -2188,7 +2188,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             if (strategy != null && !getStoreManager().isStrategyDatastoreAttributed(cmd, fieldNumber))
             {
                 // Assign the strategy value where required.
-                // Default JDO2 behaviour is to always provide a strategy value when it is marked as using a strategy
+                // Default JDO behaviour is to always provide a strategy value when it is marked as using a strategy
                 boolean applyStrategy = true;
                 if (!mmd.getType().isPrimitive() &&
                     mmd.hasExtension(MetaData.EXTENSION_MEMBER_STRATEGY_WHEN_NOTNULL) &&
@@ -2205,14 +2205,6 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                     Object obj = getStoreManager().getStrategyValue(myEC, cmd, fieldNumber);
                     this.replaceField(fieldNumber, obj);
                 }
-            }
-            else if (mmd.hasExtension("object-value-generator"))
-            {
-                // Field has object value-generator so generate value based on this object
-                String valGenName = mmd.getValueForExtension("object-value-generator");
-                ObjectValueGenerator valGen = getObjectValueGenerator(myEC, valGenName);
-                Object value = valGen.generate(myEC, myPC, mmd.getExtensions());
-                this.replaceField(myPC, fieldNumber, value, true);
             }
         }
     }
