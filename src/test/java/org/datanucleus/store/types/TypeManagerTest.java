@@ -111,7 +111,7 @@ public class TypeManagerTest extends TestCase
         checkIsSupportedSecondClassType(java.sql.Time.class, true);
         checkIsSupportedSecondClassType(java.sql.Timestamp.class, true);
 
-        checkIsSupportedSecondClassType(TestOnlyList.class, true); // Should be true since List is supported
+        checkIsSupportedSecondClassType(TestOnlyList.class, false); // Should be false since List is supported but the wrapper is not appropriate for TestOnlyList
     }
 
     /**
