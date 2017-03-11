@@ -516,20 +516,27 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         // Update "persistence-modifier" according to type etc
         if (FieldPersistenceModifier.DEFAULT.equals(persistenceModifier))
         {
-            boolean isPcClass = getType().isArray() ? isFieldArrayTypePersistable(mmgr) : mmgr.isFieldTypePersistable(type);
-            if (!isPcClass)
+            if (getTypeConverterName() != null)
             {
-                if (getType().isArray() && getType().getComponentType().isInterface())
-                {
-                    isPcClass = mmgr.getMetaDataForClassInternal(getType().getComponentType(), clr) != null;
-                }
-                else if (getType().isInterface())
-                {
-                    isPcClass = mmgr.getMetaDataForClassInternal(getType(), clr) != null;
-                }
+                // Explicitly set a converter, so assume it is persistent
+                persistenceModifier = FieldPersistenceModifier.PERSISTENT;
             }
-
-            persistenceModifier = getDefaultFieldPersistenceModifier(getType(), memberRepresented.getModifiers(), isPcClass, mmgr);
+            else
+            {
+                boolean isPcClass = getType().isArray() ? isFieldArrayTypePersistable(mmgr) : mmgr.isFieldTypePersistable(type);
+                if (!isPcClass)
+                {
+                    if (getType().isArray() && getType().getComponentType().isInterface())
+                    {
+                        isPcClass = mmgr.getMetaDataForClassInternal(getType().getComponentType(), clr) != null;
+                    }
+                    else if (getType().isInterface())
+                    {
+                        isPcClass = mmgr.getMetaDataForClassInternal(getType(), clr) != null;
+                    }
+                }
+                persistenceModifier = getDefaultFieldPersistenceModifier(getType(), memberRepresented.getModifiers(), isPcClass, mmgr);
+            }
         }
         // TODO If this field is NONE in superclass, make it NONE here too
 
