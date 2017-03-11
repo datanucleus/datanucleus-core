@@ -75,6 +75,7 @@ public class JPQLQueryHelper
     /**
      * Convenience method returning if the supplied name is a keyword for this query language (including RANGE).
      * @param name Name to check
+     * @param allowRange whether to allow the RANGE keyword extension
      * @return Whether it is a keyword
      */
     public static boolean isKeyword(String name, boolean allowRange)
