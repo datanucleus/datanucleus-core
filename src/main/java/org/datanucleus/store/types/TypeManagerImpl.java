@@ -724,12 +724,15 @@ public class TypeManagerImpl implements TypeManager, Serializable
                     // Basic type
                     if (type.cls.isAssignableFrom(cls) && type.genericType == null)
                     {
-                        javaTypes.put(cls.getName(), type); // Register this subtype for reference
-                        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                        if (type.wrapperType == null || type.wrapperType.isAssignableFrom(cls)) // Dont do this when we have a wrapper type to consider since would lead to ClassCastException
                         {
-                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("016001", cls.getName(), type.cls.getName()));
+                            javaTypes.put(cls.getName(), type); // Register this subtype for reference
+                            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                            {
+                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("016001", cls.getName(), type.cls.getName()));
+                            }
+                            return type;
                         }
-                        return type;
                     }
                 }
             }
