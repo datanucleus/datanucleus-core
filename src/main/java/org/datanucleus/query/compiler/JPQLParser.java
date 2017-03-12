@@ -415,18 +415,27 @@ public class JPQLParser extends AbstractParser
                 }
                 else if (processKey()) // TODO Can we chain fields/methods off a KEY ?
                 {
+                    // keyNode will be Node.invoke(mapKey) so convert to a JOIN with qualifier
                     Node keyNode = stack.pop();
+                    Node lastKeyNodeChild = keyNode.getChildNode(keyNode.getChildNodes().size()-1);
+                    keyNode.removeChildNode(lastKeyNodeChild); // Remove the INVOKE node created by processKey()
                     joinNode.appendChildNode(keyNode);
 
-                    // And the alias we know this joined field by
+                    // Add the alias we know this joined field by
                     lexer.parseStringIgnoreCase("AS "); // Optional
                     String alias = lexer.parseName();
                     Node joinedAliasNode = new Node(NodeType.NAME, alias);
                     joinNode.appendChildNode(joinedAliasNode);
+
+                    Node joinedQualifierNode = new Node(NodeType.JOIN_QUALIFIER, "KEY");
+                    joinNode.appendChildNode(joinedQualifierNode);
                 }
                 else if (processValue()) // TODO Can we chain fields/methods off a VALUE ?
                 {
+                    // valNode will be Node.invoke(mapValue) so convert to a JOIN with qualifier
                     Node valNode = stack.pop();
+                    Node lastValNodeChild = valNode.getChildNode(valNode.getChildNodes().size()-1);
+                    valNode.removeChildNode(lastValNodeChild); // Remove the INVOKE node created by processValue()
                     joinNode.appendChildNode(valNode);
 
                     // And the alias we know this joined field by
@@ -434,6 +443,9 @@ public class JPQLParser extends AbstractParser
                     String alias = lexer.parseName();
                     Node joinedAliasNode = new Node(NodeType.NAME, alias);
                     joinNode.appendChildNode(joinedAliasNode);
+
+                    Node joinedQualifierNode = new Node(NodeType.JOIN_QUALIFIER, "VALUE");
+                    joinNode.appendChildNode(joinedQualifierNode);
                 }
                 else
                 {

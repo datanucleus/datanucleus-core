@@ -276,8 +276,37 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                 if (childNode.getNodeType() == NodeType.OPERATOR)
                 {
                     Node joinedNode = childNode.getFirstChild();
+
+                    // Extract alias node
+                    Node aliasNode = childNode.getNextChild();
+
+                    // Extract qualifier and ON nodes (if present)
+                    Node qualifierNode = null;
+                    Node onExprNode = null;
+                    if (childNode.hasNextChild())
+                    {
+                        Node nextNode = childNode.getNextChild();
+                        if (nextNode.getNodeType() == NodeType.JOIN_QUALIFIER)
+                        {
+                            qualifierNode = nextNode;
+                            if (childNode.hasNextChild())
+                            {
+                                onExprNode = childNode.getNextChild();
+                            }
+                        }
+                        else
+                        {
+                            onExprNode = nextNode;
+                        }
+                    }
+
                     String joinedAlias = (String)joinedNode.getNodeValue();
-                    Symbol joinedSym = caseSensitiveAliases ? symtbl.getSymbol(joinedAlias) : symtbl.getSymbolIgnoreCase(joinedAlias);
+                    String aliasForLookup = joinedAlias;
+                    if (qualifierNode != null && qualifierNode.getNodeValue().equals("KEY"))
+                    {
+                        aliasForLookup = joinedAlias + ".KEY";
+                    }
+                    Symbol joinedSym = caseSensitiveAliases ? symtbl.getSymbol(aliasForLookup) : symtbl.getSymbolIgnoreCase(aliasForLookup);
                     if (joinedSym == null)
                     {
                         // DN Extension : Check for FROM clause including join to root
@@ -303,9 +332,9 @@ public abstract class JavaQueryCompiler implements SymbolResolver
 
                     AbstractClassMetaData joinedCmd = metaDataManager.getMetaDataForClass(joinedSym.getValueType(), clr);
                     Class joinedCls = joinedSym.getValueType();
+                    AbstractMemberMetaData joinedMmd = null;
                     while (joinedNode.getFirstChild() != null)
                     {
-                        Node prevNode = joinedNode;
                         joinedNode = joinedNode.getFirstChild();
                         String joinedMember = (String)joinedNode.getNodeValue();
                         if (joinedNode.getNodeType() == NodeType.CAST)
@@ -320,22 +349,6 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                             joinedCls = clr.classForName(castTypeName);
                             joinedNode.setNodeValue(castTypeName); // Update cast type now that we have resolved it
                         }
-                        else if (joinedNode.getNodeType() == NodeType.INVOKE)
-                        {
-                            if (joinedNode.getNodeValue().equals("mapKey"))
-                            {
-                                // JOIN to KEY(...)
-                                NucleusLogger.GENERAL.info(">> mapKey found! joinedMember=" + joinedMember + " prevNode=" + prevNode);
-                                throw new NucleusUserException("We do not currently support use of KEY(...) in the FROM clause : " + joinedNode);
-                            }
-                            else if (joinedNode.getNodeValue().equals("mapValue"))
-                            {
-                                // JOIN to VALUE(...)
-                                NucleusLogger.GENERAL.info(">> mapValue found! joinedMember=" + joinedMember + " prevNode=" + prevNode);
-                                throw new NucleusUserException("We do not currently support use of VALUE(...) in the FROM clause : " + joinedNode);
-                            }
-                            throw new NucleusUserException("We do not currently support method invocation in the FROM clause : " + joinedNode);
-                        }
                         else
                         {
                             // Allow for multi-field joins
@@ -349,17 +362,20 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                                     {
                                         // Polymorphic join, where the field exists in a subclass (doable since we have outer join)
                                         String[] subclasses = metaDataManager.getSubclassesForClass(joinedCmd.getFullClassName(), true);
-                                        for (int l=0;l<subclasses.length;l++)
+                                        if (subclasses != null)
                                         {
-                                            AbstractClassMetaData subCmd = metaDataManager.getMetaDataForClass(subclasses[l], clr);
-                                            if (subCmd != null)
+                                            for (int l=0;l<subclasses.length;l++)
                                             {
-                                                mmd = subCmd.getMetaDataForMember(joinedMembers[k]);
-                                                if (mmd != null)
+                                                AbstractClassMetaData subCmd = metaDataManager.getMetaDataForClass(subclasses[l], clr);
+                                                if (subCmd != null)
                                                 {
-                                                    NucleusLogger.QUERY.debug("Polymorphic join found at " + joinedMembers[k] + " of " + subCmd.getFullClassName());
-                                                    joinedCmd = subCmd;
-                                                    break;
+                                                    mmd = subCmd.getMetaDataForMember(joinedMembers[k]);
+                                                    if (mmd != null)
+                                                    {
+                                                        NucleusLogger.QUERY.debug("Polymorphic join found at " + joinedMembers[k] + " of " + subCmd.getFullClassName());
+                                                        joinedCmd = subCmd;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -371,6 +387,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                                 }
 
                                 RelationType relationType = mmd.getRelationType(clr);
+                                joinedMmd = mmd;
                                 if (RelationType.isRelationSingleValued(relationType))
                                 {
                                     joinedCls = mmd.getType();
@@ -404,21 +421,25 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                         }
                     }
 
-                    Node aliasNode = childNode.getNextChild();
                     if (aliasNode.getNodeType() == NodeType.NAME)
                     {
                         // Add JOIN alias to symbol table
-                        symtbl.addSymbol(new PropertySymbol((String)aliasNode.getNodeValue(), joinedCls));
+                        String alias = (String)aliasNode.getNodeValue();
+                        symtbl.addSymbol(new PropertySymbol(alias, joinedCls));
+                        if (joinedMmd != null && joinedMmd.hasMap())
+                        {
+                            Class keyCls = clr.classForName(joinedMmd.getMap().getKeyType());
+                            symtbl.addSymbol(new PropertySymbol(alias + ".KEY", keyCls)); // Add the KEY so that we can have joins to the key from the value alias
+                        }
                     }
 
-                    Node nextNode = childNode.getNextChild();
-                    if (nextNode != null)
+                    if (onExprNode != null)
                     {
                         // ON condition
                         ExpressionCompiler comp = new ExpressionCompiler();
                         comp.setSymbolTable(symtbl);
                         comp.setMethodAliases(queryMethodAliasByPrefix);
-                        Expression nextExpr = comp.compileExpression(nextNode);
+                        Expression nextExpr = comp.compileExpression(onExprNode);
                         nextExpr.bind(symtbl);
                     }
                 }

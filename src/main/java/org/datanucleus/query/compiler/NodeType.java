@@ -35,5 +35,6 @@ public enum NodeType
     SUBQUERY,   /** subquery node type (EXISTS, ANY, SOME, ALL, etc) **/
     TYPE,       /** "type" node type (JPQL, like "instanceof" **/
     PRIMARY,    /** "primary" node type where we have something like an OPERATOR being passed to INVOKE. */
-    CASE;       /** Case node type (JPQL) **/
+    CASE,       /** Case node type (JPQL) **/
+    JOIN_QUALIFIER; /** Qualifier for a join, such as KEY or VALUE so it qualifies what is being joined. */
 }
