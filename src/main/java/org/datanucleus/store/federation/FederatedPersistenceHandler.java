@@ -135,6 +135,19 @@ public class FederatedPersistenceHandler implements StorePersistenceHandler
     }
 
     /* (non-Javadoc)
+     * @see org.datanucleus.store.StorePersistenceHandler#fetchObjects(int[], org.datanucleus.state.ObjectProvider[])
+     */
+    @Override
+    public void fetchObjects(int[] fieldNumbers, ObjectProvider... ops)
+    {
+        // Override this to provide bulk fetching of the same fields from multiple objects
+        for (ObjectProvider op : ops)
+        {
+            fetchObject(op, fieldNumbers);
+        }
+    }
+
+    /* (non-Javadoc)
      * @see org.datanucleus.store.StorePersistenceHandler#locateObject(org.datanucleus.store.ObjectProvider)
      */
     public void locateObject(ObjectProvider op)

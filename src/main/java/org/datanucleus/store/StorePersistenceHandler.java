@@ -92,13 +92,22 @@ public interface StorePersistenceHandler
     void deleteObjects(ObjectProvider... ops);
 
     /**
-     * Fetches a persistent object from the database.
+     * Fetches specified fields of a persistent object from the database.
      * @param op The ObjectProvider of the object to be fetched.
      * @param fieldNumbers The numbers of the fields to be fetched.
      * @throws NucleusObjectNotFoundException if the object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
     void fetchObject(ObjectProvider op, int fieldNumbers[]);
+
+    /**
+     * Fetches specified fields of several persistent objects (of the same type) from the database.
+     * @param op The ObjectProvider of the object to be fetched.
+     * @param fieldNumbers The numbers of the fields to be fetched.
+     * @throws NucleusObjectNotFoundException if the object doesn't exist
+     * @throws NucleusDataStoreException when an error occurs in the datastore communication
+     */
+    void fetchObjects(int[] fieldNumbers, ObjectProvider... ops);
 
     /**
      * Locates this object in the datastore.

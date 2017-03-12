@@ -118,6 +118,19 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.StorePersistenceHandler#fetchObjects(int[], org.datanucleus.state.ObjectProvider[])
+     */
+    @Override
+    public void fetchObjects(int[] fieldNumbers, ObjectProvider... ops)
+    {
+        // Override this to provide bulk fetching of the same fields from multiple objects
+        for (ObjectProvider op : ops)
+        {
+            fetchObject(op, fieldNumbers);
+        }
+    }
+
     /**
      * Simple implementation of find of multiple objects, relaying the find for each object
      * to <pre>findObject</pre>.
