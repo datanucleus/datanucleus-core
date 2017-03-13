@@ -149,9 +149,9 @@ public class ExpressionCompiler
                     }
 
                     Node joinedNode = childNode.getFirstChild();
-                    Node joinedAliasNode = childNode.getNextChild();
                     Expression joinedExpr = compilePrimaryExpression(joinedNode);
 
+                    Node joinedAliasNode = childNode.getNextChild();
                     JoinExpression joinExpr = new JoinExpression(joinedExpr, (String)joinedAliasNode.getNodeValue(), joinTypeId);
                     if (currentJoinExpr != null)
                     {
@@ -164,16 +164,12 @@ public class ExpressionCompiler
 
                     if (childNode.hasNextChild())
                     {
+                        // JOIN "ON" expression
                         Node nextNode = childNode.getNextChild();
-
-                        if (nextNode != null)
+                        Expression onExpr = compileExpression(nextNode);
+                        if (onExpr != null)
                         {
-                            // JOIN "ON" expression
-                            Expression onExpr = compileExpression(nextNode);
-                            if (onExpr != null)
-                            {
-                                joinExpr.setOnExpression(onExpr);
-                            }
+                            joinExpr.setOnExpression(onExpr);
                         }
                     }
 

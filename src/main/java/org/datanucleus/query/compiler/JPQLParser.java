@@ -118,7 +118,7 @@ public class JPQLParser extends AbstractParser
     {
         lexer = new Lexer(expression, paramPrefixes, false);
         stack = new ArrayDeque<Node>();
-        List nodes = new ArrayList();
+        List<Node> nodes = new ArrayList<>();
         do
         {
             processExpression();
@@ -138,7 +138,7 @@ public class JPQLParser extends AbstractParser
             nodes.add(node);
         }
         while (lexer.parseString(","));
-        return (Node[])nodes.toArray(new Node[nodes.size()]);
+        return nodes.toArray(new Node[nodes.size()]);
     }
 
     /* (non-Javadoc)
@@ -148,7 +148,7 @@ public class JPQLParser extends AbstractParser
     {
         lexer = new Lexer(expression, paramPrefixes, false);
         stack = new ArrayDeque<Node>();
-        List nodes = new ArrayList();
+        List<Node> nodes = new ArrayList<>();
         do
         {
             processExpression();
@@ -156,7 +156,7 @@ public class JPQLParser extends AbstractParser
             nodes.add(node);
         }
         while (lexer.parseString(","));
-        return (Node[])nodes.toArray(new Node[nodes.size()]);
+        return nodes.toArray(new Node[nodes.size()]);
     }
 
     /* (non-Javadoc)
@@ -223,7 +223,7 @@ public class JPQLParser extends AbstractParser
     {
         String candidateClassName = null;
         String candidateAlias = null;
-        List nodes = new ArrayList();
+        List<Node> nodes = new ArrayList<>();
         do
         {
             if (lexer.peekStringIgnoreCase("IN(") || lexer.peekStringIgnoreCase("IN "))
@@ -324,7 +324,7 @@ public class JPQLParser extends AbstractParser
         }
         while (lexer.parseString(","));
 
-        return (Node[]) nodes.toArray(new Node[nodes.size()]);
+        return nodes.toArray(new Node[nodes.size()]);
     }
 
     /**
@@ -483,7 +483,7 @@ public class JPQLParser extends AbstractParser
 
     private Node[] processOrderExpression()
     {
-        List nodes = new ArrayList();
+        List<Node> nodes = new ArrayList<>();
         do
         {
             processExpression();
@@ -527,7 +527,7 @@ public class JPQLParser extends AbstractParser
             nodes.add(expr);
         }
         while (lexer.parseString(","));
-        return (Node[]) nodes.toArray(new Node[nodes.size()]);
+        return nodes.toArray(new Node[nodes.size()]);
     }
 
     private Node processExpression()
@@ -2175,10 +2175,7 @@ public class JPQLParser extends AbstractParser
     {
         if (lexer.parseChar('{'))
         {
-            // JDBC escape syntax
-            // {d '...'}
-            // {ts '...'}
-            // {t '...'}
+            // JDBC escape syntax {d '...'} or {ts '...'} or {t '...'}
             StringBuilder jdbcLiteralStr = new StringBuilder("{");
             if (lexer.parseChar('d'))
             {

@@ -280,7 +280,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                     // Extract alias node
                     Node aliasNode = childNode.getNextChild();
 
-                    // Extract qualifier and ON nodes (if present)
+                    // Extract ON node (if present)
                     Node onExprNode = null;
                     if (childNode.hasNextChild())
                     {
@@ -491,15 +491,11 @@ public abstract class JavaQueryCompiler implements SymbolResolver
         {
             AbstractMemberMetaData mmd = cmd.getMetaDataForMember(tokens[i]);
             RelationType relationType = mmd.getRelationType(clr);
-            if (relationType == RelationType.ONE_TO_ONE_BI ||
-                relationType == RelationType.ONE_TO_ONE_UNI ||
-                relationType == RelationType.MANY_TO_ONE_BI)
+            if (RelationType.isRelationSingleValued(relationType))
             {
                 cls = mmd.getType();
             }
-            else if (relationType == RelationType.ONE_TO_MANY_UNI ||
-                relationType == RelationType.ONE_TO_MANY_BI ||
-                relationType == RelationType.MANY_TO_MANY_BI)
+            else if (RelationType.isRelationMultiValued(relationType))
             {
                 if (mmd.hasCollection())
                 {
@@ -1040,8 +1036,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
             if (type == null)
             {
                 // Implicit variables don't have their type defined
-                throw new NucleusUserException("Cannot find type of " + tuples.get(0) +
-                    " since symbol has no type; implicit variable?");
+                throw new NucleusUserException("Cannot find type of " + tuples.get(0) + " since symbol has no type; implicit variable?");
             }
 
             for (int i=1; i<tupleSize; i++)
