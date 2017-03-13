@@ -276,6 +276,17 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                 if (childNode.getNodeType() == NodeType.OPERATOR)
                 {
                     Node joinedNode = childNode.getFirstChild();
+
+                    // Extract alias node
+                    Node aliasNode = childNode.getNextChild();
+
+                    // Extract qualifier and ON nodes (if present)
+                    Node onExprNode = null;
+                    if (childNode.hasNextChild())
+                    {
+                        onExprNode = childNode.getNextChild();
+                    }
+
                     String joinedAlias = (String)joinedNode.getNodeValue();
                     Symbol joinedSym = caseSensitiveAliases ? symtbl.getSymbol(joinedAlias) : symtbl.getSymbolIgnoreCase(joinedAlias);
                     if (joinedSym == null)
@@ -303,6 +314,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
 
                     AbstractClassMetaData joinedCmd = metaDataManager.getMetaDataForClass(joinedSym.getValueType(), clr);
                     Class joinedCls = joinedSym.getValueType();
+                    AbstractMemberMetaData joinedMmd = null;
                     while (joinedNode.getFirstChild() != null)
                     {
                         joinedNode = joinedNode.getFirstChild();
@@ -354,6 +366,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                                 }
 
                                 RelationType relationType = mmd.getRelationType(clr);
+                                joinedMmd = mmd;
                                 if (RelationType.isRelationSingleValued(relationType))
                                 {
                                     joinedCls = mmd.getType();
@@ -387,21 +400,27 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                         }
                     }
 
-                    Node aliasNode = childNode.getNextChild();
                     if (aliasNode.getNodeType() == NodeType.NAME)
                     {
                         // Add JOIN alias to symbol table
-                        symtbl.addSymbol(new PropertySymbol((String)aliasNode.getNodeValue(), joinedCls));
+                        String alias = (String)aliasNode.getNodeValue();
+                        symtbl.addSymbol(new PropertySymbol(alias, joinedCls));
+                        if (joinedMmd != null && joinedMmd.hasMap())
+                        {
+                            Class keyCls = clr.classForName(joinedMmd.getMap().getKeyType());
+                            symtbl.addSymbol(new PropertySymbol(alias + "#KEY", keyCls)); // Add the KEY so that we can have joins to the key from the value alias
+                            Class valueCls = clr.classForName(joinedMmd.getMap().getValueType());
+                            symtbl.addSymbol(new PropertySymbol(alias + "#VALUE", valueCls)); // Add the VALUE so that we can have joins to the value from the key alias
+                        }
                     }
 
-                    Node nextNode = childNode.getNextChild();
-                    if (nextNode != null)
+                    if (onExprNode != null)
                     {
                         // ON condition
                         ExpressionCompiler comp = new ExpressionCompiler();
                         comp.setSymbolTable(symtbl);
                         comp.setMethodAliases(queryMethodAliasByPrefix);
-                        Expression nextExpr = comp.compileExpression(nextNode);
+                        Expression nextExpr = comp.compileExpression(onExprNode);
                         nextExpr.bind(symtbl);
                     }
                 }

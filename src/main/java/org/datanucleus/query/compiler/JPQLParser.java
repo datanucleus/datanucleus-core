@@ -413,6 +413,28 @@ public class JPQLParser extends AbstractParser
                     Node joinedAliasNode = new Node(NodeType.NAME, alias);
                     joinNode.appendChildNode(joinedAliasNode);
                 }
+                else if (processKey(true))
+                {
+                    Node keyNode = stack.pop();
+                    joinNode.appendChildNode(keyNode);
+
+                    // Add the alias we know this joined field by
+                    lexer.parseStringIgnoreCase("AS "); // Optional
+                    String alias = lexer.parseName();
+                    Node joinedAliasNode = new Node(NodeType.NAME, alias);
+                    joinNode.appendChildNode(joinedAliasNode);
+                }
+                else if (processValue(true))
+                {
+                    Node valNode = stack.pop();
+                    joinNode.appendChildNode(valNode);
+
+                    // And the alias we know this joined field by
+                    lexer.parseStringIgnoreCase("AS "); // Optional
+                    String alias = lexer.parseName();
+                    Node joinedAliasNode = new Node(NodeType.NAME, alias);
+                    joinNode.appendChildNode(joinedAliasNode);
+                }
                 else
                 {
                     // Joining to an identifier with alias : "path_expression [AS alias]"
@@ -1315,11 +1337,11 @@ public class JPQLParser extends AbstractParser
         {
             // So we don't get interpreted as a method. Processed later
         }
-        else if (processKey()) // TODO Can we chain fields/methods off a KEY ?
+        else if (processKey(false))
         {
             return;
         }
-        else if (processValue()) // TODO Can we chain fields/methods off a VALUE ?
+        else if (processValue(false))
         {
             return;
         }
@@ -1508,33 +1530,47 @@ public class JPQLParser extends AbstractParser
 
     /**
      * Process a KEY construct. Puts the KEY Node on the stack.
+     * @param fromClause Whether this is a FROM clause
      * @return Whether a KEY construct was found by the lexer.
      */
-    protected boolean processKey()
+    protected boolean processKey(boolean fromClause)
     {
         if (lexer.parseString("KEY"))
         {
             // KEY(identification_variable)
-            // Convert to be {primary}.INVOKE(mapKey)
             lexer.skipWS();
             lexer.parseChar('(');
-            Node invokeNode = new Node(NodeType.INVOKE, "mapKey");
             processExpression();
             if (!lexer.parseChar(')'))
             {
                 throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
             }
 
-            Node primaryNode = stack.pop(); // Could check type ? (Map)
+            Node primaryNode = stack.pop();
             Node primaryRootNode = primaryNode;
+            Node lastNode = primaryNode;
             while (primaryNode.getFirstChild() != null)
             {
                 primaryNode = primaryNode.getFirstChild();
             }
-            primaryNode.appendChildNode(invokeNode);
+
+            if (fromClause)
+            {
+                // Convert to be {primary#KEY}
+                // Handle as a primary but with #KEY appended to the last primary
+                Object keyValue = primaryNode.getNodeValue();
+                primaryNode.setNodeValue(keyValue + "#KEY");
+            }
+            else
+            {
+                // Convert to be {primary}.INVOKE(mapKey)
+                Node invokeNode = new Node(NodeType.INVOKE, "mapKey");
+                primaryNode.appendChildNode(invokeNode);
+                lastNode = invokeNode;
+            }
             stack.push(primaryRootNode);
 
-            // Allow referral to chain of field(s) of key
+            // Allow referral to chain of field(s) of key i.e "KEY(...).field1.field2" etc
             int size = stack.size();
             while (lexer.parseChar('.'))
             {
@@ -1547,13 +1583,13 @@ public class JPQLParser extends AbstractParser
                     throw new QueryCompilerSyntaxException("Identifier expected", lexer.getIndex(), lexer.getInput());
                 }
             }
+
             // For all added nodes, step back and chain them so we have
             // Node[IDENTIFIER, a]
             // +--- Node[IDENTIFIER, b]
             //      +--- Node[IDENTIFIER, c]
             if (size != stack.size())
             {
-                Node lastNode = invokeNode;
                 while (stack.size() > size)
                 {
                     Node top = stack.pop();
@@ -1567,18 +1603,17 @@ public class JPQLParser extends AbstractParser
     }
 
     /**
-     * Process a VALUE construct. Puts the VALUE Node on the stack.
+     * Process for a VALUE construct. Puts the VALUE Node on the stack if one is found.
+     * @param fromClause Whether this is a FROM clause
      * @return Whether a VALUE construct was found by the lexer.
      */
-    protected boolean processValue()
+    protected boolean processValue(boolean fromClause)
     {
         if (lexer.parseString("VALUE"))
         {
             // VALUE(identification_variable)
-            // Convert to be {primary}.INVOKE(mapValue)
             lexer.skipWS();
             lexer.parseChar('(');
-            Node invokeNode = new Node(NodeType.INVOKE, "mapValue");
             processExpression();
             if (!lexer.parseChar(')'))
             {
@@ -1587,14 +1622,29 @@ public class JPQLParser extends AbstractParser
 
             Node primaryNode = stack.pop(); // Could check type ? (Map)
             Node primaryRootNode = primaryNode;
+            Node lastNode = primaryNode;
             while (primaryNode.getFirstChild() != null)
             {
                 primaryNode = primaryNode.getFirstChild();
             }
-            primaryNode.appendChildNode(invokeNode);
+
+            if (fromClause)
+            {
+                // Convert to be {primary#VALUE}
+                // Handle as a primary but with #VALUE appended to the last primary
+                Object keyValue = primaryNode.getNodeValue();
+                primaryNode.setNodeValue(keyValue + "#VALUE");
+            }
+            else
+            {
+                // Convert to be {primary}.INVOKE(mapValue)
+                Node invokeNode = new Node(NodeType.INVOKE, "mapValue");
+                primaryNode.appendChildNode(invokeNode);
+                lastNode = invokeNode;
+            }
             stack.push(primaryRootNode);
 
-            // Allow referral to chain of field(s) of key
+            // Allow referral to chain of field(s) of key i.e "VALUE(...).field1.field2" etc
             int size = stack.size();
             while (lexer.parseChar('.'))
             {
@@ -1607,13 +1657,13 @@ public class JPQLParser extends AbstractParser
                     throw new QueryCompilerSyntaxException("Identifier expected", lexer.getIndex(), lexer.getInput());
                 }
             }
+
             // For all added nodes, step back and chain them so we have
             // Node[IDENTIFIER, a]
             // +--- Node[IDENTIFIER, b]
             //      +--- Node[IDENTIFIER, c]
             if (size != stack.size())
             {
-                Node lastNode = invokeNode;
                 while (stack.size() > size)
                 {
                     Node top = stack.pop();

@@ -152,13 +152,6 @@ public class ExpressionCompiler
                     Node joinedAliasNode = childNode.getNextChild();
                     Expression joinedExpr = compilePrimaryExpression(joinedNode);
 
-                    Expression onExpr = null;
-                    if (childNode.hasNextChild())
-                    {
-                        Node onNode = childNode.getNextChild();
-                        onExpr = compileExpression(onNode);
-                    }
-
                     JoinExpression joinExpr = new JoinExpression(joinedExpr, (String)joinedAliasNode.getNodeValue(), joinTypeId);
                     if (currentJoinExpr != null)
                     {
@@ -168,10 +161,22 @@ public class ExpressionCompiler
                     {
                         clsExpr.setJoinExpression(joinExpr);
                     }
-                    if (onExpr != null)
+
+                    if (childNode.hasNextChild())
                     {
-                        joinExpr.setOnExpression(onExpr);
+                        Node nextNode = childNode.getNextChild();
+
+                        if (nextNode != null)
+                        {
+                            // JOIN "ON" expression
+                            Expression onExpr = compileExpression(nextNode);
+                            if (onExpr != null)
+                            {
+                                joinExpr.setOnExpression(onExpr);
+                            }
+                        }
                     }
+
                     currentJoinExpr = joinExpr;
                 }
             }
