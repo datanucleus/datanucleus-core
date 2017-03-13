@@ -281,32 +281,14 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                     Node aliasNode = childNode.getNextChild();
 
                     // Extract qualifier and ON nodes (if present)
-                    Node qualifierNode = null;
                     Node onExprNode = null;
                     if (childNode.hasNextChild())
                     {
-                        Node nextNode = childNode.getNextChild();
-                        if (nextNode.getNodeType() == NodeType.JOIN_QUALIFIER)
-                        {
-                            qualifierNode = nextNode;
-                            if (childNode.hasNextChild())
-                            {
-                                onExprNode = childNode.getNextChild();
-                            }
-                        }
-                        else
-                        {
-                            onExprNode = nextNode;
-                        }
+                        onExprNode = childNode.getNextChild();
                     }
 
                     String joinedAlias = (String)joinedNode.getNodeValue();
-                    String aliasForLookup = joinedAlias;
-                    if (qualifierNode != null && qualifierNode.getNodeValue().equals("KEY"))
-                    {
-                        aliasForLookup = joinedAlias + ".KEY";
-                    }
-                    Symbol joinedSym = caseSensitiveAliases ? symtbl.getSymbol(aliasForLookup) : symtbl.getSymbolIgnoreCase(aliasForLookup);
+                    Symbol joinedSym = caseSensitiveAliases ? symtbl.getSymbol(joinedAlias) : symtbl.getSymbolIgnoreCase(joinedAlias);
                     if (joinedSym == null)
                     {
                         // DN Extension : Check for FROM clause including join to root
@@ -429,7 +411,9 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                         if (joinedMmd != null && joinedMmd.hasMap())
                         {
                             Class keyCls = clr.classForName(joinedMmd.getMap().getKeyType());
-                            symtbl.addSymbol(new PropertySymbol(alias + ".KEY", keyCls)); // Add the KEY so that we can have joins to the key from the value alias
+                            symtbl.addSymbol(new PropertySymbol(alias + "#KEY", keyCls)); // Add the KEY so that we can have joins to the key from the value alias
+                            Class valueCls = clr.classForName(joinedMmd.getMap().getValueType());
+                            symtbl.addSymbol(new PropertySymbol(alias + "#VALUE", valueCls)); // Add the VALUE so that we can have joins to the value from the key alias
                         }
                     }
 

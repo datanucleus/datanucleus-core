@@ -50,15 +50,7 @@ public class JoinExpression extends Expression
         }
     }
 
-    /** qualifier to allow definition of joining to a map key or value */
-    public enum JoinQualifier
-    {
-        MAP_KEY,
-        MAP_VALUE
-    }
-
     JoinType type;
-    JoinQualifier qualifier;
     Expression joinedExpr; // Expression for the field we are joining to, can be PrimaryExpression, or DyadicExpression(CAST - for TREAT)
     Expression onExpr; // Optional ON expression to add to the join clause
 
@@ -67,15 +59,6 @@ public class JoinExpression extends Expression
         this.joinedExpr = expr;
         this.alias = alias;
         this.type = type;
-    }
-    
-    public void setQualifier(JoinQualifier qual)
-    {
-        this.qualifier = qual;
-    }
-    public JoinQualifier getQualifier()
-    {
-        return this.qualifier;
     }
 
     public void setJoinExpression(JoinExpression expr)
@@ -121,28 +104,7 @@ public class JoinExpression extends Expression
 
     public String toString()
     {
-        StringBuilder str = new StringBuilder("JoinExpression{").append(type);
-        if (qualifier != null)
-        {
-            if (qualifier == JoinQualifier.MAP_KEY)
-            {
-                str.append(" KEY(").append(joinedExpr).append(")");
-            }
-            else if (qualifier == JoinQualifier.MAP_VALUE)
-            {
-                str.append(" VALUE(").append(joinedExpr).append(")");
-            }
-            else
-            {
-                str.append(" ").append(joinedExpr);
-            }
-        }
-        else
-        {
-            str.append(joinedExpr);
-        }
-
-        str.append(" alias=").append(alias);
+        StringBuilder str = new StringBuilder("JoinExpression{").append(type).append(" ").append(joinedExpr).append(" alias=").append(alias);
 
         if (right != null)
         {

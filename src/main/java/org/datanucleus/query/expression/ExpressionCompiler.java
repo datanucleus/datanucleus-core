@@ -36,7 +36,6 @@ import org.datanucleus.query.compiler.NodeType;
 import org.datanucleus.query.compiler.ParameterNode;
 import org.datanucleus.query.compiler.Symbol;
 import org.datanucleus.query.compiler.SymbolTable;
-import org.datanucleus.query.expression.JoinExpression.JoinQualifier;
 import org.datanucleus.query.expression.JoinExpression.JoinType;
 import org.datanucleus.store.query.QueryCompilerSyntaxException;
 import org.datanucleus.util.NucleusLogger;
@@ -166,27 +165,6 @@ public class ExpressionCompiler
                     if (childNode.hasNextChild())
                     {
                         Node nextNode = childNode.getNextChild();
-                        if (nextNode.getNodeType() == NodeType.JOIN_QUALIFIER)
-                        {
-                            // JOIN "qualifier"
-                            if (nextNode.getNodeValue() == "KEY")
-                            {
-                                joinExpr.setQualifier(JoinQualifier.MAP_KEY);
-                            }
-                            else if (nextNode.getNodeValue() == "VALUE")
-                            {
-                                joinExpr.setQualifier(JoinQualifier.MAP_VALUE);
-                            }
-
-                            if (childNode.hasNextChild())
-                            {
-                                nextNode = childNode.getNextChild();
-                            }
-                            else
-                            {
-                                nextNode = null;
-                            }
-                        }
 
                         if (nextNode != null)
                         {
