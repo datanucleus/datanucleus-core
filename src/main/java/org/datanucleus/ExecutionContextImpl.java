@@ -2910,6 +2910,14 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return objs;
     }
 
+    /**
+     * Accessor for an object of the specified type with the provided id "key".
+     * With datastore id or single-field id the "key" is the key of the id, and with composite ids the "key" is the toString() of the id.
+     * @param cls Class of the persistable
+     * @param key Value of the key field for SingleFieldIdentity, or the string value of the key otherwise
+     * @return The object for this id.
+     * @param <T> Type of the persistable
+     */
     public <T> T findObject(Class<T> cls, Object key)
     {
         if (cls == null || key == null)
@@ -2969,7 +2977,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         assertIsOpen();
 
-        boolean createdHollow = false;
         Object pc = null;
         ObjectProvider op = null;
 
@@ -2981,10 +2988,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         if (pc == null)
         {
-            // Find direct from the store if supported. NOTE : This ignores the provided FieldValues!
+            // Find direct from the datastore if supported
             pc = getStoreManager().getPersistenceHandler().findObject(this, id);
         }
 
+        boolean createdHollow = false;
         if (pc == null)
         {
             // Determine the class details for this "id" if not provided, including checking of inheritance level
@@ -3078,16 +3086,18 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         for (int i=0;i<identities.length;i++)
         {
             // Translate the identity if required
-            IdentityStringTranslator idStringTranslator = getNucleusContext().getIdentityManager().getIdentityStringTranslator();
-            if (idStringTranslator != null && identities[i] instanceof String)
+            if (identities[i] instanceof String)
             {
-                // DataNucleus extension to translate input identities into valid persistent identities.
-                ids[i] = idStringTranslator.getIdentity(this, (String)identities[i]);
+                IdentityStringTranslator idStringTranslator = getNucleusContext().getIdentityManager().getIdentityStringTranslator();
+                if (idStringTranslator != null)
+                {
+                    // DataNucleus extension to translate input identities into valid persistent identities.
+                    ids[i] = idStringTranslator.getIdentity(this, (String)identities[i]);
+                    continue;
+                }
             }
-            else
-            {
-                ids[i] = identities[i];
-            }
+
+            ids[i] = identities[i];
         }
 
         Map pcById = new HashMap(identities.length);

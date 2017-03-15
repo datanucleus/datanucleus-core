@@ -588,7 +588,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      * @param extensions Any extensions
      * @see #addExtension
      */
-    public void setExtensions(Map extensions)
+    public void setExtensions(Map<String, Object> extensions)
     {
         this.extensions = extensions != null ? new HashMap(extensions) : null;
         if (extensions != null && extensions.containsKey(EXTENSION_EXCLUDE_SUBCLASSES))
