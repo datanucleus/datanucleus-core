@@ -132,8 +132,7 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
             catch (ClassNotResolvedException e)
             {
                 // TODO Localise this
-                NucleusLogger.QUERY.warn("Candidate class for JDOQL single-string query (" + candidateClassName + 
-                    ") could not be resolved", e);
+                NucleusLogger.QUERY.warn("Candidate class for JDOQL single-string query (" + candidateClassName + ") could not be resolved", e);
             }
         }
     }
