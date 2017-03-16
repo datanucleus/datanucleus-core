@@ -300,8 +300,19 @@ public class QueryManagerImpl implements QueryManager
     {
         if (queryCompilationCache != null)
         {
-            String queryKey = language + ":" + query;
-            queryCompilationCache.put(queryKey, compilation);
+            queryCompilationCache.put(language + ":" + query, compilation);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.query.QueryManager#deleteQueryCompilation(java.lang.String, java.lang.String)
+     */
+    @Override
+    public void removeQueryCompilation(String language, String query)
+    {
+        if (queryCompilationCache != null)
+        {
+            queryCompilationCache.evict(language + ":" + query);
         }
     }
 
@@ -354,7 +365,7 @@ public class QueryManagerImpl implements QueryManager
      * @see org.datanucleus.store.query.QueryManager#deleteDatastoreQueryCompilation(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public synchronized void deleteDatastoreQueryCompilation(String datastore, String language, String query)
+    public synchronized void removeDatastoreQueryCompilation(String datastore, String language, String query)
     {
         if (queryCompilationCacheDatastore != null)
         {

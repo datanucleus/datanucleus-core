@@ -62,6 +62,13 @@ public interface QueryManager
     void addQueryCompilation(String language, String query, QueryCompilation compilation);
 
     /**
+     * Method to remove a query compilation.
+     * @param language The query language
+     * @param query The query string
+     */
+    void removeQueryCompilation(String language, String query);
+
+    /**
      * Accessor for a Query compilation for the specified query and language.
      * @param language Language of the query
      * @param query Query string
@@ -99,7 +106,7 @@ public interface QueryManager
      * @param language The language
      * @param query The query (string form)
      */
-    void deleteDatastoreQueryCompilation(String datastore, String language, String query);
+    void removeDatastoreQueryCompilation(String datastore, String language, String query);
 
     /**
      * Accessor for the query results cache.
