@@ -204,7 +204,7 @@ public class JDOQLParser extends AbstractParser
     {
         lexer = new Lexer(expression, paramPrefixes, true);
         stack = new ArrayDeque<Node>();
-        List nodes = new ArrayList();
+        List<Node> nodes = new ArrayList<>();
         do
         {
             processExpression();
@@ -224,7 +224,7 @@ public class JDOQLParser extends AbstractParser
             nodes.add(expr);
         }
         while (lexer.parseString(","));
-        return (Node[])nodes.toArray(new Node[nodes.size()]);
+        return nodes.toArray(new Node[nodes.size()]);
     }
 
     /* (non-Javadoc)
@@ -234,7 +234,7 @@ public class JDOQLParser extends AbstractParser
     {
         lexer = new Lexer(expression, paramPrefixes, true);
         stack = new ArrayDeque<Node>();
-        List nodes = new ArrayList();
+        List<Node> nodes = new ArrayList<>();
         do
         {
             processExpression();
@@ -242,7 +242,7 @@ public class JDOQLParser extends AbstractParser
             nodes.add(expr);
         }
         while (lexer.parseString(","));
-        return (Node[])nodes.toArray(new Node[nodes.size()]);
+        return nodes.toArray(new Node[nodes.size()]);
     }
 
     /* (non-Javadoc)
@@ -312,7 +312,7 @@ public class JDOQLParser extends AbstractParser
 
     private Node[] processOrderExpression()
     {
-        List nodes = new ArrayList();
+        List<Node> nodes = new ArrayList<>();
         do
         {
             processExpression();
@@ -359,7 +359,7 @@ public class JDOQLParser extends AbstractParser
         }
         while (lexer.parseChar(','));
 
-        return (Node[]) nodes.toArray(new Node[nodes.size()]);
+        return nodes.toArray(new Node[nodes.size()]);
     }
 
     private Node processExpression()
@@ -1019,8 +1019,7 @@ public class JDOQLParser extends AbstractParser
                 // Note that this only checks the method name and not the arguments/types
                 if (Arrays.binarySearch(jdoqlMethodNames, method) < 0)
                 {
-                    throw new QueryCompilerSyntaxException("Query uses method \"" + method + 
-                        "\" but this is not a standard JDOQL method name");
+                    throw new QueryCompilerSyntaxException("Query uses method \"" + method + "\" but this is not a standard JDOQL method name");
                 }
             }
 
