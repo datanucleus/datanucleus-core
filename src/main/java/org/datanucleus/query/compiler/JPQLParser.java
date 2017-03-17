@@ -413,7 +413,7 @@ public class JPQLParser extends AbstractParser
                     Node joinedAliasNode = new Node(NodeType.NAME, alias);
                     joinNode.appendChildNode(joinedAliasNode);
                 }
-                else if (processKey(true))
+                else if (processKey())
                 {
                     Node keyNode = stack.pop();
                     joinNode.appendChildNode(keyNode);
@@ -424,7 +424,7 @@ public class JPQLParser extends AbstractParser
                     Node joinedAliasNode = new Node(NodeType.NAME, alias);
                     joinNode.appendChildNode(joinedAliasNode);
                 }
-                else if (processValue(true))
+                else if (processValue())
                 {
                     Node valNode = stack.pop();
                     joinNode.appendChildNode(valNode);
@@ -1337,11 +1337,11 @@ public class JPQLParser extends AbstractParser
         {
             // So we don't get interpreted as a method. Processed later
         }
-        else if (processKey(false)) // TODO Can we chain fields/methods off a KEY ?
+        else if (processKey()) // TODO Can we chain fields/methods off a KEY ?
         {
             return;
         }
-        else if (processValue(false)) // TODO Can we chain fields/methods off a VALUE ?
+        else if (processValue()) // TODO Can we chain fields/methods off a VALUE ?
         {
             return;
         }
@@ -1530,10 +1530,9 @@ public class JPQLParser extends AbstractParser
 
     /**
      * Process for a KEY construct. Puts the KEY Node on the stack if one is found.
-     * @param fromClause Whether this is a FROM clause
      * @return Whether a KEY construct was found by the lexer.
      */
-    protected boolean processKey(boolean fromClause)
+    protected boolean processKey()
     {
         if (lexer.parseString("KEY"))
         {
@@ -1554,20 +1553,10 @@ public class JPQLParser extends AbstractParser
                 primaryNode = primaryNode.getFirstChild();
             }
 
-            if (fromClause)
-            {
-                // Convert to be {primary#KEY}
-                // Handle as a primary but with #KEY appended to the last primary
-                Object keyValue = primaryNode.getNodeValue();
-                primaryNode.setNodeValue(keyValue + "#KEY");
-            }
-            else
-            {
-                // Convert to be {primary}.INVOKE(mapKey)
-                Node invokeNode = new Node(NodeType.INVOKE, "mapKey");
-                primaryNode.appendChildNode(invokeNode);
-                lastNode = invokeNode;
-            }
+            // Convert to be {primary#KEY}
+            // Handle as a primary but with #KEY appended to the last primary
+            Object keyValue = primaryNode.getNodeValue();
+            primaryNode.setNodeValue(keyValue + "#KEY");
             stack.push(primaryRootNode);
 
             // Allow referral to chain of field(s) of key i.e "KEY(...).field1.field2" etc
@@ -1604,10 +1593,9 @@ public class JPQLParser extends AbstractParser
 
     /**
      * Process for a VALUE construct. Puts the VALUE Node on the stack if one is found.
-     * @param fromClause Whether this is a FROM clause
      * @return Whether a VALUE construct was found by the lexer.
      */
-    protected boolean processValue(boolean fromClause)
+    protected boolean processValue()
     {
         if (lexer.parseString("VALUE"))
         {
@@ -1629,20 +1617,10 @@ public class JPQLParser extends AbstractParser
                 primaryNode = primaryNode.getFirstChild();
             }
 
-            if (fromClause)
-            {
-                // Convert to be {primary#VALUE}
-                // Handle as a primary but with #VALUE appended to the last primary
-                Object keyValue = primaryNode.getNodeValue();
-                primaryNode.setNodeValue(keyValue + "#VALUE");
-            }
-            else
-            {
-                // Convert to be {primary}.INVOKE(mapValue)
-                Node invokeNode = new Node(NodeType.INVOKE, "mapValue");
-                primaryNode.appendChildNode(invokeNode);
-                lastNode = invokeNode;
-            }
+            // Convert to be {primary#VALUE}
+            // Handle as a primary but with #VALUE appended to the last primary
+            Object keyValue = primaryNode.getNodeValue();
+            primaryNode.setNodeValue(keyValue + "#VALUE");
             stack.push(primaryRootNode);
 
             // Allow referral to chain of field(s) of key i.e "VALUE(...).field1.field2" etc

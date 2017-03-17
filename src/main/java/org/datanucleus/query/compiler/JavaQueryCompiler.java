@@ -337,7 +337,17 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                             String[] joinedMembers = joinedMember.contains(".") ? StringUtils.split(joinedMember, ".") : new String[] {joinedMember};
                             for (int k=0;k<joinedMembers.length;k++)
                             {
-                                AbstractMemberMetaData mmd = joinedCmd.getMetaDataForMember(joinedMembers[k]);
+                                String memberName = joinedMembers[k];
+                                if (memberName.endsWith("#KEY"))
+                                {
+                                    memberName = memberName.substring(0, memberName.length()-4);
+                                }
+                                else if (memberName.endsWith("#VALUE"))
+                                {
+                                    memberName = memberName.substring(0, memberName.length()-6);
+                                }
+
+                                AbstractMemberMetaData mmd = joinedCmd.getMetaDataForMember(memberName);
                                 if (mmd == null)
                                 {
                                     if (childNode.getNodeValue().equals(JOIN_OUTER) || childNode.getNodeValue().equals(JOIN_OUTER_FETCH))
@@ -351,10 +361,10 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                                                 AbstractClassMetaData subCmd = metaDataManager.getMetaDataForClass(subclasses[l], clr);
                                                 if (subCmd != null)
                                                 {
-                                                    mmd = subCmd.getMetaDataForMember(joinedMembers[k]);
+                                                    mmd = subCmd.getMetaDataForMember(memberName);
                                                     if (mmd != null)
                                                     {
-                                                        NucleusLogger.QUERY.debug("Polymorphic join found at " + joinedMembers[k] + " of " + subCmd.getFullClassName());
+                                                        NucleusLogger.QUERY.debug("Polymorphic join found at " + memberName + " of " + subCmd.getFullClassName());
                                                         joinedCmd = subCmd;
                                                         break;
                                                     }
@@ -385,11 +395,18 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                                     }
                                     else if (mmd.hasMap())
                                     {
-                                        joinedCmd = mmd.getMap().getValueClassMetaData(clr);
-                                        if (joinedCmd != null)
+                                        if (joinedMembers[k].endsWith("#KEY"))
                                         {
-                                            // JPA assumption that the value is an entity ... but it may not be!
-                                            joinedCls = clr.classForName(joinedCmd.getFullClassName());
+                                            joinedCmd = mmd.getMap().getKeyClassMetaData(clr);
+                                        }
+                                        else
+                                        {
+                                            joinedCmd = mmd.getMap().getValueClassMetaData(clr);
+                                            if (joinedCmd != null)
+                                            {
+                                                // JPA assumption that the value is an entity ... but it may not be!
+                                                joinedCls = clr.classForName(joinedCmd.getFullClassName());
+                                            }
                                         }
                                     }
                                     else if (mmd.hasArray())
