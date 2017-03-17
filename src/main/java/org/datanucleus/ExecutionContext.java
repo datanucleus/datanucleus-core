@@ -949,8 +949,8 @@ public interface ExecutionContext extends ExecutionContextReference
     /**
      * Perform an optimistic version check on the passed object, against the passed version in the datastore.
      * @param op ObjectProvider of the object to check
+     * @param versionStrategy The strategy
      * @param versionDatastore Version of the object in the datastore
-     * @param versionMetaData VersionMetaData to use for checking
      * @throws NucleusUserException thrown when an invalid strategy is specified
      * @throws NucleusOptimisticException thrown when the version check fails
      */

@@ -102,8 +102,8 @@ public interface StorePersistenceHandler
 
     /**
      * Fetches specified fields of several persistent objects (of the same type) from the database.
-     * @param op The ObjectProvider of the object to be fetched.
      * @param fieldNumbers The numbers of the fields to be fetched.
+     * @param ops The ObjectProviders of the objects to be fetched.
      * @throws NucleusObjectNotFoundException if the object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
