@@ -741,15 +741,17 @@ public abstract class JavaQueryCompiler implements SymbolResolver
             comp.setSymbolTable(symtbl);
             comp.setMethodAliases(queryMethodAliasByPrefix);
 
+            // Find the last child of this node, and check for an alias (type = NAME)
             String alias = null;
             Node aliasNode = null;
-            while (node[i].hasNextChild())
+            List<Node> childNodes = node[i].getChildNodes();
+            if (childNodes != null && childNodes.size() > 0)
             {
-                Node childNode = node[i].getNextChild();
-                if (childNode.getNodeType() == NodeType.NAME)
+                Node lastChild = childNodes.get(childNodes.size()-1);
+                if (lastChild.getNodeType() == NodeType.NAME)
                 {
                     // Alias node
-                    aliasNode = childNode;
+                    aliasNode = lastChild;
                 }
             }
             if (aliasNode != null)

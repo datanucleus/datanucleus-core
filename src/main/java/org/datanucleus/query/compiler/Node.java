@@ -151,8 +151,13 @@ public class Node
         return childNodes.get(index);
     }
 
+    /**
+     * Access the first child node.
+     * @return The first node, or null if no children present
+     */
     public Node getFirstChild()
     {
+        // TODO Phase out the use of cursorPos
         cursorPos = 0;
         if (childNodes.size() < 1)
         {
@@ -161,6 +166,10 @@ public class Node
         return childNodes.get(0);
     }
 
+    /**
+     * Access the next node. This asssumes that the method <pre>getFirstChild</pre> has been called before.
+     * @return The next child
+     */
     public Node getNextChild()
     {
         cursorPos++;
@@ -171,6 +180,10 @@ public class Node
         return childNodes.get(cursorPos);
     }
 
+    /**
+     * Return whether there is a "next" child node. Assumes that the method <pre>getFirstChild</pre> has been called before.
+     * @return Whether there is a next child node.
+     */
     public boolean hasNextChild()
     {
         return cursorPos+1<childNodes.size();
