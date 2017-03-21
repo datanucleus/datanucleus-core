@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.query.JPQLQueryHelper;
 import org.datanucleus.query.expression.Expression;
@@ -122,6 +124,29 @@ public class JPQLCompiler extends JavaQueryCompiler
         compilation.setQueryLanguage(getLanguage());
 
         return compilation;
+    }
+
+    /**
+     * Method to perform a lookup of the class name from the input name.
+     * Makes use of the query "imports" and the lookup to "entity name".
+     * @param className Name of the class
+     * @return The class corresponding to this name
+     * @throws ClassNotResolvedException thrown if not resolvable using imports or entity name
+     */
+    public Class resolveClass(String className)
+    {
+        AbstractClassMetaData acmd = metaDataManager.getMetaDataForEntityName(className);
+        if (acmd != null)
+        {
+            // Resolved as an entityName, so return this class
+            String fullClassName = acmd.getFullClassName();
+            if (fullClassName != null)
+            {
+                return clr.classForName(fullClassName);
+            }
+        }
+
+        return super.resolveClass(className);
     }
 
     /* (non-Javadoc)
