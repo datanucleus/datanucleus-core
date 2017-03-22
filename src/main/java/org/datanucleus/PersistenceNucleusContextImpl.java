@@ -1560,7 +1560,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         if (IdentityUtils.isDatastoreIdentity(id) || IdentityUtils.isSingleFieldIdentity(id))
         {
             // Datastore id, or application single-field id
-            cmd = getMetaDataManager().getMetaDataForClass(IdentityUtils.getTargetClassNameForIdentitySimple(id), getClassLoaderResolver(id.getClass().getClassLoader()));
+            cmd = getMetaDataManager().getMetaDataForClass(IdentityUtils.getTargetClassNameForIdentity(id), getClassLoaderResolver(id.getClass().getClassLoader()));
         }
         else
         {

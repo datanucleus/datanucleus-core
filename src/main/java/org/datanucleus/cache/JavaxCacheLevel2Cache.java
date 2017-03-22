@@ -348,7 +348,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
                 Object key = entry.getKey();
                 if (cmd.getIdentityType() == IdentityType.APPLICATION)
                 {
-                    String targetClassName = IdentityUtils.getTargetClassNameForIdentitySimple(key);
+                    String targetClassName = IdentityUtils.getTargetClassNameForIdentity(key);
                     if (className.equals(targetClassName))
                     {
                         entryIter.remove();
@@ -356,7 +356,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
                 }
                 else if (cmd.getIdentityType() == IdentityType.DATASTORE)
                 {
-                    String targetClassName = IdentityUtils.getTargetClassNameForIdentitySimple(key);
+                    String targetClassName = IdentityUtils.getTargetClassNameForIdentity(key);
                     if (className.equals(targetClassName))
                     {
                         entryIter.remove();

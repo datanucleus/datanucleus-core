@@ -36,6 +36,7 @@ import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Series of utilities for handling identities of objects.
@@ -66,10 +67,11 @@ public class IdentityUtils
      * Simple method to return the target class name of the persistable object that the provided id represents.
      * If this is a datastore identity (OID) or single-field identity then returns the class name.
      * Otherwise returns null. Does no inheritance checking.
+     * TODO Cater for user-provided object-id class that has a field "className" defining the target name
      * @param id The identity
      * @return Class name for the identity if easily determinable
      */
-    public static String getTargetClassNameForIdentitySimple(Object id)
+    public static String getTargetClassNameForIdentity(Object id)
     {
         if (id instanceof DatastoreId)
         {
@@ -80,6 +82,19 @@ public class IdentityUtils
         {
             // Using SingleFieldIdentity so can assume that object is of the target class
             return ((SingleFieldId)id).getTargetClassName();
+        }
+        else
+        {
+            try
+            {
+                Object val = ClassUtils.getValueOfFieldByReflection(id, "className");
+                // TODO Convert to String and return
+                NucleusLogger.GENERAL.info(">> IdentityUtils.getTargetClassNameForIdentity type=" + id.getClass().getName() + " -> className=" + val);
+            }
+            catch (NucleusException ne)
+            {
+                NucleusLogger.GENERAL.debug(">> Attempt to find field 'className' of object of type " + id.getClass() + " gave exception : " + ne.getMessage());
+            }
         }
 
         // Must be user-specified identity so just return

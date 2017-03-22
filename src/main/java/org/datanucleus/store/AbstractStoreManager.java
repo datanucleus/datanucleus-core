@@ -938,7 +938,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         if (IdentityUtils.isDatastoreIdentity(id))
         {
             // Check that the implied class is managed
-            className = IdentityUtils.getTargetClassNameForIdentitySimple(id);
+            className = IdentityUtils.getTargetClassNameForIdentity(id);
             AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
             if (cmd.getIdentityType() != IdentityType.DATASTORE)
             {
@@ -947,7 +947,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
         else if (IdentityUtils.isSingleFieldIdentity(id))
         {
-            className = IdentityUtils.getTargetClassNameForIdentitySimple(id);
+            className = IdentityUtils.getTargetClassNameForIdentity(id);
             AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
             if (cmd.getIdentityType() != IdentityType.APPLICATION || !cmd.getObjectidClass().equals(id.getClass().getName()))
             {
@@ -1057,7 +1057,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         else if (IdentityUtils.isDatastoreIdentity(id) || IdentityUtils.isSingleFieldIdentity(id))
         {
             // Object is an OID or single-field id
-            return IdentityUtils.getTargetClassNameForIdentitySimple(id);
+            return IdentityUtils.getTargetClassNameForIdentity(id);
         }
         else
         {
