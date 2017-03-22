@@ -299,11 +299,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         loadFieldValues(fv); // as a minimum the PK fields are loaded here
 
         // Create the ID now that we have the PK fields loaded
-        myID = myPC.dnNewObjectIdInstance();
-        if (!cmd.usesSingleFieldIdentityClass())
-        {
-            myPC.dnCopyKeyFieldsToObjectId(myID);
-        }
+        myID = myEC.getNucleusContext().getIdentityManager().getApplicationId(myPC, cmd);
     }
 
     /**
@@ -2117,8 +2113,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         if (className == null)
         {
             // className is null when id class exists, and object has been validated and doesn't exist.
-            throw new NucleusObjectNotFoundException(Localiser.msg("026013", 
-                IdentityUtils.getPersistableIdentityForId(myID)), myID);
+            throw new NucleusObjectNotFoundException(Localiser.msg("026013", IdentityUtils.getPersistableIdentityForId(myID)), myID);
         }
         else if (!cmd.getFullClassName().equals(className))
         {
@@ -2131,10 +2126,8 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             }
             catch (ClassNotResolvedException e)
             {
-                NucleusLogger.PERSISTENCE.warn(Localiser.msg("026014",
-                    IdentityUtils.getPersistableIdentityForId(myID)));
-                throw new NucleusUserException(Localiser.msg("026014",
-                    IdentityUtils.getPersistableIdentityForId(myID)), e);
+                NucleusLogger.PERSISTENCE.warn(Localiser.msg("026014", IdentityUtils.getPersistableIdentityForId(myID)));
+                throw new NucleusUserException(Localiser.msg("026014", IdentityUtils.getPersistableIdentityForId(myID)), e);
             }
             if (cmd == null)
             {
@@ -2162,11 +2155,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             loadFieldValues(fv);
 
             // Create the id for the new PC
-            myID = myPC.dnNewObjectIdInstance();
-            if (!cmd.usesSingleFieldIdentityClass())
-            {
-                myPC.dnCopyKeyFieldsToObjectId(myID);
-            }
+            myID = myEC.getNucleusContext().getIdentityManager().getApplicationId(myPC, cmd);
         }
     }
 
@@ -2305,7 +2294,6 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             {
                 // Not generating the identity in the datastore so set it now
                 myID = myEC.newObjectId(cmd.getFullClassName(), myPC);
-                // TODO If this is a user-provided id and has a targetClassName then we need to set it
                 idSet = true;
             }
         }
@@ -2518,14 +2506,15 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 }
             }
 
-            if (cmd.usesSingleFieldIdentityClass())
+            // All id classes are assumed to be immutable
+            return myID;
+/*            if (cmd.usesSingleFieldIdentityClass())
             {
-                //SingleFieldIdentity classes are immutable.
-                //Note, the instances of SingleFieldIdentity can be changed by the user using reflection,
-                //but this is not allowed by the JDO spec
+                // SingleFieldIdentity classes are immutable. Note, they could be changed using reflection but prohibited by JDO spec
                 return myID;
             }
-            return myEC.getNucleusContext().getIdentityManager().getApplicationId(myPC, cmd);
+            // TODO Do we really need to create a new "id" when we have one already?
+            return myEC.getNucleusContext().getIdentityManager().getApplicationId(myPC, cmd);*/
         }
 
         return myID;
