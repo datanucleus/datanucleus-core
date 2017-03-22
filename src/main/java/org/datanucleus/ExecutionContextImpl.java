@@ -4945,7 +4945,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void replaceObjectId(Object pc, Object oldID, Object newID)
     {
-        if (pc == null || getApiAdapter().getIdForObject(pc) == null)
+        if (pc == null || newID == null)
         {
             NucleusLogger.CACHE.warn(Localiser.msg("003006"));
             return;

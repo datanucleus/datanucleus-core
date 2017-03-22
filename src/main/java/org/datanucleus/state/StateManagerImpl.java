@@ -2255,12 +2255,14 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             return;
         }
 
+        boolean idSet = false;
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
             if (cmd.getIdentityMetaData() == null || !getStoreManager().isStrategyDatastoreAttributed(cmd, -1))
             {
                 // Assumed to be set
                 myID = myEC.newObjectId(cmd.getFullClassName(), myPC);
+                idSet = true;
             }
         }
         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
@@ -2303,12 +2305,14 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             {
                 // Not generating the identity in the datastore so set it now
                 myID = myEC.newObjectId(cmd.getFullClassName(), myPC);
+                // TODO If this is a user-provided id and has a targetClassName then we need to set it
+                idSet = true;
             }
         }
 
-        if (myInternalID != myID && myID != null && myEC.getApiAdapter().getIdForObject(myPC) != null)
+        if (myInternalID != myID && myID != null && (idSet || myEC.getApiAdapter().getIdForObject(myPC) != null))
         {
-            // Update the id with the PM if it is changing
+            // Update the id with the ExecutionContext if it is changing
             myEC.replaceObjectId(myPC, myInternalID, myID);
 
             this.myInternalID = myID;
