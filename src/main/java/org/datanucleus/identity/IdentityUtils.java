@@ -72,6 +72,11 @@ public class IdentityUtils
      */
     public static String getTargetClassNameForIdentity(Object id)
     {
+        if (id == null)
+        {
+            return null;
+        }
+
         if (id instanceof DatastoreId)
         {
             // Object is an OID
