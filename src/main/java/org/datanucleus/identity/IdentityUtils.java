@@ -64,10 +64,9 @@ public class IdentityUtils
     }
 
     /**
-     * Simple method to return the target class name of the persistable object that the provided id represents.
-     * If this is a datastore identity (OID) or single-field identity then returns the class name.
-     * Otherwise returns null. Does no inheritance checking.
-     * TODO Cater for user-provided object-id class that has a field "className" defining the target name
+     * Method to return the target class name of the persistable object that the provided identity represents.
+     * For the cases of datastore-identity or single-field identity then utilises the accessor method on those identity types to get the targetClassName.
+     * For user-provided identity types checks for a <pre>className</pre> field and returns it if present. Otherwise returns null.
      * @param id The identity
      * @return Class name for the identity if easily determinable
      */
@@ -88,8 +87,11 @@ public class IdentityUtils
             try
             {
                 Object val = ClassUtils.getValueOfFieldByReflection(id, "className");
-                // TODO Convert to String and return
                 NucleusLogger.GENERAL.info(">> IdentityUtils.getTargetClassNameForIdentity type=" + id.getClass().getName() + " -> className=" + val);
+                if (val instanceof String)
+                {
+                    return (String)val;
+                }
             }
             catch (NucleusException ne)
             {
