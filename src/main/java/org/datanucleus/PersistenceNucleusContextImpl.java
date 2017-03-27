@@ -1557,10 +1557,11 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         }
 
         AbstractClassMetaData cmd = null;
-        if (IdentityUtils.isDatastoreIdentity(id) || IdentityUtils.isSingleFieldIdentity(id))
+        String className = IdentityUtils.getTargetClassNameForIdentity(id);
+        if (className != null)
         {
-            // Datastore id, or application single-field id
-            cmd = getMetaDataManager().getMetaDataForClass(IdentityUtils.getTargetClassNameForIdentity(id), getClassLoaderResolver(id.getClass().getClassLoader()));
+            // "Identity" defines the class name
+            cmd = getMetaDataManager().getMetaDataForClass(className, getClassLoaderResolver(id.getClass().getClassLoader()));
         }
         else
         {

@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.identity;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,6 +34,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.IdentityType;
+import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -351,7 +353,6 @@ public class IdentityManagerImpl implements IdentityManager
         catch (Exception e)
         {
             NucleusLogger.PERSISTENCE.error("Error encountered while creating SingleFieldIdentity instance of type \"" + idType.getName() + "\"", e);
-
             return null;
         }
 
@@ -359,8 +360,7 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
     /**
-     * Utility to create a new application identity when you know the metadata for the target class,
-     * and the toString() output of the identity.
+     * Utility to create a new application identity when you know the metadata for the target class, and the toString() output of the identity.
      * @param clr ClassLoader resolver
      * @param acmd MetaData for the target class
      * @param keyToString String form of the key
@@ -440,10 +440,10 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
     /**
-     * Method to create a new object identity for the passed object with the supplied MetaData.
+     * Method to create a new object identity for the passed object with the supplied MetaData (when using APPLICATION identity).
      * Only applies to application-identity cases.
      * @param pc The persistable object
-     * @param cmd Its metadata
+     * @param cmd Metadata for the persistable object
      * @return The new identity object
      */
     public Object getApplicationId(Object pc, AbstractClassMetaData cmd)
@@ -460,6 +460,23 @@ public class IdentityManagerImpl implements IdentityManager
             {
                 ((Persistable)pc).dnCopyKeyFieldsToObjectId(id);
             }
+
+            if (!(id instanceof SingleFieldId))
+            {
+                // DataNucleus feature to allow user-defined id classes to have a field "targetClassName" storing the class name of the object being represented
+                Field classField = ClassUtils.getFieldForClass(id.getClass(), "targetClassName");
+                if (classField != null)
+                {
+                    try
+                    {
+                        classField.set(id, cmd.getFullClassName());
+                    }
+                    catch (IllegalArgumentException | IllegalAccessException e)
+                    {
+                    }
+                }
+            }
+
             return id;
         }
         catch (Exception e)

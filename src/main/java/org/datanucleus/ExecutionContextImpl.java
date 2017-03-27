@@ -3320,12 +3320,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Object class name specified so use that directly
             originalClassName = objectClassName;
         }
-        else if (IdentityUtils.isDatastoreIdentity(id) || IdentityUtils.isSingleFieldIdentity(id))
+        else
         {
-            // OID or SingleFieldIdentity, so check that the implied class is managed
             originalClassName = getStoreManager().manageClassForIdentity(id, clr);
         }
-        else
+
+        if (originalClassName == null)
         {
             // We dont know the object class so try to deduce it from what is known by the StoreManager
             originalClassName = getClassNameForObjectId(id);
@@ -3399,13 +3399,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     protected String getClassNameForObjectId(Object id)
     {
-        String className = null;
-        if (IdentityUtils.isDatastoreIdentity(id) || IdentityUtils.isSingleFieldIdentity(id))
-        {
-            // OID or SingleFieldIdentity, so check that the implied class is managed
-            className = getStoreManager().manageClassForIdentity(id, clr);
-        }
-        else
+        String className = getStoreManager().manageClassForIdentity(id, clr);
+        if (className == null) // Datastore id and single-field identity will have had targetClassName set, so must be user-provided application identity
         {
             Collection<AbstractClassMetaData> cmds = getMetaDataManager().getClassMetaDataWithApplicationId(id.getClass().getName());
             if (cmds != null && cmds.size() == 1)

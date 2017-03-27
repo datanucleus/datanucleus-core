@@ -36,7 +36,6 @@ import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.util.ClassUtils;
-import org.datanucleus.util.NucleusLogger;
 
 /**
  * Series of utilities for handling identities of objects.
@@ -89,10 +88,11 @@ public class IdentityUtils
         }
         else
         {
+            // Try to find a field with name "targetClassName"
+            // TODO Allow alternatives to this, for example using an annotation on the id class, and having a cache of what field name to use for which id type
             try
             {
-                Object val = ClassUtils.getValueOfFieldByReflection(id, "className");
-                NucleusLogger.GENERAL.info(">> IdentityUtils.getTargetClassNameForIdentity type=" + id.getClass().getName() + " -> className=" + val);
+                Object val = ClassUtils.getValueOfFieldByReflection(id, "targetClassName");
                 if (val instanceof String)
                 {
                     return (String)val;
@@ -100,11 +100,10 @@ public class IdentityUtils
             }
             catch (NucleusException ne)
             {
-                NucleusLogger.GENERAL.debug(">> Attempt to find field 'className' of object of type " + id.getClass() + " gave exception : " + ne.getMessage());
             }
         }
 
-        // Must be user-specified identity so just return
+        // Must be either user-specified identity with no targetClassName, or not an identity so just return
         return null;
     }
 

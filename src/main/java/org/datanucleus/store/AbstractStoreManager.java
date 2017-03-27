@@ -86,15 +86,13 @@ import org.datanucleus.util.TypeConversionHelper;
  * Will be implemented for the type of datastore (RDBMS, ODBMS, etc) in question. 
  * The store manager's responsibilities include:
  * <ul>
- * <li>Creating and/or validating datastore tables according to the persistent classes being 
- * accessed by the application.</li>
+ * <li>Creating and/or validating datastore tables according to the persistent classes being accessed by the application.</li>
  * <li>Serving as the primary intermediary between ObjectProviders and the database.</li>
  * <li>Serving as the base Extent and Query factory.</li>
  * </ul>
  * <p>
- * A store manager's knowledge of its contents is typically not complete. It knows about
- * the classes that it has encountered in its lifetime. The PersistenceManager can make the
- * StoreManager aware of a class, and can check if the StoreManager knows about a particular class.
+ * A store manager's knowledge of its contents is typically not complete. It knows about the classes that it has encountered in its lifetime. 
+ * The ExecutionContext can make the StoreManager aware of a class, and can check if the StoreManager knows about a particular class.
  */
 public abstract class AbstractStoreManager extends PropertyStore implements StoreManager
 {
@@ -934,30 +932,28 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      */
     public String manageClassForIdentity(Object id, ClassLoaderResolver clr)
     {
-        String className = null;
-        if (IdentityUtils.isDatastoreIdentity(id))
+        if (nucleusContext.getTypeManager().isSupportedSecondClassType(id.getClass().getName()))
         {
-            // Check that the implied class is managed
-            className = IdentityUtils.getTargetClassNameForIdentity(id);
-            AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
-            if (cmd.getIdentityType() != IdentityType.DATASTORE)
-            {
-                throw new NucleusUserException(Localiser.msg("038001", id, cmd.getFullClassName()));
-            }
+            return null;
         }
-        else if (IdentityUtils.isSingleFieldIdentity(id))
+
+        String className = IdentityUtils.getTargetClassNameForIdentity(id);
+        if (className == null)
         {
-            className = IdentityUtils.getTargetClassNameForIdentity(id);
-            AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
-            if (cmd.getIdentityType() != IdentityType.APPLICATION || !cmd.getObjectidClass().equals(id.getClass().getName()))
-            {
-                throw new NucleusUserException(Localiser.msg("038001", id, cmd.getFullClassName()));
-            }
+            // Just return since class name unknown
+            return null;
         }
-        else
+
+        AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
+
+        // Basic error checking
+        if (IdentityUtils.isDatastoreIdentity(id) && cmd.getIdentityType() != IdentityType.DATASTORE)
         {
-            throw new NucleusException("StoreManager.manageClassForIdentity called for id=" + id + 
-                " yet should only be called for datastore-identity/SingleFieldIdentity");
+            throw new NucleusUserException(Localiser.msg("038001", id, cmd.getFullClassName()));
+        }
+        if (IdentityUtils.isSingleFieldIdentity(id) && (cmd.getIdentityType() != IdentityType.APPLICATION || !cmd.getObjectidClass().equals(id.getClass().getName())))
+        {
+            throw new NucleusUserException(Localiser.msg("038001", id, cmd.getFullClassName()));
         }
 
         // If the class is not yet managed, manage it
@@ -1054,27 +1050,26 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             // Object is a SCOID
             return ((SCOID) id).getSCOClass();
         }
-        else if (IdentityUtils.isDatastoreIdentity(id) || IdentityUtils.isSingleFieldIdentity(id))
+
+        String className = IdentityUtils.getTargetClassNameForIdentity(id);
+        if (className != null)
         {
-            // Object is an OID or single-field id
-            return IdentityUtils.getTargetClassNameForIdentity(id);
+            return className;
         }
-        else
+
+        // Application identity with user PK class, so find all using this PK
+        Collection<AbstractClassMetaData> cmds = getMetaDataManager().getClassMetaDataWithApplicationId(id.getClass().getName());
+        if (cmds != null)
         {
-            // Application identity with user PK class, so find all using this PK
-            Collection<AbstractClassMetaData> cmds = getMetaDataManager().getClassMetaDataWithApplicationId(id.getClass().getName());
-            if (cmds != null)
+            Iterator<AbstractClassMetaData> iter = cmds.iterator();
+            while (iter.hasNext())
             {
-                Iterator<AbstractClassMetaData> iter = cmds.iterator();
-                while (iter.hasNext())
-                {
-                    // Just return the class name of the first one using this id - could be any in this tree
-                    AbstractClassMetaData cmd = iter.next();
-                    return cmd.getFullClassName();
-                }
+                // Just return the class name of the first one using this id - could be any in this tree
+                AbstractClassMetaData cmd = iter.next();
+                return cmd.getFullClassName();
             }
-            return null;
         }
+        return null;
     }
 
     /**
