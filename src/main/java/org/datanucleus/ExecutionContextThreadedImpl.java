@@ -112,13 +112,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void addObjectProvider(ObjectProvider op)
+    public void addObjectProviderToCache(ObjectProvider op)
     {
         try
         {
             lock.lock();
 
-            super.addObjectProvider(op);
+            super.addObjectProviderToCache(op);
         }
         finally
         {
@@ -126,13 +126,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void removeObjectProvider(ObjectProvider op)
+    public void removeObjectProviderFromCache(ObjectProvider op)
     {
         try
         {
             lock.lock();
 
-            super.removeObjectProvider(op);
+            super.removeObjectProviderFromCache(op);
         }
         finally
         {

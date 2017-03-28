@@ -81,6 +81,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * Method to return the owner object.
      * For JDO this will return the PersistenceManager in use.
      * For JPA this will return the EntityManager in use.
+     * Note: This is used by the bytecode enhancement contract.
      * @return The owner manager object
      */
     Object getOwner();
@@ -220,7 +221,7 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Method to find the ObjectProvider for the passed persistable object when it is managed by this manager, 
-     * and if not yet persistent to persist it.
+     * and if not yet persistent to persist it and return the assigned ObjectProvider.
      * @param pc The persistable object
      * @param persist Whether to persist if not yet persistent
      * @return The ObjectProvider
@@ -243,13 +244,13 @@ public interface ExecutionContext extends ExecutionContextReference
      * Method to add the object managed by the specified ObjectProvider to the cache.
      * @param op The ObjectProvider
      */
-    void addObjectProvider(ObjectProvider op);
+    void addObjectProviderToCache(ObjectProvider op);
 
     /**
      * Method to remove the object managed by the specified ObjectProvider from the cache.
      * @param op The ObjectProvider
      */
-    void removeObjectProvider(ObjectProvider op);
+    void removeObjectProviderFromCache(ObjectProvider op);
 
     /**
      * Method to evict the passed object.
@@ -525,11 +526,12 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Shortcut to calling "findObject(id, validate, validate, null)".
+     * Note: This is used by the bytecode enhancement contract in <pre>dnCopyKeyFieldsFromObjectId</pre>
      * @param id The id of the object
      * @param validate Whether to validate the id
      * @return The object
      */
-    Object findObjectById(Object id, boolean validate);
+    Object findObject(Object id, boolean validate);
 
     /**
      * Accessor for objects with the specified identities.

@@ -192,7 +192,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             provideFields(fieldNumbers, new UnsetOwnerFieldManager());
         }
 
-        myEC.removeObjectProvider(this);
+        myEC.removeObjectProviderFromCache(this);
 
         persistenceFlags = Persistable.READ_WRITE_OK;
         myPC.dnReplaceFlags();
@@ -3391,7 +3391,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 {
                     if (myLC.isPersistent())
                     {
-                        myEC.addObjectProvider(this);
+                        myEC.addObjectProviderToCache(this);
                     }
 
                     // Everything OK so far. Now we can set SM reference in PC 
@@ -3407,7 +3407,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 {
                     if (myEC.findObjectProvider(myEC.getObjectFromCache(myID)) == this)
                     {
-                        myEC.removeObjectProvider(this);
+                        myEC.removeObjectProviderFromCache(this);
                     }
                     throw ne;
                 }

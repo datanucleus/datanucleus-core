@@ -1624,7 +1624,7 @@ public abstract class AbstractStateManager<T> implements ObjectProvider<T>
      */
     public void registerTransactional()
     {
-        myEC.addObjectProvider(this);
+        myEC.addObjectProviderToCache(this);
     }
 
     /**

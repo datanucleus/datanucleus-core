@@ -1188,7 +1188,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * Method to add the object managed by the specified ObjectProvider to the (L1) cache.
      * @param op The ObjectProvider
      */
-    public void addObjectProvider(ObjectProvider op)
+    public void addObjectProviderToCache(ObjectProvider op)
     {
         // Add to the Level 1 Cache
         putObjectIntoLevel1Cache(op);
@@ -1198,7 +1198,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * Method to remove the object managed by the specified ObjectProvider from the cache.
      * @param op The ObjectProvider
      */
-    public void removeObjectProvider(ObjectProvider op)
+    public void removeObjectProviderFromCache(ObjectProvider op)
     {
         if (closing)
         {
@@ -2957,7 +2957,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return (T) findObject(id, true, true, null);
     }
 
-    public Object findObjectById(Object id, boolean validate)
+    public Object findObject(Object id, boolean validate)
     {
         return findObject(id, validate, validate, null);
     }
@@ -4305,7 +4305,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         if (properties.getFrequentProperties().getDetachAllOnCommit() && api.isDetachable(ops[i].getObject()))
                         {
                             // "DetachAllOnCommit" - Remove the object from the L1 cache since it is now detached
-                            removeObjectProvider(ops[i]);
+                            removeObjectProviderFromCache(ops[i]);
                         }
                     }
                 }
