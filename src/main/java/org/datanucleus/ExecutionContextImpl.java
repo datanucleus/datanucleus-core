@@ -2957,7 +2957,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return (T) findObject(id, true, true, null);
     }
 
-    public Object findObject(Object id, boolean validate)
+    public Object findObjectById(Object id, boolean validate)
     {
         return findObject(id, validate, validate, null);
     }
@@ -3063,7 +3063,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @return The Objects with these ids (same order)
      * @throws NucleusObjectNotFoundException if an object doesn't exist in the datastore
      */
-    public Object[] findObjects(Object[] identities, boolean validate)
+    public Object[] findObjectsById(Object[] identities, boolean validate)
     {
         if (identities == null)
         {

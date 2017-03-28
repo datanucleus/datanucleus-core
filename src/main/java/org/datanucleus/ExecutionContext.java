@@ -529,7 +529,16 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param validate Whether to validate the id
      * @return The object
      */
-    Object findObject(Object id, boolean validate);
+    Object findObjectById(Object id, boolean validate);
+
+    /**
+     * Accessor for objects with the specified identities.
+     * @param ids Ids of the object(s).
+     * @param validate Whether to validate the object state
+     * @return The Objects with these ids (same order)
+     * @throws NucleusObjectNotFoundException if an object doesn't exist in the datastore
+     */
+    Object[] findObjectsById(Object[] ids, boolean validate);
 
     /**
      * Accessor for an object given the object id.
@@ -545,8 +554,7 @@ public interface ExecutionContext extends ExecutionContextReference
     Object findObject(Object id, boolean validate, boolean checkInheritance, String objectClassName);
 
     /**
-     * Accessor for an object given the object id. Typically used after a query to apply the retrieved values
-     * to an object.
+     * Accessor for an object given the object id. Typically used after a query to apply the retrieved values to an object.
      * @param id Id of the object.
      * @param fv FieldValues to apply to the object (optional)
      * @param pcClass the type which the object is. This type will be used to instantiate the object
@@ -555,15 +563,6 @@ public interface ExecutionContext extends ExecutionContextReference
      * @return the Object
      */
     Object findObject(Object id, FieldValues fv, Class pcClass, boolean ignoreCache, boolean checkInheritance);
-
-    /**
-     * Accessor for objects with the specified identities.
-     * @param ids Ids of the object(s).
-     * @param validate Whether to validate the object state
-     * @return The Objects with these ids (same order)
-     * @throws NucleusObjectNotFoundException if an object doesn't exist in the datastore
-     */
-    Object[] findObjects(Object[] ids, boolean validate);
 
     /**
      * Accessor for the Extent for a class (and optionally its subclasses).

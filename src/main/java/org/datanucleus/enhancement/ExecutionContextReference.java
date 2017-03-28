@@ -35,5 +35,5 @@ public interface ExecutionContextReference
      * @param validate Whether to validate the id
      * @return The object
      */
-    Object findObject(Object id, boolean validate);
+    Object findObjectById(Object id, boolean validate);
 }
