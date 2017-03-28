@@ -2957,6 +2957,31 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return (T) findObject(id, true, true, null);
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.ExecutionContext#findObjectByUnique(java.lang.Class, java.lang.String[], java.lang.Object[])
+     */
+    @Override
+    public <T> T findObjectByUnique(Class<T> cls, String[] fieldNames, Object[] fieldValues)
+    {
+        if (cls == null || fieldNames == null || fieldNames.length == 0 || fieldValues == null || fieldValues.length == 0)
+        {
+            throw new NucleusUserException(Localiser.msg("010053", cls, StringUtils.objectArrayToString(fieldNames), StringUtils.objectArrayToString(fieldValues)));
+        }
+
+        AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(cls, clr);
+        if (cmd == null)
+        {
+            throw new NucleusUserException(Localiser.msg("010052", cls.getName()));
+        }
+
+        T obj = (T) getStoreManager().getPersistenceHandler().findObjectForKeys(this, cmd, fieldNames, fieldValues);
+        NucleusLogger.PERSISTENCE.debug("findObjectByUnique returned object=" + StringUtils.toJVMIDString(obj) + " for class=" + cls.getName() +
+            " members=" + StringUtils.objectArrayToString(fieldNames));
+        // TODO Add error handling
+
+        return obj;
+    }
+
     public Object findObject(Object id, boolean validate)
     {
         return findObject(id, validate, validate, null);
@@ -3278,165 +3303,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return objs;
     }
 
-    private static class ClassDetailsForId
-    {
-        Object id;
-        String className;
-        Object pc;
-        public ClassDetailsForId(Object id, String className, Object pc)
-        {
-            this.id = id;
-            this.className = className;
-            this.pc = pc;
-        }
-    }
-
-    /**
-     * Convenience method that takes an id, an optional class name for the object it represents, and whether
-     * to check for inheritance, and returns class details of the object being represented.
-     * Used by the findObject process.
-     * @param id The identity
-     * @param objectClassName Class name for the object (if known, otherwise is derived)
-     * @param checkInheritance Whether to check the inheritance level for this id
-     * @return The details for the class
-     */
-    private ClassDetailsForId getClassDetailsForId(Object id, String objectClassName, boolean checkInheritance)
-    {
-        // Object not found yet, so work out class name
-        String className = null;
-        String originalClassName = null;
-        boolean checkedClassName = false;
-        if (id instanceof SCOID)
-        {
-            throw new NucleusUserException(Localiser.msg("010006"));
-        }
-        else if (id instanceof DatastoreUniqueLongId)
-        {
-            // Should have been found using "persistenceHandler.findObject()"
-            throw new NucleusObjectNotFoundException(Localiser.msg("010026"), id);
-        }
-        else if (objectClassName != null)
-        {
-            // Object class name specified so use that directly
-            originalClassName = objectClassName;
-        }
-        else
-        {
-            originalClassName = getStoreManager().manageClassForIdentity(id, clr);
-        }
-
-        if (originalClassName == null)
-        {
-            // We dont know the object class so try to deduce it from what is known by the StoreManager
-            originalClassName = getClassNameForObjectId(id);
-            checkedClassName = true;
-        }
-
-        Object pc = null;
-        if (checkInheritance)
-        {
-            // Validate the inheritance level
-            className = checkedClassName ? originalClassName : getClassNameForObjectId(id);
-            if (className == null)
-            {
-                throw new NucleusObjectNotFoundException(Localiser.msg("010026"), id);
-            }
-
-            if (!checkedClassName)
-            {
-                // Check if this id for any known subclasses is in the cache to save searching
-                if (IdentityUtils.isDatastoreIdentity(id) || IdentityUtils.isSingleFieldIdentity(id))
-                {
-                    String[] subclasses = getMetaDataManager().getSubclassesForClass(className, true);
-                    if (subclasses != null)
-                    {
-                        for (int i=0;i<subclasses.length;i++)
-                        {
-                            Object oid = null;
-                            if (IdentityUtils.isDatastoreIdentity(id))
-                            {
-                                oid = nucCtx.getIdentityManager().getDatastoreId(subclasses[i], IdentityUtils.getTargetKeyForDatastoreIdentity(id));
-                            }
-                            else if (IdentityUtils.isSingleFieldIdentity(id))
-                            {
-                                oid = nucCtx.getIdentityManager().getSingleFieldId(id.getClass(), getClassLoaderResolver().classForName(subclasses[i]), 
-                                    IdentityUtils.getTargetKeyForSingleFieldIdentity(id));
-                            }
-                            pc = getObjectFromCache(oid);
-                            if (pc != null)
-                            {
-                                className = subclasses[i];
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (pc == null && originalClassName != null && !originalClassName.equals(className))
-            {
-                // Inheritance check implies different inheritance level, so retry
-                if (IdentityUtils.isDatastoreIdentity(id))
-                {
-                    // Create new OID using correct target class, and recheck cache
-                    id = nucCtx.getIdentityManager().getDatastoreId(className, ((DatastoreId)id).getKeyAsObject());
-                    pc = getObjectFromCache(id);
-                }
-                else if (IdentityUtils.isSingleFieldIdentity(id))
-                {
-                    // Create new SingleFieldIdentity using correct targetClass, and recheck cache
-                    id = nucCtx.getIdentityManager().getSingleFieldId(id.getClass(), clr.classForName(className), IdentityUtils.getTargetKeyForSingleFieldIdentity(id));
-                    pc = getObjectFromCache(id);
-                }
-            }
-        }
-        else
-        {
-            className = originalClassName;
-        }
-        return new ClassDetailsForId(id, className, pc);
-    }
-
-    protected String getClassNameForObjectId(Object id)
-    {
-        String className = getStoreManager().manageClassForIdentity(id, clr);
-        if (className == null) // Datastore id and single-field identity will have had targetClassName set, so must be user-provided application identity
-        {
-            Collection<AbstractClassMetaData> cmds = getMetaDataManager().getClassMetaDataWithApplicationId(id.getClass().getName());
-            if (cmds != null && cmds.size() == 1)
-            {
-                // Only 1 possible class using this id type, so return it
-                return cmds.iterator().next().getFullClassName();
-            }
-        }
-
-        if (className != null)
-        {
-            String[] subclasses = getMetaDataManager().getConcreteSubclassesForClass(className);
-            int numConcrete = 0;
-            String concreteClassName = null;
-            if (subclasses != null && subclasses.length > 0)
-            {
-                numConcrete = subclasses.length;
-                concreteClassName = subclasses[0];
-            }
-            Class rootCls = clr.classForName(className);
-            if (!Modifier.isAbstract(rootCls.getModifiers()))
-            {
-                concreteClassName = className;
-                numConcrete++;
-            }
-            if (numConcrete == 1)
-            {
-                // Single possible concrete class, so return it
-                return concreteClassName;
-            }
-        }
-
-        // If we have multiple possible classes then refer to the datastore to resolve it
-        return getStoreManager().getClassNameForObjectID(id, clr, this);
-    }
-
     /**
      * Accessor for an object given the object id. If validate is false, we return the object
      * if found in the cache, or otherwise a Hollow object with that id. If validate is true
@@ -3581,6 +3447,165 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         return pc;
+    }
+
+    private static class ClassDetailsForId
+    {
+        Object id;
+        String className;
+        Object pc;
+        public ClassDetailsForId(Object id, String className, Object pc)
+        {
+            this.id = id;
+            this.className = className;
+            this.pc = pc;
+        }
+    }
+
+    /**
+     * Convenience method that takes an id, an optional class name for the object it represents, and whether
+     * to check for inheritance, and returns class details of the object being represented.
+     * Used by the findObject process.
+     * @param id The identity
+     * @param objectClassName Class name for the object (if known, otherwise is derived)
+     * @param checkInheritance Whether to check the inheritance level for this id
+     * @return The details for the class
+     */
+    private ClassDetailsForId getClassDetailsForId(Object id, String objectClassName, boolean checkInheritance)
+    {
+        // Object not found yet, so work out class name
+        String className = null;
+        String originalClassName = null;
+        boolean checkedClassName = false;
+        if (id instanceof SCOID)
+        {
+            throw new NucleusUserException(Localiser.msg("010006"));
+        }
+        else if (id instanceof DatastoreUniqueLongId)
+        {
+            // Should have been found using "persistenceHandler.findObject()"
+            throw new NucleusObjectNotFoundException(Localiser.msg("010026"), id);
+        }
+        else if (objectClassName != null)
+        {
+            // Object class name specified so use that directly
+            originalClassName = objectClassName;
+        }
+        else
+        {
+            originalClassName = getStoreManager().manageClassForIdentity(id, clr);
+        }
+
+        if (originalClassName == null)
+        {
+            // We dont know the object class so try to deduce it from what is known by the StoreManager
+            originalClassName = getClassNameForObjectId(id);
+            checkedClassName = true;
+        }
+
+        Object pc = null;
+        if (checkInheritance)
+        {
+            // Validate the inheritance level
+            className = checkedClassName ? originalClassName : getClassNameForObjectId(id);
+            if (className == null)
+            {
+                throw new NucleusObjectNotFoundException(Localiser.msg("010026"), id);
+            }
+
+            if (!checkedClassName)
+            {
+                // Check if this id for any known subclasses is in the cache to save searching
+                if (IdentityUtils.isDatastoreIdentity(id) || IdentityUtils.isSingleFieldIdentity(id))
+                {
+                    String[] subclasses = getMetaDataManager().getSubclassesForClass(className, true);
+                    if (subclasses != null)
+                    {
+                        for (int i=0;i<subclasses.length;i++)
+                        {
+                            Object oid = null;
+                            if (IdentityUtils.isDatastoreIdentity(id))
+                            {
+                                oid = nucCtx.getIdentityManager().getDatastoreId(subclasses[i], IdentityUtils.getTargetKeyForDatastoreIdentity(id));
+                            }
+                            else if (IdentityUtils.isSingleFieldIdentity(id))
+                            {
+                                oid = nucCtx.getIdentityManager().getSingleFieldId(id.getClass(), getClassLoaderResolver().classForName(subclasses[i]), 
+                                    IdentityUtils.getTargetKeyForSingleFieldIdentity(id));
+                            }
+                            pc = getObjectFromCache(oid);
+                            if (pc != null)
+                            {
+                                className = subclasses[i];
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (pc == null && originalClassName != null && !originalClassName.equals(className))
+            {
+                // Inheritance check implies different inheritance level, so retry
+                if (IdentityUtils.isDatastoreIdentity(id))
+                {
+                    // Create new OID using correct target class, and recheck cache
+                    id = nucCtx.getIdentityManager().getDatastoreId(className, ((DatastoreId)id).getKeyAsObject());
+                    pc = getObjectFromCache(id);
+                }
+                else if (IdentityUtils.isSingleFieldIdentity(id))
+                {
+                    // Create new SingleFieldIdentity using correct targetClass, and recheck cache
+                    id = nucCtx.getIdentityManager().getSingleFieldId(id.getClass(), clr.classForName(className), IdentityUtils.getTargetKeyForSingleFieldIdentity(id));
+                    pc = getObjectFromCache(id);
+                }
+            }
+        }
+        else
+        {
+            className = originalClassName;
+        }
+        return new ClassDetailsForId(id, className, pc);
+    }
+
+    private String getClassNameForObjectId(Object id)
+    {
+        String className = getStoreManager().manageClassForIdentity(id, clr);
+        if (className == null) // Datastore id and single-field identity will have had targetClassName set, so must be user-provided application identity
+        {
+            Collection<AbstractClassMetaData> cmds = getMetaDataManager().getClassMetaDataWithApplicationId(id.getClass().getName());
+            if (cmds != null && cmds.size() == 1)
+            {
+                // Only 1 possible class using this id type, so return it
+                return cmds.iterator().next().getFullClassName();
+            }
+        }
+
+        if (className != null)
+        {
+            String[] subclasses = getMetaDataManager().getConcreteSubclassesForClass(className);
+            int numConcrete = 0;
+            String concreteClassName = null;
+            if (subclasses != null && subclasses.length > 0)
+            {
+                numConcrete = subclasses.length;
+                concreteClassName = subclasses[0];
+            }
+            Class rootCls = clr.classForName(className);
+            if (!Modifier.isAbstract(rootCls.getModifiers()))
+            {
+                concreteClassName = className;
+                numConcrete++;
+            }
+            if (numConcrete == 1)
+            {
+                // Single possible concrete class, so return it
+                return concreteClassName;
+            }
+        }
+
+        // If we have multiple possible classes then refer to the datastore to resolve it
+        return getStoreManager().getClassNameForObjectID(id, clr, this);
     }
 
     /**

@@ -519,10 +519,20 @@ public interface ExecutionContext extends ExecutionContextReference
      * With datastore id or single-field id the "key" is the key of the id, and with composite ids the "key" is the toString() of the id.
      * @param cls Class of the persistable
      * @param key Value of the key field for SingleFieldIdentity, or the string value of the key otherwise
-     * @return The object for this id.
+     * @return The object meeting this requirement
      * @param <T> Type of the persistable
      */
     <T> T findObject(Class<T> cls, Object key);
+
+    /**
+     * Accessor for an object of the specified type with the provided values for a unique key.
+     * @param cls Class of the persistable
+     * @param fieldNames Name(s) of the field(s) forming the unique key
+     * @param fieldValues Value(s) of the field(s) forming the unique key
+     * @return The object meeting this requirement
+     * @param <T> Type of the persistable
+     */
+    <T> T findObjectByUnique(Class<T> cls, String[] fieldNames, Object[] fieldValues);
 
     /**
      * Shortcut to calling "findObject(id, validate, validate, null)".
