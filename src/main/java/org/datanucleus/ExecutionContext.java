@@ -526,6 +526,10 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Accessor for an object of the specified type with the provided values for a unique key.
+     * Alternative would be to have an intermediate class and do this
+     * <pre>
+     * ec.findObjectByUnique(cls).for("field1", val1).for("field2", val2).find();
+     * </pre>
      * @param cls Class of the persistable
      * @param fieldNames Name(s) of the field(s) forming the unique key
      * @param fieldValues Value(s) of the field(s) forming the unique key

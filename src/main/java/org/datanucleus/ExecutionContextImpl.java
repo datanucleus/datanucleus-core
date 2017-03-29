@@ -2961,27 +2961,31 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @see org.datanucleus.ExecutionContext#findObjectByUnique(java.lang.Class, java.lang.String[], java.lang.Object[])
      */
     @Override
-    public <T> T findObjectByUnique(Class<T> cls, String[] fieldNames, Object[] fieldValues)
+    public <T> T findObjectByUnique(Class<T> cls, String[] memberNames, Object[] memberValues)
     {
-        if (cls == null || fieldNames == null || fieldNames.length == 0 || fieldValues == null || fieldValues.length == 0)
+        if (cls == null || memberNames == null || memberNames.length == 0 || memberValues == null || memberValues.length == 0)
         {
-            throw new NucleusUserException(Localiser.msg("010053", cls, StringUtils.objectArrayToString(fieldNames), StringUtils.objectArrayToString(fieldValues)));
+            throw new NucleusUserException(Localiser.msg("010053", cls, StringUtils.objectArrayToString(memberNames), StringUtils.objectArrayToString(memberValues)));
         }
 
+        // Check class and member existence
         AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(cls, clr);
         if (cmd == null)
         {
             throw new NucleusUserException(Localiser.msg("010052", cls.getName()));
         }
+        for (String memberName : memberNames)
+        {
+            AbstractMemberMetaData mmd = cmd.getMetaDataForMember(memberName);
+            if (mmd == null)
+            {
+                throw new NucleusUserException("Attempt to find object using unique key of class " + cmd.getFullClassName() + " but field " + memberName + " doesnt exist!");
+            }
+        }
 
-        // TODO Check cache?
+        // TODO Check cache? Would need to cache against cls+unique_fields
 
-        T obj = (T) getStoreManager().getPersistenceHandler().findObjectForUnique(this, cmd, fieldNames, fieldValues);
-        NucleusLogger.PERSISTENCE.debug("findObjectByUnique returned object=" + StringUtils.toJVMIDString(obj) + " for class=" + cls.getName() +
-            " members=" + StringUtils.objectArrayToString(fieldNames));
-        // TODO Add error handling
-
-        return obj;
+        return (T) getStoreManager().getPersistenceHandler().findObjectForUnique(this, cmd, memberNames, memberValues);
     }
 
     public Object findObject(Object id, boolean validate)
