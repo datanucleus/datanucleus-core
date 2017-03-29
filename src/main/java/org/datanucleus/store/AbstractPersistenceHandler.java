@@ -152,7 +152,7 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.StorePersistenceHandler#findObjectForKeys(org.datanucleus.ExecutionContext, org.datanucleus.metadata.AbstractClassMetaData, java.lang.String[], java.lang.Object[])
+     * @see org.datanucleus.store.StorePersistenceHandler#findObjectForUnique(org.datanucleus.ExecutionContext, org.datanucleus.metadata.AbstractClassMetaData, java.lang.String[], java.lang.Object[])
      */
     @Override
     public Object findObjectForUnique(ExecutionContext ec, AbstractClassMetaData cmd, String[] memberNames, Object[] values)
