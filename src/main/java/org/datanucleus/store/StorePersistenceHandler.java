@@ -159,7 +159,7 @@ public interface StorePersistenceHandler
      * @throws NucleusObjectNotFoundException if an object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public Object findObjectForKeys(ExecutionContext ec, AbstractClassMetaData cmd, String[] memberNames, Object[] values);
+    public Object findObjectForUnique(ExecutionContext ec, AbstractClassMetaData cmd, String[] memberNames, Object[] values);
 
     /**
      * Enum for the type of a batched operation

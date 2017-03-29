@@ -187,7 +187,7 @@ public class FederatedPersistenceHandler implements StorePersistenceHandler
      * @see org.datanucleus.store.StorePersistenceHandler#findObjectForKeys(org.datanucleus.ExecutionContext, org.datanucleus.metadata.AbstractClassMetaData, java.lang.String[], java.lang.Object[])
      */
     @Override
-    public Object findObjectForKeys(ExecutionContext ec, AbstractClassMetaData cmd, String[] memberNames, Object[] values)
+    public Object findObjectForUnique(ExecutionContext ec, AbstractClassMetaData cmd, String[] memberNames, Object[] values)
     {
         // TODO Find the appropriate datastore and process there
         return null;

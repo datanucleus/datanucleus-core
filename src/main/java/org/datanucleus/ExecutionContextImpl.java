@@ -2974,7 +2974,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             throw new NucleusUserException(Localiser.msg("010052", cls.getName()));
         }
 
-        T obj = (T) getStoreManager().getPersistenceHandler().findObjectForKeys(this, cmd, fieldNames, fieldValues);
+        T obj = (T) getStoreManager().getPersistenceHandler().findObjectForUnique(this, cmd, fieldNames, fieldValues);
         NucleusLogger.PERSISTENCE.debug("findObjectByUnique returned object=" + StringUtils.toJVMIDString(obj) + " for class=" + cls.getName() +
             " members=" + StringUtils.objectArrayToString(fieldNames));
         // TODO Add error handling

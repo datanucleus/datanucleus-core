@@ -155,11 +155,11 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
      * @see org.datanucleus.store.StorePersistenceHandler#findObjectForKeys(org.datanucleus.ExecutionContext, org.datanucleus.metadata.AbstractClassMetaData, java.lang.String[], java.lang.Object[])
      */
     @Override
-    public Object findObjectForKeys(ExecutionContext ec, AbstractClassMetaData cmd, String[] memberNames, Object[] values)
+    public Object findObjectForUnique(ExecutionContext ec, AbstractClassMetaData cmd, String[] memberNames, Object[] values)
     {
         if (memberNames.length != values.length)
         {
-            throw new NucleusUserException("findObjectForKeys should have same number of member names and values");
+            throw new NucleusUserException("findObjectForUnique should have same number of member names and values");
         }
 
         // Fallback to using a simple JDOQL query (which is what would be performed for the majority of datastores anyway)
@@ -167,11 +167,11 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
         Map<String, Object> paramValueMap = new HashMap<>();
         for (int i=0;i<memberNames.length;i++)
         {
-            jdoqlStr.append("this.").append(memberNames[i]).append("=:val").append(i);
+            jdoqlStr.append("this.").append(memberNames[i]).append("==:val").append(i);
             paramValueMap.put("val" + i, values[i]);
             if (i != memberNames.length-1)
             {
-                jdoqlStr.append(" AND ");
+                jdoqlStr.append(" && ");
             }
         }
         Query q = storeMgr.getQueryManager().newQuery("JDOQL", ec, jdoqlStr.toString());
