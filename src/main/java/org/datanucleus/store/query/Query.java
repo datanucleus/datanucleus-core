@@ -1584,7 +1584,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     /**
      * Method to add a subquery to this query.
      * @param sub The subquery
-     * @param variableDecl Declaration of variables
+     * @param variableDecl Declaration of variable that represents this subquery in the outer query
      * @param candidateExpr Candidate expression
      * @param paramMap Map of parameters for this subquery
      */
@@ -1593,6 +1593,10 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         if (StringUtils.isWhitespace(variableDecl))
         {
             throw new NucleusUserException(Localiser.msg("021115"));
+        }
+        if (variableDecl.contains(","))
+        {
+            throw new NucleusUserException("A subquery can be registered against a single variable name. Attempt to register subquery against multiple names : " + variableDecl);
         }
 
         if (sub == null)
@@ -1623,8 +1627,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
                 sub.setFrom(candidateExpr);
             }
             subqueries.put(subqueryVariableName,
-                new SubqueryDefinition(sub, StringUtils.isWhitespace(candidateExpr) ? null : candidateExpr, 
-                        variableDecl, paramMap));
+                new SubqueryDefinition(sub, StringUtils.isWhitespace(candidateExpr) ? null : candidateExpr, variableDecl, paramMap));
         }
     }
 
