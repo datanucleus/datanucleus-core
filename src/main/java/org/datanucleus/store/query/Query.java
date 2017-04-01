@@ -1594,6 +1594,10 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         {
             throw new NucleusUserException(Localiser.msg("021115"));
         }
+        if (variableDecl.contains(","))
+        {
+            throw new NucleusUserException("A subquery can be registered against a single variable name. Attempt to register subquery against multiple names : " + variableDecl);
+        }
 
         if (sub == null)
         {
