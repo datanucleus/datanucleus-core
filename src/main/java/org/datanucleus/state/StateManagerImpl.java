@@ -419,6 +419,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
 
         if (cmd.getIdentityType() == IdentityType.APPLICATION)
         {
+            // Make sure any PK fields that are Persistable are persisted first, so we have an id to assign our identity
             int[] pkFieldNumbers = cmd.getPKMemberPositions();
             for (int i=0;i<pkFieldNumbers.length;i++)
             {
@@ -426,7 +427,6 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 AbstractMemberMetaData fmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
                 if (myEC.getMetaDataManager().getMetaDataForClass(fmd.getType(), getExecutionContext().getClassLoaderResolver()) != null)
                 {
-                    // if a primary key field is of type Persistable, it must first be persistent
                     try
                     {
                         if (myEC.getMultithreaded())
@@ -447,8 +447,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                             }
                             if (!myEC.getApiAdapter().isPersistent(pkFieldPC))
                             {
-                                // Make sure the PC field is persistent - can cause the insert of our object 
-                                // being managed by this SM via flush() when bidir relation
+                                // Make sure the PC field is persistent - can cause the insert of our object being managed by this SM via flush() when bidir relation
                                 Object persistedFieldPC = myEC.persistObjectInternal(pkFieldPC, null, null, -1, ObjectProvider.PC);
                                 replaceField(myPC, fieldNumber, persistedFieldPC, false);
                             }
@@ -470,11 +469,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             }
         }
 
-        /* Set the identity
-         * This must come after the above block, because in identifying relationships
-         * the PK FK associations must be persisted before, otherwise we
-         * don't have an id assigned to the PK FK associations
-         */        
+        // Set the identity of this object
         setIdentity(false);
 
         if (myEC.getTransaction().isActive())
@@ -494,8 +489,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
             {
                 for (int i=0;i<relationPositions.length;i++)
                 {
-                    AbstractMemberMetaData mmd = 
-                        cmd.getMetaDataForManagedMemberAtAbsolutePosition(relationPositions[i]);
+                    AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(relationPositions[i]);
                     if (RelationType.isBidirectional(mmd.getRelationType(clr)))
                     {
                         Object value = provideField(relationPositions[i]);
@@ -3342,30 +3336,21 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
                 setIdentity(true); // Just in case user is setting it in preStore
             }
 
-            //in InstanceLifecycleEvents this object could get dirty if a field is changed in preStore or
-            //postCreate, we clear dirty flags to make sure this object will not be flushed again
+            // in InstanceLifecycleEvents this object could get dirty if a field is changed in preStore/postCreate; clear dirty flags to make sure this object will not be flushed again
             clearDirtyFlags();
 
             getStoreManager().getPersistenceHandler().insertObject(this);
             setFlushedNew(true);
 
             getCallbackHandler().postStore(myPC);
-
-            if (!isEmbedded())
-            {
-                // Update the object in the cache(s) - has version set etc now
-                myEC.putObjectIntoLevel1Cache(this);
-            }
         }
         catch (NotYetFlushedException ex)
         {
-            // can happen on cyclic relationships with RDBMS
-            // if not yet flushed error, we rollback dirty fields, so we can retry inserting
+            // can happen on cyclic relationships with RDBMS; if not yet flushed error, we rollback dirty fields, so we can retry inserting
             dirtyFields = tmpDirtyFields;
             myEC.markDirty(this, false);
             dirty = true;
-            //we throw exception, so the owning relationship will mark it's foreign key to update later
-            throw ex;
+            throw ex; // throw exception, so the owning relationship will mark its FK to update later
         }
         finally
         {
