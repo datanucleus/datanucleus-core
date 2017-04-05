@@ -262,6 +262,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         if (fv != null)
         {
             loadFieldValues(fv);
+            // TODO If this object has unique key(s) then they will likely be loaded from the fieldValues, so could put in L1 cache here
         }
     }
 
