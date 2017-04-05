@@ -3063,9 +3063,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 }
 
                 createdHollow = true;
-                op = nucCtx.getObjectProviderFactory().newForHollow(this, cls, id, fv);
+                op = nucCtx.getObjectProviderFactory().newForHollow(this, cls, id, fv); // Will put object in L1 cache
                 pc = op.getObject();
-                putObjectIntoLevel1Cache(op);
                 putObjectIntoLevel2Cache(op, false);
             }
         }
@@ -4493,6 +4492,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 // Note : can only have a single object with a particular id for an ExecutionContext
                 return;
             }*/
+
+            if (op.getClassMetaData().getUniqueMetaData() != null)
+            {
+                // TODO Should cache against the values of the unique key(s) to allow findObjectByUnique()
+                NucleusLogger.GENERAL.debug(">> EC L1Cache.put of type=" + op.getClassMetaData().getFullClassName() + " unimd=" + op.getClassMetaData().getUniqueMetaData() +
+                    " : need to cache against unique key also");
+            }
 
             // Put into Level 1 Cache
             Object oldOP = cache.put(id, op);
