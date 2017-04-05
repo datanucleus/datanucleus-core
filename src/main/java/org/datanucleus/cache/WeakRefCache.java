@@ -19,6 +19,7 @@ Contributors:
 package org.datanucleus.cache;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,14 +29,14 @@ import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
  * Level 1 Cache using Weak referenced objects in a Map.
- * <p>If the garbage collector clears the reference, the corresponding key is
- * automatically removed from the map.
+ * If the garbage collector clears the reference, the corresponding key is automatically removed from the map.
  *
  * @see java.lang.ref.WeakReference
  */
 public class WeakRefCache implements Level1Cache
 {
-    private Map<Object, ObjectProvider> weakCache = new ConcurrentReferenceHashMap<Object, ObjectProvider>(1, ReferenceType.STRONG, ReferenceType.WEAK);
+    private Map<Object, ObjectProvider> weakCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
+    private Map<CacheUniqueKey, ObjectProvider> weakCacheUnique = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
 
     /**
      * Default constructor (required)
@@ -44,24 +45,37 @@ public class WeakRefCache implements Level1Cache
     {
     }
 
-    public ObjectProvider put(Object key, ObjectProvider value)
+    public ObjectProvider put(Object id, ObjectProvider op)
     {
-        return weakCache.put(key, value);
+        return weakCache.put(id, op);
     }
 
-    public ObjectProvider get(Object key)
+    public ObjectProvider get(Object id)
     {
-        return weakCache.get(key);
+        return weakCache.get(id);
     }
 
-    public boolean containsKey(Object key)
+    public boolean containsKey(Object id)
     {
-        return weakCache.containsKey(key);
+        return weakCache.containsKey(id);
     }
 
-    public ObjectProvider remove(Object key)
+    public ObjectProvider remove(Object id)
     {
-        return weakCache.remove(key);
+        ObjectProvider op = weakCache.remove(id);
+        if (weakCacheUnique.containsValue(op))
+        {
+            Iterator<Entry<CacheUniqueKey, ObjectProvider>> entrySetIter = weakCacheUnique.entrySet().iterator();
+            while (entrySetIter.hasNext())
+            {
+                Entry<CacheUniqueKey, ObjectProvider> entry = entrySetIter.next();
+                if (entry.getValue() == op)
+                {
+                    entrySetIter.remove();
+                }
+            }
+        }
+        return op;
     }
 
     public void clear()
@@ -130,5 +144,23 @@ public class WeakRefCache implements Level1Cache
     public Collection values()
     {
         return weakCache.values();
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.cache.Level1Cache#getUnique(org.datanucleus.cache.CacheUniqueKey)
+     */
+    @Override
+    public ObjectProvider getUnique(CacheUniqueKey key)
+    {
+        return weakCacheUnique.get(key);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.cache.Level1Cache#putUnique(org.datanucleus.cache.CacheUniqueKey, org.datanucleus.state.ObjectProvider)
+     */
+    @Override
+    public Object putUnique(CacheUniqueKey key, ObjectProvider op)
+    {
+        return weakCacheUnique.put(key, op);
     }
 }

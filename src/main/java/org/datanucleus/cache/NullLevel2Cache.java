@@ -84,72 +84,6 @@ public class NullLevel2Cache extends AbstractLevel2Cache
     }
 
     /**
-     * Pin the parameter instance in the second-level cache.
-     * @param oid the object id of the instance to pin.
-     */
-    public void pin(Object oid)
-    {
-    }
-
-    /**
-     * Evict the parameter instances from the second-level cache.
-     * @param pcClass the class of instances to evict
-     * @param subclasses if true, evict instances of subclasses also
-     */
-    public void pinAll(Class pcClass, boolean subclasses)
-    {
-    }
-
-    /**
-     * Pin the parameter instances in the second-level cache.
-     * @param oids the object ids of the instances to pin.
-     */
-    public void pinAll(Collection oids)
-    {
-    }
-
-    /**
-     * Pin the parameter instances in the second-level cache.
-     * @param oids the object ids of the instances to pin.
-     */
-    public void pinAll(Object[] oids)
-    {
-    }
-
-    /**
-     * Unpin the parameter instance from the second-level cache.
-     * @param oid the object id of the instance to unpin.
-     */
-    public void unpin(Object oid)
-    {
-    }
-
-    /**
-     * Unpin instances from the second-level cache.
-     * @param pcClass the class of instances to unpin
-     * @param subclasses if true, unpin instances of subclasses also
-     */
-    public void unpinAll(Class pcClass, boolean subclasses)
-    {
-    }
-
-    /**
-     * Unpin the parameter instances from the second-level cache.
-     * @param oids the object ids of the instance to evict.
-     */
-    public void unpinAll(Collection oids)
-    {
-    }
-
-    /**
-     * Unpin the parameter instances from the second-level cache.
-     * @param oids the object ids of the instance to evict.
-     */
-    public void unpinAll(Object[] oids)
-    {
-    }
-
-    /**
      * Accessor for whether an object with the specified id is in the cache
      * @param oid The object id
      * @return Whether it is in the cache
@@ -167,22 +101,6 @@ public class NullLevel2Cache extends AbstractLevel2Cache
     public CachedPC get(Object oid)
     {
         return null;
-    }
-
-    /**
-     * @see org.datanucleus.cache.Level2Cache#getNumberOfPinnedObjects()
-     */
-    public int getNumberOfPinnedObjects()
-    {
-        return 0;
-    }
-
-    /**
-     * @see org.datanucleus.cache.Level2Cache#getNumberOfUnpinnedObjects()
-     */
-    public int getNumberOfUnpinnedObjects()
-    {
-        return 0;
     }
 
     /**

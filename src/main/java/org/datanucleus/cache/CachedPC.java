@@ -40,6 +40,9 @@ public class CachedPC<T> implements Serializable
     /** Class of the object being cached. */
     private Class<T> cls;
 
+    /** Identity of the object being cached. This is to allow recreation of the object when using uniqueKey lookup. */
+    private Object id;
+
     /** Values for the fields, keyed by the abs field number. Any relation fields store the id of the related object. */
     private Map<Integer, Object> fieldValues = null;
 
@@ -55,9 +58,10 @@ public class CachedPC<T> implements Serializable
      * @param loadedFields The loaded fields
      * @param vers The version (optional)
      */
-    public CachedPC(Class<T> cls, boolean[] loadedFields, Object vers)
+    public CachedPC(Class<T> cls, boolean[] loadedFields, Object vers, Object id)
     {
         this.cls = cls;
+        this.id = id;
         this.loadedFields = new boolean[loadedFields.length];
         for (int i = 0; i < loadedFields.length; i++)
         {
@@ -69,6 +73,11 @@ public class CachedPC<T> implements Serializable
     public Class<T> getObjectClass()
     {
         return cls;
+    }
+
+    public Object getId()
+    {
+        return id;
     }
 
     public void setFieldValue(Integer fieldNumber, Object value)
@@ -116,7 +125,7 @@ public class CachedPC<T> implements Serializable
 
     public synchronized CachedPC<T> getCopy()
     {
-        CachedPC<T> copy = new CachedPC(cls, loadedFields, version);
+        CachedPC<T> copy = new CachedPC(cls, loadedFields, version, id);
         if (fieldValues != null)
         {
             // TODO Some (mutable) field values may need copying

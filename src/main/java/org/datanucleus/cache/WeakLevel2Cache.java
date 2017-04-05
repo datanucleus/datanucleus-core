@@ -38,15 +38,13 @@ import org.datanucleus.util.Localiser;
 /**
  * Weak referenced implementation of a Level 2 cache.
  * <p>
- * Operates with 2 maps internally. One stores all pinned objects that have been
- * selected to be retained by user's application. The other stores all other objects.
- * This second map is the default location where objects are placed when being added here.
- * The second (unpinned) map stores weak references meaning that they can get garbage
- * collected as necessary by the JVM.
+ * Operates with 3 maps internally. One stores all pinned objects that have been selected to be retained by user's application. 
+ * The second stores all other objects, and is the default location where objects are placed when being added here, using weak references meaning that they can 
+ * get garbage collected as necessary by the JVM.
+ * The third stores objects keyed by the unique key that they relate to.
  * </P>
  * <P>
- * Maintains collections of the classes and the identities that are to be pinned if they ever
- * are put into the cache. These are defined by the pinAll(), pin() methods.
+ * Maintains collections of the classes and the identities that are to be pinned if they ever are put into the cache. These are defined by the pinAll(), pin() methods.
  * </P>
  * <P>
  * All mutating methods, and the get method have been synchronized to prevent conflicts.
@@ -63,10 +61,13 @@ public class WeakLevel2Cache implements Level2Cache
     protected Collection pinnedIds;
 
     /** Pinned objects cache. */
-    protected Map pinnedCache;
+    protected Map<Object, CachedPC> pinnedCache;
 
     /** Unpinned objects cache. */
-    protected transient Map unpinnedCache; // transient since WeakValueMap is not serialisable
+    protected transient Map<Object, CachedPC> unpinnedCache; // transient since WeakValueMap is not serialisable
+
+    /** Unique Key cache. */
+    protected transient Map<CacheUniqueKey, CachedPC> uniqueKeyCache; // transient since WeakValueMap is not serialisable
 
     protected ApiAdapter apiAdapter;
 
@@ -86,6 +87,7 @@ public class WeakLevel2Cache implements Level2Cache
         apiAdapter = nucleusCtx.getApiAdapter();
         pinnedCache = new HashMap();
         unpinnedCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
+        uniqueKeyCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
         maxSize = nucleusCtx.getConfiguration().getIntProperty(PropertyNames.PROPERTY_CACHE_L2_MAXSIZE);
     }
 
@@ -97,6 +99,7 @@ public class WeakLevel2Cache implements Level2Cache
         evictAll();
         pinnedCache = null;
         unpinnedCache = null;
+        uniqueKeyCache = null;
     }
 
     /**
@@ -121,6 +124,7 @@ public class WeakLevel2Cache implements Level2Cache
     {
         unpinnedCache.clear();
         pinnedCache.clear();
+        uniqueKeyCache.clear();
     }
 
     /**
@@ -206,6 +210,231 @@ public class WeakLevel2Cache implements Level2Cache
     }
 
     /**
+     * Accessor for an object from the cache. The returned object will not have a ObjectProvider connected.
+     * This is because data stored in the Level 2 cache is ObjectProvider and PersistenceManager independent.
+     * @param oid The Object ID
+     * @return The L2 cacheable object
+     */
+    public synchronized CachedPC get(Object oid)
+    {
+        if (oid == null)
+        {
+            return null;
+        }
+
+        CachedPC pc = pinnedCache.get(oid);
+        if (pc != null)
+        {
+            return pc;
+        }
+
+        return unpinnedCache.get(oid);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.datanucleus.cache.Level2Cache#getAll(java.util.Collection)
+     */
+    public Map<Object, CachedPC> getAll(Collection oids)
+    {
+        if (oids == null)
+        {
+            return null;
+        }
+        Map<Object, CachedPC> objs = new HashMap<Object, CachedPC>();
+        for (Object oid : oids)
+        {
+            CachedPC obj = get(oid);
+            if (obj != null)
+            {
+                objs.put(oid, obj);
+            }
+        }
+        return objs;
+    }
+
+    /**
+     * Accessor for the number of pinned objects in the cache.
+     * @return Number of pinned objects
+     */
+    public int getNumberOfPinnedObjects()
+    {
+        return pinnedCache.size();
+    }
+
+    /**
+     * Accessor for the number of unpinned objects in the cache.
+     * @return Number of unpinned objects
+     */
+    public int getNumberOfUnpinnedObjects()
+    {
+        return unpinnedCache.size();
+    }
+
+    /**
+     * Accessor for the total number of objects in the L2 cache.
+     * @return Number of objects
+     */
+    public int getSize()
+    {
+        return getNumberOfPinnedObjects() + getNumberOfUnpinnedObjects();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.datanucleus.cache.Level2Cache#putAll(java.util.Map)
+     */
+    public void putAll(Map<Object, CachedPC> objs)
+    {
+        if (objs == null)
+        {
+            return;
+        }
+
+        // TODO Support maxSize, and use putAll
+
+        // Just fallback to doing multiple puts
+        Iterator<Map.Entry<Object, CachedPC>> entryIter = objs.entrySet().iterator();
+        while (entryIter.hasNext())
+        {
+            Map.Entry<Object, CachedPC> entry = entryIter.next();
+            put(entry.getKey(), entry.getValue());
+        }
+    }
+
+    /**
+     * Method to put an object in the cache. 
+     * @param oid The Object id for this object
+     * @param pc The cacheable object
+     * @return The value previously associated with this oid
+     */
+    public synchronized CachedPC put(Object oid, CachedPC pc)
+    {
+        if (oid == null || pc == null)
+        {
+            NucleusLogger.CACHE.warn(Localiser.msg("004011"));
+            return null;
+        }
+        else if (maxSize >= 0 && getSize() == maxSize)
+        {
+            return null;
+        }
+
+        // Check if we should pin this
+        // a). check if the object class type is to be pinned
+        boolean toBePinned = false;
+        if (pinnedClasses != null)
+        {
+            Iterator<PinnedClass> pinnedClsIter = pinnedClasses.iterator();
+            while (pinnedClsIter.hasNext())
+            {
+                PinnedClass pinCls = pinnedClsIter.next();
+                if (pinCls.cls.getName().equals(pc.getObjectClass().getName()) || (pinCls.subclasses && pinCls.cls.isAssignableFrom(pc.getObjectClass())))
+                {
+                    toBePinned = true;
+                    break;
+                }
+            }
+        }
+
+        // b). check if the id is to be pinned
+        if (pinnedIds != null && pinnedIds.contains(oid))
+        {
+            toBePinned = true;
+        }
+
+        Object obj = null;
+        if (pinnedCache.get(oid) != null)
+        {
+            // Update the pinned cache if object is already there
+            obj = pinnedCache.put(oid, pc);
+            if (obj != null)
+            {
+                return (CachedPC) obj;
+            }
+        }
+        else
+        {
+            if (toBePinned)
+            {
+                // Update the pinned cache
+                pinnedCache.put(oid, pc);
+                unpinnedCache.remove(oid); // Just in case it was unpinned previously
+            }
+            else
+            {
+                // Update the unpinned cache otherwise
+                obj = unpinnedCache.put(oid, pc);
+                if (obj != null)
+                {
+                    return (CachedPC) obj;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Method to check if an object with the specified id is in the cache
+     * @param oid The object ID
+     * @return Whether it is present
+     */
+    public boolean containsOid(Object oid)
+    {
+        return pinnedCache.containsKey(oid) || unpinnedCache.containsKey(oid);
+    }
+
+    /**
+     * Accessor for whether the cache is empty.
+     * @return Whether it is empty.
+     */
+    public boolean isEmpty()
+    {
+        return pinnedCache.isEmpty() && unpinnedCache.isEmpty();
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.cache.Level2Cache#getUnique(org.datanucleus.cache.CacheUniqueKey)
+     */
+    @Override
+    public CachedPC getUnique(CacheUniqueKey key)
+    {
+        return uniqueKeyCache.get(key);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.cache.Level2Cache#putUnique(org.datanucleus.cache.CacheUniqueKey, org.datanucleus.cache.CachedPC)
+     */
+    @Override
+    public CachedPC putUnique(CacheUniqueKey key, CachedPC pc)
+    {
+        return uniqueKeyCache.put(key, pc);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.cache.Level2Cache#removeUnique(org.datanucleus.cache.CacheUniqueKey)
+     */
+    @Override
+    public void removeUnique(CacheUniqueKey key)
+    {
+        uniqueKeyCache.remove(key);
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException
+    {
+        out.defaultWriteObject();
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+        // our "pseudo-constructor"
+        in.defaultReadObject();
+        unpinnedCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
+        uniqueKeyCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
+    }
+
+    /**
      * Method to pin an object to the cache.
      * @param oid The id of the object to pin
      */
@@ -226,7 +455,7 @@ public class WeakLevel2Cache implements Level2Cache
             pinnedIds.add(oid);
         }
 
-        Object pc = unpinnedCache.get(oid);
+        CachedPC pc = unpinnedCache.get(oid);
         if (pc != null)
         {
             pinnedCache.put(oid, pc);
@@ -318,7 +547,7 @@ public class WeakLevel2Cache implements Level2Cache
             return;
         }
 
-        Object pc = pinnedCache.get(oid);
+        CachedPC pc = pinnedCache.get(oid);
         if (pc != null)
         {
             unpinnedCache.put(oid, pc);
@@ -397,204 +626,5 @@ public class WeakLevel2Cache implements Level2Cache
         {
             unpin(oids[i]);
         }
-    }
-
-    /**
-     * Accessor for an object from the cache. The returned object will not have a ObjectProvider connected.
-     * This is because data stored in the Level 2 cache is ObjectProvider and PersistenceManager independent.
-     * @param oid The Object ID
-     * @return The L2 cacheable object
-     */
-    public synchronized CachedPC get(Object oid)
-    {
-        if (oid == null)
-        {
-            return null;
-        }
-
-        CachedPC pc = (CachedPC) pinnedCache.get(oid);
-        if (pc != null)
-        {
-            return pc;
-        }
-        pc = (CachedPC) unpinnedCache.get(oid);
-        return pc;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.datanucleus.cache.Level2Cache#getAll(java.util.Collection)
-     */
-    public Map<Object, CachedPC> getAll(Collection oids)
-    {
-        if (oids == null)
-        {
-            return null;
-        }
-        Map<Object, CachedPC> objs = new HashMap<Object, CachedPC>();
-        for (Object oid : oids)
-        {
-            CachedPC obj = get(oid);
-            if (obj != null)
-            {
-                objs.put(oid, obj);
-            }
-        }
-        return objs;
-    }
-
-    /**
-     * Accessor for the number of pinned objects in the cache.
-     * @return Number of pinned objects
-     */
-    public int getNumberOfPinnedObjects()
-    {
-        return pinnedCache.size();
-    }
-
-    /**
-     * Accessor for the number of unpinned objects in the cache.
-     * @return Number of unpinned objects
-     */
-    public int getNumberOfUnpinnedObjects()
-    {
-        return unpinnedCache.size();
-    }
-
-    /**
-     * Accessor for the total number of objects in the L2 cache.
-     * @return Number of objects
-     */
-    public int getSize()
-    {
-        return getNumberOfPinnedObjects() + getNumberOfUnpinnedObjects();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.datanucleus.cache.Level2Cache#putAll(java.util.Map)
-     */
-    public void putAll(Map<Object, CachedPC> objs)
-    {
-        if (objs == null)
-        {
-            return;
-        }
-
-        // TODO Support maxSize, and use putAll
-
-        // Just fallback to doing multiple puts
-        Iterator<Map.Entry<Object, CachedPC>> entryIter = objs.entrySet().iterator();
-        while (entryIter.hasNext())
-        {
-            Map.Entry<Object, CachedPC> entry = entryIter.next();
-            put(entry.getKey(), entry.getValue());
-        }
-    }
-
-    /**
-     * Method to put an object in the cache. Note that the pc object being passed in must NOT have a
-     * ObjectProvider connected. Data stored in the Level 2 cache has to be independent of PersistenceManager
-     * and ObjectProvider.
-     * @param oid The Object id for this object
-     * @param pc The cacheable object
-     * @return The value previously associated with this oid
-     */
-    public synchronized CachedPC put(Object oid, CachedPC pc)
-    {
-        if (oid == null || pc == null)
-        {
-            NucleusLogger.CACHE.warn(Localiser.msg("004011"));
-            return null;
-        }
-        else if (maxSize >= 0 && getSize() == maxSize)
-        {
-            return null;
-        }
-
-        // Check if we should pin this
-        // a). check if the object class type is to be pinned
-        boolean toBePinned = false;
-        if (pinnedClasses != null)
-        {
-            Iterator<PinnedClass> pinnedClsIter = pinnedClasses.iterator();
-            while (pinnedClsIter.hasNext())
-            {
-                PinnedClass pinCls = pinnedClsIter.next();
-                if (pinCls.cls.getName().equals(pc.getObjectClass().getName()) || (pinCls.subclasses && pinCls.cls.isAssignableFrom(pc.getObjectClass())))
-                {
-                    toBePinned = true;
-                    break;
-                }
-            }
-        }
-
-        // b). check if the id is to be pinned
-        if (pinnedIds != null && pinnedIds.contains(oid))
-        {
-            toBePinned = true;
-        }
-
-        Object obj = null;
-        if (pinnedCache.get(oid) != null)
-        {
-            // Update the pinned cache if object is already there
-            obj = pinnedCache.put(oid, pc);
-            if (obj != null)
-            {
-                return (CachedPC) obj;
-            }
-        }
-        else
-        {
-            if (toBePinned)
-            {
-                // Update the pinned cache
-                pinnedCache.put(oid, pc);
-                unpinnedCache.remove(oid); // Just in case it was unpinned previously
-            }
-            else
-            {
-                // Update the unpinned cache otherwise
-                obj = unpinnedCache.put(oid, pc);
-                if (obj != null)
-                {
-                    return (CachedPC) obj;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Method to check if an object with the specified id is in the cache
-     * @param oid The object ID
-     * @return Whether it is present
-     */
-    public boolean containsOid(Object oid)
-    {
-        return pinnedCache.containsKey(oid) || unpinnedCache.containsKey(oid);
-    }
-
-    /**
-     * Accessor for whether the cache is empty.
-     * @return Whether it is empty.
-     */
-    public boolean isEmpty()
-    {
-        return pinnedCache.isEmpty() && unpinnedCache.isEmpty();
-    }
-
-    private void writeObject(ObjectOutputStream out) throws IOException
-    {
-        out.defaultWriteObject();
-    }
-
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
-    {
-        // our "pseudo-constructor"
-        in.defaultReadObject();
-        unpinnedCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
     }
 }

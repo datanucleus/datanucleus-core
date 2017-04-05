@@ -103,6 +103,78 @@ public interface Level2Cache extends Serializable
     void evictAll (Class pcClass, boolean subclasses);
 
     /**
+     * Accessor for the total number of objects in the L2 cache.
+     * @return Number of objects
+     */
+    int getSize();
+
+    /**
+     * Accessor for an object from the cache.
+     * @param oid The Object ID
+     * @return The L2 cacheable object
+     */
+    CachedPC get(Object oid);
+
+    /**
+     * Accessor for a collection of objects from the cache.
+     * @param oids The Object IDs
+     * @return Map of the objects, keyed by the oids that are found
+     */
+    Map<Object, CachedPC> getAll(Collection oids);
+
+    /**
+     * Method to put an object in the cache.
+     * @param oid The Object id for this object
+     * @param pc The L2 cacheable persistable object
+     * @return The value previously associated with this oid
+     */
+    CachedPC put(Object oid, CachedPC pc);
+
+    /**
+     * Method to put several objects into the cache.
+     * @param objs Map of cacheable object keyed by its oid.
+     */
+    void putAll(Map<Object, CachedPC> objs);
+
+    /**
+     * Accessor for whether the cache is empty.
+     * @return Whether it is empty.
+     */
+    boolean isEmpty();
+
+    /**
+     * Accessor for whether an object with the specified id is in the cache
+     * @param oid The object id
+     * @return Whether it is in the cache
+     */
+    boolean containsOid(Object oid);
+
+    // ======================================= Caching by UniqueKey constraint ========================================
+
+    /**
+     * Method to retrieve the id represented by the specified unique key.
+     * @param key Unique key
+     * @return The "identity" of the object that this unique key represents
+     */
+    CachedPC getUnique(CacheUniqueKey key);
+
+    /**
+     * Method to store a persistable object for this unique key.
+     * @param key The unique key
+     * @param pc The representation of the persistable object to cache
+     * @return The previous object for this unique key if one was present, otherwise null
+     */
+    CachedPC putUnique(CacheUniqueKey key, CachedPC pc);
+
+    /**
+     * Method to remove any object cached against the provided unique key.
+     * @param key Unique key
+     */
+    void removeUnique(CacheUniqueKey key);
+
+    // ======================================= Supported only by caches that allow pinning ========================================
+
+    /**
      * Pin the parameter instance in the second-level cache.
      * @param oid the object id of the instance to pin.
      */
@@ -163,53 +235,6 @@ public interface Level2Cache extends Serializable
      * @return Number of unpinned objects
      */
     int getNumberOfUnpinnedObjects();
-
-    /**
-     * Accessor for the total number of objects in the L2 cache.
-     * @return Number of objects
-     */
-    int getSize();
-
-    /**
-     * Accessor for an object from the cache.
-     * @param oid The Object ID
-     * @return The L2 cacheable object
-     */
-    CachedPC get(Object oid);
-
-    /**
-     * Accessor for a collection of objects from the cache.
-     * @param oids The Object IDs
-     * @return Map of the objects, keyed by the oids that are found
-     */
-    Map<Object, CachedPC> getAll(Collection oids);
-
-    /**
-     * Method to put an object in the cache.
-     * @param oid The Object id for this object
-     * @param pc The L2 cacheable persistable object
-     * @return The value previously associated with this oid
-     */
-    CachedPC put(Object oid, CachedPC pc);
-
-    /**
-     * Method to put several objects into the cache.
-     * @param objs Map of cacheable object keyed by its oid.
-     */
-    void putAll(Map<Object, CachedPC> objs);
-
-    /**
-     * Accessor for whether the cache is empty.
-     * @return Whether it is empty.
-     */
-    boolean isEmpty();
-
-    /**
-     * Accessor for whether an object with the specified id is in the cache
-     * @param oid The object id
-     * @return Whether it is in the cache
-     */
-    boolean containsOid(Object oid);
 
     /**
      * Representation of a class whose objects will be pinned when put into the L2 cache.

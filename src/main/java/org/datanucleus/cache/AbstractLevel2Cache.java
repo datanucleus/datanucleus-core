@@ -119,6 +119,38 @@ public abstract class AbstractLevel2Cache implements Level2Cache
         return getSize() == 0;
     }
 
+    // ============================== Unique Key Support ==============================
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.cache.Level2Cache#getUnique(org.datanucleus.cache.CacheUniqueKey)
+     */
+    @Override
+    public CachedPC getUnique(CacheUniqueKey key)
+    {
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.cache.Level2Cache#putUnique(org.datanucleus.cache.CacheUniqueKey, org.datanucleus.cache.CachedPC)
+     */
+    @Override
+    public CachedPC putUnique(CacheUniqueKey key, CachedPC pc)
+    {
+        return null;
+    }
+
+    /**
+     * Method to remove any object cached against the provided unique key.
+     * Override this in the implementation if supporting unique key caching.
+     * @param key Unique key
+     */
+    public void removeUnique(CacheUniqueKey key)
+    {
+        return;
+    }
+
+    // ============================== Pinned Object Support ==============================
+
     public int getNumberOfPinnedObjects()
     {
         // Not supported

@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import org.datanucleus.api.ApiAdapter;
+import org.datanucleus.cache.CacheUniqueKey;
 import org.datanucleus.cache.CachedPC;
 import org.datanucleus.cache.L2CachePopulateFieldManager;
 import org.datanucleus.cache.Level1Cache;
@@ -74,6 +75,7 @@ import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.TransactionType;
+import org.datanucleus.metadata.UniqueMetaData;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.metadata.VersionStrategy;
 import org.datanucleus.properties.BasePropertyStore;
@@ -2983,7 +2985,27 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         }
 
-        // TODO Check cache? Would need to cache against cls+unique_fields
+        // Check whether this is cached against the unique key
+        CacheUniqueKey uniKey = new CacheUniqueKey(cls.getName(), memberNames, memberValues);
+        ObjectProvider op = cache.getUnique(uniKey);
+        if (op == null && l2CacheEnabled)
+        {
+            if (NucleusLogger.CACHE.isDebugEnabled())
+            {
+                NucleusLogger.CACHE.debug(Localiser.msg("003007", uniKey));
+            }
+
+            // Try L2 cache
+            Object pc = getObjectFromLevel2CacheForUnique(uniKey);
+            if (pc != null)
+            {
+                op = findObjectProvider(pc);
+            }
+        }
+        if (op != null)
+        {
+            return (T) op.getObject();
+        }
 
         return (T) getStoreManager().getPersistenceHandler().findObjectForUnique(this, cmd, memberNames, memberValues);
     }
@@ -4495,9 +4517,19 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
             if (op.getClassMetaData().getUniqueMetaData() != null)
             {
-                // TODO Should cache against the values of the unique key(s) to allow findObjectByUnique()
-                NucleusLogger.GENERAL.debug(">> EC L1Cache.put of type=" + op.getClassMetaData().getFullClassName() + " unimd=" + op.getClassMetaData().getUniqueMetaData() +
-                    " : need to cache against unique key also");
+                // Check for any unique keys on this object, and cache against the unique key also
+                List<UniqueMetaData> unimds = op.getClassMetaData().getUniqueMetaData();
+                if (unimds != null && !unimds.isEmpty())
+                {
+                    for (UniqueMetaData unimd : unimds)
+                    {
+                        CacheUniqueKey uniKey = getCacheUniqueKeyForObjectProvider(op, unimd);
+                        if (uniKey != null)
+                        {
+                            cache.putUnique(uniKey, op);
+                        }
+                    }
+                }
             }
 
             // Put into Level 1 Cache
@@ -4514,8 +4546,38 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Method to add/update the managed object into the L2 cache as long as it isn't modified
-     * in the current transaction.
+     * Method to return a CacheUniqueKey to use when caching the object managed by the supplied ObjectProvider for the specified unique key.
+     * @param op The ObjectProvider
+     * @param unimd The unique key that this key will relate to
+     * @return The CacheUniqueKey, or null if any member of the unique key is null, or if the unique key is not defined on members
+     */
+    private CacheUniqueKey getCacheUniqueKeyForObjectProvider(ObjectProvider op, UniqueMetaData unimd)
+    {
+        boolean nonNullMembers = true;
+        if (unimd.getNumberOfMembers() > 0)
+        {
+            Object[] fieldVals = new Object[unimd.getNumberOfMembers()];
+            for (int i=0;i<fieldVals.length;i++)
+            {
+                AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForMember(unimd.getMemberNames()[i]);
+                fieldVals[i] = op.provideField(mmd.getAbsoluteFieldNumber());
+                if (fieldVals[i] == null)
+                {
+                    // One of the unique key fields is null so we don't cache
+                    nonNullMembers = false;
+                    break;
+                }
+            }
+            if (nonNullMembers)
+            {
+                return new CacheUniqueKey(op.getClassMetaData().getFullClassName(), unimd.getMemberNames(), fieldVals);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Method to add/update the managed object into the L2 cache as long as it isn't modified in the current transaction.
      * @param op ObjectProvider for the object
      * @param updateIfPresent Whether to update it in the L2 cache if already present
      */
@@ -4541,8 +4603,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Convenience method to convert the object managed by the ObjectProvider into a form suitable for
-     * caching in an L2 cache.
+     * Convenience method to convert the object managed by the ObjectProvider into a form suitable for caching in an L2 cache.
      * @param op ObjectProvider for the object
      * @param currentCachedPC Current L2 cached object (if any) to use for updating
      * @return The cacheable form of the object
@@ -4600,7 +4661,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 return null;
             }
 
-            cachedPC = new CachedPC(op.getObject().getClass(), op.getLoadedFields(), op.getTransactionalVersion());
+            cachedPC = new CachedPC(op.getObject().getClass(), op.getLoadedFields(), op.getTransactionalVersion(), op.getInternalObjectId());
             fieldsToUpdate = loadedFieldNumbers;
             if (NucleusLogger.CACHE.isDebugEnabled())
             {
@@ -4646,6 +4707,23 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     dataToUpdate.clear();
                 }
             }
+
+            if (op.getClassMetaData().getUniqueMetaData() != null)
+            {
+                // Check for any unique keys on this object, and cache against the unique key also
+                List<UniqueMetaData> unimds = op.getClassMetaData().getUniqueMetaData();
+                if (unimds != null && !unimds.isEmpty())
+                {
+                    for (UniqueMetaData unimd : unimds)
+                    {
+                        CacheUniqueKey uniKey = getCacheUniqueKeyForObjectProvider(op, unimd);
+                        if (uniKey != null)
+                        {
+                            l2Cache.putUnique(uniKey, cachedPC);
+                        }
+                    }
+                }
+            }
         }
 
         if (!dataToUpdate.isEmpty())
@@ -4681,6 +4759,23 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             l2Cache.put(id, cachedPC);
         }
+
+        if (op.getClassMetaData().getUniqueMetaData() != null)
+        {
+            // Cache against any unique keys defined for this object
+            List<UniqueMetaData> unimds = op.getClassMetaData().getUniqueMetaData();
+            if (unimds != null && !unimds.isEmpty())
+            {
+                for (UniqueMetaData unimd : unimds)
+                {
+                    CacheUniqueKey uniKey = getCacheUniqueKeyForObjectProvider(op, unimd);
+                    if (uniKey != null)
+                    {
+                        l2Cache.putUnique(uniKey, cachedPC);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -4693,7 +4788,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             if (NucleusLogger.CACHE.isDebugEnabled())
             {
-                NucleusLogger.CACHE.debug(Localiser.msg("003009", IdentityUtils.getPersistableIdentityForId(id), String.valueOf(cache.size())));
+                NucleusLogger.CACHE.debug(Localiser.msg("003009", IdentityUtils.getPersistableIdentityForId(id)));
             }
             Object pcRemoved = cache.remove(id);
             if (pcRemoved == null && NucleusLogger.CACHE.isDebugEnabled())
@@ -4833,7 +4928,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
                     NucleusLogger.CACHE.debug(Localiser.msg("003008", StringUtils.toJVMIDString(pc), IdentityUtils.getPersistableIdentityForId(id), 
-                        StringUtils.booleanArrayToString(op.getLoadedFields()), "" + cache.size()));
+                        StringUtils.booleanArrayToString(op.getLoadedFields())));
                 }
 
                 // Wipe the detach state that may have been added if the object has been serialised in the meantime
@@ -4844,7 +4939,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
             if (NucleusLogger.CACHE.isDebugEnabled())
             {
-                NucleusLogger.CACHE.debug(Localiser.msg("003007", IdentityUtils.getPersistableIdentityForId(id), "" + cache.size()));
+                NucleusLogger.CACHE.debug(Localiser.msg("003007", IdentityUtils.getPersistableIdentityForId(id)));
             }
         }
         return null;
@@ -4911,6 +5006,63 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
+     * Convenience method to access the identity that corresponds to a unique key, in the Level 2 cache.
+     * @param uniKey The CacheUniqueKey to use in lookups
+     * @return Identity of the associated object
+     */
+    protected Object getObjectFromLevel2CacheForUnique(CacheUniqueKey uniKey)
+    {
+        Object pc = null;
+
+        if (l2CacheEnabled)
+        {
+            String cacheRetrieveMode = getLevel2CacheRetrieveMode();
+            if ("bypass".equalsIgnoreCase(cacheRetrieveMode))
+            {
+                // Cache retrieval currently turned off
+                return null;
+            }
+
+            Level2Cache l2Cache = nucCtx.getLevel2Cache();
+            CachedPC cachedPC = l2Cache.getUnique(uniKey);
+
+            if (cachedPC != null)
+            {
+                Object id = cachedPC.getId();
+
+                // Create active version of cached object with ObjectProvider connected and same id
+                ObjectProvider op = nucCtx.getObjectProviderFactory().newForCachedPC(this, id, cachedPC);
+                pc = op.getObject(); // Object in P_CLEAN state
+                if (NucleusLogger.CACHE.isDebugEnabled())
+                {
+                    NucleusLogger.CACHE.debug(Localiser.msg("004006", IdentityUtils.getPersistableIdentityForId(id),
+                        StringUtils.intArrayToString(cachedPC.getLoadedFieldNumbers()), cachedPC.getVersion(), StringUtils.toJVMIDString(pc)));
+                }
+
+                if (tx.isActive() && tx.getOptimistic())
+                {
+                    // Optimistic txns, so return as P_NONTRANS (as per JDO spec)
+                    op.makeNontransactional();
+                }
+                else if (!tx.isActive() && getApiAdapter().isTransactional(pc))
+                {
+                    // Non-tx context, so return as P_NONTRANS (as per JDO spec)
+                    op.makeNontransactional();
+                }
+
+                return pc;
+            }
+
+            if (NucleusLogger.CACHE.isDebugEnabled())
+            {
+                NucleusLogger.CACHE.debug(Localiser.msg("004005", uniKey));
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Convenience method to access a collection of objects from the Level 2 cache.
      * @param ids Collection of ids to retrieve
      * @return Map of persistable objects (with connected ObjectProvider) keyed by their id if found in the L2 cache
@@ -4969,8 +5121,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     /**
      * Replace the previous object id for a persistable object with a new one.
-     * This is used where we have already added the object to the cache(s) and/or enlisted it in the txn before
-     * its real identity was fixed (attributed in the datastore).
+     * This is used where we have already added the object to the cache(s) and/or enlisted it in the txn before its real identity was fixed (attributed in the datastore).
      * @param pc The Persistable object
      * @param oldID the old id it was known by
      * @param newID the new id

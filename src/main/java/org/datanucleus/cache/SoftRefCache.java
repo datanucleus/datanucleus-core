@@ -19,6 +19,7 @@ Contributors:
 package org.datanucleus.cache;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,38 +30,50 @@ import org.datanucleus.util.SoftValueMap;
  * Level 1 Cache using Soft referenced objects in a Map.
  * <P>
  * If map entry value object is not actively being used, i.e. no other object has a strong reference to it, 
- * it may become garbage collected at the discretion of the garbage collector (typically if the VM is low on 
- * memory). If this happens, the entry in the <code>SoftValueMap</code> corresponding to the value object will 
- * also be removed.
- * </P>
+ * it may become garbage collected at the discretion of the garbage collector (typically if the VM is low on memory). 
+ * If this happens, the entry in the <code>SoftValueMap</code> corresponding to the value object will also be removed.
  * @see java.lang.ref.SoftReference
  */
 public class SoftRefCache implements Level1Cache
 {
     private Map<Object, ObjectProvider> softCache = new SoftValueMap();
+    private Map<CacheUniqueKey, ObjectProvider> softCacheUnique = new SoftValueMap();
 
     public SoftRefCache()
     {
     }
 
-    public ObjectProvider put(Object key, ObjectProvider value)
+    public ObjectProvider put(Object id, ObjectProvider op)
     {
-        return softCache.put(key, value);
+        return softCache.put(id, op);
     }
 
-    public ObjectProvider get(Object key)
+    public ObjectProvider get(Object id)
     {
-        return softCache.get(key);
+        return softCache.get(id);
     }
 
-    public boolean containsKey(Object key)
+    public boolean containsKey(Object id)
     {
-        return softCache.containsKey(key);
+        return softCache.containsKey(id);
     }
 
-    public ObjectProvider remove(Object key)
+    public ObjectProvider remove(Object id)
     {
-        return softCache.remove(key);
+        ObjectProvider op = softCache.remove(id);
+        if (softCacheUnique.containsValue(op))
+        {
+            Iterator<Entry<CacheUniqueKey, ObjectProvider>> entrySetIter = softCacheUnique.entrySet().iterator();
+            while (entrySetIter.hasNext())
+            {
+                Entry<CacheUniqueKey, ObjectProvider> entry = entrySetIter.next();
+                if (entry.getValue() == op)
+                {
+                    entrySetIter.remove();
+                }
+            }
+        }
+        return op;
     }
 
     public void clear()
@@ -70,6 +83,7 @@ public class SoftRefCache implements Level1Cache
             return;
         }
         softCache.clear();
+        softCacheUnique.clear();
     }
 
     /*
@@ -133,5 +147,23 @@ public class SoftRefCache implements Level1Cache
     public Collection values()
     {
         return softCache.values();
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.cache.Level1Cache#getUnique(org.datanucleus.cache.CacheUniqueKey)
+     */
+    @Override
+    public ObjectProvider getUnique(CacheUniqueKey key)
+    {
+        return softCacheUnique.get(key);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.cache.Level1Cache#putUnique(org.datanucleus.cache.CacheUniqueKey, org.datanucleus.state.ObjectProvider)
+     */
+    @Override
+    public Object putUnique(CacheUniqueKey key, ObjectProvider op)
+    {
+        return softCacheUnique.put(key, op);
     }
 }

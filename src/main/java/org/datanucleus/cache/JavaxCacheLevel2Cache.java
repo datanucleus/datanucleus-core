@@ -48,8 +48,12 @@ import org.datanucleus.util.NucleusLogger;
 public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
 {
     private static final long serialVersionUID = 3218890128547271239L;
-    /** The cache to use. */
+
+    /** Cache of CachedPC keyed by "id". */
     private final Cache cache;
+
+    /** Cache of "id" keyed by "uniqueKey". */
+    private final Cache cacheUnique;
 
     /**
      * Constructor.
@@ -92,6 +96,38 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
                 tmpcache = cacheMgr.getCache(cacheName);
             }
             cache = tmpcache;
+
+            // Cache for unique key to "id"
+            String cacheNameUnique = cacheName + "UNIQUE";
+            tmpcache = cacheMgr.getCache(cacheNameUnique);
+            if (tmpcache == null)
+            {
+                MutableConfiguration cacheConfig = new MutableConfiguration();
+                Configuration conf = nucleusCtx.getConfiguration();
+                if (conf.hasProperty(PropertyNames.PROPERTY_CACHE_L2_READ_THROUGH))
+                {
+                    cacheConfig.setReadThrough(conf.getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_READ_THROUGH));
+                }
+                if (conf.hasProperty(PropertyNames.PROPERTY_CACHE_L2_WRITE_THROUGH))
+                {
+                    cacheConfig.setWriteThrough(conf.getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_WRITE_THROUGH));
+                }
+                if (conf.hasProperty(PropertyNames.PROPERTY_CACHE_L2_STATISTICS_ENABLED))
+                {
+                    cacheConfig.setStatisticsEnabled(conf.getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_STATISTICS_ENABLED));
+                }
+                if (conf.hasProperty(PropertyNames.PROPERTY_CACHE_L2_STORE_BY_VALUE))
+                {
+                    cacheConfig.setStoreByValue(conf.getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_STORE_BY_VALUE));
+                }
+                if (timeout > 0)
+                {
+                    // TODO Some way to set the timeout/expiry
+                }
+                cacheMgr.createCache(cacheNameUnique, cacheConfig);
+                tmpcache = cacheMgr.getCache(cacheNameUnique);
+            }
+            cacheUnique = tmpcache;
         }
         catch (CacheException e)
         {
@@ -368,5 +404,43 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
         {
             NucleusLogger.CACHE.info("Objects not evicted from cache due to : " + re.getMessage());
         }
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.cache.Level2Cache#getUnique(org.datanucleus.cache.CacheUniqueKey)
+     */
+    @Override
+    public CachedPC getUnique(CacheUniqueKey key)
+    {
+        NucleusLogger.GENERAL.info(">> JavaxCacheL2Cache.getUnique");
+        return (CachedPC) cacheUnique.get(key);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.cache.Level2Cache#putUnique(org.datanucleus.cache.CacheUniqueKey, org.datanucleus.cache.CachedPC)
+     */
+    @Override
+    public CachedPC putUnique(CacheUniqueKey key, CachedPC pc)
+    {
+        try
+        {
+            cacheUnique.put(key, pc);
+            NucleusLogger.GENERAL.info(">> JavaxCacheL2Cache.putUnique");
+        }
+        catch (Exception e)
+        {
+            // Not cached due to some problem. Not serializable?
+            NucleusLogger.CACHE.info("Object with key " + key +" not cached due to : " + e.getMessage());
+        }
+        return pc;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.cache.Level2Cache#removeUnique(org.datanucleus.cache.CacheUniqueKey)
+     */
+    @Override
+    public void removeUnique(CacheUniqueKey key)
+    {
+        cacheUnique.remove(key);
     }
 }

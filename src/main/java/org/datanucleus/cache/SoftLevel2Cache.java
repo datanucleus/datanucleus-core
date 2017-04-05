@@ -27,8 +27,7 @@ import org.datanucleus.util.SoftValueMap;
 
 /**
  * Soft implementation of a Level 2 cache.
- * The second (unpinned) map stores soft references meaning that they may be garbage
- * collected only if necessary by the JVM.
+ * The second (unpinned) map stores soft references meaning that they may be garbage collected only if necessary by the JVM.
  */
 public class SoftLevel2Cache extends WeakLevel2Cache
 {
@@ -43,6 +42,7 @@ public class SoftLevel2Cache extends WeakLevel2Cache
         apiAdapter = nucleusCtx.getApiAdapter();
         pinnedCache = new HashMap();
         unpinnedCache = new SoftValueMap();
+        uniqueKeyCache = new SoftValueMap();
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
@@ -50,5 +50,6 @@ public class SoftLevel2Cache extends WeakLevel2Cache
         // our "pseudo-constructor"
         in.defaultReadObject();
         unpinnedCache = new SoftValueMap();
+        uniqueKeyCache = new SoftValueMap();
     }
 }

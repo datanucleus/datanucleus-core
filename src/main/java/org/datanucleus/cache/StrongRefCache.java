@@ -20,6 +20,7 @@ package org.datanucleus.cache;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,30 +33,44 @@ import org.datanucleus.state.ObjectProvider;
  */
 public class StrongRefCache implements Level1Cache
 {
-    private Map<Object, ObjectProvider> cache = new HashMap();
+    private Map<Object, ObjectProvider> cache = new HashMap<>();
+    private Map<CacheUniqueKey, ObjectProvider> cacheUnique = new HashMap<>();
 
     public StrongRefCache()
     {
     }
 
-    public ObjectProvider put(Object key, ObjectProvider value)
+    public ObjectProvider put(Object id, ObjectProvider op)
     {
-        return cache.put(key, value);
+        return cache.put(id, op);
     }
 
-    public ObjectProvider get(Object key)
+    public ObjectProvider get(Object id)
     {
-        return cache.get(key);
+        return cache.get(id);
     }
 
-    public boolean containsKey(Object key)
+    public boolean containsKey(Object id)
     {
-        return cache.containsKey(key);
+        return cache.containsKey(id);
     }
 
-    public ObjectProvider remove(Object key)
+    public ObjectProvider remove(Object id)
     {
-        return cache.remove(key);
+        ObjectProvider op = cache.remove(id);
+        if (cacheUnique.containsValue(op))
+        {
+            Iterator<Entry<CacheUniqueKey, ObjectProvider>> entrySetIter = cacheUnique.entrySet().iterator();
+            while (entrySetIter.hasNext())
+            {
+                Entry<CacheUniqueKey, ObjectProvider> entry = entrySetIter.next();
+                if (entry.getValue() == op)
+                {
+                    entrySetIter.remove();
+                }
+            }
+        }
+        return op;
     }
 
     public void clear()
@@ -124,5 +139,23 @@ public class StrongRefCache implements Level1Cache
     public Collection values()
     {
         return cache.values();
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.cache.Level1Cache#getUnique(org.datanucleus.cache.CacheUniqueKey)
+     */
+    @Override
+    public ObjectProvider getUnique(CacheUniqueKey key)
+    {
+        return cacheUnique.get(key);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.cache.Level1Cache#putUnique(org.datanucleus.cache.CacheUniqueKey, org.datanucleus.state.ObjectProvider)
+     */
+    @Override
+    public Object putUnique(CacheUniqueKey key, ObjectProvider op)
+    {
+        return cacheUnique.put(key, op);
     }
 }

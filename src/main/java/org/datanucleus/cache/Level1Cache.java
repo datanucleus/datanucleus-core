@@ -24,9 +24,22 @@ import org.datanucleus.state.ObjectProvider;
 
 /**
  * Provides an interface for Level 1 caches.
- * Currently we just require a Map, but interfacing this provides
- * the flexibility to being able to add requirements in the future.
+ * Currently we just require a Map, but interfacing this provides the flexibility to being able to add requirements in the future.
  */
 public interface Level1Cache extends Map<Object, ObjectProvider>
 {
+    /**
+     * Method to retrieve the ObjectProvider for the specified unique key.
+     * @param key Unique key
+     * @return The ObjectProvider if one is cached for this unique key
+     */
+    ObjectProvider getUnique(CacheUniqueKey key);
+
+    /**
+     * Method to store an ObjectProvider for this unique key.
+     * @param key The unique key
+     * @param op The ObjectProvider
+     * @return The previous ObjectProvider for this unique key if one was present, otherwise null
+     */
+    Object putUnique(CacheUniqueKey key, ObjectProvider op);
 }
