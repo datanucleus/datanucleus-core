@@ -102,6 +102,10 @@ public class PersistenceUnitMetaData extends MetaData
         return rootURI;
     }
 
+    public void setTransactionType(String transType)
+    {
+        this.transactionType = TransactionType.getValue(transType);
+    }
     public TransactionType getTransactionType()
     {
         return transactionType;
