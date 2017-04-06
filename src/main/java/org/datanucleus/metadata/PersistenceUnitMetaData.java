@@ -36,7 +36,7 @@ public class PersistenceUnitMetaData extends MetaData
     /** Name of the persistence unit. */
     String name = null;
 
-    /** Root of the persistence unit. */
+    /** Root of the persistence unit. This can be used if wanting to scan for classes, to find the root to scan from. */
     URI rootURI = null;
 
     /** Transaction type for this persistence unit. */
