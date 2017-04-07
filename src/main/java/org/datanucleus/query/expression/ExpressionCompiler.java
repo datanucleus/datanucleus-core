@@ -827,6 +827,13 @@ public class ExpressionCompiler
             caseExpr.setElseExpression(elseExpr);
             return caseExpr;
         }
+        else if (node.getNodeType() == NodeType.TYPE)
+        {
+            List<Node> children = node.getChildNodes();
+            Expression containedExpr = compileExpression(children.get(0));
+            TypeExpression typeExpr = new TypeExpression(containedExpr);
+            return typeExpr;
+        }
         else
         {
             NucleusLogger.QUERY.warn("ExpressionCompiler.compilePrimaryExpression node=" + node + " ignored by ExpressionCompiler since not of a supported type");
