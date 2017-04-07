@@ -43,6 +43,7 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class IdentityManagerImpl implements IdentityManager
 {
+    /** Default DatastoreId implementation used by DataNucleus. */
     protected Class datastoreIdClass = null;
 
     /** Identity string translator (if any). */
@@ -54,12 +55,8 @@ public class IdentityManagerImpl implements IdentityManager
     /** Cache of id class Constructor, keyed by string of the type+args. */
     private Map<String, Constructor<?>> constructorCache = new ConcurrentHashMap<String, Constructor<?>>();
 
-    protected PersistenceNucleusContext nucCtx;
-
     public IdentityManagerImpl(PersistenceNucleusContext nucCtx)
     {
-        this.nucCtx = nucCtx;
-
         // Datastore Identity type
         String dsidName = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_DATASTORE_IDENTITY_TYPE);
         String datastoreIdentityClassName = nucCtx.getPluginManager().getAttributeValueForExtension(
@@ -249,9 +246,8 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
     /**
-     * Utility to create a new SingleFieldIdentity using reflection when you know the
-     * type of the Persistable, and also which SingleFieldIdentity, and the value of the key.
-     * @param idType Type of SingleFieldIdentity
+     * Utility to create a new SingleFieldId using reflection when you know the type of the Persistable, and also which SingleFieldId type, and the value of the key.
+     * @param idType Type of SingleFieldId
      * @param pcType Type of the Persistable
      * @param key The value for the identity (the Long, or Int, or ... etc).
      * @return Single field identity
@@ -440,8 +436,7 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
     /**
-     * Method to create a new object identity for the passed object with the supplied MetaData (when using APPLICATION identity).
-     * Only applies to application-identity cases.
+     * Method to create a new (application) identity for the passed object with the supplied MetaData (when using APPLICATION identity).
      * @param pc The persistable object
      * @param cmd Metadata for the persistable object
      * @return The new identity object
