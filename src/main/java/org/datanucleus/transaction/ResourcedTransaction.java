@@ -31,6 +31,7 @@ import javax.transaction.xa.Xid;
 import org.datanucleus.NucleusContextHelper;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 import org.omg.CORBA.SystemException;
 
 /**
@@ -209,7 +210,7 @@ public class ResourcedTransaction
         }
         catch (XAException e)
         {
-            NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "enlist", xaRes, getXAErrorCode(e), toString()));
+            NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "enlist", xaRes, getXAErrorCode(e), toString(), StringUtils.getMessageFromRootCauseOfThrowable(e)));
             return false;
         }
 
@@ -262,7 +263,7 @@ public class ResourcedTransaction
 
         if (exception != null)
         {
-            NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "delist", xaRes, getXAErrorCode(exception), toString()));
+            NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "delist", xaRes, getXAErrorCode(exception), toString(), StringUtils.getMessageFromRootCauseOfThrowable(exception)));
             return false;
         }
 
@@ -366,7 +367,7 @@ public class ResourcedTransaction
                         failures.add(e);
                         failed = true;
                         status = STATUS_MARKED_ROLLBACK;
-                        NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "commit", resourceManager, getXAErrorCode(e), toString()));
+                        NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "commit", resourceManager, getXAErrorCode(e), toString(), StringUtils.getMessageFromRootCauseOfThrowable(e)));
                     }
                 }
                 if (!failed)
@@ -403,7 +404,7 @@ public class ResourcedTransaction
                         failures.add(e);
                         failed = true;
                         status = STATUS_MARKED_ROLLBACK;
-                        NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "prepare", resourceManager, getXAErrorCode(e), toString()));
+                        NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "prepare", resourceManager, getXAErrorCode(e), toString(), StringUtils.getMessageFromRootCauseOfThrowable(e)));
                     }
                 }
 
@@ -431,7 +432,7 @@ public class ResourcedTransaction
                         }
                         catch (Throwable e)
                         {
-                            NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "rollback", resourceManager, getXAErrorCode(e), toString()));
+                            NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "rollback", resourceManager, getXAErrorCode(e), toString(), StringUtils.getMessageFromRootCauseOfThrowable(e)));
                             if (failures == null)
                             {
                                 // lazy instantiate this, because we only need on failures
@@ -459,7 +460,7 @@ public class ResourcedTransaction
                         }
                         catch (Throwable e)
                         {
-                            NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "commit", resourceManager, getXAErrorCode(e), toString()));
+                            NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "commit", resourceManager, getXAErrorCode(e), toString(), StringUtils.getMessageFromRootCauseOfThrowable(e)));
                             if (failures == null)
                             {
                                 // lazy instantiate this, because we only need on failures
@@ -548,7 +549,7 @@ public class ResourcedTransaction
                         failures = new ArrayList();
                     }
                     failures.add(e);
-                    NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "rollback", resourceManager, getXAErrorCode(e), toString()));
+                    NucleusLogger.TRANSACTION.error(Localiser.msg("015038", "rollback", resourceManager, getXAErrorCode(e), toString(), StringUtils.getMessageFromRootCauseOfThrowable(e)));
                 }
             }
             status = STATUS_ROLLEDBACK;
