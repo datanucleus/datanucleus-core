@@ -1166,8 +1166,8 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                             Class castClass = imports.resolveClassDeclaration(castClassName, clr, null);
                             if (!castClass.isAssignableFrom(value.getClass()))
                             {
-                                NucleusLogger.QUERY.warn("Candidate for query results in attempt to cast " +
-                                    StringUtils.toJVMIDString(value) + " to " + castClass.getName() + " which is impossible!");
+                                NucleusLogger.QUERY.debug("In-memory query requires cast of " + StringUtils.toJVMIDString(value) + 
+                                    " to " + castClass.getName() + " which is impossible, so exiting for this candidate");
                                 return new InMemoryFailure();
                             }
                         }
@@ -1182,8 +1182,8 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                             Class castClass = imports.resolveClassDeclaration(castClassName, clr, null);
                             if (!castClass.isAssignableFrom(value.getClass()))
                             {
-                                NucleusLogger.QUERY.warn("Candidate for query results in attempt to cast " +
-                                    StringUtils.toJVMIDString(value) + " to " + castClass.getName() + " which is impossible!");
+                                NucleusLogger.QUERY.debug("In-memory query requires cast of " + StringUtils.toJVMIDString(value) + 
+                                    " to " + castClass.getName() + " which is impossible, so exiting for this candidate");
                                 return new InMemoryFailure();
                             }
                         }
