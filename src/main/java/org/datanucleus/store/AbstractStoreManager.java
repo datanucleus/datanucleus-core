@@ -1209,9 +1209,9 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             sequenceMetaData = getMetaDataManager().getMetaDataForSequence(ec.getClassLoaderResolver(), sequence);
             if (sequenceMetaData == null)
             {
-                // JPOX 1.1 behaviour was just to use the sequence name in the datastore so log it and fallback to that
-                NucleusLogger.VALUEGENERATION.warn("Field " + fieldName + " has been specified to use sequence " + sequence +
-                    " but there is no <sequence> specified in the MetaData. Falling back to use a sequence in the datastore with this name directly.");
+                // No <sequence> defining the datastore sequence name, so fallback to this name directly in the datastore
+                NucleusLogger.VALUEGENERATION.info("Member " + fieldName + " has been specified to use sequence '" + sequence +
+                    "' but there is no <sequence> specified in the MetaData. Falling back to use a sequence in the datastore with this name directly.");
             }
         }
 

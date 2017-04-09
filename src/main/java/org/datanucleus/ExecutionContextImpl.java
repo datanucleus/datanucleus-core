@@ -5756,9 +5756,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         if (!valid)
         {
-            String msg = Localiser.msg("032016", op.getObjectAsPrintable(), op.getInternalObjectId(), "" + versionDatastore, "" + versionObject);
-            NucleusLogger.PERSISTENCE.error(msg);
-            throw new NucleusOptimisticException(msg, op.getObject());
+            throw new NucleusOptimisticException(Localiser.msg("032016", op.getObjectAsPrintable(), op.getInternalObjectId(), "" + versionDatastore, "" + versionObject), op.getObject());
         }
     }
 
