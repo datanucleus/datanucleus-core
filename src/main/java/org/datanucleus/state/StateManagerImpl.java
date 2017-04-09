@@ -2907,7 +2907,7 @@ public class StateManagerImpl extends AbstractStateManager<Persistable> implemen
         }
         catch (NucleusException ne)
         {
-            NucleusLogger.PERSISTENCE.warn("Exception thrown by StateManager.isLoaded", ne);
+            NucleusLogger.PERSISTENCE.warn("Exception thrown by StateManager.isLoaded for field=" + fieldNumber + " of " + this + " : " + StringUtils.getMessageFromRootCauseOfThrowable(ne));
 
             // Convert into an exception suitable for the current API since this is called from a user update of a field
             throw myEC.getApiAdapter().getApiExceptionForNucleusException(ne);

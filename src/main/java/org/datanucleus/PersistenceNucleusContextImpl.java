@@ -446,7 +446,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         }
         catch (NucleusException ne)
         {
-            NucleusLogger.DATASTORE.error("Exception thrown creating StoreManager. See the nested exception", ne);
+            NucleusLogger.DATASTORE.error("Exception thrown creating StoreManager : " + StringUtils.getMessageFromRootCauseOfThrowable(ne));
             throw ne;
         }
         NucleusLogger.DATASTORE.debug("StoreManager now created");

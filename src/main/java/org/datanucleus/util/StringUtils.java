@@ -48,6 +48,21 @@ import org.datanucleus.exceptions.NucleusException;
 public class StringUtils
 {
     /**
+     * Convenience method to take a throwable and navigate up to the root cause and return the message of the root cause.
+     * @param thr The Throwable
+     * @return The message from the root cause
+     */
+    public static String getMessageFromRootCauseOfThrowable(Throwable thr)
+    {
+        Throwable theThr = thr;
+        while (theThr.getCause() != null)
+        {
+            theThr = theThr.getCause();
+        }
+        return theThr.getMessage();
+    }
+
+    /**
      * Convert an exception to a String with full stack trace
      * @param ex the exception
      * @return a String with the full stacktrace error text
