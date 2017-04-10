@@ -35,7 +35,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.JarFile;
@@ -559,30 +558,6 @@ public class StringUtils
         }
     }
 
-    /**
-     * Convenience method to extract an integer property value from a Properties file.
-     * @param props The Properties
-     * @param propName Name of the property
-     * @param defaultValue The default value to use (in case not specified)
-     * @return The value
-     */
-    public static int getIntValueForProperty(Properties props, String propName, int defaultValue)
-    {
-        int value = defaultValue;
-        if (props != null && props.containsKey(propName))
-        {
-            try
-            {
-                value = (Integer.valueOf(props.getProperty(propName))).intValue();
-            }
-            catch (NumberFormatException nfe)
-            {
-                // Do nothing
-            }
-        }
-        return value;
-    }
-    
     /**
      * check string is null or length is 0.
      * @param s check string 
