@@ -27,9 +27,9 @@ public class FactoryStatistics extends AbstractStatistics implements FactoryStat
     int connectionActiveHigh;
     int connectionActiveTotal;
 
-    public FactoryStatistics(String name)
+    public FactoryStatistics(ManagementManager mgmtManager)
     {
-        super(name);
+        super(mgmtManager, null);
     }
 
     public int getConnectionActiveCurrent()

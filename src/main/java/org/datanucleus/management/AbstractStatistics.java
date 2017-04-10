@@ -19,14 +19,21 @@ package org.datanucleus.management;
 
 import java.util.LinkedList;
 
+import org.datanucleus.NucleusContextHelper;
+
 /**
  * Abstract base class for a statistics object.
  */
 public abstract class AbstractStatistics
 {
-    AbstractStatistics parent = null;
+    /** Manager for the management (JMX) service. */
+    ManagementManager manager;
 
-    String registeredName;
+    /** Name that we are known by. Will be null unless the JMX manager is not null. */
+    String registeredName = null;
+
+    /** Parent for this object. */
+    AbstractStatistics parent = null;
 
     int numReads = 0;
     int numWrites = 0;
@@ -59,13 +66,30 @@ public abstract class AbstractStatistics
     SMA queryExecutionTimeAverage = new SMA(50);
 
     /**
-     * Constructor specifying a "name" that we want to know this by.
-     * The name is simply a JMX MBean name if using JMX, or null otherwise.
-     * @param name Name that is known by
+     * Constructor defining the manager.
+     * If the manager is defined then this will generate a bean name that it is registered with in the manager.
+     * @param mgmtManager The Management (JMX) Manager
      */
-    public AbstractStatistics(String name)
+    public AbstractStatistics(ManagementManager mgmtManager, AbstractStatistics parent)
     {
-        this.registeredName = name;
+        this.manager = mgmtManager;
+        this.parent = parent;
+
+        if (mgmtManager != null)
+        {
+            // Register the MBean with the active JMX manager
+            registeredName = manager.getDomainName() + ":InstanceName=" + manager.getInstanceName() + ",Type=" + this.getClass().getName() + ",Name=Manager" + 
+                NucleusContextHelper.random.nextLong();
+            mgmtManager.registerMBean(this, registeredName);
+        }
+    }
+
+    public void close()
+    {
+        if (manager != null)
+        {
+            manager.deregisterMBean(registeredName);
+        }
     }
 
     /* (non-Javadoc)

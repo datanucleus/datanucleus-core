@@ -553,10 +553,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         }
         if (statistics != null)
         {
-            if (jmxManager != null)
-            {
-                jmxManager.deregisterMBean(statistics.getRegisteredName());
-            }
+            statistics.close();
             statistics = null;
         }
         if (jmxManager != null)
@@ -1181,19 +1178,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     {
         if (statistics == null && statisticsEnabled())
         {
-            String name = null;
-            if (getJMXManager() != null)
-            {
-                // Register the MBean with the active JMX manager
-                name = jmxManager.getDomainName() + ":InstanceName=" + jmxManager.getInstanceName() + ",Type=" + FactoryStatistics.class.getName() + 
-                        ",Name=Factory" + NucleusContextHelper.random.nextInt();
-            }
-            statistics = new FactoryStatistics(name);
-            if (jmxManager != null)
-            {
-                // Register the MBean with the active JMX manager
-                jmxManager.registerMBean(this.statistics, name);
-            }
+            statistics = new FactoryStatistics(jmxManager);
         }
         return statistics;
     }

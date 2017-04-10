@@ -67,7 +67,6 @@ import org.datanucleus.identity.IdentityStringTranslator;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.identity.DatastoreId;
 import org.datanucleus.identity.SCOID;
-import org.datanucleus.management.ManagementManager;
 import org.datanucleus.management.ManagerStatistics;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -327,20 +326,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         if (nucCtx.statisticsEnabled())
         {
-            String name = null;
-            if (nucCtx.getJMXManager() != null)
-            {
-                // Register the MBean with the active JMX manager
-                ManagementManager mgmtMgr = nucCtx.getJMXManager();
-                name = mgmtMgr.getDomainName() + ":InstanceName=" + mgmtMgr.getInstanceName() +
-                        ",Type=" + ManagerStatistics.class.getName() + ",Name=Manager" + NucleusContextHelper.random.nextLong();
-            }
-            statistics = new ManagerStatistics(name, nucCtx.getStatistics());
-            if (nucCtx.getJMXManager() != null)
-            {
-                // Register the MBean with the active JMX manager
-                nucCtx.getJMXManager().registerMBean(this.statistics, name);
-            }
+            statistics = new ManagerStatistics(nucCtx.getJMXManager(), nucCtx.getStatistics());
         }
 
         contextInfoThreadLocal = new ThreadLocal()
@@ -526,11 +512,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         if (statistics != null)
         {
-            if (nucCtx.getJMXManager() != null)
-            {
-                // Deregister the MBean from the JMX manager
-                nucCtx.getJMXManager().deregisterMBean(statistics.getRegisteredName());
-            }
+            statistics.close();
             statistics = null;
         }
 
