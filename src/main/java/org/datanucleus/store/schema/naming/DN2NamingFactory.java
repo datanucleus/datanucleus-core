@@ -147,6 +147,17 @@ public class DN2NamingFactory extends AbstractNamingFactory
                 name = "TENANT" + wordSeparator + "ID";
             }
         }
+        else if (type == ColumnType.SOFTDELETE_COLUMN)
+        {
+            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE_COLUMN_NAME))
+            {
+                name = cmd.getValueForExtension(MetaData.EXTENSION_CLASS_SOFTDELETE_COLUMN_NAME);
+            }
+            if (name == null)
+            {
+                name = "DELETED";
+            }
+        }
         else
         {
             throw new NucleusException("This method does not support columns of type " + type);
