@@ -114,16 +114,13 @@
                 </xsd:annotation>
               </xsd:element>
               <!-- **************************************************** -->
-              <xsd:element name="caching" type="persistence:persistence-unit-caching-type" minOccurs="0">
+              <xsd:element name="shared-cache-mode" type="persistence:persistence-unit-caching-type" minOccurs="0">
                 <xsd:annotation>
                   <xsd:documentation>
-                  Defines whether caching is enabled for the
-                  persistence unit if caching is supported by the
-                  persistence provider. When set to ALL, all entities
-                  will be cached. When set to NONE, no entities will
-                  be cached. When set to ENABLE_SELECTIVE, only entities
-                  specified as cacheable will be cached. When set to
-                  DISABLE_SELECTIVE, entities specified as not cacheable will not be cached.
+                  Defines whether caching is enabled for the persistence unit if caching is supported by the persistence provider. 
+                  When set to ALL, all entities will be cached. When set to NONE, no entities will be cached. 
+                  When set to ENABLE_SELECTIVE, only entities specified as cacheable will be cached. 
+                  When set to DISABLE_SELECTIVE, entities specified as not cacheable will not be cached.
                   </xsd:documentation>
                 </xsd:annotation>
               </xsd:element>

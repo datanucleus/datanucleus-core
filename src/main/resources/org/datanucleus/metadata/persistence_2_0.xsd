@@ -114,7 +114,7 @@
                 </xsd:annotation>
               </xsd:element>
               <!-- **************************************************** -->
-              <xsd:element name="caching" type="persistence:persistence-unit-caching-type" minOccurs="0">
+              <xsd:element name="shared-cache-mode" type="persistence:persistence-unit-caching-type" minOccurs="0">
                 <xsd:annotation>
                   <xsd:documentation>
                   Defines whether caching is enabled for the
