@@ -240,7 +240,7 @@ public class PersistenceFileMetaDataHandler extends AbstractMetaDataHandler
             }
             else if (localName.equals("shared-cache-mode"))
             {
-                ((PersistenceUnitMetaData)md).setCaching(currentString);
+                ((PersistenceUnitMetaData)md).setSharedCacheMode(currentString);
             }
             else if (localName.equals("validation-mode"))
             {

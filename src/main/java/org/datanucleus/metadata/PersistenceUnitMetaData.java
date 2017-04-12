@@ -72,8 +72,8 @@ public class PersistenceUnitMetaData extends MetaData
     /** Whether to exclude unlisted classes. */
     boolean excludeUnlistedClasses = false; // TODO Default to true
 
-    /** Caching policy for persistable objects. */
-    String caching = "UNSPECIFIED";
+    /** L2 cache mode for persistable objects. */
+    String sharedCacheMode = "UNSPECIFIED";
 
     /**
      * Constructor.
@@ -112,21 +112,21 @@ public class PersistenceUnitMetaData extends MetaData
     }
 
     /**
-     * Accessor for the persistence unit caching policy.
+     * Accessor for the persistence unit shared cache mode.
      * @return Caching policy: ALL, NONE, ENABLE_SELECTIVE, DISABLE_SELECTIVE, UNSPECIFIED.
      */
-    public String getCaching()
+    public String getSharedCacheMode()
     {
-        return caching;
+        return sharedCacheMode;
     }
 
     /**
-     * Mutator for the unit caching policy
-     * @param cache The caching policy: ALL, NONE, ENABLE_SELECTIVE, DISABLE_SELECTIVE, UNSPECIFIED.
+     * Mutator for the shared cache mode.
+     * @param cache The shared cache mode: ALL, NONE, ENABLE_SELECTIVE, DISABLE_SELECTIVE, UNSPECIFIED.
      */
-    public void setCaching(String cache)
+    public void setSharedCacheMode(String cache)
     {
-        this.caching = cache;
+        this.sharedCacheMode = cache;
     }
 
     public String getDescription()
