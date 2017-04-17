@@ -52,10 +52,10 @@ public class ClassesAutoStarter extends AbstractAutoStartMechanism
      * @return The class auto start data. Collection of StoreData elements
      * @throws DatastoreInitialisationException If an error occurs in datastore init
      */
-    public Collection getAllClassData()
+    public Collection<StoreData> getAllClassData()
     throws DatastoreInitialisationException
     {
-        Collection classes = new HashSet();
+        Collection<StoreData> classes = new HashSet<>();
         if (classNames == null)
         {
             return classes;

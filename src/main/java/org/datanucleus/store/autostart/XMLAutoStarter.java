@@ -120,18 +120,17 @@ public class XMLAutoStarter extends AbstractAutoStartMechanism
      * @return The class auto start data. Collection of StoreData elements
      * @throws DatastoreInitialisationException If an error occurs in datastore init
      */
-    public Collection getAllClassData()
+    public Collection<StoreData> getAllClassData()
     throws DatastoreInitialisationException
     {
-        Collection classes = new HashSet();
+        Collection<StoreData> classes = new HashSet<>();
 
         NodeList classElements = rootElement.getElementsByTagName("class");
         for (int i=0; i<classElements.getLength(); i++)
         {
             Element element = (Element) classElements.item(i);
 
-            StoreData data = new StoreData(element.getAttribute("name"), 
-                element.getAttribute("type").equals("FCO") ? StoreData.Type.FCO : StoreData.Type.SCO);
+            StoreData data = new StoreData(element.getAttribute("name"), element.getAttribute("type").equals("FCO") ? StoreData.Type.FCO : StoreData.Type.SCO);
             autoStartClasses.add(data.getName());
 
             NamedNodeMap attributeMap = element.getAttributes();

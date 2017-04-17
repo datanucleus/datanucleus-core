@@ -43,7 +43,7 @@ public class MetaDataAutoStarter extends AbstractAutoStartMechanism
     protected StoreManager storeMgr;
     protected ClassLoaderResolver clr;
 
-    protected Collection classes = new HashSet();
+    protected Collection<StoreData> classes = new HashSet<>();
 
     /**
      * Constructor, taking the names of the metadata to use.
@@ -62,7 +62,7 @@ public class MetaDataAutoStarter extends AbstractAutoStartMechanism
      * @return The class auto start data. Collection of StoreData elements
      * @throws org.datanucleus.exceptions.DatastoreInitialisationException If an error occurs in datastore init
      */
-    public Collection getAllClassData()
+    public Collection<StoreData> getAllClassData()
     throws DatastoreInitialisationException 
     {
         if (metaDataFiles == null)
@@ -70,12 +70,11 @@ public class MetaDataAutoStarter extends AbstractAutoStartMechanism
             return Collections.EMPTY_SET;
         }
 
-        Collection fileMetaData = 
-            storeMgr.getNucleusContext().getMetaDataManager().loadFiles(metaDataFiles.split(","), clr);
-        Iterator iter = fileMetaData.iterator();
+        Collection<FileMetaData> fileMetaData = storeMgr.getNucleusContext().getMetaDataManager().loadFiles(metaDataFiles.split(","), clr);
+        Iterator<FileMetaData> iter = fileMetaData.iterator();
         while (iter.hasNext()) 
         {
-            FileMetaData filemd = (FileMetaData) iter.next();
+            FileMetaData filemd = iter.next();
             for (int i = 0; i < filemd.getNoOfPackages(); i++) 
             {
                 PackageMetaData pmd = filemd.getPackage(i);

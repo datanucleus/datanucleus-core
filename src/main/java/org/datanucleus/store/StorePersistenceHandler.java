@@ -48,14 +48,20 @@ public interface StorePersistenceHandler
      * @param ec The ExecutionContext
      * @param batchType Type of this batch that is starting
      */
-    void batchStart(ExecutionContext ec, PersistenceBatchType batchType);
+    default void batchStart(ExecutionContext ec, PersistenceBatchType batchType)
+    {
+        // Override in subclasses if supporting batching using this mechanism
+    }
 
     /**
      * Signal that the current batch of operations are ending for the specified ExecutionContext.
      * @param ec The ExecutionContext
      * @param type Type of batch that is ending
      */
-    void batchEnd(ExecutionContext ec, PersistenceBatchType type);
+    default void batchEnd(ExecutionContext ec, PersistenceBatchType type)
+    {
+        // Override in subclasses if supporting batching using this mechanism
+    }
 
     /**
      * Inserts a persistent object into the database.
@@ -68,7 +74,18 @@ public interface StorePersistenceHandler
      * Method to insert an array of objects to the datastore.
      * @param ops ObjectProviders for the objects to insert
      */
-    void insertObjects(ObjectProvider... ops);
+    default void insertObjects(ObjectProvider... ops)
+    {
+        if (ops.length == 1)
+        {
+            insertObject(ops[0]);
+            return;
+        }
+        for (int i=0;i<ops.length;i++)
+        {
+            insertObject(ops[i]);
+        }
+    }
 
     /**
      * Updates a persistent object in the datastore.
@@ -89,7 +106,19 @@ public interface StorePersistenceHandler
      * Method to delete an array of objects from the datastore.
      * @param ops ObjectProviders for the objects to delete
      */
-    void deleteObjects(ObjectProvider... ops);
+    default void deleteObjects(ObjectProvider... ops)
+    {
+        if (ops.length == 1)
+        {
+            deleteObject(ops[0]);
+            return;
+        }
+
+        for (int i=0;i<ops.length;i++)
+        {
+            deleteObject(ops[i]);
+        }
+    }
 
     /**
      * Fetches specified fields of a persistent object from the database.
@@ -107,7 +136,14 @@ public interface StorePersistenceHandler
      * @throws NucleusObjectNotFoundException if the object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    void fetchObjects(int[] fieldNumbers, ObjectProvider... ops);
+    default void fetchObjects(int[] fieldNumbers, ObjectProvider... ops)
+    {
+        // Override this to provide bulk fetching of the same fields from multiple objects
+        for (ObjectProvider op : ops)
+        {
+            fetchObject(op, fieldNumbers);
+        }
+    }
 
     /**
      * Locates this object in the datastore.
@@ -123,7 +159,19 @@ public interface StorePersistenceHandler
      * @throws NucleusObjectNotFoundException if an object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    void locateObjects(ObjectProvider[] ops);
+    default void locateObjects(ObjectProvider[] ops)
+    {
+        if (ops.length == 1)
+        {
+            locateObject(ops[0]);
+            return;
+        }
+
+        for (int i=0;i<ops.length;i++)
+        {
+            locateObject(ops[i]);
+        }
+    }
 
     /**
      * Method to find a persistable object with the specified id from the datastore, if the StoreManager 
@@ -135,7 +183,7 @@ public interface StorePersistenceHandler
      * @throws NucleusObjectNotFoundException if this route is supported yet the object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public Object findObject(ExecutionContext ec, Object id);
+    Object findObject(ExecutionContext ec, Object id);
 
     /**
      * Method to find an array of objects with the specified identities from the datastore.
@@ -147,7 +195,15 @@ public interface StorePersistenceHandler
      * @throws NucleusObjectNotFoundException if an object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public Object[] findObjects(ExecutionContext ec, Object[] ids);
+    default Object[] findObjects(ExecutionContext ec, Object[] ids)
+    {
+        Object[] objects = new Object[ids.length];
+        for (int i=0;i<ids.length;i++)
+        {
+            objects[i] = findObject(ec, ids[i]);
+        }
+        return objects;
+    }
 
     /**
      * Method to find the object with the specified value(s) for the member(s) of the specified type.
@@ -159,7 +215,7 @@ public interface StorePersistenceHandler
      * @throws NucleusObjectNotFoundException if an object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public Object findObjectForUnique(ExecutionContext ec, AbstractClassMetaData cmd, String[] memberNames, Object[] values);
+    Object findObjectForUnique(ExecutionContext ec, AbstractClassMetaData cmd, String[] memberNames, Object[] values);
 
     /**
      * Enum for the type of a batched operation

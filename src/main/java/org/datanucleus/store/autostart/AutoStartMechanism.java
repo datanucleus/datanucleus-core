@@ -72,7 +72,7 @@ public interface AutoStartMechanism
      * @return Collection of {@link StoreData} elements
      * @throws DatastoreInitialisationException If there is an error initialising the datastore
      */
-    Collection getAllClassData() throws DatastoreInitialisationException;
+    Collection<StoreData> getAllClassData() throws DatastoreInitialisationException;
 
     /**
      * Starts a transaction for writing (add/delete) classes to the auto start mechanism.

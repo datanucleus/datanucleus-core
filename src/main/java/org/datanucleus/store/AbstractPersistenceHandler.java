@@ -24,7 +24,6 @@ import java.util.Map;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.DatastoreReadOnlyException;
-import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -45,110 +44,6 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
     public AbstractPersistenceHandler(StoreManager storeMgr)
     {
         this.storeMgr = storeMgr;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.StorePersistenceHandler#batchStart(org.datanucleus.ExecutionContext, org.datanucleus.store.PersistenceBatchType)
-     */
-    public void batchStart(ExecutionContext ec, PersistenceBatchType batchType)
-    {
-        // Override in subclasses if supporting batching using this mechanism
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.StorePersistenceHandler#batchEnd(org.datanucleus.ExecutionContext, org.datanucleus.store.PersistenceBatchType)
-     */
-    public void batchEnd(ExecutionContext ec, PersistenceBatchType type)
-    {
-        // Override in subclasses if supporting batching using this mechanism
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.StorePersistenceHandler#insertObjects(org.datanucleus.store.ObjectProvider[])
-     */
-    public void insertObjects(ObjectProvider... ops)
-    {
-        if (ops.length == 1)
-        {
-            insertObject(ops[0]);
-            return;
-        }
-        for (int i=0;i<ops.length;i++)
-        {
-            insertObject(ops[i]);
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.StorePersistenceHandler#deleteObjects(org.datanucleus.store.ObjectProvider[])
-     */
-    public void deleteObjects(ObjectProvider... ops)
-    {
-        if (ops.length == 1)
-        {
-            deleteObject(ops[0]);
-            return;
-        }
-
-        for (int i=0;i<ops.length;i++)
-        {
-            deleteObject(ops[i]);
-        }
-    }
-
-    /**
-     * Simple implementation of location of multiple objects, relaying the locate check for each object
-     * to <pre>locateObject</pre>.
-     * Should be overridden by the datastore implementation if it is possible to do bulk locates.
-     * @param ops ObjectProviders for the objects to locate
-     * @throws NucleusObjectNotFoundException if an object doesn't exist
-     * @throws NucleusDataStoreException when an error occurs in the datastore communication
-     */
-    public void locateObjects(ObjectProvider[] ops)
-    {
-        if (ops.length == 1)
-        {
-            locateObject(ops[0]);
-            return;
-        }
-
-        for (int i=0;i<ops.length;i++)
-        {
-            locateObject(ops[i]);
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.StorePersistenceHandler#fetchObjects(int[], org.datanucleus.state.ObjectProvider[])
-     */
-    @Override
-    public void fetchObjects(int[] fieldNumbers, ObjectProvider... ops)
-    {
-        // Override this to provide bulk fetching of the same fields from multiple objects
-        for (ObjectProvider op : ops)
-        {
-            fetchObject(op, fieldNumbers);
-        }
-    }
-
-    /**
-     * Simple implementation of find of multiple objects, relaying the find for each object
-     * to <pre>findObject</pre>.
-     * Should be overridden by the datastore implementation if it is possible to do bulk retrieval.
-     * @param ec execution context
-     * @param ids identities of the object(s) to retrieve
-     * @return The persistable objects with these identities (in the same order as <pre>ids</pre>)
-     * @throws NucleusObjectNotFoundException if an object doesn't exist
-     * @throws NucleusDataStoreException when an error occurs in the datastore communication
-     */
-    public Object[] findObjects(ExecutionContext ec, Object[] ids)
-    {
-        Object[] objects = new Object[ids.length];
-        for (int i=0;i<ids.length;i++)
-        {
-            objects[i] = findObject(ec, ids[i]);
-        }
-        return objects;
     }
 
     /* (non-Javadoc)
