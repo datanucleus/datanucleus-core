@@ -583,59 +583,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
     public Class getDatastoreTypeForTypeConverter(TypeConverter conv, Class memberType)
     {
         return typeConverterDatastoreTypeByConverter.get(conv);
-/*
-        // Note that all TypeConverters should have had the memberType and dbType cached on registration, so this code is redundant now
-        try
-        {
-            Method m = conv.getClass().getMethod("toDatastoreType", new Class[] {memberType});
-            Class type = m.getReturnType();
-            typeConverterDatastoreTypeByConverter.put(conv, type);
-            return type;
-        }
-        catch (Exception e)
-        {
-            // This will fail if we have a TypeConverter converting an interface, and the field is of the implementation type
-        }
-
-        try
-        {
-            // Maybe is a wrapper to a converter, like for JDO/JPA AttributeConverter
-            Method m = conv.getClass().getMethod("getDatastoreClass");
-            Class type = (Class)m.invoke(conv);
-            typeConverterDatastoreTypeByConverter.put(conv, type);
-            return type;
-        }
-        catch (Exception e2)
-        {
-            // Not a JDO/JPA wrapper type
-        }
-
-        // Maybe there is a toDatastoreType but not precise member type so just find the toDatastoreType method
-        try
-        {
-            Method[] methods = conv.getClass().getMethods();
-            if (methods != null)
-            {
-                // Note that with reflection we can get duplicated methods here, so if we have a method "String toDatastoreType(Serializable)" then
-                // reflection returns 1 method as "String toDatastoreType(Serializable)" and another as "Object toDatastoreType(Object)"
-                for (int i=0;i<methods.length;i++)
-                {
-                    Class[] paramTypes = methods[i].getParameterTypes();
-                    if (methods[i].getName().equals("toDatastoreType") && methods[i].getReturnType() != Object.class && paramTypes != null && paramTypes.length == 1)
-                    {
-                        Class type = methods[i].getReturnType();
-                        typeConverterDatastoreTypeByConverter.put(conv, type);
-                        return type;
-                    }
-                }
-            }
-        }
-        catch (Exception e3)
-        {
-            NucleusLogger.GENERAL.warn("Converter " + conv + " didn't have adequate information from toDatastoreType nor from getDatastoreClass");
-        }
-
-        return null;*/
     }
 
     /**
@@ -647,32 +594,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
     public Class getMemberTypeForTypeConverter(TypeConverter conv, Class datastoreType)
     {
         return typeConverterMemberTypeByConverter.get(conv);
-
-        // Note that all TypeConverters should have had the memberType and dbType cached on registration, so this code is redundant now
-        /*try
-        {
-            Method m = conv.getClass().getMethod("toMemberType", new Class[] {datastoreType});
-            Class memberType = m.getReturnType();
-            typeConverterMemberTypeByConverter.put(conv, memberType);
-            return memberType;
-        }
-        catch (Exception e)
-        {
-            try
-            {
-                // Maybe is a wrapper to a converter, like for JPA/JDO AttributeConverter
-                Method m = conv.getClass().getMethod("getMemberClass");
-                Class memberType = (Class)m.invoke(conv);
-                typeConverterMemberTypeByConverter.put(conv, memberType);
-                return memberType;
-            }
-            catch (Exception e2)
-            {
-                NucleusLogger.GENERAL.warn("Converter " + conv + " didn't have adequate information from toMemberType nor from getMemberClass");
-            }
-        }
-        
-        return null;*/
     }
 
     /**
