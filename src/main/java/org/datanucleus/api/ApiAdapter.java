@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.enhancement.Detachable;
 import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.enhancement.StateManager;
 import org.datanucleus.exceptions.NucleusException;
@@ -54,14 +55,29 @@ public interface ApiAdapter extends Serializable
      * @param pc The persistable object
      * @return Whether it is managed
      */
-    boolean isManaged(Object pc);
+    default boolean isManaged(Object pc)
+    {
+        return (getExecutionContext(pc) != null);
+    }
 
     /**
      * Accessor for the state manager for the object.
      * @param pc The object
      * @return The StateManager managing this object
      */
-    StateManager getStateManager(Object pc);
+    default StateManager getStateManager(Object pc)
+    {
+        if (pc == null)
+        {
+            return null;
+        }
+
+        if (pc instanceof Persistable)
+        {
+            return ((Persistable)pc).dnGetStateManager();
+        }
+        return null;
+    }
 
     /**
      * Method to return the ExecutionContext (if any) associated with the passed object.
@@ -83,63 +99,90 @@ public interface ApiAdapter extends Serializable
      * @param obj The object
      * @return Whether it is persistent
      */
-    boolean isPersistent(Object obj);
+    default boolean isPersistent(Object obj)
+    {
+        return obj instanceof Persistable ? ((Persistable)obj).dnIsPersistent() : false;
+    }
 
     /**
      * Accessor for whether the passed object is new.
      * @param obj The object
      * @return Whether it is new
      */
-    boolean isNew(Object obj);
+    default boolean isNew(Object obj)
+    {
+        return obj instanceof Persistable ? ((Persistable)obj).dnIsNew() : false;
+    }
 
     /**
      * Accessor for whether the passed object is dirty.
      * @param obj The object
      * @return Whether it is dirty
      */
-    boolean isDirty(Object obj);
+    default boolean isDirty(Object obj)
+    {
+        return obj instanceof Persistable ? ((Persistable)obj).dnIsDirty() : false;
+    }
 
     /**
      * Accessor for whether the passed object is deleted.
      * @param obj The object
      * @return Whether it is deleted
      */
-    boolean isDeleted(Object obj);
+    default boolean isDeleted(Object obj)
+    {
+        return obj instanceof Persistable ? ((Persistable)obj).dnIsDeleted() : false;
+    }
 
     /**
      * Accessor for whether the passed object is detached.
      * @param obj The object
      * @return Whether it is detached
      */
-    boolean isDetached(Object obj);
+    default boolean isDetached(Object obj)
+    {
+        return obj instanceof Persistable ? ((Persistable)obj).dnIsDetached() : false;
+    }
 
     /**
      * Accessor for whether the passed object is transactional.
      * @param obj The object
      * @return Whether it is transactional
      */
-    boolean isTransactional(Object obj);
+    default boolean isTransactional(Object obj)
+    {
+        return obj instanceof Persistable ? ((Persistable)obj).dnIsTransactional() : false;
+    }
 
     /**
      * Method to return if the passed object is persistable using this API.
      * @param obj The object
      * @return Whether it is persistable
      */
-    boolean isPersistable(Object obj);
+    default boolean isPersistable(Object obj)
+    {
+        return obj == null ? false : obj instanceof Persistable;
+    }
 
     /**
      * Utility method to check if the specified class is of a type that can be persisted for this API.
      * @param cls The class to check
      * @return Whether the class is persistable using this API.
      */
-    boolean isPersistable(Class cls);
+    default boolean isPersistable(Class cls)
+    {
+        return cls == null ? false : Persistable.class.isAssignableFrom(cls);
+    }
 
     /**
      * Method to return if the passed object is detachable using this API.
      * @param obj The object
      * @return Whether it is detachable
      */
-    boolean isDetachable(Object obj);
+    default boolean isDetachable(Object obj)
+    {
+        return obj == null ? false : obj instanceof Detachable;
+    }
 
     /**
      * Accessor for the object state.
@@ -153,7 +196,10 @@ public interface ApiAdapter extends Serializable
      * @param obj The object
      * @param member Name of the member
      */
-    void makeDirty(Object obj, String member);
+    default void makeDirty(Object obj, String member)
+    {
+        ((Persistable)obj).dnMakeDirty(member);
+    }
 
     // ------------------------------ Object Identity  --------------------------------
 
@@ -163,7 +209,10 @@ public interface ApiAdapter extends Serializable
      * @param obj The object
      * @return The identity
      */
-    Object getIdForObject(Object obj);
+    default Object getIdForObject(Object obj)
+    {
+        return obj instanceof Persistable ? ((Persistable)obj).dnGetObjectId() : null;
+    }
 
     /**
      * Method to return the object version for the passed persistable object.
@@ -171,7 +220,10 @@ public interface ApiAdapter extends Serializable
      * @param obj The object
      * @return The version
      */
-    Object getVersionForObject(Object obj);
+    default Object getVersionForObject(Object obj)
+    {
+        return obj instanceof Persistable ? ((Persistable)obj).dnGetVersion() : null;
+    }
 
     /**
      * Utility to check if a primary-key class is valid.
@@ -191,7 +243,10 @@ public interface ApiAdapter extends Serializable
      * @param fm ObjectIdFieldConsumer
      * @param id The identity
      */
-    void copyKeyFieldsFromIdToObject(Object pc, Persistable.ObjectIdFieldConsumer fm, Object id);
+    default void copyKeyFieldsFromIdToObject(Object pc, Persistable.ObjectIdFieldConsumer fm, Object id)
+    {
+        ((Persistable)pc).dnCopyKeyFieldsFromObjectId(fm, id);
+    }
 
     // ------------------------------ Persistence --------------------------------
 
