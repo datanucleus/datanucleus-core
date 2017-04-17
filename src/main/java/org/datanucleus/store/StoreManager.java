@@ -26,6 +26,7 @@ import java.util.Map;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.PersistenceNucleusContext;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -134,7 +135,10 @@ public interface StoreManager
      * @param seqmd SequenceMetaData
      * @return The Sequence
      */
-    NucleusSequence getNucleusSequence(ExecutionContext ec, SequenceMetaData seqmd);
+    default NucleusSequence getNucleusSequence(ExecutionContext ec, SequenceMetaData seqmd)
+    {
+        return new NucleusSequenceImpl(ec, this, seqmd);
+    }
 
     /**
      * Method to return a connection to the user for the ExecutionContext.
@@ -159,7 +163,10 @@ public interface StoreManager
      * @return The Connection
      * @throws NucleusException Thrown if an error occurs getting the connection
      */
-    ManagedConnection getConnection(ExecutionContext ec);
+    default ManagedConnection getConnection(ExecutionContext ec)
+    {
+        return getConnection(ec, null);
+    }
 
     /**
      * Accessor for a connection for the specified ExecutionContext (PM/EM).
@@ -186,13 +193,19 @@ public interface StoreManager
      * Convenience accessor for the URL for the connections.
      * @return connection URL
      */
-    String getConnectionURL();
+    default String getConnectionURL()
+    {
+        return getStringProperty(PropertyNames.PROPERTY_CONNECTION_URL);
+    }
 
     /**
      * Convenience accessor for the user name to use for the connections (where required).
      * @return user name
      */
-    String getConnectionUserName();
+    default String getConnectionUserName()
+    {
+        return getStringProperty(PropertyNames.PROPERTY_CONNECTION_USER_NAME);
+    }
 
     /**
      * Convenience accessor for the password to use for the connections (where required).
@@ -204,31 +217,46 @@ public interface StoreManager
      * Convenience accessor for the driver name to use for the connections (where supported).
      * @return driver name
      */
-    String getConnectionDriverName();
+    default String getConnectionDriverName()
+    {
+        return getStringProperty(PropertyNames.PROPERTY_CONNECTION_DRIVER_NAME);
+    }
 
     /**
      * Convenience accessor for the primary connection factory (when a factory was provided by the user).
      * @return Connection Factory (primary)
      */
-    Object getConnectionFactory();
+    default Object getConnectionFactory()
+    {
+        return getProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY);
+    }
 
     /**
      * Convenience accessor for the factory (JNDI) name for the primary connection factory (when provided by the user).
      * @return Connection Factory name (primary)
      */
-    String getConnectionFactoryName();
+    default String getConnectionFactoryName()
+    {
+        return getStringProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY_NAME);
+    }
 
     /**
      * Convenience accessor for the secondary connection factory (when a factory was provided by the user).
      * @return Connection Factory (secondary)
      */
-    Object getConnectionFactory2();
+    default Object getConnectionFactory2()
+    {
+        return getProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY2);
+    }
 
     /**
      * Convenience accessor for the factory (JNDI) name for the secondary connection factory (when provided by the user).
      * @return Connection Factory name (secondary)
      */
-    String getConnectionFactory2Name();
+    default String getConnectionFactory2Name()
+    {
+        return getStringProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY2_NAME);
+    }
 
     /**
      * Accessor for the ValueGenerationManager for obtaining sequences.
@@ -252,7 +280,11 @@ public interface StoreManager
      * Accessor for the key used for representing this store manager in the query cache.
      * @return Key for the query cache
      */
-    String getQueryCacheKey();
+    default String getQueryCacheKey()
+    {
+        // Fall back to the same as the key for the store manager
+        return getStoreManagerKey();
+    }
 
     /**
      * Accessor for the context in which this StoreManager is running.
@@ -264,7 +296,11 @@ public interface StoreManager
      * Get the date/time of the datastore.
      * @return Date/time of the datastore
      */
-    Date getDatastoreDate();
+    default Date getDatastoreDate()
+    {
+        // Just return the current date here, and let any stores override this that support it
+        return new Date();
+    }
 
     /**
      * Returns whether the datastore is a "JDBC datastore". If it is then the JDO spec needs to 
@@ -359,7 +395,10 @@ public interface StoreManager
      * Accessor for the native query language of this store.
      * @return The native query language (e.g "SQL")
      */
-    String getNativeQueryLanguage();
+    default String getNativeQueryLanguage()
+    {
+        return null;
+    }
 
     /**
      * Accessor for whether this value strategy is supported.
@@ -428,21 +467,27 @@ public interface StoreManager
      * This allows the StoreManager to initialise any objects as required.
      * @param ec ExecutionContext
      */
-    void transactionStarted(ExecutionContext ec);
+    default void transactionStarted(ExecutionContext ec)
+    {
+    }
 
     /**
      * Method to inform the StoreManager that a transaction has committed for the specified execution context.
      * This allows the StoreManager to close any objects as required.
      * @param ec ExecutionContext
      */
-    void transactionCommitted(ExecutionContext ec);
+    default void transactionCommitted(ExecutionContext ec)
+    {
+    }
 
     /**
      * Method to inform the StoreManager that a transaction has rolled back for the specified execution context.
      * This allows the StoreManager to close any objects as required.
      * @param ec ExecutionContext
      */
-    void transactionRolledBack(ExecutionContext ec);
+    default void transactionRolledBack(ExecutionContext ec)
+    {
+    }
 
     String getDefaultObjectProviderClassName();
 
@@ -450,5 +495,8 @@ public interface StoreManager
      * Whether this store manager uses backing-store based SCO wrappers.
      * @return Whether this store provides backing stores for SCO wrappers.
      */
-    boolean usesBackedSCOWrappers();
+    default boolean usesBackedSCOWrappers()
+    {
+        return false;
+    }
 }

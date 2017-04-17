@@ -22,7 +22,6 @@ import java.io.PrintStream;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -308,19 +307,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      * If there is an active transaction, a connection from the primary DataSource will be returned. 
      * If there is no active transaction, a connection from the secondary DataSource will be returned.
      * @param ec ExecutionContext
-     * @return The Connection
-     * @throws NucleusException Thrown if an error occurs getting the connection
-     */
-    public ManagedConnection getConnection(ExecutionContext ec)
-    {
-        return getConnection(ec, null);
-    }
-
-    /**
-     * Accessor for a connection for the specified ExecutionContext.
-     * If there is an active transaction, a connection from the primary DataSource will be returned. 
-     * If there is no active transaction, a connection from the secondary DataSource will be returned.
-     * @param ec ExecutionContext
      * @param options Any options for the connection
      * @return The Connection
      * @throws NucleusException Thrown if an error occurs getting the connection
@@ -385,33 +371,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     }
 
     /**
-     * Convenience accessor for the driver name to use for the connection (if applicable for this datastore).
-     * @return Driver name for the connection
-     */
-    public String getConnectionDriverName()
-    {
-        return getStringProperty(PropertyNames.PROPERTY_CONNECTION_DRIVER_NAME);
-    }
-
-    /**
-     * Convenience accessor for the URL for the connection
-     * @return Connection URL
-     */
-    public String getConnectionURL()
-    {
-        return getStringProperty(PropertyNames.PROPERTY_CONNECTION_URL);
-    }
-
-    /**
-     * Convenience accessor for the username to use for the connection
-     * @return Username
-     */
-    public String getConnectionUserName()
-    {
-        return getStringProperty(PropertyNames.PROPERTY_CONNECTION_USER_NAME);
-    }
-
-    /**
      * Convenience accessor for the password to use for the connection.
      * Will perform decryption if the persistence property "datanucleus.ConnectionPasswordDecrypter" has
      * also been specified.
@@ -440,42 +399,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             }
         }
         return password;
-    }
-
-    /**
-     * Convenience accessor for the factory for the connection (transactional).
-     * @return Connection Factory (transactional)
-     */
-    public Object getConnectionFactory()
-    {
-        return getProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY);
-    }
-
-    /**
-     * Convenience accessor for the factory name for the connection (transactional).
-     * @return Connection Factory name (transactional)
-     */
-    public String getConnectionFactoryName()
-    {
-        return getStringProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY_NAME);
-    }
-
-    /**
-     * Convenience accessor for the factory for the connection (non-transactional).
-     * @return Connection Factory (non-transactional)
-     */
-    public Object getConnectionFactory2()
-    {
-        return getProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY2);
-    }
-
-    /**
-     * Convenience accessor for the factory name for the connection (non-transactional).
-     * @return Connection Factory name (non-transactional)
-     */
-    public String getConnectionFactory2Name()
-    {
-        return getStringProperty(PropertyNames.PROPERTY_CONNECTION_FACTORY2_NAME);
     }
 
 	/* (non-Javadoc)
@@ -579,17 +502,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         return namingFactory;
     }
 
-    /**
-     * Method to return a datastore sequence for this datastore matching the passed sequence MetaData.
-     * @param ec execution context
-     * @param seqmd SequenceMetaData
-     * @return The Sequence
-     */
-    public NucleusSequence getNucleusSequence(ExecutionContext ec, SequenceMetaData seqmd)
-    {
-        return new NucleusSequenceImpl(ec, this, seqmd);
-    }
-
     /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#getNucleusConnection(org.datanucleus.ExecutionContext)
      */
@@ -658,15 +570,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#getQueryCacheKey()
-     */
-    public String getQueryCacheKey()
-    {
-        // Fall back to the same as the key for the store manager
-        return getStoreManagerKey();
-    }
-
-    /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#getNucleusContext()
      */   
     public PersistenceNucleusContext getNucleusContext()
@@ -680,15 +583,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     public MetaDataManager getMetaDataManager()
     {
         return nucleusContext.getMetaDataManager();
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#getDatastoreDate()
-     */
-    public Date getDatastoreDate()
-    {
-        // Just return the current date here, and let any stores override this that support it
-        return new Date();
     }
 
     // -------------------------------- Management of Classes --------------------------------
@@ -1000,15 +894,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         String name = getNucleusContext().getPluginManager().getAttributeValueForExtension("org.datanucleus.store_query_query",
             new String[] {"name", "datastore"}, new String[]{language, storeManagerKey}, "name");
         return name != null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#getNativeQueryLanguage()
-     */
-    @Override
-    public String getNativeQueryLanguage()
-    {
-        return null;
     }
 
     /**
@@ -1709,35 +1594,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             return super.getBooleanObjectProperty(name);
         }
         return nucleusContext.getConfiguration().getBooleanObjectProperty(name);
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#transactionStarted(org.datanucleus.store.ExecutionContext)
-     */
-    public void transactionStarted(ExecutionContext ec)
-    {
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#transactionCommitted(org.datanucleus.store.ExecutionContext)
-     */
-    public void transactionCommitted(ExecutionContext ec)
-    {
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#transactionRolledBack(org.datanucleus.store.ExecutionContext)
-     */
-    public void transactionRolledBack(ExecutionContext ec)
-    {
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#usesBackedSCOWrappers()
-     */
-    public boolean usesBackedSCOWrappers()
-    {
-        return false;
     }
 
     /* (non-Javadoc)
