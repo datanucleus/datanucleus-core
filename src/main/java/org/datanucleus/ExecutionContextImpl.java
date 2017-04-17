@@ -35,7 +35,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
 
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.cache.CacheUniqueKey;
@@ -72,7 +71,6 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaData;
-import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.TransactionType;
 import org.datanucleus.metadata.UniqueMetaData;
 import org.datanucleus.metadata.VersionMetaData;
@@ -86,9 +84,7 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.Extent;
 import org.datanucleus.store.FieldValues;
-import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.StorePersistenceHandler.PersistenceBatchType;
-import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.store.types.scostore.Store;
 import org.datanucleus.util.ConcurrentReferenceHashMap;
 import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
@@ -799,26 +795,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     public ClassLoaderResolver getClassLoaderResolver()
     {
         return clr;
-    }
-
-    public StoreManager getStoreManager()
-    {
-        return getNucleusContext().getStoreManager();
-    }
-
-    public ApiAdapter getApiAdapter()
-    {
-        return getNucleusContext().getApiAdapter();
-    }
-
-    public TypeManager getTypeManager()
-    {
-        return getNucleusContext().getTypeManager();
-    }
-
-    public MetaDataManager getMetaDataManager()
-    {
-        return getNucleusContext().getMetaDataManager();
     }
 
     public LockManager getLockManager()
@@ -2088,11 +2064,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return persistObjectInternal(pc, null, op, ownerFieldNum, objectType);
         }
         return persistObjectInternal(pc, null, null, ownerFieldNum, objectType);
-    }
-
-    public <T> T persistObjectInternal(T pc, final FieldValues preInsertChanges, int objectType)
-    {
-        return persistObjectInternal(pc, preInsertChanges, null, -1, objectType);
     }
 
     /**
@@ -5478,16 +5449,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return null;
         }
         return getFetchGroupManager().getFetchGroupsWithName(name);
-    }
-
-    /**
-     * Accessor for the context lock object. 
-     * @return The lock object
-     */
-    public Lock getLock()
-    {
-        // No locking with this ExecutionContext. All single-threaded
-        return null;
     }
 
     /* (non-Javadoc)

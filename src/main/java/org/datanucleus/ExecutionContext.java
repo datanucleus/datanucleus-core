@@ -98,13 +98,19 @@ public interface ExecutionContext extends ExecutionContextReference
      * Accessor for the Store Manager.
      * @return Store Manager
      */
-    StoreManager getStoreManager();
+    default StoreManager getStoreManager()
+    {
+        return getNucleusContext().getStoreManager();
+    }
 
     /**
      * Accessor for the MetaData Manager.
      * @return The MetaData Manager
      */
-    MetaDataManager getMetaDataManager();
+    default MetaDataManager getMetaDataManager()
+    {
+        return getNucleusContext().getMetaDataManager();
+    }
 
     /**
      * Accessor for the context in which this execution context is running.
@@ -116,7 +122,10 @@ public interface ExecutionContext extends ExecutionContextReference
      * Accessor for the API adapter.
      * @return API adapter.
      */
-    ApiAdapter getApiAdapter();
+    default ApiAdapter getApiAdapter()
+    {
+        return getNucleusContext().getApiAdapter();
+    }
 
     /**
      * Acessor for the current FetchPlan
@@ -199,7 +208,10 @@ public interface ExecutionContext extends ExecutionContextReference
      * TODO should we keep this here? this is api/language dependent
      * @return The type manager
      */
-    TypeManager getTypeManager();
+    default TypeManager getTypeManager()
+    {
+        return getNucleusContext().getTypeManager();
+    }
 
     /**
      * Method to close the execution context.
@@ -324,7 +336,10 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param <T> Type of the persistable object
      * @return The persisted object
      */
-    <T> T persistObjectInternal(T pc, FieldValues preInsertChanges, int objectType);
+    default <T> T persistObjectInternal(T pc, FieldValues preInsertChanges, int objectType)
+    {
+        return persistObjectInternal(pc, preInsertChanges, null, -1, objectType);
+    }
 
     /**
      * Method to make transient the passed object.
@@ -827,7 +842,11 @@ public interface ExecutionContext extends ExecutionContextReference
      * Accessor for the lock object for this ExecutionContext.
      * @return The lock object
      */
-    Lock getLock();
+    default Lock getLock()
+    {
+        // No locking with default ExecutionContext (single-threaded).
+        return null;
+    }
 
     /**
      * Method to generate an instance of an interface, abstract class, or concrete PC class.
