@@ -80,11 +80,13 @@ import org.datanucleus.enhancer.methods.ReplaceStateManager;
 import org.datanucleus.enhancer.methods.SuperClone;
 import org.datanucleus.enhancer.methods.LoadClass;
 import org.datanucleus.metadata.AbstractClassMetaData;
+import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.ClassPersistenceModifier;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InvalidMetaDataException;
 import org.datanucleus.metadata.MetaDataManager;
+import org.datanucleus.metadata.PropertyMetaData;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
 
@@ -638,6 +640,14 @@ public class ClassEnhancerImpl implements ClassEnhancer
             {
                 if (hasOption(OPTION_GENERATE_PK))
                 {
+                    int[] pkMemberPositions = cmd.getPKMemberPositions();
+                    AbstractMemberMetaData pkMmd0 = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkMemberPositions[0]);
+                    if (pkMmd0 instanceof PropertyMetaData)
+                    {
+                        // Throw exception for invalid metadata
+                        throw new InvalidMetaDataException("044136", cmd.getFullClassName());
+                    }
+                    
                     String pkClassName = cmd.getFullClassName() + AbstractClassMetaData.GENERATED_PK_SUFFIX;
                     if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
                     {
