@@ -1208,6 +1208,26 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
+     * Method to return the ObjectProvider for an object (if managed).
+     * @param pc The object we are checking
+     * @return The ObjectProvider, null if not found.
+     * @throws NucleusUserException if the persistable object is managed by a different ExecutionContext
+     */
+    public ObjectProvider findObjectProvider(Object pc)
+    {
+        ObjectProvider op = (ObjectProvider) getApiAdapter().getStateManager(pc);
+        if (op != null)
+        {
+            ExecutionContext ec = op.getExecutionContext();
+            if (ec != null && this != ec)
+            {
+                throw new NucleusUserException(Localiser.msg("010007", getApiAdapter().getIdForObject(pc)));
+            }
+        }
+        return op;
+    }
+
+    /**
      * Find the ObjectProvider for the specified object, persisting it if required.
      * @param pc The persistable object
      * @param persist persists the object if not yet persisted. 
@@ -1263,26 +1283,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             releaseThreadContextInfo();
         }
-    }
-
-    /**
-     * Method to return the ObjectProvider for an object (if managed).
-     * @param pc The object we are checking
-     * @return The ObjectProvider, null if not found.
-     * @throws NucleusUserException if the persistable object is managed by a different ExecutionContext
-     */
-    public ObjectProvider findObjectProvider(Object pc)
-    {
-        ObjectProvider op = (ObjectProvider) getApiAdapter().getStateManager(pc);
-        if (op != null)
-        {
-            ExecutionContext ec = op.getExecutionContext();
-            if (ec != null && this != ec)
-            {
-                throw new NucleusUserException(Localiser.msg("010007", getApiAdapter().getIdForObject(pc)));
-            }
-        }
-        return op;
     }
 
     /**

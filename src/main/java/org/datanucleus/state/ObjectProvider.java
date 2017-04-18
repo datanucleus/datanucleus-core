@@ -23,6 +23,7 @@ import org.datanucleus.FetchPlan;
 import org.datanucleus.FetchPlanState;
 import org.datanucleus.Transaction;
 import org.datanucleus.cache.CachedPC;
+import org.datanucleus.enhancement.StateManager;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.store.FieldValues;
@@ -34,9 +35,10 @@ import org.datanucleus.store.fieldmanager.FieldManager;
  * A JDO StateManager is one possible implementation of an ObjectProvider, using bytecode enhancement in that case.
  * Another possible implementation would use Java reflection to obtain and set field values in the object.
  * 
+ * TODO Drop the generics and use Persistable. This will require updates to ExecutionContext to match
  * @param <T> Type of the object being managed
  */
-public interface ObjectProvider<T>
+public interface ObjectProvider<T> extends StateManager
 {
     /**
      * Key prefix under which the original value of a field is stored in the entity (nondurable objects).
@@ -436,6 +438,12 @@ public interface ObjectProvider<T>
      * @return true if this instance was deleted in the current transaction.
      */
     boolean isDeleted();
+
+    /**
+     * Tests whether this object is in the process of being detached.
+     * @return true if this instance is being detached.
+     */
+    boolean isDetaching();
 
     /**
      * Convenience method to load the passed field values.
