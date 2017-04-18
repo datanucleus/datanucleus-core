@@ -301,7 +301,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
         // Transitioning to TRANSIENT state, so if any postLoad action is pending we do it before. 
         // This usually happens when we make transient instances using the fetch plan and some
-        // fields were loaded during this action which triggered a jdoPostLoad event
+        // fields were loaded during this action which triggered a dnPostLoad event
         if (isPostLoadPending())
         {
             flags &= ~FLAG_CHANGING_STATE; //hack to make sure postLoad does not return without processing
@@ -2279,7 +2279,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         {
             // All DFG fields loaded and object is transactional so it doesnt need to contact us for those fields
             // Note that this is the DFG and NOT the current FetchPlan since in the enhancement of classes
-            // all DFG fields are set to check jdoFlags before relaying back to the StateManager
+            // all DFG fields are set to check dnFlags before relaying back to the StateManager
             persistenceFlags = Persistable.READ_OK;
             myPC.dnReplaceFlags();
         }
@@ -2407,7 +2407,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      */
     public ExecutionContextReference getExecutionContext(Persistable pc)
     {
-        //in identifying relationships, jdoCopyKeyFieldsFromId will call
+        //in identifying relationships, dnCopyKeyFieldsFromId will call
         //this method, and at this moment, myPC in statemanager is null
         // Currently AbstractPersistenceManager.java putObjectInCache prevents any identifying relation object being put in L2
 
@@ -3418,12 +3418,8 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     {
         boolean wasDirty = dirty;
 
-        /*
-         * If we're writing a field in the process of inserting it must be due 
-         * to jdoPreStore().  We haven't actually done the INSERT yet so we 
-         * don't want to mark anything as dirty, which would make us want to do 
-         * an UPDATE later. 
-         */
+        // If we're writing a field in the process of inserting it must be due to dnPreStore().
+        // We haven't actually done the INSERT yet so we don't want to mark anything as dirty, which would make us want to do an UPDATE later.
         if (activity != ActivityState.INSERTING && activity != ActivityState.INSERTING_CALLBACKS)
         {
             if (!wasDirty) // (only do it for first dirty event).
@@ -3515,8 +3511,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("026001", StringUtils.toJVMIDString(pc), this));
             }
 
-            // Reset jdoFlags in the clone to Persistable.READ_WRITE_OK 
-            // and clear its state manager.
+            // Reset dnFlags in the clone to Persistable.READ_WRITE_OK and clear its state manager.
             pc.dnReplaceFlags();
             replaceStateManager(pc, null);
             return true;
@@ -3574,16 +3569,16 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         {
             // Retrieving the detached state from the detached object
             // Don't need the id or version since they can't change
-            BitSet jdoLoadedFields = (BitSet)currentState[2];
+            BitSet theLoadedFields = (BitSet)currentState[2];
             for (int i = 0; i < this.loadedFields.length; i++)
             {
-                this.loadedFields[i] = jdoLoadedFields.get(i);
+                this.loadedFields[i] = theLoadedFields.get(i);
             }
 
-            BitSet jdoModifiedFields = (BitSet)currentState[3];
+            BitSet theModifiedFields = (BitSet)currentState[3];
             for (int i = 0; i < dirtyFields.length; i++)
             {
-                dirtyFields[i] = jdoModifiedFields.get(i);
+                dirtyFields[i] = theModifiedFields.get(i);
             }
             setVersion(currentState[1]);
             return currentState;
@@ -3733,7 +3728,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
     /**
      * Convenience method to load the passed field values.
-     * Loads the fields using any required fetch plan and calls jdoPostLoad() as appropriate.
+     * Loads the fields using any required fetch plan and calls dnPostLoad() as appropriate.
      * @param fv Field Values to load (including any fetch plan to use when loading)
      */
     public void loadFieldValues(FieldValues fv)
@@ -5829,12 +5824,9 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     protected boolean preWriteField(int fieldNumber)
     {
         boolean wasDirty = dirty;
-        /*
-         * If we're writing a field in the process of inserting it must be due 
-         * to jdoPreStore().  We haven't actually done the INSERT yet so we 
-         * don't want to mark anything as dirty, which would make us want to do 
-         * an UPDATE later. 
-         */
+
+        // If we're writing a field in the process of inserting it must be due to dnPreStore().
+        // We haven't actually done the INSERT yet so we don't want to mark anything as dirty, which would make us want to do an UPDATE later. 
         if (activity != ActivityState.INSERTING && activity != ActivityState.INSERTING_CALLBACKS)
         {
             if (!wasDirty) // (only do it for first dirty event).
@@ -5894,16 +5886,16 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
     /**
      * Called whenever the default fetch group fields have all been loaded.
-     * Updates jdoFlags and calls jdoPostLoad() as appropriate.
+     * Updates dnFlags and calls dnPostLoad() as appropriate.
      * <p>
      * If it's called in the midst of a life-cycle transition both actions will
      * be deferred until the transition is complete.
      * <em>This deferral is important</em>. Without it, we could enter user
-     * code (jdoPostLoad()) while still making a state transition, and that way
+     * code (dnPostLoad()) while still making a state transition, and that way
      * lies madness.
      * <p>
-     * As an example, consider a jdoPostLoad() that calls other enhanced methods
-     * that read fields (jdoPostLoad() itself is not enhanced). A P_NONTRANS
+     * As an example, consider a dnPostLoad() that calls other enhanced methods
+     * that read fields (dnPostLoad() itself is not enhanced). A P_NONTRANS
      * object accessed within a transaction would produce the following infinite
      * loop:
      * <p>
@@ -5913,7 +5905,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      *  isLoaded()
      *  transitionReadField()
      *  refreshLoadedFields()
-     *  jdoPostLoad()
+     *  dnPostLoad()
      *  isLoaded()
      *  ...
      * </pre>
@@ -5949,7 +5941,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
     /**
      * Guarantee that the serializable transactional and persistent fields are loaded into the instance. 
-     * This method is called by the generated jdoPreSerialize method prior to serialization of the instance.
+     * This method is called by the generated dnPreSerialize method prior to serialization of the instance.
      * @param pc the calling Persistable instance
      */
     public void preSerialize(Persistable pc)
@@ -5974,7 +5966,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 }
 
                 // Normal PC Detachable object being serialised so load up the detached state into the instance
-                // JDO2 spec "For Detachable classes, the jdoPreSerialize method must also initialize the jdoDetachedState
+                // JDO2 spec "For Detachable classes, the dnPreSerialize method must also initialize the dnDetachedState
                 // instance so that the detached state is serialized along with the instance."
                 ((Detachable)pc).dnReplaceDetachedState();
             }
