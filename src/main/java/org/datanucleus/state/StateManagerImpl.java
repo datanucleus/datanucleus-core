@@ -107,26 +107,22 @@ import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Implementation of a StateManager, supporting the bytecode enhancement contract of DataNucleus.
- * Implemented here as one StateManager per Object so adds on functionality particular 
- * to each object. All Persistable objects will have a StateManager when they 
- * have had communication with the ExecutionContext. They will typically always have
- * an identity also. The exception to that is for embedded/serialised objects.
+ * Implemented here as one StateManager per Object so adds on functionality particular to each object. 
+ * All Persistable objects will have a StateManager when they have had communication with the ExecutionContext. 
+ * They will typically always have an identity also. The exception to that is for embedded/serialised objects.
  * 
  * <H3>Embedded/Serialised Objects</H3>
- * An object that is being embedded/serialised in an owning object will NOT have an identity
- * unless the object is subject to a makePersistent() call also. When an object
- * is embedded/serialised and a field is changed, the field will NOT be marked as dirty (unless
- * it is also an object in its own right with an identity). When a field is changed
- * any owning objects are updated so that they can update their tables accordingly.
+ * An object that is being embedded/serialised in an owning object will NOT have an identity unless the object is subject to a makePersistent() call also. 
+ * When an object is embedded/serialised and a field is changed, the field will NOT be marked as dirty (unless it is also an object in its own right with an identity). 
+ * When a field is changed any owning objects are updated so that they can update their tables accordingly.
  *
  * <H3>Performance and Memory</H3>
  * StateManagers are very performance-critical, because for each Persistable object made persistent,
  * there will be one StateManager instance, adding up to the total memory footprint of that object.
- * In heap profiling analysis, StateManagerImpl showed to consume bytes 169 per StateManager by itself
- * and about 500 bytes per StateManager when taking PC-individual child-object (like the OID) referred
- * by the StateManager into account. With small Java objects this can mean a substantial memory overhead and
- * for applications using such small objects can be critical. For this reason the StateManager should always
- * be minimal in memory consumption.
+ * In heap profiling analysis (cerca 2008), StateManagerImpl showed to consume bytes 169 per StateManager by itself
+ * and about 500 bytes per StateManager when taking PC-individual child-object (like the OID) referred by the StateManager into account. 
+ * With small Java objects this can mean a substantial memory overhead and for applications using such small objects can be critical. 
+ * For this reason the StateManager should always be minimal in memory consumption.
  */
 public class StateManagerImpl implements ObjectProvider<Persistable>
 {
@@ -273,27 +269,28 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     {
         int fieldCount = cmd.getMemberCount();
         this.cmd = cmd;
-        this.dirtyFields = new boolean[fieldCount];
-        this.loadedFields = new boolean[fieldCount];
-        this.dirty = false;
         this.myEC = ec;
-        this.myFP = myEC.getFetchPlan().getFetchPlanForClass(cmd);
-        this.lock = new ReentrantLock();
-        this.lockMode = LockManager.LOCK_MODE_NONE;
-        this.savedFlags = 0;
-        this.savedLoadedFields = null;
-        this.objectType = 0;
-        this.activity = ActivityState.NONE;
-        this.myVersion = null;
-        this.transactionalVersion = null;
-        this.persistenceFlags = 0;
 
+        dirtyFields = new boolean[fieldCount];
+        loadedFields = new boolean[fieldCount];
+        dirty = false;
+        myFP = myEC.getFetchPlan().getFetchPlanForClass(cmd);
+        lock = new ReentrantLock();
+        lockMode = LockManager.LOCK_MODE_NONE;
+        savedFlags = 0;
+        savedLoadedFields = null;
+        objectType = 0;
+        activity = ActivityState.NONE;
+        myVersion = null;
+        transactionalVersion = null;
+        persistenceFlags = 0;
         savedImage = null;
+
         ec.setAttachDetachReferencedObject(this, null);
     }
 
     /**
-     * Disconnect this ObjectProvider from the ExecutionContext and PC object.
+     * Disconnect from the ExecutionContext and persistable object.
      */
     public void disconnect()
     {
@@ -802,14 +799,23 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         return myEC.getCallbackHandler();
     }
 
+    /**
+     * Accessor for the Persistable object.
+     * @return The Persistable object
+     */
+    public Persistable getObject()
+    {
+        return myPC;
+    }
+
     public String getObjectAsPrintable()
     {
-        return StringUtils.toJVMIDString(getObject());
+        return StringUtils.toJVMIDString(myPC);
     }
 
     public String toString()
     {
-        return "StateManager[pc=" + StringUtils.toJVMIDString(getObject()) + ", lifecycle=" + myLC + "]";
+        return "StateManager[pc=" + StringUtils.toJVMIDString(myPC) + ", lifecycle=" + myLC + "]";
     }
 
     /**
@@ -1497,6 +1503,14 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         }
     }
 
+    public void markFieldsAsLoaded(int[] fieldNumbers)
+    {
+        for (int i=0;i<fieldNumbers.length;i++)
+        {
+            loadedFields[fieldNumbers[i]] = true;
+        }
+    }
+
     /**
      * Convenience method to mark PK fields as loaded (if using app id).
      */
@@ -1881,6 +1895,15 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         return objectType > 0;
     }
 
+    /**
+     * Method to set this StateManager as managing an embedded/serialised object.
+     * @param objType The type of object being managed
+     */
+    public void setPcObjectType(short objType)
+    {
+        this.objectType = objType;
+    }
+
     // -------------------------- providedXXXField Methods ----------------------------
 
     /**
@@ -2141,15 +2164,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         }
     }
 
-    /**
-     * Method to set this StateManager as managing an embedded/serialised object.
-     * @param objType The type of object being managed
-     */
-    public void setPcObjectType(short objType)
-    {
-        this.objectType = objType;
-    }
-
     public void lock(short lockMode)
     {
         this.lockMode = lockMode;
@@ -2210,15 +2224,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     public boolean containsAssociatedValue(Object key)
     {
         return myEC.containsObjectProviderAssociatedValue(this, key);
-    }
-
-    /**
-     * Accessor for the Persistable object.
-     * @return The Persistable object
-     */
-    public Persistable getObject()
-    {
-        return myPC;
     }
 
     /**
@@ -2301,7 +2306,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     {
         try
         {
-            // Calls to pc.jdoReplaceStateManager must be run privileged
+            // Calls to pc.dnReplaceStateManager must be run privileged
             AccessController.doPrivileged(new PrivilegedAction()
             {
                 public Object run() 
@@ -2373,9 +2378,9 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
     /**
      * Method that replaces the PC managed by this StateManager to be the supplied object.
-     * This happens when we want to get an object for an id and create a Hollow object, and then validate
-     * against the datastore. This validation can pull in a new object graph from the datastore (e.g for DB4O)
-     * @param pc The Persistable to use
+     * This is used when we want to get an object for an id and create a Hollow object, and then validate against the datastore. 
+     * This validation can pull in a new object graph from the datastore (e.g for an ODBMS).
+     * @param pc The persistable to use
      */
     public void replaceManagedPC(Persistable pc)
     {
@@ -2673,10 +2678,9 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     }
 
     /**
-     * The StateManager uses this method to supply the value of jdoFlags to the
-     * associated Persistable instance.
+     * The StateManager uses this method to supply the value of dnFlags to the associated persistable instance.
      * @param pc the calling Persistable instance
-     * @return the value of jdoFlags to be stored in the Persistable instance
+     * @return the value of dnFlags to be stored in the Persistable instance
      */
     public byte replacingFlags(Persistable pc)
     {
@@ -2699,8 +2703,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     }
 
     /**
-     * Method to retrieve the value of a field from the PC object.
-     * Assumes that it is loaded.
+     * Method to retrieve the value of a field from the PC object. Assumes that it is loaded.
      * @param pc The PC object
      * @param fieldNumber Number of field
      * @return The value of the field
@@ -3626,49 +3629,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         }
     }
 
-    // -------------------------- getXXXField Methods ----------------------------
-    // Note that isLoaded() will always load the field if not loaded so these methods are never called
-
-    public boolean getBooleanField(Persistable pc, int fieldNumber, boolean currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-    public byte getByteField(Persistable pc, int fieldNumber, byte currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-    public char getCharField(Persistable pc, int fieldNumber, char currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-    public double getDoubleField(Persistable pc, int fieldNumber, double currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-    public float getFloatField(Persistable pc, int fieldNumber, float currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-    public int getIntField(Persistable pc, int fieldNumber, int currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-    public long getLongField(Persistable pc, int fieldNumber, long currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-    public short getShortField(Persistable pc, int fieldNumber, short currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-    public String getStringField(Persistable pc, int fieldNumber, String currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
-    public Object getObjectField(Persistable pc, int fieldNumber, Object currentValue)
-    {
-        throw new NucleusException(Localiser.msg("026006"));
-    }
 
     /**
      * Look to the database to determine which class this object is. This parameter is a hint. Set false, if it's
@@ -6293,42 +6253,5 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     public void updateFieldAfterInsert(Object pc, int fieldNumber)
     {
         // Does nothing in this implementation; refer to ReferentialJDOStateManager
-    }
-
-    /**
-     * Convenience method to update our object with the field values from the passed object.
-     * Objects need to be of the same type, and the other object should not have a StateManager.
-     * TODO Only used by XML plugin so strip this out into a convenience method.
-     * @param obj The object that we should copy fields from
-     * @param fieldNumbers Numbers of fields to copy
-     */
-    public void copyFieldsFromObject(Object obj, int[] fieldNumbers)
-    {
-        if (obj == null)
-        {
-            return;
-        }
-        if (!obj.getClass().getName().equals(myPC.getClass().getName()))
-        {
-            return;
-        }
-        if (!(obj instanceof Persistable))
-        {
-            throw new NucleusUserException("Must be Persistable");
-        }
-        Persistable pc = (Persistable)obj;
-
-        // Assign the new object to this StateManager temporarily so that we can copy its fields
-        replaceStateManager(pc, this);
-        myPC.dnCopyFields(pc, fieldNumbers);
-
-        // Remove the StateManager from the other object
-        replaceStateManager(pc, null);
-
-        // Set the loaded flags now that we have copied
-        for (int i=0;i<fieldNumbers.length;i++)
-        {
-            loadedFields[fieldNumbers[i]] = true;
-        }
     }
 }

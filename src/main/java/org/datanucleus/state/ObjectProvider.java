@@ -345,14 +345,6 @@ public interface ObjectProvider<T> extends StateManager
     void updateOwnerFieldInEmbeddedField(int fieldNumber, Object value);
 
     /**
-     * Convenience method to update our object with the field values from the passed object.
-     * Objects need to be of the same type, and the other object should not have a ObjectProvider.
-     * @param pc The object that we should copy fields from
-     * @param fieldNumbers Numbers of fields to copy
-     */
-    void copyFieldsFromObject(Object pc, int[] fieldNumbers);
-
-    /**
      * Method to set this ObjectProvider as managing an embedded/serialised object.
      * @param type The type of object being managed
      */
@@ -813,4 +805,11 @@ public interface ObjectProvider<T> extends StateManager
      * @deprecated Dont use this, to be removed
      */
     void checkInheritance(FieldValues fv);
+
+    /**
+     * Convenience method to mark all fields as "loaded".
+     * NOTE: This is a convenience mutator only to be used when you know what you are doing. Currently only used by the XML plugin.
+     * @param fieldNumbers The field numbers to mark as loaded
+     */
+    void markFieldsAsLoaded(int[] fieldNumbers);
 }
