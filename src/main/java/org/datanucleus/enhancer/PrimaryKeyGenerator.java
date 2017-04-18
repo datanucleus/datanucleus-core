@@ -37,6 +37,7 @@ import org.datanucleus.util.Localiser;
 /**
  * Class to handle the generation of a PK class for a persistable class.
  * The primary key class is generated as its own class, rather than as an inner class of the original class.
+ * NOTE: This will only currently handle persistable fields. If you require persistable properties then get the code and extend this.
  */
 public class PrimaryKeyGenerator
 {
