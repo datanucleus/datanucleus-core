@@ -38,6 +38,12 @@ import org.datanucleus.util.StringUtils;
  */
 public class ReferentialStateManagerImpl extends StateManagerImpl
 {
+    /** List of StateManagers that we must notify when we have completed inserting our record. */
+    private List<ReferentialStateManagerImpl> insertionNotifyList = null;
+
+    /** Fields of this object that we must update when notified of the insertion of the related objects. */
+    private Map<ReferentialStateManagerImpl, FieldContainer> fieldsToBeUpdatedAfterObjectInsertion = null;
+
     /**
      * Constructor for object of specified type managed by the provided ExecutionContext.
      * @param ec ExecutionContext
@@ -48,9 +54,6 @@ public class ReferentialStateManagerImpl extends StateManagerImpl
         super(ec, cmd);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.state.AbstractStateManager#connect(org.datanucleus.ExecutionContext, org.datanucleus.metadata.AbstractClassMetaData)
-     */
     @Override
     public void connect(ExecutionContext ec, AbstractClassMetaData cmd)
     {
@@ -59,21 +62,13 @@ public class ReferentialStateManagerImpl extends StateManagerImpl
         insertionNotifyList = null;
     }
 
-    /**
-     * Disconnect the provider from the ExecutionContext and PC object.
-     */
+    @Override
     public void disconnect()
     {
         this.fieldsToBeUpdatedAfterObjectInsertion = null;
         this.insertionNotifyList = null;
         super.disconnect();
     }
-
-    /** List of StateManagers that we must notify when we have completed inserting our record. */
-    private List<ReferentialStateManagerImpl> insertionNotifyList = null;
-
-    /** Fields of this object that we must update when notified of the insertion of the related objects. */
-    private Map<ReferentialStateManagerImpl, FieldContainer> fieldsToBeUpdatedAfterObjectInsertion = null;
 
     /**
      * Change the activity state to a particular state.
