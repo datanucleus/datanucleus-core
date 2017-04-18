@@ -194,25 +194,6 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
     }
 
     /**
-     * Accessor for the size of the cache.
-     * @see org.datanucleus.cache.Level2Cache#getSize()
-     */
-    public int getSize()
-    {
-        // Not supported
-        return 0;
-    }
-
-    /**
-     * Accessor for whether the cache is empty
-     * @see org.datanucleus.cache.Level2Cache#isEmpty()
-     */
-    public boolean isEmpty()
-    {
-        return getSize() == 0;
-    }
-
-    /**
      * Method to add an object to the cache under its id
      * @param oid The identity
      * @param pc The cacheable object

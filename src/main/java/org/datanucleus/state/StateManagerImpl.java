@@ -232,6 +232,8 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /** Image of the Persistable instance when the instance is enlisted in the transaction. */
     protected Persistable savedImage = null;
 
+    boolean validating = false;
+
     private static final EnhancementHelper HELPER;
     static
     {
@@ -321,14 +323,14 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         persistenceFlags = Persistable.READ_WRITE_OK;
         myPC.dnReplaceFlags();
 
-        setDisconnecting(true);
+        flags |= FLAG_DISCONNECTING;
         try
         {
             replaceStateManager(myPC, null);
         }
         finally
         {
-            setDisconnecting(false);
+            flags &= ~FLAG_DISCONNECTING;
         }
 
         clearSavedFields();
@@ -388,43 +390,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             loadFieldValues(fv);
             // TODO If this object has unique key(s) then they will likely be loaded from the fieldValues, so could put in L1 cache here
         }
-    }
-
-    /**
-     * Initialises a state manager to manage a HOLLOW / P_CLEAN instance having the given FieldValues.
-     * This constructor is used for creating new instances of existing persistent objects using application identity,
-     * and consequently shouldn't be used when the StoreManager controls the creation of such objects (such as in an ODBMS).
-     * @param fv the initial field values of the object.
-     * @param pcClass Class of the object that this will manage the state for
-     * @deprecated Remove use of this and use initialiseForHollow
-     */
-    public void initialiseForHollowAppId(FieldValues fv, Class pcClass)
-    {
-        if (cmd.getIdentityType() != IdentityType.APPLICATION)
-        {
-            throw new NucleusUserException("This constructor is only for objects using application identity.").setFatal();
-        }
-
-        myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.HOLLOW);
-        persistenceFlags = Persistable.LOAD_REQUIRED;
-        myPC = HELPER.newInstance(pcClass, this); // Create new PC
-        if (myPC == null)
-        {
-            if (!HELPER.getRegisteredClasses().contains(pcClass))
-            {
-                // probably never will get here, as JDOImplHelper.newInstance() internally already throws
-                // JDOFatalUserException when class is not registered 
-                throw new NucleusUserException(Localiser.msg("026018", pcClass.getName())).setFatal();
-            }
-
-            // Provide advisory information since we can't create an instance of this class, so maybe they have an error in their data ?
-            throw new NucleusUserException(Localiser.msg("026019", pcClass.getName())).setFatal();
-        }
-
-        loadFieldValues(fv); // as a minimum the PK fields are loaded here
-
-        // Create the ID now that we have the PK fields loaded
-        myID = myEC.getNucleusContext().getIdentityManager().getApplicationId(myPC, cmd);
     }
 
     /**
@@ -534,7 +499,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         saveFields();
 
         // Populate all fields that have "value-strategy" and are not datastore populated
-        populateStrategyFields();
+        populateValueGenerationFields();
 
         if (preInsertChanges != null)
         {
@@ -649,7 +614,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         myPC.dnReplaceFlags();
 
         // Populate all fields that have "value-strategy" and are not datastore populated
-        populateStrategyFields();
+        populateValueGenerationFields();
 
         // Set the identity
         setIdentity(false);
@@ -759,18 +724,50 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     }
 
     /**
-     * Accessor for the ClassMetaData for this object.
-     * @return The ClassMetaData.
+     * Convenience method to populate all fields in the PC object that need their value generating (according to metadata) and that aren't datastore-attributed. 
+     * This applies not just to PK fields (main use-case) but also to any other field (DN extension). 
+     * Fields can be populated only if they are null dependent on metadata. 
+     * This method is called once on a PC object, when makePersistent is called.
      */
+    private void populateValueGenerationFields()
+    {
+        int totalFieldCount = cmd.getNoOfInheritedManagedMembers() + cmd.getNoOfManagedMembers();
+
+        for (int fieldNumber=0; fieldNumber<totalFieldCount; fieldNumber++)
+        {
+            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            IdentityStrategy strategy = mmd.getValueStrategy();
+
+            // Check for the strategy, and if it is a datastore attributed strategy
+            if (strategy != null && !getStoreManager().isStrategyDatastoreAttributed(cmd, fieldNumber))
+            {
+                // Assign the strategy value where required.
+                // Default JDO/JPA behaviour is to always provide a strategy value when it is marked as using a strategy
+                boolean applyStrategy = true;
+                if (!mmd.getType().isPrimitive() &&
+                    mmd.hasExtension(MetaData.EXTENSION_MEMBER_STRATEGY_WHEN_NOTNULL) &&
+                    mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_STRATEGY_WHEN_NOTNULL).equalsIgnoreCase("false") &&
+                    this.provideField(fieldNumber) != null)
+                {
+                    // extension to only provide a value-strategy value where the field is null at persistence.
+                    applyStrategy = false;
+                }
+
+                if (applyStrategy)
+                {
+                    // Apply a strategy value for this field
+                    Object obj = getStoreManager().getStrategyValue(myEC, cmd, fieldNumber);
+                    this.replaceField(fieldNumber, obj);
+                }
+            }
+        }
+    }
+
     public AbstractClassMetaData getClassMetaData()
     {
         return cmd;
     }
 
-    /**
-     * Accessor for the ExecutionContext for this object.
-     * @return Execution Context
-     */
     public ExecutionContext getExecutionContext()
     {
         return myEC;
@@ -781,28 +778,16 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         return myEC.getNucleusContext().isFederated() ? ((FederatedStoreManager)myEC.getStoreManager()).getStoreManagerForClass(cmd) : myEC.getStoreManager();
     }
 
-    /**
-     * Accessor for the LifeCycleState
-     * @return the LifeCycleState
-     */
     public LifeCycleState getLifecycleState()
     {
         return myLC;
     }
 
-    /**
-     * returns the handler for callback events.
-     * @return the handler for callback events.
-     */
     protected CallbackHandler getCallbackHandler()
     {
         return myEC.getCallbackHandler();
     }
 
-    /**
-     * Accessor for the Persistable object.
-     * @return The Persistable object
-     */
     public Persistable getObject()
     {
         return myPC;
@@ -816,38 +801,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     public String toString()
     {
         return "StateManager[pc=" + StringUtils.toJVMIDString(myPC) + ", lifecycle=" + myLC + "]";
-    }
-
-    /**
-     * Accessor for the internal object id of the object we are managing.
-     * This will return the "id" if it has been set, otherwise a temporary id based on this StateManager.
-     * @return The internal object id
-     */
-    public Object getInternalObjectId()
-    {
-        if (myID != null)
-        {
-            return myID;
-        }
-        else if (myInternalID == null)
-        {
-            // Assign a temporary internal "id" based on the object itself until our real identity is assigned
-            myInternalID = new IdentityReference(this);
-            return myInternalID;
-        }
-        else
-        {
-            return myInternalID;
-        }
-    }
-
-    /**
-     * Tests whether this object is being inserted.
-     * @return true if this instance is inserting.
-     */
-    public boolean isInserting()
-    {
-        return activity == ActivityState.INSERTING;
     }
 
     /**
@@ -869,109 +822,14 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         return restoreValues;
     }
 
-    public void setStoringPC()
-    {
-        flags |= FLAG_STORING_PC;
-    }
-
-    public void unsetStoringPC()
-    {
-        flags &= ~FLAG_STORING_PC;
-    }
-
-    protected boolean isStoringPC()
-    {
-        return (flags&FLAG_STORING_PC) != 0;
-    }
-
-    void setPostLoadPending(boolean flag)
-    {
-        if (flag)
-        {
-            flags |= FLAG_POSTLOAD_PENDING;
-        }
-        else
-        {
-            flags &= ~FLAG_POSTLOAD_PENDING;
-        }
-    }
-
-    protected boolean isPostLoadPending()
-    {
-        return (flags&FLAG_POSTLOAD_PENDING) != 0;
-    }
-
     protected boolean isChangingState()
     {
         return (flags&FLAG_CHANGING_STATE) != 0;
     }
 
-    void setResettingDetachedState(boolean flag)
+    public boolean isInserting()
     {
-        if (flag)
-        {
-            flags |= FLAG_RESETTING_DETACHED_STATE;
-        }
-        else
-        {
-            flags &= ~FLAG_RESETTING_DETACHED_STATE;
-        }
-    }
-
-    protected boolean isResettingDetachedState()
-    {
-        return (flags&FLAG_RESETTING_DETACHED_STATE) != 0;
-    }
-
-    void setRetrievingDetachedState(boolean flag)
-    {
-        if (flag)
-        {
-            flags |= FLAG_RETRIEVING_DETACHED_STATE;
-        }
-        else
-        {
-            flags &= ~FLAG_RETRIEVING_DETACHED_STATE;
-        }
-    }
-
-    protected boolean isRetrievingDetachedState()
-    {
-        return (flags&FLAG_RETRIEVING_DETACHED_STATE) != 0;
-    }
-
-    void setDisconnecting(boolean flag)
-    {
-        if (flag)
-        {
-            flags |= FLAG_DISCONNECTING;
-        }
-        else
-        {
-            flags &= ~FLAG_DISCONNECTING;
-        }
-    }
-
-    protected boolean isDisconnecting()
-    {
-        return (flags&FLAG_DISCONNECTING) != 0;
-    }
-
-    void setMakingTransient(boolean flag)
-    {
-        if (flag)
-        {
-            flags |= FLAG_MAKING_TRANSIENT;
-        }
-        else
-        {
-            flags &= ~FLAG_MAKING_TRANSIENT;
-        }
-    }
-
-    protected boolean isMakingTransient()
-    {
-        return (flags&FLAG_MAKING_TRANSIENT) != 0;
+        return activity == ActivityState.INSERTING;
     }
 
     public boolean isDeleting()
@@ -979,60 +837,9 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         return activity == ActivityState.DELETING;
     }
 
-    void setBecomingDeleted(boolean flag)
-    {
-        if (flag)
-        {
-            flags |= FLAG_BECOMING_DELETED;
-        }
-        else
-        {
-            flags &= ~FLAG_BECOMING_DELETED;
-        }
-    }
-
-    public boolean becomingDeleted()
-    {
-        return (flags&FLAG_BECOMING_DELETED)>0;
-    }
-
     public void markForInheritanceValidation()
     {
         flags |= FLAG_NEED_INHERITANCE_VALIDATION;
-    }
-
-    void setDetaching(boolean flag)
-    {
-        if (flag)
-        {
-            flags |= FLAG_DETACHING;
-        }
-        else
-        {
-            flags &= ~FLAG_DETACHING;
-        }
-    }
-
-    public boolean isDetaching()
-    {
-        return (flags&FLAG_DETACHING) != 0;
-    }
-
-    void setAttaching(boolean flag)
-    {
-        if (flag)
-        {
-            flags |= FLAG_ATTACHING;
-        }
-        else
-        {
-            flags &= ~FLAG_ATTACHING;
-        }
-    }
-
-    public boolean isAttaching()
-    {
-        return (flags&FLAG_ATTACHING) != 0;
     }
 
     /**
@@ -1207,6 +1014,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      */
     protected void transitionReadField(boolean isLoaded)
     {
+        if (myLC == null)
+        {
+            return;
+        }
+
         try
         {
             if (myEC.getMultithreaded())
@@ -1215,10 +1027,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 lock.lock();
             }
 
-            if (myLC == null)
-            {
-                return;
-            }
             preStateChange();
             try
             {
@@ -1909,11 +1717,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /**
      * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      */
-    public void providedBooleanField(Persistable pc, int fieldNumber, boolean currentValue)
+    public void providedBooleanField(Persistable ignored, int fieldNumber, boolean currentValue)
     {
         currFM.storeBooleanField(fieldNumber, currentValue);
     }
@@ -1921,11 +1729,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /**
      * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      */
-    public void providedByteField(Persistable pc, int fieldNumber, byte currentValue)
+    public void providedByteField(Persistable ignored, int fieldNumber, byte currentValue)
     {
         currFM.storeByteField(fieldNumber, currentValue);
     }
@@ -1933,11 +1741,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /**
      * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      */
-    public void providedCharField(Persistable pc, int fieldNumber, char currentValue)
+    public void providedCharField(Persistable ignored, int fieldNumber, char currentValue)
     {
         currFM.storeCharField(fieldNumber, currentValue);
     }
@@ -1945,11 +1753,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /**
      * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      */
-    public void providedDoubleField(Persistable pc, int fieldNumber, double currentValue)
+    public void providedDoubleField(Persistable ignored, int fieldNumber, double currentValue)
     {
         currFM.storeDoubleField(fieldNumber, currentValue);
     }
@@ -1957,11 +1765,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /**
      * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      */
-    public void providedFloatField(Persistable pc, int fieldNumber, float currentValue)
+    public void providedFloatField(Persistable ignored, int fieldNumber, float currentValue)
     {
         currFM.storeFloatField(fieldNumber, currentValue);
     }
@@ -1969,11 +1777,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /**
      * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      */
-    public void providedIntField(Persistable pc, int fieldNumber, int currentValue)
+    public void providedIntField(Persistable ignored, int fieldNumber, int currentValue)
     {
         currFM.storeIntField(fieldNumber, currentValue);
     }
@@ -1981,11 +1789,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /**
      * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      */
-    public void providedLongField(Persistable pc, int fieldNumber, long currentValue)
+    public void providedLongField(Persistable ignored, int fieldNumber, long currentValue)
     {
         currFM.storeLongField(fieldNumber, currentValue);
     }
@@ -1993,11 +1801,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /**
      * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      */
-    public void providedShortField(Persistable pc, int fieldNumber, short currentValue)
+    public void providedShortField(Persistable ignored, int fieldNumber, short currentValue)
     {
         currFM.storeShortField(fieldNumber, currentValue);
     }
@@ -2005,11 +1813,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /**
      * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      */
-    public void providedStringField(Persistable pc, int fieldNumber, String currentValue)
+    public void providedStringField(Persistable ignored, int fieldNumber, String currentValue)
     {
         currFM.storeStringField(fieldNumber, currentValue);
     }
@@ -2017,22 +1825,22 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /**
      * This method is called from the associated persistable when its dnProvideFields() method is invoked. Its purpose is
      * to provide the value of the specified field to the StateManager.
-     * @param pc the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @param currentValue the current value of the field
      */
-    public void providedObjectField(Persistable pc, int fieldNumber, Object currentValue)
+    public void providedObjectField(Persistable ignored, int fieldNumber, Object currentValue)
     {
         currFM.storeObjectField(fieldNumber, currentValue);
     }
 
     /**
      * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a boolean field.
-     * @param pc the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
      */
-    public boolean replacingBooleanField(Persistable pc, int fieldNumber)
+    public boolean replacingBooleanField(Persistable ignored, int fieldNumber)
     {
         boolean value = currFM.fetchBooleanField(fieldNumber);
         loadedFields[fieldNumber] = true;
@@ -2067,11 +1875,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
     /**
      * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a double field.
-     * @param obj the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
      */
-    public double replacingDoubleField(Persistable obj, int fieldNumber)
+    public double replacingDoubleField(Persistable ignored, int fieldNumber)
     {
         double value = currFM.fetchDoubleField(fieldNumber);
         loadedFields[fieldNumber] = true;
@@ -2080,11 +1888,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
     /**
      * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a float field.
-     * @param obj the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
      */
-    public float replacingFloatField(Persistable obj, int fieldNumber)
+    public float replacingFloatField(Persistable ignored, int fieldNumber)
     {
         float value = currFM.fetchFloatField(fieldNumber);
         loadedFields[fieldNumber] = true;
@@ -2093,11 +1901,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
     /**
      * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a int field.
-     * @param obj the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
      */
-    public int replacingIntField(Persistable obj, int fieldNumber)
+    public int replacingIntField(Persistable ignored, int fieldNumber)
     {
         int value = currFM.fetchIntField(fieldNumber);
         loadedFields[fieldNumber] = true;
@@ -2106,11 +1914,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
     /**
      * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a long field.
-     * @param obj the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
      */
-    public long replacingLongField(Persistable obj, int fieldNumber)
+    public long replacingLongField(Persistable ignored, int fieldNumber)
     {
         long value = currFM.fetchLongField(fieldNumber);
         loadedFields[fieldNumber] = true;
@@ -2119,11 +1927,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
     /**
      * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a short field.
-     * @param obj the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
      */
-    public short replacingShortField(Persistable obj, int fieldNumber)
+    public short replacingShortField(Persistable ignored, int fieldNumber)
     {
         short value = currFM.fetchShortField(fieldNumber);
         loadedFields[fieldNumber] = true;
@@ -2132,11 +1940,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
     /**
      * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of a String field.
-     * @param obj the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
      */
-    public String replacingStringField(Persistable obj, int fieldNumber)
+    public String replacingStringField(Persistable ignored, int fieldNumber)
     {
         String value = currFM.fetchStringField(fieldNumber);
         loadedFields[fieldNumber] = true;
@@ -2145,11 +1953,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
     /**
      * This method is invoked by the persistable object's dnReplaceField() method to refresh the value of an Object field.
-     * @param obj the calling persistable instance
+     * @param ignored the calling persistable instance
      * @param fieldNumber the field number
      * @return the new value for the field
      */
-    public Object replacingObjectField(Persistable obj, int fieldNumber)
+    public Object replacingObjectField(Persistable ignored, int fieldNumber)
     {
         try
         {
@@ -3528,9 +3336,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     {
         if (op.getObject() instanceof Detachable)
         {
-            ((StateManagerImpl)op).setRetrievingDetachedState(true);
+            ((StateManagerImpl)op).flags |= FLAG_RETRIEVING_DETACHED_STATE;
+
             ((Detachable)op.getObject()).dnReplaceDetachedState();
-            ((StateManagerImpl)op).setRetrievingDetachedState(false);
+
+            ((StateManagerImpl)op).flags &= ~FLAG_RETRIEVING_DETACHED_STATE;
         }
     }
 
@@ -3541,14 +3351,14 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     {
         if (getObject() instanceof Detachable)
         {
-            setResettingDetachedState(true);
+            flags |= FLAG_RESETTING_DETACHED_STATE;
             try
             {
                 ((Detachable)getObject()).dnReplaceDetachedState();
             }
             finally
             {
-                setResettingDetachedState(false);
+                flags &= ~FLAG_RESETTING_DETACHED_STATE;
             }
         }
     }
@@ -3561,11 +3371,11 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      */
     public Object[] replacingDetachedState(Detachable pc, Object[] currentState)
     {
-        if (isResettingDetachedState())
+        if ((flags&FLAG_RESETTING_DETACHED_STATE) != 0)
         {
             return null;
         }
-        else if (isRetrievingDetachedState())
+        else if ((flags&FLAG_RETRIEVING_DETACHED_STATE) != 0)
         {
             // Retrieving the detached state from the detached object
             // Don't need the id or version since they can't change
@@ -3624,138 +3434,116 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         }
     }
 
-
     /**
-     * Look to the database to determine which class this object is. This parameter is a hint. Set false, if it's
-     * already determined the correct pcClass for this pc "object" in a certain
-     * level in the hierarchy. Set to true and it will look to the database.
-     * TODO This is only called by some outdated code in LDAPUtils; remove it when that is fixed
-     * @param fv the initial field values of the object.
-     * @deprecated Dont use this, to be removed
+     * Marks the given field dirty.
+     * @param fieldNumber The no of field to mark as dirty. 
      */
-    public void checkInheritance(FieldValues fv)
+    public void makeDirty(int fieldNumber)
     {
-        // Inheritance case, check the level of the instance
-        ClassLoaderResolver clr = myEC.getClassLoaderResolver();
-        String className = getStoreManager().getClassNameForObjectID(myID, clr, myEC);
-        if (className == null)
+        if (activity != ActivityState.DELETING)
         {
-            // className is null when id class exists, and object has been validated and doesn't exist.
-            throw new NucleusObjectNotFoundException(Localiser.msg("026013", IdentityUtils.getPersistableIdentityForId(myID)), myID);
-        }
-        else if (!cmd.getFullClassName().equals(className))
-        {
-            Class pcClass;
-            try
+            // Mark dirty unless in the process of being deleted
+            boolean wasDirty = preWriteField(fieldNumber);
+            postWriteField(wasDirty);
+
+            List<EmbeddedOwnerRelation> embeddedOwners = myEC.getOwnerInformationForEmbedded(this);
+            if (embeddedOwners != null)
             {
-                //load the class and make sure the class is initialized
-                pcClass = clr.classForName(className, myID.getClass().getClassLoader(), true);
-                cmd = myEC.getMetaDataManager().getMetaDataForClass(pcClass, clr);
-            }
-            catch (ClassNotResolvedException e)
-            {
-                NucleusLogger.PERSISTENCE.warn(Localiser.msg("026014", IdentityUtils.getPersistableIdentityForId(myID)));
-                throw new NucleusUserException(Localiser.msg("026014", IdentityUtils.getPersistableIdentityForId(myID)), e);
-            }
-            if (cmd == null)
-            {
-                throw new NucleusUserException(Localiser.msg("026012", pcClass)).setFatal();
-            }
-            if (cmd.getIdentityType() != IdentityType.APPLICATION)
-            {
-                throw new NucleusUserException("This method should only be used for objects using application identity.").setFatal();
-            }
-            myFP = myEC.getFetchPlan().getFetchPlanForClass(cmd);
-
-            int fieldCount = cmd.getMemberCount();
-            dirtyFields = new boolean[fieldCount];
-            loadedFields = new boolean[fieldCount];
-
-            // Create new PC at right inheritance level
-            myPC = HELPER.newInstance(pcClass, this);
-            if (myPC == null)
-            {
-                throw new NucleusUserException(Localiser.msg("026018", cmd.getFullClassName())).setFatal();
-            }
-
-            // Note that this will mean the fields are loaded twice (loaded earlier in this method)
-            // and also that postLoad will be called twice
-            loadFieldValues(fv);
-
-            // Create the id for the new PC
-            myID = myEC.getNucleusContext().getIdentityManager().getApplicationId(myPC, cmd);
-        }
-    }
-
-    /**
-     * Convenience method to populate all fields in the PC object that have "value-strategy" specified and that aren't datastore-attributed. 
-     * This applies not just to PK fields (where it is most useful to use value-strategy) but also to any other field. Fields are populated 
-     * only if they are null. This is called once on a PC object, when makePersistent is called.
-     */
-    private void populateStrategyFields()
-    {
-        int totalFieldCount = cmd.getNoOfInheritedManagedMembers() + cmd.getNoOfManagedMembers();
-
-        for (int fieldNumber=0; fieldNumber<totalFieldCount; fieldNumber++)
-        {
-            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-            IdentityStrategy strategy = mmd.getValueStrategy();
-
-            // Check for the strategy, and if it is a datastore attributed strategy
-            if (strategy != null && !getStoreManager().isStrategyDatastoreAttributed(cmd, fieldNumber))
-            {
-                // Assign the strategy value where required.
-                // Default JDO behaviour is to always provide a strategy value when it is marked as using a strategy
-                boolean applyStrategy = true;
-                if (!mmd.getType().isPrimitive() &&
-                    mmd.hasExtension(MetaData.EXTENSION_MEMBER_STRATEGY_WHEN_NOTNULL) &&
-                    mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_STRATEGY_WHEN_NOTNULL).equalsIgnoreCase("false") &&
-                    this.provideField(fieldNumber) != null)
+                // Notify any owners that embed this object that it has just changed
+                for (EmbeddedOwnerRelation owner : embeddedOwners)
                 {
-                    // extension to only provide a value-strategy value where the field is null at persistence.
-                    applyStrategy = false;
-                }
+                    StateManagerImpl ownerOP = (StateManagerImpl) owner.getOwnerOP();
 
-                if (applyStrategy)
-                {
-                    // Apply a strategy value for this field
-                    Object obj = getStoreManager().getStrategyValue(myEC, cmd, fieldNumber);
-                    this.replaceField(fieldNumber, obj);
+                    if ((ownerOP.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
+                    {
+                        ownerOP.makeDirty(owner.getOwnerFieldNum());
+                    }
                 }
             }
         }
     }
 
     /**
-     * Convenience method to load the passed field values.
-     * Loads the fields using any required fetch plan and calls dnPostLoad() as appropriate.
-     * @param fv Field Values to load (including any fetch plan to use when loading)
+     * Mark the associated persistable field dirty.
+     * @param pc the calling persistable instance
+     * @param fieldName the name of the field
      */
-    public void loadFieldValues(FieldValues fv)
+    public void makeDirty(Persistable pc, String fieldName)
     {
-        // Fetch the required fields using any defined fetch plan
-        FetchPlanForClass origFetchPlan = myFP;
-        FetchPlan loadFetchPlan = fv.getFetchPlanForLoading();
-        if (loadFetchPlan != null)
+        if (!disconnectClone(pc))
         {
-            myFP = loadFetchPlan.getFetchPlanForClass(cmd);
+            int fieldNumber = cmd.getAbsolutePositionOfMember(fieldName);
+            if (fieldNumber == -1)
+            {
+                throw myEC.getApiAdapter().getUserExceptionForException(Localiser.msg("026002", fieldName, cmd.getFullClassName()), null);
+            }
+
+            makeDirty(fieldNumber);
+        }
+    }
+
+    // -------------------------- Object Id Methods -----------------------------
+
+    /**
+     * Accessor for the internal object id of the object we are managing.
+     * This will return the "id" if it has been set, otherwise a temporary id based on this StateManager.
+     * @return The internal object id
+     */
+    public Object getInternalObjectId()
+    {
+        if (myID != null)
+        {
+            return myID;
+        }
+        else if (myInternalID == null)
+        {
+            // Assign a temporary internal "id" based on the object itself until our real identity is assigned
+            myInternalID = new IdentityReference(this);
+            return myInternalID;
+        }
+        else
+        {
+            return myInternalID;
+        }
+    }
+
+    /**
+     * Return the object representing the JDO identity of the calling instance.
+     * According to the JDO specification, if the JDO identity is being changed in the current transaction, 
+     * this method returns the JDO identify as of the beginning of the transaction.
+     * @param pc the calling Persistable instance
+     * @return the object representing the JDO identity of the calling instance
+     */
+    public Object getObjectId(Persistable pc)
+    {
+        if (disconnectClone(pc))
+        {
+            return null;
         }
 
-        boolean callPostLoad = myFP.isToCallPostLoadFetchPlan(this.loadedFields);
-        if (loadedFields.length == 0)
+        try
         {
-            // Class has no fields so since we are loading from scratch just call postLoad
-            callPostLoad = true;
+            return getExternalObjectId(pc);
         }
-
-        fv.fetchFields(this);
-        if (callPostLoad && areFieldsLoaded(myFP.getMemberNumbers()))
+        catch (NucleusException ne)
         {
-            postLoad();
+            // This can be called from user-facing methods (e.g JDOHelper.getObjectId) so wrap any exception with API variant
+            throw myEC.getApiAdapter().getApiExceptionForNucleusException(ne);
         }
+    }
 
-        // Reinstate the original (PM) fetch plan
-        myFP = origFetchPlan;
+    /**
+     * Return the object representing the JDO identity of the calling instance.  
+     * If the JDO identity is being changed in the current transaction, this method returns the 
+     * current identity as changed in the transaction. In this implementation we don't allow
+     * change of identity so this is always the same as the result of getObjectId(Persistable).
+     *
+     * @param pc the calling Persistable instance
+     * @return the object representing the JDO identity of the calling instance
+     */
+    public Object getTransactionalObjectId(Persistable pc)
+    {
+        return getObjectId(pc);
     }
 
     /**
@@ -3833,95 +3621,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
             this.myInternalID = myID;
         }
-    }
-
-    /**
-     * Marks the given field dirty.
-     * @param fieldNumber The no of field to mark as dirty. 
-     */
-    public void makeDirty(int fieldNumber)
-    {
-        if (activity != ActivityState.DELETING)
-        {
-            // Mark dirty unless in the process of being deleted
-            boolean wasDirty = preWriteField(fieldNumber);
-            postWriteField(wasDirty);
-
-            List<EmbeddedOwnerRelation> embeddedOwners = myEC.getOwnerInformationForEmbedded(this);
-            if (embeddedOwners != null)
-            {
-                // Notify any owners that embed this object that it has just changed
-                for (EmbeddedOwnerRelation owner : embeddedOwners)
-                {
-                    StateManagerImpl ownerOP = (StateManagerImpl) owner.getOwnerOP();
-
-                    if ((ownerOP.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
-                    {
-                        ownerOP.makeDirty(owner.getOwnerFieldNum());
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Mark the associated Persistable field dirty.
-     * @param pc the calling Persistable instance
-     * @param fieldName the name of the field
-     */
-    public void makeDirty(Persistable pc, String fieldName)
-    {
-        if (!disconnectClone(pc))
-        {
-            int fieldNumber = cmd.getAbsolutePositionOfMember(fieldName);
-            if (fieldNumber == -1)
-            {
-                throw myEC.getApiAdapter().getUserExceptionForException(Localiser.msg("026002", fieldName, cmd.getFullClassName()), null);
-            }
-
-            makeDirty(fieldNumber);
-        }
-    }
-
-    // -------------------------- Accessor Methods -----------------------------
-
-    /**
-     * Return the object representing the JDO identity of the calling instance.
-     * According to the JDO specification, if the JDO identity is being changed in the current transaction, 
-     * this method returns the JDO identify as of the beginning of the transaction.
-     * @param pc the calling Persistable instance
-     * @return the object representing the JDO identity of the calling instance
-     */
-    public Object getObjectId(Persistable pc)
-    {
-        if (disconnectClone(pc))
-        {
-            return null;
-        }
-
-        try
-        {
-            return getExternalObjectId(pc);
-        }
-        catch (NucleusException ne)
-        {
-            // This can be called from user-facing methods (e.g JDOHelper.getObjectId) so wrap any exception with API variant
-            throw myEC.getApiAdapter().getApiExceptionForNucleusException(ne);
-        }
-    }
-
-    /**
-     * Return the object representing the JDO identity of the calling instance.  
-     * If the JDO identity is being changed in the current transaction, this method returns the 
-     * current identity as changed in the transaction. In this implementation we don't allow
-     * change of identity so this is always the same as the result of getObjectId(Persistable).
-     *
-     * @param pc the calling Persistable instance
-     * @return the object representing the JDO identity of the calling instance
-     */
-    public Object getTransactionalObjectId(Persistable pc)
-    {
-        return getObjectId(pc);
     }
 
     /**
@@ -4058,6 +3757,38 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     }
 
     // --------------------------- Load Field Methods --------------------------
+
+    /**
+     * Convenience method to load the passed field values.
+     * Loads the fields using any required fetch plan and calls dnPostLoad() as appropriate.
+     * @param fv Field Values to load (including any fetch plan to use when loading)
+     */
+    public void loadFieldValues(FieldValues fv)
+    {
+        // Fetch the required fields using any defined fetch plan
+        FetchPlanForClass origFetchPlan = myFP;
+        FetchPlan loadFetchPlan = fv.getFetchPlanForLoading();
+        if (loadFetchPlan != null)
+        {
+            myFP = loadFetchPlan.getFetchPlanForClass(cmd);
+        }
+
+        boolean callPostLoad = myFP.isToCallPostLoadFetchPlan(this.loadedFields);
+        if (loadedFields.length == 0)
+        {
+            // Class has no fields so since we are loading from scratch just call postLoad
+            callPostLoad = true;
+        }
+
+        fv.fetchFields(this);
+        if (callPostLoad && areFieldsLoaded(myFP.getMemberNumbers()))
+        {
+            postLoad();
+        }
+
+        // Reinstate the original (PM) fetch plan
+        myFP = origFetchPlan;
+    }
 
     /**
      * Fetch the specified fields from the database.
@@ -4377,12 +4108,9 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     }
 
     /**
-     * Return true if the field is cached in the calling instance.
-     * In this implementation, isLoaded() will always return true. 
-     * If the field is not loaded, it will be loaded as a side effect of the 
-     * call to this method. If it is in the default fetch group,
-     * the default fetch group, including this field, will be loaded.
-     *
+     * Return true if the field is cached in the calling instance; in this implementation we always return true.
+     * If the field is not loaded, it will be loaded as a side effect of the call to this method. 
+     * If it is in the default fetch group, the default fetch group, including this field, will be loaded.
      * @param pc the calling Persistable instance
      * @param fieldNumber the absolute field number
      * @return always returns true (this implementation)
@@ -4946,14 +4674,15 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      */
     public void makeTransient(FetchPlanState state)
     {
-        if (isMakingTransient())
+        if ((flags&FLAG_MAKING_TRANSIENT) != 0)
         {
             return; // In the process of becoming transient
         }
 
         try
         {
-            setMakingTransient(true);
+            flags |= FLAG_MAKING_TRANSIENT;
+
             if (state == null)
             {
                 // No FetchPlan in use so just unset the owner of all loaded SCO fields
@@ -4987,7 +4716,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         }
         finally
         {
-            setMakingTransient(false);
+            flags &= ~FLAG_MAKING_TRANSIENT;
         }
     }
 
@@ -5241,8 +4970,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                     smDetachedPC.retrieveDetachState(smDetachedPC);
                 }
 
-                smDetachedPC.replaceFields(detachFieldNums, new DetachFieldManager(this, 
-                    cmd.getSCOMutableMemberFlags(), myFP, state, true));
+                smDetachedPC.replaceFields(detachFieldNums, new DetachFieldManager(this, cmd.getSCOMutableMemberFlags(), myFP, state, true));
 
                 myEC.setAttachDetachReferencedObject(smDetachedPC, null);
                 if (detachable)
@@ -5286,14 +5014,30 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         return detachedPC;
     }
 
+    void setDetaching(boolean flag)
+    {
+        if (flag)
+        {
+            flags |= FLAG_DETACHING;
+        }
+        else
+        {
+            flags &= ~FLAG_DETACHING;
+        }
+    }
+
+    public boolean isDetaching()
+    {
+        return (flags&FLAG_DETACHING) != 0;
+    }
+
     /**
      * Return an array of field numbers that must be included in the detached object
      * @return the field numbers array for detaching
      */
     private int[] getFieldsNumbersToDetach()
     {
-        String detachedState = myEC.getNucleusContext().getConfiguration().getStringProperty(
-            PropertyNames.PROPERTY_DETACH_DETACHED_STATE);
+        String detachedState = myEC.getNucleusContext().getConfiguration().getStringProperty(PropertyNames.PROPERTY_DETACH_DETACHED_STATE);
         if (detachedState.equalsIgnoreCase("all"))
         {
             return cmd.getAllMemberPositions();
@@ -5369,10 +5113,8 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             if (nonPKFieldNumbers != null && nonPKFieldNumbers.length > 0)
             {
                 // Attach the (non-PK) fields from the transient
-                NucleusLogger.GENERAL.debug("Attaching id=" + getInternalObjectId() +
-                    " fields=" + StringUtils.intArrayToString(nonPKFieldNumbers));
-                detachedSM.provideFields(nonPKFieldNumbers,
-                    new AttachFieldManager(this, cmd.getSCOMutableMemberFlags(), cmd.getNonPKMemberFlags(), true, true, false));
+                NucleusLogger.GENERAL.debug("Attaching id=" + getInternalObjectId() + " fields=" + StringUtils.intArrayToString(nonPKFieldNumbers));
+                detachedSM.provideFields(nonPKFieldNumbers, new AttachFieldManager(this, cmd.getSCOMutableMemberFlags(), cmd.getNonPKMemberFlags(), true, true, false));
             }
 
             // Disconnect the transient object
@@ -5453,11 +5195,8 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             if (attachFieldNumbers != null)
             {
                 // Only update the fields that were detached, and only update them if there are any to update
-                NucleusLogger.GENERAL.debug("Attaching id=" + getInternalObjectId() +
-                    " fields=" + StringUtils.intArrayToString(attachFieldNumbers));
-                provideFields(attachFieldNumbers,
-                    new AttachFieldManager(this, cmd.getSCOMutableMemberFlags(), dirtyFields,
-                        persistent, true, false));
+                NucleusLogger.GENERAL.debug("Attaching id=" + getInternalObjectId() + " fields=" + StringUtils.intArrayToString(attachFieldNumbers));
+                provideFields(attachFieldNumbers, new AttachFieldManager(this, cmd.getSCOMutableMemberFlags(), dirtyFields, persistent, true, false));
             }
 
             // Call any "post-attach" listeners
@@ -5523,8 +5262,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             }
 
             if (!myEC.getTransaction().getOptimistic() &&
-                (myLC == myEC.getApiAdapter().getLifeCycleState(LifeCycleState.HOLLOW) ||
-                 myLC == myEC.getApiAdapter().getLifeCycleState(LifeCycleState.P_NONTRANS)))
+                (myLC == myEC.getApiAdapter().getLifeCycleState(LifeCycleState.HOLLOW) || myLC == myEC.getApiAdapter().getLifeCycleState(LifeCycleState.P_NONTRANS)))
             {
                 // Pessimistic txns and in HOLLOW/P_NONTRANS, so move to P_CLEAN
                 // TODO Move this into the lifecycle state classes as a "transitionAttach"
@@ -5620,6 +5358,23 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         return myPC;
     }
 
+    void setAttaching(boolean flag)
+    {
+        if (flag)
+        {
+            flags |= FLAG_ATTACHING;
+        }
+        else
+        {
+            flags &= ~FLAG_ATTACHING;
+        }
+    }
+
+    public boolean isAttaching()
+    {
+        return (flags&FLAG_ATTACHING) != 0;
+    }
+
     /**
      * Attach the fields for this object using the provided detached object.
      * This will attach all loaded plus all dirty fields.
@@ -5644,10 +5399,8 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         if (attachFieldNumbers != null)
         {
             // Attach all dirty fields, and load other loaded fields
-            NucleusLogger.GENERAL.debug("Attaching id=" + getInternalObjectId() +
-                " fields=" + StringUtils.intArrayToString(attachFieldNumbers));
-            detachedOP.provideFields(attachFieldNumbers,
-                new AttachFieldManager(this, cmd.getSCOMutableMemberFlags(), dirtyFields, persistent, cascade, true));
+            NucleusLogger.GENERAL.debug("Attaching id=" + getInternalObjectId() + " fields=" + StringUtils.intArrayToString(attachFieldNumbers));
+            detachedOP.provideFields(attachFieldNumbers, new AttachFieldManager(this, cmd.getSCOMutableMemberFlags(), dirtyFields, persistent, cascade, true));
         }
     }
 
@@ -5682,7 +5435,8 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                     // Make sure all fields are loaded so we can perform reachability
                     loadUnloadedRelationFields();
                 }
-                setBecomingDeleted(true);
+
+                flags |= FLAG_BECOMING_DELETED;
 
                 // Run reachability for relations
                 if (cmd.hasRelations(myEC.getClassLoaderResolver()))
@@ -5706,7 +5460,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 }
                 finally
                 {
-                    setBecomingDeleted(false);
+                    flags &= ~FLAG_BECOMING_DELETED;
                     postStateChange();
                 }
             }
@@ -5747,12 +5501,15 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         }
     }
 
-    boolean validating = false;
+    public boolean becomingDeleted()
+    {
+        return (flags&FLAG_BECOMING_DELETED)>0;
+    }
 
     /**
-     * Validates whether the persistence capable instance exists in the datastore.
-     * If the instance doesn't exist in the datastore, this method will fail raising a 
-     * NucleusObjectNotFoundException. If the object is transactional then does nothing.
+     * Validates whether the persistable instance exists in the datastore.
+     * If the instance doesn't exist in the datastore, this method will fail raising a NucleusObjectNotFoundException. 
+     * If the object is transactional then does nothing.
      * If the object has unloaded (non-SCO, non-PK) fetch plan fields then fetches them.
      * Else it checks the existence of the object in the datastore.
      */
@@ -5884,6 +5641,23 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         }
     }
 
+    void setPostLoadPending(boolean flag)
+    {
+        if (flag)
+        {
+            flags |= FLAG_POSTLOAD_PENDING;
+        }
+        else
+        {
+            flags &= ~FLAG_POSTLOAD_PENDING;
+        }
+    }
+
+    protected boolean isPostLoadPending()
+    {
+        return (flags&FLAG_POSTLOAD_PENDING) != 0;
+    }
+
     /**
      * Called whenever the default fetch group fields have all been loaded.
      * Updates dnFlags and calls dnPostLoad() as appropriate.
@@ -5966,11 +5740,26 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 }
 
                 // Normal PC Detachable object being serialised so load up the detached state into the instance
-                // JDO2 spec "For Detachable classes, the dnPreSerialize method must also initialize the dnDetachedState
+                // JDO spec "For Detachable classes, the dnPreSerialize method must also initialize the dnDetachedState
                 // instance so that the detached state is serialized along with the instance."
                 ((Detachable)pc).dnReplaceDetachedState();
             }
         }
+    }
+
+    public void setStoringPC()
+    {
+        flags |= FLAG_STORING_PC;
+    }
+
+    public void unsetStoringPC()
+    {
+        flags &= ~FLAG_STORING_PC;
+    }
+
+    protected boolean isStoringPC()
+    {
+        return (flags&FLAG_STORING_PC) != 0;
     }
 
     /**
@@ -6165,7 +5954,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         out.println("flushing = " + isFlushing());
         out.println("changingState = " + isChangingState());
         out.println("postLoadPending = " + isPostLoadPending());
-        out.println("disconnecting = " + isDisconnecting());
+        out.println("disconnecting = " + ((flags&FLAG_DISCONNECTING) != 0));
         out.println("dirtyFields = " + StringUtils.booleanArrayToString(dirtyFields));
         out.println("getSecondClassMutableFields() = " + StringUtils.booleanArrayToString(cmd.getSCOMutableMemberFlags()));
         out.println("getAllFieldNumbers() = " + StringUtils.intArrayToString(cmd.getAllMemberPositions()));
@@ -6245,5 +6034,106 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     public void updateFieldAfterInsert(Object pc, int fieldNumber)
     {
         // Does nothing in this implementation; refer to ReferentialJDOStateManager
+    }
+
+    // ============================================= DEPRECATED METHODS ==============================================
+
+    /**
+     * Initialises a state manager to manage a HOLLOW / P_CLEAN instance having the given FieldValues.
+     * This constructor is used for creating new instances of existing persistent objects using application identity,
+     * and consequently shouldn't be used when the StoreManager controls the creation of such objects (such as in an ODBMS).
+     * @param fv the initial field values of the object.
+     * @param pcClass Class of the object that this will manage the state for
+     * @deprecated Remove use of this and use initialiseForHollow
+     */
+    public void initialiseForHollowAppId(FieldValues fv, Class pcClass)
+    {
+        if (cmd.getIdentityType() != IdentityType.APPLICATION)
+        {
+            throw new NucleusUserException("This constructor is only for objects using application identity.").setFatal();
+        }
+
+        myLC = myEC.getNucleusContext().getApiAdapter().getLifeCycleState(LifeCycleState.HOLLOW);
+        persistenceFlags = Persistable.LOAD_REQUIRED;
+        myPC = HELPER.newInstance(pcClass, this); // Create new PC
+        if (myPC == null)
+        {
+            if (!HELPER.getRegisteredClasses().contains(pcClass))
+            {
+                // probably never will get here, as JDOImplHelper.newInstance() internally already throws
+                // JDOFatalUserException when class is not registered 
+                throw new NucleusUserException(Localiser.msg("026018", pcClass.getName())).setFatal();
+            }
+
+            // Provide advisory information since we can't create an instance of this class, so maybe they have an error in their data ?
+            throw new NucleusUserException(Localiser.msg("026019", pcClass.getName())).setFatal();
+        }
+
+        loadFieldValues(fv); // as a minimum the PK fields are loaded here
+
+        // Create the ID now that we have the PK fields loaded
+        myID = myEC.getNucleusContext().getIdentityManager().getApplicationId(myPC, cmd);
+    }
+
+    /**
+     * Look to the database to determine which class this object is. This parameter is a hint. Set false, if it's
+     * already determined the correct pcClass for this pc "object" in a certain
+     * level in the hierarchy. Set to true and it will look to the database.
+     * TODO This is only called by some outdated code in LDAPUtils; remove it when that is fixed
+     * @param fv the initial field values of the object.
+     * @deprecated Dont use this, to be removed
+     */
+    public void checkInheritance(FieldValues fv)
+    {
+        // Inheritance case, check the level of the instance
+        ClassLoaderResolver clr = myEC.getClassLoaderResolver();
+        String className = getStoreManager().getClassNameForObjectID(myID, clr, myEC);
+        if (className == null)
+        {
+            // className is null when id class exists, and object has been validated and doesn't exist.
+            throw new NucleusObjectNotFoundException(Localiser.msg("026013", IdentityUtils.getPersistableIdentityForId(myID)), myID);
+        }
+        else if (!cmd.getFullClassName().equals(className))
+        {
+            Class pcClass;
+            try
+            {
+                //load the class and make sure the class is initialized
+                pcClass = clr.classForName(className, myID.getClass().getClassLoader(), true);
+                cmd = myEC.getMetaDataManager().getMetaDataForClass(pcClass, clr);
+            }
+            catch (ClassNotResolvedException e)
+            {
+                NucleusLogger.PERSISTENCE.warn(Localiser.msg("026014", IdentityUtils.getPersistableIdentityForId(myID)));
+                throw new NucleusUserException(Localiser.msg("026014", IdentityUtils.getPersistableIdentityForId(myID)), e);
+            }
+            if (cmd == null)
+            {
+                throw new NucleusUserException(Localiser.msg("026012", pcClass)).setFatal();
+            }
+            if (cmd.getIdentityType() != IdentityType.APPLICATION)
+            {
+                throw new NucleusUserException("This method should only be used for objects using application identity.").setFatal();
+            }
+            myFP = myEC.getFetchPlan().getFetchPlanForClass(cmd);
+
+            int fieldCount = cmd.getMemberCount();
+            dirtyFields = new boolean[fieldCount];
+            loadedFields = new boolean[fieldCount];
+
+            // Create new PC at right inheritance level
+            myPC = HELPER.newInstance(pcClass, this);
+            if (myPC == null)
+            {
+                throw new NucleusUserException(Localiser.msg("026018", cmd.getFullClassName())).setFatal();
+            }
+
+            // Note that this will mean the fields are loaded twice (loaded earlier in this method)
+            // and also that postLoad will be called twice
+            loadFieldValues(fv);
+
+            // Create the id for the new PC
+            myID = myEC.getNucleusContext().getIdentityManager().getApplicationId(myPC, cmd);
+        }
     }
 }

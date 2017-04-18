@@ -20,6 +20,8 @@ package org.datanucleus.cache;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -74,53 +76,72 @@ public interface Level2Cache extends Serializable
      * Evict the parameter instance from the second-level cache.
      * @param oid the object id of the instance to evict.
      */
-    void evict (Object oid);
+    void evict(Object oid);
 
     /**
      * Evict the parameter instances from the second-level cache.
      * All instances in the PersistenceManager's cache are evicted
      * from the second-level cache.
      */
-    void evictAll ();
+    void evictAll();
 
     /**
      * Evict the parameter instances from the second-level cache.
      * @param oids the object ids of the instance to evict.
      */
-    void evictAll (Object[] oids);
+    void evictAll(Object[] oids);
 
     /**
      * Evict the parameter instances from the second-level cache.
      * @param oids the object ids of the instance to evict.
      */
-    void evictAll (Collection oids);
+    void evictAll(Collection oids);
 
     /**
      * Evict the parameter instances from the second-level cache.
      * @param pcClass the class of instances to evict
      * @param subclasses if true, evict instances of subclasses also
      */
-    void evictAll (Class pcClass, boolean subclasses);
+    void evictAll(Class pcClass, boolean subclasses);
 
     /**
      * Accessor for the total number of objects in the L2 cache.
      * @return Number of objects
      */
-    int getSize();
+    default int getSize()
+    {
+        // Some don't support it, so provide a default
+        return 0;
+    }
 
     /**
      * Accessor for an object from the cache.
      * @param oid The Object ID
      * @return The L2 cacheable object
      */
-    CachedPC get(Object oid);
+    <T> CachedPC<T> get(Object oid);
 
     /**
      * Accessor for a collection of objects from the cache.
      * @param oids The Object IDs
      * @return Map of the objects, keyed by the oids that are found
      */
-    Map<Object, CachedPC> getAll(Collection oids);
+    default Map<Object, CachedPC> getAll(Collection oids)
+    {
+        if (oids == null)
+        {
+            return null;
+        }
+
+        // Just fallback to doing multiple gets. Overridden in the implementation if supported
+        Map<Object, CachedPC> objs = new HashMap<Object, CachedPC>();
+        for (Object id : oids)
+        {
+            CachedPC value = get(id);
+            objs.put(id, value);
+        }
+        return objs;
+    }
 
     /**
      * Method to put an object in the cache.
@@ -128,19 +149,36 @@ public interface Level2Cache extends Serializable
      * @param pc The L2 cacheable persistable object
      * @return The value previously associated with this oid
      */
-    CachedPC put(Object oid, CachedPC pc);
+    <T> CachedPC<T> put(Object oid, CachedPC<T> pc);
 
     /**
      * Method to put several objects into the cache.
      * @param objs Map of cacheable object keyed by its oid.
      */
-    void putAll(Map<Object, CachedPC> objs);
+    default void putAll(Map<Object, CachedPC> objs)
+    {
+        if (objs == null)
+        {
+            return;
+        }
+
+        // Just fallback to doing multiple puts. Overridden in the implementation if supported
+        Iterator<Map.Entry<Object, CachedPC>> entryIter = objs.entrySet().iterator();
+        while (entryIter.hasNext())
+        {
+            Map.Entry<Object, CachedPC> entry = entryIter.next();
+            put(entry.getKey(), entry.getValue());
+        }
+    }
 
     /**
      * Accessor for whether the cache is empty.
      * @return Whether it is empty.
      */
-    boolean isEmpty();
+    default boolean isEmpty()
+    {
+        return getSize() == 0;
+    }
 
     /**
      * Accessor for whether an object with the specified id is in the cache
@@ -156,7 +194,10 @@ public interface Level2Cache extends Serializable
      * @param key Unique key
      * @return The "identity" of the object that this unique key represents
      */
-    CachedPC getUnique(CacheUniqueKey key);
+    default CachedPC getUnique(CacheUniqueKey key)
+    {
+        return null;
+    }
 
     /**
      * Method to store a persistable object for this unique key.
@@ -164,13 +205,19 @@ public interface Level2Cache extends Serializable
      * @param pc The representation of the persistable object to cache
      * @return The previous object for this unique key if one was present, otherwise null
      */
-    CachedPC putUnique(CacheUniqueKey key, CachedPC pc);
+    default CachedPC putUnique(CacheUniqueKey key, CachedPC pc)
+    {
+        return null;
+    }
 
     /**
      * Method to remove any object cached against the provided unique key.
      * @param key Unique key
      */
-    void removeUnique(CacheUniqueKey key);
+    default void removeUnique(CacheUniqueKey key)
+    {
+        return;
+    }
 
     // ======================================= Supported only by caches that allow pinning ========================================
 
@@ -178,63 +225,95 @@ public interface Level2Cache extends Serializable
      * Pin the parameter instance in the second-level cache.
      * @param oid the object id of the instance to pin.
      */
-    void pin (Object oid);
+    default void pin (Object oid)
+    {
+        // Not supported
+    }
 
     /**
      * Pin the parameter instances in the second-level cache.
      * @param oids the object ids of the instances to pin.
      */
-    void pinAll (Collection oids);
+    default void pinAll (Collection oids)
+    {
+        // Not supported
+    }
 
     /**
      * Pin the parameter instances in the second-level cache.
      * @param oids the object ids of the instances to pin.
      */
-    void pinAll (Object[] oids);
+    default void pinAll (Object[] oids)
+    {
+        // Not supported
+    }
 
     /**
      * Pin instances in the second-level cache.
      * @param pcClass the class of instances to pin
      * @param subclasses if true, pin instances of subclasses also
      */
-    void pinAll (Class pcClass, boolean subclasses);
+    default void pinAll (Class pcClass, boolean subclasses)
+    {
+        // Not supported
+    }
 
     /**
      * Unpin the parameter instance from the second-level cache.
      * @param oid the object id of the instance to unpin.
      */
-    void unpin(Object oid);
+    default void unpin(Object oid)
+    {
+        // Not supported
+    }
 
     /**
      * Unpin the parameter instances from the second-level cache.
      * @param oids the object ids of the instance to evict.
      */
-    void unpinAll(Collection oids);
+    default void unpinAll(Collection oids)
+    {
+        // Not supported
+    }
 
     /**
      * Unpin the parameter instance from the second-level cache.
      * @param oids the object id of the instance to evict.
      */
-    void unpinAll(Object[] oids);
+    default void unpinAll(Object[] oids)
+    {
+        // Not supported
+    }
 
     /**
      * Unpin instances from the second-level cache.
      * @param pcClass the class of instances to unpin
      * @param subclasses if true, unpin instances of subclasses also
      */
-    void unpinAll(Class pcClass, boolean subclasses);
+    default void unpinAll(Class pcClass, boolean subclasses)
+    {
+        // Not supported
+    }
 
     /**
      * Accessor for the number of pinned objects in the cache.
      * @return Number of pinned objects
      */
-    int getNumberOfPinnedObjects();
+    default int getNumberOfPinnedObjects()
+    {
+        // Not supported
+        return 0;
+    }
     
     /**
      * Accessor for the number of unpinned objects in the cache.
      * @return Number of unpinned objects
      */
-    int getNumberOfUnpinnedObjects();
+    default int getNumberOfUnpinnedObjects()
+    {
+        // Not supported
+        return 0;
+    }
 
     /**
      * Representation of a class whose objects will be pinned when put into the L2 cache.
@@ -247,7 +326,7 @@ public interface Level2Cache extends Serializable
         /**
          * Constructor
          * @param cls the class
-         * @param subclasses sub classes
+         * @param subclasses include sub classes
          */
         public PinnedClass(Class cls, boolean subclasses)
         {
