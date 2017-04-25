@@ -222,11 +222,11 @@ public class MapMetaData extends ContainerMetaData
             key.embedded = Boolean.TRUE;
         }
 
-        if (hasExtension("key-implementation-classes"))
+        if (hasExtension(MetaData.EXTENSION_MEMBER_KEY_IMPLEMENTATION_CLASSES))
         {
             // Check/fix the validity of the implementation-classes and qualify them where required.
             StringBuilder str = new StringBuilder();
-            String[] implTypes = getValuesForExtension("key-implementation-classes");
+            String[] implTypes = getValuesForExtension(MetaData.EXTENSION_MEMBER_KEY_IMPLEMENTATION_CLASSES);
             for (int i=0;i<implTypes.length;i++)
             {
                 String implTypeName = ClassUtils.createFullClassName(mmd.getPackageName(), implTypes[i]);
@@ -257,7 +257,7 @@ public class MapMetaData extends ContainerMetaData
                     }
                 }
             }
-            addExtension("key-implementation-classes", str.toString()); // Replace with this new value
+            addExtension(MetaData.EXTENSION_MEMBER_KEY_IMPLEMENTATION_CLASSES, str.toString()); // Replace with this new value
         }
         key.classMetaData = mmgr.getMetaDataForClassInternal(keyTypeClass, clr);
 
@@ -354,11 +354,11 @@ public class MapMetaData extends ContainerMetaData
             value.embedded = Boolean.TRUE;
         }
 
-        if (hasExtension("value-implementation-classes"))
+        if (hasExtension(MetaData.EXTENSION_MEMBER_VALUE_IMPLEMENTATION_CLASSES))
         {
             // Check/fix the validity of the implementation-classes and qualify them where required.
             StringBuilder str = new StringBuilder();
-            String[] implTypes = getValuesForExtension("value-implementation-classes");
+            String[] implTypes = getValuesForExtension(MetaData.EXTENSION_MEMBER_VALUE_IMPLEMENTATION_CLASSES);
             for (int i=0;i<implTypes.length;i++)
             {
                 String implTypeName = ClassUtils.createFullClassName(mmd.getPackageName(), implTypes[i]);
@@ -389,7 +389,7 @@ public class MapMetaData extends ContainerMetaData
                     }
                 }
             }
-            addExtension("value-implementation-classes", str.toString()); // Replace with this new value
+            addExtension(MetaData.EXTENSION_MEMBER_VALUE_IMPLEMENTATION_CLASSES, str.toString()); // Replace with this new value
         }
         value.classMetaData = mmgr.getMetaDataForClassInternal(valueTypeClass, clr);
 
@@ -437,21 +437,6 @@ public class MapMetaData extends ContainerMetaData
     }
 
     /**
-     * Accessor for the key-type tag value.
-     * May be comma-separated if several key types are possible.
-     * @return key-type tag value
-     */
-    public String getKeyType()
-    {
-        return key.typeName;
-    }
-
-    public String[] getKeyTypes()
-    {
-        return ((AbstractMemberMetaData)getParent()).getValuesForExtension("key-implementation-classes");
-    }
-
-    /**
      * Convenience accessor for the Key ClassMetaData.
      * @param clr ClassLoader resolver (in case we need to initialise it)
      * @return key ClassMetaData
@@ -477,21 +462,6 @@ public class MapMetaData extends ContainerMetaData
     public boolean keyIsPersistent()
     {
         return key.classMetaData != null;
-    }
-
-    /**
-     * Accessor for the value-type tag value.
-     * May be comma-separated if several value types are possible.
-     * @return value-type tag value
-     */
-    public String getValueType()
-    {
-        return value.typeName;
-    }
-
-    public String[] getValueTypes()
-    {
-        return ((AbstractMemberMetaData)getParent()).getValuesForExtension("value-implementation-classes");
     }
 
     /**
@@ -617,8 +587,24 @@ public class MapMetaData extends ContainerMetaData
         }
     }
 
+    /**
+     * Accessor for the key-type tag value.
+     * May be comma-separated if several key types are possible.
+     * @return key-type tag value
+     */
+    public String getKeyType()
+    {
+        return key.typeName;
+    }
+
+    public String[] getKeyTypes()
+    {
+        return ((AbstractMemberMetaData)getParent()).getValuesForExtension(MetaData.EXTENSION_MEMBER_KEY_IMPLEMENTATION_CLASSES);
+    }
+
     public MapMetaData setKeyType(String type)
     {
+        // TODO Set value-implementation-classes using this if appropriate
         // This is only valid pre-populate
         key.setTypeName(type);
         return this;
@@ -642,8 +628,24 @@ public class MapMetaData extends ContainerMetaData
         return this;
     }
 
+    /**
+     * Accessor for the value-type tag value.
+     * May be comma-separated if several value types are possible.
+     * @return value-type tag value
+     */
+    public String getValueType()
+    {
+        return value.typeName;
+    }
+
+    public String[] getValueTypes()
+    {
+        return ((AbstractMemberMetaData)getParent()).getValuesForExtension(MetaData.EXTENSION_MEMBER_VALUE_IMPLEMENTATION_CLASSES);
+    }
+
     public MapMetaData setValueType(String type)
     {
+        // TODO Set value-implementation-classes using this if appropriate
         // This is only valid pre-populate
         value.setTypeName(type);
         return this;

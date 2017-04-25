@@ -97,6 +97,12 @@ public class MetaData implements Serializable
     /** Member : implementation class names, when the member is of a interface/reference type. */
     public static final String EXTENSION_MEMBER_IMPLEMENTATION_CLASSES = "implementation-classes";
 
+    /** Member : implementation class names, when the member is of a interface/reference type. */
+    public static final String EXTENSION_MEMBER_KEY_IMPLEMENTATION_CLASSES = "key-implementation-classes";
+
+    /** Member : implementation class names, when the member is of a interface/reference type. */
+    public static final String EXTENSION_MEMBER_VALUE_IMPLEMENTATION_CLASSES = "value-implementation-classes";
+
     /** Member : when field is enum, name of the method to get the "value" of the enum. */
     public static final String EXTENSION_MEMBER_ENUM_VALUE_GETTER = "enum-value-getter";
 

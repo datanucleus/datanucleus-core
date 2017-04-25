@@ -228,21 +228,6 @@ public class CollectionMetaData extends ContainerMetaData
         setPopulated();
     }
 
-    /**
-     * Accessor for the element-type tag value.
-     * This can contain comma-separated values.
-     * @return element-type tag value
-     */
-    public String getElementType()
-    {
-        return element.typeName;
-    }
-
-    public String[] getElementTypes()
-    {
-        return ((AbstractMemberMetaData)getParent()).getValuesForExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES);
-    }
-
     public boolean elementIsPersistent()
     {
         return element.classMetaData != null;
@@ -320,8 +305,24 @@ public class CollectionMetaData extends ContainerMetaData
         return element.serialized.booleanValue();
     }
 
+    /**
+     * Accessor for the element-type tag value.
+     * This can contain comma-separated values.
+     * @return element-type tag value
+     */
+    public String getElementType()
+    {
+        return element.typeName;
+    }
+
+    public String[] getElementTypes()
+    {
+        return ((AbstractMemberMetaData)getParent()).getValuesForExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES);
+    }
+
     public CollectionMetaData setElementType(String type)
     {
+        // TODO Set implementation-classes using this if appropriate
         // This is only valid pre-populate
         element.setTypeName(type);
         return this;
