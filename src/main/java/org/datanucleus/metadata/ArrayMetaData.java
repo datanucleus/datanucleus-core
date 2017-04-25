@@ -203,11 +203,11 @@ public class ArrayMetaData extends ContainerMetaData
             mayContainPersistableElements = true;
         }
 
-        if (hasExtension("implementation-classes"))
+        if (hasExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES))
         {
             // Check/fix the validity of the implementation-classes and qualify them where required.
             StringBuilder str = new StringBuilder();
-            String[] implTypes = getValuesForExtension("implementation-classes");
+            String[] implTypes = getValuesForExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES);
             for (int i=0;i<implTypes.length;i++)
             {
                 String implTypeName = ClassUtils.createFullClassName(mmd.getPackageName(), implTypes[i]);
@@ -238,7 +238,7 @@ public class ArrayMetaData extends ContainerMetaData
                     }
                 }
             }
-            addExtension("implementation-classes", str.toString()); // Replace with this new value
+            addExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES, str.toString()); // Replace with this new value
         }
 
         // Make sure anything in the superclass is populated too
@@ -258,7 +258,7 @@ public class ArrayMetaData extends ContainerMetaData
 
     public String[] getElementTypes()
     {
-        return ((AbstractMemberMetaData)getParent()).getValuesForExtension("implementation-classes");
+        return ((AbstractMemberMetaData)getParent()).getValuesForExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES);
     }
 
     public boolean elementIsPersistent()

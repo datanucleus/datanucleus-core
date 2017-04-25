@@ -734,11 +734,11 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             setDependent(true);
         }
 
-        if (hasExtension("implementation-classes"))
+        if (hasExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES))
         {
             // Check the validity of the implementation-classes and qualify them where required.
             StringBuilder str = new StringBuilder();
-            String[] implTypes = getValuesForExtension("implementation-classes");
+            String[] implTypes = getValuesForExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES);
             for (int i=0;i<implTypes.length;i++)
             {
                 String implTypeName = ClassUtils.createFullClassName(getAbstractClassMetaData().getPackageName(), implTypes[i]);
@@ -769,7 +769,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                     }
                 }
             }
-            addExtension("implementation-classes", str.toString()); // Replace with this new value
+            addExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES, str.toString()); // Replace with this new value
         }
 
         // Set up persistence flags for enhancement process
@@ -1823,7 +1823,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      */
     public final String[] getFieldTypes()
     {
-        return getValuesForExtension("implementation-classes");
+        return getValuesForExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES);
 //        return fieldTypes;
     }
 
@@ -1835,7 +1835,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     {
         if (!StringUtils.isWhitespace(types))
         {
-            addExtension("implementation-classes", types);
+            addExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES, types);
         }
     }
 
