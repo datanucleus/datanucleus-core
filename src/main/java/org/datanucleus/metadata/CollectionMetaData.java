@@ -307,7 +307,6 @@ public class CollectionMetaData extends ContainerMetaData
 
     /**
      * Accessor for the element-type tag value.
-     * This can contain comma-separated values.
      * @return element-type tag value
      */
     public String getElementType()
@@ -320,6 +319,7 @@ public class CollectionMetaData extends ContainerMetaData
         return ((AbstractMemberMetaData)getParent()).getValuesForExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES);
     }
 
+    // TODO Keep implementation types separate from declared type
     public CollectionMetaData setElementType(String type)
     {
         // TODO Set implementation-classes using this if appropriate

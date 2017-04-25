@@ -247,20 +247,6 @@ public class ArrayMetaData extends ContainerMetaData
         setPopulated();
     }
 
-    /**
-     * Accessor for the element implementation types (when element is a reference type).
-     * @return element implementation types
-     */
-    public String getElementType()
-    {
-        return element.typeName;
-    }
-
-    public String[] getElementTypes()
-    {
-        return ((AbstractMemberMetaData)getParent()).getValuesForExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES);
-    }
-
     public boolean elementIsPersistent()
     {
         return element.classMetaData != null;
@@ -341,6 +327,21 @@ public class ArrayMetaData extends ContainerMetaData
         return element.dependent.booleanValue();
     }
 
+    /**
+     * Accessor for the element implementation types (when element is a reference type).
+     * @return element implementation types
+     */
+    public String getElementType()
+    {
+        return element.typeName;
+    }
+
+    public String[] getElementTypes()
+    {
+        return ((AbstractMemberMetaData)getParent()).getValuesForExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES);
+    }
+
+    // TODO Keep implementation types separate from declared type
     public ArrayMetaData setElementType(String type)
     {
         // This is only valid pre-populate

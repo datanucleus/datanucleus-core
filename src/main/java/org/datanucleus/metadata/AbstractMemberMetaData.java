@@ -831,12 +831,12 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     public String getPackageName()
     {
+        String className = (this.className != null ? this.className : getClassName());
         return className.substring(0, className.lastIndexOf('.'));
     }
 
     /**
-     * Accessor for the default "persistence-modifier" for a field given the
-     * class, its modifier and whether it is a PersistentCapable class.
+     * Accessor for the default "persistence-modifier" for a field given the class, its modifier and whether it is a Persistable class.
      * @param c The class
      * @param modifier The modifiers for the field
      * @param isPCclass Whether it is persistence capable.
@@ -895,8 +895,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             return;
         }
 
-//        MetaDataManager mmgr = getMetaDataManager();
-
         // Cater for user specifying column name, or columns
         if (columns.isEmpty() && column != null)
         {
@@ -926,6 +924,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 columnMetaData[i].initialise(clr);
             }
         }
+
         // Initialise all sub-objects
         if (containerMetaData != null)
         {

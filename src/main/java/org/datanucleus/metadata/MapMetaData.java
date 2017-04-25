@@ -589,7 +589,6 @@ public class MapMetaData extends ContainerMetaData
 
     /**
      * Accessor for the key-type tag value.
-     * May be comma-separated if several key types are possible.
      * @return key-type tag value
      */
     public String getKeyType()
@@ -602,9 +601,9 @@ public class MapMetaData extends ContainerMetaData
         return ((AbstractMemberMetaData)getParent()).getValuesForExtension(MetaData.EXTENSION_MEMBER_KEY_IMPLEMENTATION_CLASSES);
     }
 
+    // TODO Keep implementation types separate from declared type
     public MapMetaData setKeyType(String type)
     {
-        // TODO Set value-implementation-classes using this if appropriate
         // This is only valid pre-populate
         key.setTypeName(type);
         return this;
@@ -630,7 +629,6 @@ public class MapMetaData extends ContainerMetaData
 
     /**
      * Accessor for the value-type tag value.
-     * May be comma-separated if several value types are possible.
      * @return value-type tag value
      */
     public String getValueType()
@@ -643,9 +641,9 @@ public class MapMetaData extends ContainerMetaData
         return ((AbstractMemberMetaData)getParent()).getValuesForExtension(MetaData.EXTENSION_MEMBER_VALUE_IMPLEMENTATION_CLASSES);
     }
 
+    // TODO Keep implementation types separate from declared type
     public MapMetaData setValueType(String type)
     {
-        // TODO Set value-implementation-classes using this if appropriate
         // This is only valid pre-populate
         value.setTypeName(type);
         return this;
