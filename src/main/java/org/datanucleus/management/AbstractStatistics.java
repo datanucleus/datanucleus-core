@@ -69,6 +69,7 @@ public abstract class AbstractStatistics
      * Constructor defining the manager.
      * If the manager is defined then this will generate a bean name that it is registered with in the manager.
      * @param mgmtManager The Management (JMX) Manager
+     * @param parent Parent statistics object (optional)
      */
     public AbstractStatistics(ManagementManager mgmtManager, AbstractStatistics parent)
     {

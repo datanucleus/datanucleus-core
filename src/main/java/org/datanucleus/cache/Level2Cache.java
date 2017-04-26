@@ -118,6 +118,7 @@ public interface Level2Cache extends Serializable
      * Accessor for an object from the cache.
      * @param oid The Object ID
      * @return The L2 cacheable object
+     * @param <T> Type of the object represented
      */
     <T> CachedPC<T> get(Object oid);
 
@@ -148,6 +149,7 @@ public interface Level2Cache extends Serializable
      * @param oid The Object id for this object
      * @param pc The L2 cacheable persistable object
      * @return The value previously associated with this oid
+     * @param <T> Type of the object represented
      */
     <T> CachedPC<T> put(Object oid, CachedPC<T> pc);
 

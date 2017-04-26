@@ -56,7 +56,8 @@ public class CachedPC<T> implements Serializable
      * Constructor.
      * @param cls The class of the object
      * @param loadedFields The loaded fields
-     * @param vers The version (optional)
+     * @param vers Version of the object (optional)
+     * @param id Identity of the object
      */
     public CachedPC(Class<T> cls, boolean[] loadedFields, Object vers, Object id)
     {
