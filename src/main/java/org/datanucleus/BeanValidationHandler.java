@@ -34,9 +34,8 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Handles the integration of "javax.validation" Bean Validation API (JSR 303). 
- * Should only be invoked if validation "mode" != none.
- * Implements only the methods preDelete, preStore, prePersist
+ * Handles the integration of "javax.validation" Bean Validation API (JSR 303).
+ * Note that this is the only class referring to BeanValidation classes so that it is usable in environments without BeanValidation present.
  */
 public class BeanValidationHandler
 {

@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
@@ -531,6 +533,10 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
 
     public synchronized void close()
     {
+        if (cdiHandler != null)
+        {
+            cdiHandler.close();
+        }
         if (opFactory != null)
         {
             opFactory.close();
@@ -1362,7 +1368,20 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         }
         else
         {
-            cdiHandler = null;
+            // Try to find a BeanManager using JNDI lookup (in case we have standalone JNDI and CDI)
+            try 
+            {
+                Object cdiBeanManager = new InitialContext().lookup("java:comp/BeanManager");
+                if (cdiBeanManager != null)
+                {
+                    cdiHandler = new CDIHandler(cdiBeanManager);
+                }
+
+            }
+            catch (NamingException e) 
+            {
+                return null;
+            }
         }
 
         return cdiHandler;
