@@ -627,4 +627,43 @@ public class WeakLevel2Cache implements Level2Cache
             unpin(oids[i]);
         }
     }
+
+    /**
+     * Representation of a class whose objects will be pinned when put into the L2 cache.
+     */
+    class PinnedClass
+    {
+        Class cls;
+        boolean subclasses;
+        
+        /**
+         * Constructor
+         * @param cls the class
+         * @param subclasses include sub classes
+         */
+        public PinnedClass(Class cls, boolean subclasses)
+        {
+            this.cls = cls;
+            this.subclasses = subclasses;
+        }
+
+        public int hashCode()
+        {
+            return cls.hashCode() ^ (subclasses ? 0 : 1);
+        }
+
+        public boolean equals(Object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+            if (!(obj instanceof PinnedClass))
+            {
+                return false;
+            }
+            PinnedClass other = (PinnedClass)obj;
+            return other.cls.getName().equals(cls.getName()) && other.subclasses == subclasses;
+        }
+    }
 }
