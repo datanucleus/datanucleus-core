@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.state;
 
+import org.datanucleus.BeanValidationHandler;
 
 /**
  * Callback handler that does nothing. Provided for the case where the user wants to do bulk operations
@@ -24,7 +25,7 @@ package org.datanucleus.state;
  */
 public class NullCallbackHandler implements CallbackHandler
 {
-    public void setValidationListener(CallbackHandler handler)
+    public void setBeanValidationHandler(BeanValidationHandler handler)
     {
     }
 

@@ -30,7 +30,6 @@ import javax.validation.ValidatorFactory;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
-import org.datanucleus.state.CallbackHandler;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.util.StringUtils;
 
@@ -39,7 +38,7 @@ import org.datanucleus.util.StringUtils;
  * Should only be invoked if validation "mode" != none.
  * Implements only the methods preDelete, preStore, prePersist
  */
-public class BeanValidatorHandler implements CallbackHandler
+public class BeanValidationHandler
 {
     Validator validator;
     ClassLoaderResolver clr;
@@ -50,7 +49,7 @@ public class BeanValidatorHandler implements CallbackHandler
      * @param ec ExecutionContext that we are persisting in
      * @param factory Validation factory
      */
-    public BeanValidatorHandler(ExecutionContext ec, ValidatorFactory factory)
+    public BeanValidationHandler(ExecutionContext ec, ValidatorFactory factory)
     {
         conf = ec.getNucleusContext().getConfiguration();
         clr = ec.getClassLoaderResolver();
@@ -109,17 +108,6 @@ public class BeanValidatorHandler implements CallbackHandler
         {
             validate(pc, "pre-persist", groups);
         }
-    }
-
-    public void setValidationListener(CallbackHandler handler)
-    {
-    }
-
-    public void addListener(Object listener, Class[] classes)
-    {
-    }
-    public void removeListener(Object listener)
-    {
     }
 
     /**

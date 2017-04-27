@@ -89,11 +89,11 @@ public interface PersistenceNucleusContext extends StoreNucleusContext
     JTASyncRegistry getJtaSyncRegistry();
 
     /**
-     * Method to return a handler for validation (JSR303).
+     * Method to return a handler for bean validation (JSR303).
      * @param ec The ExecutionContext that the handler is for.
-     * @return The handler (or null if not supported on this PMF/EMF, or no validator present)
+     * @return The bean validation handler (or null if not supported on this PMF/EMF, or no validator present)
      */
-    BeanValidatorHandler getValidationHandler(ExecutionContext ec);
+    BeanValidationHandler getBeanValidationHandler(ExecutionContext ec);
 
     /**
      * Accessor for the CDI BeanManager if in an environment that provides one.

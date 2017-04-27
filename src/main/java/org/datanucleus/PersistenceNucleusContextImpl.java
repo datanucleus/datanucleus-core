@@ -1288,7 +1288,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
      * @see org.datanucleus.PersistenceNucleusContext#getValidationHandler(org.datanucleus.ExecutionContext)
      */
     @Override
-    public BeanValidatorHandler getValidationHandler(ExecutionContext ec)
+    public BeanValidationHandler getBeanValidationHandler(ExecutionContext ec)
     {
         if (config.hasPropertyNotNull(PropertyNames.PROPERTY_VALIDATION_MODE))
         {
@@ -1328,7 +1328,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
 
             if (validatorFactory != null)
             {
-                return new BeanValidatorHandler(ec, (ValidatorFactory)validatorFactory);
+                return new BeanValidationHandler(ec, (ValidatorFactory)validatorFactory);
             }
             return null;
         }
