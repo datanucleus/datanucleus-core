@@ -34,14 +34,16 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Handles the integration of "javax.validation". 
+ * Handles the integration of "javax.validation" Bean Validation API (JSR 303). 
  * Should only be invoked if validation "mode" != none.
  * Implements only the methods preDelete, preStore, prePersist
  */
 public class BeanValidationHandler
 {
     Validator validator;
+
     ClassLoaderResolver clr;
+
     Configuration conf;
 
     /**
