@@ -60,7 +60,6 @@ import org.datanucleus.metadata.TransactionType;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.properties.CorePropertyValidator;
 import org.datanucleus.properties.StringPropertyValidator;
-import org.datanucleus.state.CallbackHandler;
 import org.datanucleus.state.ObjectProviderFactory;
 import org.datanucleus.state.ObjectProviderFactoryImpl;
 import org.datanucleus.store.StoreData;
@@ -1281,10 +1280,19 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     }
 
     /* (non-Javadoc)
+     * @see org.datanucleus.PersistenceNucleusContext#setValidationFactory(java.lang.Object)
+     */
+    @Override
+    public void setValidationFactory(Object validationFactory)
+    {
+        this.validatorFactory = validationFactory;
+    }
+
+    /* (non-Javadoc)
      * @see org.datanucleus.PersistenceNucleusContext#getValidationHandler(org.datanucleus.ExecutionContext)
      */
     @Override
-    public CallbackHandler getValidationHandler(ExecutionContext ec)
+    public BeanValidatorHandler getValidationHandler(ExecutionContext ec)
     {
         if (validatorFactoryInit && validatorFactory == null)
         {

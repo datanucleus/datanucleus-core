@@ -26,7 +26,6 @@ import org.datanucleus.identity.IdentityManager;
 import org.datanucleus.management.FactoryStatistics;
 import org.datanucleus.management.ManagementManager;
 import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.state.CallbackHandler;
 import org.datanucleus.state.ObjectProviderFactory;
 import org.datanucleus.store.autostart.AutoStartMechanism;
 import org.datanucleus.transaction.ResourcedTransactionManager;
@@ -90,11 +89,17 @@ public interface PersistenceNucleusContext extends StoreNucleusContext
     JTASyncRegistry getJtaSyncRegistry();
 
     /**
+     * Method to set the BeanValidation API factory to use (when using an external JavaEE environment usage).
+     * @param validationFactory The validation factory
+     */
+    void setValidationFactory(Object validationFactory);
+
+    /**
      * Method to return a handler for validation (JSR303).
      * @param ec The ExecutionContext that the handler is for.
      * @return The handler (or null if not supported on this PMF/EMF, or no validator present)
      */
-    CallbackHandler getValidationHandler(ExecutionContext ec);
+    BeanValidatorHandler getValidationHandler(ExecutionContext ec);
 
     boolean hasLevel2Cache();
 
