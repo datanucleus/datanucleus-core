@@ -96,10 +96,10 @@ public interface PersistenceNucleusContext extends StoreNucleusContext
     BeanValidationHandler getBeanValidationHandler(ExecutionContext ec);
 
     /**
-     * Accessor for the CDI BeanManager if in an environment that provides one.
-     * @return The CDI BeanManager
+     * Accessor for the handler for CDI (JSR346) if in an environment that provides one.
+     * @return The CDI Handler
      */
-    Object getBeanManagerCDI();
+    CDIHandler getCDIHandler();
 
     boolean hasLevel2Cache();
 

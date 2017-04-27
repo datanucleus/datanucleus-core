@@ -139,10 +139,10 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     /** Flag for whether we have initialised the ValidatorFactory. */
     private transient boolean validatorFactoryInit = false;
 
-    private transient Object beanManagerCDI = null;
+    private transient CDIHandler cdiHandler = null;
 
-    /** Flag for whether we have initialised the CDI BeanManager. */
-    private transient boolean beanManagerCDIInit = false;
+    /** Flag for whether we have initialised the CDIHandler. */
+    private transient boolean cdiHandlerInit = false;
 
     /** Pool for ExecutionContexts. */
     private ExecutionContextPool ecPool = null;
@@ -1347,21 +1347,25 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         return null;
     }
 
-    public Object getBeanManagerCDI()
+    public CDIHandler getCDIHandler()
     {
-        if (beanManagerCDIInit)
+        if (cdiHandlerInit)
         {
-            return beanManagerCDI;
+            return cdiHandler;
         }
 
+        cdiHandlerInit = true;
         if (config.hasPropertyNotNull(PropertyNames.PROPERTY_CDI_BEAN_MANAGER))
         {
-            beanManagerCDI = config.getProperty(PropertyNames.PROPERTY_CDI_BEAN_MANAGER);
-            beanManagerCDIInit = true;
-            return beanManagerCDI;
+            Object cdiBeanManager = config.getProperty(PropertyNames.PROPERTY_CDI_BEAN_MANAGER);
+            cdiHandler = new CDIHandler(cdiBeanManager);
+        }
+        else
+        {
+            cdiHandler = null;
         }
 
-        return null;
+        return cdiHandler;
     }
 
     /* (non-Javadoc)
