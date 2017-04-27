@@ -38,99 +38,131 @@ public interface CallbackHandler
      * Callback after the object has been created.
      * @param pc The Object
      */
-    void postCreate(Object pc);
+    default void postCreate(Object pc)
+    {
+    }
 
     /**
      * Callback before the object is persisted (just before the lifecycle state change).
      * @param pc The Object
      */
-    void prePersist(Object pc);
+    default void prePersist(Object pc)
+    {
+    }
 
     /**
      * Callback before the object is stored.
      * @param pc The Object
      */
-    void preStore(Object pc);
+    default void preStore(Object pc)
+    {
+    }
 
     /**
      * Callback after the object is stored.
      * @param pc The Object
      */
-    void postStore(Object pc);
+    default void postStore(Object pc)
+    {
+    }
 
     /**
      * Callback before the fields of the object are cleared.
      * @param pc The Object
      */
-    void preClear(Object pc);
+    default void preClear(Object pc)
+    {
+    }
 
     /**
      * Callback after the fields of the object are cleared.
      * @param pc The Object
      */
-    void postClear(Object pc);
+    default void postClear(Object pc)
+    {
+    }
 
     /**
      * Callback before the object is deleted.
      * @param pc The Object
      */
-    void preDelete(Object pc);
+    default void preDelete(Object pc)
+    {
+    }
 
     /**
      * Callback after the object is deleted.
      * @param pc The Object
      */
-    void postDelete(Object pc);
+    default void postDelete(Object pc)
+    {
+    }
 
     /**
      * Callback before the object is made dirty.
      * @param pc The Object
      */
-    void preDirty(Object pc);
+    default void preDirty(Object pc)
+    {
+    }
 
     /**
      * Callback after the object is made dirty.
      * @param pc The Object
      */
-    void postDirty(Object pc);
+    default void postDirty(Object pc)
+    {
+    }
 
     /**
      * Callback after the fields of the object are loaded.
      * @param pc The Object
      */
-    void postLoad(Object pc);
+    default void postLoad(Object pc)
+    {
+    }
 
     /**
      * Callback after the fields of the object are refreshed.
      * @param pc The Object
      */
-    void postRefresh(Object pc);
+    default void postRefresh(Object pc)
+    {
+    }
 
     /**
      * Callback before the object is detached.
      * @param pc The Object
      */
-    void preDetach(Object pc);
+    default void preDetach(Object pc)
+    {
+    }
 
     /**
      * Callback after the object is detached.
      * @param pc The Object
      * @param detachedPC The detached object
      */
-    void postDetach(Object pc, Object detachedPC);
+    default void postDetach(Object pc, Object detachedPC)
+    {
+    }
 
     /**
      * Callback before the object is attached.
      * @param detachedPC The Object
      */
-    void preAttach(Object detachedPC);
+    default void preAttach(Object detachedPC)
+    {
+    }
 
     /**
      * Callback after the object is attached.
      * @param pc The attached Object
      * @param detachedPC The detached object
      */
-    void postAttach(Object pc, Object detachedPC);
+    default void postAttach(Object pc, Object detachedPC)
+    {
+    }
 
     /**
      * Adds a new listener to this handler.

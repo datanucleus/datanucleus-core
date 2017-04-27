@@ -58,6 +58,10 @@ public class BeanValidatorHandler implements CallbackHandler
         validator = factory.usingContext().traversableResolver(new PersistenceTraversalResolver(ec)).getValidator();
     }
 
+    public void close()
+    {
+    }
+
     /**
      * Validate the constraints of an object
      * @param pc the object
@@ -107,56 +111,14 @@ public class BeanValidatorHandler implements CallbackHandler
         }
     }
 
-    public void close()
-    {
-    }
-
     public void setValidationListener(CallbackHandler handler)
     {
     }
+
     public void addListener(Object listener, Class[] classes)
     {
     }
     public void removeListener(Object listener)
-    {
-    }
-    public void postAttach(Object pc, Object detachedPC)
-    {
-    }
-    public void postClear(Object pc)
-    {
-    }
-    public void postCreate(Object pc)
-    {
-    }
-    public void postDelete(Object pc)
-    {
-    }
-    public void postDetach(Object pc, Object detachedPC)
-    {
-    }
-    public void postDirty(Object pc)
-    {
-    }
-    public void postLoad(Object pc)
-    {
-    }
-    public void postRefresh(Object pc)
-    {
-    }
-    public void postStore(Object pc)
-    {
-    }
-    public void preAttach(Object detachedPC)
-    {
-    }
-    public void preClear(Object pc)
-    {
-    }
-    public void preDetach(Object pc)
-    {
-    }
-    public void preDirty(Object pc)
     {
     }
 
