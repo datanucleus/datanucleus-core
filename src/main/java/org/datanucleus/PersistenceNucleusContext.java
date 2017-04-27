@@ -89,17 +89,17 @@ public interface PersistenceNucleusContext extends StoreNucleusContext
     JTASyncRegistry getJtaSyncRegistry();
 
     /**
-     * Method to set the BeanValidation API factory to use (when using an external JavaEE environment usage).
-     * @param validationFactory The validation factory
-     */
-    void setValidationFactory(Object validationFactory);
-
-    /**
      * Method to return a handler for validation (JSR303).
      * @param ec The ExecutionContext that the handler is for.
      * @return The handler (or null if not supported on this PMF/EMF, or no validator present)
      */
     BeanValidatorHandler getValidationHandler(ExecutionContext ec);
+
+    /**
+     * Accessor for the CDI BeanManager if in an environment that provides one.
+     * @return The CDI BeanManager
+     */
+    Object getBeanManagerCDI();
 
     boolean hasLevel2Cache();
 

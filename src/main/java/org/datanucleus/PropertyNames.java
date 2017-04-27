@@ -198,6 +198,8 @@ public class PropertyNames
     public static final String PROPERTY_VALIDATION_GROUP_PREREMOVE = "datanucleus.validation.group.pre-remove";
     public static final String PROPERTY_VALIDATION_FACTORY = "datanucleus.validation.factory";
 
+    public static final String PROPERTY_CDI_BEAN_MANAGER = "datanucleus.cdi.bean.manager";
+
     public static final String PROPERTY_AUTOSTART_MECHANISM = "datanucleus.autoStartMechanism";
     public static final String PROPERTY_AUTOSTART_MODE = "datanucleus.autoStartMechanismMode";
     public static final String PROPERTY_AUTOSTART_XMLFILE = "datanucleus.autoStartMechanismXmlFile";

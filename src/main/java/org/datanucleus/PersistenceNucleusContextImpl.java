@@ -136,8 +136,13 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     /** Factory for validation. */
     private transient Object validatorFactory = null;
 
-    /** Flag for whether we have initialised the validator factory. */
+    /** Flag for whether we have initialised the ValidatorFactory. */
     private transient boolean validatorFactoryInit = false;
+
+    private transient Object beanManagerCDI = null;
+
+    /** Flag for whether we have initialised the CDI BeanManager. */
+    private transient boolean beanManagerCDIInit = false;
 
     /** Pool for ExecutionContexts. */
     private ExecutionContextPool ecPool = null;
@@ -1280,25 +1285,11 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.PersistenceNucleusContext#setValidationFactory(java.lang.Object)
-     */
-    @Override
-    public void setValidationFactory(Object validationFactory)
-    {
-        this.validatorFactory = validationFactory;
-    }
-
-    /* (non-Javadoc)
      * @see org.datanucleus.PersistenceNucleusContext#getValidationHandler(org.datanucleus.ExecutionContext)
      */
     @Override
     public BeanValidatorHandler getValidationHandler(ExecutionContext ec)
     {
-        if (validatorFactoryInit && validatorFactory == null)
-        {
-            return null;
-        }
-
         if (config.hasPropertyNotNull(PropertyNames.PROPERTY_VALIDATION_MODE))
         {
             if (config.getStringProperty(PropertyNames.PROPERTY_VALIDATION_MODE).equalsIgnoreCase("none"))
@@ -1310,34 +1301,36 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
 
         try
         {
-            // Check on presence of validation API
-            ec.getClassLoaderResolver().classForName("javax.validation.Validation");
-        }
-        catch (ClassNotResolvedException cnre)
-        {
-            validatorFactoryInit = true;
-            return null;
-        }
-
-        try
-        {
-            if (validatorFactory == null)
+            if (validatorFactory == null && !validatorFactoryInit)
             {
                 validatorFactoryInit = true;
 
                 // Factory not yet set so create it
                 if (config.hasPropertyNotNull(PropertyNames.PROPERTY_VALIDATION_FACTORY))
                 {
-                    //create from javax.persistence.validation.factory if given
+                    // Create from javax.persistence.validation.factory if given
                     validatorFactory = config.getProperty(PropertyNames.PROPERTY_VALIDATION_FACTORY);
                 }
                 else
                 {
-                    validatorFactory = Validation.buildDefaultValidatorFactory();
+                    // Create via BeanValidation API bootstrap if present
+                    try
+                    {
+                        ec.getClassLoaderResolver().classForName("javax.validation.Validation");
+                        validatorFactory = Validation.buildDefaultValidatorFactory();
+                    }
+                    catch (ClassNotResolvedException cnre)
+                    {
+                        NucleusLogger.PERSISTENCE.debug("No BeanValidation API present so cannot utilise BeanValidation hooks");
+                    }
                 }
             }
 
-            return new BeanValidatorHandler(ec, (ValidatorFactory)validatorFactory);
+            if (validatorFactory != null)
+            {
+                return new BeanValidatorHandler(ec, (ValidatorFactory)validatorFactory);
+            }
+            return null;
         }
         catch (Throwable ex) //throwable used to catch linkage errors
         {
@@ -1351,6 +1344,23 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
 
             NucleusLogger.GENERAL.warn("Unable to create validator handler", ex);
         }
+        return null;
+    }
+
+    public Object getBeanManagerCDI()
+    {
+        if (beanManagerCDIInit)
+        {
+            return beanManagerCDI;
+        }
+
+        if (config.hasPropertyNotNull(PropertyNames.PROPERTY_CDI_BEAN_MANAGER))
+        {
+            beanManagerCDI = config.getProperty(PropertyNames.PROPERTY_CDI_BEAN_MANAGER);
+            beanManagerCDIInit = true;
+            return beanManagerCDI;
+        }
+
         return null;
     }
 
