@@ -5204,7 +5204,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     // ------------------------------------- Callback Listeners --------------------------------------
 
-
     /**
      * Retrieve the callback handler for this context.
      * If the callback handler hasn't yet been created, this will create it.
@@ -5217,30 +5216,29 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return callbackHandler;
         }
 
-        if (!getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ALLOW_CALLBACKS))
+        if (getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ALLOW_CALLBACKS))
+        {
+            String callbackHandlerClassName = getNucleusContext().getPluginManager().getAttributeValueForExtension(
+                "org.datanucleus.callbackhandler", "name", getNucleusContext().getApiName(), "class-name");
+            if (callbackHandlerClassName != null)
+            {
+                try
+                {
+                    callbackHandler = (CallbackHandler) getNucleusContext().getPluginManager().createExecutableExtension(
+                        "org.datanucleus.callbackhandler", "name", getNucleusContext().getApiName(), "class-name",
+                        new Class[] {ClassConstants.PERSISTENCE_NUCLEUS_CONTEXT}, new Object[] {getNucleusContext()});
+                }
+                catch (Exception e)
+                {
+                    NucleusLogger.PERSISTENCE.error(Localiser.msg("025000", callbackHandlerClassName, e));
+                }
+            }
+        }
+        else
         {
             callbackHandler = new NullCallbackHandler();
-            return callbackHandler;
         }
-
-        String callbackHandlerClassName = getNucleusContext().getPluginManager().getAttributeValueForExtension(
-            "org.datanucleus.callbackhandler", "name", getNucleusContext().getApiName(), "class-name");
-        if (callbackHandlerClassName != null)
-        {
-            try
-            {
-                callbackHandler = (CallbackHandler) getNucleusContext().getPluginManager().createExecutableExtension(
-                    "org.datanucleus.callbackhandler", "name", getNucleusContext().getApiName(), "class-name",
-                    new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {getNucleusContext()});
-                return callbackHandler;
-            }
-            catch (Exception e)
-            {
-                NucleusLogger.PERSISTENCE.error(Localiser.msg("025000", callbackHandlerClassName, e));
-            }
-        }
-
-        return null;
+        return callbackHandler;
     }
 
     /**
