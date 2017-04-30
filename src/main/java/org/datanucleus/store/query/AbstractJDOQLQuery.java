@@ -415,6 +415,12 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
      */
     protected void compileInternal(Map parameterValues)
     {
+        if ((resultClass != null || resultClassName != null) && result == null)
+        {
+            // When result class specified and no result then default the result to "DISTINCT this"
+            result = "DISTINCT this";
+        }
+
         compileGeneric(parameterValues);
     }
 
