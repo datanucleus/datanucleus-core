@@ -934,18 +934,6 @@ public class QueryUtils
             {
                 leftVal = ((Short)left).longValue();
             }
-            else if (left instanceof BigDecimal)
-            {
-                leftVal = ((BigDecimal)left).longValue();
-            }
-            else if (left instanceof Double)
-            {
-                leftVal = ((Double)left).longValue();
-            }
-            else if (left instanceof Float)
-            {
-                leftVal = ((Float)left).longValue();
-            }
             else if (left instanceof Enum)
             {
                 leftVal = ((Enum)left).ordinal();
