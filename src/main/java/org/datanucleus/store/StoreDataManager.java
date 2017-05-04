@@ -75,8 +75,8 @@ public class StoreDataManager
         }
         else
         {
-            // Index any fields by the MetaData of the field
-            if (storeDataByClass.containsKey(data.getMetaData()))
+            // Index any fields by the name of the field
+            if (storeDataByClass.containsKey(data.getName()))
             {
                 return;
             }
