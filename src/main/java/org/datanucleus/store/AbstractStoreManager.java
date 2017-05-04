@@ -320,7 +320,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
         else
         {
-            Boolean singleConnection = getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_SINGLE_CONNECTION);
+            boolean singleConnection = getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_SINGLE_CONNECTION);
             if (singleConnection)
             {
                 // Take from the primary

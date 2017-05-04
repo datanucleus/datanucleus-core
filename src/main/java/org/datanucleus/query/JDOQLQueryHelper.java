@@ -309,11 +309,6 @@ public class JDOQLQueryHelper
                 return litExpr.getLiteral().toString();
             }
         }
-        else if (expr instanceof VariableExpression)
-        {
-            VariableExpression varExpr = (VariableExpression)expr;
-            return varExpr.getId();
-        }
         else
         {
             throw new UnsupportedOperationException("Dont currently support " + expr.getClass().getName() + " in JDOQLHelper");
