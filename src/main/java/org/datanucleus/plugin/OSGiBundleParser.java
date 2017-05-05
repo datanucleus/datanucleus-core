@@ -18,6 +18,7 @@ Contributors:
  **********************************************************************/
 package org.datanucleus.plugin;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -237,10 +238,12 @@ public class OSGiBundleParser
         List<ExtensionPoint> extensionPoints = Collections.emptyList();
         List<Extension> extensions = Collections.emptyList();
         InputStream is = null;
+        InputStreamReader isr = null;
         try
         {
             is = fileUrl.openStream();
-            Element rootElement = db.parse(new InputSource(new InputStreamReader(is))).getDocumentElement();
+            isr = new InputStreamReader(is);
+            Element rootElement = db.parse(new InputSource(isr)).getDocumentElement();
 
             if (NucleusLogger.GENERAL.isDebugEnabled())
             {
@@ -264,15 +267,24 @@ public class OSGiBundleParser
         }
         finally
         {
+            if (isr != null)
+            {
+                try
+                {
+                    isr.close();
+                }
+                catch (IOException e)
+                {
+                }
+            }
             if (is != null)
             {
                 try
                 {
                     is.close();
                 }
-                catch (Exception e)
+                catch (IOException e)
                 {
-
                 }
             }
         }

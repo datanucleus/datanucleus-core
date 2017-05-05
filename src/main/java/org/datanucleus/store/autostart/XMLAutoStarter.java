@@ -80,19 +80,20 @@ public class XMLAutoStarter extends AbstractAutoStartMechanism
     {
         super();
 
-        this.fileUrl = new URL("file:" + 
-            storeMgr.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_XMLFILE));
+        this.fileUrl = new URL("file:" + storeMgr.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_XMLFILE));
 
         final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         final DocumentBuilder db;
 
         try
         {
+            InputStreamReader isr = null;
             db = factory.newDocumentBuilder();
             try
             {
                 db.setEntityResolver(new XMLAutoStarterEntityResolver());
-                rootElement = db.parse(new InputSource(new InputStreamReader(fileUrl.openStream()))).getDocumentElement();
+                isr = new InputStreamReader(fileUrl.openStream());
+                rootElement = db.parse(new InputSource(isr)).getDocumentElement();
                 doc = rootElement.getOwnerDocument();
             }
             catch (Exception e)
@@ -105,6 +106,19 @@ public class XMLAutoStarter extends AbstractAutoStartMechanism
                 doc.appendChild(rootElement);
 
                 writeToFile();
+            }
+            finally
+            {
+                if (isr != null)
+                {
+                    try
+                    {
+                        isr.close();
+                    }
+                    catch (IOException e)
+                    {
+                    }
+                }
             }
         }
         catch (ParserConfigurationException e1)
