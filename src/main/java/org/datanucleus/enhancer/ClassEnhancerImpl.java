@@ -442,14 +442,29 @@ public class ClassEnhancerImpl implements ClassEnhancer
     public static String getClassNameForFileName(String filename)
     {
         MyClassVisitor vis = new MyClassVisitor();
+        FileInputStream fis = null;
         try
         {
-            new ClassReader(new FileInputStream(filename)).accept(vis, 0);
+            fis = new FileInputStream(filename);
+            new ClassReader(fis).accept(vis, 0);
             return vis.getClassName();
         }
         catch (IOException ioe)
         {
             return null;
+        }
+        finally
+        {
+            if (fis != null)
+            {
+                try
+                {
+                    fis.close();
+                }
+                catch (IOException e)
+                {
+                }
+            }
         }
     }
 
