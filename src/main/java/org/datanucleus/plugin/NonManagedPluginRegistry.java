@@ -320,7 +320,6 @@ public class NonManagedPluginRegistry implements PluginRegistry
      * @param manifest the url to the "meta-inf/manifest.mf" file or a jar file
      * @return the Plugin
      */
-    @SuppressWarnings("resource")
     protected Bundle registerBundle(URL manifest)
     {
         if (manifest == null)
@@ -368,12 +367,23 @@ public class NonManagedPluginRegistry implements PluginRegistry
                     jarPath = jarPath.substring(5);
                 }
                 File jarFile = new File(jarPath);
-                mf = new JarFile(jarFile).getManifest();
-                if (mf == null)
+                JarFile jar = new JarFile(jarFile);
+                try
                 {
-                    return null;
+                    mf = jar.getManifest();
+                    if (mf == null)
+                    {
+                        return null;
+                    }
+                    return registerBundle(mf, jarFile.toURI().toURL());
                 }
-                return registerBundle(mf, jarFile.toURI().toURL());
+                finally
+                {
+                    if (jar != null)
+                    {
+                        jar.close();
+                    }
+                }
             }
             else if (manifest.getProtocol().equals("rar") || manifest.getProtocol().equals("war"))
             {
@@ -387,20 +397,30 @@ public class NonManagedPluginRegistry implements PluginRegistry
                 
                 String jarPath = path.substring(index+1, path.indexOf(JAR_SEPARATOR,index+1));
                 JarFile rarFile = new JarFile(file);
-                JarInputStream jis = new JarInputStream(rarFile.getInputStream(rarFile.getEntry(jarPath)));
                 try
                 {
-                    mf = jis.getManifest();
-                    if (mf == null)
+                    JarInputStream jis = new JarInputStream(rarFile.getInputStream(rarFile.getEntry(jarPath)));
+                    try
                     {
-                        return null;
+                        mf = jis.getManifest();
+                        if (mf == null)
+                        {
+                            return null;
+                        }
                     }
+                    finally
+                    {
+                        jis.close();
+                    }
+                    return registerBundle(mf, rarUrl);
                 }
                 finally
                 {
-                    jis.close();
+                    if (rarFile != null)
+                    {
+                        rarFile.close();
+                    }
                 }
-                return registerBundle(mf, rarUrl);
             }
             else
             {
@@ -446,8 +466,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
 
         if (!allowUserBundles && !bundle.getSymbolicName().startsWith(DATANUCLEUS_PKG))
         {
-            NucleusLogger.GENERAL.debug("Ignoring bundle " + bundle.getSymbolicName() +
-                " since not DataNucleus, and only loading DataNucleus bundles");
+            NucleusLogger.GENERAL.debug("Ignoring bundle " + bundle.getSymbolicName() + " since not DataNucleus, and only loading DataNucleus bundles");
             return null;
         }
 
