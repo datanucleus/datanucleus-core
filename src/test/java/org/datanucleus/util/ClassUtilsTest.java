@@ -18,7 +18,6 @@ Contributors:
 package org.datanucleus.util;
 
 import java.io.Serializable;
-import java.net.MalformedURLException;
 import java.util.AbstractCollection;
 import java.util.AbstractList;
 import java.util.Collection;
@@ -260,22 +259,7 @@ public class ClassUtilsTest extends TestCase
         assertTrue("Full classname is incorrect",
             ClassUtils.createFullClassName("org","MyClass").equals("org.MyClass"));
     }
-    
-    /**
-     * Test of the retrieval of the classname for a filename, given the root directory name.
-     * @throws MalformedURLException 
-     */
-    public void testGetClassnameForFilename() throws MalformedURLException
-    {
-        String externalForm = getClass().getResource("/org/datanucleus/util/ClassUtilsTest.class").toExternalForm();
-        externalForm = externalForm.replace("file:/","");
-        String path = externalForm.substring(0,externalForm.indexOf("/org/datanucleus/util/ClassUtilsTest.class"));
-        externalForm = externalForm.replace("/", System.getProperty("file.separator"));
-        externalForm = externalForm.replace("\\", System.getProperty("file.separator"));
-        assertTrue("Classname for filename is incorrect",
-            ClassUtils.getClassnameForFilename(externalForm, path).equals("org.datanucleus.util.ClassUtilsTest"));
-    }
-    
+
     /**
      * Test for whether classes are descendents of each other.
      */

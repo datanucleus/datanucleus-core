@@ -243,44 +243,6 @@ public class ClassUtils
     }
 
     /**
-     * Utility to get the Class name given the file name and the file name of the root of the package structure.
-     * @param filename The filename of the class file
-     * @param rootfilename The filename of the root of the package structure
-     * @return The Class name
-     */
-    public static String getClassnameForFilename(String filename, String rootfilename)
-    {
-        if (filename == null)
-        {
-            return null;
-        }
-
-        String classname=filename;
-
-        // Omit the root part of the filename
-        if (rootfilename != null)
-        {
-            classname = classname.substring(rootfilename.length());
-        }
-
-        // Remove the ".class" suffix
-        classname = classname.substring(0,classname.length()-6);
-
-        char file_separator = File.separatorChar;
-
-        // Remove any leading separator
-        if (classname.indexOf(file_separator) == 0)
-        {
-            classname = classname.substring(1);
-        }
-
-        // Change all separator characters to "."
-        classname = classname.replace(file_separator,'.');
-
-        return classname;
-    }
-
-    /**
      * Method to return the class files below the specified directory.
      * @param dir The directory
      * @param normal_classes Whether to include normal classes
