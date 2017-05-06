@@ -444,7 +444,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
      * @param key The key
      * @return The value.
      */
-    public String getProperty(String key)
+    public synchronized String getProperty(String key)
     {
         if (useCache)
         {

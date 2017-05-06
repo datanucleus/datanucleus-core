@@ -1723,7 +1723,7 @@ public abstract class AbstractClassMetaData extends MetaData
         return identityType;
     }
 
-    public synchronized void setIdentityType(IdentityType type)
+    public void setIdentityType(IdentityType type)
     {
         checkNotYetPopulated();
 
