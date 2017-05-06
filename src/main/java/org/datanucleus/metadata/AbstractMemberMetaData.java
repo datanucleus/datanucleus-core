@@ -831,8 +831,8 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     public String getPackageName()
     {
-        String className = (this.className != null ? this.className : getClassName());
-        return className.substring(0, className.lastIndexOf('.'));
+        String theClassName = (this.className != null ? this.className : getClassName());
+        return theClassName.substring(0, theClassName.lastIndexOf('.'));
     }
 
     /**
