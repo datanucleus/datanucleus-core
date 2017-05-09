@@ -489,6 +489,7 @@ Contributors:
         <query-method-evaluator class="java.util.Date" method="getTime" evaluator="org.datanucleus.query.inmemory.method.DateGetTimeMethod"/>
         <query-method-evaluator class="java.util.Date" method="getDay" evaluator="org.datanucleus.query.inmemory.method.DateGetDayMethod"/>
         <query-method-evaluator class="java.util.Date" method="getDate" evaluator="org.datanucleus.query.inmemory.method.DateGetDayMethod"/>
+        <query-method-evaluator class="java.util.Date" method="getDayOfWeek" evaluator="org.datanucleus.query.inmemory.method.DateGetDayOfWeekMethod"/>
         <query-method-evaluator class="java.util.Date" method="getMonth" evaluator="org.datanucleus.query.inmemory.method.DateGetMonthMethod"/>
         <query-method-evaluator class="java.util.Date" method="getYear" evaluator="org.datanucleus.query.inmemory.method.DateGetYearMethod"/>
         <query-method-evaluator class="java.util.Date" method="getHour" evaluator="org.datanucleus.query.inmemory.method.DateGetHoursMethod"/>
@@ -496,12 +497,14 @@ Contributors:
         <query-method-evaluator class="java.util.Date" method="getSecond" evaluator="org.datanucleus.query.inmemory.method.DateGetSecondsMethod"/>
 
         <query-method-evaluator class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.query.inmemory.method.LocalDateGetDayOfMonth"/>
+        <query-method-evaluator class="java.time.LocalDate" method="getDayOfWeek" evaluator="org.datanucleus.query.inmemory.method.LocalDateGetDayOfWeek"/>
         <query-method-evaluator class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.query.inmemory.method.LocalDateGetMonthValue"/>
         <query-method-evaluator class="java.time.LocalDate" method="getYear" evaluator="org.datanucleus.query.inmemory.method.LocalDateGetYear"/>
         <query-method-evaluator class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.query.inmemory.method.LocalTimeGetHour"/>
         <query-method-evaluator class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.query.inmemory.method.LocalTimeGetMinute"/>
         <query-method-evaluator class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.query.inmemory.method.LocalTimeGetSecond"/>
         <query-method-evaluator class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.query.inmemory.method.LocalDateTimeGetDayOfMonth"/>
+        <query-method-evaluator class="java.time.LocalDateTime" method="getDayOfWeek" evaluator="org.datanucleus.query.inmemory.method.LocalDateTimeGetDayOfWeek"/>
         <query-method-evaluator class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.query.inmemory.method.LocalDateTimeGetMonthValue"/>
         <query-method-evaluator class="java.time.LocalDateTime" method="getYear" evaluator="org.datanucleus.query.inmemory.method.LocalDateTimeGetYear"/>
         <query-method-evaluator class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.query.inmemory.method.LocalDateTimeGetHour"/>
