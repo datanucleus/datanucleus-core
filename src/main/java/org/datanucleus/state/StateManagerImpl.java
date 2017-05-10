@@ -4525,9 +4525,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             return;
         }
 
-        getCallbackHandler().prePersist(myPC);
-        // TODO Call prePersist for any embedded field objects
-
         if (isFlushedNew())
         {
             // With CompoundIdentity bidir relations when the SM is created for this object ("initialiseForPersistentNew") the persist
