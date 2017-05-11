@@ -417,8 +417,15 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
     {
         if ((resultClass != null || resultClassName != null) && result == null)
         {
-            // When result class specified and no result then default the result to "DISTINCT this"
-            result = "DISTINCT this";
+            if (resultClass == Object[].class || resultClassName.equals(Object[].class.getName()))
+            {
+                // User has specified the blatantly obvious, so ignore it
+            }
+            else
+            {
+                // When result class specified and no result then default the result to "DISTINCT this"
+                result = "DISTINCT this";
+            }
         }
 
         compileGeneric(parameterValues);
