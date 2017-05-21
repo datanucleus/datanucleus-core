@@ -982,6 +982,17 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                     {
                         createOrder = (createScript != null) ? "script" : "metadata";
                     }
+                    else
+                    {
+                        if (createOrder.equals("script") || createOrder.equals("metadata-then-script") || createOrder.equals("script-the-metadata"))
+                        {
+                            if (createScript == null)
+                            {
+                                NucleusLogger.DATASTORE_SCHEMA.warn("create order set to " + createOrder + " but no script defined, so using metadata instead");
+                                createOrder = "metadata";
+                            }
+                        }
+                    }
 
                     if (createOrder.equals("script"))
                     {
@@ -1023,6 +1034,17 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                     if (StringUtils.isWhitespace(dropOrder))
                     {
                         dropOrder = (dropScript != null) ? "script" : "metadata";
+                    }
+                    else
+                    {
+                        if (dropOrder.equals("script") || dropOrder.equals("metadata-then-script") || dropOrder.equals("script-the-metadata"))
+                        {
+                            if (dropScript == null)
+                            {
+                                NucleusLogger.DATASTORE_SCHEMA.warn("drop order set to " + dropOrder + " but no script defined, so using metadata instead");
+                                dropOrder = "metadata";
+                            }
+                        }
                     }
 
                     if (dropOrder.equals("script"))
@@ -1069,6 +1091,17 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                     {
                         dropOrder = (dropScript != null) ? "script" : "metadata";
                     }
+                    else
+                    {
+                        if (dropOrder.equals("script") || dropOrder.equals("metadata-then-script") || dropOrder.equals("script-the-metadata"))
+                        {
+                            if (dropScript == null)
+                            {
+                                NucleusLogger.DATASTORE_SCHEMA.warn("drop order set to " + dropOrder + " but no script defined, so using metadata instead");
+                                dropOrder = "metadata";
+                            }
+                        }
+                    }
 
                     if (dropOrder.equals("script"))
                     {
@@ -1098,6 +1131,17 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                     if (StringUtils.isWhitespace(createOrder))
                     {
                         createOrder = (createScript != null) ? "script" : "metadata";
+                    }
+                    else
+                    {
+                        if (createOrder.equals("script") || createOrder.equals("metadata-then-script") || createOrder.equals("script-the-metadata"))
+                        {
+                            if (createScript == null)
+                            {
+                                NucleusLogger.DATASTORE_SCHEMA.warn("create order set to " + createOrder + " but no script defined, so using metadata instead");
+                                createOrder = "metadata";
+                            }
+                        }
                     }
 
                     if (createOrder.equals("script"))
