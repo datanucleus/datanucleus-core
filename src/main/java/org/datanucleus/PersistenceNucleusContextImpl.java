@@ -239,9 +239,11 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         // Schema Generation
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_MODE, null, "none", CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_MODE, null, "none", CorePropertyValidator.class.getName(), false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_CREATE_ORDER, null, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_TARGET, null, "datanucleus-schema-create.ddl", null, false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_TARGET, null, "datanucleus-schema-drop.ddl", null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_SOURCE, null, null, null, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DROP_ORDER, null, null, null, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_TARGET, null, "datanucleus-schema-drop.ddl", null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_SOURCE, null, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_LOAD_SOURCE, null, null, null, false, false);
 
@@ -961,82 +963,168 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
 
             if (mode == Mode.CREATE)
             {
-                String createScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_SOURCE);
-                if (!StringUtils.isWhitespace(createScript))
-                {
-                    // TODO Make use of create_script ORDER
-                    String scriptContent = getDatastoreScriptForResourceName(createScript);
-                    NucleusLogger.DATASTORE_SCHEMA.debug(">> createScript=" + scriptContent);
-                    if (storeMgr instanceof SchemaScriptAwareStoreManager && !StringUtils.isWhitespace(scriptContent))
-                    {
-                        ((SchemaScriptAwareStoreManager)storeMgr).executeScript(scriptContent);
-                    }
-                }
                 if (generateScripts)
                 {
+                    // Generate the required script
                     schemaTool.setDdlFile(config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_TARGET));
+                    schemaTool.createSchemaForClasses(schemaStoreMgr, schemaClassNames);
                 }
-                schemaTool.createSchemaForClasses(schemaStoreMgr, schemaClassNames);
+                else
+                {
+                    // Process the required metadata/script
+                    String createOrder = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_CREATE_ORDER);
+                    String createScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_SOURCE);
+                    if (StringUtils.isWhitespace(createScript))
+                    {
+                        createScript = null;
+                    }
+                    if (StringUtils.isWhitespace(createOrder))
+                    {
+                        createOrder = (createScript != null) ? "script" : "metadata";
+                    }
+
+                    if (createOrder.equals("script"))
+                    {
+                        processDatastoreScript(createScript);
+                    }
+                    else if (createOrder.equals("script-then-metadata"))
+                    {
+                        processDatastoreScript(createScript);
+                        schemaTool.createSchemaForClasses(schemaStoreMgr, schemaClassNames);
+                    }
+                    else if (createOrder.equals("metadata-then-script"))
+                    {
+                        schemaTool.createSchemaForClasses(schemaStoreMgr, schemaClassNames);
+                        processDatastoreScript(createScript);
+                    }
+                    else
+                    {
+                        schemaTool.createSchemaForClasses(schemaStoreMgr, schemaClassNames);
+                    }
+                }
             }
             else if (mode == Mode.DELETE)
             {
-                // TODO Make use of drop_script ORDER
-                String dropScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_SOURCE);
-                if (!StringUtils.isWhitespace(dropScript))
-                {
-                    String scriptContent = getDatastoreScriptForResourceName(dropScript);
-                    NucleusLogger.DATASTORE_SCHEMA.debug(">> dropScript=" + scriptContent);
-                    if (storeMgr instanceof SchemaScriptAwareStoreManager && !StringUtils.isWhitespace(scriptContent))
-                    {
-                        ((SchemaScriptAwareStoreManager)storeMgr).executeScript(scriptContent);
-                    }
-                }
                 if (generateScripts)
                 {
+                    // Generate the required script
                     schemaTool.setDdlFile(config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_TARGET));
+                    schemaTool.deleteSchemaForClasses(schemaStoreMgr, schemaClassNames);
                 }
-                schemaTool.deleteSchemaForClasses(schemaStoreMgr, schemaClassNames);
+                else
+                {
+                    // Process the required metadata/script
+                    String dropOrder = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DROP_ORDER);
+                    String dropScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_SOURCE);
+                    if (StringUtils.isWhitespace(dropScript))
+                    {
+                        dropScript = null;
+                    }
+                    if (StringUtils.isWhitespace(dropOrder))
+                    {
+                        dropOrder = (dropScript != null) ? "script" : "metadata";
+                    }
+
+                    if (dropOrder.equals("script"))
+                    {
+                        processDatastoreScript(dropScript);
+                    }
+                    else if (dropOrder.equals("script-then-metadata"))
+                    {
+                        processDatastoreScript(dropScript);
+                        schemaTool.deleteSchemaForClasses(schemaStoreMgr, schemaClassNames);
+                    }
+                    else if (dropOrder.equals("metadata-then-script"))
+                    {
+                        schemaTool.deleteSchemaForClasses(schemaStoreMgr, schemaClassNames);
+                        processDatastoreScript(dropScript);
+                    }
+                    else
+                    {
+                        schemaTool.deleteSchemaForClasses(schemaStoreMgr, schemaClassNames);
+                    }
+                }
             }
             else if (mode == Mode.DELETE_CREATE)
             {
-                String dropScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_SOURCE);
-                if (!StringUtils.isWhitespace(dropScript))
-                {
-                    String scriptContent = getDatastoreScriptForResourceName(dropScript);
-                    NucleusLogger.DATASTORE_SCHEMA.debug(">> dropScript=" + scriptContent);
-                    if (storeMgr instanceof SchemaScriptAwareStoreManager && !StringUtils.isWhitespace(scriptContent))
-                    {
-                        ((SchemaScriptAwareStoreManager)storeMgr).executeScript(scriptContent);
-                    }
-                }
                 if (generateScripts)
                 {
+                    // Generate the required scripts
                     schemaTool.setDdlFile(config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_TARGET));
-                }
-                schemaTool.deleteSchemaForClasses(schemaStoreMgr, schemaClassNames);
+                    schemaTool.deleteSchemaForClasses(schemaStoreMgr, schemaClassNames);
 
-                String createScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_SOURCE);
-                if (!StringUtils.isWhitespace(createScript))
+                    schemaTool.setDdlFile(config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_TARGET));
+                    schemaTool.createSchemaForClasses(schemaStoreMgr, schemaClassNames);
+                }
+                else
                 {
-                    String scriptContent = getDatastoreScriptForResourceName(createScript);
-                    NucleusLogger.DATASTORE_SCHEMA.debug(">> createScript=" + scriptContent);
-                    if (storeMgr instanceof SchemaScriptAwareStoreManager && !StringUtils.isWhitespace(scriptContent))
+                    // Process the required metadata/scripts
+                    String dropOrder = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DROP_ORDER);
+                    String dropScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_SOURCE);
+                    if (StringUtils.isWhitespace(dropScript))
                     {
-                        ((SchemaScriptAwareStoreManager)storeMgr).executeScript(scriptContent);
+                        dropScript = null;
+                    }
+                    if (StringUtils.isWhitespace(dropOrder))
+                    {
+                        dropOrder = (dropScript != null) ? "script" : "metadata";
+                    }
+
+                    if (dropOrder.equals("script"))
+                    {
+                        processDatastoreScript(dropScript);
+                    }
+                    else if (dropOrder.equals("script-then-metadata"))
+                    {
+                        processDatastoreScript(dropScript);
+                        schemaTool.deleteSchemaForClasses(schemaStoreMgr, schemaClassNames);
+                    }
+                    else if (dropOrder.equals("metadata-then-script"))
+                    {
+                        schemaTool.deleteSchemaForClasses(schemaStoreMgr, schemaClassNames);
+                        processDatastoreScript(dropScript);
+                    }
+                    else
+                    {
+                        schemaTool.deleteSchemaForClasses(schemaStoreMgr, schemaClassNames);
+                    }
+
+                    String createOrder = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_CREATE_ORDER);
+                    String createScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_SOURCE);
+                    if (StringUtils.isWhitespace(createScript))
+                    {
+                        createScript = null;
+                    }
+                    if (StringUtils.isWhitespace(createOrder))
+                    {
+                        createOrder = (createScript != null) ? "script" : "metadata";
+                    }
+
+                    if (createOrder.equals("script"))
+                    {
+                        processDatastoreScript(createScript);
+                    }
+                    else if (createOrder.equals("script-then-metadata"))
+                    {
+                        processDatastoreScript(createScript);
+                        schemaTool.createSchemaForClasses(schemaStoreMgr, schemaClassNames);
+                    }
+                    else if (createOrder.equals("metadata-then-script"))
+                    {
+                        schemaTool.createSchemaForClasses(schemaStoreMgr, schemaClassNames);
+                        processDatastoreScript(createScript);
+                    }
+                    else
+                    {
+                        schemaTool.createSchemaForClasses(schemaStoreMgr, schemaClassNames);
                     }
                 }
-                if (generateScripts)
-                {
-                    schemaTool.setDdlFile(config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_TARGET));
-                }
-                schemaTool.createSchemaForClasses(schemaStoreMgr, schemaClassNames);
             }
 
             String loadScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_LOAD_SOURCE);
             if (!StringUtils.isWhitespace(loadScript))
             {
                 String scriptContent = getDatastoreScriptForResourceName(loadScript);
-                NucleusLogger.DATASTORE_SCHEMA.debug(">> loadScript=" + scriptContent);
                 if (storeMgr instanceof SchemaScriptAwareStoreManager && !StringUtils.isWhitespace(scriptContent))
                 {
                     ((SchemaScriptAwareStoreManager)storeMgr).executeScript(scriptContent);
@@ -1054,6 +1142,15 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
             NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("014043"));
+        }
+    }
+
+    private void processDatastoreScript(String scriptResourceName)
+    {
+        String scriptContent = getDatastoreScriptForResourceName(scriptResourceName);
+        if (storeMgr instanceof SchemaScriptAwareStoreManager && !StringUtils.isWhitespace(scriptContent))
+        {
+            ((SchemaScriptAwareStoreManager)storeMgr).executeScript(scriptContent);
         }
     }
 
