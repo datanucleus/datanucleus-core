@@ -20,7 +20,6 @@ package org.datanucleus.state;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
  * Implementation of a lock manager for objects.
  */
@@ -48,7 +47,7 @@ public class LockManagerImpl implements LockManager
     {
         if (requiredLockModesById == null)
         {
-            requiredLockModesById = new HashMap<Object, Short>();
+            requiredLockModesById = new HashMap<>();
         }
         requiredLockModesById.put(id, lockMode);
     }
@@ -85,31 +84,31 @@ public class LockManagerImpl implements LockManager
     /* (non-Javadoc)
      * @see org.datanucleus.state.lock.LockManager#lock(org.datanucleus.ObjectProvider, short)
      */
-    public void lock(ObjectProvider sm, short lockMode)
+    public void lock(ObjectProvider op, short lockMode)
     {
-        sm.lock(lockMode);
+        op.lock(lockMode);
 
         if (lockMode == LOCK_MODE_PESSIMISTIC_READ || lockMode == LOCK_MODE_PESSIMISTIC_WRITE)
         {
             // Do a SELECT ... FOR UPDATE (for RDBMS) or alternative to lock the object in the datastore
-            sm.locate();
+            op.locate();
         }
     }
 
     /* (non-Javadoc)
      * @see org.datanucleus.state.lock.LockManager#unlock(org.datanucleus.ObjectProvider)
      */
-    public void unlock(ObjectProvider sm)
+    public void unlock(ObjectProvider op)
     {
         // TODO Need to remove any row lock from the datastore
-        sm.unlock();
+        op.unlock();
     }
 
     /* (non-Javadoc)
      * @see org.datanucleus.state.lock.LockManager#getLockMode(org.datanucleus.ObjectProvider)
      */
-    public short getLockMode(ObjectProvider sm)
+    public short getLockMode(ObjectProvider op)
     {
-        return sm.getLockMode();
+        return op.getLockMode();
     }
 }

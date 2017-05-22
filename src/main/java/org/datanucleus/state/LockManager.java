@@ -34,16 +34,16 @@ public interface LockManager
     /** Lock mode representing no locking. */
     public static final short LOCK_MODE_NONE = 0;
 
-    /** Lock mode for optimistic reads. Same as LOCK_MODE_OPTIMISTIC_WRITE for DataNucleus. */
+    /** Lock mode for optimistic reads. */
     public static final short LOCK_MODE_OPTIMISTIC_READ = 1;
 
-    /** Lock mode for optimistic writes. */
+    /** Lock mode for optimistic writes (lock + update version). */
     public static final short LOCK_MODE_OPTIMISTIC_WRITE = 2;
 
-    /** Lock mode for pessimistic reads. Same as LOCK_MODE_PESSIMISTIC_WRITE for DataNucleus. */
+    /** Lock mode for pessimistic reads. */
     public static final short LOCK_MODE_PESSIMISTIC_READ = 3;
 
-    /** Lock mode for pessimistic writes. */
+    /** Lock mode for pessimistic writes (lock + version update). */
     public static final short LOCK_MODE_PESSIMISTIC_WRITE = 4;
 
     /**
