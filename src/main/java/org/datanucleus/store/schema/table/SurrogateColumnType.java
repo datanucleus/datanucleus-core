@@ -19,14 +19,28 @@ package org.datanucleus.store.schema.table;
 
 /**
  * Enum defining the types of surrogate columns for a class.
+ * The <pre>fieldNumber</pre> is used where we need to pass a list of fields to be fetched, or updated, and want to include surrogate fields.
+ * The normal fields of a class are numbered from 0 upwards, so we use negative numbers for the surrogates.
  */
 public enum SurrogateColumnType
 {
-    DATASTORE_ID,
-    VERSION,
-    DISCRIMINATOR,
-    MULTITENANCY,
-    CREATE_TIMESTAMP,
-    UPDATE_TIMESTAMP,
-    SOFTDELETE
+    DATASTORE_ID(-1),
+    VERSION(-2),
+    DISCRIMINATOR(-3),
+    MULTITENANCY(-4),
+    CREATE_TIMESTAMP(-5),
+    UPDATE_TIMESTAMP(-6),
+    SOFTDELETE(-7);
+
+    int fieldNumber;
+
+    private SurrogateColumnType(int fieldNumber)
+    {
+        this.fieldNumber = fieldNumber;
+    }
+
+    public int getFieldNumber()
+    {
+        return fieldNumber;
+    }
 }
