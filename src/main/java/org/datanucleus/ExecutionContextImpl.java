@@ -42,6 +42,7 @@ import org.datanucleus.cache.CachedPC;
 import org.datanucleus.cache.L2CachePopulateFieldManager;
 import org.datanucleus.cache.Level1Cache;
 import org.datanucleus.cache.Level2Cache;
+import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.exceptions.ClassNotDetachableException;
 import org.datanucleus.exceptions.ClassNotPersistableException;
 import org.datanucleus.exceptions.ClassNotResolvedException;
@@ -3989,6 +3990,35 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void preCommit()
     {
+        if (cache.size() > 0)
+        {
+            // Check for objects that are managed but not dirty, yet require a version update
+            Iterator<ObjectProvider> opIter = cache.values().iterator();
+            while (opIter.hasNext())
+            {
+                ObjectProvider op = opIter.next();
+                if (op.isFlushedToDatastore() && op.getClassMetaData().isVersioned() && 
+                        (op.getLockMode() == LockManager.LOCK_MODE_OPTIMISTIC_WRITE || op.getLockMode() == LockManager.LOCK_MODE_PESSIMISTIC_WRITE))
+                {
+                    // Not dirty, but locking requires a version update, so force it
+                    VersionMetaData vermd = op.getClassMetaData().getVersionMetaDataForClass();
+                    if (vermd != null)
+                    {
+                        if (vermd.getFieldName() != null)
+                        {
+                            op.makeDirty((Persistable) op.getObject(), vermd.getFieldName());
+                            dirtyOPs.add(op);
+                        }
+                        else
+                        {
+                            // TODO Cater for surrogate version
+                            NucleusLogger.PERSISTENCE.warn("We do not support forced version update with surrogate version columns : " + op);
+                        }
+                    }
+                }
+            }
+        }
+
         // Make sure all is flushed before we start
         flush();
 
