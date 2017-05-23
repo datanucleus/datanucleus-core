@@ -5856,10 +5856,12 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                     if (!isEmbedded())
                     {
                         int[] dirtyFieldNumbers = ClassUtils.getFlagsSetTo(dirtyFields, true);
-                        if (!isEmbedded() && dirtyFieldNumbers == null)
+                        if (dirtyFieldNumbers == null)
                         {
+                            // ObjectProvider is dirty but no fields. What happened?
                             throw new NucleusException(Localiser.msg("026010")).setFatal();
                         }
+
                         if (myEC.getNucleusContext().isClassCacheable(getClassMetaData()))
                         {
                             myEC.markFieldsForUpdateInLevel2Cache(getInternalObjectId(), dirtyFields);
