@@ -73,7 +73,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
         if (!api.isDetached(pc) && api.isPersistent(pc))
         {
             // Detach a copy and return the copy
-            return ec.detachObjectCopy(pc, state);
+            return ec.detachObjectCopy(state, pc);
         }
         return pc;
     }
@@ -90,7 +90,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
         if (!api.isDetached(pc) && api.isPersistent(pc))
         {
             // Persistent object that is not yet detached so detach it
-            ec.detachObject(pc, state);
+            ec.detachObject(state, pc);
         }
     }
     

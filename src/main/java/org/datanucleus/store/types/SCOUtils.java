@@ -1229,7 +1229,7 @@ public class SCOUtils
         {
             if (api.isPersistable(elements[i]))
             {
-                ownerOP.getExecutionContext().detachObject(elements[i], state);
+                ownerOP.getExecutionContext().detachObject(state, elements[i]);
             }
         }
     }
@@ -1256,7 +1256,7 @@ public class SCOUtils
                 Object object = elements[i];
                 if (api.isPersistable(object))
                 {
-                    detached.add(ownerOP.getExecutionContext().detachObjectCopy(object, state));
+                    detached.add(ownerOP.getExecutionContext().detachObjectCopy(state, object));
                 }
                 else
                 {
@@ -1308,11 +1308,11 @@ public class SCOUtils
             Object key = entry.getKey();
             if (api.isPersistable(key))
             {
-                ownerOP.getExecutionContext().detachObject(key, state);
+                ownerOP.getExecutionContext().detachObject(state, key);
             }
             if (api.isPersistable(val))
             {
-                ownerOP.getExecutionContext().detachObject(val, state);
+                ownerOP.getExecutionContext().detachObject(state, val);
             }
         }
     }
@@ -1335,11 +1335,11 @@ public class SCOUtils
             Object key = entry.getKey();
             if (api.isPersistable(val))
             {
-                val = ownerOP.getExecutionContext().detachObjectCopy(val, state);
+                val = ownerOP.getExecutionContext().detachObjectCopy(state, val);
             }
             if (api.isPersistable(key))
             {
-                key = ownerOP.getExecutionContext().detachObjectCopy(key, state);
+                key = ownerOP.getExecutionContext().detachObjectCopy(state, key);
             }
             detached.put(key, val);
         }

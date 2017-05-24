@@ -1724,7 +1724,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @throws NucleusUserException Thrown if an error occurs during the persist process.
      *     Any exception could have several nested exceptions for each failed object persist
      */
-    public Object[] persistObjects(Object[] objs)
+    public Object[] persistObjects(Object... objs)
     {
         if (objs == null)
         {
@@ -2070,10 +2070,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     /**
      * Method to delete an array of objects from the datastore.
      * @param objs The objects
-     * @throws NucleusUserException Thrown if an error occurs during the deletion process.
-     *     Any exception could have several nested exceptions for each failed object deletion
+     * @throws NucleusUserException Thrown if an error occurs during the deletion process. Any exception could have several nested exceptions for each failed object deletion
      */
-    public void deleteObjects(Object[] objs)
+    public void deleteObjects(Object... objs)
     {
         if (objs == null)
         {
@@ -2551,10 +2550,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * also all the objects which are refered to from this object are detached.
      * If the object is of class that is not detachable a ClassNotDetachableException
      * will be thrown. If the object is not persistent a NucleusUserException is thrown.
-     * @param obj The object
      * @param state State for the detachment process
+     * @param obj The object
      */
-    public void detachObject(Object obj, FetchPlanState state)
+    public void detachObject(FetchPlanState state, Object obj)
     {
         if (getApiAdapter().isDetached(obj))
         {
@@ -2591,15 +2590,74 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.ExecutionContext#detachObjects(org.datanucleus.FetchPlanState, java.lang.Object[])
+     */
+    @Override
+    public void detachObjects(FetchPlanState state, Object... pcs)
+    {
+        if (pcs == null || pcs.length == 0)
+        {
+            return;
+        }
+
+        Collection<ObjectProvider> opsToDetach = new HashSet<>();
+        for (Object pc : pcs)
+        {
+            if (getApiAdapter().isDetached(pc))
+            {
+                // Already detached
+                continue;
+            }
+            else if (!getApiAdapter().isPersistent(pc))
+            {
+                if (runningDetachAllOnTxnEnd && !getMetaDataManager().getMetaDataForClass(pc.getClass(), clr).isDetachable())
+                {
+                    // Object is not detachable, and is now transient (and after commit) so just return
+                    continue;
+                }
+
+                // Transient object passed so persist it before thinking about detaching
+                if (tx.isActive())
+                {
+                    persistObjectInternal(pc, null, null, -1, ObjectProvider.PC);
+                }
+            }
+
+            ObjectProvider op = findObjectProvider(pc);
+            if (op == null)
+            {
+                // Ignore this
+                continue;
+            }
+            opsToDetach.add(op);
+        }
+
+        Iterator<ObjectProvider> iter = opsToDetach.iterator();
+        while (iter.hasNext())
+        {
+            ObjectProvider op = iter.next();
+            op.detach(state);
+
+            // Clear any changes from this since it is now detached
+            if (dirtyOPs.contains(op) || indirectDirtyOPs.contains(op))
+            {
+                NucleusLogger.GENERAL.info(Localiser.msg("010047", StringUtils.toJVMIDString(op.getObject())));
+                clearDirty(op);
+            }
+        }
+
+    }
+
     /**
      * Detach a copy of the passed persistent object using the provided detach state.
      * If the object is of class that is not detachable it will be detached as transient.
      * If it is not yet persistent it will be first persisted.
-     * @param pc The object
      * @param state State for the detachment process
+     * @param pc The object
      * @return The detached object
      */
-    public <T> T detachObjectCopy(T pc, FetchPlanState state)
+    public <T> T detachObjectCopy(FetchPlanState state, T pc)
     {
         T thePC = pc;
         try

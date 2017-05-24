@@ -224,7 +224,7 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public Object[] persistObjects(Object[] objs)
+    public Object[] persistObjects(Object... objs)
     {
         try
         {
@@ -252,7 +252,7 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void deleteObjects(Object[] objs)
+    public void deleteObjects(Object... objs)
     {
         try
         {
@@ -322,13 +322,27 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void detachObject(Object obj, FetchPlanState state)
+    public void detachObject(FetchPlanState state, Object obj)
     {
         try
         {
             lock.lock();
 
-            super.detachObject(obj, state);
+            super.detachObject(state, obj);
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    public void detachObjects(FetchPlanState state, Object... objs)
+    {
+        try
+        {
+            lock.lock();
+
+            super.detachObjects(state, objs);
         }
         finally
         {
@@ -342,7 +356,7 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         {
             lock.lock();
 
-            return super.detachObjectCopy(pc, state);
+            return super.detachObjectCopy(state, pc);
         }
         finally
         {

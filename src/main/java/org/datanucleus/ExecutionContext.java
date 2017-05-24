@@ -303,7 +303,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param pcs The objects to persist
      * @return The persisted objects
      */
-    Object[] persistObjects(Object[] pcs);
+    Object[] persistObjects(Object... pcs);
 
     /**
      * Method to persist the passed object (internally).
@@ -409,7 +409,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * Method to delete an array of objects from the datastore.
      * @param objs The objects to delete
      */
-    void deleteObjects(Object[] objs);
+    void deleteObjects(Object... objs);
 
     /**
      * Method to delete the passed object (internally).
@@ -419,19 +419,26 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Method to detach the passed object.
-     * @param pc The object to detach
      * @param state State for the detachment process.
+     * @param pc The object to detach
      */
-    void detachObject(Object pc, FetchPlanState state);
+    void detachObject(FetchPlanState state, Object pc);
+
+    /**
+     * Method to detach the passed object(s).
+     * @param state State for the detachment process.
+     * @param pcs The object(s) to detach
+     */
+    void detachObjects(FetchPlanState state, Object... pcs);
 
     /**
      * Method to detach a copy of the passed object using the provided state.
-     * @param pc The object
      * @param state State for the detachment process
+     * @param pc The object
      * @param <T> Type of the persistable object
      * @return The detached copy of the object
      */
-    <T> T detachObjectCopy(T pc, FetchPlanState state);
+    <T> T detachObjectCopy(FetchPlanState state, T pc);
 
     /**
      * Method to detach all managed objects.
