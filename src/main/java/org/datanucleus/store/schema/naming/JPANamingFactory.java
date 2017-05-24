@@ -60,6 +60,33 @@ public class JPANamingFactory extends AbstractNamingFactory
     }
 
     /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.naming.NamingFactory#getTableName(org.datanucleus.metadata.AbstractClassMetaData)
+     */
+    public String getTableName(AbstractClassMetaData cmd)
+    {
+        String name = null;
+        if (cmd.getTable() != null)
+        {
+            name = cmd.getTable();
+            // TODO This may have "catalog.schema.name"
+        }
+        if (name == null)
+        {
+            if (cmd.getEntityName() != null)
+            {
+                name = cmd.getEntityName();
+            }
+            else
+            {
+                name = cmd.getName();
+            }
+        }
+
+        // Apply any truncation necessary
+        return prepareIdentifierNameForUse(name, SchemaComponent.TABLE);
+    }
+
+    /* (non-Javadoc)
      * @see org.datanucleus.store.schema.naming.NamingFactory#getTableName(org.datanucleus.metadata.AbstractMemberMetaData)
      */
     public String getTableName(AbstractMemberMetaData mmd)
