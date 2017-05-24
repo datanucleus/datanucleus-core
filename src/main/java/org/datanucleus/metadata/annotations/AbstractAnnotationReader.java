@@ -265,8 +265,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
      * @param clr ClassLoader resolver
      * @return The ClassMetaData (or null if no annotations)
      */
-    protected abstract AbstractClassMetaData processClassAnnotations(PackageMetaData pmd, Class cls, 
-            AnnotationObject[] annotations, ClassLoaderResolver clr);
+    protected abstract AbstractClassMetaData processClassAnnotations(PackageMetaData pmd, Class cls, AnnotationObject[] annotations, ClassLoaderResolver clr);
 
     /**
      * Method to take the passed in outline ClassMetaData and process the annotations for
@@ -277,8 +276,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
      * @param propertyAccessor if has persistent properties
      * @return The FieldMetaData/PropertyMetaData that was added (if any)
      */
-    protected abstract AbstractMemberMetaData processMemberAnnotations(AbstractClassMetaData cmd, Member member, 
-            AnnotationObject[] annotations, boolean propertyAccessor);
+    protected abstract AbstractMemberMetaData processMemberAnnotations(AbstractClassMetaData cmd, Member member, AnnotationObject[] annotations, boolean propertyAccessor);
 
     /**
      * Method to take the passed in outline ClassMetaData and process the annotations for method adding any 
@@ -303,17 +301,29 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
         {
             // Strip out unsupported annotations
             AnnotationManager annMgr = mgr.getAnnotationManager();
-            for (int j=0;j<annotations.length;j++)
+            for (Annotation annotation : annotations)
             {
-                String annName = annotations[j].annotationType().getName();
+                String annName = annotation.annotationType().getName();
                 if (isSupportedAnnotation(annName) || annMgr.getClassAnnotationHasHandler(annName))
                 {
-                    supportedAnnots.add(annotations[j]);
+                    supportedAnnots.add(annotation);
+                }
+                else
+                {
+                    Annotation[] subAnnotations = annotation.annotationType().getAnnotations();
+                    for (Annotation subAnnotation : subAnnotations)
+                    {
+                        annName = subAnnotation.annotationType().getName();
+                        if (isSupportedAnnotation(annName) || annMgr.getClassAnnotationHasHandler(annName))
+                        {
+                            supportedAnnots.add(subAnnotation);
+                        }
+                    }
                 }
             }
         }
-        return getAnnotationObjectsForAnnotations(cls.getName(),
-            supportedAnnots.toArray(new Annotation[supportedAnnots.size()]));
+
+        return getAnnotationObjectsForAnnotations(cls.getName(), supportedAnnots.toArray(new Annotation[supportedAnnots.size()]));
     }
 
     /**
@@ -341,12 +351,24 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                     // Strip out unsupported annotations
                     List<Annotation> supportedAnnots = new ArrayList();
                     AnnotationManager annMgr = mgr.getAnnotationManager();
-                    for (int j=0;j<annotations.length;j++)
+                    for (Annotation annotation : annotations)
                     {
-                        String annName = annotations[j].annotationType().getName();
+                        String annName = annotation.annotationType().getName();
                         if (isSupportedAnnotation(annName) || annMgr.getMemberAnnotationHasHandler(annName))
                         {
-                            supportedAnnots.add(annotations[j]);
+                            supportedAnnots.add(annotation);
+                        }
+                        else
+                        {
+                            Annotation[] subAnnotations = annotation.annotationType().getAnnotations();
+                            for (Annotation subAnnotation : subAnnotations)
+                            {
+                                annName = subAnnotation.annotationType().getName();
+                                if (isSupportedAnnotation(annName) || annMgr.getMemberAnnotationHasHandler(annName))
+                                {
+                                    supportedAnnots.add(subAnnotation);
+                                }
+                            }
                         }
                     }
 
@@ -384,12 +406,24 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
             {
                 // Strip out unsupported annotations
                 AnnotationManager annMgr = mgr.getAnnotationManager();
-                for (int j=0;j<annotations.length;j++)
+                for (Annotation annotation : annotations)
                 {
-                    String annName = annotations[j].annotationType().getName();
+                    String annName = annotation.annotationType().getName();
                     if (isSupportedAnnotation(annName) || annMgr.getMemberAnnotationHasHandler(annName))
                     {
-                        supportedAnnots.add(annotations[j]);
+                        supportedAnnots.add(annotation);
+                    }
+                    else
+                    {
+                        Annotation[] subAnnotations = annotation.annotationType().getAnnotations();
+                        for (Annotation subAnnotation : subAnnotations)
+                        {
+                            annName = subAnnotation.annotationType().getName();
+                            if (isSupportedAnnotation(annName) || annMgr.getMemberAnnotationHasHandler(annName))
+                            {
+                                supportedAnnots.add(subAnnotation);
+                            }
+                        }
                     }
                 }
             }
