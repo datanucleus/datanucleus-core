@@ -19,8 +19,7 @@ package org.datanucleus.metadata.annotations;
 
 /**
  * Representation of a field/method that is annotated.
- * Used by AbstractAnnotationReader to hold the annotations for a field/method when extracting them 
- * for the class.
+ * Used by AbstractAnnotationReader to hold the annotations for a field/method when extracting them for the class.
  */
 class AnnotatedMember
 {
@@ -69,7 +68,7 @@ class AnnotatedMember
     }
 
     /**
-     * Method to add more annotations for this field.
+     * Method to add more annotations for this member.
      * @param annotations Annotations to add
      */
     public void addAnnotations(AnnotationObject[] annotations)

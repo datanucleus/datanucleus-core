@@ -38,7 +38,7 @@ public interface AnnotationReader
      * @param cls The class
      * @param pmd MetaData for the owning package (that this will be a child of)
      * @param clr ClassLoader resolver
-     * @return The ClassMetaData (unpopulated and unitialised)
+     * @return The ClassMetaData (unpopulated and uninitialised)
      */
     public AbstractClassMetaData getMetaDataForClass(Class cls, PackageMetaData pmd, ClassLoaderResolver clr);
 }

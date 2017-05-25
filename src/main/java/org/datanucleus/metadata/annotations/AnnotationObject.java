@@ -22,8 +22,7 @@ import java.util.Map;
 
 /**
  * Wrapper for an annotation and its various properties etc.
- * This could represent, for example, "javax.persistence.Entity"
- * and have a map with one key "name".
+ * This could represent, for example, "javax.persistence.Entity" and have a map with one key "name".
  */
 public class AnnotationObject
 {
