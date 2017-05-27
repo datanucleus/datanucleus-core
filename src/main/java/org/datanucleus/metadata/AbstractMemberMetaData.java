@@ -1077,7 +1077,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             // Can't be not indexed and have index metadata, so just obey overriding flag
             indexMetaData = null;
         }
-        if (uniqueMetaData == null && uniqueConstraint)
+        if (uniqueMetaData == null && uniqueConstraint && joinMetaData == null)
         {
             uniqueMetaData = new UniqueMetaData();
             uniqueMetaData.setTable(column);
