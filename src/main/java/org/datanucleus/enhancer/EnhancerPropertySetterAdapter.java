@@ -63,7 +63,9 @@ import org.datanucleus.util.Localiser;
  *     dnSetXXX(zzz);
  * }
  * </pre>
- * There are other variants for MEDIATE_WRITE and NORMAL_WRITE
+ * There are other variants for MEDIATE_WRITE and NORMAL_WRITE.
+ * 
+ * TODO Consider supporting the fluent-style of JavaBean setter method, which returns the instance of the class. This class will need updates for that.
  */
 public class EnhancerPropertySetterAdapter extends MethodVisitor
 {
