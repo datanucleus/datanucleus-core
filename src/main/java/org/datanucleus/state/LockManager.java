@@ -17,60 +17,28 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.state;
 
+import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.VersionMetaData;
+import org.datanucleus.metadata.VersionStrategy;
 
 /**
  * Interface defining a manager for locking of objects.
  * There are currently two modes to a LockManager.
  * <ol>
- * <li>Where the user has the object and wants it locking. In this case they provide the ObjectProvider
- * and we lock it (by a call to the datastore where appropriate).</li>
- * <li>Where the user wants to do a find of an object with a particular id. In this case we register the
- * identity as needing this lock level, and the datastore will be called to retrieve the object and will check
- * back what lock level to use.</li>
+ * <li>Where the user has the object and wants it locking. In this case they provide the ObjectProvider and we lock it (by a call to the datastore where appropriate).</li>
+ * <li>Where the user wants to do a find of an object with a particular id. In this case we register the identity as needing this lock level, 
+ * and the datastore will be called to retrieve the object and will check back what lock level to use.</li>
  * </ol>
+ * The LockManager controls all aspects of what objects need any form of locking, the updates to versions, and version checking (optimistic locking).
  */
 public interface LockManager
 {
-    /** Lock mode representing no locking. */
-    public static final short LOCK_MODE_NONE = 0;
-
-    /** Lock mode for optimistic reads. */
-    public static final short LOCK_MODE_OPTIMISTIC_READ = 1;
-
-    /** Lock mode for optimistic writes (lock + update version). */
-    public static final short LOCK_MODE_OPTIMISTIC_WRITE = 2;
-
-    /** Lock mode for pessimistic reads. */
-    public static final short LOCK_MODE_PESSIMISTIC_READ = 3;
-
-    /** Lock mode for pessimistic writes (lock + version update). */
-    public static final short LOCK_MODE_PESSIMISTIC_WRITE = 4;
-
-    /**
-     * Method to lock the object with the provided identity (mode 2).
-     * @param id Identity of the object
-     * @param lockMode mode for locking
-     */
-    void lock(Object id, short lockMode);
-
-    /**
-     * Accessor for what locking should be applied to the object with the specified identity (mode 2).
-     * @param id The identity
-     * @return The lock mode to apply (NONE if nothing defined)
-     */
-    short getLockMode(Object id);
-
-    /**
-     * Method to clear all settings of required lock level for object ids (mode 2).
-     */
-    void clear();
-
     /**
      * Method to lock the object managed by the passed ObjectProvider (mode 1).
      * @param op ObjectProvider for the object
      * @param lockMode mode for locking
      */
-    void lock(ObjectProvider op, short lockMode);
+    void lock(ObjectProvider op, LockMode lockMode);
 
     /**
      * Method to unlock the object managed by the passed ObjectProvider (mode 1).
@@ -83,10 +51,45 @@ public interface LockManager
      * @param op ObjectProvider for the object
      * @return The lock mode
      */
-    short getLockMode(ObjectProvider op);
+    LockMode getLockMode(ObjectProvider op);
+
+    /**
+     * Method to lock the object with the provided identity (mode 2).
+     * @param id Identity of the object
+     * @param lockMode mode for locking
+     */
+    void lock(Object id, LockMode lockMode);
+
+    /**
+     * Accessor for what locking should be applied to the object with the specified identity (mode 2).
+     * @param id The identity
+     * @return The lock mode to apply (NONE if nothing defined)
+     */
+    LockMode getLockMode(Object id);
+
+    /**
+     * Method to clear all settings of required lock level.
+     */
+    void clear();
 
     /**
      * Method to close the manager and release resources.
      */
     void close();
+
+    /**
+     * Method to perform an optimistic version check on the specified ObjectProvider.
+     * @param op ObjectProvider
+     * @param versionStrategy The version strategy in use
+     * @param versionDatastore Version of the object in the datastore
+     */
+    void performOptimisticVersionCheck(ObjectProvider op, VersionStrategy versionStrategy, Object versionDatastore);
+
+    /**
+     * Convenience method to provide the next version to use given the VersionMetaData and the current version.
+     * @param currentVersion The current version
+     * @return The next version
+     * @throws NucleusUserException Thrown if the strategy is not supported.
+     */
+    Object getNextVersion(VersionMetaData vermd, Object currentVersion);
 }

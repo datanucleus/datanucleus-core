@@ -29,14 +29,11 @@ import org.datanucleus.exceptions.ClassNotPersistableException;
 import org.datanucleus.exceptions.NoPersistenceInformationException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusOptimisticException;
-import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.flush.Operation;
 import org.datanucleus.flush.OperationQueue;
 import org.datanucleus.management.ManagerStatistics;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
-import org.datanucleus.metadata.VersionMetaData;
-import org.datanucleus.metadata.VersionStrategy;
 import org.datanucleus.state.CallbackHandler;
 import org.datanucleus.state.LockManager;
 import org.datanucleus.state.ObjectProvider;
@@ -977,23 +974,4 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /** Close the callback handler, and disconnect any registered instance listeners. Used by JCA. */
     void closeCallbackHandler();
-
-    /**
-     * Convenience method to provide the next version, using the version strategy given the supplied current version.
-     * @param vermd Metadata defining the version and its strategy
-     * @param currentVersion The current version
-     * @return The next version
-     * @throws NucleusUserException Thrown if the strategy is not supported.
-     */
-    Object getNextVersion(VersionMetaData vermd, Object currentVersion);
-
-    /**
-     * Perform an optimistic version check on the passed object, against the passed version in the datastore.
-     * @param op ObjectProvider of the object to check
-     * @param versionStrategy The strategy
-     * @param versionDatastore Version of the object in the datastore
-     * @throws NucleusUserException thrown when an invalid strategy is specified
-     * @throws NucleusOptimisticException thrown when the version check fails
-     */
-    void performVersionCheck(ObjectProvider op, VersionStrategy versionStrategy, Object versionDatastore);
 }

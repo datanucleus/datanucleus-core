@@ -647,23 +647,6 @@ public interface ObjectProvider<T> extends StateManager
      */
     boolean isVersionLoaded();
 
-    /**
-     * Method to lock the object owned by this ObjectProvider.
-     * @param lockMode Lock mode to apply
-     */
-    void lock(short lockMode);
-
-    /**
-     * Method to unlock the object owned by this ObjectProvider (if locked).
-     */
-    void unlock();
-
-    /**
-     * Accessor for the current lock mode.
-     * @return Lock mode
-     */
-    short getLockMode();
-
     void evictFromTransaction();
 
     void enlistInTransaction();

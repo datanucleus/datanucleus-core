@@ -211,9 +211,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /** Lock object to synchronise execution when reading/writing fields. */
     protected Lock lock = null;
 
-    /** The current lock mode for this object. */
-    protected short lockMode = 0;
-
     /** Flags of the persistable instance when the instance is enlisted in the transaction. */
     protected byte savedFlags;
 
@@ -278,7 +275,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         dirty = false;
         myFP = myEC.getFetchPlan().getFetchPlanForClass(cmd);
         lock = new ReentrantLock();
-        lockMode = LockManager.LOCK_MODE_NONE;
         savedFlags = 0;
         savedLoadedFields = null;
         objectType = 0;
@@ -1129,8 +1125,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     }
 
     /**
-     * This method is invoked just after a commit is performed in a Transaction
-     * involving the persistable object managed by this StateManager
+     * This method is invoked just after a commit is performed in a Transaction involving the persistable object managed by this StateManager
      * @param tx The transaction
      */
     public void postCommit(org.datanucleus.Transaction tx)
@@ -1143,7 +1138,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             {
                 myVersion = transactionalVersion;
             }
-            this.lockMode = LockManager.LOCK_MODE_NONE;
         }
         finally
         {
@@ -1152,8 +1146,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     }
 
     /**
-     * This method is invoked just before a rollback is performed in a Transaction
-     * involving the persistable object managed by this StateManager.
+     * This method is invoked just before a rollback is performed in a Transaction involving the persistable object managed by this StateManager.
      * @param tx The transaction
      */
     public void preRollback(org.datanucleus.Transaction tx)
@@ -1167,7 +1160,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             {
                 transactionalVersion = myVersion;
             }
-            this.lockMode = LockManager.LOCK_MODE_NONE;
         }
         finally
         {
@@ -1970,21 +1962,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             // Beyond the scope of the fetch-depth when detaching
             return null;
         }
-    }
-
-    public void lock(short lockMode)
-    {
-        this.lockMode = lockMode;
-    }
-
-    public void unlock()
-    {
-        this.lockMode = LockManager.LOCK_MODE_NONE;
-    }
-
-    public short getLockMode()
-    {
-        return lockMode;
     }
 
     /**

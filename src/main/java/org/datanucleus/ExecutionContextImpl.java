@@ -22,7 +22,6 @@ package org.datanucleus;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -71,15 +70,14 @@ import org.datanucleus.management.ManagerStatistics;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
-import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.TransactionType;
 import org.datanucleus.metadata.UniqueMetaData;
 import org.datanucleus.metadata.VersionMetaData;
-import org.datanucleus.metadata.VersionStrategy;
 import org.datanucleus.properties.BasePropertyStore;
 import org.datanucleus.state.CallbackHandler;
 import org.datanucleus.state.LockManager;
 import org.datanucleus.state.LockManagerImpl;
+import org.datanucleus.state.LockMode;
 import org.datanucleus.state.NullCallbackHandler;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.state.RelationshipManager;
@@ -343,6 +341,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             pbrAtCommitHandler = new ReachabilityAtCommitHandler(this);
         }
+
+        lockMgr = new LockManagerImpl(this);
 
         l2CacheObjectsToEvictUponRollback = null;
 
@@ -800,10 +800,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     public LockManager getLockManager()
     {
-        if (lockMgr == null)
-        {
-            lockMgr = new LockManagerImpl();
-        }
         return lockMgr;
     }
 
@@ -4055,8 +4051,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             while (opIter.hasNext())
             {
                 ObjectProvider op = opIter.next();
+                LockMode lockMode = getLockManager().getLockMode(op);
                 if (op.isFlushedToDatastore() && op.getClassMetaData().isVersioned() && 
-                        (op.getLockMode() == LockManager.LOCK_MODE_OPTIMISTIC_WRITE || op.getLockMode() == LockManager.LOCK_MODE_PESSIMISTIC_WRITE))
+                        (lockMode == LockMode.LOCK_OPTIMISTIC_WRITE || lockMode == LockMode.LOCK_PESSIMISTIC_WRITE))
                 {
                     // Not dirty, but locking requires a version update, so force it
                     VersionMetaData vermd = op.getClassMetaData().getVersionMetaDataForClass();
@@ -4519,6 +4516,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             operationQueue.clear();
         }
         opAttachDetachObjectReferenceMap = null;
+
+        // Clear any locking requirements
+        lockMgr.clear();
     }
 
     // -------------------------------------- Cache Management ---------------------------------------
@@ -5737,133 +5737,5 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             return opAssociatedValuesMapByOP.get(op).containsKey(key);
         }
         return false;
-    }
-
-    /**
-     * Perform an optimistic version check on the passed object, against the passed version in the datastore.
-     * @param op ObjectProvider of the object to check
-     * @param versionStrategy Version strategy
-     * @param versionDatastore Version of the object in the datastore
-     * @throws NucleusUserException thrown when an invalid strategy is specified
-     * @throws NucleusOptimisticException thrown when the version check fails
-     */
-    public void performVersionCheck(ObjectProvider op, VersionStrategy versionStrategy, Object versionDatastore)
-    {
-        // Extract the version of the object (that we are updating)
-        Object versionObject = op.getTransactionalVersion();
-        if (versionObject == null)
-        {
-            return;
-        }
-
-        if (versionStrategy == null)
-        {
-            // No version specification so no check needed
-            NucleusLogger.PERSISTENCE.info(op.getClassMetaData().getFullClassName() + 
-                " has no version metadata so no check of version is required, since this will not have the version flag in its table");
-            return;
-        }
-
-        boolean valid;
-        if (versionStrategy == VersionStrategy.DATE_TIME)
-        {
-            valid = ((Timestamp)versionObject).getTime() == ((Timestamp)versionDatastore).getTime();
-        }
-        else if (versionStrategy == VersionStrategy.VERSION_NUMBER)
-        {
-            valid = ((Number)versionObject).longValue() == ((Number)versionDatastore).longValue();
-        }
-        else if (versionStrategy == VersionStrategy.STATE_IMAGE)
-        {
-            // TODO Support state-image strategy
-            throw new NucleusUserException(Localiser.msg("032017", op.getClassMetaData().getFullClassName(), versionStrategy));
-        }
-        else
-        {
-            throw new NucleusUserException(Localiser.msg("032017", op.getClassMetaData().getFullClassName(), versionStrategy));
-        }
-
-        if (!valid)
-        {
-            throw new NucleusOptimisticException(Localiser.msg("032016", op.getObjectAsPrintable(), op.getInternalObjectId(), "" + versionDatastore, "" + versionObject), op.getObject());
-        }
-    }
-
-    /**
-     * Convenience method to provide the next version, using the version strategy given the supplied current version.
-     * @param currentVersion The current version
-     * @return The next version
-     * @throws NucleusUserException Thrown if the strategy is not supported.
-     */
-    public Object getNextVersion(VersionMetaData vermd, Object currentVersion)
-    {
-        if (vermd == null)
-        {
-            return null;
-        }
-
-        VersionStrategy versionStrategy = vermd.getVersionStrategy();
-        if (versionStrategy == null)
-        {
-            return null;
-        }
-        else if (versionStrategy == VersionStrategy.NONE)
-        {
-            // Set an initial value, otherwise return the current value
-            if (currentVersion == null)
-            {
-                if (vermd.getFieldName() != null)
-                {
-                    AbstractMemberMetaData verMmd = ((AbstractClassMetaData)vermd.getParent()).getMetaDataForMember(vermd.getFieldName());
-                    if (verMmd.getType() == Integer.class || verMmd.getType() == int.class)
-                    {
-                        return Integer.valueOf(1);
-                    }
-                }
-                return Long.valueOf(1); // Assumed to be numeric
-            }
-            return currentVersion;
-        }
-        else if (versionStrategy == VersionStrategy.DATE_TIME)
-        {
-            return new Timestamp(System.currentTimeMillis());
-        }
-        else if (versionStrategy == VersionStrategy.VERSION_NUMBER)
-        {
-            if (currentVersion == null)
-            {
-                // Get the initial value from the VersionMetaData extension if provided, otherwise the global default (for the context)
-                Integer initValue = getIntProperty(PropertyNames.PROPERTY_VERSION_NUMBER_INITIAL_VALUE);
-                if (vermd.hasExtension(MetaData.EXTENSION_VERSION_NUMBER_INITIAL_VALUE))
-                {
-                    initValue = Integer.valueOf(vermd.getValueForExtension(MetaData.EXTENSION_VERSION_NUMBER_INITIAL_VALUE));
-                }
-
-                if (vermd.getFieldName() != null)
-                {
-                    AbstractMemberMetaData verMmd = ((AbstractClassMetaData)vermd.getParent()).getMetaDataForMember(vermd.getFieldName());
-                    if (verMmd.getType() == Integer.class || verMmd.getType() == int.class)
-                    {
-                        return initValue;
-                    }
-                }
-                return Long.valueOf(initValue);
-            }
-
-            if (currentVersion instanceof Integer)
-            {
-                return Integer.valueOf(((Integer)currentVersion).intValue()+1);
-            }
-            return Long.valueOf(((Long)currentVersion).longValue()+1);
-        }
-        else if (versionStrategy == VersionStrategy.STATE_IMAGE)
-        {
-            // TODO Support state-image strategy
-            throw new NucleusUserException("DataNucleus doesnt currently support version strategy \"state-image\"");
-        }
-        else
-        {
-            throw new NucleusUserException("Unknown version strategy - not supported");
-        }
     }
 }
