@@ -87,6 +87,7 @@ public interface LockManager
 
     /**
      * Convenience method to provide the next version to use given the VersionMetaData and the current version.
+     * @param vermd Version metadata
      * @param currentVersion The current version
      * @return The next version
      * @throws NucleusUserException Thrown if the strategy is not supported.

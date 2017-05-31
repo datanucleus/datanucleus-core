@@ -50,6 +50,7 @@ public class CDIHandler
      * Method to instantiate an object of the specified type with injected dependencies.
      * @param cls The type to instantiate
      * @return The instance
+     * @param <T> Type of the object
      */
     public <T> T createObjectWithInjectedDependencies(Class<T> cls)
     {

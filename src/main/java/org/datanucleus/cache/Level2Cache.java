@@ -29,7 +29,6 @@ import java.util.Map;
  * Provides the typical controls required internally and including the JDO/JPA L2 cache methods.
  * JDO and JPA allow the use of a level 2 (L2) cache, with the cache shared between PersistenceManagers/EntityManagers. 
  * The objects in the level 2 cache don't pertain to any one manager.
- * </p>
  * <p>
  * The L2 cache stores an object of type <i>org.datanucleus.cache.CachedPC</i> and is keyed by the identity of the object. 
  * The <i>CachedPC</i> contains the values of fields of a persistable object, together with the indicators for which fields are loaded.
