@@ -129,15 +129,28 @@ public class AnnotationManagerImpl implements AnnotationManager
 
         // Find an annotation reader for this classes annotations (if we have one)
         String readerClassName = null;
-        for (int i=0;i<annotations.length;i++)
+        for (Annotation annotation : annotations)
         {
-            String reader = annotationReaderLookup.get(annotations[i].annotationType().getName());
+            String reader = annotationReaderLookup.get(annotation.annotationType().getName());
             if (reader != null)
             {
                 readerClassName = reader;
                 break;
             }
+
+            // Try any sub-annotations in case this is a meta-annotation
+            Annotation[] subAnnotations = annotation.annotationType().getAnnotations();
+            for (Annotation subAnnotation : subAnnotations)
+            {
+                reader = annotationReaderLookup.get(subAnnotation.annotationType().getName());
+                if (reader != null)
+                {
+                    readerClassName = reader;
+                    break;
+                }
+            }
         }
+
         if (readerClassName == null)
         {
             NucleusLogger.METADATA.debug(Localiser.msg("044202", cls.getName()));
