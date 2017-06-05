@@ -56,6 +56,7 @@ import org.datanucleus.exceptions.ObjectDetachedException;
 import org.datanucleus.exceptions.RollbackStateTransitionException;
 import org.datanucleus.exceptions.TransactionActiveOnCloseException;
 import org.datanucleus.exceptions.TransactionNotActiveException;
+import org.datanucleus.flush.FlushMode;
 import org.datanucleus.flush.FlushProcess;
 import org.datanucleus.flush.Operation;
 import org.datanucleus.flush.OperationQueue;
@@ -158,6 +159,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     /** Current transaction */
     private Transaction tx;
+
+    /** The current flush mode, if it is defined. */
+    private FlushMode flushMode = null;
 
     /** Cache of ObjectProviders enlisted in the current transaction, keyed by the object id. */
     private Map<Object, ObjectProvider> enlistedOPCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
@@ -881,7 +885,26 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 }
             }
         }
-        // TODO Do same for PBR at commit
+        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_PERSISTENCE_BY_REACHABILITY_AT_COMMIT))
+        {
+            if (pbrAtCommitHandler != null)
+            {
+                if ("false".equalsIgnoreCase((String)value))
+                {
+                    // Turn off PBR at commit if enabled
+                    pbrAtCommitHandler = null;
+                }
+                else if ("true".equalsIgnoreCase((String)value))
+                {
+                    pbrAtCommitHandler = new ReachabilityAtCommitHandler(this);
+                }
+            }
+        }
+        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_FLUSH_MODE))
+        {
+            flushMode = FlushMode.getFlushModeForString((String) value);
+            return;
+        }
 
         if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
         {
@@ -984,37 +1007,51 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return false;
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.ExecutionContext#getFlushMode()
+     */
+    @Override
+    public FlushMode getFlushMode()
+    {
+        return flushMode;
+    }
+
     /**
      * Whether the datastore operations are delayed until commit/flush. 
-     * In optimistic transactions this is automatically enabled. In datastore transactions there is a
-     * persistence property to enable it.
+     * In optimistic transactions this is automatically enabled. In datastore transactions there is a persistence property to enable it.
      * If we are committing/flushing then will return false since the delay is no longer required.
      * @return true if datastore operations are delayed until commit/flush
      */
     public boolean isDelayDatastoreOperationsEnabled()
     {
+        if (!tx.isActive())
+        {
+            // Non-transactional usage
+            if (isFlushing())
+            {
+                return false;
+            }
+            return !isNonTxAtomic();
+        }
+
+        // Transactional usage
         if (isFlushing() || tx.isCommitting())
         {
             // Already sending to the datastore so return false to not confuse things
             return false;
         }
 
-        String flushModeString = (String) getProperty(PropertyNames.PROPERTY_FLUSH_MODE);
-        if (flushModeString != null)
+        if (flushMode == FlushMode.AUTO)
         {
-            // User has overridden any default behaviour
-            return !flushModeString.equalsIgnoreCase("AUTO");
+            return false;
+        }
+        else if (flushMode == FlushMode.MANUAL || flushMode == FlushMode.QUERY)
+        {
+            return true;
         }
 
-        // Default behaviour
-        if (tx.isActive())
-        {
-            // We delay ops with optimistic, and don't (currently) with datastore txns
-            return tx.getOptimistic();
-        }
-
-        // Delay ops if not atomic flushing
-        return !isNonTxAtomic();
+        // Default behaviour - delay ops with optimistic, and don't (currently) with datastore txns
+        return tx.getOptimistic();
     }
 
     /**

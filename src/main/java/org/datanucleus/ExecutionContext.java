@@ -29,6 +29,7 @@ import org.datanucleus.exceptions.ClassNotPersistableException;
 import org.datanucleus.exceptions.NoPersistenceInformationException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusOptimisticException;
+import org.datanucleus.flush.FlushMode;
 import org.datanucleus.flush.Operation;
 import org.datanucleus.flush.OperationQueue;
 import org.datanucleus.management.ManagerStatistics;
@@ -517,13 +518,6 @@ public interface ExecutionContext extends ExecutionContextReference
     void clearDirty();
 
     /**
-     * Whether the datastore operations are delayed until commit.
-     * In optimistic transactions this is automatically enabled.
-     * @return true if datastore operations are delayed until commit
-     */
-    boolean isDelayDatastoreOperationsEnabled();
-
-    /**
      * Method to process any outstanding non-transactional updates that are queued.
      * If "datanucleus.nontx.atomic" is false, or currently in a transaction then returns immediately.
      * Otherwise will flush any updates that are outstanding (updates to an object), will perform detachAllOnCommit
@@ -715,6 +709,19 @@ public interface ExecutionContext extends ExecutionContextReference
      * @return Whether it is currently flushing
      */
     boolean isFlushing();
+
+    /**
+     * Accessor for the flush mode. Whether to auto-commit, or whether to delay flushing.
+     * @return The flush mode.
+     */
+    FlushMode getFlushMode();
+
+    /**
+     * Whether the datastore operations are delayed until commit.
+     * In optimistic transactions this is automatically enabled.
+     * @return true if datastore operations are delayed until commit
+     */
+    boolean isDelayDatastoreOperationsEnabled();
 
     /**
      * Accessor for whether this ExecutionContext is currently running detachAllOnCommit.

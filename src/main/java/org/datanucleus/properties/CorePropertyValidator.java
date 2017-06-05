@@ -58,7 +58,8 @@ public class CorePropertyValidator implements PropertyValidator
             {
                 String strVal = (String)value;
                 if (strVal.equalsIgnoreCase("Auto") ||
-                    strVal.equalsIgnoreCase("Manual"))
+                    strVal.equalsIgnoreCase("Manual") ||
+                    strVal.equalsIgnoreCase("Query"))
                 {
                     return true;
                 }

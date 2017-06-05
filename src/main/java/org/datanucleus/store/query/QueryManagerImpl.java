@@ -35,6 +35,7 @@ import org.datanucleus.Configuration;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.flush.FlushMode;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.query.QueryUtils;
@@ -259,6 +260,13 @@ public class QueryManagerImpl implements QueryManager
                     throw new NucleusException(Localiser.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
                 }
             }
+
+            if (ec.getFlushMode() == FlushMode.QUERY)
+            {
+                // Flush mode implies flush all before executing the query so set the necessary property
+                q.addExtension(Query.EXTENSION_FLUSH_BEFORE_EXECUTION, Boolean.TRUE);
+            }
+
             return q;
         }
         catch (InvocationTargetException e)
