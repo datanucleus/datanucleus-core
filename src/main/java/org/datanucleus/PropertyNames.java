@@ -98,7 +98,7 @@ public class PropertyNames
     public static final String PROPERTY_TRANSACTION_NONTX_ATOMIC = "datanucleus.transaction.nontx.atomic";
 
     public static final String PROPERTY_FLUSH_MODE = "datanucleus.flush.mode";
-    public static final String PROPERTY_FLUSH_AUTO_OBJECT_LIMIT = "datanucleus.datastoreTransactionFlushLimit"; // TODO Rename to datanucleus.flush.autoObjectLimit
+    public static final String PROPERTY_FLUSH_AUTO_OBJECT_LIMIT = "datanucleus.flush.auto.objectLimit";
 
     public static final String PROPERTY_ATTACH_SAME_DATASTORE = "datanucleus.attachSameDatastore";
     public static final String PROPERTY_DETACH_ALL_ON_COMMIT = "datanucleus.DetachAllOnCommit";
