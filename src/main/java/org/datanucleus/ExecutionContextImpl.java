@@ -4084,27 +4084,26 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (cache.size() > 0)
         {
             // Check for objects that are managed but not dirty, yet require a version update
-            Iterator<ObjectProvider> opIter = cache.values().iterator();
-            while (opIter.hasNext())
+            Collection<ObjectProvider> cachedOPs = new HashSet<>(cache.values());
+            for (ObjectProvider cachedOP : cachedOPs)
             {
-                ObjectProvider op = opIter.next();
-                LockMode lockMode = getLockManager().getLockMode(op);
-                if (op.isFlushedToDatastore() && op.getClassMetaData().isVersioned() && 
+                LockMode lockMode = getLockManager().getLockMode(cachedOP);
+                if (cachedOP.isFlushedToDatastore() && cachedOP.getClassMetaData().isVersioned() && 
                         (lockMode == LockMode.LOCK_OPTIMISTIC_WRITE || lockMode == LockMode.LOCK_PESSIMISTIC_WRITE))
                 {
                     // Not dirty, but locking requires a version update, so force it
-                    VersionMetaData vermd = op.getClassMetaData().getVersionMetaDataForClass();
+                    VersionMetaData vermd = cachedOP.getClassMetaData().getVersionMetaDataForClass();
                     if (vermd != null)
                     {
                         if (vermd.getFieldName() != null)
                         {
-                            op.makeDirty((Persistable) op.getObject(), vermd.getFieldName());
-                            dirtyOPs.add(op);
+                            cachedOP.makeDirty((Persistable) cachedOP.getObject(), vermd.getFieldName());
+                            dirtyOPs.add(cachedOP);
                         }
                         else
                         {
                             // TODO Cater for surrogate version
-                            NucleusLogger.PERSISTENCE.warn("We do not support forced version update with surrogate version columns : " + op);
+                            NucleusLogger.PERSISTENCE.warn("We do not support forced version update with surrogate version columns : " + cachedOP);
                         }
                     }
                 }

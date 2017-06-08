@@ -379,9 +379,9 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         {
             return;
         }
-
+/*
         if (mmgr != null)
-        {
+        {*/
             // Set defaults for cascading when not yet set
             ApiAdapter apiAdapter = mmgr.getNucleusContext().getApiAdapter();
             if (cascadePersist == null)
@@ -403,8 +403,8 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             if (cascadeRefresh == null)
             {
                 cascadeRefresh = apiAdapter.getDefaultCascadeRefreshForField();
-            }
-        }
+            }/*
+        }*/
 
         if (field == null && method == null)
         {
