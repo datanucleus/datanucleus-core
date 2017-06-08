@@ -293,12 +293,16 @@ public class XMLAutoStarter extends AbstractAutoStartMechanism
         }
         finally
         {
-            try
+            if (os != null)
             {
-                os.close();
+                try
+                {
+                    os.close();
+                    os = null;
+                }
+                catch (IOException ioe)
+                {}
             }
-            catch (IOException ioe)
-            {}
         }
     }
 }

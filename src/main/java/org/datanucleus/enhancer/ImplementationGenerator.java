@@ -222,14 +222,17 @@ public class ImplementationGenerator
         }
         finally
         {
-            try
+            if (out != null)
             {
-                out.close();
-                out = null;
-            }
-            catch (Exception ignore)
-            {
-                // ignore exception in closing the stream
+                try
+                {
+                    out.close();
+                    out = null;
+                }
+                catch (Exception ignore)
+                {
+                    // ignore exception in closing the stream
+                }
             }
         }
     }
