@@ -459,14 +459,18 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
     {
         V oldValue = delegate.put(key, value);
         makeDirty();
-        if (SCOUtils.useQueuedUpdate(ownerOP))
-        {
-            ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), key, value));
-        }
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerOP != null)
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            if (SCOUtils.useQueuedUpdate(ownerOP))
+            {
+                ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), key, value));
+            }
+
+            if (!ownerOP.getExecutionContext().getTransaction().isActive())
+            {
+                ownerOP.getExecutionContext().processNontransactionalUpdate();
+            }
         }
         return oldValue;
     }
@@ -479,19 +483,23 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
     {
         delegate.putAll(m);
         makeDirty();
-        if (SCOUtils.useQueuedUpdate(ownerOP))
-        {
-            Iterator<Map.Entry> entryIter = m.entrySet().iterator();
-            while (entryIter.hasNext())
-            {
-                Map.Entry entry = entryIter.next();
-                ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), entry.getKey(), entry.getValue()));
-            }
-        }
 
-        if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+        if (ownerOP != null)
         {
-            ownerOP.getExecutionContext().processNontransactionalUpdate();
+            if (SCOUtils.useQueuedUpdate(ownerOP))
+            {
+                Iterator<Map.Entry> entryIter = m.entrySet().iterator();
+                while (entryIter.hasNext())
+                {
+                    Map.Entry entry = entryIter.next();
+                    ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, ownerMmd.getAbsoluteFieldNumber(), entry.getKey(), entry.getValue()));
+                }
+            }
+
+            if (!ownerOP.getExecutionContext().getTransaction().isActive())
+            {
+                ownerOP.getExecutionContext().processNontransactionalUpdate();
+            }
         }
     }
 
