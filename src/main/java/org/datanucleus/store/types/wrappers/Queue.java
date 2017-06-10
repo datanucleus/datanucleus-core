@@ -503,9 +503,18 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      **/
     public synchronized boolean removeAll(java.util.Collection elements)
     {
+        if (elements == null)
+        {
+            throw new NullPointerException();
+        }
+        else if (elements.isEmpty())
+        {
+            return true;
+        }
+
         boolean success = delegate.removeAll(elements);
 
-        if (ownerOP != null && elements != null && !elements.isEmpty())
+        if (ownerOP != null)
         {
             // Cascade delete
             if (SCOUtils.useQueuedUpdate(ownerOP))

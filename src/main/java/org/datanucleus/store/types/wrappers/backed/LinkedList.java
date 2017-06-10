@@ -960,6 +960,15 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
      **/
     public boolean removeAll(Collection elements)
     {
+        if (elements == null)
+        {
+            throw new NullPointerException();
+        }
+        else if (elements.isEmpty())
+        {
+            return true;
+        }
+
         makeDirty();
 
         if (useCache)

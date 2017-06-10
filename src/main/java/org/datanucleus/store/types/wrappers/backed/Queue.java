@@ -781,6 +781,15 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
      **/
     public synchronized boolean removeAll(java.util.Collection elements)
     {
+        if (elements == null)
+        {
+            throw new NullPointerException();
+        }
+        else if (elements.isEmpty())
+        {
+            return true;
+        }
+
         makeDirty();
  
         if (useCache)

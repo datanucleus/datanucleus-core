@@ -1048,6 +1048,15 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
      */
     public synchronized boolean removeAll(Collection elements)
     {
+        if (elements == null)
+        {
+            throw new NullPointerException();
+        }
+        else if (elements.isEmpty())
+        {
+            return true;
+        }
+
         makeDirty();
 
         if (useCache)

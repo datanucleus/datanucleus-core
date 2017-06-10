@@ -566,20 +566,30 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      **/
     public boolean removeAll(java.util.Collection elements)
     {
-        boolean success = delegate.removeAll(elements);
-        if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
+        if (elements == null)
         {
-            // Relationship management
-            Iterator iter = elements.iterator();
-            RelationshipManager relMgr = ownerOP.getExecutionContext().getRelationshipManager(ownerOP);
-            while (iter.hasNext())
-            {
-                relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), iter.next());
-            }
+            throw new NullPointerException();
+        }
+        else if (elements.isEmpty())
+        {
+            return true;
         }
 
-        if (ownerOP != null && elements != null && !elements.isEmpty())
+        boolean success = delegate.removeAll(elements);
+
+        if (ownerOP != null)
         {
+            if (ownerOP.getExecutionContext().getManageRelations())
+            {
+                // Relationship management
+                Iterator iter = elements.iterator();
+                RelationshipManager relMgr = ownerOP.getExecutionContext().getRelationshipManager(ownerOP);
+                while (iter.hasNext())
+                {
+                    relMgr.relationRemove(ownerMmd.getAbsoluteFieldNumber(), iter.next());
+                }
+            }
+
             // Cascade delete
             if (SCOUtils.useQueuedUpdate(ownerOP))
             {

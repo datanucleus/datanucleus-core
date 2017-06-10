@@ -528,9 +528,18 @@ public class PriorityQueue<E> extends java.util.PriorityQueue<E> implements SCOC
      */
     public boolean removeAll(java.util.Collection elements)
     {
+        if (elements == null)
+        {
+            throw new NullPointerException();
+        }
+        else if (elements.isEmpty())
+        {
+            return true;
+        }
+
         boolean success = delegate.removeAll(elements);
 
-        if (ownerOP != null && elements != null && !elements.isEmpty())
+        if (ownerOP != null)
         {
             // Cascade delete
             if (SCOUtils.useQueuedUpdate(ownerOP))

@@ -942,6 +942,15 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      */
     public boolean removeAll(Collection elements)
     {
+        if (elements == null)
+        {
+            throw new NullPointerException();
+        }
+        else if (elements.isEmpty())
+        {
+            return true;
+        }
+
         makeDirty();
 
         if (useCache)
