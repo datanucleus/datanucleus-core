@@ -176,7 +176,10 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
         }
 
         E obj = retrieveObjectForIndex(index);
-        itemsByIndex.put(index, obj);
+        if (itemsByIndex != null)
+        {
+            itemsByIndex.put(index, obj);
+        }
         return obj;
     }
 

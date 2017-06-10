@@ -231,8 +231,7 @@ public class EnhancerClassAdapter extends ClassVisitor
             // jdoPreClear/jdoPostLoad should not be enhanced (JDO spec [10.1, 10.3]
             return mv;
         }
-        else if (name.equals("readObject") &&
-            (desc.equals("(Ljava/io/ObjectOutputStream;)V") || desc.equals("(Ljava/io/ObjectInputStream;)V")))
+        else if (name.equals("readObject") && desc != null && (desc.equals("(Ljava/io/ObjectOutputStream;)V") || desc.equals("(Ljava/io/ObjectInputStream;)V")))
         {
             // readObject(ObjectInputStream), readObject(ObjectOutputStream) should not be enhanced (JDO spec [21.6])
             return mv;

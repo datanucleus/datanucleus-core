@@ -195,7 +195,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
             {
                 metaDataManager = (MetaDataManager)pluginManager.createExecutableExtension("org.datanucleus.metadata_manager", new String[]{"name"}, new String[]{apiName}, 
                     "class", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[]{this});
-                if (config.hasProperty(PropertyNames.PROPERTY_METADATA_LISTENER_OBJECT))
+                if (metaDataManager != null && config.hasProperty(PropertyNames.PROPERTY_METADATA_LISTENER_OBJECT))
                 {
                     MetaDataListener mdl = (MetaDataListener)config.getProperty(PropertyNames.PROPERTY_METADATA_LISTENER_OBJECT);
                     metaDataManager.registerListener(mdl);

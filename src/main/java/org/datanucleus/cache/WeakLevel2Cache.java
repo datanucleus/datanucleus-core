@@ -161,7 +161,7 @@ public class WeakLevel2Cache implements Level2Cache
         {
             Map.Entry entry = (Map.Entry) unpinnedIter.next();
             CachedPC pc = (CachedPC) entry.getValue();
-            if (pc != null && pcClass.getName().equals(pc.getObjectClass().getName()) || (subclasses && pcClass.isAssignableFrom(pc.getObjectClass())))
+            if (pc != null && (pcClass.getName().equals(pc.getObjectClass().getName()) || (subclasses && pcClass.isAssignableFrom(pc.getObjectClass()))))
             {
                 oidsToEvict.add(entry.getKey());
             }

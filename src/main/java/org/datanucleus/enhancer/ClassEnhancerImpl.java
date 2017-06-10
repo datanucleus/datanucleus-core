@@ -393,14 +393,17 @@ public class ClassEnhancerImpl implements ClassEnhancer
         }
         finally
         {
-            try
+            if (out != null)
             {
-                out.close();
-                out = null;
-            }
-            catch (Exception ignore)
-            {
-                // ignore exception in closing the stream
+                try
+                {
+                    out.close();
+                    out = null;
+                }
+                catch (Exception ignore)
+                {
+                    // ignore exception in closing the stream
+                }
             }
         }
 
@@ -416,14 +419,17 @@ public class ClassEnhancerImpl implements ClassEnhancer
             }
             finally
             {
-                try
+                if (out != null)
                 {
-                    out.close();
-                    out = null;
-                }
-                catch (Exception ignore)
-                {
-                    // ignore exception in closing the stream
+                    try
+                    {
+                        out.close();
+                        out = null;
+                    }
+                    catch (Exception ignore)
+                    {
+                        // ignore exception in closing the stream
+                    }
                 }
             }
         }

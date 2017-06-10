@@ -104,29 +104,31 @@ public class OSGiPluginRegistry implements PluginRegistry
             // TODO Any way we can handle this better? e.g force OSGi to start it?
             NucleusLogger.GENERAL.error("Bundle " + bdl.getSymbolicName() + " is in state " + bdl.getState() + " and has NULL context, so cannot register it properly!");
         }
-
-        // parse the plugin files
-        DocumentBuilder docBuilder = OSGiBundleParser.getDocumentBuilder();
-        org.osgi.framework.Bundle[] osgiBundles = ctx.getBundles();
-        for (org.osgi.framework.Bundle osgiBundle : osgiBundles)
+        else
         {
-            URL pluginURL = osgiBundle.getEntry("plugin.xml");
-
-            if (pluginURL == null)
+            // parse the plugin files
+            DocumentBuilder docBuilder = OSGiBundleParser.getDocumentBuilder();
+            org.osgi.framework.Bundle[] osgiBundles = ctx.getBundles();
+            for (org.osgi.framework.Bundle osgiBundle : osgiBundles)
             {
-                continue;
-            }
+                URL pluginURL = osgiBundle.getEntry("plugin.xml");
 
-            Bundle bundle = registerBundle(osgiBundle);
-            if (bundle == null)
-            {
-                // No MANIFEST.MF for this plugin.xml so ignore it
-                continue;
-            }
+                if (pluginURL == null)
+                {
+                    continue;
+                }
 
-            List[] elements = OSGiBundleParser.parsePluginElements(docBuilder, this, pluginURL, bundle, osgiBundle);
-            registerExtensionPointsForPluginInternal(elements[0], false);
-            registeringExtensions.addAll(elements[1]);
+                Bundle bundle = registerBundle(osgiBundle);
+                if (bundle == null)
+                {
+                    // No MANIFEST.MF for this plugin.xml so ignore it
+                    continue;
+                }
+
+                List[] elements = OSGiBundleParser.parsePluginElements(docBuilder, this, pluginURL, bundle, osgiBundle);
+                registerExtensionPointsForPluginInternal(elements[0], false);
+                registeringExtensions.addAll(elements[1]);
+            }
         }
         extensionPoints = extensionPointsByUniqueId.values().toArray(new ExtensionPoint[extensionPointsByUniqueId.values().size()]);
 
