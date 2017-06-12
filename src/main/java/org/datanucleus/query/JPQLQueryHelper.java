@@ -19,6 +19,7 @@ package org.datanucleus.query;
 
 import java.util.List;
 
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.query.expression.DyadicExpression;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.expression.InvokeExpression;
@@ -350,6 +351,10 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("matches"))
             {
+                if (args == null || args.isEmpty())
+                {
+                    throw new NucleusUserException("Cannot use 'matches' without an argument");
+                }
                 StringBuilder str = new StringBuilder();
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
                 str.append(" LIKE ");
@@ -365,6 +370,10 @@ public class JPQLQueryHelper
             else if (method.equalsIgnoreCase("contains"))
             {
                 StringBuilder str = new StringBuilder();
+                if (args == null || args.isEmpty())
+                {
+                    throw new NucleusUserException("Cannot use 'contains' without an argument");
+                }
                 Expression firstExpr = args.get(0);
                 str.append(JPQLQueryHelper.getJPQLForExpression(firstExpr));
                 str.append(" MEMBER OF ");
@@ -373,6 +382,10 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("COUNT"))
             {
+                if (args == null || args.isEmpty())
+                {
+                    throw new NucleusUserException("Cannot use 'COUNT' without an argument");
+                }
                 Expression argExpr = args.get(0);
                 if (argExpr instanceof DyadicExpression && ((DyadicExpression)argExpr).getOperator() == Expression.OP_DISTINCT)
                 {

@@ -1080,7 +1080,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
         }
         boolean delegateSuccess = delegate.removeAll(elements);
 
-        if (backingStore != null)
+        if (backingStore != null && ownerOP != null)
         {
             boolean backingSuccess = true;
             if (SCOUtils.useQueuedUpdate(ownerOP))

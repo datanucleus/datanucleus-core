@@ -894,7 +894,7 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
             }
         }
 
-        if (backingStore != null)
+        if (backingStore != null && ownerOP != null)
         {
             boolean backingSuccess = true;
             if (SCOUtils.useQueuedUpdate(ownerOP))

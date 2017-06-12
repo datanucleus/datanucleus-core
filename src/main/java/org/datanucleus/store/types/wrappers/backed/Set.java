@@ -799,7 +799,7 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
             }
         }
 
-        if (backingStore != null)
+        if (backingStore != null && ownerOP != null)
         {
             boolean backingSuccess = false;
             if (SCOUtils.useQueuedUpdate(ownerOP))

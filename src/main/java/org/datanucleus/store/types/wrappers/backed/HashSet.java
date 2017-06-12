@@ -746,7 +746,7 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
             }
         }
 
-        if (backingStore != null)
+        if (backingStore != null && ownerOP != null)
         {
             boolean backingSuccess = true;
 

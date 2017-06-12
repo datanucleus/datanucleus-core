@@ -992,7 +992,7 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
         }
         boolean delegateSuccess = delegate.removeAll(elements);
 
-        if (backingStore != null)
+        if (backingStore != null && ownerOP != null)
         {
             boolean backingSuccess = true;
             if (SCOUtils.useQueuedUpdate(ownerOP))

@@ -903,7 +903,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
             }
         }
 
-        if (backingStore != null)
+        if (backingStore != null && ownerOP != null)
         {
             boolean backingSuccess = true;
             if (SCOUtils.useQueuedUpdate(ownerOP))

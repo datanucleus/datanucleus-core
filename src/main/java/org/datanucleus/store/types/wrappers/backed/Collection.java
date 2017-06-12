@@ -886,7 +886,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
             }
         }
 
-        if (backingStore != null)
+        if (backingStore != null && ownerOP != null)
         {
             boolean backingSuccess = true;
             if (SCOUtils.useQueuedUpdate(ownerOP))
