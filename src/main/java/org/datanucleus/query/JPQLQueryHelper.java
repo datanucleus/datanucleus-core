@@ -270,12 +270,15 @@ public class JPQLQueryHelper
             {
                 StringBuilder str = new StringBuilder("LOCATE(");
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
-                Expression firstExpr = args.get(0);
-                str.append(",").append(JPQLQueryHelper.getJPQLForExpression(firstExpr));
-                if (args.size() > 1)
+                if (args != null && !args.isEmpty())
                 {
-                    Expression secondExpr = args.get(1);
-                    str.append(",").append(JPQLQueryHelper.getJPQLForExpression(secondExpr));
+                    Expression firstExpr = args.get(0);
+                    str.append(",").append(JPQLQueryHelper.getJPQLForExpression(firstExpr));
+                    if (args.size() > 1)
+                    {
+                        Expression secondExpr = args.get(1);
+                        str.append(",").append(JPQLQueryHelper.getJPQLForExpression(secondExpr));
+                    }
                 }
                 str.append(")");
                 return str.toString();
@@ -284,12 +287,15 @@ public class JPQLQueryHelper
             {
                 StringBuilder str = new StringBuilder("SUBSTRING(");
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
-                Expression firstExpr = args.get(0);
-                str.append(",").append(JPQLQueryHelper.getJPQLForExpression(firstExpr));
-                if (args.size() > 1)
+                if (args != null && !args.isEmpty())
                 {
-                    Expression secondExpr = args.get(1);
-                    str.append(",").append(JPQLQueryHelper.getJPQLForExpression(secondExpr));
+                    Expression firstExpr = args.get(0);
+                    str.append(",").append(JPQLQueryHelper.getJPQLForExpression(firstExpr));
+                    if (args.size() > 1)
+                    {
+                        Expression secondExpr = args.get(1);
+                        str.append(",").append(JPQLQueryHelper.getJPQLForExpression(secondExpr));
+                    }
                 }
                 str.append(")");
                 return str.toString();
@@ -299,7 +305,7 @@ public class JPQLQueryHelper
                 StringBuilder str = new StringBuilder("TRIM(BOTH ");
 
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
-                if (!args.isEmpty())
+                if (args != null && !args.isEmpty())
                 {
                     Expression trimChrExpr = args.get(0);
                     str.append(JPQLQueryHelper.getJPQLForExpression(trimChrExpr));
@@ -315,7 +321,7 @@ public class JPQLQueryHelper
                 StringBuilder str = new StringBuilder("TRIM(LEADING ");
 
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
-                if (!args.isEmpty())
+                if (args != null && !args.isEmpty())
                 {
                     Expression trimChrExpr = args.get(0);
                     str.append(JPQLQueryHelper.getJPQLForExpression(trimChrExpr));
@@ -331,7 +337,7 @@ public class JPQLQueryHelper
                 StringBuilder str = new StringBuilder("TRIM(TRAILING ");
 
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
-                if (!args.isEmpty())
+                if (args != null && !args.isEmpty())
                 {
                     Expression trimChrExpr = args.get(0);
                     str.append(JPQLQueryHelper.getJPQLForExpression(trimChrExpr));
@@ -349,7 +355,7 @@ public class JPQLQueryHelper
                 str.append(" LIKE ");
                 Expression firstExpr = args.get(0);
                 str.append(JPQLQueryHelper.getJPQLForExpression(firstExpr));
-                if (args.size() > 1)
+                if (args != null && args.size() > 1)
                 {
                     Expression secondExpr = args.get(1);
                     str.append(" ESCAPE ").append(JPQLQueryHelper.getJPQLForExpression(secondExpr));
@@ -378,13 +384,16 @@ public class JPQLQueryHelper
             else if (method.equalsIgnoreCase("COALESCE"))
             {
                 StringBuilder str = new StringBuilder("COALESCE(");
-                for (int i=0;i<args.size();i++)
+                if (args != null && !args.isEmpty())
                 {
-                    Expression argExpr = args.get(i);
-                    str.append(JPQLQueryHelper.getJPQLForExpression(argExpr));
-                    if (i < args.size()-1)
+                    for (int i=0;i<args.size();i++)
                     {
-                        str.append(",");
+                        Expression argExpr = args.get(i);
+                        str.append(JPQLQueryHelper.getJPQLForExpression(argExpr));
+                        if (i < args.size()-1)
+                        {
+                            str.append(",");
+                        }
                     }
                 }
                 str.append(")");
@@ -393,13 +402,16 @@ public class JPQLQueryHelper
             else if (method.equalsIgnoreCase("NULLIF"))
             {
                 StringBuilder str = new StringBuilder("NULLIF(");
-                for (int i=0;i<args.size();i++)
+                if (args != null && !args.isEmpty())
                 {
-                    Expression argExpr = args.get(i);
-                    str.append(JPQLQueryHelper.getJPQLForExpression(argExpr));
-                    if (i < args.size()-1)
+                    for (int i=0;i<args.size();i++)
                     {
-                        str.append(",");
+                        Expression argExpr = args.get(i);
+                        str.append(JPQLQueryHelper.getJPQLForExpression(argExpr));
+                        if (i < args.size()-1)
+                        {
+                            str.append(",");
+                        }
                     }
                 }
                 str.append(")");
@@ -407,33 +419,33 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("ABS"))
             {
-                Expression argExpr = args.get(0);
-                return "ABS(" + JPQLQueryHelper.getJPQLForExpression(argExpr) + ")";
+                String argExprStr = (args != null && !args.isEmpty()) ? JPQLQueryHelper.getJPQLForExpression(args.get(0)) : "";
+                return "ABS(" + argExprStr + ")";
             }
             else if (method.equalsIgnoreCase("AVG"))
             {
-                Expression argExpr = args.get(0);
-                return "AVG(" + JPQLQueryHelper.getJPQLForExpression(argExpr) + ")";
+                String argExprStr = (args != null && !args.isEmpty()) ? JPQLQueryHelper.getJPQLForExpression(args.get(0)) : "";
+                return "AVG(" + argExprStr + ")";
             }
             else if (method.equalsIgnoreCase("MAX"))
             {
-                Expression argExpr = args.get(0);
-                return "MAX(" + JPQLQueryHelper.getJPQLForExpression(argExpr) + ")";
+                String argExprStr = (args != null && !args.isEmpty()) ? JPQLQueryHelper.getJPQLForExpression(args.get(0)) : "";
+                return "MAX(" + argExprStr + ")";
             }
             else if (method.equalsIgnoreCase("MIN"))
             {
-                Expression argExpr = args.get(0);
-                return "MIN(" + JPQLQueryHelper.getJPQLForExpression(argExpr) + ")";
+                String argExprStr = (args != null && !args.isEmpty()) ? JPQLQueryHelper.getJPQLForExpression(args.get(0)) : "";
+                return "MIN(" + argExprStr + ")";
             }
             else if (method.equalsIgnoreCase("SQRT"))
             {
-                Expression argExpr = args.get(0);
-                return "SQRT(" + JPQLQueryHelper.getJPQLForExpression(argExpr) + ")";
+                String argExprStr = (args != null && !args.isEmpty()) ? JPQLQueryHelper.getJPQLForExpression(args.get(0)) : "";
+                return "SQRT(" + argExprStr + ")";
             }
             else if (method.equalsIgnoreCase("SUM"))
             {
-                Expression argExpr = args.get(0);
-                return "SUM(" + JPQLQueryHelper.getJPQLForExpression(argExpr) + ")";
+                String argExprStr = (args != null && !args.isEmpty()) ? JPQLQueryHelper.getJPQLForExpression(args.get(0)) : "";
+                return "SUM(" + argExprStr + ")";
             }
             // TODO Support this
             throw new UnsupportedOperationException("Dont currently support InvokeExpression (" + invExpr + ") conversion into JPQL");
