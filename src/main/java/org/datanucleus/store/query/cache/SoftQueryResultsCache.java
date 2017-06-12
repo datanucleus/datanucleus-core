@@ -18,7 +18,8 @@ Contributors:
 package org.datanucleus.store.query.cache;
 
 import org.datanucleus.NucleusContext;
-import org.datanucleus.util.SoftValueMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
  * Soft-reference implementation of a query results cache.
@@ -30,6 +31,6 @@ public class SoftQueryResultsCache extends AbstractQueryResultsCache
     public SoftQueryResultsCache(NucleusContext ctx)
     {
         super(ctx);
-        cache = new SoftValueMap();
+        cache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
     }
 }

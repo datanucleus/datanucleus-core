@@ -421,10 +421,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     tx.begin();
                 }
 
-                Iterator<ObjectProvider> iter = toDetach.iterator();
-                while (iter.hasNext())
+                for (ObjectProvider op : toDetach)
                 {
-                    ObjectProvider op = iter.next();
                     if (op != null && op.getObject() != null && !op.getExecutionContext().getApiAdapter().isDeleted(op.getObject()) && op.getExternalObjectId() != null)
                     {
                         // If the object is deleted then no point detaching. An object can be in L1 cache if transient and passed in to a query as a param for example
@@ -471,14 +469,16 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             // Clear out the cache (use separate list since sm.disconnect will remove the object from "cache" so we avoid any ConcurrentModification issues)
             Collection<ObjectProvider> cachedOPsClone = new HashSet<>(cache.values());
-            Iterator<ObjectProvider> iter = cachedOPsClone.iterator();
-            while (iter.hasNext())
+            for (ObjectProvider op : cachedOPsClone)
             {
-                ObjectProvider op = iter.next();
                 if (op != null)
                 {
                     // Remove it from any transaction
                     op.disconnect();
+                }
+                else
+                {
+                    NucleusLogger.CACHE.error(">> EC.close L1Cache op IS NULL!");
                 }
             }
 
@@ -1503,11 +1503,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         if (cache != null)
         {
-            Set<ObjectProvider> opsToEvict = new HashSet(cache.values());
-            Iterator<ObjectProvider> opIter = opsToEvict.iterator();
-            while (opIter.hasNext())
+            Set<ObjectProvider> opsToEvict = new HashSet<>(cache.values());
+            for (ObjectProvider op : opsToEvict)
             {
-                ObjectProvider op = opIter.next();
                 Object pc = op.getObject();
                 boolean evict = false;
                 if (!subclasses && pc.getClass() == cls)
@@ -1533,19 +1531,21 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void evictAllObjects()
     {
-        if (cache != null)
+        if (cache != null && !cache.isEmpty())
         {
             // TODO All persistent non-transactional instances should be evicted here, but not yet supported
 
             // Evict ObjectProviders and remove objects from cache. Performed in separate loop to avoid ConcurrentModificationException
             Set<ObjectProvider> opsToEvict = new HashSet(cache.values());
-            Iterator<ObjectProvider> opIter = opsToEvict.iterator();
-            while (opIter.hasNext())
+            for (ObjectProvider op : opsToEvict)
             {
-                ObjectProvider op = opIter.next();
                 if (op != null)
                 {
                     op.evict();
+                }
+                else
+                {
+                    NucleusLogger.CACHE.error(">> EC.evictAllObjects L1Cache op IS NULL!");
                 }
             }
 
@@ -1558,8 +1558,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Method to do a refresh of an object, updating it from its
-     * datastore representation. Also updates the object in the L1/L2 caches.
+     * Method to do a refresh of an object, updating it from its datastore representation. 
+     * Also updates the object in the L1/L2 caches.
      * @param obj The Object
      */
     public void refreshObject(Object obj)
@@ -1605,7 +1605,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         toRefresh.addAll(enlistedOPCache.values());
         toRefresh.addAll(dirtyOPs);
         toRefresh.addAll(indirectDirtyOPs);
-        if (!tx.isActive() && cache != null)
+        if (!tx.isActive() && cache != null && !cache.isEmpty())
         {
             toRefresh.addAll(cache.values());
         }
@@ -1708,7 +1708,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
             threadInfo.nontxPersistDelete = true;
             boolean success = true;
-            Set cachedIds = cache != null ? new HashSet(cache.keySet()) : null;
+            Set cachedIds = (cache != null && !cache.isEmpty()) ? new HashSet(cache.keySet()) : null;
             try
             {
                 return persistObjectWork(obj);
@@ -2740,16 +2740,15 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     public void detachAll()
     {
         Collection<ObjectProvider> opsToDetach = new HashSet<>(this.enlistedOPCache.values());
-        if (cache != null)
+        if (cache != null && !cache.isEmpty())
         {
-            opsToDetach.addAll(this.cache.values());
+            opsToDetach.addAll(cache.values());
         }
 
         FetchPlanState fps = new FetchPlanState();
-        Iterator<ObjectProvider> iter = opsToDetach.iterator();
-        while (iter.hasNext())
+        for (ObjectProvider op : opsToDetach)
         {
-            iter.next().detach(fps);
+            op.detach(fps);
         }
     }
 
@@ -4081,14 +4080,14 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void preCommit()
     {
-        if (cache.size() > 0)
+        if (cache != null && !cache.isEmpty())
         {
             // Check for objects that are managed but not dirty, yet require a version update
             Collection<ObjectProvider> cachedOPs = new HashSet<>(cache.values());
             for (ObjectProvider cachedOP : cachedOPs)
             {
                 LockMode lockMode = getLockManager().getLockMode(cachedOP);
-                if (cachedOP.isFlushedToDatastore() && cachedOP.getClassMetaData().isVersioned() && 
+                if (cachedOP != null && cachedOP.isFlushedToDatastore() && cachedOP.getClassMetaData().isVersioned() && 
                         (lockMode == LockMode.LOCK_OPTIMISTIC_WRITE || lockMode == LockMode.LOCK_PESSIMISTIC_WRITE))
                 {
                     // Not dirty, but locking requires a version update, so force it
@@ -4106,6 +4105,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                             NucleusLogger.PERSISTENCE.warn("We do not support forced version update with surrogate version columns : " + cachedOP);
                         }
                     }
+                }
+                else if (cachedOP == null)
+                {
+                    NucleusLogger.CACHE.error(">> EC.preCommit L1Cache op IS NULL!");
                 }
             }
         }
@@ -4325,7 +4328,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 }
             }
         }
-        else if (cache != null)
+        else if (cache != null && !cache.isEmpty())
         {
             // Detach all objects in the L1 cache
             ops.addAll(cache.values());
@@ -4421,7 +4424,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 try
                 {
                     // Perform any operations required after committing
-                    //TODO this if is due to sms that can have lc == null, why?, should not be here then
+                    // TODO this if is due to sms that can have lc == null, why?, should not be here then
                     if (ops[i] != null && ops[i].getObject() != null &&
                             (api.isPersistent(ops[i].getObject()) || api.isTransactional(ops[i].getObject())))
                     {

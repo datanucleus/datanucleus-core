@@ -30,9 +30,10 @@ import java.util.Set;
 
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
+import org.datanucleus.util.ConcurrentReferenceHashMap;
 import org.datanucleus.util.Localiser;
-import org.datanucleus.util.SoftValueMap;
 import org.datanucleus.util.StringUtils;
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
  * FetchPlan for fields for use internally.
@@ -596,7 +597,7 @@ public class FetchPlan implements Serializable
     {
         if (isToCallPostLoadFetchPlanByCmd == null)
         {
-            isToCallPostLoadFetchPlanByCmd = new SoftValueMap();
+            isToCallPostLoadFetchPlanByCmd = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
         }
         Map cachedIsToCallPostLoadFetchPlan = isToCallPostLoadFetchPlanByCmd.get(cmd);
         if (cachedIsToCallPostLoadFetchPlan==null)
@@ -610,12 +611,12 @@ public class FetchPlan implements Serializable
     {
         if (isToCallPostLoadFetchPlanByCmd == null)
         {
-            isToCallPostLoadFetchPlanByCmd = new SoftValueMap();
+            isToCallPostLoadFetchPlanByCmd = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
         }
         Map cachedIsToCallPostLoadFetchPlan = isToCallPostLoadFetchPlanByCmd.get(cmd);
         if (cachedIsToCallPostLoadFetchPlan == null)
         {
-            cachedIsToCallPostLoadFetchPlan = new SoftValueMap();
+            cachedIsToCallPostLoadFetchPlan = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
             isToCallPostLoadFetchPlanByCmd.put(cmd, cachedIsToCallPostLoadFetchPlan);
         }
         cachedIsToCallPostLoadFetchPlan.put(loadedFields, itcplfp);
@@ -625,7 +626,7 @@ public class FetchPlan implements Serializable
     {
         if (isToCallPostLoadFetchPlanByCmd == null)
         {
-            isToCallPostLoadFetchPlanByCmd = new SoftValueMap();
+            isToCallPostLoadFetchPlanByCmd = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
         }
         Map cachedIsToCallPostLoadFetchPlan = isToCallPostLoadFetchPlanByCmd.get(cmd);
         if (cachedIsToCallPostLoadFetchPlan != null)

@@ -18,7 +18,8 @@ Contributors:
 package org.datanucleus.query.compiler;
 
 import org.datanucleus.NucleusContext;
-import org.datanucleus.util.SoftValueMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
  * Soft-reference implementation of a generic query compilation cache.
@@ -27,6 +28,6 @@ public class SoftQueryCompilationCache extends AbstractQueryCompilationCache
 {
     public SoftQueryCompilationCache(NucleusContext nucleusCtx)
     {
-        cache = new SoftValueMap();
+        cache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
     }
 }

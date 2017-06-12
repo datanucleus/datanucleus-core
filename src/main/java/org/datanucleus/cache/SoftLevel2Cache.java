@@ -20,10 +20,11 @@ package org.datanucleus.cache;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.NucleusContext;
-import org.datanucleus.util.SoftValueMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
  * Soft implementation of a Level 2 cache.
@@ -40,16 +41,16 @@ public class SoftLevel2Cache extends WeakLevel2Cache
     public SoftLevel2Cache(NucleusContext nucleusCtx)
     {
         apiAdapter = nucleusCtx.getApiAdapter();
-        pinnedCache = new HashMap();
-        unpinnedCache = new SoftValueMap();
-        uniqueKeyCache = new SoftValueMap();
+        pinnedCache = new ConcurrentHashMap<>();
+        unpinnedCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
+        uniqueKeyCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
         // our "pseudo-constructor"
         in.defaultReadObject();
-        unpinnedCache = new SoftValueMap();
-        uniqueKeyCache = new SoftValueMap();
+        unpinnedCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
+        uniqueKeyCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
     }
 }

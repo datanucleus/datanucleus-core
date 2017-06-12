@@ -24,7 +24,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.util.SoftValueMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
  * Level 1 Cache using Soft referenced objects in a Map.
@@ -36,8 +37,8 @@ import org.datanucleus.util.SoftValueMap;
  */
 public class SoftRefCache implements Level1Cache
 {
-    private Map<Object, ObjectProvider> softCache = new SoftValueMap();
-    private Map<CacheUniqueKey, ObjectProvider> softCacheUnique = new SoftValueMap();
+    private Map<Object, ObjectProvider> softCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);//new SoftValueMap();
+    private Map<CacheUniqueKey, ObjectProvider> softCacheUnique = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);//new SoftValueMap();
 
     public SoftRefCache()
     {

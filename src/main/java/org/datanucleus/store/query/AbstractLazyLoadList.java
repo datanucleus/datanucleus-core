@@ -28,7 +28,6 @@ import java.util.NoSuchElementException;
 import org.datanucleus.util.ConcurrentReferenceHashMap;
 import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 import org.datanucleus.util.Localiser;
-import org.datanucleus.util.SoftValueMap;
 
 /**
  * Abstract implementation of a lazy loaded list of (persistent) objects.
@@ -58,7 +57,7 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
         {
             if (cacheType.equalsIgnoreCase("soft"))
             {
-                itemsByIndex = new SoftValueMap();
+                itemsByIndex = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
             }
             else if (cacheType.equalsIgnoreCase("weak"))
             {

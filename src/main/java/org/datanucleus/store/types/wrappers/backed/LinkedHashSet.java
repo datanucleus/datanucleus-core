@@ -740,11 +740,14 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
             boolean backingSuccess = true;
             if (SCOUtils.useQueuedUpdate(ownerOP))
             {
-                backingSuccess = false;
-                for (Object element : contained)
+                if (contained != null && !contained.isEmpty())
                 {
-                    backingSuccess = true;
-                    ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, backingStore, element, true));
+                    backingSuccess = false;
+                    for (Object element : contained)
+                    {
+                        backingSuccess = true;
+                        ownerOP.getExecutionContext().addOperationToQueue(new CollectionRemoveOperation(ownerOP, backingStore, element, true));
+                    }
                 }
             }
             else

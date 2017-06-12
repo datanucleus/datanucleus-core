@@ -28,7 +28,6 @@ import java.util.NoSuchElementException;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.util.ConcurrentReferenceHashMap;
-import org.datanucleus.util.SoftValueMap;
 import org.datanucleus.util.StringUtils;
 import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
@@ -65,7 +64,7 @@ public class CandidateIdsQueryResult<E> extends AbstractQueryResult<E>
         {
             if (ext.equalsIgnoreCase("soft"))
             {
-                results = new SoftValueMap();
+                results = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
             }
             else if (ext.equalsIgnoreCase("strong"))
             {

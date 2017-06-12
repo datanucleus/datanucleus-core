@@ -56,6 +56,7 @@ import org.datanucleus.ClassNameConstants;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
  * Utilities for handling classes.
@@ -64,7 +65,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 public class ClassUtils
 {
     /** caching for constructors - using caching, the perf is at least doubled **/
-    protected static final Map constructorsCache = new SoftValueMap();
+    protected static final Map constructorsCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
 
     /**
      * Accessor for a new instance of an object.

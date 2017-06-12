@@ -7,19 +7,13 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.datanucleus.util.ReferenceValueMap;
-
 /**
- * Abstract base class for tests that test the functionality of a {@link ReferenceValueMap}.
+ * Abstract base class for tests that test the functionality of a map storing references (string, weak, soft).
  */
 public abstract class ReferenceValueMapTestCase extends TestCase
 {
     private static final int NUM_TEST_ENTRIES = 50;
 
-    /**
-     * Used by the JUnit framework to construct tests.  Normally, programmers would never explicitly use this constructor.
-     * @param name Name of the <tt>TestCase</tt>.
-     */
     public ReferenceValueMapTestCase(String name)
     {
         super(name);
@@ -38,10 +32,8 @@ public abstract class ReferenceValueMapTestCase extends TestCase
         int size;
         long freeMem;
 
-        /*
-         * Fill the map with entries until some references get cleared.  GC
-         * should cause references to be cleared well before memory fills up.
-         */
+        // Fill the map with entries until some references get cleared.  
+        // GC should cause references to be cleared well before memory fills up.
         do
         {
             freeMem = rt.freeMemory();
@@ -58,7 +50,6 @@ public abstract class ReferenceValueMapTestCase extends TestCase
         NucleusLogger.GENERAL.info("ReferenceValueMap " + (added - size) + " entries out of " + added + " cleared when free memory was " + (int)(freeMem / 1024) + "KB");
     }
 
-
     public void testBasicFunction()
     {
         Map map = newReferenceValueMap();
@@ -72,27 +63,22 @@ public abstract class ReferenceValueMapTestCase extends TestCase
 
             map.put(keyArray[i], valueArray[i]);
         }
-
         checkMapContents(map, keyArray, valueArray);
 
         Map map2 = newReferenceValueMap();
         map2.putAll(map);
         map.clear();
-
         assertEquals(0, map.size());
 
         map.putAll(map2);
-
         checkMapContents(map, keyArray, valueArray);
 
         assertEquals(NUM_TEST_ENTRIES, map.size());
-
         for (int i = 0; i < keyArray.length; ++i)
         {
             Object value = map.remove(keyArray[i]);
             assertEquals(valueArray[i], value);
         }
-
         assertEquals(0, map.size());
     }
 
@@ -105,17 +91,23 @@ public abstract class ReferenceValueMapTestCase extends TestCase
         assertEquals(keyArray.length, map.size());
 
         for (int i = 0; i < keyArray.length; i++)
+        {
             assertTrue(map.containsKey(keyArray[i]));
+        }
 
         assertTrue(!map.containsKey("bitbucket"));
 
         for (int i = 0; i < valueArray.length; i++)
+        {
             assertTrue(map.containsValue(valueArray[i]));
+        }
 
         assertTrue(!map.containsValue("bitbucket"));
 
         for (int i = 0; i < keyArray.length; i++)
+        {
             assertEquals(i, ((Integer)map.get(keyArray[i])).intValue());
+        }
 
         Set set = map.entrySet();
         Iterator it = set.iterator();

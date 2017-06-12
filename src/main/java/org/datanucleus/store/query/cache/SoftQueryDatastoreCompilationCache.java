@@ -18,7 +18,8 @@ Contributors:
 package org.datanucleus.store.query.cache;
 
 import org.datanucleus.NucleusContext;
-import org.datanucleus.util.SoftValueMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
  * Weak-referenced implementation of datastore query compilation cache.
@@ -27,6 +28,6 @@ public class SoftQueryDatastoreCompilationCache extends AbstractQueryDatastoreCo
 {
     public SoftQueryDatastoreCompilationCache(NucleusContext nucleusCtx)
     {
-        cache = new SoftValueMap();
+        cache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
     }
 }
