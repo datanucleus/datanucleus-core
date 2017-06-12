@@ -948,8 +948,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
         else if (invokeExpr.getLeft() instanceof ParameterExpression)
         {
             // {paramExpr}.method(...)
-            Object invokedValue =
-                QueryUtils.getValueForParameterExpression(parameterValues, (ParameterExpression)invokeExpr.getLeft());
+            Object invokedValue = QueryUtils.getValueForParameterExpression(parameterValues, (ParameterExpression)invokeExpr.getLeft());
 
             // Invoke method on this object
             Class invokedType = invokedValue != null ? invokedValue.getClass() : invokeExpr.getLeft().getSymbol().getValueType();
@@ -959,7 +958,14 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
                 return methodEval.evaluate(invokeExpr, invokedValue, this);
             }
 
-            NucleusLogger.QUERY.warn("Query contains call to method " + invokedValue.getClass().getName() + "." + method + " yet no support is available for this");
+            if (invokedValue != null)
+            {
+                NucleusLogger.QUERY.warn("Query contains call to method " + invokedValue.getClass().getName() + "." + method + " yet no support is available for this");
+            }
+            else
+            {
+                NucleusLogger.QUERY.warn("Query contains call to static method " + method + " yet no support is available for this");
+            }
             return new InMemoryFailure();
         }
         else if (invokeExpr.getLeft() instanceof PrimaryExpression)

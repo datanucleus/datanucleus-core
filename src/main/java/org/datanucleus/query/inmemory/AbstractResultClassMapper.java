@@ -142,7 +142,7 @@ public class AbstractResultClassMapper
                 return null;
             }
         }
-        else if (fieldNames.length == 1 && resultClass.isAssignableFrom(inputResult.getClass()))
+        else if (fieldNames.length == 1 && inputResult != null && resultClass.isAssignableFrom(inputResult.getClass()))
         {
             // Only 1 column, and the input result is of the type of the result class, so return it
             return inputResult;

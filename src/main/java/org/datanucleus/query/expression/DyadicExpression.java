@@ -207,8 +207,8 @@ public class DyadicExpression extends Expression
                 // primary {op} parameter
                 right.getSymbol().setValueType(leftType);
             }
-            leftType = left.getSymbol() != null ? left.getSymbol().getValueType() : null;
-            rightType = right.getSymbol() != null ? right.getSymbol().getValueType() : null;
+            leftType = (left != null && left.getSymbol() != null) ? left.getSymbol().getValueType() : null;
+            rightType = (right != null && right.getSymbol() != null) ? right.getSymbol().getValueType() : null;
         }
 
         return null;

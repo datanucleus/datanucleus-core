@@ -468,6 +468,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 // TODO Localise this
                 throw new NucleusUserException("Error in specified NamingFactory " + namingFactoryName + " not found");
             }
+
             try
             {
                 Class[] argTypes = new Class[] {ClassConstants.NUCLEUS_CONTEXT};
@@ -477,7 +478,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             }
             catch (Throwable thr)
             {
-                NucleusLogger.GENERAL.debug(">> Exception creating NamingFactory", thr);
+                throw new NucleusUserException("Exception creating NamingFactory for datastore : " + thr.getMessage(), thr);
             }
 
             // Set the case TODO Handle quoted cases (not specifiable via this property currently)
@@ -1262,7 +1263,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         {
             return "identity";
         }
-        else if (supportsValueStrategy("sequence") && idmd.getSequence() != null)
+        else if (supportsValueStrategy("sequence") && idmd != null && idmd.getSequence() != null)
         {
             return "sequence";
         }
