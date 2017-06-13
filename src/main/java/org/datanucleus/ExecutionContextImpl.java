@@ -1724,7 +1724,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     while (cacheIter.hasNext())
                     {
                         Object id = cacheIter.next();
-                        if (!cachedIds.contains(id))
+                        if (cachedIds == null || !cachedIds.contains(id))
                         {
                             // Remove from L1 cache
                             cacheIter.remove();
@@ -3274,7 +3274,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         for (Object id : idsToFind)
         {
             Object idOrig = id; // Id target class could change due to inheritance level
-            Object pc = foundPcs[foundPcIdx++];
+            Object pc = foundPcs != null ? foundPcs[foundPcIdx++] : null;
             ObjectProvider op = null;
             if (pc != null)
             {
@@ -5402,7 +5402,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     public void assertClassPersistable(Class cls)
     {
-        if (cls != null && !getNucleusContext().getApiAdapter().isPersistable(cls) && !cls.isInterface())
+        if (cls == null)
+        {
+            return;
+        }
+        if (!getNucleusContext().getApiAdapter().isPersistable(cls) && !cls.isInterface())
         {
             throw new ClassNotPersistableException(cls.getName());
         }

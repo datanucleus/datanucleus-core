@@ -278,7 +278,7 @@ public abstract class ClassMethod
                 {
                     sb.append(argTypes[i]);
                 }
-                sb.append(" ").append(argNames[i]);
+                sb.append(" ").append(argNames != null ? argNames[i] : "(unknown)");
             }
         }
         sb.append(")");
