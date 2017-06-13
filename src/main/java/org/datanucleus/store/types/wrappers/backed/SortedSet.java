@@ -931,7 +931,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
                 }
             }
 
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (!ownerOP.getExecutionContext().getTransaction().isActive())
             {
                 ownerOP.getExecutionContext().processNontransactionalUpdate();
             }

@@ -914,7 +914,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
                 }
             }
 
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (!ownerOP.getExecutionContext().getTransaction().isActive())
             {
                 ownerOP.getExecutionContext().processNontransactionalUpdate();
             }

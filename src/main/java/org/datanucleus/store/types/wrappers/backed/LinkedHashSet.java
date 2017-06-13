@@ -763,7 +763,7 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
                 }
             }
 
-            if (ownerOP != null && !ownerOP.getExecutionContext().getTransaction().isActive())
+            if (!ownerOP.getExecutionContext().getTransaction().isActive())
             {
                 ownerOP.getExecutionContext().processNontransactionalUpdate();
             }
