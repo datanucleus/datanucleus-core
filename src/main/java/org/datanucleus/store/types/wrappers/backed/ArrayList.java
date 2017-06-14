@@ -403,6 +403,15 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
         return true;
     }
 
+    public int hashCode()
+    {
+        if (useCache)
+        {
+            loadFromStore();
+        }
+        return delegate.hashCode();
+    }
+
     /**
      * Method to retrieve an element no.
      * @param index The item to retrieve

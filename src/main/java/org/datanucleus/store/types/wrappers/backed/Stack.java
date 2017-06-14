@@ -392,6 +392,15 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         return true;
     }
 
+    public synchronized int hashCode()
+    {
+        if (useCache)
+        {
+            loadFromStore();
+        }
+        return delegate.hashCode();
+    }
+
     /**
      * Method to retrieve an element no.
      * @param index The item to retrieve
