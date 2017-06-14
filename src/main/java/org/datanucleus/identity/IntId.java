@@ -70,21 +70,17 @@ public class IntId extends SingleFieldId<Integer>
         return Integer.toString(key);
     }
 
-    public boolean equals(Object obj)
+    /* (non-Javadoc)
+     * @see org.datanucleus.identity.SingleFieldId#keyEquals(org.datanucleus.identity.SingleFieldId)
+     */
+    @Override
+    protected boolean keyEquals(SingleFieldId obj)
     {
-        if (this == obj)
+        if (obj instanceof IntId)
         {
-            return true;
+            return key == ((IntId)obj).key;
         }
-        else if (!super.equals(obj))
-        {
-            return false;
-        }
-        else
-        {
-            IntId other = (IntId) obj;
-            return key == other.key;
-        }
+        return false;
     }
 
     public int compareTo(Object o)

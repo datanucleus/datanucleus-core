@@ -70,21 +70,17 @@ public class LongId extends SingleFieldId<Long>
         return Long.toString(key);
     }
 
-    public boolean equals(Object obj)
+    /* (non-Javadoc)
+     * @see org.datanucleus.identity.SingleFieldId#keyEquals(org.datanucleus.identity.SingleFieldId)
+     */
+    @Override
+    protected boolean keyEquals(SingleFieldId obj)
     {
-        if (this == obj)
+        if (obj instanceof LongId)
         {
-            return true;
+            return key == ((LongId)obj).key;
         }
-        else if (!super.equals(obj))
-        {
-            return false;
-        }
-        else
-        {
-            LongId other = (LongId) obj;
-            return key == other.key;
-        }
+        return false;
     }
 
     public int compareTo(Object o)

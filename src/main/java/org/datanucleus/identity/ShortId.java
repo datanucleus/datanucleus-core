@@ -70,21 +70,17 @@ public class ShortId extends SingleFieldId<Short>
         return Short.toString(key);
     }
 
-    public boolean equals(Object obj)
+    /* (non-Javadoc)
+     * @see org.datanucleus.identity.SingleFieldId#keyEquals(org.datanucleus.identity.SingleFieldId)
+     */
+    @Override
+    protected boolean keyEquals(SingleFieldId obj)
     {
-        if (this == obj)
+        if (obj instanceof ShortId)
         {
-            return true;
+            return key == ((ShortId)obj).key;
         }
-        else if (!super.equals(obj))
-        {
-            return false;
-        }
-        else
-        {
-            ShortId other = (ShortId) obj;
-            return key == other.key;
-        }
+        return false;
     }
 
     public int compareTo(Object o)

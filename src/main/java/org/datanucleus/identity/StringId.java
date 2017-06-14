@@ -58,21 +58,17 @@ public class StringId extends SingleFieldId<String>
         return key;
     }
 
-    public boolean equals(Object obj)
+    /* (non-Javadoc)
+     * @see org.datanucleus.identity.SingleFieldId#keyEquals(org.datanucleus.identity.SingleFieldId)
+     */
+    @Override
+    protected boolean keyEquals(SingleFieldId obj)
     {
-        if (this == obj)
+        if (obj instanceof StringId)
         {
-            return true;
+            return key.equals(((StringId)obj).key);
         }
-        else if (!super.equals(obj))
-        {
-            return false;
-        }
-        else
-        {
-            StringId other = (StringId) obj;
-            return key.equals(other.key);
-        }
+        return false;
     }
 
     public int compareTo(Object o)

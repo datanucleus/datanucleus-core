@@ -70,21 +70,17 @@ public class ByteId extends SingleFieldId<Byte>
         return Byte.toString(key);
     }
 
-    public boolean equals(Object obj)
+    /* (non-Javadoc)
+     * @see org.datanucleus.identity.SingleFieldId#keyEquals(org.datanucleus.identity.SingleFieldId)
+     */
+    @Override
+    protected boolean keyEquals(SingleFieldId obj)
     {
-        if (this == obj)
+        if (obj instanceof ByteId)
         {
-            return true;
+            return key == ((ByteId)obj).key;
         }
-        else if (!super.equals(obj))
-        {
-            return false;
-        }
-        else
-        {
-            ByteId other = (ByteId) obj;
-            return key == other.key;
-        }
+        return false;
     }
 
     public int compareTo(Object o)

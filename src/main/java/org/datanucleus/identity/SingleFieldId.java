@@ -87,9 +87,15 @@ public abstract class SingleFieldId<T> implements Externalizable, Comparable
         else
         {
             SingleFieldId other = (SingleFieldId) obj;
-            return targetClassName.equals(other.targetClassName);
+            if (!targetClassName.equals(other.targetClassName))
+            {
+                return false;
+            }
+            return keyEquals(other);
         }
     }
+
+    protected abstract boolean keyEquals(SingleFieldId other);
 
     public int hashCode()
     {

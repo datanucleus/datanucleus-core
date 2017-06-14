@@ -94,20 +94,17 @@ public class ObjectId extends SingleFieldId
         return key.getClass().getName() + STRING_DELIMITER + key.toString();
     }
 
-    public boolean equals(Object obj)
+    /* (non-Javadoc)
+     * @see org.datanucleus.identity.SingleFieldId#keyEquals(org.datanucleus.identity.SingleFieldId)
+     */
+    @Override
+    protected boolean keyEquals(SingleFieldId obj)
     {
-        if (this == obj)
-        {
-            return true;
-        }
-        else if (!super.equals(obj))
-        {
-            return false;
-        }
-        else
+        if (obj instanceof ObjectId)
         {
             return key.equals(((ObjectId)obj).key);
         }
+        return false;
     }
 
     public int compareTo(Object o)
