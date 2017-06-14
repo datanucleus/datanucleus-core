@@ -2518,17 +2518,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     }
 
     /**
-     * Method to create a new JoinMetaData, set it, and return it.
-     * @return The join metadata
-     */
-    public JoinMetaData newJoinMetadata()
-    {
-        JoinMetaData joinmd = new JoinMetaData();
-        setJoinMetaData(joinmd);
-        return joinmd;
-    }
-
-    /**
      * Mutator for the field id.
      * Given package access since updated by ClassMetaData typically.
      * Only used when the field is not an overriding field.
