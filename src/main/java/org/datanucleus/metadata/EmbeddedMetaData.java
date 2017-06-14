@@ -196,12 +196,14 @@ public class EmbeddedMetaData extends MetaData
                 throw new InvalidMemberMetaDataException("044124", apmd.getClassName(), apmd.getName(), embeddedType);
             }
         }
+        else
+        {
+            throw new InvalidMemberMetaDataException("044165", md.getClass().getName());
+        }
 
         // Check that all "members" are of the correct type for the embedded object
-        Iterator<AbstractMemberMetaData> memberIter = members.iterator();
-        while (memberIter.hasNext())
+        for (AbstractMemberMetaData mmd : members)
         {
-            AbstractMemberMetaData mmd = memberIter.next();
             // TODO Should allow PropertyMetaData here I think
             if (embCmd instanceof InterfaceMetaData && mmd instanceof FieldMetaData)
             {
@@ -323,7 +325,7 @@ public class EmbeddedMetaData extends MetaData
         }
         Collections.sort(members);
 
-        memberIter = members.iterator();
+        Iterator<AbstractMemberMetaData> memberIter = members.iterator();
         while (memberIter.hasNext())
         {
             Class embFmdClass = embeddedClass;

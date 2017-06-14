@@ -701,7 +701,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 throw new InvalidClassMetaDataException("044094", fullName, identityMetaData.getValueStrategy(), baseImd.getValueStrategy());
             }
 
-            if (baseCmd.identitySpecified && identityMetaData != null && baseImd.getValueStrategy() != identityMetaData.getValueStrategy())
+            if (baseCmd.identitySpecified && identityMetaData != null && baseImd != null && baseImd.getValueStrategy() != identityMetaData.getValueStrategy())
             {
                 // Make sure the strategy matches the parent (likely just took the default "native" schema)
                 identityMetaData.setValueStrategy(baseImd.getValueStrategy());
