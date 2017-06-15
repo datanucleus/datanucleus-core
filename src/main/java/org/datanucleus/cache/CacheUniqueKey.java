@@ -66,6 +66,10 @@ public class CacheUniqueKey implements Serializable, Comparable<CacheUniqueKey>
 
     public boolean equals(Object other)
     {
+        if (other == null || !(other instanceof CacheUniqueKey))
+        {
+            return false;
+        }
         return hashCode == other.hashCode();
     }
 
