@@ -49,10 +49,10 @@ public class CandidateIdsQueryResult<E> extends AbstractQueryResult<E>
     /** Whether to validate the objects if getting from the cache. */
     boolean validateObjects = true;
 
-    public CandidateIdsQueryResult(Query query, List<Object> ids)
+    public CandidateIdsQueryResult(Query query, List<Object> inputIds)
     {
         super(query);
-        this.ids = ids;
+        ids = inputIds;
         size = ids != null ? ids.size() : 0; // Size is known
 
         // Allow override of validate setting
@@ -118,6 +118,15 @@ public class CandidateIdsQueryResult<E> extends AbstractQueryResult<E>
             return other.query == query;
         }
         return StringUtils.toJVMIDString(other).equals(StringUtils.toJVMIDString(this));
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.query.AbstractQueryResult#hashCode()
+     */
+    @Override
+    public int hashCode()
+    {
+        return super.hashCode();
     }
 
     public E get(int index)
