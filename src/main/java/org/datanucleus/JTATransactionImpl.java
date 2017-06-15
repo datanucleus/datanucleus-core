@@ -175,7 +175,10 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
                                 else
                                 {
                                     // Register via Transaction
-                                    jtaTx.registerSynchronization(this);
+                                    if (jtaTx != null)
+                                    {
+                                        jtaTx.registerSynchronization(this);
+                                    }
                                 }
 
                                 if (!super.isActive())
