@@ -582,7 +582,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             defaultFetchGroup = Boolean.FALSE;
             if (!primaryKey.equals(Boolean.TRUE))
             {
-                if (hasContainer())
+                if (hasContainer() && containerHandler != null)
                 {
                     defaultFetchGroup = containerHandler.isDefaultFetchGroup(clr, typeMgr, this);
                 }
