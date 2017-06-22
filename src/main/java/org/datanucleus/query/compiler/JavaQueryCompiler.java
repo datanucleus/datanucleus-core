@@ -341,6 +341,10 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                                 for (int k=0;k<joinedMembers.length;k++)
                                 {
                                     String memberName = joinedMembers[k];
+                                    if (joinedCmd == null)
+                                    {
+                                        throw new NucleusUserException("Query has JOIN to " + memberName + " but previous element (" + joinedCls.getName() + ") has no metadata");
+                                    }
                                     if (memberName.endsWith("#KEY"))
                                     {
                                         memberName = memberName.substring(0, memberName.length()-4);
@@ -394,13 +398,21 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                                         {
                                             // TODO Don't currently allow interface field navigation
                                             joinedCmd = mmd.getCollection().getElementClassMetaData(clr);
-                                            joinedCls = clr.classForName(joinedCmd.getFullClassName());
+                                            if (joinedCmd != null)
+                                            {
+                                                joinedCls = clr.classForName(joinedCmd.getFullClassName());
+                                            }
+                                            else
+                                            {
+                                                joinedCls = clr.classForName(mmd.getCollection().getElementType());
+                                            }
                                         }
                                         else if (mmd.hasMap())
                                         {
                                             if (joinedMembers[k].endsWith("#KEY"))
                                             {
                                                 joinedCmd = mmd.getMap().getKeyClassMetaData(clr);
+                                                // TODO Set joinedCls
                                             }
                                             else
                                             {
@@ -410,13 +422,24 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                                                     // JPA assumption that the value is an entity ... but it may not be!
                                                     joinedCls = clr.classForName(joinedCmd.getFullClassName());
                                                 }
+                                                else
+                                                {
+                                                    joinedCls = clr.classForName(mmd.getMap().getValueType());
+                                                }
                                             }
                                         }
                                         else if (mmd.hasArray())
                                         {
                                             // TODO Don't currently allow interface field navigation
                                             joinedCmd = mmd.getArray().getElementClassMetaData(clr);
-                                            joinedCls = clr.classForName(joinedCmd.getFullClassName());
+                                            if (joinedCmd != null)
+                                            {
+                                                joinedCls = clr.classForName(joinedCmd.getFullClassName());
+                                            }
+                                            else
+                                            {
+                                                joinedCls = clr.classForName(mmd.getArray().getElementType());
+                                            }
                                         }
                                     }
                                 }
