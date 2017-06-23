@@ -68,6 +68,7 @@ import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.autostart.AutoStartMechanism;
 import org.datanucleus.store.federation.FederatedStoreManager;
+import org.datanucleus.store.schema.CurrentUserProvider;
 import org.datanucleus.store.schema.MultiTenancyProvider;
 import org.datanucleus.store.schema.SchemaAwareStoreManager;
 import org.datanucleus.store.schema.SchemaScriptAwareStoreManager;
@@ -153,6 +154,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     private ObjectProviderFactory opFactory = null;
 
     private MultiTenancyProvider multiTenancyProvider = null;
+
+    private CurrentUserProvider currentUserProvider = null;
 
     /**
      * Constructor for the context.
@@ -354,8 +357,14 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING, null, null, StringPropertyValidator.class.getName(), true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_CATALOG, null, null, null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_SCHEMA, null, null, null, true, false);
+
+        // Multitenancy
         conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID, null, null, null, false, true);
         conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_TENANT_PROVIDER, null, null, null, false, false);
+
+        // Current user
+        conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_CURRENT_USER, null, null, null, false, true);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_CURRENT_USER_PROVIDER, null, null, null, false, false);
 
         // Auto-Start Mechanism
         conf.addDefaultProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM, null, "None", null, true, false);
@@ -527,6 +536,18 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             catch (Throwable thr)
             {
                 NucleusLogger.PERSISTENCE.warn("Error accessing property " + PropertyNames.PROPERTY_MAPPING_TENANT_PROVIDER + "; should be an instance of MultiTenancyProvider but isnt! Ignored");
+            }
+        }
+
+        if (config.hasProperty(PropertyNames.PROPERTY_MAPPING_CURRENT_USER_PROVIDER))
+        {
+            try
+            {
+                currentUserProvider = (CurrentUserProvider)config.getProperty(PropertyNames.PROPERTY_MAPPING_CURRENT_USER_PROVIDER); 
+            }
+            catch (Throwable thr)
+            {
+                NucleusLogger.PERSISTENCE.warn("Error accessing property " + PropertyNames.PROPERTY_MAPPING_CURRENT_USER_PROVIDER + "; should be an instance of CurrentUserProvider but isnt! Ignored");
             }
         }
 
@@ -1834,5 +1855,18 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             return multiTenancyProvider.getTenantId(ec);
         }
         return ec.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.PersistenceNucleusContext#getCurrentUser(org.datanucleus.ExecutionContext)
+     */
+    @Override
+    public String getCurrentUser(ExecutionContext ec)
+    {
+        if (currentUserProvider != null)
+        {
+            return currentUserProvider.currentUser();
+        }
+        return ec.getStringProperty(PropertyNames.PROPERTY_MAPPING_CURRENT_USER);
     }
 }

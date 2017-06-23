@@ -1218,7 +1218,7 @@ public abstract class AbstractClassMetaData extends MetaData
             return pcSuperclassMetaData.getClassManagingTable();
         }
         return null;
-    }    
+    }
 
     /**
      * Accessor for the Meta-Data for the superclass of this class.
@@ -1274,10 +1274,8 @@ public abstract class AbstractClassMetaData extends MetaData
 
         int no_of_pk_fields = 0;
         AbstractMemberMetaData mmd_pk = null;
-        Iterator<AbstractMemberMetaData> memberIter = members.iterator();
-        while (memberIter.hasNext())
+        for (AbstractMemberMetaData mmd : members)
         {
-            AbstractMemberMetaData mmd = memberIter.next();
             if (mmd.isPrimaryKey())
             {
                 mmd_pk = mmd;

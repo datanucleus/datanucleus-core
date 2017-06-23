@@ -1164,6 +1164,14 @@ public class CompleteClassTable implements Table
         {
             // TODO Support this
         }
+        else if (colType == SurrogateColumnType.CREATE_USER)
+        {
+            // TODO Support this
+        }
+        else if (colType == SurrogateColumnType.UPDATE_USER)
+        {
+            // TODO Support this
+        }
         else if (colType == SurrogateColumnType.SOFTDELETE)
         {
             return softDeleteColumn;

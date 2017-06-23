@@ -1725,6 +1725,26 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         return this;
     }
 
+    public boolean isCreateUser()
+    {
+        return hasExtension("create-user");
+    }
+
+    public boolean isCreateTimestamp()
+    {
+        return hasExtension("create-timestamp");
+    }
+
+    public boolean isUpdateUser()
+    {
+        return hasExtension("update-user");
+    }
+
+    public boolean isUpdateTimestamp()
+    {
+        return hasExtension("update-timestamp");
+    }
+
     public AbstractMemberMetaData setColumn(String col)
     {
         this.column = StringUtils.isWhitespace(col) ? null : col;

@@ -30,7 +30,9 @@ public enum SurrogateColumnType
     MULTITENANCY(-4),
     CREATE_TIMESTAMP(-5),
     UPDATE_TIMESTAMP(-6),
-    SOFTDELETE(-7);
+    SOFTDELETE(-7),
+    CREATE_USER(-8),
+    UPDATE_USER(-9);
 
     int fieldNumber;
 

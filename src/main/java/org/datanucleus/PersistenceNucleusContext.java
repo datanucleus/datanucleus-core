@@ -208,10 +208,17 @@ public interface PersistenceNucleusContext extends StoreNucleusContext
     boolean isClassMultiTenant(AbstractClassMetaData cmd);
 
     /**
-     * Accessor for the tenant id for the supplied class and executionContext.
+     * Accessor for the tenant id for the supplied class and ExecutionContext.
      * @param ec ExecutionContext
      * @param cmd The class
      * @return The tenant id for this class and context.
      */
     String getMultiTenancyId(ExecutionContext ec, AbstractClassMetaData cmd);
+
+    /**
+     * Accessor for the current user for the supplied ExecutionContext.
+     * @param ec ExecutionContext
+     * @return The current user for this context.
+     */
+    String getCurrentUser(ExecutionContext ec);
 }
