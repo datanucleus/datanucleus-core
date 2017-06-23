@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.query.expression;
 
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.query.compiler.Symbol;
 import org.datanucleus.query.compiler.SymbolTable;
 
@@ -39,6 +40,10 @@ public class SubqueryExpression extends Expression
      */
     public SubqueryExpression(String keyword, VariableExpression operand)
     {
+        if (keyword == null)
+        {
+            throw new NucleusUserException("Attempt to create SubqueryExpression with null keyword");
+        }
         this.keyword = keyword;
         this.right = operand;
     }
