@@ -446,7 +446,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                             }
                         }
 
-                        if (aliasNode.getNodeType() == NodeType.NAME)
+                        if (aliasNode != null && aliasNode.getNodeType() == NodeType.NAME)
                         {
                             // Add JOIN alias to symbol table
                             String alias = (String)aliasNode.getNodeValue();
