@@ -199,6 +199,26 @@ public interface Level2Cache extends Serializable
     }
 
     /**
+     * Method to put several objects into the cache.
+     * @param objs Map of cacheable object keyed by the unique keys.
+     */
+    default void putUniqueAll(Map<CacheUniqueKey, CachedPC> objs)
+    {
+        if (objs == null)
+        {
+            return;
+        }
+
+        // Just fallback to doing multiple puts. Overridden in the implementation if supported
+        Iterator<Map.Entry<CacheUniqueKey, CachedPC>> entryIter = objs.entrySet().iterator();
+        while (entryIter.hasNext())
+        {
+            Map.Entry<CacheUniqueKey, CachedPC> entry = entryIter.next();
+            putUnique(entry.getKey(), entry.getValue());
+        }
+    }
+
+    /**
      * Method to remove any object cached against the provided unique key.
      * @param key Unique key
      */

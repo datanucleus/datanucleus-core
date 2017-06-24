@@ -4766,7 +4766,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         int batchSize = nucCtx.getConfiguration().getIntProperty(PropertyNames.PROPERTY_CACHE_L2_BATCHSIZE);
         Level2Cache l2Cache = nucCtx.getLevel2Cache();
-        Map<Object, CachedPC> dataToUpdate = new HashMap<Object, CachedPC>();
+        Map<Object, CachedPC> dataToUpdate = new HashMap<>();
+        Map<CacheUniqueKey, CachedPC> dataUniqueToUpdate = new HashMap<>();
         for (ObjectProvider op : ops)
         {
             Object id = op.getInternalObjectId();
@@ -4783,6 +4784,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 dataToUpdate.put(id, cachedPC);
                 if (dataToUpdate.size() == batchSize)
                 {
+                    // Put this batch of objects in the L2 cache
                     l2Cache.putAll(dataToUpdate);
                     dataToUpdate.clear();
                 }
@@ -4799,17 +4801,29 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         CacheUniqueKey uniKey = getCacheUniqueKeyForObjectProvider(op, unimd);
                         if (uniKey != null)
                         {
-                            l2Cache.putUnique(uniKey, cachedPC);
+                            dataUniqueToUpdate.put(uniKey, cachedPC);
+                            if (dataUniqueToUpdate.size() == batchSize)
+                            {
+                                // Put this batch of unique keyed objects in the L2 cache
+                                l2Cache.putUniqueAll(dataUniqueToUpdate);
+                                dataUniqueToUpdate.clear();
+                            }
                         }
                     }
                 }
             }
         }
 
+        // Put all remaining objects
         if (!dataToUpdate.isEmpty())
         {
             l2Cache.putAll(dataToUpdate);
             dataToUpdate.clear();
+        }
+        if (!dataUniqueToUpdate.isEmpty())
+        {
+            l2Cache.putUniqueAll(dataUniqueToUpdate);
+            dataUniqueToUpdate.clear();
         }
     }
 

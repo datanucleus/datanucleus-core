@@ -413,6 +413,15 @@ public class WeakLevel2Cache implements Level2Cache
     }
 
     /* (non-Javadoc)
+     * @see org.datanucleus.cache.Level2Cache#putUniqueAll(java.util.Map)
+     */
+    @Override
+    public void putUniqueAll(Map<CacheUniqueKey, CachedPC> objs)
+    {
+        uniqueKeyCache.putAll(objs);
+    }
+
+    /* (non-Javadoc)
      * @see org.datanucleus.cache.Level2Cache#removeUnique(org.datanucleus.cache.CacheUniqueKey)
      */
     @Override
