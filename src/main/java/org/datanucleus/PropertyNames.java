@@ -152,6 +152,7 @@ public class PropertyNames
     public static final String PROPERTY_CACHE_QUERYRESULTS_TYPE = "datanucleus.cache.queryResults.type";
     public static final String PROPERTY_CACHE_QUERYRESULTS_NAME = "datanucleus.cache.queryResults.cacheName";
     public static final String PROPERTY_CACHE_QUERYRESULTS_MAXSIZE = "datanucleus.cache.queryResults.maxSize";
+    public static final String PROPERTY_CACHE_QUERYRESULTS_CLEARATCLOSE = "datanucleus.cache.queryResults.clearAtClose";
     public static final String PROPERTY_CACHE_QUERYRESULTS_EXPIRY_MILLIS = "datanucleus.cache.queryResults.expiryMillis";
     public static final String PROPERTY_CACHE_QUERYRESULTS_CONFIG_FILE = "datanucleus.cache.queryResults.configurationFile";
 

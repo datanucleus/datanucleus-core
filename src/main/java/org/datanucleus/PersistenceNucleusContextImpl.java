@@ -279,6 +279,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_TYPE, null, "soft", null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_NAME, null, "datanucleus-query", null, false, false);
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_MAXSIZE, null, -1, false, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_CLEARATCLOSE, null, true, false, false);
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_EXPIRY_MILLIS, null, -1, false, false);
 
         // Queries

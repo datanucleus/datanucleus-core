@@ -24,7 +24,7 @@ import org.datanucleus.NucleusContext;
 /**
  * Strong-reference implementation of a query results cache.
  */
-public class StrongQueryResultsCache extends AbstractQueryResultsCache
+public class StrongQueryResultsCache extends AbstractMapQueryResultsCache
 {
     private static final long serialVersionUID = -8309204044669474063L;
 

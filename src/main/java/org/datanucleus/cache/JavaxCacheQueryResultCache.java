@@ -30,17 +30,16 @@ import javax.cache.configuration.MutableConfiguration;
 import javax.cache.spi.CachingProvider;
 
 import org.datanucleus.NucleusContext;
-import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.QueryUtils;
 import org.datanucleus.store.query.Query;
-import org.datanucleus.store.query.cache.QueryResultsCache;
+import org.datanucleus.store.query.cache.AbstractQueryResultsCache;
 import org.datanucleus.util.NucleusLogger;
 
 /**
  * Implementation of a query results cache using javax.cache (v0.3+) interface.
  */
-public class JavaxCacheQueryResultCache implements QueryResultsCache
+public class JavaxCacheQueryResultCache extends AbstractQueryResultsCache
 {
     private static final long serialVersionUID = -3967431477335678467L;
 
@@ -52,12 +51,7 @@ public class JavaxCacheQueryResultCache implements QueryResultsCache
      */
     public JavaxCacheQueryResultCache(NucleusContext nucleusCtx)
     {
-        String cacheName = nucleusCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_NAME);
-        if (cacheName == null)
-        {
-            NucleusLogger.CACHE.warn("No " + PropertyNames.PROPERTY_CACHE_QUERYRESULTS_NAME + " specified so using name of 'DataNucleus-Query'");
-            cacheName = "datanucleus-query";
-        }
+        super(nucleusCtx);
 
         try
         {

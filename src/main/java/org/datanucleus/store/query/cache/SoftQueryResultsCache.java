@@ -24,7 +24,7 @@ import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 /**
  * Soft-reference implementation of a query results cache.
  */
-public class SoftQueryResultsCache extends AbstractQueryResultsCache
+public class SoftQueryResultsCache extends AbstractMapQueryResultsCache
 {
     private static final long serialVersionUID = -2353653447203789565L;
 

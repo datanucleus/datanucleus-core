@@ -24,7 +24,7 @@ import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 /**
  * Weak-reference implementation of a query results cache.
  */
-public class WeakQueryResultsCache extends AbstractQueryResultsCache
+public class WeakQueryResultsCache extends AbstractMapQueryResultsCache
 {
     private static final long serialVersionUID = 5007468676679033002L;
 

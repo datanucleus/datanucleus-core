@@ -1,5 +1,5 @@
 /**********************************************************************
-Copyright (c) 2009 Andy Jefferson and others. All rights reserved.
+Copyright (c) 2017 Andy Jefferson and others. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -13,242 +13,53 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 Contributors:
-   ...
-**********************************************************************/
+     ...
+ **********************************************************************/
 package org.datanucleus.store.query.cache;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import org.datanucleus.Configuration;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.PropertyNames;
-import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.query.QueryUtils;
-import org.datanucleus.store.query.Query;
 import org.datanucleus.util.NucleusLogger;
 
 /**
- * Abstract representation of a query results cache for the query.
+ * Root implementation of a query results cache, providing provessing of common persistence properties.
  */
-public class AbstractQueryResultsCache implements QueryResultsCache
+public abstract class AbstractQueryResultsCache implements QueryResultsCache
 {
-    private static final long serialVersionUID = -1071931192920096219L;
+    private static final long serialVersionUID = 5815194081248492071L;
 
-    /** Keys to pin, if entering into the cache. */
-    Set<String> keysToPin = new HashSet<String>();
+    protected NucleusContext nucleusCtx;
 
-    /** Cache of pinned objects. */
-    Map<String, List<Object>> pinnedCache = new HashMap<String, List<Object>>();
+    /** Maximum size of cache (if supported by the plugin). */
+    protected int maxSize = -1;
 
-    /** Cache of unpinned objects. */
-    Map<String, List<Object>> cache = null;
+    /** Whether to clear out all objects at close(). */
+    protected boolean clearAtClose = true;
 
-    private int maxSize = -1;
-    private final NucleusContext nucCtx;
+    /** Timeout for cache object expiration (milliseconds). */
+    protected long expiryMillis = -1;
+
+    /** Name of the cache to use. */
+    protected String cacheName;
 
     public AbstractQueryResultsCache(NucleusContext nucleusCtx)
     {
-        maxSize = nucleusCtx.getConfiguration().getIntProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_MAXSIZE);
-        nucCtx = nucleusCtx;
-    }
+        this.nucleusCtx = nucleusCtx;
+        Configuration conf = nucleusCtx.getConfiguration();
+        maxSize = conf.getIntProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_MAXSIZE);
+        clearAtClose = conf.getBooleanProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_CLEARATCLOSE, true);
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#close()
-     */
-    public void close()
-    {
-        cache.clear();
-        cache = null;
-        pinnedCache.clear();
-        pinnedCache = null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#contains(java.lang.String)
-     */
-    public boolean contains(String queryKey)
-    {
-        return cache.containsKey(queryKey);
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#evict(java.lang.Class)
-     */
-    public synchronized void evict(Class candidate)
-    {
-        AbstractClassMetaData cmd = nucCtx.getMetaDataManager().getMetaDataForClass(candidate, nucCtx.getClassLoaderResolver(candidate.getClassLoader()));
-        Iterator<String> iter = cache.keySet().iterator();
-        while (iter.hasNext())
+        if (conf.hasProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_EXPIRY_MILLIS))
         {
-            String key = iter.next();
-            if (key.matches("JDOQL:.* FROM " + candidate.getName() + ".*"))
-            {
-                NucleusLogger.GENERAL.info(">> Evicting query results for key="+key);
-                iter.remove();
-            }
-            else if (key.matches("JPQL:.* FROM " + candidate.getName() + ".*"))
-            {
-                NucleusLogger.GENERAL.info(">> Evicting query results for key="+key);
-                iter.remove();
-            }
-            else if (key.matches("JPQL:.* FROM " + cmd.getEntityName()+".*"))
-            {
-                NucleusLogger.GENERAL.info(">> Evicting query results for key="+key);
-                iter.remove();
-            }
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#evictAll()
-     */
-    public synchronized void evictAll()
-    {
-        cache.clear();
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#evict(org.datanucleus.store.query.Query)
-     */
-    public synchronized void evict(Query query)
-    {
-        String baseKey = QueryUtils.getKeyForQueryResultsCache(query, null);
-        Iterator<String> iter = cache.keySet().iterator();
-        while (iter.hasNext())
-        {
-            String key = iter.next();
-            if (key.startsWith(baseKey))
-            {
-                iter.remove();
-            }
-        }
-        iter = pinnedCache.keySet().iterator();
-        while (iter.hasNext())
-        {
-            String key = iter.next();
-            if (key.startsWith(baseKey))
-            {
-                iter.remove();
-            }
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#evict(org.datanucleus.store.query.Query, java.util.Map)
-     */
-    public synchronized void evict(Query query, Map params)
-    {
-        String key = QueryUtils.getKeyForQueryResultsCache(query, params);
-        cache.remove(key);
-        pinnedCache.remove(key);
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#pin(org.datanucleus.store.query.Query, java.util.Map)
-     */
-    public void pin(Query query, Map params)
-    {
-        String key = QueryUtils.getKeyForQueryResultsCache(query, params);
-        List<Object> results = cache.get(key);
-        if (results != null)
-        {
-            keysToPin.add(key);
-            pinnedCache.put(key, results);
-            cache.remove(key);
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#pin(org.datanucleus.store.query.Query)
-     */
-    public void pin(Query query)
-    {
-        String key = QueryUtils.getKeyForQueryResultsCache(query, null);
-        List<Object> results = cache.get(key);
-        if (results != null)
-        {
-            keysToPin.add(key);
-            pinnedCache.put(key, results);
-            cache.remove(key);
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#unpin(org.datanucleus.store.query.Query, java.util.Map)
-     */
-    public void unpin(Query query, Map params)
-    {
-        String key = QueryUtils.getKeyForQueryResultsCache(query, params);
-        List<Object> results = pinnedCache.get(key);
-        if (results != null)
-        {
-            keysToPin.remove(key);
-            cache.put(key, results);
-            pinnedCache.remove(key);
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#unpin(org.datanucleus.store.query.Query)
-     */
-    public void unpin(Query query)
-    {
-        String key = QueryUtils.getKeyForQueryResultsCache(query, null);
-        List<Object> results = pinnedCache.get(key);
-        if (results != null)
-        {
-            keysToPin.remove(key);
-            cache.put(key, results);
-            pinnedCache.remove(key);
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#get(java.lang.String)
-     */
-    public List<Object> get(String queryKey)
-    {
-        if (pinnedCache.containsKey(queryKey))
-        {
-            return pinnedCache.get(queryKey);
-        }
-        return cache.get(queryKey);
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#isEmpty()
-     */
-    public boolean isEmpty()
-    {
-        return cache.isEmpty();
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#put(java.lang.String, java.util.List)
-     */
-    public synchronized List<Object> put(String queryKey, List<Object> results)
-    {
-        if (maxSize >= 0 && size() == maxSize)
-        {
-            return null;
+            expiryMillis = conf.getIntProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_EXPIRY_MILLIS);
         }
 
-        if (keysToPin.contains(queryKey))
+        cacheName = conf.getStringProperty(PropertyNames.PROPERTY_CACHE_QUERYRESULTS_NAME);
+        if (cacheName == null)
         {
-            return pinnedCache.put(queryKey, results);
+            NucleusLogger.CACHE.warn("No property " + PropertyNames.PROPERTY_CACHE_QUERYRESULTS_NAME + " specified so using name of 'DataNucleus-Query'");
+            cacheName = "DataNucleus-Query";
         }
-        return cache.put(queryKey, results);
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#size()
-     */
-    public int size()
-    {
-        return cache.size();
     }
 }
