@@ -50,10 +50,10 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
     private static final long serialVersionUID = 3218890128547271239L;
 
     /** Cache of CachedPC keyed by "id". */
-    private final Cache cache;
+    private Cache cache;
 
     /** Cache of "id" keyed by "uniqueKey". */
-    private final Cache cacheUnique;
+    private Cache cacheUnique;
 
     /**
      * Constructor.
@@ -142,8 +142,29 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
     {
         if (clearAtClose)
         {
-            evictAll();
+            try
+            {
+                cache.removeAll();
+            }
+            catch (Exception re)
+            {
+                NucleusLogger.CACHE.debug("Objects not evicted from cache due to : " + re.getMessage());
+            }
+            cache.close();
+
+            try
+            {
+                cacheUnique.removeAll();
+            }
+            catch (Exception re)
+            {
+                NucleusLogger.CACHE.debug("Objects not evicted from cache due to : " + re.getMessage());
+            }
+            cacheUnique.close();
         }
+
+        cache = null;
+        cacheUnique = null;
     }
 
     /**
@@ -198,7 +219,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
      * @param oid The identity
      * @param pc The cacheable object
      */
-    public synchronized CachedPC put(Object oid, CachedPC pc)
+    public CachedPC put(Object oid, CachedPC pc)
     {
         if (oid == null || pc == null)
         {
@@ -247,7 +268,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
      * Evict the parameter instance from the second-level cache.
      * @param oid the object id of the instance to evict.
      */
-    public synchronized void evict(Object oid)
+    public void evict(Object oid)
     {
         try
         {
@@ -264,7 +285,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
      * All instances in the PersistenceManager's cache are evicted
      * from the second-level cache.
      */
-    public synchronized void evictAll()
+    public void evictAll()
     {
         try
         {
@@ -280,7 +301,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
      * Evict the parameter instances from the second-level cache.
      * @param oids the object ids of the instance to evict.
      */
-    public synchronized void evictAll(Collection oids)
+    public void evictAll(Collection oids)
     {
         if (oids == null)
         {
@@ -308,7 +329,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
      * Evict the parameter instances from the second-level cache.
      * @param oids the object ids of the instance to evict.
      */
-    public synchronized void evictAll(Object[] oids)
+    public void evictAll(Object[] oids)
     {
         if (oids == null)
         {
@@ -331,7 +352,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
      * @param pcClass the class of instances to evict
      * @param subclasses if true, evict instances of subclasses also
      */
-    public synchronized void evictAll(Class pcClass, boolean subclasses)
+    public void evictAll(Class pcClass, boolean subclasses)
     {
         if (!nucleusCtx.getApiAdapter().isPersistable(pcClass))
         {

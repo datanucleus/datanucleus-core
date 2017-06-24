@@ -42,7 +42,7 @@ import org.datanucleus.util.NucleusLogger;
 public class JavaxCacheQueryResultCache implements QueryResultsCache
 {
     private static final long serialVersionUID = -3967431477335678467L;
-    /** The cache to use. */
+
     private Cache cache;
 
     /**
@@ -51,13 +51,13 @@ public class JavaxCacheQueryResultCache implements QueryResultsCache
      */
     public JavaxCacheQueryResultCache(NucleusContext nucleusCtx)
     {
-        org.datanucleus.Configuration conf = nucleusCtx.getConfiguration();
-        String cacheName = conf.getStringProperty("datanucleus.cache.queryResults.cacheName");
+        String cacheName = nucleusCtx.getConfiguration().getStringProperty("datanucleus.cache.queryResults.cacheName");
         if (cacheName == null)
         {
             NucleusLogger.CACHE.warn("No 'datanucleus.cache.queryResults.cacheName' specified so using name of 'DataNucleus-Query'");
             cacheName = "datanucleus-query";
         }
+
         try
         {
             CachingProvider cacheProvider = Caching.getCachingProvider();
@@ -83,7 +83,14 @@ public class JavaxCacheQueryResultCache implements QueryResultsCache
      */
     public void close()
     {
-        evictAll();
+        try
+        {
+            cache.removeAll();
+        }
+        catch (Exception re)
+        {
+            NucleusLogger.CACHE.debug("Objects not evicted from cache due to : " + re.getMessage());
+        }
         cache = null;
     }
 
@@ -106,7 +113,7 @@ public class JavaxCacheQueryResultCache implements QueryResultsCache
     /* (non-Javadoc)
      * @see org.datanucleus.store.query.cache.QueryResultsCache#evict(org.datanucleus.store.query.Query)
      */
-    public synchronized void evict(Query query)
+    public void evict(Query query)
     {
         String baseKey = QueryUtils.getKeyForQueryResultsCache(query, null);
         Iterator<Cache.Entry> entryIter = cache.iterator();
@@ -124,7 +131,7 @@ public class JavaxCacheQueryResultCache implements QueryResultsCache
     /* (non-Javadoc)
      * @see org.datanucleus.store.query.cache.QueryResultsCache#evict(org.datanucleus.store.query.Query, java.util.Map)
      */
-    public synchronized void evict(Query query, Map params)
+    public void evict(Query query, Map params)
     {
         String key = QueryUtils.getKeyForQueryResultsCache(query, params);
         cache.remove(key);
@@ -133,41 +140,16 @@ public class JavaxCacheQueryResultCache implements QueryResultsCache
     /* (non-Javadoc)
      * @see org.datanucleus.store.query.cache.QueryResultsCache#clear()
      */
-    public synchronized void evictAll()
+    public void evictAll()
     {
-        cache.removeAll();
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#pin(org.datanucleus.store.query.Query, java.util.Map)
-     */
-    public void pin(Query query, Map params)
-    {
-        return;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#pin(org.datanucleus.store.query.Query)
-     */
-    public void pin(Query query)
-    {
-        return;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#unpin(org.datanucleus.store.query.Query, java.util.Map)
-     */
-    public void unpin(Query query, Map params)
-    {
-        return;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#unpin(org.datanucleus.store.query.Query)
-     */
-    public void unpin(Query query)
-    {
-        return;
+        try
+        {
+            cache.removeAll();
+        }
+        catch (Exception re)
+        {
+            NucleusLogger.CACHE.debug("Objects not evicted from cache due to : " + re.getMessage());
+        }
     }
 
     /* (non-Javadoc)
@@ -179,17 +161,9 @@ public class JavaxCacheQueryResultCache implements QueryResultsCache
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#isEmpty()
-     */
-    public boolean isEmpty()
-    {
-        return size() == 0;
-    }
-
-    /* (non-Javadoc)
      * @see org.datanucleus.store.query.cache.QueryResultsCache#put(java.lang.String, java.util.List)
      */
-    public synchronized List<Object> put(String queryKey, List<Object> results)
+    public List<Object> put(String queryKey, List<Object> results)
     {
         if (queryKey == null || results == null)
         {
@@ -206,14 +180,5 @@ public class JavaxCacheQueryResultCache implements QueryResultsCache
             NucleusLogger.CACHE.info("Query results with key '" + queryKey + "' not cached. " + re.getMessage());
         }
         return results;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.cache.QueryResultsCache#size()
-     */
-    public int size()
-    {
-        // TODO Implement this
-        throw new UnsupportedOperationException("size() method not supported by this plugin");
     }
 }
