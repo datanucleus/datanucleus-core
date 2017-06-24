@@ -62,39 +62,58 @@ public interface QueryResultsCache extends Serializable
      * Method to pin the specified query in the cache, preventing garbage collection.
      * @param query The query
      */
-    void pin(Query query);
+    default void pin(Query query)
+    {
+        // Not supported
+    }
 
     /**
      * Method to pin the specified query in the cache, preventing garbage collection.
      * @param query The query
      * @param params Its params
      */
-    void pin(Query query, Map params);
+    default void pin(Query query, Map params)
+    {
+        // Not supported
+    }
 
     /**
      * Method to unpin the specified query from the cache, allowing garbage collection.
      * @param query The query
      */
-    void unpin(Query query);
+    default void unpin(Query query)
+    {
+        // Not supported
+    }
 
     /**
      * Method to unpin the specified query from the cache, allowing garbage collection.
      * @param query The query
      * @param params Its params
      */
-    void unpin(Query query, Map params);
+    default void unpin(Query query, Map params)
+    {
+        // Not supported
+    }
 
     /**
      * Accessor for whether the cache is empty.
      * @return Whether it is empty.
      */
-    boolean isEmpty();
+    default boolean isEmpty()
+    {
+        return size() == 0;
+    }
 
     /**
      * Accessor for the total number of results in the query cache.
      * @return Number of queries
      */
-    int size();
+    default int size()
+    {
+        // Some don't support it, so provide a default
+        return 0;
+    }
 
     /**
      * Accessor for the results from the cache.

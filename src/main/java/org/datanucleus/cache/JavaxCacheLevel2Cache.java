@@ -167,7 +167,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
         }
         catch (Exception e)
         {
-            NucleusLogger.CACHE.info("Object with id " + oid +" not retrieved from cache due to : " + e.getMessage());
+            NucleusLogger.CACHE.debug("Object with id " + oid +" not retrieved from cache due to : " + e.getMessage());
             return null;
         }
     }
@@ -188,7 +188,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
         }
         catch (Exception e)
         {
-            NucleusLogger.CACHE.info("Objects not retrieved from cache due to : " + e.getMessage());
+            NucleusLogger.CACHE.debug("Objects not retrieved from cache due to : " + e.getMessage());
             return null;
         }
     }
@@ -216,7 +216,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
         catch (Exception e)
         {
             // Not cached due to some problem. Not serializable?
-            NucleusLogger.CACHE.info("Object with id " + oid +" not cached due to : " + e.getMessage());
+            NucleusLogger.CACHE.debug("Object with id " + oid +" not cached due to : " + e.getMessage());
         }
         return pc;
     }
@@ -239,7 +239,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
         catch (Exception e)
         {
             // Not cached due to some problem. Not serializable?
-            NucleusLogger.CACHE.info("Objects not cached due to : " + e.getMessage());
+            NucleusLogger.CACHE.debug("Objects not cached due to : " + e.getMessage());
         }
     }
 
@@ -255,7 +255,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
         }
         catch (Exception re)
         {
-            NucleusLogger.CACHE.info("Object with id=" + oid + " not evicted from cache due to : " + re.getMessage());
+            NucleusLogger.CACHE.debug("Object with id=" + oid + " not evicted from cache due to : " + re.getMessage());
         }
     }
 
@@ -272,7 +272,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
         }
         catch (Exception re)
         {
-            NucleusLogger.CACHE.info("Objects not evicted from cache due to : " + re.getMessage());
+            NucleusLogger.CACHE.debug("Objects not evicted from cache due to : " + re.getMessage());
         }
     }
 
@@ -300,7 +300,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
         }
         catch (Exception re)
         {
-            NucleusLogger.CACHE.info("Objects not evicted from cache due to : " + re.getMessage());
+            NucleusLogger.CACHE.debug("Objects not evicted from cache due to : " + re.getMessage());
         }
     }
 
@@ -322,7 +322,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
         }
         catch (Exception re)
         {
-            NucleusLogger.CACHE.info("Objects not evicted from cache due to : " + re.getMessage());
+            NucleusLogger.CACHE.debug("Objects not evicted from cache due to : " + re.getMessage());
         }
     }
 
@@ -383,7 +383,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
         }
         catch (Exception re)
         {
-            NucleusLogger.CACHE.info("Objects not evicted from cache due to : " + re.getMessage());
+            NucleusLogger.CACHE.debug("Objects not evicted from cache due to : " + re.getMessage());
         }
     }
 
@@ -393,7 +393,6 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
     @Override
     public CachedPC getUnique(CacheUniqueKey key)
     {
-        NucleusLogger.GENERAL.info(">> JavaxCacheL2Cache.getUnique");
         return (CachedPC) cacheUnique.get(key);
     }
 
@@ -406,12 +405,11 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
         try
         {
             cacheUnique.put(key, pc);
-            NucleusLogger.GENERAL.info(">> JavaxCacheL2Cache.putUnique");
         }
         catch (Exception e)
         {
             // Not cached due to some problem. Not serializable?
-            NucleusLogger.CACHE.info("Object with key " + key +" not cached due to : " + e.getMessage());
+            NucleusLogger.CACHE.debug("Object with key " + key +" not cached due to : " + e.getMessage());
         }
         return pc;
     }
