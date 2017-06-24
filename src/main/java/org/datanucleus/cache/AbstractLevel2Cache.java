@@ -39,7 +39,7 @@ public abstract class AbstractLevel2Cache implements Level2Cache
     protected boolean clearAtClose = true;
 
     /** Timeout for cache object expiration (milliseconds). */
-    protected long timeout = -1;
+    protected long expiryMillis = -1;
 
     /** Name of the cache to use. */
     protected String cacheName;
@@ -51,9 +51,9 @@ public abstract class AbstractLevel2Cache implements Level2Cache
         maxSize = conf.getIntProperty(PropertyNames.PROPERTY_CACHE_L2_MAXSIZE);
         clearAtClose = conf.getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CLEARATCLOSE, true);
 
-        if (conf.hasProperty(PropertyNames.PROPERTY_CACHE_L2_TIMEOUT))
+        if (conf.hasProperty(PropertyNames.PROPERTY_CACHE_L2_EXPIRY_MILLIS))
         {
-            timeout = conf.getIntProperty(PropertyNames.PROPERTY_CACHE_L2_TIMEOUT);
+            expiryMillis = conf.getIntProperty(PropertyNames.PROPERTY_CACHE_L2_EXPIRY_MILLIS);
         }
 
         cacheName = conf.getStringProperty(PropertyNames.PROPERTY_CACHE_L2_NAME);

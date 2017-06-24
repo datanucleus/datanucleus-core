@@ -260,7 +260,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_CACHE_L2_MAXSIZE, null, -1, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_LOADFIELDS, null, true, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CLEARATCLOSE, null, true, false, false);
-        conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_CACHE_L2_TIMEOUT, null, -1, false, false);
+        conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_CACHE_L2_EXPIRY_MILLIS, null, -1, false, false);
         conf.addDefaultIntegerProperty(PropertyNames.PROPERTY_CACHE_L2_BATCHSIZE, null, 100, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CACHE_EMBEDDED, null, true, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_READ_THROUGH, null, true, false, false);

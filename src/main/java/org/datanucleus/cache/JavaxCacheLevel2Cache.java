@@ -88,9 +88,9 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
                 {
                     cacheConfig.setStoreByValue(conf.getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_STORE_BY_VALUE));
                 }
-                if (timeout > 0)
+                if (expiryMillis > 0)
                 {
-                    // TODO Some way to set the timeout/expiry
+                    // TODO Some way to set the expiry
                 }
                 cacheMgr.createCache(cacheName, cacheConfig);
                 tmpcache = cacheMgr.getCache(cacheName);
@@ -120,9 +120,9 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
                 {
                     cacheConfig.setStoreByValue(conf.getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_STORE_BY_VALUE));
                 }
-                if (timeout > 0)
+                if (expiryMillis > 0)
                 {
-                    // TODO Some way to set the timeout/expiry
+                    // TODO Some way to set the expiry
                 }
                 cacheMgr.createCache(cacheNameUnique, cacheConfig);
                 tmpcache = cacheMgr.getCache(cacheNameUnique);

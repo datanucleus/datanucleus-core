@@ -135,7 +135,7 @@ public class PropertyNames
     public static final String PROPERTY_CACHE_L2_MAXSIZE = "datanucleus.cache.level2.maxSize";
     public static final String PROPERTY_CACHE_L2_LOADFIELDS = "datanucleus.cache.level2.loadFields";
     public static final String PROPERTY_CACHE_L2_CLEARATCLOSE = "datanucleus.cache.level2.clearAtClose";
-    public static final String PROPERTY_CACHE_L2_TIMEOUT = "datanucleus.cache.level2.timeout";
+    public static final String PROPERTY_CACHE_L2_EXPIRY_MILLIS = "datanucleus.cache.level2.expiryMillis";
     public static final String PROPERTY_CACHE_L2_BATCHSIZE = "datanucleus.cache.level2.batchSize";
     public static final String PROPERTY_CACHE_L2_MODE = "datanucleus.cache.level2.mode";
     public static final String PROPERTY_CACHE_L2_CACHE_EMBEDDED = "datanucleus.cache.level2.cacheEmbedded";
