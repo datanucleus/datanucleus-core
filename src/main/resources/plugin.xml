@@ -393,7 +393,7 @@ Contributors:
         <cache name="soft" class-name="org.datanucleus.store.query.cache.SoftQueryResultsCache"/>
         <cache name="weak" class-name="org.datanucleus.store.query.cache.WeakQueryResultsCache"/>
         <cache name="strong" class-name="org.datanucleus.store.query.cache.StrongQueryResultsCache"/>
-        <cache name="javax.cache" class-name="org.datanucleus.cache.JavaxCacheQueryResultCache"/>
+        <cache name="javax.cache" class-name="org.datanucleus.store.query.cache.JavaxCacheQueryResultCache"/>
     </extension>
 
     <!-- QUERY METHODS (IN-MEMORY) -->

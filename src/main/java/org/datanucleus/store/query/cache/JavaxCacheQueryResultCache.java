@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
    ...
 **********************************************************************/
-package org.datanucleus.cache;
+package org.datanucleus.store.query.cache;
 
 import java.util.Iterator;
 import java.util.List;
@@ -33,7 +33,6 @@ import org.datanucleus.NucleusContext;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.QueryUtils;
 import org.datanucleus.store.query.Query;
-import org.datanucleus.store.query.cache.AbstractQueryResultsCache;
 import org.datanucleus.util.NucleusLogger;
 
 /**
