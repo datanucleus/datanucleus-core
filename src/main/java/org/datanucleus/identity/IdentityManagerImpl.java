@@ -59,8 +59,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         // Datastore Identity type
         String dsidName = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_DATASTORE_IDENTITY_TYPE);
-        String datastoreIdentityClassName = nucCtx.getPluginManager().getAttributeValueForExtension(
-            "org.datanucleus.store_datastoreidentity", "name", dsidName, "class-name");
+        String datastoreIdentityClassName = nucCtx.getPluginManager().getAttributeValueForExtension("org.datanucleus.store_datastoreidentity", "name", dsidName, "class-name");
         if (datastoreIdentityClassName == null)
         {
             // User has specified a datastore_identity plugin that has not registered
@@ -143,34 +142,30 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public DatastoreId getDatastoreId(String className, Object value)
     {
-        DatastoreId id;
         if (datastoreIdClass == ClassConstants.IDENTITY_DATASTORE_IMPL)
         {
-            //we hard code OIDImpl to improve performance
-            id = new DatastoreIdImpl(className, value);
+            // Hardcoded for performance
+            return new DatastoreIdImpl(className, value);
         }
-        else
+
+        // Others are pluggable
+        try
         {
-            //others are pluggable
-            try
+            Class[] ctrArgTypes = new Class[] {String.class, Object.class};
+            String ctrName = getConstructorNameForCache(datastoreIdClass, ctrArgTypes);
+            Constructor ctr = constructorCache.get(ctrName);
+            if (ctr == null)
             {
-                Class[] ctrArgTypes = new Class[] {String.class, Object.class};
-                String ctrName = getConstructorNameForCache(datastoreIdClass, ctrArgTypes);
-                Constructor ctr = constructorCache.get(ctrName);
-                if (ctr == null)
-                {
-                    ctr = datastoreIdClass.getConstructor(ctrArgTypes);
-                    constructorCache.put(ctrName, ctr);
-                }
-                id = (DatastoreId)ctr.newInstance(new Object[] {className, value});
+                ctr = datastoreIdClass.getConstructor(ctrArgTypes);
+                constructorCache.put(ctrName, ctr);
             }
-            catch (Exception e)
-            {
-                // TODO Localise this
-                throw new NucleusException("Error encountered while creating datastore instance for class \"" + className + "\"", e);
-            }
+            return (DatastoreId)ctr.newInstance(new Object[] {className, value});
         }
-        return id;
+        catch (Exception e)
+        {
+            // TODO Localise this
+            throw new NucleusException("Error encountered while creating datastore instance for class \"" + className + "\"", e);
+        }
     }
 
     /* (non-Javadoc)
@@ -179,34 +174,30 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public DatastoreId getDatastoreId(long value)
     {
-        DatastoreId id;
         if (datastoreIdClass == DatastoreUniqueLongId.class)
         {
-            // hard code DatastoreUniqueLongId to improve performance
-            id = new DatastoreUniqueLongId(value);
+            // Hardcoded for performance
+            return new DatastoreUniqueLongId(value);
         }
-        else
+
+        // Others are pluggable
+        try
         {
-            // others are pluggable
-            try
+            Class[] ctrArgTypes = new Class[] {Long.class};
+            String ctrName = getConstructorNameForCache(datastoreIdClass, ctrArgTypes);
+            Constructor ctr = constructorCache.get(ctrName);
+            if (ctr == null)
             {
-                Class[] ctrArgTypes = new Class[] {Long.class};
-                String ctrName = getConstructorNameForCache(datastoreIdClass, ctrArgTypes);
-                Constructor ctr = constructorCache.get(ctrName);
-                if (ctr == null)
-                {
-                    ctr = datastoreIdClass.getConstructor(ctrArgTypes);
-                    constructorCache.put(ctrName, ctr);
-                }
-                id = (DatastoreId)ctr.newInstance(new Object[] {Long.valueOf(value)});
+                ctr = datastoreIdClass.getConstructor(ctrArgTypes);
+                constructorCache.put(ctrName, ctr);
             }
-            catch (Exception e)
-            {
-                // TODO Localise this
-                throw new NucleusException("Error encountered while creating datastore instance for unique value \"" + value + "\"", e);
-            }
+            return (DatastoreId)ctr.newInstance(new Object[] {Long.valueOf(value)});
         }
-        return id;
+        catch (Exception e)
+        {
+            // TODO Localise this
+            throw new NucleusException("Error encountered while creating datastore instance for unique value \"" + value + "\"", e);
+        }
     }
 
     /* (non-Javadoc)
@@ -215,34 +206,30 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public DatastoreId getDatastoreId(String idString)
     {
-        DatastoreId id;
         if (datastoreIdClass == ClassConstants.IDENTITY_DATASTORE_IMPL)
         {
-            //we hard code OIDImpl to improve performance
-            id = new DatastoreIdImpl(idString);
+            // Hardcoded for performance
+            return new DatastoreIdImpl(idString);
         }
-        else
+
+        // Others are pluggable
+        try
         {
-            //others are pluggable
-            try
+            Class[] ctrArgTypes = new Class[] {String.class};
+            String ctrName = getConstructorNameForCache(datastoreIdClass, ctrArgTypes);
+            Constructor ctr = constructorCache.get(ctrName);
+            if (ctr == null)
             {
-                Class[] ctrArgTypes = new Class[] {String.class};
-                String ctrName = getConstructorNameForCache(datastoreIdClass, ctrArgTypes);
-                Constructor ctr = constructorCache.get(ctrName);
-                if (ctr == null)
-                {
-                    ctr = datastoreIdClass.getConstructor(ctrArgTypes);
-                    constructorCache.put(ctrName, ctr);
-                }
-                id = (DatastoreId)ctr.newInstance(new Object[] {idString});
+                ctr = datastoreIdClass.getConstructor(ctrArgTypes);
+                constructorCache.put(ctrName, ctr);
             }
-            catch (Exception e)
-            {
-                // TODO Localise this
-                throw new NucleusException("Error encountered while creating datastore instance for string \"" + idString + "\"", e);
-            }
+            return (DatastoreId)ctr.newInstance(new Object[] {idString});
         }
-        return id;
+        catch (Exception e)
+        {
+            // TODO Localise this
+            throw new NucleusException("Error encountered while creating datastore instance for string \"" + idString + "\"", e);
+        }
     }
 
     /**
@@ -279,8 +266,7 @@ public class IdentityManagerImpl implements IdentityManager
             keyType = Long.class;
             if (!(key instanceof Long))
             {
-                throw new NucleusException(Localiser.msg("029004", idType.getName(), 
-                    pcType.getName(), key.getClass().getName(), "Long")).setFatal();
+                throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "Long")).setFatal();
             }
         }
         else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_INT)
@@ -288,8 +274,7 @@ public class IdentityManagerImpl implements IdentityManager
             keyType = Integer.class;
             if (!(key instanceof Integer))
             {
-                throw new NucleusException(Localiser.msg("029004", idType.getName(), 
-                    pcType.getName(), key.getClass().getName(), "Integer")).setFatal();
+                throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "Integer")).setFatal();
             }
         }
         else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_STRING)
@@ -297,8 +282,7 @@ public class IdentityManagerImpl implements IdentityManager
             keyType = String.class;
             if (!(key instanceof String))
             {
-                throw new NucleusException(Localiser.msg("029004", idType.getName(), 
-                    pcType.getName(), key.getClass().getName(), "String")).setFatal();
+                throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "String")).setFatal();
             }
         }
         else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_BYTE)
@@ -306,8 +290,7 @@ public class IdentityManagerImpl implements IdentityManager
             keyType = Byte.class;
             if (!(key instanceof Byte))
             {
-                throw new NucleusException(Localiser.msg("029004", idType.getName(), 
-                    pcType.getName(), key.getClass().getName(), "Byte")).setFatal();
+                throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "Byte")).setFatal();
             }
         }
         else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_SHORT)
@@ -315,8 +298,7 @@ public class IdentityManagerImpl implements IdentityManager
             keyType = Short.class;
             if (!(key instanceof Short))
             {
-                throw new NucleusException(Localiser.msg("029004", idType.getName(), 
-                    pcType.getName(), key.getClass().getName(), "Short")).setFatal();
+                throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "Short")).setFatal();
             }
         }
         else if (idType == ClassConstants.IDENTITY_SINGLEFIELD_CHAR)
@@ -324,8 +306,7 @@ public class IdentityManagerImpl implements IdentityManager
             keyType = Character.class;
             if (!(key instanceof Character))
             {
-                throw new NucleusException(Localiser.msg("029004", idType.getName(), 
-                    pcType.getName(), key.getClass().getName(), "Character")).setFatal();
+                throw new NucleusException(Localiser.msg("029004", idType.getName(), pcType.getName(), key.getClass().getName(), "Character")).setFatal();
             }
         }
         else
@@ -372,7 +353,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         Class targetClass = clr.classForName(acmd.getFullClassName());
         Class idType = clr.classForName(acmd.getObjectidClass());
-        Object id = null;
+
         if (acmd.usesSingleFieldIdentityClass())
         {
             try
@@ -393,7 +374,7 @@ public class IdentityManagerImpl implements IdentityManager
                     ctr = idType.getConstructor(ctrArgTypes);
                     constructorCache.put(ctrName, ctr);
                 }
-                id = ctr.newInstance(new Object[] {targetClass, keyToString});
+                return ctr.newInstance(new Object[] {targetClass, keyToString});
             }
             catch (Exception e)
             {
@@ -401,38 +382,32 @@ public class IdentityManagerImpl implements IdentityManager
                 throw new NucleusException("Error encountered while creating single-field identity instance with key \"" + keyToString + "\"", e);
             }
         }
-        else
+
+        if (Modifier.isAbstract(targetClass.getModifiers()) && acmd.getObjectidClass() != null) 
         {
-            if (Modifier.isAbstract(targetClass.getModifiers()) && acmd.getObjectidClass() != null) 
+            try
             {
-                try
+                Class type = clr.classForName(acmd.getObjectidClass());
+                Class[] ctrArgTypes = new Class[] {String.class};
+                String ctrName = getConstructorNameForCache(type, ctrArgTypes);
+                Constructor ctr = constructorCache.get(ctrName);
+                if (ctr == null)
                 {
-                    Class type = clr.classForName(acmd.getObjectidClass());
-                    Class[] ctrArgTypes = new Class[] {String.class};
-                    String ctrName = getConstructorNameForCache(type, ctrArgTypes);
-                    Constructor ctr = constructorCache.get(ctrName);
-                    if (ctr == null)
-                    {
-                        ctr = type.getConstructor(ctrArgTypes);
-                        constructorCache.put(ctrName, ctr);
-                    }
-                    id = ctr.newInstance(new Object[] {keyToString});
+                    ctr = type.getConstructor(ctrArgTypes);
+                    constructorCache.put(ctrName, ctr);
                 }
-                catch (Exception e) 
-                {
-                    String msg = Localiser.msg("010030", acmd.getObjectidClass(), acmd.getFullClassName());
-                    NucleusLogger.PERSISTENCE.error(msg, e);
-                    throw new NucleusUserException(msg);
-                }
+                return ctr.newInstance(new Object[] {keyToString});
             }
-            else
+            catch (Exception e) 
             {
-                clr.classForName(targetClass.getName(), true);
-                id = EnhancementHelper.getInstance().newObjectIdInstance(targetClass, keyToString);
+                String msg = Localiser.msg("010030", acmd.getObjectidClass(), acmd.getFullClassName());
+                NucleusLogger.PERSISTENCE.error(msg, e);
+                throw new NucleusUserException(msg);
             }
         }
 
-        return id;
+        clr.classForName(targetClass.getName(), true);
+        return EnhancementHelper.getInstance().newObjectIdInstance(targetClass, keyToString);
     }
 
     /**

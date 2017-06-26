@@ -22,8 +22,7 @@ import org.datanucleus.util.Localiser;
 /**
  * Object identifier, typically used for datastore identity.
  * The behaviour of this class is governed by JDO spec 5.4.3.
- * Utilises a String form of the style "mydomain.MyClass:3258".
- * This is a form similar to Xcalia. Note : Xcalia also allows "{alias}:3258" but this isn't catered for here
+ * Utilises a String form of the style "mydomain.MyClass:3258"; this is a form similar to Xcalia. Note : Xcalia also allows "{alias}:3258" but this isn't catered for here
  */
 public class DatastoreIdImplXcalia implements java.io.Serializable, DatastoreId, Comparable
 {
@@ -31,30 +30,20 @@ public class DatastoreIdImplXcalia implements java.io.Serializable, DatastoreId,
 
     protected static final transient String STRING_DELIMITER = ":";
 
-    // JDO spec 5.4.3 says: all serializable fields of ObjectID classes are required to be public.
+    // JDO spec 5.4.3 says: all serializable fields of ID classes are required to be public.
 
     public final Object keyAsObject;
 
     public final String targetClassName;
 
-    /** pre-created toString to improve performance **/ 
     public final String toString;
 
-    /** pre-created hasCode to improve performance **/ 
     public final int hashCode;
 
-    public DatastoreIdImplXcalia()
-    {
-        keyAsObject = null;
-        targetClassName = null; 
-        toString = null;
-        hashCode = -1;
-    }
-
-    public DatastoreIdImplXcalia(String pcClass, Object object)
+    public DatastoreIdImplXcalia(String pcClass, Object key)
     {
         this.targetClassName = pcClass;
-        this.keyAsObject = object;
+        this.keyAsObject = key;
 
         StringBuilder s = new StringBuilder();
         s.append(this.targetClassName);
@@ -65,8 +54,8 @@ public class DatastoreIdImplXcalia implements java.io.Serializable, DatastoreId,
     }
 
     /**
-     * Constructs an OID from its string representation that is consistent with the output of toString().
-     * @param str the string representation of an OID
+     * Constructs a DatastoreId from its string representation that is consistent with the output of toString().
+     * @param str the string representation of a DatastoreId
      * @exception IllegalArgumentException if the given string representation is not valid.
      * @see #toString
      */

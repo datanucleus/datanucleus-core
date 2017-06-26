@@ -20,6 +20,7 @@ package org.datanucleus.state;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.Configuration;
@@ -43,7 +44,7 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
 {
     Class opClass = null;
 
-    public static final Class[] OBJECT_PROVIDER_CTR_ARG_CLASSES = new Class[] {ExecutionContext.class, AbstractClassMetaData.class};
+    public static final Class[] OBJECT_PROVIDER_CTR_ARG_CLASSES = new Class[] {ClassConstants.EXECUTION_CONTEXT, AbstractClassMetaData.class};
 
     // Single pool of all ObjectProvider objects. TODO Consider having one pool per object type.
 //    ObjectProviderPool opPool = null;

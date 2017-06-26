@@ -37,30 +37,20 @@ public class DatastoreIdImpl implements java.io.Serializable, DatastoreId, Compa
 
     protected static final transient String STRING_DELIMITER = "[OID]";
 
-    // JDO spec 5.4.3 says: all serializable fields of ObjectID classes are required to be public.
+    // JDO spec 5.4.3 says: all serializable fields of ID classes are required to be public.
 
     public final Object keyAsObject;
 
     public final String targetClassName;
 
-    /** pre-created toString to improve performance **/ 
     public final String toString;
 
-    /** pre-created hasCode to improve performance **/ 
     public final int hashCode;
 
-    public DatastoreIdImpl()
-    {
-        keyAsObject = null;
-        targetClassName = null; 
-        toString = null;
-        hashCode = -1;
-    }
-
-    public DatastoreIdImpl(String pcClass, Object object)
+    public DatastoreIdImpl(String pcClass, Object key)
     {
         this.targetClassName = pcClass;
-        this.keyAsObject = object;
+        this.keyAsObject = key;
 
         StringBuilder s = new StringBuilder();
         s.append(this.keyAsObject.toString());
@@ -71,8 +61,8 @@ public class DatastoreIdImpl implements java.io.Serializable, DatastoreId, Compa
     }
 
     /**
-     * Constructs an identity from its string representation that is consistent with the output of toString().
-     * @param str the string representation of an OID
+     * Constructs a DatastoreId from its string representation that is consistent with the output of toString().
+     * @param str the string representation of a DatastoreId
      * @exception IllegalArgumentException if the given string representation is not valid.
      * @see #toString
      */
