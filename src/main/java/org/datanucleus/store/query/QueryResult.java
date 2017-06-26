@@ -26,8 +26,7 @@ import java.util.Collection;
  * The lifecycle of a QueryResult is as follows
  * <ul>
  * <li><b>Open, Connected, With Connection</b> - the query has been run and the results returned.</li>
- * <li><b>Open, Disconnected</b> - the query has been run, and the txn committed, and the PM closed so has 
- *     its results available internally</li>
+ * <li><b>Open, Disconnected</b> - the query has been run, and the txn committed, and the PM closed so has its results available internally</li>
  * <li><b>Closed, Disconnected</b> - the query has been run, txn committed, query results closed.</li>
  * </ul>
  * 
@@ -41,8 +40,7 @@ public interface QueryResult<E> extends Collection<E>
     void close();
 
     /**
-     * Method to disconnect the results from the ExecutionContext, meaning that thereafter it just behaves
-     * like a List.
+     * Method to disconnect the results from the ExecutionContext, meaning that thereafter it just behaves like a List.
      */
     void disconnect();
 }

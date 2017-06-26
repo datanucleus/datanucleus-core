@@ -164,7 +164,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
     {
         if (connectionListeners == null)
         {
-            connectionListeners = new ArrayList();
+            connectionListeners = new ArrayList<>();
         }
         connectionListeners.add(listener);
     }
@@ -192,68 +192,8 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
     // ------------------------- Implementation of the List -------------------------
 
     /**
-     * Method to add a result. Unsupported.
-     * @param index The position to add
-     * @param element The results to add
-     */
-    public void add(int index, E element)
-    {
-        throw new UnsupportedOperationException(Localiser.msg("052603"));
-    }
-
-    /**
-     * Method to add results. Unsupported.
-     * @param o The result to add
-     * @return true if added successfully
-     */
-    public boolean add(E o)
-    {
-        throw new UnsupportedOperationException(Localiser.msg("052603"));
-    }
-
-    /**
-     * Method to add results. Unsupported.
-     * @param index The position to add
-     * @param c The results to add
-     * @return true if added successfully
-     */
-    public boolean addAll(int index, Collection c)
-    {
-        throw new UnsupportedOperationException(Localiser.msg("052603"));
-    }
-
-    /**
-     * Method to clear the results.
-     */
-    public void clear()
-    {
-        throw new UnsupportedOperationException(Localiser.msg("052603"));
-    }
-
-    /**
-     * Method to check if the specified object is contained in this result.
-     * @param o The object
-     * @return Whether it is contained here.
-     */
-    public boolean contains(Object o)
-    {
-        throw new UnsupportedOperationException(Localiser.msg("052604"));
-    }
-
-    /**
-     * Method to check if all of the specified objects are contained here.
-     * @param c The collection of objects
-     * @return Whether they are all contained here.
-     */
-    public boolean containsAll(Collection c)
-    {
-        throw new UnsupportedOperationException(Localiser.msg("052604"));
-    }
-
-    /**
      * Equality operator for QueryResults.
-     * Overrides the AbstractList implementation since that uses 
-     * size() and iterator() and that would cause problems when closed.
+     * Overrides the AbstractList implementation since that uses size() and iterator() and that would cause problems when closed.
      * @param o The object to compare against
      * @return Whether they are equal
      */
@@ -281,39 +221,10 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
     }
 
     /**
-     * Method to check the index of a result. Not supported.
-     * @param o The result
-     * @return The position
-     */
-    public int indexOf(Object o)
-    {
-        throw new UnsupportedOperationException(Localiser.msg("052604"));
-    }
-
-    /**
-     * Returns <tt>true</tt> if this collection contains no elements.<p>
-     * @return <tt>true</tt> if this collection contains no elements.
-     */
-    public boolean isEmpty()
-    {
-        return size() < 1;
-    }
-
-    /**
      * Accessor for an iterator for the results.
      * @return The iterator
      */
     public abstract Iterator<E> iterator();
-
-    /**
-     * Method to check the last index of a result. Not supported.
-     * @param o The result
-     * @return The last index
-     */
-    public int lastIndexOf(Object o)
-    {
-        throw new UnsupportedOperationException(Localiser.msg("052604"));
-    }
 
     /**
      * Accessor for a list iterator for the results.
@@ -322,24 +233,12 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
     public abstract ListIterator<E> listIterator();
 
     /**
-     * Method to remove a result. Not supported.
-     * @param index The position of the result.
-     * @return The removed object.
+     * Returns <tt>true</tt> if this collection contains no elements.
+     * @return <tt>true</tt> if this collection contains no elements.
      */
-    public E remove(int index)
+    public boolean isEmpty()
     {
-        throw new UnsupportedOperationException(Localiser.msg("052603"));
-    }
-
-    /**
-     * Method to set the position of a result. Not supported.
-     * @param index Position of the result
-     * @param element The result
-     * @return The element
-     */
-    public E set(int index, E element)
-    {
-        throw new UnsupportedOperationException(Localiser.msg("052603"));
+        return size() < 1;
     }
 
     /**
@@ -403,14 +302,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
         {
             for (int i = 0; i < a.length; i++)
             {
-                if (i < theSize)
-                {
-                    a[i] = get(i);
-                }
-                else
-                {
-                    a[i] = null;
-                }
+                a[i] = (i < theSize) ? get(i) : null;
             }
             return a;
         }
@@ -511,5 +403,105 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
             throw new NucleusUserException("datanucleus.query.resultSizeMethod of \"COUNT\" is only valid for use with JDOQL or JPQL currently");
         }
         throw new NucleusUserException("DataNucleus doesnt currently support any method \"" + resultSizeMethod + "\" for determining the size of the query results");
+    }
+
+    /**
+     * Method to add a result. Unsupported.
+     * @param index The position to add
+     * @param element The results to add
+     */
+    public void add(int index, E element)
+    {
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
+    }
+
+    /**
+     * Method to add results. Unsupported.
+     * @param o The result to add
+     * @return true if added successfully
+     */
+    public boolean add(E o)
+    {
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
+    }
+
+    /**
+     * Method to add results. Unsupported.
+     * @param index The position to add
+     * @param c The results to add
+     * @return true if added successfully
+     */
+    public boolean addAll(int index, Collection c)
+    {
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
+    }
+
+    /**
+     * Method to clear the results.
+     */
+    public void clear()
+    {
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
+    }
+
+    /**
+     * Method to check if the specified object is contained in this result.
+     * @param o The object
+     * @return Whether it is contained here.
+     */
+    public boolean contains(Object o)
+    {
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
+    }
+
+    /**
+     * Method to check if all of the specified objects are contained here.
+     * @param c The collection of objects
+     * @return Whether they are all contained here.
+     */
+    public boolean containsAll(Collection c)
+    {
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
+    }
+
+    /**
+     * Method to check the index of a result. Not supported.
+     * @param o The result
+     * @return The position
+     */
+    public int indexOf(Object o)
+    {
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
+    }
+
+    /**
+     * Method to check the last index of a result. Not supported.
+     * @param o The result
+     * @return The last index
+     */
+    public int lastIndexOf(Object o)
+    {
+        throw new UnsupportedOperationException(Localiser.msg("052604"));
+    }
+
+    /**
+     * Method to remove a result. Not supported.
+     * @param index The position of the result.
+     * @return The removed object.
+     */
+    public E remove(int index)
+    {
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
+    }
+
+    /**
+     * Method to set the position of a result. Not supported.
+     * @param index Position of the result
+     * @param element The result
+     * @return The element
+     */
+    public E set(int index, E element)
+    {
+        throw new UnsupportedOperationException(Localiser.msg("052603"));
     }
 }
