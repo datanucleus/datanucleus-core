@@ -151,27 +151,26 @@ public class RelationshipManagerImpl implements RelationshipManager
             // TODO What about Map?
             if (mmd.hasCollection())
             {
-                if (oldValue == null)
+                Collection oldColl = (Collection)oldValue;
+                Collection newColl = (Collection)newValue;
+                if (oldColl == null)
                 {
-                    if (newValue != null)
+                    if (newColl != null)
                     {
                         // Add all elements
-                        Iterator iter = ((Collection)newValue).iterator();
-                        while (iter.hasNext())
+                        for (Object newElem : newColl)
                         {
-                            changes.add(new RelationChange(ChangeType.ADD_OBJECT, iter.next()));
+                            changes.add(new RelationChange(ChangeType.ADD_OBJECT, newElem));
                         }
                     }
                 }
                 else
                 {
-                    if (newValue == null)
+                    if (newColl == null)
                     {
                         AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaData(ec.getClassLoaderResolver())[0];
-                        Iterator iter = ((Collection)oldValue).iterator();
-                        while (iter.hasNext())
+                        for (Object element : oldColl)
                         {
-                            Object element = iter.next();
                             if (ownerOP.getLifecycleState().isDeleted)
                             {
                                 // Deleting the owner, so register the element to reset its owner
@@ -198,15 +197,11 @@ public class RelationshipManagerImpl implements RelationshipManager
                     else
                     {
                         // Remove some and add some
-                        Iterator newIter = ((Collection)newValue).iterator();
-                        while (newIter.hasNext())
+                        for (Object newElem : newColl)
                         {
-                            Object newElem = newIter.next();
-                            Iterator oldIter = ((Collection)oldValue).iterator();
                             boolean alreadyExists = false;
-                            while (oldIter.hasNext())
+                            for (Object oldElem : oldColl)
                             {
-                                Object oldElem = oldIter.next();
                                 if (newElem == oldElem)
                                 {
                                     alreadyExists = true;
@@ -238,15 +233,12 @@ public class RelationshipManagerImpl implements RelationshipManager
                                 relationAdd(fieldNumber, newElem);
                             }
                         }
-                        Iterator oldIter = ((Collection)oldValue).iterator();
-                        while (oldIter.hasNext())
+
+                        for (Object oldElem : oldColl)
                         {
-                            Object oldElem = oldIter.next();
-                            newIter = ((Collection)newValue).iterator();
                             boolean stillExists = false;
-                            while (newIter.hasNext())
+                            for (Object newElem : newColl)
                             {
-                                Object newElem = newIter.next();
                                 if (oldElem == newElem)
                                 {
                                     stillExists = true;
@@ -437,10 +429,8 @@ public class RelationshipManagerImpl implements RelationshipManager
      */
     protected void checkOneToOneBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, List<RelationChange> changes)
     {
-        Iterator iter = changes.iterator();
-        while (iter.hasNext())
+        for (RelationChange change : changes)
         {
-            RelationChange change = (RelationChange)iter.next();
             if (change.type == ChangeType.CHANGE_OBJECT)
             {
                 Object newValue = ownerOP.provideField(mmd.getAbsoluteFieldNumber()); // TODO Use change.value (JDO TCK test pm.conf can fail due to being hollow instead of transient)
@@ -492,10 +482,8 @@ public class RelationshipManagerImpl implements RelationshipManager
      */
     protected void checkOneToManyBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, List<RelationChange> changes)
     {
-        Iterator iter = changes.iterator();
-        while (iter.hasNext())
+        for (RelationChange change : changes)
         {
-            RelationChange change = (RelationChange)iter.next();
             if (change.type == ChangeType.ADD_OBJECT)
             {
                 if (ec.getApiAdapter().isDeleted(change.value))
@@ -620,10 +608,8 @@ public class RelationshipManagerImpl implements RelationshipManager
      */
     protected void processOneToOneBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, List<RelationChange> changes)
     {
-        Iterator iter = changes.iterator();
-        while (iter.hasNext())
+        for (RelationChange change : changes)
         {
-            RelationChange change = (RelationChange)iter.next();
             if (change.type == ChangeType.CHANGE_OBJECT)
             {
                 Object oldValue = change.oldValue;
@@ -761,10 +747,8 @@ public class RelationshipManagerImpl implements RelationshipManager
         // TODO A better way here would be to consider a particular element and if removed+added
         // then we should allow for that in updates. Also, what if an element is reassigned to a different
         // collection; this is not really allowed for here since we only consider one collection
-        Iterator iter = changes.iterator();
-        while (iter.hasNext())
+        for (RelationChange change : changes)
         {
-            RelationChange change = (RelationChange)iter.next();
             if (change.type != ChangeType.ADD_OBJECT && change.type != ChangeType.REMOVE_OBJECT)
             {
                 continue;
@@ -837,10 +821,8 @@ public class RelationshipManagerImpl implements RelationshipManager
      */
     protected void processManyToOneBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, List<RelationChange> changes)
     {
-        Iterator iter = changes.iterator();
-        while (iter.hasNext())
+        for (RelationChange change : changes)
         {
-            RelationChange change = (RelationChange)iter.next();
             if (change.type == ChangeType.CHANGE_OBJECT)
             {
                 Object oldValue = change.oldValue;
@@ -929,10 +911,8 @@ public class RelationshipManagerImpl implements RelationshipManager
      */
     protected void processManyToManyBidirectionalRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr, ExecutionContext ec, List<RelationChange> changes)
     {
-        Iterator iter = changes.iterator();
-        while (iter.hasNext())
+        for (RelationChange change : changes)
         {
-            RelationChange change = (RelationChange)iter.next();
             if (change.type != ChangeType.ADD_OBJECT && change.type != ChangeType.REMOVE_OBJECT)
             {
                 continue;

@@ -37,7 +37,6 @@ import java.io.PrintWriter;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.BitSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -4208,10 +4207,8 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         {
             // Notify any owners that embed this object that it has just changed
             // We do this before we actually change the object so we can compare with the old value
-            Iterator<EmbeddedOwnerRelation> ownerRelIter = embeddedOwners.iterator();
-            while (ownerRelIter.hasNext())
+            for (EmbeddedOwnerRelation ownerRel : embeddedOwners)
             {
-                EmbeddedOwnerRelation ownerRel = ownerRelIter.next();
                 StateManagerImpl ownerOP = (StateManagerImpl) ownerRel.getOwnerOP();
 
                 AbstractMemberMetaData ownerMmd = ownerOP.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(ownerRel.getOwnerFieldNum());

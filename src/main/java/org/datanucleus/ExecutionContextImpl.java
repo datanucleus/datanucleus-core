@@ -2658,18 +2658,14 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
 
             ObjectProvider op = findObjectProvider(pc);
-            if (op == null)
+            if (op != null)
             {
-                // Ignore this
-                continue;
+                opsToDetach.add(op);
             }
-            opsToDetach.add(op);
         }
 
-        Iterator<ObjectProvider> iter = opsToDetach.iterator();
-        while (iter.hasNext())
+        for (ObjectProvider op : opsToDetach)
         {
-            ObjectProvider op = iter.next();
             op.detach(state);
 
             // Clear any changes from this since it is now detached
@@ -4303,11 +4299,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (roots != null && !roots.isEmpty())
         {
             // Detachment roots specified
-            Iterator rootsIter = roots.iterator();
-            while (rootsIter.hasNext())
+            for (Object root : roots)
             {
-                Object obj = rootsIter.next();
-                ops.add(findObjectProvider(obj));
+                ops.add(findObjectProvider(root));
             }
         }
         else if (rootClasses != null && rootClasses.length > 0)
