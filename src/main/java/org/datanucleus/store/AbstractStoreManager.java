@@ -343,12 +343,11 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      * Utility to return a managed connection not tied to any ExecutionContext. This would typically be used for schema operations or
      * for accessing sequences, things that we normally want to separate from any PM/EM persistence operations.
      * This method returns a connection from the secondary connection factory (e.g. datanucleus.connectionFactory2Name), if it is provided.
-     * @param isolation_level The transaction isolation scheme to use See org.datanucleus.transaction.TransactionIsolation 
-     *     Pass in -1 if just want the default
+     * @param isolationLevel The transaction isolation scheme to use See org.datanucleus.transaction.TransactionIsolation. Pass in -1 if just want the default
      * @return The Connection to the datastore
      * @throws NucleusException if an error occurs getting the connection
      */
-    public ManagedConnection getConnection(int isolation_level)
+    public ManagedConnection getConnection(int isolationLevel)
     {
         ConnectionFactory connFactory = null;
         if (secondaryConnectionFactoryName != null)
@@ -361,11 +360,11 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             connFactory = connectionMgr.lookupConnectionFactory(primaryConnectionFactoryName);
         }
 
-        Map options = null;
-        if (isolation_level >= 0)
+        Map<String, Object> options = null;
+        if (isolationLevel >= 0)
         {
-            options = new HashMap();
-            options.put(Transaction.TRANSACTION_ISOLATION_OPTION, Integer.valueOf(isolation_level));
+            options = new HashMap<>();
+            options.put(Transaction.TRANSACTION_ISOLATION_OPTION, Integer.valueOf(isolationLevel));
         }
         return connFactory.getConnection(null, null, options);
     }
@@ -768,15 +767,13 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         String[] filteredClassNames = getNucleusContext().getTypeManager().filterOutSupportedSecondClassNames(classNames);
 
         // Find the ClassMetaData for these classes and all referenced by these classes
-        Iterator<AbstractClassMetaData> iter = getMetaDataManager().getReferencedClasses(filteredClassNames, clr).iterator();
-        while (iter.hasNext())
+        for (AbstractClassMetaData cmd : getMetaDataManager().getReferencedClasses(filteredClassNames, clr))
         {
-            ClassMetaData cmd = (ClassMetaData)iter.next();
             if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
             {
                 if (!storeDataMgr.managesClass(cmd.getFullClassName()))
                 {
-                    registerStoreData(newStoreData(cmd, clr));
+                    registerStoreData(newStoreData((ClassMetaData) cmd, clr));
                 }
             }
         }
@@ -945,16 +942,12 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
 
         // Application identity with user PK class, so find all using this PK
         Collection<AbstractClassMetaData> cmds = getMetaDataManager().getClassMetaDataWithApplicationId(id.getClass().getName());
-        if (cmds != null)
+        if (cmds != null && !cmds.isEmpty())
         {
-            Iterator<AbstractClassMetaData> iter = cmds.iterator();
-            while (iter.hasNext())
-            {
-                // Just return the class name of the first one using this id - could be any in this tree
-                AbstractClassMetaData cmd = iter.next();
-                return cmd.getFullClassName();
-            }
+            // Just return the class name of the first one using this id - could be any in this tree
+            return cmds.iterator().next().getFullClassName();
         }
+
         return null;
     }
 

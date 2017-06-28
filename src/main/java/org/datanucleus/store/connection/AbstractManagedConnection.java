@@ -51,7 +51,7 @@ public abstract class AbstractManagedConnection implements ManagedConnection
     protected boolean locked = false;
 
     /** Listeners for the connection. */
-    protected List<ManagedConnectionResourceListener> listeners = new ArrayList();
+    protected List<ManagedConnectionResourceListener> listeners = new ArrayList<>();
 
     /** Count on the number of outstanding uses of this connection. Incremented on get. Decremented on release(). */
     protected int useCount = 0;

@@ -75,8 +75,7 @@ public class ConnectionManagerImpl implements ConnectionManager
     class ManagedConnectionPool
     {
         /**
-         * Connection pool keeps a reference to a connection for each ExecutionContext (and so the connection
-         * used by each transaction).
+         * Connection pool keeps a reference to a connection for each ExecutionContext (and so the connection used by each transaction).
          * This permits reuse of connections in the same transaction, but not at same time!!!
          * ManagedConnection must be released to return to pool.
          * On transaction commit/rollback, connection pool is cleared
@@ -95,10 +94,12 @@ public class ConnectionManagerImpl implements ConnectionManager
             synchronized (connectionsPool)
             {
                 Object poolKey = getPoolKey(factory, ec);
-                Map connectionsForPool = connectionsPool.get(poolKey);
+                Map<ConnectionFactory, ManagedConnection> connectionsForPool = connectionsPool.get(poolKey);
                 if (connectionsForPool != null)
                 {
-                    if (connectionsForPool.remove(factory) != null && nucleusContext.getStatistics() != null)
+                    ManagedConnection prevConn = connectionsForPool.remove(factory);
+
+                    if (nucleusContext.getStatistics() != null && prevConn != null)
                     {
                         nucleusContext.getStatistics().decrementActiveConnections();
                     }
@@ -113,7 +114,7 @@ public class ConnectionManagerImpl implements ConnectionManager
         }
         
         /**
-         * Object a ManagedConnection from pool
+         * Obtain a ManagedConnection from the pool.
          * @param factory The factory for connections
          * @param ec Key for pooling
          * @return The managed connection
@@ -137,7 +138,8 @@ public class ConnectionManagerImpl implements ConnectionManager
                     {
                         // Enlisted connection that is locked so throw exception
                         throw new NucleusUserException(Localiser.msg("009000"));
-                    }                        
+                    }
+
                     // Already registered enlisted connection present so return it
                     return mconn;
                 }
@@ -150,13 +152,15 @@ public class ConnectionManagerImpl implements ConnectionManager
             synchronized (connectionsPool)
             {
                 Object poolKey = getPoolKey(factory, ec);
-                Map connectionsForOM = connectionsPool.get(poolKey);
-                if (connectionsForOM == null)
+                Map<ConnectionFactory, ManagedConnection> connectionsForEC = connectionsPool.get(poolKey);
+                if (connectionsForEC == null)
                 {
-                    connectionsForOM = new HashMap();
-                    connectionsPool.put(poolKey, connectionsForOM);
+                    connectionsForEC = new HashMap();
+                    connectionsPool.put(poolKey, connectionsForEC);
                 }
-                if (connectionsForOM.put(factory, mconn) == null && nucleusContext.getStatistics() != null)
+
+                ManagedConnection prevConn = connectionsForEC.put(factory, mconn);
+                if (nucleusContext.getStatistics() != null && prevConn == null)
                 {
                     nucleusContext.getStatistics().incrementActiveConnections();
                 }

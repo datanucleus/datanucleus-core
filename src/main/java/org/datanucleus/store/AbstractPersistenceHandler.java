@@ -62,7 +62,7 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
         Map<String, Object> paramValueMap = new HashMap<>();
         for (int i=0;i<memberNames.length;i++)
         {
-            jdoqlStr.append("this.").append(memberNames[i]).append("==:val").append(i);
+            jdoqlStr.append("this.").append(memberNames[i]).append(" == :val").append(i);
             paramValueMap.put("val" + i, values[i]);
             if (i != memberNames.length-1)
             {
@@ -92,8 +92,7 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
         {
             if (op.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
             {
-                throw new DatastoreReadOnlyException(Localiser.msg("032004",
-                    op.getObjectAsPrintable()), op.getExecutionContext().getClassLoaderResolver());
+                throw new DatastoreReadOnlyException(Localiser.msg("032004", op.getObjectAsPrintable()), op.getExecutionContext().getClassLoaderResolver());
             }
 
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
@@ -114,8 +113,7 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
                 {
                     if (op.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
                     {
-                        throw new DatastoreReadOnlyException(Localiser.msg("032006",
-                            op.getObjectAsPrintable()), op.getExecutionContext().getClassLoaderResolver());
+                        throw new DatastoreReadOnlyException(Localiser.msg("032006", op.getObjectAsPrintable()), op.getExecutionContext().getClassLoaderResolver());
                     }
 
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())

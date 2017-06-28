@@ -40,7 +40,7 @@ public interface ConnectionFactory
      * @param options Any options for then creating the connection
      * @return the {@link org.datanucleus.store.connection.ManagedConnection}
      */
-    ManagedConnection getConnection(ExecutionContext ec, org.datanucleus.Transaction transaction, Map options);
+    ManagedConnection getConnection(ExecutionContext ec, org.datanucleus.Transaction transaction, Map<String, Object> options);
 
     /**
      * Create the ManagedConnection. 
@@ -49,7 +49,7 @@ public interface ConnectionFactory
      * @param transactionOptions the Transaction options this connection will be enlisted to, null if non existent
      * @return The ManagedConnection.
      */
-    ManagedConnection createManagedConnection(ExecutionContext ec, Map transactionOptions);
+    ManagedConnection createManagedConnection(ExecutionContext ec, Map<String, Object> transactionOptions);
 
     /**
      * Release any resources that have been allocated.
