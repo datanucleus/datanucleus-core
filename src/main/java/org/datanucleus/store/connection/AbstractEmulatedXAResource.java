@@ -21,9 +21,6 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-import org.datanucleus.util.Localiser;
-import org.datanucleus.util.NucleusLogger;
-
 /**
  * Abstract base for any emulated XAResource implementations for the store plugins.
  */
@@ -42,7 +39,6 @@ public abstract class AbstractEmulatedXAResource implements XAResource
     @Override
     public void start(Xid xid, int flags) throws XAException
     {
-        NucleusLogger.CONNECTION.debug(Localiser.msg("009017", mconn.toString(), xid.toString(), flags));
     }
 
     /* (non-Javadoc)
@@ -51,7 +47,6 @@ public abstract class AbstractEmulatedXAResource implements XAResource
     @Override
     public int prepare(Xid xid) throws XAException
     {
-        NucleusLogger.CONNECTION.debug(Localiser.msg("009018", mconn.toString(), xid.toString()));
         return 0;
     }
 
@@ -61,7 +56,6 @@ public abstract class AbstractEmulatedXAResource implements XAResource
     @Override
     public void commit(Xid xid, boolean onePhase) throws XAException
     {
-        NucleusLogger.CONNECTION.debug(Localiser.msg("009019", mconn.toString(), xid.toString(), onePhase));
     }
 
     /* (non-Javadoc)
@@ -70,7 +64,6 @@ public abstract class AbstractEmulatedXAResource implements XAResource
     @Override
     public void rollback(Xid xid) throws XAException
     {
-        NucleusLogger.CONNECTION.debug(Localiser.msg("009021", mconn.toString(), xid.toString()));
     }
 
     /* (non-Javadoc)
@@ -79,7 +72,6 @@ public abstract class AbstractEmulatedXAResource implements XAResource
     @Override
     public void end(Xid xid, int flags) throws XAException
     {
-        NucleusLogger.CONNECTION.debug(Localiser.msg("009023", mconn.toString(), xid.toString(), flags));
     }
 
     /* (non-Javadoc)

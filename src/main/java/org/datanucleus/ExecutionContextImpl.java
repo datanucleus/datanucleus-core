@@ -409,10 +409,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         if (properties.getFrequentProperties().getDetachOnClose() && cache != null && !cache.isEmpty())
         {
-            // "detach-on-close", detaching all currently cached objects.
-            // Note that this will delete each object from the L1 cache one-by-one TODO Can we optimise this in terms of cache clearance?
+            // "Detach-on-Close", detaching all currently cached objects
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("010011"));
             List<ObjectProvider> toDetach = new ArrayList<>(cache.values());
+            cache.clear();
 
             try
             {
@@ -4874,15 +4874,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         if (id != null && cache != null)
         {
-            if (NucleusLogger.CACHE.isDebugEnabled())
+            Object pcRemoved = cache.remove(id);
+            if (pcRemoved != null && NucleusLogger.CACHE.isDebugEnabled())
             {
                 NucleusLogger.CACHE.debug(Localiser.msg("003009", IdentityUtils.getPersistableIdentityForId(id)));
-            }
-            Object pcRemoved = cache.remove(id);
-            if (pcRemoved == null && NucleusLogger.CACHE.isDebugEnabled())
-            {
-                // For some reason the object isn't in the L1 cache - garbage collected maybe ?
-                NucleusLogger.CACHE.debug(Localiser.msg("003010", IdentityUtils.getPersistableIdentityForId(id)));
             }
         }
     }

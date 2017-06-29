@@ -31,19 +31,16 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.federation.FederatedStoreManager;
 import org.datanucleus.transaction.ResourcedTransaction;
 import org.datanucleus.util.Localiser;
-import org.datanucleus.util.NucleusLogger;
 
 /**
  * Manager of connections for a datastore, allowing ManagedConnection pooling, enlistment in transaction.
  * The pool caches one connection per ExecutionContext per factory, consequently there will be 0-2 connections pooled per ExecutionContext
  * (0 if none in use, 1 if just primary factory, 1 if primary+secondary factory).
- * The "allocateConnection" method can create connections and enlist them (like most normal persistence operations need)
- * or create a connection and return it without enlisting it into a transaction, for example on a read-only operation, or when
- * running non-transactional, or to get schema information.
+ * The "allocateConnection" method can create connections and enlist them (like most normal persistence operations need) or create a connection and return it 
+ * without enlisting it into a transaction, for example on a read-only operation, or when running non-transactional, or to get schema information.
  * <p>
- * Connections can be locked per ExecutionContext basis. Locking of connections is used to
- * handle the connection over to the user application. A locked connection denies any further
- * access to the datastore, until the user application unlock it.
+ * Connections can be locked per ExecutionContext basis. Locking of connections is used to handle the connection over to the user application. 
+ * A locked connection denies any further access to the datastore, until the user application unlock it.
  * </p>
  */
 public class ConnectionManagerImpl implements ConnectionManager
@@ -226,10 +223,6 @@ public class ConnectionManagerImpl implements ConnectionManager
             if (mconnFromPool != null)
             {
                 // Already registered enlisted connection present so return it
-                if (NucleusLogger.CONNECTION.isDebugEnabled())
-                {
-                    NucleusLogger.CONNECTION.debug(Localiser.msg("009005", mconnFromPool, ec, factory));
-                }
                 mconnFromPool.close();
             }
         }
@@ -252,11 +245,6 @@ public class ConnectionManagerImpl implements ConnectionManager
             if (mconnFromPool != null)
             {
                 // Factory already has a ManagedConnection
-                if (NucleusLogger.CONNECTION.isDebugEnabled())
-                {
-                    NucleusLogger.CONNECTION.debug(Localiser.msg("009004", mconnFromPool, ec, factory));
-                }
-
                 if (!mconnFromPool.closeAfterTransactionEnd())
                 {
                     if (transaction.isActive())
@@ -339,10 +327,6 @@ public class ConnectionManagerImpl implements ConnectionManager
                     public void managedConnectionPreClose() {}
                     public void managedConnectionPostClose()
                     {
-                        if (NucleusLogger.CONNECTION.isDebugEnabled())
-                        {
-                            NucleusLogger.CONNECTION.debug(Localiser.msg("009006", mconn, ec, factory));
-                        }
                         connectionPool.removeManagedConnection(factory, ec); // Connection closed so remove
 
                         // Remove this listener
@@ -352,10 +336,6 @@ public class ConnectionManagerImpl implements ConnectionManager
                 });
 
                 // Register this connection against the ExecutionContext - connection is valid
-                if (NucleusLogger.CONNECTION.isDebugEnabled())
-                {
-                    NucleusLogger.CONNECTION.debug(Localiser.msg("009007", mconn, ec, factory));
-                }
                 connectionPool.putManagedConnection(factory, ec, mconn);
             }
         }
