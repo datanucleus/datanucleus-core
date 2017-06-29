@@ -186,11 +186,11 @@ public class StoreData
         if (metadata instanceof ClassMetaData)
         {
             ClassMetaData cmd = (ClassMetaData)metadata;
-            return Localiser.msg("035004", name, "(none)", cmd.getInheritanceMetaData().getStrategy().toString());
+            return Localiser.msg("035004", name, table != null ? table.getName() : "(none)", cmd.getInheritanceMetaData().getStrategy().toString());
         }
         else if (metadata instanceof AbstractMemberMetaData)
         {
-            return Localiser.msg("035003", name, null);
+            return Localiser.msg("035003", name, table != null ? table.getName() : "(none)");
         }
         else
         {
