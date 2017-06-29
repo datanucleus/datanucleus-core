@@ -410,9 +410,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (properties.getFrequentProperties().getDetachOnClose() && cache != null && !cache.isEmpty())
         {
             // "Detach-on-Close", detaching all currently cached objects
+            // TODO This will remove objects from the L1 cache one-by-one. Is there a possibility for optimisation? See also AttachDetachTest.testDetachOnClose
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("010011"));
             List<ObjectProvider> toDetach = new ArrayList<>(cache.values());
-            cache.clear();
 
             try
             {

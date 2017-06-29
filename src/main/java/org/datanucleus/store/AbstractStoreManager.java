@@ -230,11 +230,11 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 ConnectionFactory cf = (ConnectionFactory)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.store_connectionfactory",
                     new String[] {"datastore", "transactional"}, new String[] {storeManagerKey, "false"}, "class-name",
                     new Class[] {ClassConstants.STORE_MANAGER, ClassConstants.JAVA_LANG_STRING}, new Object[] {this, AbstractConnectionFactory.RESOURCE_NAME_NONTX});
+                connectionMgr.registerConnectionFactory(secondaryConnectionFactoryName, cf);
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
                     NucleusLogger.CONNECTION.debug(Localiser.msg("032019", secondaryConnectionFactoryName));
                 }
-                connectionMgr.registerConnectionFactory(secondaryConnectionFactoryName, cf);
             }
             catch (Exception e)
             {
