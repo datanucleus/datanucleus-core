@@ -68,6 +68,8 @@ public interface StoreManager
     public static final String OPTION_DATASTORE_ID = "DatastoreId";
     public static final String OPTION_NONDURABLE_ID = "NonDurableId";
 
+    public static final String OPTION_TRANSACTION_ACID = "Transaction.ACID";
+
     public static final String OPTION_ORM = "ORM";
     public static final String OPTION_ORM_EMBEDDED_PC = "ORM.EmbeddedPC";
     public static final String OPTION_ORM_EMBEDDED_COLLECTION = "ORM.EmbeddedCollection";
