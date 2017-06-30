@@ -127,6 +127,10 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 {
     protected static final SingleTypeFieldManager HOLLOWFIELDMANAGER = new SingleTypeFieldManager();
 
+    /** Whether we are currently validating the object in the datastore. */
+    protected static final int FLAG_VALIDATING = 2<<17;
+    /** Whether to restore values at StateManager. If true, overwrites the restore values at tx level. */
+    protected static final int FLAG_RESTORE_VALUES = 2<<16;
     /** Flag to signify that we are currently storing the persistable object, so we don't detach it on serialisation. */
     protected static final int FLAG_STORING_PC = 2<<15;
     /** Whether the managed object needs the inheritance level validating before loading fields. */
@@ -161,9 +165,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /** Bit-packed flags for operational settings (packed into "int" for memory benefit). */
     protected int flags;
 
-    /** Whether to restore values at StateManager. If true, overwrites the restore values at tx level. */
-    protected boolean restoreValues = false;
-
     /** The ExecutionContext for this StateManager */
     protected ExecutionContext myEC;
 
@@ -179,13 +180,13 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /** The actual LifeCycleState for the persistable instance */
     protected LifeCycleState myLC;
 
-    /** version field for optimistic transactions */
+    /** Optimistic version, when starting any transaction. */
     protected Object myVersion;
 
-    /** version field for optimistic transactions, after a insert/update but not yet committed. */
+    /** Optimistic version, after insert/update but not yet committed (i.e incremented). */
     protected Object transactionalVersion;
 
-    /** Flags for state stored with the object. Maps onto JDO PersistenceCapable flags. */
+    /** Flags for state stored with the object. Maps onto org.datanucleus.enhancement.Persistable "dnFlags". */
     protected byte persistenceFlags;
 
     /** Fetch plan for the class of the managed object. */
@@ -210,12 +211,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /** Lock object to synchronise execution when reading/writing fields. */
     protected Lock lock = null;
 
-    /** Flags of the persistable instance when the instance is enlisted in the transaction. */
-    protected byte savedFlags;
-
-    /** Loaded fields of the persistable instance when the instance is enlisted in the transaction. */
-    protected boolean[] savedLoadedFields = null;
-
     /** state for transitions of activities. */
     protected ActivityState activity;
 
@@ -225,10 +220,14 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     /** The type of the managed object (0 = PC, 1 = embedded PC, 2 = embedded element, 3 = embedded key, 4 = embedded value. */
     protected short objectType = 0;
 
+    /** Flags of the persistable instance when the instance is enlisted in the transaction. */
+    protected byte savedPersistenceFlags;
+
+    /** Loaded fields of the persistable instance when the instance is enlisted in the transaction. */
+    protected boolean[] savedLoadedFields = null;
+
     /** Image of the Persistable instance when the instance is enlisted in the transaction. */
     protected Persistable savedImage = null;
-
-    boolean validating = false;
 
     private static final EnhancementHelper HELPER;
     static
@@ -274,7 +273,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         dirty = false;
         myFP = myEC.getFetchPlan().getFetchPlanForClass(cmd);
         lock = new ReentrantLock();
-        savedFlags = 0;
+        savedPersistenceFlags = 0;
         savedLoadedFields = null;
         objectType = 0;
         activity = ActivityState.NONE;
@@ -340,7 +339,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         myVersion = null;
         persistenceFlags = 0;
         flags = 0;
-        restoreValues = false;
         transactionalVersion = null;
         currFM = null;
         dirty = false;
@@ -814,7 +812,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      */
     public boolean isRestoreValues()
     {
-        return restoreValues;
+        return (flags&FLAG_RESTORE_VALUES) != 0;
     }
 
     protected boolean isChangingState()
@@ -2008,44 +2006,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     public boolean containsAssociatedValue(Object key)
     {
         return myEC.containsObjectProviderAssociatedValue(this, key);
-    }
-
-    /**
-     * Method to save all fields of the object so we can potentially restore them later.
-     */
-    public void saveFields()
-    {
-        savedImage = myPC.dnNewInstance(this);
-        savedImage.dnCopyFields(myPC, cmd.getAllMemberPositions());
-        savedFlags = persistenceFlags;
-        savedLoadedFields = loadedFields.clone();
-    }
-
-    /**
-     * Method to clear all saved fields on the object.
-     */
-    public void clearSavedFields()
-    {
-        savedImage = null;
-        savedFlags = 0;
-        savedLoadedFields = null;
-    }
-
-    /**
-     * Method to restore all fields of the object.
-     */
-    public void restoreFields()
-    {
-        if (savedImage != null)
-        {
-            loadedFields = savedLoadedFields;
-            persistenceFlags = savedFlags;
-            myPC.dnReplaceFlags();
-            myPC.dnCopyFields(savedImage, cmd.getAllMemberPositions());
-
-            clearDirtyFlags();
-            clearSavedFields();
-        }
     }
 
     /**
@@ -4629,7 +4589,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                     throw ne;
                 }
 
-                this.restoreValues = true;
+                flags |= FLAG_RESTORE_VALUES;
             }
             else
             {
@@ -5509,12 +5469,13 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             }
             if ((fieldNumbers != null && fieldNumbers.length > 0) || versionNeedsLoading)
             {
-                if (!validating)
+                if ((flags&FLAG_VALIDATING) == 0)
                 {
                     try
                     {
                         // It is possible to get recursive validation when using things like ODF, Cassandra etc and having a bidir relation, and nontransactional.
-                        validating = true;
+                        flags |= FLAG_VALIDATING;
+
                         transitionReadField(false);
                         // Some fetch plan fields, or the version are not loaded so try to load them, and this by itself 
                         // validates the existence. Loads the fields in the current FetchPlan (JDO2 spec 12.6.5)
@@ -5532,7 +5493,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                     }
                     finally
                     {
-                        validating = false;
+                        flags &= ~FLAG_VALIDATING;
                     }
                 }
             }
@@ -5858,6 +5819,44 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         }
     }
 
+    /**
+     * Method to save all fields of the object, for use in any rollback.
+     */
+    public void saveFields()
+    {
+        savedImage = myPC.dnNewInstance(this);
+        savedImage.dnCopyFields(myPC, cmd.getAllMemberPositions());
+        savedPersistenceFlags = persistenceFlags;
+        savedLoadedFields = loadedFields.clone();
+    }
+
+    /**
+     * Method to clear all saved fields on the object.
+     */
+    public void clearSavedFields()
+    {
+        savedImage = null;
+        savedPersistenceFlags = 0;
+        savedLoadedFields = null;
+    }
+
+    /**
+     * Method to restore all fields of the object.
+     */
+    public void restoreFields()
+    {
+        if (savedImage != null)
+        {
+            loadedFields = savedLoadedFields;
+            persistenceFlags = savedPersistenceFlags;
+            myPC.dnReplaceFlags();
+            myPC.dnCopyFields(savedImage, cmd.getAllMemberPositions());
+
+            clearDirtyFlags();
+            clearSavedFields();
+        }
+    }
+
     // ------------------------------ Helper Methods ---------------------------
 
     /**
@@ -5957,7 +5956,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         dumpPC(myPC, out);
 
         out.println();
-        switch (savedFlags)
+        switch (savedPersistenceFlags)
         {
             case Persistable.LOAD_REQUIRED:
                 out.println("savedFlags = LOAD_REQUIRED");
