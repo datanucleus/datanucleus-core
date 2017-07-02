@@ -24,6 +24,7 @@ public interface CurrentUserProvider
 {
     /**
      * Return the current user.
+     * @return Current user
      */
     String currentUser();
 }
