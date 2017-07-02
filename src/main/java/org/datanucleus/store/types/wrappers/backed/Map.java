@@ -186,7 +186,7 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
      * Method to initialise the SCO from an existing value.
      * @param m The object to set from
      */
-    public synchronized void initialise(java.util.Map m)
+    public void initialise(java.util.Map m)
     {
         if (m != null)
         {
@@ -337,7 +337,7 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
     /**
      * Method to unset the owner and field information.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         super.unsetOwner();
         if (backingStore != null)
@@ -369,7 +369,7 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
      * @param key The key to check
      * @return Whether it is contained
      **/
-    public synchronized boolean containsKey(Object key)
+    public boolean containsKey(Object key)
     {
         if (useCache && isCacheLoaded)
         {
@@ -389,7 +389,7 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
      * @param value The value to check
      * @return Whether it is contained
      **/
-    public synchronized boolean containsValue(Object value)
+    public boolean containsValue(Object value)
     {
         if (useCache && isCacheLoaded)
         {
@@ -408,7 +408,7 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
      * Accessor for the set of entries in the Map.
      * @return Set of entries
      **/
-    public synchronized java.util.Set entrySet()
+    public java.util.Set entrySet()
     {
         if (useCache)
         {
@@ -427,7 +427,7 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
      * @param o The map to compare against.
      * @return Whether they are equal.
      **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         if (useCache)
         {
@@ -452,7 +452,7 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
      * @param key The key
      * @return The value.
      **/
-    public synchronized V get(Object key)
+    public V get(Object key)
     {
         if (useCache)
         {
@@ -470,7 +470,7 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
      * Method to generate a hashcode for this Map.
      * @return The hashcode.
      **/
-    public synchronized int hashCode()
+    public int hashCode()
     {
         if (useCache)
         {
@@ -494,7 +494,7 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
      * Method to return if the Map is empty.
      * @return Whether it is empty.
      **/
-    public synchronized boolean isEmpty()
+    public boolean isEmpty()
     {
         return size() == 0;
     }
@@ -503,7 +503,7 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
      * Accessor for the set of keys in the Map.
      * @return Set of keys.
      **/
-    public synchronized java.util.Set keySet()
+    public java.util.Set keySet()
     {
         if (useCache)
         {
@@ -521,7 +521,7 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
      * Method to return the size of the Map.
      * @return The size
      **/
-    public synchronized int size()
+    public int size()
     {
         if (useCache && isCacheLoaded)
         {
@@ -540,7 +540,7 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
      * Accessor for the set of values in the Map.
      * @return Set of values.
      **/
-    public synchronized Collection values()
+    public Collection values()
     {
         if (useCache)
         {
@@ -589,7 +589,7 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
     /**
      * Method to clear the Map.
      **/
-    public synchronized void clear()
+    public void clear()
     {
         makeDirty();
         delegate.clear();
@@ -618,7 +618,7 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
      * @param value The value
      * @return The previous value against this key (if any).
      */
-    public synchronized V put(K key, V value)
+    public V put(K key, V value)
     {
         // Reject inappropriate values
         if (!allowNulls)
@@ -674,7 +674,7 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
      * Method to add a Map of values to this map.
      * @param m The Map to add
      **/
-    public synchronized void putAll(java.util.Map m)
+    public void putAll(java.util.Map m)
     {
         makeDirty();
 
@@ -713,7 +713,7 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
      * @param key The key for the value.
      * @return The value removed.
      **/
-    public synchronized V remove(Object key)
+    public V remove(Object key)
     {
         makeDirty();
 

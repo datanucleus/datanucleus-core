@@ -177,7 +177,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
     /**
      * Method to unset the owner and field information.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         if (ownerOP != null)
         {
@@ -278,7 +278,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      * @param c The collection
      * @return Whether it is contained.
      **/
-    public synchronized boolean containsAll(java.util.Collection c)
+    public boolean containsAll(java.util.Collection c)
     {
         return delegate.containsAll(c);
     }
@@ -288,7 +288,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      * @param o The object to compare against.
      * @return Whether this object is the same.
      **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         return delegate.equals(o);
     }
@@ -306,7 +306,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      * Hashcode operator.
      * @return The Hash code.
      **/
-    public synchronized int hashCode()
+    public int hashCode()
     {
         return delegate.hashCode();
     }
@@ -513,7 +513,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      * @param element The Element to remove
      * @return Whether it was removed successfully.
      **/
-    public synchronized boolean remove(Object element)
+    public boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -523,7 +523,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      * @param element The Element to remove
      * @return Whether it was removed successfully.
      **/
-    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
+    public boolean remove(Object element, boolean allowCascadeDelete)
     {
         boolean success = delegate.remove(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -628,7 +628,7 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
      * @param c The collection to retain
      * @return Whether they were retained successfully.
      **/
-    public synchronized boolean retainAll(java.util.Collection c)
+    public boolean retainAll(java.util.Collection c)
     {
         if (c == null)
         {

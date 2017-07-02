@@ -298,7 +298,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
     /**
      * Method to unset the owner and field information.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         super.unsetOwner();
         if (backingStore != null)

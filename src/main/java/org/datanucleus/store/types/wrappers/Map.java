@@ -61,7 +61,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
         initialise(newValue);
     }
 
-    public synchronized void initialise(java.util.Map m)
+    public void initialise(java.util.Map m)
     {
         if (m != null)
         {
@@ -170,7 +170,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
     /**
      * Method to unset the owner and field information.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         if (ownerOP != null)
         {
@@ -241,7 +241,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      * @param key The key to check
      * @return Whether it is contained
      **/
-    public synchronized boolean containsKey(Object key)
+    public boolean containsKey(Object key)
     {
         return delegate.containsKey(key);
     }
@@ -251,7 +251,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      * @param value The value to check
      * @return Whether it is contained
      **/
-    public synchronized boolean containsValue(Object value)
+    public boolean containsValue(Object value)
     {
         return delegate.containsValue(value);
     }
@@ -260,7 +260,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      * Accessor for the set of entries in the Map.
      * @return Set of entries
      **/
-    public synchronized java.util.Set entrySet()
+    public java.util.Set entrySet()
     {
         return delegate.entrySet();
     }
@@ -270,7 +270,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      * @param o The map to compare against.
      * @return Whether they are equal.
      **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         return delegate.equals(o);
     }
@@ -280,7 +280,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      * @param key The key
      * @return The value.
      **/
-    public synchronized V get(Object key)
+    public V get(Object key)
     {
         return delegate.get(key);
     }
@@ -289,7 +289,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      * Method to generate a hashcode for this Map.
      * @return The hashcode.
      **/
-    public synchronized int hashCode()
+    public int hashCode()
     {
         return delegate.hashCode();
     }
@@ -298,7 +298,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      * Method to return if the Map is empty.
      * @return Whether it is empty.
      **/
-    public synchronized boolean isEmpty()
+    public boolean isEmpty()
     {
         return delegate.isEmpty();
     }
@@ -307,7 +307,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      * Accessor for the set of keys in the Map.
      * @return Set of keys.
      **/
-    public synchronized java.util.Set keySet()
+    public java.util.Set keySet()
     {
         return delegate.keySet();
     }
@@ -316,7 +316,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      * Method to return the size of the Map.
      * @return The size
      **/
-    public synchronized int size()
+    public int size()
     {
         return delegate.size();
     }
@@ -325,7 +325,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      * Accessor for the set of values in the Map.
      * @return Set of values.
      **/
-    public synchronized Collection values()
+    public Collection values()
     {
         return delegate.values();
     }
@@ -333,7 +333,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
     /**
      * Method to clear the Map.
      **/
-    public synchronized void clear()
+    public void clear()
     {
         if (ownerOP != null && !delegate.isEmpty())
         {
@@ -380,7 +380,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      * @param value The value
      * @return The previous value against this key (if any).
      **/
-    public synchronized V put(K key, V value)
+    public V put(K key, V value)
     {
         // Reject inappropriate elements
         V oldValue = delegate.put(key, value);
@@ -405,7 +405,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      * Method to add a Map of values to this map.
      * @param m The Map to add
      **/
-    public synchronized void putAll(java.util.Map m)
+    public void putAll(java.util.Map m)
     {
         delegate.putAll(m);
         makeDirty();
@@ -434,7 +434,7 @@ public class Map<K, V> extends AbstractMap<K, V> implements SCOMap<java.util.Map
      * @param key The key for the value.
      * @return The value removed.
      **/
-    public synchronized V remove(Object key)
+    public V remove(Object key)
     {
         V value = delegate.remove(key);
 

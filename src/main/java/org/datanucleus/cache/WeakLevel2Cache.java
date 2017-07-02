@@ -106,7 +106,7 @@ public class WeakLevel2Cache implements Level2Cache
      * Method to evict an object from the cache.
      * @param oid The id of the object to evict
      */
-    public synchronized void evict(Object oid)
+    public void evict(Object oid)
     {
         if (oid == null)
         {
@@ -120,7 +120,7 @@ public class WeakLevel2Cache implements Level2Cache
     /**
      * Method to evict all objects from the L2 cache.
      */
-    public synchronized void evictAll()
+    public void evictAll()
     {
         unpinnedCache.clear();
         pinnedCache.clear();
@@ -132,7 +132,7 @@ public class WeakLevel2Cache implements Level2Cache
      * @param pcClass The class to evict
      * @param subclasses Whether to also evict subclasses
      */
-    public synchronized void evictAll(Class pcClass, boolean subclasses)
+    public void evictAll(Class pcClass, boolean subclasses)
     {
         if (pcClass == null)
         {
@@ -178,7 +178,7 @@ public class WeakLevel2Cache implements Level2Cache
      * Method to evict the objects with the specified ids.
      * @param oids The ids of the objects to evict
      */
-    public synchronized void evictAll(Collection oids)
+    public void evictAll(Collection oids)
     {
         if (oids == null)
         {
@@ -196,7 +196,7 @@ public class WeakLevel2Cache implements Level2Cache
      * Method to evict the objects with the specified ids.
      * @param oids The ids of the objects to evict
      */
-    public synchronized void evictAll(Object[] oids)
+    public void evictAll(Object[] oids)
     {
         if (oids == null)
         {
@@ -215,7 +215,7 @@ public class WeakLevel2Cache implements Level2Cache
      * @param oid The Object ID
      * @return The L2 cacheable object
      */
-    public synchronized CachedPC get(Object oid)
+    public CachedPC get(Object oid)
     {
         if (oid == null)
         {
@@ -308,7 +308,7 @@ public class WeakLevel2Cache implements Level2Cache
      * @param pc The cacheable object
      * @return The value previously associated with this oid
      */
-    public synchronized CachedPC put(Object oid, CachedPC pc)
+    public CachedPC put(Object oid, CachedPC pc)
     {
         if (oid == null || pc == null)
         {
@@ -447,7 +447,7 @@ public class WeakLevel2Cache implements Level2Cache
      * Method to pin an object to the cache.
      * @param oid The id of the object to pin
      */
-    public synchronized void pin(Object oid)
+    public void pin(Object oid)
     {
         if (oid == null)
         {
@@ -477,7 +477,7 @@ public class WeakLevel2Cache implements Level2Cache
      * @param cls The class
      * @param subs Whether to include subclasses
      */
-    public synchronized void pinAll(Class cls, boolean subs)
+    public void pinAll(Class cls, boolean subs)
     {
         if (cls == null)
         {
@@ -514,7 +514,7 @@ public class WeakLevel2Cache implements Level2Cache
      * Method to pin all of the supplied objects
      * @param oids The Object ids to pin
      */
-    public synchronized void pinAll(Collection oids)
+    public void pinAll(Collection oids)
     {
         if (oids == null)
         {
@@ -532,7 +532,7 @@ public class WeakLevel2Cache implements Level2Cache
      * Method to pin all of the supplied objects
      * @param oids The object ids to pin
      */
-    public synchronized void pinAll(Object[] oids)
+    public void pinAll(Object[] oids)
     {
         if (oids == null)
         {
@@ -549,7 +549,7 @@ public class WeakLevel2Cache implements Level2Cache
      * Method to unpin an object
      * @param oid The object id
      */
-    public synchronized void unpin(Object oid)
+    public void unpin(Object oid)
     {
         if (oid == null)
         {
@@ -575,7 +575,7 @@ public class WeakLevel2Cache implements Level2Cache
      * @param cls Base class
      * @param subs Whether to include subclasses
      */
-    public synchronized void unpinAll(Class cls, boolean subs)
+    public void unpinAll(Class cls, boolean subs)
     {
         if (cls == null)
         {
@@ -606,7 +606,7 @@ public class WeakLevel2Cache implements Level2Cache
      * Method to unpin all of the supplied objects
      * @param oids The object ids to unpin
      */
-    public synchronized void unpinAll(Collection oids)
+    public void unpinAll(Collection oids)
     {
         if (oids == null)
         {
@@ -624,7 +624,7 @@ public class WeakLevel2Cache implements Level2Cache
      * Method to unpin all of the specified objects
      * @param oids The object ids to unpin
      */
-    public synchronized void unpinAll(Object[] oids)
+    public void unpinAll(Object[] oids)
     {
         if (oids == null)
         {

@@ -168,7 +168,7 @@ public class Hashtable<K, V> extends java.util.Hashtable<K, V> implements SCOMap
     /**
      * Method to unset the owner and field details.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         if (ownerOP != null)
         {

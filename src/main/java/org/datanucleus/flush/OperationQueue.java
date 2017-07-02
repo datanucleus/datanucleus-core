@@ -53,7 +53,7 @@ public class OperationQueue
      * Method to add the specified operation to the operation queue.
      * @param oper Operation
      */
-    public synchronized void enqueue(Operation oper)
+    public void enqueue(Operation oper)
     {
         ObjectProvider op = oper.getObjectProvider();
         if (oper instanceof SCOOperation)
@@ -71,7 +71,7 @@ public class OperationQueue
     /**
      * Convenience method to log the current operation queue.
      */
-    public synchronized void log()
+    public void log()
     {
         NucleusLogger.GENERAL.debug(">> OperationQueue :" + (queuedOperations.isEmpty() ? " Empty" : ("" + queuedOperations.size() + " operations")));
         for (Operation oper : queuedOperations)
@@ -103,7 +103,7 @@ public class OperationQueue
      * Method to perform all operations queued.
      * Those operations are then removed from the queue.
      */
-    public synchronized void performAll()
+    public void performAll()
     {
         for (Operation op : queuedOperations)
         {
@@ -118,7 +118,7 @@ public class OperationQueue
      * @param store The backing store
      * @param op ObjectProvider
      */
-    public synchronized void performAll(Store store, ObjectProvider op)
+    public void performAll(Store store, ObjectProvider op)
     {
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {

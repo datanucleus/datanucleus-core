@@ -175,7 +175,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
     /**
      * Method to unset the owner and field information.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         if (ownerOP != null)
         {
@@ -252,7 +252,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * @param element The element
      * @return Whether the element is contained here
      **/
-    public synchronized boolean contains(Object element)
+    public boolean contains(Object element)
     {
         return delegate.contains(element);
     }
@@ -262,7 +262,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * @param c The collection of elements.
      * @return Whether they are contained.
      **/
-    public synchronized boolean containsAll(java.util.Collection c)
+    public boolean containsAll(java.util.Collection c)
     {
         return delegate.containsAll(c);
     }
@@ -272,7 +272,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * @param o The object to compare against.
      * @return Whether this object is the same.
      **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         return delegate.equals(o);
     }
@@ -281,7 +281,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * Hashcode operator.
      * @return The Hash code.
      **/
-    public synchronized int hashCode()
+    public int hashCode()
     {
         return delegate.hashCode();
     }
@@ -290,7 +290,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * Accessor for whether the Collection is empty.
      * @return Whether it is empty.
      **/
-    public synchronized boolean isEmpty()
+    public boolean isEmpty()
     {
         return delegate.isEmpty();
     }
@@ -299,7 +299,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * Accessor for an iterator for the Collection.
      * @return The iterator
      **/
-    public synchronized Iterator iterator()
+    public Iterator iterator()
     {
         return new SCOCollectionIterator(this, ownerOP, delegate, null, true);
     }
@@ -308,7 +308,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * Method to peek at the next element in the Queue.
      * @return The element
      **/
-    public synchronized E peek()
+    public E peek()
     {
         return delegate.peek();
     }
@@ -317,7 +317,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * Accessor for the size of the Collection.
      * @return The size
      **/
-    public synchronized int size()
+    public int size()
     {
         return delegate.size();
     }
@@ -326,7 +326,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * Method to return the Collection as an array.
      * @return The array
      **/
-    public synchronized Object[] toArray()
+    public Object[] toArray()
     {
         return delegate.toArray();
     }
@@ -336,7 +336,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * @param a The array to write the results to
      * @return The array
      **/
-    public synchronized Object[] toArray(Object a[])
+    public Object[] toArray(Object a[])
     {
         return delegate.toArray(a);
     }
@@ -346,7 +346,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * @param element The element to add
      * @return Whether it was added successfully.
      */
-    public synchronized boolean add(E element)
+    public boolean add(E element)
     {
         boolean success = delegate.add(element);
         if (success)
@@ -369,7 +369,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * @param elements The collection of elements to add.
      * @return Whether they were added successfully.
      */
-    public synchronized boolean addAll(java.util.Collection elements)
+    public boolean addAll(java.util.Collection elements)
     {
         boolean success = delegate.addAll(elements);
         if (success)
@@ -393,7 +393,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
     /**
      * Method to clear the Collection.
      */
-    public synchronized void clear()
+    public void clear()
     {
         if (ownerOP != null && !delegate.isEmpty())
         {
@@ -432,7 +432,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * @param element The element to offer
      * @return Whether it was added successfully.
      **/
-    public synchronized boolean offer(E element)
+    public boolean offer(E element)
     {
         return add(element);
     }
@@ -441,7 +441,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * Method to poll the next element in the Queue.
      * @return The element (now removed)
      **/
-    public synchronized E poll()
+    public E poll()
     {
         E obj = delegate.poll();
         makeDirty();
@@ -457,7 +457,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * @param element The Element to remove
      * @return Whether it was removed successfully.
      **/
-    public synchronized boolean remove(Object element)
+    public boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -467,7 +467,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * @param element The Element to remove
      * @return Whether it was removed successfully.
      **/
-    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
+    public boolean remove(Object element, boolean allowCascadeDelete)
     {
         boolean success = delegate.remove(element);
 
@@ -501,7 +501,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * @param elements The collection to remove
      * @return Whether they were removed successfully.
      **/
-    public synchronized boolean removeAll(java.util.Collection elements)
+    public boolean removeAll(java.util.Collection elements)
     {
         if (elements == null)
         {
@@ -552,7 +552,7 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
      * @param c The collection to retain
      * @return Whether they were retained successfully.
      **/
-    public synchronized boolean retainAll(java.util.Collection c)
+    public boolean retainAll(java.util.Collection c)
     {
         boolean success = delegate.retainAll(c);
         if (success)

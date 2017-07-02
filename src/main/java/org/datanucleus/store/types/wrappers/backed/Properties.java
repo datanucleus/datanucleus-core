@@ -310,7 +310,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
     /**
      * Method to unset the owner and field details.
      **/
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         super.unsetOwner();
         if (backingStore != null)

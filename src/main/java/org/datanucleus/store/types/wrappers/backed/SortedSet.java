@@ -315,7 +315,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
     /**
      * Method to unset the owner and field information.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         super.unsetOwner();
         if (backingStore != null)
@@ -374,7 +374,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
      * @param c The collection
      * @return Whether it is contained.
      **/
-    public synchronized boolean containsAll(java.util.Collection c)
+    public boolean containsAll(java.util.Collection c)
     {
         if (useCache)
         {
@@ -400,7 +400,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
      * @param o The object to compare against.
      * @return Whether this object is the same.
      **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         if (useCache)
         {
@@ -449,7 +449,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
      * Hashcode operator.
      * @return The Hash code.
      **/
-    public synchronized int hashCode()
+    public int hashCode()
     {
         if (useCache)
         {
@@ -793,7 +793,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
      * @param element The element
      * @return Whether it was removed ok.
      **/
-    public synchronized boolean remove(Object element)
+    public boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -803,7 +803,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
      * @param element The element
      * @param allowCascadeDelete Whether to allow cascade delete
      */
-    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
+    public boolean remove(Object element, boolean allowCascadeDelete)
     {
         makeDirty();
 
@@ -951,7 +951,7 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
      * @param c The collection to retain
      * @return Whether they were retained successfully.
      **/
-    public synchronized boolean retainAll(java.util.Collection c)
+    public boolean retainAll(java.util.Collection c)
     {
         makeDirty();
 

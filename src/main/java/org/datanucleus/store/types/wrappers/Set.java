@@ -160,7 +160,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
     /**
      * Method to unset the owner and field information.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         if (ownerOP != null)
         {
@@ -235,7 +235,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * @param element The element
      * @return Whether the element is contained here
      **/
-    public synchronized boolean contains(Object element)
+    public boolean contains(Object element)
     {
         return delegate.contains(element);
     }
@@ -245,7 +245,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * @param c The collection of elements.
      * @return Whether they are contained.
      **/
-    public synchronized boolean containsAll(java.util.Collection c)
+    public boolean containsAll(java.util.Collection c)
     {
         return delegate.containsAll(c);
     }
@@ -255,7 +255,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * @param o The object to compare against.
      * @return Whether this object is the same.
      **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         return delegate.equals(o);
     }
@@ -264,7 +264,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * Hashcode operator.
      * @return The Hash code.
      **/
-    public synchronized int hashCode()
+    public int hashCode()
     {
         return delegate.hashCode();
     }
@@ -273,7 +273,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * Accessor for whether the Collection is empty.
      * @return Whether it is empty.
      **/
-    public synchronized boolean isEmpty()
+    public boolean isEmpty()
     {
         return delegate.isEmpty();
     }
@@ -282,7 +282,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * Accessor for an iterator for the Collection.
      * @return The iterator
      **/
-    public synchronized Iterator<E> iterator()
+    public Iterator<E> iterator()
     {
         return new SCOCollectionIterator(this, ownerOP, delegate, null, true);
     }
@@ -291,7 +291,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * Accessor for the size of the Collection.
      * @return The size
      **/
-    public synchronized int size()
+    public int size()
     {
         return delegate.size();
     }
@@ -300,7 +300,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * Method to return the Collection as an array.
      * @return The array
      **/
-    public synchronized Object[] toArray()
+    public Object[] toArray()
     {
         return delegate.toArray();
     }
@@ -310,7 +310,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * @param a The array to write the results to
      * @return The array
      **/
-    public synchronized <T> T[] toArray(T a[])
+    public <T> T[] toArray(T a[])
     {
         return delegate.toArray(a);
     }
@@ -320,7 +320,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * @param element The element to add
      * @return Whether it was added successfully.
      **/
-    public synchronized boolean add(E element)
+    public boolean add(E element)
     {
         boolean success = delegate.add(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -348,7 +348,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * @param c The collection of elements to add.
      * @return Whether they were added successfully.
      **/
-    public synchronized boolean addAll(java.util.Collection<? extends E> c)
+    public boolean addAll(java.util.Collection<? extends E> c)
     {
         boolean success = delegate.addAll(c);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -381,7 +381,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
     /**
      * Method to clear the Collection.
      **/
-    public synchronized void clear()
+    public void clear()
     {
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
         {
@@ -431,7 +431,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * @param element The Element to remove
      * @return Whether it was removed successfully.
      **/
-    public synchronized boolean remove(Object element)
+    public boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -441,7 +441,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * @param element The Element to remove
      * @return Whether it was removed successfully.
      **/
-    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
+    public boolean remove(Object element, boolean allowCascadeDelete)
     {
         boolean success = delegate.remove(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -481,7 +481,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * @param elements The collection to remove
      * @return Whether they were removed successfully.
      */
-    public synchronized boolean removeAll(java.util.Collection elements)
+    public boolean removeAll(java.util.Collection elements)
     {
         if (elements == null)
         {
@@ -545,7 +545,7 @@ public class Set<E> extends AbstractSet<E> implements SCOCollection<java.util.Se
      * @param c The collection to retain
      * @return Whether they were retained successfully.
      **/
-    public synchronized boolean retainAll(java.util.Collection c)
+    public boolean retainAll(java.util.Collection c)
     {
         if (c == null)
         {

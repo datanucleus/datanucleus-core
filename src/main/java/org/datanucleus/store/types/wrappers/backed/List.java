@@ -299,7 +299,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
     /**
      * Method to unset the owner and field information.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         super.unsetOwner();
         if (backingStore != null)
@@ -331,7 +331,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * @param element The element
      * @return Whether the element is contained here
      **/
-    public synchronized boolean contains(Object element)
+    public boolean contains(Object element)
     {
         if (useCache && isCacheLoaded)
         {
@@ -351,7 +351,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * @param c The collection of elements.
      * @return Whether they are contained.
      **/
-    public synchronized boolean containsAll(java.util.Collection c)
+    public boolean containsAll(java.util.Collection c)
     {
         if (useCache)
         {
@@ -377,7 +377,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * @param o The object to compare against.
      * @return Whether this object is the same.
      **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         if (useCache)
         {
@@ -426,7 +426,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         return delegate.get(index);
     }
 
-    public synchronized int hashCode()
+    public int hashCode()
     {
         if (useCache)
         {
@@ -458,7 +458,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * Accessor for whether the List is empty.
      * @return Whether it is empty.
      **/
-    public synchronized boolean isEmpty()
+    public boolean isEmpty()
     {
         return size() == 0;
     }
@@ -486,7 +486,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * Accessor for an iterator for the List
      * @return The iterator
      **/
-    public synchronized Iterator<E> iterator()
+    public Iterator<E> iterator()
     {
         // Populate the cache if necessary
         if (useCache)
@@ -532,7 +532,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * Accessor for the size of the List
      * @return The size
      **/
-    public synchronized int size()
+    public int size()
     {
         if (useCache && isCacheLoaded)
         {
@@ -553,7 +553,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * @param to End index (exclusive) 
      * @return The subList
      **/
-    public synchronized java.util.List<E> subList(int from,int to)
+    public java.util.List<E> subList(int from,int to)
     {
         if (useCache)
         {
@@ -571,7 +571,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * Method to return the List as an array.
      * @return The array
      **/
-    public synchronized Object[] toArray()
+    public Object[] toArray()
     {
         if (useCache)
         {
@@ -589,7 +589,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * @param a The array to copy to
      * @return The array
      **/
-    public synchronized Object[] toArray(Object a[])
+    public Object[] toArray(Object a[])
     {
         if (useCache)
         {
@@ -609,7 +609,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * @param element The element to add
      * @return Whether it was added successfully.
      **/
-    public synchronized boolean add(E element)
+    public boolean add(E element)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -805,7 +805,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
     /**
      * Method to clear the List
      **/
-    public synchronized void clear()
+    public void clear()
     {
         makeDirty();
         delegate.clear();
@@ -833,7 +833,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * @param element The Element to remove
      * @return Whether it was removed successfully.
      **/
-    public synchronized boolean remove(Object element)
+    public boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -843,7 +843,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * @param element The element
      * @param allowCascadeDelete Whether to allow cascade delete
      */
-    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
+    public boolean remove(Object element, boolean allowCascadeDelete)
     {
         makeDirty();
 
@@ -1022,7 +1022,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      * @param c The collection to retain
      * @return Whether they were retained successfully.
      **/
-    public synchronized boolean retainAll(java.util.Collection c)
+    public boolean retainAll(java.util.Collection c)
     {
         makeDirty();
 

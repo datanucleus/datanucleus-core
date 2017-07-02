@@ -168,7 +168,7 @@ public class Properties extends java.util.Properties implements SCOMap<java.util
     /**
      * Method to unset the owner and field details.
      **/
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         if (ownerOP != null)
         {

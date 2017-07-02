@@ -306,7 +306,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
     /**
      * Method to unset the owner and field details.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         if (backingStore != null)
         {

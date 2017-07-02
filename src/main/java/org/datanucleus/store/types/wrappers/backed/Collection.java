@@ -409,7 +409,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
     /**
      * Method to unset the owner state manager and backing store information.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         super.unsetOwner();
         if (backingStore != null)
@@ -445,7 +445,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * @param element The element
      * @return Whether the element is contained here
      **/
-    public synchronized boolean contains(Object element)
+    public boolean contains(Object element)
     {
         if (useCache && isCacheLoaded)
         {
@@ -465,7 +465,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * @param c The collection of elements.
      * @return Whether they are contained.
      **/
-    public synchronized boolean containsAll(java.util.Collection c)
+    public boolean containsAll(java.util.Collection c)
     {
         if (useCache)
         {
@@ -491,7 +491,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * @param o The object to compare against.
      * @return Whether this object is the same.
      **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         if (useCache)
         {
@@ -515,7 +515,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * Hashcode operator.
      * @return The Hash code.
      **/
-    public synchronized int hashCode()
+    public int hashCode()
     {
         if (useCache)
         {
@@ -528,7 +528,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * Accessor for whether the Collection is empty.
      * @return Whether it is empty.
      **/
-    public synchronized boolean isEmpty()
+    public boolean isEmpty()
     {
         return size() == 0;
     }
@@ -537,7 +537,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * Accessor for an iterator for the Collection.
      * @return The iterator
      **/
-    public synchronized Iterator<E> iterator()
+    public Iterator<E> iterator()
     {
         // Populate the cache if necessary
         if (useCache)
@@ -551,7 +551,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * Accessor for the size of the Collection.
      * @return The size
      **/
-    public synchronized int size()
+    public int size()
     {
         if (useCache && isCacheLoaded)
         {
@@ -570,7 +570,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * Method to return the Collection as an array.
      * @return The array
      **/
-    public synchronized Object[] toArray()
+    public Object[] toArray()
     {
         if (useCache)
         {
@@ -588,7 +588,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * @param a The array to write the results to
      * @return The array
      **/
-    public synchronized Object[] toArray(Object a[])
+    public Object[] toArray(Object a[])
     {
         if (useCache)
         {
@@ -631,7 +631,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * @param element The element to add
      * @return Whether it was added successfully.
      **/
-    public synchronized boolean add(E element)
+    public boolean add(E element)
     {
         // Reject inappropriate elements
         if (!allowNulls && element == null)
@@ -692,7 +692,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * @param c The collection of elements to add.
      * @return Whether they were added successfully.
      **/
-    public synchronized boolean addAll(java.util.Collection c)
+    public boolean addAll(java.util.Collection c)
     {
         if (useCache)
         {
@@ -748,7 +748,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
     /**
      * Method to clear the Collection.
      **/
-    public synchronized void clear()
+    public void clear()
     {
         makeDirty();
         delegate.clear();
@@ -776,7 +776,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * @param element The Element to remove
      * @return Whether it was removed successfully.
      **/
-    public synchronized boolean remove(Object element)
+    public boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -786,7 +786,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * @param element The element
      * @param allowCascadeDelete Whether to allow cascade delete
      */
-    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
+    public boolean remove(Object element, boolean allowCascadeDelete)
     {
         makeDirty();
 
@@ -841,7 +841,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * @param elements The collection to remove
      * @return Whether they were removed successfully.
      **/
-    public synchronized boolean removeAll(java.util.Collection elements)
+    public boolean removeAll(java.util.Collection elements)
     {
         if (elements == null)
         {
@@ -934,7 +934,7 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
      * @param c The collection to retain
      * @return Whether they were retained successfully.
      **/
-    public synchronized boolean retainAll(java.util.Collection c)
+    public boolean retainAll(java.util.Collection c)
     {
         makeDirty();
 

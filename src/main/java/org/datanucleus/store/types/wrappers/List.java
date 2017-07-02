@@ -165,7 +165,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
     /**
      * Method to unset the owner and field information.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         if (ownerOP != null)
         {
@@ -235,7 +235,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * @param element The element
      * @return Whether the element is contained here
      **/
-    public synchronized boolean contains(Object element)
+    public boolean contains(Object element)
     {
         return delegate.contains(element);
     }
@@ -245,7 +245,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * @param c The collection of elements.
      * @return Whether they are contained.
      **/
-    public synchronized boolean containsAll(java.util.Collection c)
+    public boolean containsAll(java.util.Collection c)
     {
         return delegate.containsAll(c);
     }
@@ -255,7 +255,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * @param o The object to compare against.
      * @return Whether this object is the same.
      **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         return delegate.equals(o);
     }
@@ -270,7 +270,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
         return delegate.get(index);
     }
 
-    public synchronized int hashCode()
+    public int hashCode()
     {
         return delegate.hashCode();
     }
@@ -289,7 +289,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * Accessor for whether the List is empty.
      * @return Whether it is empty.
      **/
-    public synchronized boolean isEmpty()
+    public boolean isEmpty()
     {
         return delegate.isEmpty();
     }
@@ -308,7 +308,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * Accessor for an iterator for the List
      * @return The iterator
      **/
-    public synchronized Iterator iterator()
+    public Iterator iterator()
     {
         return new SCOListIterator(this, ownerOP, delegate, null, true, -1);
     }
@@ -336,7 +336,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * Accessor for the size of the List
      * @return The size
      **/
-    public synchronized int size()
+    public int size()
     {
         return delegate.size();
     }
@@ -347,7 +347,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * @param to End index (exclusive) 
      * @return The subList
      **/
-    public synchronized java.util.List<E> subList(int from,int to)
+    public java.util.List<E> subList(int from,int to)
     {
         return delegate.subList(from,to);
     }
@@ -356,7 +356,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * Method to return the List as an array.
      * @return The array
      **/
-    public synchronized Object[] toArray()
+    public Object[] toArray()
     {
         return delegate.toArray();
     }
@@ -366,7 +366,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * @param a The array to copy to
      * @return The array
      **/
-    public synchronized Object[] toArray(Object a[])
+    public Object[] toArray(Object a[])
     {
         return delegate.toArray(a);
     }
@@ -376,7 +376,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * @param element The element to add
      * @return Whether it was added successfully.
      **/
-    public synchronized boolean add(E element)
+    public boolean add(E element)
     {
         boolean success = delegate.add(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -502,7 +502,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
     /**
      * Method to clear the List
      */
-    public synchronized void clear()
+    public void clear()
     {
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
         {
@@ -552,7 +552,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * @param element The Element to remove
      * @return Whether it was removed successfully.
      **/
-    public synchronized boolean remove(Object element)
+    public boolean remove(Object element)
     {
         return remove(element, true);
     }
@@ -562,7 +562,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * @param element The Element to remove
      * @return Whether it was removed successfully.
      **/
-    public synchronized boolean remove(Object element, boolean allowCascadeDelete)
+    public boolean remove(Object element, boolean allowCascadeDelete)
     {
         boolean success = delegate.remove(element);
         if (ownerOP != null && ownerOP.getExecutionContext().getManageRelations())
@@ -696,7 +696,7 @@ public class List<E> extends AbstractList<E> implements SCOList<java.util.List<E
      * @param c The collection to retain
      * @return Whether they were retained successfully.
      **/
-    public synchronized boolean retainAll(java.util.Collection c)
+    public boolean retainAll(java.util.Collection c)
     {
         boolean success = delegate.retainAll(c);
         if (success)

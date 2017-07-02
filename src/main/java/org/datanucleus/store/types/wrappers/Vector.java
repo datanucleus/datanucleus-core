@@ -168,7 +168,7 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
     /**
      * Method to unset the owner and field information.
      **/
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         if (ownerOP != null)
         {

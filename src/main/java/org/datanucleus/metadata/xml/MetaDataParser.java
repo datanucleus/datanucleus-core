@@ -192,7 +192,7 @@ public class MetaDataParser extends DefaultHandler
      * @return The MetaData for this file
      * @throws NucleusException thrown if error occurred
      */
-    public synchronized MetaData parseMetaDataStream(InputStream in, String filename, String handlerName)
+    public MetaData parseMetaDataStream(InputStream in, String filename, String handlerName)
     {
         if (in == null)
         {

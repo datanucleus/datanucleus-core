@@ -314,7 +314,7 @@ public class TreeMap<K, V> extends org.datanucleus.store.types.wrappers.TreeMap<
     /**
      * Method to unset the owner and field details.
      */
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         super.unsetOwner();
         if (backingStore != null)
@@ -413,7 +413,7 @@ public class TreeMap<K, V> extends org.datanucleus.store.types.wrappers.TreeMap<
      * @param o The map to compare against.
      * @return Whether they are equal.
      **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         if (useCache)
         {
@@ -589,7 +589,7 @@ public class TreeMap<K, V> extends org.datanucleus.store.types.wrappers.TreeMap<
      * Method to generate a hashcode for this Map.
      * @return The hashcode.
      **/
-    public synchronized int hashCode()
+    public int hashCode()
     {
         if (useCache)
         {

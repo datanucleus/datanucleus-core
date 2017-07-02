@@ -167,7 +167,7 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
     /**
      * Method to unset the owner and field information.
      **/
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         if (ownerOP != null)
         {

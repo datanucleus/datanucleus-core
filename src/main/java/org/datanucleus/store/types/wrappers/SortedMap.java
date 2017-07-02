@@ -186,7 +186,7 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
     /**
      * Method to unset the owner and field details.
      **/
-    public synchronized void unsetOwner()
+    public void unsetOwner()
     {
         if (ownerOP != null)
         {
@@ -295,7 +295,7 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
      * @param o The map to compare against.
      * @return Whether they are equal.
      **/
-    public synchronized boolean equals(Object o)
+    public boolean equals(Object o)
     {
         return delegate.equals(o);
     }
@@ -363,7 +363,7 @@ public class SortedMap<K, V> extends AbstractMap<K, V> implements java.util.Sort
      * Method to generate a hashcode for this Map.
      * @return The hashcode.
      **/
-    public synchronized int hashCode()
+    public int hashCode()
     {
         return delegate.hashCode();
     }
