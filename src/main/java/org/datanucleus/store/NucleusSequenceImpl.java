@@ -97,7 +97,7 @@ public class NucleusSequenceImpl implements NucleusSequence
             ManagedConnection mconn;
             public ManagedConnection retrieveConnection()
             {
-                mconn = storeManager.getConnection(ec);
+                mconn = storeManager.getConnectionManager().getConnection(ec);
                 return mconn;
             }
 

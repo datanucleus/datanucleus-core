@@ -22,7 +22,6 @@ import java.io.PrintStream;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
@@ -34,7 +33,6 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
-import org.datanucleus.Transaction;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NoExtentException;
 import org.datanucleus.exceptions.NucleusException;
@@ -125,12 +123,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     /** ConnectionManager **/
     protected ConnectionManager connectionMgr;
 
-    /** Name of primary connection factory. */
-    protected String primaryConnectionFactoryName;
-
-    /** Name of secondary connection factory (null if not present). Typically for schema/sequences etc. */
-    protected String secondaryConnectionFactoryName;
-
     /**
      * Constructor for a new StoreManager. Stores the basic information required for the datastore management.
      * @param key Key for this StoreManager
@@ -161,10 +153,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             public void preClose(ExecutionContext ec)
             {
                 // Close all connections for this ExecutionContext whether tx or non-tx when ExecutionContext closes
-                ConnectionFactory connFactory = connectionMgr.lookupConnectionFactory(primaryConnectionFactoryName);
-                connectionMgr.closeAllConnections(connFactory, ec);
-                connFactory = connectionMgr.lookupConnectionFactory(secondaryConnectionFactoryName);
-                connectionMgr.closeAllConnections(connFactory, ec);
+                connectionMgr.closeAllConnections(ec);
             }
         });
     }
@@ -176,7 +165,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     {
         this.connectionMgr = new ConnectionManagerImpl(nucleusContext);
     }
-    
+
     /**
      * Register the Connection Factory defined in plugins
      */
@@ -189,20 +178,20 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             new String[] {"datastore", "transactional"}, new String[] {storeManagerKey, "true"});
         if (cfElem != null)
         {
-            primaryConnectionFactoryName = cfElem.getAttribute("name");
+            String cfName = cfElem.getAttribute("name");
             if (datastoreName != null)
             {
-                primaryConnectionFactoryName += "-" + datastoreName;
+                cfName += "-" + datastoreName;
             }
             try
             {
                 ConnectionFactory cf = (ConnectionFactory)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.store_connectionfactory",
                     new String[] {"datastore", "transactional"}, new String[] {storeManagerKey, "true"}, "class-name",
                     new Class[] {ClassConstants.STORE_MANAGER, ClassConstants.JAVA_LANG_STRING}, new Object[] {this, AbstractConnectionFactory.RESOURCE_NAME_TX});
-                connectionMgr.registerConnectionFactory(primaryConnectionFactoryName, cf);
+                connectionMgr.registerPrimaryConnectionFactory(cf);
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
-                    NucleusLogger.CONNECTION.debug(Localiser.msg("032018", primaryConnectionFactoryName));
+                    NucleusLogger.CONNECTION.debug(Localiser.msg("032018", cfName));
                 }
             }
             catch (Exception e)
@@ -220,20 +209,20 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             new String[] {"datastore", "transactional"}, new String[] {storeManagerKey, "false"});
         if (cfElem != null)
         {
-            secondaryConnectionFactoryName = cfElem.getAttribute("name");
+            String cfName = cfElem.getAttribute("name");
             if (datastoreName != null)
             {
-                secondaryConnectionFactoryName += "-" + datastoreName;
+                cfName += "-" + datastoreName;
             }
             try
             {
                 ConnectionFactory cf = (ConnectionFactory)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.store_connectionfactory",
                     new String[] {"datastore", "transactional"}, new String[] {storeManagerKey, "false"}, "class-name",
                     new Class[] {ClassConstants.STORE_MANAGER, ClassConstants.JAVA_LANG_STRING}, new Object[] {this, AbstractConnectionFactory.RESOURCE_NAME_NONTX});
-                connectionMgr.registerConnectionFactory(secondaryConnectionFactoryName, cf);
+                connectionMgr.registerSecondaryConnectionFactory(cf);
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
-                    NucleusLogger.CONNECTION.debug(Localiser.msg("032019", secondaryConnectionFactoryName));
+                    NucleusLogger.CONNECTION.debug(Localiser.msg("032019", cfName));
                 }
             }
             catch (Exception e)
@@ -248,22 +237,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      */
     public synchronized void close()
     {
-        if (primaryConnectionFactoryName != null)
-        {
-            ConnectionFactory cf = connectionMgr.lookupConnectionFactory(primaryConnectionFactoryName);
-            if (cf != null)
-            {
-                cf.close();
-            }
-        }
-        if (secondaryConnectionFactoryName != null)
-        {
-            ConnectionFactory cf = connectionMgr.lookupConnectionFactory(secondaryConnectionFactoryName);
-            if (cf != null)
-            {
-                cf.close();
-            }
-        }
+        connectionMgr.close();
         connectionMgr = null;
 
         if (valueGenerationMgr != null)
@@ -303,76 +277,8 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     }
 
     /**
-     * Accessor for a connection for the specified ExecutionContext.
-     * If there is an active transaction, a connection from the primary DataSource will be returned. 
-     * If there is no active transaction, a connection from the secondary DataSource will be returned.
-     * @param ec ExecutionContext
-     * @param options Any options for the connection
-     * @return The Connection
-     * @throws NucleusException Thrown if an error occurs getting the connection
-     */
-    public ManagedConnection getConnection(ExecutionContext ec, Map options)
-    {
-        ConnectionFactory connFactory;
-        if (ec.getTransaction().isActive())
-        {
-            connFactory = connectionMgr.lookupConnectionFactory(primaryConnectionFactoryName);
-        }
-        else
-        {
-            boolean singleConnection = getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_SINGLE_CONNECTION);
-            if (singleConnection)
-            {
-                // Take from the primary
-                connFactory = connectionMgr.lookupConnectionFactory(primaryConnectionFactoryName);
-            }
-            else if (secondaryConnectionFactoryName != null)
-            {
-                connFactory = connectionMgr.lookupConnectionFactory(secondaryConnectionFactoryName);
-            }
-            else
-            {
-                // Some datastores don't define secondary handling so just fallback to the primary factory
-                connFactory = connectionMgr.lookupConnectionFactory(primaryConnectionFactoryName);
-            }
-        }
-        return connFactory.getConnection(ec, ec.getTransaction(), options);
-    }
-
-    /**
-     * Utility to return a managed connection not tied to any ExecutionContext. This would typically be used for schema operations or
-     * for accessing sequences, things that we normally want to separate from any PM/EM persistence operations.
-     * This method returns a connection from the secondary connection factory (e.g. datanucleus.connectionFactory2Name), if it is provided.
-     * @param isolationLevel The transaction isolation scheme to use See org.datanucleus.transaction.TransactionIsolation. Pass in -1 if just want the default
-     * @return The Connection to the datastore
-     * @throws NucleusException if an error occurs getting the connection
-     */
-    public ManagedConnection getConnection(int isolationLevel)
-    {
-        ConnectionFactory connFactory = null;
-        if (secondaryConnectionFactoryName != null)
-        {
-            connFactory = connectionMgr.lookupConnectionFactory(secondaryConnectionFactoryName);
-        }
-        else
-        {
-            // Some datastores don't define non-tx handling so just fallback to the primary factory
-            connFactory = connectionMgr.lookupConnectionFactory(primaryConnectionFactoryName);
-        }
-
-        Map<String, Object> options = null;
-        if (isolationLevel >= 0)
-        {
-            options = new HashMap<>();
-            options.put(Transaction.TRANSACTION_ISOLATION_OPTION, Integer.valueOf(isolationLevel));
-        }
-        return connFactory.getConnection(null, null, options);
-    }
-
-    /**
      * Convenience accessor for the password to use for the connection.
-     * Will perform decryption if the persistence property "datanucleus.ConnectionPasswordDecrypter" has
-     * also been specified.
+     * Will perform decryption if the persistence property "datanucleus.ConnectionPasswordDecrypter" has also been specified.
      * @return Password
      */
     public String getConnectionPassword()
@@ -507,20 +413,8 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      */
     public NucleusConnection getNucleusConnection(ExecutionContext ec)
     {
-        ConnectionFactory cf = connectionMgr.lookupConnectionFactory(primaryConnectionFactoryName);
-
-        final ManagedConnection mc;
-        final boolean enlisted;
-        if (!ec.getTransaction().isActive())
-        {
-            // no active transaction so don't enlist
-            enlisted = false;
-        }
-        else
-        {
-            enlisted = true;
-        }
-        mc = cf.getConnection(enlisted ? ec : null, enlisted ? ec.getTransaction() : null, null); // Will throw exception if already locked
+        // In <= 5.1.0.m3 this would have had last arg as "ec.getTransaction().isActive() ? ec.getTransaction() : null"
+        ManagedConnection mc = connectionMgr.getConnection(true, ec, ec.getTransaction());
 
         // Lock the connection now that it is in use by the user
         mc.lock();
@@ -531,7 +425,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             {
                 // Unlock the connection now that the user has finished with it
                 mc.unlock();
-                if (!enlisted)
+                if (!ec.getTransaction().isActive())
                 {
                     // Close the (unenlisted) connection (committing its statements)
                     mc.close();
@@ -1292,7 +1186,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                     ManagedConnection mconn;
                     public ManagedConnection retrieveConnection()
                     {
-                        mconn = getConnection(ec);
+                        mconn = connectionMgr.getConnection(ec);
                         return mconn;
                     }
                     public void releaseConnection() 

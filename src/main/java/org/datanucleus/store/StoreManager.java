@@ -21,14 +21,12 @@ package org.datanucleus.store;
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
-import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.flush.FlushProcess;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -36,7 +34,6 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.store.connection.ConnectionManager;
-import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.store.schema.naming.NamingFactory;
@@ -155,41 +152,6 @@ public interface StoreManager
      * @return connection manager
      */
     ConnectionManager getConnectionManager();
-
-    /**
-     * Accessor for a connection for the specified ExecutionContext (PM/EM).
-     * If there is an active transaction, a connection from the primary connection factory will be returned. 
-     * If there is no active transaction, a connection from the secondary connection factory will be returned (unless
-     * the user has specified to just use the primary).
-     * @param ec execution context
-     * @return The Connection
-     * @throws NucleusException Thrown if an error occurs getting the connection
-     */
-    default ManagedConnection getConnection(ExecutionContext ec)
-    {
-        return getConnection(ec, null);
-    }
-
-    /**
-     * Accessor for a connection for the specified ExecutionContext (PM/EM).
-     * If there is an active transaction, a connection from the primary connection factory will be returned. 
-     * If there is no active transaction, a connection from the secondary connection factory will be returned (unless
-     * the user has specified to just use the primary).
-     * @param ec execution context
-     * @param options connection options
-     * @return The Connection
-     * @throws NucleusException Thrown if an error occurs getting the connection
-     */
-    ManagedConnection getConnection(ExecutionContext ec, Map options);
-
-    /**
-     * Accessor for a connection for the specified transaction isolation level.
-     * This is used for schema and sequence access operations.
-     * @param isolation_level Isolation level (-1 implies use the default for the datastore).
-     * @return The Connection
-     * @throws NucleusException Thrown if an error occurs getting the connection
-     */
-    ManagedConnection getConnection(int isolation_level);
 
     /**
      * Convenience accessor for the URL for the connections.

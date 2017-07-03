@@ -17,15 +17,12 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.connection;
 
-import java.util.Map;
-
-import org.datanucleus.ExecutionContext;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Abstract implementation of a ConnectionFactory for a DataNucleus supported datastore.
+ * Abstract implementation of a ConnectionFactory for a DataNucleus-supported datastore.
  */
 public abstract class AbstractConnectionFactory implements ConnectionFactory
 {
@@ -74,16 +71,6 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory
     public String getResourceType()
     {
         return resourceType;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.connection.ConnectionFactory#getConnection(org.datanucleus.store.ExecutionContext, java.util.Map)
-     */
-    public ManagedConnection getConnection(ExecutionContext ec, org.datanucleus.Transaction txn, Map options)
-    {
-        ManagedConnection mconn = storeMgr.getConnectionManager().allocateConnection(this, ec, txn, options);
-        ((AbstractManagedConnection)mconn).incrementUseCount();
-        return mconn;
     }
 
     /* (non-Javadoc)

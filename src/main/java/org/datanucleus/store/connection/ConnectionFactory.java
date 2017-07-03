@@ -29,22 +29,13 @@ public interface ConnectionFactory
 {
     /** User-visible configuration property name */
     public static final String DATANUCLEUS_CONNECTION_RESOURCE_TYPE = "datanucleus.connection.resourceType";
+
     /** User-visible configuration property name */
     public static final String DATANUCLEUS_CONNECTION2_RESOURCE_TYPE = "datanucleus.connection2.resourceType";
 
     /**
-     * Obtain a connection from the Factory. The connection will be enlisted within the transaction
-     * associated to the ExecutionContext if enlist set to true.
-     * @param ec ExecutionContext that the connection is bound to during its lifecycle (or null)
-     * @param transaction The transaction to enlist with
-     * @param options Any options for then creating the connection
-     * @return the {@link org.datanucleus.store.connection.ManagedConnection}
-     */
-    ManagedConnection getConnection(ExecutionContext ec, org.datanucleus.Transaction transaction, Map<String, Object> options);
-
-    /**
      * Create the ManagedConnection. 
-     * Only used by ConnectionManager so do not call this.
+     * <b>Only used by ConnectionManager so do not call this.</b>
      * @param ec ExecutionContext that the connection is bound to during its lifecycle (if any)
      * @param transactionOptions the Transaction options this connection will be enlisted to, null if non existent
      * @return The ManagedConnection.
@@ -61,4 +52,10 @@ public interface ConnectionFactory
      * @return Resource type ("JTA", "RESOURCE_LOCAL")
      */
     String getResourceType();
+
+    /**
+     * Accessor for the resource name (e.g "jdbc/tx").
+     * @return The resource name
+     */
+    String getResourceName();
 }

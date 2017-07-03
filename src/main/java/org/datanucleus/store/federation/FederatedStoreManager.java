@@ -423,17 +423,17 @@ public class FederatedStoreManager implements StoreManager
 
     public ManagedConnection getConnection(ExecutionContext ec)
     {
-        return primaryStoreMgr.getConnection(ec);
+        return primaryStoreMgr.getConnectionManager().getConnection(ec);
     }
     
     public ManagedConnection getConnection(ExecutionContext ec, Map options)
     {
-        return primaryStoreMgr.getConnection(ec, options);
+        return primaryStoreMgr.getConnectionManager().getConnection(ec, options);
     }
 
     public ManagedConnection getConnection(int isolation_level)
     {
-        return primaryStoreMgr.getConnection(isolation_level);
+        return primaryStoreMgr.getConnectionManager().getConnection(isolation_level);
     }
     
     /* (non-Javadoc)

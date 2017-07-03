@@ -21,6 +21,8 @@ package org.datanucleus.store.connection;
 import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.Transaction;
+import org.datanucleus.exceptions.NucleusException;
 
 /**
  * Manager of connections for a StoreManager, allowing ManagedConnection pooling, enlistment in transaction.
@@ -39,39 +41,72 @@ import org.datanucleus.ExecutionContext;
 public interface ConnectionManager
 {
     /**
-     * Method to lookup a connection factory and create it if not yet existing.
-     * @param name The lookup name "e.g "jdbc/tx"
-     * @return The connection factory
+     * Method to close the connection manager. This will close all open connections.
      */
-    ConnectionFactory lookupConnectionFactory(String name);
+    void close();
 
     /**
-     * Method to register a connection factory
-     * @param name The lookup name "e.g "jdbc/tx"
-     * @param factory The connection factory
-     */
-    void registerConnectionFactory(String name, ConnectionFactory factory);
-
-    /**
-     * Method to close all pooled connections for the specified key of the specified factory.
-     * @param factory The factory
-     * @param ec The key in the pool
-     */
-    void closeAllConnections(final ConnectionFactory factory, final ExecutionContext ec);
-
-    /**
-     * Allocate a connection using the specified factory (unless we already have one cached for the ExecutionContext).
-     * @param factory The ConnectionFactory to create any new connection with
-     * @param ec ExecutionContext that binds the connection during its lifetime (key in the pool)
-     * @param tx The transaction
-     * @param options Any overriding options for allocating the connection (e.g isolation) that override the transaction (default) options
-     * @return The ManagedConnection
-     */
-    ManagedConnection allocateConnection(ConnectionFactory factory, final ExecutionContext ec, org.datanucleus.Transaction tx, Map options);
-
-    /**
-     * Disable binding objects to "ExecutionContext" references, so automatically
-     * disables the connection pooling 
+     * Disable binding objects to "ExecutionContext" references, so automatically disables the connection pooling 
      */
     void disableConnectionPool();
+
+    /**
+     * Method to register the "primary" connection factory
+     * @param factory The connection factory
+     */
+    void registerPrimaryConnectionFactory(ConnectionFactory factory);
+
+    /**
+     * Method to register the "secondary" connection factory
+     * @param factory The connection factory
+     */
+    void registerSecondaryConnectionFactory(ConnectionFactory factory);
+
+    /**
+     * Accessor for a connection for the specified ExecutionContext.
+     * If there is an active transaction, a connection from the primary connection factory will be returned. 
+     * If there is no active transaction, a connection from the secondary connection factory will be returned (unless the user has specified to just use the primary).
+     * @param ec execution context
+     * @return The ManagedConnection
+     * @throws NucleusException Thrown if an error occurs getting the connection
+     */
+    default ManagedConnection getConnection(ExecutionContext ec)
+    {
+        return getConnection(ec, null);
+    }
+
+    /**
+     * Accessor for a connection for the specified ExecutionContext.
+     * If there is an active transaction, a connection from the primary connection factory will be returned. 
+     * If there is no active transaction, a connection from the secondary connection factory will be returned (unless the user has specified to just use the primary).
+     * @param ec execution context
+     * @param options connection options
+     * @return The ManagedConnection
+     * @throws NucleusException Thrown if an error occurs getting the connection
+     */
+    ManagedConnection getConnection(ExecutionContext ec, Map options);
+
+    /**
+     * Accessor for a connection for the specified transaction isolation level.
+     * This is used for schema and sequence access operations.
+     * @param isolationLevel Isolation level (-1 implies use the default for the datastore).
+     * @return The ManagedConnection
+     * @throws NucleusException Thrown if an error occurs getting the connection
+     */
+    ManagedConnection getConnection(int isolationLevel);
+
+    /**
+     * Accessor for a connection from the specified factory, for the specified ExecutionContext dependent on whether the connection will be enlisted.
+     * @param primary Whether to take use the "primary" connection factory, otherwise takes the "secondary"
+     * @param ec ExecutionContext
+     * @param txn The Transaction
+     * @return The ManagedConnection
+     */
+    ManagedConnection getConnection(boolean primary, ExecutionContext ec, Transaction txn);
+
+    /**
+     * Method to close all pooled connections for the specified ExecutionContext.
+     * @param ec The ExecutionContext
+     */
+    void closeAllConnections(final ExecutionContext ec);
 }

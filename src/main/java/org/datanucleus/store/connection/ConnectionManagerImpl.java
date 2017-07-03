@@ -15,29 +15,34 @@ limitations under the License.
 Contributors:
 2007 Andy Jefferson - javadocs, formatted, copyrighted
 2007 Andy Jefferson - added lock/unlock/hasConnection/hasLockedConnection and enlisting
+2017 Andy Jefferson - largely rewritten to take on StoreManager getConnection methods.
     ...
 **********************************************************************/
 package org.datanucleus.store.connection;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.transaction.xa.XAResource;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.PersistenceNucleusContext;
+import org.datanucleus.PropertyNames;
+import org.datanucleus.Transaction;
 import org.datanucleus.TransactionEventListener;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.store.federation.FederatedStoreManager;
 import org.datanucleus.transaction.ResourcedTransaction;
 import org.datanucleus.util.Localiser;
 
 /**
- * Manager of connections for a datastore, allowing ManagedConnection pooling, enlistment in transaction.
- * The pool caches one connection per ExecutionContext per factory, consequently there will be 0-2 connections pooled per ExecutionContext
- * (0 if none in use, 1 if just primary factory, 1 if primary+secondary factory).
+ * Manager of connections for a datastore, allowing caching of ManagedConnections, enlistment in transaction.
+ * Manages a "primary" and (optionally) a "secondary" ConnectionFactory.
+ * Each ExecutionContext can have at most 1 ManagedConnection per ConnectionFactory at any time.
+ * <p>
  * The "allocateConnection" method can create connections and enlist them (like most normal persistence operations need) or create a connection and return it 
  * without enlisting it into a transaction, for example on a read-only operation, or when running non-transactional, or to get schema information.
+ * </p>
  * <p>
  * Connections can be locked per ExecutionContext basis. Locking of connections is used to handle the connection over to the user application. 
  * A locked connection denies any further access to the datastore, until the user application unlock it.
@@ -48,13 +53,14 @@ public class ConnectionManagerImpl implements ConnectionManager
     /** Context for this connection manager. */
     PersistenceNucleusContext nucleusContext;
 
-    /** Registry of factories for connections, keyed by their symbolic name. */
-    Map<String, ConnectionFactory> factories = new HashMap<>();
-
-    ManagedConnectionPool connectionPool = new ManagedConnectionPool();
-
     /** Whether connection pooling is enabled. */
     boolean connectionPoolEnabled = true;
+
+    /** "Primary" ConnectionFactory, normally used for transactional operations. */
+    ConnectionFactory primaryConnectionFactory = null;
+
+    /** "Secondary" ConnectionFactory, normally used for non-transactional operations. */
+    ConnectionFactory secondaryConnectionFactory = null;
 
     /**
      * Constructor.
@@ -65,165 +71,224 @@ public class ConnectionManagerImpl implements ConnectionManager
         this.nucleusContext = context;
     }
 
-    /**
-     * Pool of managed connections keyed by poolKey objects.
-     * Each "poolKey" key has its own pool of ManagedConnection's
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.connection.ConnectionManager#close()
      */
-    class ManagedConnectionPool
+    @Override
+    public void close()
     {
-        /**
-         * Connection pool keeps a reference to a connection for each ExecutionContext (and so the connection used by each transaction).
-         * This permits reuse of connections in the same transaction, but not at same time!!!
-         * ManagedConnection must be released to return to pool.
-         * On transaction commit/rollback, connection pool is cleared
-         *
-         * For each combination of ExecutionContext-ConnectionFactory there is 0 or 1 ManagedConnection
-         */
-        Map<Object, Map<ConnectionFactory, ManagedConnection>> connectionsPool = new HashMap();
-
-        /**
-         * Method to remove the managed connection from the pool.
-         * @param factory The factory for connections
-         * @param ec Key for the pool of managed connections
-         */
-        public void removeManagedConnection(ConnectionFactory factory, ExecutionContext ec)
+        if (primaryConnectionFactory != null)
         {
-            synchronized (connectionsPool)
+            primaryConnectionFactory.close();
+        }
+        if (secondaryConnectionFactory != null)
+        {
+            secondaryConnectionFactory.close();
+        }
+    }
+
+    /**
+     * Disable binding objects to ExecutionContext references, so automatically
+     * disables the connection pooling 
+     */
+    public void disableConnectionPool()
+    {
+        connectionPoolEnabled = false;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.connection.ConnectionManager#registerPrimaryConnectionFactory(org.datanucleus.store.connection.ConnectionFactory)
+     */
+    @Override
+    public void registerPrimaryConnectionFactory(ConnectionFactory factory)
+    {
+        this.primaryConnectionFactory = factory;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.connection.ConnectionManager#registerSecondaryConnectionFactory(org.datanucleus.store.connection.ConnectionFactory)
+     */
+    @Override
+    public void registerSecondaryConnectionFactory(ConnectionFactory factory)
+    {
+        this.secondaryConnectionFactory = factory;
+    }
+
+    /**
+     * Connection pool keeps a reference to a connection for each ExecutionContext (and so the connection used by each transaction).
+     * This permits reuse of connections in the same transaction, but not at same time!!!
+     * ManagedConnection must be released to return to pool.
+     * On transaction commit/rollback, connection pool is cleared
+     *
+     * For each combination of ExecutionContext-ConnectionFactory there is 0 or 1 ManagedConnection
+     * TODO Change this to have a primary and secondary since we only have 2 ConnectionFactory. Need to update allocateConnection too.
+     */
+    Map<ExecutionContext, Map<ConnectionFactory, ManagedConnection>> connectionsPool = new ConcurrentHashMap<>();
+
+    /**
+     * Method to remove the managed connection from the pool.
+     * @param factory The factory for connections
+     * @param ec Key for the pool of managed connections
+     */
+    protected void removeManagedConnection(ConnectionFactory factory, ExecutionContext ec)
+    {
+        Map<ConnectionFactory, ManagedConnection> connectionsForEC = connectionsPool.get(ec);
+        if (connectionsForEC != null)
+        {
+            ManagedConnection prevConn = connectionsForEC.remove(factory);
+
+            if (nucleusContext.getStatistics() != null && prevConn != null)
             {
-                Object poolKey = getPoolKey(factory, ec);
-                Map<ConnectionFactory, ManagedConnection> connectionsForPool = connectionsPool.get(poolKey);
-                if (connectionsForPool != null)
-                {
-                    ManagedConnection prevConn = connectionsForPool.remove(factory);
+                nucleusContext.getStatistics().decrementActiveConnections();
+            }
 
-                    if (nucleusContext.getStatistics() != null && prevConn != null)
-                    {
-                        nucleusContext.getStatistics().decrementActiveConnections();
-                    }
-
-                    if (connectionsForPool.isEmpty())
-                    {
-                        // No connections remaining for this OM so remove the entry for the ExecutionContext
-                        connectionsPool.remove(poolKey);
-                    }
-                }
+            if (connectionsForEC.isEmpty())
+            {
+                // No connections remaining for this ExecutionContext
+                connectionsPool.remove(ec);
             }
         }
-        
-        /**
-         * Obtain a ManagedConnection from the pool.
-         * @param factory The factory for connections
-         * @param ec Key for pooling
-         * @return The managed connection
-         */
-        public ManagedConnection getManagedConnection(ConnectionFactory factory, ExecutionContext ec)
+    }
+
+    /**
+     * Obtain a ManagedConnection from the pool.
+     * @param factory The factory for connections
+     * @param ec Key for pooling
+     * @return The managed connection
+     */
+    protected ManagedConnection getManagedConnection(ConnectionFactory factory, ExecutionContext ec)
+    {
+        Map<ConnectionFactory, ManagedConnection> connectionsForEC = connectionsPool.get(ec);
+        if (connectionsForEC == null)
         {
-            synchronized (connectionsPool)
-            {
-                Object poolKey = getPoolKey(factory, ec);
-                Map<ConnectionFactory, ManagedConnection> connectionsForEC = connectionsPool.get(poolKey);
-                if (connectionsForEC == null)
-                {
-                    return null;
-                }
-
-                //obtain a ManagedConnection for an specific ConnectionFactory
-                ManagedConnection mconn = connectionsForEC.get(factory);
-                if (mconn != null)
-                {
-                    if (mconn.isLocked())
-                    {
-                        // Enlisted connection that is locked so throw exception
-                        throw new NucleusUserException(Localiser.msg("009000"));
-                    }
-
-                    // Already registered enlisted connection present so return it
-                    return mconn;
-                }
-            }
             return null;
         }
-        
-        public void putManagedConnection(ConnectionFactory factory, ExecutionContext ec, ManagedConnection mconn)
-        {
-            synchronized (connectionsPool)
-            {
-                Object poolKey = getPoolKey(factory, ec);
-                Map<ConnectionFactory, ManagedConnection> connectionsForEC = connectionsPool.get(poolKey);
-                if (connectionsForEC == null)
-                {
-                    connectionsForEC = new HashMap();
-                    connectionsPool.put(poolKey, connectionsForEC);
-                }
 
-                ManagedConnection prevConn = connectionsForEC.put(factory, mconn);
-                if (nucleusContext.getStatistics() != null && prevConn == null)
-                {
-                    nucleusContext.getStatistics().incrementActiveConnections();
-                }
-            }
-        }
-
-        Object getPoolKey(ConnectionFactory factory, ExecutionContext ec)
+        // obtain a ManagedConnection for an specific ConnectionFactory
+        ManagedConnection mconn = connectionsForEC.get(factory);
+        if (mconn != null)
         {
-            if (ec.getStoreManager() instanceof FederatedStoreManager)
+            if (mconn.isLocked())
             {
-                // With data federation we need to key via factory+ec
-                return new PoolKey(factory, ec);
+                // Enlisted connection that is locked so throw exception
+                throw new NucleusUserException(Localiser.msg("009000"));
             }
-            return ec;
+
+            // Already registered enlisted connection present so return it
+            return mconn;
         }
+        return null;
     }
 
-    class PoolKey
+    protected void putManagedConnection(ConnectionFactory factory, ExecutionContext ec, ManagedConnection mconn)
     {
-        ConnectionFactory factory;
-        ExecutionContext ec;
-
-        public PoolKey(ConnectionFactory factory, ExecutionContext ec)
+        Map<ConnectionFactory, ManagedConnection> connectionsForEC = connectionsPool.get(ec);
+        if (connectionsForEC == null)
         {
-            this.factory = factory;
-            this.ec = ec;
+            connectionsForEC = new HashMap();
+            connectionsPool.put(ec, connectionsForEC);
         }
 
-        /* (non-Javadoc)
-         * @see java.lang.Object#equals(java.lang.Object)
-         */
-        @Override
-        public boolean equals(Object obj)
+        ManagedConnection prevConn = connectionsForEC.put(factory, mconn);
+        if (nucleusContext.getStatistics() != null && prevConn == null)
         {
-            if (obj == null || !(obj instanceof PoolKey))
-            {
-                return false;
-            }
-            PoolKey other = (PoolKey)obj;
-            return factory == other.factory && ec == other.ec;
-        }
-
-        /* (non-Javadoc)
-         * @see java.lang.Object#hashCode()
-         */
-        @Override
-        public int hashCode()
-        {
-            return factory.hashCode() ^ ec.hashCode();
+            nucleusContext.getStatistics().incrementActiveConnections();
         }
     }
 
-    /**
-     * Method to close all pooled connections for the specified key of the specified factory.
-     * @param factory The factory
-     * @param ec The key in the pool
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.connection.ConnectionManager#getConnection(org.datanucleus.ExecutionContext, java.util.Map)
      */
-    public void closeAllConnections(final ConnectionFactory factory, final ExecutionContext ec)
+    @Override
+    public ManagedConnection getConnection(ExecutionContext ec, Map options)
+    {
+        ConnectionFactory connFactory;
+        if (ec.getTransaction().isActive())
+        {
+            connFactory = primaryConnectionFactory;
+        }
+        else
+        {
+            boolean singleConnection = nucleusContext.getStoreManager().getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_SINGLE_CONNECTION);
+            if (singleConnection)
+            {
+                connFactory = primaryConnectionFactory;
+            }
+            else if (secondaryConnectionFactory != null)
+            {
+                connFactory = secondaryConnectionFactory;
+            }
+            else
+            {
+                // Some datastores don't define secondary handling so just fallback to the primary factory
+                connFactory = primaryConnectionFactory;
+            }
+        }
+
+        ManagedConnection mconn = allocateConnection(connFactory, ec, ec.getTransaction(), options);
+        ((AbstractManagedConnection)mconn).incrementUseCount(); // Will be decremented on calling mconn.release
+        return mconn;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.connection.ConnectionManager#getConnection(int)
+     */
+    @Override
+    public ManagedConnection getConnection(int isolationLevel)
+    {
+        // Some datastores don't define non-tx handling so just fallback to the primary factory
+        ConnectionFactory connFactory = (secondaryConnectionFactory != null) ? secondaryConnectionFactory : primaryConnectionFactory;
+
+        Map<String, Object> options = null;
+        if (isolationLevel >= 0)
+        {
+            options = new HashMap<>();
+            options.put(Transaction.TRANSACTION_ISOLATION_OPTION, Integer.valueOf(isolationLevel));
+        }
+
+        ManagedConnection mconn = allocateConnection(connFactory, null, null, options);
+        ((AbstractManagedConnection)mconn).incrementUseCount(); // Will be decremented on calling mconn.release
+        return mconn;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.connection.ConnectionManager#getConnection(boolean, org.datanucleus.ExecutionContext, org.datanucleus.Transaction)
+     */
+    @Override
+    public ManagedConnection getConnection(boolean primary, ExecutionContext ec, Transaction txn)
+    {
+        ConnectionFactory cf = primary ? primaryConnectionFactory : secondaryConnectionFactory;
+
+        ManagedConnection mconn = allocateConnection(cf, ec, txn, null);
+        ((AbstractManagedConnection)mconn).incrementUseCount(); // Will be decremented on calling mconn.release
+        return mconn;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.connection.ConnectionManager#closeAllConnections(org.datanucleus.ExecutionContext)
+     */
+    @Override
+    public void closeAllConnections(ExecutionContext ec)
     {
         if (ec != null && connectionPoolEnabled)
         {
-            ManagedConnection mconnFromPool = connectionPool.getManagedConnection(factory, ec);
-            if (mconnFromPool != null)
+            if (primaryConnectionFactory != null)
             {
-                // Already registered enlisted connection present so return it
-                mconnFromPool.close();
+                ManagedConnection mconnFromPool = getManagedConnection(primaryConnectionFactory, ec);
+                if (mconnFromPool != null)
+                {
+                    // Already registered enlisted connection present so return it
+                    mconnFromPool.close();
+                }
+            }
+            if (secondaryConnectionFactory != null)
+            {
+                ManagedConnection mconnFromPool = getManagedConnection(secondaryConnectionFactory, ec);
+                if (mconnFromPool != null)
+                {
+                    // Already registered enlisted connection present so return it
+                    mconnFromPool.close();
+                }
             }
         }
     }
@@ -237,11 +302,11 @@ public class ConnectionManagerImpl implements ConnectionManager
      * @param options Options for the connection (e.g isolation). These will override those of the txn itself
      * @return The ManagedConnection
      */
-    public ManagedConnection allocateConnection(final ConnectionFactory factory, final ExecutionContext ec, final org.datanucleus.Transaction transaction, Map options)
+    private ManagedConnection allocateConnection(final ConnectionFactory factory, final ExecutionContext ec, final org.datanucleus.Transaction transaction, Map options)
     {
         if (ec != null && connectionPoolEnabled)
         {
-            ManagedConnection mconnFromPool = connectionPool.getManagedConnection(factory, ec);
+            ManagedConnection mconnFromPool = getManagedConnection(factory, ec);
             if (mconnFromPool != null)
             {
                 // Factory already has a ManagedConnection
@@ -291,7 +356,16 @@ public class ConnectionManagerImpl implements ConnectionManager
         }
 
         // No cached connection so create new connection with required options
-        final ManagedConnection mconn = factory.createManagedConnection(ec, mergeOptions(transaction, options));
+        Map txnOptions = new HashMap();
+        if (transaction != null && transaction.getOptions() != null && !transaction.getOptions().isEmpty())
+        {
+            txnOptions.putAll(transaction.getOptions());
+        }
+        if (options != null && !options.isEmpty())
+        {
+            txnOptions.putAll(options);
+        }
+        final ManagedConnection mconn = factory.createManagedConnection(ec, txnOptions);
 
         // Enlist the connection in this transaction
         if (ec != null)
@@ -327,7 +401,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                     public void managedConnectionPreClose() {}
                     public void managedConnectionPostClose()
                     {
-                        connectionPool.removeManagedConnection(factory, ec); // Connection closed so remove
+                        removeManagedConnection(factory, ec); // Connection closed so remove
 
                         // Remove this listener
                         mconn.removeListener(this);
@@ -336,31 +410,11 @@ public class ConnectionManagerImpl implements ConnectionManager
                 });
 
                 // Register this connection against the ExecutionContext - connection is valid
-                connectionPool.putManagedConnection(factory, ec, mconn);
+                putManagedConnection(factory, ec, mconn);
             }
         }
 
         return mconn;
-    }
-
-    /**
-     * Merge the options defined for the transaction with any overriding options specified for this connection.
-     * @param transaction The transaction
-     * @param overridingOptions Any options requested
-     * @return The merged options
-     */
-    private Map mergeOptions(final org.datanucleus.Transaction transaction, final Map overridingOptions)
-    {
-        Map m = new HashMap();
-        if (transaction != null && transaction.getOptions() != null && !transaction.getOptions().isEmpty())
-        {
-            m.putAll(transaction.getOptions());
-        }
-        if (overridingOptions != null && !overridingOptions.isEmpty())
-        {
-            m.putAll(overridingOptions);
-        }
-        return m;
     }
 
     /**
@@ -493,34 +547,5 @@ public class ConnectionManagerImpl implements ConnectionManager
                     }
                 });
         }
-    }
-
-    /**
-     * Method to lookup a connection factory and create it if not yet existing.
-     * @param name The lookup name "e.g "jdbc/tx"
-     * @return The connection factory
-     */
-    public ConnectionFactory lookupConnectionFactory(String name)
-    {
-        return factories.get(name);
-    }
-
-    /**
-     * Method to register a connection factory under a name.
-     * @param name The lookup name "e.g "jdbc/tx"
-     * @param factory The connection factory
-     */
-    public void registerConnectionFactory(String name, ConnectionFactory factory)
-    {
-        factories.put(name, factory);
-    }
-
-    /**
-     * Disable binding objects to ExecutionContext references, so automatically
-     * disables the connection pooling 
-     */
-    public void disableConnectionPool()
-    {
-        connectionPoolEnabled = false;
     }
 }

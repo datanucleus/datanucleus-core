@@ -1,5 +1,17 @@
 <BODY>
     Package defining the connection to the datastore.
-    Every datastore has to implement the ConnectionFactory and ManagedConnection interfaces.
-    Abstract representations of these are provided as starting points.
+
+    <h3>ConnectionManager</h3>
+    This is the entry point into the connection management process. You use it to get a connection to the datastore (<i>ManagedConnection</i>).
+    This manages a "primary" ConnectionFactory and an optional "secondary" ConnectionFactory. Some datastores only support a single factory.
+
+    <h3>ConnectionFactory</h3>
+    This is responsible for generating the actual connections to the datastore.
+    Each datastore plugin has to implement this for their own datastore.
+    There is a provided <i>AbstractConnectionFactory</i> that must be extended to provide this implementation.
+
+    <h3>ManagedConnection</h3>
+    This represents the actual connection to the datastore, wrapping the real connection.
+    Each datastore plugin has to implement this for their own datastore.
+    There is a provided <i>AbstractManagedConnection</i> that must be extended to provide this implementation.
 </BODY>
