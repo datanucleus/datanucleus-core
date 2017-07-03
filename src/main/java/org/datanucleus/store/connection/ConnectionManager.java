@@ -26,16 +26,15 @@ import org.datanucleus.exceptions.NucleusException;
 
 /**
  * Manager of connections for a StoreManager, allowing ManagedConnection pooling, enlistment in transaction.
- * The pool caches one connection per ExecutionContext.
- * The <i>allocateConnection</i> method can create connections and enlist them (like most normal persistence 
- * operations need) or create a connection and return it without enlisting it into a transaction, for example the 
- * connections used to generate object identity, create the database schema or obtaining the schema metadata.
- * The <i>closeAllConnections</i> method is typically called when the owning object (ExecutionContext) is being closed
- * giving us chance to close all retained connections for that ExecutionContext.
+ * Manages a "primary" and (optionally) a "secondary" ConnectionFactory.
+ * When caching is enabled it maintains caches of the allocated ManagedConnection per ExecutionContext (an EC can have a single ManagedConnection per ConnectionFactory at any time).
  * <p>
- * Connections can be locked per ExecutionContext basis. Locking of connections is used to
- * handle the connection over to the user application. A locked connection denies any further
- * access to the datastore, until the user application unlock it.
+ * The "allocateConnection" method can create connections and enlist them (like most normal persistence operations need) or create a connection and return it 
+ * without enlisting it into a transaction, for example on a read-only operation, or when running non-transactional, or to get schema information.
+ * </p>
+ * <p>
+ * Connections can be locked per ExecutionContext basis. Locking of connections is used to handle the connection over to the user application. 
+ * A locked connection denies any further access to the datastore, until the user application unlock it.
  * </p>
  */
 public interface ConnectionManager
@@ -46,9 +45,9 @@ public interface ConnectionManager
     void close();
 
     /**
-     * Disable binding objects to "ExecutionContext" references, so automatically disables the connection pooling 
+     * Disable binding objects to "ExecutionContext" references, so automatically disables the connection caching. 
      */
-    void disableConnectionPool();
+    void disableConnectionCaching();
 
     /**
      * Accessor for a connection for the specified ExecutionContext.
