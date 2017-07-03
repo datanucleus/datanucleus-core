@@ -79,7 +79,7 @@ public class ConnectionManagerImpl implements ConnectionManager
     /**
      * Constructor.
      * This will register the "primary" and "secondary" ConnectionFactory objects.
-     * @param context Context for this manager.
+     * @param storeMgr Store manager for whom we are managing connections
      */
     public ConnectionManagerImpl(StoreManager storeMgr)
     {

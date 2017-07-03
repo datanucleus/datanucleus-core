@@ -3,7 +3,9 @@
 
     <h3>ConnectionManager</h3>
     This is the entry point into the connection management process. You use it to get a connection to the datastore (<i>ManagedConnection</i>).
-    This manages a "primary" ConnectionFactory and an optional "secondary" ConnectionFactory. Some datastores only support a single factory.
+    This manages a "primary" <i>ConnectionFactory</i> and an optional "secondary" <i>ConnectionFactory</i>. Some datastores only support a single factory.
+    The <i>ConnectionManager</i> manages 2 caches of the currently allocated <i>ManagedConnection</i> objects, keyed by the <i>ExecutionContext</i> they are for;
+    an <i>ExecutionContext</i> can only have 1 <i>ManagedConnection</i> per <i>ConnectionFactory</i>.
 
     <h3>ConnectionFactory</h3>
     This is responsible for generating the actual connections to the datastore.
