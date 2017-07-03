@@ -26,14 +26,20 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.transaction.xa.XAResource;
 
+import org.datanucleus.ClassConstants;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.Transaction;
 import org.datanucleus.TransactionEventListener;
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.plugin.ConfigurationElement;
+import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.federation.FederatedStoreManager;
 import org.datanucleus.transaction.ResourcedTransaction;
 import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Manager of connections for a datastore, allowing caching of ManagedConnections, enlistment in transaction.
@@ -50,6 +56,8 @@ import org.datanucleus.util.Localiser;
  */
 public class ConnectionManagerImpl implements ConnectionManager
 {
+    StoreManager storeMgr;
+
     /** Context for this connection manager. */
     PersistenceNucleusContext nucleusContext;
 
@@ -64,11 +72,73 @@ public class ConnectionManagerImpl implements ConnectionManager
 
     /**
      * Constructor.
+     * This will register the "primary" and "secondary" ConnectionFactory objects.
      * @param context Context for this manager.
      */
-    public ConnectionManagerImpl(PersistenceNucleusContext context)
+    public ConnectionManagerImpl(StoreManager storeMgr)
     {
-        this.nucleusContext = context;
+        this.storeMgr = storeMgr;
+        this.nucleusContext = storeMgr.getNucleusContext();
+
+        String datastoreName = storeMgr.getStringProperty(FederatedStoreManager.PROPERTY_DATA_FEDERATION_DATASTORE_NAME);
+
+        // "Primary" Factory for connections - transactional
+        ConfigurationElement cfElem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_connectionfactory",
+            new String[] {"datastore", "transactional"}, new String[] {storeMgr.getStoreManagerKey(), "true"});
+        if (cfElem != null)
+        {
+            try
+            {
+                this.primaryConnectionFactory = (ConnectionFactory)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.store_connectionfactory",
+                    new String[] {"datastore", "transactional"}, new String[] {storeMgr.getStoreManagerKey(), "true"}, "class-name",
+                    new Class[] {ClassConstants.STORE_MANAGER, ClassConstants.JAVA_LANG_STRING}, new Object[] {storeMgr, AbstractConnectionFactory.RESOURCE_NAME_TX});
+
+                if (NucleusLogger.CONNECTION.isDebugEnabled())
+                {
+                    String cfName = cfElem.getAttribute("name");
+                    if (datastoreName != null)
+                    {
+                        cfName += "-" + datastoreName;
+                    }
+                    NucleusLogger.CONNECTION.debug(Localiser.msg("032018", cfName));
+                }
+            }
+            catch (Exception e)
+            {
+                throw new NucleusException("Error creating transactional connection factory", e).setFatal();
+            }
+        }
+        else
+        {
+            throw new NucleusException("Error creating transactional connection factory. No connection factory plugin defined");
+        }
+
+        // "Secondary" Factory for connections - typically for schema/sequences etc
+        cfElem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_connectionfactory",
+            new String[] {"datastore", "transactional"}, new String[] {storeMgr.getStoreManagerKey(), "false"});
+        if (cfElem != null)
+        {
+            try
+            {
+                this.secondaryConnectionFactory = (ConnectionFactory)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.store_connectionfactory",
+                    new String[] {"datastore", "transactional"}, new String[] {storeMgr.getStoreManagerKey(), "false"}, "class-name",
+                    new Class[] {ClassConstants.STORE_MANAGER, ClassConstants.JAVA_LANG_STRING}, new Object[] {storeMgr, AbstractConnectionFactory.RESOURCE_NAME_NONTX});
+
+                if (NucleusLogger.CONNECTION.isDebugEnabled())
+                {
+                    String cfName = cfElem.getAttribute("name");
+                    if (datastoreName != null)
+                    {
+                        cfName += "-" + datastoreName;
+                    }
+                    NucleusLogger.CONNECTION.debug(Localiser.msg("032019", cfName));
+                }
+            }
+            catch (Exception e)
+            {
+                throw new NucleusException("Error creating nontransactional connection factory", e).setFatal();
+            }
+        }
     }
 
     /* (non-Javadoc)
@@ -94,24 +164,6 @@ public class ConnectionManagerImpl implements ConnectionManager
     public void disableConnectionPool()
     {
         connectionPoolEnabled = false;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.connection.ConnectionManager#registerPrimaryConnectionFactory(org.datanucleus.store.connection.ConnectionFactory)
-     */
-    @Override
-    public void registerPrimaryConnectionFactory(ConnectionFactory factory)
-    {
-        this.primaryConnectionFactory = factory;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.connection.ConnectionManager#registerSecondaryConnectionFactory(org.datanucleus.store.connection.ConnectionFactory)
-     */
-    @Override
-    public void registerSecondaryConnectionFactory(ConnectionFactory factory)
-    {
-        this.secondaryConnectionFactory = factory;
     }
 
     /**
@@ -209,7 +261,7 @@ public class ConnectionManagerImpl implements ConnectionManager
         }
         else
         {
-            boolean singleConnection = nucleusContext.getStoreManager().getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_SINGLE_CONNECTION);
+            boolean singleConnection = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_SINGLE_CONNECTION);
             if (singleConnection)
             {
                 connFactory = primaryConnectionFactory;

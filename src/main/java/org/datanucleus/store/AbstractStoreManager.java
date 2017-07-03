@@ -56,12 +56,9 @@ import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.properties.PropertyStore;
 import org.datanucleus.state.StateManagerImpl;
 import org.datanucleus.store.autostart.AutoStartMechanism;
-import org.datanucleus.store.connection.AbstractConnectionFactory;
-import org.datanucleus.store.connection.ConnectionFactory;
 import org.datanucleus.store.connection.ConnectionManager;
 import org.datanucleus.store.connection.ConnectionManagerImpl;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.federation.FederatedStoreManager;
 import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.query.QueryManagerImpl;
 import org.datanucleus.store.schema.DefaultStoreSchemaHandler;
@@ -147,89 +144,24 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
 
         // Set up connection handling
         registerConnectionMgr();
-        registerConnectionFactory();
+
         nucleusContext.addExecutionContextListener(new ExecutionContext.LifecycleListener()
         {
             public void preClose(ExecutionContext ec)
             {
-                // Close all connections for this ExecutionContext whether tx or non-tx when ExecutionContext closes
+                // Close all connections for this ExecutionContext when ExecutionContext closes
                 connectionMgr.closeAllConnections(ec);
             }
         });
     }
 
     /**
-     * Register the default ConnectionManager implementation
+     * Register the default ConnectionManager implementation.
+     * Having this in a separate method to allow overriding by store plugins if required.
      */
     protected void registerConnectionMgr()
     {
-        this.connectionMgr = new ConnectionManagerImpl(nucleusContext);
-    }
-
-    /**
-     * Register the Connection Factory defined in plugins
-     */
-    protected void registerConnectionFactory()
-    {
-        String datastoreName = getStringProperty(FederatedStoreManager.PROPERTY_DATA_FEDERATION_DATASTORE_NAME);
-
-        // Factory for connections - transactional
-        ConfigurationElement cfElem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_connectionfactory",
-            new String[] {"datastore", "transactional"}, new String[] {storeManagerKey, "true"});
-        if (cfElem != null)
-        {
-            String cfName = cfElem.getAttribute("name");
-            if (datastoreName != null)
-            {
-                cfName += "-" + datastoreName;
-            }
-            try
-            {
-                ConnectionFactory cf = (ConnectionFactory)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.store_connectionfactory",
-                    new String[] {"datastore", "transactional"}, new String[] {storeManagerKey, "true"}, "class-name",
-                    new Class[] {ClassConstants.STORE_MANAGER, ClassConstants.JAVA_LANG_STRING}, new Object[] {this, AbstractConnectionFactory.RESOURCE_NAME_TX});
-                connectionMgr.registerPrimaryConnectionFactory(cf);
-                if (NucleusLogger.CONNECTION.isDebugEnabled())
-                {
-                    NucleusLogger.CONNECTION.debug(Localiser.msg("032018", cfName));
-                }
-            }
-            catch (Exception e)
-            {
-                throw new NucleusException("Error creating transactional connection factory", e).setFatal();
-            }
-        }
-        else
-        {
-            throw new NucleusException("Error creating transactional connection factory. No connection factory plugin defined");
-        }
-
-        // Factory for connections - typically for schema/sequences etc
-        cfElem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_connectionfactory",
-            new String[] {"datastore", "transactional"}, new String[] {storeManagerKey, "false"});
-        if (cfElem != null)
-        {
-            String cfName = cfElem.getAttribute("name");
-            if (datastoreName != null)
-            {
-                cfName += "-" + datastoreName;
-            }
-            try
-            {
-                ConnectionFactory cf = (ConnectionFactory)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.store_connectionfactory",
-                    new String[] {"datastore", "transactional"}, new String[] {storeManagerKey, "false"}, "class-name",
-                    new Class[] {ClassConstants.STORE_MANAGER, ClassConstants.JAVA_LANG_STRING}, new Object[] {this, AbstractConnectionFactory.RESOURCE_NAME_NONTX});
-                connectionMgr.registerSecondaryConnectionFactory(cf);
-                if (NucleusLogger.CONNECTION.isDebugEnabled())
-                {
-                    NucleusLogger.CONNECTION.debug(Localiser.msg("032019", cfName));
-                }
-            }
-            catch (Exception e)
-            {
-                throw new NucleusException("Error creating nontransactional connection factory", e).setFatal();
-            }
-        }
+        this.connectionMgr = new ConnectionManagerImpl(this);
     }
 
     /* (non-Javadoc)

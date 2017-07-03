@@ -84,7 +84,6 @@ public class FrequentlyAccessedPropertiesTest
 
     public static class StoreManagerStub extends AbstractStoreManager 
     {
-
         public StoreManagerStub(ClassLoaderResolver clr, PersistenceNucleusContext nucleusContext, Map<String, Object> props)
         {
             super("test", clr, nucleusContext, props);
@@ -95,12 +94,6 @@ public class FrequentlyAccessedPropertiesTest
         protected void registerConnectionMgr()
         {
         }
-
-        @Override
-        protected void registerConnectionFactory()
-        {
-        }
-        
     }
 }
 

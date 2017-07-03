@@ -51,18 +51,6 @@ public interface ConnectionManager
     void disableConnectionPool();
 
     /**
-     * Method to register the "primary" connection factory
-     * @param factory The connection factory
-     */
-    void registerPrimaryConnectionFactory(ConnectionFactory factory);
-
-    /**
-     * Method to register the "secondary" connection factory
-     * @param factory The connection factory
-     */
-    void registerSecondaryConnectionFactory(ConnectionFactory factory);
-
-    /**
      * Accessor for a connection for the specified ExecutionContext.
      * If there is an active transaction, a connection from the primary connection factory will be returned. 
      * If there is no active transaction, a connection from the secondary connection factory will be returned (unless the user has specified to just use the primary).
