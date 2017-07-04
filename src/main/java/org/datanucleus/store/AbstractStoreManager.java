@@ -961,36 +961,30 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
 
         // Try to find the generator from the ValueGenerationManager if we already have it managed
-        ValueGenerator generator = null;
-        synchronized (this)
+        ValueGenerator generator = getValueGenerationManager().getValueGenerator(generatorNameKeyInManager);
+        if (generator == null)
         {
+            if (generatorName == null)
+            {
+                // No available value-generator for the specified strategy for this datastore
+                throw new NucleusUserException(Localiser.msg("038004", strategy));
+            }
+
             // This block is synchronised since we don't want to let any other thread through until
             // the generator is created, in case it is the same as the next request
-            generator = getValueGenerationManager().getValueGenerator(generatorNameKeyInManager);
-            if (generator == null)
+            synchronized (valueGenerationMgr)
             {
-                if (generatorName == null)
-                {
-                    // No available value-generator for the specified strategy for this datastore
-                    throw new NucleusUserException(Localiser.msg("038004", strategy));
-                }
-
                 // Set up the default properties available for all value generators
-                Properties props = getPropertiesForGenerator(cmd, absoluteFieldNumber, ec, sequenceMetaData,
-                    tableGeneratorMetaData);
+                Properties props = getPropertiesForGenerator(cmd, absoluteFieldNumber, ec, sequenceMetaData, tableGeneratorMetaData);
 
-                Class cls = null;
-                if (elem != null)
-                {
-                    cls = nucleusContext.getPluginManager().loadClass(elem.getExtension().getPlugin().getSymbolicName(), elem.getAttribute("class-name"));
-                }
+                Class cls = (elem != null) ? nucleusContext.getPluginManager().loadClass(elem.getExtension().getPlugin().getSymbolicName(), elem.getAttribute("class-name")) : null;
                 if (cls == null)
                 {
                     throw new NucleusException("Cannot create Value Generator for strategy " + generatorName);
                 }
 
                 // Create the new ValueGenerator since the first time required (registers it with the ValueGenerationManager too)
-                generator = getValueGenerationManager().createValueGenerator(generatorNameKeyInManager, cls, props, this, null);
+                generator = valueGenerationMgr.createValueGenerator(generatorNameKeyInManager, cls, props, this, null);
             }
         }
 
@@ -1095,8 +1089,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
 
     /**
      * Accessor for the next value from the specified generator.
-     * This implementation simply returns generator.next(). Any case where the generator requires
-     * datastore connections should override this method.
+     * This implementation simply returns generator.next(). Any case where the generator requires datastore connections should override this method.
      * @param generator The generator
      * @param ec execution context
      * @return The next value.
@@ -1107,8 +1100,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         synchronized (generator)
         {
             // Get the next value for this generator for this ExecutionContext
-            // Note : this is synchronised since we don't want to risk handing out this generator
-            // while its connectionProvider is set to that of a different ExecutionContext
+            // Note : this is synchronised since we don't want to risk handing out this generator while its connectionProvider is set to that of a different ExecutionContext
             // It maybe would be good to change ValueGenerator to have a next taking the connectionProvider
             if (generator instanceof AbstractDatastoreGenerator)
             {

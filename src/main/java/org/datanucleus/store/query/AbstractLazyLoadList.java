@@ -31,10 +31,9 @@ import org.datanucleus.util.Localiser;
 
 /**
  * Abstract implementation of a lazy loaded list of (persistent) objects.
- * Needs to be extended to implement the <pre>retrieveObjectForIndex()</pre> method to retrieve
- * the object at the specified index from whatever datasource is being used, and to implement
- * the <pre>getSize()</pre> method to return the size of the list. The "datasource" could
- * be results for a query, or a connection to a datastore, or whatever ... just a source of objects.
+ * Needs to be extended to implement the <code>retrieveObjectForIndex()</code> method to retrieve the object at the specified index 
+ * from whatever datasource is being used, and to implement the <code>getSize()</code> method to return the size of the list. 
+ * The "datasource" could be results for a query, or a connection to a datastore, or whatever ... just a source of objects.
  * TODO Change Localised message numbers to be generic
  * @param <E> Type of the element of this list
  */
@@ -352,62 +351,53 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
 
         public boolean hasNext()
         {
-            synchronized (AbstractLazyLoadList.this)
+            if (!isOpen())
             {
-                if (!isOpen())
-                {
-                    // Closed list so return false
-                    return false;
-                }
-
-                // When we aren't at size()-1 we have at least one more element
-                return iteratorIndex <= (size() - 1);
+                // Closed list so return false
+                return false;
             }
+
+            // When we aren't at size()-1 we have at least one more element
+            return iteratorIndex <= (size() - 1);
         }
 
         public boolean hasPrevious()
         {
-            synchronized (AbstractLazyLoadList.this)
+            if (!isOpen())
             {
-                if (!isOpen())
-                {
-                    // Closed list so return false
-                    return false;
-                }
-
-                // A List has indices starting at 0 so when we have > 0 we have a previous
-                return iteratorIndex > 0;
+                // Closed list so return false
+                return false;
             }
+
+            // A List has indices starting at 0 so when we have > 0 we have a previous
+            return iteratorIndex > 0;
         }
 
         public Object next()
         {
-            synchronized (AbstractLazyLoadList.this)
+            if (!isOpen())
             {
-                if (!isOpen())
-                {
-                    // Closed list so throw NoSuchElementException
-                    throw new NoSuchElementException(Localiser.msg("052600"));
-                }
-
-                if (!hasNext())
-                {
-                    throw new NoSuchElementException("No next element");
-                }
-
-                if (itemsByIndex != null && itemsByIndex.containsKey(iteratorIndex))
-                {
-                    return itemsByIndex.get(iteratorIndex);
-                }
-
-                E obj = retrieveObjectForIndex(iteratorIndex);
-                if (itemsByIndex != null)
-                {
-                    itemsByIndex.put(iteratorIndex, obj);
-                }
-                iteratorIndex++;
-                return obj;
+                // Closed list so throw NoSuchElementException
+                throw new NoSuchElementException(Localiser.msg("052600"));
             }
+
+            if (!hasNext())
+            {
+                throw new NoSuchElementException("No next element");
+            }
+
+            if (itemsByIndex != null && itemsByIndex.containsKey(iteratorIndex))
+            {
+                return itemsByIndex.get(iteratorIndex);
+            }
+
+            E obj = retrieveObjectForIndex(iteratorIndex);
+            if (itemsByIndex != null)
+            {
+                itemsByIndex.put(iteratorIndex, obj);
+            }
+            iteratorIndex++;
+            return obj;
         }
 
         public int nextIndex()
@@ -421,33 +411,30 @@ public abstract class AbstractLazyLoadList<E> implements List<E>
 
         public Object previous()
         {
-            synchronized (AbstractLazyLoadList.this)
+            if (!isOpen())
             {
-                if (!isOpen())
-                {
-                    // Closed list so throw NoSuchElementException
-                    throw new NoSuchElementException(Localiser.msg("052600"));
-                }
-
-                if (!hasPrevious())
-                {
-                    throw new NoSuchElementException("No previous element");
-                }
-
-                iteratorIndex--;
-                if (itemsByIndex != null &&itemsByIndex.containsKey(iteratorIndex))
-                {
-                    return itemsByIndex.get(iteratorIndex);
-                }
-
-                E obj = retrieveObjectForIndex(iteratorIndex);
-                if (itemsByIndex != null)
-                {
-                    itemsByIndex.put(iteratorIndex, obj);
-                }
-                iteratorIndex++;
-                return obj;
+                // Closed list so throw NoSuchElementException
+                throw new NoSuchElementException(Localiser.msg("052600"));
             }
+
+            if (!hasPrevious())
+            {
+                throw new NoSuchElementException("No previous element");
+            }
+
+            iteratorIndex--;
+            if (itemsByIndex != null &&itemsByIndex.containsKey(iteratorIndex))
+            {
+                return itemsByIndex.get(iteratorIndex);
+            }
+
+            E obj = retrieveObjectForIndex(iteratorIndex);
+            if (itemsByIndex != null)
+            {
+                itemsByIndex.put(iteratorIndex, obj);
+            }
+            iteratorIndex++;
+            return obj;
         }
 
         public int previousIndex()

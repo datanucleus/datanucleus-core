@@ -665,11 +665,6 @@ public class ResourcedTransaction
 
     public String toString()
     {
-        String resString = null;
-        synchronized (enlistedResources)
-        {
-            resString = enlistedResources.toString();
-        }
-        return "[DataNucleus Transaction, ID=" + idString + ", enlisted resources=" + resString + "]";
+        return "[DataNucleus Transaction, ID=" + idString + ", enlisted resources=" + enlistedResources.toString() + "]";
     }
 }

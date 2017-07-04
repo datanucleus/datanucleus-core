@@ -295,7 +295,7 @@ public class QueryManagerImpl implements QueryManager
      * @see org.datanucleus.store.query.QueryManager#getQueryCompilationCache()
      */
     @Override
-    public synchronized QueryCompilationCache getQueryCompilationCache()
+    public QueryCompilationCache getQueryCompilationCache()
     {
         return queryCompilationCache;
     }
@@ -304,7 +304,7 @@ public class QueryManagerImpl implements QueryManager
      * @see org.datanucleus.store.query.QueryManager#addQueryCompilation(java.lang.String, java.lang.String, org.datanucleus.query.compiler.QueryCompilation)
      */
     @Override
-    public synchronized void addQueryCompilation(String language, String query, QueryCompilation compilation)
+    public void addQueryCompilation(String language, String query, QueryCompilation compilation)
     {
         if (queryCompilationCache != null)
         {
@@ -328,7 +328,7 @@ public class QueryManagerImpl implements QueryManager
      * @see org.datanucleus.store.query.QueryManager#getQueryCompilationForQuery(java.lang.String, java.lang.String)
      */
     @Override
-    public synchronized QueryCompilation getQueryCompilationForQuery(String language, String query)
+    public QueryCompilation getQueryCompilationForQuery(String language, String query)
     {
         if (queryCompilationCache != null)
         {
@@ -350,7 +350,7 @@ public class QueryManagerImpl implements QueryManager
      * @see org.datanucleus.store.query.QueryManager#getQueryDatastoreCompilationCache()
      */
     @Override
-    public synchronized QueryDatastoreCompilationCache getQueryDatastoreCompilationCache()
+    public QueryDatastoreCompilationCache getQueryDatastoreCompilationCache()
     {
         return queryCompilationCacheDatastore;
     }
@@ -359,8 +359,7 @@ public class QueryManagerImpl implements QueryManager
      * @see org.datanucleus.store.query.QueryManager#addDatastoreQueryCompilation(java.lang.String, java.lang.String, java.lang.String, java.lang.Object)
      */
     @Override
-    public synchronized void addDatastoreQueryCompilation(String datastore, String language, String query,
-            Object compilation)
+    public void addDatastoreQueryCompilation(String datastore, String language, String query, Object compilation)
     {
         if (queryCompilationCacheDatastore != null)
         {
@@ -373,7 +372,7 @@ public class QueryManagerImpl implements QueryManager
      * @see org.datanucleus.store.query.QueryManager#deleteDatastoreQueryCompilation(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public synchronized void removeDatastoreQueryCompilation(String datastore, String language, String query)
+    public void removeDatastoreQueryCompilation(String datastore, String language, String query)
     {
         if (queryCompilationCacheDatastore != null)
         {
@@ -386,7 +385,7 @@ public class QueryManagerImpl implements QueryManager
      * @see org.datanucleus.store.query.QueryManager#getDatastoreQueryCompilation(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public synchronized Object getDatastoreQueryCompilation(String datastore, String language, String query)
+    public Object getDatastoreQueryCompilation(String datastore, String language, String query)
     {
         if (queryCompilationCacheDatastore != null)
         {
@@ -408,7 +407,7 @@ public class QueryManagerImpl implements QueryManager
      * @see org.datanucleus.store.query.QueryManager#getQueryResultsCache()
      */
     @Override
-    public synchronized QueryResultsCache getQueryResultsCache()
+    public QueryResultsCache getQueryResultsCache()
     {
         return queryResultsCache;
     }
@@ -417,7 +416,7 @@ public class QueryManagerImpl implements QueryManager
      * @see org.datanucleus.store.query.QueryManager#evictQueryResultsForType(java.lang.Class)
      */
     @Override
-    public synchronized void evictQueryResultsForType(Class cls)
+    public void evictQueryResultsForType(Class cls)
     {
         if (queryResultsCache != null)
         {
@@ -429,7 +428,7 @@ public class QueryManagerImpl implements QueryManager
      * @see org.datanucleus.store.query.QueryManager#addDatastoreQueryResult(org.datanucleus.store.query.Query, java.util.Map, java.util.List)
      */
     @Override
-    public synchronized void addQueryResult(Query query, Map params, List<Object> results)
+    public void addQueryResult(Query query, Map params, List<Object> results)
     {
         if (queryResultsCache != null)
         {
@@ -446,7 +445,7 @@ public class QueryManagerImpl implements QueryManager
      * @see org.datanucleus.store.query.QueryManager#getDatastoreQueryResult(org.datanucleus.store.query.Query, java.util.Map)
      */
     @Override
-    public synchronized List<Object> getQueryResult(Query query, Map params)
+    public List<Object> getQueryResult(Query query, Map params)
     {
         if (queryResultsCache != null)
         {

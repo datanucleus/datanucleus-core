@@ -23,9 +23,9 @@ Contributors:
 package org.datanucleus.store.valuegenerator;
 
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.Localiser;
@@ -38,7 +38,7 @@ import org.datanucleus.util.NucleusLogger;
 public class ValueGenerationManager
 {
     /** Map of ValueGenerator keyed by the symbolic name. */
-    protected Map<String, ValueGenerator> generatorsByName = new HashMap();
+    protected Map<String, ValueGenerator> generatorsByName = new ConcurrentHashMap<>();
 
     /**
      * Constructor.
@@ -60,7 +60,7 @@ public class ValueGenerationManager
      * @param name Name of the ValueGenerator when created
      * @return The ValueGenerator with this name
      */
-    public synchronized ValueGenerator getValueGenerator(String name)
+    public ValueGenerator getValueGenerator(String name)
     {
         if (name == null)
         {
@@ -78,9 +78,7 @@ public class ValueGenerationManager
      * @param connectionProvider Provider for connections
      * @return The ValueGenerator
      */
-    public synchronized ValueGenerator createValueGenerator(String name, 
-            Class generatorClass, Properties props, StoreManager storeMgr, 
-            ValueGenerationConnectionProvider connectionProvider)
+    public ValueGenerator createValueGenerator(String name, Class generatorClass, Properties props, StoreManager storeMgr, ValueGenerationConnectionProvider connectionProvider)
     {
         // Create the requested generator
         ValueGenerator generator;

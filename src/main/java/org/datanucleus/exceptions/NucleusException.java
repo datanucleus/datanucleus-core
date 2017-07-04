@@ -175,63 +175,56 @@ public class NucleusException extends RuntimeException
     }
 
     /**
-     * Prints this <code>Exception</code> and its backtrace to the
-     * specified print stream. Print nested Throwables' stack trace as well.
+     * Prints this <code>Exception</code> and its backtrace to the specified print stream. Print nested Throwables' stack trace as well.
      * @param s <code>PrintStream</code> to use for output
      */
-    public synchronized void printStackTrace(java.io.PrintStream s)
+    public void printStackTrace(java.io.PrintStream s)
     {
         int len = nested == null ? 0 : nested.length;
-        synchronized (s)
+        if (getMessage() != null)
         {
-            if( getMessage() != null )
+            s.println(getMessage());
+        }
+
+        super.printStackTrace(s);
+        if (len > 0)
+        {
+            s.println("Nested Throwables StackTrace:");
+            for (int i = 0; i < len; ++i)
             {
-                s.println(getMessage());
-            }
-            super.printStackTrace(s);
-            if (len > 0)
-            {
-                s.println("Nested Throwables StackTrace:");
-                for (int i = 0; i < len; ++i)
+                Throwable exception = nested[i];
+                if (exception != null)
                 {
-                    Throwable exception = nested[i];
-                    if (exception != null)
-                    {
-                        exception.printStackTrace(s);
-                    }
+                    exception.printStackTrace(s);
                 }
             }
         }
     }
 
     /**
-     * Prints this <code>Exception</code> and its backtrace to the
-     * specified print writer. Print nested Throwables' stack trace as well.
+     * Prints this <code>Exception</code> and its backtrace to the specified print writer. Print nested Throwables' stack trace as well.
      * @param s <code>PrintWriter</code> to use for output
      */
-    public synchronized void printStackTrace(java.io.PrintWriter s)
+    public void printStackTrace(java.io.PrintWriter s)
     {
         int len = nested == null ? 0 : nested.length;
-        synchronized (s)
+        if (getMessage() != null)
         {
-            if( getMessage() != null )
+            s.println(getMessage());
+        }
+
+        super.printStackTrace(s);
+        if (len > 0)
+        {
+            s.println("Nested Throwables StackTrace:");
+            for (int i = 0; i < len; ++i)
             {
-                s.println(getMessage());
-            }
-            super.printStackTrace(s);
-            if (len > 0)
-            {
-                s.println("Nested Throwables StackTrace:");
-                for (int i = 0; i < len; ++i)
+                Throwable exception = nested[i];
+                if (exception != null)
                 {
-                    Throwable exception = nested[i];
-                    if (exception != null)
-                    {
-                        exception.printStackTrace(s);
-                    }
+                    exception.printStackTrace(s);
                 }
             }
         }
     }
-      
 }
