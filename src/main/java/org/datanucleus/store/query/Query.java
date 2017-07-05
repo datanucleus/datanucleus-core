@@ -850,8 +850,9 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      */
     public void setFrom(String from)
     {
+        assertIsModifiable();
+
         discardCompiled();
-        assertIsModifiable();    
         this.from = from;
     }
 
@@ -870,8 +871,9 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      */
     public void setFilter(String filter)
     {
-        discardCompiled();
         assertIsModifiable();
+
+        discardCompiled();
         this.filter = StringUtils.isWhitespace(filter) ? null : StringUtils.removeSpecialTagsFromString(filter).trim();
     }
 
@@ -890,8 +892,9 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      */
     public void declareImports(String imports)
     {
-        discardCompiled();
         assertIsModifiable();
+
+        discardCompiled();
         this.imports = StringUtils.isWhitespace(imports) ? null : StringUtils.removeSpecialTagsFromString(imports).trim();
     }
 
@@ -910,8 +913,9 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      */
     public void declareExplicitParameters(String parameters)
     {
-        discardCompiled();
         assertIsModifiable();
+
+        discardCompiled();
         this.explicitParameters = StringUtils.isWhitespace(parameters) ? null : StringUtils.removeSpecialTagsFromString(parameters).trim();
     }
 
@@ -930,8 +934,9 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      */
     public void declareExplicitVariables(String variables)
     {
-        discardCompiled();
         assertIsModifiable();
+
+        discardCompiled();
         this.explicitVariables = StringUtils.isWhitespace(variables) ? null : StringUtils.removeSpecialTagsFromString(variables).trim();
     }
 
@@ -1105,9 +1110,18 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      */
     public void setOrdering(String ordering)
     {
-        discardCompiled();
         assertIsModifiable();
 
+        if (this.ordering == null && ordering == null)
+        {
+            return;
+        }
+        else if (this.ordering != null && this.ordering.equals(ordering))
+        {
+            return;
+        }
+
+        discardCompiled();
         this.ordering = ordering != null ? ordering.trim() : null;
     }
 
@@ -1126,9 +1140,18 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      */
     public void setGrouping(String grouping)
     {
-        discardCompiled();
         assertIsModifiable();
 
+        if (this.grouping == null && grouping == null)
+        {
+            return;
+        }
+        else if (this.grouping != null && this.grouping.equals(grouping))
+        {
+            return;
+        }
+
+        discardCompiled();
         this.grouping = grouping != null ? grouping.trim() : null;
     }
 
@@ -1147,9 +1170,18 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      */
     public void setHaving(String having)
     {
-        discardCompiled();
         assertIsModifiable();
 
+        if (this.having == null && having == null)
+        {
+            return;
+        }
+        else if (this.having != null && this.having.equals(having))
+        {
+            return;
+        }
+
+        discardCompiled();
         this.having = having != null ? having.trim() : null;
     }
 
@@ -1181,9 +1213,13 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      */
     public void setUnique(boolean unique)
     {
-        discardCompiled();
         assertIsModifiable();
-        this.unique = unique;
+        if (this.unique != unique)
+        {
+            // Only mark as not compiled if different setting
+            discardCompiled();
+            this.unique = unique;
+        }
     }
 
     /**
