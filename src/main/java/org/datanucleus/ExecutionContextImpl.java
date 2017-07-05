@@ -155,7 +155,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     protected Level1Cache cache;
 
     /** Properties controlling runtime behaviour (detach on commit, multithreaded, etc). */
-    private BasePropertyStore properties = new BasePropertyStore();
+    private final BasePropertyStore properties = new BasePropertyStore();
 
     /** Current transaction */
     private Transaction tx;
@@ -164,13 +164,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     private FlushMode flushMode = null;
 
     /** Cache of ObjectProviders enlisted in the current transaction, keyed by the object id. */
-    private Map<Object, ObjectProvider> enlistedOPCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
+    private final Map<Object, ObjectProvider> enlistedOPCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
 
     /** List of ObjectProviders for all current dirty objects managed by this context. */
-    private List<ObjectProvider> dirtyOPs = new ArrayList<>();
+    private final List<ObjectProvider> dirtyOPs = new ArrayList<>();
 
     /** List of ObjectProviders for all current dirty objects made dirty by reachability. */
-    private List<ObjectProvider> indirectDirtyOPs = new ArrayList<>();
+    private final List<ObjectProvider> indirectDirtyOPs = new ArrayList<>();
 
     private OperationQueue operationQueue = null;
 

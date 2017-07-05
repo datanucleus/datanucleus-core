@@ -29,10 +29,10 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory
     protected StoreManager storeMgr;
 
     /** Type of resource represented by this ConnectionFactory. See ConnectionResourceType. */
-    protected String resourceType;
+    protected final String resourceType;
 
     /** Name of this resource ("tx", "non-tx" etc). */
-    protected String resourceName;
+    protected final String resourceName;
 
     public static final String RESOURCE_NAME_TX = "tx";
     public static final String RESOURCE_NAME_NONTX = "nontx";
@@ -49,6 +49,7 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory
         if (resourceName == null)
         {
             // Should never be null
+            resourceType = null;
             NucleusLogger.CONNECTION.warn("Attempt to create ConnectionFactory with NULL resourceName for connection factory with storeManager=" + StringUtils.toJVMIDString(storeMgr));
         }
         else if (resourceName.equals(RESOURCE_NAME_TX))

@@ -57,9 +57,9 @@ import org.datanucleus.util.NucleusLogger;
 public class ConnectionManagerImpl implements ConnectionManager
 {
     /** StoreManager that we are managing the connections for. */
-    StoreManager storeMgr;
+    final StoreManager storeMgr;
 
-    PersistenceNucleusContext nucleusContext;
+    final PersistenceNucleusContext nucleusContext;
 
     /** Whether connection caching is enabled. */
     boolean connectionCachingEnabled = true;
@@ -351,7 +351,7 @@ public class ConnectionManagerImpl implements ConnectionManager
                 // Factory already has a ManagedConnection
                 if (!mconnFromPool.closeAfterTransactionEnd())
                 {
-                    if (transaction.isActive())
+                    if (transaction != null && transaction.isActive())
                     {
                         // ManagedConnection that is not closed after commit, so make sure it is enlisted
                         if (mconnFromPool.commitOnRelease())
@@ -409,7 +409,7 @@ public class ConnectionManagerImpl implements ConnectionManager
         // Enlist the connection in this transaction
         if (ec != null)
         {
-            if (transaction.isActive())
+            if (transaction != null && transaction.isActive())
             {
                 // Connection is "managed", and enlist with txn
                 configureTransactionEventListener(transaction, mconn);

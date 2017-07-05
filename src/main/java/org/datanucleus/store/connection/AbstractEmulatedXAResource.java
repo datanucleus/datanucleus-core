@@ -26,7 +26,7 @@ import javax.transaction.xa.Xid;
  */
 public abstract class AbstractEmulatedXAResource implements XAResource
 {
-    protected ManagedConnection mconn;
+    protected final ManagedConnection mconn;
 
     public AbstractEmulatedXAResource(ManagedConnection mconn)
     {
