@@ -51,23 +51,6 @@ Contributors:
     <extension-point id="member_annotation_handler" name="Member Annotation Handler" schema="schema/member_annotation_handler.exsd"/>
     <extension-point id="identifier_namingfactory" name="Identifier NamingFactory" schema="schema/identifier_namingfactory.exsd"/>
 
-    <!-- JTA LOCATORS -->
-    <extension point="org.datanucleus.jta_locator">
-        <jta_locator name="jboss" class-name="org.datanucleus.transaction.jta.JBossTransactionManagerLocator"/>
-        <jta_locator name="jonas" class-name="org.datanucleus.transaction.jta.JOnASTransactionManagerLocator"/>
-        <jta_locator name="jotm" class-name="org.datanucleus.transaction.jta.JOTMTransactionManagerLocator"/>
-        <jta_locator name="oc4j" class-name="org.datanucleus.transaction.jta.OC4JTransactionManagerLocator"/>
-        <jta_locator name="orion" class-name="org.datanucleus.transaction.jta.OrionTransactionManagerLocator"/>
-        <jta_locator name="resin" class-name="org.datanucleus.transaction.jta.ResinTransactionManagerLocator"/>
-        <jta_locator name="sap" class-name="org.datanucleus.transaction.jta.SAPWebASTransactionManagerLocator"/>
-        <jta_locator name="sun" class-name="org.datanucleus.transaction.jta.SunTransactionManagerLocator"/>
-        <jta_locator name="weblogic" class-name="org.datanucleus.transaction.jta.WebLogicTransactionManagerLocator"/>
-        <jta_locator name="websphere" class-name="org.datanucleus.transaction.jta.WebSphereTransactionManagerLocator"/>
-        <jta_locator name="custom_jndi" class-name="org.datanucleus.transaction.jta.CustomJNDITransactionManagerLocator"/>
-        <jta_locator name="atomikos" class-name="org.datanucleus.transaction.jta.AtomikosTransactionManagerLocator"/>
-        <jta_locator name="bitronix" class-name="org.datanucleus.transaction.jta.BTMTransactionManagerLocator"/>
-    </extension>
-
     <!-- JAVA TYPES -->
     <extension point="org.datanucleus.java_type">
         <!-- "primitive" types -->

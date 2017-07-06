@@ -55,6 +55,28 @@ public class TransactionManagerFinder
         if ("autodetect".equalsIgnoreCase(jtaLocatorName) || jtaLocatorName == null)
         {
             // Cycle through all available locators and find one that returns a TransactionManager
+            String[] builtinLocatorNames = new String[]{"jboss", "jonas", "jotm", "oc4j", "orion", "resin", "sap", "sun", "weblogic", "websphere", "custom_jndi", "atomikos", "bitronix"};
+            for (String builtinLocatorName : builtinLocatorNames)
+            {
+                try
+                {
+                    TransactionManagerLocator locator = getTransactionManagerLocatorForName(pluginMgr, builtinLocatorName);
+                    if (locator != null)
+                    {
+                        TransactionManager tm = locator.getTransactionManager(clr);
+                        if (tm != null)
+                        {
+                            return tm;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    // Ignore any errors
+                }
+            }
+
+            // Fallback to the plugin mechanism
             String[] locatorNames = pluginMgr.getAttributeValuesForExtension("org.datanucleus.jta_locator", null, null, "name");
             if (locatorNames != null)
             {
@@ -84,18 +106,79 @@ public class TransactionManagerFinder
         else
         {
             // User has specified which locator to use
+            TransactionManagerLocator locator = getTransactionManagerLocatorForName(pluginMgr, jtaLocatorName);
+            return locator.getTransactionManager(clr);
+        }
+        return null;
+    }
+
+    protected TransactionManagerLocator getTransactionManagerLocatorForName(PluginManager pluginMgr, String name)
+    {
+        if ("jboss".equalsIgnoreCase(name))
+        {
+            return new JBossTransactionManagerLocator(nucleusContext);
+        }
+        else if ("jonas".equalsIgnoreCase(name))
+        {
+            return new JOnASTransactionManagerLocator(nucleusContext);
+        }
+        else if ("jotm".equalsIgnoreCase(name))
+        {
+            return new JOTMTransactionManagerLocator(nucleusContext);
+        }
+        else if ("oc4j".equalsIgnoreCase(name))
+        {
+            return new OC4JTransactionManagerLocator(nucleusContext);
+        }
+        else if ("orion".equalsIgnoreCase(name))
+        {
+            return new OrionTransactionManagerLocator(nucleusContext);
+        }
+        else if ("resin".equalsIgnoreCase(name))
+        {
+            return new ResinTransactionManagerLocator(nucleusContext);
+        }
+        else if ("sap".equalsIgnoreCase(name))
+        {
+            return new SAPWebASTransactionManagerLocator(nucleusContext);
+        }
+        else if ("sun".equalsIgnoreCase(name))
+        {
+            return new SunTransactionManagerLocator(nucleusContext);
+        }
+        else if ("weblogic".equalsIgnoreCase(name))
+        {
+            return new WebLogicTransactionManagerLocator(nucleusContext);
+        }
+        else if ("websphere".equalsIgnoreCase(name))
+        {
+            return new WebSphereTransactionManagerLocator(nucleusContext);
+        }
+        else if ("custom_jndi".equalsIgnoreCase(name))
+        {
+            return new CustomJNDITransactionManagerLocator(nucleusContext);
+        }
+        else if ("atomikos".equalsIgnoreCase(name))
+        {
+            return new AtomikosTransactionManagerLocator(nucleusContext);
+        }
+        else if ("bitronix".equalsIgnoreCase(name))
+        {
+            return new BTMTransactionManagerLocator(nucleusContext);
+        }
+        else
+        {
+            // Fallback to plugin mechanism
             try
             {
-                TransactionManagerLocator locator = (TransactionManagerLocator)pluginMgr.createExecutableExtension(
-                        "org.datanucleus.jta_locator", "name", jtaLocatorName, 
+                return (TransactionManagerLocator)pluginMgr.createExecutableExtension("org.datanucleus.jta_locator", "name", name, 
                         "class-name", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusContext});
-                return locator.getTransactionManager(clr);
             }
             catch (Exception e)
             {
                 // Ignore any errors
+                return null;
             }
         }
-        return null;
     }
 }
