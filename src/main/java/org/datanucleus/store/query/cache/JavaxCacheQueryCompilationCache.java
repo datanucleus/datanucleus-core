@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
      ...
  **********************************************************************/
-package org.datanucleus.query.compiler;
+package org.datanucleus.store.query.cache;
 
 import java.io.Serializable;
 
@@ -29,6 +29,7 @@ import javax.cache.spi.CachingProvider;
 
 import org.datanucleus.NucleusContext;
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.query.compiler.QueryCompilation;
 import org.datanucleus.util.NucleusLogger;
 
 /**

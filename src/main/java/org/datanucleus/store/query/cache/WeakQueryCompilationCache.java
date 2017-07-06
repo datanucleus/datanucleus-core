@@ -15,9 +15,10 @@ limitations under the License.
 Contributors:
    ...
 **********************************************************************/
-package org.datanucleus.query.compiler;
+package org.datanucleus.store.query.cache;
 
 import org.datanucleus.NucleusContext;
+import org.datanucleus.query.compiler.QueryCompilation;
 import org.datanucleus.util.ConcurrentReferenceHashMap;
 import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 

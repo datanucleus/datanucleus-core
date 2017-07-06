@@ -374,10 +374,10 @@ Contributors:
 
     <!-- QUERY COMPILATION CACHE (GENERIC) -->
     <extension point="org.datanucleus.cache_query_compilation">
-        <cache name="soft" class-name="org.datanucleus.query.compiler.SoftQueryCompilationCache"/>
-        <cache name="weak" class-name="org.datanucleus.query.compiler.WeakQueryCompilationCache"/>
-        <cache name="strong" class-name="org.datanucleus.query.compiler.StrongQueryCompilationCache"/>
-        <cache name="javax.cache" class-name="org.datanucleus.query.compiler.JavaxCacheQueryCompilationCache"/>
+        <cache name="soft" class-name="org.datanucleus.store.query.cache.SoftQueryCompilationCache"/>
+        <cache name="weak" class-name="org.datanucleus.store.query.cache.WeakQueryCompilationCache"/>
+        <cache name="strong" class-name="org.datanucleus.store.query.cache.StrongQueryCompilationCache"/>
+        <cache name="javax.cache" class-name="org.datanucleus.store.query.cache.JavaxCacheQueryCompilationCache"/>
     </extension>
 
     <!-- QUERY COMPILATION CACHE (DATASTORE) -->

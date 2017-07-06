@@ -15,19 +15,19 @@ limitations under the License.
 Contributors:
    ...
 **********************************************************************/
-package org.datanucleus.query.compiler;
+package org.datanucleus.store.query.cache;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.NucleusContext;
-import org.datanucleus.util.ConcurrentReferenceHashMap;
-import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
- * Soft-reference implementation of a generic query compilation cache.
+ * Strong-reference implementation of a generic query compilation cache.
  */
-public class SoftQueryCompilationCache extends AbstractQueryCompilationCache
+public class StrongQueryCompilationCache extends AbstractQueryCompilationCache
 {
-    public SoftQueryCompilationCache(NucleusContext nucleusCtx)
+    public StrongQueryCompilationCache(NucleusContext nucleusCtx)
     {
-        cache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
+        cache = new ConcurrentHashMap();
     }
 }
