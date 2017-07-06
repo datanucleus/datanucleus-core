@@ -147,8 +147,22 @@ public class ManagementManager
             String jmxType = nucleusContext.getConfiguration().getStringProperty(PropertyNames.PROPERTY_JMX_TYPE);
             try
             {
-                mgmtServer = (ManagementServer) nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.management_server", "name", jmxType, "class", null, null);
-                if (mgmtServer != null)
+                if (jmxType != null)
+                {
+                    if (jmxType.equals("default"))
+                    {
+                        mgmtServer = new PlatformManagementServer();
+                    }
+                    else if (jmxType.equals("mx4j"))
+                    {
+                        mgmtServer = new Mx4jManagementServer();
+                    }
+                }
+                if (mgmtServer == null)
+                {
+                    NucleusLogger.GENERAL.error("Could not start management server of type " + jmxType + " since not found");
+                }
+                else
                 {
                     NucleusLogger.GENERAL.info("Starting Management Server");
                     mgmtServer.start();

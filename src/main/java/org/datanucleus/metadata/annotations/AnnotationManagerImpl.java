@@ -43,10 +43,10 @@ public class AnnotationManagerImpl implements AnnotationManager
     protected final MetaDataManager metadataMgr;
 
     /** Lookup of annotation reader name keyed by the annotation class name. */
-    Map<String, String> annotationReaderLookup = new HashMap<String, String>();
+    Map<String, String> annotationReaderLookup = new HashMap<>();
 
     /** Cache of the available annotation readers (keyed by the class name). */
-    Map<String, AnnotationReader> annotationReaders = new HashMap<String, AnnotationReader>();
+    Map<String, AnnotationReader> annotationReaders = new HashMap<>();
 
     /** Set of (class) annotations that have handlers. */
     Set<String> classAnnotationHandlerAnnotations = null;
@@ -84,8 +84,8 @@ public class AnnotationManagerImpl implements AnnotationManager
         elems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.class_annotation_handler", null, null);
         if (elems != null && elems.length > 0)
         {
-            classAnnotationHandlerAnnotations = new HashSet<String>(elems.length);
-            classAnnotationHandlers = new HashMap<String, ClassAnnotationHandler>(elems.length);
+            classAnnotationHandlerAnnotations = new HashSet<>(elems.length);
+            classAnnotationHandlers = new HashMap<>(elems.length);
             for (int i=0; i<elems.length; i++)
             {
                 classAnnotationHandlerAnnotations.add(elems[i].getAttribute("annotation-class"));
@@ -93,11 +93,17 @@ public class AnnotationManagerImpl implements AnnotationManager
         }
 
         // Load up the registry of available member annotation handlers
+        memberAnnotationHandlerAnnotations = new HashSet<String>(elems.length);
+        memberAnnotationHandlers = new HashMap<String, MemberAnnotationHandler>(elems.length);
+
+        // a). Built-in type support
+        memberAnnotationHandlerAnnotations.add("javax.validation.constraints.NotNull");
+        memberAnnotationHandlerAnnotations.add("javax.validation.constraints.Size");
+
+        // b). Plugin provided support
         elems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.member_annotation_handler", null, null);
         if (elems != null && elems.length > 0)
         {
-            memberAnnotationHandlerAnnotations = new HashSet<String>(elems.length);
-            memberAnnotationHandlers = new HashMap<String, MemberAnnotationHandler>(elems.length);
             for (int i=0; i<elems.length; i++)
             {
                 memberAnnotationHandlerAnnotations.add(elems[i].getAttribute("annotation-class"));
@@ -235,18 +241,32 @@ public class AnnotationManagerImpl implements AnnotationManager
         MemberAnnotationHandler handler = memberAnnotationHandlers.get(annotationName);
         if (handler == null)
         {
-            // Try to create this MemberAnnotationHandler
-            try
+            // Built-in handlers for common annotations
+            if (annotationName.equals("javax.validation.constraints.NotNull"))
             {
-                PluginManager pluginMgr = metadataMgr.getNucleusContext().getPluginManager();
-                handler = (MemberAnnotationHandler)pluginMgr.createExecutableExtension("org.datanucleus.member_annotation_handler",
-                    "annotation-class", annotationName, "handler", null, null);
+                handler = new ValidationNotNullAnnotationHandler();
                 memberAnnotationHandlers.put(annotationName, handler);
             }
-            catch (Exception e)
+            else if (annotationName.equals("javax.validation.constraints.Size"))
             {
-                NucleusLogger.METADATA.warn(Localiser.msg("MetaData.MemberAnnotationHandlerNotFound", annotationName));
-                return null;
+                handler = new ValidationSizeAnnotationHandler();
+                memberAnnotationHandlers.put(annotationName, handler);
+            }
+            else
+            {
+                // Try to create this MemberAnnotationHandler
+                try
+                {
+                    PluginManager pluginMgr = metadataMgr.getNucleusContext().getPluginManager();
+                    handler = (MemberAnnotationHandler)pluginMgr.createExecutableExtension("org.datanucleus.member_annotation_handler",
+                        "annotation-class", annotationName, "handler", null, null);
+                    memberAnnotationHandlers.put(annotationName, handler);
+                }
+                catch (Exception e)
+                {
+                    NucleusLogger.METADATA.warn(Localiser.msg("MetaData.MemberAnnotationHandlerNotFound", annotationName));
+                    return null;
+                }
             }
         }
 

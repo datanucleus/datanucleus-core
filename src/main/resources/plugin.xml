@@ -35,7 +35,6 @@ Contributors:
     <extension-point id="identity_string_translator" name="Identity String Translator" schema="schema/identity_string_translator.exsd"/>
     <extension-point id="identity_key_translator" name="Identity Key Translator" schema="schema/identity_key_translator.exsd"/>
     <extension-point id="jta_locator" name="JTA Locator" schema="schema/jta_locator.exsd"/>
-    <extension-point id="management_server" name="Management Server" schema="schema/management_server.exsd"/>
     <extension-point id="store_datastoreidentity" name="Datastore Identity" schema="schema/datastoreidentity.exsd"/>
     <extension-point id="store_manager" name="Store Manager" schema="schema/store_manager.exsd"/>
     <extension-point id="store_query_query" name="Query" schema="schema/query.exsd"/>
@@ -532,17 +531,5 @@ Contributors:
        <entityresolver identity="http://java.sun.com/xml/ns/persistence/persistence_2_1.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_1.xsd"/>
        <entityresolver identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_1.xsd"/>
        <entityresolver url="/org/datanucleus/metadata/persistence_2_0.xsd"/>
-    </extension>
-
-    <!-- EXTENSION ANNOTATIONS -->
-    <extension point="org.datanucleus.member_annotation_handler">
-        <member-annotation-handler annotation-class="javax.validation.constraints.NotNull" handler="org.datanucleus.metadata.annotations.ValidationNotNullAnnotationHandler"/>
-        <member-annotation-handler annotation-class="javax.validation.constraints.Size" handler="org.datanucleus.metadata.annotations.ValidationSizeAnnotationHandler"/>
-    </extension>
-
-    <!-- JMX SERVERS -->
-    <extension point="org.datanucleus.management_server">
-        <management-server class="org.datanucleus.management.PlatformManagementServer" name="default"/>
-        <management-server class="org.datanucleus.management.Mx4jManagementServer" name="mx4j"/>
     </extension>
 </plugin>
