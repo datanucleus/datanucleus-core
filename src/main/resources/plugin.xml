@@ -51,21 +51,6 @@ Contributors:
     <extension-point id="member_annotation_handler" name="Member Annotation Handler" schema="schema/member_annotation_handler.exsd"/>
     <extension-point id="identifier_namingfactory" name="Identifier NamingFactory" schema="schema/identifier_namingfactory.exsd"/>
 
-    <!-- LEVEL1 CACHES -->
-    <extension point="org.datanucleus.cache_level1">
-        <cache name="strong" class-name="org.datanucleus.cache.StrongRefCache"/>
-        <cache name="soft" class-name="org.datanucleus.cache.SoftRefCache"/>
-        <cache name="weak" class-name="org.datanucleus.cache.WeakRefCache"/>
-    </extension>
-
-    <!-- LEVEL2 CACHES -->
-    <extension point="org.datanucleus.cache_level2">
-        <cache name="weak" class-name="org.datanucleus.cache.WeakLevel2Cache"/>
-        <cache name="soft" class-name="org.datanucleus.cache.SoftLevel2Cache"/>
-        <cache name="none" class-name="org.datanucleus.cache.NullLevel2Cache"/>
-        <cache name="javax.cache" class-name="org.datanucleus.cache.JavaxCacheLevel2Cache"/>
-    </extension>
-
     <!-- JTA LOCATORS -->
     <extension point="org.datanucleus.jta_locator">
         <jta_locator name="jboss" class-name="org.datanucleus.transaction.jta.JBossTransactionManagerLocator"/>
@@ -367,30 +352,6 @@ Contributors:
         <autostart class-name="org.datanucleus.store.autostart.ClassesAutoStarter" name="Classes"/>
         <autostart class-name="org.datanucleus.store.autostart.XMLAutoStarter" name="XML"/>
         <autostart class-name="org.datanucleus.store.autostart.MetaDataAutoStarter" name="MetaData"/>
-    </extension>
-
-    <!-- QUERY COMPILATION CACHE (GENERIC) -->
-    <extension point="org.datanucleus.cache_query_compilation">
-        <cache name="soft" class-name="org.datanucleus.store.query.cache.SoftQueryCompilationCache"/>
-        <cache name="weak" class-name="org.datanucleus.store.query.cache.WeakQueryCompilationCache"/>
-        <cache name="strong" class-name="org.datanucleus.store.query.cache.StrongQueryCompilationCache"/>
-        <cache name="javax.cache" class-name="org.datanucleus.store.query.cache.JavaxCacheQueryCompilationCache"/>
-    </extension>
-
-    <!-- QUERY COMPILATION CACHE (DATASTORE) -->
-    <extension point="org.datanucleus.cache_query_compilation_store">
-        <cache name="soft" class-name="org.datanucleus.store.query.cache.SoftQueryDatastoreCompilationCache"/>
-        <cache name="weak" class-name="org.datanucleus.store.query.cache.WeakQueryDatastoreCompilationCache"/>
-        <cache name="strong" class-name="org.datanucleus.store.query.cache.StrongQueryDatastoreCompilationCache"/>
-        <cache name="javax.cache" class-name="org.datanucleus.store.query.cache.JavaxCacheQueryDatastoreCompilationCache"/>
-    </extension>
-
-    <!-- QUERY RESULT CACHE -->
-    <extension point="org.datanucleus.cache_query_result">
-        <cache name="soft" class-name="org.datanucleus.store.query.cache.SoftQueryResultsCache"/>
-        <cache name="weak" class-name="org.datanucleus.store.query.cache.WeakQueryResultsCache"/>
-        <cache name="strong" class-name="org.datanucleus.store.query.cache.StrongQueryResultsCache"/>
-        <cache name="javax.cache" class-name="org.datanucleus.store.query.cache.JavaxCacheQueryResultCache"/>
     </extension>
 
     <!-- QUERY METHODS (IN-MEMORY) -->

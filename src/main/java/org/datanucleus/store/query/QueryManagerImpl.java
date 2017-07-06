@@ -40,9 +40,21 @@ import org.datanucleus.query.inmemory.InvocationEvaluator;
 import org.datanucleus.query.inmemory.method.ArrayContainsMethod;
 import org.datanucleus.query.inmemory.method.ArraySizeMethod;
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.query.cache.JavaxCacheQueryCompilationCache;
+import org.datanucleus.store.query.cache.JavaxCacheQueryDatastoreCompilationCache;
+import org.datanucleus.store.query.cache.JavaxCacheQueryResultCache;
 import org.datanucleus.store.query.cache.QueryCompilationCache;
 import org.datanucleus.store.query.cache.QueryDatastoreCompilationCache;
 import org.datanucleus.store.query.cache.QueryResultsCache;
+import org.datanucleus.store.query.cache.SoftQueryCompilationCache;
+import org.datanucleus.store.query.cache.SoftQueryDatastoreCompilationCache;
+import org.datanucleus.store.query.cache.SoftQueryResultsCache;
+import org.datanucleus.store.query.cache.StrongQueryCompilationCache;
+import org.datanucleus.store.query.cache.StrongQueryDatastoreCompilationCache;
+import org.datanucleus.store.query.cache.StrongQueryResultsCache;
+import org.datanucleus.store.query.cache.WeakQueryCompilationCache;
+import org.datanucleus.store.query.cache.WeakQueryDatastoreCompilationCache;
+import org.datanucleus.store.query.cache.WeakQueryResultsCache;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -82,26 +94,46 @@ public class QueryManagerImpl implements QueryManager
         {
             cacheType = "soft";
         }
-        String cacheClassName = nucleusCtx.getPluginManager().getAttributeValueForExtension("org.datanucleus.cache_query_compilation", "name", cacheType, "class-name");
-        if (cacheClassName == null)
+        if ("soft".equalsIgnoreCase(cacheType))
         {
-            // Plugin of this name not found
-            throw new NucleusUserException(Localiser.msg("021500", cacheType)).setFatal();
+            queryCompilationCache = new SoftQueryCompilationCache(nucleusContext);
         }
-        try
+        else if ("weak".equalsIgnoreCase(cacheType))
         {
-            // Create an instance of the Query Cache
-            queryCompilationCache = (QueryCompilationCache)nucleusCtx.getPluginManager().createExecutableExtension("org.datanucleus.cache_query_compilation",
-                "name", cacheType, "class-name", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusCtx});
-            if (NucleusLogger.CACHE.isDebugEnabled())
+            queryCompilationCache = new WeakQueryCompilationCache(nucleusCtx);
+        }
+        else if ("strong".equalsIgnoreCase(cacheType))
+        {
+            queryCompilationCache = new StrongQueryCompilationCache(nucleusCtx);
+        }
+        else if ("javax.cache".equalsIgnoreCase(cacheType))
+        {
+            queryCompilationCache = new JavaxCacheQueryCompilationCache(nucleusCtx);
+        }
+        else
+        {
+            // Try via the plugin mechanism
+            String cacheClassName = nucleusCtx.getPluginManager().getAttributeValueForExtension("org.datanucleus.cache_query_compilation", "name", cacheType, "class-name");
+            if (cacheClassName == null)
             {
-                NucleusLogger.CACHE.debug(Localiser.msg("021502", cacheClassName));
+                // Plugin of this name not found
+                throw new NucleusUserException(Localiser.msg("021500", cacheType)).setFatal();
             }
-        }
-        catch (Exception e)
-        {
-            // Class name for this Query cache plugin is not found!
-            throw new NucleusUserException(Localiser.msg("021501", cacheType, cacheClassName), e).setFatal();
+            try
+            {
+                // Create an instance of the Query Cache
+                queryCompilationCache = (QueryCompilationCache)nucleusCtx.getPluginManager().createExecutableExtension("org.datanucleus.cache_query_compilation",
+                    "name", cacheType, "class-name", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusCtx});
+                if (NucleusLogger.CACHE.isDebugEnabled())
+                {
+                    NucleusLogger.CACHE.debug(Localiser.msg("021502", cacheClassName));
+                }
+            }
+            catch (Exception e)
+            {
+                // Class name for this Query cache plugin is not found!
+                throw new NucleusUserException(Localiser.msg("021501", cacheType, cacheClassName), e).setFatal();
+            }
         }
 
         // QueryCompilationCache (datastore compilation)
@@ -110,26 +142,46 @@ public class QueryManagerImpl implements QueryManager
         {
             cacheType = "soft";
         }
-        cacheClassName = nucleusCtx.getPluginManager().getAttributeValueForExtension("org.datanucleus.cache_query_compilation_store", "name", cacheType, "class-name");
-        if (cacheClassName == null)
+        if ("soft".equalsIgnoreCase(cacheType))
         {
-            // Plugin of this name not found
-            throw new NucleusUserException(Localiser.msg("021500", cacheType)).setFatal();
+            queryCompilationCacheDatastore = new SoftQueryDatastoreCompilationCache(nucleusContext);
         }
-        try
+        else if ("weak".equalsIgnoreCase(cacheType))
         {
-            // Create an instance of the Query Cache
-            queryCompilationCacheDatastore = (QueryDatastoreCompilationCache)nucleusCtx.getPluginManager().createExecutableExtension("org.datanucleus.cache_query_compilation_store", 
-                "name", cacheType, "class-name", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusCtx});
-            if (NucleusLogger.CACHE.isDebugEnabled())
+            queryCompilationCacheDatastore = new WeakQueryDatastoreCompilationCache(nucleusCtx);
+        }
+        else if ("strong".equalsIgnoreCase(cacheType))
+        {
+            queryCompilationCacheDatastore = new StrongQueryDatastoreCompilationCache(nucleusCtx);
+        }
+        else if ("javax.cache".equalsIgnoreCase(cacheType))
+        {
+            queryCompilationCacheDatastore = new JavaxCacheQueryDatastoreCompilationCache(nucleusCtx);
+        }
+        else
+        {
+            // Try via the plugin mechanism
+            String cacheClassName = nucleusCtx.getPluginManager().getAttributeValueForExtension("org.datanucleus.cache_query_compilation_store", "name", cacheType, "class-name");
+            if (cacheClassName == null)
             {
-                NucleusLogger.CACHE.debug(Localiser.msg("021502", cacheClassName));
+                // Plugin of this name not found
+                throw new NucleusUserException(Localiser.msg("021500", cacheType)).setFatal();
             }
-        }
-        catch (Exception e)
-        {
-            // Class name for this Query cache plugin is not found!
-            throw new NucleusUserException(Localiser.msg("021501", cacheType, cacheClassName), e).setFatal();
+            try
+            {
+                // Create an instance of the Query Cache
+                queryCompilationCacheDatastore = (QueryDatastoreCompilationCache)nucleusCtx.getPluginManager().createExecutableExtension("org.datanucleus.cache_query_compilation_store", 
+                    "name", cacheType, "class-name", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusCtx});
+                if (NucleusLogger.CACHE.isDebugEnabled())
+                {
+                    NucleusLogger.CACHE.debug(Localiser.msg("021502", cacheClassName));
+                }
+            }
+            catch (Exception e)
+            {
+                // Class name for this Query cache plugin is not found!
+                throw new NucleusUserException(Localiser.msg("021501", cacheType, cacheClassName), e).setFatal();
+            }
         }
 
         // Query results cache
@@ -138,26 +190,46 @@ public class QueryManagerImpl implements QueryManager
         {
             cacheType = "soft";
         }
-        cacheClassName = nucleusCtx.getPluginManager().getAttributeValueForExtension("org.datanucleus.cache_query_result", "name", cacheType, "class-name");
-        if (cacheClassName == null)
+        if ("soft".equalsIgnoreCase(cacheType))
         {
-            // Plugin of this name not found
-            throw new NucleusUserException(Localiser.msg("021500", cacheType)).setFatal();
+            queryResultsCache = new SoftQueryResultsCache(nucleusContext);
         }
-        try
+        else if ("weak".equalsIgnoreCase(cacheType))
         {
-            // Create an instance of the Query Cache
-            queryResultsCache = (QueryResultsCache)nucleusCtx.getPluginManager().createExecutableExtension("org.datanucleus.cache_query_result", 
-                "name", cacheType, "class-name", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusCtx});
-            if (NucleusLogger.CACHE.isDebugEnabled())
+            queryResultsCache = new WeakQueryResultsCache(nucleusCtx);
+        }
+        else if ("strong".equalsIgnoreCase(cacheType))
+        {
+            queryResultsCache = new StrongQueryResultsCache(nucleusCtx);
+        }
+        else if ("javax.cache".equalsIgnoreCase(cacheType))
+        {
+            queryResultsCache = new JavaxCacheQueryResultCache(nucleusCtx);
+        }
+        else
+        {
+            // Try via the plugin mechanism
+            String cacheClassName = nucleusCtx.getPluginManager().getAttributeValueForExtension("org.datanucleus.cache_query_result", "name", cacheType, "class-name");
+            if (cacheClassName == null)
             {
-                NucleusLogger.CACHE.debug(Localiser.msg("021502", cacheClassName));
+                // Plugin of this name not found
+                throw new NucleusUserException(Localiser.msg("021500", cacheType)).setFatal();
             }
-        }
-        catch (Exception e)
-        {
-            // Class name for this Query cache plugin is not found!
-            throw new NucleusUserException(Localiser.msg("021501", cacheType, cacheClassName), e).setFatal();
+            try
+            {
+                // Create an instance of the Query Cache
+                queryResultsCache = (QueryResultsCache)nucleusCtx.getPluginManager().createExecutableExtension("org.datanucleus.cache_query_result", 
+                    "name", cacheType, "class-name", new Class[] {ClassConstants.NUCLEUS_CONTEXT}, new Object[] {nucleusCtx});
+                if (NucleusLogger.CACHE.isDebugEnabled())
+                {
+                    NucleusLogger.CACHE.debug(Localiser.msg("021502", cacheClassName));
+                }
+            }
+            catch (Exception e)
+            {
+                // Class name for this Query cache plugin is not found!
+                throw new NucleusUserException(Localiser.msg("021501", cacheType, cacheClassName), e).setFatal();
+            }
         }
     }
 

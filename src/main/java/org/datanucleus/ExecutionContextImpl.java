@@ -41,6 +41,9 @@ import org.datanucleus.cache.CachedPC;
 import org.datanucleus.cache.L2CachePopulateFieldManager;
 import org.datanucleus.cache.Level1Cache;
 import org.datanucleus.cache.Level2Cache;
+import org.datanucleus.cache.SoftRefCache;
+import org.datanucleus.cache.StrongRefCache;
+import org.datanucleus.cache.WeakRefCache;
 import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.exceptions.ClassNotDetachableException;
 import org.datanucleus.exceptions.ClassNotPersistableException;
@@ -762,29 +765,43 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             return;
         }
-
-        // Find the L1 cache class name from its plugin name
-        String level1ClassName = getNucleusContext().getPluginManager().getAttributeValueForExtension("org.datanucleus.cache_level1", "name", level1Type, "class-name");
-        if (level1ClassName == null)
+        else if ("soft".equalsIgnoreCase(level1Type))
         {
-            // Plugin of this name not found
-            throw new NucleusUserException(Localiser.msg("003001", level1Type)).setFatal();
+            cache = new SoftRefCache();
         }
-
-        try
+        else if ("weak".equalsIgnoreCase(level1Type))
         {
-            // Create an instance of the L1 Cache
-            cache = (Level1Cache)getNucleusContext().getPluginManager().createExecutableExtension(
-                "org.datanucleus.cache_level1", "name", level1Type, "class-name", null, null);
-            if (NucleusLogger.CACHE.isDebugEnabled())
+            cache = new WeakRefCache();
+        }
+        else if ("strong".equalsIgnoreCase(level1Type))
+        {
+            cache = new StrongRefCache();
+        }
+        else
+        {
+            // Find the L1 cache class name from its plugin name
+            String level1ClassName = getNucleusContext().getPluginManager().getAttributeValueForExtension("org.datanucleus.cache_level1", "name", level1Type, "class-name");
+            if (level1ClassName == null)
             {
-                NucleusLogger.CACHE.debug(Localiser.msg("003003", level1Type));
+                // Plugin of this name not found
+                throw new NucleusUserException(Localiser.msg("003001", level1Type)).setFatal();
             }
-        }
-        catch (Exception e)
-        {
-            // Class name for this L1 cache plugin is not found!
-            throw new NucleusUserException(Localiser.msg("003002", level1Type, level1ClassName),e).setFatal();
+
+            try
+            {
+                // Create an instance of the L1 Cache
+                cache = (Level1Cache)getNucleusContext().getPluginManager().createExecutableExtension(
+                    "org.datanucleus.cache_level1", "name", level1Type, "class-name", null, null);
+                if (NucleusLogger.CACHE.isDebugEnabled())
+                {
+                    NucleusLogger.CACHE.debug(Localiser.msg("003003", level1Type));
+                }
+            }
+            catch (Exception e)
+            {
+                // Class name for this L1 cache plugin is not found!
+                throw new NucleusUserException(Localiser.msg("003002", level1Type, level1ClassName),e).setFatal();
+            }
         }
     }
 

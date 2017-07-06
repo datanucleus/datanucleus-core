@@ -36,8 +36,11 @@ import javax.naming.NamingException;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
+import org.datanucleus.cache.JavaxCacheLevel2Cache;
 import org.datanucleus.cache.Level2Cache;
 import org.datanucleus.cache.NullLevel2Cache;
+import org.datanucleus.cache.SoftLevel2Cache;
+import org.datanucleus.cache.WeakLevel2Cache;
 import org.datanucleus.enhancer.ImplementationCreatorImpl;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.DatastoreInitialisationException;
@@ -1572,29 +1575,47 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         if (cache == null)
         {
             String level2Type = config.getStringProperty(PropertyNames.PROPERTY_CACHE_L2_TYPE);
-
-            // Find the L2 cache class name from its plugin name
-            String level2ClassName = pluginManager.getAttributeValueForExtension("org.datanucleus.cache_level2", "name", level2Type, "class-name");
-            if (level2ClassName == null)
+            if ("none".equals(level2Type))
             {
-                // Plugin of this name not found
-                throw new NucleusUserException(Localiser.msg("004000", level2Type)).setFatal();
+                cache = new NullLevel2Cache(this);
             }
-
-            try
+            else if ("soft".equals(level2Type))
             {
-                // Create an instance of the L2 Cache
-                cache = (Level2Cache)pluginManager.createExecutableExtension("org.datanucleus.cache_level2", "name", level2Type, "class-name",
-                    new Class[]{ClassConstants.NUCLEUS_CONTEXT}, new Object[]{this});
-                if (NucleusLogger.CACHE.isDebugEnabled())
+                cache = new SoftLevel2Cache(this);
+            }
+            else if ("weak".equals(level2Type))
+            {
+                cache = new WeakLevel2Cache(this);
+            }
+            else if ("javax.cache".equals(level2Type))
+            {
+                cache = new JavaxCacheLevel2Cache(this);
+            }
+            else
+            {
+                // Find the L2 cache class name from its plugin name
+                String level2ClassName = pluginManager.getAttributeValueForExtension("org.datanucleus.cache_level2", "name", level2Type, "class-name");
+                if (level2ClassName == null)
                 {
-                    NucleusLogger.CACHE.debug(Localiser.msg("004002", level2Type));
+                    // Plugin of this name not found
+                    throw new NucleusUserException(Localiser.msg("004000", level2Type)).setFatal();
                 }
-            }
-            catch (Exception e)
-            {
-                // Class name for this L2 cache plugin is not found!
-                throw new NucleusUserException(Localiser.msg("004001", level2Type, level2ClassName), e).setFatal();
+
+                try
+                {
+                    // Create an instance of the L2 Cache
+                    cache = (Level2Cache)pluginManager.createExecutableExtension("org.datanucleus.cache_level2", "name", level2Type, "class-name",
+                        new Class[]{ClassConstants.NUCLEUS_CONTEXT}, new Object[]{this});
+                    if (NucleusLogger.CACHE.isDebugEnabled())
+                    {
+                        NucleusLogger.CACHE.debug(Localiser.msg("004002", level2Type));
+                    }
+                }
+                catch (Exception e)
+                {
+                    // Class name for this L2 cache plugin is not found!
+                    throw new NucleusUserException(Localiser.msg("004001", level2Type, level2ClassName), e).setFatal();
+                }
             }
         }
         return cache;
