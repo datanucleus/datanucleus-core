@@ -59,20 +59,40 @@ public class IdentityManagerImpl implements IdentityManager
     {
         // Datastore Identity type
         String dsidName = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_DATASTORE_IDENTITY_TYPE);
-        String datastoreIdentityClassName = nucCtx.getPluginManager().getAttributeValueForExtension("org.datanucleus.store_datastoreidentity", "name", dsidName, "class-name");
-        if (datastoreIdentityClassName == null)
+        if ("datanucleus".equalsIgnoreCase(dsidName))
         {
-            // User has specified a datastore_identity plugin that has not registered
-            throw new NucleusUserException(Localiser.msg("002001", dsidName)).setFatal();
+            datastoreIdClass = DatastoreIdImpl.class;
         }
-        ClassLoaderResolver clr = nucCtx.getClassLoaderResolver(null);
-        try
+        else if ("kodo".equalsIgnoreCase(dsidName))
         {
-            datastoreIdClass = clr.classForName(datastoreIdentityClassName, org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
+            datastoreIdClass = DatastoreIdImplKodo.class;
         }
-        catch (ClassNotResolvedException cnre)
+        else if ("xcalia".equalsIgnoreCase(dsidName))
         {
-            throw new NucleusUserException(Localiser.msg("002002", dsidName, datastoreIdentityClassName)).setFatal();
+            datastoreIdClass = DatastoreIdImplXcalia.class;
+        }
+        else if ("unique".equalsIgnoreCase(dsidName))
+        {
+            datastoreIdClass = DatastoreUniqueLongId.class;
+        }
+        else
+        {
+            // Fallback to plugin mechanism
+            String datastoreIdentityClassName = nucCtx.getPluginManager().getAttributeValueForExtension("org.datanucleus.store_datastoreidentity", "name", dsidName, "class-name");
+            if (datastoreIdentityClassName == null)
+            {
+                // User has specified a datastore_identity plugin that has not registered
+                throw new NucleusUserException(Localiser.msg("002001", dsidName)).setFatal();
+            }
+            ClassLoaderResolver clr = nucCtx.getClassLoaderResolver(null);
+            try
+            {
+                datastoreIdClass = clr.classForName(datastoreIdentityClassName, org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
+            }
+            catch (ClassNotResolvedException cnre)
+            {
+                throw new NucleusUserException(Localiser.msg("002002", dsidName, datastoreIdentityClassName)).setFatal();
+            }
         }
 
         // Identity key translation

@@ -68,14 +68,6 @@ Contributors:
         <jta_locator name="bitronix" class-name="org.datanucleus.transaction.jta.BTMTransactionManagerLocator"/>
     </extension>
 
-    <!-- DATASTORE IDENTITY -->
-    <extension point="org.datanucleus.store_datastoreidentity">
-        <datastoreidentity name="datanucleus" class-name="org.datanucleus.identity.DatastoreIdImpl"/>
-        <datastoreidentity name="kodo" class-name="org.datanucleus.identity.DatastoreIdImplKodo"/>
-        <datastoreidentity name="xcalia" class-name="org.datanucleus.identity.DatastoreIdImplXcalia"/>
-        <datastoreidentity name="unique" class-name="org.datanucleus.identity.DatastoreUniqueLongId"/>
-    </extension>
-
     <!-- JAVA TYPES -->
     <extension point="org.datanucleus.java_type">
         <!-- "primitive" types -->
