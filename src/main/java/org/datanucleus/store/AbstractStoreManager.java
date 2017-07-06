@@ -63,6 +63,8 @@ import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.query.QueryManagerImpl;
 import org.datanucleus.store.schema.DefaultStoreSchemaHandler;
 import org.datanucleus.store.schema.StoreSchemaHandler;
+import org.datanucleus.store.schema.naming.DN2NamingFactory;
+import org.datanucleus.store.schema.naming.JPANamingFactory;
 import org.datanucleus.store.schema.naming.NamingCase;
 import org.datanucleus.store.schema.naming.NamingFactory;
 import org.datanucleus.store.valuegenerator.AbstractDatastoreGenerator;
@@ -298,24 +300,36 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         {
             // Create the NamingFactory
             String namingFactoryName = getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_NAMING_FACTORY);
-            String namingFactoryClassName = nucleusContext.getPluginManager().getAttributeValueForExtension("org.datanucleus.identifier_namingfactory", 
-                "name", namingFactoryName, "class-name");
-            if (namingFactoryClassName == null)
+            if ("datanucleus2".equalsIgnoreCase(namingFactoryName))
             {
-                // TODO Localise this
-                throw new NucleusUserException("Error in specified NamingFactory " + namingFactoryName + " not found");
+                namingFactory = new DN2NamingFactory(nucleusContext);
             }
+            else if ("jpa".equalsIgnoreCase(namingFactoryName))
+            {
+                namingFactory = new JPANamingFactory(nucleusContext);
+            }
+            else
+            {
+                // Fallback to the plugin mechanism
+                String namingFactoryClassName = nucleusContext.getPluginManager().getAttributeValueForExtension("org.datanucleus.identifier_namingfactory", 
+                    "name", namingFactoryName, "class-name");
+                if (namingFactoryClassName == null)
+                {
+                    // TODO Localise this
+                    throw new NucleusUserException("Error in specified NamingFactory " + namingFactoryName + " not found");
+                }
 
-            try
-            {
-                Class[] argTypes = new Class[] {ClassConstants.NUCLEUS_CONTEXT};
-                Object[] args = new Object[] {nucleusContext};
-                namingFactory = (NamingFactory)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.identifier_namingfactory", 
-                    "name", namingFactoryName, "class-name", argTypes, args);
-            }
-            catch (Throwable thr)
-            {
-                throw new NucleusUserException("Exception creating NamingFactory for datastore : " + thr.getMessage(), thr);
+                try
+                {
+                    Class[] argTypes = new Class[] {ClassConstants.NUCLEUS_CONTEXT};
+                    Object[] args = new Object[] {nucleusContext};
+                    namingFactory = (NamingFactory)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.identifier_namingfactory", 
+                        "name", namingFactoryName, "class-name", argTypes, args);
+                }
+                catch (Throwable thr)
+                {
+                    throw new NucleusUserException("Exception creating NamingFactory for datastore : " + thr.getMessage(), thr);
+                }
             }
 
             // Set the case TODO Handle quoted cases (not specifiable via this property currently)

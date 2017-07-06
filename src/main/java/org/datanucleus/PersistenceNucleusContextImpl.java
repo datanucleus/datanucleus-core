@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,6 +71,9 @@ import org.datanucleus.state.ObjectProviderFactoryImpl;
 import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.autostart.AutoStartMechanism;
+import org.datanucleus.store.autostart.ClassesAutoStarter;
+import org.datanucleus.store.autostart.MetaDataAutoStarter;
+import org.datanucleus.store.autostart.XMLAutoStarter;
 import org.datanucleus.store.federation.FederatedStoreManager;
 import org.datanucleus.store.schema.CurrentUserProvider;
 import org.datanucleus.store.schema.MultiTenancyProvider;
@@ -633,40 +637,66 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     throws DatastoreInitialisationException
     {
         String autoStartMechanism = config.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM);
-        String autoStarterClassName = getPluginManager().getAttributeValueForExtension("org.datanucleus.autostart", "name", autoStartMechanism, "class-name");
-        if (autoStarterClassName != null)
+        String mode = config.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_MODE);
+
+        if ("Classes".equalsIgnoreCase(autoStartMechanism))
         {
-            String mode = config.getStringProperty(PropertyNames.PROPERTY_AUTOSTART_MODE);
-            Class[] argsClass = new Class[] {ClassConstants.STORE_MANAGER, ClassConstants.CLASS_LOADER_RESOLVER};
-            Object[] args = new Object[] {storeMgr, clr};
+            starter = new ClassesAutoStarter(storeMgr, clr);
+        }
+        else if ("XML".equalsIgnoreCase(autoStartMechanism))
+        {
             try
             {
-                starter = (AutoStartMechanism) getPluginManager().createExecutableExtension("org.datanucleus.autostart", "name", autoStartMechanism, "class-name", argsClass, args);
-                if (mode.equalsIgnoreCase("None"))
-                {
-                    starter.setMode(org.datanucleus.store.autostart.AutoStartMechanism.Mode.NONE);
-                }
-                else if (mode.equalsIgnoreCase("Checked"))
-                {
-                    starter.setMode(org.datanucleus.store.autostart.AutoStartMechanism.Mode.CHECKED);
-                }
-                else if (mode.equalsIgnoreCase("Quiet"))
-                {
-                    starter.setMode(org.datanucleus.store.autostart.AutoStartMechanism.Mode.QUIET);
-                }
-                else if (mode.equalsIgnoreCase("Ignored"))
-                {
-                    starter.setMode(org.datanucleus.store.autostart.AutoStartMechanism.Mode.IGNORED);
-                }
+                starter = new XMLAutoStarter(storeMgr, clr);
             }
-            catch (Exception e)
+            catch (MalformedURLException mue)
             {
-                NucleusLogger.PERSISTENCE.error(StringUtils.getStringFromStackTrace(e));
+                NucleusLogger.PERSISTENCE.warn("Unable to create XML AutoStarter due to ", mue);
+                starter = null;
+            }
+        }
+        else if ("MetaData".equalsIgnoreCase(autoStartMechanism))
+        {
+            starter = new MetaDataAutoStarter(storeMgr, clr);
+        }
+        else
+        {
+            // Fallback to the plugin mechanism
+            String autoStarterClassName = getPluginManager().getAttributeValueForExtension("org.datanucleus.autostart", "name", autoStartMechanism, "class-name");
+            if (autoStarterClassName != null)
+            {
+                Class[] argsClass = new Class[] {ClassConstants.STORE_MANAGER, ClassConstants.CLASS_LOADER_RESOLVER};
+                Object[] args = new Object[] {storeMgr, clr};
+                try
+                {
+                    starter = (AutoStartMechanism) getPluginManager().createExecutableExtension("org.datanucleus.autostart", "name", autoStartMechanism, "class-name", argsClass, args);
+                }
+                catch (Exception e)
+                {
+                    NucleusLogger.PERSISTENCE.error(StringUtils.getStringFromStackTrace(e));
+                }
             }
         }
         if (starter == null)
         {
             return;
+        }
+
+        if (mode.equalsIgnoreCase("None"))
+        {
+            starter.setMode(org.datanucleus.store.autostart.AutoStartMechanism.Mode.NONE);
+        }
+        else if (mode.equalsIgnoreCase("Checked"))
+        {
+            starter.setMode(org.datanucleus.store.autostart.AutoStartMechanism.Mode.CHECKED);
+        }
+        else if (mode.equalsIgnoreCase("Quiet"))
+        {
+            starter.setMode(org.datanucleus.store.autostart.AutoStartMechanism.Mode.QUIET);
+        }
+        else if (mode.equalsIgnoreCase("Ignored"))
+        {
+            starter.setMode(org.datanucleus.store.autostart.AutoStartMechanism.Mode.IGNORED);
         }
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())

@@ -97,19 +97,26 @@ public abstract class AbstractNucleusContext implements NucleusContext
 
         // Set the name of class loader resolver
         String clrName = config.getStringProperty(PropertyNames.PROPERTY_CLASSLOADER_RESOLVER_NAME);
-        if (clrName != null)
+        if ("datanucleus".equalsIgnoreCase(clrName))
         {
-            classLoaderResolverClassName = pluginManager.getAttributeValueForExtension(
-                "org.datanucleus.classloader_resolver", "name", clrName, "class-name");
-            if (classLoaderResolverClassName == null)
-            {
-                // User has specified a classloader_resolver plugin that has not registered
-                throw new NucleusUserException(Localiser.msg("001001", clrName)).setFatal();
-            }
+            classLoaderResolverClassName = ClassLoaderResolverImpl.class.getName();
         }
         else
         {
-            classLoaderResolverClassName = null;
+            // Fallback to the plugin mechanism
+            if (clrName != null)
+            {
+                classLoaderResolverClassName = pluginManager.getAttributeValueForExtension("org.datanucleus.classloader_resolver", "name", clrName, "class-name");
+                if (classLoaderResolverClassName == null)
+                {
+                    // User has specified a classloader_resolver plugin that has not registered
+                    throw new NucleusUserException(Localiser.msg("001001", clrName)).setFatal();
+                }
+            }
+            else
+            {
+                classLoaderResolverClassName = null;
+            }
         }
 
         // Initialise API, and set defaults for properties for the API

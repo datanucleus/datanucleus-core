@@ -95,15 +95,23 @@ public class IdentityManagerImpl implements IdentityManager
         String stringTranslatorType = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_IDENTITY_STRING_TRANSLATOR_TYPE);
         if (stringTranslatorType != null)
         {
-            try
+            if ("xcalia".equalsIgnoreCase(stringTranslatorType))
             {
-                idStringTranslator = (IdentityStringTranslator)nucCtx.getPluginManager().createExecutableExtension(
-                    "org.datanucleus.identity_string_translator", "name", stringTranslatorType, "class-name", null, null);
+                idStringTranslator = new XcaliaIdentityStringTranslator();
             }
-            catch (Exception e)
+            else
             {
-                // User has specified a string identity translator plugin that has not registered
-                throw new NucleusUserException(Localiser.msg("002001", stringTranslatorType)).setFatal();
+                // Fallback to the plugin mechanism
+                try
+                {
+                    idStringTranslator = (IdentityStringTranslator)nucCtx.getPluginManager().createExecutableExtension(
+                        "org.datanucleus.identity_string_translator", "name", stringTranslatorType, "class-name", null, null);
+                }
+                catch (Exception e)
+                {
+                    // User has specified a string identity translator plugin that has not registered
+                    throw new NucleusUserException(Localiser.msg("002001", stringTranslatorType)).setFatal();
+                }
             }
         }
     }

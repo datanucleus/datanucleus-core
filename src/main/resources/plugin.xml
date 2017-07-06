@@ -76,17 +76,6 @@ Contributors:
         <datastoreidentity name="unique" class-name="org.datanucleus.identity.DatastoreUniqueLongId"/>
     </extension>
 
-    <!-- IDENTITY STRING TRANSLATOR -->
-    <extension point="org.datanucleus.identity_string_translator">
-        <identitystringtranslator name="xcalia" class-name="org.datanucleus.identity.XcaliaIdentityStringTranslator"/>
-    </extension>
-
-    <!-- NAMING FACTORY -->
-    <extension point="org.datanucleus.identifier_namingfactory">
-        <namingfactory name="datanucleus2" class-name="org.datanucleus.store.schema.naming.DN2NamingFactory"/>
-        <namingfactory name="jpa" class-name="org.datanucleus.store.schema.naming.JPANamingFactory"/>
-    </extension>
-
     <!-- JAVA TYPES -->
     <extension point="org.datanucleus.java_type">
         <!-- "primitive" types -->
@@ -340,18 +329,6 @@ Contributors:
         <valuegenerator name="uuid-string" class-name="org.datanucleus.store.valuegenerator.UUIDStringGenerator" unique="true"/>
         <valuegenerator name="uuid" class-name="org.datanucleus.store.valuegenerator.UUIDGenerator" unique="true"/>
         <valuegenerator name="uuid-object" class-name="org.datanucleus.store.valuegenerator.UUIDObjectGenerator" unique="true"/>
-    </extension>
-
-    <!-- CLASS LOADERS -->
-    <extension point="org.datanucleus.classloader_resolver">
-        <class-loader-resolver name="datanucleus" class-name="org.datanucleus.ClassLoaderResolverImpl"/>
-    </extension>
-
-    <!-- AUTOSTART MECHANISMS -->
-    <extension point="org.datanucleus.autostart">
-        <autostart class-name="org.datanucleus.store.autostart.ClassesAutoStarter" name="Classes"/>
-        <autostart class-name="org.datanucleus.store.autostart.XMLAutoStarter" name="XML"/>
-        <autostart class-name="org.datanucleus.store.autostart.MetaDataAutoStarter" name="MetaData"/>
     </extension>
 
     <!-- QUERY METHODS (IN-MEMORY) -->
