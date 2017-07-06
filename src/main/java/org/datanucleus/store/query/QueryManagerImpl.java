@@ -204,6 +204,7 @@ public class QueryManagerImpl implements QueryManager
         // Find the query support for this language and this datastore
         try
         {
+            // TODO It would be quicker to just call "new JDOQLQuery(...)" but this keeps it general. Can we do anything to alleviate this
             if (query == null)
             {
                 Class[] argsClass = new Class[] {ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT};
