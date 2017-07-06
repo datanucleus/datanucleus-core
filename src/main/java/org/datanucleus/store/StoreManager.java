@@ -224,10 +224,34 @@ public interface StoreManager
     }
 
     /**
-     * Accessor for the ValueGenerationManager for obtaining sequences.
-     * @return The ValueGenerationManagerr for this datastore
+     * Accessor for the ValueGenerationManager for generating field values.
+     * @return The ValueGenerationManager for this datastore
      */
     ValueGenerationManager getValueGenerationManager();
+
+    /**
+     * Accessor for whether this value generation strategy is supported.
+     * @param strategy The value generation strategy
+     * @return Whether it is supported.
+     */
+    boolean supportsValueGenerationStrategy(String strategy);
+
+    /**
+     * Convenience method to return whether the value generation strategy used by the specified class/member is generated in the datastore during a persist.
+     * @param cmd Metadata for the class
+     * @param absFieldNumber number of the field (or -1 if for datastore-id)
+     * @return if the object for the value generation strategy is attributed by the database ("identity", etc)
+     */
+    boolean isValueGenerationStrategyDatastoreAttributed(AbstractClassMetaData cmd, int absFieldNumber);
+
+    /**
+     * Method to retrieve the value for a value generation strategy for a particular field.
+     * @param ec execution context
+     * @param cmd AbstractClassMetaData for the class
+     * @param absoluteFieldNumber The field number
+     * @return The generated value
+     */
+    Object getValueGenerationStrategyValue(ExecutionContext ec, AbstractClassMetaData cmd, int absoluteFieldNumber);
 
     /**
      * Accessor for the API adapter.
@@ -397,13 +421,6 @@ public interface StoreManager
     }
 
     /**
-     * Accessor for whether this value strategy is supported.
-     * @param strategy The strategy
-     * @return Whether it is supported.
-     */
-    boolean supportsValueStrategy(String strategy);
-
-    /**
      * Returns the class corresponding to the given object identity. 
      * If the object is datastore-identity, return the PC class specified in the identity.
      * If the object is single-field identity, return the PC class specified in the identity
@@ -419,24 +436,6 @@ public interface StoreManager
      * @exception ClassCastException If the type of ID is not recognized
      */
     String getClassNameForObjectID(Object id, ClassLoaderResolver clr, ExecutionContext ec);
-
-    /**
-     * Convenience method to return whether the strategy used by the specified class/member is
-     * generated in the datastore during a persist.
-     * @param cmd Metadata for the class
-     * @param absFieldNumber number of the field (or -1 if for datastore-id)
-     * @return if the object for the strategy is attributed by the database
-     */
-    boolean isStrategyDatastoreAttributed(AbstractClassMetaData cmd, int absFieldNumber);
-
-    /**
-     * Method to retrieve the value for a strategy for a particular field.
-     * @param ec execution context
-     * @param cmd AbstractClassMetaData for the class
-     * @param absoluteFieldNumber The field number
-     * @return The value
-     */
-    Object getStrategyValue(ExecutionContext ec, AbstractClassMetaData cmd, int absoluteFieldNumber);
 
     /**
      * Utility to return the names of the classes that are known subclasses of the provided

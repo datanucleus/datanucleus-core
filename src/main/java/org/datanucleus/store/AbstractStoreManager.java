@@ -745,7 +745,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      * @param strategy The strategy
      * @return Whether it is supported.
      */
-    public boolean supportsValueStrategy(String strategy)
+    public boolean supportsValueGenerationStrategy(String strategy)
     {
         ConfigurationElement elem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
             new String[]{"name", "unique"}, new String[] {strategy, "true"});
@@ -804,7 +804,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      * @param absFieldNumber Absolute field number for the field (or -1 if datastore id)
      * @return Whether the strategy is generated in the datastore
      */
-    public boolean isStrategyDatastoreAttributed(AbstractClassMetaData cmd, int absFieldNumber)
+    public boolean isValueGenerationStrategyDatastoreAttributed(AbstractClassMetaData cmd, int absFieldNumber)
     {
         if (absFieldNumber < 0)
         {
@@ -868,7 +868,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#getStrategyValue(org.datanucleus.ExecutionContext, org.datanucleus.metadata.AbstractClassMetaData, int)
      */
-    public Object getStrategyValue(ExecutionContext ec, AbstractClassMetaData cmd, int absoluteFieldNumber)
+    public Object getValueGenerationStrategyValue(ExecutionContext ec, AbstractClassMetaData cmd, int absoluteFieldNumber)
     {
         // Extract the control information for this field that needs its value
         AbstractMemberMetaData mmd = null;
@@ -1062,15 +1062,15 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             }
             else if (type == Long.class || type == Integer.class || type == Short.class || type == long.class || type == int.class || type == short.class || type== BigInteger.class)
             {
-                if (supportsValueStrategy("identity"))
+                if (supportsValueGenerationStrategy("identity"))
                 {
                     return "identity";
                 }
-                else if (supportsValueStrategy("sequence") && mmd.getSequence() != null)
+                else if (supportsValueGenerationStrategy("sequence") && mmd.getSequence() != null)
                 {
                     return "sequence";
                 }
-                else if (supportsValueStrategy("increment"))
+                else if (supportsValueGenerationStrategy("increment"))
                 {
                     return "increment";
                 }
@@ -1092,15 +1092,15 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
 
         // Numeric datastore-identity
-        if (supportsValueStrategy("identity"))
+        if (supportsValueGenerationStrategy("identity"))
         {
             return "identity";
         }
-        else if (supportsValueStrategy("sequence") && idmd != null && idmd.getSequence() != null)
+        else if (supportsValueGenerationStrategy("sequence") && idmd != null && idmd.getSequence() != null)
         {
             return "sequence";
         }
-        else if (supportsValueStrategy("increment"))
+        else if (supportsValueGenerationStrategy("increment"))
         {
             return "increment";
         }

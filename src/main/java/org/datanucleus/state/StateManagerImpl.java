@@ -732,7 +732,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             IdentityStrategy strategy = mmd.getValueStrategy();
 
             // Check for the strategy, and if it is a datastore attributed strategy
-            if (strategy != null && !getStoreManager().isStrategyDatastoreAttributed(cmd, fieldNumber))
+            if (strategy != null && !getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, fieldNumber))
             {
                 // Assign the strategy value where required.
                 // Default JDO/JPA behaviour is to always provide a strategy value when it is marked as using a strategy
@@ -749,7 +749,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 if (applyStrategy)
                 {
                     // Apply a strategy value for this field
-                    Object obj = getStoreManager().getStrategyValue(myEC, cmd, fieldNumber);
+                    Object obj = getStoreManager().getValueGenerationStrategyValue(myEC, cmd, fieldNumber);
                     this.replaceField(fieldNumber, obj);
                 }
             }
@@ -3499,7 +3499,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         boolean idSet = false;
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
-            if (cmd.getIdentityMetaData() == null || !getStoreManager().isStrategyDatastoreAttributed(cmd, -1))
+            if (cmd.getIdentityMetaData() == null || !getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, -1))
             {
                 // Assumed to be set
                 myID = myEC.newObjectId(cmd.getFullClassName(), myPC);
@@ -3516,7 +3516,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 AbstractMemberMetaData fmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
                 if (fmd.isPrimaryKey())
                 {
-                    if (getStoreManager().isStrategyDatastoreAttributed(cmd, fieldNumber))
+                    if (getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, fieldNumber))
                     {
                         idSetInDatastore = true;
                         break;
@@ -3588,7 +3588,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 for (int fieldNumber = 0; fieldNumber < fieldCount; fieldNumber++)
                 {
                     AbstractMemberMetaData fmd=cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-                    if (fmd.isPrimaryKey() && getStoreManager().isStrategyDatastoreAttributed(cmd, fieldNumber))
+                    if (fmd.isPrimaryKey() && getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, fieldNumber))
                     {
                         //replace the value of the id, but before convert the value to the field type if needed
                         replaceField(myPC, fieldNumber, TypeConversionHelper.convertTo(id, fmd.getType()), false);
@@ -3637,7 +3637,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                     activity != ActivityState.INSERTING && activity != ActivityState.INSERTING_CALLBACKS &&
                     myLC.stateType() == LifeCycleState.P_NEW)
                 {
-                    if (getStoreManager().isStrategyDatastoreAttributed(cmd, -1))
+                    if (getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, -1))
                     {
                         flush();
                     }
@@ -3660,7 +3660,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                     int[] pkFieldNumbers = cmd.getPKMemberPositions();
                     for (int i = 0; i < pkFieldNumbers.length; i++)
                     {
-                        if (getStoreManager().isStrategyDatastoreAttributed(cmd, pkFieldNumbers[i]))
+                        if (getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, pkFieldNumbers[i]))
                         {
                             flush();
                             break;

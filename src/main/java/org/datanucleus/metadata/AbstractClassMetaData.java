@@ -1244,7 +1244,7 @@ public abstract class AbstractClassMetaData extends MetaData
             {
                 for (int i=0;i<pkMemberPositions.length;i++)
                 {
-                    if (storeMgr.isStrategyDatastoreAttributed(this, pkMemberPositions[i]))
+                    if (storeMgr.isValueGenerationStrategyDatastoreAttributed(this, pkMemberPositions[i]))
                     {
                         pkIsDatastoreAttributed = true;
                     }
@@ -1252,7 +1252,7 @@ public abstract class AbstractClassMetaData extends MetaData
             }
             else if (identityType == IdentityType.DATASTORE)
             {
-                pkIsDatastoreAttributed = storeMgr.isStrategyDatastoreAttributed(this, -1);
+                pkIsDatastoreAttributed = storeMgr.isValueGenerationStrategyDatastoreAttributed(this, -1);
             }
         }
         return pkIsDatastoreAttributed.booleanValue();

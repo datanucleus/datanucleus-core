@@ -354,9 +354,9 @@ public class FederatedStoreManager implements StoreManager
         return primaryStoreMgr.getQueryCacheKey();
     }
 
-    public Object getStrategyValue(ExecutionContext ec, AbstractClassMetaData cmd, int absoluteFieldNumber)
+    public Object getValueGenerationStrategyValue(ExecutionContext ec, AbstractClassMetaData cmd, int absoluteFieldNumber)
     {
-        return getStoreManagerForClass(cmd).getStrategyValue(ec, cmd, absoluteFieldNumber);
+        return getStoreManagerForClass(cmd).getValueGenerationStrategyValue(ec, cmd, absoluteFieldNumber);
     }
 
     public Collection<String> getSubClassesForClass(String className, boolean includeDescendents, ClassLoaderResolver clr)
@@ -364,9 +364,9 @@ public class FederatedStoreManager implements StoreManager
         return getStoreManagerForClass(className, clr).getSubClassesForClass(className, includeDescendents, clr);
     }
 
-    public boolean isStrategyDatastoreAttributed(AbstractClassMetaData cmd, int absFieldNumber)
+    public boolean isValueGenerationStrategyDatastoreAttributed(AbstractClassMetaData cmd, int absFieldNumber)
     {
-        return getStoreManagerForClass(cmd).isStrategyDatastoreAttributed(cmd, absFieldNumber);
+        return getStoreManagerForClass(cmd).isValueGenerationStrategyDatastoreAttributed(cmd, absFieldNumber);
     }
 
     public String manageClassForIdentity(Object id, ClassLoaderResolver clr)
@@ -440,9 +440,9 @@ public class FederatedStoreManager implements StoreManager
         return primaryStoreMgr.getNativeQueryLanguage();
     }
 
-    public boolean supportsValueStrategy(String language)
+    public boolean supportsValueGenerationStrategy(String language)
     {
-        return primaryStoreMgr.supportsValueStrategy(language);
+        return primaryStoreMgr.supportsValueGenerationStrategy(language);
     }
 
     public Collection getSupportedOptions()
