@@ -32,7 +32,6 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.expression.ExpressionCompiler;
 import org.datanucleus.query.expression.Literal;
@@ -67,6 +66,16 @@ public abstract class JavaQueryCompiler implements SymbolResolver
     public static final String JOIN_OUTER_FETCH = "JOIN_OUTER_FETCH";
     public static final String JOIN_OUTER_RIGHT = "JOIN_OUTER_RIGHT";
     public static final String JOIN_OUTER_FETCH_RIGHT = "JOIN_OUTER_FETCH_RIGHT";
+
+    protected static Map<String, String> queryMethodAliasByPrefix = new HashMap<String, String>();
+
+    static 
+    {
+        queryMethodAliasByPrefix.put("JDOHelper", "JDOHelper");
+        queryMethodAliasByPrefix.put("javax.jdo.JDOHelper", "JDOHelper");
+        queryMethodAliasByPrefix.put("Math", "Math");
+        queryMethodAliasByPrefix.put("java.lang.Math", "Math");
+    }
 
     protected JavaQueryCompiler parentCompiler;
     protected Map<Object, String> parameterSubtitutionMap;
@@ -105,8 +114,6 @@ public abstract class JavaQueryCompiler implements SymbolResolver
     /** Parser specific to the type of query being compiled. */
     protected Parser parser;
 
-    protected Map<String, String> queryMethodAliasByPrefix = null;
-
     protected Map<String, Object> options;
 
     public JavaQueryCompiler(MetaDataManager metaDataManager, ClassLoaderResolver clr, 
@@ -116,17 +123,6 @@ public abstract class JavaQueryCompiler implements SymbolResolver
     {
         this.metaDataManager = metaDataManager;
         this.clr = clr;
-
-        ConfigurationElement[] queryMethodAliases = metaDataManager.getNucleusContext().getPluginManager().getConfigurationElementsForExtension(
-            "org.datanucleus.query_method_prefix", null, null);
-        if (queryMethodAliases != null && queryMethodAliases.length > 0)
-        {
-            queryMethodAliasByPrefix = new HashMap<String, String>();
-            for (int i=0;i<queryMethodAliases.length;i++)
-            {
-                queryMethodAliasByPrefix.put(queryMethodAliases[i].getAttribute("prefix"), queryMethodAliases[i].getAttribute("alias"));
-            }
-        }
 
         this.from = from;
         this.candidateClass = candidateClass;

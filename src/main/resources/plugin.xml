@@ -40,7 +40,6 @@ Contributors:
     <extension-point id="store_manager" name="Store Manager" schema="schema/store_manager.exsd"/>
     <extension-point id="store_query_query" name="Query" schema="schema/query.exsd"/>
     <extension-point id="query_method_evaluators" name="Query Method Evaluators" schema="schema/query_method_evaluator.exsd"/>
-    <extension-point id="query_method_prefix" name="Query Method Prefix" schema="schema/query_method_prefix.exsd"/>
     <extension-point id="store_valuegenerator" name="Value Generator" schema="schema/valuegenerator.exsd"/>
     <extension-point id="store_connectionfactory" name="Connection Factory" schema="schema/connectionfactory.exsd"/>
     <extension-point id="java_type" name="Java Type" schema="schema/java_type.exsd"/>
@@ -517,14 +516,6 @@ Contributors:
         <query-method-evaluator class="java.time.Period" method="getYears" evaluator="org.datanucleus.query.inmemory.method.PeriodGetYears"/>
         <query-method-evaluator class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.query.inmemory.method.YearMonthGetYear"/>
         <query-method-evaluator class="java.time.YearMonth" method="getMonthValue" evaluator="org.datanucleus.query.inmemory.method.YearMonthGetMonthValue"/>
-    </extension>
-
-    <!-- QUERY METHODS -->
-    <extension point="org.datanucleus.query_method_prefix">
-        <query-method-prefix prefix="JDOHelper" alias="JDOHelper"/>
-        <query-method-prefix prefix="javax.jdo.JDOHelper" alias="JDOHelper"/>
-        <query-method-prefix prefix="Math" alias="Math"/>
-        <query-method-prefix prefix="java.lang.Math" alias="Math"/>
     </extension>
 
     <!-- METADATA HANDLERS -->
