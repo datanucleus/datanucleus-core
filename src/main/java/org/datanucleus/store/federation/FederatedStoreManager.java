@@ -51,6 +51,7 @@ import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.StorePersistenceHandler;
 import org.datanucleus.store.connection.ConnectionManager;
 import org.datanucleus.store.connection.ManagedConnection;
+import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.store.schema.naming.NamingFactory;
@@ -300,6 +301,42 @@ public class FederatedStoreManager implements StoreManager
             queryMgr = new FederatedQueryManagerImpl(nucleusContext, this);
         }
         return queryMgr;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.StoreManager#getSupportedQueryLanguages()
+     */
+    @Override
+    public Collection<String> getSupportedQueryLanguages()
+    {
+        return primaryStoreMgr.getSupportedQueryLanguages();
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.StoreManager#newQuery(java.lang.String, org.datanucleus.ExecutionContext)
+     */
+    @Override
+    public Query newQuery(String language, ExecutionContext ec)
+    {
+        return primaryStoreMgr.newQuery(language, ec);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.StoreManager#newQuery(java.lang.String, org.datanucleus.ExecutionContext, java.lang.String)
+     */
+    @Override
+    public Query newQuery(String language, ExecutionContext ec, String queryString)
+    {
+        return primaryStoreMgr.newQuery(language, ec, queryString);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.StoreManager#newQuery(java.lang.String, org.datanucleus.ExecutionContext, org.datanucleus.store.query.Query)
+     */
+    @Override
+    public Query newQuery(String language, ExecutionContext ec, Query q)
+    {
+        return primaryStoreMgr.newQuery(language, ec, q);
     }
 
     public ValueGenerationManager getValueGenerationManager()

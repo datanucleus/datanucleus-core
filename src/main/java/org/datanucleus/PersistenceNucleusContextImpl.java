@@ -908,7 +908,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                     {
                         NucleusLogger.QUERY.debug(Localiser.msg("008017", queryName, qmd.getQuery()));
                     }
-                    org.datanucleus.store.query.Query q = storeMgr.getQueryManager().newQuery(qmd.getLanguage().toString(), ec, qmd.getQuery());
+                    org.datanucleus.store.query.Query q = storeMgr.newQuery(qmd.getLanguage().toString(), ec, qmd.getQuery());
                     q.compile();
                     q.closeAll();
                 }

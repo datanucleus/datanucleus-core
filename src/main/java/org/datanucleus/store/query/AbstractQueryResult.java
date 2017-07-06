@@ -327,7 +327,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
                 if (query.getCompilation().getQueryLanguage().equalsIgnoreCase("JDOQL"))
                 {
                     // JDOQL : "count([DISTINCT ]this)" query
-                    Query countQuery = query.getStoreManager().getQueryManager().newQuery("JDOQL", ec, query);
+                    Query countQuery = query.getStoreManager().newQuery("JDOQL", ec, query);
                     if (query.getResultDistinct())
                     {
                         countQuery.setResult("COUNT(DISTINCT this)");
@@ -368,7 +368,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
                 else if (query.getCompilation().getQueryLanguage().equalsIgnoreCase("JPQL"))
                 {
                     // JPQL : "count()" query
-                    Query countQuery = query.getStoreManager().getQueryManager().newQuery("JPQL", ec, query);
+                    Query countQuery = query.getStoreManager().newQuery("JPQL", ec, query);
                     countQuery.setResult("count(" + query.getCompilation().getCandidateAlias() + ")");
                     countQuery.setOrdering(null);
                     countQuery.setRange(null); // Don't want range to interfere with the query

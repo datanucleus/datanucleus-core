@@ -24,11 +24,13 @@ import junit.framework.Assert;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.Configuration;
+import org.datanucleus.ExecutionContext;
 import org.datanucleus.ExecutionContextImpl;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PersistenceNucleusContextImpl;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.store.AbstractStoreManager;
+import org.datanucleus.store.query.Query;
 import org.junit.Test;
 
 public class FrequentlyAccessedPropertiesTest
@@ -87,12 +89,35 @@ public class FrequentlyAccessedPropertiesTest
         public StoreManagerStub(ClassLoaderResolver clr, PersistenceNucleusContext nucleusContext, Map<String, Object> props)
         {
             super("test", clr, nucleusContext, props);
-        
         }
 
         @Override
         protected void registerConnectionMgr()
         {
+        }
+
+        @Override
+        public Query newQuery(String language, ExecutionContext ec)
+        {
+            return null;
+        }
+
+        @Override
+        public Query newQuery(String language, ExecutionContext ec, String queryString)
+        {
+            return null;
+        }
+
+        @Override
+        public Query newQuery(String language, ExecutionContext ec, Query q)
+        {
+            return null;
+        }
+
+        @Override
+        public boolean supportsQueryLanguage(String language)
+        {
+            return true;
         }
     }
 }

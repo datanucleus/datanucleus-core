@@ -548,8 +548,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             String namingCase = getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_CASE);
             NucleusLogger.DATASTORE.debug("Schema : NamingFactory=" + namingFactoryName + " identifierCase=" + namingCase);
 
-            String[] queryLanguages = nucleusContext.getPluginManager().getAttributeValuesForExtension("org.datanucleus.store_query_query", "datastore", storeManagerKey, "name");
-            NucleusLogger.DATASTORE.debug("Query Languages : " + (queryLanguages != null ? StringUtils.objectArrayToString(queryLanguages) : "none"));
+            NucleusLogger.DATASTORE.debug("Query Languages : " + StringUtils.collectionToString(getSupportedQueryLanguages()));
             NucleusLogger.DATASTORE.debug("Queries : Timeout=" + getIntProperty(PropertyNames.PROPERTY_DATASTORE_READ_TIMEOUT));
 
             NucleusLogger.DATASTORE.debug("===========================================================");
@@ -705,19 +704,26 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     }
 
     /* (non-Javadoc)
+     * @see org.datanucleus.store.StoreManager#getSupportedQueryLanguages()
+     */
+    @Override
+    public Collection<String> getSupportedQueryLanguages()
+    {
+        // All StoreManagers should support a minimum of JDOQL/JPQL
+        Collection<String> languages = new HashSet<>();
+        languages.add("JDOQL");
+        languages.add("JPQL");
+        return languages;
+    }
+
+    /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#supportsQueryLanguage(java.lang.String)
      */
+    @Override
     public boolean supportsQueryLanguage(String language)
     {
-        if (language == null)
-        {
-            return false;
-        }
-
-        // Find if datastore=storeManagerKey has an extension for name="{language}"
-        String name = getNucleusContext().getPluginManager().getAttributeValueForExtension("org.datanucleus.store_query_query",
-            new String[] {"name", "datastore"}, new String[]{language, storeManagerKey}, "name");
-        return name != null;
+        // All StoreManagers should support a minimum of JDOQL/JPQL
+        return (language != null && (language.equalsIgnoreCase("JDOQL") || language.equalsIgnoreCase("JPQL")));
     }
 
     /**

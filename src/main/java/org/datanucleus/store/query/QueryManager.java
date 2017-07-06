@@ -20,7 +20,6 @@ package org.datanucleus.store.query;
 import java.util.List;
 import java.util.Map;
 
-import org.datanucleus.ExecutionContext;
 import org.datanucleus.query.compiler.QueryCompilation;
 import org.datanucleus.query.inmemory.InvocationEvaluator;
 import org.datanucleus.store.query.cache.QueryCompilationCache;
@@ -37,15 +36,6 @@ public interface QueryManager
      * Close the QueryManager, releasing all cached compilations and results.
      */
     void close();
-
-    /**
-     * Method to generate a new query using the passed query as basis.
-     * @param language The query language
-     * @param ec ExecutionContext
-     * @param query The query filter (String) or a previous Query
-     * @return The Query
-     */
-    Query newQuery(String language, ExecutionContext ec, Object query);
 
     /**
      * Accessor for the generic compilation cache.

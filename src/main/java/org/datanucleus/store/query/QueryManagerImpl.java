@@ -19,7 +19,6 @@ Contributors:
 ***********************************************************************/
 package org.datanucleus.store.query;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,13 +28,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.ExecutionContext;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.Configuration;
 import org.datanucleus.PropertyNames;
-import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.flush.FlushMode;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.query.QueryUtils;
@@ -186,108 +182,6 @@ public class QueryManagerImpl implements QueryManager
 
         inmemoryQueryMethodEvaluatorMap.clear();
         inmemoryQueryMethodEvaluatorMap = null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.QueryManager#newQuery(java.lang.String, org.datanucleus.ExecutionContext, java.lang.Object)
-     */
-    @Override
-    public Query newQuery(String language, ExecutionContext ec, Object query)
-    {
-        if (language == null)
-        {
-            return null;
-        }
-
-        String languageImpl = language;
-
-        // Find the query support for this language and this datastore
-        try
-        {
-            // TODO It would be quicker to just call "new JDOQLQuery(...)" but this keeps it general. Can we do anything to alleviate this
-            if (query == null)
-            {
-                Class[] argsClass = new Class[] {ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT};
-                Object[] args = new Object[] {storeMgr, ec};
-                Query q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store_query_query",
-                    new String[] {"name", "datastore"}, new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, "class-name", argsClass, args);
-                if (q == null)
-                {
-                    // No query support for this language
-                    throw new NucleusException(Localiser.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
-                }
-                return q;
-            }
-
-            Query q = null;
-            if (query instanceof String)
-            {
-                // Try XXXQuery(ExecutionContext, String);
-                Class[] argsClass = new Class[]{ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT, String.class};
-                Object[] args = new Object[]{storeMgr, ec, query};
-                q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store_query_query", 
-                    new String[] {"name", "datastore"}, new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, "class-name", argsClass, args);
-                if (q == null)
-                {
-                    // No query support for this language
-                    throw new NucleusException(Localiser.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
-                }
-            }
-            else if (query instanceof Query)
-            {
-                // Try XXXQuery(StoreManager, ExecutionContext, Query.class);
-                Class[] argsClass = new Class[]{ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT, query.getClass()};
-                Object[] args = new Object[]{storeMgr, ec, query};
-                q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store_query_query", 
-                    new String[] {"name", "datastore"}, new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, "class-name", argsClass, args);
-                if (q == null)
-                {
-                    // No query support for this language
-                    throw new NucleusException(Localiser.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
-                }
-            }
-            else
-            {
-                // Try XXXQuery(StoreManager, ExecutionContext, Object);
-                Class[] argsClass = new Class[]{ClassConstants.STORE_MANAGER, ClassConstants.EXECUTION_CONTEXT, Object.class};
-                Object[] args = new Object[]{storeMgr, ec, query};
-                q = (Query) ec.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store_query_query",
-                    new String[] {"name", "datastore"}, new String[] {languageImpl, ec.getStoreManager().getStoreManagerKey()}, "class-name", argsClass, args);
-                if (q == null)
-                {
-                    // No query support for this language
-                    throw new NucleusException(Localiser.msg("021034", languageImpl, ec.getStoreManager().getStoreManagerKey()));
-                }
-            }
-
-            if (ec.getFlushMode() == FlushMode.QUERY)
-            {
-                // Flush mode implies flush all before executing the query so set the necessary property
-                q.addExtension(Query.EXTENSION_FLUSH_BEFORE_EXECUTION, Boolean.TRUE);
-            }
-
-            return q;
-        }
-        catch (InvocationTargetException e)
-        {
-            Throwable t = e.getTargetException();
-            if (t instanceof RuntimeException)
-            {
-                throw (RuntimeException) t;
-            }
-            else if (t instanceof Error)
-            {
-                throw (Error) t;
-            }
-            else
-            {
-                throw new NucleusException(t.getMessage(), t).setFatal();
-            }
-        }
-        catch (Exception e)
-        {
-            throw new NucleusException(e.getMessage(), e).setFatal();
-        }
     }
 
     /* (non-Javadoc)

@@ -34,6 +34,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.store.connection.ConnectionManager;
+import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.store.schema.naming.NamingFactory;
@@ -329,9 +330,8 @@ public interface StoreManager
     void unmanageAllClasses(ClassLoaderResolver clr);
 
     /**
-     * Convenience method to ensure that the class defined by the passed OID/SingleFIeldIdentity is 
-     * managed by the store.
-     * @param id OID
+     * Convenience method to ensure that the class defined by the passed DatastoreId/SingleFieldId is managed by the store.
+     * @param id identity
      * @param clr ClassLoader resolver
      * @return The class name of the class associated to this identity
      * @throws NucleusUserException if the identity is assigned to the wrong class
@@ -349,11 +349,43 @@ public interface StoreManager
     <T> Extent<T> getExtent(ExecutionContext ec, Class<T> c, boolean subclasses);
 
     /**
+     * Accessor for the supported query languages.
+     * @return The supported query languages
+     */
+    Collection<String> getSupportedQueryLanguages();
+
+    /**
      * Accessor for whether this query language is supported.
      * @param language The language
      * @return Whether it is supported.
      */
     boolean supportsQueryLanguage(String language);
+
+    /**
+     * Method to return a new query, for the specified language and ExecutionContext.
+     * @param language The query language
+     * @param ec ExecutionContext
+     * @return The query
+     */
+    Query newQuery(String language, ExecutionContext ec);
+
+    /**
+     * Method to return a new query, for the specified language and ExecutionContext, using the specified query string.
+     * @param language The query language
+     * @param ec ExecutionContext
+     * @param queryString The query string
+     * @return The query
+     */
+    Query newQuery(String language, ExecutionContext ec, String queryString);
+
+    /**
+     * Method to return a new query, for the specified language and ExecutionContext, using the specified existing query to copy from.
+     * @param language The query language
+     * @param ec ExecutionContext
+     * @param q Existing query
+     * @return The query
+     */
+    Query newQuery(String language, ExecutionContext ec, Query q);
 
     /**
      * Accessor for the native query language of this store.

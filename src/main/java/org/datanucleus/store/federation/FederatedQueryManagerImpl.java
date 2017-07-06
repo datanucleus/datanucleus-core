@@ -85,7 +85,7 @@ public class FederatedQueryManagerImpl extends QueryManagerImpl
                 ClassLoaderResolver clr = nucleusCtx.getClassLoaderResolver(null);
                 AbstractClassMetaData cmd = nucleusCtx.getMetaDataManager().getMetaDataForClass(candidateName, clr);
                 StoreManager classStoreMgr = ((FederatedStoreManager)storeMgr).getStoreManagerForClass(cmd);
-                return classStoreMgr.getQueryManager().newQuery(languageImpl, ec, query);
+                return classStoreMgr.newQuery(languageImpl, ec, (String)query);
             }
             // TODO Extract the candidate for this query
             // TODO Find StoreManager for the candidate
@@ -95,19 +95,10 @@ public class FederatedQueryManagerImpl extends QueryManagerImpl
         {
             // Based on previous query
             StoreManager storeMgr = ((Query)query).getStoreManager();
-            return storeMgr.getQueryManager().newQuery(languageImpl, ec, query);
+            return storeMgr.newQuery(languageImpl, ec, (Query)query);
         }
         else
         {
-            if (query instanceof Class)
-            {
-                // Find StoreManager for the candidate
-                Class cls = (Class)query;
-                ClassLoaderResolver clr = nucleusCtx.getClassLoaderResolver(cls.getClassLoader());
-                AbstractClassMetaData cmd = nucleusCtx.getMetaDataManager().getMetaDataForClass(cls, clr);
-                StoreManager classStoreMgr = ((FederatedStoreManager)storeMgr).getStoreManagerForClass(cmd);
-                return classStoreMgr.getQueryManager().newQuery(languageImpl, ec, query);
-            }
             throw new NucleusException("Not yet supported for queries taking in object of type " + query.getClass());
         }
     }
