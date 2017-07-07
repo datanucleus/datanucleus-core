@@ -108,6 +108,7 @@ public class NucleusSequenceImpl implements NucleusSequence
             }
         };
 
+        // TODO Move this to ValueGeneratorManager
         Class cls = null;
         ConfigurationElement elem =
             ec.getNucleusContext().getPluginManager().getConfigurationElementForExtension(
@@ -123,7 +124,7 @@ public class NucleusSequenceImpl implements NucleusSequence
         {
             throw new NucleusException("Cannot create ValueGenerator for strategy "+valueGeneratorName);
         }
-        generator = mgr.createValueGenerator(seqMetaData.getName(), cls, props, storeManager, connProvider);
+        generator = mgr.createValueGenerator(seqMetaData.getName(), cls, props, connProvider);
 
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {

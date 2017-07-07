@@ -37,14 +37,18 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class ValueGenerationManager
 {
+    protected final StoreManager storeMgr;
+
     /** Map of ValueGenerator keyed by the symbolic name. */
     protected Map<String, ValueGenerator> generatorsByName = new ConcurrentHashMap<>();
 
     /**
      * Constructor.
+     * @param storeMgr Store Manager
      */
-    public ValueGenerationManager()
+    public ValueGenerationManager(StoreManager storeMgr)
     {
+        this.storeMgr = storeMgr;
     }
 
     /**
@@ -74,11 +78,10 @@ public class ValueGenerationManager
      * @param name Symbolic name of the generator
      * @param generatorClass Class for the generator type
      * @param props Properties to control the generator
-     * @param storeMgr Manager for the store
      * @param connectionProvider Provider for connections
      * @return The ValueGenerator
      */
-    public ValueGenerator createValueGenerator(String name, Class generatorClass, Properties props, StoreManager storeMgr, ValueGenerationConnectionProvider connectionProvider)
+    public ValueGenerator createValueGenerator(String name, Class generatorClass, Properties props, ValueGenerationConnectionProvider connectionProvider)
     {
         // Create the requested generator
         ValueGenerator generator;
@@ -108,6 +111,35 @@ public class ValueGenerationManager
 
         // Store the generator
         generatorsByName.put(name, generator);
+
+        return generator;
+    }
+
+    public ValueGenerator createValueGenerator(String strategyName)
+    {
+        ValueGenerator generator = null;
+
+        // Create generator so we can find the generated type
+        // a). Try as unique generator first
+        try
+        {
+            generator = (ValueGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
+                "org.datanucleus.store_valuegenerator", 
+                new String[] {"name", "unique"}, new String[] {strategyName, "true"},
+                "class-name", new Class[] {String.class, Properties.class}, new Object[] {null, null});
+            if (generator == null)
+            {
+                // b). Try as datastore-specific generator
+                generator = (AbstractGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
+                    "org.datanucleus.store_valuegenerator",
+                    new String[] {"name", "datastore"}, new String[] {strategyName, storeMgr.getStoreManagerKey()},
+                    "class-name", new Class[] {String.class, Properties.class}, new Object[] {null, null});
+            }
+        }
+        catch (Exception e)
+        {
+            
+        }
 
         return generator;
     }

@@ -388,7 +388,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     {
         if (valueGenerationMgr == null)
         {
-            this.valueGenerationMgr = new ValueGenerationManager();
+            this.valueGenerationMgr = new ValueGenerationManager(this);
         }
         return valueGenerationMgr;
     }
@@ -1004,7 +1004,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 }
 
                 // Create the new ValueGenerator since the first time required (registers it with the ValueGenerationManager too)
-                generator = valueGenerationMgr.createValueGenerator(generatorNameKeyInManager, cls, props, this, null);
+                generator = valueGenerationMgr.createValueGenerator(generatorNameKeyInManager, cls, props, null);
             }
         }
 
