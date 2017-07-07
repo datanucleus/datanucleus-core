@@ -27,20 +27,35 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
  * Manager for the creation of ValueGenerators.
- * Allows creation of generators and provides lookup by symbolic name.
+ * ValueGenerators are of two primary types.
+ * <ul>
+ * <li><b>unique</b> : apply to any datastore, and generate unique values. For example, UUID, which generates the values in Java space.</li>
+ * <li><b>datastore</b> : apply to a particular datastore, and member. For example, an RDBMS SEQUENCE.</li>
+ * </ul>
+ * Any unique generators are loaded at initialisation. Any datastore generators are loaded when required.
+ * All generators are cached once created, and can be looked up by the member "key" that they are for.
+ * 
+ * <h3>Member Key</h3>
+ * The member "key" is either the fully-qualified member name (e.g "mydomain.MyClass.myField") that is having its values generated, or
+ * is for a (surrogate) datastore id member (e.g "mydomain.MyClass (datastore-id)").
+ * All unique generators can also be looked up by the strategy name (since there is one instance of that generator per strategy.
  */
 public class ValueGenerationManager
 {
     protected final StoreManager storeMgr;
 
-    /** Map of ValueGenerator keyed by the symbolic name. */
-    protected Map<String, ValueGenerator> generatorsByName = new ConcurrentHashMap<>();
+    /** Map of ValueGenerators, keyed by the member key ("{class}.{field}", or "{class} + (datastore-id)"). */
+    protected Map<String, ValueGenerator> generatorsByMemberKey = new ConcurrentHashMap<>();
+
+    /** Map of "unique" ValueGenerators, keyed by their strategy name. */
+    protected Map<String, ValueGenerator> uniqueGeneratorsByName = new ConcurrentHashMap<>();
 
     /**
      * Constructor.
@@ -49,6 +64,49 @@ public class ValueGenerationManager
     public ValueGenerationManager(StoreManager storeMgr)
     {
         this.storeMgr = storeMgr;
+
+        // Load up all built-in generators
+        ValueGenerator generator = new TimestampGenerator("timestamp", null);
+        uniqueGeneratorsByName.put("timestamp", generator);
+
+        generator = new TimestampValueGenerator("timestamp-value", null);
+        uniqueGeneratorsByName.put("timestamp-value", generator);
+
+        generator = new AUIDGenerator("timestamp-value", null);
+        uniqueGeneratorsByName.put("auid", generator);
+
+        generator = new UUIDGenerator("uuid", null);
+        uniqueGeneratorsByName.put("uuid", generator);
+
+        generator = new UUIDObjectGenerator("uuid-object", null);
+        uniqueGeneratorsByName.put("uuid-object", generator);
+
+        generator = new UUIDHexGenerator("uuid-hex", null);
+        uniqueGeneratorsByName.put("uuid-hex", generator);
+
+        generator = new UUIDStringGenerator("uuid-string", null);
+        uniqueGeneratorsByName.put("uuid-string", generator);
+
+        // Load up any unique generators from the plugin mechanism
+        try
+        {
+            ConfigurationElement[] elems = storeMgr.getNucleusContext().getPluginManager().getConfigurationElementsForExtension("org.datanucleus.store_valuegenerator",
+                "unique", "true");
+            if (elems != null)
+            {
+                for (ConfigurationElement elem : elems)
+                {
+                    // Assumed to not take any properties
+                    generator = (ValueGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store_valuegenerator", 
+                        new String[] {"name", "unique"}, new String[] {elem.getName(), "true"},
+                        "class-name", new Class[] {String.class, Properties.class}, new Object[] {elem.getName(), null});
+                    uniqueGeneratorsByName.put(elem.getName(), generator);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+        }
     }
 
     /**
@@ -56,25 +114,104 @@ public class ValueGenerationManager
      */
     public void clear()
     {
-        generatorsByName.clear();
+        generatorsByMemberKey.clear();
+        uniqueGeneratorsByName.clear();
     }
 
     /**
-     * Accessor for the ValueGenerator with the given symbolic name.
-     * @param name Name of the ValueGenerator when created
-     * @return The ValueGenerator with this name
+     * Method to access the currently defined ValueGenerator for the specified member "key" (if any).
+     * @param memberKey The member "key"
+     * @return Its ValueGenerator
      */
-    public ValueGenerator getValueGenerator(String name)
+    public ValueGenerator getValueGeneratorForMemberKey(String memberKey)
     {
-        if (name == null)
+        return generatorsByMemberKey.get(memberKey);
+    }
+
+    /**
+     * Method to store a ValueGenerator for the specified member "key".
+     * @param memberKey The member "key"
+     * @param generator The ValueGenerator to use for that member key
+     */
+    public void registerValueGeneratorForMemberKey(String memberKey, ValueGenerator generator)
+    {
+        this.generatorsByMemberKey.put(memberKey, generator);
+    }
+
+    /**
+     * Accessor for the "unique" ValueGenerator for the specified name (if any).
+     * @param name The (strategy) name.
+     * @return The ValueGenerator for that name
+     */
+    public ValueGenerator getUniqueValueGeneratorByName(String name)
+    {
+        return uniqueGeneratorsByName.get(name);
+    }
+
+    /**
+     * Method to register a "unique" ValueGenerator for the specified (strategy) name.
+     * @param name The name
+     * @param generator The "unique" ValueGenerator
+     */
+    public void registerUniqueValueGeneratorForName(String name, ValueGenerator generator)
+    {
+        this.uniqueGeneratorsByName.put(name, generator);
+    }
+
+    /**
+     * Method to create a ValueGenerator that is "unique" for the StoreManager.
+     * @param strategyName Name of the strategy
+     * @param props Any properties controlling its behaviour
+     * @return The ValueGenerator
+     */
+    public ValueGenerator createUniqueValueGenerator(String strategyName, Properties props)
+    {
+        // Firstly try the built-in generators
+        if ("timestamp".equalsIgnoreCase(strategyName))
+        {
+            return new TimestampGenerator(strategyName, props);
+        }
+        else if ("timestamp-value".equalsIgnoreCase(strategyName))
+        {
+            return new TimestampValueGenerator(strategyName, props);
+        }
+        else if ("auid".equalsIgnoreCase(strategyName))
+        {
+            return new AUIDGenerator(strategyName, props);
+        }
+        else if ("uuid".equalsIgnoreCase(strategyName))
+        {
+            return new UUIDGenerator(strategyName, props);
+        }
+        else if ("uuid-object".equalsIgnoreCase(strategyName))
+        {
+            return new UUIDObjectGenerator(strategyName, props);
+        }
+        else if ("uuid-hex".equalsIgnoreCase(strategyName))
+        {
+            return new UUIDHexGenerator(strategyName, props);
+        }
+        else if ("uuid-string".equalsIgnoreCase(strategyName))
+        {
+            return new UUIDStringGenerator(strategyName, props);
+        }
+
+        // Fallback to the plugin mechanism
+        try
+        {
+            return (ValueGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store_valuegenerator", 
+                new String[] {"name", "unique"}, new String[] {strategyName, "true"},
+                "class-name", new Class[] {String.class, Properties.class}, new Object[] {null, null});
+        }
+        catch (Exception e)
         {
             return null;
         }
-        return generatorsByName.get(name);
     }
 
     /**
      * Method to create a ValueGenerator when the generator is datastore based.
+     * This is used solely by the NucleusSequence API to create a generator, but not to register it here for further use.
      * @param name Symbolic name of the generator
      * @param generatorClass Class for the generator type
      * @param props Properties to control the generator
@@ -107,38 +244,6 @@ public class ValueGenerationManager
             // Set the store manager and connection provider for any datastore-based generators
             ((AbstractDatastoreGenerator)generator).setStoreManager(storeMgr);
             ((AbstractDatastoreGenerator)generator).setConnectionProvider(connectionProvider);
-        }
-
-        // Store the generator
-        generatorsByName.put(name, generator);
-
-        return generator;
-    }
-
-    public ValueGenerator createValueGenerator(String strategyName)
-    {
-        ValueGenerator generator = null;
-
-        // Create generator so we can find the generated type
-        // a). Try as unique generator first
-        try
-        {
-            generator = (ValueGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
-                "org.datanucleus.store_valuegenerator", 
-                new String[] {"name", "unique"}, new String[] {strategyName, "true"},
-                "class-name", new Class[] {String.class, Properties.class}, new Object[] {null, null});
-            if (generator == null)
-            {
-                // b). Try as datastore-specific generator
-                generator = (AbstractGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
-                    "org.datanucleus.store_valuegenerator",
-                    new String[] {"name", "datastore"}, new String[] {strategyName, storeMgr.getStoreManagerKey()},
-                    "class-name", new Class[] {String.class, Properties.class}, new Object[] {null, null});
-            }
-        }
-        catch (Exception e)
-        {
-            
         }
 
         return generator;

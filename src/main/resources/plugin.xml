@@ -51,17 +51,6 @@ Contributors:
     <extension-point id="member_annotation_handler" name="Member Annotation Handler" schema="schema/member_annotation_handler.exsd"/>
     <extension-point id="identifier_namingfactory" name="Identifier NamingFactory" schema="schema/identifier_namingfactory.exsd"/>
 
-    <!-- VALUE GENERATORS -->
-    <extension point="org.datanucleus.store_valuegenerator">
-        <valuegenerator name="timestamp" class-name="org.datanucleus.store.valuegenerator.TimestampGenerator" unique="true"/>
-        <valuegenerator name="timestamp-value" class-name="org.datanucleus.store.valuegenerator.TimestampValueGenerator" unique="true"/>
-        <valuegenerator name="auid" class-name="org.datanucleus.store.valuegenerator.AUIDGenerator" unique="true"/>
-        <valuegenerator name="uuid-hex" class-name="org.datanucleus.store.valuegenerator.UUIDHexGenerator" unique="true"/>
-        <valuegenerator name="uuid-string" class-name="org.datanucleus.store.valuegenerator.UUIDStringGenerator" unique="true"/>
-        <valuegenerator name="uuid" class-name="org.datanucleus.store.valuegenerator.UUIDGenerator" unique="true"/>
-        <valuegenerator name="uuid-object" class-name="org.datanucleus.store.valuegenerator.UUIDObjectGenerator" unique="true"/>
-    </extension>
-
     <!-- QUERY METHODS (IN-MEMORY) -->
     <extension point="org.datanucleus.query_method_evaluators">
         <query-method-evaluator method="Math.abs" evaluator="org.datanucleus.query.inmemory.method.AbsFunction"/>

@@ -68,6 +68,7 @@ import org.datanucleus.store.schema.naming.JPANamingFactory;
 import org.datanucleus.store.schema.naming.NamingCase;
 import org.datanucleus.store.schema.naming.NamingFactory;
 import org.datanucleus.store.valuegenerator.AbstractDatastoreGenerator;
+import org.datanucleus.store.valuegenerator.AbstractGenerator;
 import org.datanucleus.store.valuegenerator.ValueGenerationConnectionProvider;
 import org.datanucleus.store.valuegenerator.ValueGenerationManager;
 import org.datanucleus.store.valuegenerator.ValueGenerator;
@@ -99,7 +100,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     protected PersistenceNucleusContext nucleusContext;
 
     /** Manager for value generation. Lazy initialised, so use getValueGenerationManager() to access. */
-    protected ValueGenerationManager valueGenerationMgr;
+    protected ValueGenerationManager valueGenerationMgr = new ValueGenerationManager(this);
 
     /** Manager for the data definition in the datastore. */
     protected StoreDataManager storeDataMgr = new StoreDataManager();
@@ -174,11 +175,8 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         connectionMgr.close();
         connectionMgr = null;
 
-        if (valueGenerationMgr != null)
-        {
-            valueGenerationMgr.clear();
-            valueGenerationMgr = null;
-        }
+        valueGenerationMgr.clear();
+        valueGenerationMgr = null;
 
         storeDataMgr.clear();
         storeDataMgr = null;
@@ -386,10 +384,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      */
     public ValueGenerationManager getValueGenerationManager()
     {
-        if (valueGenerationMgr == null)
-        {
-            this.valueGenerationMgr = new ValueGenerationManager(this);
-        }
         return valueGenerationMgr;
     }
 
@@ -747,6 +741,19 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      */
     public boolean supportsValueGenerationStrategy(String strategy)
     {
+        if (StringUtils.isWhitespace(strategy))
+        {
+            return false;
+        }
+
+        // Built-in unique ValueGenerators
+        if ("timestamp".equalsIgnoreCase(strategy) || "timestamp-value".equalsIgnoreCase(strategy) || "auid".equalsIgnoreCase(strategy) ||
+            "uuid".equalsIgnoreCase(strategy) || "uuid-object".equalsIgnoreCase(strategy) || "uuid-hex".equalsIgnoreCase(strategy) || "uuid-string".equalsIgnoreCase(strategy))
+        {
+            return true;
+        }
+
+        // Try plugin mechanism "unique" generators
         ConfigurationElement elem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
             new String[]{"name", "unique"}, new String[] {strategy, "true"});
         if (elem != null)
@@ -755,12 +762,14 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             return true;
         }
 
+        // Try plugin mechanism "datastore" (non-unique) generators
         elem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
             new String[]{"name", "datastore"}, new String[] {strategy, storeManagerKey});
         if (elem != null)
         {
             return true;
         }
+
         return false;
     }
 
@@ -866,150 +875,33 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#getStrategyValue(org.datanucleus.ExecutionContext, org.datanucleus.metadata.AbstractClassMetaData, int)
+     * @see org.datanucleus.store.StoreManager#getStrategyValue(org.datanucleus.ClassLoaderResolver, org.datanucleus.metadata.AbstractClassMetaData, int)
      */
     public Object getValueGenerationStrategyValue(ExecutionContext ec, AbstractClassMetaData cmd, int absoluteFieldNumber)
     {
-        // Extract the control information for this field that needs its value
+        // Get the ValueGenerator for this member
+        ValueGenerator generator = getValueGeneratorForMember(ec.getClassLoaderResolver(), cmd, absoluteFieldNumber);
+
+        // Get the next value from the ValueGenerator
+        Object oid = getStrategyValueForGenerator(generator, ec);
+
+        // Do any necessary conversion of the value to the precise member type
         AbstractMemberMetaData mmd = null;
         String fieldName = null;
         IdentityStrategy strategy = null;
-        String sequence = null;
-        String valueGeneratorName = null;
-        TableGeneratorMetaData tableGeneratorMetaData = null;
-        SequenceMetaData sequenceMetaData = null;
         if (absoluteFieldNumber >= 0)
         {
             // real field
             mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(absoluteFieldNumber);
             fieldName = mmd.getFullFieldName();
             strategy = mmd.getValueStrategy();
-            sequence = mmd.getSequence();
-            valueGeneratorName = mmd.getValueGeneratorName();
         }
         else
         {
             // datastore-identity surrogate field
             fieldName = cmd.getFullClassName() + " (datastore id)";
             strategy = cmd.getIdentityMetaData().getValueStrategy();
-            sequence = cmd.getIdentityMetaData().getSequence();
-            valueGeneratorName = cmd.getIdentityMetaData().getValueGeneratorName();
         }
-
-        String strategyName = strategy.toString();
-        if (strategy.equals(IdentityStrategy.CUSTOM))
-        {
-            // Using a "custom" generator
-            strategyName = strategy.getCustomName();
-        }
-        else if (strategy.equals(IdentityStrategy.NATIVE))
-        {
-            strategyName = getStrategyForNative(cmd, absoluteFieldNumber);
-            strategy = IdentityStrategy.getIdentityStrategy(strategyName);
-        }
-
-        // Extract any metadata-based generation information
-        if (valueGeneratorName != null)
-        {
-            if (strategy == IdentityStrategy.INCREMENT)
-            {
-                tableGeneratorMetaData = getMetaDataManager().getMetaDataForTableGenerator(ec.getClassLoaderResolver(), valueGeneratorName);
-                if (tableGeneratorMetaData == null)
-                {
-                    throw new NucleusUserException(Localiser.msg("038005", fieldName, valueGeneratorName));
-                }
-            }
-            else if (strategy == IdentityStrategy.SEQUENCE)
-            {
-                sequenceMetaData = getMetaDataManager().getMetaDataForSequence(ec.getClassLoaderResolver(), valueGeneratorName);
-                if (sequenceMetaData == null)
-                {
-                    throw new NucleusUserException(Localiser.msg("038006", fieldName, valueGeneratorName));
-                }
-            }
-        }
-        else if (strategy == IdentityStrategy.SEQUENCE && sequence != null)
-        {
-            // TODO Allow for package name of this class prefix for the sequence name
-            sequenceMetaData = getMetaDataManager().getMetaDataForSequence(ec.getClassLoaderResolver(), sequence);
-            if (sequenceMetaData == null)
-            {
-                // No <sequence> defining the datastore sequence name, so fallback to this name directly in the datastore
-                NucleusLogger.VALUEGENERATION.info("Member " + fieldName + " has been specified to use sequence '" + sequence +
-                    "' but there is no <sequence> specified in the MetaData. Falling back to use a sequence in the datastore with this name directly.");
-            }
-        }
-
-        // Value Generators are cached against a name. Some Value Generators are unique per datastore.
-        // Others are per class/field. Others have a user-defined name.
-        // The name that they are cached under relates to what they use.
-        // Generate the name for ValueGenerationManager to use the strategy for this field/class.
-        String generatorName = null;
-        String generatorNameKeyInManager = null;
-        ConfigurationElement elem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
-            new String[]{"name", "unique"}, new String[] {strategyName, "true"});
-        if (elem != null)
-        {
-            // Unique value generator so set the key in ValueGenerationManager to the value generator name itself
-            generatorName = elem.getAttribute("name");
-            generatorNameKeyInManager = generatorName;
-        }
-        else
-        {
-            // Not a unique (datastore-independent) generator so try just for this datastore
-            elem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator", 
-                new String[]{"name", "datastore"}, new String[] {strategyName, storeManagerKey});
-            if (elem != null)
-            {
-                // Set the generator name (for use by the ValueGenerationManager)
-                generatorName = elem.getAttribute("name");
-            }
-        }
-        if (generatorNameKeyInManager == null)
-        {
-            // Value generator is not unique so set based on class/field
-            if (absoluteFieldNumber >= 0)
-            {
-                // Require generation for a field so use field name for the generator symbolic name
-                generatorNameKeyInManager = mmd.getFullFieldName();
-            }
-            else
-            {
-                // Require generation for a datastore id field so use the base class name for generator symbolic name
-                generatorNameKeyInManager = cmd.getBaseAbstractClassMetaData().getFullClassName();
-            }
-        }
-
-        // Try to find the generator from the ValueGenerationManager if we already have it managed
-        ValueGenerator generator = getValueGenerationManager().getValueGenerator(generatorNameKeyInManager);
-        if (generator == null)
-        {
-            if (generatorName == null)
-            {
-                // No available value-generator for the specified strategy for this datastore
-                throw new NucleusUserException(Localiser.msg("038004", strategy));
-            }
-
-            // This block is synchronised since we don't want to let any other thread through until
-            // the generator is created, in case it is the same as the next request
-            synchronized (valueGenerationMgr)
-            {
-                // Set up the default properties available for all value generators
-                Properties props = getPropertiesForGenerator(cmd, absoluteFieldNumber, ec, sequenceMetaData, tableGeneratorMetaData);
-
-                Class cls = (elem != null) ? nucleusContext.getPluginManager().loadClass(elem.getExtension().getPlugin().getSymbolicName(), elem.getAttribute("class-name")) : null;
-                if (cls == null)
-                {
-                    throw new NucleusException("Cannot create Value Generator for strategy " + generatorName);
-                }
-
-                // Create the new ValueGenerator since the first time required (registers it with the ValueGenerationManager too)
-                generator = valueGenerationMgr.createValueGenerator(generatorNameKeyInManager, cls, props, null);
-            }
-        }
-
-        // Get the next value from the generator
-        Object oid = getStrategyValueForGenerator(generator, ec);
 
         if (mmd != null)
         {
@@ -1036,6 +928,138 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
 
         return oid;
+    }
+
+    public ValueGenerator getValueGeneratorForMember(ClassLoaderResolver clr, AbstractClassMetaData cmd, int absoluteFieldNumber)
+    {
+        // Extract the control information for this field that needs its value
+        AbstractMemberMetaData mmd = null;
+        String fieldName = null;
+        IdentityStrategy strategy = null;
+        String sequence = null;
+        String valueGeneratorName = null;
+        if (absoluteFieldNumber >= 0)
+        {
+            // real field
+            mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(absoluteFieldNumber);
+            fieldName = mmd.getFullFieldName();
+            strategy = mmd.getValueStrategy();
+            sequence = mmd.getSequence();
+            valueGeneratorName = mmd.getValueGeneratorName();
+        }
+        else
+        {
+            // datastore-identity surrogate field
+            fieldName = cmd.getFullClassName() + " (datastore id)";
+            strategy = cmd.getIdentityMetaData().getValueStrategy();
+            sequence = cmd.getIdentityMetaData().getSequence();
+            valueGeneratorName = cmd.getIdentityMetaData().getValueGeneratorName();
+        }
+
+        // Check if we have a ValueGenerator already created for this member
+        ValueGenerator generator = valueGenerationMgr.getValueGeneratorForMemberKey(fieldName);
+        if (generator != null)
+        {
+            // Return the ValueGenerator already registered against this member "key"
+            return generator;
+        }
+
+        // No ValueGenerator, so need to determine which to use and create it as required.
+        String strategyName = strategy.toString();
+        if (strategy.equals(IdentityStrategy.CUSTOM))
+        {
+            // Using a "custom" generator
+            strategyName = strategy.getCustomName();
+        }
+        else if (strategy.equals(IdentityStrategy.NATIVE))
+        {
+            strategyName = getStrategyForNative(cmd, absoluteFieldNumber);
+            strategy = IdentityStrategy.getIdentityStrategy(strategyName);
+        }
+
+        // Extract any metadata-based generation information keyed by the "valueGeneratorName"
+        TableGeneratorMetaData tableGeneratorMetaData = null;
+        SequenceMetaData sequenceMetaData = null;
+        if (valueGeneratorName != null)
+        {
+            if (strategy == IdentityStrategy.INCREMENT)
+            {
+                tableGeneratorMetaData = getMetaDataManager().getMetaDataForTableGenerator(clr, valueGeneratorName);
+                if (tableGeneratorMetaData == null)
+                {
+                    throw new NucleusUserException(Localiser.msg("038005", fieldName, valueGeneratorName));
+                }
+            }
+            else if (strategy == IdentityStrategy.SEQUENCE)
+            {
+                sequenceMetaData = getMetaDataManager().getMetaDataForSequence(clr, valueGeneratorName);
+                if (sequenceMetaData == null)
+                {
+                    throw new NucleusUserException(Localiser.msg("038006", fieldName, valueGeneratorName));
+                }
+            }
+        }
+        else if (strategy == IdentityStrategy.SEQUENCE && sequence != null)
+        {
+            // TODO Allow for package name of this class prefix for the sequence name
+            sequenceMetaData = getMetaDataManager().getMetaDataForSequence(clr, sequence);
+            if (sequenceMetaData == null)
+            {
+                // No <sequence> defining the datastore sequence name, so fallback to this name directly in the datastore
+                NucleusLogger.VALUEGENERATION.info("Member " + fieldName + " has been specified to use sequence '" + sequence +
+                    "' but there is no <sequence> specified in the MetaData. Falling back to use a sequence in the datastore with this name directly.");
+            }
+        }
+
+        // Set up the default properties available for all value generators
+        Properties props = getPropertiesForGenerator(cmd, absoluteFieldNumber, clr, sequenceMetaData, tableGeneratorMetaData);
+
+        // Check for this strategy being a "unique" ValueGenerator, and created if not yet present
+        generator = valueGenerationMgr.getUniqueValueGeneratorByName(strategyName);
+        if (generator != null)
+        {
+            // "unique" ValueGenerator already defined for this strategy, so register it against the member
+            valueGenerationMgr.registerValueGeneratorForMemberKey(fieldName, generator);
+            return generator;
+        }
+
+        // Try to create a "unique" generator in case not yet created
+        generator = valueGenerationMgr.createUniqueValueGenerator(strategyName, props);
+        if (generator != null)
+        {
+            valueGenerationMgr.registerUniqueValueGeneratorForName(strategyName, generator);
+
+            // "unique" ValueGenerator now created for this strategy, so register it against the member
+            valueGenerationMgr.registerValueGeneratorForMemberKey(fieldName, generator);
+            return generator;
+        }
+
+        // Must be "datastore" specific generator so use plugin mechanism to create one
+        synchronized (valueGenerationMgr)
+        {
+            try
+            {
+                generator = (AbstractGenerator)nucleusContext.getPluginManager().createExecutableExtension(
+                    "org.datanucleus.store_valuegenerator",
+                    new String[] {"name", "datastore"}, new String[] {strategyName, getStoreManagerKey()},
+                    "class-name", new Class[] {String.class, Properties.class}, new Object[] {fieldName, props});
+
+                if (generator instanceof AbstractDatastoreGenerator)
+                {
+                    // Set the store manager and connection provider for any datastore-based generators
+                    ((AbstractDatastoreGenerator)generator).setStoreManager(this);
+                    ((AbstractDatastoreGenerator)generator).setConnectionProvider(null);
+                }
+            }
+            catch (Exception e)
+            {
+            }
+
+            // Register the generator against this member
+            valueGenerationMgr.registerValueGeneratorForMemberKey(fieldName, generator);
+        }
+
+        return generator;
     }
 
     /**
@@ -1155,12 +1179,12 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      * In addition any extension properties on the respective field or datastore-identity are also passed through as properties.
      * @param cmd MetaData for the class
      * @param absoluteFieldNumber Number of the field (-1 = datastore identity)
-     * @param ec execution context
+     * @param clr ClassLoader resolver
      * @param seqmd Any sequence metadata
      * @param tablegenmd Any table generator metadata
      * @return The properties to use for this field
      */
-    protected Properties getPropertiesForGenerator(AbstractClassMetaData cmd, int absoluteFieldNumber, ExecutionContext ec, SequenceMetaData seqmd, TableGeneratorMetaData tablegenmd)
+    protected Properties getPropertiesForGenerator(AbstractClassMetaData cmd, int absoluteFieldNumber, ClassLoaderResolver clr, SequenceMetaData seqmd, TableGeneratorMetaData tablegenmd)
     {
         // Set up the default properties available for all value generators
         Properties properties = new Properties();
