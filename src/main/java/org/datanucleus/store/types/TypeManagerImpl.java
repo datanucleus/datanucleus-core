@@ -19,16 +19,56 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types;
 
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.MonthDay;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.Period;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Currency;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.PriorityQueue;
+import java.util.Properties;
+import java.util.Queue;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.Stack;
+import java.util.TimeZone;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -37,6 +77,22 @@ import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.PluginManager;
+import org.datanucleus.store.types.containers.ArrayHandler;
+import org.datanucleus.store.types.containers.ArrayListHandler;
+import org.datanucleus.store.types.containers.HashMapHandler;
+import org.datanucleus.store.types.containers.HashSetHandler;
+import org.datanucleus.store.types.containers.HashtableHandler;
+import org.datanucleus.store.types.containers.JDKCollectionHandler;
+import org.datanucleus.store.types.containers.LinkedHashMapHandler;
+import org.datanucleus.store.types.containers.LinkedHashSetHandler;
+import org.datanucleus.store.types.containers.LinkedListHandler;
+import org.datanucleus.store.types.containers.OptionalHandler;
+import org.datanucleus.store.types.containers.PriorityQueueHandler;
+import org.datanucleus.store.types.containers.PropertiesHandler;
+import org.datanucleus.store.types.containers.StackHandler;
+import org.datanucleus.store.types.containers.TreeMapHandler;
+import org.datanucleus.store.types.containers.TreeSetHandler;
+import org.datanucleus.store.types.containers.VectorHandler;
 import org.datanucleus.store.types.converters.ClassStringConverter;
 import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.util.ClassUtils;
@@ -735,7 +791,8 @@ public class TypeManagerImpl implements TypeManager, Serializable
     }
 
     /**
-     * Method to load the java type that are currently registered in the PluginManager.
+     * Method to load the java types that we support out of the box.
+     * This includes all built-in types, as well as all types registered via the plugin mechanism.
      * @param mgr the PluginManager
      */
     private void loadJavaTypes(PluginManager mgr)
@@ -744,7 +801,150 @@ public class TypeManagerImpl implements TypeManager, Serializable
         {
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("016003"));
         }
+
         ClassLoaderResolver clr = getClassLoaderResolver();
+
+        // Load up built-in types
+        addJavaType(boolean.class, null, true, true, null, null, null, null);
+        addJavaType(byte.class, null, true, true, null, null, null, null);
+        addJavaType(char.class, null, true, true, null, null, null, null);
+        addJavaType(double.class, null, true, true, null, null, null, null);
+        addJavaType(float.class, null, true, true, null, null, null, null);
+        addJavaType(int.class, null, true, true, null, null, null, null);
+        addJavaType(long.class, null, true, true, null, null, null, null);
+        addJavaType(short.class, null, true, true, null, null, null, null);
+
+        addJavaType(Boolean.class, null, true, true, null, null, null, null);
+        addJavaType(Byte.class, null, true, true, null, null, null, null);
+        addJavaType(Character.class, null, true, true, null, null, null, null);
+        addJavaType(Double.class, null, true, true, null, null, null, null);
+        addJavaType(Float.class, null, true, true, null, null, null, null);
+        addJavaType(Integer.class, null, true, true, null, null, null, null);
+        addJavaType(Long.class, null, true, true, null, null, null, null);
+        addJavaType(Short.class, null, true, true, null, null, null, null);
+
+        addJavaType(Number.class, null, true, true, null, null, null, null);
+        addJavaType(String.class, null, true, true, null, null, null, null);
+        addJavaType(Enum.class, null, true, true, null, null, null, null);
+        addJavaType(StringBuffer.class, null, true, true, null, null, null, "dn.stringbuffer-string");
+        addJavaType(StringBuilder.class, null, true, true, null, null, null, "dn.stringbuilder-string");
+        addJavaType(Class.class, null, true, true, null, null, null, "dn.class-string");
+
+        // java.awt
+        addJavaType(java.awt.image.BufferedImage.class, null, true, false, null, null, null, "dn.bufferedimage-bytearray");
+        addJavaType(java.awt.Color.class, null, true, true, null, null, null, "dn.color-string");
+
+        addJavaType(java.math.BigDecimal.class, null, true, true, null, null, null, null);
+        addJavaType(java.math.BigInteger.class, null, true, true, null, null, null, null);
+
+        // java.net
+        addJavaType(java.net.URL.class, null, true, true, null, null, null, "dn.url-string");
+        addJavaType(java.net.URI.class, null, true, true, null, null, null, "dn.uri-string");
+
+        // date/time/java.time
+        addJavaType(java.sql.Date.class, null, true, true, org.datanucleus.store.types.wrappers.SqlDate.class, null, null, null);
+        addJavaType(java.sql.Time.class, null, true, true, org.datanucleus.store.types.wrappers.SqlTime.class, null, null, null);
+        addJavaType(java.sql.Timestamp.class, null, true, true, org.datanucleus.store.types.wrappers.SqlTimestamp.class, null, null, null);
+        addJavaType(java.util.Date.class, null, true, true, org.datanucleus.store.types.wrappers.Date.class, null, null, null);
+        addJavaType(java.time.LocalDate.class, null, true, true, null, null, null, "dn.localdate-sqldate");
+        addJavaType(java.time.LocalDateTime.class, null, true, true, null, null, null, "dn.localdatetime-timestamp");
+        addJavaType(java.time.LocalTime.class, null, true, true, null, null, null, "dn.localtime-sqltime");
+        addJavaType(java.time.OffsetTime.class, null, true, true, null, null, null, "dn.offsettime-sqltime");
+        addJavaType(java.time.OffsetDateTime.class, null, true, true, null, null, null, "dn.offsetdatetime-timestamp");
+        addJavaType(java.time.Duration.class, null, true, true, null, null, null, "dn.duration-long");
+        addJavaType(java.time.Instant.class, null, true, true, null, null, null, "dn.instant-timestamp");
+        addJavaType(java.time.Period.class, null, true, true, null, null, null, "dn.period-string");
+        addJavaType(java.time.Year.class, null, true, true, null, null, null, "dn.year-integer");
+        addJavaType(java.time.YearMonth.class, null, true, true, null, null, null, "dn.yearmonth-string");
+        addJavaType(java.time.Month.class, null, true, true, null, null, null, "dn.monthday-string");
+        addJavaType(java.time.ZoneId.class, null, true, true, null, null, null, "dn.zoneid-string");
+        addJavaType(java.time.ZoneOffset.class, null, true, true, null, null, null, "dn.zoneoffset-string");
+        addJavaType(java.time.ZonedDateTime.class, null, true, true, null, null, null, "dn.zoneddatetime-timestamp");
+
+        // java.util
+        addJavaType(Locale.class, null, true, true, null, null, null, "dn.locale-string");
+        addJavaType(Currency.class, null, true, true, null, null, null, "dn.currency-string");
+        addJavaType(Calendar.class, null, true, true, org.datanucleus.store.types.wrappers.GregorianCalendar.class, null, null, "dn.calendar-string");
+        addJavaType(GregorianCalendar.class, null, true, true, org.datanucleus.store.types.wrappers.GregorianCalendar.class, null, null, "dn.calendar-string");
+        addJavaType(UUID.class, null, true, true, null, null, null, "dn.uuid-string");
+        addJavaType(TimeZone.class, null, true, true, null, null, null, "dn.timezone-string");
+
+        addJavaType(ArrayList.class, null, false, false, org.datanucleus.store.types.wrappers.ArrayList.class, 
+            org.datanucleus.store.types.wrappers.backed.ArrayList.class, ArrayListHandler.class, null);
+
+        String arrayListInnerType = "java.util.Arrays$ArrayList";
+        Class arrayListInnerTypeCls = clr.classForName(arrayListInnerType);
+        addJavaType(arrayListInnerTypeCls, null, false, false, org.datanucleus.store.types.wrappers.List.class, org.datanucleus.store.types.wrappers.backed.List.class,
+            org.datanucleus.store.types.containers.ArrayListHandler.class, null);
+
+        addJavaType(BitSet.class, null, true, true, org.datanucleus.store.types.wrappers.BitSet.class, null, null, "dn.bitset-string");
+        addJavaType(Collection.class, null, false, false, org.datanucleus.store.types.wrappers.Collection.class, org.datanucleus.store.types.wrappers.backed.Collection.class, 
+            JDKCollectionHandler.class, null);
+        addJavaType(HashMap.class, null, false, false, org.datanucleus.store.types.wrappers.HashMap.class, org.datanucleus.store.types.wrappers.backed.HashMap.class,
+            HashMapHandler.class, null);
+        addJavaType(HashSet.class, null, false, false, org.datanucleus.store.types.wrappers.HashSet.class, org.datanucleus.store.types.wrappers.backed.HashSet.class,
+            HashSetHandler.class, null);
+        addJavaType(Hashtable.class, null, false, false, org.datanucleus.store.types.wrappers.Hashtable.class, org.datanucleus.store.types.wrappers.backed.Hashtable.class,
+            HashtableHandler.class, null);
+        addJavaType(LinkedHashMap.class, null, false, false, org.datanucleus.store.types.wrappers.LinkedHashMap.class, org.datanucleus.store.types.wrappers.backed.LinkedHashMap.class,
+            LinkedHashMapHandler.class, null);
+        addJavaType(LinkedHashSet.class, null, false, false, org.datanucleus.store.types.wrappers.LinkedHashSet.class, org.datanucleus.store.types.wrappers.backed.LinkedHashSet.class,
+            LinkedHashSetHandler.class, null);
+        addJavaType(LinkedList.class, null, false, false, org.datanucleus.store.types.wrappers.LinkedList.class, org.datanucleus.store.types.wrappers.backed.LinkedList.class,
+            LinkedListHandler.class, null);
+        addJavaType(List.class, null, false, false, org.datanucleus.store.types.wrappers.List.class, org.datanucleus.store.types.wrappers.backed.List.class,
+            ArrayListHandler.class, null);
+        addJavaType(Map.class, null, false, false, org.datanucleus.store.types.wrappers.Map.class, org.datanucleus.store.types.wrappers.backed.Map.class,
+            HashMapHandler.class, null);
+        addJavaType(PriorityQueue.class, null, false, false, org.datanucleus.store.types.wrappers.PriorityQueue.class, org.datanucleus.store.types.wrappers.backed.PriorityQueue.class,
+            PriorityQueueHandler.class, null);
+        addJavaType(Properties.class, null, false, false, org.datanucleus.store.types.wrappers.Properties.class, org.datanucleus.store.types.wrappers.backed.Properties.class,
+            PropertiesHandler.class, null);
+        addJavaType(Queue.class, null, false, false, org.datanucleus.store.types.wrappers.Queue.class, org.datanucleus.store.types.wrappers.backed.Queue.class,
+            PriorityQueueHandler.class, null);
+        addJavaType(Set.class, null, false, false, org.datanucleus.store.types.wrappers.Set.class, org.datanucleus.store.types.wrappers.backed.Set.class,
+            HashSetHandler.class, null);
+        addJavaType(SortedMap.class, null, false, false, org.datanucleus.store.types.wrappers.SortedMap.class, org.datanucleus.store.types.wrappers.backed.SortedMap.class,
+            TreeMapHandler.class, null);
+        addJavaType(SortedSet.class, null, false, false, org.datanucleus.store.types.wrappers.SortedSet.class, org.datanucleus.store.types.wrappers.backed.SortedSet.class,
+            TreeSetHandler.class, null);
+        addJavaType(Stack.class, null, false, false, org.datanucleus.store.types.wrappers.Stack.class, org.datanucleus.store.types.wrappers.backed.Stack.class,
+            StackHandler.class, null);
+        addJavaType(TreeMap.class, null, false, false, org.datanucleus.store.types.wrappers.TreeMap.class, org.datanucleus.store.types.wrappers.backed.TreeMap.class,
+            TreeMapHandler.class, null);
+        addJavaType(TreeSet.class, null, false, false, org.datanucleus.store.types.wrappers.TreeSet.class, org.datanucleus.store.types.wrappers.backed.TreeSet.class,
+            TreeSetHandler.class, null);
+        addJavaType(Vector.class, null, false, false, org.datanucleus.store.types.wrappers.Vector.class, org.datanucleus.store.types.wrappers.backed.Vector.class,
+            VectorHandler.class, null);
+        addJavaType(Optional.class, null, false, false, null, null, OptionalHandler.class, null);
+
+        // arrays
+        addJavaType(boolean[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(byte[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(char[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(double[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(float[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(int[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(long[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(short[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(Boolean[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(Byte[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(Character[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(Double[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(Float[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(Integer[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(Long[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(Short[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(Number[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(String[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(BigDecimal[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(BigInteger[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(java.util.Date[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(java.util.Locale[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(Enum[].class, null, true, false, null, null, ArrayHandler.class, null);
+        addJavaType(Object[].class, null, true, false, null, null, ArrayHandler.class, null);
+
+        // Add on any plugin mechanism types
         ConfigurationElement[] elems = mgr.getConfigurationElementsForExtension("org.datanucleus.java_type", null, null);
         if (elems != null)
         {
@@ -839,7 +1039,18 @@ public class TypeManagerImpl implements TypeManager, Serializable
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("016006", StringUtils.collectionToString(typesList)));
         }
     }
-    
+
+    private void addJavaType(Class cls, Class genericType, boolean embedded, boolean dfg, Class wrapperType, Class wrapperTypeBacked, Class containerHandlerType, String typeConverterName)
+    {
+        String typeName = cls.getName();
+        if (genericType != null)
+        {
+            // "Collection<String>"
+            typeName += "<" + genericType.getName() + ">";
+        }
+        javaTypes.put(typeName, new JavaType(cls, genericType, embedded, dfg, wrapperType, wrapperTypeBacked, containerHandlerType, typeConverterName));
+    }
+
     private Class loadClass(PluginManager mgr, ConfigurationElement[] elems, int i, String className, String messageKey)
     {
         Class result = null;
@@ -871,6 +1082,118 @@ public class TypeManagerImpl implements TypeManager, Serializable
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("016007"));
         }
 
+        // Load up built-in converters
+        registerConverter("dn.boolean-yn", new org.datanucleus.store.types.converters.BooleanYNConverter(), Boolean.class, Character.class, false, null);
+        registerConverter("dn.boolean-integer", new org.datanucleus.store.types.converters.BooleanIntegerConverter(), Boolean.class, Integer.class, false, null);
+        registerConverter("dn.character-string", new org.datanucleus.store.types.converters.CharacterStringConverter(), Character.class, String.class, false, null);
+        registerConverter("dn.bigdecimal-string", new org.datanucleus.store.types.converters.BigDecimalStringConverter(), BigDecimal.class, String.class, false, null);
+        registerConverter("dn.bigdecimal-double", new org.datanucleus.store.types.converters.BigDecimalDoubleConverter(), BigDecimal.class, Double.class, false, null);
+        registerConverter("dn.biginteger-string", new org.datanucleus.store.types.converters.BigIntegerStringConverter(), BigInteger.class, String.class, false, null);
+        registerConverter("dn.biginteger-long", new org.datanucleus.store.types.converters.BigIntegerLongConverter(), BigInteger.class, Long.class, false, null);
+        registerConverter("dn.bitset-string", new org.datanucleus.store.types.converters.BitSetStringConverter(), BitSet.class, String.class, false, null);
+
+        registerConverter("dn.bufferedimage-bytearray", new org.datanucleus.store.types.converters.BufferedImageByteArrayConverter(), BufferedImage.class, byte[].class, false, null);
+        registerConverter("dn.bufferedimage-bytebuffer", new org.datanucleus.store.types.converters.BufferedImageByteBufferConverter(), BufferedImage.class, ByteBuffer.class, false, null);
+
+        registerConverter("dn.calendar-string", new org.datanucleus.store.types.converters.CalendarStringConverter(), Calendar.class, String.class, false, null);
+        registerConverter("dn.calendar-date", new org.datanucleus.store.types.converters.CalendarDateConverter(), Calendar.class, java.util.Date.class, false, null);
+        registerConverter("dn.calendar-timestamp", new org.datanucleus.store.types.converters.CalendarTimestampConverter(), Calendar.class, java.sql.Timestamp.class, false, null);
+        registerConverter("dn.calendar-components", new org.datanucleus.store.types.converters.CalendarComponentsConverter(), Calendar.class, Object[].class, false, null);
+
+        registerConverter("dn.color-string", new org.datanucleus.store.types.converters.ColorStringConverter(), java.awt.Color.class, String.class, false, null);
+        registerConverter("dn.color-components", new org.datanucleus.store.types.converters.ColorComponentsConverter(), java.awt.Color.class, int[].class, false, null);
+
+        registerConverter("dn.class-string", new org.datanucleus.store.types.converters.ClassStringConverter(), Class.class, String.class, false, null);
+        registerConverter("dn.integer-string", new org.datanucleus.store.types.converters.IntegerStringConverter(), Integer.class, String.class, false, null);
+        registerConverter("dn.long-string", new org.datanucleus.store.types.converters.LongStringConverter(), Long.class, String.class, false, null);
+        registerConverter("dn.currency-string", new org.datanucleus.store.types.converters.CurrencyStringConverter(), Currency.class, String.class, false, null);
+        registerConverter("dn.locale-string", new org.datanucleus.store.types.converters.LocaleStringConverter(), Locale.class, String.class, false, null);
+        registerConverter("dn.stringbuffer-string", new org.datanucleus.store.types.converters.StringBufferStringConverter(), StringBuffer.class, String.class, false, null);
+        registerConverter("dn.stringbuilder-string", new org.datanucleus.store.types.converters.StringBuilderStringConverter(), StringBuilder.class, String.class, false, null);
+        registerConverter("dn.timezone-string", new org.datanucleus.store.types.converters.TimeZoneStringConverter(), TimeZone.class, String.class, false, null);
+        registerConverter("dn.uri-string", new org.datanucleus.store.types.converters.URIStringConverter(), java.net.URI.class, String.class, false, null);
+        registerConverter("dn.url-string", new org.datanucleus.store.types.converters.URLStringConverter(), java.net.URL.class, String.class, false, null);
+        registerConverter("dn.uuid-string", new org.datanucleus.store.types.converters.UUIDStringConverter(), UUID.class, String.class, false, null);
+
+        registerConverter("dn.date-long", new org.datanucleus.store.types.converters.DateLongConverter(), java.util.Date.class, Long.class, false, null);
+        registerConverter("dn.date-string", new org.datanucleus.store.types.converters.DateStringConverter(), java.util.Date.class, String.class, false, null);
+
+        registerConverter("dn.sqldate-long", new org.datanucleus.store.types.converters.SqlDateLongConverter(), java.sql.Date.class, Long.class, false, null);
+        registerConverter("dn.sqldate-string", new org.datanucleus.store.types.converters.SqlDateStringConverter(), java.sql.Date.class, String.class, false, null);
+        registerConverter("dn.sqldate-date", new org.datanucleus.store.types.converters.SqlDateStringConverter(), java.sql.Date.class, java.util.Date.class, false, null);
+        registerConverter("dn.sqltime-long", new org.datanucleus.store.types.converters.SqlTimeStringConverter(), java.sql.Time.class, Long.class, false, null);
+        registerConverter("dn.sqltime-string", new org.datanucleus.store.types.converters.SqlTimeStringConverter(), java.sql.Time.class, String.class, false, null);
+        registerConverter("dn.sqltime-date", new org.datanucleus.store.types.converters.SqlTimeStringConverter(), java.sql.Time.class, java.util.Date.class, false, null);
+        registerConverter("dn.sqltimestamp-long", new org.datanucleus.store.types.converters.SqlTimestampStringConverter(), java.sql.Timestamp.class, Long.class, false, null);
+        registerConverter("dn.sqltimestamp-date", new org.datanucleus.store.types.converters.SqlTimestampStringConverter(), java.sql.Timestamp.class, java.util.Date.class, false, null);
+        registerConverter("dn.sqltimestamp-string", new org.datanucleus.store.types.converters.SqlTimestampStringConverter(), java.sql.Timestamp.class, String.class, false, null);
+
+        registerConverter("dn.serializable-string", new org.datanucleus.store.types.converters.SerializableStringConverter(), java.io.Serializable.class, String.class, false, null);
+        registerConverter("dn.serializable-bytearray", new org.datanucleus.store.types.converters.SerializableByteArrayConverter(), java.io.Serializable.class, byte[].class, false, null);
+        registerConverter("dn.serializable-bytebuffer", new org.datanucleus.store.types.converters.SerializableByteBufferConverter(), java.io.Serializable.class, ByteBuffer.class, false, null);
+
+        registerConverter("dn.bytearray-bytebuffer", new org.datanucleus.store.types.converters.ByteArrayByteBufferConverter(), byte[].class, ByteBuffer.class, false, null);
+        registerConverter("dn.booleanarray-bytebuffer", new org.datanucleus.store.types.converters.BooleanArrayByteBufferConverter(), boolean[].class, ByteBuffer.class, false, null);
+        registerConverter("dn.chararray-bytebuffer", new org.datanucleus.store.types.converters.CharArrayByteBufferConverter(), char[].class, ByteBuffer.class, false, null);
+        registerConverter("dn.doublearray-bytebuffer", new org.datanucleus.store.types.converters.DoubleArrayByteBufferConverter(), double[].class, ByteBuffer.class, false, null);
+        registerConverter("dn.floatarray-bytebuffer", new org.datanucleus.store.types.converters.FloatArrayByteBufferConverter(), float[].class, ByteBuffer.class, false, null);
+        registerConverter("dn.intarray-bytebuffer", new org.datanucleus.store.types.converters.IntArrayByteBufferConverter(), int[].class, ByteBuffer.class, false, null);
+        registerConverter("dn.longarray-bytebuffer", new org.datanucleus.store.types.converters.LongArrayByteBufferConverter(), long[].class, ByteBuffer.class, false, null);
+        registerConverter("dn.shortarray-bytebuffer", new org.datanucleus.store.types.converters.ShortArrayByteBufferConverter(), short[].class, ByteBuffer.class, false, null);
+        registerConverter("dn.bigintegerarray-bytebuffer", new org.datanucleus.store.types.converters.BigIntegerArrayByteBufferConverter(), BigInteger[].class, ByteBuffer.class, false, null);
+        registerConverter("dn.bigdecimalarray-bytebuffer", new org.datanucleus.store.types.converters.BigDecimalArrayByteBufferConverter(), BigDecimal[].class, ByteBuffer.class, false, null);
+
+        registerConverter("dn.localdate-string", new org.datanucleus.store.types.converters.LocalDateStringConverter(), LocalDate.class, String.class, false, null);
+        registerConverter("dn.localdate-sqldate", new org.datanucleus.store.types.converters.LocalDateSqlDateConverter(), LocalDate.class, java.sql.Date.class, false, null);
+        registerConverter("dn.localdate-date", new org.datanucleus.store.types.converters.LocalDateDateConverter(), LocalDate.class, java.util.Date.class, false, null);
+
+        registerConverter("dn.localtime-string", new org.datanucleus.store.types.converters.LocalTimeStringConverter(), LocalTime.class, String.class, false, null);
+        registerConverter("dn.localtime-sqltime", new org.datanucleus.store.types.converters.LocalTimeSqlTimeConverter(), LocalTime.class, java.sql.Time.class, false, null);
+        registerConverter("dn.localtime-date", new org.datanucleus.store.types.converters.LocalTimeDateConverter(), LocalTime.class, java.util.Date.class, false, null);
+        registerConverter("dn.localtime-long", new org.datanucleus.store.types.converters.LocalTimeLongConverter(), LocalTime.class, Long.class, false, null);
+
+        registerConverter("dn.localdatetime-string", new org.datanucleus.store.types.converters.LocalDateTimeStringConverter(), LocalDateTime.class, String.class, false, null);
+        registerConverter("dn.localdatetime-timestamp", new org.datanucleus.store.types.converters.LocalDateTimeTimestampConverter(), LocalDateTime.class, java.sql.Timestamp.class, false, null);
+        registerConverter("dn.localdatetime-date", new org.datanucleus.store.types.converters.LocalDateTimeDateConverter(), LocalDateTime.class, java.util.Date.class, false, null);
+
+        registerConverter("dn.offsettime-string", new org.datanucleus.store.types.converters.OffsetTimeStringConverter(), OffsetTime.class, String.class, false, null);
+        registerConverter("dn.offsettime-long", new org.datanucleus.store.types.converters.OffsetTimeLongConverter(), OffsetTime.class, Long.class, false, null);
+        registerConverter("dn.offsettime-sqltime", new org.datanucleus.store.types.converters.OffsetTimeSqlTimeConverter(), OffsetTime.class, java.sql.Time.class, false, null);
+
+        registerConverter("dn.offsetdatetime-string", new org.datanucleus.store.types.converters.OffsetDateTimeStringConverter(), OffsetDateTime.class, String.class, false, null);
+        registerConverter("dn.offsetdatetime-timestamp", new org.datanucleus.store.types.converters.OffsetDateTimeTimestampConverter(), OffsetDateTime.class, java.sql.Timestamp.class, false, null);
+        registerConverter("dn.offsetdatetime-date", new org.datanucleus.store.types.converters.OffsetDateTimeDateConverter(), OffsetDateTime.class, java.util.Date.class, false, null);
+
+        registerConverter("dn.duration-string", new org.datanucleus.store.types.converters.DurationStringConverter(), Duration.class, String.class, false, null);
+        registerConverter("dn.duration-long", new org.datanucleus.store.types.converters.DurationLongConverter(), Duration.class, Long.class, false, null);
+        registerConverter("dn.duration-double", new org.datanucleus.store.types.converters.DurationDoubleConverter(), Duration.class, Double.class, false, null);
+
+        registerConverter("dn.period-string", new org.datanucleus.store.types.converters.DurationStringConverter(), Period.class, String.class, false, null);
+
+        registerConverter("dn.instant-timestamp", new org.datanucleus.store.types.converters.InstantTimestampConverter(), Instant.class, java.sql.Timestamp.class, false, null);
+        registerConverter("dn.instant-date", new org.datanucleus.store.types.converters.InstantDateConverter(), Instant.class, java.util.Date.class, false, null);
+        registerConverter("dn.instant-string", new org.datanucleus.store.types.converters.InstantStringConverter(), Instant.class, String.class, false, null);
+        registerConverter("dn.instant-long", new org.datanucleus.store.types.converters.InstantLongConverter(), Instant.class, Long.class, false, null);
+
+        registerConverter("dn.year-string", new org.datanucleus.store.types.converters.YearStringConverter(), Year.class, String.class, false, null);
+        registerConverter("dn.year-integer", new org.datanucleus.store.types.converters.YearIntegerConverter(), Year.class, Integer.class, false, null);
+
+        registerConverter("dn.yearmonth-string", new org.datanucleus.store.types.converters.YearMonthStringConverter(), YearMonth.class, String.class, false, null);
+        registerConverter("dn.yearmonth-components", new org.datanucleus.store.types.converters.YearMonthComponentsConverter(), YearMonth.class, int[].class, false, null);
+        registerConverter("dn.yearmonth-sqldate", new org.datanucleus.store.types.converters.YearMonthSqlDateConverter(), YearMonth.class, java.sql.Date.class, false, null);
+        registerConverter("dn.yearmonth-date", new org.datanucleus.store.types.converters.YearMonthDateConverter(), YearMonth.class, java.util.Date.class, false, null);
+
+        registerConverter("dn.monthday-string", new org.datanucleus.store.types.converters.MonthDayStringConverter(), MonthDay.class, String.class, false, null);
+        registerConverter("dn.monthday-components", new org.datanucleus.store.types.converters.MonthDayComponentsConverter(), MonthDay.class, int[].class, false, null);
+        registerConverter("dn.monthday-sqldate", new org.datanucleus.store.types.converters.MonthDaySqlDateConverter(), MonthDay.class, java.sql.Date.class, false, null);
+        registerConverter("dn.monthday-date", new org.datanucleus.store.types.converters.MonthDayDateConverter(), MonthDay.class, java.util.Date.class, false, null);
+
+        registerConverter("dn.zoneid-string", new org.datanucleus.store.types.converters.ZoneIdStringConverter(), ZoneId.class, String.class, false, null);
+        registerConverter("dn.zoneoffset-string", new org.datanucleus.store.types.converters.ZoneOffsetStringConverter(), ZoneOffset.class, String.class, false, null);
+        registerConverter("dn.zoneddatetime-string", new org.datanucleus.store.types.converters.ZonedDateTimeStringConverter(), ZonedDateTime.class, String.class, false, null);
+        registerConverter("dn.zoneddatetime-timestamp", new org.datanucleus.store.types.converters.ZonedDateTimeTimestampConverter(), ZonedDateTime.class, java.sql.Timestamp.class, false, null);
+
+        // Add on any plugin mechanism types
         ClassLoaderResolver clr = getClassLoaderResolver();
         ConfigurationElement[] elems = mgr.getConfigurationElementsForExtension("org.datanucleus.type_converter", null, null);
         if (elems != null)
@@ -908,6 +1231,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
                 }
             }
         }
+
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("016008"));
