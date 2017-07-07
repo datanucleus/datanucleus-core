@@ -93,8 +93,8 @@ public class AnnotationManagerImpl implements AnnotationManager
         }
 
         // Load up the registry of available member annotation handlers
-        memberAnnotationHandlerAnnotations = new HashSet<String>(elems.length);
-        memberAnnotationHandlers = new HashMap<String, MemberAnnotationHandler>(elems.length);
+        memberAnnotationHandlerAnnotations = new HashSet<String>(2);
+        memberAnnotationHandlers = new HashMap<String, MemberAnnotationHandler>(elems != null ? elems.length : 5);
 
         // a). Built-in type support
         memberAnnotationHandlerAnnotations.add("javax.validation.constraints.NotNull");
