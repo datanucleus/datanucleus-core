@@ -933,7 +933,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     public ValueGenerator getValueGeneratorForMember(ClassLoaderResolver clr, AbstractClassMetaData cmd, int absoluteFieldNumber)
     {
         // Extract the control information for this field that needs its value
-        AbstractMemberMetaData mmd = null;
         String fieldName = null;
         IdentityStrategy strategy = null;
         String sequence = null;
@@ -941,8 +940,8 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         if (absoluteFieldNumber >= 0)
         {
             // real field
-            mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(absoluteFieldNumber);
-            fieldName = mmd.getFullFieldName();
+            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(absoluteFieldNumber);
+            fieldName = mmd.getFullFieldName(); // TODO Make use of ValueGenerationManager.getMemberKey
             strategy = mmd.getValueStrategy();
             sequence = mmd.getSequence();
             valueGeneratorName = mmd.getValueGeneratorName();
@@ -950,7 +949,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         else
         {
             // datastore-identity surrogate field
-            fieldName = cmd.getFullClassName() + " (datastore id)";
+            fieldName = cmd.getFullClassName() + " (datastore id)"; // TODO Make use of ValueGenerationManager.getMemberKey
             strategy = cmd.getIdentityMetaData().getValueStrategy();
             sequence = cmd.getIdentityMetaData().getSequence();
             valueGeneratorName = cmd.getIdentityMetaData().getValueGeneratorName();
@@ -1023,7 +1022,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             return generator;
         }
 
-        // Try to create a "unique" generator in case not yet created
+        // Try to create a "unique" generator in case not yet created TODO We don't need to do this now, since all "unique" generators are cached at startup
         generator = valueGenerationMgr.createUniqueValueGenerator(strategyName, props);
         if (generator != null)
         {
