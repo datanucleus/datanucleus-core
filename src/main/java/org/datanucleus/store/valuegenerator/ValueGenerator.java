@@ -58,12 +58,6 @@ public interface ValueGenerator<T>
     public static final String PROPERTY_COLUMN_NAME = "column-name";
 
     /**
-     * Returns the fully qualified name of the <code>Sequence</code>.
-     * @return the name of the sequence
-     */
-    String getName ();
-
-    /**
      * Returns the next sequence value as an Object. If the next
      * sequence value is not available, throw NucleusDataStoreException.
      * @return the next value
