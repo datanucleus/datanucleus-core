@@ -75,6 +75,11 @@ public abstract class JavaQueryCompiler implements SymbolResolver
         queryMethodAliasByPrefix.put("javax.jdo.JDOHelper", "JDOHelper");
         queryMethodAliasByPrefix.put("Math", "Math");
         queryMethodAliasByPrefix.put("java.lang.Math", "Math");
+        // TODO These come from geospatial plugin, but moved here when we got rid of that plugin point. Find a better solution (e.g get rid of them)
+        queryMethodAliasByPrefix.put("Spatial", "Spatial");
+        queryMethodAliasByPrefix.put("MySQL", "MySQL");
+        queryMethodAliasByPrefix.put("Oracle", "Oracle");
+        queryMethodAliasByPrefix.put("PostGIS", "PostGIS");
     }
 
     protected JavaQueryCompiler parentCompiler;
