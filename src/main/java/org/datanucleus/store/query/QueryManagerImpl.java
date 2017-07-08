@@ -81,6 +81,8 @@ public class QueryManagerImpl implements QueryManager
     /** Cache of InvocationEvaluator objects keyed by the method name, for use by in-memory querying. */
     protected Map<String, Map<Object, InvocationEvaluator>> inmemoryQueryMethodEvaluatorMap = new ConcurrentHashMap<String, Map<Object,InvocationEvaluator>>();
 
+    protected Map<String, String> queryMethodAliasByPrefix = null;
+
     public QueryManagerImpl(NucleusContext nucleusContext, StoreManager storeMgr)
     {
         this.nucleusCtx = nucleusContext;
@@ -231,6 +233,25 @@ public class QueryManagerImpl implements QueryManager
                 throw new NucleusUserException(Localiser.msg("021501", cacheType, cacheClassName), e).setFatal();
             }
         }
+
+        // JDOQL/JPQL query method alias prefixes (extension)
+        queryMethodAliasByPrefix = new HashMap<String, String>();
+
+        // a). built-in aliases for standard JDOQL
+        queryMethodAliasByPrefix.put("JDOHelper", "JDOHelper");
+        queryMethodAliasByPrefix.put("javax.jdo.JDOHelper", "JDOHelper");
+        queryMethodAliasByPrefix.put("Math", "Math");
+        queryMethodAliasByPrefix.put("java.lang.Math", "Math");
+
+        // b). use plugin mechanism for extension aliases
+        ConfigurationElement[] queryMethodAliases = nucleusCtx.getPluginManager().getConfigurationElementsForExtension("org.datanucleus.query_method_prefix", null, null);
+        if (queryMethodAliases != null && queryMethodAliases.length > 0)
+        {
+            for (int i=0;i<queryMethodAliases.length;i++)
+            {
+                queryMethodAliasByPrefix.put(queryMethodAliases[i].getAttribute("prefix"), queryMethodAliases[i].getAttribute("alias"));
+            }
+        }
     }
 
     /* (non-Javadoc)
@@ -254,6 +275,15 @@ public class QueryManagerImpl implements QueryManager
 
         inmemoryQueryMethodEvaluatorMap.clear();
         inmemoryQueryMethodEvaluatorMap = null;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.query.QueryManager#getQueryMethodAliasesByPrefix()
+     */
+    @Override
+    public Map<String, String> getQueryMethodAliasesByPrefix()
+    {
+        return queryMethodAliasByPrefix;
     }
 
     /* (non-Javadoc)

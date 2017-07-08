@@ -23,10 +23,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.query.JPQLQueryHelper;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.expression.InvokeExpression;
@@ -39,10 +39,10 @@ import org.datanucleus.util.Imports;
  */
 public class JPQLCompiler extends JavaQueryCompiler
 {
-    public JPQLCompiler(MetaDataManager metaDataManager, ClassLoaderResolver clr, String from, Class candidateClass, Collection candidates,
+    public JPQLCompiler(PersistenceNucleusContext nucCtx, ClassLoaderResolver clr, String from, Class candidateClass, Collection candidates,
             String filter, Imports imports, String ordering, String result, String grouping, String having, String params, String update)
     {
-        super(metaDataManager, clr, from, candidateClass, candidates, filter, imports, ordering, result, grouping, having, params, null, update);
+        super(nucCtx, clr, from, candidateClass, candidates, filter, imports, ordering, result, grouping, having, params, null, update);
         this.from = from;
         this.caseSensitiveAliases = false;
     }

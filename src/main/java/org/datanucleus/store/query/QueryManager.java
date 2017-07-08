@@ -134,4 +134,10 @@ public interface QueryManager
      * @return Evaluator suitable for this type with this method name
      */
     InvocationEvaluator getInMemoryEvaluatorForMethod(Class type, String methodName);
+
+    /**
+     * Accessor for JDOQL/JPQL query method aliases keyed by the prefix.
+     * @return The method aliases map
+     */
+    Map<String, String> getQueryMethodAliasesByPrefix();
 }

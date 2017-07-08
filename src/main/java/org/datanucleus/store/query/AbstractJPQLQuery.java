@@ -295,7 +295,7 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
             // Append artificial alias so the compilation passes
             from += " this";
         }
-        JavaQueryCompiler compiler = new JPQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), from, candidateClass, candidateCollection, 
+        JavaQueryCompiler compiler = new JPQLCompiler(ec.getNucleusContext(), ec.getClassLoaderResolver(), from, candidateClass, candidateCollection, 
             this.filter, getParsedImports(), this.ordering, this.result, this.grouping, this.having, explicitParameters, update);
         if (getBooleanExtensionProperty(EXTENSION_JPQL_STRICT, false))
         {
@@ -388,7 +388,7 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
                 NucleusLogger.QUERY.debug(Localiser.msg("021044", getLanguage(), ((AbstractJPQLQuery)subquery).getSingleStringQuery()));
             }
 
-            JavaQueryCompiler subCompiler = new JPQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), subquery.from, subquery.candidateClass, null,
+            JavaQueryCompiler subCompiler = new JPQLCompiler(ec.getNucleusContext(), ec.getClassLoaderResolver(), subquery.from, subquery.candidateClass, null,
                 subquery.filter, getParsedImports(), subquery.ordering, subquery.result, subquery.grouping, subquery.having, null, null);
             if (getBooleanExtensionProperty(EXTENSION_JPQL_STRICT, false))
             {

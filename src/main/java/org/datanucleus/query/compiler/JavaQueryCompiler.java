@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -42,6 +43,7 @@ import org.datanucleus.query.expression.PrimaryExpressionIsClassStaticFieldExcep
 import org.datanucleus.query.expression.PrimaryExpressionIsVariableException;
 import org.datanucleus.query.expression.VariableExpression;
 import org.datanucleus.store.query.QueryCompilerSyntaxException;
+import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Imports;
 import org.datanucleus.util.Localiser;
@@ -67,20 +69,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
     public static final String JOIN_OUTER_RIGHT = "JOIN_OUTER_RIGHT";
     public static final String JOIN_OUTER_FETCH_RIGHT = "JOIN_OUTER_FETCH_RIGHT";
 
-    protected static Map<String, String> queryMethodAliasByPrefix = new HashMap<String, String>();
-
-    static 
-    {
-        queryMethodAliasByPrefix.put("JDOHelper", "JDOHelper");
-        queryMethodAliasByPrefix.put("javax.jdo.JDOHelper", "JDOHelper");
-        queryMethodAliasByPrefix.put("Math", "Math");
-        queryMethodAliasByPrefix.put("java.lang.Math", "Math");
-        // TODO These come from geospatial plugin, but moved here when we got rid of that plugin point. Find a better solution (e.g get rid of them)
-        queryMethodAliasByPrefix.put("Spatial", "Spatial");
-        queryMethodAliasByPrefix.put("MySQL", "MySQL");
-        queryMethodAliasByPrefix.put("Oracle", "Oracle");
-        queryMethodAliasByPrefix.put("PostGIS", "PostGIS");
-    }
+    protected QueryManager queryMgr = null;
 
     protected JavaQueryCompiler parentCompiler;
     protected Map<Object, String> parameterSubtitutionMap;
@@ -121,12 +110,12 @@ public abstract class JavaQueryCompiler implements SymbolResolver
 
     protected Map<String, Object> options;
 
-    public JavaQueryCompiler(MetaDataManager metaDataManager, ClassLoaderResolver clr, 
+    public JavaQueryCompiler(PersistenceNucleusContext nucCtx, ClassLoaderResolver clr, 
             String from, Class candidateClass, Collection candidates,
             String filter, Imports imports, String ordering, String result, String grouping, String having, 
             String params, String variables, String update)
     {
-        this.metaDataManager = metaDataManager;
+        this.metaDataManager = nucCtx.getMetaDataManager();
         this.clr = clr;
 
         this.from = from;
@@ -153,6 +142,8 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                 this.imports.importPackage(candidateClass.getName());
             }
         }
+
+        this.queryMgr = nucCtx.getStoreManager().getQueryManager();
     }
 
     /**
@@ -467,7 +458,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                         // ON condition
                         ExpressionCompiler comp = new ExpressionCompiler();
                         comp.setSymbolTable(symtbl);
-                        comp.setMethodAliases(queryMethodAliasByPrefix);
+                        comp.setMethodAliases(queryMgr.getQueryMethodAliasesByPrefix());
                         Expression nextExpr = comp.compileExpression(onExprNode);
                         nextExpr.bind(symtbl);
                     }
@@ -486,7 +477,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
 
             ExpressionCompiler comp = new ExpressionCompiler();
             comp.setSymbolTable(symtbl);
-            comp.setMethodAliases(queryMethodAliasByPrefix);
+            comp.setMethodAliases(queryMgr.getQueryMethodAliasesByPrefix());
             expr[i] = comp.compileFromExpression(node[i], classIsExpression);
             if (expr[i] != null)
             {
@@ -593,7 +584,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
         {
             ExpressionCompiler comp = new ExpressionCompiler();
             comp.setSymbolTable(symtbl);
-            comp.setMethodAliases(queryMethodAliasByPrefix);
+            comp.setMethodAliases(queryMgr.getQueryMethodAliasesByPrefix());
             expr[i] = comp.compileExpression(node[i]);
             expr[i].bind(symtbl);
         }
@@ -621,7 +612,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
 
             ExpressionCompiler comp = new ExpressionCompiler();
             comp.setSymbolTable(symtbl);
-            comp.setMethodAliases(queryMethodAliasByPrefix);
+            comp.setMethodAliases(queryMgr.getQueryMethodAliasesByPrefix());
             Expression expr = comp.compileExpression(node);
             expr.bind(symtbl);
             return expr;
@@ -767,7 +758,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
         {
             ExpressionCompiler comp = new ExpressionCompiler();
             comp.setSymbolTable(symtbl);
-            comp.setMethodAliases(queryMethodAliasByPrefix);
+            comp.setMethodAliases(queryMgr.getQueryMethodAliasesByPrefix());
 
             // Find the last child of this node, and check for an alias (type = NAME)
             String alias = null;
@@ -884,7 +875,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
 
             ExpressionCompiler comp = new ExpressionCompiler();
             comp.setSymbolTable(symtbl);
-            comp.setMethodAliases(queryMethodAliasByPrefix);
+            comp.setMethodAliases(queryMgr.getQueryMethodAliasesByPrefix());
             expr[i] = comp.compileExpression(node[i]);
             expr[i].bind(symtbl);
         }
@@ -910,7 +901,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
 
         ExpressionCompiler comp = new ExpressionCompiler();
         comp.setSymbolTable(symtbl);
-        comp.setMethodAliases(queryMethodAliasByPrefix);
+        comp.setMethodAliases(queryMgr.getQueryMethodAliasesByPrefix());
         Expression expr = comp.compileExpression(node);
         expr.bind(symtbl);
         return expr;
@@ -1003,7 +994,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
 
             ExpressionCompiler comp = new ExpressionCompiler();
             comp.setSymbolTable(symtbl);
-            comp.setMethodAliases(queryMethodAliasByPrefix);
+            comp.setMethodAliases(queryMgr.getQueryMethodAliasesByPrefix());
             expr[i] = comp.compileOrderExpression(node[i]);
             expr[i].bind(symtbl);
         }

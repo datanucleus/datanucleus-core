@@ -352,7 +352,7 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
             startTime = System.currentTimeMillis();
             NucleusLogger.QUERY.debug(Localiser.msg("021044", getLanguage(), getSingleStringQuery()));
         }
-        JDOQLCompiler compiler = new JDOQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), from, candidateClass, candidateCollection, 
+        JDOQLCompiler compiler = new JDOQLCompiler(ec.getNucleusContext(), ec.getClassLoaderResolver(), from, candidateClass, candidateCollection, 
             this.filter, getParsedImports(), this.ordering, this.result, this.grouping, this.having, explicitParameters, explicitVariables, this.update);
         if (getBooleanExtensionProperty(PropertyNames.PROPERTY_QUERY_COMPILE_OPTIMISE_VAR_THIS, false))
         {
@@ -454,7 +454,7 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
                 NucleusLogger.QUERY.debug(Localiser.msg("021044", getLanguage(), ((AbstractJDOQLQuery)subquery).getSingleStringQuery()));
             }
 
-            JDOQLCompiler subCompiler = new JDOQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), subquery.from, subquery.candidateClass, null,
+            JDOQLCompiler subCompiler = new JDOQLCompiler(ec.getNucleusContext(), ec.getClassLoaderResolver(), subquery.from, subquery.candidateClass, null,
                 subquery.filter, getParsedImports(), subquery.ordering, subquery.result, subquery.grouping, subquery.having, subquery.explicitParameters, null, null);
             if (getBooleanExtensionProperty(EXTENSION_JDOQL_STRICT, false))
             {

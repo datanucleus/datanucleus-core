@@ -37,6 +37,7 @@ Contributors:
     <extension-point id="jta_locator" name="JTA Locator" schema="schema/jta_locator.exsd"/>
     <extension-point id="store_datastoreidentity" name="Datastore Identity" schema="schema/datastoreidentity.exsd"/>
     <extension-point id="store_manager" name="Store Manager" schema="schema/store_manager.exsd"/>
+    <extension-point id="query_method_prefix" name="Query Method Prefix" schema="schema/query_method_prefix.exsd"/>
     <extension-point id="query_method_evaluators" name="Query Method Evaluators" schema="schema/query_method_evaluator.exsd"/>
     <extension-point id="store_valuegenerator" name="Value Generator" schema="schema/valuegenerator.exsd"/>
     <extension-point id="store_connectionfactory" name="Connection Factory" schema="schema/connectionfactory.exsd"/>

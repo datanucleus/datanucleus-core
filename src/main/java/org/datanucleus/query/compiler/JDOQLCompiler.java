@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.query.JDOQLQueryHelper;
 import org.datanucleus.query.compiler.JDOQLParser;
 import org.datanucleus.query.expression.DyadicExpression;
@@ -49,10 +49,10 @@ public class JDOQLCompiler extends JavaQueryCompiler
 {
     boolean allowAll = false;
 
-    public JDOQLCompiler(MetaDataManager metaDataManager, ClassLoaderResolver clr, String from, Class candidateClass, Collection candidates, 
+    public JDOQLCompiler(PersistenceNucleusContext nucCtx, ClassLoaderResolver clr, String from, Class candidateClass, Collection candidates, 
             String filter, Imports imports, String ordering, String result, String grouping, String having, String params, String variables, String update)
     {
-        super(metaDataManager, clr, from, candidateClass, candidates, filter, imports, ordering, result, grouping, having, params, variables, update);
+        super(nucCtx, clr, from, candidateClass, candidates, filter, imports, ordering, result, grouping, having, params, variables, update);
     }
 
     /**

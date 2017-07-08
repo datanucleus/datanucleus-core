@@ -1332,7 +1332,7 @@ public class QueryUtils
             return candidates;
         }
 
-        JavaQueryCompiler compiler = new JPQLCompiler(ec.getMetaDataManager(), ec.getClassLoaderResolver(), null, type, null, null, null, ordering, null, null, null, null, null);
+        JavaQueryCompiler compiler = new JPQLCompiler(ec.getNucleusContext(), ec.getClassLoaderResolver(), null, type, null, null, null, ordering, null, null, null, null, null);
         QueryCompilation compilation = compiler.compile(null, null);
         return QueryUtils.orderCandidates(candidates, compilation.getExprOrdering(), new HashMap(), "this", ec, clr, null, null, queryLanguage);
     }
