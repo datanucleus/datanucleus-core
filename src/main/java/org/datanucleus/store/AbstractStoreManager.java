@@ -71,6 +71,7 @@ import org.datanucleus.store.valuegenerator.AbstractDatastoreGenerator;
 import org.datanucleus.store.valuegenerator.AbstractGenerator;
 import org.datanucleus.store.valuegenerator.ValueGenerationConnectionProvider;
 import org.datanucleus.store.valuegenerator.ValueGenerationManager;
+import org.datanucleus.store.valuegenerator.ValueGenerationManagerImpl;
 import org.datanucleus.store.valuegenerator.ValueGenerator;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -99,8 +100,8 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     /** Nucleus Context. */
     protected PersistenceNucleusContext nucleusContext;
 
-    /** Manager for value generation. Lazy initialised, so use getValueGenerationManager() to access. */
-    protected ValueGenerationManager valueGenerationMgr = new ValueGenerationManager(this);
+    /** Manager for value generation. */
+    protected ValueGenerationManager valueGenerationMgr = new ValueGenerationManagerImpl(this);
 
     /** Manager for the data definition in the datastore. */
     protected StoreDataManager storeDataMgr = new StoreDataManager();
@@ -937,11 +938,12 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         IdentityStrategy strategy = null;
         String sequence = null;
         String valueGeneratorName = null;
+        String memberKey = valueGenerationMgr.getMemberKey(cmd, absoluteFieldNumber);
         if (absoluteFieldNumber >= 0)
         {
             // real field
             AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(absoluteFieldNumber);
-            fieldName = mmd.getFullFieldName(); // TODO Make use of ValueGenerationManager.getMemberKey
+            fieldName = mmd.getFullFieldName();
             strategy = mmd.getValueStrategy();
             sequence = mmd.getSequence();
             valueGeneratorName = mmd.getValueGeneratorName();
@@ -949,14 +951,14 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         else
         {
             // datastore-identity surrogate field
-            fieldName = cmd.getFullClassName() + " (datastore id)"; // TODO Make use of ValueGenerationManager.getMemberKey
+            fieldName = cmd.getFullClassName() + " (datastore id)";
             strategy = cmd.getIdentityMetaData().getValueStrategy();
             sequence = cmd.getIdentityMetaData().getSequence();
             valueGeneratorName = cmd.getIdentityMetaData().getValueGeneratorName();
         }
 
         // Check if we have a ValueGenerator already created for this member
-        ValueGenerator generator = valueGenerationMgr.getValueGeneratorForMemberKey(fieldName);
+        ValueGenerator generator = valueGenerationMgr.getValueGeneratorForMemberKey(memberKey);
         if (generator != null)
         {
             // Return the ValueGenerator already registered against this member "key"
@@ -1010,38 +1012,26 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             }
         }
 
-        // Set up the default properties available for all value generators
-        Properties props = getPropertiesForValueGenerator(cmd, absoluteFieldNumber, clr, sequenceMetaData, tableGeneratorMetaData);
-
         // Check for this strategy being a "unique" ValueGenerator, and created if not yet present
         generator = valueGenerationMgr.getUniqueValueGeneratorByName(strategyName);
         if (generator != null)
         {
             // "unique" ValueGenerator already defined for this strategy, so register it against the member
-            valueGenerationMgr.registerValueGeneratorForMemberKey(fieldName, generator);
+            valueGenerationMgr.registerValueGeneratorForMemberKey(memberKey, generator);
             return generator;
         }
 
-        // Try to create a "unique" generator in case not yet created TODO We don't need to do this now, since all "unique" generators are cached at startup
-        generator = valueGenerationMgr.createUniqueValueGenerator(strategyName, props);
-        if (generator != null)
-        {
-            valueGenerationMgr.registerUniqueValueGeneratorForName(strategyName, generator);
+        // Set up the default properties available for all value generators
+        Properties props = getPropertiesForValueGenerator(cmd, absoluteFieldNumber, clr, sequenceMetaData, tableGeneratorMetaData);
 
-            // "unique" ValueGenerator now created for this strategy, so register it against the member
-            valueGenerationMgr.registerValueGeneratorForMemberKey(fieldName, generator);
-            return generator;
-        }
-
-        // Must be "datastore" specific generator so use plugin mechanism to create one
+        // Must be "datastore" specific generator so use plugin mechanism to create one and register against this member "key"
         synchronized (valueGenerationMgr)
         {
             try
             {
-                generator = (AbstractGenerator)nucleusContext.getPluginManager().createExecutableExtension(
-                    "org.datanucleus.store_valuegenerator",
+                generator = (AbstractGenerator)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.store_valuegenerator",
                     new String[] {"name", "datastore"}, new String[] {strategyName, getStoreManagerKey()},
-                    "class-name", new Class[] {String.class, Properties.class}, new Object[] {fieldName, props});
+                    "class-name", new Class[] {String.class, Properties.class}, new Object[] {memberKey, props});
 
                 if (generator instanceof AbstractDatastoreGenerator)
                 {
@@ -1055,7 +1045,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             }
 
             // Register the generator against this member
-            valueGenerationMgr.registerValueGeneratorForMemberKey(fieldName, generator);
+            valueGenerationMgr.registerValueGeneratorForMemberKey(memberKey, generator);
         }
 
         return generator;
