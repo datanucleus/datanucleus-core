@@ -369,14 +369,23 @@ public class FederatedStoreManager implements StoreManager
         return getStoreManagerForClass(cmd).getValueGenerationStrategyValue(ec, cmd, absoluteFieldNumber);
     }
 
-    public Collection<String> getSubClassesForClass(String className, boolean includeDescendents, ClassLoaderResolver clr)
-    {
-        return getStoreManagerForClass(className, clr).getSubClassesForClass(className, includeDescendents, clr);
-    }
-
     public boolean isValueGenerationStrategyDatastoreAttributed(AbstractClassMetaData cmd, int absFieldNumber)
     {
         return getStoreManagerForClass(cmd).isValueGenerationStrategyDatastoreAttributed(cmd, absFieldNumber);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.StoreManager#getValueGenerationStrategyForNative(org.datanucleus.metadata.AbstractClassMetaData, int)
+     */
+    @Override
+    public String getValueGenerationStrategyForNative(AbstractClassMetaData cmd, int absFieldNumber)
+    {
+        return primaryStoreMgr.getValueGenerationStrategyForNative(cmd, absFieldNumber);
+    }
+
+    public Collection<String> getSubClassesForClass(String className, boolean includeDescendents, ClassLoaderResolver clr)
+    {
+        return getStoreManagerForClass(className, clr).getSubClassesForClass(className, includeDescendents, clr);
     }
 
     public String manageClassForIdentity(Object id, ClassLoaderResolver clr)

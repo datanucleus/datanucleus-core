@@ -264,6 +264,14 @@ public interface StoreManager
     Object getValueGenerationStrategyValue(ExecutionContext ec, AbstractClassMetaData cmd, int absoluteFieldNumber);
 
     /**
+     * Method defining which value-strategy to use when the user specifies "native"/"auto".
+     * @param cmd Class requiring the strategy
+     * @param absFieldNumber Field of the class
+     * @return The value generation strategy used when "native"/"auto" is specified
+     */
+    String getValueGenerationStrategyForNative(AbstractClassMetaData cmd, int absFieldNumber);
+
+    /**
      * Accessor for the API adapter.
      * @return API adapter
      */

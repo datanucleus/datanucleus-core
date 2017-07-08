@@ -827,7 +827,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             if (idmd == null)
             {
                 // native
-                String strategy = getStrategyForNative(cmd, absFieldNumber);
+                String strategy = getValueGenerationStrategyForNative(cmd, absFieldNumber);
                 if (strategy.equalsIgnoreCase("identity"))
                 {
                     return true;
@@ -842,7 +842,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 }
                 else if (idStrategy == IdentityStrategy.NATIVE)
                 {
-                    String strategy = getStrategyForNative(cmd, absFieldNumber);
+                    String strategy = getValueGenerationStrategyForNative(cmd, absFieldNumber);
                     if (strategy.equalsIgnoreCase("identity"))
                     {
                         return true;
@@ -864,7 +864,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             }
             else if (mmd.getValueStrategy() == IdentityStrategy.NATIVE)
             {
-                String strategy = getStrategyForNative(cmd, absFieldNumber);
+                String strategy = getValueGenerationStrategyForNative(cmd, absFieldNumber);
                 if (strategy.equalsIgnoreCase("identity"))
                 {
                     return true;
@@ -883,7 +883,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         ValueGenerator generator = getValueGeneratorForMember(ec.getClassLoaderResolver(), cmd, absoluteFieldNumber);
 
         // Get the next value from the ValueGenerator
-        Object oid = getStrategyValueForGenerator(generator, ec);
+        Object oid = getNextValueForValueGenerator(generator, ec);
 
         // Do any necessary conversion of the value to the precise member type
         AbstractMemberMetaData mmd = null;
@@ -972,7 +972,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
         else if (strategy.equals(IdentityStrategy.NATIVE))
         {
-            strategyName = getStrategyForNative(cmd, absoluteFieldNumber);
+            strategyName = getValueGenerationStrategyForNative(cmd, absoluteFieldNumber);
             strategy = IdentityStrategy.getIdentityStrategy(strategyName);
         }
 
@@ -1011,7 +1011,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
 
         // Set up the default properties available for all value generators
-        Properties props = getPropertiesForGenerator(cmd, absoluteFieldNumber, clr, sequenceMetaData, tableGeneratorMetaData);
+        Properties props = getPropertiesForValueGenerator(cmd, absoluteFieldNumber, clr, sequenceMetaData, tableGeneratorMetaData);
 
         // Check for this strategy being a "unique" ValueGenerator, and created if not yet present
         generator = valueGenerationMgr.getUniqueValueGeneratorByName(strategyName);
@@ -1073,7 +1073,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      * @param absFieldNumber Field of the class
      * @return The strategy used when "native" is specified
      */
-    public String getStrategyForNative(AbstractClassMetaData cmd, int absFieldNumber)
+    public String getValueGenerationStrategyForNative(AbstractClassMetaData cmd, int absFieldNumber)
     {
         if (absFieldNumber >= 0)
         {
@@ -1131,13 +1131,13 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     }
 
     /**
-     * Accessor for the next value from the specified generator.
+     * Accessor for the next value from the specified ValueGenerator.
      * This implementation simply returns generator.next(). Any case where the generator requires datastore connections should override this method.
      * @param generator The generator
      * @param ec execution context
      * @return The next value.
      */
-    protected Object getStrategyValueForGenerator(ValueGenerator generator, final ExecutionContext ec)
+    protected Object getNextValueForValueGenerator(ValueGenerator generator, final ExecutionContext ec)
     {
         Object oid = null;
         synchronized (generator)
@@ -1183,7 +1183,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      * @param tablegenmd Any table generator metadata
      * @return The properties to use for this field
      */
-    protected Properties getPropertiesForGenerator(AbstractClassMetaData cmd, int absoluteFieldNumber, ClassLoaderResolver clr, SequenceMetaData seqmd, TableGeneratorMetaData tablegenmd)
+    protected Properties getPropertiesForValueGenerator(AbstractClassMetaData cmd, int absoluteFieldNumber, ClassLoaderResolver clr, SequenceMetaData seqmd, TableGeneratorMetaData tablegenmd)
     {
         // Set up the default properties available for all value generators
         Properties properties = new Properties();
@@ -1228,7 +1228,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
 
         if (strategy.equals(IdentityStrategy.NATIVE))
         {
-            String realStrategyName = getStrategyForNative(cmd, absoluteFieldNumber);
+            String realStrategyName = getValueGenerationStrategyForNative(cmd, absoluteFieldNumber);
             strategy = IdentityStrategy.getIdentityStrategy(realStrategyName);
         }
 
