@@ -79,14 +79,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
 
     public AbstractNucleusContext(String apiName, Map startupProps, PluginManager pluginMgr)
     {
-        if (pluginMgr != null)
-        {
-            this.pluginManager = pluginMgr;
-        }
-        else
-        {
-            this.pluginManager = PluginManager.createPluginManager(startupProps, this.getClass().getClassLoader());
-        }
+        this.pluginManager = (pluginMgr != null) ? pluginMgr : PluginManager.createPluginManager(startupProps, this.getClass().getClassLoader());
 
         // Create Configuration (with defaults for plugins), and impose any startup properties
         this.config = new Configuration(this);

@@ -341,17 +341,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS, null, false, true, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS, null, false, true, false);
 
-        // Legacy properties from earlier DataNucleus (< 3.9), mapped onto new named properties
-        conf.addDefaultBooleanProperty("datanucleus.autoCreateSchema", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL, false, true, false); // TODO Drop in future release
-        conf.addDefaultBooleanProperty("datanucleus.autoCreateTables", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, false, true, false); // TODO Drop in future release
-        conf.addDefaultBooleanProperty("datanucleus.autoCreateColumns", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, false, true, false); // TODO Drop in future release
-        conf.addDefaultBooleanProperty("datanucleus.autoCreateConstraints", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, false, true, false); // TODO Drop in future release
-        conf.addDefaultBooleanProperty("datanucleus.validateSchema", PropertyNames.PROPERTY_SCHEMA_VALIDATE_ALL, false, true, false); // TODO Drop in future release
-        conf.addDefaultBooleanProperty("datanucleus.validateTables", PropertyNames.PROPERTY_SCHEMA_VALIDATE_TABLES, false, true, false); // TODO Drop in future release
-        conf.addDefaultBooleanProperty("datanucleus.validateColumns", PropertyNames.PROPERTY_SCHEMA_VALIDATE_COLUMNS, false, true, false); // TODO Drop in future release
-        conf.addDefaultBooleanProperty("datanucleus.validateConstraints", PropertyNames.PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS, false, true, false); // TODO Drop in future release
-        conf.addDefaultBooleanProperty("datanucleus.autoCreateWarnOnError", PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_WARNONERROR, false, true, false); // TODO Drop in future release
-
         // Schema identifier naming
         conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_NAMING_FACTORY, null, "datanucleus2", null, true, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_IDENTIFIER_CASE, null, null, CorePropertyValidator.class.getName(), true, false);
