@@ -25,6 +25,7 @@ import org.datanucleus.query.expression.ParameterExpression;
 import org.datanucleus.query.expression.PrimaryExpression;
 import org.datanucleus.query.inmemory.InMemoryExpressionEvaluator;
 import org.datanucleus.query.inmemory.InvocationEvaluator;
+import org.datanucleus.store.query.Query;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -82,7 +83,7 @@ public class StringMatchesMethod implements InvocationEvaluator
         }
 
         arg = QueryUtils.getStringValue(argObj);
-        if (eval.getQueryLanguage().equalsIgnoreCase("JPQL"))
+        if (eval.getQueryLanguage().equalsIgnoreCase(Query.LANGUAGE_JPQL))
         {
             // Convert JPQL like expression to String.matches input
             String matchesArg = arg;

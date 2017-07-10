@@ -1311,7 +1311,7 @@ public class QueryUtils
      */
     public static List orderCandidates(List candidates, Class type, String ordering, ExecutionContext ec, ClassLoaderResolver clr)
     {
-        return orderCandidates(candidates, type, ordering, ec, clr, "JDOQL");
+        return orderCandidates(candidates, type, ordering, ec, clr, Query.LANGUAGE_JDOQL);
     }
 
     /**

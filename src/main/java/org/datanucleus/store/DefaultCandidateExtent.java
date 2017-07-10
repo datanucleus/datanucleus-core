@@ -53,7 +53,7 @@ public class DefaultCandidateExtent<T> extends AbstractExtent<T> implements Auto
     {
         super(ec, cls, subclasses, cmd);
 
-        query = ec.getStoreManager().newQuery("JDOQL", ec);
+        query = ec.getStoreManager().newQuery(Query.LANGUAGE_JDOQL, ec);
         fetchPlan = query.getFetchPlan();
         query.setCandidateClass(cls);
         query.setSubclasses(subclasses);

@@ -494,6 +494,6 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
      */
     public String getLanguage()
     {
-        return "JDOQL";
+        return Query.LANGUAGE_JDOQL;
     }
 }

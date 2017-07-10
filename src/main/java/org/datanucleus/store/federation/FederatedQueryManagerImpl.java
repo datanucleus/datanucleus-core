@@ -73,7 +73,7 @@ public class FederatedQueryManagerImpl extends QueryManagerImpl
             // Single-string query
             String queryString = (String)query;
             String candidateName = null;
-            if (languageImpl.equalsIgnoreCase("JDOQL") && queryString.toUpperCase().indexOf(" FROM ") > 0)
+            if (languageImpl.equalsIgnoreCase(Query.LANGUAGE_JDOQL) && queryString.toUpperCase().indexOf(" FROM ") > 0)
             {
                 int candidateStart = queryString.toUpperCase().indexOf(" FROM ") + 6;
                 int candidateEnd = queryString.indexOf(" ", candidateStart+1);

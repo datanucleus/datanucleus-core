@@ -45,7 +45,7 @@ public class JPQLInMemoryEvaluator extends JavaQueryInMemoryEvaluator
      */
     public JPQLInMemoryEvaluator(Query query, Collection candidates, QueryCompilation compilation, Map parameterValues, ClassLoaderResolver clr)
     {
-        super("JPQL", query, compilation, parameterValues, clr, candidates);
+        super(Query.LANGUAGE_JPQL, query, compilation, parameterValues, clr, candidates);
 
         if (this.parameterValues != null && !this.parameterValues.isEmpty())
         {

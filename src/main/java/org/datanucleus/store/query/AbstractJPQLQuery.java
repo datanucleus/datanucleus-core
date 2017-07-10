@@ -436,6 +436,6 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
      */
     public String getLanguage()
     {
-        return "JPQL";
+        return Query.LANGUAGE_JPQL;
     }
 }

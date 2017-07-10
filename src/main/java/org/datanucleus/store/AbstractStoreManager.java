@@ -59,6 +59,7 @@ import org.datanucleus.store.autostart.AutoStartMechanism;
 import org.datanucleus.store.connection.ConnectionManager;
 import org.datanucleus.store.connection.ConnectionManagerImpl;
 import org.datanucleus.store.connection.ManagedConnection;
+import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.query.QueryManagerImpl;
 import org.datanucleus.store.schema.DefaultStoreSchemaHandler;
@@ -720,8 +721,8 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     {
         // All StoreManagers should support a minimum of JDOQL/JPQL
         Collection<String> languages = new HashSet<>();
-        languages.add("JDOQL");
-        languages.add("JPQL");
+        languages.add(Query.LANGUAGE_JDOQL);
+        languages.add(Query.LANGUAGE_JPQL);
         return languages;
     }
 
@@ -732,7 +733,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     public boolean supportsQueryLanguage(String language)
     {
         // All StoreManagers should support a minimum of JDOQL/JPQL
-        return (language != null && (language.equalsIgnoreCase("JDOQL") || language.equalsIgnoreCase("JPQL")));
+        return (language != null && (language.equalsIgnoreCase(Query.LANGUAGE_JDOQL) || language.equalsIgnoreCase(Query.LANGUAGE_JPQL)));
     }
 
     /**

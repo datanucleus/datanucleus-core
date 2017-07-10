@@ -172,7 +172,7 @@ public class JPQLCompiler extends JavaQueryCompiler
      */
     public String getLanguage()
     {
-        return "JPQL";
+        return Query.LANGUAGE_JPQL;
     }
 
     /**

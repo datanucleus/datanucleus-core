@@ -72,6 +72,11 @@ import org.datanucleus.util.StringUtils;
 public abstract class Query<T> implements Serializable, ExecutionContextListener
 {
     private static final long serialVersionUID = 7820102897590182771L;
+
+    public static final String LANGUAGE_JDOQL = "JDOQL";
+    public static final String LANGUAGE_JPQL = "JPQL";
+    public static final String LANGUAGE_SQL = "SQL";
+
     public static final String EXTENSION_FLUSH_BEFORE_EXECUTION = PropertyNames.PROPERTY_QUERY_FLUSH_BEFORE_EXECUTE;
     public static final String EXTENSION_USE_FETCH_PLAN = PropertyNames.PROPERTY_QUERY_USE_FETCHPLAN;
     public static final String EXTENSION_RESULT_SIZE_METHOD = PropertyNames.PROPERTY_QUERY_RESULT_SIZE_METHOD;

@@ -412,7 +412,7 @@ public class JDOQLCompiler extends JavaQueryCompiler
      */
     public String getLanguage()
     {
-        return "JDOQL";
+        return Query.LANGUAGE_JDOQL;
     }
 
     /**

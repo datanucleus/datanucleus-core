@@ -41,7 +41,7 @@ public class JDOQLInMemoryEvaluator extends JavaQueryInMemoryEvaluator
      */
     public JDOQLInMemoryEvaluator(Query query, Collection candidates, QueryCompilation compilation, Map parameterValues, ClassLoaderResolver clr)
     {
-        super("JDOQL", query, compilation, parameterValues, clr, candidates);
+        super(Query.LANGUAGE_JDOQL, query, compilation, parameterValues, clr, candidates);
     }
 
     /**

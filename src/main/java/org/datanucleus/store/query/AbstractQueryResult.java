@@ -324,10 +324,10 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
             if (query != null && query.getCompilation() != null)
             {
                 ExecutionContext ec = query.getExecutionContext();
-                if (query.getCompilation().getQueryLanguage().equalsIgnoreCase("JDOQL"))
+                if (query.getCompilation().getQueryLanguage().equalsIgnoreCase(Query.LANGUAGE_JDOQL))
                 {
                     // JDOQL : "count([DISTINCT ]this)" query
-                    Query countQuery = query.getStoreManager().newQuery("JDOQL", ec, query);
+                    Query countQuery = query.getStoreManager().newQuery(Query.LANGUAGE_JDOQL, ec, query);
                     if (query.getResultDistinct())
                     {
                         countQuery.setResult("COUNT(DISTINCT this)");
@@ -365,10 +365,10 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
                     countQuery.closeAll();
                     return (int)count;
                 }
-                else if (query.getCompilation().getQueryLanguage().equalsIgnoreCase("JPQL"))
+                else if (query.getCompilation().getQueryLanguage().equalsIgnoreCase(Query.LANGUAGE_JPQL))
                 {
                     // JPQL : "count()" query
-                    Query countQuery = query.getStoreManager().newQuery("JPQL", ec, query);
+                    Query countQuery = query.getStoreManager().newQuery(Query.LANGUAGE_JPQL, ec, query);
                     countQuery.setResult("count(" + query.getCompilation().getCandidateAlias() + ")");
                     countQuery.setOrdering(null);
                     countQuery.setRange(null); // Don't want range to interfere with the query

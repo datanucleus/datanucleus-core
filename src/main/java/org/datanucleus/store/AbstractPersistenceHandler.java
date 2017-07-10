@@ -69,7 +69,7 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
                 jdoqlStr.append(" && ");
             }
         }
-        Query q = storeMgr.newQuery("JDOQL", ec, jdoqlStr.toString());
+        Query q = storeMgr.newQuery(Query.LANGUAGE_JDOQL, ec, jdoqlStr.toString());
         List results = (List)q.executeWithMap(paramValueMap);
         if (results == null || results.size() == 0)
         {
