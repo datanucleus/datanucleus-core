@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassPersistenceModifier;
@@ -52,7 +53,7 @@ import org.datanucleus.util.Localiser;
 public abstract class AbstractAnnotationReader implements AnnotationReader
 {
     /** Manager for MetaData operations */
-    protected MetaDataManager mgr;
+    protected MetaDataManager mmgr;
 
     /** Supported annotations packages. */
     protected String[] supportedPackages;
@@ -63,7 +64,16 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
      */
     public AbstractAnnotationReader(MetaDataManager mgr)
     {
-        this.mgr = mgr;
+        this.mmgr = mgr;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.metadata.annotations.AnnotationReader#isPersistenceContext()
+     */
+    @Override
+    public boolean isPersistenceContext()
+    {
+        return (mmgr.getNucleusContext() instanceof PersistenceNucleusContext);
     }
 
     /**
@@ -123,7 +133,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
         if (cmd != null)
         {
             // Process using any user-provided class annotation handlers
-            AnnotationManager annMgr = mgr.getAnnotationManager();
+            AnnotationManager annMgr = mmgr.getAnnotationManager();
             for (int i=0;i<classAnnotations.length;i++)
             {
                 String annName = classAnnotations[i].getName();
@@ -279,8 +289,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
     protected abstract AbstractMemberMetaData processMemberAnnotations(AbstractClassMetaData cmd, Member member, AnnotationObject[] annotations, boolean propertyAccessor);
 
     /**
-     * Method to take the passed in outline ClassMetaData and process the annotations for method adding any 
-     * necessary MetaData to the ClassMetaData.
+     * Method to take the passed in outline ClassMetaData and process the annotations for method adding any necessary MetaData to the ClassMetaData.
      * Called for all methods and is intended for processing of any methods other than persistence specifications 
      * (for example listener methods). Methods for persistence specification are processed via "processMemberAnnotations".
      * @param cmd The ClassMetaData (to be updated)
@@ -300,7 +309,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
         if (annotations != null && annotations.length > 0)
         {
             // Strip out unsupported annotations
-            AnnotationManager annMgr = mgr.getAnnotationManager();
+            AnnotationManager annMgr = mmgr.getAnnotationManager();
             for (Annotation annotation : annotations)
             {
                 String annName = annotation.annotationType().getName();
@@ -350,7 +359,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                 {
                     // Strip out unsupported annotations
                     List<Annotation> supportedAnnots = new ArrayList();
-                    AnnotationManager annMgr = mgr.getAnnotationManager();
+                    AnnotationManager annMgr = mmgr.getAnnotationManager();
                     for (Annotation annotation : annotations)
                     {
                         String annName = annotation.annotationType().getName();
@@ -405,7 +414,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
             if (annotations != null && annotations.length > 0)
             {
                 // Strip out unsupported annotations
-                AnnotationManager annMgr = mgr.getAnnotationManager();
+                AnnotationManager annMgr = mmgr.getAnnotationManager();
                 for (Annotation annotation : annotations)
                 {
                     String annName = annotation.annotationType().getName();

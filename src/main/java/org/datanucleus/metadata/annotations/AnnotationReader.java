@@ -34,11 +34,17 @@ public interface AnnotationReader
     String[] getSupportedAnnotationPackages();
 
     /**
-     * Method to get the ClassMetaData for a class from its annotations.
+     * Method to get the MetaData for a class from its annotations.
      * @param cls The class
      * @param pmd MetaData for the owning package (that this will be a child of)
      * @param clr ClassLoader resolver
      * @return The ClassMetaData (unpopulated and uninitialised)
      */
-    public AbstractClassMetaData getMetaDataForClass(Class cls, PackageMetaData pmd, ClassLoaderResolver clr);
+    AbstractClassMetaData getMetaDataForClass(Class cls, PackageMetaData pmd, ClassLoaderResolver clr);
+
+    /**
+     * Method to return whether this is reading in a persistence context.
+     * @return Whether this is a persistence context
+     */
+    boolean isPersistenceContext();
 }
