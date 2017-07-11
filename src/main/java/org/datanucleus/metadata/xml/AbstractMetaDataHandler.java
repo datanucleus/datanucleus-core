@@ -20,6 +20,7 @@ package org.datanucleus.metadata.xml;
 import java.io.IOException;
 import java.util.Stack;
 
+import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.util.NucleusLogger;
@@ -74,6 +75,11 @@ public class AbstractMetaDataHandler extends DefaultHandler
         this.mgr = mgr;
         this.filename = filename;
         this.entityResolver = resolver;
+    }
+
+    public boolean isPersistenceContext()
+    {
+        return (mgr.getNucleusContext() instanceof PersistenceNucleusContext);
     }
 
     /**
