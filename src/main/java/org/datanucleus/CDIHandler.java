@@ -19,6 +19,7 @@ package org.datanucleus;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -95,10 +96,12 @@ public class CDIHandler
         }
         if (!creationalContexts.isEmpty())
         {
-            for (CreationalContext ctx : creationalContexts)
+            Iterator<CreationalContext> ctxIter = creationalContexts.iterator();
+            while (ctxIter.hasNext())
             {
+                CreationalContext ctx = ctxIter.next();
                 ctx.release();
-                creationalContexts.remove(ctx);
+                ctxIter.remove();
             }
         }
     }
