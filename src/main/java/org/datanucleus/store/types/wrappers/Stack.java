@@ -19,13 +19,10 @@ package org.datanucleus.store.types.wrappers;
 
 import java.io.ObjectStreamException;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Spliterator;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 import org.datanucleus.FetchPlanState;
@@ -911,33 +908,5 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
     public Spliterator spliterator()
     {
         return delegate.spliterator();
-    }
-
-    /* (non-Javadoc)
-     * @see java.util.Collection#removeIf(java.util.function.Predicate)
-     */
-    @Override
-    public synchronized boolean removeIf(Predicate filter)
-    {
-        return delegate.removeIf(filter);
-    }
-
-    /* (non-Javadoc)
-     * @see java.util.ArrayList#replaceAll(java.util.function.UnaryOperator)
-     */
-    @Override
-    public synchronized void replaceAll(UnaryOperator operator)
-    {
-        delegate.replaceAll(operator);
-    }
-
-    /* (non-Javadoc)
-     * @see java.util.ArrayList#sort(java.util.Comparator)
-     */
-    @Override
-    public synchronized void sort(Comparator c)
-    {
-        // TODO Java 8 gives no info regarding what it changed, so we need to write something to work it out (and inform any backing store)
-        delegate.sort(c);
     }
 }
