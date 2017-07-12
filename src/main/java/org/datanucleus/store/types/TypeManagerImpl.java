@@ -846,6 +846,8 @@ public class TypeManagerImpl implements TypeManager, Serializable
         addJavaType(java.sql.Time.class, null, true, true, org.datanucleus.store.types.wrappers.SqlTime.class, null, null, null);
         addJavaType(java.sql.Timestamp.class, null, true, true, org.datanucleus.store.types.wrappers.SqlTimestamp.class, null, null, null);
         addJavaType(java.util.Date.class, null, true, true, org.datanucleus.store.types.wrappers.Date.class, null, null, null);
+        addJavaType(Calendar.class, null, true, true, org.datanucleus.store.types.wrappers.GregorianCalendar.class, null, null, "dn.calendar-string");
+        addJavaType(GregorianCalendar.class, null, true, true, org.datanucleus.store.types.wrappers.GregorianCalendar.class, null, null, "dn.calendar-string");
         addJavaType(java.time.LocalDate.class, null, true, true, null, null, null, "dn.localdate-sqldate");
         addJavaType(java.time.LocalDateTime.class, null, true, true, null, null, null, "dn.localdatetime-timestamp");
         addJavaType(java.time.LocalTime.class, null, true, true, null, null, null, "dn.localtime-sqltime");
@@ -856,7 +858,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         addJavaType(java.time.Period.class, null, true, true, null, null, null, "dn.period-string");
         addJavaType(java.time.Year.class, null, true, true, null, null, null, "dn.year-integer");
         addJavaType(java.time.YearMonth.class, null, true, true, null, null, null, "dn.yearmonth-string");
-        addJavaType(java.time.Month.class, null, true, true, null, null, null, "dn.monthday-string");
+        addJavaType(java.time.MonthDay.class, null, true, true, null, null, null, "dn.monthday-string");
         addJavaType(java.time.ZoneId.class, null, true, true, null, null, null, "dn.zoneid-string");
         addJavaType(java.time.ZoneOffset.class, null, true, true, null, null, null, "dn.zoneoffset-string");
         addJavaType(java.time.ZonedDateTime.class, null, true, true, null, null, null, "dn.zoneddatetime-timestamp");
@@ -864,8 +866,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
         // java.util
         addJavaType(Locale.class, null, true, true, null, null, null, "dn.locale-string");
         addJavaType(Currency.class, null, true, true, null, null, null, "dn.currency-string");
-        addJavaType(Calendar.class, null, true, true, org.datanucleus.store.types.wrappers.GregorianCalendar.class, null, null, "dn.calendar-string");
-        addJavaType(GregorianCalendar.class, null, true, true, org.datanucleus.store.types.wrappers.GregorianCalendar.class, null, null, "dn.calendar-string");
         addJavaType(UUID.class, null, true, true, null, null, null, "dn.uuid-string");
         addJavaType(TimeZone.class, null, true, true, null, null, null, "dn.timezone-string");
 
