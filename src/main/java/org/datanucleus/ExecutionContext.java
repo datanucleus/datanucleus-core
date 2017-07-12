@@ -538,6 +538,16 @@ public interface ExecutionContext extends ExecutionContextReference
     <T> T findObject(Class<T> cls, Object key);
 
     /**
+     * Accessor for objects of the specified type, with the provided id "key"s.
+     * With datastore id or single-field id the "key" is the key of the id, and with composite ids the "key" is the toString() of the id.
+     * @param cls Class of the persistable
+     * @param keys Values of the key field for SingleFieldIdentity, or the string value of the keys otherwise
+     * @return The objects meeting this requirement
+     * @param <T> Type of the persistable
+     */
+    <T> List<T> findObjects(Class<T> cls, List keys);
+
+    /**
      * Accessor for an object of the specified type with the provided values for a unique key.
      * Alternative would be to have an intermediate class and do this
      * <pre>

@@ -2994,7 +2994,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         Object id = key;
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
-            if (!IdentityUtils.isDatastoreIdentity(id))
+            if (!IdentityUtils.isDatastoreIdentity(key))
             {
                 // Create an OID
                 id = nucCtx.getIdentityManager().getDatastoreId(cmd.getFullClassName(), key);
@@ -3014,6 +3014,55 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         return (T) findObject(id, true, true, null);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.ExecutionContext#findObjects(java.lang.Class, java.util.List)
+     */
+    @Override
+    public <T> List<T> findObjects(Class<T> cls, List keys)
+    {
+        if (cls == null || keys == null)
+        {
+            throw new NucleusUserException(Localiser.msg("010051", cls, keys));
+        }
+
+        AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(cls, clr);
+        if (cmd == null)
+        {
+            throw new NucleusUserException(Localiser.msg("010052", cls.getName()));
+        }
+
+        // Get the identities TODO Batch this process
+        List<T> objs = new ArrayList<>();
+        for (Object key : keys)
+        {
+            Object id = key;
+            if (cmd.getIdentityType() == IdentityType.DATASTORE)
+            {
+                if (!IdentityUtils.isDatastoreIdentity(key))
+                {
+                    // Create an OID
+                    id = nucCtx.getIdentityManager().getDatastoreId(cmd.getFullClassName(), key);
+                }
+            }
+            else if (!cmd.getObjectidClass().equals(key.getClass().getName()))
+            {
+                // primaryKey is just the key (when using single-field identity), so create a PK object
+                try
+                {
+                    id = newObjectId(cls, key);
+                }
+                catch (NucleusException ne)
+                {
+                    throw new IllegalArgumentException(ne);
+                }
+            }
+
+            objs.add((T) findObject(id, true, true, null));
+        }
+
+        return objs;
     }
 
     /* (non-Javadoc)
