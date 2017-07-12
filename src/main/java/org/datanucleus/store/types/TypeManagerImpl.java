@@ -1092,14 +1092,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         registerConverter("dn.biginteger-long", new org.datanucleus.store.types.converters.BigIntegerLongConverter(), BigInteger.class, Long.class, false, null);
         registerConverter("dn.bitset-string", new org.datanucleus.store.types.converters.BitSetStringConverter(), BitSet.class, String.class, false, null);
 
-        registerConverter("dn.bufferedimage-bytearray", new org.datanucleus.store.types.converters.BufferedImageByteArrayConverter(), BufferedImage.class, byte[].class, false, null);
-        registerConverter("dn.bufferedimage-bytebuffer", new org.datanucleus.store.types.converters.BufferedImageByteBufferConverter(), BufferedImage.class, ByteBuffer.class, false, null);
-
-        registerConverter("dn.calendar-string", new org.datanucleus.store.types.converters.CalendarStringConverter(), Calendar.class, String.class, false, null);
-        registerConverter("dn.calendar-date", new org.datanucleus.store.types.converters.CalendarDateConverter(), Calendar.class, java.util.Date.class, false, null);
-        registerConverter("dn.calendar-timestamp", new org.datanucleus.store.types.converters.CalendarTimestampConverter(), Calendar.class, java.sql.Timestamp.class, false, null);
-        registerConverter("dn.calendar-components", new org.datanucleus.store.types.converters.CalendarComponentsConverter(), Calendar.class, Object[].class, false, null);
-
+        // java.awt
         registerConverter("dn.color-string", new org.datanucleus.store.types.converters.ColorStringConverter(), java.awt.Color.class, String.class, false, null);
         registerConverter("dn.color-components", new org.datanucleus.store.types.converters.ColorComponentsConverter(), java.awt.Color.class, int[].class, false, null);
 
@@ -1115,6 +1108,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         registerConverter("dn.url-string", new org.datanucleus.store.types.converters.URLStringConverter(), java.net.URL.class, String.class, false, null);
         registerConverter("dn.uuid-string", new org.datanucleus.store.types.converters.UUIDStringConverter(), UUID.class, String.class, false, null);
 
+        // Date/Time
         registerConverter("dn.date-long", new org.datanucleus.store.types.converters.DateLongConverter(), java.util.Date.class, Long.class, false, null);
         registerConverter("dn.date-string", new org.datanucleus.store.types.converters.DateStringConverter(), java.util.Date.class, String.class, false, null);
 
@@ -1128,9 +1122,18 @@ public class TypeManagerImpl implements TypeManager, Serializable
         registerConverter("dn.sqltimestamp-date", new org.datanucleus.store.types.converters.SqlTimestampStringConverter(), java.sql.Timestamp.class, java.util.Date.class, false, null);
         registerConverter("dn.sqltimestamp-string", new org.datanucleus.store.types.converters.SqlTimestampStringConverter(), java.sql.Timestamp.class, String.class, false, null);
 
+        registerConverter("dn.calendar-string", new org.datanucleus.store.types.converters.CalendarStringConverter(), Calendar.class, String.class, false, null);
+        registerConverter("dn.calendar-date", new org.datanucleus.store.types.converters.CalendarDateConverter(), Calendar.class, java.util.Date.class, false, null);
+        registerConverter("dn.calendar-timestamp", new org.datanucleus.store.types.converters.CalendarTimestampConverter(), Calendar.class, java.sql.Timestamp.class, false, null);
+        registerConverter("dn.calendar-components", new org.datanucleus.store.types.converters.CalendarComponentsConverter(), Calendar.class, Object[].class, false, null);
+
+        // Arrays
         registerConverter("dn.serializable-string", new org.datanucleus.store.types.converters.SerializableStringConverter(), java.io.Serializable.class, String.class, false, null);
         registerConverter("dn.serializable-bytearray", new org.datanucleus.store.types.converters.SerializableByteArrayConverter(), java.io.Serializable.class, byte[].class, false, null);
         registerConverter("dn.serializable-bytebuffer", new org.datanucleus.store.types.converters.SerializableByteBufferConverter(), java.io.Serializable.class, ByteBuffer.class, false, null);
+
+        registerConverter("dn.bufferedimage-bytearray", new org.datanucleus.store.types.converters.BufferedImageByteArrayConverter(), BufferedImage.class, byte[].class, false, null);
+        registerConverter("dn.bufferedimage-bytebuffer", new org.datanucleus.store.types.converters.BufferedImageByteBufferConverter(), BufferedImage.class, ByteBuffer.class, false, null);
 
         registerConverter("dn.bytearray-bytebuffer", new org.datanucleus.store.types.converters.ByteArrayByteBufferConverter(), byte[].class, ByteBuffer.class, false, null);
         registerConverter("dn.booleanarray-bytebuffer", new org.datanucleus.store.types.converters.BooleanArrayByteBufferConverter(), boolean[].class, ByteBuffer.class, false, null);
@@ -1143,6 +1146,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         registerConverter("dn.bigintegerarray-bytebuffer", new org.datanucleus.store.types.converters.BigIntegerArrayByteBufferConverter(), BigInteger[].class, ByteBuffer.class, false, null);
         registerConverter("dn.bigdecimalarray-bytebuffer", new org.datanucleus.store.types.converters.BigDecimalArrayByteBufferConverter(), BigDecimal[].class, ByteBuffer.class, false, null);
 
+        // java.time
         registerConverter("dn.localdate-string", new org.datanucleus.store.types.converters.LocalDateStringConverter(), LocalDate.class, String.class, false, null);
         registerConverter("dn.localdate-sqldate", new org.datanucleus.store.types.converters.LocalDateSqlDateConverter(), LocalDate.class, java.sql.Date.class, false, null);
         registerConverter("dn.localdate-date", new org.datanucleus.store.types.converters.LocalDateDateConverter(), LocalDate.class, java.util.Date.class, false, null);
@@ -1168,7 +1172,8 @@ public class TypeManagerImpl implements TypeManager, Serializable
         registerConverter("dn.duration-long", new org.datanucleus.store.types.converters.DurationLongConverter(), Duration.class, Long.class, false, null);
         registerConverter("dn.duration-double", new org.datanucleus.store.types.converters.DurationDoubleConverter(), Duration.class, Double.class, false, null);
 
-        registerConverter("dn.period-string", new org.datanucleus.store.types.converters.DurationStringConverter(), Period.class, String.class, false, null);
+        registerConverter("dn.period-string", new org.datanucleus.store.types.converters.PeriodStringConverter(), Period.class, String.class, false, null);
+        registerConverter("dn.period-components", new org.datanucleus.store.types.converters.PeriodComponentsConverter(), Period.class, int[].class, false, null);
 
         registerConverter("dn.instant-timestamp", new org.datanucleus.store.types.converters.InstantTimestampConverter(), Instant.class, java.sql.Timestamp.class, false, null);
         registerConverter("dn.instant-date", new org.datanucleus.store.types.converters.InstantDateConverter(), Instant.class, java.util.Date.class, false, null);
