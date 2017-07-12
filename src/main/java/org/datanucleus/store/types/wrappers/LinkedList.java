@@ -885,6 +885,7 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
     @Override
     public void sort(Comparator c)
     {
+        // TODO Java 8 gives no info regarding what it changed, so we need to write something to work it out (and inform any backing store)
         delegate.sort(c);
     }
 }

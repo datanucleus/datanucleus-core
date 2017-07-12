@@ -852,6 +852,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
     @Override
     public void sort(Comparator c)
     {
+        // TODO Java 8 gives no info regarding what it changed, so we need to write something to work it out (and inform any backing store)
         delegate.sort(c);
     }
 }

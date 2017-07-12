@@ -937,6 +937,7 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
     @Override
     public synchronized void sort(Comparator c)
     {
+        // TODO Java 8 gives no info regarding what it changed, so we need to write something to work it out (and inform any backing store)
         delegate.sort(c);
     }
 }
