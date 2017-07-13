@@ -20,6 +20,7 @@ package org.datanucleus.store.valuegenerator;
 import java.util.Properties;
 import java.util.UUID;
 
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -29,9 +30,9 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class UUIDObjectGenerator extends AbstractGenerator<UUID>
 {
-    public UUIDObjectGenerator(String name, Properties props)
+    public UUIDObjectGenerator(StoreManager storeMgr, String name, Properties props)
     {
-        super(name, props);
+        super(storeMgr, name, props);
     }
 
     /* (non-Javadoc)

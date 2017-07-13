@@ -20,23 +20,24 @@ package org.datanucleus.store.valuegenerator;
 
 import java.util.Properties;
 
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Value generator for a UUID String format.
- * Results in Strings of length 16 characters, containing the IP address of the local machine
- * as per the JDO2 spec section 18.6.1.
+ * Results in Strings of length 16 characters, containing the IP address of the local machine as per the JDO spec section 18.6.1.
  */
 public class UUIDStringGenerator extends AbstractUUIDGenerator
 {
     /**
      * Constructor.
+     * @param storeMgr StoreManager
      * @param name Symbolic name for this generator
      * @param props Properties controlling its behaviour
      */
-    public UUIDStringGenerator(String name, Properties props)
+    public UUIDStringGenerator(StoreManager storeMgr, String name, Properties props)
     {
-        super(name, props);
+        super(storeMgr, name, props);
     }
 
     /**

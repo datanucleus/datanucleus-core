@@ -72,25 +72,25 @@ public class ValueGenerationManagerImpl implements ValueGenerationManager
         this.storeMgr = storeMgr;
 
         // Load up all built-in generators
-        ValueGenerator generator = new TimestampGenerator("timestamp", null);
+        ValueGenerator generator = new TimestampGenerator(storeMgr, "timestamp", null);
         uniqueGeneratorsByName.put("timestamp", generator);
 
-        generator = new TimestampValueGenerator("timestamp-value", null);
+        generator = new TimestampValueGenerator(storeMgr, "timestamp-value", null);
         uniqueGeneratorsByName.put("timestamp-value", generator);
 
-        generator = new AUIDGenerator("timestamp-value", null);
+        generator = new AUIDGenerator(storeMgr, "timestamp-value", null);
         uniqueGeneratorsByName.put("auid", generator);
 
-        generator = new UUIDGenerator("uuid", null);
+        generator = new UUIDGenerator(storeMgr, "uuid", null);
         uniqueGeneratorsByName.put("uuid", generator);
 
-        generator = new UUIDObjectGenerator("uuid-object", null);
+        generator = new UUIDObjectGenerator(storeMgr, "uuid-object", null);
         uniqueGeneratorsByName.put("uuid-object", generator);
 
-        generator = new UUIDHexGenerator("uuid-hex", null);
+        generator = new UUIDHexGenerator(storeMgr, "uuid-hex", null);
         uniqueGeneratorsByName.put("uuid-hex", generator);
 
-        generator = new UUIDStringGenerator("uuid-string", null);
+        generator = new UUIDStringGenerator(storeMgr, "uuid-string", null);
         uniqueGeneratorsByName.put("uuid-string", generator);
 
         // Load up any unique generators from the plugin mechanism
@@ -186,7 +186,7 @@ public class ValueGenerationManagerImpl implements ValueGenerationManager
                     generator = (AbstractGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
                         "org.datanucleus.store_valuegenerator",
                         new String[] {"name", "datastore"}, new String[] {strategyName, storeMgr.getStoreManagerKey()},
-                        "class-name", new Class[] {String.class, Properties.class}, new Object[] {memberKey, null});
+                        "class-name", new Class[] {StoreManager.class, String.class, Properties.class}, new Object[] {storeMgr, memberKey, null});
                 }
                 catch (Exception e)
                 {
@@ -280,8 +280,8 @@ public class ValueGenerationManagerImpl implements ValueGenerationManager
             {
                 NucleusLogger.VALUEGENERATION.debug(Localiser.msg("040001", generatorClass.getName(), seqName));
             }
-            Class[] argTypes = new Class[] {String.class, Properties.class};
-            Object[] args = new Object[] {seqName, props};
+            Class[] argTypes = new Class[] {StoreManager.class, String.class, Properties.class};
+            Object[] args = new Object[] {storeMgr, seqName, props};
             Constructor ctor = generatorClass.getConstructor(argTypes);
             generator = (ValueGenerator)ctor.newInstance(args);
         }
@@ -291,11 +291,10 @@ public class ValueGenerationManagerImpl implements ValueGenerationManager
             throw new ValueGenerationException(Localiser.msg("040000", generatorClass.getName(),e),e);
         }
 
-        if (generator instanceof AbstractDatastoreGenerator && storeMgr != null)
+        if (generator instanceof AbstractConnectedGenerator && storeMgr != null)
         {
             // Set the store manager and connection provider for any datastore-based generators
-            ((AbstractDatastoreGenerator)generator).setStoreManager(storeMgr);
-            ((AbstractDatastoreGenerator)generator).setConnectionProvider(connectionProvider);
+            ((AbstractConnectedGenerator)generator).setConnectionProvider(connectionProvider);
         }
 
         return generator;

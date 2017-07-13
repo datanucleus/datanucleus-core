@@ -21,6 +21,8 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Properties;
 
+import org.datanucleus.store.StoreManager;
+
 /**
  * Value generator for timestamps.
  */
@@ -28,12 +30,13 @@ public class TimestampGenerator extends AbstractGenerator<Timestamp>
 {
     /**
      * Constructor.
+     * @param storeMgr StoreManager
      * @param name Symbolic name of the generator
      * @param props Any properties controlling its behaviour.
      */
-    public TimestampGenerator(String name, Properties props)
+    public TimestampGenerator(StoreManager storeMgr, String name, Properties props)
     {
-        super(name, props);
+        super(storeMgr, name, props);
     }
 
     /**

@@ -21,6 +21,7 @@ package org.datanucleus.store.valuegenerator;
 import java.util.Properties;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -29,6 +30,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public abstract class AbstractGenerator<T> implements ValueGenerator<T>
 {
+    protected StoreManager storeMgr;
+
     /** Symbolic name for the sequence. */
     protected String name;
 
@@ -60,12 +63,13 @@ public abstract class AbstractGenerator<T> implements ValueGenerator<T>
      * <li>column-name : Name of the column in the table (for the field)</li>
      * <li>sequence-name : Name of the sequence (if specified in MetaData as "sequence)</li>
      * </ul>
-     * 
+     * @param storeMgr Store Manager
      * @param name Symbolic name for this generator
      * @param props Properties controlling the behaviour of the generator (or null if not required).
      */
-    public AbstractGenerator(String name, Properties props)
+    public AbstractGenerator(StoreManager storeMgr, String name, Properties props)
     {
+        this.storeMgr = storeMgr;
         this.name = name;
         this.properties = props;
     }

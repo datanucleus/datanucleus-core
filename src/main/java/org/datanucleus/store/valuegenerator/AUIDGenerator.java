@@ -23,6 +23,7 @@ import java.util.GregorianCalendar;
 import java.util.Properties;
 import java.util.Random;
 
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -52,9 +53,9 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class AUIDGenerator extends AbstractGenerator<String>
 {
-    public AUIDGenerator(String name, Properties props)
+    public AUIDGenerator(StoreManager storeMgr, String name, Properties props)
     {
-        super(name, props);
+        super(storeMgr, name, props);
         allocationSize = 1;
     }
 

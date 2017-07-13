@@ -21,6 +21,7 @@ package org.datanucleus.store.valuegenerator;
 import java.net.InetAddress;
 import java.util.Properties;
 
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.TypeConversionHelper;
@@ -56,12 +57,13 @@ public abstract class AbstractUUIDGenerator extends AbstractGenerator<String>
 
     /**
      * Constructor.
+     * @param storeMgr StoreManager
      * @param name Symbolic name for this generator
      * @param props Properties controlling its behaviour
      */
-    public AbstractUUIDGenerator(String name, Properties props)
+    public AbstractUUIDGenerator(StoreManager storeMgr, String name, Properties props)
     {
-        super(name, props);
+        super(storeMgr, name, props);
     }
 
     /**

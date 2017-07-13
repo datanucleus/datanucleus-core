@@ -33,7 +33,7 @@ public class UUIDGeneratorTest extends TestCase
      */
     public void testStringLength()
     {
-        UUIDGenerator gen = new UUIDGenerator("Test", null);
+        UUIDGenerator gen = new UUIDGenerator(null, "Test", null);
         for (int i=0; i<10; i++)
         {
             Object id = gen.next();
@@ -48,7 +48,7 @@ public class UUIDGeneratorTest extends TestCase
     {
         // Create 1000 identifiers
         String[] ids = new String[1000];
-        UUIDGenerator gen = new UUIDGenerator("Test", null);
+        UUIDGenerator gen = new UUIDGenerator(null, "Test", null);
         for (int i=0;i<ids.length;i++)
         {
             ids[i] = gen.next();

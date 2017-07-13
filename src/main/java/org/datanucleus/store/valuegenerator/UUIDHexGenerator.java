@@ -20,6 +20,7 @@ package org.datanucleus.store.valuegenerator;
 
 import java.util.Properties;
 
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.TypeConversionHelper;
 
 /**
@@ -31,12 +32,13 @@ public class UUIDHexGenerator extends AbstractUUIDGenerator
 {
     /**
      * Constructor.
+     * @param storeMgr StoreManager
      * @param name Symbolic name for this generator
      * @param props Properties controlling its behaviour
      */
-    public UUIDHexGenerator(String name, Properties props)
+    public UUIDHexGenerator(StoreManager storeMgr, String name, Properties props)
     {
-        super(name, props);
+        super(storeMgr, name, props);
     }
 
     /**

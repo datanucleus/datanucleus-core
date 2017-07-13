@@ -23,36 +23,24 @@ import java.util.Properties;
 import org.datanucleus.store.StoreManager;
 
 /**
- * Abstract representation of a ValueGenerator for a datastore.
- * Builds on the base AbstractValueGenerator, and providing datastore connection 
- * and StoreManager information.
+ * Abstract representation of a ValueGenerator requiring a connection to a datastore.
+ * Builds on the base AbstractGenerator, providing datastore connection information.
  */
-public abstract class AbstractDatastoreGenerator<T> extends AbstractGenerator<T>
+public abstract class AbstractConnectedGenerator<T> extends AbstractGenerator<T>
 {
-    /** Manager for the datastore. */
-    protected StoreManager storeMgr;
-
     /** The means of connecting to the datastore (if required by the generator). */
     protected ValueGenerationConnectionProvider connectionProvider;
 
     /**
      * Constructor.
+     * @param storeMgr Store Manager
      * @param name Symbolic name for the generator
      * @param props Properties controlling the behaviour of the generator
      */
-    public AbstractDatastoreGenerator(String name, Properties props)
+    public AbstractConnectedGenerator(StoreManager storeMgr, String name, Properties props)
     {
-        super(name, props);
+        super(storeMgr, name, props);
         allocationSize = 1;
-    }
-
-    /**
-     * Method to set the StoreManager to be used.
-     * @param storeMgr The Store Manager 
-     */
-    public void setStoreManager(StoreManager storeMgr)
-    {
-        this.storeMgr = storeMgr;
     }
 
     /**

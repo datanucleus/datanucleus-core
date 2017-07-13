@@ -20,6 +20,8 @@ package org.datanucleus.store.valuegenerator;
 import java.util.Calendar;
 import java.util.Properties;
 
+import org.datanucleus.store.StoreManager;
+
 /**
  * Value generator for timestamp values (millisecs).
  * The "timestamps" are the number of milliseconds (since Jan 1 1970).
@@ -28,12 +30,13 @@ public class TimestampValueGenerator extends AbstractGenerator<Long>
 {
     /**
      * Constructor.
+     * @param storeMgr StoreManager
      * @param name Symbolic name of the generator
      * @param props Any properties controlling its behaviour.
      */
-    public TimestampValueGenerator(String name, Properties props)
+    public TimestampValueGenerator(StoreManager storeMgr, String name, Properties props)
     {
-        super(name, props);
+        super(storeMgr, name, props);
     }
 
     /**

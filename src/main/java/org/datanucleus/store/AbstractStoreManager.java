@@ -67,7 +67,7 @@ import org.datanucleus.store.schema.naming.DN2NamingFactory;
 import org.datanucleus.store.schema.naming.JPANamingFactory;
 import org.datanucleus.store.schema.naming.NamingCase;
 import org.datanucleus.store.schema.naming.NamingFactory;
-import org.datanucleus.store.valuegenerator.AbstractDatastoreGenerator;
+import org.datanucleus.store.valuegenerator.AbstractConnectedGenerator;
 import org.datanucleus.store.valuegenerator.AbstractGenerator;
 import org.datanucleus.store.valuegenerator.ValueGenerationConnectionProvider;
 import org.datanucleus.store.valuegenerator.ValueGenerationManager;
@@ -1003,13 +1003,12 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             {
                 generator = (AbstractGenerator)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.store_valuegenerator",
                     new String[] {"name", "datastore"}, new String[] {strategyName, getStoreManagerKey()},
-                    "class-name", new Class[] {String.class, Properties.class}, new Object[] {memberKey, props});
+                    "class-name", new Class[] {StoreManager.class, String.class, Properties.class}, new Object[] {this, memberKey, props});
 
-                if (generator instanceof AbstractDatastoreGenerator)
+                if (generator instanceof AbstractConnectedGenerator)
                 {
                     // Set the store manager and connection provider for any datastore-based generators
-                    ((AbstractDatastoreGenerator)generator).setStoreManager(this);
-                    ((AbstractDatastoreGenerator)generator).setConnectionProvider(null);
+                    ((AbstractConnectedGenerator)generator).setConnectionProvider(null);
                 }
             }
             catch (Exception e)
@@ -1107,7 +1106,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             // Get the next value for this generator for this ExecutionContext
             // Note : this is synchronised since we don't want to risk handing out this generator while its connectionProvider is set to that of a different ExecutionContext
             // It maybe would be good to change ValueGenerator to have a next taking the connectionProvider
-            if (generator instanceof AbstractDatastoreGenerator)
+            if (generator instanceof AbstractConnectedGenerator)
             {
                 // datastore-based generator so set the connection provider, using connection for PM
                 ValueGenerationConnectionProvider connProvider = new ValueGenerationConnectionProvider()
@@ -1124,7 +1123,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                         mconn = null;
                     }
                 };
-                ((AbstractDatastoreGenerator)generator).setConnectionProvider(connProvider);
+                ((AbstractConnectedGenerator)generator).setConnectionProvider(connProvider);
             }
 
             oid = generator.next();
