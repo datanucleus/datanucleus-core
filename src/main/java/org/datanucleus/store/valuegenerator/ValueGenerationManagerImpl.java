@@ -28,12 +28,15 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.plugin.ConfigurationElement;
+import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Manager for the creation of ValueGenerators.
@@ -214,21 +217,71 @@ public class ValueGenerationManagerImpl implements ValueGenerationManager
     }
 
     /* (non-Javadoc)
+     * @see org.datanucleus.store.valuegenerator.ValueGenerationManager#supportsStrategy(java.lang.String)
+     */
+    @Override
+    public boolean supportsStrategy(String strategy)
+    {
+        if (StringUtils.isWhitespace(strategy))
+        {
+            return false;
+        }
+
+        // Built-in unique ValueGenerators
+        if ("timestamp".equalsIgnoreCase(strategy) || "timestamp-value".equalsIgnoreCase(strategy) || "auid".equalsIgnoreCase(strategy) ||
+            "uuid".equalsIgnoreCase(strategy) || "uuid-object".equalsIgnoreCase(strategy) || "uuid-hex".equalsIgnoreCase(strategy) || "uuid-string".equalsIgnoreCase(strategy))
+        {
+            return true;
+        }
+
+        PluginManager pluginMgr = storeMgr.getNucleusContext().getPluginManager();
+
+        // Try plugin mechanism "unique" generators
+        ConfigurationElement elem = pluginMgr.getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
+            new String[]{"name", "unique"}, new String[] {strategy, "true"});
+        if (elem != null)
+        {
+            // Unique strategy so supported for all datastores
+            return true;
+        }
+
+        // Try plugin mechanism "datastore" (non-unique) generators
+        elem = pluginMgr.getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
+            new String[]{"name", "datastore"}, new String[] {strategy, storeMgr.getStoreManagerKey()});
+        if (elem != null)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /* (non-Javadoc)
      * @see org.datanucleus.store.valuegenerator.ValueGenerationManager#createValueGenerator(java.lang.String, java.lang.Class, java.util.Properties, org.datanucleus.store.valuegenerator.ValueGenerationConnectionProvider)
      */
     @Override
-    public ValueGenerator createValueGenerator(String name, Class generatorClass, Properties props, ValueGenerationConnectionProvider connectionProvider)
+    public ValueGenerator createValueGenerator(String strategyName, String seqName, Properties props, ValueGenerationConnectionProvider connectionProvider)
     {
-        // Create the requested generator
+        PluginManager pluginMgr = storeMgr.getNucleusContext().getPluginManager();
+
+        ConfigurationElement elem = pluginMgr.getConfigurationElementForExtension("org.datanucleus.store_valuegenerator", 
+                new String[]{"name", "datastore"}, new String[] {strategyName, storeMgr.getStoreManagerKey()});
+        Class generatorClass = (elem != null) ? pluginMgr.loadClass(elem.getExtension().getPlugin().getSymbolicName(), elem.getAttribute("class-name")) : null;
+        if (generatorClass == null)
+        {
+            throw new NucleusException("Cannot create ValueGenerator for strategy "+seqName);
+        }
+
+        // Create the requested generator TODO If using plugin mechanism, should use createExecutableExtension
         ValueGenerator generator;
         try
         {
             if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
             {
-                NucleusLogger.VALUEGENERATION.debug(Localiser.msg("040001", generatorClass.getName(), name));
+                NucleusLogger.VALUEGENERATION.debug(Localiser.msg("040001", generatorClass.getName(), seqName));
             }
             Class[] argTypes = new Class[] {String.class, Properties.class};
-            Object[] args = new Object[] {name, props};
+            Object[] args = new Object[] {seqName, props};
             Constructor ctor = generatorClass.getConstructor(argTypes);
             generator = (ValueGenerator)ctor.newInstance(args);
         }

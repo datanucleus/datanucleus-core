@@ -81,14 +81,20 @@ public interface ValueGenerationManager
     Class getTypeForValueGeneratorForMember(String strategyName, String memberKey);
 
     /**
+     * Convenience accessor for whether the specified strategy is supported for this datastore.
+     * @param strategy The strategy name
+     * @return Whether it is supported
+     */
+    boolean supportsStrategy(String strategy);
+
+    /**
      * Method to create a ValueGenerator when the generator is datastore based.
      * This is used solely by the NucleusSequence API to create a generator, but not to register it here for further use.
-     * @param name Symbolic name of the generator
-     * @param generatorClass Class for the generator type
+     * @param strategyName Strategy name
+     * @param seqName Symbolic name of the generator
      * @param props Properties to control the generator
      * @param connectionProvider Provider for connections
      * @return The ValueGenerator
      */
-    ValueGenerator createValueGenerator(String name, Class generatorClass, Properties props, ValueGenerationConnectionProvider connectionProvider);
-
+    ValueGenerator createValueGenerator(String strategyName, String seqName, Properties props, ValueGenerationConnectionProvider connectionProvider);
 }

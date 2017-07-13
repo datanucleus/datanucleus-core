@@ -21,9 +21,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.SequenceMetaData;
-import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.valuegenerator.ValueGenerationConnectionProvider;
 import org.datanucleus.store.valuegenerator.ValueGenerationManager;
@@ -33,7 +31,6 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * Basic generic implementation of a datastore sequence.
- * Utilises the "org.datanucleus.store_valuegenerator" extensions.
  */
 public class NucleusSequenceImpl implements NucleusSequence
 {
@@ -108,24 +105,7 @@ public class NucleusSequenceImpl implements NucleusSequence
             }
         };
 
-        // TODO Move this to ValueGeneratorManager
-        Class cls = null;
-        ConfigurationElement elem =
-            ec.getNucleusContext().getPluginManager().getConfigurationElementForExtension(
-                "org.datanucleus.store_valuegenerator", 
-                new String[]{"name", "datastore"}, 
-                new String[] {valueGeneratorName, storeManager.getStoreManagerKey()});
-        if (elem != null)
-        {
-            cls = ec.getNucleusContext().getPluginManager().loadClass(
-                elem.getExtension().getPlugin().getSymbolicName(), elem.getAttribute("class-name"));
-        }
-        if (cls == null)
-        {
-            throw new NucleusException("Cannot create ValueGenerator for strategy "+valueGeneratorName);
-        }
-        generator = mgr.createValueGenerator(seqMetaData.getName(), cls, props, connProvider);
-
+        generator = mgr.createValueGenerator(valueGeneratorName, seqMetaData.getName(), props, connProvider);
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
             NucleusLogger.DATASTORE.debug(Localiser.msg("017003", seqMetaData.getName(), valueGeneratorName));

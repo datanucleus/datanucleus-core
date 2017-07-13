@@ -52,7 +52,6 @@ import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.metadata.TableGeneratorMetaData;
-import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.properties.PropertyStore;
 import org.datanucleus.state.StateManagerImpl;
 import org.datanucleus.store.autostart.AutoStartMechanism;
@@ -743,36 +742,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      */
     public boolean supportsValueGenerationStrategy(String strategy)
     {
-        if (StringUtils.isWhitespace(strategy))
-        {
-            return false;
-        }
-
-        // Built-in unique ValueGenerators
-        if ("timestamp".equalsIgnoreCase(strategy) || "timestamp-value".equalsIgnoreCase(strategy) || "auid".equalsIgnoreCase(strategy) ||
-            "uuid".equalsIgnoreCase(strategy) || "uuid-object".equalsIgnoreCase(strategy) || "uuid-hex".equalsIgnoreCase(strategy) || "uuid-string".equalsIgnoreCase(strategy))
-        {
-            return true;
-        }
-
-        // Try plugin mechanism "unique" generators
-        ConfigurationElement elem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
-            new String[]{"name", "unique"}, new String[] {strategy, "true"});
-        if (elem != null)
-        {
-            // Unique strategy so supported for all datastores
-            return true;
-        }
-
-        // Try plugin mechanism "datastore" (non-unique) generators
-        elem = nucleusContext.getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
-            new String[]{"name", "datastore"}, new String[] {strategy, storeManagerKey});
-        if (elem != null)
-        {
-            return true;
-        }
-
-        return false;
+        return valueGenerationMgr.supportsStrategy(strategy);
     }
 
     /* (non-Javadoc)
@@ -1026,6 +996,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         Properties props = getPropertiesForValueGenerator(cmd, absoluteFieldNumber, clr, sequenceMetaData, tableGeneratorMetaData);
 
         // Must be "datastore" specific generator so use plugin mechanism to create one and register against this member "key"
+        // TODO Move to ValueGenerationManager
         synchronized (valueGenerationMgr)
         {
             try
@@ -1072,7 +1043,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             Class type = mmd.getType();
             if (String.class.isAssignableFrom(type))
             {
-                return "uuid-hex";
+                return "uuid-hex"; // TODO Do we really want this when we have "uuid"?
             }
             else if (type == Long.class || type == Integer.class || type == Short.class || type == long.class || type == int.class || type == short.class || type== BigInteger.class)
             {
