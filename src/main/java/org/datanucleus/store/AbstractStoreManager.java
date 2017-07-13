@@ -68,7 +68,6 @@ import org.datanucleus.store.schema.naming.JPANamingFactory;
 import org.datanucleus.store.schema.naming.NamingCase;
 import org.datanucleus.store.schema.naming.NamingFactory;
 import org.datanucleus.store.valuegenerator.AbstractConnectedGenerator;
-import org.datanucleus.store.valuegenerator.AbstractGenerator;
 import org.datanucleus.store.valuegenerator.ValueGenerationConnectionProvider;
 import org.datanucleus.store.valuegenerator.ValueGenerationManager;
 import org.datanucleus.store.valuegenerator.ValueGenerationManagerImpl;
@@ -992,34 +991,11 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             return generator;
         }
 
+        // Must be "datastore" specific generator so use plugin mechanism to create one and register against this member "key"
         // Set up the default properties available for all value generators
         Properties props = getPropertiesForValueGenerator(cmd, absoluteFieldNumber, clr, sequenceMetaData, tableGeneratorMetaData);
 
-        // Must be "datastore" specific generator so use plugin mechanism to create one and register against this member "key"
-        // TODO Move to ValueGenerationManager
-        synchronized (valueGenerationMgr)
-        {
-            try
-            {
-                generator = (AbstractGenerator)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.store_valuegenerator",
-                    new String[] {"name", "datastore"}, new String[] {strategyName, getStoreManagerKey()},
-                    "class-name", new Class[] {StoreManager.class, String.class, Properties.class}, new Object[] {this, memberKey, props});
-
-                if (generator instanceof AbstractConnectedGenerator)
-                {
-                    // Set the store manager and connection provider for any datastore-based generators
-                    ((AbstractConnectedGenerator)generator).setConnectionProvider(null);
-                }
-            }
-            catch (Exception e)
-            {
-            }
-
-            // Register the generator against this member
-            valueGenerationMgr.registerValueGeneratorForMemberKey(memberKey, generator);
-        }
-
-        return generator;
+        return valueGenerationMgr.createAndRegisterValueGenerator(memberKey, strategyName, props);
     }
 
     /**

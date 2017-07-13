@@ -173,47 +173,83 @@ public class ValueGenerationManagerImpl implements ValueGenerationManager
     @Override
     public Class getTypeForValueGeneratorForMember(String strategyName, String memberKey)
     {
+        // Find the generator class for this strategy
+        Class generatorClass = null;
         ValueGenerator generator = generatorsByMemberKey.get(memberKey);
         if (generator == null)
         {
             // No generator assigned to this member key, so check for a unique generator
             generator = uniqueGeneratorsByName.get(strategyName);
-            if (generator == null)
-            {
-                // Try to create a datastore generator with this strategy
-                try
-                {
-                    generator = (AbstractGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
-                        "org.datanucleus.store_valuegenerator",
-                        new String[] {"name", "datastore"}, new String[] {strategyName, storeMgr.getStoreManagerKey()},
-                        "class-name", new Class[] {StoreManager.class, String.class, Properties.class}, new Object[] {storeMgr, memberKey, null});
-                }
-                catch (Exception e)
-                {
-                }
-            }
         }
 
         if (generator != null)
+        {
+            generatorClass = generator.getClass();
+        }
+        else
+        {
+            // Check the plugin mechanism for a generator for this strategy
+            try
+            {
+                ConfigurationElement elem = storeMgr.getNucleusContext().getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator", 
+                    new String[]{"name", "datastore"}, new String[] {strategyName, storeMgr.getStoreManagerKey()});
+                generatorClass = (elem != null) ? storeMgr.getNucleusContext().getPluginManager().loadClass(elem.getExtension().getPlugin().getSymbolicName(), 
+                    elem.getAttribute("class-name")) : null;
+            }
+            catch (Exception e)
+            {
+            }
+        }
+
+        if (generatorClass != null)
         {
             Class valueGeneratedType = null;
             try
             {
                 // Use "getStorageClass" method if available
-                valueGeneratedType = (Class) generator.getClass().getMethod("getStorageClass").invoke(null);
+                valueGeneratedType = (Class) generatorClass.getMethod("getStorageClass").invoke(null);
             }
             catch (Exception e)
             {
-                if (generator.getClass().getGenericSuperclass() instanceof ParameterizedType)
+                if (generatorClass.getGenericSuperclass() instanceof ParameterizedType)
                 {
-                    // TODO Improve this so it works always
-                    ParameterizedType parameterizedType = (ParameterizedType) generator.getClass().getGenericSuperclass();
+                    // TODO Improve this so it works always and so we don't need "getStorageClass" method (i.e what generic type is provided to AbstractGenerator?)
+                    ParameterizedType parameterizedType = (ParameterizedType) generatorClass.getGenericSuperclass();
                     valueGeneratedType = (Class) parameterizedType.getActualTypeArguments()[0];
                 }
             }
             return valueGeneratedType;
         }
+
         return null;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.valuegenerator.ValueGenerationManager#createAndRegisterValueGenerator(java.lang.String, java.lang.String, java.util.Properties)
+     */
+    @Override
+    public ValueGenerator createAndRegisterValueGenerator(String memberKey, String strategyName, Properties props)
+    {
+        ValueGenerator generator = null;
+        synchronized (this)
+        {
+            try
+            {
+                generator = (AbstractGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store_valuegenerator",
+                    new String[] {"name", "datastore"}, new String[] {strategyName, storeMgr.getStoreManagerKey()},
+                    "class-name", new Class[] {StoreManager.class, String.class, Properties.class}, new Object[] {storeMgr, memberKey, props});
+
+                // Register the generator against this member
+                registerValueGeneratorForMemberKey(memberKey, generator);
+            }
+            catch (Exception e)
+            {
+                NucleusLogger.VALUEGENERATION.error("Exception thrown trying to create value generator for strategy=" + strategyName + " datastore=" + storeMgr.getStoreManagerKey(), e);
+            }
+
+        }
+
+        return generator;
     }
 
     /* (non-Javadoc)
