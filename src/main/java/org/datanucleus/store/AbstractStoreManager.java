@@ -735,16 +735,6 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         return (language != null && (language.equalsIgnoreCase(Query.LANGUAGE_JDOQL) || language.equalsIgnoreCase(Query.LANGUAGE_JPQL)));
     }
 
-    /**
-     * Accessor for whether this value strategy is supported.
-     * @param strategy The strategy
-     * @return Whether it is supported.
-     */
-    public boolean supportsValueGenerationStrategy(String strategy)
-    {
-        return valueGenerationMgr.supportsStrategy(strategy);
-    }
-
     /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#getClassNameForObjectID(java.lang.Object, org.datanucleus.ClassLoaderResolver, org.datanucleus.ExecutionContext)
      */
@@ -776,6 +766,16 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
 
         return null;
+    }
+
+    /**
+     * Accessor for whether this value strategy is supported.
+     * @param strategy The strategy
+     * @return Whether it is supported.
+     */
+    public boolean supportsValueGenerationStrategy(String strategy)
+    {
+        return valueGenerationMgr.supportsStrategy(strategy);
     }
 
     /**

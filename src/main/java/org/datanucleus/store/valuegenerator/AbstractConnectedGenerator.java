@@ -21,6 +21,8 @@ package org.datanucleus.store.valuegenerator;
 import java.util.Properties;
 
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Abstract representation of a ValueGenerator requiring a connection to a datastore.
@@ -30,6 +32,9 @@ public abstract class AbstractConnectedGenerator<T> extends AbstractGenerator<T>
 {
     /** The means of connecting to the datastore (if required by the generator). */
     protected ValueGenerationConnectionProvider connectionProvider;
+
+    /** Flag for whether we know that the repository exists. Only applies if repository is required. */
+    protected boolean repositoryExists = false;
 
     /**
      * Constructor.
@@ -70,4 +75,134 @@ public abstract class AbstractConnectedGenerator<T> extends AbstractGenerator<T>
     {
         return ConnectionPreference.NONE;
     }
+
+    /**
+     * Indicator for whether the generator requires its own repository.
+     * AbstractValueGenerator returns false and this should be overridden by all
+     * generators requiring a repository.
+     * @return Whether a repository is required.
+     */
+    protected boolean requiresRepository()
+    {
+        return false;
+    }
+
+    /**
+     * Method to return if the repository already exists.
+     * @return Whether the repository exists
+     */
+    protected boolean repositoryExists()
+    {
+        return true;
+    }
+
+    /**
+     * Method to create any needed repository for the values.
+     * AbstractValueGenerator just returns true and should be overridden by any
+     * implementing generator requiring its own repository.
+     * @return If all is ready for use
+     */
+    protected boolean createRepository()
+    {
+        // Do nothing - to be overridden by generators that want to create a repository for their ids
+        return true;
+    }
+
+    /**
+     * Get a new block with the specified number of ids.
+     * @param number The number of additional ids required
+     * @return the block
+     */
+    protected ValueGenerationBlock<T> obtainGenerationBlock(int number)
+    {
+        ValueGenerationBlock<T> block = null;
+
+        // Try getting the block
+        boolean repository_exists=true; // TODO Ultimately this can be removed when "repositoryExists()" is implemented
+        try
+        {
+            if (requiresRepository() && !repositoryExists)
+            {
+                // Make sure the repository is present before proceeding
+                repositoryExists = repositoryExists();
+                if (!repositoryExists)
+                {
+                    createRepository();
+                    repositoryExists = true;
+                }
+            }
+
+            try
+            {
+                if (number < 0)
+                {
+                    block = reserveBlock();
+                }
+                else
+                {
+                    block = reserveBlock(number);
+                }
+            }
+            catch (ValueGenerationException vex)
+            {
+                NucleusLogger.VALUEGENERATION.info(Localiser.msg("040003", vex.getMessage()));
+
+                // attempt to obtain the block of unique identifiers is invalid
+                if (requiresRepository())
+                {
+                    repository_exists = false;
+                }
+                else
+                {
+                    throw vex;
+                }
+            }
+            catch (RuntimeException ex)
+            {
+                //exceptions cached by the value should be enclosed in ValueGenerationException
+                //when the exceptions are not caught exception by value, we give a new try
+                //in creating the repository
+                NucleusLogger.VALUEGENERATION.info(Localiser.msg("040003", ex.getMessage()));
+                // attempt to obtain the block of unique identifiers is invalid
+                if (requiresRepository())
+                {
+                    repository_exists = false;
+                }
+                else
+                {
+                    throw ex;
+                }
+            }
+        }
+        finally
+        {
+        }
+
+        // If repository didn't exist, try creating it and then get block
+        if (!repository_exists)
+        {
+            try
+            {
+                NucleusLogger.VALUEGENERATION.info(Localiser.msg("040005"));
+                if (!createRepository())
+                {
+                    throw new ValueGenerationException(Localiser.msg("040002"));
+                }
+
+                if (number < 0)
+                {
+                    block = reserveBlock();
+                }
+                else
+                {
+                    block = reserveBlock(number);
+                }
+            }
+            finally
+            {
+            }
+        }
+        return block;
+    }
+
 }
