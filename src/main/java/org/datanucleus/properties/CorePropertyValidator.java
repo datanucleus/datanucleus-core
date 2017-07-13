@@ -120,8 +120,7 @@ public class CorePropertyValidator implements PropertyValidator
             {
                 String strVal = (String)value;
                 if (strVal.equalsIgnoreCase("NEW") ||
-                    strVal.equalsIgnoreCase("EXISTING") ||
-                    strVal.equalsIgnoreCase("UsePM")) // TODO deprecated so remove
+                    strVal.equalsIgnoreCase("EXISTING"))
                 {
                     return true;
                 }
