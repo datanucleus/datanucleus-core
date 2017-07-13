@@ -157,8 +157,7 @@ public abstract class AbstractGenerator<T> implements ValueGenerator<T>
 
     /**
      * Method to allocate a number of values into the block.
-     * If the block already exists and has remaining values, the
-     * additional values are added to the block.
+     * If the block already exists and has remaining values, the additional values are added to the block.
      * @param additional The number to allocate
      */
     public synchronized void allocate(int additional)
