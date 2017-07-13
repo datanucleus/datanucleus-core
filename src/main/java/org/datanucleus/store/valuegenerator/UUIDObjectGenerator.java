@@ -17,7 +17,6 @@ Contributors:
  **********************************************************************/
 package org.datanucleus.store.valuegenerator;
 
-import java.util.Properties;
 import java.util.UUID;
 
 import org.datanucleus.store.StoreManager;
@@ -30,9 +29,18 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class UUIDObjectGenerator extends AbstractGenerator<UUID>
 {
-    public UUIDObjectGenerator(StoreManager storeMgr, String name, Properties props)
+    public UUIDObjectGenerator(StoreManager storeMgr, String name)
     {
-        super(storeMgr, name, props);
+        super(storeMgr, name);
+    }
+
+    /**
+     * Accessor for the storage class for values generated with this generator.
+     * @return Storage class (in this case UUID.class)
+     */
+    public static Class getStorageClass()
+    {
+        return UUID.class;
     }
 
     /* (non-Javadoc)

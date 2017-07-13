@@ -19,7 +19,6 @@ Contributors:
 package org.datanucleus.store.valuegenerator;
 
 import java.net.InetAddress;
-import java.util.Properties;
 
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.Localiser;
@@ -59,11 +58,10 @@ public abstract class AbstractUUIDGenerator extends AbstractGenerator<String>
      * Constructor.
      * @param storeMgr StoreManager
      * @param name Symbolic name for this generator
-     * @param props Properties controlling its behaviour
      */
-    public AbstractUUIDGenerator(StoreManager storeMgr, String name, Properties props)
+    public AbstractUUIDGenerator(StoreManager storeMgr, String name)
     {
-        super(storeMgr, name, props);
+        super(storeMgr, name);
     }
 
     /**

@@ -18,8 +18,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.valuegenerator;
 
-import java.util.Properties;
-
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.TypeConversionHelper;
 
@@ -33,11 +31,19 @@ public class UUIDStringGenerator extends AbstractUUIDGenerator
      * Constructor.
      * @param storeMgr StoreManager
      * @param name Symbolic name for this generator
-     * @param props Properties controlling its behaviour
      */
-    public UUIDStringGenerator(StoreManager storeMgr, String name, Properties props)
+    public UUIDStringGenerator(StoreManager storeMgr, String name)
     {
-        super(storeMgr, name, props);
+        super(storeMgr, name);
+    }
+
+    /**
+     * Accessor for the storage class for values generated with this generator.
+     * @return Storage class (in this case String.class)
+     */
+    public static Class getStorageClass()
+    {
+        return String.class;
     }
 
     /**

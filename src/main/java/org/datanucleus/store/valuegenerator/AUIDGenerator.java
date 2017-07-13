@@ -20,7 +20,6 @@ package org.datanucleus.store.valuegenerator;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Properties;
 import java.util.Random;
 
 import org.datanucleus.store.StoreManager;
@@ -42,9 +41,6 @@ import org.datanucleus.util.NucleusLogger;
  * break performance limits.
  * </p>
  * <p>
- * There are no properties for this ValueGenerator.
- * </p>
- * <p>
  * Note: Due to limitations of the available Java API there is a chance of less
  * than 1:2^62 that two concurrently running JVMs will produce the same
  * identifiers, which is in practical terms never, because your database server
@@ -53,9 +49,9 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class AUIDGenerator extends AbstractGenerator<String>
 {
-    public AUIDGenerator(StoreManager storeMgr, String name, Properties props)
+    public AUIDGenerator(StoreManager storeMgr, String name)
     {
-        super(storeMgr, name, props);
+        super(storeMgr, name);
         allocationSize = 1;
     }
 

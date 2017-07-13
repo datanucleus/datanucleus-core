@@ -18,8 +18,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.valuegenerator;
 
-import java.util.Properties;
-
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.Localiser;
@@ -32,11 +30,8 @@ public abstract class AbstractGenerator<T> implements ValueGenerator<T>
 {
     protected StoreManager storeMgr;
 
-    /** Symbolic name for the sequence. */
+    /** Symbolic name for the value generator. */
     protected String name;
-
-    /** Properties controlling the generator behaviour. */
-    protected Properties properties;
 
     /** Allocation size */
     protected int allocationSize = 5;
@@ -49,26 +44,13 @@ public abstract class AbstractGenerator<T> implements ValueGenerator<T>
 
     /**
      * Constructor.
-     * Will receive the following properties (as a minimum) through this constructor.
-     * <ul>
-     * <li>class-name : Name of the class whose object is being inserted.</li>
-     * <li>root-class-name : Name of the root class in this inheritance tree</li>
-     * <li>field-name : Name of the field with the strategy (unless datastore identity field)</li>
-     * <li>catalog-name : Catalog of the table (if specified)</li>
-     * <li>schema-name : Schema of the table (if specified)</li>
-     * <li>table-name : Name of the root table for this inheritance tree (containing the field).</li>
-     * <li>column-name : Name of the column in the table (for the field)</li>
-     * <li>sequence-name : Name of the sequence (if specified in MetaData as "sequence)</li>
-     * </ul>
      * @param storeMgr Store Manager
      * @param name Symbolic name for this generator
-     * @param props Properties controlling the behaviour of the generator (or null if not required).
      */
-    public AbstractGenerator(StoreManager storeMgr, String name, Properties props)
+    public AbstractGenerator(StoreManager storeMgr, String name)
     {
         this.storeMgr = storeMgr;
         this.name = name;
-        this.properties = props;
     }
 
     /**
@@ -111,7 +93,7 @@ public abstract class AbstractGenerator<T> implements ValueGenerator<T>
     }
 
     /**
-     * Accessor for the next element in the sequence as a long.
+     * Accessor for the next element as a long.
      * @return The next element
      * @throws NucleusDataStoreException Thrown if not numeric
      */
@@ -121,7 +103,7 @@ public abstract class AbstractGenerator<T> implements ValueGenerator<T>
     }
 
     /**
-     * Accessor for the current element in the sequence as a long.
+     * Accessor for the current element as a long.
      * @return The current element
      * @throws NucleusDataStoreException Thrown if not numeric
      */

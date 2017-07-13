@@ -33,7 +33,7 @@ public class UUIDHexGeneratorTest extends TestCase
      */
     public void testStringLength()
     {
-        UUIDHexGenerator gen = new UUIDHexGenerator(null, "Test", null);
+        UUIDHexGenerator gen = new UUIDHexGenerator(null, "Test");
         for (int i=0; i<10; i++)
         {
             Object id = gen.next();
@@ -48,7 +48,7 @@ public class UUIDHexGeneratorTest extends TestCase
     {
         // Create 1000 identifiers
         String[] ids = new String[1000];
-        UUIDHexGenerator gen = new UUIDHexGenerator(null, "Test", null);
+        UUIDHexGenerator gen = new UUIDHexGenerator(null, "Test");
         for (int i=0;i<ids.length;i++)
         {
             ids[i] = gen.next();

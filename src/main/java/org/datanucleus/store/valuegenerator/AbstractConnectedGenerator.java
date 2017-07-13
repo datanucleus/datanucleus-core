@@ -25,11 +25,15 @@ import org.datanucleus.store.StoreManager;
 /**
  * Abstract representation of a ValueGenerator requiring a connection to a datastore.
  * Builds on the base AbstractGenerator, providing datastore connection information.
+ * TODO Remove "properties" and pass in class+member so we can extract the precise definition for this generator directly
  */
 public abstract class AbstractConnectedGenerator<T> extends AbstractGenerator<T>
 {
-    /** The means of connecting to the datastore (if required by the generator). */
+    /** The means of connecting to the datastore. */
     protected ValueGenerationConnectionProvider connectionProvider;
+
+    /** Properties controlling the value generator behaviour. */
+    protected Properties properties;
 
     /**
      * Constructor.
@@ -39,8 +43,9 @@ public abstract class AbstractConnectedGenerator<T> extends AbstractGenerator<T>
      */
     public AbstractConnectedGenerator(StoreManager storeMgr, String name, Properties props)
     {
-        super(storeMgr, name, props);
-        allocationSize = 1;
+        super(storeMgr, name);
+        this.properties = props;
+        this.allocationSize = 1;
     }
 
     /**

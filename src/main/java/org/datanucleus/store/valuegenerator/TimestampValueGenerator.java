@@ -18,7 +18,6 @@ Contributors:
 package org.datanucleus.store.valuegenerator;
 
 import java.util.Calendar;
-import java.util.Properties;
 
 import org.datanucleus.store.StoreManager;
 
@@ -32,11 +31,19 @@ public class TimestampValueGenerator extends AbstractGenerator<Long>
      * Constructor.
      * @param storeMgr StoreManager
      * @param name Symbolic name of the generator
-     * @param props Any properties controlling its behaviour.
      */
-    public TimestampValueGenerator(StoreManager storeMgr, String name, Properties props)
+    public TimestampValueGenerator(StoreManager storeMgr, String name)
     {
-        super(storeMgr, name, props);
+        super(storeMgr, name);
+    }
+
+    /**
+     * Accessor for the storage class for values generated with this generator.
+     * @return Storage class (in this case Long.class)
+     */
+    public static Class getStorageClass()
+    {
+        return Long.class;
     }
 
     /**
