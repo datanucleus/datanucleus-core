@@ -88,13 +88,12 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         // Set up our delegate
         this.delegate = new java.util.ArrayList();
 
-        ExecutionContext ec = ownerOP.getExecutionContext();
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
         useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
         if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            ClassLoaderResolver clr = ec.getClassLoaderResolver();
+            ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
             this.backingStore = (ListStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.List.class);
         }
 

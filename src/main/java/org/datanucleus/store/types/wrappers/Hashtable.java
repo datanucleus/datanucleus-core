@@ -51,7 +51,6 @@ public class Hashtable<K, V> extends java.util.Hashtable<K, V> implements SCOMap
      */
     public Hashtable(ObjectProvider ownerOP, AbstractMemberMetaData mmd)
     {
-        super(0);
         this.ownerOP = ownerOP;
         this.ownerMmd = mmd;
     }

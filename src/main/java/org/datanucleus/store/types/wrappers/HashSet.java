@@ -57,7 +57,6 @@ public class HashSet<E> extends java.util.HashSet<E> implements SCOCollection<ja
      */
     public HashSet(ObjectProvider ownerOP, AbstractMemberMetaData mmd)
     {
-        super(0);
         this.ownerOP = ownerOP;
         this.ownerMmd = mmd;
     }

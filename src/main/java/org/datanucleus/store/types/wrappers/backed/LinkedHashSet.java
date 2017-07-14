@@ -84,13 +84,12 @@ public class LinkedHashSet<E> extends org.datanucleus.store.types.wrappers.Linke
         // Set up our delegate
         this.delegate = new java.util.LinkedHashSet();
 
-        ExecutionContext ec = ownerOP.getExecutionContext();
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
         useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
         if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            ClassLoaderResolver clr = ec.getClassLoaderResolver();
+            ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
             this.backingStore = (SetStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.LinkedHashSet.class);
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())

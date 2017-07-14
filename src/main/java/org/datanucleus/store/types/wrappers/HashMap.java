@@ -54,7 +54,6 @@ public class HashMap<K, V> extends java.util.HashMap<K, V> implements SCOMap<jav
      */
     public HashMap(ObjectProvider ownerOP, AbstractMemberMetaData mmd)
     {
-        super(0);
         this.ownerOP = ownerOP;
         this.ownerMmd = mmd;
     }

@@ -59,7 +59,6 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
      */
     public ArrayList(ObjectProvider ownerOP, AbstractMemberMetaData mmd)
     {
-        super(0);
         this.ownerOP = ownerOP;
         this.ownerMmd = mmd;
     }

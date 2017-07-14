@@ -62,7 +62,6 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
      */
     public Vector(ObjectProvider ownerOP, AbstractMemberMetaData mmd)
     {
-        super(0);
         this.ownerOP = ownerOP;
         this.ownerMmd = mmd;
     }

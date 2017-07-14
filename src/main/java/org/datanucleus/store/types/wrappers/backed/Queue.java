@@ -90,14 +90,13 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
             this.delegate = new java.util.PriorityQueue();
         }
 
-        ExecutionContext ec = ownerOP.getExecutionContext();
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
         useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
         if (!SCOUtils.collectionHasSerialisedElements(mmd) && 
             mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            ClassLoaderResolver clr = ec.getClassLoaderResolver();
+            ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
             this.backingStore = (ListStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr,mmd,java.util.Queue.class);
         }
 

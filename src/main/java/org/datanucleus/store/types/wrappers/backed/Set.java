@@ -100,19 +100,17 @@ public class Set<E> extends org.datanucleus.store.types.wrappers.Set<E> implemen
         // Set up our delegate
         this.delegate = new java.util.HashSet();
 
-        ExecutionContext ec = ownerOP.getExecutionContext();
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
         useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
-        ClassLoaderResolver clr = ec.getClassLoaderResolver();
         if (backingStore != null)
         {
             this.backingStore = backingStore;
         }
         else if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            this.backingStore = (SetStore)
-            ((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.Set.class);
+            ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
+            this.backingStore = (SetStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.Set.class);
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {

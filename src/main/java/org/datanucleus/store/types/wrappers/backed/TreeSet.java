@@ -84,17 +84,17 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
     {
         super(op, mmd);
 
-        ExecutionContext ec = op.getExecutionContext();
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
         useCache = SCOUtils.useContainerCache(op, mmd);
 
         if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            ClassLoaderResolver clr = ec.getClassLoaderResolver();
+            ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
             this.backingStore = (SetStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.TreeSet.class);
         }
+
         // Set up our delegate, using a suitable comparator
-        Comparator comparator = SCOUtils.getComparator(mmd, ec.getClassLoaderResolver());
+        Comparator comparator = SCOUtils.getComparator(mmd, ownerOP.getExecutionContext().getClassLoaderResolver());
         if (comparator != null)
         {
             this.delegate = new java.util.TreeSet(comparator);

@@ -57,7 +57,6 @@ public class LinkedHashSet<E> extends java.util.LinkedHashSet<E> implements SCOC
      */
     public LinkedHashSet(ObjectProvider ownerOP, AbstractMemberMetaData mmd)
     {
-        super(0);
         this.ownerOP = ownerOP;
         this.ownerMmd = mmd;
     }

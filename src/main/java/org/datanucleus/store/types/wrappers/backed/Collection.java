@@ -85,13 +85,12 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
     {
         super(op, mmd);
 
-        ExecutionContext ec = op.getExecutionContext();
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
         useCache = SCOUtils.useContainerCache(op, mmd);
 
         if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            ClassLoaderResolver clr = ec.getClassLoaderResolver();
+            ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
             this.backingStore = (CollectionStore)((BackedSCOStoreManager)op.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.Collection.class);
         }
 

@@ -88,14 +88,12 @@ public class HashSet<E> extends org.datanucleus.store.types.wrappers.HashSet<E> 
         // Set up our delegate
         this.delegate = new java.util.HashSet();
 
-        ExecutionContext ec = ownerOP.getExecutionContext();
         allowNulls = SCOUtils.allowNullsInContainer(allowNulls, mmd);
         useCache = SCOUtils.useContainerCache(ownerOP, mmd);
 
-        if (!SCOUtils.collectionHasSerialisedElements(mmd) && 
-            mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
+        if (!SCOUtils.collectionHasSerialisedElements(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            ClassLoaderResolver clr = ec.getClassLoaderResolver();
+            ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
             this.backingStore = (SetStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(clr, mmd, java.util.HashSet.class);
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
