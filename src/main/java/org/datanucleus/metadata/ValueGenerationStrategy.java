@@ -29,66 +29,64 @@ public class ValueGenerationStrategy implements Serializable
     private static final long serialVersionUID = -6851202349718961853L;
 
     /**
-     * strategy="native" in JDO, and "auto" in JPA
-     * 
-     * The value "native" allows the JDO implementation to pick the most
-     * suitable strategy based on the underlying database.
+     * The value "native" allows the JDO implementation to pick the most suitable strategy based on the underlying database.
      */
     public static final ValueGenerationStrategy NATIVE=new ValueGenerationStrategy(1);
 
     /**
-     * strategy="sequence" in JDO and JPA
-     * 
-     * The value "sequence" specifies that a named database sequence is used to
-     * generate key values for the table. If sequence is used, then the
-     * sequence-name attribute is required.
+     * The value "sequence" specifies that a named database sequence is used to generate key values for the table. 
      */
     public static final ValueGenerationStrategy SEQUENCE=new ValueGenerationStrategy(2);
 
     /**
-     * strategy="identity" in JDO and JPA
-     * 
-     * The value "identity" specifies that the column identified as the key
-     * column is managed by the database as an autoincrementing identity type.
+     * The value "identity" specifies that the column identified as the key column is managed by the database as an auto-incrementing identity type.
      */
     public static final ValueGenerationStrategy IDENTITY=new ValueGenerationStrategy(3);
 
     /**
-     * strategy="increment" in JDO and "table" in JPA
-     * 
-     * The value "increment" specifies a strategy that simply finds the largest
-     * key already in the database and increments the key value for new
-     * instances. It can be used with integral column types when the JDO
-     * application is the only database user inserting new instances.
+     * The value "increment" specifies a strategy that simply finds the largest key already in the database and increments the key value for new instances.
      */
     public static final ValueGenerationStrategy INCREMENT=new ValueGenerationStrategy(4);
 
     /**
-     * strategy="uuid-string"
-     * 
-     * The value "uuid-string" specifies a strategy that generates a 128-bit
-     * UUID unique within a network (the IP address of the machine running the
-     * application is part of the id) and represents the result as a
-     * 16-character String.
+     * The value "uuid-string" specifies a strategy that generates a 128-bit UUID unique within a network, and represents the result as a 16-character String.
      */
     public static final ValueGenerationStrategy UUIDSTRING=new ValueGenerationStrategy(5);
 
     /**
-     * strategy="uuid-hex"
-     * 
-     * The value "uuid-hex" specifies a strategy that generates a 128-bit UUID
-     * unique within a network (the IP address of the machine running the
-     * application is part of the id) and represents the result as a
-     * 32-character String.
+     * The value "uuid-hex" specifies a strategy that generates a 128-bit UUID unique within a network, and represents the result as a 32-character String.
      */
     public static final ValueGenerationStrategy UUIDHEX=new ValueGenerationStrategy(6);
 
     /**
-     * An extension strategy not in the standard JDO/JPA list.
-     * Will have the "customName" set to the chosen strategy.
-     * This object only exists for use in the equals() method to check if something is CUSTOM.
+     * The value "auid" specifies a strategy that is a Java implementation of DCE UUIDs, and represents the results as a 36-character String.
      */
-    public static final ValueGenerationStrategy CUSTOM = new ValueGenerationStrategy(7);
+    public static final ValueGenerationStrategy AUID=new ValueGenerationStrategy(7);
+
+    /**
+     * The value "uuid" specifies a strategy that uses the Java "UUID" class, and represents the results as a 36-character String.
+     */
+    public static final ValueGenerationStrategy UUID=new ValueGenerationStrategy(8);
+
+    /**
+     * The value "uuid-object" specifies a strategy that uses the Java "UUID" class, and represents the results as a UUID object.
+     */
+    public static final ValueGenerationStrategy UUID_OBJECT=new ValueGenerationStrategy(9);
+
+    /**
+     * The value "timestamp" specifies a strategy that uses the Java "Timestamp" class, and represents the results as a Timestamp object.
+     */
+    public static final ValueGenerationStrategy TIMESTAMP=new ValueGenerationStrategy(10);
+
+    /**
+     * The value "timestamp-value" specifies a strategy that uses the Java "Timestamp" class, and represents the results as a Long.
+     */
+    public static final ValueGenerationStrategy TIMESTAMP_VALUE=new ValueGenerationStrategy(11);
+
+    /**
+     * Extension strategy, that will have the "customName" set to the chosen strategy.
+     */
+    public static final ValueGenerationStrategy CUSTOM = new ValueGenerationStrategy(12);
 
     /** The type id. */
     private final int typeId;
@@ -149,6 +147,16 @@ public class ValueGenerationStrategy implements Serializable
             case 6 :
                 return "uuid-hex";
             case 7 :
+                return "auid";
+            case 8 :
+                return "uuid";
+            case 9 :
+                return "uuid-object";
+            case 10 :
+                return "timestamp";
+            case 11 :
+                return "timestamp-value";
+            case 12 :
                 return "custom";
         }
         return "";
@@ -208,7 +216,7 @@ public class ValueGenerationStrategy implements Serializable
         else
         {
             // All other strategies have their own strategy object
-            ValueGenerationStrategy strategy = new ValueGenerationStrategy(7);
+            ValueGenerationStrategy strategy = new ValueGenerationStrategy(12);
             strategy.customName = value;
             return strategy;
         }

@@ -799,7 +799,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             {
                 // native
                 String strategy = getValueGenerationStrategyForNative(cmd, absFieldNumber);
-                if (strategy.equalsIgnoreCase("identity"))
+                if (strategy.equalsIgnoreCase(ValueGenerationStrategy.IDENTITY.toString()))
                 {
                     return true;
                 }
@@ -814,7 +814,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 else if (idStrategy == ValueGenerationStrategy.NATIVE)
                 {
                     String strategy = getValueGenerationStrategyForNative(cmd, absFieldNumber);
-                    if (strategy.equalsIgnoreCase("identity"))
+                    if (strategy.equalsIgnoreCase(ValueGenerationStrategy.IDENTITY.toString()))
                     {
                         return true;
                     }
@@ -836,7 +836,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             else if (mmd.getValueStrategy() == ValueGenerationStrategy.NATIVE)
             {
                 String strategy = getValueGenerationStrategyForNative(cmd, absFieldNumber);
-                if (strategy.equalsIgnoreCase("identity"))
+                if (strategy.equalsIgnoreCase(ValueGenerationStrategy.IDENTITY.toString()))
                 {
                     return true;
                 }
@@ -1018,21 +1018,21 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             Class type = mmd.getType();
             if (String.class.isAssignableFrom(type))
             {
-                return "uuid-hex"; // TODO Do we really want this when we have "uuid"?
+                return ValueGenerationStrategy.UUIDHEX.toString(); // TODO Do we really want this when we have "uuid"?
             }
             else if (type == Long.class || type == Integer.class || type == Short.class || type == long.class || type == int.class || type == short.class || type== BigInteger.class)
             {
-                if (supportsValueGenerationStrategy("identity"))
+                if (supportsValueGenerationStrategy(ValueGenerationStrategy.IDENTITY.toString()))
                 {
-                    return "identity";
+                    return ValueGenerationStrategy.IDENTITY.toString();
                 }
-                else if (supportsValueGenerationStrategy("sequence") && mmd.getSequence() != null)
+                else if (supportsValueGenerationStrategy(ValueGenerationStrategy.SEQUENCE.toString()) && mmd.getSequence() != null)
                 {
-                    return "sequence";
+                    return ValueGenerationStrategy.SEQUENCE.toString();
                 }
-                else if (supportsValueGenerationStrategy("increment"))
+                else if (supportsValueGenerationStrategy(ValueGenerationStrategy.INCREMENT.toString()))
                 {
-                    return "increment";
+                    return ValueGenerationStrategy.INCREMENT.toString();
                 }
                 throw new NucleusUserException("This datastore provider doesn't support numeric native strategy for member " + mmd.getFullFieldName());
             }
@@ -1047,22 +1047,22 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         {
             if (MetaDataUtils.isJdbcTypeString(idmd.getColumnMetaData().getJdbcType()))
             {
-                return "uuid-hex";
+                return ValueGenerationStrategy.UUIDHEX.toString();
             }
         }
 
         // Numeric datastore-identity
-        if (supportsValueGenerationStrategy("identity"))
+        if (supportsValueGenerationStrategy(ValueGenerationStrategy.IDENTITY.toString()))
         {
-            return "identity";
+            return ValueGenerationStrategy.IDENTITY.toString();
         }
-        else if (supportsValueGenerationStrategy("sequence") && idmd != null && idmd.getSequence() != null)
+        else if (supportsValueGenerationStrategy(ValueGenerationStrategy.SEQUENCE.toString()) && idmd != null && idmd.getSequence() != null)
         {
-            return "sequence";
+            return ValueGenerationStrategy.SEQUENCE.toString();
         }
-        else if (supportsValueGenerationStrategy("increment"))
+        else if (supportsValueGenerationStrategy(ValueGenerationStrategy.INCREMENT.toString()))
         {
-            return "increment";
+            return ValueGenerationStrategy.INCREMENT.toString();
         }
         throw new NucleusUserException("This datastore provider doesn't support numeric native strategy for class " + cmd.getFullClassName());
     }
