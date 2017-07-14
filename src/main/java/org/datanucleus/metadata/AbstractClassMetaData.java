@@ -695,7 +695,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 identityMetaData != null && identityMetaData.getValueStrategy() != null &&
                 identityMetaData.getValueStrategy() != baseImd.getValueStrategy() &&
                 identityMetaData.getValueStrategy() != null && 
-                identityMetaData.getValueStrategy() != IdentityStrategy.NATIVE)
+                identityMetaData.getValueStrategy() != ValueGenerationStrategy.NATIVE)
             {
                 // User made deliberate attempt to change strategy in this subclass
                 throw new InvalidClassMetaDataException("044094", fullName, identityMetaData.getValueStrategy(), baseImd.getValueStrategy());

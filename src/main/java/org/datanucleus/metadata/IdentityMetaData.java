@@ -35,7 +35,7 @@ public class IdentityMetaData extends MetaData
     protected ColumnMetaData columnMetaData;
 
     /** strategy tag value. */
-    protected IdentityStrategy strategy = IdentityStrategy.NATIVE;
+    protected ValueGenerationStrategy strategy = ValueGenerationStrategy.NATIVE;
 
     /** sequence tag value. */
     protected String sequence;
@@ -96,12 +96,12 @@ public class IdentityMetaData extends MetaData
         return this;
     }
 
-    public IdentityStrategy getValueStrategy()
+    public ValueGenerationStrategy getValueStrategy()
     {
         return strategy;
     }
 
-    public IdentityMetaData setValueStrategy(IdentityStrategy strategy)
+    public IdentityMetaData setValueStrategy(ValueGenerationStrategy strategy)
     {
         this.strategy = strategy;
         return this;
@@ -118,7 +118,7 @@ public class IdentityMetaData extends MetaData
         if (this.sequence != null && this.strategy == null)
         {
             // JDO2 Section 18.6.1. No strategy, but sequence defined means use "sequence"
-            this.strategy = IdentityStrategy.SEQUENCE;
+            this.strategy = ValueGenerationStrategy.SEQUENCE;
         }
         return this;
     }

@@ -177,7 +177,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      * values for the field. This attribute has the same values and meaning as
      * the strategy attribute in datastoreidentity.
      */
-    protected IdentityStrategy valueStrategy;
+    protected ValueGenerationStrategy valueStrategy;
 
     /** Name of a value generator if the user wants to override the default generator. */
     protected String valueGeneratorName;
@@ -1259,19 +1259,19 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         return Modifier.isAbstract(memberRepresented.getModifiers());
     }
 
-    public IdentityStrategy getValueStrategy()
+    public ValueGenerationStrategy getValueStrategy()
     {
         return valueStrategy;
     }
 
-    public void setValueStrategy(IdentityStrategy valueStrategy)
+    public void setValueStrategy(ValueGenerationStrategy valueStrategy)
     {
         this.valueStrategy = valueStrategy;
     }
 
     public void setValueStrategy(String strategy)
     {
-        this.valueStrategy = strategy == null ? null : IdentityStrategy.getIdentityStrategy(strategy);
+        this.valueStrategy = strategy == null ? null : ValueGenerationStrategy.getIdentityStrategy(strategy);
     }
 
     /**

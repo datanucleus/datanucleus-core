@@ -21,10 +21,10 @@ package org.datanucleus.metadata;
 import java.io.Serializable;
 
 /**
- * Representation of the values for identity "strategy".
+ * Value generation "strategy".
  * Would have been nice to have this as an enum, but we need to allow for CUSTOM types
  */
-public class IdentityStrategy implements Serializable
+public class ValueGenerationStrategy implements Serializable
 {
     private static final long serialVersionUID = -6851202349718961853L;
 
@@ -34,7 +34,7 @@ public class IdentityStrategy implements Serializable
      * The value "native" allows the JDO implementation to pick the most
      * suitable strategy based on the underlying database.
      */
-    public static final IdentityStrategy NATIVE=new IdentityStrategy(1);
+    public static final ValueGenerationStrategy NATIVE=new ValueGenerationStrategy(1);
 
     /**
      * strategy="sequence" in JDO and JPA
@@ -43,7 +43,7 @@ public class IdentityStrategy implements Serializable
      * generate key values for the table. If sequence is used, then the
      * sequence-name attribute is required.
      */
-    public static final IdentityStrategy SEQUENCE=new IdentityStrategy(2);
+    public static final ValueGenerationStrategy SEQUENCE=new ValueGenerationStrategy(2);
 
     /**
      * strategy="identity" in JDO and JPA
@@ -51,7 +51,7 @@ public class IdentityStrategy implements Serializable
      * The value "identity" specifies that the column identified as the key
      * column is managed by the database as an autoincrementing identity type.
      */
-    public static final IdentityStrategy IDENTITY=new IdentityStrategy(3);
+    public static final ValueGenerationStrategy IDENTITY=new ValueGenerationStrategy(3);
 
     /**
      * strategy="increment" in JDO and "table" in JPA
@@ -61,7 +61,7 @@ public class IdentityStrategy implements Serializable
      * instances. It can be used with integral column types when the JDO
      * application is the only database user inserting new instances.
      */
-    public static final IdentityStrategy INCREMENT=new IdentityStrategy(4);
+    public static final ValueGenerationStrategy INCREMENT=new ValueGenerationStrategy(4);
 
     /**
      * strategy="uuid-string"
@@ -71,7 +71,7 @@ public class IdentityStrategy implements Serializable
      * application is part of the id) and represents the result as a
      * 16-character String.
      */
-    public static final IdentityStrategy UUIDSTRING=new IdentityStrategy(5);
+    public static final ValueGenerationStrategy UUIDSTRING=new ValueGenerationStrategy(5);
 
     /**
      * strategy="uuid-hex"
@@ -81,14 +81,14 @@ public class IdentityStrategy implements Serializable
      * application is part of the id) and represents the result as a
      * 32-character String.
      */
-    public static final IdentityStrategy UUIDHEX=new IdentityStrategy(6);
+    public static final ValueGenerationStrategy UUIDHEX=new ValueGenerationStrategy(6);
 
     /**
      * An extension strategy not in the standard JDO/JPA list.
      * Will have the "customName" set to the chosen strategy.
      * This object only exists for use in the equals() method to check if something is CUSTOM.
      */
-    public static final IdentityStrategy CUSTOM = new IdentityStrategy(7);
+    public static final ValueGenerationStrategy CUSTOM = new ValueGenerationStrategy(7);
 
     /** The type id. */
     private final int typeId;
@@ -100,7 +100,7 @@ public class IdentityStrategy implements Serializable
      * constructor
      * @param i type id
      */
-    private IdentityStrategy(int i)
+    private ValueGenerationStrategy(int i)
     {
         this.typeId = i;
     }
@@ -121,9 +121,9 @@ public class IdentityStrategy implements Serializable
 
     public boolean equals(Object o)
     {
-        if (o instanceof IdentityStrategy)
+        if (o instanceof ValueGenerationStrategy)
         {
-            return ((IdentityStrategy)o).typeId == typeId;
+            return ((ValueGenerationStrategy)o).typeId == typeId;
         }
         return false;
     }
@@ -170,45 +170,45 @@ public class IdentityStrategy implements Serializable
      * IdentityStrategy is returned if the value argument is null or no
      * corresponding strategy was found
      */
-    public static IdentityStrategy getIdentityStrategy(final String value)
+    public static ValueGenerationStrategy getIdentityStrategy(final String value)
     {
         if (value == null)
         {
-            return IdentityStrategy.NATIVE;
+            return ValueGenerationStrategy.NATIVE;
         }
-        else if (IdentityStrategy.NATIVE.toString().equals(value))
+        else if (ValueGenerationStrategy.NATIVE.toString().equals(value))
         {
-            return IdentityStrategy.NATIVE;
+            return ValueGenerationStrategy.NATIVE;
         }
-        else if (IdentityStrategy.SEQUENCE.toString().equals(value))
+        else if (ValueGenerationStrategy.SEQUENCE.toString().equals(value))
         {
-            return IdentityStrategy.SEQUENCE;
+            return ValueGenerationStrategy.SEQUENCE;
         }
-        else if (IdentityStrategy.IDENTITY.toString().equals(value))
+        else if (ValueGenerationStrategy.IDENTITY.toString().equals(value))
         {
-            return IdentityStrategy.IDENTITY;
+            return ValueGenerationStrategy.IDENTITY;
         }
-        else if (IdentityStrategy.INCREMENT.toString().equals(value))
+        else if (ValueGenerationStrategy.INCREMENT.toString().equals(value))
         {
-            return IdentityStrategy.INCREMENT;
+            return ValueGenerationStrategy.INCREMENT;
         }
         else if ("TABLE".equalsIgnoreCase(value))
         {
             // JPA "table" strategy equates to JDO "increment"
-            return IdentityStrategy.INCREMENT;
+            return ValueGenerationStrategy.INCREMENT;
         }
-        else if (IdentityStrategy.UUIDSTRING.toString().equals(value))
+        else if (ValueGenerationStrategy.UUIDSTRING.toString().equals(value))
         {
-            return IdentityStrategy.UUIDSTRING;
+            return ValueGenerationStrategy.UUIDSTRING;
         }
-        else if (IdentityStrategy.UUIDHEX.toString().equals(value))
+        else if (ValueGenerationStrategy.UUIDHEX.toString().equals(value))
         {
-            return IdentityStrategy.UUIDHEX;
+            return ValueGenerationStrategy.UUIDHEX;
         }
         else
         {
             // All other strategies have their own strategy object
-            IdentityStrategy strategy = new IdentityStrategy(7);
+            ValueGenerationStrategy strategy = new ValueGenerationStrategy(7);
             strategy.customName = value;
             return strategy;
         }

@@ -911,7 +911,7 @@ public class MetaDataUtils
         {
             return long.class;
         }
-        if (idmd.getValueStrategy() == IdentityStrategy.UUIDHEX || idmd.getValueStrategy() == IdentityStrategy.UUIDSTRING)
+        if (idmd.getValueStrategy() == ValueGenerationStrategy.UUIDHEX || idmd.getValueStrategy() == ValueGenerationStrategy.UUIDSTRING)
         {
             return String.class;
         }

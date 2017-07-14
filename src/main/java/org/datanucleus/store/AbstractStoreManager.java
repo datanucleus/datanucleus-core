@@ -46,7 +46,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.ClassPersistenceModifier;
 import org.datanucleus.metadata.IdentityMetaData;
-import org.datanucleus.metadata.IdentityStrategy;
+import org.datanucleus.metadata.ValueGenerationStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.MetaDataUtils;
@@ -806,12 +806,12 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             }
             else
             {
-                IdentityStrategy idStrategy = idmd.getValueStrategy();
-                if (idStrategy == IdentityStrategy.IDENTITY)
+                ValueGenerationStrategy idStrategy = idmd.getValueStrategy();
+                if (idStrategy == ValueGenerationStrategy.IDENTITY)
                 {
                     return true;
                 }
-                else if (idStrategy == IdentityStrategy.NATIVE)
+                else if (idStrategy == ValueGenerationStrategy.NATIVE)
                 {
                     String strategy = getValueGenerationStrategyForNative(cmd, absFieldNumber);
                     if (strategy.equalsIgnoreCase("identity"))
@@ -829,11 +829,11 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             {
                 return false;
             }
-            else if (mmd.getValueStrategy() == IdentityStrategy.IDENTITY)
+            else if (mmd.getValueStrategy() == ValueGenerationStrategy.IDENTITY)
             {
                 return true;
             }
-            else if (mmd.getValueStrategy() == IdentityStrategy.NATIVE)
+            else if (mmd.getValueStrategy() == ValueGenerationStrategy.NATIVE)
             {
                 String strategy = getValueGenerationStrategyForNative(cmd, absFieldNumber);
                 if (strategy.equalsIgnoreCase("identity"))
@@ -859,7 +859,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         // Do any necessary conversion of the value to the precise member type
         AbstractMemberMetaData mmd = null;
         String fieldName = null;
-        IdentityStrategy strategy = null;
+        ValueGenerationStrategy strategy = null;
         if (absoluteFieldNumber >= 0)
         {
             // real field
@@ -905,7 +905,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     {
         // Extract the control information for this field that needs its value
         String fieldName = null;
-        IdentityStrategy strategy = null;
+        ValueGenerationStrategy strategy = null;
         String sequence = null;
         String valueGeneratorName = null;
         String memberKey = valueGenerationMgr.getMemberKey(cmd, absoluteFieldNumber);
@@ -937,15 +937,15 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
 
         // No ValueGenerator, so need to determine which to use and create it as required.
         String strategyName = strategy.toString();
-        if (strategy.equals(IdentityStrategy.CUSTOM))
+        if (strategy.equals(ValueGenerationStrategy.CUSTOM))
         {
             // Using a "custom" generator
             strategyName = strategy.getCustomName();
         }
-        else if (strategy.equals(IdentityStrategy.NATIVE))
+        else if (strategy.equals(ValueGenerationStrategy.NATIVE))
         {
             strategyName = getValueGenerationStrategyForNative(cmd, absoluteFieldNumber);
-            strategy = IdentityStrategy.getIdentityStrategy(strategyName);
+            strategy = ValueGenerationStrategy.getIdentityStrategy(strategyName);
         }
 
         // Extract any metadata-based generation information keyed by the "valueGeneratorName"
@@ -953,7 +953,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         SequenceMetaData sequenceMetaData = null;
         if (valueGeneratorName != null)
         {
-            if (strategy == IdentityStrategy.INCREMENT)
+            if (strategy == ValueGenerationStrategy.INCREMENT)
             {
                 tableGeneratorMetaData = getMetaDataManager().getMetaDataForTableGenerator(clr, valueGeneratorName);
                 if (tableGeneratorMetaData == null)
@@ -961,7 +961,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                     throw new NucleusUserException(Localiser.msg("038005", fieldName, valueGeneratorName));
                 }
             }
-            else if (strategy == IdentityStrategy.SEQUENCE)
+            else if (strategy == ValueGenerationStrategy.SEQUENCE)
             {
                 sequenceMetaData = getMetaDataManager().getMetaDataForSequence(clr, valueGeneratorName);
                 if (sequenceMetaData == null)
@@ -970,7 +970,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 }
             }
         }
-        else if (strategy == IdentityStrategy.SEQUENCE && sequence != null)
+        else if (strategy == ValueGenerationStrategy.SEQUENCE && sequence != null)
         {
             // TODO Allow for package name of this class prefix for the sequence name
             sequenceMetaData = getMetaDataManager().getMetaDataForSequence(clr, sequence);
@@ -1125,7 +1125,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         // Set up the default properties available for all value generators
         Properties properties = new Properties();
         AbstractMemberMetaData mmd = null;
-        IdentityStrategy strategy = null;
+        ValueGenerationStrategy strategy = null;
         String sequence = null;
         Map<String, String> extensions = null;
         if (absoluteFieldNumber >= 0)
@@ -1163,13 +1163,13 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             properties.putAll(extensions);
         }
 
-        if (strategy.equals(IdentityStrategy.NATIVE))
+        if (strategy.equals(ValueGenerationStrategy.NATIVE))
         {
             String realStrategyName = getValueGenerationStrategyForNative(cmd, absoluteFieldNumber);
-            strategy = IdentityStrategy.getIdentityStrategy(realStrategyName);
+            strategy = ValueGenerationStrategy.getIdentityStrategy(realStrategyName);
         }
 
-        if (strategy == IdentityStrategy.INCREMENT && tablegenmd != null)
+        if (strategy == ValueGenerationStrategy.INCREMENT && tablegenmd != null)
         {
             // User has specified a TableGenerator (JPA)
             properties.put(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + tablegenmd.getInitialValue());
@@ -1201,7 +1201,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 properties.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, tablegenmd.getPKColumnValue());
             }
         }
-        else if (strategy == IdentityStrategy.INCREMENT && tablegenmd == null)
+        else if (strategy == ValueGenerationStrategy.INCREMENT && tablegenmd == null)
         {
             if (!properties.containsKey(ValueGenerator.PROPERTY_KEY_CACHE_SIZE))
             {
@@ -1209,7 +1209,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + getIntProperty(PropertyNames.PROPERTY_VALUEGEN_INCREMENT_ALLOCSIZE));
             }
         }
-        else if (strategy == IdentityStrategy.SEQUENCE && seqmd != null)
+        else if (strategy == ValueGenerationStrategy.SEQUENCE && seqmd != null)
         {
             // User has specified a SequenceGenerator (JDO/JPA)
             if (seqmd.getDatastoreSequence() != null)

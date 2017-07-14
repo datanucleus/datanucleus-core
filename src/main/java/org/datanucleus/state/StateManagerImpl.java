@@ -71,7 +71,7 @@ import org.datanucleus.identity.IdentityReference;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.IdentityStrategy;
+import org.datanucleus.metadata.ValueGenerationStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.RelationType;
@@ -729,7 +729,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         for (int fieldNumber=0; fieldNumber<totalFieldCount; fieldNumber++)
         {
             AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-            IdentityStrategy strategy = mmd.getValueStrategy();
+            ValueGenerationStrategy strategy = mmd.getValueStrategy();
 
             // Check for the strategy, and if it is a datastore attributed strategy
             if (strategy != null && !getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, fieldNumber))
