@@ -1098,7 +1098,7 @@ public class ArrayList<E> extends org.datanucleus.store.types.wrappers.ArrayList
      */
     public E set(int index, E element)
     {
-        return set(index, element, true);
+        return set(index, element, !sorting);
     }
 
     /**

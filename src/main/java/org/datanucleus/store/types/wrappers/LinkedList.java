@@ -19,6 +19,7 @@ package org.datanucleus.store.types.wrappers;
 
 import java.io.ObjectStreamException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Spliterator;
@@ -802,7 +803,7 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
      **/
     public E set(int index, E element)
     {
-        return set(index, element, true);
+        return set(index, element, !sorting);
     }
 
     /**
@@ -856,5 +857,18 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
     public Spliterator spliterator()
     {
         return delegate.spliterator();
+    }
+
+    protected boolean sorting = false;
+
+    /* (non-Javadoc)
+     * @see java.util.List#sort(java.util.Comparator)
+     */
+    @Override
+    public void sort(Comparator<? super E> comp)
+    {
+        sorting = true;
+        super.sort(comp);
+        sorting = false;
     }
 }

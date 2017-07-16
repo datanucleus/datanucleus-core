@@ -22,8 +22,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.datanucleus.FetchPlanState;
@@ -710,29 +708,11 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
     }
 
     /* (non-Javadoc)
-     * @see java.util.Iterable#forEach(java.util.function.Consumer)
-     */
-    @Override
-    public void forEach(Consumer action)
-    {
-        delegate.forEach(action);
-    }
-
-    /* (non-Javadoc)
      * @see java.util.SortedSet#spliterator()
      */
     @Override
     public Spliterator spliterator()
     {
         return delegate.spliterator();
-    }
-
-    /* (non-Javadoc)
-     * @see java.util.Collection#removeIf(java.util.function.Predicate)
-     */
-    @Override
-    public boolean removeIf(Predicate filter)
-    {
-        return delegate.removeIf(filter);
     }
 }

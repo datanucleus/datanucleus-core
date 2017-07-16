@@ -1235,7 +1235,7 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
      **/
     public synchronized E set(int index, E element)
     {
-        return set(index, element, true);
+        return set(index, element, !sorting);
     }
 
     /**

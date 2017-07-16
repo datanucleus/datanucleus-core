@@ -21,8 +21,6 @@ import java.io.ObjectStreamException;
 import java.util.AbstractQueue;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.datanucleus.FetchPlanState;
@@ -599,23 +597,5 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
     public Stream parallelStream()
     {
         return delegate.parallelStream();
-    }
-
-    /* (non-Javadoc)
-     * @see java.util.Iterable#forEach(java.util.function.Consumer)
-     */
-    @Override
-    public void forEach(Consumer action)
-    {
-        delegate.forEach(action);
-    }
-
-    /* (non-Javadoc)
-     * @see java.util.Collection#removeIf(java.util.function.Predicate)
-     */
-    @Override
-    public boolean removeIf(Predicate filter)
-    {
-        return delegate.removeIf(filter);
     }
 }

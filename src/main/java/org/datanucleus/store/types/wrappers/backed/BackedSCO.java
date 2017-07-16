@@ -25,4 +25,6 @@ import org.datanucleus.store.types.scostore.Store;
 public interface BackedSCO
 {
     Store getBackingStore();
+
+    boolean isLoaded();
 }

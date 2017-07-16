@@ -1102,7 +1102,7 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
      */
     public E set(int index, E element)
     {
-        return set(index, element, true);
+        return set(index, element, !sorting);
     }
 
     /**

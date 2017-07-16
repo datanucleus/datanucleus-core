@@ -1137,7 +1137,7 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
      **/
     public E set(int index, E element)
     {
-        return set(index, element, true);
+        return set(index, element, !sorting);
     }
 
     /**
