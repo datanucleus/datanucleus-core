@@ -3123,7 +3123,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             if (needsSCOUpdating)
             {
                 // Wrap with SCO so we can detect future updates
-                newValue = SCOUtils.wrapAndReplaceSCOField(this, fieldNumber, newValue, oldValue, true);
+                newValue = myEC.getTypeManager().wrapAndReplaceSCOField(this, fieldNumber, newValue, oldValue, true);
             }
 
             if (oldValue != null && newValue == null)
