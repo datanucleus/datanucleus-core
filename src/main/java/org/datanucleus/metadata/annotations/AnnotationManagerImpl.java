@@ -121,7 +121,7 @@ public class AnnotationManagerImpl implements AnnotationManager
      */
     public AbstractClassMetaData getMetaDataForClass(Class cls, PackageMetaData pmd, ClassLoaderResolver clr)
     {
-        if (cls == null)
+        if (cls == null || cls.isAnnotation())
         {
             return null;
         }

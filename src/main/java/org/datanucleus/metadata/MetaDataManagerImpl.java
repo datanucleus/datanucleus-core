@@ -2844,8 +2844,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     }
 
     /**
-     * Method to load the annotations for the specified class and return the FileMetaData containing
-     * the class. The FileMetaData, PackageMetaData will be dummy records.
+     * Method to load the annotations for the specified class and return the FileMetaData containing the class. 
+     * The FileMetaData, PackageMetaData will be dummy records.
      * @param cls The class
      * @param clr ClassLoader resolver
      * @param register Whether to register the data
@@ -2854,12 +2854,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      */
     protected FileMetaData loadAnnotationsForClass(Class cls, ClassLoaderResolver clr, boolean register, boolean populate)
     {
-        if (!allowAnnotations)
+        if (!allowAnnotations || cls.isAnnotation() || isClassWithoutPersistenceInfo(cls.getName()))
         {
-            return null;
-        }
-        if (isClassWithoutPersistenceInfo(cls.getName()))
-        {
+            // Annotations not allowed during this context, or this is an annotation, or already registered without persistence info
             return null;
         }
 
