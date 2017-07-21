@@ -73,6 +73,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -447,8 +448,12 @@ public class TypeManagerImpl implements TypeManager, Serializable
         }
 
         // Create new wrapper of the required type
-        Class requiredType = value != null ? value.getClass() : instantiatedType;
-//        requiredType = mmd.getType(); // TODO Make this an option, the default option
+        Class requiredType = value != null ? value.getClass() : instantiatedType; // Default to instantiated type
+        if ("declared".equalsIgnoreCase(nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_TYPE_WRAPPER_BASIS)))
+        {
+            // Use declared type of the field to define the wrapper type
+            requiredType = mmd.getType();
+        }
         SCO sco = createSCOInstance(ownerOP, mmd, requiredType);
 
         if (replaceField)

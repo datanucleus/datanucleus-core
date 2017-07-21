@@ -334,6 +334,18 @@ public class CorePropertyValidator implements PropertyValidator
                 }
             }
         }
+        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_TYPE_WRAPPER_BASIS))
+        {
+            if (value instanceof String)
+            {
+                String strVal = (String)value;
+                if (strVal.equalsIgnoreCase("instantiated") ||
+                    strVal.equalsIgnoreCase("declared"))
+                {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 }
