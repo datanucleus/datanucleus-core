@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.PersistenceNucleusContext;
@@ -305,6 +306,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
     protected AnnotationObject[] getClassAnnotationsForClass(Class cls)
     {
         Annotation[] annotations = cls.getAnnotations();
+        Set<String> annotNames = new HashSet<>();
         List<Annotation> supportedAnnots = new ArrayList();
         if (annotations != null && annotations.length > 0)
         {
@@ -316,6 +318,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                 if (isSupportedAnnotation(annName) || annMgr.getClassAnnotationHasHandler(annName))
                 {
                     supportedAnnots.add(annotation);
+                    annotNames.add(annName);
                 }
                 else
                 {
@@ -325,7 +328,12 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                         annName = subAnnotation.annotationType().getName();
                         if (isSupportedAnnotation(annName) || annMgr.getClassAnnotationHasHandler(annName))
                         {
+                            if (annotNames.contains(annName))
+                            {
+                                NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : for sub of " + annotation);
+                            }
                             supportedAnnots.add(subAnnotation);
+                            annotNames.add(annName);
                         }
                     }
                 }
@@ -343,6 +351,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
     protected Collection<AnnotatedMember> getJavaBeanAccessorAnnotationsForClass(Class cls)
     {
         Collection<AnnotatedMember> annotatedMethods = new HashSet<AnnotatedMember>();
+        Set<String> annotNames = new HashSet<>();
 
         Method[] methods = cls.getDeclaredMethods();
         int numberOfMethods = methods.length;
@@ -366,6 +375,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                         if (isSupportedAnnotation(annName) || annMgr.getMemberAnnotationHasHandler(annName))
                         {
                             supportedAnnots.add(annotation);
+                            annotNames.add(annName);
                         }
                         else
                         {
@@ -375,7 +385,12 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                                 annName = subAnnotation.annotationType().getName();
                                 if (isSupportedAnnotation(annName) || annMgr.getMemberAnnotationHasHandler(annName))
                                 {
+                                    if (annotNames.contains(annName))
+                                    {
+                                        NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : for sub of " + annotation);
+                                    }
                                     supportedAnnots.add(subAnnotation);
+                                    annotNames.add(annName);
                                 }
                             }
                         }
@@ -402,6 +417,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
     protected Collection<AnnotatedMember> getFieldAnnotationsForClass(Class cls)
     {
         Collection<AnnotatedMember> annotatedFields = new HashSet<AnnotatedMember>();
+        Set<String> annotNames = new HashSet<>();
 
         Field[] fields = cls.getDeclaredFields();
         int numberOfFields = fields.length;
@@ -421,6 +437,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                     if (isSupportedAnnotation(annName) || annMgr.getMemberAnnotationHasHandler(annName))
                     {
                         supportedAnnots.add(annotation);
+                        annotNames.add(annName);
                     }
                     else
                     {
@@ -430,7 +447,12 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                             annName = subAnnotation.annotationType().getName();
                             if (isSupportedAnnotation(annName) || annMgr.getMemberAnnotationHasHandler(annName))
                             {
+                                if (annotNames.contains(annName))
+                                {
+                                    NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : for sub of " + annotation);
+                                }
                                 supportedAnnots.add(subAnnotation);
+                                annotNames.add(annName);
                             }
                         }
                     }
