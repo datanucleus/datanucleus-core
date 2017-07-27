@@ -315,6 +315,10 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                 String annName = annotation.annotationType().getName();
                 if (isSupportedAnnotation(annName) || annMgr.getClassAnnotationHasHandler(annName))
                 {
+                    if (annotNames.contains(annName))
+                    {
+                        NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : " + annotation + " - only the first will be used!");
+                    }
                     supportedAnnots.add(annotation);
                     annotNames.add(annName);
                 }
@@ -372,6 +376,10 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                         String annName = annotation.annotationType().getName();
                         if (isSupportedAnnotation(annName) || annMgr.getMemberAnnotationHasHandler(annName))
                         {
+                            if (annotNames.contains(annName))
+                            {
+                                NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : " + annotation + " - only the first will be used!");
+                            }
                             supportedAnnots.add(annotation);
                             annotNames.add(annName);
                         }
@@ -433,6 +441,10 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                     String annName = annotation.annotationType().getName();
                     if (isSupportedAnnotation(annName) || annMgr.getMemberAnnotationHasHandler(annName))
                     {
+                        if (annotNames.contains(annName))
+                        {
+                            NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : " + annotation + " - only the first will be used!");
+                        }
                         supportedAnnots.add(annotation);
                         annotNames.add(annName);
                     }
