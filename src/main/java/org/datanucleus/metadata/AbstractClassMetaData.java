@@ -910,7 +910,7 @@ public abstract class AbstractClassMetaData extends MetaData
                         ColumnMetaData superDiscrimColmd = pcSuperclassMetaData.getDiscriminatorColumnMetaData();
                         if (superDiscrimColmd != null)
                         {
-                            NucleusLogger.GENERAL.debug(Localiser.msg("044126", fullName));
+                            NucleusLogger.METADATA.debug(Localiser.msg("044126", fullName));
                         }
                     }
                 }

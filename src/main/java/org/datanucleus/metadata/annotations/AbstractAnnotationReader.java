@@ -107,16 +107,14 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
             return false;
         }
 
-        boolean supported = false;
-        for (int j=0;j<supportedPackages.length;j++)
+        for (String supportedPackage : supportedPackages)
         {
-            if (annotationClassName.startsWith(supportedPackages[j]))
+            if (annotationClassName.startsWith(supportedPackage))
             {
-                supported = true;
-                break;
+                return true;
             }
         }
-        return supported;
+        return false;
     }
 
     /**
@@ -307,7 +305,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
     {
         Annotation[] annotations = cls.getAnnotations();
         Set<String> annotNames = new HashSet<>();
-        List<Annotation> supportedAnnots = new ArrayList();
+        List<Annotation> supportedAnnots = new ArrayList<>();
         if (annotations != null && annotations.length > 0)
         {
             // Strip out unsupported annotations
@@ -330,7 +328,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                         {
                             if (annotNames.contains(annName))
                             {
-                                NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : for sub of " + annotation);
+                                NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : for sub of " + annotation + " - only the first will be used!");
                             }
                             supportedAnnots.add(subAnnotation);
                             annotNames.add(annName);
@@ -350,7 +348,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
      */
     protected Collection<AnnotatedMember> getJavaBeanAccessorAnnotationsForClass(Class cls)
     {
-        Collection<AnnotatedMember> annotatedMethods = new HashSet<AnnotatedMember>();
+        Collection<AnnotatedMember> annotatedMethods = new HashSet<>();
         Set<String> annotNames = new HashSet<>();
 
         Method[] methods = cls.getDeclaredMethods();
@@ -367,7 +365,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                 if (annotations != null && annotations.length > 0)
                 {
                     // Strip out unsupported annotations
-                    List<Annotation> supportedAnnots = new ArrayList();
+                    List<Annotation> supportedAnnots = new ArrayList<>();
                     AnnotationManager annMgr = mmgr.getAnnotationManager();
                     for (Annotation annotation : annotations)
                     {
@@ -387,7 +385,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                                 {
                                     if (annotNames.contains(annName))
                                     {
-                                        NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : for sub of " + annotation);
+                                        NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : for sub of " + annotation + " - only the first will be used!");
                                     }
                                     supportedAnnots.add(subAnnotation);
                                     annotNames.add(annName);
@@ -399,8 +397,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                     if (!supportedAnnots.isEmpty())
                     {
                         AnnotationObject[] annotObjects = getAnnotationObjectsForAnnotations(cls.getName(), supportedAnnots.toArray(new Annotation[supportedAnnots.size()]));
-                        AnnotatedMember annMember = new AnnotatedMember(new Member(methods[i]), annotObjects);
-                        annotatedMethods.add(annMember);
+                        annotatedMethods.add(new AnnotatedMember(new Member(methods[i]), annotObjects));
                     }
                 }
             }
@@ -416,7 +413,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
      */
     protected Collection<AnnotatedMember> getFieldAnnotationsForClass(Class cls)
     {
-        Collection<AnnotatedMember> annotatedFields = new HashSet<AnnotatedMember>();
+        Collection<AnnotatedMember> annotatedFields = new HashSet<>();
         Set<String> annotNames = new HashSet<>();
 
         Field[] fields = cls.getDeclaredFields();
@@ -426,7 +423,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
         {
             // For each Field get the annotations and convert into AnnotationObjects
             Annotation[] annotations = fields[i].getAnnotations();
-            List<Annotation> supportedAnnots = new ArrayList();
+            List<Annotation> supportedAnnots = new ArrayList<>();
             if (annotations != null && annotations.length > 0)
             {
                 // Strip out unsupported annotations
@@ -449,7 +446,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                             {
                                 if (annotNames.contains(annName))
                                 {
-                                    NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : for sub of " + annotation);
+                                    NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : for sub of " + annotation + " - only the first will be used!");
                                 }
                                 supportedAnnots.add(subAnnotation);
                                 annotNames.add(annName);
@@ -461,10 +458,8 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
 
             if (!supportedAnnots.isEmpty())
             {
-                AnnotationObject[] objects = getAnnotationObjectsForAnnotations(cls.getName(),
-                    supportedAnnots.toArray(new Annotation[supportedAnnots.size()]));
-                AnnotatedMember annField = new AnnotatedMember(new Member(fields[i]), objects);
-                annotatedFields.add(annField);
+                AnnotationObject[] objects = getAnnotationObjectsForAnnotations(cls.getName(), supportedAnnots.toArray(new Annotation[supportedAnnots.size()]));
+                annotatedFields.add(new AnnotatedMember(new Member(fields[i]), objects));
             }
         }
 
@@ -489,7 +484,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
         int numberOfAnns = annotations.length;
         for (int i=0;i<numberOfAnns;i++)
         {
-            Map<String, Object> map = new HashMap<String, Object>();
+            Map<String, Object> map = new HashMap<>();
             Method[] annMethods = annotations[i].annotationType().getDeclaredMethods();
             int numberOfAnnotateMethods = annMethods.length;
             for (int j = 0; j < numberOfAnnotateMethods; j++)
@@ -501,8 +496,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                 catch (Exception ex)
                 {
                     // Error in annotation specification so log a warning
-                    NucleusLogger.METADATA.warn(Localiser.msg("044201", clsName, 
-                        annotations[i].annotationType().getName(), annMethods[j].getName()));
+                    NucleusLogger.METADATA.warn(Localiser.msg("044201", clsName, annotations[i].annotationType().getName(), annMethods[j].getName()));
                 }
             }
 
