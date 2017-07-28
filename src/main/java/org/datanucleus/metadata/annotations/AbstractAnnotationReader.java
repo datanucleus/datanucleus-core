@@ -353,7 +353,6 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
     protected Collection<AnnotatedMember> getJavaBeanAccessorAnnotationsForClass(Class cls)
     {
         Collection<AnnotatedMember> annotatedMethods = new HashSet<>();
-        Set<String> annotNames = new HashSet<>();
 
         Method[] methods = cls.getDeclaredMethods();
         int numberOfMethods = methods.length;
@@ -361,6 +360,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
         for (int i = 0; i < numberOfMethods; i++)
         {
             // Restrict to Java Bean accessor methods that are not bridge methods
+            Set<String> annotNames = new HashSet<>();
             String methodName = methods[i].getName();
             if (!methods[i].isBridge() && ((methodName.startsWith("get") && methodName.length() > 3) || (methodName.startsWith("is") && methodName.length() > 2)))
             {
@@ -422,7 +422,6 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
     protected Collection<AnnotatedMember> getFieldAnnotationsForClass(Class cls)
     {
         Collection<AnnotatedMember> annotatedFields = new HashSet<>();
-        Set<String> annotNames = new HashSet<>();
 
         Field[] fields = cls.getDeclaredFields();
         int numberOfFields = fields.length;
@@ -430,6 +429,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
         for (int i = 0; i < numberOfFields; i++)
         {
             // For each Field get the annotations and convert into AnnotationObjects
+            Set<String> annotNames = new HashSet<>();
             Annotation[] annotations = fields[i].getAnnotations();
             List<Annotation> supportedAnnots = new ArrayList<>();
             if (annotations != null && annotations.length > 0)
