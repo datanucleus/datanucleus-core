@@ -128,30 +128,35 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
     public AbstractClassMetaData getMetaDataForClass(Class cls, PackageMetaData pmd, ClassLoaderResolver clr)
     {
         AnnotationObject[] classAnnotations = getClassAnnotationsForClass(cls);
+        if (classAnnotations == null || classAnnotations.length == 0)
+        {
+            return null;
+        }
+
         AbstractClassMetaData cmd = processClassAnnotations(pmd, cls, classAnnotations, clr);
         if (cmd != null)
         {
             // Process using any user-provided class annotation handlers
             AnnotationManager annMgr = mmgr.getAnnotationManager();
-            for (int i=0;i<classAnnotations.length;i++)
+            for (AnnotationObject classAnnotation : classAnnotations)
             {
-                String annName = classAnnotations[i].getName();
+                String annName = classAnnotation.getName();
                 ClassAnnotationHandler handler = annMgr.getHandlerForClassAnnotation(annName);
                 if (handler != null)
                 {
-                    handler.processClassAnnotation(classAnnotations[i], cmd, clr);
+                    handler.processClassAnnotation(classAnnotation, cmd, clr);
                 }
             }
 
             if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
             {
                 Collection<AnnotatedMember> annotatedFields = getFieldAnnotationsForClass(cls);
-                Collection<AnnotatedMember> annotatedMethods = getJavaBeanAccessorAnnotationsForClass(cls);
+                Collection<AnnotatedMember> annotatedGetterMethods = getJavaBeanAccessorAnnotationsForClass(cls);
 
                 // Check for duplicate field/method and put on to field
                 for (AnnotatedMember field : annotatedFields)
                 {
-                    Iterator<AnnotatedMember> methodIter = annotatedMethods.iterator();
+                    Iterator<AnnotatedMember> methodIter = annotatedGetterMethods.iterator();
                     while (methodIter.hasNext())
                     {
                         AnnotatedMember method = methodIter.next();
@@ -178,10 +183,8 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                 else
                 {
                     // Extract the annotations for the getters
-                    Iterator it = annotatedMethods.iterator();
-                    while (it.hasNext())
+                    for (AnnotatedMember method : annotatedGetterMethods)
                     {
-                        AnnotatedMember method = (AnnotatedMember) it.next();
                         if (method.getAnnotations().length > 0)
                         {
                             // We have a getter with at least one annotation so must be using properties
@@ -190,23 +193,27 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                     }
                 }
 
+                // TODO Clear up whether we are processing just properties or just fields or mixed mode. Currently we process both
                 // Process the getters
-                Iterator<AnnotatedMember> methodIter = annotatedMethods.iterator();
-                while (methodIter.hasNext())
+                for (AnnotatedMember method : annotatedGetterMethods)
                 {
-                    AnnotatedMember method = methodIter.next();
                     AnnotationObject[] annotations = method.getAnnotations();
 
-                    // Process members with annotations against the method
-                    // TODO Omit if no annotations?
-                    AbstractMemberMetaData mmd = processMemberAnnotations(cmd, method.getMember(), annotations, propertyAccessor);
+                    if ((annotations == null || annotations.length == 0) && method.getMember().isProperty() && !propertyAccessor)
+                    {
+                        // Getter with no annotations, and not using property access so ignore
+                        continue;
+                    }
+
+                    // Process member annotations. We allow each annotation reader to create members if default persistent and no annotations
+                    AbstractMemberMetaData mmd = processMemberAnnotations(cmd, method.getMember(), annotations);
 
                     if (annotations != null && annotations.length > 0)
                     {
                         // Process using any user-provided member annotation handlers
-                        for (int i=0;i<annotations.length;i++)
+                        for (AnnotationObject annotation : annotations)
                         {
-                            String annName = annotations[i].getName();
+                            String annName = annotation.getName();
                             MemberAnnotationHandler handler = annMgr.getHandlerForMemberAnnotation(annName);
                             if (handler != null)
                             {
@@ -215,30 +222,32 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                                     mmd = new PropertyMetaData(cmd, method.getMember().getName());
                                     cmd.addMember(mmd);
                                 }
-                                handler.processMemberAnnotation(annotations[i], mmd, clr);
+                                handler.processMemberAnnotation(annotation, mmd, clr);
                             }
                         }
                     }
                 }
 
-                // TODO If we have property access then should we ignore these?
                 // Process the fields
-                Iterator<AnnotatedMember> fieldMapValueIter = annotatedFields.iterator();
-                while (fieldMapValueIter.hasNext())
+                for (AnnotatedMember field : annotatedFields)
                 {
-                    AnnotatedMember field = fieldMapValueIter.next();
                     AnnotationObject[] annotations = field.getAnnotations();
 
-                    // Process members with annotations against the field
-                    // TODO Omit if no annotations?
-                    AbstractMemberMetaData mmd = processMemberAnnotations(cmd, field.getMember(), annotations, propertyAccessor);
+                    if ((annotations == null || annotations.length == 0) && !field.getMember().isProperty() && propertyAccessor)
+                    {
+                        // Field with no annotations, and using property access so ignore
+                        continue;
+                    }
+
+                    // Process fields. We allow each annotation reader to create members if default persistent and no annotations
+                    AbstractMemberMetaData mmd = processMemberAnnotations(cmd, field.getMember(), annotations);
 
                     if (annotations != null && annotations.length > 0)
                     {
                         // Process using any user-provided member annotation handlers
-                        for (int i=0;i<annotations.length;i++)
+                        for (AnnotationObject annotation : annotations)
                         {
-                            String annName = annotations[i].getName();
+                            String annName = annotation.getName();
                             MemberAnnotationHandler handler = annMgr.getHandlerForMemberAnnotation(annName);
                             if (handler != null)
                             {
@@ -247,7 +256,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                                     mmd = new FieldMetaData(cmd, field.getMember().getName());
                                     cmd.addMember(mmd);
                                 }
-                                handler.processMemberAnnotation(annotations[i], mmd, clr);
+                                handler.processMemberAnnotation(annotation, mmd, clr);
                             }
                         }
                     }
@@ -255,10 +264,9 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
 
                 // Process other methods (for listeners etc)
                 Method[] methods = cls.getDeclaredMethods();
-                int numberOfMethods = methods.length;
-                for (int i = 0; i < numberOfMethods; i++)
+                for (Method method : methods)
                 {
-                    processMethodAnnotations(cmd, methods[i]);
+                    processMethodAnnotations(cmd, method);
                 }
             }
         }
@@ -277,15 +285,13 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
     protected abstract AbstractClassMetaData processClassAnnotations(PackageMetaData pmd, Class cls, AnnotationObject[] annotations, ClassLoaderResolver clr);
 
     /**
-     * Method to take the passed in outline ClassMetaData and process the annotations for
-     * fields/properties adding any necessary FieldMetaData/PropertyMetaData to the ClassMetaData.
+     * Method to take the passed in outline ClassMetaData and process the annotations for fields/properties adding any necessary FieldMetaData/PropertyMetaData to the ClassMetaData.
      * @param cmd The ClassMetaData (to be updated)
      * @param member The field/property being processed
      * @param annotations The annotations for this field/property
-     * @param propertyAccessor if has persistent properties
      * @return The FieldMetaData/PropertyMetaData that was added (if any)
      */
-    protected abstract AbstractMemberMetaData processMemberAnnotations(AbstractClassMetaData cmd, Member member, AnnotationObject[] annotations, boolean propertyAccessor);
+    protected abstract AbstractMemberMetaData processMemberAnnotations(AbstractClassMetaData cmd, Member member, AnnotationObject[] annotations);
 
     /**
      * Method to take the passed in outline ClassMetaData and process the annotations for method adding any necessary MetaData to the ClassMetaData.
