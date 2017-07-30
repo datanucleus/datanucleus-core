@@ -72,7 +72,6 @@ public final class EnhancerClassLoader extends ClassLoader
     /**
      * Overwrite to have an opportunity to load classes from the delegate ClassLoaderResolver
      */
-    @SuppressWarnings("unchecked")
     public synchronized Class loadClass(String name) throws ClassNotFoundException
     {
         //avoid reentrant calls

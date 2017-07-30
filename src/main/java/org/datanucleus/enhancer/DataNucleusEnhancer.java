@@ -325,7 +325,6 @@ public class DataNucleusEnhancer
      * @param classNames Names of the classes
      * @return The enhancer
      */
-    @SuppressWarnings("unchecked")
     public DataNucleusEnhancer addClasses(String... classNames)
     {
         if (classNames == null)
@@ -859,7 +858,6 @@ public class DataNucleusEnhancer
      * @param bytes Bytes (if provided)
      * @return ClassEnhancer instance to use
      */
-    @SuppressWarnings("unchecked")
     protected ClassEnhancer getClassEnhancer(ClassMetaData cmd, byte[] bytes)
     {
         // Obtain the required ClassEnhancer to do the work

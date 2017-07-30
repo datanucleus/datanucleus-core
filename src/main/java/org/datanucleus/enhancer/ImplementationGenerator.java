@@ -241,7 +241,6 @@ public class ImplementationGenerator
      * Enhance the implementation of the class/interface.
      * @param clr ClassLoader resolver
      */
-    @SuppressWarnings("unchecked")
     public void enhance(final ClassLoaderResolver clr)
     {
         // define the generated class in the classloader so we populate the metadata

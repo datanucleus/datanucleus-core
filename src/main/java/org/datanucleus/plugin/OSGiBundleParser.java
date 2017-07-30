@@ -48,7 +48,6 @@ public class OSGiBundleParser
 {
     public static Bundle parseManifest(org.osgi.framework.Bundle osgiBundle)
     {
-        @SuppressWarnings("unchecked")
         Dictionary<String, String> headers = osgiBundle.getHeaders();
         Bundle bundle = null;
         try

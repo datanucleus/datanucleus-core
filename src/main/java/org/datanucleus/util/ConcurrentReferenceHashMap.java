@@ -413,7 +413,6 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
             return value;
         }
 
-        @SuppressWarnings("unchecked")
         final K key()
         {
             if (keyRef instanceof KeyReference)
@@ -429,7 +428,6 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
             return dereferenceValue(valueRef);
         }
 
-        @SuppressWarnings("unchecked")
         final V dereferenceValue(Object value)
         {
             if (value instanceof KeyReference)
@@ -445,7 +443,6 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
             this.valueRef = newValueReference(value, valueType, refQueue);
         }
 
-        @SuppressWarnings("unchecked")
         static final <K, V> HashEntry<K, V>[] newArray(int i)
         {
             return new HashEntry[i];
@@ -535,7 +532,6 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
             setTable(HashEntry.<K, V> newArray(initialCapacity));
         }
 
-        @SuppressWarnings("unchecked")
         static final <K, V> Segment<K, V>[] newArray(int i)
         {
             return new Segment[i];
@@ -1727,7 +1723,6 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
             {
                 return false;
             }
-            @SuppressWarnings("unchecked")
             Map.Entry e = (Map.Entry) o;
             return eq(key, e.getKey()) && eq(value, e.getValue());
         }
@@ -1968,7 +1963,6 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
      * @throws IOException if an i/o error occurs
      * @throws ClassNotFoundException if a class is not found
      */
-    @SuppressWarnings("unchecked")
     private void readObject(java.io.ObjectInputStream s) throws IOException, ClassNotFoundException
     {
         s.defaultReadObject();

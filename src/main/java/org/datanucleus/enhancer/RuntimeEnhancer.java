@@ -58,7 +58,6 @@ public class RuntimeEnhancer
             super(loader);
         }
 
-        @SuppressWarnings("unchecked")
         protected synchronized Class loadClass(String name, boolean resolve) throws ClassNotFoundException
         {
             Class c = super.findLoadedClass(name);
