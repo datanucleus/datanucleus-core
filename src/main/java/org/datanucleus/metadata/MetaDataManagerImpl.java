@@ -130,27 +130,27 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     protected Lock updateLock = null;
 
     /** Cache of class names that are known to not have MetaData/annotations. */
-    protected Collection<String> classesWithoutPersistenceInfo = new HashSet();
+    protected Collection<String> classesWithoutPersistenceInfo = new HashSet<>();
 
     /** Map of ClassMetaData, keyed by the class name. */
-    protected Map<String, AbstractClassMetaData> classMetaDataByClass = new ConcurrentHashMap<String, AbstractClassMetaData>();
+    protected Map<String, AbstractClassMetaData> classMetaDataByClass = new ConcurrentHashMap<>();
 
-    protected Map<String, AbstractClassMetaData> usableClassMetaDataByClass = new ConcurrentHashMap<String, AbstractClassMetaData>();
+    protected Map<String, AbstractClassMetaData> usableClassMetaDataByClass = new ConcurrentHashMap<>();
 
     /** Map of FileMetaData for the parsed files, keyed by the URL string. */
-    protected Map<String, FileMetaData> fileMetaDataByURLString = new ConcurrentHashMap();
+    protected Map<String, FileMetaData> fileMetaDataByURLString = new ConcurrentHashMap<>();
 
     /** Map of ClassMetaData, keyed by the JPA "entity name". */
-    protected Map<String, AbstractClassMetaData> classMetaDataByEntityName = new ConcurrentHashMap();
+    protected Map<String, AbstractClassMetaData> classMetaDataByEntityName = new ConcurrentHashMap<>();
 
     /** Map of ClassMetaData, keyed by the class discriminator name. */
-    protected Map<String, AbstractClassMetaData> classMetaDataByDiscriminatorName = new ConcurrentHashMap();
+    protected Map<String, AbstractClassMetaData> classMetaDataByDiscriminatorName = new ConcurrentHashMap<>();
 
     /** Cache subclass information as that is expensive to compute, keyed by class name */
-    protected Map<String, Set<String>> directSubclassesByClass = new ConcurrentHashMap();
+    protected Map<String, Set<String>> directSubclassesByClass = new ConcurrentHashMap<>();
 
     /** Cache of names of concrete subclass for a class name. Used for fast lookups from ids. */
-    protected Map<String, Set<String>> concreteSubclassNamesByClassName = new ConcurrentHashMap<String, Set<String>>();
+    protected Map<String, Set<String>> concreteSubclassNamesByClassName = new ConcurrentHashMap<>();
 
     /** Map of QueryMetaData, keyed by the (class name + query name). */
     protected Map<String, QueryMetaData> queryMetaDataByName = null;
@@ -225,18 +225,16 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         annotationManager = new AnnotationManagerImpl(this);
 
         // Register all of the types managed by the TypeManager as known second-class types (no metadata).
-        Set supportedClasses = nucleusContext.getTypeManager().getSupportedSecondClassTypes();
-        Iterator<String> iter = supportedClasses.iterator();
-        while (iter.hasNext())
+        Set<String> supportedClasses = nucleusContext.getTypeManager().getSupportedSecondClassTypes();
+        for (String supportedClass : supportedClasses)
         {
-            classesWithoutPersistenceInfo.add(iter.next());
+            classesWithoutPersistenceInfo.add(supportedClass);
         }
 
         allowORM = nucleusContext.supportsORMMetaData();
         if (allowORM)
         {
-            Boolean configOrm = 
-                nucleusContext.getConfiguration().getBooleanObjectProperty(PropertyNames.PROPERTY_METADATA_SUPPORT_ORM);
+            Boolean configOrm = nucleusContext.getConfiguration().getBooleanObjectProperty(PropertyNames.PROPERTY_METADATA_SUPPORT_ORM);
             if (configOrm != null && !configOrm.booleanValue())
             {
                 // User has turned it off
@@ -335,7 +333,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     {
         if (listeners == null)
         {
-            listeners = new HashSet<MetaDataListener>();
+            listeners = new HashSet<>();
         }
         listeners.add(listener);
     }
@@ -583,15 +581,15 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
             // Load classes
             ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(loader);
-            Collection fileMetaData = new ArrayList();
-            Set<Exception> exceptions = new HashSet();
-            for (int i=0;i<classNames.length;i++)
+            Collection<FileMetaData> fileMetaData = new ArrayList<>();
+            Set<Exception> exceptions = new HashSet<>();
+            for (String className : classNames)
             {
                 try
                 {
-                    Class cls = clr.classForName(classNames[i]);
+                    Class cls = clr.classForName(className);
                     // Check for MetaData for this class (take precedence over annotations if they exist)
-                    AbstractClassMetaData cmd = classMetaDataByClass.get(classNames[i]);
+                    AbstractClassMetaData cmd = classMetaDataByClass.get(className);
                     if (cmd == null)
                     {
                         // No MetaData so try annotations
@@ -599,7 +597,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                         if (filemd != null)
                         {
                             // Store file against an annotations specific "URL"
-                            registerFile("annotations:" + classNames[i], filemd, clr);
+                            registerFile("annotations:" + className, filemd, clr);
                             fileMetaData.add(filemd);
                         }
                         else
@@ -608,7 +606,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                             if (cmd == null)
                             {
                                 // Class has no metadata or annotations so warn the user
-                                NucleusLogger.METADATA.debug(Localiser.msg("044017", classNames[i]));
+                                NucleusLogger.METADATA.debug(Localiser.msg("044017", className));
                             }
                             else
                             {
@@ -635,8 +633,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             if (!exceptions.isEmpty())
             {
                 // Exceptions while loading annotations
-                throw new NucleusUserException(Localiser.msg("044016"),
-                    exceptions.toArray(new Throwable[exceptions.size()]),null);
+                throw new NucleusUserException(Localiser.msg("044016"), exceptions.toArray(new Throwable[exceptions.size()]),null);
             }
 
             if (!fileMetaData.isEmpty())
@@ -654,7 +651,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 processListenerLoadingCall();
             }
 
-            return (FileMetaData[])fileMetaData.toArray(new FileMetaData[fileMetaData.size()]);
+            return fileMetaData.toArray(new FileMetaData[fileMetaData.size()]);
         }
         finally
         {
@@ -695,44 +692,42 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             }
 
             ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(loader);
-            List<FileMetaData> fileMetaData = new ArrayList();
+            List<FileMetaData> fileMetaData = new ArrayList<>();
 
             // Generate list of package.jdo and classes present in the jar
-            Set mappingFiles = new HashSet();
+            Set<String> mappingFileNames = new HashSet<>();
             if (allowXML)
             {
                 String[] packageJdoFiles = ClassUtils.getPackageJdoFilesForJarFile(jarFileName);
                 if (packageJdoFiles != null)
                 {
-                    for (int i=0;i<packageJdoFiles.length;i++)
+                    for (String packageJdoFile : packageJdoFiles)
                     {
-                        mappingFiles.add(packageJdoFiles[i]);
+                        mappingFileNames.add(packageJdoFile);
                     }
                 }
             }
 
-            Set classNames = new HashSet();
+            Set<String> classNames = new HashSet<>();
             if (allowAnnotations)
             {
                 String[] jarClassNames = ClassUtils.getClassNamesForJarFile(jarFileName);
                 if (jarClassNames != null)
                 {
-                    for (int i=0;i<jarClassNames.length;i++)
+                    for (String jarClassName : jarClassNames)
                     {
-                        classNames.add(jarClassNames[i]);
+                        classNames.add(jarClassName);
                     }
                 }
             }
 
-            Set<Throwable> exceptions = new HashSet();
+            Set<Throwable> exceptions = new HashSet<>();
 
-            if (allowXML && !mappingFiles.isEmpty())
+            if (allowXML && !mappingFileNames.isEmpty())
             {
                 // Load XML metadata
-                Iterator iter = mappingFiles.iterator();
-                while (iter.hasNext())
+                for (String mappingFileName : mappingFileNames)
                 {
-                    String mappingFileName = (String)iter.next();
                     try
                     {
                         Enumeration files = clr.getResources(mappingFileName, Thread.currentThread().getContextClassLoader());
@@ -759,8 +754,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     }
                     catch (IOException ioe)
                     {
-                        NucleusLogger.METADATA.error(Localiser.msg("044027",
-                            jarFileName, mappingFileName, ioe.getMessage()), ioe);
+                        NucleusLogger.METADATA.error(Localiser.msg("044027", jarFileName, mappingFileName, ioe.getMessage()), ioe);
                     }
                 }
             }
@@ -768,11 +762,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             if (allowAnnotations && !classNames.isEmpty())
             {
                 // Load annotation metadata for all classes
-                Iterator iter = classNames.iterator();
-                while (iter.hasNext())
+                for (String className : classNames)
                 {
                     // Check for MetaData for this class (take precedence over annotations if they exist)
-                    String className = (String)iter.next();
                     AbstractClassMetaData cmd = classMetaDataByClass.get(className);
                     if (cmd == null)
                     {
@@ -804,8 +796,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             }
             if (!exceptions.isEmpty())
             {
-                throw new NucleusUserException(Localiser.msg("044024", jarFileName), 
-                    exceptions.toArray(new Throwable[exceptions.size()]));
+                throw new NucleusUserException(Localiser.msg("044024", jarFileName), exceptions.toArray(new Throwable[exceptions.size()]));
             }
 
             if (!fileMetaData.isEmpty())
@@ -885,21 +876,21 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             }
 
             ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(loader);
-            Set<Throwable> exceptions = new HashSet();
-            List<FileMetaData> fileMetaData = new ArrayList();
+            Set<Throwable> exceptions = new HashSet<>();
+            List<FileMetaData> fileMetaData = new ArrayList<>();
 
             // Generate list of XML files
-            Set mappingFiles = new HashSet();
+            Set<String> mappingFileNames = new HashSet<>();
             if (allowXML)
             {
                 if (nucleusContext.getApiName().equalsIgnoreCase("JPA"))
                 {
-                    mappingFiles.add("META-INF/orm.xml"); // Default location for JPA
+                    mappingFileNames.add("META-INF/orm.xml"); // Default location for JPA
                 }
                 if (pumd.getMappingFiles() != null)
                 {
                     // <mapping-file>
-                    mappingFiles.addAll(pumd.getMappingFiles());
+                    mappingFileNames.addAll(pumd.getMappingFiles());
                 }
                 if (nucleusContext.getApiName().equalsIgnoreCase("JDO")) // When in JDO mode grab any package.jdo
                 {
@@ -916,9 +907,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                                 String[] packageJdoFiles = ClassUtils.getPackageJdoFilesForJarFile((String)jarFile);
                                 if (packageJdoFiles != null)
                                 {
-                                    for (int i=0;i<packageJdoFiles.length;i++)
+                                    for (String packageJdoFile : packageJdoFiles)
                                     {
-                                        mappingFiles.add(packageJdoFiles[i]);
+                                        mappingFileNames.add(packageJdoFile);
                                     }
                                 }
                             }
@@ -927,9 +918,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                                 String[] packageJdoFiles = ClassUtils.getPackageJdoFilesForJarFile((URL)jarFile);
                                 if (packageJdoFiles != null)
                                 {
-                                    for (int i=0;i<packageJdoFiles.length;i++)
+                                    for (String packageJdoFile : packageJdoFiles)
                                     {
-                                        mappingFiles.add(packageJdoFiles[i]);
+                                        mappingFileNames.add(packageJdoFile);
                                     }
                                 }
                             }
@@ -938,9 +929,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                                 String[] packageJdoFiles = ClassUtils.getPackageJdoFilesForJarFile((URI)jarFile);
                                 if (packageJdoFiles != null)
                                 {
-                                    for (int i=0;i<packageJdoFiles.length;i++)
+                                    for (String packageJdoFile : packageJdoFiles)
                                     {
-                                        mappingFiles.add(packageJdoFiles[i]);
+                                        mappingFileNames.add(packageJdoFile);
                                     }
                                 }
                             }
@@ -950,7 +941,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             }
 
             // Generate list of (possibly annotated) class names
-            Set classNames = new HashSet();
+            Set<String> classNames = new HashSet<>();
             if (allowAnnotations)
             {
                 if (pumd.getClassNames() != null)
@@ -972,9 +963,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                                 String[] jarClassNames = ClassUtils.getClassNamesForJarFile((String)jarFile);
                                 if (jarClassNames != null)
                                 {
-                                    for (int i=0;i<jarClassNames.length;i++)
+                                    for (String jarClassName : jarClassNames)
                                     {
-                                        classNames.add(jarClassNames[i]);
+                                        classNames.add(jarClassName);
                                     }
                                 }
                             }
@@ -983,9 +974,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                                 String[] jarClassNames = ClassUtils.getClassNamesForJarFile((URL)jarFile);
                                 if (jarClassNames != null)
                                 {
-                                    for (int i=0;i<jarClassNames.length;i++)
+                                    for (String jarClassName : jarClassNames)
                                     {
-                                        classNames.add(jarClassNames[i]);
+                                        classNames.add(jarClassName);
                                     }
                                 }
                             }
@@ -994,9 +985,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                                 String[] jarClassNames = ClassUtils.getClassNamesForJarFile((URI)jarFile);
                                 if (jarClassNames != null)
                                 {
-                                    for (int i=0;i<jarClassNames.length;i++)
+                                    for (String jarClassName : jarClassNames)
                                     {
-                                        classNames.add(jarClassNames[i]);
+                                        classNames.add(jarClassName);
                                     }
                                 }
                             }
@@ -1027,10 +1018,10 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                                 String[] scannedClassNames = ClassUtils.getClassNamesForDirectoryAndBelow(rootDir);
                                 if (scannedClassNames != null)
                                 {
-                                    for (int i=0;i<scannedClassNames.length;i++)
+                                    for (String scannedClassName : scannedClassNames)
                                     {
-                                        NucleusLogger.METADATA.debug(Localiser.msg("044026", scannedClassNames[i], pumd.getName()));
-                                        classNames.add(scannedClassNames[i]);
+                                        NucleusLogger.METADATA.debug(Localiser.msg("044026", scannedClassName, pumd.getName()));
+                                        classNames.add(scannedClassName);
                                     }
                                 }
                             }
@@ -1044,13 +1035,11 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 }
             }
 
-            if (allowXML && !mappingFiles.isEmpty())
+            if (allowXML && !mappingFileNames.isEmpty())
             {
                 // Load XML metadata for all <mapping-file> specifications
-                Iterator iter = mappingFiles.iterator();
-                while (iter.hasNext())
+                for (String mappingFileName : mappingFileNames)
                 {
-                    String mappingFileName = (String)iter.next();
                     try
                     {
                         Enumeration files = clr.getResources(mappingFileName, Thread.currentThread().getContextClassLoader());
@@ -1084,8 +1073,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     }
                     catch (IOException ioe)
                     {
-                        NucleusLogger.METADATA.error(Localiser.msg("044027",
-                            pumd.getName(), mappingFileName, ioe.getMessage()), ioe);
+                        NucleusLogger.METADATA.error(Localiser.msg("044027", pumd.getName(), mappingFileName, ioe.getMessage()), ioe);
                     }
                 }
             }
@@ -1093,11 +1081,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             if (allowAnnotations && !classNames.isEmpty())
             {
                 // Load annotation metadata for all classes
-                Iterator iter = classNames.iterator();
-                while (iter.hasNext())
+                for (String className : classNames)
                 {
                     // Check for MetaData for this class (take precedence over annotations if they exist)
-                    String className = (String)iter.next();
                     AbstractClassMetaData cmd = classMetaDataByClass.get(className);
                     if (cmd == null)
                     {
@@ -1217,7 +1203,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             userMetaDataNumber++;
 
             registerFile(fileMetaData.getFilename(), fileMetaData, clr);
-            Collection filemds = new ArrayList();
+            Collection filemds = new ArrayList<>();
             filemds.add(fileMetaData);
             initialiseFileMetaDataForUse(filemds, clr);
 
@@ -1270,6 +1256,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     iter.remove();
                 }
             }
+
             iter = classMetaDataByEntityName.entrySet().iterator();
             while (iter.hasNext())
             {
@@ -1279,6 +1266,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     iter.remove();
                 }
             }
+
             Iterator<Map.Entry> entryIter = classMetaDataByAppIdClassName.entrySet().iterator();
             while (entryIter.hasNext())
             {
@@ -1323,8 +1311,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         {
             try 
             {
-                Class clazz = clr.classForName((String) so);
-                return (MetaDataScanner) clazz.newInstance();
+                return (MetaDataScanner) clr.classForName((String)so).newInstance();
             }
             catch (Throwable t)
             {
@@ -1347,19 +1334,17 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      * @param clr ClassLoader resolver
      * @throws NucleusUserException thrown if an error occurs during the populate/initialise of the supplied metadata.
      */
-    protected void initialiseFileMetaDataForUse(Collection fileMetaData, ClassLoaderResolver clr)
+    protected void initialiseFileMetaDataForUse(Collection<FileMetaData> fileMetaData, ClassLoaderResolver clr)
     {
-        Set<Exception> exceptions = new HashSet();
+        Set<Exception> exceptions = new HashSet<>();
 
         // a). Populate MetaData
         if (NucleusLogger.METADATA.isDebugEnabled())
         {
             NucleusLogger.METADATA.debug(Localiser.msg("044018"));
         }
-        Iterator iter = fileMetaData.iterator();
-        while (iter.hasNext())
+        for (FileMetaData filemd : fileMetaData)
         {
-            FileMetaData filemd = (FileMetaData)iter.next();
             if (!filemd.isInitialised())
             {
                 populateFileMetaData(filemd, clr, null);
@@ -1371,10 +1356,9 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         {
             NucleusLogger.METADATA.debug(Localiser.msg("044019"));
         }
-        iter = fileMetaData.iterator();
-        while (iter.hasNext())
+
+        for (FileMetaData filemd : fileMetaData)
         {
-            FileMetaData filemd = (FileMetaData)iter.next();
             if (!filemd.isInitialised())
             {
                 try
@@ -1400,12 +1384,12 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     @Override
     public Collection<FileMetaData> loadFiles(String[] metadataFiles, ClassLoaderResolver clr) 
     {
-        List<FileMetaData> fileMetaData = new ArrayList();
+        List<FileMetaData> fileMetaData = new ArrayList<>();
 
-        Set<Throwable> exceptions = new HashSet();
+        Set<Throwable> exceptions = new HashSet<>();
         if (allowXML)
         {
-            for (int i = 0; i < metadataFiles.length; i++) 
+            for (String metadataFile : metadataFiles)
             {
                 try 
                 {
@@ -1413,23 +1397,23 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     try
                     {
                         // Try as file
-                        File file = new File(metadataFiles[i]);
+                        File file = new File(metadataFile);
                         fileURL = file.toURI().toURL();
                         if (!file.exists())
                         {
                             // Try as CLASSPATH resource
-                            fileURL = clr.getResource(metadataFiles[i], null);        
+                            fileURL = clr.getResource(metadataFile, null);        
                         }
                     }
                     catch (Exception mue)
                     {
                         // Try as CLASSPATH resource
-                        fileURL = clr.getResource(metadataFiles[i], null);
+                        fileURL = clr.getResource(metadataFile, null);
                     }
                     if (fileURL == null)
                     {
                         // User provided a filename which doesn't exist
-                        NucleusLogger.METADATA.warn("Metadata file " + metadataFiles[i] + " not found in CLASSPATH");
+                        NucleusLogger.METADATA.warn("Metadata file " + metadataFile + " not found in CLASSPATH");
                         continue;
                     }
 
@@ -1445,7 +1429,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                         }
                         else
                         {
-                            throw new NucleusUserException(Localiser.msg("044015", metadataFiles[i]));
+                            throw new NucleusUserException(Localiser.msg("044015", metadataFile));
                         }
                     }
                     else
@@ -1592,14 +1576,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             Class c = null;
             try
             {
-                if (clr == null)
-                {
-                    c = Class.forName(className);
-                }
-                else
-                {
-                    c = clr.classForName(className, null, false);
-                }
+                c = (clr == null) ? Class.forName(className) : clr.classForName(className, null, false);
             }
             catch (ClassNotFoundException cnfe)
             {
@@ -1614,7 +1591,6 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     // Return any previously loaded metadata
                     return cmd;
                 }
-
                 return null;
             }
 
@@ -1628,7 +1604,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     }
 
     /** Temporary list of the FileMetaData objects utilised in this call for metadata. */
-    protected ArrayList<FileMetaData> utilisedFileMetaData = new ArrayList();
+    protected ArrayList<FileMetaData> utilisedFileMetaData = new ArrayList<>();
 
     /* (non-Javadoc)
      * @see org.datanucleus.metadata.MetaDataManager#getMetaDataForClass(java.lang.Class, org.datanucleus.ClassLoaderResolver)
@@ -1684,24 +1660,20 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 if (!utilisedFileMetaData.isEmpty())
                 {
                     // Pass 1 - initialise anything loaded during the initialise of the requested class
-                    ArrayList utilisedFileMetaData1 = (ArrayList)utilisedFileMetaData.clone();
+                    List<FileMetaData> utilisedFileMetaData1 = (ArrayList)utilisedFileMetaData.clone();
                     utilisedFileMetaData.clear();
-                    Iterator iter1 = utilisedFileMetaData1.iterator();
-                    while (iter1.hasNext())
+                    for (FileMetaData filemd : utilisedFileMetaData1)
                     {
-                        FileMetaData filemd = (FileMetaData)iter1.next();
                         initialiseFileMetaData(filemd, clr,c.getClassLoader());
                     }
 
                     if (!utilisedFileMetaData.isEmpty())
                     {
                         // Pass 2 - initialise anything loaded during the initialise of pass 1
-                        ArrayList utilisedFileMetaData2 = (ArrayList)utilisedFileMetaData.clone();
+                        List<FileMetaData> utilisedFileMetaData2 = (List)utilisedFileMetaData.clone();
                         utilisedFileMetaData.clear();
-                        Iterator iter2 = utilisedFileMetaData2.iterator();
-                        while (iter2.hasNext())
+                        for (FileMetaData filemd : utilisedFileMetaData2)
                         {
-                            FileMetaData filemd = (FileMetaData)iter2.next();
                             initialiseFileMetaData(filemd, clr,c.getClassLoader());
                         }
                     }
@@ -1832,17 +1804,15 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     @Override
     public String[] getClassesImplementingInterface(String interfaceName, ClassLoaderResolver clr)
     {
-        Collection<Class> classes = new HashSet();
+        Collection<Class> classes = new HashSet<>();
         Class intfClass = clr.classForName(interfaceName);
-        Collection generatedClassNames = new HashSet();
+        Collection<String> generatedClassNames = new HashSet<>();
 
         // Loop through all known classes and find the implementations
-        Collection cmds = classMetaDataByClass.values();
-        Iterator cmdIter = cmds.iterator();
+        Collection<AbstractClassMetaData> cmds = classMetaDataByClass.values();
         boolean isPersistentInterface = false;
-        while (cmdIter.hasNext())
+        for (AbstractClassMetaData acmd : cmds)
         {
-            AbstractClassMetaData acmd = (AbstractClassMetaData)cmdIter.next();
             Class implClass = null;
             try
             {
@@ -2286,17 +2256,16 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     public PersistenceUnitMetaData getMetaDataForPersistenceUnit(String unitName)
     {
         String filename = nucleusContext.getConfiguration().getStringProperty(PropertyNames.PROPERTY_PERSISTENCE_XML_FILENAME);
-        PersistenceFileMetaData[] files = MetaDataUtils.parsePersistenceFiles(nucleusContext.getPluginManager(),
-            filename, validateXML, nucleusContext.getClassLoaderResolver(null));
+        PersistenceFileMetaData[] files = MetaDataUtils.parsePersistenceFiles(nucleusContext.getPluginManager(), filename, validateXML, nucleusContext.getClassLoaderResolver(null));
         if (files == null)
         {
             // No "persistence.xml" files found
             throw new NucleusUserException(Localiser.msg("044046"));
         }
 
-        for (int i=0;i<files.length;i++)
+        for (PersistenceFileMetaData pfmd : files)
         {
-            PersistenceUnitMetaData[] unitmds = files[i].getPersistenceUnits();
+            PersistenceUnitMetaData[] unitmds = pfmd.getPersistenceUnits();
             if (unitmds != null)
             {
                 for (int j=0;j<unitmds.length;j++)
@@ -2314,10 +2283,10 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
     /**
      * Utility to parse an XML metadata file.
-     * @param file_url URL of the file
+     * @param fileURL URL of the file
      * @return The FileMetaData for this file
      */
-    protected abstract FileMetaData parseFile(URL file_url);
+    protected abstract FileMetaData parseFile(URL fileURL);
 
     /* (non-Javadoc)
      * @see org.datanucleus.metadata.MetaDataManager#registerFile(java.lang.String, org.datanucleus.metadata.FileMetaData, org.datanucleus.ClassLoaderResolver)
@@ -2415,19 +2384,19 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             {
                 if (sequenceMetaDataByPackageSequence == null)
                 {
-                    sequenceMetaDataByPackageSequence = new ConcurrentHashMap();
+                    sequenceMetaDataByPackageSequence = new ConcurrentHashMap<>();
                 }
 
                 // The problem here is that with JDO we want the sequence to be fully-qualified
                 // yet JPA wants the sequence name itself. Also we could be using JPA annotations
                 // with JDO persistence, or mixed mode, so need to cater for both ways
-                for (int j=0;j<seqmds.length;j++)
+                for (SequenceMetaData seqmd : seqmds)
                 {
                     // Register using its fully qualified name (JDO)
-                    sequenceMetaDataByPackageSequence.put(seqmds[j].getFullyQualifiedName(), seqmds[j]);
+                    sequenceMetaDataByPackageSequence.put(seqmd.getFullyQualifiedName(), seqmd);
 
                     // Register using its basic name (JPA)
-                    sequenceMetaDataByPackageSequence.put(seqmds[j].getName(), seqmds[j]);
+                    sequenceMetaDataByPackageSequence.put(seqmd.getName(), seqmd);
                 }
             }
         }
@@ -2448,19 +2417,19 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             {
                 if (tableGeneratorMetaDataByPackageSequence == null)
                 {
-                    tableGeneratorMetaDataByPackageSequence = new ConcurrentHashMap();
+                    tableGeneratorMetaDataByPackageSequence = new ConcurrentHashMap<>();
                 }
 
                 // The problem here is that with JDO we want the generator to be fully-qualified
                 // yet JPA wants the generator name itself. Also we could be using JPA annotations
                 // with JDO persistence, or mixed mode, so need to cater for both ways
-                for (int j=0;j<tgmds.length;j++)
+                for (TableGeneratorMetaData tgmd : tgmds)
                 {
                     // Register using its fully qualified name (JDO)
-                    tableGeneratorMetaDataByPackageSequence.put(tgmds[j].getFullyQualifiedName(), tgmds[j]);
+                    tableGeneratorMetaDataByPackageSequence.put(tgmd.getFullyQualifiedName(), tgmd);
 
                     // Register using its basic sequence name
-                    tableGeneratorMetaDataByPackageSequence.put(tgmds[j].getName(), tgmds[j]);
+                    tableGeneratorMetaDataByPackageSequence.put(tgmd.getName(), tgmd);
                 }
             }
         }
@@ -2478,11 +2447,11 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         {
             if (queryResultMetaDataByName == null)
             {
-                queryResultMetaDataByName = new ConcurrentHashMap();
+                queryResultMetaDataByName = new ConcurrentHashMap<>();
             }
-            for (int i=0;i<fqrmds.length;i++)
+            for (QueryResultMetaData qrmd : fqrmds)
             {
-                queryResultMetaDataByName.put(fqrmds[i].getName(), fqrmds[i]);
+                queryResultMetaDataByName.put(qrmd.getName(), qrmd);
             }
         }
 
@@ -2498,11 +2467,11 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 {
                     if (queryResultMetaDataByName == null)
                     {
-                        queryResultMetaDataByName = new ConcurrentHashMap();
+                        queryResultMetaDataByName = new ConcurrentHashMap<>();
                     }
-                    for (int k=0;k<qrmds.length;k++)
+                    for (QueryResultMetaData qrmd : qrmds)
                     {
-                        queryResultMetaDataByName.put(qrmds[k].getName(), qrmds[k]);
+                        queryResultMetaDataByName.put(qrmd.getName(), qrmd);
                     }
                 }
             }
@@ -2517,7 +2486,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     {
         if (queryMetaDataByName == null)
         {
-            queryMetaDataByName = new ConcurrentHashMap();
+            queryMetaDataByName = new ConcurrentHashMap<>();
         }
 
         String scope = qmd.getScope();
@@ -2542,17 +2511,17 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         {
             if (queryMetaDataByName == null)
             {
-                queryMetaDataByName = new ConcurrentHashMap();
+                queryMetaDataByName = new ConcurrentHashMap<>();
             }
-            for (int i=0;i<queries.length;i++)
+            for (QueryMetaData qmd : queries)
             {
-                String scope = queries[i].getScope();
-                String key = queries[i].getName();
+                String scope = qmd.getScope();
+                String key = qmd.getName();
                 if (scope != null)
                 {
                     key = scope + "_" + key;
                 }
-                queryMetaDataByName.put(key, queries[i]);
+                queryMetaDataByName.put(key, qmd);
             }
         }
 
@@ -2570,17 +2539,17 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 {
                     if (queryMetaDataByName == null)
                     {
-                        queryMetaDataByName = new ConcurrentHashMap();
+                        queryMetaDataByName = new ConcurrentHashMap<>();
                     }
-                    for (int k = 0; k < classQueries.length; k++)
+                    for (QueryMetaData qmd : classQueries)
                     {
-                        String scope = classQueries[k].getScope();
-                        String key = classQueries[k].getName();
+                        String scope = qmd.getScope();
+                        String key = qmd.getName();
                         if (scope != null)
                         {
                             key = scope + "_" + key;
                         }
-                        queryMetaDataByName.put(key, classQueries[k]);
+                        queryMetaDataByName.put(key, qmd);
                     }
                 }
             }
@@ -2595,17 +2564,17 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 {
                     if (queryMetaDataByName == null)
                     {
-                        queryMetaDataByName = new ConcurrentHashMap();
+                        queryMetaDataByName = new ConcurrentHashMap<>();
                     }
-                    for (int k = 0; k < interfaceQueries.length; k++)
+                    for (QueryMetaData qmd : interfaceQueries)
                     {
-                        String scope = interfaceQueries[k].getScope();
-                        String key = interfaceQueries[k].getName();
+                        String scope = qmd.getScope();
+                        String key = qmd.getName();
                         if (scope != null)
                         {
                             key = scope + "_" + key;
                         }
-                        queryMetaDataByName.put(key, interfaceQueries[k]);
+                        queryMetaDataByName.put(key, qmd);
                     }
                 }
             }
@@ -2625,7 +2594,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         {
             if (storedProcQueryMetaDataByName == null)
             {
-                storedProcQueryMetaDataByName = new ConcurrentHashMap();
+                storedProcQueryMetaDataByName = new ConcurrentHashMap<>();
             }
             for (int i=0;i<queries.length;i++)
             {
@@ -2648,12 +2617,12 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 {
                     if (storedProcQueryMetaDataByName == null)
                     {
-                        storedProcQueryMetaDataByName = new ConcurrentHashMap();
+                        storedProcQueryMetaDataByName = new ConcurrentHashMap<>();
                     }
-                    for (int k = 0; k < classStoredProcQueries.length; k++)
+                    for (StoredProcQueryMetaData spqmd : classStoredProcQueries)
                     {
-                        String key = classStoredProcQueries[k].getName();
-                        storedProcQueryMetaDataByName.put(key, classStoredProcQueries[k]);
+                        String key = spqmd.getName();
+                        storedProcQueryMetaDataByName.put(key, spqmd);
                     }
                 }
             }
@@ -2668,12 +2637,12 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                 {
                     if (storedProcQueryMetaDataByName == null)
                     {
-                        storedProcQueryMetaDataByName = new ConcurrentHashMap();
+                        storedProcQueryMetaDataByName = new ConcurrentHashMap<>();
                     }
-                    for (int k = 0; k < interfaceStoredProcQueries.length; k++)
+                    for (StoredProcQueryMetaData spqmd : interfaceStoredProcQueries)
                     {
-                        String key = interfaceStoredProcQueries[k].getName();
-                        storedProcQueryMetaDataByName.put(key, interfaceStoredProcQueries[k]);
+                        String key = spqmd.getName();
+                        storedProcQueryMetaDataByName.put(key, spqmd);
                     }
                 }
             }
@@ -2686,18 +2655,17 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      */
     protected void registerFetchPlansForFile(FileMetaData filemd)
     {
-        // Register all queries for this file
-        // Store queries against "queryname"
+        // Register all fetch plans for this file. Store FetchPlanMetaData against fetch plan name
         FetchPlanMetaData[] fetchPlans = filemd.getFetchPlans();
         if (fetchPlans != null)
         {
             if (fetchPlanMetaDataByName == null)
             {
-                fetchPlanMetaDataByName = new ConcurrentHashMap();
+                fetchPlanMetaDataByName = new ConcurrentHashMap<>();
             }
-            for (int i=0;i<fetchPlans.length;i++)
+            for (FetchPlanMetaData fpmd : fetchPlans)
             {
-                fetchPlanMetaDataByName.put(fetchPlans[i].getName(), fetchPlans[i]);
+                fetchPlanMetaDataByName.put(fpmd.getName(), fpmd);
             }
         }
     }
@@ -2794,10 +2762,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     }
 
     /**
-     * Utility to initialise the MetaData for a class, using the specified
-     * class. This assigns defaults to tags that haven't been assigned.
-     * If the class that is being used to populate the MetaData is not
-     * enhanced, this will throw a NucleusUserException informing them of this. 
+     * Utility to initialise the MetaData for a class, using the specified class. This assigns defaults to tags that haven't been assigned.
+     * If the class that is being used to populate the MetaData is not enhanced, this will throw a NucleusUserException informing them of this. 
      * @param cmd The classes metadata
      * @param cls The class to use as a basis for initialisation
      * @param clr ClassLoader resolver to use
@@ -3015,7 +2981,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                         Set<String> subclassNames = concreteSubclassNamesByClassName.get(theCmd.getFullClassName());
                         if (subclassNames == null)
                         {
-                            subclassNames = new HashSet();
+                            subclassNames = new HashSet<>();
                             concreteSubclassNamesByClassName.put(theCmd.getFullClassName(), subclassNames);
                         }
                         subclassNames.add(cmd.getFullClassName());
@@ -3046,11 +3012,11 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     @Override
     public String[] getSubclassesForClass(String className, boolean includeDescendents)
     {
-        Collection subclassNames2 = new HashSet();
+        Collection<String> subclassNames2 = new HashSet<>();
         provideSubclassesForClass(className, includeDescendents, subclassNames2);
         if (!subclassNames2.isEmpty())
         {
-            return (String[])subclassNames2.toArray(new String[subclassNames2.size()]);
+            return subclassNames2.toArray(new String[subclassNames2.size()]);
         }
 
         return null;
@@ -3062,7 +3028,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      * @param includeDescendents Whether to include subclasses of subclasses etc
      * @param consumer the Collection (Set) where discovered subclasses are added
      */
-    private void provideSubclassesForClass(String className, boolean includeDescendents, Collection consumer)
+    private void provideSubclassesForClass(String className, boolean includeDescendents, Collection<String> consumer)
     {
         Set<String> subclasses = directSubclassesByClass.get(className);
         if (subclasses != null)
@@ -3087,20 +3053,20 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     @Override
     public List<AbstractClassMetaData> getReferencedClasses(String[] classNames, ClassLoaderResolver clr)
     {
-        List<AbstractClassMetaData> cmds = new ArrayList();
-        for (int i = 0; i < classNames.length; ++i)
+        List<AbstractClassMetaData> cmds = new ArrayList<>();
+        for (String className : classNames)
         {
             Class cls = null;
             try
             {
-                cls = clr.classForName(classNames[i]);
+                cls = clr.classForName(className);
                 if (!cls.isInterface())
                 {
-                    AbstractClassMetaData cmd = getMetaDataForClass(classNames[i], clr);
+                    AbstractClassMetaData cmd = getMetaDataForClass(className, clr);
                     if (cmd == null)
                     {
-                        NucleusLogger.DATASTORE.warn("Class Invalid " + classNames[i]);
-                        throw new NoPersistenceInformationException(classNames[i]);
+                        NucleusLogger.DATASTORE.warn("Class Invalid " + className);
+                        throw new NoPersistenceInformationException(className);
                     }
                     cmds.addAll(getReferencedClassMetaData(cmd, clr));
                 }
@@ -3108,7 +3074,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             catch (ClassNotResolvedException cnre)
             {
                 // Class not found so ignore it
-                NucleusLogger.DATASTORE.warn("Class " + classNames[i] + " not found so being ignored");
+                NucleusLogger.DATASTORE.warn("Class " + className + " not found so being ignored");
             }
         }
         return cmds;
@@ -3145,8 +3111,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         {
             // Enhancing so return if we have MetaData that is persistable
             AbstractClassMetaData cmd = readMetaDataForClass(type.getName());
-            if (cmd != null && cmd instanceof ClassMetaData &&
-                cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
+            if (cmd != null && cmd instanceof ClassMetaData && cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
             {
                 return true;
             }

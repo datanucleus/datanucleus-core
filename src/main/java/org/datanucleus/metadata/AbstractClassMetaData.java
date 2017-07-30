@@ -2455,8 +2455,7 @@ public abstract class AbstractClassMetaData extends MetaData
             inheritedBasicPositions = pcSuperclassMetaData.getBasicMemberPositions(clr);
         }
 
-        int[] basicPositions = new int[numBasics + 
-            (inheritedBasicPositions != null ? inheritedBasicPositions.length : 0)];
+        int[] basicPositions = new int[numBasics + (inheritedBasicPositions != null ? inheritedBasicPositions.length : 0)];
         int number = 0;
         if (inheritedBasicPositions != null)
         {
@@ -2471,9 +2470,7 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             AbstractMemberMetaData mmd = iter.next();
             if (mmd.getRelationType(clr) == RelationType.NONE && !mmd.isPersistentInterface(clr) &&
-                !Collection.class.isAssignableFrom(mmd.getType()) &&
-                !Map.class.isAssignableFrom(mmd.getType()) &&
-                !mmd.getType().isArray())
+                !Collection.class.isAssignableFrom(mmd.getType()) && !Map.class.isAssignableFrom(mmd.getType()) && !mmd.getType().isArray())
             {
                 basicPositions[number++] = mmd.getAbsoluteFieldNumber();
             }
@@ -2492,14 +2489,10 @@ public abstract class AbstractClassMetaData extends MetaData
     {
         // Do double pass on members - first pass to get number of members, and second to set up array
         // Could do single pass with ArrayList but want primitives and in JDK1.3/4 can't put direct in ArrayList
-        Iterator<AbstractMemberMetaData> iter = members.iterator();
         int numMultivalues = 0;
-        while (iter.hasNext())
+        for (AbstractMemberMetaData mmd : members)
         {
-            AbstractMemberMetaData mmd = iter.next();
-            if (mmd.getType().isArray() ||
-                Collection.class.isAssignableFrom(mmd.getType()) ||
-                Map.class.isAssignableFrom(mmd.getType()))
+            if (mmd.getType().isArray() || Collection.class.isAssignableFrom(mmd.getType()) || Map.class.isAssignableFrom(mmd.getType()))
             {
                 numMultivalues++;
             }
@@ -2510,8 +2503,7 @@ public abstract class AbstractClassMetaData extends MetaData
             inheritedMultivaluePositions = pcSuperclassMetaData.getMultivaluedMemberPositions();
         }
 
-        int[] multivaluePositions = new int[numMultivalues + 
-            (inheritedMultivaluePositions != null ? inheritedMultivaluePositions.length : 0)];
+        int[] multivaluePositions = new int[numMultivalues + (inheritedMultivaluePositions != null ? inheritedMultivaluePositions.length : 0)];
         int number = 0;
         if (inheritedMultivaluePositions != null)
         {
@@ -2521,10 +2513,8 @@ public abstract class AbstractClassMetaData extends MetaData
             }
         }
 
-        iter = members.iterator();
-        while (iter.hasNext())
+        for (AbstractMemberMetaData mmd : members)
         {
-            AbstractMemberMetaData mmd = iter.next();
             if (mmd.getType().isArray() || Collection.class.isAssignableFrom(mmd.getType()) || Map.class.isAssignableFrom(mmd.getType()))
             {
                 multivaluePositions[number++] = mmd.getAbsoluteFieldNumber();
@@ -2554,11 +2544,10 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             int[] noncontainerMemberPositions;
             int numberNonContainerSCOFields = 0;
-            for (int i=0;i<scoMutableMemberPositions.length;i++)
+            for (int scoMutableMemberPosition : scoMutableMemberPositions)
             {
-                AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePosition(scoMutableMemberPositions[i]);
-                if (!(java.util.Collection.class.isAssignableFrom(mmd.getType())) &&
-                    !(java.util.Map.class.isAssignableFrom(mmd.getType())))
+                AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePosition(scoMutableMemberPosition);
+                if (!(java.util.Collection.class.isAssignableFrom(mmd.getType())) && !(java.util.Map.class.isAssignableFrom(mmd.getType())))
                 {
                     numberNonContainerSCOFields++;
                 }
@@ -2566,13 +2555,12 @@ public abstract class AbstractClassMetaData extends MetaData
 
             noncontainerMemberPositions = new int[numberNonContainerSCOFields];
             int nonContNum = 0;
-            for (int i=0;i<scoMutableMemberPositions.length;i++)
+            for (int scoMutableMemberPosition : scoMutableMemberPositions)
             {
-                AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePosition(scoMutableMemberPositions[i]);
-                if (!(java.util.Collection.class.isAssignableFrom(mmd.getType())) &&
-                    !(java.util.Map.class.isAssignableFrom(mmd.getType())))
+                AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePosition(scoMutableMemberPosition);
+                if (!(java.util.Collection.class.isAssignableFrom(mmd.getType())) && !(java.util.Map.class.isAssignableFrom(mmd.getType())))
                 {
-                    noncontainerMemberPositions[nonContNum++] = scoMutableMemberPositions[i];
+                    noncontainerMemberPositions[nonContNum++] = scoMutableMemberPosition;
                 }
             }
 
@@ -2595,11 +2583,10 @@ public abstract class AbstractClassMetaData extends MetaData
         {
             int[] containerMemberPositions;
             int numberContainerSCOFields = 0;
-            for (int i=0;i<scoMutableMemberPositions.length;i++)
+            for (int scoMutableMemberPosition : scoMutableMemberPositions)
             {
-                AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePosition(scoMutableMemberPositions[i]);
-                if (java.util.Collection.class.isAssignableFrom(mmd.getType()) ||
-                    java.util.Map.class.isAssignableFrom(mmd.getType()))
+                AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePosition(scoMutableMemberPosition);
+                if (java.util.Collection.class.isAssignableFrom(mmd.getType()) || java.util.Map.class.isAssignableFrom(mmd.getType()))
                 {
                     numberContainerSCOFields++;
                 }
@@ -2607,13 +2594,12 @@ public abstract class AbstractClassMetaData extends MetaData
 
             containerMemberPositions = new int[numberContainerSCOFields];
             int contNum = 0;
-            for (int i=0;i<scoMutableMemberPositions.length;i++)
+            for (int scoMutableMemberPosition : scoMutableMemberPositions)
             {
-                AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePosition(scoMutableMemberPositions[i]);
-                if (java.util.Collection.class.isAssignableFrom(mmd.getType()) ||
-                    java.util.Map.class.isAssignableFrom(mmd.getType()))
+                AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePosition(scoMutableMemberPosition);
+                if (java.util.Collection.class.isAssignableFrom(mmd.getType()) || java.util.Map.class.isAssignableFrom(mmd.getType()))
                 {
-                    containerMemberPositions[contNum++] = scoMutableMemberPositions[i];
+                    containerMemberPositions[contNum++] = scoMutableMemberPosition;
                 }
             }
 
@@ -2732,8 +2718,7 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
-     * Convenience method to return the absolute positions of fields/properties that have bidirectional
-     * relations.
+     * Convenience method to return the absolute positions of fields/properties that have bidirectional relations.
      * @param clr ClassLoader resolver
      * @return Absolute positions of bidirectional relation fields/properties
      */
@@ -2782,7 +2767,6 @@ public abstract class AbstractClassMetaData extends MetaData
     {
         this.mappedSuperclass = mapped;
     }
-
     public boolean isMappedSuperclass()
     {
         return mappedSuperclass;
@@ -2792,7 +2776,6 @@ public abstract class AbstractClassMetaData extends MetaData
     {
         serializeRead = serialise;
     }
-
     public boolean isSerializeRead()
     {
         return serializeRead;
@@ -2896,7 +2879,7 @@ public abstract class AbstractClassMetaData extends MetaData
      */
     public int getNoOfStoredProcQueries()
     {
-        return storedProcQueries.size();
+        return (storedProcQueries != null) ? storedProcQueries.size() : 0;
     }
 
     /**
@@ -3149,8 +3132,7 @@ public abstract class AbstractClassMetaData extends MetaData
             AbstractMemberMetaData md = iter.next();
             if (mmd.getName().equals(md.getName()))
             {
-                if ((mmd instanceof PropertyMetaData && md instanceof PropertyMetaData) ||
-                    (mmd instanceof FieldMetaData && md instanceof FieldMetaData))
+                if ((mmd instanceof PropertyMetaData && md instanceof PropertyMetaData) || (mmd instanceof FieldMetaData && md instanceof FieldMetaData))
                 {
                     // Duplicate entry for the same field or property
                     throw new NucleusUserException(Localiser.msg("044090", fullName, mmd.getName()));
@@ -3251,13 +3233,12 @@ public abstract class AbstractClassMetaData extends MetaData
      * @param groupNames Names of the fetch groups
      * @return MetaData for the groups
      */
-    public Set<FetchGroupMetaData> getFetchGroupMetaData(Collection groupNames)
+    public Set<FetchGroupMetaData> getFetchGroupMetaData(Collection<String> groupNames)
     {
         Set<FetchGroupMetaData> results = new HashSet<>();
-        for (Iterator iter = groupNames.iterator(); iter.hasNext();)
+        for (String groupName : groupNames)
         {
-            String groupname = (String) iter.next();
-            FetchGroupMetaData fgmd = getFetchGroupMetaData(groupname);
+            FetchGroupMetaData fgmd = getFetchGroupMetaData(groupName);
             if (fgmd != null)
             {
                 results.add(fgmd);
@@ -3602,11 +3583,7 @@ public abstract class AbstractClassMetaData extends MetaData
      */
     public final IdentityMetaData getBaseIdentityMetaData()
     {
-        if (pcSuperclassMetaData != null)
-        {
-            return pcSuperclassMetaData.getBaseIdentityMetaData();
-        }
-        return identityMetaData;
+        return (pcSuperclassMetaData != null) ? pcSuperclassMetaData.getBaseIdentityMetaData() : identityMetaData;
     }
 
     /**
