@@ -342,7 +342,7 @@ public class FileMetaData extends MetaData
      * Get the event listeners registered against the file.
      * @return the event listeners
      */
-    public List getListeners()
+    public List<EventListenerMetaData> getListeners()
     {
         return listeners;
     }

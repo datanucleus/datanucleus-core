@@ -3405,7 +3405,7 @@ public abstract class AbstractClassMetaData extends MetaData
      * Get the event listeners
      * @return the event listeners
      */
-    public List getListeners()
+    public List<EventListenerMetaData> getListeners()
     {
         return listeners;
     }
