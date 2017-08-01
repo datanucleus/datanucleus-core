@@ -1465,13 +1465,15 @@ public abstract class AbstractClassMetaData extends MetaData
             }
         }
  
-        if (pkFieldCount > 0 && identityType != IdentityType.APPLICATION)
+        if (pkFieldCount > 0)
         {
-            // primary key fields found, but not using application identity
-            throw new InvalidClassMetaDataException("044078", fullName, Integer.valueOf(pkFieldCount), identityType);
-        }
-        else if (pkFieldCount > 0)
-        {
+            // Primary key fields found
+            if (identityType != IdentityType.APPLICATION)
+            {
+                // Not using application identity!
+                throw new InvalidClassMetaDataException("044078", fullName, Integer.valueOf(pkFieldCount), identityType);
+            }
+
             pkMemberPositions = new int[pkFieldCount];
             for (int i=0,pk_num=0;i<memberCount;i++)
             {
@@ -1482,10 +1484,13 @@ public abstract class AbstractClassMetaData extends MetaData
                 }
             }
         }
-        else if (instantiable && pkFieldCount == 0 && identityType == IdentityType.APPLICATION)
+        else
         {
-            // No primary key fields found even though it does permit instances
-            throw new InvalidClassMetaDataException("044077", fullName, objectidClass);
+            if (instantiable && identityType == IdentityType.APPLICATION)
+            {
+                // No primary key fields found even though it does permit instances
+                throw new InvalidClassMetaDataException("044077", fullName, objectidClass);
+            }
         }
 
         nonPkMemberPositions = new int[memberCount-pkFieldCount];
