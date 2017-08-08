@@ -154,6 +154,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
                 return processPersistableCopy(value);
             }
 
+            // TODO If cascadeDetach is false then don't do this
             processPersistable(value);
         }
 
@@ -216,6 +217,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
     {
         Object detachedContainer;
 
+        // TODO If cascadeDetach is false then don't do this
         ElementContainerAdapter containerAdapter = containerHandler.getAdapter(container);
         if (copy)
         {
@@ -246,6 +248,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
     {
         Object detachedMapContainer;
 
+        // TODO If cascadeDetach is false then don't do this
         MapContainerAdapter<Object> mapAdapter = containerHandler.getAdapter(mapContainer);
 
         if (copy)
