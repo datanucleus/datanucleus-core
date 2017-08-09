@@ -45,7 +45,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.PersistenceNucleusContext;
-import org.datanucleus.PersistenceNucleusContextImpl;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.enhancer.EnhancementNucleusContextImpl;
@@ -949,7 +948,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     classNames.addAll(pumd.getClassNames());
                 }
                 // TODO Process pumd.getConverters
-                if (getNucleusContext() instanceof PersistenceNucleusContextImpl) // TODO Why not when enhancing? document it
+                if (getNucleusContext() instanceof PersistenceNucleusContext) // TODO Why not when enhancing? document it
                 {
                     Set jarFileNames = pumd.getJarFiles();
                     if (jarFileNames != null)
@@ -2773,7 +2772,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     {
         synchronized(cmd)
         {
-            if (getNucleusContext() instanceof PersistenceNucleusContextImpl && 
+            if (getNucleusContext() instanceof PersistenceNucleusContext && 
                 cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE &&
                 !getNucleusContext().getApiAdapter().isPersistable(cls))
             {

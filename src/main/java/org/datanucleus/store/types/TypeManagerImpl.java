@@ -73,6 +73,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
+import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
@@ -123,19 +124,19 @@ public class TypeManagerImpl implements TypeManager, Serializable
     protected transient ClassLoaderResolver clr;
 
     /** Map of java types, keyed by the class name. */
-    protected Map<String, JavaType> javaTypes = new ConcurrentHashMap();
-    
+    protected Map<String, JavaType> javaTypes = new ConcurrentHashMap<>();
+
     /** Map of ContainerHandlers, keyed by the container type class name. */
-    protected Map<Class, ? super ContainerHandler> containerHandlersByClass = new ConcurrentHashMap();
+    protected Map<Class, ? super ContainerHandler> containerHandlersByClass = new ConcurrentHashMap<>();
 
     /** Map of TypeConverter keyed by their symbolic name. */
-    protected Map<String, TypeConverter> typeConverterByName = null;
+    protected Map<String, TypeConverter> typeConverterByName = new ConcurrentHashMap<>();
 
     /** Map of TypeConverter keyed by type name that we should default to for this type (user-defined). */
     protected Map<String, TypeConverter> autoApplyConvertersByType = null;
 
     /** Map of (Map of TypeConverter keyed by the datastore type), keyed by the member type. */
-    protected Map<Class, Map<Class, TypeConverter>> typeConverterMap = null;
+    protected Map<Class, Map<Class, TypeConverter>> typeConverterMap = new ConcurrentHashMap<>();
 
     /** Cache of TypeConverter datastore type, keyed by the converter. */
     protected Map<TypeConverter, Class> typeConverterDatastoreTypeByConverter = new ConcurrentHashMap<>();
@@ -151,17 +152,23 @@ public class TypeManagerImpl implements TypeManager, Serializable
     {
         this.nucCtx = nucCtx;
         loadJavaTypes(nucCtx.getPluginManager());
-        loadTypeConverters(nucCtx.getPluginManager());
+        if (nucCtx instanceof PersistenceNucleusContext)
+        {
+            // Not needed for enhancing
+            loadTypeConverters(nucCtx.getPluginManager());
+        }
     }
 
     public void close()
     {
         containerHandlersByClass = null;
         javaTypes = null;
-        typeConverterByName = null;
-        typeConverterMap = null;
-        typeConverterMemberTypeByConverter = null;
-        typeConverterDatastoreTypeByConverter = null;
+
+        typeConverterByName.clear();
+        typeConverterMap.clear();
+        typeConverterMemberTypeByConverter.clear();
+        typeConverterDatastoreTypeByConverter.clear();
+
         autoApplyConvertersByType = null;
     }
 
@@ -712,7 +719,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
     @Override
     public TypeConverter getTypeConverterForName(String converterName)
     {
-        return (typeConverterByName == null || converterName == null) ? null : typeConverterByName.get(converterName);
+        return converterName == null ? null : typeConverterByName.get(converterName);
     }
 
     /* (non-Javadoc)
@@ -724,10 +731,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
         // Add to lookup name -> converter
         if (name != null)
         {
-            if (typeConverterByName == null)
-            {
-                typeConverterByName = new ConcurrentHashMap<String, TypeConverter>();
-            }
             typeConverterByName.put(name, converter);
         }
 
@@ -738,10 +741,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
         typeConverterMemberTypeByConverter.put(converter, memberType);
 
         // Add to lookup by memberType and dbType
-        if (typeConverterMap == null)
-        {
-            typeConverterMap = new ConcurrentHashMap<Class, Map<Class,TypeConverter>>();
-        }
         Map<Class, TypeConverter> convertersForMember = typeConverterMap.get(memberType);
         if (convertersForMember == null)
         {
@@ -820,7 +819,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
     @Override
     public TypeConverter getTypeConverterForType(Class memberType, Class datastoreType)
     {
-        if (typeConverterMap == null || memberType == null)
+        if (memberType == null)
         {
             return null;
         }
@@ -839,7 +838,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
     @Override
     public Collection<TypeConverter> getTypeConvertersForType(Class memberType)
     {
-        if (typeConverterMap == null || memberType == null)
+        if (memberType == null)
         {
             return null;
         }
