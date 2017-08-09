@@ -292,7 +292,12 @@ public interface ApiAdapter extends Serializable
      */
     boolean getDefaultCascadeDeleteForField();
 
-    // TODO Add defaultCascadeDetachForField but we don't currently use/care about this
+    /**
+     * Method to return the default setting for cascading detach of a field
+     * @return default cascade detach setting.
+     */
+    boolean getDefaultCascadeDetachForField();
+
     /**
      * Method to return the default setting for cascading refresh of a field
      * @return default cascade refresh setting.

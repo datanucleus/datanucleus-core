@@ -379,32 +379,29 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         {
             return;
         }
-/*
-        if (mmgr != null)
-        {*/
-            // Set defaults for cascading when not yet set
-            ApiAdapter apiAdapter = mmgr.getNucleusContext().getApiAdapter();
-            if (cascadePersist == null)
-            {
-                cascadePersist = apiAdapter.getDefaultCascadePersistForField();
-            }
-            if (cascadeUpdate == null)
-            {
-                cascadeUpdate = apiAdapter.getDefaultCascadeUpdateForField();
-            }
-            if (cascadeDelete == null)
-            {
-                cascadeDelete = apiAdapter.getDefaultCascadeDeleteForField();
-            }
-            if (cascadeDetach == null)
-            {
-                cascadeDetach = false;
-            }
-            if (cascadeRefresh == null)
-            {
-                cascadeRefresh = apiAdapter.getDefaultCascadeRefreshForField();
-            }/*
-        }*/
+
+        // Set defaults for cascading when not yet set
+        ApiAdapter apiAdapter = mmgr.getNucleusContext().getApiAdapter();
+        if (cascadePersist == null)
+        {
+            cascadePersist = apiAdapter.getDefaultCascadePersistForField();
+        }
+        if (cascadeUpdate == null)
+        {
+            cascadeUpdate = apiAdapter.getDefaultCascadeUpdateForField();
+        }
+        if (cascadeDelete == null)
+        {
+            cascadeDelete = apiAdapter.getDefaultCascadeDeleteForField();
+        }
+        if (cascadeDetach == null)
+        {
+            cascadeDetach = apiAdapter.getDefaultCascadeDetachForField();
+        }
+        if (cascadeRefresh == null)
+        {
+            cascadeRefresh = apiAdapter.getDefaultCascadeRefreshForField();
+        }
 
         if (field == null && method == null)
         {
@@ -1118,6 +1115,19 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 cascadeUpdate = false;
             }
         }
+        if (hasExtension(MetaData.EXTENSION_MEMBER_CASCADE_DETACH))
+        {
+            // JDO doesn't have a metadata attribute for this so we use an extension
+            String cascadeValue = getValueForExtension(MetaData.EXTENSION_MEMBER_CASCADE_DETACH);
+            if (cascadeValue.equalsIgnoreCase("true"))
+            {
+                cascadeDetach = true;
+            }
+            else if (cascadeValue.equalsIgnoreCase("false"))
+            {
+                cascadeDetach = false;
+            }
+        }
         if (hasExtension(MetaData.EXTENSION_MEMBER_CASCADE_REFRESH))
         {
             // JDO doesn't have a metadata attribute for this so we use an extension
@@ -1656,7 +1666,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     }
 
     /**
-     * Accessor for the whether this field should be cascaded at persist
+     * Accessor for the whether this field should be cascaded at persist.
      * @return Whether to cascade at persist
      */
     public boolean isCascadePersist()
@@ -1665,7 +1675,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     }
 
     /**
-     * Accessor for the whether this field should be cascaded at update
+     * Accessor for the whether this field should be cascaded at update.
      * @return Whether to cascade at update
      */
     public boolean isCascadeUpdate()
@@ -1674,7 +1684,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     }
 
     /**
-     * Accessor for the whether this field should be cascaded at delete
+     * Accessor for the whether this field should be cascaded at delete.
      * @return Whether to cascade at delete
      */
     public boolean isCascadeDelete()
@@ -1684,7 +1694,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     }
 
     /**
-     * Accessor for the whether this field should be cascaded at detach (JPA only).
+     * Accessor for the whether this field should be cascaded at detach.
      * @return Whether to cascade at detach
      */
     public boolean isCascadeDetach()
@@ -1693,7 +1703,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     }
 
     /**
-     * Accessor for the whether this field should be cascaded at refresh
+     * Accessor for the whether this field should be cascaded at refresh.
      * @return Whether to cascade at refresh
      */
     public boolean isCascadeRefresh()
