@@ -39,7 +39,6 @@ import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.store.schema.naming.NamingFactory;
 import org.datanucleus.store.valuegenerator.ValueGenerationManager;
-import org.datanucleus.store.valuegenerator.ValueGenerator;
 
 /**
  * Interface defining management of a datastore.
@@ -244,15 +243,6 @@ public interface StoreManager
      * @return if the object for the value generation strategy is attributed by the database ("identity", etc)
      */
     boolean isValueGenerationStrategyDatastoreAttributed(AbstractClassMetaData cmd, int absFieldNumber);
-
-    /**
-     * Method to get the ValueGenerator to use for the specified member (including datastore id surrogate members).
-     * @param clr {@link ClassLoaderResolver}
-     * @param cmd The Class
-     * @param absoluteFieldNumber Member number, or -1 for datastore id
-     * @return The ValueGenerator
-     */
-    ValueGenerator getValueGeneratorForMember(ClassLoaderResolver clr, AbstractClassMetaData cmd, int absoluteFieldNumber);
 
     /**
      * Method to retrieve the value for a value generation strategy for a particular field.

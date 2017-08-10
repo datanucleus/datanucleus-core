@@ -56,7 +56,6 @@ import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.store.schema.naming.NamingFactory;
 import org.datanucleus.store.valuegenerator.ValueGenerationManager;
-import org.datanucleus.store.valuegenerator.ValueGenerator;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -353,15 +352,6 @@ public class FederatedStoreManager implements StoreManager
     public String getQueryCacheKey()
     {
         return primaryStoreMgr.getQueryCacheKey();
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.StoreManager#getValueGeneratorForMember(org.datanucleus.ClassLoaderResolver, org.datanucleus.metadata.AbstractClassMetaData, int)
-     */
-    @Override
-    public ValueGenerator getValueGeneratorForMember(ClassLoaderResolver clr, AbstractClassMetaData cmd, int absoluteFieldNumber)
-    {
-        return primaryStoreMgr.getValueGeneratorForMember(clr, cmd, absoluteFieldNumber);
     }
 
     public Object getValueGenerationStrategyValue(ExecutionContext ec, AbstractClassMetaData cmd, int absoluteFieldNumber)
