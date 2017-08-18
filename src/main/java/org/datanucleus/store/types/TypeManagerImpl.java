@@ -747,6 +747,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
             convertersForMember = new ConcurrentHashMap<Class, TypeConverter>();
             typeConverterMap.put(memberType, convertersForMember);
         }
+        // TODO We could already have a converter registered for this datastore type, so this replaces it!
         convertersForMember.put(dbType, converter);
 
         if (converter instanceof ClassStringConverter)
