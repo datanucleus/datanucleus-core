@@ -24,14 +24,10 @@ package org.datanucleus.metadata.xml;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -41,7 +37,6 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.InvalidMetaDataException;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataManager;
-import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -60,7 +55,8 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class MetaDataParser extends DefaultHandler
 {
-    protected EntityResolver entityResolver = null;
+    /** EntityResolver for all XML MetaData. */
+    protected MetaDataEntityResolver entityResolver = null;
 
     /** MetaData manager. */
     protected final MetaDataManager mgr;
@@ -215,7 +211,7 @@ public class MetaDataParser extends DefaultHandler
                 {
                     try
                     {
-                        Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getRegisteredSchemas(pluginMgr));
+                        Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(entityResolver.getRegisteredSchemas());
                         if (schema != null)
                         {
                             try
@@ -319,29 +315,5 @@ public class MetaDataParser extends DefaultHandler
                 // Do nothing
             }
         }
-    }
-
-    /**
-     * The list of schemas registered in the plugin "metadata_entityresolver".
-     * @param pluginMgr the PluginManager
-     * @return the Sources pointing to the .xsd files
-     */
-    private Source[] getRegisteredSchemas(PluginManager pluginMgr)
-    {
-        ConfigurationElement[] elems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.metadata_entityresolver", null, null);
-        Set<Source> sources = new HashSet<>();
-        for (int i=0; i<elems.length; i++)
-        {
-            if (elems[i].getAttribute("type") == null)
-            {
-                InputStream in = MetaDataParser.class.getResourceAsStream(elems[i].getAttribute("url"));
-                if (in == null)
-                {
-                    NucleusLogger.METADATA.warn("local resource \"" + elems[i].getAttribute("url") + "\" does not exist!!!");
-                }
-                sources.add(new StreamSource(in));
-            }
-        }
-        return sources.toArray(new Source[sources.size()]);
     }
 }

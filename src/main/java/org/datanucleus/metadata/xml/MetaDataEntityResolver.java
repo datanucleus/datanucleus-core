@@ -18,9 +18,17 @@ Contributors:
 *****************************************************************/
 package org.datanucleus.metadata.xml;
 
+import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.util.AbstractXMLEntityResolver;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Implementation of an entity resolver for MetaData XML files.
@@ -29,8 +37,12 @@ import org.datanucleus.util.AbstractXMLEntityResolver;
  */
 public class MetaDataEntityResolver extends AbstractXMLEntityResolver
 {
+    final PluginManager pluginMgr;
+
     public MetaDataEntityResolver(PluginManager pluginMgr)
     {
+        this.pluginMgr = pluginMgr;
+
         ConfigurationElement[] elems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.metadata_entityresolver", null, null);
         for (int i=0; i<elems.length; i++)
         {
@@ -46,5 +58,28 @@ public class MetaDataEntityResolver extends AbstractXMLEntityResolver
                 }
             }
         }
+    }
+
+    /**
+     * The list of schemas registered in the plugin "metadata_entityresolver".
+     * @return the Sources pointing to the .xsd files
+     */
+    public Source[] getRegisteredSchemas()
+    {
+        ConfigurationElement[] elems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.metadata_entityresolver", null, null);
+        Set<Source> sources = new HashSet<>();
+        for (int i=0; i<elems.length; i++)
+        {
+            if (elems[i].getAttribute("type") == null)
+            {
+                InputStream in = MetaDataParser.class.getResourceAsStream(elems[i].getAttribute("url"));
+                if (in == null)
+                {
+                    NucleusLogger.METADATA.warn("local resource \"" + elems[i].getAttribute("url") + "\" does not exist!!!");
+                }
+                sources.add(new StreamSource(in));
+            }
+        }
+        return sources.toArray(new Source[sources.size()]);
     }
 }
