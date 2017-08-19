@@ -2257,7 +2257,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     public PersistenceUnitMetaData getMetaDataForPersistenceUnit(String unitName)
     {
         String filename = nucleusContext.getConfiguration().getStringProperty(PropertyNames.PROPERTY_PERSISTENCE_XML_FILENAME);
-        PersistenceFileMetaData[] files = MetaDataUtils.parsePersistenceFiles(nucleusContext.getPluginManager(), filename, validateXML, nucleusContext.getClassLoaderResolver(null));
+        PersistenceFileMetaData[] files = MetaDataUtils.parsePersistenceFiles(nucleusContext.getPluginManager(), filename, validateXML, supportXMLNamespaces,
+            nucleusContext.getClassLoaderResolver(null));
         if (files == null)
         {
             // No "persistence.xml" files found

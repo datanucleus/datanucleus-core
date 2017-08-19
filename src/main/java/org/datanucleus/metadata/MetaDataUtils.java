@@ -816,10 +816,11 @@ public class MetaDataUtils
      * @param pluginMgr PluginManager
      * @param persistenceFilename Name of persistence file (if null will use "persistence.xml")
      * @param validate Whether to validate the persistence file
+     * @param namespaceAware Whether to support namespaces
      * @param clr ClassLoader resolver
      * @return The metadata for all "persistence.xml" files
      */
-    public static PersistenceFileMetaData[] parsePersistenceFiles(PluginManager pluginMgr, String persistenceFilename, boolean validate, ClassLoaderResolver clr)
+    public static PersistenceFileMetaData[] parsePersistenceFiles(PluginManager pluginMgr, String persistenceFilename, boolean validate, boolean namespaceAware, ClassLoaderResolver clr)
     {
         if (persistenceFilename != null)
         {
@@ -827,7 +828,7 @@ public class MetaDataUtils
             try
             {
                 URL fileURL = new URL(persistenceFilename);
-                MetaDataParser parser = new MetaDataParser(null, pluginMgr, validate);
+                MetaDataParser parser = new MetaDataParser(null, pluginMgr, validate, namespaceAware);
                 MetaData permd = parser.parseMetaDataURL(fileURL, "persistence");
                 return new PersistenceFileMetaData[] {(PersistenceFileMetaData)permd};
             }
@@ -857,7 +858,7 @@ public class MetaDataUtils
                 URL fileURL = (URL)files.nextElement();
                 if (parser == null)
                 {
-                    parser = new MetaDataParser(null, pluginMgr, validate);
+                    parser = new MetaDataParser(null, pluginMgr, validate, true);
                 }
                 MetaData permd = parser.parseMetaDataURL(fileURL, "persistence");
                 metadata.add(permd);

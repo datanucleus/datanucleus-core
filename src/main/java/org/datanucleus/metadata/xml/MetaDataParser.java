@@ -68,7 +68,7 @@ public class MetaDataParser extends DefaultHandler
     protected final boolean validate;
 
     /** Whether to support namespaces. */
-    protected boolean namespaceAware = true;
+    protected final boolean namespaceAware;
 
     /** SAXParser being used. */
     protected SAXParser parser = null;
@@ -78,22 +78,15 @@ public class MetaDataParser extends DefaultHandler
      * @param mgr MetaDataManager
      * @param pluginMgr Manager for plugins
      * @param validate Whether to validate while parsing
+     * @param namespaceAware Whether to support namespaces
      */
-    public MetaDataParser(MetaDataManager mgr, PluginManager pluginMgr, boolean validate)
+    public MetaDataParser(MetaDataManager mgr, PluginManager pluginMgr, boolean validate, boolean namespaceAware)
     {
         this.mgr = mgr;
         this.pluginMgr = pluginMgr;
         this.validate = validate;
+        this.namespaceAware = namespaceAware;
         this.entityResolver = new MetaDataEntityResolver(pluginMgr);
-    }
-
-    public void setNamespaceAware(boolean aware)
-    {
-        if (namespaceAware != aware)
-        {
-            parser = null;
-        }
-        this.namespaceAware = aware;
     }
 
     /**
