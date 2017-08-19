@@ -20,10 +20,8 @@ Contributors:
 package org.datanucleus.store.query;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassConstants;
@@ -78,8 +76,8 @@ public class QueryManagerImpl implements QueryManager
     /** Cache for query results. */
     protected final QueryResultsCache queryResultsCache;
 
-    /** Cache of InvocationEvaluator objects keyed by the method name, for use by in-memory querying. */
-    protected Map<String, Map<Object, InvocationEvaluator>> inmemoryQueryMethodEvaluatorMap = new ConcurrentHashMap<String, Map<Object,InvocationEvaluator>>();
+    /** Cache of InvocationEvaluator objects keyed by the "class:methodName", for use by in-memory querying. */
+    protected Map<String, InvocationEvaluator> inmemoryQueryMethodEvaluatorByName = new ConcurrentHashMap<>();
 
     protected Map<String, String> queryMethodAliasByPrefix = null;
 
@@ -273,8 +271,8 @@ public class QueryManagerImpl implements QueryManager
             queryResultsCache.close();
         }
 
-        inmemoryQueryMethodEvaluatorMap.clear();
-        inmemoryQueryMethodEvaluatorMap = null;
+        inmemoryQueryMethodEvaluatorByName.clear();
+        inmemoryQueryMethodEvaluatorByName = null;
     }
 
     /* (non-Javadoc)
@@ -464,58 +462,213 @@ public class QueryManagerImpl implements QueryManager
     @Override
     public InvocationEvaluator getInMemoryEvaluatorForMethod(Class type, String methodName)
     {
+        String lookupName = type != null ? (type.getName() + ":" + methodName) : methodName;
+
         // Hardcode support for Array.size()/Array.length()/Array.contains() since not currently pluggable
         if (type != null && type.isArray())
         {
-            // TODO Cache these
-            if (methodName.equals("size") || methodName.equals("length"))
-            {
-                return new ArraySizeMethod();
-            }
-            else if (methodName.equals("contains"))
-            {
-                return new ArrayContainsMethod();
-            }
+            lookupName = "ARRAY:" + methodName;
         }
 
-        Map<Object, InvocationEvaluator> evaluatorsForMethod = inmemoryQueryMethodEvaluatorMap.get(methodName);
-        if (evaluatorsForMethod != null)
+        InvocationEvaluator eval = inmemoryQueryMethodEvaluatorByName.get(lookupName);
+        if (eval != null)
         {
-            Iterator evaluatorClsIter = evaluatorsForMethod.entrySet().iterator();
-            while (evaluatorClsIter.hasNext())
-            {
-                Map.Entry<Object, InvocationEvaluator> entry = (Entry<Object, InvocationEvaluator>) evaluatorClsIter.next();
-                Object clsKey = entry.getKey();
-                if (clsKey instanceof Class && ((Class)clsKey).isAssignableFrom(type))
-                {
-                    return entry.getValue();
-                }
-                else if (clsKey instanceof String && ((String)clsKey).equals("STATIC") && type == null)
-                {
-                    // Can only be one static method so just return it
-                    return entry.getValue();
-                }
-            }
-            return null;
+            return eval;
         }
 
-        // Not yet loaded anything for this method
+        // Load built-in handler for this class+method
         ClassLoaderResolver clr = nucleusCtx.getClassLoaderResolver(type != null ? type.getClassLoader() : null);
+        if (type == null)
+        {
+            if ("Math.abs".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.AbsFunction();
+            if ("Math.sqrt".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.SqrtFunction();
+            if ("Math.acos".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ArcCosineFunction();
+            if ("Math.asin".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ArcSineFunction();
+            if ("Math.atan".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ArcTangentFunction();
+            if ("Math.cos".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.CosineFunction();
+            if ("Math.sin".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.SineFunction();
+            if ("Math.tan".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.TangentFunction();
+            if ("Math.log".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LogFunction();
+            if ("Math.exp".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ExpFunction();
+            if ("Math.floor".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.FloorFunction();
+            if ("Math.ceil".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.CeilFunction();
+            if ("Math.toDegrees".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.DegreesFunction();
+            if ("Math.toRadians".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.RadiansFunction();
+
+            if ("CURRENT_DATE".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.CurrentDateFunction();
+            if ("CURRENT_TIME".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.CurrentTimeFunction();
+            if ("CURRENT_TIMESTAMP".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.CurrentTimestampFunction();
+            if ("ABS".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.AbsFunction();
+            if ("SQRT".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.SqrtFunction();
+            if ("MOD".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ModFunction();
+            if ("COALESCE".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.CoalesceFunction();
+            if ("COS".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.CosineFunction();
+            if ("SIN".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.SineFunction();
+            if ("TAN".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.TangentFunction();
+            if ("ACOS".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ArcCosineFunction();
+            if ("ASIN".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ArcSineFunction();
+            if ("ATAN".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ArcTangentFunction();
+            if ("CEIL".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.CeilFunction();
+            if ("FLOOR".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.FloorFunction();
+            if ("LOG".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LogFunction();
+            if ("EXP".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ExpFunction();
+            if ("NULLIF".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.NullIfFunction();
+            if ("SIZE".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.SizeFunction();
+            if ("UPPER".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.UpperFunction();
+            if ("LOWER".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LowerFunction();
+            if ("LENGTH".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LengthFunction();
+            if ("CONCAT".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ConcatFunction();
+            if ("SUBSTRING".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.SubstringFunction();
+            if ("LOCATE".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LocateFunction();
+            if ("TRIM".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.TrimFunction();
+            if ("TRIM_LEADING".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.TrimFunction();
+            if ("TRIM_TRAILING".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.TrimFunction();
+            if ("DEGREES".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.DegreesFunction();
+            if ("RADIANS".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.RadiansFunction();
+            if ("YEAR".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.TemporalYearMethod();
+            if ("MONTH".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.TemporalMonthMethod();
+            if ("MONTH_JAVA".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.TemporalMonthJavaMethod();
+            if ("DAY".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.TemporalDayMethod();
+            if ("HOUR".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.TemporalHourMethod();
+            if ("MINUTE".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.TemporalMinuteMethod();
+            if ("SECOND".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.TemporalSecondMethod();
+
+            if (eval != null)
+            {
+                inmemoryQueryMethodEvaluatorByName.put(lookupName, eval);
+                return eval;
+            }
+        }
+        else
+        {
+            if (type != null && type.isArray())
+            {
+                if ("size".equals(methodName)) eval = new ArraySizeMethod();
+                if ("length".equals(methodName)) eval = new ArraySizeMethod();
+                if ("contains".equals(methodName)) eval = new ArrayContainsMethod();
+            }
+            else if (type.isEnum())
+            {
+                if ("matches".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.EnumMatchesMethod();
+                if ("toString".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.EnumToStringMethod();
+                if ("ordinal".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.EnumOrdinalMethod();
+            }
+            else if ("java.lang.String".equals(type.getName()))
+            {
+                if ("charAt".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.StringCharAtMethod();
+                if ("concat".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.StringConcatMethod();
+                if ("endsWith".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.StringEndsWithMethod();
+                if ("equals".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.StringEqualsMethod();
+                if ("equalsIgnoreCase".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.StringEqualsIgnoreCaseMethod();
+                if ("indexOf".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.StringIndexOfMethod();
+                if ("length".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.StringLengthMethod();
+                if ("matches".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.StringMatchesMethod();
+                if ("startsWith".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.StringStartsWithMethod();
+                if ("substring".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.StringSubstringMethod();
+                if ("toUpperCase".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.StringToUpperCaseMethod();
+                if ("toLowerCase".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.StringToLowerCaseMethod();
+                if ("trim".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.StringTrimMethod();
+                if ("trimLeft".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.StringTrimLeftMethod();
+                if ("trimRight".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.StringTrimRightMethod();
+            }
+            else if (java.util.Collection.class.isAssignableFrom(type))
+            {
+                if ("size".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ContainerSizeMethod();
+                if ("isEmpty".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ContainerIsEmptyMethod();
+                if ("contains".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.CollectionContainsMethod();
+            }
+            else if (java.util.Map.class.isAssignableFrom(type))
+            {
+                if ("size".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ContainerSizeMethod();
+                if ("isEmpty".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ContainerIsEmptyMethod();
+                if ("containsKey".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.MapContainsKeyMethod();
+                if ("containsValue".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.MapContainsValueMethod();
+                if ("containsEntry".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.MapContainsEntryMethod();
+                if ("get".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.MapGetMethod();
+            }
+            else if (java.util.Optional.class.isAssignableFrom(type))
+            {
+                if ("isPresent".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.OptionalIsPresentMethod();
+                if ("get".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.OptionalGetMethod();
+                if ("orElse".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.OptionalOrElseMethod();
+            }
+            else if (java.util.Date.class.isAssignableFrom(type))
+            {
+                if ("getTime".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.DateGetTimeMethod();
+                if ("getDay".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.DateGetDayMethod();
+                if ("getDate".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.DateGetDayMethod();
+                if ("getDayOfWeek".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.DateGetDayOfWeekMethod();
+                if ("getMonth".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.DateGetMonthMethod();
+                if ("getYear".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.DateGetYearMethod();
+                if ("getHour".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.DateGetHoursMethod();
+                if ("getMinute".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.DateGetMinutesMethod();
+                if ("getSecond".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.DateGetSecondsMethod();
+            }
+            else if (java.time.LocalDate.class.isAssignableFrom(type))
+            {
+                if ("getDayOfMonth".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LocalDateGetDayOfMonth();
+                if ("getDayOfWeek".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LocalDateGetDayOfWeek();
+                if ("getMonthValue".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LocalDateGetMonthValue();
+                if ("getYear".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LocalDateGetYear();
+            }
+            else if (java.time.LocalTime.class.isAssignableFrom(type))
+            {
+                if ("getHour".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LocalTimeGetHour();
+                if ("getMinute".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LocalTimeGetMinute();
+                if ("getSecond".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LocalTimeGetSecond();
+            }
+            else if (java.time.LocalDateTime.class.isAssignableFrom(type))
+            {
+                if ("getDayOfMonth".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LocalDateTimeGetDayOfMonth();
+                if ("getDayOfWeek".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LocalDateTimeGetDayOfWeek();
+                if ("getMonthValue".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LocalDateTimeGetMonthValue();
+                if ("getYear".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LocalDateTimeGetYear();
+                if ("getHour".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LocalDateTimeGetHour();
+                if ("getMinute".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LocalDateTimeGetMinute();
+                if ("getSecond".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.LocalDateTimeGetSecond();
+            }
+            else if (java.time.MonthDay.class.isAssignableFrom(type))
+            {
+                if ("getDayOfMonth".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.MonthDayGetDayOfMonth();
+                if ("getMonthValue".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.MonthDayGetMonthValue();
+            }
+            else if (java.time.Period.class.isAssignableFrom(type))
+            {
+                if ("getDays".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.PeriodGetDays();
+                if ("getMonths".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.PeriodGetMonths();
+                if ("getYears".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.PeriodGetYears();
+            }
+            else if (java.time.YearMonth.class.isAssignableFrom(type))
+            {
+                if ("getYear".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.YearMonthGetYear();
+                if ("getMonthValue".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.YearMonthGetMonthValue();
+            }
+
+            if (eval == null && java.lang.Object.class.isAssignableFrom(type) && "getClass".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ObjectGetClassMethod();
+
+            if (eval != null)
+            {
+                inmemoryQueryMethodEvaluatorByName.put(lookupName, eval);
+                return eval;
+            }
+        }
+
+        // Fallback to the plugin mechanism
         PluginManager pluginMgr = nucleusCtx.getPluginManager();
         ConfigurationElement[] elems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.query_method_evaluators", "method", methodName);
-        Map<Object, InvocationEvaluator> evaluators = new HashMap();
-        InvocationEvaluator requiredEvaluator = null;
         if (elems == null)
         {
             return null;
         }
 
+        // TODO Lookup with class specified when type != null
+        InvocationEvaluator requiredEvaluator = null;
         for (int i=0;i<elems.length;i++)
         {
             try
             {
                 String evalName = elems[i].getAttribute("evaluator");
-                InvocationEvaluator eval = (InvocationEvaluator)pluginMgr.createExecutableExtension("org.datanucleus.query_method_evaluators", 
+                eval = (InvocationEvaluator)pluginMgr.createExecutableExtension("org.datanucleus.query_method_evaluators", 
                     new String[] {"method", "evaluator"}, new String[] {methodName, evalName}, "evaluator", null, null);
 
                 String elemClsName = elems[i].getAttribute("class");
@@ -531,7 +684,8 @@ public class QueryManagerImpl implements QueryManager
                         // Evaluator is applicable to the required type
                         requiredEvaluator = eval;
                     }
-                    evaluators.put("STATIC", eval);
+
+                    inmemoryQueryMethodEvaluatorByName.put(lookupName, eval);
                 }
                 else
                 {
@@ -541,7 +695,8 @@ public class QueryManagerImpl implements QueryManager
                         // Evaluator is applicable to the required type
                         requiredEvaluator = eval;
                     }
-                    evaluators.put(elemCls, eval);
+
+                    inmemoryQueryMethodEvaluatorByName.put(lookupName, eval);
                 }
             }
             catch (Exception e)
@@ -550,8 +705,6 @@ public class QueryManagerImpl implements QueryManager
             }
         }
 
-        // Store evaluators for this method name
-        inmemoryQueryMethodEvaluatorMap.put(methodName, evaluators);
         return requiredEvaluator;
     }
 }
