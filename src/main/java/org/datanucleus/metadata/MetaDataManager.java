@@ -41,6 +41,8 @@ public interface MetaDataManager
 
     AnnotationManager getAnnotationManager();
 
+ //   MetaDataParser getMetaDataParser(boolean validate);
+
     String getEnhancedMethodNamePrefix();
 
     boolean isEnhancerField(String memberName);

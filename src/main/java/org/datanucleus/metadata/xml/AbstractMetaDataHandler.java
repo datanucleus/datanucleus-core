@@ -39,12 +39,12 @@ import org.xml.sax.helpers.DefaultHandler;
 public class AbstractMetaDataHandler extends DefaultHandler
 {
     /** Manager for the MetaData. */
-    protected final MetaDataManager mgr;
+    protected final MetaDataManager mmgr;
 
-    /** Filename for the parsed file. */
+    /** Filename containing the XML metadata */
     protected final String filename;
 
-    /** The MetaData for this file (the end result of the parse process. */
+    /** The MetaData for this file (the end result of the parse process). */
     protected MetaData metadata;
 
     /** Entity Resolver to use (if required) */
@@ -61,25 +61,25 @@ public class AbstractMetaDataHandler extends DefaultHandler
      * being process at the moment. The elements are not the XML Element type
      * but are things like ClassMetaData, PackageMetaData etc.
      */
-    protected Stack<MetaData> stack = new Stack();
+    protected Stack<MetaData> stack = new Stack<>();
 
     /**
      * Constructor.
-     * @param mgr Manager for the MetaData
+     * @param mmgr Manager for the MetaData
      * @param filename The filename
      * @param resolver Entity Resolver to use (null if not available)
      */
-    public AbstractMetaDataHandler(MetaDataManager mgr, String filename, EntityResolver resolver)
+    public AbstractMetaDataHandler(MetaDataManager mmgr, String filename, EntityResolver resolver)
     {
         super();
-        this.mgr = mgr;
+        this.mmgr = mmgr;
         this.filename = filename;
         this.entityResolver = resolver;
     }
 
     public boolean isPersistenceContext()
     {
-        return (mgr.getNucleusContext() instanceof PersistenceNucleusContext);
+        return (mmgr.getNucleusContext() instanceof PersistenceNucleusContext);
     }
 
     /**
@@ -125,8 +125,7 @@ public class AbstractMetaDataHandler extends DefaultHandler
     }
 
     /**
-     * Accessor for an attribute out of the attributes for an element. Allows
-     * the specification of a default if no value is provided.
+     * Accessor for an attribute out of the attributes for an element. Allows the specification of a default if no value is provided.
      * @param attrs The attributes
      * @param key Key for the attribute to return
      * @param defaultValue A default to impose if no value.

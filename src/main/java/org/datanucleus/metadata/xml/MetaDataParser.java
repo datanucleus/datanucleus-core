@@ -52,17 +52,16 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Class to provide the parsing framework for parsing metadata files.
- * This will support parsing of any metadata files where the resultant object is
- * derived from org.datanucleus.metadata.MetaData, so can be used on JDO files, ORM files,
- * JDOQUERY files, JPA files, or "persistence.xml" files. Can be used for any future
- * metadata files too.
+ * This will support parsing of any metadata files where the resultant object is derived from org.datanucleus.metadata.MetaData, so can be used on JDO files, ORM files,
+ * JDOQUERY files, JPA ORM files, or JPA "persistence.xml" files. Can be used for any future metadata files too.
  * <P>
- * Provides 3 different entry points depending on whether the caller has a URL,
- * a file, or an InputStream.
+ * Provides 3 different entry points depending on whether the caller has a URL, a file, or an InputStream.
  * </P>
  */
 public class MetaDataParser extends DefaultHandler
 {
+    protected EntityResolver entityResolver = null;
+
     /** MetaData manager. */
     protected final MetaDataManager mgr;
 
@@ -76,7 +75,7 @@ public class MetaDataParser extends DefaultHandler
     protected boolean namespaceAware = true;
 
     /** SAXParser being used. */
-    SAXParser parser = null;
+    protected SAXParser parser = null;
 
     /**
      * Constructor.
@@ -89,6 +88,7 @@ public class MetaDataParser extends DefaultHandler
         this.mgr = mgr;
         this.pluginMgr = pluginMgr;
         this.validate = validate;
+        this.entityResolver = new MetaDataEntityResolver(pluginMgr);
     }
 
     public void setNamespaceAware(boolean aware)
@@ -215,8 +215,7 @@ public class MetaDataParser extends DefaultHandler
                 {
                     try
                     {
-                        Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(
-                            getRegisteredSchemas(pluginMgr));
+                        Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getRegisteredSchemas(pluginMgr));
                         if (schema != null)
                         {
                             try
@@ -249,25 +248,28 @@ public class MetaDataParser extends DefaultHandler
                 parser = factory.newSAXParser();
             }
 
-            // Generate the default handler to process the metadata
+            // Generate the required handler to process this metadata
             DefaultHandler handler = null;
-            EntityResolver entityResolver = null;
             try
             {
-                entityResolver = EntityResolverFactory.getInstance(pluginMgr, handlerName);
-                if (entityResolver != null)
-                {
-                    parser.getXMLReader().setEntityResolver(entityResolver);
-                }
-                Class[] argTypes = new Class[] {ClassConstants.METADATA_MANAGER, String.class, EntityResolver.class};
-                Object[] argValues = new Object[] {mgr, filename, entityResolver};
+                parser.getXMLReader().setEntityResolver(entityResolver);
 
-                handler = (DefaultHandler)pluginMgr.createExecutableExtension("org.datanucleus.metadata_handler", 
-                    "name", handlerName, "class-name", argTypes, argValues);
-                if (handler == null)
+                if ("persistence".equalsIgnoreCase(handlerName))
                 {
-                    // Plugin of this name not found
-                    throw new NucleusUserException(Localiser.msg("044028", handlerName)).setFatal();
+                    // "persistence.xml"
+                    handler = new org.datanucleus.metadata.xml.PersistenceFileMetaDataHandler(mgr, filename, entityResolver);
+                }
+                else
+                {
+                    // Fallback to the plugin mechanism for other MetaData handlers
+                    Class[] argTypes = new Class[] {ClassConstants.METADATA_MANAGER, ClassConstants.JAVA_LANG_STRING, EntityResolver.class};
+                    Object[] argValues = new Object[] {mgr, filename, entityResolver};
+                    handler = (DefaultHandler)pluginMgr.createExecutableExtension("org.datanucleus.metadata_handler", "name", handlerName, "class-name", argTypes, argValues);
+                    if (handler == null)
+                    {
+                        // Plugin of this name not found
+                        throw new NucleusUserException(Localiser.msg("044028", handlerName)).setFatal();
+                    }
                 }
             }
             catch (Exception e)
@@ -294,8 +296,7 @@ public class MetaDataParser extends DefaultHandler
             Throwable cause = e;
             if (e instanceof SAXException)
             {
-                SAXException se = (SAXException)e;
-                cause = se.getException();
+                cause = ((SAXException)e).getException();
             }
             cause = e.getCause() == null ? cause : e.getCause();
 
@@ -321,15 +322,14 @@ public class MetaDataParser extends DefaultHandler
     }
 
     /**
-     * The list of schemas registered in the plugin metadata_entityresolver
-     * @param pm the PluginManager
+     * The list of schemas registered in the plugin "metadata_entityresolver".
+     * @param pluginMgr the PluginManager
      * @return the Sources pointing to the .xsd files
      */
-    private Source[] getRegisteredSchemas(PluginManager pm)
+    private Source[] getRegisteredSchemas(PluginManager pluginMgr)
     {
-        ConfigurationElement[] elems = pm.getConfigurationElementsForExtension(
-            "org.datanucleus.metadata_entityresolver", null, null);
-        Set<Source> sources = new HashSet<Source>();
+        ConfigurationElement[] elems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.metadata_entityresolver", null, null);
+        Set<Source> sources = new HashSet<>();
         for (int i=0; i<elems.length; i++)
         {
             if (elems[i].getAttribute("type") == null)
@@ -337,8 +337,7 @@ public class MetaDataParser extends DefaultHandler
                 InputStream in = MetaDataParser.class.getResourceAsStream(elems[i].getAttribute("url"));
                 if (in == null)
                 {
-                    NucleusLogger.METADATA.warn("local resource \"" + elems[i].getAttribute("url") + 
-                        "\" does not exist!!!");
+                    NucleusLogger.METADATA.warn("local resource \"" + elems[i].getAttribute("url") + "\" does not exist!!!");
                 }
                 sources.add(new StreamSource(in));
             }

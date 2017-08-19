@@ -33,12 +33,12 @@ import org.datanucleus.util.StringUtils;
 
 /**
  * Parser handler for "persistence.xml" files to convert them into a PersistenceFileMetaData.
- * Implements DefaultHandler and handles the extracting of MetaData from the
- * XML elements/attributes. This class simply constructs the MetaData representation
- * mirroring what is in the MetaData file.
- * <P>Operates the parse process using a Stack. MetaData components are added
- * to the stack as they are encountered and created. They are then popped off
- * the stack when the end element is encountered.</P>
+ * Implements DefaultHandler and handles the extracting of MetaData from the XML elements/attributes. 
+ * This class simply constructs the MetaData representation mirroring what is in the MetaData file.
+ * <P>
+ * Operates the parse process using a Stack. MetaData components are added to the stack as they are encountered and created. 
+ * They are then popped off the stack when the end element is encountered.
+ * </P>
  */
 public class PersistenceFileMetaDataHandler extends AbstractMetaDataHandler
 {
@@ -114,8 +114,7 @@ public class PersistenceFileMetaDataHandler extends AbstractMetaDataHandler
             {
                 // New "persistence-unit"
                 PersistenceFileMetaData filemd = (PersistenceFileMetaData)getStack();
-                PersistenceUnitMetaData pumd = new PersistenceUnitMetaData(getAttr(attrs, "name"),
-                    getAttr(attrs, "transaction-type"), rootURI);
+                PersistenceUnitMetaData pumd = new PersistenceUnitMetaData(getAttr(attrs, "name"), getAttr(attrs, "transaction-type"), rootURI);
                 filemd.addPersistenceUnit(pumd);
                 pushStack(pumd);
             }

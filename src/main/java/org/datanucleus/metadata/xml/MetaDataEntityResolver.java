@@ -23,18 +23,18 @@ import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.util.AbstractXMLEntityResolver;
 
 /**
- * Implementation of an entity resolver for DTD/XSD files.
- * Handles entity resolution for files configured via plugins.
+ * Implementation of an entity resolver for MetaData XML files.
+ * Note that this applies to ALL types of MetaData XML (persistence.xml, JDO package.jdo, JDO package.orm, JDO package.jdoquery, JPA orm.xml).
+ * We could, potentially, separate these different types of MetaData XML file, and hence split up the entities based on the handler, but not considered a priority currently.
  */
-public class PluginEntityResolver extends AbstractXMLEntityResolver
+public class MetaDataEntityResolver extends AbstractXMLEntityResolver
 {
-    public PluginEntityResolver(PluginManager pluginMgr)
+    public MetaDataEntityResolver(PluginManager pluginMgr)
     {
-        ConfigurationElement[] elems =
-            pluginMgr.getConfigurationElementsForExtension("org.datanucleus.metadata_entityresolver", null, null);
+        ConfigurationElement[] elems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.metadata_entityresolver", null, null);
         for (int i=0; i<elems.length; i++)
         {
-            if (elems[i].getAttribute("type") != null )
+            if (elems[i].getAttribute("type") != null)
             {
                 if (elems[i].getAttribute("type").equals("PUBLIC"))
                 {

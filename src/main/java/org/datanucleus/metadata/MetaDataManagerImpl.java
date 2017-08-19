@@ -54,7 +54,6 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.annotations.AnnotationManager;
 import org.datanucleus.metadata.annotations.AnnotationManagerImpl;
-import org.datanucleus.metadata.xml.MetaDataParser;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.MultiMap;
@@ -101,9 +100,6 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
     /** Manager for annotations. */
     protected final AnnotationManager annotationManager;
-
-    /** XML Parser for MetaData. */
-    protected MetaDataParser metaDataParser = null;
 
     /** Flag whether we should validate the (XML) metadata files when parsing. */
     protected boolean validateXML = true;
@@ -323,6 +319,12 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             listeners = null;
         }
     }
+
+    /*public MetaDataParser getMetaDataParser(boolean validate)
+    {
+        // TODO Support access to "metaDataParser" to avoid creating multiple
+        return new MetaDataParser(this, nucleusContext.getPluginManager(), validate);
+    }*/
 
     /* (non-Javadoc)
      * @see org.datanucleus.metadata.MetaDataManager#registerListener(org.datanucleus.metadata.MetaDataListener)

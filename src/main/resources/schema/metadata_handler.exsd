@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.datanucleus">
+<schema targetNamespace="org.datanucleus" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
          <meta.schema plugin="org.datanucleus" id="metadata_handler" name="MetaData Handler"/>
@@ -11,6 +11,11 @@
    </annotation>
 
    <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
       <complexType>
          <sequence>
             <element ref="handler" minOccurs="1" maxOccurs="unbounded"/>
@@ -61,16 +66,6 @@
                </appInfo>
             </annotation>
          </attribute>
-         <attribute name="entity-resolver" type="string">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-               <appInfo>
-                  <meta.attribute kind="java" basedOn="org.xml.sax.EntityResolver"/>
-               </appInfo>
-            </annotation>
-         </attribute>
       </complexType>
    </element>
 
@@ -110,13 +105,5 @@
       </documentation>
    </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="copyright"/>
-      </appInfo>
-      <documentation>
-         
-      </documentation>
-   </annotation>
 
 </schema>

@@ -819,8 +819,7 @@ public class MetaDataUtils
      * @param clr ClassLoader resolver
      * @return The metadata for all "persistence.xml" files
      */
-    public static PersistenceFileMetaData[] parsePersistenceFiles(PluginManager pluginMgr, String persistenceFilename,
-            boolean validate, ClassLoaderResolver clr)
+    public static PersistenceFileMetaData[] parsePersistenceFiles(PluginManager pluginMgr, String persistenceFilename, boolean validate, ClassLoaderResolver clr)
     {
         if (persistenceFilename != null)
         {

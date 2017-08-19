@@ -35,10 +35,10 @@ Contributors:
     <extension-point id="identity_string_translator" name="Identity String Translator" schema="schema/identity_string_translator.exsd"/>
     <extension-point id="identity_key_translator" name="Identity Key Translator" schema="schema/identity_key_translator.exsd"/>
     <extension-point id="jta_locator" name="JTA Locator" schema="schema/jta_locator.exsd"/>
-    <extension-point id="store_datastoreidentity" name="Datastore Identity" schema="schema/datastoreidentity.exsd"/>
-    <extension-point id="store_manager" name="Store Manager" schema="schema/store_manager.exsd"/>
     <extension-point id="query_method_prefix" name="Query Method Prefix" schema="schema/query_method_prefix.exsd"/>
     <extension-point id="query_method_evaluators" name="Query Method Evaluators" schema="schema/query_method_evaluator.exsd"/>
+    <extension-point id="store_datastoreidentity" name="Datastore Identity" schema="schema/datastoreidentity.exsd"/>
+    <extension-point id="store_manager" name="Store Manager" schema="schema/store_manager.exsd"/>
     <extension-point id="store_valuegenerator" name="Value Generator" schema="schema/valuegenerator.exsd"/>
     <extension-point id="store_connectionfactory" name="Connection Factory" schema="schema/connectionfactory.exsd"/>
     <extension-point id="java_type" name="Java Type" schema="schema/java_type.exsd"/>
@@ -52,22 +52,18 @@ Contributors:
     <extension-point id="member_annotation_handler" name="Member Annotation Handler" schema="schema/member_annotation_handler.exsd"/>
     <extension-point id="identifier_namingfactory" name="Identifier NamingFactory" schema="schema/identifier_namingfactory.exsd"/>
 
-    <!-- METADATA HANDLERS -->
-    <extension point="org.datanucleus.metadata_handler">
-        <handler class-name="org.datanucleus.metadata.xml.PersistenceFileMetaDataHandler" name="Persistence" entity-resolver="org.datanucleus.metadata.xml.PluginEntityResolver"/>
-    </extension>
-
-    <!-- METADATA RESOLVERS -->
+    <!-- METADATA ENTITY RESOLVERS -->
     <extension point="org.datanucleus.metadata_entityresolver">
-       <entityresolver identity="http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_1_0.xsd"/>
-       <entityresolver identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_1_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_1_0.xsd"/>
-       <entityresolver identity="http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_0.xsd"/>
-       <entityresolver identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_2_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_0.xsd"/>
-       <entityresolver identity="http://java.sun.com/xml/ns/persistence/persistence_2_1.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_1.xsd"/>
-       <entityresolver identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_1.xsd"/>
-       <entityresolver identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_2.xsd"/>
-       <entityresolver url="/org/datanucleus/metadata/persistence_2_0.xsd"/>
-       <entityresolver url="/org/datanucleus/metadata/persistence_2_1.xsd"/>
-       <entityresolver url="/org/datanucleus/metadata/persistence_2_2.xsd"/>
+        <!-- Persistence XML -->
+        <entityresolver url="/org/datanucleus/metadata/persistence_1_0.xsd" identity="http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd" type="SYSTEM"/>
+        <entityresolver url="/org/datanucleus/metadata/persistence_1_0.xsd" identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_1_0.xsd" type="SYSTEM"/>
+        <entityresolver url="/org/datanucleus/metadata/persistence_2_0.xsd" identity="http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" type="SYSTEM"/>
+        <entityresolver url="/org/datanucleus/metadata/persistence_2_0.xsd" identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_2_0.xsd" type="SYSTEM"/>
+        <entityresolver url="/org/datanucleus/metadata/persistence_2_1.xsd" identity="http://java.sun.com/xml/ns/persistence/persistence_2_1.xsd" type="SYSTEM"/>
+        <entityresolver url="/org/datanucleus/metadata/persistence_2_1.xsd" identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd" type="SYSTEM"/>
+        <entityresolver url="/org/datanucleus/metadata/persistence_2_2.xsd" identity="http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd" type="SYSTEM"/>
+        <entityresolver url="/org/datanucleus/metadata/persistence_2_0.xsd"/>
+        <entityresolver url="/org/datanucleus/metadata/persistence_2_1.xsd"/>
+        <entityresolver url="/org/datanucleus/metadata/persistence_2_2.xsd"/>
     </extension>
 </plugin>
