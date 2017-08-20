@@ -580,9 +580,14 @@ public class SchemaTool
         PersistenceUnitMetaData pumd = null;
         if (persistenceUnitName != null)
         {
-            // Obtain any props defined for the persistence-unit
             props.put(PropertyNames.PROPERTY_PERSISTENCE_UNIT_NAME.toLowerCase(), persistenceUnitName);
-            pumd = nucleusCtx.getMetaDataManager().getMetaDataForPersistenceUnit(persistenceUnitName);
+
+            // Extract the persistence-unit metadata
+            String filename = nucleusCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_PERSISTENCE_XML_FILENAME);
+            boolean validateXML = nucleusCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_XML_VALIDATE);
+            boolean supportXMLNamespaces = nucleusCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_XML_NAMESPACE_AWARE);
+            ClassLoaderResolver clr = nucleusCtx.getClassLoaderResolver(null);
+            pumd = MetaDataUtils.getMetaDataForPersistenceUnit(nucleusCtx.getPluginManager(), filename, persistenceUnitName, validateXML, supportXMLNamespaces, clr);
             if (pumd != null)
             {
                 // Add the properties for the unit
@@ -593,8 +598,7 @@ public class SchemaTool
             }
             else
             {
-                throw new NucleusUserException("SchemaTool has been specified to use persistence-unit with name " + 
-                    persistenceUnitName + " but none was found with that name");
+                throw new NucleusUserException("SchemaTool has been specified to use persistence-unit with name " + persistenceUnitName + " but none was found with that name");
             }
 
             if (api.equalsIgnoreCase("JPA"))

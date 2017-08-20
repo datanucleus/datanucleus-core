@@ -30,6 +30,14 @@ import org.datanucleus.metadata.annotations.AnnotationManager;
 
 /**
  * Manager for metadata in DataNucleus.
+ * The <i>MetaDataManager</i> manages the metadata for classes/members.
+ * MetaData can be derived from annotations, or XML, or via an API, or a mixture of all.
+ * MetaData from different sources is merged using <i>MetaDataMerger</i>
+ * 
+ * <h3>persistence.xml</h3>
+ * This class does not handle the parsing of a persistence-unit metadata from a "persistence.xml" file.
+ * That is handled by <i>MetaDataUtils.getMetaDataForPersistenceUnit</i> which returns the <i>PersistenceUnitMetaData</i> and
+ * by <i>MetaDataUtils.parsePersistenceFiles</i> which parses all <i>PersistenceFileMetaData</i> from the available "persistence.xml" file(s).
  */
 public interface MetaDataManager
 {
@@ -459,14 +467,4 @@ public interface MetaDataManager
     void registerSequencesForFile(FileMetaData filemd);
     void registerTableGeneratorsForFile(FileMetaData filemd);
     void registerDiscriminatorValueForClass(AbstractClassMetaData cmd, String discrimValue);
-
-    /**
-     * Method to parse all available "persistence.xml" files and return the metadata for the persistence unit with the specified name.
-     * TODO This likely would be better located in MetaDataUtils and just have MetaDataManager for managing the metadata of classes since
-     * we need to load the persistence-unit to know the properties that define the MetaDataManager.
-     * @param unitName Name of the persistence-unit
-     * @return MetaData for the persistence-unit of the specified name (or null if not found)
-     * @throws NucleusUserException if no "persistence.xml" files are found
-     */
-    PersistenceUnitMetaData getMetaDataForPersistenceUnit(String unitName);
 }

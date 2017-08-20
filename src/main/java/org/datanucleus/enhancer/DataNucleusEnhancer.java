@@ -36,6 +36,7 @@ import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -43,6 +44,7 @@ import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.ClassPersistenceModifier;
 import org.datanucleus.metadata.FileMetaData;
 import org.datanucleus.metadata.MetaDataManager;
+import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.PackageMetaData;
 import org.datanucleus.metadata.PersistenceUnitMetaData;
 import org.datanucleus.util.ClassUtils;
@@ -761,7 +763,12 @@ public class DataNucleusEnhancer
                         Object puValue = comp.getValue();
                         if (puValue instanceof String)
                         {
-                            pumd = metadataMgr.getMetaDataForPersistenceUnit((String)comp.getValue());
+                            // Extract the metadata for the persistence-unit
+                            NucleusContext nucleusCtx = metadataMgr.getNucleusContext();
+                            String filename = nucleusCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_PERSISTENCE_XML_FILENAME);
+                            boolean validateXML = nucleusCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_XML_VALIDATE);
+                            boolean supportXMLNamespaces = nucleusCtx.getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_XML_NAMESPACE_AWARE);
+                            pumd = MetaDataUtils.getMetaDataForPersistenceUnit(nucleusCtx.getPluginManager(), filename, (String)comp.getValue(), validateXML, supportXMLNamespaces, clr);
                         }
                         else
                         {

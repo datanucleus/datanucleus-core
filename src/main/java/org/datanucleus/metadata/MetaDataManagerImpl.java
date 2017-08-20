@@ -3087,37 +3087,4 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         }
         return getApiAdapter().isPersistable(type);
     }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.metadata.MetaDataManager#getMetaDataForPersistenceUnit(java.lang.String)
-     */
-    @Override
-    public PersistenceUnitMetaData getMetaDataForPersistenceUnit(String unitName)
-    {
-        String filename = nucleusContext.getConfiguration().getStringProperty(PropertyNames.PROPERTY_PERSISTENCE_XML_FILENAME);
-        PersistenceFileMetaData[] files = MetaDataUtils.parsePersistenceFiles(nucleusContext.getPluginManager(), filename, validateXML, supportXMLNamespaces,
-            nucleusContext.getClassLoaderResolver(null));
-        if (files == null)
-        {
-            // No "persistence.xml" files found
-            throw new NucleusUserException(Localiser.msg("044046"));
-        }
-
-        for (PersistenceFileMetaData pfmd : files)
-        {
-            PersistenceUnitMetaData[] unitmds = pfmd.getPersistenceUnits();
-            if (unitmds != null)
-            {
-                for (PersistenceUnitMetaData pumd : unitmds)
-                {
-                    if (pumd.getName().equals(unitName))
-                    {
-                        // Found the required unit
-                        return pumd;
-                    }
-                }
-            }
-        }
-        return null;
-    }
 }
