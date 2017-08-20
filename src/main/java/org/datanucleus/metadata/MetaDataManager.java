@@ -403,15 +403,6 @@ public interface MetaDataManager
     ClassMetaData getClassMetaDataForImplementationOfPersistentInterface(String interfaceName);
 
     /**
-     * Method to parse all available "persistence.xml" files and return the metadata
-     * for the persistence unit with the specified name.
-     * @param unitName Name of the persistence-unit
-     * @return MetaData for the persistence-unit of the specified name (or null if not found)
-     * @throws NucleusUserException if no "persistence.xml" files are found
-     */
-    PersistenceUnitMetaData getMetaDataForPersistenceUnit(String unitName);
-
-    /**
      * Method to take the FileMetaData and register the relevant parts of it with the assorted caches provided.
      * Note : this is only public to allow enhancer tests to load up metadata manually.
      * @param fileURLString URL of the metadata file
@@ -468,4 +459,14 @@ public interface MetaDataManager
     void registerSequencesForFile(FileMetaData filemd);
     void registerTableGeneratorsForFile(FileMetaData filemd);
     void registerDiscriminatorValueForClass(AbstractClassMetaData cmd, String discrimValue);
+
+    /**
+     * Method to parse all available "persistence.xml" files and return the metadata for the persistence unit with the specified name.
+     * TODO This likely would be better located in MetaDataUtils and just have MetaDataManager for managing the metadata of classes since
+     * we need to load the persistence-unit to know the properties that define the MetaDataManager.
+     * @param unitName Name of the persistence-unit
+     * @return MetaData for the persistence-unit of the specified name (or null if not found)
+     * @throws NucleusUserException if no "persistence.xml" files are found
+     */
+    PersistenceUnitMetaData getMetaDataForPersistenceUnit(String unitName);
 }
