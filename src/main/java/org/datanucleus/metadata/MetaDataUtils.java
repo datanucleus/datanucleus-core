@@ -859,6 +859,43 @@ public class MetaDataUtils
     }
 
     /**
+     * Convenience method to parse the available persistence.xml file(s) and find the metadata for the specified persistence-unit.
+     * @param pluginMgr Plugin Manager
+     * @param persistenceFilename Filename of the persistence.xml (or null if using default "META-INF/persistence.xml")
+     * @param unitName Name of the persistence unit
+     * @param validate Whether to validate the XML
+     * @param namespaceAware Whether the XML is namespace aware
+     * @param clr ClassLoader resolver
+     * @return Metadata for the persistence-unit (if found), or null (if not found)
+     */
+    public static PersistenceUnitMetaData getMetaDataForPersistenceUnit(PluginManager pluginMgr, String persistenceFilename, String unitName, boolean validate, boolean namespaceAware, ClassLoaderResolver clr)
+    {
+        PersistenceFileMetaData[] files = MetaDataUtils.parsePersistenceFiles(pluginMgr, persistenceFilename, validate, namespaceAware, clr);
+        if (files == null)
+        {
+            // No "persistence.xml" files found
+            throw new NucleusUserException(Localiser.msg("044046"));
+        }
+
+        for (PersistenceFileMetaData pfmd : files)
+        {
+            PersistenceUnitMetaData[] unitmds = pfmd.getPersistenceUnits();
+            if (unitmds != null)
+            {
+                for (PersistenceUnitMetaData pumd : unitmds)
+                {
+                    if (pumd.getName().equals(unitName))
+                    {
+                        // Found the required unit
+                        return pumd;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Convenience method for whether to persist the provided column as numeric.
      * Returns true if it has the jdbcType defined as "int"/"integer"
      * @param colmd Metadata for the column
