@@ -274,8 +274,7 @@ public class MetaDataUtils
         else
         {
             // 1-1 relation with PC
-            if (ClassUtils.isReferenceType(fmd.getType()) &&
-                mmgr.getMetaDataForImplementationOfReference(fmd.getType(), null, clr) != null)
+            if (ClassUtils.isReferenceType(fmd.getType()) && mmgr.getMetaDataForImplementationOfReference(fmd.getType(), null, clr) != null)
             {
                 // Reference type for an FCO
                 return true;
@@ -320,8 +319,7 @@ public class MetaDataUtils
 
             String elementType = fmd.getCollection().getElementType();
             Class elementCls = clr.classForName(elementType);
-            if (elementCls != null && ClassUtils.isReferenceType(elementCls) &&
-                    mgr.getMetaDataForImplementationOfReference(elementCls, null, clr) != null)
+            if (elementCls != null && ClassUtils.isReferenceType(elementCls) && mgr.getMetaDataForImplementationOfReference(elementCls, null, clr) != null)
             {
                 // Collection of reference type for FCOs
                 return true;
@@ -337,8 +335,7 @@ public class MetaDataUtils
 
             String keyType = fmd.getMap().getKeyType();
             Class keyCls = clr.classForName(keyType);
-            if (keyCls != null && ClassUtils.isReferenceType(keyCls) &&
-                    mgr.getMetaDataForImplementationOfReference(keyCls, null, clr) != null)
+            if (keyCls != null && ClassUtils.isReferenceType(keyCls) && mgr.getMetaDataForImplementationOfReference(keyCls, null, clr) != null)
             {
                 // Map with keys of reference type for FCOs
                 return true;
@@ -352,8 +349,7 @@ public class MetaDataUtils
 
             String valueType = fmd.getMap().getValueType();
             Class valueCls = clr.classForName(valueType);
-            if (valueCls != null && ClassUtils.isReferenceType(valueCls) &&
-                    mgr.getMetaDataForImplementationOfReference(valueCls, null, clr) != null)
+            if (valueCls != null && ClassUtils.isReferenceType(valueCls) && mgr.getMetaDataForImplementationOfReference(valueCls, null, clr) != null)
             {
                 // Map with values of reference type for FCOs
                 return true;
@@ -370,8 +366,7 @@ public class MetaDataUtils
         else
         {
             // 1-1 relation with PC
-            if (ClassUtils.isReferenceType(fmd.getType()) &&
-                mgr.getMetaDataForImplementationOfReference(fmd.getType(), null, clr) != null)
+            if (ClassUtils.isReferenceType(fmd.getType()) && mgr.getMetaDataForImplementationOfReference(fmd.getType(), null, clr) != null)
             {
                 // Reference type for an FCO
                 return true;
@@ -660,11 +655,10 @@ public class MetaDataUtils
      * @return The metadata, starting with the candidate
      * @throws NucleusUserException if candidate is an interface with no metadata (i.e not persistent)
      */
-    public static List<AbstractClassMetaData> getMetaDataForCandidates(Class cls, boolean subclasses, 
-        ExecutionContext ec)
+    public static List<AbstractClassMetaData> getMetaDataForCandidates(Class cls, boolean subclasses, ExecutionContext ec)
     {
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
-        List<AbstractClassMetaData> cmds = new ArrayList();
+        List<AbstractClassMetaData> cmds = new ArrayList<>();
         if (cls.isInterface())
         {
             // Query of interface(+subclasses)
@@ -673,25 +667,23 @@ public class MetaDataUtils
             {
                 throw new NucleusUserException("Attempting to query an interface yet it is not declared 'persistent'." +
                     " Define the interface in metadata as being persistent to perform this operation, and make sure" +
-                " any implementations use the same identity and identity member(s)");
+                    " any implementations use the same identity and identity member(s)");
             }
 
             String[] impls = ec.getMetaDataManager().getClassesImplementingInterface(cls.getName(), clr);
-            for (int i=0;i<impls.length;i++)
+            for (String implName : impls)
             {
-                AbstractClassMetaData implCmd = ec.getMetaDataManager().getMetaDataForClass(impls[i], clr);
+                AbstractClassMetaData implCmd = ec.getMetaDataManager().getMetaDataForClass(implName, clr);
                 cmds.add(implCmd);
+
                 if (subclasses)
                 {
-                    String[] subclassNames = 
-                        ec.getMetaDataManager().getSubclassesForClass(implCmd.getFullClassName(), true);
+                    String[] subclassNames = ec.getMetaDataManager().getSubclassesForClass(implCmd.getFullClassName(), true);
                     if (subclassNames != null && subclassNames.length > 0)
                     {
-                        for (int j=0;j<subclassNames.length;j++)
+                        for (String subclassName : subclassNames)
                         {
-                            AbstractClassMetaData subcmd = 
-                                ec.getMetaDataManager().getMetaDataForClass(subclassNames[j], clr);
-                            cmds.add(subcmd);
+                            cmds.add(ec.getMetaDataManager().getMetaDataForClass(subclassName, clr));
                         }
                     }
                 }
@@ -709,8 +701,7 @@ public class MetaDataUtils
                 {
                     for (int j=0;j<subclassNames.length;j++)
                     {
-                        AbstractClassMetaData subcmd = 
-                            ec.getMetaDataManager().getMetaDataForClass(subclassNames[j], clr);
+                        AbstractClassMetaData subcmd = ec.getMetaDataManager().getMetaDataForClass(subclassNames[j], clr);
                         cmds.add(subcmd);
                     }
                 }
@@ -728,8 +719,7 @@ public class MetaDataUtils
      * @return The FileMetaData for the input
      * @throws NucleusException Thrown if error(s) occur in processing the input
      */
-    public static FileMetaData[] getFileMetaDataForInputFiles(MetaDataManager metaDataMgr, ClassLoaderResolver clr, 
-            String[] inputFiles)
+    public static FileMetaData[] getFileMetaDataForInputFiles(MetaDataManager metaDataMgr, ClassLoaderResolver clr, String[] inputFiles)
     {
         FileMetaData[] filemds = null;
 
@@ -738,8 +728,8 @@ public class MetaDataUtils
         try
         {
             // Split the input files into MetaData files and classes
-            Set<String> metadataFiles = new HashSet();
-            Set<String> classNames = new HashSet();
+            Set<String> metadataFiles = new HashSet<>();
+            Set<String> classNames = new HashSet<>();
             for (int i=0;i<inputFiles.length;i++)
             {
                 if (inputFiles[i].endsWith(".class"))
@@ -822,13 +812,14 @@ public class MetaDataUtils
      */
     public static PersistenceFileMetaData[] parsePersistenceFiles(PluginManager pluginMgr, String persistenceFilename, boolean validate, boolean namespaceAware, ClassLoaderResolver clr)
     {
+        MetaDataParser parser = new MetaDataParser(null, pluginMgr, validate, namespaceAware);
+
         if (persistenceFilename != null)
         {
             // User has specified filename for persistence.xml
             try
             {
                 URL fileURL = new URL(persistenceFilename);
-                MetaDataParser parser = new MetaDataParser(null, pluginMgr, validate, namespaceAware);
                 MetaData permd = parser.parseMetaDataURL(fileURL, "persistence");
                 return new PersistenceFileMetaData[] {(PersistenceFileMetaData)permd};
             }
@@ -840,26 +831,20 @@ public class MetaDataUtils
             }
         }
 
-        Set metadata = new LinkedHashSet();
+        Set<MetaData> metadata = new LinkedHashSet<>();
         try
         {
             // Find all "META-INF/persistence.xml" files in the CLASSPATH of the current thread
-            Enumeration files = clr.getResources("META-INF/persistence.xml", 
-                Thread.currentThread().getContextClassLoader());
+            Enumeration files = clr.getResources("META-INF/persistence.xml", Thread.currentThread().getContextClassLoader());
             if (!files.hasMoreElements())
             {
                 return null;
             }
 
-            MetaDataParser parser = null;
             for ( ; files.hasMoreElements() ;)
             {
                 // Parse the "persistence.xml"
                 URL fileURL = (URL)files.nextElement();
-                if (parser == null)
-                {
-                    parser = new MetaDataParser(null, pluginMgr, validate, true);
-                }
                 MetaData permd = parser.parseMetaDataURL(fileURL, "persistence");
                 metadata.add(permd);
             }
@@ -870,7 +855,7 @@ public class MetaDataUtils
             NucleusLogger.METADATA.warn(StringUtils.getStringFromStackTrace(ioe));
         }
 
-        return (PersistenceFileMetaData[])metadata.toArray(new PersistenceFileMetaData[metadata.size()]);
+        return metadata.toArray(new PersistenceFileMetaData[metadata.size()]);
     }
 
     /**
@@ -928,8 +913,7 @@ public class MetaDataUtils
      * @param mmgr MetaData manager
      * @return Whether it is embedded
      */
-    public static boolean isMemberEmbedded(AbstractMemberMetaData mmd, RelationType relationType,
-            ClassLoaderResolver clr, MetaDataManager mmgr)
+    public static boolean isMemberEmbedded(AbstractMemberMetaData mmd, RelationType relationType, ClassLoaderResolver clr, MetaDataManager mmgr)
     {
         boolean embedded = false;
 
