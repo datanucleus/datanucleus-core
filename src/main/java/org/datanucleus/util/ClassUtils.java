@@ -1620,6 +1620,25 @@ public class ClassUtils
     }
 
     /**
+     * Convenience method to say whether a class is present.
+     * @param className The class name
+     * @param clr ClassLoader resolver
+     * @return Whether it is present
+     */
+    public static boolean isClassPresent(String className, ClassLoaderResolver clr)
+    {
+        try
+        {
+            clr.classForName(className);
+            return true;
+        }
+        catch (ClassNotResolvedException cnre)
+        {
+            return false;
+        }
+    }
+
+    /**
      * Convenience method to throw a NucleusUserException if the specified class is not loadable 
      * from the ClassLoaderResolver.
      * @param clr ClassLoader resolver
