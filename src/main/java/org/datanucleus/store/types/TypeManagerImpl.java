@@ -19,7 +19,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types;
 
-import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -1052,9 +1051,12 @@ public class TypeManagerImpl implements TypeManager, Serializable
         addJavaType(StringBuilder.class, null, true, true, null, null, null, "dn.stringbuilder-string");
         addJavaType(Class.class, null, true, true, null, null, null, "dn.class-string");
 
-        // java.awt
-        addJavaType(java.awt.image.BufferedImage.class, null, true, false, null, null, null, "dn.bufferedimage-bytearray");
-        addJavaType(java.awt.Color.class, null, true, true, null, null, null, "dn.color-string");
+        if (ClassUtils.isClassPresent("java.awt.Color", clr)) // Not present in some JDKs
+        {
+            // java.awt
+            addJavaType(java.awt.image.BufferedImage.class, null, true, false, null, null, null, "dn.bufferedimage-bytearray");
+            addJavaType(java.awt.Color.class, null, true, true, null, null, null, "dn.color-string");
+        }
 
         addJavaType(java.math.BigDecimal.class, null, true, true, null, null, null, null);
         addJavaType(java.math.BigInteger.class, null, true, true, null, null, null, null);
@@ -1070,6 +1072,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         addJavaType(java.util.Date.class, null, true, true, org.datanucleus.store.types.wrappers.Date.class, null, null, null);
         addJavaType(Calendar.class, null, true, true, org.datanucleus.store.types.wrappers.GregorianCalendar.class, null, null, "dn.calendar-string");
         addJavaType(GregorianCalendar.class, null, true, true, org.datanucleus.store.types.wrappers.GregorianCalendar.class, null, null, "dn.calendar-string");
+
         addJavaType(java.time.LocalDate.class, null, true, true, null, null, null, "dn.localdate-sqldate");
         addJavaType(java.time.LocalDateTime.class, null, true, true, null, null, null, "dn.localdatetime-timestamp");
         addJavaType(java.time.LocalTime.class, null, true, true, null, null, null, "dn.localtime-sqltime");
@@ -1314,9 +1317,14 @@ public class TypeManagerImpl implements TypeManager, Serializable
         registerConverter("dn.biginteger-long", new org.datanucleus.store.types.converters.BigIntegerLongConverter(), BigInteger.class, Long.class, false, null);
         registerConverter("dn.bitset-string", new org.datanucleus.store.types.converters.BitSetStringConverter(), BitSet.class, String.class, false, null);
 
-        // java.awt
-        registerConverter("dn.color-string", new org.datanucleus.store.types.converters.ColorStringConverter(), java.awt.Color.class, String.class, false, null);
-        registerConverter("dn.color-components", new org.datanucleus.store.types.converters.ColorComponentsConverter(), java.awt.Color.class, int[].class, false, null);
+        if (ClassUtils.isClassPresent("java.awt.Color", clr)) // Not present in some JDKs
+        {
+            // java.awt
+            registerConverter("dn.color-string", new org.datanucleus.store.types.converters.ColorStringConverter(), java.awt.Color.class, String.class, false, null);
+            registerConverter("dn.color-components", new org.datanucleus.store.types.converters.ColorComponentsConverter(), java.awt.Color.class, int[].class, false, null);
+            registerConverter("dn.bufferedimage-bytearray", new org.datanucleus.store.types.converters.BufferedImageByteArrayConverter(), java.awt.image.BufferedImage.class, byte[].class, false, null);
+            registerConverter("dn.bufferedimage-bytebuffer", new org.datanucleus.store.types.converters.BufferedImageByteBufferConverter(), java.awt.image.BufferedImage.class, ByteBuffer.class, false, null);
+        }
 
         registerConverter("dn.class-string", new org.datanucleus.store.types.converters.ClassStringConverter(), Class.class, String.class, false, null);
         registerConverter("dn.integer-string", new org.datanucleus.store.types.converters.IntegerStringConverter(), Integer.class, String.class, false, null);
@@ -1349,14 +1357,12 @@ public class TypeManagerImpl implements TypeManager, Serializable
         registerConverter("dn.calendar-timestamp", new org.datanucleus.store.types.converters.CalendarTimestampConverter(), Calendar.class, java.sql.Timestamp.class, false, null);
         registerConverter("dn.calendar-components", new org.datanucleus.store.types.converters.CalendarComponentsConverter(), Calendar.class, Object[].class, false, null);
 
-        // Arrays
+        // Serializable
         registerConverter("dn.serializable-string", new org.datanucleus.store.types.converters.SerializableStringConverter(), java.io.Serializable.class, String.class, false, null);
         registerConverter("dn.serializable-bytearray", new org.datanucleus.store.types.converters.SerializableByteArrayConverter(), java.io.Serializable.class, byte[].class, false, null);
         registerConverter("dn.serializable-bytebuffer", new org.datanucleus.store.types.converters.SerializableByteBufferConverter(), java.io.Serializable.class, ByteBuffer.class, false, null);
 
-        registerConverter("dn.bufferedimage-bytearray", new org.datanucleus.store.types.converters.BufferedImageByteArrayConverter(), BufferedImage.class, byte[].class, false, null);
-        registerConverter("dn.bufferedimage-bytebuffer", new org.datanucleus.store.types.converters.BufferedImageByteBufferConverter(), BufferedImage.class, ByteBuffer.class, false, null);
-
+        // Arrays
         registerConverter("dn.bytearray-bytebuffer", new org.datanucleus.store.types.converters.ByteArrayByteBufferConverter(), byte[].class, ByteBuffer.class, false, null);
         registerConverter("dn.booleanarray-bytebuffer", new org.datanucleus.store.types.converters.BooleanArrayByteBufferConverter(), boolean[].class, ByteBuffer.class, false, null);
         registerConverter("dn.chararray-bytebuffer", new org.datanucleus.store.types.converters.CharArrayByteBufferConverter(), char[].class, ByteBuffer.class, false, null);
