@@ -150,6 +150,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
     public TypeManagerImpl(NucleusContext nucCtx)
     {
         this.nucCtx = nucCtx;
+        this.clr = nucCtx.getClassLoaderResolver(null);
         loadJavaTypes(nucCtx.getPluginManager());
         if (nucCtx instanceof PersistenceNucleusContext)
         {
@@ -171,15 +172,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
         autoApplyConvertersByType = null;
     }
 
-    protected ClassLoaderResolver getClassLoaderResolver()
-    {
-        if (clr == null)
-        {
-            clr = nucCtx.getClassLoaderResolver(null);
-        }
-        return clr;
-    }
-
     /* (non-Javadoc)
      * @see org.datanucleus.store.types.TypeManager#getSupportedSecondClassTypes()
      */
@@ -199,12 +191,13 @@ public class TypeManagerImpl implements TypeManager, Serializable
         {
             return false;
         }
+
         JavaType type = javaTypes.get(className);
         if (type == null)
         {
             try
             {
-                Class cls = getClassLoaderResolver().classForName(className);
+                Class cls = clr.classForName(className);
                 type = findJavaTypeForClass(cls);
                 return type != null;
             }
@@ -752,7 +745,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
         if (converter instanceof ClassStringConverter)
         {
             // ClassStringConverter is a special case that needs the CLR injecting. TODO Find a general way for converters to use this
-            ((ClassStringConverter)converter).setClassLoaderResolver(getClassLoaderResolver());
+            ((ClassStringConverter)converter).setClassLoaderResolver(clr);
         }
 
         if (autoApply)
@@ -1022,8 +1015,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
         {
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("016003"));
         }
-
-        ClassLoaderResolver clr = getClassLoaderResolver();
 
         // Load up built-in types
         addJavaType(boolean.class, null, true, true, null, null, null, null);
@@ -1427,7 +1418,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
         registerConverter("dn.zoneddatetime-timestamp", new org.datanucleus.store.types.converters.ZonedDateTimeTimestampConverter(), ZonedDateTime.class, java.sql.Timestamp.class, false, null);
 
         // Add on any plugin mechanism types
-        ClassLoaderResolver clr = getClassLoaderResolver();
         ConfigurationElement[] elems = mgr.getConfigurationElementsForExtension("org.datanucleus.type_converter", null, null);
         if (elems != null)
         {
