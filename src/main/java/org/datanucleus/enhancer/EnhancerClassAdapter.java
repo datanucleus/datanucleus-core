@@ -364,49 +364,49 @@ public class EnhancerClassAdapter extends ClassVisitor
             }
 
             // Add dnGetXXX, dnSetXXX for each of the (managed) fields/properties
-            AbstractMemberMetaData[] fmds = cmd.getManagedMembers();
-            for (int i = 0; i < fmds.length; i++)
+            for (AbstractMemberMetaData mmd : cmd.getManagedMembers())
             {
-                if (fmds[i].getPersistenceModifier() == FieldPersistenceModifier.NONE)
+                if (mmd.getPersistenceModifier() == FieldPersistenceModifier.NONE)
                 {
                     // Field/Property is not persistent so ignore
                     continue;
                 }
 
-                byte persistenceFlags = fmds[i].getPersistenceFlags();
                 ClassMethod getMethod = null;
                 ClassMethod setMethod = null;
-                if (fmds[i] instanceof PropertyMetaData)
+                if (mmd instanceof PropertyMetaData)
                 {
-                    // dnGetXXX, dnSetXXX for property are generated when processing existing getXXX, setXXX methods
+                    // dnGetXXX, dnSetXXX for property are typically generated when processing existing getXXX, setXXX methods
+                    // TODO What if the user overrode the getter and not the setter? or vice-versa?
                 }
                 else
                 {
                     // Generate dnGetXXX, dnSetXXX for field
+                    byte persistenceFlags = mmd.getPersistenceFlags();
                     if ((persistenceFlags & Persistable.MEDIATE_READ) == Persistable.MEDIATE_READ)
                     {
-                        getMethod = new GetViaMediate(enhancer, fmds[i]);
+                        getMethod = new GetViaMediate(enhancer, mmd);
                     }
                     else if ((persistenceFlags & Persistable.CHECK_READ) == Persistable.CHECK_READ)
                     {
-                        getMethod = new GetViaCheck(enhancer, fmds[i]);
+                        getMethod = new GetViaCheck(enhancer, mmd);
                     }
                     else
                     {
-                        getMethod = new GetNormal(enhancer, fmds[i]);
+                        getMethod = new GetNormal(enhancer, mmd);
                     }
 
                     if ((persistenceFlags & Persistable.MEDIATE_WRITE) == Persistable.MEDIATE_WRITE)
                     {
-                        setMethod = new SetViaMediate(enhancer, fmds[i]);
+                        setMethod = new SetViaMediate(enhancer, mmd);
                     }
                     else if ((persistenceFlags & Persistable.CHECK_WRITE) == Persistable.CHECK_WRITE)
                     {
-                        setMethod = new SetViaCheck(enhancer, fmds[i]);
+                        setMethod = new SetViaCheck(enhancer, mmd);
                     }
                     else
                     {
-                        setMethod = new SetNormal(enhancer, fmds[i]);
+                        setMethod = new SetNormal(enhancer, mmd);
                     }
                 }
 
