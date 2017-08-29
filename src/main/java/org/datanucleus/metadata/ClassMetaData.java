@@ -385,7 +385,7 @@ public class ClassMetaData extends AbstractClassMetaData
             // Add fields/properties in the current class that have been omitted by the user (subject to the API default handling)
             if (hasProperties)
             {
-                if (api.equalsIgnoreCase("JPA"))
+                if (api.equalsIgnoreCase("JPA")) // TODO Make this a flag in the ApiFactory whether we default to persistent properties when not specified
                 {
                     // JPA : when we are using properties go through and add properties for those not specified in the populating class.
                     Method[] clsMethods = cls.getDeclaredMethods();
@@ -788,6 +788,10 @@ public class ClassMetaData extends AbstractClassMetaData
                         {
                         }
                     }
+                    if (getMethod != null && getMethod.getReturnType() == void.class)
+                    {
+                        throw new InvalidClassMetaDataException("044166", fullName, mmd.getName());
+                    }
                     if (getMethod == null && mmd.getPersistenceModifier() != FieldPersistenceModifier.NONE)
                     {
                         // Property is persistent yet no getter!
@@ -824,10 +828,21 @@ public class ClassMetaData extends AbstractClassMetaData
                     catch (Exception e)
                     {
                     }
+
                     if (setMethod == null && mmd.getPersistenceModifier() != FieldPersistenceModifier.NONE)
                     {
                         // Property is persistent yet no setter!
                         throw new InvalidClassMetaDataException("044074", fullName, mmd.getName());
+                    }
+                    else if (setMethod != null && getMethod != null)
+                    {
+                        // Check types of getter/setter
+                        Class getType = getMethod.getReturnType();
+                        Class setType = setMethod.getParameterTypes()[0];
+                        if (!getType.isAssignableFrom(setType) && !setType.isAssignableFrom(getType))
+                        {
+                            throw new InvalidMetaDataException("044167", fullName, mmd.getName(), getType.getName(), setType.getName());
+                        }
                     }
 
                     // Populate the property using the getter
