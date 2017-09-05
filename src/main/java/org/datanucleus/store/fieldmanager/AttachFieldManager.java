@@ -145,8 +145,7 @@ public class AttachFieldManager extends AbstractFieldManager
                 attachedOP.makeDirty(fieldNumber);
             }
 
-            if (mmd.isDependent() && !mmd.isEmbedded() &&
-                oldValue != null && api.isPersistable(oldValue))
+            if (mmd.isDependent() && !mmd.isEmbedded() && oldValue != null && api.isPersistable(oldValue))
             {
                 // Check for a field storing a PC where it is being nulled and the other object is dependent
                 attachedOP.flush(); // Flush the nulling of the field
@@ -202,7 +201,7 @@ public class AttachFieldManager extends AbstractFieldManager
                     {
                         NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029", StringUtils.toJVMIDString(attachedOP.getObject()), attachedOP.getInternalObjectId(), mmd.getName()));
                     }
-                    sco = ec.getTypeManager().createSCOInstance(attachedOP, mmd, null, null, false);
+                    sco = ec.getTypeManager().createSCOInstance(attachedOP, mmd, value != null ? value.getClass() : null, null, false);
                     if (sco instanceof SCOContainer)
                     {
                         // Load any containers to avoid update issues
@@ -232,15 +231,12 @@ public class AttachFieldManager extends AbstractFieldManager
                         if (sco instanceof Collection)
                         {
                             // Attach all PC elements of the collection
-                            SCOUtils.attachForCollection(attachedOP, ((Collection)value).toArray(),
-                                SCOUtils.collectionHasElementsWithoutIdentity(mmd));
+                            SCOUtils.attachForCollection(attachedOP, ((Collection)value).toArray(), SCOUtils.collectionHasElementsWithoutIdentity(mmd));
                         }
                         else if (sco instanceof Map)
                         {
                             // Attach all PC keys/values of the map
-                            SCOUtils.attachForMap(attachedOP, ((Map)value).entrySet(), 
-                                SCOUtils.mapHasKeysWithoutIdentity(mmd), 
-                                SCOUtils.mapHasValuesWithoutIdentity(mmd));
+                            SCOUtils.attachForMap(attachedOP, ((Map)value).entrySet(), SCOUtils.mapHasKeysWithoutIdentity(mmd), SCOUtils.mapHasValuesWithoutIdentity(mmd));
                         }
                         else
                         {
