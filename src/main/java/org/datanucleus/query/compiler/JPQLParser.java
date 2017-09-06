@@ -504,13 +504,13 @@ public class JPQLParser extends AbstractParser
 
             // Nulls positioning
             Node nullsNode = null;
-            if (lexer.parseString("NULLS FIRST") || lexer.parseString("nulls first"))
+            if (lexer.parseStringIgnoreCase("NULLS FIRST"))
             {
-                nullsNode = new Node(NodeType.OPERATOR, "nulls first");
+                nullsNode = new Node(NodeType.OPERATOR, "NULLS FIRST");
             }
-            else if (lexer.parseString("NULLS LAST") || lexer.parseString("nulls last"))
+            else if (lexer.parseStringIgnoreCase("NULLS LAST"))
             {
-                nullsNode = new Node(NodeType.OPERATOR, "nulls last");
+                nullsNode = new Node(NodeType.OPERATOR, "NULLS LAST");
             }
 
             Node expr = new Node(NodeType.OPERATOR, "order");
@@ -2107,7 +2107,7 @@ public class JPQLParser extends AbstractParser
      */
     protected boolean processTreat()
     {
-        if (lexer.parseString("TREAT("))
+        if (lexer.parseStringIgnoreCase("TREAT("))
         {
             // "TREAT(p AS Employee)" will create a Node tree as
             // [IDENTIFIER : p.
