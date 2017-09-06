@@ -1502,7 +1502,7 @@ public class JPQLParser extends AbstractParser
      */
     protected boolean processEntry()
     {
-        if (lexer.parseString("ENTRY"))
+        if (lexer.parseStringIgnoreCase("ENTRY"))
         {
             // ENTRY(identification_variable)
             // Convert to be {primary}.INVOKE(mapEntry)
@@ -1534,7 +1534,7 @@ public class JPQLParser extends AbstractParser
      */
     protected boolean processKey()
     {
-        if (lexer.parseString("KEY"))
+        if (lexer.parseStringIgnoreCase("KEY"))
         {
             // KEY(identification_variable)
             lexer.skipWS();
@@ -1597,7 +1597,7 @@ public class JPQLParser extends AbstractParser
      */
     protected boolean processValue()
     {
-        if (lexer.parseString("VALUE"))
+        if (lexer.parseStringIgnoreCase("VALUE"))
         {
             // VALUE(identification_variable)
             // Convert to be {primary}.INVOKE(mapValue)
