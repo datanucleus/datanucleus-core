@@ -156,9 +156,27 @@ public class EnhancementHelper extends java.lang.Object
      */
     public Persistable newInstance(Class pcClass, StateManager sm)
     {
+        // check whether pcClass has been loaded
+        checkClassLoad(pcClass);
+        
         Meta meta = getMeta(pcClass);
         Persistable pcInstance = meta.getPC();
         return pcInstance == null ? null : pcInstance.dnNewInstance(sm);
+    }
+    
+    private void checkClassLoad(Class pcClass) 
+    {
+        if (registeredClasses.get(pcClass) == null) 
+        {
+            try 
+            {
+                Class.forName(pcClass.getName());
+            } 
+            catch (ClassNotFoundException e) 
+            {
+                throw new NucleusUserException("Cannot lookup meta Class for " + pcClass + " - nothing found");
+            }
+        }
     }
 
     /**
