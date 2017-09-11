@@ -56,8 +56,7 @@ public class InitClass extends ClassMethod
      * @param argTypes Argument types
      * @param argNames Argument names
      */
-    public InitClass(ClassEnhancer enhancer, String name, int access, 
-        Object returnType, Object[] argTypes, String[] argNames)
+    public InitClass(ClassEnhancer enhancer, String name, int access, Object returnType, Object[] argTypes, String[] argNames)
     {
         super(enhancer, name, access, returnType, argTypes, argNames);
     }
@@ -79,48 +78,34 @@ public class InitClass extends ClassMethod
 
     /**
      * Convenience method to add the initialise instructions to the supplied MethodVisitor.
-     * Available as a separate method so that the initialise instructions can be added to an existing
-     * static class initialise block (where the class already has one).
+     * Available as a separate method so that the initialise instructions can be added to an existing static class initialise block (where the class already has one).
      * @param mv MethodVisitor to use
      */
     public void addInitialiseInstructions(MethodVisitor mv)
     {
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(),
-            getNamer().getFieldNamesInitMethodName(), "()[Ljava/lang/String;");
-        mv.visitFieldInsn(Opcodes.PUTSTATIC, getClassEnhancer().getASMClassName(),
-            getNamer().getFieldNamesFieldName(), "[Ljava/lang/String;");
+        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(), getNamer().getFieldNamesInitMethodName(), "()[Ljava/lang/String;");
+        mv.visitFieldInsn(Opcodes.PUTSTATIC, getClassEnhancer().getASMClassName(), getNamer().getFieldNamesFieldName(), "[Ljava/lang/String;");
 
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(),
-            getNamer().getFieldTypesInitMethodName(), "()[Ljava/lang/Class;");
-        mv.visitFieldInsn(Opcodes.PUTSTATIC, getClassEnhancer().getASMClassName(),
-            getNamer().getFieldTypesFieldName(), "[Ljava/lang/Class;");
+        // TODO Drop this block when we remove "dnFieldTypes" from the enhancement contract.
+        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(), getNamer().getFieldTypesInitMethodName(), "()[Ljava/lang/Class;");
+        mv.visitFieldInsn(Opcodes.PUTSTATIC, getClassEnhancer().getASMClassName(), getNamer().getFieldTypesFieldName(), "[Ljava/lang/Class;");
 
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(),
-            getNamer().getFieldFlagsInitMethodName(), "()[B");
-        mv.visitFieldInsn(Opcodes.PUTSTATIC, getClassEnhancer().getASMClassName(),
-            getNamer().getFieldFlagsFieldName(), "[B");
+        // TODO Drop this block when we remove "dnFieldFlags" from the enhancement contract.
+        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(), getNamer().getFieldFlagsInitMethodName(), "()[B");
+        mv.visitFieldInsn(Opcodes.PUTSTATIC, getClassEnhancer().getASMClassName(), getNamer().getFieldFlagsFieldName(), "[B");
 
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(),
-            getNamer().getGetInheritedFieldCountMethodName(), "()I");
-        mv.visitFieldInsn(Opcodes.PUTSTATIC, getClassEnhancer().getASMClassName(),
-            getNamer().getInheritedFieldCountFieldName(), "I");
+        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(), getNamer().getGetInheritedFieldCountMethodName(), "()I");
+        mv.visitFieldInsn(Opcodes.PUTSTATIC, getClassEnhancer().getASMClassName(), getNamer().getInheritedFieldCountFieldName(), "I");
 
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(),
-            getNamer().getPersistableSuperclassInitMethodName(), "()Ljava/lang/Class;");
-        mv.visitFieldInsn(Opcodes.PUTSTATIC, getClassEnhancer().getASMClassName(),
-            getNamer().getPersistableSuperclassFieldName(), "Ljava/lang/Class;");
+        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(), getNamer().getPersistableSuperclassInitMethodName(), "()Ljava/lang/Class;");
+        mv.visitFieldInsn(Opcodes.PUTSTATIC, getClassEnhancer().getASMClassName(), getNamer().getPersistableSuperclassFieldName(), "Ljava/lang/Class;");
 
         mv.visitLdcInsn(getClassEnhancer().getClassName());
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(),
-            getNamer().getLoadClassMethodName(), "(Ljava/lang/String;)Ljava/lang/Class;");
-        mv.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(),
-            getNamer().getFieldNamesFieldName(), "[Ljava/lang/String;");
-        mv.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(),
-            getNamer().getFieldTypesFieldName(), "[Ljava/lang/Class;");
-        mv.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(),
-            getNamer().getFieldFlagsFieldName(), "[B");
-        mv.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(),
-            getNamer().getPersistableSuperclassFieldName(), "Ljava/lang/Class;");
+        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(), getNamer().getLoadClassMethodName(), "(Ljava/lang/String;)Ljava/lang/Class;");
+        mv.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), getNamer().getFieldNamesFieldName(), "[Ljava/lang/String;");
+        mv.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), getNamer().getFieldTypesFieldName(), "[Ljava/lang/Class;");
+        mv.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), getNamer().getFieldFlagsFieldName(), "[B");
+        mv.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), getNamer().getPersistableSuperclassFieldName(), "Ljava/lang/Class;");
         if (enhancer.getClassMetaData().isAbstract())
         {
             mv.visitInsn(Opcodes.ACONST_NULL);
@@ -129,9 +114,9 @@ public class InitClass extends ClassMethod
         {
             mv.visitTypeInsn(Opcodes.NEW, getClassEnhancer().getASMClassName());
             mv.visitInsn(Opcodes.DUP);
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, getClassEnhancer().getASMClassName(),
-                "<init>", "()V");
+            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, getClassEnhancer().getASMClassName(), "<init>", "()V");
         }
+        // TODO Skip the 3 field property args and the superclass arg
         mv.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getImplHelperAsmClassName(), "registerClass",
             "(Ljava/lang/Class;" +
             "[Ljava/lang/String;" +

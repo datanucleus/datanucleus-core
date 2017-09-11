@@ -33,6 +33,7 @@ import org.datanucleus.util.ClassUtils;
  *              ___dn$loadClass("java.lang.String") };
  * }
  * </pre>
+ * TODO Drop this class when we remove "dnFieldTypes" from the enhancement contract.
  */
 public class InitFieldTypes extends ClassMethod
 {

@@ -31,6 +31,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
  *     return new byte[] { 10, 24, 21 };
  * }
  * </pre>
+ * TODO Drop this class when we remove "dnFieldFlags" from the enhancement contract.
  */
 public class InitFieldFlags extends ClassMethod
 {
