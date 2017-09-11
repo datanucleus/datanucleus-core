@@ -37,15 +37,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.enhancement.StateManager;
-import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 
 /**
- * Helper class for the DN bytecode enhancement contract. It contains methods to register metadata for
- * persistable classes and to perform common operations needed by implementations, not by end users.
+ * Helper class for the DN bytecode enhancement contract. 
+ * It contains methods to register metadata for persistable classes and to perform common operations needed by implementations, not by end users.
  * <P>
  * It allows construction of instances of persistable classes without using reflection.
  * <P>
@@ -56,17 +56,17 @@ public class EnhancementHelper extends java.lang.Object
     private static EnhancementHelper singletonHelper = new EnhancementHelper();
 
     /**
-     * This synchronized <code>HashMap</code> contains a static mapping of <code>Persistable</code> class to
+     * This synchronized <code>Map</code> contains a static mapping of <code>Persistable</code> class to
      * metadata for the class used for constructing new instances. New entries are added by the static method
      * in each <code>Persistable</code> class. Entries are never removed.
      */
-    private static Map<Class, Meta> registeredClasses = Collections.synchronizedMap(new HashMap<Class, Meta>());
+    private static Map<Class, Meta> registeredClasses = new ConcurrentHashMap<>();
 
     /**
      * This Set contains all classes that have registered for setStateManager permissions via
      * authorizeStateManagerClass. Only the key is used in order to maintain a weak set of classes.
      */
-    private static final Map<Class, Class> authorizedStateManagerClasses = new WeakHashMap<Class, Class>();
+    private static final Map<Class, Class> authorizedStateManagerClasses = new WeakHashMap<>();
 
     /**
      * This list contains the registered listeners for <code>RegisterClassEvent</code>s.
@@ -100,55 +100,7 @@ public class EnhancementHelper extends java.lang.Object
     }
 
     /**
-     * Get the field names for a <code>Persistable</code> class. The order of fields is the natural ordering
-     * of the <code>String</code> class (without considering localization).
-     * @param pcClass the <code>Persistable</code> class.
-     * @return the field names for the class.
-     */
-    public String[] getFieldNames(Class pcClass)
-    {
-        Meta meta = getMeta(pcClass);
-        return meta.getFieldNames();
-    }
-
-    /**
-     * Get the field types for a <code>Persistable</code> class. The order of fields is the same as for field
-     * names.
-     * @param pcClass the <code>Persistable</code> class.
-     * @return the field types for the class.
-     */
-    public Class[] getFieldTypes(Class pcClass)
-    {
-        Meta meta = getMeta(pcClass);
-        return meta.getFieldTypes();
-    }
-
-    /**
-     * Get the field flags for a <code>Persistable</code> class. The order of fields is the same as for field
-     * names.
-     * @param pcClass the <code>Persistable</code> class.
-     * @return the field types for the class.
-     */
-    public byte[] getFieldFlags(Class pcClass)
-    {
-        Meta meta = getMeta(pcClass);
-        return meta.getFieldFlags();
-    }
-
-    /**
-     * Get the persistence-capable superclass for a <code>Persistable</code> class.
-     * @param pcClass the <code>Persistable</code> class.
-     * @return The <code>Persistable</code> superclass for this class, or <code>null</code> if there isn't
-     * one.
-     */
-    public Class getPersistableSuperclass(Class pcClass)
-    {
-        Meta meta = getMeta(pcClass);
-        return meta.getPersistableSuperclass();
-    }
-
-    /**
-     * Create a new instance of the class and assign its StateManager. The new instance has its <code>dnFlags</code> set to <code>LOAD_REQUIRED</code>.
+     * Create a new instance of the class and assign its StateManager.
      * @see Persistable#dnNewInstance(StateManager sm)
      * @param pcClass the <code>Persistable</code> class.
      * @param sm the <code>StateManager</code> which will own the new instance.
@@ -156,15 +108,13 @@ public class EnhancementHelper extends java.lang.Object
      */
     public Persistable newInstance(Class pcClass, StateManager sm)
     {
-        Meta meta = getMeta(pcClass);
-        Persistable pcInstance = meta.getPC();
-        return pcInstance == null ? null : pcInstance.dnNewInstance(sm);
+        Persistable pc = getPersistableForClass(pcClass);
+        return pc == null ? null : pc.dnNewInstance(sm);
     }
 
     /**
-     * Create a new instance of the class and assign its StateManager and key values from the
-     * ObjectId. If the oid parameter is <code>null</code>, no key values are copied. The new instance has its
-     * <code>dnFlags</code> set to <code>LOAD_REQUIRED</code>.
+     * Create a new instance of the class and assign its StateManager and key values from the ObjectId. If the oid parameter is <code>null</code>, no key values are copied. 
+     * The new instance has its <code>dnFlags</code> set to <code>LOAD_REQUIRED</code>.
      * @see Persistable#dnNewInstance(StateManager sm, Object oid)
      * @param pcClass the <code>Persistable</code> class.
      * @param sm the <code>StateManager</code> which will own the new instance.
@@ -173,39 +123,34 @@ public class EnhancementHelper extends java.lang.Object
      */
     public Persistable newInstance(Class pcClass, StateManager sm, Object oid)
     {
-        Meta meta = getMeta(pcClass);
-        Persistable pcInstance = meta.getPC();
-        return pcInstance == null ? null : pcInstance.dnNewInstance(sm, oid);
+        Persistable pc = getPersistableForClass(pcClass);
+        return pc == null ? null : pc.dnNewInstance(sm, oid);
     }
 
     /**
-     * Create a new instance of the ObjectId class of this <code>Persistable</code> class. It is intended only
-     * for application identity. This method should not be called for classes that use single field identity;
-     * newObjectIdInstance(Class, Object) should be used instead. If the class has been enhanced for datastore
-     * identity, or if the class is abstract, null is returned.
+     * Create a new instance of the ObjectId class of this <code>Persistable</code> class. 
+     * It is intended only for application identity. 
+     * This method should not be called for classes that use single field identity; newObjectIdInstance(Class, Object) should be used instead.
+     * If the class has been enhanced for datastore identity, or if the class is abstract, null is returned.
      * @param pcClass the <code>Persistable</code> class.
      * @return the new ObjectId instance, or <code>null</code> if the class is not registered.
      */
     public Object newObjectIdInstance(Class pcClass)
     {
-        Meta meta = getMeta(pcClass);
-        Persistable pcInstance = meta.getPC();
-        return pcInstance == null ? null : pcInstance.dnNewObjectIdInstance();
+        Persistable pc = getPersistableForClass(pcClass);
+        return pc == null ? null : pc.dnNewObjectIdInstance();
     }
 
     /**
-     * Create a new instance of the class used by the parameter Class for JDO identity, using the key
-     * constructor of the object id class. It is intended for single field identity. The identity instance
-     * returned has no relationship with the values of the primary key fields of the persistence-capable
-     * instance on which the method is called. If the key is the wrong class for the object id class, null is
-     * returned.
+     * Create a new instance of the class used by the parameter Class for JDO identity, using the key constructor of the object id class. 
+     * It is intended for single field identity. 
+     * The identity instance returned has no relationship with the values of the primary key fields of the persistence-capable instance on which the method is called. 
+     * If the key is the wrong class for the object id class, null is returned.
      * <P>
-     * For classes that use single field identity, if the parameter is of one of the following types, the
-     * behavior must be as specified:
+     * For classes that use single field identity, if the parameter is of one of the following types, the behavior must be as specified:
      * <ul>
      * <li><code>Number</code> or <code>Character</code>: the parameter must be the single field type or the
-     * wrapper class of the primitive field type; the parameter is passed to the single field identity
-     * constructor</li>
+     * wrapper class of the primitive field type; the parameter is passed to the single field identity constructor</li>
      * <li><code>ObjectIdFieldSupplier</code>: the field value is fetched from the
      * <code>ObjectIdFieldSupplier</code> and passed to the single field identity constructor</li>
      * <li><code>String</code>: the String is passed to the single field identity constructor</li>
@@ -216,78 +161,15 @@ public class EnhancementHelper extends java.lang.Object
      */
     public Object newObjectIdInstance(Class pcClass, Object obj)
     {
-        Meta meta = getMeta(pcClass);
-        Persistable pcInstance = meta.getPC();
-        return (pcInstance == null) ? null : pcInstance.dnNewObjectIdInstance(obj);
-    }
-
-    /**
-     * Copy fields from an outside source to the key fields in the ObjectId. This method is generated in the
-     * <code>Persistable</code> class to generate a call to the field manager for each key field in the
-     * ObjectId.
-     * <P>
-     * For example, an ObjectId class that has three key fields (<code>int id</code>, <code>String name</code>
-     * , and <code>Float salary</code>) would have the method generated:
-     * <code>
-     * void dnCopyKeyFieldsToObjectId (Object oid, ObjectIdFieldSupplier fm) 
-     * {
-     *     oid.id = fm.fetchIntField (0);
-     *     oid.name = fm.fetchStringField (1);
-     *     oid.salary = fm.fetchObjectField (2);
-     * }</code>
-     * <P>
-     * The implementation is responsible for implementing the <code>ObjectIdFieldSupplier</code> to provide
-     * the values for the key fields.
-     * @param pcClass the <code>Persistable Class</code>.
-     * @param oid the ObjectId target of the copy.
-     * @param fm the field manager that supplies the field values.
-     */
-    public void copyKeyFieldsToObjectId(Class pcClass, Persistable.ObjectIdFieldSupplier fm, Object oid)
-    {
-        Meta meta = getMeta(pcClass);
-        Persistable pcInstance = meta.getPC();
-        if (pcInstance == null)
-        {
-            throw new NucleusException("Class " + pcClass.getName() + " has no identity!").setFatal();
-        }
-        pcInstance.dnCopyKeyFieldsToObjectId(fm, oid);
-    }
-
-    /**
-     * Copy fields to an outside source from the key fields in the ObjectId. This method is generated in the
-     * <code>Persistable</code> class to generate a call to the field manager for each key field in the
-     * ObjectId. For example, an ObjectId class that has three key fields (<code>int id</code>,
-     * <code>String name</code>, and <code>Float salary</code>) would have the method generated:
-     * <code>void dnCopyKeyFieldsFromObjectId(Persistable oid, ObjectIdFieldConsumer fm)
-     * {
-     *     fm.storeIntField (0, oid.id);
-     *     fm.storeStringField (1, oid.name);
-     *     fm.storeObjectField (2, oid.salary);
-     * }</code>
-     * <P>
-     * The implementation is responsible for implementing the <code>ObjectIdFieldConsumer</code> to store the
-     * values for the key fields.
-     * @param pcClass the <code>Persistable</code> class
-     * @param oid the ObjectId source of the copy.
-     * @param fm the field manager that receives the field values.
-     */
-    public void copyKeyFieldsFromObjectId(Class pcClass, Persistable.ObjectIdFieldConsumer fm, Object oid)
-    {
-        Meta meta = getMeta(pcClass);
-        Persistable pcInstance = meta.getPC();
-        if (pcInstance == null)
-        {
-            throw new NucleusException("Class " + pcClass.getName() + " has no identity!").setFatal();
-        }
-        pcInstance.dnCopyKeyFieldsFromObjectId(fm, oid);
+        Persistable pc = getPersistableForClass(pcClass);
+        return (pc == null) ? null : pc.dnNewObjectIdInstance(obj);
     }
 
     public static interface RegisterClassListener extends EventListener
     {
         /**
-         * This method gets called when a persistence-capable class is registered.
-         * @param event a <code>RegisterClassEvent</code> instance describing the registered 
-         * class plus metadata.
+         * This method gets called when a Persistable class is registered.
+         * @param event a <code>RegisterClassEvent</code> instance describing the registered class plus metadata.
          */
         public void registerClass(RegisterClassEvent event);
     }
@@ -295,59 +177,32 @@ public class EnhancementHelper extends java.lang.Object
     public static class RegisterClassEvent extends EventObject
     {
         private static final long serialVersionUID = -8336171250765467347L;
-        /** The class object of the registered persistence-capable class */
+
+        /** The class object of the registered Persistable class */
         protected Class pcClass;
-        /** The names of managed fields of the persistence-capable class */
-        protected String[] fieldNames;  
-        /** The types of managed fields of the persistence-capable class */
-        protected Class[] fieldTypes;
-        /** The flags of managed fields of the persistence-capable class */
-        protected byte[] fieldFlags;
 
-        protected Class persistableSuperclass; 
-
-        public RegisterClassEvent(EnhancementHelper helper, Class registeredClass, String[] fieldNames, Class[] fieldTypes, byte[] fieldFlags, Class persistableSuperclass)
+        public RegisterClassEvent(EnhancementHelper helper, Class registeredClass)
         {
             super(helper);
             this.pcClass = registeredClass;
-            this.fieldNames = fieldNames;
-            this.fieldTypes = fieldTypes;
-            this.fieldFlags = fieldFlags;
-            this.persistableSuperclass = persistableSuperclass;
         }
 
         public Class getRegisteredClass()
         {
             return pcClass;
         }
-        public String[] getFieldNames()
-        {
-            return fieldNames;
-        }
-        public Class[] getFieldTypes()
-        {
-            return fieldTypes;
-        }
-        public byte[] getFieldFlags()
-        {
-            return fieldFlags;
-        }
-        public Class getPersistableSuperclass()
-        {
-            return persistableSuperclass;
-        }
     }
 
     /**
-     * Register metadata by class. The registration will be done in the class named EnhancementHelper
-     * loaded by the same or an ancestor class loader as the <code>Persistable</code> class performing the
-     * registration.
+     * Register metadata by class.
+     * This is called by the enhanced constructor of the <code>Persistable</code> class.
+     * TODO Remove the unused arguments when the enhancement contract is updated to not use them.
      * @param pcClass the <code>Persistable</code> class used as the key for lookup.
-     * @param fieldNames an array of <code>String</code> field names for persistent and transactional fields
-     * @param fieldTypes an array of <code>Class</code> field types
-     * @param fieldFlags the Field Flags for persistent and transactional fields
+     * @param fieldNames Not used
+     * @param fieldTypes Not used
+     * @param fieldFlags Not used
      * @param pc an instance of the <code>Persistable</code> class
-     * @param persistableSuperclass the most immediate superclass that is <code>Persistable</code>
+     * @param persistableSuperclass Not used
      */
     public static void registerClass(Class pcClass, String[] fieldNames, Class[] fieldTypes, byte[] fieldFlags, Class persistableSuperclass, Persistable pc)
     {
@@ -355,14 +210,15 @@ public class EnhancementHelper extends java.lang.Object
         {
             throw new NullPointerException("Attempt to register class with null class type");
         }
-        Meta meta = new Meta(fieldNames, fieldTypes, fieldFlags, persistableSuperclass, pc);
-        registeredClasses.put(pcClass, meta);
 
+        registeredClasses.put(pcClass, new Meta(pc));
+
+        // Notify all listeners
         synchronized (listeners)
         {
             if (!listeners.isEmpty())
             {
-                RegisterClassEvent event = new RegisterClassEvent(singletonHelper, pcClass, fieldNames, fieldTypes, fieldFlags, persistableSuperclass);
+                RegisterClassEvent event = new RegisterClassEvent(singletonHelper, pcClass);
                 for (Iterator i = listeners.iterator(); i.hasNext();)
                 {
                     RegisterClassListener crl = (RegisterClassListener) i.next();
@@ -370,36 +226,6 @@ public class EnhancementHelper extends java.lang.Object
                     {
                         crl.registerClass(event);
                     }
-                }
-            }
-        }
-    }
-
-    /**
-     * Unregister metadata by class loader. This method unregisters all registered <code>Persistable</code>
-     * classes loaded by the specified class loader. Any attempt to get metadata for unregistered classes will
-     * result in a <code>JDOFatalUserException</code>.
-     * @param cl the class loader.
-     */
-    public void unregisterClasses(ClassLoader cl)
-    {
-        /*SecurityManager sec = System.getSecurityManager();
-        if (sec != null)
-        {
-            // throws exception if caller is not authorized
-            sec.checkPermission(JDOPermission.MANAGE_METADATA);
-        }*/
-        synchronized (registeredClasses)
-        {
-            for (Iterator i = registeredClasses.keySet().iterator(); i.hasNext();)
-            {
-                Class pcClass = (Class) i.next();
-                // Note, the pc class was registered by calling the static method EnhancementHelper.registerClass. 
-                // This means the EnhancementHelper class loader is the same as or an ancestor of the class loader of the pc class. 
-                if ((pcClass != null) && (pcClass.getClassLoader() == cl))
-                {
-                    // unregister pc class, if its class loader is the specified one.
-                    i.remove();
                 }
             }
         }
@@ -431,25 +257,21 @@ public class EnhancementHelper extends java.lang.Object
      */
     public void addRegisterClassListener(RegisterClassListener crl)
     {
-        Set alreadyRegisteredClasses = null;
+        Set<Class> alreadyRegisteredClasses = null;
         synchronized (listeners)
         {
             listeners.add(crl);
+
             // Make a copy of the existing set of registered classes.
-            // Between these two lines of code, any number of new class
-            // registrations might occur, and will then all wait until this
-            // synchronized block completes. Some of the class registrations
-            // might be delivered twice to the newly registered listener.
+            // Between these two lines of code, any number of new class registrations might occur, and will then all wait until this synchronized block completes. 
+            // Some of the class registrations might be delivered twice to the newly registered listener.
             alreadyRegisteredClasses = new HashSet<Class>(registeredClasses.keySet());
         }
-        // new registrations will call the new listener while the following
-        // occurs notify the new listener about already-registered classes
-        for (Iterator it = alreadyRegisteredClasses.iterator(); it.hasNext();)
+
+        // new registrations will call the new listener while the following occurs notify the new listener about already-registered classes
+        for (Class pcClass : alreadyRegisteredClasses)
         {
-            Class pcClass = (Class) it.next();
-            Meta meta = getMeta(pcClass);
-            RegisterClassEvent event = new RegisterClassEvent(this, pcClass, meta.getFieldNames(), meta.getFieldTypes(), meta.getFieldFlags(),
-                    meta.getPersistableSuperclass());
+            RegisterClassEvent event = new RegisterClassEvent(this, pcClass);
             crl.registerClass(event);
         }
     }
@@ -476,18 +298,18 @@ public class EnhancementHelper extends java.lang.Object
     }
 
     /**
-     * Look up the metadata for a <code>Persistable</code> class.
+     * Look up the instance for a Persistable class.
      * @param pcClass the <code>Class</code>.
-     * @return the <code>Meta</code> for the <code>Class</code>.
+     * @return the Persistable instance for the <code>Class</code>.
      */
-    private static Meta getMeta(Class pcClass)
+    private static Persistable getPersistableForClass(Class pcClass)
     {
         Meta ret = registeredClasses.get(pcClass);
         if (ret == null)
         {
             throw new NucleusUserException("Cannot lookup meta info for " + pcClass + " - nothing found").setFatal();
         }
-        return ret;
+        return ret.getPC();
     }
 
     /**
@@ -513,52 +335,14 @@ public class EnhancementHelper extends java.lang.Object
     }
 
     /**
-     * Register classes authorized to replaceStateManager. During replaceStateManager, a persistable class will call the
-     * corresponding checkAuthorizedStateManager and the class of the instance of the parameter must have been registered.
-     * @param smClasses a Collection of Classes
-     */
-    public static void registerAuthorizedStateManagerClasses(Collection smClasses) /*throws SecurityException*/
-    {
-        /*SecurityManager sm = System.getSecurityManager();
-        if (sm != null)
-        {
-            sm.checkPermission(JDOPermission.SET_STATE_MANAGER);*/
-            synchronized (authorizedStateManagerClasses)
-            {
-                for (Iterator it = smClasses.iterator(); it.hasNext();)
-                {
-                    Object smClass = it.next();
-                    if (!(smClass instanceof Class))
-                    {
-                        throw new ClassCastException("Cannot register StateManager class passing in object of type " + smClass.getClass().getName());
-                    }
-                    registerAuthorizedStateManagerClass((Class) it.next());
-                }
-            }
-        /*}*/
-    }
-
-    /**
-     * Check that the parameter instance is of a class that is authorized for
-     * JDOPermission("setStateManager"). This method is called by the replaceStateManager method in
-     * persistable classes. A class that is passed as the parameter to replaceStateManager must be
-     * authorized for JDOPermission("setStateManager"). To improve performance, first the set of authorized
-     * classes is checked, and if not present, a regular permission check is made. The regular permission
-     * check requires that all callers on the stack, including the persistence-capable class itself, must be
-     * authorized for JDOPermission("setStateManager").
+     * Check that the parameter instance is of a class that is authorized for JDOPermission("setStateManager"). 
+     * This method is called by the <code>replaceStateManager</code> method in Persistable classes. 
+     * A class that is passed as the parameter to replaceStateManager must be authorized for JDOPermission("setStateManager"). 
+     * To improve performance, first the set of authorized classes is checked, and if not present, a regular permission check is made. 
+     * The regular permission check requires that all callers on the stack, including the persistence-capable class itself, must be authorized for JDOPermission("setStateManager").
      * @param sm an instance of StateManager whose class is to be checked.
      */
     public static void checkAuthorizedStateManager(StateManager sm)
-    {
-        checkAuthorizedStateManagerClass(sm.getClass());
-    }
-
-    /**
-     * Check that the parameter instance is a class that is authorized for JDOPermission("setStateManager").
-     * This method is called by the constructors of JDO Reference Implementation classes.
-     * @param smClass a Class to be checked for JDOPermission("setStateManager")
-     */
-    public static void checkAuthorizedStateManagerClass(Class smClass)
     {
         /*final SecurityManager scm = System.getSecurityManager();
         if (scm == null)
@@ -568,20 +352,21 @@ public class EnhancementHelper extends java.lang.Object
         }*/
         synchronized (authorizedStateManagerClasses)
         {
-            if (authorizedStateManagerClasses.containsKey(smClass))
+            if (authorizedStateManagerClasses.containsKey(sm.getClass()))
             {
                 return;
             }
         }
+
         // if not already authorized, perform "long" security checking.
         /*scm.checkPermission(JDOPermission.SET_STATE_MANAGER);*/
     }
 
     /**
-     * Construct an instance of a key class using a String as input. This is a helper interface for use with
-     * ObjectIdentity. Classes without a String constructor (such as those in java.lang and java.util) will
-     * use this interface for constructing new instances. The result might be a singleton or use some other
-     * strategy.
+     * Construct an instance of a key class using a String as input. 
+     * This is a helper interface for use with ObjectIdentity. 
+     * Classes without a String constructor (such as those in java.lang and java.util) will use this interface for constructing new instances. 
+     * The result might be a singleton or use some other strategy.
      */
     public interface StringConstructor
     {
@@ -682,8 +467,7 @@ public class EnhancementHelper extends java.lang.Object
                     Date result = dateFormat.parse(s, pp);
                     if (result == null)
                     {
-                        throw new NucleusUserException("Exception in Date identity String constructor", 
-                            new Object[] {s, Integer.valueOf(pp.getErrorIndex()), dateFormatPattern});
+                        throw new NucleusUserException("Exception in Date identity String constructor", new Object[] {s, Integer.valueOf(pp.getErrorIndex()), dateFormatPattern});
                     }
                     return result;
                 }
@@ -692,9 +476,10 @@ public class EnhancementHelper extends java.lang.Object
     }
 
     /**
-     * Construct an instance of the parameter class, using the keyString as an argument to the constructor. If
-     * the class has a StringConstructor instance registered, use it. If not, try to find a constructor for
-     * the class with a single String argument. Otherwise, throw a JDOUserException.
+     * Construct an instance of the parameter class, using the keyString as an argument to the constructor. 
+     * If the class has a StringConstructor instance registered, use it. 
+     * If not, try to find a constructor for the class with a single String argument. Otherwise, throw a JDOUserException.
+     * TODO Consider moving this to ObjectId or IdentityManager
      * @param className the name of the class
      * @param keyString the String parameter for the constructor
      * @return the result of construction
@@ -769,60 +554,22 @@ public class EnhancementHelper extends java.lang.Object
     }
 
     /**
-     * This is a helper class to manage metadata per persistable class. 
-     * The information is used at runtime to provide field names and field types to the JDO Model. 
-     * This is the value of the <code>HashMap</code> which relates the <code>Persistable Class</code> as a key to the metadata.
+     * Helper class to manage persistable classes. 
      */
     static class Meta
     {
         /** Instance of <code>Persistable</code>, used at runtime to create new instances. */
         Persistable pc;
 
-        /** This is an array of field names used for the Model at runtime. The field is passed by the static class initialization. */
-        String[] fieldNames;
-
-        /** This is an array of field types used for the Model at runtime. The field is passed by the static class initialization. */
-        Class[] fieldTypes;
-
-        /** This is an array of field flags used for the Model at runtime. The field is passed by the static class initialization. */
-        byte[] fieldFlags;
-
-        /** This is the <code>Class</code> instance of the <code>Persistable</code> superclass. */
-        Class persistableSuperclass;
-
         /**
          * Construct an instance of <code>Meta</code>.
-         * @param fieldNames An array of <code>String</code>
-         * @param fieldTypes An array of <code>Class</code>
-         * @param fieldFlags an array of <code>int</code>
-         * @param persistableSuperclass the most immediate <code>Persistable</code> superclass
          * @param pc An instance of the <code>Persistable</code> class
          */
-        Meta(String[] fieldNames, Class[] fieldTypes, byte[] fieldFlags, Class persistableSuperclass, Persistable pc)
+        Meta(Persistable pc)
         {
-            this.fieldNames = fieldNames;
-            this.fieldTypes = fieldTypes;
-            this.fieldFlags = fieldFlags;
-            this.persistableSuperclass = persistableSuperclass;
             this.pc = pc;
         }
 
-        String[] getFieldNames()
-        {
-            return fieldNames;
-        }
-        Class[] getFieldTypes()
-        {
-            return fieldTypes;
-        }
-        byte[] getFieldFlags()
-        {
-            return fieldFlags;
-        }
-        Class getPersistableSuperclass()
-        {
-            return persistableSuperclass;
-        }
         Persistable getPC()
         {
             return pc;
