@@ -599,8 +599,8 @@ public class ClassEnhancerImpl implements ClassEnhancer
         methodsToAdd.add(CopyField.getInstance(this));
         methodsToAdd.add(CopyFields.getInstance(this));
         methodsToAdd.add(InitFieldNames.getInstance(this));
-        methodsToAdd.add(InitFieldTypes.getInstance(this));
-        methodsToAdd.add(InitFieldFlags.getInstance(this));
+        methodsToAdd.add(InitFieldTypes.getInstance(this)); // TODO Remove this when we remove dnFieldTypes
+        methodsToAdd.add(InitFieldFlags.getInstance(this)); // TODO Remove this when we remove dnFieldFlags
         methodsToAdd.add(GetInheritedFieldCount.getInstance(this));
         methodsToAdd.add(GetManagedFieldCount.getInstance(this));
         methodsToAdd.add(InitPersistableSuperclass.getInstance(this));
