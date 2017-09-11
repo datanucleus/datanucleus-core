@@ -5864,7 +5864,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      * @param pc The persistable object
      * @param out The PrintWriter
      */
-    private static void dumpPC(Object pc, PrintWriter out)
+    private static void dumpPC(Object pc, AbstractClassMetaData cmd, PrintWriter out)
     {
         out.println(StringUtils.toJVMIDString(pc));
 
@@ -5902,14 +5902,16 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         Class c = pc.getClass();
         do
         {
-            String[] fieldNames = HELPER.getFieldNames(c);
-            for (int i = 0; i < fieldNames.length; ++i)
+            AbstractMemberMetaData[] mmds = cmd.getManagedMembers();
+            for (AbstractMemberMetaData mmd : mmds)
             {
-                out.print(fieldNames[i]);
-                out.print(" = ");
-                out.println(peekField(pc, fieldNames[i]));
+                out.println(mmd.getName());
+                out.println(" = ");
+                out.println(peekField(pc, mmd.getName()));
             }
+
             c = c.getSuperclass();
+            cmd = cmd.getSuperAbstractClassMetaData();
         }
         while (c != null && Persistable.class.isAssignableFrom(c));
     }
@@ -5953,7 +5955,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         }
         out.println("loadedFields = " + StringUtils.booleanArrayToString(loadedFields));
         out.print("myPC = ");
-        dumpPC(myPC, out);
+        dumpPC(myPC, cmd, out);
 
         out.println();
         switch (savedPersistenceFlags)
@@ -5970,7 +5972,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         out.println("savedLoadedFields = " + StringUtils.booleanArrayToString(savedLoadedFields));
 
         out.print("savedImage = ");
-        dumpPC(savedImage, out);
+        dumpPC(savedImage, cmd, out);
     }
 
     /**
