@@ -25,15 +25,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Currency;
-import java.util.Date;
 import java.util.EventListener;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -72,17 +69,6 @@ public class EnhancementHelper extends java.lang.Object
      * This list contains the registered listeners for <code>RegisterClassEvent</code>s.
      */
     private static final List<RegisterClassListener> listeners = new ArrayList<RegisterClassListener>();
-
-    /** The DateFormat pattern. */
-    private static String dateFormatPattern;
-
-    /** The default DateFormat instance. */
-    private static DateFormat dateFormat;
-
-    static
-    {
-        singletonHelper.registerDateFormat(getDateTimeInstance());
-    }
 
     private EnhancementHelper()
     {
@@ -313,6 +299,34 @@ public class EnhancementHelper extends java.lang.Object
     }
 
     /**
+     * Helper class to manage persistable classes. 
+     */
+    static class Meta
+    {
+        /** Instance of <code>Persistable</code>, used at runtime to create new instances. */
+        Persistable pc;
+
+        /**
+         * Construct an instance of <code>Meta</code>.
+         * @param pc An instance of the <code>Persistable</code> class
+         */
+        Meta(Persistable pc)
+        {
+            this.pc = pc;
+        }
+
+        Persistable getPC()
+        {
+            return pc;
+        }
+
+        public String toString()
+        {
+            return "Meta-" + pc.getClass().getName(); // NOI18N
+        }
+    }
+
+    /**
      * Register a class authorized to replaceStateManager. During replaceStateManager, a persistable class will call the
      * corresponding checkAuthorizedStateManager and the class of the instance of the parameter must have been registered.
      * @param smClass a Class that is authorized for JDOPermission("setStateManager").
@@ -400,85 +414,9 @@ public class EnhancementHelper extends java.lang.Object
     }
 
     /**
-     * Register the default special StringConstructor instances.
-     */
-    static
-    {
-        // TODO Add other possible types
-        singletonHelper.registerStringConstructor(Currency.class, new StringConstructor()
-        {
-            public Object construct(String s)
-            {
-                try
-                {
-                    return Currency.getInstance(s);
-                }
-                catch (Exception ex)
-                {
-                    throw new NucleusUserException("Exception in Currency identity String constructor", ex);
-                }
-            }
-        });
-        singletonHelper.registerStringConstructor(Locale.class, new StringConstructor()
-        {
-            public Object construct(String s)
-            {
-                try
-                {
-                    String lang = s;
-                    int firstUnderbar = s.indexOf('_');
-                    if (firstUnderbar == -1)
-                    {
-                        // nothing but language
-                        return new Locale(lang);
-                    }
-                    lang = s.substring(0, firstUnderbar);
-                    String country;
-                    int secondUnderbar = s.indexOf('_', firstUnderbar + 1);
-                    if (secondUnderbar == -1)
-                    {
-                        // nothing but language, country
-                        country = s.substring(firstUnderbar + 1);
-                        return new Locale(lang, country);
-                    }
-                    country = s.substring(firstUnderbar + 1, secondUnderbar);
-                    String variant = s.substring(secondUnderbar + 1);
-                    return new Locale(lang, country, variant);
-                }
-                catch (Exception ex)
-                {
-                    throw new NucleusUserException("Exception in Locale identity String constructor", ex);
-                }
-            }
-        });
-        singletonHelper.registerStringConstructor(Date.class, new StringConstructor()
-        {
-            public synchronized Object construct(String s)
-            {
-                try
-                {
-                    // first, try the String as a Long
-                    return new Date(Long.parseLong(s));
-                }
-                catch (NumberFormatException ex)
-                {
-                    // not a Long; try the formatted date
-                    ParsePosition pp = new ParsePosition(0);
-                    Date result = dateFormat.parse(s, pp);
-                    if (result == null)
-                    {
-                        throw new NucleusUserException("Exception in Date identity String constructor", new Object[] {s, Integer.valueOf(pp.getErrorIndex()), dateFormatPattern});
-                    }
-                    return result;
-                }
-            }
-        });
-    }
-
-    /**
      * Construct an instance of the parameter class, using the keyString as an argument to the constructor. 
      * If the class has a StringConstructor instance registered, use it. 
-     * If not, try to find a constructor for the class with a single String argument. Otherwise, throw a JDOUserException.
+     * If not, try to find a constructor for the class with a single String argument. Otherwise, throw a NucleusUserException.
      * TODO Consider moving this to ObjectId or IdentityManager
      * @param className the name of the class
      * @param keyString the String parameter for the constructor
@@ -507,16 +445,70 @@ public class EnhancementHelper extends java.lang.Object
         }
     }
 
+    /** The default DateFormat instance. */
+    private static DateFormat dateFormat;
+
     /**
-     * Get the DateFormat instance for the default locale from the VM. This requires the following privileges
-     * for EnhancementHelper in the security permissions file: permission java.util.PropertyPermission
-     * "user.country", "read"; permission java.util.PropertyPermission "user.timezone", "read,write";
-     * permission java.util.PropertyPermission "java.home", "read"; If these permissions are not present, or
-     * there is some other problem getting the default date format, a simple formatter is returned.
-     * @return the default date-time formatter
+     * Register the default special StringConstructor instances.
      */
-    static DateFormat getDateTimeInstance()
+    static
     {
+        // TODO Add other possible types
+        singletonHelper.registerStringConstructor(java.util.Currency.class, new StringConstructor()
+        {
+            public Object construct(String s)
+            {
+                try
+                {
+                    return java.util.Currency.getInstance(s);
+                }
+                catch (Exception ex)
+                {
+                    throw new NucleusUserException("Exception in Currency identity String constructor", ex);
+                }
+            }
+        });
+
+        singletonHelper.registerStringConstructor(java.util.Locale.class, new StringConstructor()
+        {
+            public Object construct(String s)
+            {
+                try
+                {
+                    String lang = s;
+                    int firstUnderbar = s.indexOf('_');
+                    if (firstUnderbar == -1)
+                    {
+                        // nothing but language
+                        return new java.util.Locale(lang);
+                    }
+                    lang = s.substring(0, firstUnderbar);
+                    String country;
+                    int secondUnderbar = s.indexOf('_', firstUnderbar + 1);
+                    if (secondUnderbar == -1)
+                    {
+                        // nothing but language, country
+                        country = s.substring(firstUnderbar + 1);
+                        return new java.util.Locale(lang, country);
+                    }
+                    country = s.substring(firstUnderbar + 1, secondUnderbar);
+                    String variant = s.substring(secondUnderbar + 1);
+                    return new java.util.Locale(lang, country, variant);
+                }
+                catch (Exception ex)
+                {
+                    throw new NucleusUserException("Exception in Locale identity String constructor", ex);
+                }
+            }
+        });
+
+        /*
+         * This requires the following privileges for EnhancementHelper in the security permissions file: 
+         * permission java.util.PropertyPermission "user.country", "read"; 
+         * permission java.util.PropertyPermission "user.timezone", "read,write";
+         * permission java.util.PropertyPermission "java.home", "read"; 
+         * If these permissions are not present, or there is some other problem getting the default date format, a simple formatter is returned.
+         */
         DateFormat result = null;
         try
         {
@@ -532,52 +524,38 @@ public class EnhancementHelper extends java.lang.Object
         {
             result = DateFormat.getInstance();
         }
-        return result;
-    }
+        dateFormat = result;
 
-    /**
-     * Register a DateFormat instance for use with constructing Date instances. The default is the default
-     * DateFormat instance. If the new instance implements SimpleDateFormat, get its pattern for error messages.
-     * @param df the DateFormat instance to use
-     */
-    public synchronized void registerDateFormat(DateFormat df)
-    {
-        dateFormat = df;
-        if (df instanceof SimpleDateFormat)
+        singletonHelper.registerStringConstructor(java.util.Date.class, new StringConstructor()
         {
-            dateFormatPattern = ((SimpleDateFormat) df).toPattern();
-        }
-        else
-        {
-            dateFormatPattern = "Unknown message";
-        }
-    }
-
-    /**
-     * Helper class to manage persistable classes. 
-     */
-    static class Meta
-    {
-        /** Instance of <code>Persistable</code>, used at runtime to create new instances. */
-        Persistable pc;
-
-        /**
-         * Construct an instance of <code>Meta</code>.
-         * @param pc An instance of the <code>Persistable</code> class
-         */
-        Meta(Persistable pc)
-        {
-            this.pc = pc;
-        }
-
-        Persistable getPC()
-        {
-            return pc;
-        }
-
-        public String toString()
-        {
-            return "Meta-" + pc.getClass().getName(); // NOI18N
-        }
+            public synchronized Object construct(String s)
+            {
+                try
+                {
+                    // first, try the String as a Long
+                    return new java.util.Date(Long.parseLong(s));
+                }
+                catch (NumberFormatException ex)
+                {
+                    // not a Long; try the formatted date
+                    ParsePosition pp = new ParsePosition(0);
+                    java.util.Date result = dateFormat.parse(s, pp);
+                    if (result == null)
+                    {
+                        String dateFormatPattern = null;
+                        if (dateFormat instanceof SimpleDateFormat)
+                        {
+                            dateFormatPattern = ((SimpleDateFormat)dateFormat).toPattern();
+                        }
+                        else
+                        {
+                            dateFormatPattern = "Unknown message";
+                        }
+                        throw new NucleusUserException("Exception in Date identity String constructor", new Object[] {s, Integer.valueOf(pp.getErrorIndex()), dateFormatPattern});
+                    }
+                    return result;
+                }
+            }
+        });
     }
 }
