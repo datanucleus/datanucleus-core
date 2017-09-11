@@ -103,10 +103,12 @@ public class InitClass extends ClassMethod
 
         mv.visitLdcInsn(getClassEnhancer().getClassName());
         mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(), getNamer().getLoadClassMethodName(), "(Ljava/lang/String;)Ljava/lang/Class;");
+
         mv.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), getNamer().getFieldNamesFieldName(), "[Ljava/lang/String;");
         mv.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), getNamer().getFieldTypesFieldName(), "[Ljava/lang/Class;");
         mv.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), getNamer().getFieldFlagsFieldName(), "[B");
         mv.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), getNamer().getPersistableSuperclassFieldName(), "Ljava/lang/Class;");
+
         if (enhancer.getClassMetaData().isAbstract())
         {
             mv.visitInsn(Opcodes.ACONST_NULL);
@@ -125,4 +127,33 @@ public class InitClass extends ClassMethod
             "[BLjava/lang/Class;" +
             "L" + getNamer().getPersistableAsmClassName() + ";)V");
     }
+/*
+THIS IS HOW THE CODE SHOULD LOOK WHEN WE GET RID OF dnFieldFlags, dnFieldTypes, dnPersistableSuperclass
+
+mv = cw.visitMethod(ACC_STATIC, "<clinit>", "()V", null, null);
+mv.visitCode();
+
+---
+mv.visitMethodInsn(INVOKESTATIC, "mydomain/model/Base", "__dnFieldNamesInit", "()[Ljava/lang/String;", false);
+mv.visitFieldInsn(PUTSTATIC, "mydomain/model/Base", "dnFieldNames", "[Ljava/lang/String;");
+
+mv.visitMethodInsn(INVOKESTATIC, "mydomain/model/Base", "__dnGetInheritedFieldCount", "()I", false);
+mv.visitFieldInsn(PUTSTATIC, "mydomain/model/Base", "dnInheritedFieldCount", "I");
+
+mv.visitMethodInsn(INVOKESTATIC, "mydomain/model/Base", "__dnPersistableSuperclassInit", "()Ljava/lang/Class;", false);
+mv.visitInsn(POP);
+
+mv.visitLdcInsn("mydomain.model.Base");
+mv.visitMethodInsn(INVOKESTATIC, "mydomain/model/Base", "___dn$loadClass", "(Ljava/lang/String;)Ljava/lang/Class;", false);
+
+mv.visitTypeInsn(NEW, "mydomain/model/Base");
+mv.visitInsn(DUP);
+mv.visitMethodInsn(INVOKESPECIAL, "mydomain/model/Base", "<init>", "()V", false);
+
+mv.visitMethodInsn(INVOKESTATIC, "org/datanucleus/enhancer/EnhancementHelper", "registerClass", "(Ljava/lang/Class;Lorg/datanucleus/enhancement/Persistable;)V", false);
+---
+
+mv.visitInsn(RETURN);
+mv.visitMaxs(3, 0);
+ */
 }
