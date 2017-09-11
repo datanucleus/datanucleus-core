@@ -626,9 +626,11 @@ public class ClassEnhancerImpl implements ClassEnhancer
             fieldsToAdd.add(new ClassField(this, namer.getDetachedStateFieldName(), Opcodes.ACC_PROTECTED, Object[].class));
         }
 
+        // TODO Drop these 3 when we upgrade the enhancement contract
         fieldsToAdd.add(new ClassField(this, namer.getFieldFlagsFieldName(), Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, byte[].class));
         fieldsToAdd.add(new ClassField(this, namer.getPersistableSuperclassFieldName(), Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, Class.class));
         fieldsToAdd.add(new ClassField(this, namer.getFieldTypesFieldName(), Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, Class[].class));
+
         fieldsToAdd.add(new ClassField(this, namer.getFieldNamesFieldName(), Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, String[].class));
         fieldsToAdd.add(new ClassField(this, namer.getInheritedFieldCountFieldName(), Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, int.class));
     }

@@ -97,6 +97,7 @@ public class InitClass extends ClassMethod
         mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(), getNamer().getGetInheritedFieldCountMethodName(), "()I");
         mv.visitFieldInsn(Opcodes.PUTSTATIC, getClassEnhancer().getASMClassName(), getNamer().getInheritedFieldCountFieldName(), "I");
 
+        // TODO Change this to just call the method when we remove "dnPersistableSuperclass" from the enhancement contract.
         mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(), getNamer().getPersistableSuperclassInitMethodName(), "()Ljava/lang/Class;");
         mv.visitFieldInsn(Opcodes.PUTSTATIC, getClassEnhancer().getASMClassName(), getNamer().getPersistableSuperclassFieldName(), "Ljava/lang/Class;");
 
