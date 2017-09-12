@@ -32,9 +32,8 @@ import org.datanucleus.enhancer.asm.Opcodes;
  *     dnFieldFlags = __dnFieldFlagsInit();
  *     dnInheritedFieldCount = __dnGetInheritedFieldCount();
  *     dnPersistableSuperclass = __dnPersistableSuperclassInit();
- *     JDOImplHelper.registerClass(___dn$loadClass("mydomain.MyClass"),
- *         dnFieldNames, dnFieldTypes, dnFieldFlags,
- *         dnPersistableSuperclass, new MyClass());
+ *     EnhancementHelper.registerClass(___dn$loadClass("mydomain.MyClass"),
+ *         dnFieldNames, dnFieldTypes, dnFieldFlags, dnPersistableSuperclass, new MyClass());
  * }
  * </pre>
  */
