@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EventListener;
-import java.util.EventObject;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -47,9 +46,8 @@ public class EnhancementHelper extends java.lang.Object
     private static EnhancementHelper singletonHelper = new EnhancementHelper();
 
     /**
-     * This synchronized <code>Map</code> contains a static mapping of <code>Persistable</code> class to
-     * metadata for the class used for constructing new instances. New entries are added by the static method
-     * in each <code>Persistable</code> class. Entries are never removed.
+     * Static mapping of <code>Persistable</code> class to an instance of that class.
+     * New entries are added by the static method in each <code>Persistable</code> class initialisation. Entries are never removed.
      */
     private static Map<Class, Meta> registeredClasses = new ConcurrentHashMap<>();
 
@@ -149,28 +147,9 @@ public class EnhancementHelper extends java.lang.Object
     {
         /**
          * This method gets called when a Persistable class is registered.
-         * @param event a <code>RegisterClassEvent</code> instance describing the registered class plus metadata.
+         * @param registeredClass The class that has just been initialised/registered
          */
-        public void registerClass(RegisterClassEvent event);
-    }
-
-    public static class RegisterClassEvent extends EventObject
-    {
-        private static final long serialVersionUID = -8336171250765467347L;
-
-        /** The class object of the registered Persistable class */
-        protected Class pcClass;
-
-        public RegisterClassEvent(EnhancementHelper helper, Class registeredClass)
-        {
-            super(helper);
-            this.pcClass = registeredClass;
-        }
-
-        public Class getRegisteredClass()
-        {
-            return pcClass;
-        }
+        public void registerClass(Class registeredClass);
     }
 
     /**
@@ -181,7 +160,7 @@ public class EnhancementHelper extends java.lang.Object
      * @param fieldNames Not used
      * @param fieldTypes Not used
      * @param fieldFlags Not used
-     * @param pc an instance of the <code>Persistable</code> class
+     * @param pc an instance of the <code>Persistable</code> class. TODO We can just do pcClass.newInstance() to get one!
      * @param persistableSuperclass Not used
      */
     public static void registerClass(Class pcClass, String[] fieldNames, Class[] fieldTypes, byte[] fieldFlags, Class persistableSuperclass, Persistable pc)
@@ -198,37 +177,16 @@ public class EnhancementHelper extends java.lang.Object
         {
             if (!listeners.isEmpty())
             {
-                RegisterClassEvent event = new RegisterClassEvent(singletonHelper, pcClass);
                 for (Iterator i = listeners.iterator(); i.hasNext();)
                 {
                     RegisterClassListener crl = (RegisterClassListener) i.next();
                     if (crl != null)
                     {
-                        crl.registerClass(event);
+                        crl.registerClass(pcClass);
                     }
                 }
             }
         }
-    }
-
-    /**
-     * Unregister metadata by class. This method unregisters the specified class. Any further attempt to get
-     * metadata for the specified class will result in a <code>JDOFatalUserException</code>.
-     * @param pcClass the <code>Persistable</code> class to be unregistered.
-     */
-    public void unregisterClass(Class pcClass)
-    {
-        if (pcClass == null)
-        {
-            throw new NullPointerException("Cannot unregisterClass on null");
-        }
-        /*SecurityManager sec = System.getSecurityManager();
-        if (sec != null)
-        {
-            // throws exception if caller is not authorized
-            sec.checkPermission(JDOPermission.MANAGE_METADATA);
-        }*/
-        registeredClasses.remove(pcClass);
     }
 
     /**
@@ -251,8 +209,7 @@ public class EnhancementHelper extends java.lang.Object
         // new registrations will call the new listener while the following occurs notify the new listener about already-registered classes
         for (Class pcClass : alreadyRegisteredClasses)
         {
-            RegisterClassEvent event = new RegisterClassEvent(this, pcClass);
-            crl.registerClass(event);
+            crl.registerClass(pcClass);
         }
     }
 
@@ -287,6 +244,21 @@ public class EnhancementHelper extends java.lang.Object
         Meta ret = registeredClasses.get(pcClass);
         if (ret == null)
         {
+            // Commented out code that we could enable, particularly if we update registerClass to not pass an instance
+            /*if (Persistable.class.isAssignableFrom(pcClass))
+            {
+                // Not yet registered but this is Persistable, so create an instance
+                Persistable pc;
+                try
+                {
+                    pc = (Persistable) pcClass.newInstance();
+                    registeredClasses.put(pcClass, new Meta(pc));
+                    return pc;
+                }
+                catch (InstantiationException | IllegalAccessException e)
+                {
+                }
+            }*/
             throw new NucleusUserException("Cannot lookup meta info for " + pcClass + " - nothing found").setFatal();
         }
         return ret.getPC();
@@ -316,7 +288,7 @@ public class EnhancementHelper extends java.lang.Object
 
         public String toString()
         {
-            return "Meta-" + pc.getClass().getName(); // NOI18N
+            return "Meta-" + pc.getClass().getName();
         }
     }
 
