@@ -225,7 +225,7 @@ public interface Persistable
      * Return a new instance of this class, with the StateManager set to the parameter, and dnFlags set to LOAD_REQUIRED.
      * <P>
      * This method is used as a performance optimization as an alternative to using reflection to construct a
-     * new instance. It is used by the JDOImplHelper class method newInstance.
+     * new instance. It is used by the EnhancementHelper class method newInstance.
      * @param sm the StateManager that will own the new instance.
      * @return a new instance of this class.
      */
@@ -236,8 +236,7 @@ public interface Persistable
      * initialized to the values in the oid, and dnFlags set to LOAD_REQUIRED.
      * <P>
      * This method is used as a performance optimization as an alternative to using reflection to construct a
-     * new instance of a class that uses application identity. It is used by the JDOImplHelper class method
-     * newInstance.
+     * new instance of a class that uses application identity. It is used by the EnhancementHelper class method newInstance.
      * @param sm the StateManager that will own the new instance.
      * @param oid an instance of the object id class (application identity).
      * @return a new instance of this class.

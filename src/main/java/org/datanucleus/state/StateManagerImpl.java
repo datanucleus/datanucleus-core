@@ -6037,8 +6037,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         {
             if (!HELPER.getRegisteredClasses().contains(pcClass))
             {
-                // probably never will get here, as JDOImplHelper.newInstance() internally already throws
-                // JDOFatalUserException when class is not registered 
+                // probably never will get here, as EnhancementHelper.newInstance() internally already throws JDOFatalUserException when class is not registered 
                 throw new NucleusUserException(Localiser.msg("026018", pcClass.getName())).setFatal();
             }
 

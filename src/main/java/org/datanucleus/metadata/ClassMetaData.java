@@ -346,9 +346,7 @@ public class ClassMetaData extends AbstractClassMetaData
             memberNames.add(mmd.getName());
         }
 
-        // Add fields/properties for the class that don't have MetaData.
-        // We use Reflection here since JDOImplHelper would only give use info
-        // for enhanced files (and the enhancer needs unenhanced as well). 
+        // Add fields/properties for the class that don't have MetaData, using Reflection.
         // NOTE 1 : We ignore fields/properties in superclasses
         // NOTE 2 : We ignore "enhanced" fields/properties (added by the enhancer)
         // NOTE 3 : We ignore inner class fields/properties (containing "$")

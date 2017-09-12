@@ -424,9 +424,7 @@ public class InterfaceMetaData extends AbstractClassMetaData
             memberNames.add(mmd.getName());
         }
 
-        // Add MetaData for properties for the interface that aren't in the XML/annotations.
-        // We use Reflection here since JDOImplHelper would only give use info
-        // for enhanced files (and the enhancer needs unenhanced as well). 
+        // Add MetaData for properties for the interface that aren't in the XML/annotations, using Reflection.
         // NOTE 1 : We ignore properties in superclasses
         // NOTE 2 : We ignore "enhanced" properties (added by the enhancer)
         // NOTE 3 : We ignore inner class fields (containing "$") 
