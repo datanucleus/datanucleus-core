@@ -33,7 +33,7 @@ import org.datanucleus.enhancer.asm.Opcodes;
  *     }
  *     else
  *     {
- *         JDOImplHelper.checkAuthorizedStateManager(sm);
+ *         EnhancementHelper.checkAuthorizedStateManager(sm);
  *         dnStateManager = stateManager;
  *         dnFlags = (byte) 1;
  *     }
@@ -75,21 +75,18 @@ public class ReplaceStateManager extends ClassMethod
         visitor.visitLabel(startLabel);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         Label l1 = new Label();
         visitor.visitJumpInsn(Opcodes.IFNULL, l1);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
         visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(), "replacingStateManager",
             "(" + getNamer().getPersistableDescriptor() + getNamer().getStateManagerDescriptor() + ")" + getNamer().getStateManagerDescriptor());
-        visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         Label l3 = new Label();
         visitor.visitJumpInsn(Opcodes.GOTO, l3);
 
@@ -97,12 +94,10 @@ public class ReplaceStateManager extends ClassMethod
         visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
-        visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getImplHelperAsmClassName(), 
-            "checkAuthorizedStateManager", "(L" + getNamer().getStateManagerAsmClassName() + ";)V");
+        visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getImplHelperAsmClassName(), "checkAuthorizedStateManager", "(L" + getNamer().getStateManagerAsmClassName() + ";)V");
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
-        visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitInsn(Opcodes.ICONST_1);
         visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(), getNamer().getFlagsFieldName(), "B");
