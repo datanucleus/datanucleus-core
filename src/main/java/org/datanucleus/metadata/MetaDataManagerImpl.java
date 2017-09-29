@@ -2324,16 +2324,25 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             // TODO If classMetaData not known load it?
             return discrimValue;
         }
-        else if (dismd.getStrategy() == DiscriminatorStrategy.ENTITY_NAME)
-        {
-            AbstractClassMetaData cmd = classMetaDataByEntityName.get(discrimValue);
-            return (cmd != null) ? cmd.getFullClassName() : null;
-        }
         else if (dismd.getStrategy() == DiscriminatorStrategy.VALUE_MAP)
         {
             AbstractClassMetaData baseCmd = (AbstractClassMetaData)((InheritanceMetaData)dismd.getParent()).getParent();
             AbstractClassMetaData rootCmd = baseCmd.getBaseAbstractClassMetaData();
             return getClassNameForDiscriminatorValueWithRoot(rootCmd, discrimValue);
+        }
+        else if (dismd.getStrategy() == DiscriminatorStrategy.VALUE_MAP_ENTITY_NAME)
+        {
+            AbstractClassMetaData baseCmd = (AbstractClassMetaData)((InheritanceMetaData)dismd.getParent()).getParent();
+            AbstractClassMetaData rootCmd = baseCmd.getBaseAbstractClassMetaData();
+            String value = getClassNameForDiscriminatorValueWithRoot(rootCmd, discrimValue);
+            if (value != null)
+            {
+                return value;
+            }
+
+            // Fallback to the entity name
+            AbstractClassMetaData cmd = classMetaDataByEntityName.get(discrimValue);
+            return (cmd != null) ? cmd.getFullClassName() : null;
         }
         return null;
     }

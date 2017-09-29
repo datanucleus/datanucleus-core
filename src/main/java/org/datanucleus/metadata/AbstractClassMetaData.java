@@ -1036,7 +1036,7 @@ public abstract class AbstractClassMetaData extends MetaData
                             }
                             else
                             {
-                                inheritanceMetaData.newDiscriminatorMetadata().setStrategy(DiscriminatorStrategy.ENTITY_NAME).setIndexed("true").newColumnMetaData().setLength(31);
+                                inheritanceMetaData.newDiscriminatorMetadata().setStrategy(DiscriminatorStrategy.VALUE_MAP_ENTITY_NAME).setIndexed("true").newColumnMetaData().setLength(31);
                             }
                         }
                         inheritanceMetaData.strategy = InheritanceStrategy.NEW_TABLE;
@@ -1698,10 +1698,6 @@ public abstract class AbstractClassMetaData extends MetaData
             {
                 return getFullClassName();
             }
-            else if (str == DiscriminatorStrategy.ENTITY_NAME)
-            {
-                return getEntityName();
-            }
             else if (str == DiscriminatorStrategy.VALUE_MAP)
             {
                 DiscriminatorMetaData dismd = getDiscriminatorMetaDataRoot();
@@ -1716,6 +1712,25 @@ public abstract class AbstractClassMetaData extends MetaData
                     }
                 }
                 return value;
+            }
+            else if (str == DiscriminatorStrategy.VALUE_MAP_ENTITY_NAME)
+            {
+                DiscriminatorMetaData dismd = getDiscriminatorMetaDataRoot();
+                Object value = getInheritanceMetaData().getDiscriminatorMetaData().getValue();
+                if (value != null)
+                {
+                    if (dismd.getColumnMetaData() != null)
+                    {
+                        ColumnMetaData colmd = dismd.getColumnMetaData();
+                        if (MetaDataUtils.isJdbcTypeNumeric(colmd.getJdbcType()))
+                        {
+                            // Split out integer-based types. Probably not worth splitting out any other types (floating point?)
+                            value = Long.parseLong((String)value);
+                        }
+                    }
+                    return value;
+                }
+                return getEntityName();
             }
         }
         return null;

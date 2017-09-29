@@ -19,13 +19,18 @@ package org.datanucleus.metadata;
 
 /**
  * Representation of the values for discriminator "strategy".
+ * <ul>
+ * <li><b>VALUE_MAP</b> where you define a value for each class, with no fallback default.</li>
+ * <li><b>CLASS_NAME</b> where the class name is used as the discriminator value</li>
+ * <li><b>VALUE_MAP_ENTITY_NAME</b> where you define a value for each class, but the fallback is the entity name when no value is provided.</li>
+ * </ul>
  */
 public enum DiscriminatorStrategy
 {
     NONE("none"),
     VALUE_MAP("value-map"),
     CLASS_NAME("class-name"),
-    ENTITY_NAME("entity-name");
+    VALUE_MAP_ENTITY_NAME("value-map-entity-name");
 
     String name;
 
@@ -62,9 +67,9 @@ public enum DiscriminatorStrategy
         {
             return DiscriminatorStrategy.CLASS_NAME;
         }
-        else if (DiscriminatorStrategy.ENTITY_NAME.toString().equals(value))
+        else if (DiscriminatorStrategy.VALUE_MAP_ENTITY_NAME.toString().equals(value))
         {
-            return DiscriminatorStrategy.ENTITY_NAME;
+            return DiscriminatorStrategy.VALUE_MAP_ENTITY_NAME;
         }
         return null;
     }
