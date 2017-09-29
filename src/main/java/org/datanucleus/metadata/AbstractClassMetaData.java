@@ -1716,7 +1716,7 @@ public abstract class AbstractClassMetaData extends MetaData
             else if (str == DiscriminatorStrategy.VALUE_MAP_ENTITY_NAME)
             {
                 DiscriminatorMetaData dismd = getDiscriminatorMetaDataRoot();
-                Object value = getInheritanceMetaData().getDiscriminatorMetaData().getValue();
+                Object value = getInheritanceMetaData().getDiscriminatorMetaData() != null ? getInheritanceMetaData().getDiscriminatorMetaData().getValue() : null;
                 if (value != null)
                 {
                     if (dismd.getColumnMetaData() != null)
