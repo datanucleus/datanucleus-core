@@ -59,6 +59,9 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
     /** Supported annotations packages. */
     protected String[] supportedPackages;
 
+    /** Supported annotations that can be duplicated (when used in meta-annotations). */
+    protected Set<String> supportedDuplicateAnnotations = new HashSet<>();
+
     /**
      * Constructor.
      * @param mgr MetaData manager
@@ -93,6 +96,11 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
     protected void setSupportedAnnotationPackages(String[] packages)
     {
         this.supportedPackages = packages;
+    }
+
+    protected void addSupportedDuplicateAnnotations(String annot)
+    {
+        this.supportedDuplicateAnnotations.add(annot);
     }
 
     /**
@@ -321,7 +329,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                 String annName = annotation.annotationType().getName();
                 if (isSupportedAnnotation(annName) || annMgr.getClassAnnotationHasHandler(annName))
                 {
-                    if (annotNames.contains(annName))
+                    if (annotNames.contains(annName) && !supportedDuplicateAnnotations.contains(annName))
                     {
                         NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : " + annotation + " - only the first will be used!");
                     }
@@ -336,7 +344,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                         annName = subAnnotation.annotationType().getName();
                         if (isSupportedAnnotation(annName) || annMgr.getClassAnnotationHasHandler(annName))
                         {
-                            if (annotNames.contains(annName))
+                            if (annotNames.contains(annName) && !supportedDuplicateAnnotations.contains(annName))
                             {
                                 NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : for sub of " + annotation + " - only the first will be used!");
                             }
@@ -382,7 +390,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                         String annName = annotation.annotationType().getName();
                         if (isSupportedAnnotation(annName) || annMgr.getMemberAnnotationHasHandler(annName))
                         {
-                            if (annotNames.contains(annName))
+                            if (annotNames.contains(annName) && !supportedDuplicateAnnotations.contains(annName))
                             {
                                 NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : " + annotation + " - only the first will be used!");
                             }
@@ -397,7 +405,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                                 annName = subAnnotation.annotationType().getName();
                                 if (isSupportedAnnotation(annName) || annMgr.getMemberAnnotationHasHandler(annName))
                                 {
-                                    if (annotNames.contains(annName))
+                                    if (annotNames.contains(annName) && !supportedDuplicateAnnotations.contains(annName))
                                     {
                                         NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : for sub of " + annotation + " - only the first will be used!");
                                     }
@@ -447,7 +455,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                     String annName = annotation.annotationType().getName();
                     if (isSupportedAnnotation(annName) || annMgr.getMemberAnnotationHasHandler(annName))
                     {
-                        if (annotNames.contains(annName))
+                        if (annotNames.contains(annName) && !supportedDuplicateAnnotations.contains(annName))
                         {
                             NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : " + annotation + " - only the first will be used!");
                         }
@@ -462,7 +470,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                             annName = subAnnotation.annotationType().getName();
                             if (isSupportedAnnotation(annName) || annMgr.getMemberAnnotationHasHandler(annName))
                             {
-                                if (annotNames.contains(annName))
+                                if (annotNames.contains(annName) && !supportedDuplicateAnnotations.contains(annName))
                                 {
                                     NucleusLogger.METADATA.warn("Annotation " + annName + " on class=" + cls.getName() + " is DUPLICATED : for sub of " + annotation + " - only the first will be used!");
                                 }
