@@ -47,7 +47,6 @@ The execution process will return a QueryResult (which is a List).
 
 
 
-<a name="pessimistic"/>
 ### Persistence : Pessimistic Transactions
 
 All persist, remove, field update calls go to the datastore straight away. 
@@ -55,14 +54,14 @@ Flush() doesn't have the same significance here as it does for optimistic, excep
 This means that multiple setters can be called on a single object and we get one UPDATE statement.
 
 
-####persist
+#### persist
 Calls ExecutionContext.persistObject which calls EC.persistObjectWork.  
 Creates an ObjectProvider (StateManagerImpl - OP). Adds the object to EC.dirtyOPs.  
 Calls OP.makePersistent which calls OP.internalMakePersistent which will pass the persist through to the datastore plugin.  
 Calls PersistenceHandler.insertObject, which will do any necessary cascade persist (coming back through EC.persistObjectInternal, EC.indirectDirtyOPs).  
 
 
-####remove
+#### remove
 Calls ExecutionContext.deleteObject, which calls ExecutionContext.deleteObjectWork.  
 This will add the object to EC.dirtyOPs.  
 Calls OP.deletePersistent.  
@@ -70,23 +69,22 @@ Calls OP.internalDeletePersistent which will pass the delete through to the data
 Calls PersistenceHandler.deleteObject, which will do any necessary cascade delete (coming back through EC.deleteObjectInternal, EC.indirectDirtyOPs).  
 
 
-####update field
+#### update field
 Calls OP.setXXXField which calls OP.updateField and, in turn, EC.makeDirty.  
 The update is then queued internally until EC.flushInternal is triggered (e.g 3 changes waiting).  
 
 
-####Collection.add
+#### Collection.add
 Calls SCO wrapper.add which will add the element locally.  
 If a backing store is present (RDBMS) then passes it through to the backingStore.add().  
 
 
-####Collection.remove/clear
+#### Collection.remove/clear
 Calls SCO wrapper.remove/clear which will add the element locally.  
 If a backing store is present (RDBMS) then passes it through to the backingStore.remove()/clear().  
 If no backing store is present and cascade delete is true then does the cascade delete, via EC.deleteObjectInternal.  
 
 
-<a name="optimistic"/>
 ### Persistence : Optimistic Transactions
 
 All persist, remove, field update calls are queued.
@@ -94,29 +92,29 @@ Flush() processes all remove/add/updates that have been queued.
 Call ExecutionContext.getOperationQueue() to see the operations that are queued up waiting to flush.
 
 
-####persist
+#### persist
 Calls ExecutionContext.persistObject which calls EC.persistObjectWork.  
 Creates an ObjectProvider (StateManagerImpl - OP). Adds the object to EC.dirtyOPs.  
 Calls OP.makePersistent. Uses PersistFieldManager to process all reachable objects.  
 
 
-####remove
+#### remove
 Calls ExecutionContext.deleteObject, which calls ExecutionContext.deleteObjectWork.  
 Creates an ObjectProvider as required. Adds the object to EC.dirtyOPs.  
 Calls OP.deletePersistent. Uses DeleteFieldManager to process all reachable objects.
 
 
-####update field
+#### update field
 Calls OP.setXXXField which calls OP.updateField and, in turn, EC.makeDirty.  
 The update is then queued internally until EC.flushInternal is triggered.  
 
 
-####Collection.add
+#### Collection.add
 Calls SCO wrapper.add which will add the element locally.  
 Adds a queued operation to the queue for addition of this element.  
 
 
-####Collection.remove/clear
+#### Collection.remove/clear
 Calls SCO wrapper.remove/clear which will add the element locally.  
 Adds a queued operation to the queue for removal of this element.  
 
