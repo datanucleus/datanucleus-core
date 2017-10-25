@@ -4,6 +4,7 @@
   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   xmlns:persistence="http://xmlns.jcp.org/xml/ns/persistence"
   elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.2">
+
   <xsd:annotation>
     <xsd:documentation>
       @(#)persistence_2_2.xsd 1.0    July 7 2017
@@ -28,11 +29,13 @@
       </persistence>
     ]]></xsd:documentation>
   </xsd:annotation>
+
   <xsd:simpleType name="versionType">
     <xsd:restriction base="xsd:token">
       <xsd:pattern value="[0-9]+(\.[0-9]+)*"/>
     </xsd:restriction>
   </xsd:simpleType>
+
   <!-- **************************************************** -->
   <xsd:element name="persistence">
     <xsd:complexType>
@@ -175,7 +178,7 @@
           </xsd:complexType>
         </xsd:element>
       </xsd:sequence>
-      <xsd:attribute name="version" type="persistence:versionType" fixed="2.0" use="required"/>
+      <xsd:attribute name="version" type="persistence:versionType" fixed="2.2" use="required"/>
     </xsd:complexType>
   </xsd:element>
   <!-- **************************************************** -->

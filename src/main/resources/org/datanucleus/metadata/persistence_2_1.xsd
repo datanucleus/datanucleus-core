@@ -175,7 +175,7 @@
           </xsd:complexType>
         </xsd:element>
       </xsd:sequence>
-      <xsd:attribute name="version" type="persistence:versionType" fixed="2.0" use="required"/>
+      <xsd:attribute name="version" type="persistence:versionType" fixed="2.1" use="required"/>
     </xsd:complexType>
   </xsd:element>
   <!-- **************************************************** -->
