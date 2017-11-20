@@ -1092,8 +1092,7 @@ public class JDOQLParser extends AbstractParser
 
     /**
      * A literal is one value of any type.
-     * Supported literals are of types String, Floating Point, Integer,
-     * Character, Boolean and null e.g. 'J', "String", 1, 1.8, true, false, null.
+     * Supported literals are of types String, Floating Point, Integer, Character, Boolean and null e.g. 'J', "String", 1, 1.8, true, false, null.
      * @return The parsed literal
      */
     protected boolean processLiteral()
@@ -1105,12 +1104,12 @@ public class JDOQLParser extends AbstractParser
         BigInteger iLiteral;
         Boolean bLiteral;
 
+        // TODO Consider support for JDBC escape syntax for temporal literals, like in JPQLParser. Be careful with array syntax though
+
         boolean single_quote_next = lexer.nextIsSingleQuote();
         if ((sLiteral = lexer.parseStringLiteral()) != null)
         {
-            // Both String and Character are allowed to use single-quotes
-            // so we need to check if it was single-quoted and
-            // use CharacterLiteral if length is 1.
+            // Both String and Character are allowed to use single-quotes, so we need to check if it was single-quoted and use CharacterLiteral if length is 1.
             if (sLiteral.length() == 1 && single_quote_next)
             {
                 litValue = Character.valueOf(sLiteral.charAt(0));
