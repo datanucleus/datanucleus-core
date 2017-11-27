@@ -633,7 +633,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 throw new InvalidClassMetaDataException("044081", fullName, persistableSuperclass);
             }
 
-            if (persistableSuperclass.equals(fullName) || !(pcsc.isAssignableFrom(cls)))
+            if (persistableSuperclass.equals(fullName) ||  !clr.isAssignableFrom(pcsc.getName(), cls) )
             {
                 throw new InvalidClassMetaDataException("044082", fullName, persistableSuperclass);
             }
