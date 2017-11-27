@@ -405,17 +405,9 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
 
         try
         {
-            Class class_1 = null;
-            if (class_2.getClassLoader() != null)
-            {
-                // Use class_2's loader if possible
-                class_1 = class_2.getClassLoader().loadClass(class_name_1);
-            }
-            else
-            {
-                // Use the boot class loader
-                class_1 = Class.forName(class_name_1);
-            }
+            // Use class_2's loader if possible
+            Class class_1 = classForName(class_name_1, class_2.getClassLoader());
+            
             return class_1.isAssignableFrom(class_2);
         }
         catch (Exception e)
@@ -445,17 +437,9 @@ public class ClassLoaderResolverImpl implements ClassLoaderResolver
 
         try
         {
-            Class class_2 = null;
-            if (class_1.getClassLoader() != null)
-            {
-                // Use class_1's loader if possible
-                class_2 = class_1.getClassLoader().loadClass(class_name_2);
-            }
-            else
-            {
-                // Use the boot class loader
-                class_2 = Class.forName(class_name_2);
-            }
+            // Use class_1's loader if possible
+            Class class_2 = classForName(class_name_2, class_1.getClassLoader());
+            
             return class_1.isAssignableFrom(class_2);
         }
         catch (Exception e)
