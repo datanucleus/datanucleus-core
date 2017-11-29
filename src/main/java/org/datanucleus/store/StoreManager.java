@@ -61,47 +61,94 @@ import org.datanucleus.store.valuegenerator.ValueGenerationManager;
  */
 public interface StoreManager
 {
+    /** Whether the store supports persistence of "application" identity. */
     public static final String OPTION_APPLICATION_ID = "ApplicationId";
+    /** Whether the store supports persistence of composite "application" identity. */
     public static final String OPTION_APPLICATION_COMPOSITE_ID = "ApplicationCompositeId";
+    /** Whether the store supports persistence of "datastore" identity. */
     public static final String OPTION_DATASTORE_ID = "DatastoreId";
+    /** Whether the store supports persistence of "non-durable" identity. */
     public static final String OPTION_NONDURABLE_ID = "NonDurableId";
 
-    public static final String OPTION_TRANSACTION_ACID = "Transaction.ACID";
-
+    /** Whether the store supports "ORM" concepts in general. */
     public static final String OPTION_ORM = "ORM";
+
+    /** Whether the store supports embedding PC objects (into the owning objects datastore representation). */
     public static final String OPTION_ORM_EMBEDDED_PC = "ORM.EmbeddedPC";
+    /** Whether the store supports embedding collections (into the owning objects datastore representation). */
     public static final String OPTION_ORM_EMBEDDED_COLLECTION = "ORM.EmbeddedCollection";
+    /** Whether the store supports embedding maps (into the owning objects datastore representation). */
     public static final String OPTION_ORM_EMBEDDED_MAP = "ORM.EmbeddedMap";
+    /** Whether the store supports embedding arrays (into the owning objects datastore representation). */
     public static final String OPTION_ORM_EMBEDDED_ARRAY = "ORM.EmbeddedArray";
-    public static final String OPTION_ORM_EMBEDDED_PC_NESTED = "ORM.EmbeddedPC.Nested"; // Whether the embedded object is storable nested like in JSON (default is flat embedding)
-    public static final String OPTION_ORM_EMBEDDED_COLLECTION_NESTED = "ORM.EmbeddedCollection.Nested"; // Whether the embedded element is storable nested like in JSON (default is in separate table)
-    public static final String OPTION_ORM_EMBEDDED_MAP_NESTED = "ORM.EmbeddedMap.Nested"; // Whether the embedded element is storable nested like in JSON (default is in separate table)
-    public static final String OPTION_ORM_EMBEDDED_ARRAY_NESTED = "ORM.EmbeddedArray.Nested"; // Whether the embedded key/value is storable nested like in JSON (default is in separate table)
+
+    /** Whether the embedded object is storable nested like in JSON (default is flat embedding). */
+    public static final String OPTION_ORM_EMBEDDED_PC_NESTED = "ORM.EmbeddedPC.Nested";
+
+    /** Whether the embedded element is storable nested like in JSON (default is in separate table). */
+    public static final String OPTION_ORM_EMBEDDED_COLLECTION_NESTED = "ORM.EmbeddedCollection.Nested";
+    /** Whether the embedded element is storable nested like in JSON (default is in separate table). */
+    public static final String OPTION_ORM_EMBEDDED_MAP_NESTED = "ORM.EmbeddedMap.Nested";
+    /** Whether the embedded key/value is storable nested like in JSON (default is in separate table). */
+    public static final String OPTION_ORM_EMBEDDED_ARRAY_NESTED = "ORM.EmbeddedArray.Nested";
+
+    /** Whether the store supports serialisation of a PC into a "column". */
     public static final String OPTION_ORM_SERIALISED_PC = "ORM.SerialisedPC";
+    /** Whether the store supports serialisation of a collection element into a "column". */
     public static final String OPTION_ORM_SERIALISED_COLLECTION_ELEMENT = "ORM.SerialisedCollectionElement";
+    /** Whether the store supports serialisation of a map key into a "column". */
     public static final String OPTION_ORM_SERIALISED_MAP_KEY = "ORM.SerialisedMapKey";
+    /** Whether the store supports serialisation of a map value into a "column". */
     public static final String OPTION_ORM_SERIALISED_MAP_VALUE = "ORM.SerialisedMapValue";
+    /** Whether the store supports serialisation of a array element into a "column". */
     public static final String OPTION_ORM_SERIALISED_ARRAY_ELEMENT = "ORM.SerialisedArrayElement";
+
+    /** Whether the store supports "secondary tables". */
     public static final String OPTION_ORM_SECONDARY_TABLE = "ORM.SecondaryTable";
+    /** Whether the store supports "foreign keys". */
     public static final String OPTION_ORM_FOREIGN_KEYS = "ORM.ForeignKeys";
+
+    /** Whether the store supports "complete table" inheritance. */
     public static final String OPTION_ORM_INHERITANCE_COMPLETE_TABLE = "ORM.Inheritance.CompleteTable";
+    /** Whether the store supports "single table" inheritance. */
     public static final String OPTION_ORM_INHERITANCE_SINGLE_TABLE = "ORM.Inheritance.SingleTable";
+    /** Whether the store supports "joined table" inheritance. */
     public static final String OPTION_ORM_INHERITANCE_JOINED_TABLE = "ORM.Inheritance.JoinedTable";
 
+    /** Whether the store supports ACID transactions. */
+    public static final String OPTION_TRANSACTION_ACID = "Transaction.ACID";
+
+    /** Whether the store supports "read-committed" transaction isolation. */
     public static final String OPTION_TXN_ISOLATION_READ_COMMITTED = "TransactionIsolationLevel.read-committed";
+    /** Whether the store supports "read-uncommitted" transaction isolation. */
     public static final String OPTION_TXN_ISOLATION_READ_UNCOMMITTED = "TransactionIsolationLevel.read-uncommitted";
+    /** Whether the store supports "repeatable-read" transaction isolation. */
     public static final String OPTION_TXN_ISOLATION_REPEATABLE_READ = "TransactionIsolationLevel.repeatable-read";
+    /** Whether the store supports "serializable" transaction isolation. */
     public static final String OPTION_TXN_ISOLATION_SERIALIZABLE = "TransactionIsolationLevel.serializable";
+
+    /** Whether the store supports cancellation of queries once started. */
     public static final String OPTION_QUERY_CANCEL = "Query.Cancel";
+    /** Whether the store supports JDOQL queries performing "bulk" INSERT of data. */
     public static final String OPTION_QUERY_JDOQL_BULK_INSERT = "Query.JDOQL.BulkInsert";
+    /** Whether the store supports JDOQL queries performing "bulk" UPDATE of data. */
     public static final String OPTION_QUERY_JDOQL_BULK_UPDATE = "Query.JDOQL.BulkUpdate";
+    /** Whether the store supports JDOQL queries performing "bulk" DELETE of data. */
     public static final String OPTION_QUERY_JDOQL_BULK_DELETE = "Query.JDOQL.BulkDelete";
+    /** Whether the store supports use of "bitwise" operations in JDOQL queries. */
     public static final String OPTION_QUERY_JDOQL_BITWISE_OPS = "Query.JDOQL.BitwiseOperations";
+    /** Whether the store supports JPQL queries performing "bulk" INSERT of data. */
     public static final String OPTION_QUERY_JPQL_BULK_INSERT = "Query.JPQL.BulkInsert";
+    /** Whether the store supports JPQL queries performing "bulk" UPDATE of data. */
     public static final String OPTION_QUERY_JPQL_BULK_UPDATE = "Query.JPQL.BulkUpdate";
+    /** Whether the store supports JPQL queries performing "bulk" DELETE of data. */
     public static final String OPTION_QUERY_JPQL_BULK_DELETE = "Query.JPQL.BulkDelete";
+
+    /** Whether the store supports specification of a timeout on datastore operations. */
     public static final String OPTION_DATASTORE_TIMEOUT = "Datastore.Timeout";
+    /** Whether the store will persist milliseconds when persisting a "time" type. */
     public static final String OPTION_DATASTORE_TIME_STORES_MILLISECS = "Datastore.Time.Millisecs";
+    /** Whether the store will persist nanoseconds when persisting a "time" type. */
     public static final String OPTION_DATASTORE_TIME_STORES_NANOSECS = "Datastore.Time.Nanosecs";
 
     public static final String RELATION_IDENTITY_STORAGE_PERSISTABLE_IDENTITY = "PersistableIdentity";
