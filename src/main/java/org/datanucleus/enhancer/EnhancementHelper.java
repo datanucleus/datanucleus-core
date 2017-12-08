@@ -39,7 +39,9 @@ import org.datanucleus.exceptions.NucleusUserException;
  * <P>
  * It allows construction of instances of persistable classes without using reflection.
  * <P>
- * Persistable classes register themselves via a static method at class load time. There is no security restriction on this access. 
+ * Persistable classes register themselves via a static method at class load time. There is no security restriction on this access.
+ * 
+ * TODO Provide a mechanism to automatically deregister classes when their class loader exits? or register against the NucleusContext?
  */
 public class EnhancementHelper extends java.lang.Object
 {
@@ -184,6 +186,28 @@ public class EnhancementHelper extends java.lang.Object
                     {
                         crl.registerClass(pcClass);
                     }
+                }
+            }
+        }
+    }
+
+    /**
+     * Unregister all classes for the specified class loader.
+     * @param cl ClassLoader
+     */
+    public void unregisterClasses (ClassLoader cl)
+    {
+        synchronized(registeredClasses) 
+        {
+            for (Iterator i = registeredClasses.keySet().iterator(); i.hasNext();)
+            {
+                Class pcClass = (Class)i.next();
+                // Note, the pc class was registered by calling the static method EnhancementHelper.registerClass. 
+                // This means the EnhancementHelper class loader is the same as or an ancestor of the class loader of the pc class.
+                if ((pcClass != null) && (pcClass.getClassLoader() == cl)) 
+                {
+                    // unregister pc class, if its class loader is the specified one.
+                    i.remove();
                 }
             }
         }
