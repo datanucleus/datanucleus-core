@@ -131,8 +131,8 @@ public class ClassUtils
     }
 
     /**
-     * Convenience method to return the constructor of the passed class that accepts the supplied
-     * argument types. Allows for primitive to primitive wrapper conversion. Typically used by the JDOQL ResultClass mapping process.
+     * Convenience method to return the constructor of the passed class that accepts the supplied argument types. 
+     * Allows for primitive to primitive wrapper conversion. Typically used by the JDOQL/JPQL ResultClass mapping process.
      * @param cls The class
      * @param argTypes The constructor argument types. If we know we need a parameter yet don't know the type then this will have a null for that argument type.
      * @return The constructor
@@ -164,8 +164,76 @@ public class ClassUtils
                                 ctrIsValid = false;
                                 break;
                             }
-                            else if (argTypes[j] != null && !ctrParams[j].isAssignableFrom( argTypes[j] ) &&
-                                (primType == null || ctrParams[j] != primType))
+                            else if (argTypes[j] != null && !ctrParams[j].isAssignableFrom(argTypes[j]) && (primType == null || ctrParams[j] != primType))
+                            {
+                                // Different type in this parameter position
+                                ctrIsValid = false;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ctrIsValid = false;
+                    }
+
+                    if (ctrIsValid)
+                    {
+                        return constructors[i];
+                    }
+                }
+            }
+        }
+        catch (SecurityException se)
+        {
+            // Can't access the constructors
+        }
+
+        return null;
+    }
+
+    /**
+     * Convenience method to return the constructor of the passed class that accepts the supplied argument types. 
+     * Allows for primitive to primitive wrapper conversion. Typically used by the JDOQL/JPQL ResultClass mapping process.
+     * @param cls The class
+     * @param argTypes The constructor argument types. If we know we need a parameter yet don't know the type then this will have a null for that argument type.
+     * @param argTypeCheck Whether to check the type of the different arguments. Useful where we don't know the result type of an argument until processing results
+     * @return The constructor
+     */
+    public static Constructor getConstructorWithArguments(Class cls, Class[] argTypes, boolean[] argTypeCheck)
+    {
+        try
+        {
+            Constructor[] constructors = cls.getConstructors();
+            if (constructors != null)
+            {
+                // Check the types of the constructor and find one that matches allowing for
+                // primitive to wrapper conversion
+                for (int i=0;i<constructors.length;i++)
+                {
+                    Class[] ctrParams = constructors[i].getParameterTypes();
+                    boolean ctrIsValid = true;
+
+                    // Discard any constructor with a different number of params
+                    if (ctrParams != null && ctrParams.length == argTypes.length)
+                    {
+                        for (int j=0;j<ctrParams.length;j++)
+                        {
+                            if (!argTypeCheck[j])
+                            {
+                                // This argument doesn't need precise type checking
+                                break;
+                            }
+
+                            // Compare the type with the object or any primitive
+                            Class primType = ClassUtils.getPrimitiveTypeForType(argTypes[j]);
+                            if (argTypes[j] == null && ctrParams[j].isPrimitive())
+                            {
+                                // Null type for field so has to accept nulls, and primitives don't do that
+                                ctrIsValid = false;
+                                break;
+                            }
+                            else if (argTypes[j] != null && !ctrParams[j].isAssignableFrom(argTypes[j]) && (primType == null || ctrParams[j] != primType))
                             {
                                 // Different type in this parameter position
                                 ctrIsValid = false;
