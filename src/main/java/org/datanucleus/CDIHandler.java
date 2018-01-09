@@ -28,9 +28,13 @@ import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionTarget;
 
+import org.datanucleus.exceptions.NucleusUserException;
+
 /**
  * Handles the integration of "javax.enterprise.inject" CDI API.
  * Note that this is the only class referring to CDI classes so that it is usable in environments without CDI present.
+ * 
+ * TODO Make this thread-safe
  */
 public class CDIHandler
 {
@@ -43,8 +47,11 @@ public class CDIHandler
 
     public CDIHandler(Object beanMgr)
     {
+        if (!(beanMgr instanceof BeanManager))
+        {
+            throw new NucleusUserException("Attempt to create CDI handler using BeanManager of type " + beanMgr.getClass().getName() + " : unsupported!");
+        }
         this.beanManager = (BeanManager) beanMgr;
-
     }
 
     /**
