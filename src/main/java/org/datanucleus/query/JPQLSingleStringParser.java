@@ -109,9 +109,9 @@ public class JPQLSingleStringParser
     }
 
     /**
-     * Compiler to process keywords contents. In the query the keywords often have
-     * content values following them that represent the constituent parts of the query. This takes the keyword
-     * and sets the constituent part accordingly.
+     * Compiler to process keywords contents. 
+     * In the query the keywords often have content values following them that represent the constituent parts of the query. 
+     * This takes the keyword and sets the constituent part accordingly.
      */
     private class Compiler
     {
@@ -294,27 +294,28 @@ public class JPQLSingleStringParser
             {
                 // Subquery (or subqueries) present so split them out and just apply the filter for this query
                 String substitutedContent = processContentWithSubqueries(content);
+
                 String contentUpper = substitutedContent.toUpperCase();
-                int setIndex = contentUpper.indexOf("SET");
+                int setIndex = contentUpper.indexOf(" SET ");
                 if (setIndex < 0)
                 {
-                    // UPDATE clause has no "SET ..." !
+                    // UPDATE clause has no " SET ..." !
                     throw new NucleusUserException(Localiser.msg("043011"));
                 }
-                query.setFrom(substitutedContent.substring(0, setIndex).trim());
-                query.setUpdate(substitutedContent.substring(setIndex+3).trim());
+                query.setFrom(substitutedContent.substring(0, setIndex+1).trim());
+                query.setUpdate(substitutedContent.substring(setIndex+4).trim());
             }
             else
             {
                 String contentUpper = content.toUpperCase();
-                int setIndex = contentUpper.indexOf("SET");
+                int setIndex = contentUpper.indexOf(" SET ");
                 if (setIndex < 0)
                 {
-                    // UPDATE clause has no "SET ..." !
+                    // UPDATE clause has no " SET ..." !
                     throw new NucleusUserException(Localiser.msg("043011"));
                 }
-                query.setFrom(content.substring(0, setIndex).trim());
-                query.setUpdate(content.substring(setIndex+3).trim());
+                query.setFrom(content.substring(0, setIndex+1).trim());
+                query.setUpdate(content.substring(setIndex+4).trim());
             }
         }
 
