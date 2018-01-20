@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.SortedMap;
+import java.util.function.BiConsumer;
 
 import org.datanucleus.FetchPlanState;
 import org.datanucleus.flush.MapPutOperation;
@@ -309,6 +310,12 @@ public class TreeMap<K, V> extends java.util.TreeMap<K, V> implements SCOMap<jav
     public K firstKey()
     {
         return delegate.firstKey();
+    }
+    
+    @Override
+    public void forEach(BiConsumer<? super K, ? super V> action)
+    {
+        delegate.forEach(action);
     }
 
     /**

@@ -24,8 +24,10 @@ package org.datanucleus.store.types.wrappers.backed;
 
 import java.io.ObjectStreamException;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Spliterator;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -509,6 +511,20 @@ public class Collection<E> extends org.datanucleus.store.types.wrappers.Collecti
 
         return c.size() == size() && containsAll(c);
     }
+    
+    /**
+     * Performs the given action for each element of the Iterable.
+     * @param action
+     */
+    @Override
+    public void forEach(Consumer action)
+    {
+        Objects.requireNonNull(action);
+        for (E t : this) { // uses iterator() implicitly
+            action.accept(t);
+        }
+    }
+
 
     /**
      * Hashcode operator.

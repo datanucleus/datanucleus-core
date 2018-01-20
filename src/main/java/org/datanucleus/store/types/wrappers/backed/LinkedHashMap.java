@@ -20,8 +20,11 @@ package org.datanucleus.store.types.wrappers.backed;
 
 import java.io.ObjectStreamException;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.BiConsumer;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.flush.MapClearOperation;
@@ -417,6 +420,23 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
         java.util.Map m = (java.util.Map)o;
 
         return entrySet().equals(m.entrySet());
+    }
+    
+    @Override
+    public void forEach(BiConsumer<? super K, ? super V> action) {
+        Objects.requireNonNull(action);
+        for (Map.Entry<K, V> entry : (java.util.Set<Map.Entry<K, V>>)entrySet()) {
+            K k;
+            V v;
+            try {
+                k = entry.getKey();
+                v = entry.getValue();
+            } catch(IllegalStateException ise) {
+                // this usually means the entry is no longer in the map.
+                throw new ConcurrentModificationException(ise);
+            }
+            action.accept(k, v);
+        }
     }
 
     /**

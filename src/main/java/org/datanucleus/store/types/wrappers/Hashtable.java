@@ -20,6 +20,7 @@ package org.datanucleus.store.types.wrappers;
 import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.function.BiConsumer;
 
 import org.datanucleus.FetchPlanState;
 import org.datanucleus.flush.MapPutOperation;
@@ -270,6 +271,12 @@ public class Hashtable<K, V> extends java.util.Hashtable<K, V> implements SCOMap
     public synchronized boolean equals(Object o)
     {
         return delegate.equals(o);
+    }
+    
+    @Override
+    public synchronized void forEach(BiConsumer<? super K, ? super V> action)
+    {
+        delegate.forEach(action);
     }
 
     /**

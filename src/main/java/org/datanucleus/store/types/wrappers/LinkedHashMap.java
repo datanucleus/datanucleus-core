@@ -20,6 +20,7 @@ package org.datanucleus.store.types.wrappers;
 import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.function.BiConsumer;
 
 import org.datanucleus.FetchPlanState;
 import org.datanucleus.flush.MapPutOperation;
@@ -261,6 +262,12 @@ public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V> implement
     public java.util.Set entrySet()
     {
         return delegate.entrySet();
+    }
+    
+    @Override
+    public void forEach(BiConsumer<? super K, ? super V> action)
+    {
+        delegate.forEach(action);
     }
 
     /**

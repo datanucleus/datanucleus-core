@@ -22,7 +22,9 @@ import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Spliterator;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -417,6 +419,19 @@ public class SortedSet<E> extends org.datanucleus.store.types.wrappers.SortedSet
         java.util.Set s = (java.util.Set)o;
 
         return s.size() == size() && containsAll(s);
+    }
+    
+    /**
+     * Performs the given action for each element of the Iterable.
+     * @param action
+     */
+    @Override
+    public void forEach(Consumer action)
+    {
+        Objects.requireNonNull(action);
+        for (E t : this) { // uses iterator() implicitly
+            action.accept(t);
+        }
     }
 
     /**

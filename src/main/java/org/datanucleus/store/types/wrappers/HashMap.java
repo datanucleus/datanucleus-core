@@ -23,6 +23,7 @@ package org.datanucleus.store.types.wrappers;
 import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.function.BiConsumer;
 
 import org.datanucleus.FetchPlanState;
 import org.datanucleus.flush.MapPutOperation;
@@ -270,6 +271,12 @@ public class HashMap<K, V> extends java.util.HashMap<K, V> implements SCOMap<jav
         return delegate.equals(o);
     }
 
+    @Override
+    public void forEach(BiConsumer<? super K, ? super V> action)
+    {
+        delegate.forEach(action);
+    }
+    
     /**
      * Accessor for the value stored against a key.
      * @param key The key

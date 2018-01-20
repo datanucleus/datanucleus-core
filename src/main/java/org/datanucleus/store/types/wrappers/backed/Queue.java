@@ -21,7 +21,9 @@ import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Spliterator;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -397,6 +399,19 @@ public class Queue<E> extends org.datanucleus.store.types.wrappers.Queue<E> impl
         java.util.Queue c = (java.util.Queue)o;
 
         return c.size() == size() && containsAll(c);
+    }
+    
+    /**
+     * Performs the given action for each element of the Iterable.
+     * @param action
+     */
+    @Override
+    public void forEach(Consumer action)
+    {
+        Objects.requireNonNull(action);
+        for (E t : this) { // uses iterator() implicitly
+            action.accept(t);
+        }
     }
 
     /**
