@@ -21,6 +21,8 @@ import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -399,6 +401,19 @@ public class PriorityQueue<E> extends org.datanucleus.store.types.wrappers.Prior
         java.util.PriorityQueue c = (java.util.PriorityQueue)o;
 
         return c.size() == size() && containsAll(c);
+    }
+    
+    /**
+     * Performs the given action for each element of the Iterable.
+     * @param action
+     */
+    @Override
+    public void forEach(Consumer action)
+    {
+        Objects.requireNonNull(action);
+        for (E t : this) { // uses iterator() implicitly
+            action.accept(t);
+        }
     }
 
     public int hashCode()

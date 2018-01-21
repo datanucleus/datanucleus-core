@@ -21,9 +21,12 @@ package org.datanucleus.store.types.wrappers.backed;
 import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.SortedMap;
+import java.util.function.BiConsumer;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -457,6 +460,23 @@ public class TreeMap<K, V> extends org.datanucleus.store.types.wrappers.TreeMap<
         }
 
         return delegate.firstKey();
+    }
+    
+    @Override
+    public void forEach(BiConsumer<? super K, ? super V> action) {
+        Objects.requireNonNull(action);
+        for (Map.Entry<K, V> entry : (java.util.Set<Map.Entry<K, V>>)entrySet()) {
+            K k;
+            V v;
+            try {
+                k = entry.getKey();
+                v = entry.getValue();
+            } catch(IllegalStateException ise) {
+                // this usually means the entry is no longer in the map.
+                throw new ConcurrentModificationException(ise);
+            }
+            action.accept(k, v);
+        }
     }
 
     /**

@@ -23,7 +23,9 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Objects;
 import java.util.Spliterator;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -444,6 +446,19 @@ public class Vector<E> extends org.datanucleus.store.types.wrappers.Vector<E> im
     public synchronized E firstElement()
     {
         return get(0);
+    }
+    
+    /**
+     * Performs the given action for each element of the Iterable.
+     * @param action
+     */
+    @Override
+    public synchronized void forEach(Consumer action)
+    {
+        Objects.requireNonNull(action);
+        for (E t : this) { // uses iterator() implicitly
+            action.accept(t);
+        }
     }
 
     /**

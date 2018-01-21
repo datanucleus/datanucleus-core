@@ -22,8 +22,10 @@ import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.Spliterator;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -438,6 +440,19 @@ public class TreeSet<E> extends org.datanucleus.store.types.wrappers.TreeSet<E> 
         }
 
         return delegate.first();
+    }
+    
+    /**
+     * Performs the given action for each element of the Iterable.
+     * @param action
+     */
+    @Override
+    public void forEach(Consumer action)
+    {
+        Objects.requireNonNull(action);
+        for (E t : this) { // uses iterator() implicitly
+            action.accept(t);
+        }
     }
 
     public int hashCode()
