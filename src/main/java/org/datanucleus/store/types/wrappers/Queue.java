@@ -21,6 +21,7 @@ import java.io.ObjectStreamException;
 import java.util.AbstractQueue;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.datanucleus.FetchPlanState;
@@ -579,6 +580,15 @@ public class Queue<E> extends AbstractQueue<E> implements SCOCollection<java.uti
     protected Object writeReplace() throws ObjectStreamException
     {
         return new java.util.PriorityQueue(delegate);
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Iterable#forEach(java.util.function.Consumer)
+     */
+    @Override
+    public void forEach(Consumer<? super E> action)
+    {
+        delegate.forEach(action);
     }
 
     /* (non-Javadoc)

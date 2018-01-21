@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.datanucleus.FetchPlanState;
@@ -687,6 +688,15 @@ public class SortedSet<E> extends java.util.AbstractSet<E> implements java.util.
     protected Object writeReplace() throws ObjectStreamException
     {
         return new java.util.TreeSet(delegate);
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Iterable#forEach(java.util.function.Consumer)
+     */
+    @Override
+    public void forEach(Consumer<? super E> action)
+    {
+        delegate.forEach(action);
     }
 
     /* (non-Javadoc)

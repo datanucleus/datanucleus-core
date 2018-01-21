@@ -894,7 +894,7 @@ public class Stack<E> extends java.util.Stack<E> implements SCOList<java.util.St
     }
 
     /* (non-Javadoc)
-     * @see java.util.ArrayList#forEach(java.util.function.Consumer)
+     * @see java.lang.Iterable#forEach(java.util.function.Consumer)
      */
     @Override
     public synchronized void forEach(Consumer action)

@@ -919,10 +919,10 @@ public class Vector<E> extends java.util.Vector<E> implements SCOList<java.util.
     }
 
     /* (non-Javadoc)
-     * @see java.util.ArrayList#forEach(java.util.function.Consumer)
+     * @see java.lang.Iterable#forEach(java.util.function.Consumer)
      */
     @Override
-    public synchronized void forEach(Consumer action)
+    public synchronized void forEach(Consumer<? super E> action)
     {
         delegate.forEach(action);
     }

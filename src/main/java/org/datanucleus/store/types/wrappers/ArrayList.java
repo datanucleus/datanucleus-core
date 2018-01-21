@@ -808,7 +808,7 @@ public class ArrayList<E> extends java.util.ArrayList<E> implements SCOList<java
     }
 
     /* (non-Javadoc)
-     * @see java.util.ArrayList#forEach(java.util.function.Consumer)
+     * @see java.lang.Iterable#forEach(java.util.function.Consumer)
      */
     @Override
     public void forEach(Consumer action)

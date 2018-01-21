@@ -463,22 +463,27 @@ public class SortedMap<K, V> extends org.datanucleus.store.types.wrappers.Sorted
     }
 
     @Override
-    public void forEach(BiConsumer<? super K, ? super V> action) {
+    public void forEach(BiConsumer<? super K, ? super V> action)
+    {
         Objects.requireNonNull(action);
-        for (Map.Entry<K, V> entry : (java.util.Set<Map.Entry<K, V>>)entrySet()) {
+        for (Map.Entry<K, V> entry : (java.util.Set<Map.Entry<K, V>>) entrySet())
+        {
             K k;
             V v;
-            try {
+            try
+            {
                 k = entry.getKey();
                 v = entry.getValue();
-            } catch(IllegalStateException ise) {
+            }
+            catch (IllegalStateException ise)
+            {
                 // this usually means the entry is no longer in the map.
                 throw new ConcurrentModificationException(ise);
             }
             action.accept(k, v);
         }
     }
-    
+
     /**
      * Accessor for the last key in the sorted map.
      * @return The last key

@@ -842,7 +842,7 @@ public class LinkedList<E> extends java.util.LinkedList<E> implements SCOList<ja
     }
 
     /* (non-Javadoc)
-     * @see java.util.ArrayList#forEach(java.util.function.Consumer)
+     * @see java.lang.Iterable#forEach(java.util.function.Consumer)
      */
     @Override
     public void forEach(Consumer action)

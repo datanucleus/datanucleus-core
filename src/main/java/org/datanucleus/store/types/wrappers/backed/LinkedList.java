@@ -402,16 +402,13 @@ public class LinkedList<E> extends org.datanucleus.store.types.wrappers.LinkedLi
         }
         return true;
     }
-    
-    /**
-     * Performs the given action for each element of the Iterable.
-     * @param action
-     */
+
     @Override
     public void forEach(Consumer action)
     {
         Objects.requireNonNull(action);
-        for (E t : this) { // uses iterator() implicitly
+        for (E t : this)
+        { // uses iterator() implicitly
             action.accept(t);
         }
     }

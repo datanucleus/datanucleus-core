@@ -407,20 +407,17 @@ public class List<E> extends org.datanucleus.store.types.wrappers.List<E> implem
         // test for equal order of contained items
         return super.equals(o);
     }
-    
-    /**
-     * Performs the given action for each element of the Iterable.
-     * @param action
-     */
+
     @Override
     public void forEach(Consumer action)
     {
         Objects.requireNonNull(action);
-        for (E t : this) { // uses iterator() implicitly
+        for (E t : this)
+        { // uses iterator() implicitly
             action.accept(t);
         }
     }
-    
+
     /**
      * Method to retrieve an element no.
      * @param index The item to retrieve

@@ -391,16 +391,13 @@ public class Stack<E> extends org.datanucleus.store.types.wrappers.Stack<E> impl
         }
         return true;
     }
-    
-    /**
-     * Performs the given action for each element of the Iterable.
-     * @param action
-     */
+
     @Override
     public synchronized void forEach(Consumer action)
     {
         Objects.requireNonNull(action);
-        for (E t : this) { // uses iterator() implicitly
+        for (E t : this)
+        { // uses iterator() implicitly
             action.accept(t);
         }
     }
