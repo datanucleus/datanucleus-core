@@ -32,7 +32,6 @@ import org.datanucleus.NucleusContextHelper;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
-import org.omg.CORBA.SystemException;
 
 /**
  * Transaction allowing resources to be enlisted, with branches and phased commit, following the style of an Open/XA transaction.
@@ -96,7 +95,7 @@ public class ResourcedTransaction
         }
     }
 
-    public int getStatus() throws SystemException
+    public int getStatus()
     {
         return status;
     }
@@ -141,8 +140,7 @@ public class ResourcedTransaction
         return false;
     }
 
-    public boolean enlistResource(XAResource xaRes) 
-    throws RollbackException, IllegalStateException, SystemException
+    public boolean enlistResource(XAResource xaRes)
     {
         if (xaRes == null)
         {
@@ -225,8 +223,7 @@ public class ResourcedTransaction
         return true;
     }
 
-    public boolean delistResource(XAResource xaRes, int flag) 
-    throws IllegalStateException, SystemException
+    public boolean delistResource(XAResource xaRes, int flag)
     {
         if (xaRes == null)
         {
@@ -275,7 +272,6 @@ public class ResourcedTransaction
     }
 
     public void registerSynchronization(Synchronization sync)
-    throws RollbackException, IllegalStateException, SystemException
     {
         if (sync == null)
         {
@@ -297,7 +293,6 @@ public class ResourcedTransaction
     }
 
     public void commit()
-    throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException
     {
         if (completing)
         {
@@ -508,8 +503,7 @@ public class ResourcedTransaction
         }
     }
 
-    public void rollback() 
-    throws IllegalStateException, SystemException
+    public void rollback()
     {
         if (completing)
         {
@@ -571,7 +565,6 @@ public class ResourcedTransaction
     }
 
     public void setRollbackOnly()
-    throws IllegalStateException, SystemException
     {
         status = STATUS_MARKED_ROLLBACK;
     }
