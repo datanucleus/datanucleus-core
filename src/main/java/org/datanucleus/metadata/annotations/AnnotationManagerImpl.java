@@ -247,18 +247,15 @@ public class AnnotationManagerImpl implements AnnotationManager
         if (handler == null)
         {
             // Built-in handlers for common annotations
-            if (metadataMgr.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_JAVAX_VALIDATION_SHORTCUTS))
+            if (annotationName.equals("javax.validation.constraints.NotNull"))
             {
-                if (annotationName.equals("javax.validation.constraints.NotNull"))
-                {
-                    handler = new ValidationNotNullAnnotationHandler();
-                    memberAnnotationHandlers.put(annotationName, handler);
-                }
-                else if (annotationName.equals("javax.validation.constraints.Size"))
-                {
-                    handler = new ValidationSizeAnnotationHandler();
-                    memberAnnotationHandlers.put(annotationName, handler);
-                }
+                handler = new ValidationNotNullAnnotationHandler();
+                memberAnnotationHandlers.put(annotationName, handler);
+            }
+            else if (annotationName.equals("javax.validation.constraints.Size"))
+            {
+                handler = new ValidationSizeAnnotationHandler();
+                memberAnnotationHandlers.put(annotationName, handler);
             }
             else
             {
