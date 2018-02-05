@@ -151,6 +151,7 @@ public abstract class AbstractNucleusContext implements NucleusContext
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_EMBEDDED_PC_FLAT, null, true, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_USE_DISCRIMINATOR_FOR_SINGLE_TABLE, null, false, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_USE_DISCRIMINATOR_DEFAULT_CLASS_NAME, null, true, false, false);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_METADATA_JAVAX_VALIDATION_SHORTCUTS, null, false, false, false);
     }
 
     public synchronized void initialise()

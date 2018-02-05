@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.PackageMetaData;
@@ -97,8 +98,12 @@ public class AnnotationManagerImpl implements AnnotationManager
         memberAnnotationHandlers = new HashMap<String, MemberAnnotationHandler>(elems != null ? elems.length : 5);
 
         // a). Built-in type support
-        memberAnnotationHandlerAnnotations.add("javax.validation.constraints.NotNull");
-        memberAnnotationHandlerAnnotations.add("javax.validation.constraints.Size");
+        boolean supportJavaxValidationShortcuts = metadataMgr.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_JAVAX_VALIDATION_SHORTCUTS);
+        if (supportJavaxValidationShortcuts)
+        {
+            memberAnnotationHandlerAnnotations.add("javax.validation.constraints.NotNull");
+            memberAnnotationHandlerAnnotations.add("javax.validation.constraints.Size");
+        }
 
         // b). Plugin provided support
         elems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.member_annotation_handler", null, null);
@@ -242,15 +247,18 @@ public class AnnotationManagerImpl implements AnnotationManager
         if (handler == null)
         {
             // Built-in handlers for common annotations
-            if (annotationName.equals("javax.validation.constraints.NotNull"))
+            if (metadataMgr.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_JAVAX_VALIDATION_SHORTCUTS))
             {
-                handler = new ValidationNotNullAnnotationHandler();
-                memberAnnotationHandlers.put(annotationName, handler);
-            }
-            else if (annotationName.equals("javax.validation.constraints.Size"))
-            {
-                handler = new ValidationSizeAnnotationHandler();
-                memberAnnotationHandlers.put(annotationName, handler);
+                if (annotationName.equals("javax.validation.constraints.NotNull"))
+                {
+                    handler = new ValidationNotNullAnnotationHandler();
+                    memberAnnotationHandlers.put(annotationName, handler);
+                }
+                else if (annotationName.equals("javax.validation.constraints.Size"))
+                {
+                    handler = new ValidationSizeAnnotationHandler();
+                    memberAnnotationHandlers.put(annotationName, handler);
+                }
             }
             else
             {

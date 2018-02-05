@@ -37,6 +37,7 @@ public class ValidationSizeAnnotationHandler implements MemberAnnotationHandler
         Map<String, Object> annotationValues = annotation.getNameValueMap();
         int max = (Integer)annotationValues.get("max");
         ColumnMetaData[] colmds = mmd.getColumnMetaData();
+        // TODO This should only be processed when the member is STRING. Currently dont have access to that info
         if (colmds == null || colmds.length == 0)
         {
             ColumnMetaData colmd = new ColumnMetaData();
