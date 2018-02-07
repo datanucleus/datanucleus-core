@@ -512,8 +512,7 @@ public class ExpressionCompiler
 
             if (currentExpr != null && !tupple.isEmpty())
             {
-                // We have a trailing identifier expression 
-                // e.g "((B)a).c" where we have a CastExpression and trailing "c"
+                // We have a trailing identifier expression e.g "((B)a).c" where we have a CastExpression and trailing "c"
                 currentExpr = new PrimaryExpression(currentExpr, tupple);
             }
 
@@ -524,6 +523,7 @@ public class ExpressionCompiler
                 Symbol firstSym = symtbl.getSymbol(first);
                 if (firstSym != null)
                 {
+                    // TODO If the user has a field in the candidate the same name as a parameter and they just put the name (rather than "this.{name}") then it interprets as parameter
                     if (firstSym.getType() == Symbol.PARAMETER)
                     {
                         ParameterExpression paramExpr = new ParameterExpression(first, -1);
