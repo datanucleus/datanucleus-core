@@ -48,7 +48,7 @@ public class InvokeExpression extends Expression
      * @param methodName Name of the method
      * @param args Arguments passed in to the method/function call
      */
-    public InvokeExpression(Expression invoked, String methodName, List args)
+    public InvokeExpression(Expression invoked, String methodName, List<Expression> args)
     {
         this.left = invoked;
         this.methodName = methodName;
