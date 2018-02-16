@@ -90,8 +90,9 @@ public class MetaDataParser extends DefaultHandler
         this.entityResolver = new MetaDataEntityResolver(pluginMgr);
         this.parser = createSAXParser();
     }
-    
-    private SAXParser createSAXParser() {
+
+    private SAXParser createSAXParser()
+    {
         // Create a SAXParser (use JDK parser for now)
         SAXParserFactory factory = SAXParserFactory.newInstance();
         factory.setValidating(validate);
