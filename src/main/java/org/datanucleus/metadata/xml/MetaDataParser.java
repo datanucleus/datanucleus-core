@@ -17,6 +17,7 @@ Contributors:
 2004 Andy Jefferson - updated resolve entity to use Ralf Ullrich suggestion
 2004 Marco Schulze (NightLabs.de) - added safety checks for missing local dtd files
 2004 Marco Schulze (NightLabs.de) - added special handling of SAXException
+2018 Jasper Siepkes - ensure SAXParser instances aren't accessed concurrently
     ...
 **********************************************************************/
 package org.datanucleus.metadata.xml;
@@ -70,8 +71,8 @@ public class MetaDataParser extends DefaultHandler
     /** Whether to support namespaces. */
     protected final boolean namespaceAware;
 
-    /** SAXParser being used. */
-    protected SAXParser parser = null;
+    /** SAXParser being used. SAXParser instances are NOT thread-safe. Obtain a lock on this instance when using it. */
+    private final SAXParser parser;
 
     /**
      * Constructor.
@@ -87,6 +88,61 @@ public class MetaDataParser extends DefaultHandler
         this.validate = validate;
         this.namespaceAware = namespaceAware;
         this.entityResolver = new MetaDataEntityResolver(pluginMgr);
+        this.parser = createSAXParser();
+    }
+    
+    private SAXParser createSAXParser() {
+        // Create a SAXParser (use JDK parser for now)
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        factory.setValidating(validate);
+        factory.setNamespaceAware(namespaceAware);
+
+        if (validate)
+        {
+            try
+            {
+                Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(entityResolver.getRegisteredSchemas());
+                if (schema != null)
+                {
+                    try
+                    {
+                        factory.setSchema(schema);
+                    }
+                    catch (UnsupportedOperationException e)
+                    {
+                        // may happen in conflict of JDK 1.5 and older xml libraries (xerces)
+                        NucleusLogger.METADATA.info(e.getMessage());
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                // Cannot validate since no SchemaFactory could be loaded?
+                NucleusLogger.METADATA.info(e.getMessage());
+            }
+
+            // Xerces (if in CLASSPATH) needs this for validation (of XSD)
+            try
+            {
+                factory.setFeature("http://apache.org/xml/features/validation/schema", true);
+            }
+            catch (Exception e)
+            {
+                NucleusLogger.METADATA.info(e.getMessage());
+            }
+        }
+
+        SAXParser saxParser = null;
+        try
+        {
+            saxParser = factory.newSAXParser();
+        }
+        catch (Exception e)
+        {
+            NucleusLogger.METADATA.warn(e.getMessage());
+        }
+        
+        return saxParser;
     }
 
     /**
@@ -194,87 +250,47 @@ public class MetaDataParser extends DefaultHandler
         }
         try
         {
-            if (parser == null)
+            synchronized (parser) 
             {
-                // Create a SAXParser (use JDK parser for now)
-                SAXParserFactory factory = SAXParserFactory.newInstance();
-                factory.setValidating(validate);
-                factory.setNamespaceAware(namespaceAware);
-                if (validate)
+                // Generate the required handler to process this metadata
+                DefaultHandler handler = null;
+                try 
                 {
-                    try
+                    parser.getXMLReader().setEntityResolver(entityResolver);
+
+                    if ("persistence".equalsIgnoreCase(handlerName)) 
                     {
-                        Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(entityResolver.getRegisteredSchemas());
-                        if (schema != null)
+                        // "persistence.xml"
+                        handler = new org.datanucleus.metadata.xml.PersistenceFileMetaDataHandler(mgr, filename, entityResolver);
+                    } 
+                    else 
+                    {                        
+                        // Fallback to the plugin mechanism for other MetaData handlers
+                        Class[] argTypes = new Class[]{ClassConstants.METADATA_MANAGER, ClassConstants.JAVA_LANG_STRING, EntityResolver.class};
+                        Object[] argValues = new Object[]{mgr, filename, entityResolver};
+                        handler = (DefaultHandler) pluginMgr.createExecutableExtension("org.datanucleus.metadata_handler", "name", handlerName, "class-name", argTypes, argValues);
+                        if (handler == null) 
                         {
-                            try
-                            {
-                                factory.setSchema(schema);
-                            }
-                            catch (UnsupportedOperationException e)
-                            {
-                                // may happen in conflict of JDK 1.5 and older xml libraries (xerces)
-                                NucleusLogger.METADATA.info(e.getMessage());
-                            }
+                            // Plugin of this name not found
+                            throw new NucleusUserException(Localiser.msg("044028", handlerName)).setFatal();
                         }
                     }
-                    catch (Exception e)
-                    {
-                        // Cannot validate since no SchemaFactory could be loaded?
-                        NucleusLogger.METADATA.info(e.getMessage());
-                    }
-
-                    // Xerces (if in CLASSPATH) needs this for validation (of XSD)
-                    try
-                    {
-                        factory.setFeature("http://apache.org/xml/features/validation/schema", true);
-                    }
-                    catch (Exception e)
-                    {
-                        NucleusLogger.METADATA.info(e.getMessage());
-                    }
-                }
-                parser = factory.newSAXParser();
-            }
-
-            // Generate the required handler to process this metadata
-            DefaultHandler handler = null;
-            try
-            {
-                parser.getXMLReader().setEntityResolver(entityResolver);
-
-                if ("persistence".equalsIgnoreCase(handlerName))
+                } 
+                catch (Exception e) 
                 {
-                    // "persistence.xml"
-                    handler = new org.datanucleus.metadata.xml.PersistenceFileMetaDataHandler(mgr, filename, entityResolver);
+                    String msg = Localiser.msg("044029", handlerName, e.getMessage());
+                    throw new NucleusException(msg, e);
                 }
-                else
-                {
-                    // Fallback to the plugin mechanism for other MetaData handlers
-                    Class[] argTypes = new Class[] {ClassConstants.METADATA_MANAGER, ClassConstants.JAVA_LANG_STRING, EntityResolver.class};
-                    Object[] argValues = new Object[] {mgr, filename, entityResolver};
-                    handler = (DefaultHandler)pluginMgr.createExecutableExtension("org.datanucleus.metadata_handler", "name", handlerName, "class-name", argTypes, argValues);
-                    if (handler == null)
-                    {
-                        // Plugin of this name not found
-                        throw new NucleusUserException(Localiser.msg("044028", handlerName)).setFatal();
-                    }
-                }
+
+                // Set whether to validate
+                ((AbstractMetaDataHandler) handler).setValidate(validate);
+
+                // Parse the metadata
+                parser.parse(in, handler);
+
+                // Return the FileMetaData that has been parsed
+                return ((AbstractMetaDataHandler) handler).getMetaData();
             }
-            catch (Exception e)
-            {
-                String msg = Localiser.msg("044029", handlerName, e.getMessage());
-                throw new NucleusException(msg, e);
-            }
-
-            // Set whether to validate
-            ((AbstractMetaDataHandler)handler).setValidate(validate);
-
-            // Parse the metadata
-            parser.parse(in, handler);
-
-            // Return the FileMetaData that has been parsed
-            return ((AbstractMetaDataHandler)handler).getMetaData();
         }
         catch (NucleusException e)
         {
