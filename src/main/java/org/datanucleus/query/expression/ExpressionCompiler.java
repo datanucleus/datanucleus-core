@@ -806,7 +806,7 @@ public class ExpressionCompiler
             List<Node> children = node.getChildNodes();
             if ((children.size()%2) == 0)
             {
-                throw new QueryCompilerSyntaxException("Invalid number of children for CASE node (should be odd) : " + node);
+                throw new QueryCompilerSyntaxException("Invalid number of children for CASE node (should be odd). Have you omitted the ELSE clause? : " + node);
             }
 
             Node elseNode = children.get(children.size()-1);
