@@ -1502,12 +1502,22 @@ public class JPQLParser extends AbstractParser
      */
     protected boolean processEntry()
     {
-        if (lexer.parseStringIgnoreCase("ENTRY"))
+        boolean foundEntry = false;
+        if (lexer.parseStringIgnoreCase("ENTRY "))
+        {
+            foundEntry = true;
+            lexer.skipWS();
+            lexer.parseChar('(');
+        }
+        else if (lexer.parseStringIgnoreCase("ENTRY("))
+        {
+            foundEntry = true;
+        }
+
+        if (foundEntry)
         {
             // ENTRY(identification_variable)
             // Convert to be {primary}.INVOKE(mapEntry)
-            lexer.skipWS();
-            lexer.parseChar('(');
             Node invokeNode = new Node(NodeType.INVOKE, "mapEntry");
             processExpression();
             if (!lexer.parseChar(')'))
@@ -1534,11 +1544,21 @@ public class JPQLParser extends AbstractParser
      */
     protected boolean processKey()
     {
-        if (lexer.parseStringIgnoreCase("KEY"))
+        boolean foundKey = false;
+        if (lexer.parseStringIgnoreCase("KEY "))
         {
-            // KEY(identification_variable)
+            foundKey = true;
             lexer.skipWS();
             lexer.parseChar('(');
+        }
+        else if (lexer.parseStringIgnoreCase("KEY("))
+        {
+            foundKey = true;
+        }
+
+        if (foundKey)
+        {
+            // KEY(identification_variable)
             processExpression();
             if (!lexer.parseChar(')'))
             {
@@ -1597,12 +1617,22 @@ public class JPQLParser extends AbstractParser
      */
     protected boolean processValue()
     {
-        if (lexer.parseStringIgnoreCase("VALUE"))
+        boolean foundValue = false;
+        if (lexer.parseStringIgnoreCase("VALUE "))
+        {
+            foundValue = true;
+            lexer.skipWS();
+            lexer.parseChar('(');
+        }
+        else if (lexer.parseStringIgnoreCase("VALUE("))
+        {
+            foundValue = true;
+        }
+
+        if (foundValue)
         {
             // VALUE(identification_variable)
             // Convert to be {primary}.INVOKE(mapValue)
-            lexer.skipWS();
-            lexer.parseChar('(');
             processExpression();
             if (!lexer.parseChar(')'))
             {
