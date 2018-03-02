@@ -98,8 +98,17 @@ public class JoinExpression extends Expression
      */
     public Symbol bind(SymbolTable symtbl)
     {
-        // TODO Implement this
-        return null;
+        if (onExpr != null)
+        {
+            onExpr.bind(symtbl);
+        }
+        if (right != null)
+        {
+            right.bind(symtbl);
+        }
+
+        symbol = symtbl.getSymbol(alias);
+        return symbol;
     }
 
     public String toString()

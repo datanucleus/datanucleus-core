@@ -71,6 +71,11 @@ public class ClassExpression extends Expression
      */
     public Symbol bind(SymbolTable symtbl)
     {
+        if (right != null)
+        {
+            right.bind(symtbl);
+        }
+
         symbol = symtbl.getSymbol(alias);
         return symbol;
     }
