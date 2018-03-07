@@ -404,7 +404,7 @@ public class ExpressionCompiler
             }
             Expression currentExpr = compileExpression(currentNode);
             String methodName = (String)invokeNode.getNodeValue();
-            List parameterExprs = getExpressionsForPropertiesOfNode(invokeNode);
+            List<Expression> parameterExprs = getExpressionsForPropertiesOfNode(invokeNode);
             Expression invokeExpr = new InvokeExpression(currentExpr, methodName, parameterExprs);
             return invokeExpr;
         }
@@ -465,7 +465,7 @@ public class ExpressionCompiler
                             currentExpr = null;
                         }
                     }
-                    List parameterExprs = getExpressionsForPropertiesOfNode(currentNode);
+                    List<Expression> parameterExprs = getExpressionsForPropertiesOfNode(currentNode);
                     currentExpr = new InvokeExpression(currentExpr, methodName, parameterExprs);
 
                     currentNode = currentNode.getFirstChild();
@@ -585,7 +585,7 @@ public class ExpressionCompiler
                 if (childNode.getNodeType() == NodeType.INVOKE)
                 {
                     String methodName = (String)childNode.getNodeValue();
-                    List parameterExprs = getExpressionsForPropertiesOfNode(childNode);
+                    List<Expression> parameterExprs = getExpressionsForPropertiesOfNode(childNode);
                     currentExpr = new InvokeExpression(currentExpr, methodName, parameterExprs);
                 }
                 else if (childNode.getNodeType() == NodeType.IDENTIFIER)
@@ -631,7 +631,7 @@ public class ExpressionCompiler
                 if (currentNode.getNodeType() == NodeType.INVOKE)
                 {
                     String methodName = (String)tupple.get(tupple.size()-1);
-                    List parameterExprs = getExpressionsForPropertiesOfNode(currentNode);
+                    List<Expression> parameterExprs = getExpressionsForPropertiesOfNode(currentNode);
                     currentExpr = new InvokeExpression(currentExpr, methodName, parameterExprs);
 
                     currentNode = currentNode.getFirstChild();
@@ -666,7 +666,7 @@ public class ExpressionCompiler
                 currentNode = currentNode.getFirstChild();
             }
 
-            List parameterExprs = null;
+            List<Expression> parameterExprs = null;
             if (method)
             {
                 parameterExprs = getExpressionsForPropertiesOfNode(currentNode);
@@ -695,7 +695,7 @@ public class ExpressionCompiler
                     }
 
                     String methodName = (String)tupple.get(tupple.size()-1);
-                    List parameterExprs = getExpressionsForPropertiesOfNode(currentNode);
+                    List<Expression> parameterExprs = getExpressionsForPropertiesOfNode(currentNode);
                     currentExpr = new InvokeExpression(currentExpr, methodName, parameterExprs);
 
                     currentNode = currentNode.getFirstChild();
@@ -774,7 +774,7 @@ public class ExpressionCompiler
                     }
 
                     String methodName = (String)tupple.get(tupple.size()-1);
-                    List parameterExprs = getExpressionsForPropertiesOfNode(currentNode);
+                    List<Expression> parameterExprs = getExpressionsForPropertiesOfNode(currentNode);
                     currentExpr = new InvokeExpression(currentExpr, methodName, parameterExprs);
 
                     currentNode = currentNode.getFirstChild();

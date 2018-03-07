@@ -26,6 +26,7 @@ import org.datanucleus.exceptions.NucleusException;
 public class PrimaryExpressionIsInvokeException extends NucleusException
 {
     private static final long serialVersionUID = 7343816751966773821L;
+
     /** The InvokeExpression that the PrimaryExpression should be swapped with. */
     InvokeExpression invokeExpr;
 

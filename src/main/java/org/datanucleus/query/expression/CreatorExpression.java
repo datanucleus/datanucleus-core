@@ -36,12 +36,12 @@ public class CreatorExpression extends Expression
     private static final long serialVersionUID = -6455308731943969503L;
 
     /** Components of the class name being created e.g ["org", "datanucleus", "MyClass"]. */
-    List tuples;
+    List<String> tuples;
 
     /** Arguments for the creation call. */
     List<Expression> arguments;
 
-    public CreatorExpression(List tuples, List args)
+    public CreatorExpression(List<String> tuples, List<Expression> args)
     {
         this.tuples = tuples;
         this.arguments = args;
@@ -62,13 +62,13 @@ public class CreatorExpression extends Expression
     public String getId()
     {
         StringBuilder id = new StringBuilder();
-        for (int i = 0; i < tuples.size(); i++)
+        for (String tuple : tuples)
         {
             if (id.length() > 0)
             {
                 id.append('.');
             }
-            id.append((String) tuples.get(i));
+            id.append(tuple);
         }
         return id.toString();
     }
@@ -103,8 +103,7 @@ public class CreatorExpression extends Expression
             try
             {
                 // Try to find this as a complete class name (e.g as used in "instanceof")
-                String className = getId();
-                Class cls = symtbl.getSymbolResolver().resolveClass(className);
+                Class cls = symtbl.getSymbolResolver().resolveClass(getId());
                 symbol = new PropertySymbol(getId(), cls);
             }
             catch (ClassNotResolvedException cnre)
@@ -117,7 +116,6 @@ public class CreatorExpression extends Expression
 
     public String toString()
     {
-        return "CreatorExpression{" + getId() + "(" + StringUtils.collectionToString(arguments) + ")}" +
-            (alias != null ? " AS " + alias : "");
+        return "CreatorExpression{" + getId() + "(" + StringUtils.collectionToString(arguments) + ")}" + (alias != null ? " AS " + alias : "");
     }
 }

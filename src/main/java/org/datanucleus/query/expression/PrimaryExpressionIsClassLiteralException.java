@@ -26,6 +26,7 @@ import org.datanucleus.exceptions.NucleusException;
 public class PrimaryExpressionIsClassLiteralException extends NucleusException
 {
     private static final long serialVersionUID = 5464896171302876686L;
+
     /** The Literal that the PrimaryExpression should be swapped with. */
     Literal literal;
 

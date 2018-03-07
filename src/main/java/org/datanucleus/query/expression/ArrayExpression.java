@@ -39,10 +39,10 @@ public class ArrayExpression extends Expression
         this.elements = new ArrayList<Expression>();
         if (elements != null)
         {
-            for (int i=0;i<elements.length;i++)
+            for (Expression elem : elements)
             {
-                this.elements.add(elements[i]);
-                elements[i].parent = this;
+                this.elements.add(elem);
+                elem.parent = this;
             }
         }
     }
@@ -73,9 +73,8 @@ public class ArrayExpression extends Expression
      */
     public Symbol bind(SymbolTable symtbl)
     {
-        for (int i=0;i<elements.size();i++)
+        for (Expression expr : elements)
         {
-            Expression expr = elements.get(i);
             expr.bind(symtbl);
         }
         // ArrayExpression has no symbol as such since just a container
