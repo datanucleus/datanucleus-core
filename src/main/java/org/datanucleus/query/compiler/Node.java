@@ -37,8 +37,6 @@ public class Node
     /** Working variable used for iterating between child nodes. */
     private int cursorPos = -1;
 
-    protected Symbol symbol; // ??????
-
     /** Parent of this node. */
     protected Node parent;
 
@@ -189,16 +187,6 @@ public class Node
         return cursorPos+1<childNodes.size();
     }
 
-    public Symbol getSymbol()
-    {
-        return symbol;
-    }
-    
-    public void setSymbol(Symbol symbol)
-    {
-        this.symbol = symbol;
-    }
-    
     public void setParent(Node parent)
     {
         this.parent = parent;

@@ -242,8 +242,7 @@ public class JPQLParser extends AbstractParser
                 //    +--- Node(NAME, "g")
                 if (!lexer.parseChar('('))
                 {
-                    throw new QueryCompilerSyntaxException("Expected: '(' but got " + lexer.remaining(), 
-                        lexer.getIndex(), lexer.getInput());
+                    throw new QueryCompilerSyntaxException("Expected: '(' but got " + lexer.remaining(), lexer.getIndex(), lexer.getInput());
                 }
 
                 // Find what we are joining to
@@ -261,8 +260,7 @@ public class JPQLParser extends AbstractParser
 
                 if (!lexer.parseChar(')'))
                 {
-                    throw new QueryCompilerSyntaxException("Expected: ')' but got " + lexer.remaining(), 
-                        lexer.getIndex(), lexer.getInput());
+                    throw new QueryCompilerSyntaxException("Expected: ')' but got " + lexer.remaining(), lexer.getIndex(), lexer.getInput());
                 }
                 lexer.parseStringIgnoreCase("AS"); // Optional
                 String alias = lexer.parseIdentifier();

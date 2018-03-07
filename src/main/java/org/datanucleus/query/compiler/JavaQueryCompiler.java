@@ -219,10 +219,9 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                 cls = resolveClass(className);
             }
 
-            List children = node[i].getChildNodes();
-            for (int j=0;j<children.size();j++)
+            List<Node> children = node[i].getChildNodes();
+            for (Node child : children) 
             {
-                Node child = (Node)children.get(j);
                 if (child.getNodeType() == NodeType.NAME) // Alias - maybe should assume it is the first child
                 {
                     classAlias = (String)child.getNodeValue();
@@ -260,11 +259,9 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                 }
             }
 
-            Iterator childIter = node[i].getChildNodes().iterator();
-            while (childIter.hasNext())
+            for (Node childNode : children)
             {
                 // Add entries in symbol table for any joined aliases
-                Node childNode = (Node)childIter.next();
                 if (childNode.getNodeType() == NodeType.OPERATOR)
                 {
                     Node joinedNode = childNode.getFirstChild();
@@ -500,8 +497,8 @@ public abstract class JavaQueryCompiler implements SymbolResolver
             return null;
         }
 
-        String[] tokens = StringUtils.split(classExpr, ".");
         Class cls = null;
+        String[] tokens = StringUtils.split(classExpr, ".");
         if (tokens[0].equalsIgnoreCase(parentCompiler.candidateAlias))
         {
             // Starts with candidate of parent query
@@ -684,7 +681,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
     }
 
     /**
-     * Convenience method that takes the input node if it is a parameter node swaps the node to be 
+     * Convenience method that takes the input node if it is a parameter node and swaps the node
      * @param node The node to process
      * @return The Node with the swap
      */

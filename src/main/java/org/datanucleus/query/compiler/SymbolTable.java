@@ -20,8 +20,8 @@ package org.datanucleus.query.compiler;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -80,7 +80,7 @@ public class SymbolTable implements Serializable
      */
     public Collection<String> getSymbolNames()
     {
-        return new HashSet<String>(symbols.keySet());
+        return Collections.unmodifiableCollection(symbols.keySet());
     }
 
     /**
