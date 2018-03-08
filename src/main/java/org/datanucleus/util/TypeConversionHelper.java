@@ -882,11 +882,10 @@ public class TypeConversionHelper
     }
 
     /**
-     * Convert the value to a instance of the given type. The value is converted only
-     * if the type can't be assigned from the current type of the value instance. 
+     * Convert the value to a instance of the given type. The value is converted only if the type can't be assigned from the current type of the value instance. 
      * @param value the value to be converted
      * @param type the type of the expected object returned from the conversion
-     * @return the converted object, or null if the object can't be converted
+     * @return the converted object, or the input value if the object can't be converted
      */
     public static Object convertTo(Object value, Class type)
     {
@@ -894,110 +893,153 @@ public class TypeConversionHelper
         {
             return value;
         }
-
-        //check if the id can be assigned for the field type, otherwise convert the id to the appropriate type
-        if (!type.isAssignableFrom(value.getClass()))
+        if (type.isPrimitive())
         {
-            if (type == short.class || type == Short.class)
-            {
-                return Short.valueOf(value.toString());
-            }
-            else if (type == char.class || type == Character.class)
-            {
-                return Character.valueOf(value.toString().charAt(0));
-            }
-            else if (type == int.class || type == Integer.class)
-            {
-                return Integer.valueOf(value.toString());
-            }
-            else if (type == long.class || type == Long.class)
-            {
-                return Long.valueOf(value.toString());
-            }
-            else if (type == boolean.class || type == Boolean.class)
-            {
-                return Boolean.valueOf(value.toString());
-            }
-            else if (type == byte.class || type == Byte.class)
-            {
-                return Byte.valueOf(value.toString());
-            }
-            else if (type == float.class || type == Float.class)
-            {
-                return Float.valueOf(value.toString());
-            }
-            else if (type == double.class || type == Double.class)
-            {
-                return Double.valueOf(value.toString());
-            }
-            else if (type == BigDecimal.class)
-            {
-                return new BigDecimal(value.toString());
-            }
-            else if (type == BigInteger.class)
-            {
-                return new BigInteger(value.toString());
-            }
-            else if (type == java.sql.Timestamp.class)
-            {
-                if (value instanceof Date)
-                {
-                    return new java.sql.Timestamp(((Date)value).getTime());
-                }
-                return java.sql.Timestamp.valueOf(value.toString());
-            }
-            else if (type == java.sql.Date.class)
-            {
-                if (value instanceof Date)
-                {
-                    return new java.sql.Date(((Date)value).getTime());
-                }
-                return java.sql.Date.valueOf(value.toString());
-            }
-            else if (type == java.sql.Time.class)
-            {
-                if (value instanceof Date)
-                {
-                    return new java.sql.Time(((Date)value).getTime());
-                }
-                return java.sql.Time.valueOf(value.toString());
-            }
-            else if (type == String.class)
-            {
-                return value.toString();
-            }
-            else if (type == UUID.class)
-            {
-                if (value instanceof String)
-                {
-                    return UUID.fromString((String)value);
-                }
-            }
-            else if (type == TimeZone.class)
-            {
-                if (value instanceof String)
-                {
-                    return TimeZone.getTimeZone((String)value);
-                }
-            }
-            else if (type == Currency.class)
-            {
-                if (value instanceof String)
-                {
-                    return Currency.getInstance((String)value);
-                }
-            }
-            else if (type == Locale.class)
-            {
-                if (value instanceof String)
-                {
-                    return I18nUtils.getLocaleFromString((String)value);
-                }
-            }
-
-            NucleusLogger.PERSISTENCE.warn("Request to convert value of type " + value.getClass().getName() + " to type " + type.getName() + " but this is not yet supported." +
-                "Raise an issue and contribute the code to support this conversion, with a testcase that demonstrates the problem");
+            // We are returning an object-based value, so convert requested primitive as the object wrapper equivalent
+            type = ClassUtils.getWrapperTypeForPrimitiveType(type);
         }
+
+        if (type.isAssignableFrom(value.getClass()))
+        {
+            // Already in the correct type
+            return value;
+        }
+
+        if (type == Short.class)
+        {
+            if (value instanceof Number)
+            {
+                return Short.valueOf(((Number)value).shortValue());
+            }
+            return Short.valueOf(value.toString());
+        }
+        else if (type == Character.class)
+        {
+            return Character.valueOf(value.toString().charAt(0));
+        }
+        else if (type == Integer.class)
+        {
+            if (value instanceof Number)
+            {
+                return Integer.valueOf(((Number)value).intValue());
+            }
+            return Integer.valueOf(value.toString());
+        }
+        else if (type == Long.class)
+        {
+            if (value instanceof Number)
+            {
+                return Long.valueOf(((Number)value).longValue());
+            }
+            return Long.valueOf(value.toString());
+        }
+        else if (type == Boolean.class)
+        {
+            if (value instanceof Long)
+            {
+                // Convert a Long (0, 1) to Boolean (FALSE, TRUE) and null otherwise
+                return (Long)value == 0 ? Boolean.FALSE : ((Long)value == 1 ? Boolean.TRUE : null);
+            }
+            else if (value instanceof Integer)
+            {
+                // Convert a Integer (0, 1) to Boolean (FALSE, TRUE) and null otherwise
+                return (Integer)value == 0 ? Boolean.FALSE : ((Integer)value == 1 ? Boolean.TRUE : null);
+            }
+            else if (value instanceof Short)
+            {
+                // Convert a Short (0, 1) to Boolean (FALSE, TRUE) and null otherwise
+                return (Short)value == 0 ? Boolean.FALSE : ((Short)value == 1 ? Boolean.TRUE : null);
+            }
+            return Boolean.valueOf(value.toString());
+        }
+        else if (type == Byte.class)
+        {
+            return Byte.valueOf(value.toString());
+        }
+        else if (type == Float.class)
+        {
+            if (value instanceof Number)
+            {
+                return Float.valueOf(((Number)value).floatValue());
+            }
+            return Float.valueOf(value.toString());
+        }
+        else if (type == Double.class)
+        {
+            if (value instanceof Number)
+            {
+                return Double.valueOf(((Number)value).doubleValue());
+            }
+            return Double.valueOf(value.toString());
+        }
+        else if (type == BigDecimal.class)
+        {
+            return new BigDecimal(value.toString());
+        }
+        else if (type == BigInteger.class)
+        {
+            return new BigInteger(value.toString());
+        }
+        else if (type == String.class)
+        {
+            return value.toString();
+        }
+        else if (type == java.sql.Timestamp.class)
+        {
+            if (value instanceof Date)
+            {
+                return new java.sql.Timestamp(((Date)value).getTime());
+            }
+            return java.sql.Timestamp.valueOf(value.toString());
+        }
+        else if (type == java.sql.Date.class)
+        {
+            if (value instanceof Date)
+            {
+                return new java.sql.Date(((Date)value).getTime());
+            }
+            return java.sql.Date.valueOf(value.toString());
+        }
+        else if (type == java.sql.Time.class)
+        {
+            if (value instanceof Date)
+            {
+                return new java.sql.Time(((Date)value).getTime());
+            }
+            return java.sql.Time.valueOf(value.toString());
+        }
+        // TODO Add LocalDate, LocalTime, LocalDateTime etc
+        else if (type == UUID.class)
+        {
+            if (value instanceof String)
+            {
+                return UUID.fromString((String)value);
+            }
+        }
+        else if (type == TimeZone.class)
+        {
+            if (value instanceof String)
+            {
+                return TimeZone.getTimeZone((String)value);
+            }
+        }
+        else if (type == Currency.class)
+        {
+            if (value instanceof String)
+            {
+                return Currency.getInstance((String)value);
+            }
+        }
+        else if (type == Locale.class)
+        {
+            if (value instanceof String)
+            {
+                return I18nUtils.getLocaleFromString((String)value);
+            }
+        }
+
+        NucleusLogger.PERSISTENCE.warn("Request to convert value of type " + value.getClass().getName() + " to type " + type.getName() + " but this is not yet supported." +
+                "Raise an issue and contribute the code to support this conversion, with a testcase that demonstrates the problem");
         return value;
     }
 
