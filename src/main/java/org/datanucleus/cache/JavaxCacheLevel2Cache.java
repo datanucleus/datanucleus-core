@@ -237,7 +237,7 @@ public class JavaxCacheLevel2Cache extends AbstractLevel2Cache
         catch (Exception e)
         {
             // Not cached due to some problem. Not serializable?
-            NucleusLogger.CACHE.debug("Object with id " + oid +" not cached due to : " + e.getMessage());
+            NucleusLogger.CACHE.debug("Object with id " + oid + " for cachedPC=" + pc.toString("", true) + " not cached due to : " + e.getMessage());
         }
         return pc;
     }
