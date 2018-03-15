@@ -149,7 +149,9 @@ public class CachedPC<T> implements Serializable
 
     /**
      * Method to return a sting form of the cached object. Returns something like
-     * "CachedPC : version=1 loadedFlags=[YY]"
+     * <pre>
+     * CachedPC : cls=mydomain.MyClass version=1 loadedFlags=[YY]
+     * </pre>
      * @return The string form
      */
     public String toString()
@@ -159,7 +161,12 @@ public class CachedPC<T> implements Serializable
 
     /**
      * Method to return a string form of the cached object. Returns something like
-     * "CachedPC : version=1 loadedFlags=[YY]".
+     * <pre>
+     * CachedPC : cls=mydomain.MyClass version=1 loadedFlags=[YY] numValues=2
+     *     field=0 value=101 type=class java.lang.Long
+     *     field=1 value=Home type=class java.lang.String
+     * </pre>
+     * when debug is enabled, and omits the "field=..." parts when not using debug.
      * @param indent Indent for this CachedPC
      * @param debug Whether to include the field values in the return
      * @return The string form
@@ -185,6 +192,10 @@ public class CachedPC<T> implements Serializable
                 else
                 {
                     str.append(fieldValuesEntry.getValue());
+                    if (fieldValuesEntry.getValue() != null)
+                    {
+                        str.append(" type=" + fieldValuesEntry.getValue().getClass().getName());
+                    }
                 }
                 if (fieldValuesIter.hasNext())
                 {
