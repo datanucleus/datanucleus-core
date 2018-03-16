@@ -4180,6 +4180,14 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                     {
                         ((SCOCollection)ownerField).updateEmbeddedElement(myPC, fieldNumber, value, makeDirty);
                     }
+                    if ((ownerOP.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
+                    {
+                        // Update the owner when one of our fields have changed, EXCEPT when they have just notified us of our owner field!
+                        if (makeDirty)
+                        {
+                            ownerOP.makeDirty(ownerRel.getOwnerFieldNum());
+                        }
+                    }
                 }
                 else if (ownerMmd.getMap() != null)
                 {
@@ -4194,6 +4202,14 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                         if (objectType == ObjectProvider.EMBEDDED_MAP_VALUE_PC)
                         {
                             ((SCOMap)ownerField).updateEmbeddedValue(myPC, fieldNumber, value, makeDirty);
+                        }
+                    }
+                    if ((ownerOP.flags&FLAG_UPDATING_EMBEDDING_FIELDS_WITH_OWNER)==0)
+                    {
+                        // Update the owner when one of our fields have changed, EXCEPT when they have just notified us of our owner field!
+                        if (makeDirty)
+                        {
+                            ownerOP.makeDirty(ownerRel.getOwnerFieldNum());
                         }
                     }
                 }

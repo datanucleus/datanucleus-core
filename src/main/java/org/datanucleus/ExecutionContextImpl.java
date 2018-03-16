@@ -4279,7 +4279,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             ObjectProvider op = enlistedOPCache.get(id);
             if (op == null)
             {
-                // Modified object no longer enlisted so has been GCed, so remove from L2 if present
+                // Modified object either no longer enlisted (GCed) OR is an embedded object without own identity. Remove from L2 if present
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
                     if (nucCtx.getLevel2Cache().containsOid(id))
