@@ -506,7 +506,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
                 // Put object in cached as (nested) CachedPC
                 ObjectProvider valueOP = ec.findObjectProvider(value);
                 int[] loadedFields = valueOP.getLoadedFieldNumbers();
-                CachedPC valueCachedPC = new CachedPC(value.getClass(), valueOP.getLoadedFields(), null, valueOP.getInternalObjectId());
+                CachedPC valueCachedPC = new CachedPC(value.getClass(), valueOP.getLoadedFields(), null, null);
                 if (loadedFields != null && loadedFields.length > 0)
                 {
                     // Set the values of any fields that are loaded
