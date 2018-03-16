@@ -269,11 +269,39 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
             }
             else
             {
-                // Restore the Container<OID> to Container<PC>
-                for (Object cachedId : cachedContainerAdapter)
+                if ((containerHandler.isSerialised(mmd) || containerHandler.isEmbedded(mmd)) &&
+                    ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CACHE_EMBEDDED))
                 {
-                    Object element = cachedId == null ? null : getObjectFromCachedId(cachedId);  
-                    fieldContainerAdapter.add(element);
+                    // Collection/array of embedded elements (stored as nested CachedPC)
+                    for (Object cachedObject : cachedContainerAdapter)
+                    {
+                        CachedPC elementCachedPC = (CachedPC)cachedObject;
+                        Object element = null;
+                        if (elementCachedPC != null)
+                        {
+                            // Convert the CachedPC back into a managed object loading all cached fields TODO Perhaps only load fetch plan fields?
+                            AbstractClassMetaData elementCmd = ec.getMetaDataManager().getMetaDataForClass(elementCachedPC.getObjectClass(), ec.getClassLoaderResolver());
+                            int[] fieldsToLoad = ClassUtils.getFlagsSetTo(elementCachedPC.getLoadedFields(), elementCmd.getAllMemberPositions(), true);
+
+                            ObjectProvider elementOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elementCmd, op, mmd.getAbsoluteFieldNumber());
+                            if (fieldsToLoad != null && fieldsToLoad.length > 0)
+                            {
+                                elementOP.replaceFields(fieldsToLoad, new L2CacheRetrieveFieldManager(elementOP, elementCachedPC));
+                            }
+                            element = elementOP.getObject();
+                        }
+
+                        fieldContainerAdapter.add(element);
+                    }
+                }
+                else
+                {
+                    // Collection/array of embedded elements (stored as "id")
+                    for (Object cachedId : cachedContainerAdapter)
+                    {
+                        Object element = cachedId == null ? null : getObjectFromCachedId(cachedId);  
+                        fieldContainerAdapter.add(element);
+                    }
                 }
             }   
             
@@ -306,8 +334,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
             {
                 if (value instanceof CachedPC)
                 {
-                    // Convert the CachedPC back into a managed object loading all cached fields
-                    // TODO Perhaps only load fetch plan fields?
+                    // Convert the CachedPC back into a managed object loading all cached fields TODO Perhaps only load fetch plan fields?
                     CachedPC valueCachedPC = (CachedPC)value;
                     AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(valueCachedPC.getObjectClass(), ec.getClassLoaderResolver());
                     int[] fieldsToLoad = ClassUtils.getFlagsSetTo(valueCachedPC.getLoadedFields(), cmd.getAllMemberPositions(), true);

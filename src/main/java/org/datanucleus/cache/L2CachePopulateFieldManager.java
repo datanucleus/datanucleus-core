@@ -368,7 +368,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
         RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
         if (relType != RelationType.NONE && (containerHandler.isSerialised(mmd) || containerHandler.isEmbedded(mmd)))
         {
-            // TODO Support serialised/embedded elements
+            // TODO Support serialised/embedded keys/values
             cachedPC.setLoadedField(fieldNumber, false);
             return;
         }
@@ -442,16 +442,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
         else
         {
             // Container<PC>
-
-            if (containerHandler.isSerialised(mmd) || containerHandler.isEmbedded(mmd))
-            {
-                // TODO Support serialised/embedded elements
-                cachedPC.setLoadedField(fieldNumber, false);
-                return;
-            }
-
             ElementContainerAdapter containerAdapter = containerHandler.getAdapter(container);
-
             if (containerAdapter instanceof SequenceAdapter && mmd.getOrderMetaData() != null && !mmd.getOrderMetaData().isIndexedList())
             {
                 // Ordered list so don't cache since dependent on datastore-retrieve order
@@ -461,19 +452,42 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
 
             try
             {
-                // For arrays[PC] just use an Object array to store the ids because we can use the same type
-                // of the original container. Later when restoring the values it will be based on the metadata
-                // instead of the actual container type, as opposed to how it's done for non-array containers.
+                // For arrays[PC] just use an Object array to store the ids because we can use the same type of the original container. 
+                // Later when restoring the values it will be based on the metadata instead of the actual container type, as opposed to how it's done for non-array containers.
                 Object newContainer = mmd.hasArray() ? EMPTY_ARRAY : newContainer(container, mmd, containerHandler);
                 ElementContainerAdapter containerToCacheAdapter = containerHandler.getAdapter(newContainer);
                 ApiAdapter api = ec.getApiAdapter();
+
+                if ((containerHandler.isSerialised(mmd) || containerHandler.isEmbedded(mmd)) &&
+                    !ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CACHE_EMBEDDED))
+                {
+                    // User not caching embedded/serialised
+                    cachedPC.setLoadedField(fieldNumber, false);
+                }
+
                 // Recurse through elements, and put ids of elements in return value
                 for (Object element : containerAdapter)
                 {
-                    containerToCacheAdapter.add(getCacheableIdForId(api, element));
+                    if (containerHandler.isSerialised(mmd) || containerHandler.isEmbedded(mmd))
+                    {
+                        // Store embedded/serialised element as nested collection element
+                        ObjectProvider valueOP = ec.findObjectProvider(element);
+                        int[] loadedFields = valueOP.getLoadedFieldNumbers();
+                        CachedPC valueCachedPC = new CachedPC(element.getClass(), valueOP.getLoadedFields(), null, null);
+                        if (loadedFields != null && loadedFields.length > 0)
+                        {
+                            // Set the values of any fields that are loaded
+                            valueOP.provideFields(loadedFields, new L2CachePopulateFieldManager(valueOP, valueCachedPC));
+                        }
+                        containerToCacheAdapter.add(valueCachedPC);
+                    }
+                    else
+                    {
+                        containerToCacheAdapter.add(getCacheableIdForId(api, element));
+                    }
                 }
 
-                // Put Container<OID> in CachedPC
+                // Put container in CachedPC
                 Object cachedValue = containerToCacheAdapter.getContainer();
                 cachedPC.setFieldValue(fieldNumber, cachedValue);
             }
@@ -517,14 +531,14 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
             }
             else
             {
-                // TODO Support serialised/embedded PC fields
+                // User not caching embedded/serialised
                 cachedPC.setLoadedField(fieldNumber, false);
             }
-            return;
         }
-        
-        ApiAdapter api = ec.getApiAdapter();
-        // Put cacheable form of the id in CachedPC
-        cachedPC.setFieldValue(fieldNumber, getCacheableIdForId(api, value));
+        else
+        {
+            // Put cacheable form of the id in CachedPC
+            cachedPC.setFieldValue(fieldNumber, getCacheableIdForId(ec.getApiAdapter(), value));
+        }
     }
 }
