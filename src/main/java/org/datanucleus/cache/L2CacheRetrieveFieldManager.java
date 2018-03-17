@@ -189,12 +189,25 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
             MapContainerAdapter<Object> cachedMapContainerAdapter = containerHandler.getAdapter(cachedMapContainer);
             Object newContainer = newContainer(cachedMapContainer, mmd, containerHandler);
             MapContainerAdapter fieldMapContainerAdapter = containerHandler.getAdapter(newContainer);
+            boolean keyIsPersistent = mmd.getMap().keyIsPersistent();
+            boolean keyIsEmbedded = mmd.getMap().isEmbeddedKey();
+            boolean keyIsSerialised = mmd.getMap().isSerializedKey();
+            boolean valueIsPersistent = mmd.getMap().valueIsPersistent();
+            boolean valueIsEmbedded = mmd.getMap().isEmbeddedValue();
+            boolean valueIsSerialised = mmd.getMap().isSerializedValue();
             for (Entry<Object, Object> entry : cachedMapContainerAdapter.entries())
             {
                 Object mapKey = null;
-                if (mmd.getMap().keyIsPersistent())
+                if (keyIsPersistent)
                 {
-                    mapKey = getObjectFromCachedId(entry.getKey());
+                    if (keyIsEmbedded || keyIsSerialised || mmd.isSerialized())
+                    {
+                        mapKey = convertCachedPCToPersistable((CachedPC)entry.getKey(), fieldNumber);
+                    }
+                    else
+                    {
+                        mapKey = getObjectFromCachedId(entry.getKey());
+                    }
                 }
                 else
                 {
@@ -205,9 +218,16 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                 Object mapValueId = entry.getValue();
                 if (mapValueId != null)
                 {
-                    if (mmd.getMap().valueIsPersistent())
+                    if (valueIsPersistent)
                     {
-                        mapValue = getObjectFromCachedId(entry.getValue());
+                        if (valueIsEmbedded || valueIsSerialised || mmd.isSerialized())
+                        {
+                            mapValue = convertCachedPCToPersistable((CachedPC)entry.getValue(), fieldNumber);
+                        }
+                        else
+                        {
+                            mapValue = getObjectFromCachedId(entry.getValue());
+                        }
                     }
                     else
                     {
@@ -279,16 +299,8 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
                         Object element = null;
                         if (elementCachedPC != null)
                         {
-                            // Convert the CachedPC back into a managed object loading all cached fields TODO Perhaps only load fetch plan fields?
-                            AbstractClassMetaData elementCmd = ec.getMetaDataManager().getMetaDataForClass(elementCachedPC.getObjectClass(), ec.getClassLoaderResolver());
-                            int[] fieldsToLoad = ClassUtils.getFlagsSetTo(elementCachedPC.getLoadedFields(), elementCmd.getAllMemberPositions(), true);
-
-                            ObjectProvider elementOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elementCmd, op, mmd.getAbsoluteFieldNumber());
-                            if (fieldsToLoad != null && fieldsToLoad.length > 0)
-                            {
-                                elementOP.replaceFields(fieldsToLoad, new L2CacheRetrieveFieldManager(elementOP, elementCachedPC));
-                            }
-                            element = elementOP.getObject();
+                            // Convert the CachedPC back into a managed object loading all cached fields
+                            element = convertCachedPCToPersistable(elementCachedPC, mmd.getAbsoluteFieldNumber());
                         }
 
                         fieldContainerAdapter.add(element);
@@ -334,19 +346,8 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
             {
                 if (value instanceof CachedPC)
                 {
-                    // Convert the CachedPC back into a managed object loading all cached fields TODO Perhaps only load fetch plan fields?
-                    CachedPC valueCachedPC = (CachedPC)value;
-                    AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(valueCachedPC.getObjectClass(), ec.getClassLoaderResolver());
-                    int[] fieldsToLoad = ClassUtils.getFlagsSetTo(valueCachedPC.getLoadedFields(), cmd.getAllMemberPositions(), true);
-
-                    ObjectProvider valueOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, cmd, op, mmd.getAbsoluteFieldNumber());
-                    if (fieldsToLoad != null && fieldsToLoad.length > 0)
-                    {
-                        valueOP.replaceFields(fieldsToLoad, new L2CacheRetrieveFieldManager(valueOP, valueCachedPC));
-                    }
-                    // TODO When we have nested embedded objects with relations to non-embedded then we need to unload the fields not present in L2 cache
-
-                    return valueOP.getObject();
+                    // Convert the CachedPC back into a managed object loading all cached fields
+                    return convertCachedPCToPersistable((CachedPC)value, mmd.getAbsoluteFieldNumber());
                 }
             }
         }
@@ -407,5 +408,25 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         }
         
         return (T) newContainer;
+    }
+
+    /**
+     * Method to convert a nested (i.e embedded) CachedPC back to the persistable object it represents.
+     * @param cachedPC The CachedPC
+     * @param fieldNumber Field number in the owning object where this is stored
+     * @return The (persistable) object
+     */
+    private Object convertCachedPCToPersistable(CachedPC cachedPC, int fieldNumber)
+    {
+        AbstractClassMetaData valueCmd = ec.getMetaDataManager().getMetaDataForClass(cachedPC.getObjectClass(), ec.getClassLoaderResolver());
+        ObjectProvider valueOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, valueCmd, op, fieldNumber);
+
+        // TODO Perhaps only load fetch plan fields?
+        int[] fieldsToLoad = ClassUtils.getFlagsSetTo(cachedPC.getLoadedFields(), valueCmd.getAllMemberPositions(), true);
+        if (fieldsToLoad != null && fieldsToLoad.length > 0)
+        {
+            valueOP.replaceFields(fieldsToLoad, new L2CacheRetrieveFieldManager(valueOP, cachedPC));
+        }
+        return valueOP.getObject();
     }
 }

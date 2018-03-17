@@ -365,33 +365,54 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
 
     private void processMapContainer(int fieldNumber, Object mapContainer, AbstractMemberMetaData mmd, MapHandler<Object> containerHandler)
     {
-        RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
-        if (relType != RelationType.NONE && (containerHandler.isSerialised(mmd) || containerHandler.isEmbedded(mmd)))
-        {
-            // TODO Support serialised/embedded keys/values
-            cachedPC.setLoadedField(fieldNumber, false);
-            return;
-        }
-
         try
         {
-            ApiAdapter api = ec.getApiAdapter();
-
-            Object newContainer = newContainer(mapContainer, mmd, containerHandler);
-            MapContainerAdapter<Object> mapToCacheAdapter = containerHandler.getAdapter(newContainer);
+            if (!ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CACHE_EMBEDDED))
+            {
+                RelationType relType = mmd.getRelationType(ec.getClassLoaderResolver());
+                if (relType != RelationType.NONE && (containerHandler.isSerialised(mmd) || containerHandler.isEmbedded(mmd)))
+                {
+                    // User has requested no caching of embedded/serialised, so ignore this field
+                    cachedPC.setLoadedField(fieldNumber, false);
+                    return;
+                }
+            }
 
             boolean keyIsPersistent = mmd.getMap().keyIsPersistent();
+            boolean keyIsEmbedded = mmd.getMap().isEmbeddedKey();
+            boolean keyIsSerialised = mmd.getMap().isSerializedKey();
             boolean valueIsPersistent = mmd.getMap().valueIsPersistent();
-
+            boolean valueIsEmbedded = mmd.getMap().isEmbeddedValue();
+            boolean valueIsSerialised = mmd.getMap().isSerializedValue();
+            Object newContainer = newContainer(mapContainer, mmd, containerHandler);
+            MapContainerAdapter<Object> mapToCacheAdapter = containerHandler.getAdapter(newContainer);
+            ApiAdapter api = ec.getApiAdapter();
             for (Entry<Object, Object> entry : containerHandler.getAdapter(mapContainer).entries())
             {
-                Object mapKey = keyIsPersistent ? getCacheableIdForId(api, entry.getKey()) : SCOUtils.copyValue(entry.getKey());
-                Object mapValue = valueIsPersistent ? getCacheableIdForId(api, entry.getValue()) : SCOUtils.copyValue(entry.getValue());
+                Object mapKey = null;
+                if (keyIsPersistent)
+                {
+                    mapKey = (keyIsEmbedded || keyIsSerialised || mmd.isSerialized()) ? convertPersistableToCachedPC(entry.getKey()) : getCacheableIdForId(api, entry.getKey());
+                }
+                else
+                {
+                    mapKey = SCOUtils.copyValue(entry.getKey());
+                }
+
+                Object mapValue = null;
+                if (valueIsPersistent)
+                {
+                    mapValue = (valueIsEmbedded || valueIsSerialised || mmd.isSerialized()) ? convertPersistableToCachedPC(entry.getValue()) : getCacheableIdForId(api, entry.getValue());
+                }
+                else
+                {
+                    mapValue = SCOUtils.copyValue(entry.getValue());
+                }
 
                 mapToCacheAdapter.put(mapKey, mapValue);
             }
 
-            // Put Map<X, Y> in CachedPC where X, Y can be OID if they are persistable objects
+            // Put Map<X, Y> in CachedPC where X, Y can be OID or CachedPC if they are persistable objects
             cachedPC.setFieldValue(fieldNumber, mapToCacheAdapter.getContainer());
         }
         catch (Exception e)
@@ -463,33 +484,24 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
                 {
                     // User not caching embedded/serialised
                     cachedPC.setLoadedField(fieldNumber, false);
+                    return;
                 }
 
-                // Recurse through elements, and put ids of elements in return value
                 for (Object element : containerAdapter)
                 {
                     if (containerHandler.isSerialised(mmd) || containerHandler.isEmbedded(mmd))
                     {
                         // Store embedded/serialised element as nested collection element
-                        ObjectProvider valueOP = ec.findObjectProvider(element);
-                        int[] loadedFields = valueOP.getLoadedFieldNumbers();
-                        CachedPC valueCachedPC = new CachedPC(element.getClass(), valueOP.getLoadedFields(), null, null);
-                        if (loadedFields != null && loadedFields.length > 0)
-                        {
-                            // Set the values of any fields that are loaded
-                            valueOP.provideFields(loadedFields, new L2CachePopulateFieldManager(valueOP, valueCachedPC));
-                        }
-                        containerToCacheAdapter.add(valueCachedPC);
+                        containerToCacheAdapter.add(convertPersistableToCachedPC(element));
                     }
                     else
                     {
+                        // Store id of element, since cached in its own right
                         containerToCacheAdapter.add(getCacheableIdForId(api, element));
                     }
                 }
 
-                // Put container in CachedPC
-                Object cachedValue = containerToCacheAdapter.getContainer();
-                cachedPC.setFieldValue(fieldNumber, cachedValue);
+                cachedPC.setFieldValue(fieldNumber, containerToCacheAdapter.getContainer());
             }
             catch (Exception e)
             {
@@ -511,23 +523,14 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
             cachedPC.setFieldValue(fieldNumber, SCOUtils.copyValue(unwrappedValue));
             return;
         }
-        
+
         // 1-1, N-1 persistable field
         if (mmd.isSerialized() || MetaDataUtils.isMemberEmbedded(mmd, relType, ec.getClassLoaderResolver(), ec.getMetaDataManager()))
         {
             if (ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_L2_CACHE_EMBEDDED))
             {
                 // Put object in cached as (nested) CachedPC
-                ObjectProvider valueOP = ec.findObjectProvider(value);
-                int[] loadedFields = valueOP.getLoadedFieldNumbers();
-                CachedPC valueCachedPC = new CachedPC(value.getClass(), valueOP.getLoadedFields(), null, null);
-                if (loadedFields != null && loadedFields.length > 0)
-                {
-                    // Set the values of any fields that are loaded
-                    valueOP.provideFields(loadedFields, new L2CachePopulateFieldManager(valueOP, valueCachedPC));
-                }
-
-                cachedPC.setFieldValue(fieldNumber, valueCachedPC);
+                cachedPC.setFieldValue(fieldNumber, convertPersistableToCachedPC(value));
             }
             else
             {
@@ -540,5 +543,25 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
             // Put cacheable form of the id in CachedPC
             cachedPC.setFieldValue(fieldNumber, getCacheableIdForId(ec.getApiAdapter(), value));
         }
+    }
+
+    /**
+     * Method to convert an embedded/serialised object to a CachedPC object for L2 caching.
+     * @param pc The persistable
+     * @return The CachedPC that it is stored as
+     */
+    protected CachedPC convertPersistableToCachedPC(Object pc)
+    {
+        ObjectProvider valueOP = ec.findObjectProvider(pc);
+        CachedPC valueCachedPC = new CachedPC(pc.getClass(), valueOP.getLoadedFields(), null, null);
+
+        int[] loadedFields = valueOP.getLoadedFieldNumbers();
+        if (loadedFields != null && loadedFields.length > 0)
+        {
+            // Set the values of any fields that are loaded
+            valueOP.provideFields(loadedFields, new L2CachePopulateFieldManager(valueOP, valueCachedPC));
+        }
+
+        return valueCachedPC;
     }
 }
