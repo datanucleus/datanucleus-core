@@ -27,11 +27,13 @@ import org.datanucleus.util.StringUtils;
 
 /**
  * An object that is stored in the Level2 Cache keyed by the identity of the persistable object.
- * Comprises a map of the field values keyed by the absolute field number in the class, the loaded fields array,
- * and the version of the object that is represented with these values.
- * Where the field is a relation field (PC, Map, Collection, array) we store the id of any referenced persistable object. 
+ * Comprises a map of the field values keyed by the absolute field number in the class, the loaded fields array, and the version of the object that is represented with these values.
+ * <ul>
+ * <li>Where the field is a relation field (PC, Map, Collection, array) we store the id of any referenced persistable object. 
  * This is used when regenerating the object, and recreating its relations. 
- * Note that the "id" is the DatastoreId or SingleFieldId etc where applicable otherwise is CachedId (ensuring that the class of the related object is stored).
+ * Note that the "id" is the DatastoreId or SingleFieldId etc where applicable otherwise is CachedId (ensuring that the class of the related object is stored).</li>
+ * <li>Where the field contains an embedded/serialised persistable object, we store a nested CachedPC object representing that object (since it doesn't exist in its own right).</li>
+ * </ul>
  */
 public class CachedPC<T> implements Serializable
 {
@@ -43,7 +45,7 @@ public class CachedPC<T> implements Serializable
     /** Identity of the object being cached. This is to allow recreation of the object when using uniqueKey lookup. */
     private Object id;
 
-    /** Values for the fields, keyed by the absolute field number. Any relation fields store the "id" of the related object. */
+    /** Values for the fields, keyed by the absolute field number. */
     private Map<Integer, Object> fieldValues = null;
 
     /** Version of the cached object (if any) - Long, Timestamp etc. */

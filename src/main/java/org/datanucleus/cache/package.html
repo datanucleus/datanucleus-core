@@ -1,36 +1,30 @@
 <BODY>
-    This package provides classes implementing caching within DataNucleus.
+    This package provides classes implementing L1/L2 persistable object caching within DataNucleus.
     There are 2 caches used internally :-
     <P>
-        The first is within the PersistenceManager and is the <B>Level 1 Cache</B>. 
-        There are 3 available implementations of a Level 1 Cache here :- <I>SoftRefCache</I>, 
-        <I>WeakRefCache</I> and <I>HardRefCache</I>. They provide varying degrees of object 
-        retention during the garbage collection process.
+        The <B>Level 1 cache</B> is used within the PersistenceManager/EntityManager, storing objects that are currently managed etc. 
+        There are several implementations of Level 1 Cache here :- <I>SoftRefCache</I>, <I>WeakRefCache</I> and <I>HardRefCache</I>. 
+        They provide varying degrees of object retention during the garbage collection process.
     </P>
     <P>
-        The second is across multiple PersistenceManagers within the same PersistenceManagerFactory, 
-        and is the <B>Level 2 Cache</B>. There is one implementation of a Level 2 Cache here :- 
-        <I>DefaultLevel2Cache</I>. Alternatively, there are plugins for EHCache, SwarmCache, OSCache
-        and Coherence products
+        The <b>Level 2 cache</B> is used across multiple PersistenceManagers/EntityManagers within the same PersistenceManagerFactory/EntityManagerFactory. 
+        There are several implementations of a Level 2 Cache here :- <I>JavaxCacheLevel2Cache</I> (using the javax.cache API), <I>SoftLevel2Cache</I>, and <I>WeakLevel2Cache</I>.
+        Alternatively look in the <I>datanucleus-cache</I> plugin for various L2 caches using third party software.
     </P>
     
     <P>
-        As far as Level 2 caching is concerned each class is configurable via metadata @Cacheable (and equivalent XML).
-        In addition we can define which fields are cacheable using this mechanism, but maybe using @Extension metadata
-        if the persistence API doesn't support field-level restrictions.
+        As far as Level 2 caching is concerned each class is configurable via metadata @Cacheable (and equivalent XML) as to whether it is cached.
+        In addition we can define which fields are cacheable using this mechanism, but maybe using @Extension metadata if the persistence API doesn't support field-level restrictions.
     </P>
     <P>
-        At commit of a transaction we check all enlisted objects and have a recursive process that navigates down
-        through all objects to cache (limited by the FetchPlan) and at the end all of these objects will be put in 
-        the L2 cache (and logged). Also at this point if any enlisted objects have been deleted during the transaction 
-        we remove them from the L2 cache.
-        When an object is to be put in the L2 cache we check if it already has an entry in the L2 cache and, if so, 
-        we update that object with the current field values, version, etc. When an object is to be put in the L2 cache 
-        and it has relation fields, we don't store the actual objects of those relations instead storing the identities 
-        of the related objects in the CachedPC object. When an object is to be taken from the L2 cache we create a 
-        copy of that object and copy the field values across for all fields that were loaded when it was originally 
-        put in the cache. When a relation field is required to be loaded we use the identities that are stored in the 
-        CachedPC, and find the equivalent object for that identity from the L1/L2 caches, reinstating it into the 
-        managed object.
+        At commit of a transaction we check all enlisted objects and have a recursive process that navigates down through all objects to cache (limited by the FetchPlan) 
+        and at the end all of these objects will be put in the L2 cache (and logged). 
+        Also at this point if any enlisted objects have been deleted during the transaction we remove them from the L2 cache.
+        When an object is to be put in the L2 cache we check if it already has an entry in the L2 cache and, if so, we update that object with the current field values, version, etc. 
+        When an object is to be put in the L2 cache and it has relation fields, we don't store the actual objects of those relations instead storing the identities 
+        of the related objects in the CachedPC object. 
+        When an object is to be taken from the L2 cache we create a copy of that object and copy the field values across for all fields that were loaded when it was originally put in the cache. 
+        When a relation field is required to be loaded we use the identities that are stored in the CachedPC, and find the equivalent object for that identity from the L1/L2 caches, 
+        reinstating it into the managed object.
     </P>
 </BODY>
