@@ -26,7 +26,7 @@ import org.datanucleus.exceptions.ClassNotResolvedException;
  */
 public interface SymbolResolver
 {
-    Class getType(List tuples);
+    Class getType(List<String> tuples);
 
     /**
      * Accessor for the candidate class of the query.

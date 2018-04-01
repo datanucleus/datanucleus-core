@@ -41,8 +41,7 @@ public class SymbolTable implements Serializable
     Map<String, Symbol> symbols = new HashMap<>();
 
     /**
-     * Resolver for symbols.
-     * Note that this is not serialisable, but is set when compile() is called.
+     * Resolver for symbols. Note that this is not serialisable, but is set when compile() is called.
      */
     transient SymbolResolver resolver;
 
@@ -125,7 +124,7 @@ public class SymbolTable implements Serializable
             return parentSymbolTable.getSymbolIgnoreCase(name);
         }
         return null;
-    }    
+    }
 
     /**
      * Accessor for whether this symbol table has a particular symbol name. Does not make any use of parent symbol table(s).
@@ -135,7 +134,8 @@ public class SymbolTable implements Serializable
     public boolean hasSymbol(String name)
     {
         return symbols.containsKey(name);
-    }    
+    }
+    // TODO Consider providing a method that checks the parentSymbolTable also
 
     public int addSymbol(Symbol symbol)
     {

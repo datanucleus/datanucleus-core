@@ -35,8 +35,7 @@ public class JDOQLSymbolResolver extends AbstractSymbolResolver
      * @param cls Candidate class
      * @param alias Candidate alias
      */
-    public JDOQLSymbolResolver(MetaDataManager mmgr, ClassLoaderResolver clr, SymbolTable symtbl, 
-            Class cls, String alias)
+    public JDOQLSymbolResolver(MetaDataManager mmgr, ClassLoaderResolver clr, SymbolTable symtbl, Class cls, String alias)
     {
         super(mmgr, clr, symtbl, cls, alias);
     }

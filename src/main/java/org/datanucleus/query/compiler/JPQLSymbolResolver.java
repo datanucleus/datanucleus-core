@@ -35,8 +35,7 @@ public class JPQLSymbolResolver extends AbstractSymbolResolver
      * @param cls Candidate class
      * @param alias Candidate alias
      */
-    public JPQLSymbolResolver(MetaDataManager mmgr, ClassLoaderResolver clr, SymbolTable symtbl, 
-            Class cls, String alias)
+    public JPQLSymbolResolver(MetaDataManager mmgr, ClassLoaderResolver clr, SymbolTable symtbl, Class cls, String alias)
     {
         super(mmgr, clr, symtbl, cls, alias);
     }

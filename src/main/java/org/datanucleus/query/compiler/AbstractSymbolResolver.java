@@ -47,8 +47,7 @@ public abstract class AbstractSymbolResolver implements SymbolResolver
      * @param cls Candidate class
      * @param alias Candidate alias
      */
-    public AbstractSymbolResolver(MetaDataManager mmgr, ClassLoaderResolver clr, SymbolTable symtbl, 
-            Class cls, String alias)
+    public AbstractSymbolResolver(MetaDataManager mmgr, ClassLoaderResolver clr, SymbolTable symtbl, Class cls, String alias)
     {
         this.metaDataManager = mmgr;
         this.clr = clr;
@@ -57,11 +56,11 @@ public abstract class AbstractSymbolResolver implements SymbolResolver
         this.candidateAlias = alias;
     }
 
-    public Class getType(List tuples)
+    public Class getType(List<String> tuples)
     {
         Class type = null;
         Symbol symbol = null;
-        String firstTuple = (String)tuples.get(0);
+        String firstTuple = tuples.get(0);
         if (caseSensitiveSymbolNames())
         {
             symbol = symtbl.getSymbol(firstTuple);
@@ -84,13 +83,12 @@ public abstract class AbstractSymbolResolver implements SymbolResolver
             if (type == null)
             {
                 // Implicit variables don't have their type defined
-                throw new NucleusUserException("Cannot find type of " + tuples.get(0) +
-                    " since symbol has no type; implicit variable?");
+                throw new NucleusUserException("Cannot find type of " + tuples.get(0) + " since symbol has no type; implicit variable?");
             }
 
             for (int i=1; i<tuples.size(); i++)
             {
-                type = getType(type, (String)tuples.get(i));
+                type = getType(type, tuples.get(i));
             }
         }
         else
@@ -99,7 +97,7 @@ public abstract class AbstractSymbolResolver implements SymbolResolver
             type = symbol.getValueType();
             for (int i=0; i<tuples.size(); i++)
             {
-                type = getType(type, (String)tuples.get(i));
+                type = getType(type, tuples.get(i));
             }
         }
         return type;

@@ -1043,11 +1043,11 @@ public abstract class JavaQueryCompiler implements SymbolResolver
         throw new ClassNotResolvedException("Class " + className + " for query has not been resolved. Check the query and any imports/aliases specification");
     }
 
-    public Class getType(List tuples)
+    public Class getType(List<String> tuples)
     {
         Class type = null;
         Symbol symbol = null;
-        String firstTuple = (String)tuples.get(0);
+        String firstTuple = tuples.get(0);
         if (caseSensitiveSymbolNames())
         {
             symbol = symtbl.getSymbol(firstTuple);
@@ -1076,7 +1076,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
 
             for (int i=1; i<tupleSize; i++)
             {
-                type = getType(type, (String)tuples.get(i), i == tupleSize-1);
+                type = getType(type, tuples.get(i), i == tupleSize-1);
             }
         }
         else
@@ -1085,7 +1085,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
             type = symbol.getValueType();
             for (int i=0; i<tupleSize; i++)
             {
-                type = getType(type, (String)tuples.get(i), i == tupleSize-1);
+                type = getType(type, tuples.get(i), i == tupleSize-1);
             }
         }
         return type;
