@@ -30,13 +30,13 @@ public interface FactoryStatisticsMBean
 
     int getQueryExecutionTotalCount();
 
-    int getQueryExecutionTimeLow();
+    long getQueryExecutionTimeLow();
 
-    int getQueryExecutionTimeHigh();
+    long getQueryExecutionTimeHigh();
 
-    int getQueryExecutionTotalTime();
+    long getQueryExecutionTotalTime();
 
-    int getQueryExecutionTimeAverage();
+    long getQueryExecutionTimeAverage();
 
     int getNumberOfDatastoreWrites();
 
@@ -54,13 +54,13 @@ public interface FactoryStatisticsMBean
 
     int getNumberOfObjectDeletes();
 
-    int getTransactionExecutionTimeAverage();
+    long getTransactionExecutionTimeAverage();
 
-    int getTransactionExecutionTimeLow();
+    long getTransactionExecutionTimeLow();
 
-    int getTransactionExecutionTimeHigh();
+    long getTransactionExecutionTimeHigh();
 
-    int getTransactionExecutionTotalTime();
+    long getTransactionExecutionTotalTime();
 
     int getTransactionTotalCount();
 

@@ -52,17 +52,17 @@ public abstract class AbstractStatistics
     int txnCommittedTotalCount;
     int txnRolledBackTotalCount;
     int txnActiveTotalCount;
-    int txnExecutionTotalTime = 0;
-    int txnExecutionTimeHigh =-1;
-    int txnExecutionTimeLow =-1;
+    long txnExecutionTotalTime = 0;
+    long txnExecutionTimeHigh =-1;
+    long txnExecutionTimeLow =-1;
     SMA txnExecutionTimeAverage = new SMA(50);
 
     int queryActiveTotalCount;
     int queryErrorTotalCount;
     int queryExecutionTotalCount;
-    int queryExecutionTotalTime = 0;
-    int queryExecutionTimeHigh =-1;
-    int queryExecutionTimeLow =-1;
+    long queryExecutionTotalTime = 0;
+    long queryExecutionTimeHigh =-1;
+    long queryExecutionTimeLow =-1;
     SMA queryExecutionTimeAverage = new SMA(50);
 
     /**
@@ -93,73 +93,46 @@ public abstract class AbstractStatistics
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getRegisteredName()
-     */
     public String getRegisteredName()
     {
         return registeredName;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getQueryActiveTotalCount()
-     */
     public int getQueryActiveTotalCount()
     {
         return queryActiveTotalCount;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getQueryErrorTotalCount()
-     */
     public int getQueryErrorTotalCount()
     {
         return queryErrorTotalCount;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getQueryExecutionTotalCount()
-     */
     public int getQueryExecutionTotalCount()
     {
         return queryExecutionTotalCount;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getQueryExecutionTimeLow()
-     */
-    public int getQueryExecutionTimeLow()
+    public long getQueryExecutionTimeLow()
     {
         return queryExecutionTimeLow;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getQueryExecutionTimeHigh()
-     */
-    public int getQueryExecutionTimeHigh()
+    public long getQueryExecutionTimeHigh()
     {
         return queryExecutionTimeHigh;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getQueryExecutionTotalTime()
-     */
-    public int getQueryExecutionTotalTime()
+    public long getQueryExecutionTotalTime()
     {
         return queryExecutionTotalTime;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getQueryExecutionTimeAverage()
-     */
-    public int getQueryExecutionTimeAverage()
+    public long getQueryExecutionTimeAverage()
     {
         return (int) queryExecutionTimeAverage.currentAverage();
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#queryBegin()
-     */
     public void queryBegin()
     {
         this.queryActiveTotalCount++;
@@ -169,9 +142,6 @@ public abstract class AbstractStatistics
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#queryExecutedWithError()
-     */
     public void queryExecutedWithError()
     {
         this.queryErrorTotalCount++;
@@ -181,10 +151,7 @@ public abstract class AbstractStatistics
             parent.queryExecutedWithError();
         }
     }
-    
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#queryExecuted(long)
-     */
+
     public void queryExecuted(long executionTime)
     {
         this.queryExecutionTotalCount++;
@@ -199,41 +166,29 @@ public abstract class AbstractStatistics
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getNumberOfDatastoreWrites()
-     */
     public int getNumberOfDatastoreWrites()
     {
         return numWrites;
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getNumberOfDatastoreReads()
+     * @see org.datanucleus.management.FactoryStatisticsMBean#getNumberOfDatastoreReads()
      */
     public int getNumberOfDatastoreReads()
     {
         return numReads;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getNumberOfDatastoreWritesInLatestTxn()
-     */
     public int getNumberOfDatastoreWritesInLatestTxn()
     {
         return numWritesLastTxn;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getNumberOfDatastoreReadsInLatestTxn()
-     */
     public int getNumberOfDatastoreReadsInLatestTxn()
     {
         return numReadsLastTxn;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#incrementNumReads()
-     */
     public void incrementNumReads()
     {
         numReads++;
@@ -243,9 +198,6 @@ public abstract class AbstractStatistics
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#incrementNumWrites()
-     */
     public void incrementNumWrites()
     {
         numWrites++;
@@ -255,41 +207,26 @@ public abstract class AbstractStatistics
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getNumberOfObjectFetches()
-     */
     public int getNumberOfObjectFetches()
     {
         return fetchCount;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getNumberOfObjectInserts()
-     */
     public int getNumberOfObjectInserts()
     {
         return insertCount;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getNumberOfObjectUpdates()
-     */
     public int getNumberOfObjectUpdates()
     {
         return updateCount;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getNumberOfObjectDeletes()
-     */
     public int getNumberOfObjectDeletes()
     {
         return deleteCount;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#incrementInsertCount()
-     */
     public void incrementInsertCount()
     {
         insertCount++;
@@ -299,9 +236,6 @@ public abstract class AbstractStatistics
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#incrementDeleteCount()
-     */
     public void incrementDeleteCount()
     {
         deleteCount++;
@@ -311,9 +245,6 @@ public abstract class AbstractStatistics
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#incrementFetchCount()
-     */
     public void incrementFetchCount()
     {
         fetchCount++;
@@ -323,9 +254,6 @@ public abstract class AbstractStatistics
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#incrementUpdateCount()
-     */
     public void incrementUpdateCount()
     {
         updateCount++;
@@ -335,73 +263,46 @@ public abstract class AbstractStatistics
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getTransactionExecutionTimeAverage()
-     */
-    public int getTransactionExecutionTimeAverage()
+    public long getTransactionExecutionTimeAverage()
     {
         return (int) txnExecutionTimeAverage.currentAverage();
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getTransactionExecutionTimeLow()
-     */
-    public int getTransactionExecutionTimeLow()
+    public long getTransactionExecutionTimeLow()
     {
         return txnExecutionTimeLow;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getTransactionExecutionTimeHigh()
-     */
-    public int getTransactionExecutionTimeHigh()
+    public long getTransactionExecutionTimeHigh()
     {
         return txnExecutionTimeHigh;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getTransactionExecutionTotalTime()
-     */
-    public int getTransactionExecutionTotalTime()
+    public long getTransactionExecutionTotalTime()
     {
         return txnExecutionTotalTime;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getTransactionTotalCount()
-     */
     public int getTransactionTotalCount()
     {
         return txnTotalCount;
     }
-    
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getTransactionActiveTotalCount()
-     */
+
     public int getTransactionActiveTotalCount()
     {
         return txnActiveTotalCount;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getTransactionCommittedTotalCount()
-     */
     public int getTransactionCommittedTotalCount()
     {
         return txnCommittedTotalCount;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#getTransactionRolledBackTotalCount()
-     */
     public int getTransactionRolledBackTotalCount()
     {
         return txnRolledBackTotalCount;
     }
-    
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#transactionCommitted(long)
-     */
+
     public void transactionCommitted(long executionTime)
     {
         this.txnCommittedTotalCount++;
@@ -418,10 +319,7 @@ public abstract class AbstractStatistics
             parent.transactionCommitted(executionTime);
         }
     }
-    
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#transactionRolledBack(long)
-     */
+
     public void transactionRolledBack(long executionTime)
     {
         this.txnRolledBackTotalCount++;
@@ -438,10 +336,7 @@ public abstract class AbstractStatistics
             parent.transactionRolledBack(executionTime);
         }
     }
-    
-    /* (non-Javadoc)
-     * @see org.datanucleus.management.AbstractStats#transactionStarted()
-     */
+
     public void transactionStarted()
     {
         this.txnTotalCount++;
