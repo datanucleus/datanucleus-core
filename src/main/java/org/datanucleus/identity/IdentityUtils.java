@@ -65,7 +65,7 @@ public class IdentityUtils
     /**
      * Method to return the target class name of the persistable object that the provided identity represents.
      * For the cases of datastore-identity or single-field identity then utilises the accessor method on those identity types to get the targetClassName.
-     * For user-provided identity types checks for a <pre>className</pre> field and returns it if present. Otherwise returns null.
+     * For user-provided identity types checks for a <pre>targetClassName</pre> field and returns it if present. Otherwise returns null.
      * @param id The identity
      * @return Class name for the identity if easily determinable
      */
@@ -269,134 +269,135 @@ public class IdentityUtils
      * @param resultsFM FieldManager servicing the results
      * @return The identity (if found) or null (if either not sure of inheritance, or not known).
      */
-    public static Object getApplicationIdentityForResultSetRow(ExecutionContext ec, AbstractClassMetaData cmd, 
-            Class pcClass, boolean inheritanceCheck, FieldManager resultsFM)
+    public static Object getApplicationIdentityForResultSetRow(ExecutionContext ec, AbstractClassMetaData cmd, Class pcClass, boolean inheritanceCheck, FieldManager resultsFM)
     {
-        if (cmd.getIdentityType() == IdentityType.APPLICATION)
+        if (cmd.getIdentityType() != IdentityType.APPLICATION)
         {
-            if (pcClass == null)
+            return null;
+        }
+
+        if (pcClass == null)
+        {
+            pcClass = ec.getClassLoaderResolver().classForName(cmd.getFullClassName());
+        }
+        ApiAdapter api = ec.getApiAdapter();
+        int[] pkFieldNums = cmd.getPKMemberPositions();
+        Object[] pkFieldValues = new Object[pkFieldNums.length];
+        for (int i=0;i<pkFieldNums.length;i++)
+        {
+            AbstractMemberMetaData pkMmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkFieldNums[i]);
+            if (pkMmd.getType() == int.class)
             {
-                pcClass = ec.getClassLoaderResolver().classForName(cmd.getFullClassName());
+                pkFieldValues[i] = resultsFM.fetchIntField(pkFieldNums[i]);
             }
-            ApiAdapter api = ec.getApiAdapter();
-            int[] pkFieldNums = cmd.getPKMemberPositions();
-            Object[] pkFieldValues = new Object[pkFieldNums.length];
+            else if (pkMmd.getType() == short.class)
+            {
+                pkFieldValues[i] = resultsFM.fetchShortField(pkFieldNums[i]);
+            }
+            else if (pkMmd.getType() == long.class)
+            {
+                pkFieldValues[i] = resultsFM.fetchLongField(pkFieldNums[i]);
+            }
+            else if (pkMmd.getType() == char.class)
+            {
+                pkFieldValues[i] = resultsFM.fetchCharField(pkFieldNums[i]);
+            }
+            else if (pkMmd.getType() == boolean.class)
+            {
+                pkFieldValues[i] = resultsFM.fetchBooleanField(pkFieldNums[i]);
+            }
+            else if (pkMmd.getType() == byte.class)
+            {
+                pkFieldValues[i] = resultsFM.fetchByteField(pkFieldNums[i]);
+            }
+            else if (pkMmd.getType() == double.class)
+            {
+                pkFieldValues[i] = resultsFM.fetchDoubleField(pkFieldNums[i]);
+            }
+            else if (pkMmd.getType() == float.class)
+            {
+                pkFieldValues[i] = resultsFM.fetchFloatField(pkFieldNums[i]);
+            }
+            else if (pkMmd.getType() == String.class)
+            {
+                pkFieldValues[i] = resultsFM.fetchStringField(pkFieldNums[i]);
+            }
+            else
+            {
+                pkFieldValues[i] = resultsFM.fetchObjectField(pkFieldNums[i]);
+            }
+        }
+
+        Class idClass = ec.getClassLoaderResolver().classForName(cmd.getObjectidClass());
+        if (cmd.usesSingleFieldIdentityClass())
+        {
+            // Create SingleField identity with query key value
+            Object id = ec.getNucleusContext().getIdentityManager().getSingleFieldId(idClass, pcClass, pkFieldValues[0]);
+            if (inheritanceCheck)
+            {
+                // Check if this identity exists in the cache(s)
+                if (ec.hasIdentityInCache(id))
+                {
+                    return id;
+                }
+
+                // Check if this id for any known subclasses is in the cache to save searching
+                String[] subclasses = ec.getMetaDataManager().getSubclassesForClass(pcClass.getName(), true);
+                if (subclasses != null)
+                {
+                    for (int i=0;i<subclasses.length;i++)
+                    {
+                        Object subid = ec.getNucleusContext().getIdentityManager().getSingleFieldId(idClass, 
+                            ec.getClassLoaderResolver().classForName(subclasses[i]), IdentityUtils.getTargetKeyForSingleFieldIdentity(id));
+                        if (ec.hasIdentityInCache(subid))
+                        {
+                            return subid;
+                        }
+                    }
+                }
+
+                // Check the inheritance with the store manager (may involve a trip to the datastore)
+                String className = ec.getStoreManager().getClassNameForObjectID(id, ec.getClassLoaderResolver(), ec);
+                return ec.getNucleusContext().getIdentityManager().getSingleFieldId(idClass, ec.getClassLoaderResolver().classForName(className), pkFieldValues[0]);
+            }
+            return id;
+        }
+
+        // Create user-defined PK class with PK field values
+        try
+        {
+            // All user-defined PK classes have a default constructor
+            Object id = idClass.newInstance();
+
             for (int i=0;i<pkFieldNums.length;i++)
             {
                 AbstractMemberMetaData pkMmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkFieldNums[i]);
-                if (pkMmd.getType() == int.class)
+                Object value = pkFieldValues[i];
+                if (api.isPersistable(value))
                 {
-                    pkFieldValues[i] = resultsFM.fetchIntField(pkFieldNums[i]);
+                    // CompoundIdentity, so use id
+                    value = api.getIdForObject(value);
                 }
-                else if (pkMmd.getType() == short.class)
+
+                if (pkMmd instanceof FieldMetaData)
                 {
-                    pkFieldValues[i] = resultsFM.fetchShortField(pkFieldNums[i]);
-                }
-                else if (pkMmd.getType() == long.class)
-                {
-                    pkFieldValues[i] = resultsFM.fetchLongField(pkFieldNums[i]);
-                }
-                else if (pkMmd.getType() == char.class)
-                {
-                    pkFieldValues[i] = resultsFM.fetchCharField(pkFieldNums[i]);
-                }
-                else if (pkMmd.getType() == boolean.class)
-                {
-                    pkFieldValues[i] = resultsFM.fetchBooleanField(pkFieldNums[i]);
-                }
-                else if (pkMmd.getType() == byte.class)
-                {
-                    pkFieldValues[i] = resultsFM.fetchByteField(pkFieldNums[i]);
-                }
-                else if (pkMmd.getType() == double.class)
-                {
-                    pkFieldValues[i] = resultsFM.fetchDoubleField(pkFieldNums[i]);
-                }
-                else if (pkMmd.getType() == float.class)
-                {
-                    pkFieldValues[i] = resultsFM.fetchFloatField(pkFieldNums[i]);
-                }
-                else if (pkMmd.getType() == String.class)
-                {
-                    pkFieldValues[i] = resultsFM.fetchStringField(pkFieldNums[i]);
+                    // Set the field directly (assumed to be public)
+                    Field pkField = ClassUtils.getFieldForClass(idClass, pkMmd.getName());
+                    pkField.set(id, value);
                 }
                 else
                 {
-                    pkFieldValues[i] = resultsFM.fetchObjectField(pkFieldNums[i]);
+                    // Use the setter
+                    Method pkMethod = ClassUtils.getSetterMethodForClass(idClass, pkMmd.getName(), pkMmd.getType());
+                    pkMethod.invoke(id, value);
                 }
             }
-
-            Class idClass = ec.getClassLoaderResolver().classForName(cmd.getObjectidClass());
-            if (cmd.usesSingleFieldIdentityClass())
-            {
-                // Create SingleField identity with query key value
-                Object id = ec.getNucleusContext().getIdentityManager().getSingleFieldId(idClass, pcClass, pkFieldValues[0]);
-                if (inheritanceCheck)
-                {
-                    // Check if this identity exists in the cache(s)
-                    if (ec.hasIdentityInCache(id))
-                    {
-                        return id;
-                    }
-
-                    // Check if this id for any known subclasses is in the cache to save searching
-                    String[] subclasses = ec.getMetaDataManager().getSubclassesForClass(pcClass.getName(), true);
-                    if (subclasses != null)
-                    {
-                        for (int i=0;i<subclasses.length;i++)
-                        {
-                            Object subid = ec.getNucleusContext().getIdentityManager().getSingleFieldId(idClass, 
-                                ec.getClassLoaderResolver().classForName(subclasses[i]), IdentityUtils.getTargetKeyForSingleFieldIdentity(id));
-                            if (ec.hasIdentityInCache(subid))
-                            {
-                                return subid;
-                            }
-                        }
-                    }
-
-                    // Check the inheritance with the store manager (may involve a trip to the datastore)
-                    String className = ec.getStoreManager().getClassNameForObjectID(id, ec.getClassLoaderResolver(), ec);
-                    return ec.getNucleusContext().getIdentityManager().getSingleFieldId(idClass, ec.getClassLoaderResolver().classForName(className), pkFieldValues[0]);
-                }
-                return id;
-            }
-
-            // Create user-defined PK class with PK field values
-            try
-            {
-                // All user-defined PK classes have a default constructor
-                Object id = idClass.newInstance();
-
-                for (int i=0;i<pkFieldNums.length;i++)
-                {
-                    AbstractMemberMetaData pkMmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkFieldNums[i]);
-                    Object value = pkFieldValues[i];
-                    if (api.isPersistable(value))
-                    {
-                        // CompoundIdentity, so use id
-                        value = api.getIdForObject(value);
-                    }
-                    if (pkMmd instanceof FieldMetaData)
-                    {
-                        // Set the field directly (assumed to be public)
-                        Field pkField = ClassUtils.getFieldForClass(idClass, pkMmd.getName());
-                        pkField.set(id, value);
-                    }
-                    else
-                    {
-                        // Use the setter
-                        Method pkMethod = ClassUtils.getSetterMethodForClass(idClass, pkMmd.getName(), pkMmd.getType());
-                        pkMethod.invoke(id, value);
-                    }
-                }
-                return id;
-            }
-            catch (Exception e)
-            {
-                return null;
-            }
+            return id;
         }
-        return null;
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
     /**
@@ -467,8 +468,7 @@ public class IdentityUtils
             }
             else
             {
-                Class cls = clr.classForName(cmd.getFullClassName());
-                id = ec.newObjectId(cls, idStr);
+                id = ec.newObjectId(clr.classForName(cmd.getFullClassName()), idStr);
             }
         }
         return ec.findObject(id, true, checkInheritance, null);
@@ -489,8 +489,7 @@ public class IdentityUtils
         if (fieldRole == FieldRole.ROLE_FIELD && mmd.getType().isInterface())
         {
             // Interface field, so use information about possible implementation types
-            String[] implNames = MetaDataUtils.getInstance().getImplementationNamesForReferenceField(mmd, fieldRole, 
-                clr, ec.getMetaDataManager());
+            String[] implNames = MetaDataUtils.getInstance().getImplementationNamesForReferenceField(mmd, fieldRole, clr, ec.getMetaDataManager());
             if (implNames == null || implNames.length == 0)
             {
                 // No known implementations so no way of knowing the type
