@@ -274,11 +274,6 @@ class PluginParser
                 NucleusLogger.GENERAL.debug(Localiser.msg("024003", fileUrl.toString()));
             }
             extensionPoints = parseExtensionPoints(rootElement, plugin, clr);
-
-            if (NucleusLogger.GENERAL.isDebugEnabled())
-            {
-                NucleusLogger.GENERAL.debug(Localiser.msg("024004", fileUrl.toString()));
-            }
             extensions = parseExtensions(rootElement, plugin, clr);
         }
         catch (NucleusException ex)

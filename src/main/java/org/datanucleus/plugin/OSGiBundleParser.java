@@ -249,11 +249,6 @@ public class OSGiBundleParser
                 NucleusLogger.GENERAL.debug(Localiser.msg("024003", fileUrl.toString()));
             }
             extensionPoints = parseExtensionPoints(rootElement, plugin, osgiBundle);
-
-            if (NucleusLogger.GENERAL.isDebugEnabled())
-            {
-                NucleusLogger.GENERAL.debug(Localiser.msg("024004", fileUrl.toString()));
-            }
             extensions = parseExtensions(rootElement, plugin, osgiBundle);
         }
         catch (NucleusException ex)
