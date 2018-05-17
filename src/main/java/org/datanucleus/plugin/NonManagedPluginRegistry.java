@@ -332,22 +332,21 @@ public class NonManagedPluginRegistry implements PluginRegistry
         try
         {
             Manifest mf = null;
-            if (manifest.getProtocol().equals("jar") || manifest.getProtocol().equals("zip") ||
-                manifest.getProtocol().equals("wsjar"))
+            if (manifest.getProtocol().equals("jar") || manifest.getProtocol().equals("zip") || manifest.getProtocol().equals("wsjar"))
             {
                 if (manifest.getPath().startsWith("http://") || manifest.getPath().startsWith("https://"))
                 {
-                  // protocol formats: 
-                  //     jar:http:<path>!<manifest-file>, zip:http:<path>!<manifest-file>
-                  // e.g jar:http://<host>[:port]/[app-path]/jpox-java5.jar!/plugin.xml
-                  JarURLConnection jarConnection = (JarURLConnection) manifest.openConnection();
-                  URL url = jarConnection.getJarFileURL();
-                  mf = jarConnection.getManifest();
-                  if (mf == null)
-                  {
-                      return null;
-                  }
-                  return registerBundle(mf, url);
+                    // protocol formats:
+                    // jar:http:<path>!<manifest-file>, zip:http:<path>!<manifest-file>
+                    // e.g jar:http://<host>[:port]/[app-path]/jpox-java5.jar!/plugin.xml
+                    JarURLConnection jarConnection = (JarURLConnection) manifest.openConnection();
+                    URL url = jarConnection.getJarFileURL();
+                    mf = jarConnection.getManifest();
+                    if (mf == null)
+                    {
+                        return null;
+                    }
+                    return registerBundle(mf, url);
                 }
 
                 int begin = 4;
@@ -355,6 +354,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
                 {
                     begin = 6;
                 }
+
                 // protocol formats: 
                 //     jar:<path>!<manifest-file>, zip:<path>!<manifest-file>
                 //     jar:file:<path>!<manifest-file>, zip:file:<path>!<manifest-file>
@@ -366,6 +366,37 @@ public class NonManagedPluginRegistry implements PluginRegistry
                     // remove "file:" from path, so we can use in File constructor
                     jarPath = jarPath.substring(5);
                 }
+
+                if (path.substring(index + 1).contains("!"))
+                {
+                    // Embedded jar within app jar, such as "jar:file:<app_jar_path>!<path_inside_app_jar>!/plugin.xml"
+                    File file = new File(jarPath);
+                    URL rarUrl = file.toURI().toURL();
+
+                    String embeddedJar = path.substring(index+1, path.indexOf(JAR_SEPARATOR,index+1));
+                    if(embeddedJar.startsWith("/")) 
+                    {
+                        embeddedJar = embeddedJar.substring(1);
+                    }
+
+                    @SuppressWarnings("resource")
+                    JarFile rarFile = new JarFile(file);
+                    JarInputStream jis = new JarInputStream(rarFile.getInputStream(rarFile.getEntry(embeddedJar)));
+                    try
+                    {
+                        mf = jis.getManifest();
+                        if (mf == null)
+                        {
+                            return null;
+                        }
+                    }
+                    finally
+                    {
+                        jis.close();
+                    }
+                    return registerBundle(mf, rarUrl);
+                }
+
                 File jarFile = new File(jarPath);
                 JarFile jar = new JarFile(jarFile);
                 try
