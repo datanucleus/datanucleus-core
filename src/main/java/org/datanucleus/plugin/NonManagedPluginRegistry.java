@@ -379,7 +379,6 @@ public class NonManagedPluginRegistry implements PluginRegistry
                         embeddedJar = embeddedJar.substring(1);
                     }
 
-                    @SuppressWarnings("resource")
                     JarFile rarFile = new JarFile(file);
                     JarInputStream jis = new JarInputStream(rarFile.getInputStream(rarFile.getEntry(embeddedJar)));
                     try
@@ -393,6 +392,10 @@ public class NonManagedPluginRegistry implements PluginRegistry
                     finally
                     {
                         jis.close();
+                        if (rarFile != null)
+                        {
+                            rarFile.close();
+                        }
                     }
                     return registerBundle(mf, rarUrl);
                 }
