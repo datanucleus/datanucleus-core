@@ -576,6 +576,8 @@ public class QueryManagerImpl implements QueryManager
                 if ("size".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ContainerSizeMethod();
                 if ("isEmpty".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ContainerIsEmptyMethod();
                 if ("contains".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.CollectionContainsMethod();
+                if ("get".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ListGetMethod();
+                if ("indexOf".equals(methodName)) eval = new org.datanucleus.query.inmemory.method.ListIndexOfMethod();
             }
             else if (java.util.Map.class.isAssignableFrom(type))
             {
