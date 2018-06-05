@@ -8,7 +8,7 @@ This is built using Maven, by executing `mvn clean install` which installs the b
 
 __License__ : Apache 2 licensed  
 __Issue Tracker__ : http://github.com/datanucleus/datanucleus-core/issues  
-__Javadocs__ : [5.1](http://www.datanucleus.org/javadocs/core/5.1/), [5.0](http://www.datanucleus.org/javadocs/core/5.0/), [4.1](http://www.datanucleus.org/javadocs/core/4.1/), [4.0](http://www.datanucleus.org/javadocs/core/4.0/)  
+__Javadocs__ : [5.2](http://www.datanucleus.org/javadocs/core/5.2/), [5.1](http://www.datanucleus.org/javadocs/core/5.1/), [5.0](http://www.datanucleus.org/javadocs/core/5.0/), [4.1](http://www.datanucleus.org/javadocs/core/4.1/), [4.0](http://www.datanucleus.org/javadocs/core/4.0/)  
 __Download(Releases)__ : [Maven Central](http://central.maven.org/maven2/org/datanucleus/datanucleus-core)  
 __Download(Nightly)__ : [Nightly Builds](http://www.datanucleus.org/downloads/maven2-nightly/org/datanucleus/datanucleus-core)  
 __Dependencies__ : See file [pom.xml](pom.xml)  
