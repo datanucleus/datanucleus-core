@@ -41,10 +41,7 @@ import org.datanucleus.enhancer.asm.FieldVisitor;
 import org.datanucleus.enhancer.asm.MethodVisitor;
 import org.datanucleus.enhancer.asm.Opcodes;
 import org.datanucleus.enhancer.asm.Type;
-import org.datanucleus.enhancer.methods.InitFieldFlags;
 import org.datanucleus.enhancer.methods.InitFieldNames;
-import org.datanucleus.enhancer.methods.InitFieldTypes;
-import org.datanucleus.enhancer.methods.InitPersistableSuperclass;
 import org.datanucleus.enhancer.methods.CopyField;
 import org.datanucleus.enhancer.methods.CopyFields;
 import org.datanucleus.enhancer.methods.CopyKeyFieldsFromObjectId;
@@ -598,14 +595,13 @@ public class ClassEnhancerImpl implements ClassEnhancer
         methodsToAdd.add(ProvideField.getInstance(this));
         methodsToAdd.add(CopyField.getInstance(this));
         methodsToAdd.add(CopyFields.getInstance(this));
+
         methodsToAdd.add(InitFieldNames.getInstance(this));
-        methodsToAdd.add(InitFieldTypes.getInstance(this)); // TODO Remove this when we remove dnFieldTypes
-        methodsToAdd.add(InitFieldFlags.getInstance(this)); // TODO Remove this when we remove dnFieldFlags
         methodsToAdd.add(GetInheritedFieldCount.getInstance(this));
         methodsToAdd.add(GetManagedFieldCount.getInstance(this));
-        methodsToAdd.add(InitPersistableSuperclass.getInstance(this));
+
         methodsToAdd.add(LoadClass.getInstance(this));
-        methodsToAdd.add(SuperClone.getInstance(this));
+        methodsToAdd.add(SuperClone.getInstance(this)); // TODO Only add this if required due to clone method
     }
 
     /**
@@ -625,11 +621,6 @@ public class ClassEnhancerImpl implements ClassEnhancer
             // Detachable fields
             fieldsToAdd.add(new ClassField(this, namer.getDetachedStateFieldName(), Opcodes.ACC_PROTECTED, Object[].class));
         }
-
-        // TODO Drop these 3 when we upgrade the enhancement contract
-        fieldsToAdd.add(new ClassField(this, namer.getFieldFlagsFieldName(), Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, byte[].class));
-        fieldsToAdd.add(new ClassField(this, namer.getPersistableSuperclassFieldName(), Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, Class.class));
-        fieldsToAdd.add(new ClassField(this, namer.getFieldTypesFieldName(), Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, Class[].class));
 
         fieldsToAdd.add(new ClassField(this, namer.getFieldNamesFieldName(), Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, String[].class));
         fieldsToAdd.add(new ClassField(this, namer.getInheritedFieldCountFieldName(), Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, int.class));

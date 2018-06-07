@@ -28,12 +28,6 @@ public interface EnhancementNamer
 
     String getFieldNamesFieldName();
 
-    String getFieldTypesFieldName();
-
-    String getFieldFlagsFieldName();
-
-    String getPersistableSuperclassFieldName();
-
     String getInheritedFieldCountFieldName();
 
     String getDetachedStateFieldName();
@@ -41,10 +35,6 @@ public interface EnhancementNamer
     String getSerialVersionUidFieldName();
 
     String getFieldNamesInitMethodName();
-
-    String getFieldTypesInitMethodName();
-
-    String getFieldFlagsInitMethodName();
 
     String getGetObjectIdMethodName();
 
@@ -77,8 +67,6 @@ public interface EnhancementNamer
     String getSuperCloneMethodName();
 
     String getGetManagedFieldCountMethodName();
-
-    String getPersistableSuperclassInitMethodName();
 
     String getLoadClassMethodName();
 

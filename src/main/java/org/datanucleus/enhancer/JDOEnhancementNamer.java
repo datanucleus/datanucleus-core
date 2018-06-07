@@ -26,8 +26,7 @@ import org.datanucleus.util.DetachListener;
 
 /**
  * Definition of enhancement naming, for use with the JDO API.
- * Note that this does not provide "binary compatibility" since we need to provide something that works for JDO and JPA and cannot rely
- * on having jdo-api.jar present.
+ * Note that this does not provide "binary compatibility" since we need to provide something that works for JDO and JPA and cannot rely on having jdo-api.jar present.
  */
 public class JDOEnhancementNamer implements EnhancementNamer
 {
@@ -105,30 +104,6 @@ public class JDOEnhancementNamer implements EnhancementNamer
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getFieldTypesFieldName()
-     */
-    public String getFieldTypesFieldName()
-    {
-        return "dnFieldTypes";
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getFieldFlagsFieldName()
-     */
-    public String getFieldFlagsFieldName()
-    {
-        return "dnFieldFlags";
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getPersistableSuperclassFieldName()
-     */
-    public String getPersistableSuperclassFieldName()
-    {
-        return "dnPersistableSuperclass";
-    }
-
-    /* (non-Javadoc)
      * @see org.datanucleus.enhancer.ClassEnhancer#getInheritedFieldCountFieldName()
      */
     public String getInheritedFieldCountFieldName()
@@ -158,22 +133,6 @@ public class JDOEnhancementNamer implements EnhancementNamer
     public String getFieldNamesInitMethodName()
     {
         return "__dnFieldNamesInit";
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getFieldTypesInitMethodName()
-     */
-    public String getFieldTypesInitMethodName()
-    {
-        return "__dnFieldTypesInit";
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getFieldFlagsInitMethodName()
-     */
-    public String getFieldFlagsInitMethodName()
-    {
-        return "__dnFieldFlagsInit";
     }
 
     /* (non-Javadoc)
@@ -303,14 +262,6 @@ public class JDOEnhancementNamer implements EnhancementNamer
     public String getGetManagedFieldCountMethodName()
     {
         return "dnGetManagedFieldCount";
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.enhancer.ClassEnhancer#getPersistableSuperclassInitMethodName()
-     */
-    public String getPersistableSuperclassInitMethodName()
-    {
-        return "__dnPersistableSuperclassInit";
     }
 
     /* (non-Javadoc)

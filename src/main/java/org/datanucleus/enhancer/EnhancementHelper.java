@@ -157,15 +157,10 @@ public class EnhancementHelper extends java.lang.Object
     /**
      * Register metadata by class.
      * This is called by the enhanced constructor of the <code>Persistable</code> class.
-     * TODO Remove the unused arguments when the enhancement contract is updated to not use them.
      * @param pcClass the <code>Persistable</code> class used as the key for lookup.
-     * @param fieldNames Not used
-     * @param fieldTypes Not used
-     * @param fieldFlags Not used
      * @param pc an instance of the <code>Persistable</code> class. TODO We can just do pcClass.newInstance() to get one!
-     * @param persistableSuperclass Not used
      */
-    public static void registerClass(Class pcClass, String[] fieldNames, Class[] fieldTypes, byte[] fieldFlags, Class persistableSuperclass, Persistable pc)
+    public static void registerClass(Class pcClass, Persistable pc)
     {
         if (pcClass == null)
         {
