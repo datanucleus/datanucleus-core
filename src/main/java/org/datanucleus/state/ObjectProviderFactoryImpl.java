@@ -60,6 +60,7 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
         }
         opClass = nucCtx.getClassLoaderResolver(null).classForName(opClassName);
 
+        // TODO core-264 Remove this block
         // Register the StateManager class with EnhancementHelper for security
         AccessController.doPrivileged(new PrivilegedAction() 
         {

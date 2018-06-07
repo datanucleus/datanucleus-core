@@ -93,8 +93,10 @@ public class ReplaceStateManager extends ClassMethod
         visitor.visitLabel(l1);
         visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
+        // TODO core-264 Remove next 2 lines to get rid of checkAuthorizedStateManager call
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
         visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getImplHelperAsmClassName(), "checkAuthorizedStateManager", "(L" + getNamer().getStateManagerAsmClassName() + ";)V");
+
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
         visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());

@@ -54,12 +54,6 @@ public class EnhancementHelper extends java.lang.Object
     private static Map<Class, Meta> registeredClasses = new ConcurrentHashMap<>();
 
     /**
-     * This Set contains all classes that have registered for setStateManager permissions via
-     * authorizeStateManagerClass. Only the key is used in order to maintain a weak set of classes.
-     */
-    private static final Map<Class, Class> authorizedStateManagerClasses = new WeakHashMap<>();
-
-    /**
      * This list contains the registered listeners for <code>RegisterClassEvent</code>s.
      */
     private static final List<RegisterClassListener> listeners = new ArrayList<RegisterClassListener>();
@@ -310,6 +304,13 @@ public class EnhancementHelper extends java.lang.Object
             return "Meta-" + pc.getClass().getName();
         }
     }
+
+    // TODO core-264 Remove this field and 2 methods
+    /**
+     * This Set contains all classes that have registered for setStateManager permissions via authorizeStateManagerClass. 
+     * Only the key is used in order to maintain a weak set of classes.
+     */
+    private static final Map<Class, Class> authorizedStateManagerClasses = new WeakHashMap<>();
 
     /**
      * Register a class authorized to replaceStateManager. During replaceStateManager, a persistable class will call the
