@@ -17,9 +17,6 @@ Contributors:
  **********************************************************************/
 package org.datanucleus.state;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
 import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -27,7 +24,6 @@ import org.datanucleus.Configuration;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.cache.CachedPC;
-import org.datanucleus.enhancer.EnhancementHelper;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -59,17 +55,6 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
             opClassName = nucCtx.getStoreManager().getDefaultObjectProviderClassName();
         }
         opClass = nucCtx.getClassLoaderResolver(null).classForName(opClassName);
-
-        // TODO core-264 Remove this block
-        // Register the StateManager class with EnhancementHelper for security
-        AccessController.doPrivileged(new PrivilegedAction() 
-        {
-            public Object run()
-            {
-                EnhancementHelper.registerAuthorizedStateManagerClass(opClass);
-                return null;
-            }
-        });
 
 //        opPool = new ObjectProviderPool(conf.getIntProperty(PropertyNames.PROPERTY_OBJECT_PROVIDER_MAX_IDLE),
 //            conf.getBooleanProperty(PropertyNames.PROPERTY_OBJECT_PROVIDER_REAPER_THREAD),

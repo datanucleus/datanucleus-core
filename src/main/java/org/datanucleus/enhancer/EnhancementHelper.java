@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.enhancement.Persistable;
@@ -303,62 +302,5 @@ public class EnhancementHelper extends java.lang.Object
         {
             return "Meta-" + pc.getClass().getName();
         }
-    }
-
-    // TODO core-264 Remove this field and 2 methods
-    /**
-     * This Set contains all classes that have registered for setStateManager permissions via authorizeStateManagerClass. 
-     * Only the key is used in order to maintain a weak set of classes.
-     */
-    private static final Map<Class, Class> authorizedStateManagerClasses = new WeakHashMap<>();
-
-    /**
-     * Register a class authorized to replaceStateManager. During replaceStateManager, a persistable class will call the
-     * corresponding checkAuthorizedStateManager and the class of the instance of the parameter must have been registered.
-     * @param smClass a Class that is authorized for JDOPermission("setStateManager").
-     */
-    public static void registerAuthorizedStateManagerClass(Class smClass) /*throws SecurityException*/
-    {
-        if (smClass == null)
-        {
-            throw new NullPointerException("Cannot register StateManager class with null input!");
-        }
-        /*SecurityManager sm = System.getSecurityManager();
-        if (sm != null)
-        {
-            sm.checkPermission(JDOPermission.SET_STATE_MANAGER);
-        }*/
-        synchronized (authorizedStateManagerClasses)
-        {
-            authorizedStateManagerClasses.put(smClass, null);
-        }
-    }
-
-    /**
-     * Check that the parameter instance is of a class that is authorized for JDOPermission("setStateManager"). 
-     * This method is called by the <code>replaceStateManager</code> method in Persistable classes. 
-     * A class that is passed as the parameter to replaceStateManager must be authorized for JDOPermission("setStateManager"). 
-     * To improve performance, first the set of authorized classes is checked, and if not present, a regular permission check is made. 
-     * The regular permission check requires that all callers on the stack, including the persistence-capable class itself, must be authorized for JDOPermission("setStateManager").
-     * @param sm an instance of StateManager whose class is to be checked.
-     */
-    public static void checkAuthorizedStateManager(StateManager sm)
-    {
-        /*final SecurityManager scm = System.getSecurityManager();
-        if (scm == null)
-        {
-            // if no security manager, no checking.
-            return;
-        }*/
-        synchronized (authorizedStateManagerClasses)
-        {
-            if (authorizedStateManagerClasses.containsKey(sm.getClass()))
-            {
-                return;
-            }
-        }
-
-        // if not already authorized, perform "long" security checking.
-        /*scm.checkPermission(JDOPermission.SET_STATE_MANAGER);*/
     }
 }
