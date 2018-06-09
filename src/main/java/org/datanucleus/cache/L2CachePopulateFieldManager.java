@@ -417,7 +417,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
         }
         catch (Exception e)
         {
-            NucleusLogger.CACHE.warn("Unable to create object of type " + mapContainer.getClass().getName() + " for L2 caching : " + e.getMessage());
+            NucleusLogger.CACHE.warn("Unable to create object of type " + mapContainer.getClass().getName() + " for L2 caching", e);
 
             // Contents not loaded so just mark as unloaded
             cachedPC.setLoadedField(fieldNumber, false);
@@ -505,7 +505,7 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
             }
             catch (Exception e)
             {
-                NucleusLogger.CACHE.warn("Unable to create object of type " + container.getClass().getName() + " for L2 caching : " + e.getMessage());
+                NucleusLogger.CACHE.warn("Unable to create object of type " + container.getClass().getName() + " for L2 caching : ", e);
 
                 // Contents not loaded so just mark as unloaded
                 cachedPC.setLoadedField(fieldNumber, false);
@@ -552,6 +552,11 @@ public class L2CachePopulateFieldManager extends AbstractFieldManager
      */
     protected CachedPC convertPersistableToCachedPC(Object pc)
     {
+        if (pc == null)
+        {
+            return null;
+        }
+
         ObjectProvider valueOP = ec.findObjectProvider(pc);
         CachedPC valueCachedPC = new CachedPC(pc.getClass(), valueOP.getLoadedFields(), null, null);
 
