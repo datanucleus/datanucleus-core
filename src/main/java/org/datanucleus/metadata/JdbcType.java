@@ -48,6 +48,7 @@ public enum JdbcType
     NVARCHAR(Types.NVARCHAR),
     OTHER(Types.OTHER),
     REAL(Types.REAL),
+    REF_CURSOR(2012), // JDK 1.8+
     SMALLINT(Types.SMALLINT),
     SQLXML(Types.SQLXML),
     TIME(Types.TIME),
