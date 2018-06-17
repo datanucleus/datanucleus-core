@@ -178,7 +178,7 @@
           </xsd:complexType>
         </xsd:element>
       </xsd:sequence>
-      <xsd:attribute name="version" type="persistence:versionType" fixed="2.2" use="required"/>
+      <xsd:attribute name="version" type="persistence:versionType" use="required"/> <!-- REMOVED version fixed from here to allow validation with all JPA persistence.xml versions -->
     </xsd:complexType>
   </xsd:element>
   <!-- **************************************************** -->
