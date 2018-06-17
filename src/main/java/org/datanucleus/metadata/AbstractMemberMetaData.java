@@ -38,6 +38,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.types.ContainerHandler;
 import org.datanucleus.store.types.TypeManager;
+import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -520,19 +521,28 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             }
             else
             {
-                boolean isPcClass = getType().isArray() ? isFieldArrayTypePersistable(mmgr) : mmgr.isFieldTypePersistable(type);
-                if (!isPcClass)
+                TypeConverter autoApplyTypeConv = mmgr.getNucleusContext().getTypeManager().getAutoApplyTypeConverterForType(getType());
+                if (autoApplyTypeConv != null && !isTypeConversionDisabled())
                 {
-                    if (getType().isArray() && getType().getComponentType().isInterface())
-                    {
-                        isPcClass = mmgr.getMetaDataForClassInternal(getType().getComponentType(), clr) != null;
-                    }
-                    else if (getType().isInterface())
-                    {
-                        isPcClass = mmgr.getMetaDataForClassInternal(getType(), clr) != null;
-                    }
+                    // Auto-apply converter is available, and not disabled, so member becomes default persistent
+                    persistenceModifier = FieldPersistenceModifier.PERSISTENT;
                 }
-                persistenceModifier = getDefaultFieldPersistenceModifier(getType(), memberRepresented.getModifiers(), isPcClass, mmgr);
+                else
+                {
+                    boolean isPcClass = getType().isArray() ? isFieldArrayTypePersistable(mmgr) : mmgr.isFieldTypePersistable(type);
+                    if (!isPcClass)
+                    {
+                        if (getType().isArray() && getType().getComponentType().isInterface())
+                        {
+                            isPcClass = mmgr.getMetaDataForClassInternal(getType().getComponentType(), clr) != null;
+                        }
+                        else if (getType().isInterface())
+                        {
+                            isPcClass = mmgr.getMetaDataForClassInternal(getType(), clr) != null;
+                        }
+                    }
+                    persistenceModifier = getDefaultFieldPersistenceModifier(getType(), memberRepresented.getModifiers(), isPcClass, mmgr);
+                }
             }
         }
         // TODO If this field is NONE in superclass, make it NONE here too

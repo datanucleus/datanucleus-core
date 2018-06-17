@@ -72,7 +72,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
-import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
@@ -152,11 +151,9 @@ public class TypeManagerImpl implements TypeManager, Serializable
         this.nucCtx = nucCtx;
         this.clr = nucCtx.getClassLoaderResolver(null);
         loadJavaTypes(nucCtx.getPluginManager());
-        if (nucCtx instanceof PersistenceNucleusContext)
-        {
-            // Not needed for enhancing
-            loadTypeConverters(nucCtx.getPluginManager());
-        }
+
+        // Load converters since if a type is otherwise not persistable but a converter is found, then the type becomes persistable, hence needs enhancing
+        loadTypeConverters(nucCtx.getPluginManager());
     }
 
     public void close()
