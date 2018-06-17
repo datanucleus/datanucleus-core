@@ -958,6 +958,10 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         }
 
         // Must be "datastore" specific generator so use plugin mechanism to create one and register against this member "key"
+        if (!strategy.toString().equalsIgnoreCase("custom") && !supportsValueGenerationStrategy(strategy.toString()))
+        {
+            throw new NucleusUserException("Attempt to use strategy=" + strategy.toString() + " but this is not supported for this datastore");
+        }
 
         // Set up the default properties available for all value generators
         // Extract any metadata-based generation information keyed by the "valueGeneratorName"
