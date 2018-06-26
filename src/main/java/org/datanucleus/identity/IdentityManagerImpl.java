@@ -462,7 +462,7 @@ public class IdentityManagerImpl implements IdentityManager
             if (!(id instanceof SingleFieldId))
             {
                 // DataNucleus feature to allow user-defined id classes to have a field "targetClassName" storing the class name of the object being represented
-                Field classField = ClassUtils.getFieldForClass(id.getClass(), "targetClassName");
+                Field classField = ClassUtils.getFieldForClass(id.getClass(), IdentityManager.IDENTITY_CLASS_TARGET_CLASS_NAME_FIELD);
                 if (classField != null)
                 {
                     try

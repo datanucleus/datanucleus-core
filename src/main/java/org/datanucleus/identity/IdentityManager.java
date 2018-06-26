@@ -25,6 +25,8 @@ import org.datanucleus.metadata.AbstractClassMetaData;
  */
 public interface IdentityManager
 {
+    public static final String IDENTITY_CLASS_TARGET_CLASS_NAME_FIELD = "targetClassName";
+
     Class getDatastoreIdClass();
 
     /**

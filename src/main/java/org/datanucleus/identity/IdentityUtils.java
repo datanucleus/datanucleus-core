@@ -92,7 +92,7 @@ public class IdentityUtils
             // TODO Allow alternatives to this, for example using an annotation on the id class, and having a cache of what field name to use for which id type
             try
             {
-                Object val = ClassUtils.getValueOfFieldByReflection(id, "targetClassName");
+                Object val = ClassUtils.getValueOfFieldByReflection(id, IdentityManager.IDENTITY_CLASS_TARGET_CLASS_NAME_FIELD);
                 if (val instanceof String)
                 {
                     return (String)val;
