@@ -1038,7 +1038,7 @@ public class TypeConversionHelper
             }
         }
 
-        NucleusLogger.PERSISTENCE.warn("Request to convert value of type " + value.getClass().getName() + " to type " + type.getName() + " but this is not yet supported." +
+        NucleusLogger.PERSISTENCE.warn("Request to convert value of type " + value.getClass().getName() + " to type " + type.getName() + " but this is not yet supported. " +
                 "Raise an issue and contribute the code to support this conversion, with a testcase that demonstrates the problem");
         return value;
     }

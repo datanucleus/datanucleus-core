@@ -61,8 +61,7 @@ public class OSGiBundleParser
         }
         catch (NucleusException ne)
         {
-            NucleusLogger.GENERAL.warn("Plugin at bundle " + osgiBundle.getSymbolicName() + 
-                " (" + osgiBundle.getBundleId() + ") failed to parse so is being ignored", ne);
+            NucleusLogger.GENERAL.warn("Plugin at bundle " + osgiBundle.getSymbolicName() + " (" + osgiBundle.getBundleId() + ") failed to parse so is being ignored", ne);
             return null;
         }
         return bundle;
@@ -70,7 +69,7 @@ public class OSGiBundleParser
 
     /**
      * Accessor for the Bundle-Name from the manifest.mf file
-     * @param mf the manifest
+     * @param headers manifest headers
      * @return the Set with BundleDescription
      */
     private static List<Bundle.BundleDescription> getRequireBundle(Dictionary<String, String> headers)
@@ -80,8 +79,9 @@ public class OSGiBundleParser
         {
             return Collections.emptyList();
         }
+
         Parser p = new Parser(str);
-        List<Bundle.BundleDescription> requiredBundle = new ArrayList<Bundle.BundleDescription>();
+        List<Bundle.BundleDescription> requiredBundle = new ArrayList<>();
         String bundleSymbolicName = p.parseSymbolicName();
         while (bundleSymbolicName != null)
         {
@@ -98,13 +98,13 @@ public class OSGiBundleParser
      * Method to parse ExtensionPoints from plug-in file
      * @param rootElement the root element of the plugin xml
      * @param plugin the plugin bundle
-     * @param clr the ClassLoaderResolver
+     * @param osgiBundle The bundle
      * @return a List of extensionPoints, if any
      * @throws NucleusException if an error occurs during parsing
      */
     private static List<ExtensionPoint> parseExtensionPoints(Element rootElement, Bundle plugin, org.osgi.framework.Bundle osgiBundle)
     {
-        List<ExtensionPoint> extensionPoints = new ArrayList<ExtensionPoint>();
+        List<ExtensionPoint> extensionPoints = new ArrayList<>();
         try
         {
             NodeList elements = rootElement.getElementsByTagName("extension-point");
@@ -128,13 +128,13 @@ public class OSGiBundleParser
      * Method to parse Extensions from plug-in file
      * @param rootElement the root element of the plugin xml
      * @param plugin the plugin bundle
-     * @param clr the ClassLoaderResolver
+     * @param osgiBundle the bundle
      * @return a List of extensions, if any
      * @throws NucleusException if an error occurs during parsing
      */
     private static List<Extension> parseExtensions(Element rootElement, Bundle plugin, org.osgi.framework.Bundle osgiBundle)
     {
-        List<Extension> extensions = new ArrayList<Extension>();
+        List<Extension> extensions = new ArrayList<>();
         try
         {
             NodeList elements = rootElement.getElementsByTagName("extension");
@@ -176,7 +176,7 @@ public class OSGiBundleParser
 
     /**
      * Accessor for the Bundle-SymbolicName from the manifest.mf file
-     * @param mf the manifest
+     * @param headers Manifest headers
      * @param defaultValue a default value, in case no symbolic name found in manifest
      * @return the bundle symbolic name
      */
@@ -189,7 +189,7 @@ public class OSGiBundleParser
 
     /**
      * Accessor for the Bundle-Name from the manifest.mf file
-     * @param mf the manifest
+     * @param headers manifest headers
      * @param defaultValue a default value, in case no name found in manifest
      * @return the bundle name
      */
@@ -200,7 +200,7 @@ public class OSGiBundleParser
 
     /**
      * Accessor for the Bundle-Vendor from the manifest.mf file
-     * @param mf the manifest
+     * @param headers manifest headers
      * @param defaultValue a default value, in case no vendor found in manifest
      * @return the bundle vendor
      */
@@ -231,8 +231,7 @@ public class OSGiBundleParser
      * Extension
      * @throws NucleusException if an error occurs during parsing
      */
-    public static List[] parsePluginElements(DocumentBuilder db, PluginRegistry mgr, URL fileUrl, Bundle plugin,
-            org.osgi.framework.Bundle osgiBundle)
+    public static List[] parsePluginElements(DocumentBuilder db, PluginRegistry mgr, URL fileUrl, Bundle plugin, org.osgi.framework.Bundle osgiBundle)
     {
         List<ExtensionPoint> extensionPoints = Collections.emptyList();
         List<Extension> extensions = Collections.emptyList();

@@ -1920,10 +1920,11 @@ public class ClassUtils
     }
 
     /**
-     * Helper method to retrieve the java.lang.reflect.Field
+     * Helper method to retrieve the java.lang.reflect.Method
      * @param clazz the Class instance of the declaring class or interface
-     * @param fieldName the field name
-     * @return The field
+     * @param methodName the method name
+     * @param argTypes Types of the arguments to this method
+     * @return The method
      */
     private static Method getDeclaredMethodPrivileged(final Class clazz, final String methodName, final Class... argTypes)
     {

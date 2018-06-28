@@ -1917,7 +1917,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
         /**
          * Method defining the ordering of objects. Places all nulls at the end.
-         * @param cls First class
+         * @param cls1 First class
          * @param cls2 Second class
          * @return The comparison result
          */

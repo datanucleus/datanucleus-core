@@ -308,10 +308,9 @@ public class QueryUtils
     }
 
     /**
-     * Convenience method to create an instance of the result class with the provided field
-     * values, using the default constructor and setting the fields using either public fields,
-     * or setters, or a put method. If one of these parts is not found in the result class the
-     * returned object is null.
+     * Convenience method to create an instance of the result class with the provided field values, 
+     * using the default constructor and setting the fields using either public fields, or setters, or a put method. 
+     * If one of these parts is not found in the result class the returned object is null.
      * @param resultClass Result class that we need to create an object of
      * @param resultFieldNames Names of the fields in the results
      * @param resultFields (java.lang.reflect.)Field objects for the fields in the results
@@ -354,11 +353,10 @@ public class QueryUtils
 
     /**
      * Method to set a field of an object, using set/put methods, or via a public field.
-     * See JDO2 spec [14.6.12] describing the 3 ways of setting the field values
-     * after creating the result object using the default constructor.
-     * @param resultClassFieldName Map of the field keyed by field name
+     * See JDO spec [14.6.12] describing the 3 ways of setting the field values after creating the result object using the default constructor.
      * @param obj The object to update the field for
      * @param fieldName Name of the field
+     * @param field The field
      * @param value The value to apply
      * @return Whether it was updated
      */
