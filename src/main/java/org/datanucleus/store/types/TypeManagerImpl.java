@@ -1286,7 +1286,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
     /**
      * Method to load the java type that are currently registered in the PluginManager.
      * @param mgr the PluginManager
-     * @param clr the ClassLoaderResolver
      */
     private void loadTypeConverters(PluginManager mgr)
     {

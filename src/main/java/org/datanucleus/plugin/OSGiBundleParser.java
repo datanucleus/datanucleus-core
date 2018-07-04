@@ -211,7 +211,7 @@ public class OSGiBundleParser
 
     /**
      * Accessor for the Bundle-Version from the manifest.mf file
-     * @param mf the manifest
+     * @param headers the manifest headers
      * @param defaultValue a default value, in case no version found in manifest
      * @return the bundle version
      */

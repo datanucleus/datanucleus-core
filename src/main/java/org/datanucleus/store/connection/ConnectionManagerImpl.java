@@ -335,8 +335,9 @@ public class ConnectionManagerImpl implements ConnectionManager
      * Method to return a ManagedConnection for this ExecutionContext.
      * If a connection for the ExecutionContext exists in the cache will return it.
      * If no connection exists will create a new one using the ConnectionFactory.
-     * @param factory ConnectionFactory it relates to
+     * @param primary Whether this is the primary connection pool
      * @param ec Key in the pool
+     * @param transaction The transaction
      * @param options Options for the connection (e.g isolation). These will override those of the txn itself
      * @return The ManagedConnection
      */
