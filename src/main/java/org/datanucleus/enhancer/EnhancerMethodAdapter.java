@@ -179,19 +179,20 @@ public class EnhancerMethodAdapter extends MethodVisitor
      * @param owner Owner class
      * @param name Name of the field
      * @param desc Descriptor for the field
+     * @param isInterface Whether this method is an interface
      */
-    public void visitMethodInsn(int opcode, String owner, String name, String desc)
+    public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface)
     {
         if (methodName.equals("clone") && methodDescriptor.equals("()Ljava/lang/Object;") &&
             enhancer.getClassMetaData().getPersistableSuperclass() == null &&
             opcode == Opcodes.INVOKESPECIAL && name.equals("clone") && desc.equals("()Ljava/lang/Object;"))
         {
             // clone() method calls super.clone() so change to use dnSuperClone()
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, enhancer.getASMClassName(), enhancer.getNamer().getSuperCloneMethodName(), "()Ljava/lang/Object;");
+            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, enhancer.getASMClassName(), enhancer.getNamer().getSuperCloneMethodName(), "()Ljava/lang/Object;", false);
             return;
         }
 
-        super.visitMethodInsn(opcode, owner, name, desc);
+        super.visitMethodInsn(opcode, owner, name, desc, isInterface);
     }
 
     /**
