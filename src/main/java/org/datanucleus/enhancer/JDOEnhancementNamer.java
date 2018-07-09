@@ -251,9 +251,9 @@ public class JDOEnhancementNamer implements EnhancementNamer
     /* (non-Javadoc)
      * @see org.datanucleus.enhancer.ClassEnhancer#getSuperCloneMethodName()
      */
-    public String getSuperCloneMethodName()
+    public String getCloneMethodName()
     {
-        return "dnSuperClone";
+        return "dnClone";
     }
 
     /* (non-Javadoc)

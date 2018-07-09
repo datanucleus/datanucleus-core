@@ -64,7 +64,7 @@ public interface EnhancementNamer
 
     String getGetInheritedFieldCountMethodName();
 
-    String getSuperCloneMethodName();
+    String getCloneMethodName();
 
     String getGetManagedFieldCountMethodName();
 

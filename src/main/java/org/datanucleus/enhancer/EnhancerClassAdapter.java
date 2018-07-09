@@ -30,6 +30,7 @@ import org.datanucleus.enhancer.asm.FieldVisitor;
 import org.datanucleus.enhancer.asm.MethodVisitor;
 import org.datanucleus.enhancer.asm.Opcodes;
 import org.datanucleus.enhancer.asm.Type;
+import org.datanucleus.enhancer.methods.Clone;
 import org.datanucleus.enhancer.methods.DefaultConstructor;
 import org.datanucleus.enhancer.methods.InitClass;
 import org.datanucleus.enhancer.methods.GetNormal;
@@ -74,6 +75,8 @@ public class EnhancerClassAdapter extends ClassVisitor
     /** Whether the class already has a static init block. Set if found, and processed in visitEnd. */
     protected boolean hasStaticInitialisation = false;
 
+    protected boolean needsClone = false;
+
     /**
      * Constructor.
      * If the writer is null it means we just have to check the enhancement status
@@ -84,6 +87,11 @@ public class EnhancerClassAdapter extends ClassVisitor
     {
         super(ClassEnhancer.ASM_API_VERSION, cv);
         this.enhancer = enhancer;
+        if (enhancer.getClassMetaData().getSuperAbstractClassMetaData() == null && Cloneable.class.isAssignableFrom(enhancer.getClassBeingEnhanced()))
+        {
+            // Root persistable class that is Cloneable, in principle, needs "clone()"
+            needsClone = true;
+        }
     }
 
     /**
@@ -236,6 +244,12 @@ public class EnhancerClassAdapter extends ClassVisitor
             // readObject(ObjectInputStream), readObject(ObjectOutputStream) should not be enhanced (JDO spec [21.6])
             return mv;
         }
+        else if (name.equals("clone") && desc != null && (desc.equals("()Ljava/lang/Object;")))
+        {
+            // "Object clone()"
+            needsClone = false; // User has provided clone so this will move it to "dnClone" and add a "clone" to call it.
+            return new EnhancerCloneAdapter(mv, enhancer, cv);
+        }
 
         String propGetterName = ClassUtils.getFieldNameForJavaBeanGetter(name);
         String propSetterName = ClassUtils.getFieldNameForJavaBeanSetter(name);
@@ -312,6 +326,12 @@ public class EnhancerClassAdapter extends ClassVisitor
 
             // Add any new methods
             List methods = enhancer.getMethodsList();
+            if (needsClone)
+            {
+                // Add a default clone() method
+                methods.add(Clone.getInstance(enhancer));
+            }
+
             Iterator<ClassMethod> methodsIter = methods.iterator();
             while (methodsIter.hasNext())
             {

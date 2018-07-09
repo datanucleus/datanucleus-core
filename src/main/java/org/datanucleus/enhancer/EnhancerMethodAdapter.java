@@ -174,28 +174,6 @@ public class EnhancerMethodAdapter extends MethodVisitor
     }
 
     /**
-     * Method to intercept any calls to methods.
-     * @param opcode Operation
-     * @param owner Owner class
-     * @param name Name of the field
-     * @param desc Descriptor for the field
-     * @param isInterface Whether this method is an interface
-     */
-    public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface)
-    {
-        if (methodName.equals("clone") && methodDescriptor.equals("()Ljava/lang/Object;") &&
-            enhancer.getClassMetaData().getPersistableSuperclass() == null &&
-            opcode == Opcodes.INVOKESPECIAL && name.equals("clone") && desc.equals("()Ljava/lang/Object;"))
-        {
-            // clone() method calls super.clone() so change to use dnSuperClone()
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, enhancer.getASMClassName(), enhancer.getNamer().getSuperCloneMethodName(), "()Ljava/lang/Object;", false);
-            return;
-        }
-
-        super.visitMethodInsn(opcode, owner, name, desc, isInterface);
-    }
-
-    /**
      * Method to intercept any general instructions.
      * We use it to intercept any RETURN on a static initialisation block so we can append to it.
      * @param opcode Operation

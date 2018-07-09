@@ -74,7 +74,6 @@ import org.datanucleus.enhancer.methods.ReplaceField;
 import org.datanucleus.enhancer.methods.ReplaceFields;
 import org.datanucleus.enhancer.methods.ReplaceFlags;
 import org.datanucleus.enhancer.methods.ReplaceStateManager;
-import org.datanucleus.enhancer.methods.SuperClone;
 import org.datanucleus.enhancer.methods.LoadClass;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -601,7 +600,6 @@ public class ClassEnhancerImpl implements ClassEnhancer
         methodsToAdd.add(GetManagedFieldCount.getInstance(this));
 
         methodsToAdd.add(LoadClass.getInstance(this));
-        methodsToAdd.add(SuperClone.getInstance(this)); // TODO Only add this if required due to clone method
     }
 
     /**
