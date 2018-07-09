@@ -24,9 +24,9 @@ import org.datanucleus.enhancer.asm.Label;
 import org.datanucleus.enhancer.asm.Opcodes;
 
 /**
- * Method to generate a default method "clone" using ASM that has the effect of nulling the state manager etc.
+ * Method to generate a default "clone" method, using ASM, that has the effect of nulling the state manager etc.
  * <pre>
- * private Object dnSuperClone() throws CloneNotSupportedException
+ * public Object clone() throws CloneNotSupportedException
  * {
  *     MyClass copy = (MyClass) super.clone();
  *     copy.dnFlags = (byte) 0;
@@ -58,7 +58,7 @@ public class Clone extends ClassMethod
     }
 
     /**
-     * Method to add the contents of the class method.
+     * Method to add the contents of the method.
      */
     public void execute()
     {
