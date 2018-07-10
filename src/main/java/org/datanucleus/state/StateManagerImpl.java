@@ -458,7 +458,10 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             // Swap the managed PC to be the copy and not the input
             replaceStateManager(pcCopy, this);
             myPC = pcCopy;
-            disconnectClone(pc);
+
+            // Reset dnFlags in the input object to Persistable.READ_WRITE_OK and clear its state manager.
+            pc.dnReplaceFlags();
+            replaceStateManager(pc, null);
         }
 
         // Mark all fields as loaded since we are using the passed Persistable
