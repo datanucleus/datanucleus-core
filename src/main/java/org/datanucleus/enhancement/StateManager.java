@@ -24,17 +24,17 @@ import org.datanucleus.util.Localiser;
  * This interface is the point of contact between managed instances of <code>Persistable</code> classes and DataNucleus.
  * It contains the methods used by <code>Persistable</code> instances to delegate behavior to DataNucleus.
  * <P>
- * Each managed <code>Persistable</code> instance contains a reference to a <code>StateManager</code>. A
- * <code>StateManager</code> might manage one or multiple instances of <code>Persistable</code> instances.
+ * Each managed <code>Persistable</code> instance contains a reference to a <code>StateManager</code>. 
+ * In principle, a <code>StateManager</code> might manage one or multiple instances of <code>Persistable</code> instances.
+ * In reality we only ever manage a single <code>Persistable</code> instance here, see StateManagerImpl.
  */
 public interface StateManager
 {
     /**
      * Return the <code>ExecutionContext</code> that owns this instance.
-     * @param pc the calling <code>Persistable</code> instance
      * @return the <code>ExecutionContext</code> that owns this instance
      */
-    ExecutionContextReference getExecutionContext(Persistable pc);
+    ExecutionContextReference getExecutionContextReference();
 
     /**
      * The owning <code>StateManager</code> uses this method to supply the value of the flags to the

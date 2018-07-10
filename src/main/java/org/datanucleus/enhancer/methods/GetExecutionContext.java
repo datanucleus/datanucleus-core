@@ -27,7 +27,7 @@ import org.datanucleus.enhancer.asm.Opcodes;
  * <pre>
  * public final ExecutionContext dnGetExecutionContext()
  * {
- *     return (dnStateManager != null ? dnStateManager.getExecutionContext(this) : null);
+ *     return (dnStateManager != null ? dnStateManager.getExecutionContextReference() : null);
  * }
  * </pre>
  */
@@ -36,8 +36,7 @@ public class GetExecutionContext extends ClassMethod
     public static GetExecutionContext getInstance(ClassEnhancer enhancer)
     {
         return new GetExecutionContext(enhancer, enhancer.getNamer().getGetExecutionContextMethodName(), 
-            Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL,
-            enhancer.getNamer().getExecutionContextClass(), null, null);
+            Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL, enhancer.getNamer().getExecutionContextClass(), null, null);
     }
 
     /**
@@ -49,8 +48,7 @@ public class GetExecutionContext extends ClassMethod
      * @param argTypes Argument types
      * @param argNames Argument names
      */
-    public GetExecutionContext(ClassEnhancer enhancer, String name, int access, 
-        Object returnType, Object[] argTypes, String[] argNames)
+    public GetExecutionContext(ClassEnhancer enhancer, String name, int access, Object returnType, Object[] argTypes, String[] argNames)
     {
         super(enhancer, name, access, returnType, argTypes, argNames);
     }
@@ -62,20 +60,18 @@ public class GetExecutionContext extends ClassMethod
     {
         visitor.visitCode();
 
-        Label l0 = new Label();
-        visitor.visitLabel(l0);
+        Label startLabel = new Label();
+        visitor.visitLabel(startLabel);
+
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         Label l1 = new Label();
         visitor.visitJumpInsn(Opcodes.IFNULL, l1);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
-        visitor.visitVarInsn(Opcodes.ALOAD, 0);
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
-            "getExecutionContext", // TODO Put this in namer
-            "(" + getNamer().getPersistableDescriptor() + ")" + getNamer().getExecutionContextDescriptor());
+            "getExecutionContextReference", "()" + getNamer().getExecutionContextDescriptor());
+
         Label l2 = new Label();
         visitor.visitJumpInsn(Opcodes.GOTO, l2);
         visitor.visitLabel(l1);
@@ -86,10 +82,11 @@ public class GetExecutionContext extends ClassMethod
         visitor.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] {getClassEnhancer().getNamer().getExecutionContextAsmClassName()});
 
         visitor.visitInsn(Opcodes.ARETURN);
-        Label l3 = new Label();
-        visitor.visitLabel(l3);
-        visitor.visitLocalVariable("this", getClassEnhancer().getClassDescriptor(), null, l0, l3, 0);
-        visitor.visitMaxs(2, 1);
+
+        Label endLabel = new Label();
+        visitor.visitLabel(endLabel);
+        visitor.visitLocalVariable("this", getClassEnhancer().getClassDescriptor(), null, startLabel, endLabel, 0);
+        visitor.visitMaxs(1, 1);
 
         visitor.visitEnd();
     }

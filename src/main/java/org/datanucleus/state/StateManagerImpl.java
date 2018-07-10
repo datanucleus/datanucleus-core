@@ -769,6 +769,15 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         return myEC;
     }
 
+    /**
+     * Accessor for the ExecutionContextReference for the StateManager implementation.
+     * @return The ExecutionContextReference that owns this instance
+     */
+    public ExecutionContextReference getExecutionContextReference()
+    {
+        return myEC;
+    }
+
     public StoreManager getStoreManager()
     {
         return myEC.getNucleusContext().isFederated() ? ((FederatedStoreManager)myEC.getStoreManager()).getStoreManagerForClass(cmd) : myEC.getStoreManager();
@@ -2145,30 +2154,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
         // Put it in the cache in case the previous object was stored
         myEC.putObjectIntoLevel1Cache(this);
-    }
-
-    /**
-     * Accessor for the ExecutionContext that owns this instance.
-     * @param pc The Persistable instance
-     * @return The ExecutionContext that owns this instance
-     */
-    public ExecutionContextReference getExecutionContext(Persistable pc)
-    {
-        //in identifying relationships, dnCopyKeyFieldsFromId will call
-        //this method, and at this moment, myPC in statemanager is null
-        // Currently AbstractPersistenceManager.java putObjectInCache prevents any identifying relation object being put in L2
-
-        //if not identifying relationship, do the default check of disconnectClone:
-        //"this.disconnectClone(pc)"
-        if (myPC != null && this.disconnectClone(pc))
-        {
-            return null;
-        }
-        else if (myEC == null)
-        {
-            return null;
-        }
-        return myEC;
     }
 
     // -------------------------- Lifecycle Methods ---------------------------
