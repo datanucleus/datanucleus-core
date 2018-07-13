@@ -56,9 +56,6 @@ public class EnhancerCloneAdapter extends MethodVisitor
      * Constructor for the clone adapter.
      * @param mv MethodVisitor
      * @param enhancer ClassEnhancer for the class with the method
-     * @param methodName Name of the method
-     * @param methodDesc Method descriptor
-     * @param mmd MetaData for the property
      * @param cv ClassVisitor
      */
     public EnhancerCloneAdapter(MethodVisitor mv, ClassEnhancer enhancer, ClassVisitor cv)
