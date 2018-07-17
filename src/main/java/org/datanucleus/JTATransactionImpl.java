@@ -133,6 +133,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
             throw new NucleusTransactionException(Localiser.msg("015026"), se);
         }
     }
+
     /**
      * Method to call if you want to join to the underlying UserTransaction.
      * Will be called by isActive() and constructor if "autoJoin" is set, otherwise has to be called by user code.
@@ -146,12 +147,12 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
                 javax.transaction.Transaction txn = jtaTM.getTransaction();
                 if (jtaTx != null && !jtaTx.equals(txn))
                 {
-                    // changed transaction, clear saved jtaTxn, reset join status and reprocess
-                    // it should happen only if joinStatus == JOIN_STATUS_IMPOSSIBLE
+                    // changed transaction, clear saved jtaTxn, reset join status and reprocess. It should happen only if joinStatus == JOIN_STATUS_IMPOSSIBLE
                     if (! (joinStatus == JoinStatus.IMPOSSIBLE))
                     {
                         throw new InternalError("JTA Transaction changed without being notified");
                     }
+
                     jtaTx = null;
                     joinStatus = JoinStatus.NO_TXN;
                     joinTransaction();
@@ -227,9 +228,10 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
     }
 
     /**
-     * Accessor for whether the transaction is active. The UserTransaction is considered active if its status is
-     * anything other than {@link Status#STATUS_NO_TRANSACTION}, i.e. when the current thread is associated with a
-     * JTA transaction. <b>Note that this will attempt to join if not yet joined</b>
+     * Accessor for whether the transaction is active. 
+     * The UserTransaction is considered active if its status is anything other than {@link Status#STATUS_NO_TRANSACTION}, 
+     * i.e. when the current thread is associated with a JTA transaction. 
+     * <b>Note that this will attempt to join if not yet joined</b>
      * @return Whether the transaction is active.
      */
     public boolean isActive()
@@ -308,9 +310,6 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         userTransaction = utx;
     }
 
-    /**
-     * Allow UserTransaction demarcation
-     */
     public void commit()
     {
         if (userTransaction == null)
@@ -332,9 +331,6 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
         }
     }
 
-    /**
-     * Allow UserTransaction demarcation
-     */
     public void rollback()
     {
         if (userTransaction == null)
@@ -357,9 +353,6 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
 
     }
 
-    /**
-     * Allow UserTransaction demarcation
-     */
     public void setRollbackOnly()
     {
         if (userTransaction == null)

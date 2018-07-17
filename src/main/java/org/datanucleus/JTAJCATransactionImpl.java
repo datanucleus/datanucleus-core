@@ -84,9 +84,8 @@ public class JTAJCATransactionImpl extends TransactionImpl implements Synchroniz
 
     /**
      * Synchronise our active state with that of the JTA transaction, if it exists.
-     * Look for an active JTA transaction. if there is one, begin() ourselves
-     * and register synchronisation. We must poll because there is no
-     * way of getting notified of a newly begun transaction.<p>
+     * Look for an active JTA transaction. If there is one, begin() ourselves and register synchronisation. 
+     * We must poll because there is no way of getting notified of a newly begun transaction.
      */
     private synchronized void joinTransaction()
     {       
@@ -98,16 +97,18 @@ public class JTAJCATransactionImpl extends TransactionImpl implements Synchroniz
         // try to registerSynchronization()
         try
         {
+            // TODO Move this to constructor to match what JTATransactionImpl does
             if (jtaTM == null)
             {
-                // Retrieve the JTA TransactionManager. Unfortunately, before JavaEE 5 there is no specified way to do it, 
-                // only app-server-specific ways. In JavaEE 5, we can use TransactionSynchronizationRegistry
+                // Retrieve the JTA TransactionManager. Unfortunately, before JavaEE 5 there is no specified way to do it, only app-server-specific ways. 
+                // TODO In JavaEE 5, we can use TransactionSynchronizationRegistry
                 jtaTM = ec.getNucleusContext().getJtaTransactionManager();
                 if (jtaTM == null)
                 {
                     throw new NucleusTransactionException(Localiser.msg("015030"));
                 }
             }
+
             jtaTx = jtaTM.getTransaction();
             if (jtaTx != null && jtaTx.getStatus() == Status.STATUS_ACTIVE)
             {
@@ -145,6 +146,8 @@ public class JTAJCATransactionImpl extends TransactionImpl implements Synchroniz
         }
     }
 
+    // ----------------- Implementation of javax.transaction.Synchronization -------------------
+
     /**
      * Called by the transaction manager prior to the start of the two-phase transaction commit process.
      */
@@ -171,8 +174,7 @@ public class JTAJCATransactionImpl extends TransactionImpl implements Synchroniz
 
     /**
      * Called by the transaction manager after the transaction is committed or rolled back.
-     * Must be synchronised because some callers expect to be owner of this object's monitor (internalPostCommit() 
-     * calls closeSQLConnection() which calls notifyAll()).
+     * Must be synchronised because some callers expect to be owner of this object's monitor (internalPostCommit() calls closeSQLConnection() which calls notifyAll()).
      * @param status The status
      */
     public synchronized void afterCompletion(int status)
