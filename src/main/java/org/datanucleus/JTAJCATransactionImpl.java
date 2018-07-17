@@ -36,6 +36,7 @@ import org.datanucleus.util.StringUtils;
  */
 public class JTAJCATransactionImpl extends TransactionImpl implements Synchronization 
 {
+    /** JTA TransactionManager. */
     private javax.transaction.TransactionManager jtaTM;
 
     /** JTA transaction we currently are synchronized with. Null when there is no JTA transaction active or not yet detected. */
@@ -51,6 +52,15 @@ public class JTAJCATransactionImpl extends TransactionImpl implements Synchroniz
     JTAJCATransactionImpl(ExecutionContext ec, PropertyStore properties)
     {
         super(ec, properties);
+
+        // Retrieve the JTA TransactionManager
+        jtaTM = ec.getNucleusContext().getJtaTransactionManager();
+        if (jtaTM == null)
+        {
+            throw new NucleusTransactionException(Localiser.msg("015030"));
+        }
+        // TODO In JavaEE 5, we can use TransactionSynchronizationRegistry as a way of registering the synchronization, see JTATransactionImpl
+
         joinTransaction();
     }
 
@@ -97,18 +107,6 @@ public class JTAJCATransactionImpl extends TransactionImpl implements Synchroniz
         // try to registerSynchronization()
         try
         {
-            // TODO Move this to constructor to match what JTATransactionImpl does
-            if (jtaTM == null)
-            {
-                // Retrieve the JTA TransactionManager. Unfortunately, before JavaEE 5 there is no specified way to do it, only app-server-specific ways. 
-                // TODO In JavaEE 5, we can use TransactionSynchronizationRegistry
-                jtaTM = ec.getNucleusContext().getJtaTransactionManager();
-                if (jtaTM == null)
-                {
-                    throw new NucleusTransactionException(Localiser.msg("015030"));
-                }
-            }
-
             jtaTx = jtaTM.getTransaction();
             if (jtaTx != null && jtaTx.getStatus() == Status.STATUS_ACTIVE)
             {
