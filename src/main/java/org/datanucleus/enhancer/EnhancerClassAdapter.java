@@ -371,15 +371,18 @@ public class EnhancerClassAdapter extends ClassVisitor
                     cv.visitField(cf.getAccess(), cf.getName(), Type.getDescriptor((Class)cf.getType()), null, cf.getInitialValue());
                 }
 
-                // The dnPreSerialize method need be called only once for a persistent instance. The writeObject method in the least-derived
-                // pc class that implements Serializable in the inheritance hierarchy needs to be modified or generated to call it.
-                if (cmd.getSuperAbstractClassMetaData() == null && !hasWriteObject)
+                // The dnPreSerialize method need be called only once for a persistent instance.
+                // The writeObject method in the least-derived pc class that implements Serializable in the inheritance hierarchy needs to be modified or generated to call it.
+                if (cmd.getSuperAbstractClassMetaData() == null)
                 {
-                    // User hasn't provided their own writeObject, so provide the default but with a call to dnPreSerialize first
-                    ClassMethod method = WriteObject.getInstance(enhancer);
-                    method.initialise(cv);
-                    method.execute();
-                    method.close();
+                    if (!hasWriteObject)
+                    {
+                        // User hasn't provided their own writeObject, so provide the default but with a call to dnPreSerialize first
+                        ClassMethod method = WriteObject.getInstance(enhancer);
+                        method.initialise(cv);
+                        method.execute();
+                        method.close();
+                    }
                 }
             }
 

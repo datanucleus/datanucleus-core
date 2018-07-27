@@ -54,8 +54,7 @@ public class WriteObject extends ClassMethod
      * @param argTypes Argument types
      * @param argNames Argument names
      */
-    public WriteObject(ClassEnhancer enhancer, String name, int access, 
-        Object returnType, Object[] argTypes, String[] argNames)
+    public WriteObject(ClassEnhancer enhancer, String name, int access, Object returnType, Object[] argTypes, String[] argNames)
     {
         super(enhancer, name, access, returnType, argTypes, argNames);
     }
@@ -70,8 +69,7 @@ public class WriteObject extends ClassMethod
      * @param argNames Argument names
      * @param exceptions Exceptions that are thrown
      */
-    public WriteObject(ClassEnhancer enhancer, String name, int access, 
-            Object returnType, Object[] argTypes, String[] argNames, String[] exceptions)
+    public WriteObject(ClassEnhancer enhancer, String name, int access, Object returnType, Object[] argTypes, String[] argNames, String[] exceptions)
     {
         super(enhancer, name, access, returnType, argTypes, argNames, exceptions);
     }
@@ -86,9 +84,11 @@ public class WriteObject extends ClassMethod
         Label startLabel = new Label();
         visitor.visitLabel(startLabel);
 
+        // "dnPreSerialize();"
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), getNamer().getPreSerializeMethodName(), "()V");
 
+        // "out.defaultWriteObject();"
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/ObjectOutputStream", "defaultWriteObject", "()V");
 

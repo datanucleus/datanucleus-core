@@ -80,19 +80,15 @@ public class EnhancerMethodAdapter extends MethodVisitor
             if (methodName.equals("writeObject"))
             {
                 // User has provided a "writeObject" method so enhance it by adding "dnPreSerialize" before user code (so after the first "label")
+
+                // "dnPreSerialize();"
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, enhancer.getASMClassName(), enhancer.getNamer().getPreSerializeMethodName(), "()V");
-                // TODO Really would like "new Label", "visitLabel", "visitLineNumber" so it appears correct in byte-code decompilers ...
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, enhancer.getASMClassName(), enhancer.getNamer().getPreSerializeMethodName(), "()V", false);
+
                 if (DataNucleusEnhancer.LOGGER.isDebugEnabled())
                 {
                     DataNucleusEnhancer.LOGGER.debug(Localiser.msg("005033", enhancer.getClassName() + "." + methodName));
                 }
-
-                // TODO Need to save dnDetachedState
-            }
-            else if (methodName.equals("readObject"))
-            {
-                // TODO Need to load dnDetachedState
             }
         }
         firstLabel = false;
