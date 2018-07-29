@@ -43,8 +43,7 @@ public class LoadClass extends ClassMethod
      * @param argTypes Argument types
      * @param argNames Argument names
      */
-    public LoadClass(ClassEnhancer enhancer, String name, int access, 
-        Object returnType, Object[] argTypes, String[] argNames)
+    public LoadClass(ClassEnhancer enhancer, String name, int access, Object returnType, Object[] argTypes, String[] argNames)
     {
         super(enhancer, name, access, returnType, argTypes, argNames);
     }
@@ -63,7 +62,7 @@ public class LoadClass extends ClassMethod
         visitor.visitTryCatchBlock(l0, l1, l2, "java/lang/ClassNotFoundException");
         visitor.visitLabel(l0);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Class", "forName", "(Ljava/lang/String;)Ljava/lang/Class;");
+        visitor.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Class", "forName", "(Ljava/lang/String;)Ljava/lang/Class;", false);
         visitor.visitLabel(l1);
         visitor.visitInsn(Opcodes.ARETURN);
         visitor.visitLabel(l2);
@@ -75,8 +74,8 @@ public class LoadClass extends ClassMethod
         visitor.visitTypeInsn(Opcodes.NEW, "java/lang/NoClassDefFoundError");
         visitor.visitInsn(Opcodes.DUP);
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
-        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/ClassNotFoundException", "getMessage", "()Ljava/lang/String;");
-        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/NoClassDefFoundError", "<init>", "(Ljava/lang/String;)V");
+        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/ClassNotFoundException", "getMessage", "()Ljava/lang/String;", false);
+        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/NoClassDefFoundError", "<init>", "(Ljava/lang/String;)V", false);
         visitor.visitInsn(Opcodes.ATHROW);
         Label l4 = new Label();
         visitor.visitLabel(l4);

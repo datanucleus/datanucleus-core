@@ -55,8 +55,7 @@ public class NewInstance2 extends ClassMethod
      * @param argTypes Argument types
      * @param argNames Argument names
      */
-    public NewInstance2(ClassEnhancer enhancer, String name, int access, 
-        Object returnType, Object[] argTypes, String[] argNames)
+    public NewInstance2(ClassEnhancer enhancer, String name, int access, Object returnType, Object[] argTypes, String[] argNames)
     {
         super(enhancer, name, access, returnType, argTypes, argNames);
     }
@@ -76,8 +75,7 @@ public class NewInstance2 extends ClassMethod
             visitor.visitTypeInsn(Opcodes.NEW, getNamer().getFatalInternalExceptionAsmClassName());
             visitor.visitInsn(Opcodes.DUP);
             visitor.visitLdcInsn("Cannot instantiate abstract class.");
-            visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, getNamer().getFatalInternalExceptionAsmClassName(),
-                "<init>", "(Ljava/lang/String;)V");
+            visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, getNamer().getFatalInternalExceptionAsmClassName(), "<init>", "(Ljava/lang/String;)V", false);
             visitor.visitInsn(Opcodes.ATHROW);
 
             Label endLabel = new Label();
@@ -91,7 +89,7 @@ public class NewInstance2 extends ClassMethod
         {
             visitor.visitTypeInsn(Opcodes.NEW, getClassEnhancer().getASMClassName());
             visitor.visitInsn(Opcodes.DUP);
-            visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, getClassEnhancer().getASMClassName(), "<init>", "()V");
+            visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, getClassEnhancer().getASMClassName(), "<init>", "()V", false);
             visitor.visitVarInsn(Opcodes.ASTORE, 3);
             Label l1 = new Label();
             visitor.visitLabel(l1);
@@ -100,12 +98,10 @@ public class NewInstance2 extends ClassMethod
             visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(), getNamer().getFlagsFieldName(), "B");
             visitor.visitVarInsn(Opcodes.ALOAD, 3);
             visitor.visitVarInsn(Opcodes.ALOAD, 1);
-            visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(), 
-                getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+            visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
             visitor.visitVarInsn(Opcodes.ALOAD, 3);
             visitor.visitVarInsn(Opcodes.ALOAD, 2);
-            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
-                getNamer().getCopyKeyFieldsFromObjectIdMethodName(), "(" + EnhanceUtils.CD_Object + ")V");
+            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), getNamer().getCopyKeyFieldsFromObjectIdMethodName(), "(" + EnhanceUtils.CD_Object + ")V", false);
             visitor.visitVarInsn(Opcodes.ALOAD, 3);
             visitor.visitInsn(Opcodes.ARETURN);
 

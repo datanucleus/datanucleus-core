@@ -137,7 +137,7 @@ public class CopyKeyFieldsToObjectId2 extends ClassMethod
                     visitor.visitTypeInsn(Opcodes.NEW, getNamer().getFatalInternalExceptionAsmClassName());
                     visitor.visitInsn(Opcodes.DUP);
                     visitor.visitLdcInsn("It's illegal to call dnCopyKeyFieldsToObjectId for a class with single-field identity.");
-                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, getNamer().getFatalInternalExceptionAsmClassName(), "<init>", "(Ljava/lang/String;)V");
+                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, getNamer().getFatalInternalExceptionAsmClassName(), "<init>", "(Ljava/lang/String;)V", false);
                     visitor.visitInsn(Opcodes.ATHROW);
 
                     Label endLabel = new Label();
@@ -164,7 +164,7 @@ public class CopyKeyFieldsToObjectId2 extends ClassMethod
                     visitor.visitTypeInsn(Opcodes.NEW, "java/lang/IllegalArgumentException");
                     visitor.visitInsn(Opcodes.DUP);
                     visitor.visitLdcInsn("ObjectIdFieldSupplier is null");
-                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V");
+                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V", false);
                     visitor.visitInsn(Opcodes.ATHROW);
 
                     visitor.visitLabel(l4);
@@ -177,7 +177,7 @@ public class CopyKeyFieldsToObjectId2 extends ClassMethod
                     visitor.visitTypeInsn(Opcodes.NEW, "java/lang/ClassCastException");
                     visitor.visitInsn(Opcodes.DUP);
                     visitor.visitLdcInsn("oid is not instanceof " + objectIdClass);
-                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/ClassCastException", "<init>", "(Ljava/lang/String;)V");
+                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/ClassCastException", "<init>", "(Ljava/lang/String;)V", false);
                     visitor.visitInsn(Opcodes.ATHROW);
 
                     visitor.visitLabel(l5);
@@ -208,7 +208,7 @@ public class CopyKeyFieldsToObjectId2 extends ClassMethod
                             visitor.visitVarInsn(Opcodes.ALOAD, 1);
                             EnhanceUtils.addBIPUSHToMethod(visitor, fmd.getFieldId());
                             visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(),
-                                "fetch" + typeMethodName + "Field", "(I)" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()));
+                                "fetch" + typeMethodName + "Field", "(I)" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()), true);
                             if (typeMethodName.equals("Object"))
                             {
                                 visitor.visitTypeInsn(Opcodes.CHECKCAST, fmd.getTypeName().replace('.', '/'));
@@ -232,13 +232,12 @@ public class CopyKeyFieldsToObjectId2 extends ClassMethod
                                 visitor.visitVarInsn(Opcodes.ALOAD, 1);
                                 EnhanceUtils.addBIPUSHToMethod(visitor, fmd.getFieldId());
                                 visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(),
-                                    "fetch" + typeMethodName + "Field", "(I)" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()));
+                                    "fetch" + typeMethodName + "Field", "(I)" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()), true);
                                 if (typeMethodName.equals("Object"))
                                 {
                                     visitor.visitTypeInsn(Opcodes.CHECKCAST, fmd.getTypeName().replace('.', '/'));
                                 }
-                                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, ACN_objectIdClass, 
-                                    ClassUtils.getJavaBeanSetterName(fmd.getName()), "(" + fieldTypeDesc + ")V");
+                                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, ACN_objectIdClass, ClassUtils.getJavaBeanSetterName(fmd.getName()), "(" + fieldTypeDesc + ")V", false);
                             }
                             else if (Modifier.isPublic(pkFieldModifiers))
                             {
@@ -247,7 +246,7 @@ public class CopyKeyFieldsToObjectId2 extends ClassMethod
                                 visitor.visitVarInsn(Opcodes.ALOAD, 1);
                                 EnhanceUtils.addBIPUSHToMethod(visitor, fmd.getFieldId());
                                 visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(),
-                                    "fetch" + typeMethodName + "Field", "(I)" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()));
+                                    "fetch" + typeMethodName + "Field", "(I)" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()), true);
                                 if (typeMethodName.equals("Object"))
                                 {
                                     visitor.visitTypeInsn(Opcodes.CHECKCAST, fmd.getTypeName().replace('.', '/'));
@@ -262,9 +261,9 @@ public class CopyKeyFieldsToObjectId2 extends ClassMethod
                                 // "field.set(o, fs.fetchObjectField(1));"
 
                                 visitor.visitVarInsn(Opcodes.ALOAD, 3);
-                                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;");
+                                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
                                 visitor.visitLdcInsn(fmd.getName());
-                                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Class", "getDeclaredField", "(Ljava/lang/String;)Ljava/lang/reflect/Field;");
+                                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Class", "getDeclaredField", "(Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
                                 visitor.visitVarInsn(Opcodes.ASTORE, 4);
                                 if (reflectionFieldStart == null)
                                 {
@@ -273,55 +272,55 @@ public class CopyKeyFieldsToObjectId2 extends ClassMethod
                                 }
                                 visitor.visitVarInsn(Opcodes.ALOAD, 4);
                                 visitor.visitInsn(Opcodes.ICONST_1);
-                                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setAccessible", "(Z)V");
+                                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setAccessible", "(Z)V", false);
                                 visitor.visitVarInsn(Opcodes.ALOAD, 4);
                                 visitor.visitVarInsn(Opcodes.ALOAD, 3);
                                 visitor.visitVarInsn(Opcodes.ALOAD, 1);
                                 EnhanceUtils.addBIPUSHToMethod(visitor, fmd.getFieldId());
                                 if (fmd.getTypeName().equals("boolean"))
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchBooleanField", "(I)Z");
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setBoolean", "(Ljava/lang/Object;Z)V");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchBooleanField", "(I)Z", true);
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setBoolean", "(Ljava/lang/Object;Z)V", false);
                                 }
                                 else if (fmd.getTypeName().equals("byte"))
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchByteField", "(I)B");
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setByte", "(Ljava/lang/Object;B)V");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchByteField", "(I)B", true);
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setByte", "(Ljava/lang/Object;B)V", false);
                                 }
                                 else if (fmd.getTypeName().equals("char"))
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchCharField", "(I)C");
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setChar", "(Ljava/lang/Object;C)V");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchCharField", "(I)C", true);
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setChar", "(Ljava/lang/Object;C)V", false);
                                 }
                                 else if (fmd.getTypeName().equals("double"))
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchDoubleField", "(I)D");
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setDouble", "(Ljava/lang/Object;D)V");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchDoubleField", "(I)D", true);
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setDouble", "(Ljava/lang/Object;D)V", false);
                                 }
                                 else if (fmd.getTypeName().equals("float"))
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchFloatField", "(I)F");
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setFloat", "(Ljava/lang/Object;F)V");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchFloatField", "(I)F", true);
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setFloat", "(Ljava/lang/Object;F)V", false);
                                 }
                                 else if (fmd.getTypeName().equals("int"))
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchIntField", "(I)I");
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setInt", "(Ljava/lang/Object;I)V");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchIntField", "(I)I", true);
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setInt", "(Ljava/lang/Object;I)V", false);
                                 }
                                 else if (fmd.getTypeName().equals("long"))
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchLongField", "(I)J");
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setLong", "(Ljava/lang/Object;J)V");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchLongField", "(I)J", true);
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setLong", "(Ljava/lang/Object;J)V", false);
                                 }
                                 else if (fmd.getTypeName().equals("short"))
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchShortField", "(I)S");
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setShort", "(Ljava/lang/Object;S)V");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchShortField", "(I)S", true);
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setShort", "(Ljava/lang/Object;S)V", false);
                                 }
                                 else
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchObjectField", "(I)Ljava/lang/Object;");
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "set", "(Ljava/lang/Object;Ljava/lang/Object;)V");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldSupplierAsmClassName(), "fetchObjectField", "(I)Ljava/lang/Object;", true);
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "set", "(Ljava/lang/Object;Ljava/lang/Object;)V", false);
                                 }
                             }
                         }

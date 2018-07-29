@@ -83,18 +83,15 @@ public class IsDirty extends ClassMethod
         visitor.visitLabel(startLabel);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         Label l1 = new Label();
         visitor.visitJumpInsn(Opcodes.IFNULL, l1);
         Label l2 = new Label();
         visitor.visitLabel(l2);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
-            "isDirty", "(" + getNamer().getPersistableDescriptor() + ")Z");
+        visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(), "isDirty", "(" + getNamer().getPersistableDescriptor() + ")Z", true);
         visitor.visitInsn(Opcodes.IRETURN);
         visitor.visitLabel(l1);
         visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
@@ -107,8 +104,7 @@ public class IsDirty extends ClassMethod
         else
         {
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
-            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(),
-                getNamer().getIsDetachedMethodName(), "()Z");
+            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), getNamer().getIsDetachedMethodName(), "()Z", false);
             Label l3 = new Label();
             visitor.visitJumpInsn(Opcodes.IFNE, l3);
             visitor.visitInsn(Opcodes.ICONST_0);
@@ -117,12 +113,11 @@ public class IsDirty extends ClassMethod
             visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
-            visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-                getNamer().getDetachedStateFieldName(), "[" + EnhanceUtils.CD_Object);
+            visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getDetachedStateFieldName(), "[" + EnhanceUtils.CD_Object);
             visitor.visitInsn(Opcodes.ICONST_3);
             visitor.visitInsn(Opcodes.AALOAD);
             visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/util/BitSet");
-            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "length", "()I");
+            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "length", "()I", false);
             Label l5 = new Label();
             visitor.visitJumpInsn(Opcodes.IFGT, l5);
             visitor.visitInsn(Opcodes.ICONST_0);

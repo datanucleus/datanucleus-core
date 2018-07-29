@@ -49,8 +49,7 @@ public class GetVersion extends ClassMethod
 {
     public static GetVersion getInstance(ClassEnhancer enhancer)
     {
-        return new GetVersion(enhancer, enhancer.getNamer().getGetVersionMethodName(), Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL,
-            Object.class, null, null);
+        return new GetVersion(enhancer, enhancer.getNamer().getGetVersionMethodName(), Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL, Object.class, null, null);
     }
 
     /**
@@ -62,8 +61,7 @@ public class GetVersion extends ClassMethod
      * @param argTypes Argument types
      * @param argNames Argument names
      */
-    public GetVersion(ClassEnhancer enhancer, String name, int access, 
-        Object returnType, Object[] argTypes, String[] argNames)
+    public GetVersion(ClassEnhancer enhancer, String name, int access, Object returnType, Object[] argTypes, String[] argNames)
     {
         super(enhancer, name, access, returnType, argTypes, argNames);
     }
@@ -78,16 +76,13 @@ public class GetVersion extends ClassMethod
         Label l0 = new Label();
         visitor.visitLabel(l0);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         Label l1 = new Label();
         visitor.visitJumpInsn(Opcodes.IFNULL, l1);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
-            "getVersion", "(" + getNamer().getPersistableDescriptor() + ")" + EnhanceUtils.CD_Object);
+        visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(), "getVersion", "(" + getNamer().getPersistableDescriptor() + ")" + EnhanceUtils.CD_Object, true);
         visitor.visitInsn(Opcodes.ARETURN);
         visitor.visitLabel(l1);
         visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
@@ -105,8 +100,7 @@ public class GetVersion extends ClassMethod
         else
         {
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
-            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(),
-                getNamer().getIsDetachedMethodName(), "()Z");
+            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), getNamer().getIsDetachedMethodName(), "()Z", false);
             Label l3 = new Label();
             visitor.visitJumpInsn(Opcodes.IFNE, l3);
             visitor.visitInsn(Opcodes.ACONST_NULL);
@@ -115,8 +109,7 @@ public class GetVersion extends ClassMethod
             visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
-            visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-                getNamer().getDetachedStateFieldName(), "[" + EnhanceUtils.CD_Object);
+            visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getDetachedStateFieldName(), "[" + EnhanceUtils.CD_Object);
             visitor.visitInsn(Opcodes.ICONST_1);
             visitor.visitInsn(Opcodes.AALOAD);
             visitor.visitInsn(Opcodes.ARETURN);

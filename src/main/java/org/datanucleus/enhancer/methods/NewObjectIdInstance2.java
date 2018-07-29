@@ -74,8 +74,7 @@ public class NewObjectIdInstance2 extends ClassMethod
      * @param argTypes Argument types
      * @param argNames Argument names
      */
-    public NewObjectIdInstance2(ClassEnhancer enhancer, String name, int access, 
-        Object returnType, Object[] argTypes, String[] argNames)
+    public NewObjectIdInstance2(ClassEnhancer enhancer, String name, int access, Object returnType, Object[] argTypes, String[] argNames)
     {
         super(enhancer, name, access, returnType, argTypes, argNames);
     }
@@ -101,7 +100,7 @@ public class NewObjectIdInstance2 extends ClassMethod
                 visitor.visitInsn(Opcodes.DUP);
                 visitor.visitLdcInsn("This class has no identity");
                 visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, 
-                    getClassEnhancer().getNamer().getFatalInternalExceptionAsmClassName(), "<init>", "(Ljava/lang/String;)V");
+                    getClassEnhancer().getNamer().getFatalInternalExceptionAsmClassName(), "<init>", "(Ljava/lang/String;)V", false);
                 visitor.visitInsn(Opcodes.ATHROW);
                 Label endLabel = new Label();
                 visitor.visitLabel(endLabel);
@@ -126,7 +125,7 @@ public class NewObjectIdInstance2 extends ClassMethod
                         visitor.visitTypeInsn(Opcodes.NEW, "java/lang/IllegalArgumentException");
                         visitor.visitInsn(Opcodes.DUP);
                         visitor.visitLdcInsn("key is null");
-                        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V");
+                        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V", false);
                         visitor.visitInsn(Opcodes.ATHROW);
 
                         // Object constructor : "if (key instanceof String != true) return new XXXIdentity(this.getClass(), key);"
@@ -141,7 +140,7 @@ public class NewObjectIdInstance2 extends ClassMethod
                         visitor.visitTypeInsn(Opcodes.NEW, ACN_objectIdClass);
                         visitor.visitInsn(Opcodes.DUP);
                         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-                        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;");
+                        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
                         visitor.visitVarInsn(Opcodes.ALOAD, 1);
 
                         String objectTypeInConstructor = EnhanceUtils.getASMClassNameForSingleFieldIdentityConstructor(fmd.getType());
@@ -155,8 +154,7 @@ public class NewObjectIdInstance2 extends ClassMethod
                             // Add cast if using an Object based type or an Object wrapper of a primitive
                             visitor.visitTypeInsn(Opcodes.CHECKCAST, objectTypeInConstructor);
                         }
-                        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, ACN_objectIdClass, "<init>",
-                            "(Ljava/lang/Class;" + "L" + objectTypeInConstructor + ";)V");
+                        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, ACN_objectIdClass, "<init>", "(Ljava/lang/Class;" + "L" + objectTypeInConstructor + ";)V", false);
                         visitor.visitInsn(Opcodes.ARETURN);
 
                         // String constructor : "return new XXXIdentity(this.getClass(), (String) key);"
@@ -166,11 +164,10 @@ public class NewObjectIdInstance2 extends ClassMethod
                         visitor.visitTypeInsn(Opcodes.NEW, ACN_objectIdClass);
                         visitor.visitInsn(Opcodes.DUP);
                         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-                        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;");
+                        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
                         visitor.visitVarInsn(Opcodes.ALOAD, 1);
                         visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/String");
-                        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, ACN_objectIdClass, "<init>",
-                            "(Ljava/lang/Class;Ljava/lang/String;" + ")V");
+                        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, ACN_objectIdClass, "<init>", "(Ljava/lang/Class;Ljava/lang/String;" + ")V", false);
                         visitor.visitInsn(Opcodes.ARETURN);
 
                         Label endLabel = new Label();
@@ -189,7 +186,7 @@ public class NewObjectIdInstance2 extends ClassMethod
                     visitor.visitInsn(Opcodes.DUP);
                     visitor.visitVarInsn(Opcodes.ALOAD, 1);
                     visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/String");
-                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, ACN_objectIdClass, "<init>", "(Ljava/lang/String;)V");
+                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, ACN_objectIdClass, "<init>", "(Ljava/lang/String;)V", false);
                     visitor.visitInsn(Opcodes.ARETURN);
 
                     Label endLabel = new Label();

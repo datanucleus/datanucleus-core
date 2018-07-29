@@ -68,8 +68,7 @@ public class GetManagedFieldCount extends ClassMethod
         if (persistableSuperclass != null && persistableSuperclass.length() > 0)
         {
             EnhanceUtils.addBIPUSHToMethod(visitor, cmd.getNoOfManagedMembers());
-            visitor.visitMethodInsn(Opcodes.INVOKESTATIC, persistableSuperclass.replace('.', '/'),
-                methodName, "()I");
+            visitor.visitMethodInsn(Opcodes.INVOKESTATIC, persistableSuperclass.replace('.', '/'), methodName, "()I", false);
             visitor.visitInsn(Opcodes.IADD);
             visitor.visitInsn(Opcodes.IRETURN);
             visitor.visitMaxs(2, 0);

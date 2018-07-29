@@ -51,8 +51,7 @@ public class ReplaceFlags extends ClassMethod
      * @param argTypes Argument types
      * @param argNames Argument names
      */
-    public ReplaceFlags(ClassEnhancer enhancer, String name, int access, 
-        Object returnType, Object[] argTypes, String[] argNames)
+    public ReplaceFlags(ClassEnhancer enhancer, String name, int access, Object returnType, Object[] argTypes, String[] argNames)
     {
         super(enhancer, name, access, returnType, argTypes, argNames);
     }
@@ -68,17 +67,15 @@ public class ReplaceFlags extends ClassMethod
         visitor.visitLabel(startLabel);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         Label l1 = new Label();
         visitor.visitJumpInsn(Opcodes.IFNULL, l1);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
-            "replacingFlags", "(" + getNamer().getPersistableDescriptor() + ")B");
+            "replacingFlags", "(" + getNamer().getPersistableDescriptor() + ")B", true);
         visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(), getNamer().getFlagsFieldName(), "B");
 
         visitor.visitLabel(l1);

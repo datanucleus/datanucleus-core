@@ -58,8 +58,7 @@ public class ReplaceFields extends ClassMethod
      * @param argTypes Argument types
      * @param argNames Argument names
      */
-    public ReplaceFields(ClassEnhancer enhancer, String name, int access, 
-        Object returnType, Object[] argTypes, String[] argNames)
+    public ReplaceFields(ClassEnhancer enhancer, String name, int access, Object returnType, Object[] argTypes, String[] argNames)
     {
         super(enhancer, name, access, returnType, argTypes, argNames);
     }
@@ -79,8 +78,7 @@ public class ReplaceFields extends ClassMethod
         visitor.visitTypeInsn(Opcodes.NEW, "java/lang/IllegalArgumentException");
         visitor.visitInsn(Opcodes.DUP);
         visitor.visitLdcInsn("argument is null");
-        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException",
-            "<init>", "(Ljava/lang/String;)V");
+        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V", false);
         visitor.visitInsn(Opcodes.ATHROW);
 
         visitor.visitLabel(l1);
@@ -104,8 +102,7 @@ public class ReplaceFields extends ClassMethod
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
         visitor.visitVarInsn(Opcodes.ILOAD, 3);
         visitor.visitInsn(Opcodes.IALOAD);
-        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(),
-            getNamer().getReplaceFieldMethodName(), "(I)V");
+        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), getNamer().getReplaceFieldMethodName(), "(I)V", false);
         visitor.visitIincInsn(3, 1);
         visitor.visitVarInsn(Opcodes.ILOAD, 3);
         visitor.visitVarInsn(Opcodes.ILOAD, 2);

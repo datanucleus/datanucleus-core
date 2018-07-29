@@ -304,7 +304,7 @@ public class ImplementationGenerator
         Label l0 = new Label();
         visitor.visitLabel(l0);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, fullSuperclassName.replace('.', '/'), "<init>", "()V");
+        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, fullSuperclassName.replace('.', '/'), "<init>", "()V", false);
         visitor.visitInsn(Opcodes.RETURN);
         Label l1 = new Label();
         visitor.visitLabel(l1);

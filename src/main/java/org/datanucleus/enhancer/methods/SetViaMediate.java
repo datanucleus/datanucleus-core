@@ -77,14 +77,12 @@ public class SetViaMediate extends ClassMethod
 
         // "if (objPC.dnStateManager == null) objPC.ZZZ = zzz;"
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), "L" + getNamer().getStateManagerAsmClassName() + ";");
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), "L" + getNamer().getStateManagerAsmClassName() + ";");
         Label l1 = new Label();
         visitor.visitJumpInsn(Opcodes.IFNONNULL, l1);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         EnhanceUtils.addLoadForType(visitor, fmd.getType(), 1);
-        visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(),
-            fmd.getName(), fieldTypeDesc);
+        visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(), fmd.getName(), fieldTypeDesc);
         Label l3 = new Label();
         visitor.visitJumpInsn(Opcodes.GOTO, l3);
 
@@ -93,19 +91,16 @@ public class SetViaMediate extends ClassMethod
         visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), "L" + getNamer().getStateManagerAsmClassName() + ";");
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), "L" + getNamer().getStateManagerAsmClassName() + ";");
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         EnhanceUtils.addBIPUSHToMethod(visitor, fmd.getFieldId());
         if (enhancer.getClassMetaData().getPersistableSuperclass() != null)
         {
-            visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), 
-                getNamer().getInheritedFieldCountFieldName(), "I");
+            visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(),  getNamer().getInheritedFieldCountFieldName(), "I");
             visitor.visitInsn(Opcodes.IADD);
         }
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            fmd.getName(), fieldTypeDesc);
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), fmd.getName(), fieldTypeDesc);
         EnhanceUtils.addLoadForType(visitor, fmd.getType(), 1);
         String dnMethodName = "set" + EnhanceUtils.getTypeNameForPersistableMethod(fmd.getType()) + "Field";
         String argTypeDesc = fieldTypeDesc;
@@ -114,7 +109,7 @@ public class SetViaMediate extends ClassMethod
             argTypeDesc = EnhanceUtils.CD_Object;
         }
         visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
-            dnMethodName, "(L" + getNamer().getPersistableAsmClassName() + ";I" + argTypeDesc + argTypeDesc + ")V");
+            dnMethodName, "(L" + getNamer().getPersistableAsmClassName() + ";I" + argTypeDesc + argTypeDesc + ")V", true);
         visitor.visitLabel(l3);
         visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
@@ -122,26 +117,23 @@ public class SetViaMediate extends ClassMethod
         {
             // "if (objPC.dnIsDetached() == true)"
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
-            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(),
-                getNamer().getIsDetachedMethodName(), "()Z");
+            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), getNamer().getIsDetachedMethodName(), "()Z", false);
             Label l6 = new Label();
             visitor.visitJumpInsn(Opcodes.IFEQ, l6);
 
             // "((BitSet) objPC.dnDetachedState[3]).set(0);"
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
-            visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-                getNamer().getDetachedStateFieldName(), "[Ljava/lang/Object;");
+            visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getDetachedStateFieldName(), "[Ljava/lang/Object;");
             visitor.visitInsn(Opcodes.ICONST_3);
             visitor.visitInsn(Opcodes.AALOAD);
             visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/util/BitSet");
             EnhanceUtils.addBIPUSHToMethod(visitor, fmd.getFieldId());
             if (enhancer.getClassMetaData().getPersistableSuperclass() != null)
             {
-                visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(),
-                    getNamer().getInheritedFieldCountFieldName(), "I");
+                visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), getNamer().getInheritedFieldCountFieldName(), "I");
                 visitor.visitInsn(Opcodes.IADD);
             }
-            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "set", "(I)V");
+            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "set", "(I)V", false);
             visitor.visitLabel(l6);
 
             visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);

@@ -57,8 +57,7 @@ public class ProvideFields extends ClassMethod
      * @param argTypes Argument types
      * @param argNames Argument names
      */
-    public ProvideFields(ClassEnhancer enhancer, String name, int access, 
-        Object returnType, Object[] argTypes, String[] argNames)
+    public ProvideFields(ClassEnhancer enhancer, String name, int access, Object returnType, Object[] argTypes, String[] argNames)
     {
         super(enhancer, name, access, returnType, argTypes, argNames);
     }
@@ -78,8 +77,7 @@ public class ProvideFields extends ClassMethod
         visitor.visitTypeInsn(Opcodes.NEW, "java/lang/IllegalArgumentException");
         visitor.visitInsn(Opcodes.DUP);
         visitor.visitLdcInsn("argment is null");
-        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException",
-            "<init>", "(Ljava/lang/String;)V");
+        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V", false);
         visitor.visitInsn(Opcodes.ATHROW);
 
         visitor.visitLabel(l1);
@@ -103,8 +101,7 @@ public class ProvideFields extends ClassMethod
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
         visitor.visitVarInsn(Opcodes.ILOAD, 2);
         visitor.visitInsn(Opcodes.IALOAD);
-        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(),
-            getNamer().getProvideFieldMethodName(), "(I)V");
+        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), getNamer().getProvideFieldMethodName(), "(I)V", false);
         visitor.visitIincInsn(2, -1);
         visitor.visitVarInsn(Opcodes.ILOAD, 2);
         visitor.visitJumpInsn(Opcodes.IFGE, l5);

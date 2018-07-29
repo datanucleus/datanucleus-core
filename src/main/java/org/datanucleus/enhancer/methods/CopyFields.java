@@ -88,8 +88,7 @@ public class CopyFields extends ClassMethod
         visitor.visitTypeInsn(Opcodes.NEW, "java/lang/IllegalStateException");
         visitor.visitInsn(Opcodes.DUP);
         visitor.visitLdcInsn("state manager is null");
-        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalStateException",
-            "<init>", "(Ljava/lang/String;)V");
+        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalStateException", "<init>", "(Ljava/lang/String;)V", false);
         visitor.visitInsn(Opcodes.ATHROW);
 
         visitor.visitLabel(l1);
@@ -101,8 +100,7 @@ public class CopyFields extends ClassMethod
         visitor.visitTypeInsn(Opcodes.NEW, "java/lang/IllegalStateException");
         visitor.visitInsn(Opcodes.DUP);
         visitor.visitLdcInsn("fieldNumbers is null");
-        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalStateException",
-            "<init>", "(Ljava/lang/String;)V");
+        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalStateException", "<init>", "(Ljava/lang/String;)V", false);
         visitor.visitInsn(Opcodes.ATHROW);
 
         visitor.visitLabel(l3);
@@ -115,8 +113,7 @@ public class CopyFields extends ClassMethod
         visitor.visitTypeInsn(Opcodes.NEW, "java/lang/IllegalArgumentException");
         visitor.visitInsn(Opcodes.DUP);
         visitor.visitLdcInsn("object is not an object of type " + getClassEnhancer().getASMClassName().replace('/', '.'));
-        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException",
-            "<init>", "(Ljava/lang/String;)V");
+        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V", false);
         visitor.visitInsn(Opcodes.ATHROW);
 
         visitor.visitLabel(l5);
@@ -140,8 +137,7 @@ public class CopyFields extends ClassMethod
         visitor.visitTypeInsn(Opcodes.NEW, "java/lang/IllegalArgumentException");
         visitor.visitInsn(Opcodes.DUP);
         visitor.visitLdcInsn("state managers do not match");
-        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException",
-            "<init>", "(Ljava/lang/String;)V");
+        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V", false);
         visitor.visitInsn(Opcodes.ATHROW);
 
         visitor.visitLabel(l10);
@@ -167,7 +163,7 @@ public class CopyFields extends ClassMethod
         visitor.visitVarInsn(Opcodes.ILOAD, 4);
         visitor.visitInsn(Opcodes.IALOAD);
         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(),
-            getNamer().getCopyFieldMethodName(), "(" + getClassEnhancer().getClassDescriptor() + "I)V");
+            getNamer().getCopyFieldMethodName(), "(" + getClassEnhancer().getClassDescriptor() + "I)V", false);
         visitor.visitIincInsn(4, -1);
         visitor.visitVarInsn(Opcodes.ILOAD, 4);
         visitor.visitJumpInsn(Opcodes.IFGE, l14);

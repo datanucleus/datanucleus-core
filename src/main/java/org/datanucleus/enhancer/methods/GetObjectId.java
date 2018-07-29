@@ -78,16 +78,13 @@ public class GetObjectId extends ClassMethod
         Label l0 = new Label();
         visitor.visitLabel(l0);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         Label l1 = new Label();
         visitor.visitJumpInsn(Opcodes.IFNULL, l1);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
-            "getObjectId", "(" + getNamer().getPersistableDescriptor() + ")" + EnhanceUtils.CD_Object);
+        visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(), "getObjectId", "(" + getNamer().getPersistableDescriptor() + ")" + EnhanceUtils.CD_Object, true);
         visitor.visitInsn(Opcodes.ARETURN);
         visitor.visitLabel(l1);
         visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
@@ -105,8 +102,7 @@ public class GetObjectId extends ClassMethod
         else
         {
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
-            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(),
-                getNamer().getIsDetachedMethodName(), "()Z");
+            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), getNamer().getIsDetachedMethodName(), "()Z", false);
             Label l3 = new Label();
             visitor.visitJumpInsn(Opcodes.IFNE, l3);
             visitor.visitInsn(Opcodes.ACONST_NULL);
@@ -115,8 +111,7 @@ public class GetObjectId extends ClassMethod
             visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
-            visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-                getNamer().getDetachedStateFieldName(), "[" + EnhanceUtils.CD_Object);
+            visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getDetachedStateFieldName(), "[" + EnhanceUtils.CD_Object);
             visitor.visitInsn(Opcodes.ICONST_0);
             visitor.visitInsn(Opcodes.AALOAD);
             visitor.visitInsn(Opcodes.ARETURN);

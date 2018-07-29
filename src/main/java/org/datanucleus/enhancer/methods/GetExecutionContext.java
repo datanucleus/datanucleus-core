@@ -70,7 +70,7 @@ public class GetExecutionContext extends ClassMethod
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
-            "getExecutionContextReference", "()" + getNamer().getExecutionContextDescriptor());
+            "getExecutionContextReference", "()" + getNamer().getExecutionContextDescriptor(), true);
 
         Label l2 = new Label();
         visitor.visitJumpInsn(Opcodes.GOTO, l2);

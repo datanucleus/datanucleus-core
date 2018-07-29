@@ -68,7 +68,7 @@ public class Clone extends ClassMethod
         visitor.visitLabel(startLabel);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, EnhanceUtils.ACN_Object, "clone", "()" + EnhanceUtils.CD_Object);
+        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, EnhanceUtils.ACN_Object, "clone", "()" + EnhanceUtils.CD_Object, false);
         visitor.visitTypeInsn(Opcodes.CHECKCAST, getClassEnhancer().getASMClassName());
         visitor.visitVarInsn(Opcodes.ASTORE, 1);
 

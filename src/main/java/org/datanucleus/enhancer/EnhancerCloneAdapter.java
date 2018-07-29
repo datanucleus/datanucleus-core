@@ -244,6 +244,7 @@ public class EnhancerCloneAdapter extends MethodVisitor
         visitor.visitMaxs(arg0, arg1);
     }
 
+    @Deprecated
     public void visitMethodInsn(int opcode, String owner, String name, String desc)
     {
         visitor.visitMethodInsn(opcode, owner, name, desc);

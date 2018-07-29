@@ -86,11 +86,11 @@ public class WriteObject extends ClassMethod
 
         // "dnPreSerialize();"
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), getNamer().getPreSerializeMethodName(), "()V");
+        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), getNamer().getPreSerializeMethodName(), "()V", false);
 
         // "out.defaultWriteObject();"
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
-        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/ObjectOutputStream", "defaultWriteObject", "()V");
+        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/ObjectOutputStream", "defaultWriteObject", "()V", false);
 
         visitor.visitInsn(Opcodes.RETURN);
 

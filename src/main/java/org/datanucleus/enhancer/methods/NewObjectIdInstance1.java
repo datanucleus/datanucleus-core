@@ -71,8 +71,7 @@ public class NewObjectIdInstance1 extends ClassMethod
      * @param argTypes Argument types
      * @param argNames Argument names
      */
-    public NewObjectIdInstance1(ClassEnhancer enhancer, String name, int access, 
-        Object returnType, Object[] argTypes, String[] argNames)
+    public NewObjectIdInstance1(ClassEnhancer enhancer, String name, int access, Object returnType, Object[] argTypes, String[] argNames)
     {
         super(enhancer, name, access, returnType, argTypes, argNames);
     }
@@ -97,8 +96,7 @@ public class NewObjectIdInstance1 extends ClassMethod
                 visitor.visitTypeInsn(Opcodes.NEW, getClassEnhancer().getNamer().getFatalInternalExceptionAsmClassName());
                 visitor.visitInsn(Opcodes.DUP);
                 visitor.visitLdcInsn("This class has no identity");
-                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, 
-                    getClassEnhancer().getNamer().getFatalInternalExceptionAsmClassName(), "<init>", "(Ljava/lang/String;)V");
+                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, getClassEnhancer().getNamer().getFatalInternalExceptionAsmClassName(), "<init>", "(Ljava/lang/String;)V", false);
                 visitor.visitInsn(Opcodes.ATHROW);
                 Label endLabel = new Label();
                 visitor.visitLabel(endLabel);
@@ -118,31 +116,30 @@ public class NewObjectIdInstance1 extends ClassMethod
                     visitor.visitTypeInsn(Opcodes.NEW, ACN_objectIdClass);
                     visitor.visitInsn(Opcodes.DUP);
                     visitor.visitVarInsn(Opcodes.ALOAD, 0);
-                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;");
+                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
                     visitor.visitVarInsn(Opcodes.ALOAD, 0);
                     if (fmd instanceof PropertyMetaData)
                     {
                         // Persistent property so use dnGetXXX()
                         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
-                            getNamer().getGetMethodPrefixMethodName() + fmd.getName(), "()" + Type.getDescriptor(fmd.getType()));
+                            getNamer().getGetMethodPrefixMethodName() + fmd.getName(), "()" + Type.getDescriptor(fmd.getType()), false);
                     }
                     else
                     {
                         // Persistent field so use xxx
-                        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-                            fmd.getName(), Type.getDescriptor(fmd.getType()));
+                        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), fmd.getName(), Type.getDescriptor(fmd.getType()));
                     }
                     Class primitiveType = ClassUtils.getPrimitiveTypeForType(fmd.getType());
                     if (primitiveType != null)
                     {
                         // Using object wrapper of primitive so use wrapper constructor
                         visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, ACN_objectIdClass, "<init>",
-                            "(Ljava/lang/Class;" + Type.getDescriptor(fmd.getType()) + ")V");
+                            "(Ljava/lang/Class;" + Type.getDescriptor(fmd.getType()) + ")V", false);
                     }
                     else
                     {
                         visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, ACN_objectIdClass, "<init>",
-                            "(Ljava/lang/Class;" + getNamer().getTypeDescriptorForSingleFieldIdentityGetKey(objectIdClass) + ")V");
+                            "(Ljava/lang/Class;" + getNamer().getTypeDescriptorForSingleFieldIdentityGetKey(objectIdClass) + ")V", false);
                     }
 
                     visitor.visitInsn(Opcodes.ARETURN);
@@ -159,7 +156,7 @@ public class NewObjectIdInstance1 extends ClassMethod
 
                     visitor.visitTypeInsn(Opcodes.NEW, ACN_objectIdClass);
                     visitor.visitInsn(Opcodes.DUP);
-                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, ACN_objectIdClass, "<init>", "()V");
+                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, ACN_objectIdClass, "<init>", "()V", false);
                     visitor.visitInsn(Opcodes.ARETURN);
 
                     Label endLabel = new Label();

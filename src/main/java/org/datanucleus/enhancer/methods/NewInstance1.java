@@ -74,8 +74,7 @@ public class NewInstance1 extends ClassMethod
             visitor.visitTypeInsn(Opcodes.NEW, getNamer().getFatalInternalExceptionAsmClassName());
             visitor.visitInsn(Opcodes.DUP);
             visitor.visitLdcInsn("Cannot instantiate abstract class.");
-            visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, getNamer().getFatalInternalExceptionAsmClassName(),
-                "<init>", "(Ljava/lang/String;)V");
+            visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, getNamer().getFatalInternalExceptionAsmClassName(), "<init>", "(Ljava/lang/String;)V", false);
             visitor.visitInsn(Opcodes.ATHROW);
 
             Label endLabel = new Label();
@@ -88,7 +87,7 @@ public class NewInstance1 extends ClassMethod
         {
             visitor.visitTypeInsn(Opcodes.NEW, getClassEnhancer().getASMClassName());
             visitor.visitInsn(Opcodes.DUP);
-            visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, getClassEnhancer().getASMClassName(), "<init>", "()V");
+            visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, getClassEnhancer().getASMClassName(), "<init>", "()V", false);
             visitor.visitVarInsn(Opcodes.ASTORE, 2);
             Label l1 = new Label();
             visitor.visitLabel(l1);
@@ -97,8 +96,7 @@ public class NewInstance1 extends ClassMethod
             visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(), getNamer().getFlagsFieldName(), "B");
             visitor.visitVarInsn(Opcodes.ALOAD, 2);
             visitor.visitVarInsn(Opcodes.ALOAD, 1);
-            visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(), 
-                getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+            visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
             visitor.visitVarInsn(Opcodes.ALOAD, 2);
             visitor.visitInsn(Opcodes.ARETURN);
 

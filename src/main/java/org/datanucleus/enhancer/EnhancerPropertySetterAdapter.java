@@ -160,7 +160,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
             mv.visitJumpInsn(Opcodes.IFNONNULL, l1);
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             EnhanceUtils.addLoadForType(mv, mmd.getType(), 1);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getSetMethodPrefixMethodName() + mmd.getName(), "(" + fieldTypeDesc + ")V");
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getSetMethodPrefixMethodName() + mmd.getName(), "(" + fieldTypeDesc + ")V", false);
             Label l3 = new Label();
             mv.visitJumpInsn(Opcodes.GOTO, l3);
             mv.visitLabel(l1);
@@ -177,7 +177,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
                 mv.visitInsn(Opcodes.IADD);
             }
             mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getGetMethodPrefixMethodName() + mmd.getName(), "()" + fieldTypeDesc);
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getGetMethodPrefixMethodName() + mmd.getName(), "()" + fieldTypeDesc, false);
             EnhanceUtils.addLoadForType(mv, mmd.getType(), 1);
             String methodName = "set" + EnhanceUtils.getTypeNameForPersistableMethod(mmd.getType()) + "Field";
             String argTypeDesc = fieldTypeDesc;
@@ -186,7 +186,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
                 argTypeDesc = EnhanceUtils.CD_Object;
             }
             mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, namer.getStateManagerAsmClassName(),
-                methodName, "(L" + namer.getPersistableAsmClassName() + ";I" + argTypeDesc + argTypeDesc + ")V");
+                methodName, "(L" + namer.getPersistableAsmClassName() + ";I" + argTypeDesc + argTypeDesc + ")V", true);
 
             mv.visitLabel(l3);
             mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
@@ -195,7 +195,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
             {
                 // "if (objPC.dnIsDetached() == true)"
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getIsDetachedMethodName(), "()Z");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getIsDetachedMethodName(), "()Z", false);
                 Label l6 = new Label();
                 mv.visitJumpInsn(Opcodes.IFEQ, l6);
 
@@ -211,7 +211,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
                     mv.visitFieldInsn(Opcodes.GETSTATIC, asmClassName, namer.getInheritedFieldCountFieldName(), "I");
                     mv.visitInsn(Opcodes.IADD);
                 }
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "set", "(I)V");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "set", "(I)V", false);
 
                 mv.visitLabel(l6);
                 mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
@@ -250,8 +250,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
                 mv.visitInsn(Opcodes.IADD);
             }
             mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, 
-                namer.getGetMethodPrefixMethodName() + mmd.getName(), "()" + fieldTypeDesc);
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getGetMethodPrefixMethodName() + mmd.getName(), "()" + fieldTypeDesc, false);
             EnhanceUtils.addLoadForType(mv, mmd.getType(), 1);
             String methodName = "set" + EnhanceUtils.getTypeNameForPersistableMethod(mmd.getType()) + "Field";
             String argTypeDesc = fieldTypeDesc;
@@ -260,7 +259,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
                 argTypeDesc = EnhanceUtils.CD_Object;
             }
             mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, namer.getStateManagerAsmClassName(),
-                methodName, "(L" + namer.getPersistableAsmClassName() + ";I" + argTypeDesc + argTypeDesc + ")V");
+                methodName, "(L" + namer.getPersistableAsmClassName() + ";I" + argTypeDesc + argTypeDesc + ")V", true);
             Label l3 = new Label();
             mv.visitJumpInsn(Opcodes.GOTO, l3);
             mv.visitLabel(l1);
@@ -269,13 +268,13 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
             mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             EnhanceUtils.addLoadForType(mv, mmd.getType(), 1);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getSetMethodPrefixMethodName() + mmd.getName(), "(" + fieldTypeDesc + ")V");
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getSetMethodPrefixMethodName() + mmd.getName(), "(" + fieldTypeDesc + ")V", false);
 
             if (cmd.isDetachable())
             {
                 // "if (objPC.dnIsDetached() == true)  ((BitSet) objPC.dnDetachedState[3]).set(8);"
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getIsDetachedMethodName(), "()Z");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getIsDetachedMethodName(), "()Z", false);
                 mv.visitJumpInsn(Opcodes.IFEQ, l3);
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitFieldInsn(Opcodes.GETFIELD, asmClassName, namer.getDetachedStateFieldName(), "[Ljava/lang/Object;");
@@ -288,7 +287,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
                     mv.visitFieldInsn(Opcodes.GETSTATIC, asmClassName, namer.getInheritedFieldCountFieldName(), "I");
                     mv.visitInsn(Opcodes.IADD);
                 }
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "set", "(I)V");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "set", "(I)V", false);
             }
 
             mv.visitLabel(l3);
@@ -309,7 +308,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
 
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             EnhanceUtils.addLoadForType(mv, mmd.getType(), 1);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getSetMethodPrefixMethodName() + mmd.getName(), "(" + fieldTypeDesc + ")V");
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, asmClassName, namer.getSetMethodPrefixMethodName() + mmd.getName(), "(" + fieldTypeDesc + ")V", false);
             mv.visitInsn(Opcodes.RETURN);
 
             Label endLabel = new Label();
@@ -474,6 +473,7 @@ public class EnhancerPropertySetterAdapter extends MethodVisitor
         visitor.visitMaxs(arg0, arg1);
     }
 
+    @Deprecated
     public void visitMethodInsn(int opcode, String owner, String name, String desc)
     {
         visitor.visitMethodInsn(opcode, owner, name, desc);

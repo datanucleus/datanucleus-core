@@ -62,16 +62,15 @@ public abstract class IsXXX extends ClassMethod
         Label l0 = new Label();
         visitor.visitLabel(l0);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), 
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+
         Label l1 = new Label();
         visitor.visitJumpInsn(Opcodes.IFNULL, l1);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), 
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(), 
-            getStateManagerIsMethod(), "(" + getNamer().getPersistableDescriptor() + ")Z");
+        visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(), getStateManagerIsMethod(), "(" + getNamer().getPersistableDescriptor() + ")Z", true);
         Label l2 = new Label();
         visitor.visitJumpInsn(Opcodes.GOTO, l2);
         visitor.visitLabel(l1);

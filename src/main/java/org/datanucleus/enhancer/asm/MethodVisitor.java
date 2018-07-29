@@ -391,8 +391,7 @@ public abstract class MethodVisitor {
    * @param name the method's name.
    * @param descriptor the method's descriptor (see {@link Type}).
    */
-// AJ Commented out the deprecated annotation (and deleted the associated javadoc) so we don't get pages of warnings
-//  @Deprecated
+  @Deprecated
   public void visitMethodInsn(
       final int opcode, final String owner, final String name, final String descriptor) {
     if (api >= Opcodes.ASM5) {

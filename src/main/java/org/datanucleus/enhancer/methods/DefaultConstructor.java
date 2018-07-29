@@ -60,7 +60,7 @@ public class DefaultConstructor extends ClassMethod
         visitor.visitLabel(l0);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         Class superclass = enhancer.getClassBeingEnhanced().getSuperclass();
-        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, superclass.getName().replace('.', '/'), "<init>", "()V");
+        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, superclass.getName().replace('.', '/'), "<init>", "()V", false);
         visitor.visitInsn(Opcodes.RETURN);
         Label l1 = new Label();
         visitor.visitLabel(l1);

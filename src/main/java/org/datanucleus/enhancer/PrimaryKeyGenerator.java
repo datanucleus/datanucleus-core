@@ -150,7 +150,7 @@ public class PrimaryKeyGenerator
         mv.visitLabel(startLabel);
 
         mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
 
         mv.visitInsn(Opcodes.RETURN);
 
@@ -184,14 +184,14 @@ public class PrimaryKeyGenerator
 
         // Invoke default constructor of superclass (Object)
         mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
 
         // StringTokenizer tokeniser = new StringTokenizer(str, {stringSeparator});
         mv.visitTypeInsn(Opcodes.NEW, "java/util/StringTokenizer");
         mv.visitInsn(Opcodes.DUP);
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitLdcInsn(stringSeparator);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/util/StringTokenizer", "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/util/StringTokenizer", "<init>", "(Ljava/lang/String;Ljava/lang/String;)V", false);
         mv.visitVarInsn(Opcodes.ASTORE, 2);
         Label l5 = new Label();
         mv.visitLabel(l5);
@@ -206,7 +206,7 @@ public class PrimaryKeyGenerator
 
             // String tokenX = tokeniser.nextToken();
             mv.visitVarInsn(Opcodes.ALOAD, 2);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/StringTokenizer", "nextToken", "()Ljava/lang/String;");
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/StringTokenizer", "nextToken", "()Ljava/lang/String;", false);
             mv.visitVarInsn(Opcodes.ASTORE, astorePosition);
 
             fieldLabels[i] = new Label();
@@ -232,15 +232,15 @@ public class PrimaryKeyGenerator
                 }
 
                 mv.visitVarInsn(Opcodes.ALOAD, astorePosition);
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, wrapperClassName_ASM, "valueOf", "(Ljava/lang/String;)L" + wrapperClassName_ASM + ";");
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, wrapperClassName_ASM, wrapperConverterMethod, "()" + type_desc);
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, wrapperClassName_ASM, "valueOf", "(Ljava/lang/String;)L" + wrapperClassName_ASM + ";", false);
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, wrapperClassName_ASM, wrapperConverterMethod, "()" + type_desc, false);
                 mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, mmd.getName(), type_desc);
             }
             else if (mmd.getType() == char.class)
             {
                 mv.visitVarInsn(Opcodes.ALOAD, astorePosition);
                 mv.visitInsn(Opcodes.ICONST_0);
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "charAt", "(I)C");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "charAt", "(I)C", false);
                 mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, "field1", "C");
             }
             else if (mmd.getType() == String.class)
@@ -254,28 +254,28 @@ public class PrimaryKeyGenerator
                 // Uses the following pattern (e.g for Long)
                 // fieldX = Long.valueOf(tokenX);
                 mv.visitVarInsn(Opcodes.ALOAD, astorePosition);
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, typeName_ASM, "valueOf", "(Ljava/lang/String;)L" + typeName_ASM + ";");
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, typeName_ASM, "valueOf", "(Ljava/lang/String;)L" + typeName_ASM + ";", false);
                 mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, mmd.getName(), "L" + typeName_ASM + ";");
             }
             else if (mmd.getType() == Currency.class)
             {
                 // "fieldX = TypeX.newInstance(tokenX)"
                 mv.visitVarInsn(Opcodes.ALOAD, astorePosition);
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/Currency", "getInstance", "(Ljava/lang/String;)Ljava/util/Currency;");
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/Currency", "getInstance", "(Ljava/lang/String;)Ljava/util/Currency;", false);
                 mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, mmd.getName(), "Ljava/util/Currency;");
             }
             else if (mmd.getType() == TimeZone.class)
             {
                 // "fieldX = TimeZone.getTimeZone(tokenX)"
                 mv.visitVarInsn(Opcodes.ALOAD, astorePosition);
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/TimeZone", "getTimeZone", "(Ljava/lang/String;)Ljava/util/TimeZone;");
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/TimeZone", "getTimeZone", "(Ljava/lang/String;)Ljava/util/TimeZone;", false);
                 mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, mmd.getName(), "Ljava/util/TimeZone;");
             }
             else if (mmd.getType() == UUID.class)
             {
                 // "fieldX = UUID.fromString(tokenX)"
                 mv.visitVarInsn(Opcodes.ALOAD, astorePosition);
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/UUID", "fromString", "(Ljava/lang/String;)Ljava/util/UUID;");
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/UUID", "fromString", "(Ljava/lang/String;)Ljava/util/UUID;", false);
                 mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, mmd.getName(), "Ljava/util/UUID;");
             }
             else if (Date.class.isAssignableFrom(mmd.getType()))
@@ -286,9 +286,9 @@ public class PrimaryKeyGenerator
                 mv.visitTypeInsn(Opcodes.NEW, "java/lang/Long");
                 mv.visitInsn(Opcodes.DUP);
                 mv.visitVarInsn(Opcodes.ALOAD, astorePosition);
-                mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Long", "<init>", "(Ljava/lang/String;)V");
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J");
-                mv.visitMethodInsn(Opcodes.INVOKESPECIAL, typeName_ASM, "<init>", "(J)V");
+                mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Long", "<init>", "(Ljava/lang/String;)V", false);
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J", false);
+                mv.visitMethodInsn(Opcodes.INVOKESPECIAL, typeName_ASM, "<init>", "(J)V", false);
                 mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, mmd.getName(), 
                     EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()));
             }
@@ -296,14 +296,14 @@ public class PrimaryKeyGenerator
             {
                 // fieldX = Calendar.getInstance();
                 // fieldX.setTimeInMillis(Long.valueOf(tokenX).longValue());
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/Calendar", "getInstance", "()Ljava/util/Calendar;");
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/Calendar", "getInstance", "()Ljava/util/Calendar;", false);
                 mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, mmd.getName(), "Ljava/util/Calendar;");
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitFieldInsn(Opcodes.GETFIELD, className_ASM, mmd.getName(), "Ljava/util/Calendar;");
                 mv.visitVarInsn(Opcodes.ALOAD, astorePosition);
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Long", "valueOf", "(Ljava/lang/String;)Ljava/lang/Long;");
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J");
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/Calendar", "setTimeInMillis", "(J)V");
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Long", "valueOf", "(Ljava/lang/String;)Ljava/lang/Long;", false);
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J", false);
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/Calendar", "setTimeInMillis", "(J)V", false);
             }
             else
             {
@@ -315,7 +315,7 @@ public class PrimaryKeyGenerator
                 mv.visitTypeInsn(Opcodes.NEW, fieldTypeName_ASM);
                 mv.visitInsn(Opcodes.DUP);
                 mv.visitVarInsn(Opcodes.ALOAD, astorePosition);
-                mv.visitMethodInsn(Opcodes.INVOKESPECIAL, fieldTypeName_ASM, "<init>", "(Ljava/lang/String;)V");
+                mv.visitMethodInsn(Opcodes.INVOKESPECIAL, fieldTypeName_ASM, "<init>", "(Ljava/lang/String;)V", false);
                 mv.visitFieldInsn(Opcodes.PUTFIELD, className_ASM, mmd.getName(), EnhanceUtils.getTypeDescriptorForType(fieldTypeName));
             }
         }
@@ -358,7 +358,7 @@ public class PrimaryKeyGenerator
         // "StringBuilder str = new StringBuilder();"
         mv.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
         mv.visitInsn(Opcodes.DUP);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V");
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V", false);
         mv.visitVarInsn(Opcodes.ASTORE, 1);
         Label l1 = new Label();
         mv.visitLabel(l1);
@@ -377,61 +377,53 @@ public class PrimaryKeyGenerator
             if (mmd.getType() == int.class || mmd.getType() == long.class ||
                 mmd.getType() == float.class || mmd.getType() == double.class)
             {
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", 
-                    "(" + EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()) + ")Ljava/lang/StringBuilder;");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(" + EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()) + ")Ljava/lang/StringBuilder;", false);
             }
             else if (mmd.getType() == char.class)
             {
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
-                    "(" + EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()) + ")Ljava/lang/StringBuilder;");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(" + EnhanceUtils.getTypeDescriptorForType(mmd.getTypeName()) + ")Ljava/lang/StringBuilder;", false);
             }
             else if (mmd.getType() == String.class)
             {
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
-                    "(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
             }
             else if (Date.class.isAssignableFrom(mmd.getType()))
             {
                 // Use the long value of the date (millisecs)
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, mmd.getTypeName().replace('.', '/'), "getTime", "()J");
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
-                    "(J)Ljava/lang/StringBuilder;");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, mmd.getTypeName().replace('.', '/'), "getTime", "()J", false);
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(J)Ljava/lang/StringBuilder;", false);
             }
             else if (Calendar.class.isAssignableFrom(mmd.getType()))
             {
                 // Use the long value of the Calendar (millisecs)
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/Calendar", "getTime", "()Ljava/util/Date;");
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/Date", "getTime", "()J");
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
-                    "(J)Ljava/lang/StringBuilder;");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/Calendar", "getTime", "()Ljava/util/Date;", false);
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/Date", "getTime", "()J", false);
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(J)Ljava/lang/StringBuilder;", false);
             }
             else if (mmd.getType() == TimeZone.class)
             {
                 // Use the ID of the TimeZone
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/TimeZone", "getID", "()Ljava/lang/String;");
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
-                    "(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/TimeZone", "getID", "()Ljava/lang/String;", false);
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
             }
             else
             {
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, mmd.getTypeName().replace('.', '/'), "toString", "()Ljava/lang/String;");
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
-                    "(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, mmd.getTypeName().replace('.', '/'), "toString", "()Ljava/lang/String;", false);
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
             }
 
             if (i < (pkPositions.length-1))
             {
                 // Add separator ({stringSeparator})
                 mv.visitLdcInsn(stringSeparator);
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
-                    "(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
             }
         }
         mv.visitInsn(Opcodes.POP);
 
         // "return str.toString();"
         mv.visitVarInsn(Opcodes.ALOAD, 1);
-        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;");
+        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
         mv.visitInsn(Opcodes.ARETURN);
 
         Label endLabel = new Label();
@@ -530,7 +522,7 @@ public class PrimaryKeyGenerator
                 mv.visitFieldInsn(Opcodes.GETFIELD, className_ASM, mmd.getName(), typeNameDesc);
                 mv.visitVarInsn(Opcodes.ALOAD, 2);
                 mv.visitFieldInsn(Opcodes.GETFIELD, className_ASM, mmd.getName(), typeNameDesc);
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, typeName_ASM, "equals", "(Ljava/lang/Object;)Z");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, typeName_ASM, "equals", "(Ljava/lang/Object;)Z", false);
 
                 if (i == 0)
                 {
@@ -590,7 +582,7 @@ public class PrimaryKeyGenerator
             else
             {
                 // "fieldX.hashCode"
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, mmd.getTypeName().replace('.', '/'), "hashCode", "()I");
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, mmd.getTypeName().replace('.', '/'), "hashCode", "()I", false);
             }
 
             if (i > 0)

@@ -129,9 +129,9 @@ public class CopyField extends ClassMethod
                     {
                         // Persistent property so use dnSetXXX(obj.dnGetXXX())
                         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
-                            getNamer().getGetMethodPrefixMethodName() + fields[i].getName(), "()" + Type.getDescriptor(fields[i].getType()));
+                            getNamer().getGetMethodPrefixMethodName() + fields[i].getName(), "()" + Type.getDescriptor(fields[i].getType()), false);
                         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
-                            getNamer().getSetMethodPrefixMethodName() + fields[i].getName(), "(" + Type.getDescriptor(fields[i].getType()) + ")V");
+                            getNamer().getSetMethodPrefixMethodName() + fields[i].getName(), "(" + Type.getDescriptor(fields[i].getType()) + ")V", false);
                     }
                     else
                     {
@@ -152,8 +152,7 @@ public class CopyField extends ClassMethod
                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                 visitor.visitVarInsn(Opcodes.ALOAD, 1);
                 visitor.visitVarInsn(Opcodes.ILOAD, 2);
-                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, pcSuperclassName.replace('.', '/'),
-                    getNamer().getCopyFieldMethodName(), "(" + superclsDescriptor + "I)V");
+                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, pcSuperclassName.replace('.', '/'), getNamer().getCopyFieldMethodName(), "(" + superclsDescriptor + "I)V", false);
 
                 // End of switch
                 visitor.visitLabel(endSwitchLabel);
@@ -166,8 +165,7 @@ public class CopyField extends ClassMethod
                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                 visitor.visitVarInsn(Opcodes.ALOAD, 1);
                 visitor.visitVarInsn(Opcodes.ILOAD, 2);
-                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, pcSuperclassName.replace('.', '/'),
-                    getNamer().getCopyFieldMethodName(), "(" + superclsDescriptor + "I)V");
+                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, pcSuperclassName.replace('.', '/'), getNamer().getCopyFieldMethodName(), "(" + superclsDescriptor + "I)V", false);
 
                 visitor.visitInsn(Opcodes.RETURN);
             }
@@ -199,17 +197,15 @@ public class CopyField extends ClassMethod
                     {
                         // Persistent property so use dnSetXXX(obj.dnGetXXX())
                         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
-                            getNamer().getGetMethodPrefixMethodName() + fields[i].getName(), "()" + Type.getDescriptor(fields[i].getType()));
+                            getNamer().getGetMethodPrefixMethodName() + fields[i].getName(), "()" + Type.getDescriptor(fields[i].getType()), false);
                         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
-                            getNamer().getSetMethodPrefixMethodName() + fields[i].getName(), "(" + Type.getDescriptor(fields[i].getType()) + ")V");
+                            getNamer().getSetMethodPrefixMethodName() + fields[i].getName(), "(" + Type.getDescriptor(fields[i].getType()) + ")V", false);
                     }
                     else
                     {
                         // Persistent field so use xxx = obj.xxx
-                        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-                            fields[i].getName(), Type.getDescriptor(fields[i].getType()));
-                        visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(),
-                            fields[i].getName(), Type.getDescriptor(fields[i].getType()));
+                        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), fields[i].getName(), Type.getDescriptor(fields[i].getType()));
+                        visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(), fields[i].getName(), Type.getDescriptor(fields[i].getType()));
                     }
                     visitor.visitJumpInsn(Opcodes.GOTO, endSwitchLabel);
                 }
@@ -224,11 +220,11 @@ public class CopyField extends ClassMethod
                 visitor.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuffer");
                 visitor.visitInsn(Opcodes.DUP);
                 visitor.visitLdcInsn("out of field index :");
-                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuffer", "<init>", "(Ljava/lang/String;)V");
+                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuffer", "<init>", "(Ljava/lang/String;)V", false);
                 visitor.visitVarInsn(Opcodes.ILOAD, 2);
-                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuffer", "append", "(I)Ljava/lang/StringBuffer;");
-                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuffer", "toString", "()Ljava/lang/String;");
-                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V");
+                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuffer", "append", "(I)Ljava/lang/StringBuffer;", false);
+                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuffer", "toString", "()Ljava/lang/String;", false);
+                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V", false);
                 visitor.visitInsn(Opcodes.ATHROW);
 
                 // End of switch
@@ -245,11 +241,11 @@ public class CopyField extends ClassMethod
                 visitor.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuffer");
                 visitor.visitInsn(Opcodes.DUP);
                 visitor.visitLdcInsn("out of field index :");
-                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuffer", "<init>", "(Ljava/lang/String;)V");
+                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuffer", "<init>", "(Ljava/lang/String;)V", false);
                 visitor.visitVarInsn(Opcodes.ILOAD, 2);
-                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuffer", "append", "(I)Ljava/lang/StringBuffer;");
-                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuffer", "toString", "()Ljava/lang/String;");
-                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V");
+                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuffer", "append", "(I)Ljava/lang/StringBuffer;", false);
+                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuffer", "toString", "()Ljava/lang/String;", false);
+                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V", false);
                 visitor.visitInsn(Opcodes.ATHROW);
             }
         }

@@ -98,18 +98,15 @@ public class MakeDirty extends ClassMethod
         visitor.visitLabel(startLabel);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         Label l1 = new Label();
         visitor.visitJumpInsn(Opcodes.IFNULL, l1);
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitVarInsn(Opcodes.ALOAD, 1);
-        visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
-            "makeDirty", "(" + getNamer().getPersistableDescriptor() + "Ljava/lang/String;" + ")V");
+        visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(), "makeDirty", "(" + getNamer().getPersistableDescriptor() + "Ljava/lang/String;" + ")V", true);
         visitor.visitLabel(l1);
 
         visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
@@ -118,8 +115,7 @@ public class MakeDirty extends ClassMethod
         {
             // if (dnIsDetached())
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
-            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
-                getNamer().getIsDetachedMethodName(), "()Z");
+            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), getNamer().getIsDetachedMethodName(), "()Z", false);
             Label l3 = new Label();
             visitor.visitJumpInsn(Opcodes.IFEQ, l3);
 
@@ -132,17 +128,17 @@ public class MakeDirty extends ClassMethod
             visitor.visitLabel(l5);
             visitor.visitVarInsn(Opcodes.ALOAD, 1);
             visitor.visitIntInsn(Opcodes.BIPUSH, 46);
-            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "indexOf", "(I)I");
+            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "indexOf", "(I)I", false);
             Label l6 = new Label();
             visitor.visitJumpInsn(Opcodes.IFLT, l6);
 
             visitor.visitVarInsn(Opcodes.ALOAD, 1);
             visitor.visitVarInsn(Opcodes.ALOAD, 1);
             visitor.visitIntInsn(Opcodes.BIPUSH, 46);
-            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "lastIndexOf", "(I)I");
+            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "lastIndexOf", "(I)I", false);
             visitor.visitInsn(Opcodes.ICONST_1);
             visitor.visitInsn(Opcodes.IADD);
-            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "substring", "(I)Ljava/lang/String;");
+            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "substring", "(I)Ljava/lang/String;", false);
             visitor.visitVarInsn(Opcodes.ASTORE, 2);
             Label l8 = new Label();
             visitor.visitJumpInsn(Opcodes.GOTO, l8);
@@ -164,40 +160,35 @@ public class MakeDirty extends ClassMethod
             visitor.visitLabel(l11);
 
             visitor.visitFrame(Opcodes.F_APPEND,1, new Object[] {Opcodes.INTEGER}, 0, null);
-            visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), 
-                getNamer().getFieldNamesFieldName(), "[Ljava/lang/String;");
+            visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), getNamer().getFieldNamesFieldName(), "[Ljava/lang/String;");
             visitor.visitVarInsn(Opcodes.ILOAD, 3);
             visitor.visitInsn(Opcodes.AALOAD);
             visitor.visitVarInsn(Opcodes.ALOAD, 2);
-            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z");
+            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
             Label l12 = new Label();
             visitor.visitJumpInsn(Opcodes.IFEQ, l12);
 
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
-            visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), 
-                getNamer().getDetachedStateFieldName(), "[Ljava/lang/Object;");
+            visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getDetachedStateFieldName(), "[Ljava/lang/Object;");
             visitor.visitInsn(Opcodes.ICONST_2);
             visitor.visitInsn(Opcodes.AALOAD);
             visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/util/BitSet");
             visitor.visitVarInsn(Opcodes.ILOAD, 3);
-            visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), 
-                getNamer().getInheritedFieldCountFieldName(), "I");
+            visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), getNamer().getInheritedFieldCountFieldName(), "I");
             visitor.visitInsn(Opcodes.IADD);
-            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "get", "(I)Z");
+            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "get", "(I)Z", false);
             Label l14 = new Label();
             visitor.visitJumpInsn(Opcodes.IFEQ, l14);
 
             visitor.visitVarInsn(Opcodes.ALOAD, 0);
-            visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), 
-                getNamer().getDetachedStateFieldName(), "[Ljava/lang/Object;");
+            visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getDetachedStateFieldName(), "[Ljava/lang/Object;");
             visitor.visitInsn(Opcodes.ICONST_3);
             visitor.visitInsn(Opcodes.AALOAD);
             visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/util/BitSet");
             visitor.visitVarInsn(Opcodes.ILOAD, 3);
-            visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), 
-                getNamer().getInheritedFieldCountFieldName(), "I");
+            visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), getNamer().getInheritedFieldCountFieldName(), "I");
             visitor.visitInsn(Opcodes.IADD);
-            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "set", "(I)V");
+            visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/BitSet", "set", "(I)V", false);
 
             visitor.visitInsn(Opcodes.RETURN);
             visitor.visitLabel(l14);
@@ -207,11 +198,11 @@ public class MakeDirty extends ClassMethod
             {
                 // TODO Check this bytecode
                 visitor.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getDetachListenerAsmClassName(),
-                    "getInstance", "()L" + getNamer().getDetachListenerAsmClassName() + ";");
+                    "getInstance", "()L" + getNamer().getDetachListenerAsmClassName() + ";", false);
                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                 visitor.visitLdcInsn("field/property");
                 visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getNamer().getDetachListenerAsmClassName(), 
-                    "undetachedFieldAccess", "(Ljava/lang/Object;Ljava/lang/String;)V");
+                    "undetachedFieldAccess", "(Ljava/lang/Object;Ljava/lang/String;)V", false);
             }
             else
             {
@@ -219,7 +210,7 @@ public class MakeDirty extends ClassMethod
                 visitor.visitInsn(Opcodes.DUP);
                 visitor.visitLdcInsn("You have just attempted to access a field/property that hasn't been detached. Please detach it first before performing this operation");
                 visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, getNamer().getDetachedFieldAccessExceptionAsmClassName(), 
-                    "<init>", "(Ljava/lang/String;)V");
+                    "<init>", "(Ljava/lang/String;)V", false);
                 visitor.visitInsn(Opcodes.ATHROW);
             }
             visitor.visitLabel(l12);
@@ -229,8 +220,7 @@ public class MakeDirty extends ClassMethod
             visitor.visitLabel(l10);
             visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             visitor.visitVarInsn(Opcodes.ILOAD, 3);
-            visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), 
-                getNamer().getFieldNamesFieldName(), "[Ljava/lang/String;");
+            visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), getNamer().getFieldNamesFieldName(), "[Ljava/lang/String;");
             visitor.visitInsn(Opcodes.ARRAYLENGTH);
             visitor.visitJumpInsn(Opcodes.IF_ICMPLT, l11);
             visitor.visitLabel(l3);
@@ -241,8 +231,7 @@ public class MakeDirty extends ClassMethod
                 // Relay to the superclass to see if it has this field
                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                 visitor.visitVarInsn(Opcodes.ALOAD, 1);
-                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, pcSuperclassName.replace('.', '/'),
-                    getNamer().getMakeDirtyMethodName(), "(Ljava/lang/String;)V");
+                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, pcSuperclassName.replace('.', '/'), getNamer().getMakeDirtyMethodName(), "(Ljava/lang/String;)V", false);
             }
 
             visitor.visitInsn(Opcodes.RETURN);

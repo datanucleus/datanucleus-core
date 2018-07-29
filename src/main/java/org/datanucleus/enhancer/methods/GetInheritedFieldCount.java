@@ -62,7 +62,7 @@ public class GetInheritedFieldCount extends ClassMethod
         if (persistableSuperclass != null && persistableSuperclass.length() > 0)
         {
             visitor.visitMethodInsn(Opcodes.INVOKESTATIC, persistableSuperclass.replace('.', '/'),
-                getNamer().getGetManagedFieldCountMethodName(), "()I");
+                getNamer().getGetManagedFieldCountMethodName(), "()I", false);
             visitor.visitInsn(Opcodes.IRETURN);
             visitor.visitMaxs(1, 0);
         }

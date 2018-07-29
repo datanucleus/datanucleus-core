@@ -83,8 +83,7 @@ public class ReplaceField extends ClassMethod
      * @param argTypes Argument types
      * @param argNames Argument names
      */
-    public ReplaceField(ClassEnhancer enhancer, String name, int access, 
-        Object returnType, Object[] argTypes, String[] argNames)
+    public ReplaceField(ClassEnhancer enhancer, String name, int access, Object returnType, Object[] argTypes, String[] argNames)
     {
         super(enhancer, name, access, returnType, argTypes, argNames);
     }
@@ -107,23 +106,20 @@ public class ReplaceField extends ClassMethod
             if (fields.length > 0)
             {
                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
-                visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-                    getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+                visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
                 Label l1 = new Label();
                 visitor.visitJumpInsn(Opcodes.IFNONNULL, l1);
                 visitor.visitTypeInsn(Opcodes.NEW, "java/lang/IllegalStateException");
                 visitor.visitInsn(Opcodes.DUP);
                 visitor.visitLdcInsn("state manager is null");
-                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalStateException",
-                    "<init>", "(Ljava/lang/String;)V");
+                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalStateException", "<init>", "(Ljava/lang/String;)V", false);
                 visitor.visitInsn(Opcodes.ATHROW);
 
                 visitor.visitLabel(l1);
                 visitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 
                 visitor.visitVarInsn(Opcodes.ILOAD, 1);
-                visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(),
-                    getNamer().getInheritedFieldCountFieldName(), "I");
+                visitor.visitFieldInsn(Opcodes.GETSTATIC, getClassEnhancer().getASMClassName(), getNamer().getInheritedFieldCountFieldName(), "I");
                 visitor.visitInsn(Opcodes.ISUB);
 
                 Label[] fieldOptions = new Label[fields.length];
@@ -144,14 +140,13 @@ public class ReplaceField extends ClassMethod
 
                     visitor.visitVarInsn(Opcodes.ALOAD, 0);
                     visitor.visitVarInsn(Opcodes.ALOAD, 0);
-                    visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-                        getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+                    visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
                     visitor.visitVarInsn(Opcodes.ALOAD, 0);
                     visitor.visitVarInsn(Opcodes.ILOAD, 1);
                     String methodNameType = EnhanceUtils.getTypeNameForPersistableMethod(fields[i].getType());
                     visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
                         "replacing" + methodNameType + "Field",
-                        "(" + getNamer().getPersistableDescriptor() + "I)" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fields[i].getType()));
+                        "(" + getNamer().getPersistableDescriptor() + "I)" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fields[i].getType()), true);
                     if (methodNameType.equals("Object"))
                     {
                         // Check any Object types for casting
@@ -161,7 +156,7 @@ public class ReplaceField extends ClassMethod
                     {
                         // Persistent properties so use dnSetXXX(...)
                         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
-                            getNamer().getSetMethodPrefixMethodName() + fields[i].getName(), "(" + Type.getDescriptor(fields[i].getType()) + ")V");
+                            getNamer().getSetMethodPrefixMethodName() + fields[i].getName(), "(" + Type.getDescriptor(fields[i].getType()) + ")V", false);
                     }
                     else
                     {
@@ -178,8 +173,7 @@ public class ReplaceField extends ClassMethod
 
                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                 visitor.visitVarInsn(Opcodes.ILOAD, 1);
-                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, pcSuperclassName.replace('.', '/'),
-                    getNamer().getReplaceFieldMethodName(), "(I)V");
+                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, pcSuperclassName.replace('.', '/'), getNamer().getReplaceFieldMethodName(), "(I)V", false);
 
                 // End of switch
                 visitor.visitLabel(endSwitchLabel);
@@ -196,8 +190,7 @@ public class ReplaceField extends ClassMethod
             {
                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
                 visitor.visitVarInsn(Opcodes.ILOAD, 1);
-                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, pcSuperclassName.replace('.', '/'),
-                    getNamer().getReplaceFieldMethodName(), "(I)V");
+                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, pcSuperclassName.replace('.', '/'), getNamer().getReplaceFieldMethodName(), "(I)V", false);
                 visitor.visitInsn(Opcodes.RETURN);
 
                 Label endLabel = new Label();
@@ -212,15 +205,13 @@ public class ReplaceField extends ClassMethod
             if (fields.length > 0)
             {
                 visitor.visitVarInsn(Opcodes.ALOAD, 0);
-                visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-                    getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+                visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
                 Label l1 = new Label();
                 visitor.visitJumpInsn(Opcodes.IFNONNULL, l1);
                 visitor.visitTypeInsn(Opcodes.NEW, "java/lang/IllegalStateException");
                 visitor.visitInsn(Opcodes.DUP);
                 visitor.visitLdcInsn("state manager is null");
-                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalStateException", 
-                    "<init>", "(Ljava/lang/String;)V");
+                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalStateException", "<init>", "(Ljava/lang/String;)V", false);
                 visitor.visitInsn(Opcodes.ATHROW);
 
                 visitor.visitLabel(l1);
@@ -246,14 +237,13 @@ public class ReplaceField extends ClassMethod
 
                     visitor.visitVarInsn(Opcodes.ALOAD, 0);
                     visitor.visitVarInsn(Opcodes.ALOAD, 0);
-                    visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-                        getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+                    visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
                     visitor.visitVarInsn(Opcodes.ALOAD, 0);
                     visitor.visitVarInsn(Opcodes.ILOAD, 1);
                     String methodNameType = EnhanceUtils.getTypeNameForPersistableMethod(fields[i].getType());
                     visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(),
                         "replacing" + methodNameType + "Field",
-                        "(" + getNamer().getPersistableDescriptor() + "I)" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fields[i].getType()));
+                        "(" + getNamer().getPersistableDescriptor() + "I)" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fields[i].getType()), true);
                     if (methodNameType.equals("Object"))
                     {
                         // Check any Object types for casting
@@ -263,13 +253,12 @@ public class ReplaceField extends ClassMethod
                     {
                         // Persistent properties so use dnSetXXX(...)
                         visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(), 
-                            getNamer().getSetMethodPrefixMethodName() + fields[i].getName(), "(" + Type.getDescriptor(fields[i].getType()) + ")V");
+                            getNamer().getSetMethodPrefixMethodName() + fields[i].getName(), "(" + Type.getDescriptor(fields[i].getType()) + ")V", false);
                     }
                     else
                     {
                         // Persistent field so use xxx = ...
-                        visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(),
-                            fields[i].getName(), Type.getDescriptor(fields[i].getType()));
+                        visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(), fields[i].getName(), Type.getDescriptor(fields[i].getType()));
                     }
                     visitor.visitJumpInsn(Opcodes.GOTO, endSwitchLabel);
                 }
@@ -282,11 +271,11 @@ public class ReplaceField extends ClassMethod
                 visitor.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuffer");
                 visitor.visitInsn(Opcodes.DUP);
                 visitor.visitLdcInsn("out of field index :");
-                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuffer", "<init>", "(Ljava/lang/String;)V");
+                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuffer", "<init>", "(Ljava/lang/String;)V", false);
                 visitor.visitVarInsn(Opcodes.ILOAD, 1);
-                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuffer", "append", "(I)Ljava/lang/StringBuffer;");
-                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuffer", "toString", "()Ljava/lang/String;");
-                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V");
+                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuffer", "append", "(I)Ljava/lang/StringBuffer;", false);
+                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuffer", "toString", "()Ljava/lang/String;", false);
+                visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V", false);
                 visitor.visitInsn(Opcodes.ATHROW);
 
                 // End of switch

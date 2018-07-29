@@ -108,8 +108,7 @@ public class CopyKeyFieldsFromObjectId extends ClassMethod
      * @param argTypes Argument types
      * @param argNames Argument names
      */
-    public CopyKeyFieldsFromObjectId(ClassEnhancer enhancer, String name, int access, 
-        Object returnType, Object[] argTypes, String[] argNames)
+    public CopyKeyFieldsFromObjectId(ClassEnhancer enhancer, String name, int access, Object returnType, Object[] argTypes, String[] argNames)
     {
         super(enhancer, name, access, returnType, argTypes, argNames);
     }
@@ -156,7 +155,7 @@ public class CopyKeyFieldsFromObjectId extends ClassMethod
                     visitor.visitTypeInsn(Opcodes.NEW, "java/lang/IllegalArgumentException");
                     visitor.visitInsn(Opcodes.DUP);
                     visitor.visitLdcInsn("ObjectIdFieldConsumer is null");
-                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V");
+                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V", false);
                     visitor.visitInsn(Opcodes.ATHROW);
 
                     // if (!(oid instanceof LongIdentity)) throw new ClassCastException("...");
@@ -170,7 +169,7 @@ public class CopyKeyFieldsFromObjectId extends ClassMethod
                     visitor.visitTypeInsn(Opcodes.NEW, "java/lang/ClassCastException");
                     visitor.visitInsn(Opcodes.DUP);
                     visitor.visitLdcInsn("oid is not instanceof " + objectIdClass);
-                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/ClassCastException", "<init>", "(Ljava/lang/String;)V");
+                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/ClassCastException", "<init>", "(Ljava/lang/String;)V", false);
                     visitor.visitInsn(Opcodes.ATHROW);
 
                     // XXXIdentity o = (XXXIdentity) oid;
@@ -197,25 +196,20 @@ public class CopyKeyFieldsFromObjectId extends ClassMethod
                         String getKeyReturnDesc = Type.getDescriptor(primitiveType);
 
                         visitor.visitVarInsn(Opcodes.ALOAD, 3);
-                        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, ACN_objectIdClass, 
-                            "getKey", "()" + getKeyReturnDesc);
-                        visitor.visitMethodInsn(Opcodes.INVOKESTATIC, ACN_fieldType, 
-                            "valueOf", "(" + getKeyReturnDesc + ")L" + ACN_fieldType + ";");
+                        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, ACN_objectIdClass, "getKey", "()" + getKeyReturnDesc, false);
+                        visitor.visitMethodInsn(Opcodes.INVOKESTATIC, ACN_fieldType, "valueOf", "(" + getKeyReturnDesc + ")L" + ACN_fieldType + ";", false);
 
-                        visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE,
-                            getNamer().getObjectIdFieldConsumerAsmClassName(),
-                            "storeObjectField", "(I" + EnhanceUtils.CD_Object + ")V");
+                        visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldConsumerAsmClassName(),
+                            "storeObjectField", "(I" + EnhanceUtils.CD_Object + ")V", true);
                     }
                     else
                     {
                         // PK field isn't a primitive wrapper
                         visitor.visitVarInsn(Opcodes.ALOAD, 3);
-                        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, ACN_objectIdClass, "getKey",
-                            "()" + getNamer().getTypeDescriptorForSingleFieldIdentityGetKey(objectIdClass));
-                        visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE,
-                            getNamer().getObjectIdFieldConsumerAsmClassName(),
+                        visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, ACN_objectIdClass, "getKey", "()" + getNamer().getTypeDescriptorForSingleFieldIdentityGetKey(objectIdClass), false);
+                        visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldConsumerAsmClassName(),
                             "store" + getNamer().getTypeNameForUseWithSingleFieldIdentity(objectIdClass) + "Field",
-                            "(I" + getNamer().getTypeDescriptorForSingleFieldIdentityGetKey(objectIdClass) + ")V");
+                            "(I" + getNamer().getTypeDescriptorForSingleFieldIdentityGetKey(objectIdClass) + ")V", true);
                     }
 
                     visitor.visitInsn(Opcodes.RETURN);
@@ -246,8 +240,7 @@ public class CopyKeyFieldsFromObjectId extends ClassMethod
                     visitor.visitTypeInsn(Opcodes.NEW, "java/lang/IllegalArgumentException");
                     visitor.visitInsn(Opcodes.DUP);
                     visitor.visitLdcInsn("ObjectIdFieldConsumer is null");
-                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException",
-                        "<init>", "(Ljava/lang/String;)V");
+                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V", false);
                     visitor.visitInsn(Opcodes.ATHROW);
 
                     visitor.visitLabel(l4);
@@ -260,8 +253,7 @@ public class CopyKeyFieldsFromObjectId extends ClassMethod
                     visitor.visitTypeInsn(Opcodes.NEW, "java/lang/ClassCastException");
                     visitor.visitInsn(Opcodes.DUP);
                     visitor.visitLdcInsn("oid is not instanceof " + objectIdClass);
-                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/ClassCastException",
-                        "<init>", "(Ljava/lang/String;)V");
+                    visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/ClassCastException", "<init>", "(Ljava/lang/String;)V", false);
                     visitor.visitInsn(Opcodes.ATHROW);
 
                     visitor.visitLabel(l5);
@@ -293,7 +285,7 @@ public class CopyKeyFieldsFromObjectId extends ClassMethod
                             EnhanceUtils.addBIPUSHToMethod(visitor, fmd.getFieldId());
                             visitor.visitVarInsn(Opcodes.ALOAD, 0);
                             visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, getClassEnhancer().getASMClassName(),
-                                getNamer().getGetExecutionContextMethodName(), "()L" + getNamer().getExecutionContextAsmClassName() + ";");
+                                getNamer().getGetExecutionContextMethodName(), "()L" + getNamer().getExecutionContextAsmClassName() + ";", false);
                             visitor.visitVarInsn(Opcodes.ALOAD, 3);
 
                             // TODO Cater for property, or private field cases
@@ -302,10 +294,9 @@ public class CopyKeyFieldsFromObjectId extends ClassMethod
 
                             visitor.visitInsn(Opcodes.ICONST_0);
                             visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getExecutionContextAsmClassName(),
-                                "findObject", "(Ljava/lang/Object;Z)Ljava/lang/Object;");
-                            visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE,
-                                getNamer().getObjectIdFieldConsumerAsmClassName(),
-                                "storeObjectField", "(ILjava/lang/Object;)V");
+                                "findObject", "(Ljava/lang/Object;Z)Ljava/lang/Object;", true);
+                            visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldConsumerAsmClassName(),
+                                "storeObjectField", "(ILjava/lang/Object;)V", true);
                         }
                         else
                         {
@@ -317,12 +308,9 @@ public class CopyKeyFieldsFromObjectId extends ClassMethod
                                 EnhanceUtils.addBIPUSHToMethod(visitor, fmd.getFieldId());
                                 visitor.visitVarInsn(Opcodes.ALOAD, 3);
                                 visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, ACN_objectIdClass,
-                                    ClassUtils.getJavaBeanGetterName(fmd.getName(), fmd.getTypeName().equals("boolean")),
-                                    "()" + Type.getDescriptor(fmd.getType()));
-                                visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE,
-                                    getNamer().getObjectIdFieldConsumerAsmClassName(),
-                                    "store" + typeMethodName + "Field",
-                                    "(I" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()) + ")V");
+                                    ClassUtils.getJavaBeanGetterName(fmd.getName(), fmd.getTypeName().equals("boolean")), "()" + Type.getDescriptor(fmd.getType()), false);
+                                visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldConsumerAsmClassName(),
+                                    "store" + typeMethodName + "Field", "(I" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()) + ")V", true);
                             }
                             else if (Modifier.isPublic(pkFieldModifiers))
                             {
@@ -332,10 +320,8 @@ public class CopyKeyFieldsFromObjectId extends ClassMethod
                                 visitor.visitVarInsn(Opcodes.ALOAD, 3);
                                 visitor.visitFieldInsn(Opcodes.GETFIELD, ACN_objectIdClass,
                                     fmd.getName(), fieldTypeDesc);
-                                visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE,
-                                    getNamer().getObjectIdFieldConsumerAsmClassName(),
-                                    "store" + typeMethodName + "Field",
-                                    "(I" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()) + ")V");
+                                visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldConsumerAsmClassName(),
+                                    "store" + typeMethodName + "Field", "(I" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()) + ")V", true);
                             }
                             else
                             {
@@ -345,11 +331,9 @@ public class CopyKeyFieldsFromObjectId extends ClassMethod
                                 // "fc.storeObjectField(1, field.get(o));"
 
                                 visitor.visitVarInsn(Opcodes.ALOAD, 3);
-                                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", 
-                                    "getClass", "()Ljava/lang/Class;");
+                                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
                                 visitor.visitLdcInsn(fmd.getName());
-                                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Class", 
-                                    "getDeclaredField", "(Ljava/lang/String;)Ljava/lang/reflect/Field;");
+                                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Class", "getDeclaredField", "(Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
                                 visitor.visitVarInsn(Opcodes.ASTORE, 4);
                                 if (reflectionFieldStart == null)
                                 {
@@ -358,67 +342,54 @@ public class CopyKeyFieldsFromObjectId extends ClassMethod
                                 }
                                 visitor.visitVarInsn(Opcodes.ALOAD, 4);
                                 visitor.visitInsn(Opcodes.ICONST_1);
-                                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", 
-                                    "setAccessible", "(Z)V");
+                                visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "setAccessible", "(Z)V", false);
                                 visitor.visitVarInsn(Opcodes.ALOAD, 1);
                                 EnhanceUtils.addBIPUSHToMethod(visitor, fmd.getFieldId());
                                 visitor.visitVarInsn(Opcodes.ALOAD, 4);
                                 visitor.visitVarInsn(Opcodes.ALOAD, 3);
                                 if (fmd.getTypeName().equals("boolean"))
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", 
-                                        "getBoolean", "(Ljava/lang/Object;)Z");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "getBoolean", "(Ljava/lang/Object;)Z", false);
                                 }
                                 else if (fmd.getTypeName().equals("byte"))
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", 
-                                        "getByte", "(Ljava/lang/Object;)B");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "getByte", "(Ljava/lang/Object;)B", false);
                                 }
                                 else if (fmd.getTypeName().equals("char"))
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", 
-                                        "getChar", "(Ljava/lang/Object;)C");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "getChar", "(Ljava/lang/Object;)C", false);
                                 }
                                 else if (fmd.getTypeName().equals("double"))
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", 
-                                        "getDouble", "(Ljava/lang/Object;)D");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "getDouble", "(Ljava/lang/Object;)D", false);
                                 }
                                 else if (fmd.getTypeName().equals("float"))
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", 
-                                        "getFloat", "(Ljava/lang/Object;)F");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "getFloat", "(Ljava/lang/Object;)F", false);
                                 }
                                 else if (fmd.getTypeName().equals("int"))
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", 
-                                        "getInt", "(Ljava/lang/Object;)I");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "getInt", "(Ljava/lang/Object;)I", false);
                                 }
                                 else if (fmd.getTypeName().equals("long"))
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", 
-                                        "getLong", "(Ljava/lang/Object;)L");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "getLong", "(Ljava/lang/Object;)L", false);
                                 }
                                 else if (fmd.getTypeName().equals("short"))
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", 
-                                        "getShort", "(Ljava/lang/Object;)S");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "getShort", "(Ljava/lang/Object;)S", false);
                                 }
                                 else if (fmd.getTypeName().equals("java.lang.String"))
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field",
-                                        "get", "(Ljava/lang/Object;)Ljava/lang/Object;");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "get", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
                                     visitor.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/String");
                                 }
                                 else
                                 {
-                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field",
-                                        "get", "(Ljava/lang/Object;)Ljava/lang/Object;");
+                                    visitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/reflect/Field", "get", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
                                 }
-                                visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE,
-                                    getNamer().getObjectIdFieldConsumerAsmClassName(),
-                                    "store" + typeMethodName + "Field",
-                                    "(I" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()) + ")V");
+                                visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getObjectIdFieldConsumerAsmClassName(),
+                                    "store" + typeMethodName + "Field", "(I" + EnhanceUtils.getTypeDescriptorForEnhanceMethod(fmd.getType()) + ")V", true);
                             }
                         }
                     }
@@ -462,11 +433,11 @@ public class CopyKeyFieldsFromObjectId extends ClassMethod
             Label startLabel = new Label();
             visitor.visitLabel(startLabel);
             visitor.visitInsn(Opcodes.RETURN);
+
             Label endLabel = new Label();
             visitor.visitLabel(endLabel);
             visitor.visitLocalVariable("this", getClassEnhancer().getClassDescriptor(), null, startLabel, endLabel, 0);
-            visitor.visitLocalVariable(argNames[0], "L" + getNamer().getObjectIdFieldConsumerAsmClassName() + ";", null, 
-                startLabel, endLabel, 1);
+            visitor.visitLocalVariable(argNames[0], "L" + getNamer().getObjectIdFieldConsumerAsmClassName() + ";", null, startLabel, endLabel, 1);
             visitor.visitLocalVariable(argNames[1], EnhanceUtils.CD_Object, null, startLabel, endLabel, 2);
             visitor.visitMaxs(0, 3);
         }

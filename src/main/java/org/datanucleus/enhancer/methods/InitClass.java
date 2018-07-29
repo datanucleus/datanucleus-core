@@ -77,14 +77,14 @@ public class InitClass extends ClassMethod
      */
     public void addInitialiseInstructions(MethodVisitor mv)
     {
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(), getNamer().getFieldNamesInitMethodName(), "()[Ljava/lang/String;");
+        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(), getNamer().getFieldNamesInitMethodName(), "()[Ljava/lang/String;", false);
         mv.visitFieldInsn(Opcodes.PUTSTATIC, getClassEnhancer().getASMClassName(), getNamer().getFieldNamesFieldName(), "[Ljava/lang/String;");
 
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(), getNamer().getGetInheritedFieldCountMethodName(), "()I");
+        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(), getNamer().getGetInheritedFieldCountMethodName(), "()I", false);
         mv.visitFieldInsn(Opcodes.PUTSTATIC, getClassEnhancer().getASMClassName(), getNamer().getInheritedFieldCountFieldName(), "I");
 
         mv.visitLdcInsn(getClassEnhancer().getClassName());
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(), getNamer().getLoadClassMethodName(), "(Ljava/lang/String;)Ljava/lang/Class;");
+        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getClassEnhancer().getASMClassName(), getNamer().getLoadClassMethodName(), "(Ljava/lang/String;)Ljava/lang/Class;", false);
 
         if (enhancer.getClassMetaData().isAbstract())
         {
@@ -94,10 +94,9 @@ public class InitClass extends ClassMethod
         {
             mv.visitTypeInsn(Opcodes.NEW, getClassEnhancer().getASMClassName());
             mv.visitInsn(Opcodes.DUP);
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, getClassEnhancer().getASMClassName(), "<init>", "()V");
+            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, getClassEnhancer().getASMClassName(), "<init>", "()V", false);
         }
 
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getImplHelperAsmClassName(), "registerClass",
-            "(Ljava/lang/Class;L" + getNamer().getPersistableAsmClassName() + ";)V");
+        mv.visitMethodInsn(Opcodes.INVOKESTATIC, getNamer().getImplHelperAsmClassName(), "registerClass", "(Ljava/lang/Class;L" + getNamer().getPersistableAsmClassName() + ";)V", false);
     }
 }

@@ -52,8 +52,7 @@ public class ReplaceDetachedState extends ClassMethod
      * @param argTypes Argument types
      * @param argNames Argument names
      */
-    public ReplaceDetachedState(ClassEnhancer enhancer, String name, int access, 
-        Object returnType, Object[] argTypes, String[] argNames)
+    public ReplaceDetachedState(ClassEnhancer enhancer, String name, int access, Object returnType, Object[] argTypes, String[] argNames)
     {
         super(enhancer, name, access, returnType, argTypes, argNames);
     }
@@ -68,15 +67,13 @@ public class ReplaceDetachedState extends ClassMethod
         Label startLabel = new Label();
         visitor.visitLabel(startLabel);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         Label l1 = new Label();
         visitor.visitJumpInsn(Opcodes.IFNONNULL, l1);
         visitor.visitTypeInsn(Opcodes.NEW, "java/lang/IllegalStateException");
         visitor.visitInsn(Opcodes.DUP);
         visitor.visitLdcInsn("state manager is null");
-        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalStateException",
-            "<init>", "(Ljava/lang/String;)V");
+        visitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalStateException", "<init>", "(Ljava/lang/String;)V", false);
         visitor.visitInsn(Opcodes.ATHROW);
 
         visitor.visitLabel(l1);
@@ -84,16 +81,13 @@ public class ReplaceDetachedState extends ClassMethod
 
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getStateManagerFieldName(), getNamer().getStateManagerDescriptor());
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
         visitor.visitVarInsn(Opcodes.ALOAD, 0);
-        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getDetachedStateFieldName(), "[" + EnhanceUtils.CD_Object);
+        visitor.visitFieldInsn(Opcodes.GETFIELD, getClassEnhancer().getASMClassName(), getNamer().getDetachedStateFieldName(), "[" + EnhanceUtils.CD_Object);
         visitor.visitMethodInsn(Opcodes.INVOKEINTERFACE, getNamer().getStateManagerAsmClassName(), "replacingDetachedState",
-            "(L" + getNamer().getDetachableAsmClassName() + ";[" + EnhanceUtils.CD_Object + ")[" + EnhanceUtils.CD_Object);
-        visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(),
-            getNamer().getDetachedStateFieldName(), "[" + EnhanceUtils.CD_Object);
+            "(L" + getNamer().getDetachableAsmClassName() + ";[" + EnhanceUtils.CD_Object + ")[" + EnhanceUtils.CD_Object, true);
+        visitor.visitFieldInsn(Opcodes.PUTFIELD, getClassEnhancer().getASMClassName(), getNamer().getDetachedStateFieldName(), "[" + EnhanceUtils.CD_Object);
         visitor.visitInsn(Opcodes.RETURN);
 
         Label endLabel = new Label();
