@@ -2799,6 +2799,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * Method to generate an instance of an interface, abstract class, or concrete PC class.
      * @param cls The class of the interface or abstract class, or concrete class defined in MetaData
      * @return The instance of this type
+     * @throws NucleusUserException if an ImplementationCreator instance does not exist and one is needed (i.e not a concrete class passed in)
      */
     public <T> T newInstance(Class<T> cls)
     {
@@ -2816,7 +2817,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
 
         // Use ImplementationCreator
-        assertHasImplementationCreator();
+        if (getNucleusContext().getImplementationCreator() == null)
+        {
+            throw new NucleusUserException(Localiser.msg("010035"));
+        }
         return getNucleusContext().getImplementationCreator().newInstance(cls, clr);
     }
 
@@ -5520,18 +5524,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (!tx.isActive())
         {
             throw new TransactionNotActiveException();
-        }
-    }
-
-    /**
-     * Validates that an ImplementationCreator instance is accessible.
-     * @throws NucleusUserException if an ImplementationCreator instance does not exist
-     */
-    protected void assertHasImplementationCreator()
-    {
-        if (getNucleusContext().getImplementationCreator() == null)
-        {
-            throw new NucleusUserException(Localiser.msg("010035"));
         }
     }
 
