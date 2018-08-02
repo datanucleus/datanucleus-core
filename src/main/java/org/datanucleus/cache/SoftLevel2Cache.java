@@ -18,10 +18,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.cache;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.datanucleus.NucleusContext;
 import org.datanucleus.util.ConcurrentReferenceHashMap;
 import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
@@ -30,9 +26,11 @@ import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
  * Soft implementation of a Level 2 cache.
  * The second (unpinned) map stores soft references meaning that they may be garbage collected only if necessary by the JVM.
  */
-public class SoftLevel2Cache extends WeakLevel2Cache
+public class SoftLevel2Cache extends AbstractReferencedLevel2Cache
 {
-    private static final long serialVersionUID = 1204825081286087936L;
+    public static final String NAME = "soft";
+
+    private static final long serialVersionUID = -96782958845067038L;
 
     /**
      * Constructor.
@@ -40,16 +38,15 @@ public class SoftLevel2Cache extends WeakLevel2Cache
      */
     public SoftLevel2Cache(NucleusContext nucleusCtx)
     {
-        apiAdapter = nucleusCtx.getApiAdapter();
-        pinnedCache = new ConcurrentHashMap<>();
-        unpinnedCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
-        uniqueKeyCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
+        super(nucleusCtx);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    /* (non-Javadoc)
+     * @see org.datanucleus.cache.AbstractReferencedLevel2Cache#initialiseCaches()
+     */
+    @Override
+    protected void initialiseCaches()
     {
-        // our "pseudo-constructor"
-        in.defaultReadObject();
         unpinnedCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
         uniqueKeyCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
     }

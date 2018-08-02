@@ -1595,19 +1595,19 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         if (cache == null)
         {
             String level2Type = config.getStringProperty(PropertyNames.PROPERTY_CACHE_L2_TYPE);
-            if ("none".equals(level2Type))
+            if (NullLevel2Cache.NAME.equals(level2Type))
             {
                 cache = new NullLevel2Cache(this);
             }
-            else if ("soft".equals(level2Type))
+            else if (SoftLevel2Cache.NAME.equals(level2Type))
             {
                 cache = new SoftLevel2Cache(this);
             }
-            else if ("weak".equals(level2Type))
+            else if (WeakLevel2Cache.NAME.equals(level2Type))
             {
                 cache = new WeakLevel2Cache(this);
             }
-            else if ("javax.cache".equals(level2Type))
+            else if (JavaxCacheLevel2Cache.NAME.equals(level2Type))
             {
                 cache = new JavaxCacheLevel2Cache(this);
             }

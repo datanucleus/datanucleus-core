@@ -35,6 +35,8 @@ import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
  */
 public class WeakRefCache implements Level1Cache
 {
+    public static final String NAME = "weak";
+
     private Map<Object, ObjectProvider> weakCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
     private Map<CacheUniqueKey, ObjectProvider> weakCacheUnique = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
 

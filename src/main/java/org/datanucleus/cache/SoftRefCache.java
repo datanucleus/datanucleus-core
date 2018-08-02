@@ -37,6 +37,8 @@ import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
  */
 public class SoftRefCache implements Level1Cache
 {
+    public static final String NAME = "soft";
+
     private Map<Object, ObjectProvider> softCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);//new SoftValueMap();
     private Map<CacheUniqueKey, ObjectProvider> softCacheUnique = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);//new SoftValueMap();
 

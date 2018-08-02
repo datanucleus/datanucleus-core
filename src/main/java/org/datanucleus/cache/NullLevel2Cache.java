@@ -28,6 +28,8 @@ import org.datanucleus.NucleusContext;
  */
 public class NullLevel2Cache extends AbstractLevel2Cache
 {
+    public static final String NAME = "none";
+
     private static final long serialVersionUID = -218917474395656038L;
 
     public NullLevel2Cache(NucleusContext nucleusCtx)

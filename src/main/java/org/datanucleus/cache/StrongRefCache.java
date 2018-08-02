@@ -33,6 +33,8 @@ import org.datanucleus.state.ObjectProvider;
  */
 public class StrongRefCache implements Level1Cache
 {
+    public static final String NAME = "strong";
+
     private Map<Object, ObjectProvider> cache = new HashMap<>();
     private Map<CacheUniqueKey, ObjectProvider> cacheUnique = new HashMap<>();
 

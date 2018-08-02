@@ -761,19 +761,19 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     protected void initialiseLevel1Cache()
     {
         String level1Type = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_CACHE_L1_TYPE);
-        if ("none".equalsIgnoreCase(level1Type))
+        if (Level1Cache.NONE_NAME.equalsIgnoreCase(level1Type))
         {
             return;
         }
-        else if ("soft".equalsIgnoreCase(level1Type))
+        else if (SoftRefCache.NAME.equalsIgnoreCase(level1Type))
         {
             cache = new SoftRefCache();
         }
-        else if ("weak".equalsIgnoreCase(level1Type))
+        else if (WeakRefCache.NAME.equalsIgnoreCase(level1Type))
         {
             cache = new WeakRefCache();
         }
-        else if ("strong".equalsIgnoreCase(level1Type))
+        else if (StrongRefCache.NAME.equalsIgnoreCase(level1Type))
         {
             cache = new StrongRefCache();
         }

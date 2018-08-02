@@ -28,6 +28,8 @@ import org.datanucleus.state.ObjectProvider;
  */
 public interface Level1Cache extends Map<Object, ObjectProvider>
 {
+    public static final String NONE_NAME = "none";
+
     /**
      * Method to retrieve the ObjectProvider for the specified unique key.
      * @param key Unique key
