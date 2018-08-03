@@ -4757,10 +4757,22 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Object already L2 cached, create copy of cached object and just update the fields changed here
             cachedPC = currentCachedPC.getCopy();
             cachedPC.setVersion(op.getTransactionalVersion());
+            VersionMetaData vermd = op.getClassMetaData().getVersionMetaDataForClass();
+            int versionFieldNum = -1;
+            if (vermd != null && vermd.getFieldName() != null)
+            {
+                versionFieldNum = op.getClassMetaData().getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
+            }
 
             BitSet fieldsToUpdateBitSet = l2CacheTxFieldsToUpdateById.get(op.getInternalObjectId());
             if (fieldsToUpdateBitSet != null)
-            {
+            {                
+                if (versionFieldNum >= 0 && !fieldsToUpdateBitSet.get(versionFieldNum))
+                {
+                    // Version is stored in a field, so make sure the field is also updated
+                    fieldsToUpdateBitSet.set(versionFieldNum);
+                }
+
                 int num = 0;
                 for (int i=0;i<fieldsToUpdateBitSet.length();i++)
                 {
