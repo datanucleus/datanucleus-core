@@ -45,7 +45,7 @@ import org.datanucleus.util.StringUtils;
  * Abstract representation of the MetaData of a class/interface.
  * Has a parent PackageMetaData that can contain the metadata for several classes/interfaces. 
  * Is extended by ClassMetaData and InterfaceMetaData.
- * Of the things that it contains the main one are the "members" which are the MetaData for all fields and properties that are persistable.
+ * Of the things that it contains the main ones are the "members" which are the MetaData for all fields and properties that are persistable.
  */
 public abstract class AbstractClassMetaData extends MetaData
 {
@@ -1790,12 +1790,7 @@ public abstract class AbstractClassMetaData extends MetaData
 
     public String getCatalog()
     {
-        if (this.catalog == null)
-        {
-            // Nothing defined here for catalog, so get from package
-            return ((PackageMetaData)parent).getCatalog();
-        }
-        return catalog;
+        return this.catalog != null ? this.catalog : ((PackageMetaData)parent).getCatalog();
     }
 
     public AbstractClassMetaData setCatalog(String catalog)
@@ -1806,12 +1801,7 @@ public abstract class AbstractClassMetaData extends MetaData
 
     public String getSchema()
     {
-        if (this.schema == null)
-        {
-            // Nothing defined here for schema, so get from package
-            return ((PackageMetaData)parent).getSchema();
-        }
-        return schema;
+        return this.schema != null ? this.schema : ((PackageMetaData)parent).getSchema();
     }
 
     public AbstractClassMetaData setSchema(String schema)
@@ -1911,10 +1901,6 @@ public abstract class AbstractClassMetaData extends MetaData
         return this;
     }
 
-    /**
-     * Convenience accessor for the parent Package MetaData.
-     * @return MetaData for parent package.
-     */
     public PackageMetaData getPackageMetaData()
     {
         if (parent != null)
@@ -1924,10 +1910,6 @@ public abstract class AbstractClassMetaData extends MetaData
         return null;
     }
 
-    /**
-     * Convenience accessor for the package name.
-     * @return package name.
-     */
     public String getPackageName()
     {
         return getPackageMetaData().getName();
@@ -3541,6 +3523,17 @@ public abstract class AbstractClassMetaData extends MetaData
                 pcSuperclassMetaData.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
             {
                 // We own the table but the superclass uses it too, so relay up to superclass
+                VersionMetaData vermd = pcSuperclassMetaData.getVersionMetaDataForTable();
+                if (vermd != null)
+                {
+                    // Superclass has versioning info so return that
+                    return vermd;
+                }
+            }
+            if (getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE &&
+                pcSuperclassMetaData.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
+            {
+                // Subclass owns the table but the superclass uses it too, so relay up to superclass
                 VersionMetaData vermd = pcSuperclassMetaData.getVersionMetaDataForTable();
                 if (vermd != null)
                 {
