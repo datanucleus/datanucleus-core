@@ -117,7 +117,7 @@ public class IdentityMetaData extends MetaData
         this.sequence = StringUtils.isWhitespace(sequence) ? null : sequence;
         if (this.sequence != null && this.strategy == null)
         {
-            // JDO2 Section 18.6.1. No strategy, but sequence defined means use "sequence"
+            // JDO Section 18.6.1. No strategy, but sequence defined means use "sequence"
             this.strategy = ValueGenerationStrategy.SEQUENCE;
         }
         return this;
@@ -132,5 +132,25 @@ public class IdentityMetaData extends MetaData
     {
         this.valueGeneratorName = StringUtils.isWhitespace(generator) ? null : generator;
         return this;
+    }
+
+    public String toString()
+    {
+        StringBuilder str = new StringBuilder("IdentityMetaData[");
+        str.append("strategy=").append(strategy);
+        if (columnMetaData != null)
+        {
+            str.append(", column=").append(columnName);
+        }
+        if (sequence != null)
+        {
+            str.append(", sequence=").append(sequence);
+        }
+        if (valueGeneratorName != null)
+        {
+            str.append(", valueGeneratorName=").append(valueGeneratorName);
+        }
+        str.append("]");
+        return str.toString();
     }
 }

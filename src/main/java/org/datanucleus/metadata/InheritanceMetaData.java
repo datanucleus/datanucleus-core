@@ -143,4 +143,24 @@ public class InheritanceMetaData extends MetaData
         setDiscriminatorMetaData(dismd);
         return dismd;
     }
+
+    public String toString()
+    {
+        StringBuilder str = new StringBuilder("InheritanceMetaData[");
+        str.append("strategy=").append(strategy);
+        if (strategyForTree != null)
+        {
+            str.append(", strategy-for-tree=").append(strategyForTree);
+        }
+        if (discriminatorMetaData != null)
+        {
+            str.append(", discriminator=").append(discriminatorMetaData);
+        }
+        if (joinMetaData != null)
+        {
+            str.append(", join=").append(joinMetaData);
+        }
+        str.append("]");
+        return str.toString();
+    }
 }

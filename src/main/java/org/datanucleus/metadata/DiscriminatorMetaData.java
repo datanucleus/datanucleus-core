@@ -260,4 +260,20 @@ public class DiscriminatorMetaData extends MetaData
         this.indexed = IndexedValue.getIndexedValue(indexed);
         return this;
     }
+
+    public String toString()
+    {
+        StringBuilder str = new StringBuilder("DiscriminatorMetaData[");
+        str.append("strategy=").append(strategy);
+        if (value != null)
+        {
+            str.append(", value=").append(value);
+        }
+        if (columnMetaData != null)
+        {
+            str.append(", column=").append(columnMetaData);
+        }
+        str.append("]");
+        return str.toString();
+    }
 }

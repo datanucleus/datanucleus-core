@@ -225,4 +225,20 @@ public class VersionMetaData extends MetaData
         this.fieldName = fieldName;
         return this;
     }
+
+    public String toString()
+    {
+        StringBuilder str = new StringBuilder("VersionMetaData[");
+        str.append("strategy=").append(versionStrategy);
+        if (fieldName != null)
+        {
+            str.append(", field=").append(fieldName);
+        }
+        if (columnMetaData != null)
+        {
+            str.append(", column=").append(columnMetaData);
+        }
+        str.append("]");
+        return str.toString();
+    }
 }
