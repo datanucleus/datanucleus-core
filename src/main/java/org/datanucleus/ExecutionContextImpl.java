@@ -4854,7 +4854,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
             CachedPC currentCachedPC = l2Cache.get(id);
             CachedPC cachedPC = getL2CacheableObject(op, currentCachedPC);
-            if (cachedPC != null && id != null && !(id instanceof IdentityReference))
+            if (cachedPC != null && !(id instanceof IdentityReference))
             {
                 // Only cache if something to be cached and has identity
                 dataToUpdate.put(id, cachedPC);

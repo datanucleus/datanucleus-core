@@ -504,7 +504,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
                 }
             }
 
-            if (newValue != null && newValue instanceof SCO)
+            if (newValue instanceof SCO)
             {
                 // Passed in value is a wrapper type already, so just return it!
                 if (replaceFieldIfChanged)

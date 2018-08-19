@@ -360,7 +360,7 @@ public class JPQLQueryHelper
                 str.append(" LIKE ");
                 Expression firstExpr = args.get(0);
                 str.append(JPQLQueryHelper.getJPQLForExpression(firstExpr));
-                if (args != null && args.size() > 1)
+                if (args.size() > 1)
                 {
                     Expression secondExpr = args.get(1);
                     str.append(" ESCAPE ").append(JPQLQueryHelper.getJPQLForExpression(secondExpr));

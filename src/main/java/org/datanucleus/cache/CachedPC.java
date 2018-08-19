@@ -179,7 +179,7 @@ public class CachedPC<T> implements Serializable
         str.append(indent).append("CachedPC : cls=").append(cls.getName()).append(" version=").append(version).append(" loadedFlags=").append(StringUtils.booleanArrayToString(loadedFields));
         if (debug && fieldValues != null)
         {
-            str.append(" numValues=").append(fieldValues != null ? fieldValues.size() : 0).append("\n");
+            str.append(" numValues=").append(fieldValues.size()).append("\n");
 
             Iterator<Map.Entry<Integer, Object>> fieldValuesIter = fieldValues.entrySet().iterator();
             while (fieldValuesIter.hasNext())

@@ -392,10 +392,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
                     finally
                     {
                         jis.close();
-                        if (rarFile != null)
-                        {
-                            rarFile.close();
-                        }
+                        rarFile.close();
                     }
                     return registerBundle(mf, rarUrl);
                 }
@@ -413,10 +410,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
                 }
                 finally
                 {
-                    if (jar != null)
-                    {
-                        jar.close();
-                    }
+                    jar.close();
                 }
             }
             else if (manifest.getProtocol().equals("rar") || manifest.getProtocol().equals("war"))
@@ -450,10 +444,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
                 }
                 finally
                 {
-                    if (rarFile != null)
-                    {
-                        rarFile.close();
-                    }
+                    rarFile.close();
                 }
             }
             else

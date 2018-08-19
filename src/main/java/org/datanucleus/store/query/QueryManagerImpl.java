@@ -541,7 +541,7 @@ public class QueryManagerImpl implements QueryManager
         }
         else
         {
-            if (type != null && type.isArray())
+            if (type.isArray())
             {
                 if ("size".equals(methodName)) eval = new ArraySizeMethod();
                 if ("length".equals(methodName)) eval = new ArraySizeMethod();
