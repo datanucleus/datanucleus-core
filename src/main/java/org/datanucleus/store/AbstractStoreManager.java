@@ -358,7 +358,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     public NucleusConnection getNucleusConnection(ExecutionContext ec)
     {
         // In <= 5.1.0.m3 this would have had last arg as "ec.getTransaction().isActive() ? ec.getTransaction() : null"
-        ManagedConnection mc = connectionMgr.getConnection(true, ec, ec.getTransaction());
+        ManagedConnection mc = connectionMgr.getConnection(ec.getTransaction().isActive(), ec, ec.getTransaction());
 
         // Lock the connection now that it is in use by the user
         mc.lock();
@@ -369,10 +369,11 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             {
                 // Unlock the connection now that the user has finished with it
                 mc.unlock();
+
                 if (!ec.getTransaction().isActive())
                 {
-                    // Close the (unenlisted) connection (committing its statements)
-                    mc.close();
+                    // Release the (unenlisted) connection (committing its statements)
+                    mc.release();
                 }
             }
         };
