@@ -265,9 +265,10 @@ public class CompleteClassTable implements Table
                             }
                             mappingByMember.put(mmd.getFullFieldName(), mapping);
                         }
-
-                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded map. Not yet supported. Ignoring");
-                        continue;
+                        else {
+                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded map. Not yet supported. Ignoring");
+                            continue;
+                        }
                     }
                     else if (mmd.hasArray())
                     {
@@ -613,7 +614,7 @@ public class CompleteClassTable implements Table
                 if (!mapping.getMemberMetaData().isInsertable() && !mapping.getMemberMetaData().isUpdateable())
                 {
                     // Ignored
-                    NucleusLogger.DATASTORE_SCHEMA.debug("Not adding column " + col.getName() + " for member=" + mapping.getMemberMetaData().getFullFieldName() + 
+                    NucleusLogger.DATASTORE_SCHEMA.debug("Not adding column " + col.getName() + " for member=" + mapping.getMemberMetaData().getFullFieldName() +
                         " since is not insertable/updateable");
                 }
                 else
@@ -635,9 +636,9 @@ public class CompleteClassTable implements Table
                             }
                             else
                             {
-                                NucleusLogger.DATASTORE_SCHEMA.error("Unable to add column with name=" + col.getName() + " to table=" + getName() + " for class=" + cmd.getFullClassName() + 
+                                NucleusLogger.DATASTORE_SCHEMA.error("Unable to add column with name=" + col.getName() + " to table=" + getName() + " for class=" + cmd.getFullClassName() +
                                         " since one with same name already exists (superclass?).");
-                                throw new NucleusUserException("Unable to add column with name=" + col.getName() + " to table=" + getName() + " for class=" + cmd.getFullClassName() + 
+                                throw new NucleusUserException("Unable to add column with name=" + col.getName() + " to table=" + getName() + " for class=" + cmd.getFullClassName() +
                                         " since one with same name already exists (superclass?).");
                             }
                         }
@@ -800,32 +801,112 @@ public class CompleteClassTable implements Table
             }
 
             RelationType relationType = mmd.getRelationType(clr);
-            if (relationType != RelationType.NONE && MetaDataUtils.getInstance().isMemberEmbedded(mmgr, clr, mmd, relationType, lastMmd))
-            {
-                if (RelationType.isRelationSingleValued(relationType))
-                {
-                    // Nested embedded PC, so recurse
-                    boolean nested = false;
-                    if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_PC_NESTED))
-                    {
-                        nested = !storeMgr.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_EMBEDDED_PC_FLAT);
-                        String nestedStr = mmd.getValueForExtension("nested");
-                        if (nestedStr != null && nestedStr.equalsIgnoreCase("" + !nested))
-                        {
-                            nested = !nested;
-                        }
-                    }
+            Collection<String> supportedOptions = storeMgr.getSupportedOptions();
 
-                    List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
-                    embMmds.add(mmd);
-                    if (nested)
+            if (RelationType.isRelationMultiValued(relationType) && MetaDataUtils.getInstance().isMemberEmbedded(mmgr, clr, mmd, relationType, lastMmd)) {
+                if (mmd.hasCollection() && !supportedOptions.contains(StoreManager.OPTION_ORM_EMBEDDED_COLLECTION_NESTED))
+                {
+                    NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not yet supported. Ignoring");
+                    continue;
+                }
+                else if (mmd.hasMap() && !supportedOptions.contains(StoreManager.OPTION_ORM_EMBEDDED_MAP_NESTED))
+                {
+                    NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not yet supported. Ignoring");
+                    continue;
+
+                }
+                else if (mmd.hasArray() && !supportedOptions.contains(StoreManager.OPTION_ORM_EMBEDDED_ARRAY_NESTED))
+                {
+                    NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded array. Not yet supported. Ignoring");
+                    continue;
+                }
+            }
+
+            List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
+            embMmds.add(mmd);
+            ColumnMetaData[] colmds = mmd.getColumnMetaData();
+
+            if (relationType != RelationType.NONE)
+            {
+                // 1-1/N-1 stored as single column with persistable-id
+                // 1-N/M-N stored as single column with collection<persistable-id>
+                // Create column for basic type
+                String colName = namingFactory.getColumnName(embMmds, 0);
+                ColumnImpl col = addEmbeddedColumn(colName, null);
+                col.setNested(ownerNested);
+                if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getPosition() != null)
+                {
+                    col.setPosition(embmdMmd.getColumnMetaData()[0].getPosition());
+                }
+                else if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                {
+                    col.setPosition(colmds[0].getPosition());
+                }
+                if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getJdbcType() != null)
+                {
+                    col.setJdbcType(embmdMmd.getColumnMetaData()[0].getJdbcType());
+                }
+                else if (colmds != null && colmds.length == 1 && colmds[0].getJdbcType() != null)
+                {
+                    col.setJdbcType(colmds[0].getJdbcType());
+                }
+                MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
+                col.setMemberColumnMapping(mapping);
+                if (schemaVerifier != null)
+                {
+                    schemaVerifier.attributeEmbeddedMember(mapping, embMmds);
+                }
+                mappingByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(embMmds), mapping);
+            }
+            else
+            {
+                TypeConverter typeConv = getTypeConverterForMember(mmd, colmds, typeMgr); // TODO Pass in embedded colmds if they have jdbcType info?
+                if (typeConv != null)
+                {
+                    // Create column(s) for this TypeConverter
+                    if (typeConv instanceof MultiColumnConverter)
                     {
-                        // Embedded object stored as nested under this in the owner table (where the datastore supports that)
-                        // Add column for the owner of the embedded object, typically for the column name only
-                        ColumnMetaData[] colmds = mmd.getColumnMetaData();
+                        Class[] colJavaTypes = ((MultiColumnConverter)typeConv).getDatastoreColumnTypes();
+                        Column[] cols = new Column[colJavaTypes.length];
+                        for (int j=0; j<colJavaTypes.length; j++)
+                        {
+                            String colName = namingFactory.getColumnName(embMmds, j);
+                            ColumnImpl col = addEmbeddedColumn(colName, typeConv);
+                            col.setNested(ownerNested);
+                            if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == colJavaTypes.length && embmdMmd.getColumnMetaData()[j].getPosition() != null)
+                            {
+                                col.setPosition(embmdMmd.getColumnMetaData()[j].getPosition());
+                            }
+                            else if (colmds != null && colmds.length == colJavaTypes.length && colmds[j].getPosition() != null)
+                            {
+                                col.setPosition(colmds[j].getPosition());
+                            }
+                            if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == colJavaTypes.length && embmdMmd.getColumnMetaData()[j].getJdbcType() != null)
+                            {
+                                col.setJdbcType(embmdMmd.getColumnMetaData()[j].getJdbcType());
+                            }
+                            else if (colmds != null && colmds.length == colJavaTypes.length && colmds[j].getJdbcType() != null)
+                            {
+                                col.setJdbcType(colmds[j].getJdbcType());
+                            }
+                            cols[j] = col;
+                        }
+                        MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, cols, typeConv);
+                        for (int j=0;j<colJavaTypes.length;j++)
+                        {
+                            ((ColumnImpl)cols[j]).setMemberColumnMapping(mapping);
+                        }
+                        if (schemaVerifier != null)
+                        {
+                            schemaVerifier.attributeEmbeddedMember(mapping, embMmds);
+                        }
+                        mappingByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(embMmds), mapping);
+                    }
+                    else
+                    {
                         String colName = namingFactory.getColumnName(embMmds, 0);
-                        ColumnImpl col = addEmbeddedColumn(colName, null);
-                        col.setNested(true);
+                        ColumnImpl col = addEmbeddedColumn(colName, typeConv);
+                        col.setNested(ownerNested);
                         if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getPosition() != null)
                         {
                             col.setPosition(embmdMmd.getColumnMetaData()[0].getPosition());
@@ -844,67 +925,25 @@ public class CompleteClassTable implements Table
                         }
                         MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
                         col.setMemberColumnMapping(mapping);
+                        mapping.setTypeConverter(typeConv);
                         if (schemaVerifier != null)
                         {
                             schemaVerifier.attributeEmbeddedMember(mapping, embMmds);
                         }
                         mappingByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(embMmds), mapping);
-
-                        // TODO Create mapping for the related info under the above column
-                        processEmbeddedMember(embMmds, clr, embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null, true);
-                    }
-                    else
-                    {
-                        // Embedded object stored flat into this table, with columns at same level as owner columns
-                        processEmbeddedMember(embMmds, clr, embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null, false);
                     }
                 }
                 else
                 {
-                    if (mmd.hasCollection())
-                    {
-                        if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_COLLECTION_NESTED))
-                        {
-                            // TODO Support nested embedded collection element
-                        }
-                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not yet supported. Ignoring");
-                        continue;
-                    }
-                    else if (mmd.hasMap())
-                    {
-                        if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_MAP_NESTED))
-                        {
-                            // TODO Support nested embedded map key/value
-                        }
-                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not yet supported. Ignoring");
-                        continue;
-                        
-                    }
-                    else if (mmd.hasArray())
-                    {
-                        if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_ARRAY_NESTED))
-                        {
-                            // TODO Support nested embedded array element
-                        }
-                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded array. Not yet supported. Ignoring");
-                        continue;
-                    }
-                }
-            }
-            else
-            {
-                List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
-                embMmds.add(mmd);
-                ColumnMetaData[] colmds = mmd.getColumnMetaData();
-
-                if (relationType != RelationType.NONE)
-                {
-                    // 1-1/N-1 stored as single column with persistable-id
-                    // 1-N/M-N stored as single column with collection<persistable-id>
                     // Create column for basic type
                     String colName = namingFactory.getColumnName(embMmds, 0);
                     ColumnImpl col = addEmbeddedColumn(colName, null);
                     col.setNested(ownerNested);
+                    AbstractMemberMetaData theMmd = embMmds.get(0);
+                    if (theMmd.isPrimaryKey())
+                    {
+                        col.setPrimaryKey();
+                    }
                     if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getPosition() != null)
                     {
                         col.setPosition(embmdMmd.getColumnMetaData()[0].getPosition());
@@ -928,117 +967,6 @@ public class CompleteClassTable implements Table
                         schemaVerifier.attributeEmbeddedMember(mapping, embMmds);
                     }
                     mappingByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(embMmds), mapping);
-                }
-                else
-                {
-                    TypeConverter typeConv = getTypeConverterForMember(mmd, colmds, typeMgr); // TODO Pass in embedded colmds if they have jdbcType info?
-                    if (typeConv != null)
-                    {
-                        // Create column(s) for this TypeConverter
-                        if (typeConv instanceof MultiColumnConverter)
-                        {
-                            Class[] colJavaTypes = ((MultiColumnConverter)typeConv).getDatastoreColumnTypes();
-                            Column[] cols = new Column[colJavaTypes.length];
-                            for (int j=0;j<colJavaTypes.length;j++)
-                            {
-                                String colName = namingFactory.getColumnName(embMmds, j);
-                                ColumnImpl col = addEmbeddedColumn(colName, typeConv);
-                                col.setNested(ownerNested);
-                                if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == colJavaTypes.length && embmdMmd.getColumnMetaData()[j].getPosition() != null)
-                                {
-                                    col.setPosition(embmdMmd.getColumnMetaData()[j].getPosition());
-                                }
-                                else if (colmds != null && colmds.length == colJavaTypes.length && colmds[j].getPosition() != null)
-                                {
-                                    col.setPosition(colmds[j].getPosition());
-                                }
-                                if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == colJavaTypes.length && embmdMmd.getColumnMetaData()[j].getJdbcType() != null)
-                                {
-                                    col.setJdbcType(embmdMmd.getColumnMetaData()[j].getJdbcType());
-                                }
-                                else if (colmds != null && colmds.length == colJavaTypes.length && colmds[j].getJdbcType() != null)
-                                {
-                                    col.setJdbcType(colmds[j].getJdbcType());
-                                }
-                                cols[j] = col;
-                            }
-                            MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, cols, typeConv);
-                            for (int j=0;j<colJavaTypes.length;j++)
-                            {
-                                ((ColumnImpl)cols[j]).setMemberColumnMapping(mapping);
-                            }
-                            if (schemaVerifier != null)
-                            {
-                                schemaVerifier.attributeEmbeddedMember(mapping, embMmds);
-                            }
-                            mappingByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(embMmds), mapping);
-                        }
-                        else
-                        {
-                            String colName = namingFactory.getColumnName(embMmds, 0);
-                            ColumnImpl col = addEmbeddedColumn(colName, typeConv);
-                            col.setNested(ownerNested);
-                            if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getPosition() != null)
-                            {
-                                col.setPosition(embmdMmd.getColumnMetaData()[0].getPosition());
-                            }
-                            else if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
-                            {
-                                col.setPosition(colmds[0].getPosition());
-                            }
-                            if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getJdbcType() != null)
-                            {
-                                col.setJdbcType(embmdMmd.getColumnMetaData()[0].getJdbcType());
-                            }
-                            else if (colmds != null && colmds.length == 1 && colmds[0].getJdbcType() != null)
-                            {
-                                col.setJdbcType(colmds[0].getJdbcType());
-                            }
-                            MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
-                            col.setMemberColumnMapping(mapping);
-                            mapping.setTypeConverter(typeConv);
-                            if (schemaVerifier != null)
-                            {
-                                schemaVerifier.attributeEmbeddedMember(mapping, embMmds);
-                            }
-                            mappingByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(embMmds), mapping);
-                        }
-                    }
-                    else
-                    {
-                        // Create column for basic type
-                        String colName = namingFactory.getColumnName(embMmds, 0);
-                        ColumnImpl col = addEmbeddedColumn(colName, null);
-                        col.setNested(ownerNested);
-                        AbstractMemberMetaData theMmd = embMmds.get(0);
-                        if (theMmd.isPrimaryKey())
-                        {
-                            col.setPrimaryKey();
-                        }
-                        if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getPosition() != null)
-                        {
-                            col.setPosition(embmdMmd.getColumnMetaData()[0].getPosition());
-                        }
-                        else if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
-                        {
-                            col.setPosition(colmds[0].getPosition());
-                        }
-                        if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getJdbcType() != null)
-                        {
-                            col.setJdbcType(embmdMmd.getColumnMetaData()[0].getJdbcType());
-                        }
-                        else if (colmds != null && colmds.length == 1 && colmds[0].getJdbcType() != null)
-                        {
-                            col.setJdbcType(colmds[0].getJdbcType());
-                        }
-                        MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
-                        col.setMemberColumnMapping(mapping);
-                        if (schemaVerifier != null)
-                        {
-                            schemaVerifier.attributeEmbeddedMember(mapping, embMmds);
-                        }
-                        mappingByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(embMmds), mapping);
-                    }
                 }
             }
         }
