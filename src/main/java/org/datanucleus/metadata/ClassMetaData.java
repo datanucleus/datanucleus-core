@@ -1156,6 +1156,7 @@ public class ClassMetaData extends AbstractClassMetaData
             }
         }
         str.append(", modifier=" + persistenceModifier);
+        str.append(", embeddedOnly=" + embeddedOnly);
         if (inheritanceMetaData != null && inheritanceMetaData.getStrategy() != null)
         {
             str.append(", inheritance=").append(inheritanceMetaData.getStrategy().toString());
