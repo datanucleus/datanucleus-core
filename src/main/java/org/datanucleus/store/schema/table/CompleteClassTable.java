@@ -232,7 +232,7 @@ public class CompleteClassTable implements Table
                         }
                         else
                         {
-                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not yet supported. Ignoring");
+                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not supported for this datastore, so ignoring");
                             continue;
                         }
                     }
@@ -264,10 +264,14 @@ public class CompleteClassTable implements Table
                                 schemaVerifier.attributeMember(mapping, mmd);
                             }
                             mappingByMember.put(mmd.getFullFieldName(), mapping);
-                        }
 
-                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded map. Not yet supported. Ignoring");
-                        continue;
+                            // TODO Add processEmbeddedMember for key/value as done for collection/array element
+                        }
+                        else
+                        {
+                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded map. Not supported for this datastore, so ignoring");
+                            continue;
+                        }
                     }
                     else if (mmd.hasArray())
                     {
@@ -304,7 +308,7 @@ public class CompleteClassTable implements Table
                         }
                         else
                         {
-                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded array. Not yet supported. Ignoring");
+                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded array. Not supported for this datastore, so ignoring");
                             continue;
                         }
                     }
