@@ -657,10 +657,10 @@ public class CompleteClassTable implements Table
                             }
                             else
                             {
-                                NucleusLogger.DATASTORE_SCHEMA.error("Unable to add column with name=" + col.getName() + " to table=" + getName() + " for class=" + cmd.getFullClassName() + 
-                                        " since one with same name already exists (superclass?).");
-                                throw new NucleusUserException("Unable to add column with name=" + col.getName() + " to table=" + getName() + " for class=" + cmd.getFullClassName() + 
-                                        " since one with same name already exists (superclass?).");
+                                String msg = "Unable to add column with name=" + col.getName() + " for member=" + mapping.getMemberMetaData() + 
+                                        " to table=" + getName() + " for class=" + cmd.getFullClassName() + " since one with same name already exists (superclass?).";
+                                NucleusLogger.DATASTORE_SCHEMA.error(msg);
+                                throw new NucleusUserException(msg);
                             }
                         }
                     }
