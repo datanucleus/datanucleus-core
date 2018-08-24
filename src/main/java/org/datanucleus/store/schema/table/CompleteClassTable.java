@@ -784,6 +784,7 @@ public class CompleteClassTable implements Table
             // Embedded array element
             embCmd = mmgr.getMetaDataForClass(lastMmd.getArray().getElementType(), clr);
         }
+        // TODO Cater for map key / value (pass embCmd in to method?)
         else
         {
             // Embedded 1-1
