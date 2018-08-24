@@ -89,6 +89,7 @@ public class CompleteClassTable implements Table
 
     // TODO Support create-timestamp surrogate
     // TODO Support update-timestamp surrogate
+
     /** Map of member-column mapping, keyed by the metadata for the member. */
     Map<String, MemberColumnMapping> mappingByMember = new HashMap<>();
 
@@ -199,9 +200,9 @@ public class CompleteClassTable implements Table
                 {
                     if (mmd.hasCollection())
                     {
+                        // Embedded collection element (nested into owner table where supported)
                         if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_COLLECTION_NESTED))
                         {
-                            // Embedded collection element (nested into owner table where supported)
                             // Add column for the collection (since the store needs a name to reference it by)
                             ColumnMetaData[] colmds = mmd.getColumnMetaData();
                             String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
@@ -238,9 +239,9 @@ public class CompleteClassTable implements Table
                     }
                     else if (mmd.hasMap())
                     {
+                        // Embedded map key/value (nested into owner table where supported)
                         if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_MAP_NESTED))
                         {
-                            // TODO Support nested embedded map key/value
                             // Add column for the map (since the store needs a name to reference it by)
                             ColumnMetaData[] colmds = mmd.getColumnMetaData();
                             String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
@@ -265,7 +266,24 @@ public class CompleteClassTable implements Table
                             }
                             mappingByMember.put(mmd.getFullFieldName(), mapping);
 
-                            // TODO Add processEmbeddedMember for key/value as done for collection/array element
+                            if (mmd.getMap().keyIsPersistent())
+                            {
+                                EmbeddedMetaData embmd = mmd.getKeyMetaData() != null ? mmd.getKeyMetaData().getEmbeddedMetaData() : null;
+                                processEmbeddedMember(embMmds, clr, embmd, true);
+                            }
+                            else
+                            {
+                                // TODO Add basic key column
+                            }
+                            if (mmd.getMap().valueIsPersistent())
+                            {
+                                EmbeddedMetaData embmd = mmd.getValueMetaData() != null ? mmd.getValueMetaData().getEmbeddedMetaData() : null;
+                                processEmbeddedMember(embMmds, clr, embmd, true);
+                            }
+                            else
+                            {
+                                // TODO Add basic value column
+                            }
                         }
                         else
                         {
@@ -275,9 +293,9 @@ public class CompleteClassTable implements Table
                     }
                     else if (mmd.hasArray())
                     {
+                        // Embedded array element (nested into owner table where supported)
                         if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_ARRAY_NESTED))
                         {
-                            // TODO Support nested embedded array element
                             // Add column for the array (since the store needs a name to reference it by)
                             ColumnMetaData[] colmds = mmd.getColumnMetaData();
                             String colName = storeMgr.getNamingFactory().getColumnName(mmd, ColumnType.COLUMN, 0);
@@ -659,6 +677,7 @@ public class CompleteClassTable implements Table
                 columnByName.put(col.getName(), col);
             }
         }
+//        NucleusLogger.GENERAL.info(">> " + debugString());
     }
 
     protected TypeConverter getTypeConverterForMember(AbstractMemberMetaData mmd, ColumnMetaData[] colmds, TypeManager typeMgr)
@@ -869,29 +888,104 @@ public class CompleteClassTable implements Table
                     {
                         if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_COLLECTION_NESTED))
                         {
-                            // TODO Support nested embedded collection element
+                            List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
+                            embMmds.add(mmd);
+
+                            // Add column for the collection (since the store needs a name to reference it by)
+                            ColumnMetaData[] colmds = mmd.getColumnMetaData();
+                            String colName = namingFactory.getColumnName(embMmds, 0);
+                            ColumnImpl col = addEmbeddedColumn(colName, null);
+                            col.setNested(true);
+                            if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getPosition() != null)
+                            {
+                                col.setPosition(embmdMmd.getColumnMetaData()[0].getPosition());
+                            }
+                            else if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                            {
+                                col.setPosition(colmds[0].getPosition());
+                            }
+                            if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getJdbcType() != null)
+                            {
+                                col.setJdbcType(embmdMmd.getColumnMetaData()[0].getJdbcType());
+                            }
+                            else if (colmds != null && colmds.length == 1 && colmds[0].getJdbcType() != null)
+                            {
+                                col.setJdbcType(colmds[0].getJdbcType());
+                            }
+                            MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
+                            col.setMemberColumnMapping(mapping);
+                            if (schemaVerifier != null)
+                            {
+                                schemaVerifier.attributeEmbeddedMember(mapping, embMmds);
+                            }
+                            mappingByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(embMmds), mapping);
+
+                            // TODO Create mapping for the related info under the above column
+                            processEmbeddedMember(embMmds, clr, embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null, true);
                         }
-                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not yet supported. Ignoring");
-                        continue;
+                        else
+                        {
+                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not supported for this datastore so ignoring");
+                            continue;
+                        }
                     }
                     else if (mmd.hasMap())
                     {
                         if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_MAP_NESTED))
                         {
                             // TODO Support nested embedded map key/value
+                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded map. Not yet supported so ignoring");
                         }
-                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not yet supported. Ignoring");
-                        continue;
-                        
+                        else
+                        {
+                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded map. Not supported for this datastore so ignoring");
+                            continue;
+                        }
                     }
                     else if (mmd.hasArray())
                     {
                         if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_ARRAY_NESTED))
                         {
-                            // TODO Support nested embedded array element
+                            List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
+                            embMmds.add(mmd);
+
+                            // Add column for the array (since the store needs a name to reference it by) TODO Extract this block out and reuse it
+                            ColumnMetaData[] colmds = mmd.getColumnMetaData();
+                            String colName = namingFactory.getColumnName(embMmds, 0);
+                            ColumnImpl col = addEmbeddedColumn(colName, null);
+                            col.setNested(true);
+                            if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getPosition() != null)
+                            {
+                                col.setPosition(embmdMmd.getColumnMetaData()[0].getPosition());
+                            }
+                            else if (colmds != null && colmds.length == 1 && colmds[0].getPosition() != null)
+                            {
+                                col.setPosition(colmds[0].getPosition());
+                            }
+                            if (embmdMmd != null && embmdMmd.getColumnMetaData() != null && embmdMmd.getColumnMetaData().length == 1 && embmdMmd.getColumnMetaData()[0].getJdbcType() != null)
+                            {
+                                col.setJdbcType(embmdMmd.getColumnMetaData()[0].getJdbcType());
+                            }
+                            else if (colmds != null && colmds.length == 1 && colmds[0].getJdbcType() != null)
+                            {
+                                col.setJdbcType(colmds[0].getJdbcType());
+                            }
+                            MemberColumnMapping mapping = new MemberColumnMappingImpl(mmd, col);
+                            col.setMemberColumnMapping(mapping);
+                            if (schemaVerifier != null)
+                            {
+                                schemaVerifier.attributeEmbeddedMember(mapping, embMmds);
+                            }
+                            mappingByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(embMmds), mapping);
+
+                            // TODO Create mapping for the related info under the above column
+                            processEmbeddedMember(embMmds, clr, embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null, true);
                         }
-                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded array. Not yet supported. Ignoring");
-                        continue;
+                        else
+                        {
+                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded array. Not supported for this datastore so ignoring");
+                            continue;
+                        }
                     }
                 }
             }
@@ -938,7 +1032,7 @@ public class CompleteClassTable implements Table
                     TypeConverter typeConv = getTypeConverterForMember(mmd, colmds, typeMgr); // TODO Pass in embedded colmds if they have jdbcType info?
                     if (typeConv != null)
                     {
-                        // Create column(s) for this TypeConverter
+                        // Create column(s) for this type using a TypeConverter
                         if (typeConv instanceof MultiColumnConverter)
                         {
                             Class[] colJavaTypes = ((MultiColumnConverter)typeConv).getDatastoreColumnTypes();
