@@ -925,7 +925,7 @@ public class CompleteClassTable implements Table
                         }
                         else
                         {
-                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded collection. Not supported for this datastore so ignoring");
+                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is a (nested) embedded collection. Not supported for this datastore so ignoring");
                             continue;
                         }
                     }
@@ -934,11 +934,11 @@ public class CompleteClassTable implements Table
                         if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_MAP_NESTED))
                         {
                             // TODO Support nested embedded map key/value
-                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded map. Not yet supported so ignoring");
+                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is a (nested) embedded map. Not yet supported so ignoring");
                         }
                         else
                         {
-                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded map. Not supported for this datastore so ignoring");
+                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is a (nested) embedded map. Not supported for this datastore so ignoring");
                             continue;
                         }
                     }
@@ -983,7 +983,7 @@ public class CompleteClassTable implements Table
                         }
                         else
                         {
-                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is an embedded array. Not supported for this datastore so ignoring");
+                            NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " is a (nested) embedded array. Not supported for this datastore so ignoring");
                             continue;
                         }
                     }
