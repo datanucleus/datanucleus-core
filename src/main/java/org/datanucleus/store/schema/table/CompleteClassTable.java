@@ -266,7 +266,7 @@ public class CompleteClassTable implements Table
                             }
                             mappingByMember.put(mmd.getFullFieldName(), mapping);
 
-                            if (mmd.getMap().keyIsPersistent())
+                            /*if (mmd.getMap().keyIsPersistent())
                             {
                                 EmbeddedMetaData embmd = mmd.getKeyMetaData() != null ? mmd.getKeyMetaData().getEmbeddedMetaData() : null;
                                 processEmbeddedMember(embMmds, clr, embmd, true);
@@ -283,7 +283,7 @@ public class CompleteClassTable implements Table
                             else
                             {
                                 // TODO Add basic value column
-                            }
+                            }*/
                         }
                         else
                         {
