@@ -127,6 +127,7 @@ public class CompleteClassTable implements Table
 
         columns = new ArrayList<Column>();
 
+        MetaDataManager mmgr = storeMgr.getMetaDataManager();
         TypeManager typeMgr = storeMgr.getNucleusContext().getTypeManager();
         ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
         int numMembers = cmd.getAllMemberPositions().length;
@@ -141,7 +142,7 @@ public class CompleteClassTable implements Table
 
             // TODO Make use of cmd.overriddenMembers
             RelationType relationType = mmd.getRelationType(clr);
-            if (relationType != RelationType.NONE && MetaDataUtils.getInstance().isMemberEmbedded(storeMgr.getMetaDataManager(), clr, mmd, relationType, null))
+            if (relationType != RelationType.NONE && MetaDataUtils.getInstance().isMemberEmbedded(mmgr, clr, mmd, relationType, null))
             {
                 // EMBEDDED MEMBER
                 List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>();
@@ -186,15 +187,11 @@ public class CompleteClassTable implements Table
                             schemaVerifier.attributeMember(mapping, mmd);
                         }
                         mappingByMember.put(mmd.getFullFieldName(), mapping);
-
                         // TODO Consider adding the embedded info under the above column as related information
-                        processEmbeddedMember(embMmds, clr, mmd.getEmbeddedMetaData(), true);
                     }
-                    else
-                    {
-                        // Embedded object stored flat into this table, with columns at same level as owner columns
-                        processEmbeddedMember(embMmds, clr, mmd.getEmbeddedMetaData(), false);
-                    }
+
+                    // Recurse through the embedded member
+                    processEmbeddedMember(embMmds, mmgr.getMetaDataForClass(mmd.getType(), clr), clr, mmd.getEmbeddedMetaData(), nested);
                 }
                 else if (RelationType.isRelationMultiValued(relationType))
                 {
@@ -226,10 +223,11 @@ public class CompleteClassTable implements Table
                                 schemaVerifier.attributeMember(mapping, mmd);
                             }
                             mappingByMember.put(mmd.getFullFieldName(), mapping);
-
                             // TODO Consider adding the embedded info under the above column as related information
+
+                            // Recurse through the embedded collection element
                             EmbeddedMetaData embmd = mmd.getElementMetaData() != null ? mmd.getElementMetaData().getEmbeddedMetaData() : null;
-                            processEmbeddedMember(embMmds, clr, embmd, true);
+                            processEmbeddedMember(embMmds, mmgr.getMetaDataForClass(mmd.getCollection().getElementType(), clr), clr, embmd, true);
                         }
                         else
                         {
@@ -266,10 +264,11 @@ public class CompleteClassTable implements Table
                             }
                             mappingByMember.put(mmd.getFullFieldName(), mapping);
 
-                            /*if (mmd.getMap().keyIsPersistent())
+                            if (mmd.getMap().keyIsPersistent())
                             {
+                                // Recurse through the embedded key
                                 EmbeddedMetaData embmd = mmd.getKeyMetaData() != null ? mmd.getKeyMetaData().getEmbeddedMetaData() : null;
-                                processEmbeddedMember(embMmds, clr, embmd, true);
+                                processEmbeddedMember(embMmds, mmgr.getMetaDataForClass(mmd.getMap().getKeyType(), clr), clr, embmd, true);
                             }
                             else
                             {
@@ -277,13 +276,14 @@ public class CompleteClassTable implements Table
                             }
                             if (mmd.getMap().valueIsPersistent())
                             {
+                                // Recurse through the embedded value
                                 EmbeddedMetaData embmd = mmd.getValueMetaData() != null ? mmd.getValueMetaData().getEmbeddedMetaData() : null;
-                                processEmbeddedMember(embMmds, clr, embmd, true);
+                                processEmbeddedMember(embMmds, mmgr.getMetaDataForClass(mmd.getMap().getValueType(), clr), clr, embmd, true);
                             }
                             else
                             {
                                 // TODO Add basic value column
-                            }*/
+                            }
                         }
                         else
                         {
@@ -319,10 +319,11 @@ public class CompleteClassTable implements Table
                                 schemaVerifier.attributeMember(mapping, mmd);
                             }
                             mappingByMember.put(mmd.getFullFieldName(), mapping);
-
                             // TODO Consider adding the embedded info under the above column as related information
+
+                            // Recurse through the embedded array element
                             EmbeddedMetaData embmd = mmd.getElementMetaData() != null ? mmd.getElementMetaData().getEmbeddedMetaData() : null;
-                            processEmbeddedMember(embMmds, clr, embmd, true);
+                            processEmbeddedMember(embMmds, mmgr.getMetaDataForClass(mmd.getArray().getElementType(), clr), clr, embmd, true);
                         }
                         else
                         {
@@ -767,31 +768,22 @@ public class CompleteClassTable implements Table
         return typeConv;
     }
 
-    protected void processEmbeddedMember(List<AbstractMemberMetaData> mmds, ClassLoaderResolver clr, EmbeddedMetaData embmd, boolean ownerNested)
+    /**
+     * Handler for an embedded member.
+     * @param mmds Chain of member metadata to the embedded member
+     * @param embCmd Class metadata for the embedded member type
+     * @param clr ClassLoader resolver
+     * @param embmd Any EmbeddedMetaData defining column info
+     * @param ownerNested Whether the owner is nested
+     */
+    protected void processEmbeddedMember(List<AbstractMemberMetaData> mmds, AbstractClassMetaData embCmd, ClassLoaderResolver clr, EmbeddedMetaData embmd, boolean ownerNested)
     {
         TypeManager typeMgr = storeMgr.getNucleusContext().getTypeManager();
         MetaDataManager mmgr = storeMgr.getMetaDataManager();
         NamingFactory namingFactory = storeMgr.getNamingFactory();
         AbstractMemberMetaData lastMmd = mmds.get(mmds.size()-1);
-        AbstractClassMetaData embCmd = null;
-        if (lastMmd.hasCollection())
-        {
-            // Embedded collection element
-            embCmd = mmgr.getMetaDataForClass(lastMmd.getCollection().getElementType(), clr);
-        }
-        else if (lastMmd.hasArray())
-        {
-            // Embedded array element
-            embCmd = mmgr.getMetaDataForClass(lastMmd.getArray().getElementType(), clr);
-        }
-        // TODO Cater for map key / value (pass embCmd in to method?)
-        else
-        {
-            // Embedded 1-1
-            embCmd = mmgr.getMetaDataForClass(lastMmd.getType(), clr);
-        }
 
-        // Go through all members of the embedded class
+        // Go through all members of the embedded type
         int[] memberPositions = embCmd.getAllMemberPositions();
         for (int i=0;i<memberPositions.length;i++)
         {
@@ -873,20 +865,17 @@ public class CompleteClassTable implements Table
                             schemaVerifier.attributeEmbeddedMember(mapping, embMmds);
                         }
                         mappingByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(embMmds), mapping);
-
                         // TODO Create mapping for the related info under the above column
-                        processEmbeddedMember(embMmds, clr, embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null, true);
                     }
-                    else
-                    {
-                        // Embedded object stored flat into this table, with columns at same level as owner columns
-                        processEmbeddedMember(embMmds, clr, embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null, false);
-                    }
+
+                    // Recurse through the embedded member
+                    processEmbeddedMember(embMmds, mmgr.getMetaDataForClass(mmd.getType(), clr), clr, embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null, nested);
                 }
                 else
                 {
                     if (mmd.hasCollection())
                     {
+                        // Nested embedded collection, so recurse
                         if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_COLLECTION_NESTED))
                         {
                             List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
@@ -920,9 +909,10 @@ public class CompleteClassTable implements Table
                                 schemaVerifier.attributeEmbeddedMember(mapping, embMmds);
                             }
                             mappingByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(embMmds), mapping);
-
                             // TODO Create mapping for the related info under the above column
-                            processEmbeddedMember(embMmds, clr, embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null, true);
+
+                            // Recurse through the embedded collection element
+                            processEmbeddedMember(embMmds, mmgr.getMetaDataForClass(mmd.getCollection().getElementType(), clr), clr, embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null, true);
                         }
                         else
                         {
@@ -932,6 +922,7 @@ public class CompleteClassTable implements Table
                     }
                     else if (mmd.hasMap())
                     {
+                        // Nested embedded map, so recurse
                         if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_MAP_NESTED))
                         {
                             // TODO Support nested embedded map key/value
@@ -945,6 +936,7 @@ public class CompleteClassTable implements Table
                     }
                     else if (mmd.hasArray())
                     {
+                        // Nested embedded array, so recurse
                         if (storeMgr.getSupportedOptions().contains(StoreManager.OPTION_ORM_EMBEDDED_ARRAY_NESTED))
                         {
                             List<AbstractMemberMetaData> embMmds = new ArrayList<AbstractMemberMetaData>(mmds);
@@ -978,9 +970,10 @@ public class CompleteClassTable implements Table
                                 schemaVerifier.attributeEmbeddedMember(mapping, embMmds);
                             }
                             mappingByEmbeddedMember.put(getEmbeddedMemberNavigatedPath(embMmds), mapping);
-
                             // TODO Create mapping for the related info under the above column
-                            processEmbeddedMember(embMmds, clr, embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null, true);
+
+                            // Recurse through the embedded array element
+                            processEmbeddedMember(embMmds, mmgr.getMetaDataForClass(mmd.getArray().getElementType(), clr), clr, embmdMmd != null ? embmdMmd.getEmbeddedMetaData() : null, true);
                         }
                         else
                         {
