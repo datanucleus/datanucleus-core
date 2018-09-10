@@ -555,7 +555,6 @@ public class TransactionImpl implements Transaction
     {
         try
         {
-            beginTime = -1;
             active = false;
             if (ec.getStatistics() != null)
             {
