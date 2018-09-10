@@ -474,6 +474,7 @@ public class TransactionImpl implements Transaction
                             }
                             finally
                             {
+                                beginTime = -1;
                                 listenersPerTransaction.clear(); 
                                 rollbackOnly = false; // Reset rollbackOnly flag
                                 if (sync != null)
@@ -563,6 +564,7 @@ public class TransactionImpl implements Transaction
         }
         finally
         {
+            beginTime = -1;
             try
             {
                 TransactionEventListener[] ls = getListenersForEvent();
