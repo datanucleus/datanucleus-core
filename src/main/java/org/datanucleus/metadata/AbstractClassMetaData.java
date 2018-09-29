@@ -3509,8 +3509,18 @@ public abstract class AbstractClassMetaData extends MetaData
     {
         if (pcSuperclassMetaData != null)
         {
-            if (getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUPERCLASS_TABLE &&
-                pcSuperclassMetaData.getInheritanceMetaData().getStrategy() == InheritanceStrategy.NEW_TABLE)
+            InheritanceStrategy thisStrategy = getInheritanceMetaData().getStrategy();
+            InheritanceStrategy superStrategy = pcSuperclassMetaData.getInheritanceMetaData().getStrategy();
+            if (thisStrategy == InheritanceStrategy.SUPERCLASS_TABLE && superStrategy == InheritanceStrategy.SUPERCLASS_TABLE)
+            {
+                // Relay up to the superclass to see if it can find the owner of the table
+                VersionMetaData vermd = pcSuperclassMetaData.getVersionMetaDataForTable();
+                if (vermd != null)
+                {
+                    return vermd;
+                }
+            }
+            if (thisStrategy == InheritanceStrategy.SUPERCLASS_TABLE && superStrategy == InheritanceStrategy.NEW_TABLE)
             {
                 // Superclass owns the table that we use so relay up to superclass
                 VersionMetaData vermd = pcSuperclassMetaData.getVersionMetaDataForTable();
@@ -3519,8 +3529,7 @@ public abstract class AbstractClassMetaData extends MetaData
                     return vermd;
                 }
             }
-            if (getInheritanceMetaData().getStrategy() == InheritanceStrategy.NEW_TABLE &&
-                pcSuperclassMetaData.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
+            if (thisStrategy == InheritanceStrategy.NEW_TABLE && superStrategy == InheritanceStrategy.SUBCLASS_TABLE)
             {
                 // We own the table but the superclass uses it too, so relay up to superclass
                 VersionMetaData vermd = pcSuperclassMetaData.getVersionMetaDataForTable();
@@ -3530,8 +3539,7 @@ public abstract class AbstractClassMetaData extends MetaData
                     return vermd;
                 }
             }
-            if (getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE &&
-                pcSuperclassMetaData.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
+            if (thisStrategy == InheritanceStrategy.SUBCLASS_TABLE && superStrategy == InheritanceStrategy.SUBCLASS_TABLE)
             {
                 // Subclass owns the table but the superclass uses it too, so relay up to superclass
                 VersionMetaData vermd = pcSuperclassMetaData.getVersionMetaDataForTable();
@@ -3541,7 +3549,7 @@ public abstract class AbstractClassMetaData extends MetaData
                     return vermd;
                 }
             }
-            if (getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
+            if (thisStrategy == InheritanceStrategy.COMPLETE_TABLE)
             {
                 VersionMetaData vermd = pcSuperclassMetaData.getVersionMetaDataForTable();
                 if (vermd != null)
