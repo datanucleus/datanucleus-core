@@ -3527,6 +3527,16 @@ public abstract class AbstractClassMetaData extends MetaData
     {
         if (pcSuperclassMetaData != null)
         {
+            if (getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUPERCLASS_TABLE && 
+                pcSuperclassMetaData.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUPERCLASS_TABLE)
+            {
+                // Relay up to the superclass to see if it can find the owner of the table
+                VersionMetaData vermd = pcSuperclassMetaData.getVersionMetaDataForTable();
+                if (vermd != null)
+                {
+                    return vermd;
+                }
+            }
             if (getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUPERCLASS_TABLE &&
                 pcSuperclassMetaData.getInheritanceMetaData().getStrategy() == InheritanceStrategy.NEW_TABLE)
             {
