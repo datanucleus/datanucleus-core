@@ -64,7 +64,7 @@ public class DatastoreIdImplKodo implements java.io.Serializable, DatastoreId, C
     {
         if (str.length() < 2)
         {
-            throw new IllegalArgumentException(Localiser.msg("038000",str));
+            throw new IllegalArgumentException(Localiser.msg("002003",str));
         }
 
         int separatorPosition = str.indexOf(STRING_DELIMITER);

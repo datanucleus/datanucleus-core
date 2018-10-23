@@ -71,11 +71,11 @@ public class DatastoreIdImpl implements java.io.Serializable, DatastoreId, Compa
     {
         if (str.length() < 2)
         {
-            throw new IllegalArgumentException(Localiser.msg("038000", str));
+            throw new IllegalArgumentException(Localiser.msg("002003", str));
         }
         else if (str.indexOf(STRING_DELIMITER) < 0)
         {
-            throw new IllegalArgumentException(Localiser.msg("038000", str));
+            throw new IllegalArgumentException(Localiser.msg("002003", str));
         }
 
         int start = 0;

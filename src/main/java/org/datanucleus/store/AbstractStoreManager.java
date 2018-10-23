@@ -675,11 +675,11 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         // Basic error checking
         if (IdentityUtils.isDatastoreIdentity(id) && cmd.getIdentityType() != IdentityType.DATASTORE)
         {
-            throw new NucleusUserException(Localiser.msg("038001", id, cmd.getFullClassName()));
+            throw new NucleusUserException(Localiser.msg("002004", id, cmd.getFullClassName()));
         }
         if (IdentityUtils.isSingleFieldIdentity(id) && (cmd.getIdentityType() != IdentityType.APPLICATION || !cmd.getObjectidClass().equals(id.getClass().getName())))
         {
-            throw new NucleusUserException(Localiser.msg("038001", id, cmd.getFullClassName()));
+            throw new NucleusUserException(Localiser.msg("002004", id, cmd.getFullClassName()));
         }
 
         // If the class is not yet managed, manage it
@@ -883,7 +883,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 Object convertedValue = TypeConversionHelper.convertTo(oid, mmd.getType());
                 if (convertedValue == null)
                 {
-                    throw new NucleusException(Localiser.msg("038003", mmd.getFullFieldName(), oid)).setFatal();
+                    throw new NucleusException(Localiser.msg("040013", mmd.getFullFieldName(), oid)).setFatal();
                 }
                 oid = convertedValue;
             }
@@ -896,7 +896,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
 
         if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
         {
-            NucleusLogger.VALUEGENERATION.debug(Localiser.msg("038002", fieldName, strategy, generator.getClass().getName(), oid));
+            NucleusLogger.VALUEGENERATION.debug(Localiser.msg("040012", fieldName, strategy, generator.getClass().getName(), oid));
         }
 
         return oid;
@@ -975,7 +975,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 tableGeneratorMetaData = getMetaDataManager().getMetaDataForTableGenerator(clr, valueGeneratorName);
                 if (tableGeneratorMetaData == null)
                 {
-                    throw new NucleusUserException(Localiser.msg("038005", fieldName, valueGeneratorName));
+                    throw new NucleusUserException(Localiser.msg("040014", fieldName, valueGeneratorName));
                 }
             }
             else if (strategy == ValueGenerationStrategy.SEQUENCE)
@@ -983,7 +983,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 sequenceMetaData = getMetaDataManager().getMetaDataForSequence(clr, valueGeneratorName);
                 if (sequenceMetaData == null)
                 {
-                    throw new NucleusUserException(Localiser.msg("038006", fieldName, valueGeneratorName));
+                    throw new NucleusUserException(Localiser.msg("040015", fieldName, valueGeneratorName));
                 }
             }
         }
