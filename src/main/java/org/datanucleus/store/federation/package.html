@@ -1,5 +1,8 @@
 <BODY>
     Package providing management for federation of datastores.
-    This allows us to have a PMF/EMF for multiple datastores, and to distribute any insert/update/delete/fetch
-    to the relevant datastore. It also allows us to query across multiple datastores and federate the results.
+    This allows us to have a PMF/EMF for multiple datastores, and to distribute any insert/update/delete/fetch to the relevant datastore. 
+    It also allows us to query across multiple datastores and federate the results.
+    <p>
+    The more standard alternative to this is to have a PMF per datastore, and then to persist to whichever you want, and query whichever you want.
+    Merging results is then left to the user.
 </BODY>
