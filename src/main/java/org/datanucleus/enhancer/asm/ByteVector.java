@@ -242,7 +242,7 @@ public class ByteVector {
   public ByteVector putUTF8(final String stringValue) {
     int charLength = stringValue.length();
     if (charLength > 65535) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("UTF8 string too large");
     }
     int currentLength = length;
     if (currentLength + 2 + charLength > data.length) {
@@ -294,7 +294,7 @@ public class ByteVector {
       }
     }
     if (byteLength > maxByteLength) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("UTF8 string too large");
     }
     // Compute where 'byteLength' must be stored in 'data', and store it at this location.
     int byteLengthOffset = length - offset - 2;

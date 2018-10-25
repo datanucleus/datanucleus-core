@@ -174,7 +174,7 @@ final class FieldWriter extends FieldVisitor {
     }
 
     return lastRuntimeInvisibleTypeAnnotation =
-          new AnnotationWriter(symbolTable, typeAnnotation, lastRuntimeInvisibleTypeAnnotation);
+            new AnnotationWriter(symbolTable, typeAnnotation, lastRuntimeInvisibleTypeAnnotation);
   }
 
   @Override
