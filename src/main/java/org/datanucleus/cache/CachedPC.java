@@ -35,14 +35,14 @@ import org.datanucleus.util.StringUtils;
  * <li>Where the field contains an embedded/serialised persistable object, we store a nested CachedPC object representing that object (since it doesn't exist in its own right).</li>
  * </ul>
  */
-public class CachedPC<T> implements Serializable
+public class CachedPC<T> implements Serializable, Comparable<CachedPC<T>>
 {
     private static final long serialVersionUID = 1326244752228266953L;
 
     /** Class of the object being cached. */
     private Class<T> cls;
 
-    /** Identity of the object being cached. This is to allow recreation of the object when using uniqueKey lookup. */
+    /** Identity of the object being cached. This is to allow recreation of the object when using uniqueKey lookup. This will be null if embedded/serialised. */
     private Object id;
 
     /** Values for the fields, keyed by the absolute field number. */
@@ -65,6 +65,7 @@ public class CachedPC<T> implements Serializable
     {
         this.cls = cls;
         this.id = id;
+
         this.loadedFields = new boolean[loadedFields.length];
         for (int i = 0; i < loadedFields.length; i++)
         {
@@ -147,6 +148,29 @@ public class CachedPC<T> implements Serializable
             }
         }
         return copy;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    @Override
+    public int compareTo(CachedPC other)
+    {
+        if (other == null)
+        {
+            return -1;
+        }
+        if (id == null)
+        {
+            // Embedded/serialised
+            return -1;
+        }
+
+        if (cls.getName().equals(other.cls.getName()))
+        {
+            return id.toString().compareTo(other.id.toString());
+        }
+        return cls.getName().compareTo(other.cls.getName());
     }
 
     /**
