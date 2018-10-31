@@ -21,6 +21,7 @@ import java.io.Serializable;
 
 /**
  * Key representing a unique key for a persistable object.
+ * This is used to cache a CachedPC against a key other than its primary key.
  */
 public class CacheUniqueKey implements Serializable, Comparable<CacheUniqueKey>
 {
@@ -29,6 +30,12 @@ public class CacheUniqueKey implements Serializable, Comparable<CacheUniqueKey>
     String toString = null;
     int hashCode;
 
+    /**
+     * Constructor for a unique cache key.
+     * @param className Name of the class of the persistable object
+     * @param fieldNames Names of the fields used to form the unique key
+     * @param fieldValues Values of the fields used to form the unique key
+     */
     public CacheUniqueKey(String className, String[] fieldNames, Object[] fieldValues)
     {
         int myHashCode = 1;
