@@ -41,6 +41,7 @@ import org.datanucleus.identity.SingleFieldId;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.state.ReferentialStateManagerImpl;
 import org.datanucleus.store.Extent;
@@ -327,6 +328,14 @@ public class FederatedStoreManager implements StoreManager
     @Override
     public Query newQuery(String language, ExecutionContext ec, String queryString)
     {
+        if (QueryLanguage.JDOQL.toString().equalsIgnoreCase(language))
+        {
+            // TODO Determine candidate class and hence store manager
+        }
+        else if (QueryLanguage.JPQL.toString().equalsIgnoreCase(language))
+        {
+            // TODO Determine candidate class and hence store manager
+        }
         return primaryStoreMgr.newQuery(language, ec, queryString);
     }
 
@@ -336,7 +345,8 @@ public class FederatedStoreManager implements StoreManager
     @Override
     public Query newQuery(String language, ExecutionContext ec, Query q)
     {
-        return primaryStoreMgr.newQuery(language, ec, q);
+        StoreManager storeMgr = getStoreManagerForClass(q.getCandidateClassName(), ec.getClassLoaderResolver());
+        return storeMgr.newQuery(language, ec, q);
     }
 
     public ValueGenerationManager getValueGenerationManager()
