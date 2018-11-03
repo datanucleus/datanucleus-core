@@ -142,6 +142,37 @@ public class JDOQLQueryHelper
         return true;
     }
 
+    /**
+     * Convenience method to extract the FROM candidate from a JDOQL query string.
+     * @param query The query string
+     * @return The from candidate
+     */
+    public static String getCandidateFromJDOQLString(String query)
+    {
+        if (query == null)
+        {
+            return null;
+        }
+        int fromStartPos = query.indexOf(" FROM ");
+        if (fromStartPos < 0)
+        {
+            fromStartPos = query.indexOf(" from ");
+        }
+        if (fromStartPos < 0)
+        {
+            return null;
+        }
+
+        String fromStr = query.substring(fromStartPos + 6).trim();
+        int fromEndPos = fromStr.indexOf(' ');
+        String fromCandidate = fromStr;
+        if (fromEndPos > 0)
+        {
+            fromCandidate = fromStr.substring(0, fromEndPos);
+        }
+        return fromCandidate;
+    }
+
     public static String getJDOQLForExpression(Expression expr)
     {
         if (expr instanceof DyadicExpression)

@@ -116,6 +116,37 @@ public class JPQLQueryHelper
     }
 
     /**
+     * Convenience method to extract the FROM candidate entity name from a JPQL query string.
+     * @param query The query string
+     * @return The candidate entity name
+     */
+    public static String getEntityNameFromJPQLString(String query)
+    {
+        if (query == null)
+        {
+            return null;
+        }
+        int fromStartPos = query.indexOf(" FROM ");
+        if (fromStartPos < 0)
+        {
+            fromStartPos = query.indexOf(" from ");
+        }
+        if (fromStartPos < 0)
+        {
+            return null;
+        }
+
+        String fromStr = query.substring(fromStartPos + 6).trim();
+        int fromEndPos = fromStr.indexOf(' ');
+        String fromCandidate = fromStr;
+        if (fromEndPos > 0)
+        {
+            fromCandidate = fromStr.substring(0, fromEndPos);
+        }
+        return fromCandidate;
+    }
+
+    /**
      * Convenience method to return the JPQL single-string query text for the provided expression.
      * @param expr The expression
      * @return The JPQL single-string text that equates to this expression

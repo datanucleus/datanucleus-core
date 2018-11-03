@@ -43,6 +43,8 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.metadata.SequenceMetaData;
+import org.datanucleus.query.JDOQLQueryHelper;
+import org.datanucleus.query.JPQLQueryHelper;
 import org.datanucleus.state.ReferentialStateManagerImpl;
 import org.datanucleus.store.Extent;
 import org.datanucleus.store.NucleusConnection;
@@ -328,15 +330,30 @@ public class FederatedStoreManager implements StoreManager
     @Override
     public Query newQuery(String language, ExecutionContext ec, String queryString)
     {
+        String candidateClassName = null;
         if (QueryLanguage.JDOQL.toString().equalsIgnoreCase(language))
         {
-            // TODO Determine candidate class and hence store manager
+            candidateClassName = JDOQLQueryHelper.getCandidateFromJDOQLString(queryString);
         }
         else if (QueryLanguage.JPQL.toString().equalsIgnoreCase(language))
         {
-            // TODO Determine candidate class and hence store manager
+            String candidateEntityName = JPQLQueryHelper.getEntityNameFromJPQLString(queryString);
+            if (candidateEntityName != null)
+            {
+                AbstractClassMetaData entityCmd = ec.getMetaDataManager().getMetaDataForEntityName(candidateEntityName);
+                if (entityCmd != null)
+                {
+                    candidateClassName = entityCmd.getFullClassName();
+                }
+            }
         }
-        return primaryStoreMgr.newQuery(language, ec, queryString);
+
+        StoreManager storeMgr = primaryStoreMgr;
+        if (candidateClassName != null)
+        {
+            storeMgr = getStoreManagerForClass(candidateClassName, ec.getClassLoaderResolver());
+        }
+        return storeMgr.newQuery(language, ec, queryString);
     }
 
     /* (non-Javadoc)
@@ -345,8 +362,7 @@ public class FederatedStoreManager implements StoreManager
     @Override
     public Query newQuery(String language, ExecutionContext ec, Query q)
     {
-        StoreManager storeMgr = getStoreManagerForClass(q.getCandidateClassName(), ec.getClassLoaderResolver());
-        return storeMgr.newQuery(language, ec, q);
+        return getStoreManagerForClass(q.getCandidateClassName(), ec.getClassLoaderResolver()).newQuery(language, ec, q);
     }
 
     public ValueGenerationManager getValueGenerationManager()
