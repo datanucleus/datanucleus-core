@@ -1502,14 +1502,44 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 myEC.removeObjectFromLevel1Cache(myID);
                 myEC.removeObjectFromLevel2Cache(myID);
                 throw new NucleusObjectNotFoundException("Object with id " + myID + 
-                    " was created without validating of type " + getObject().getClass().getName() +
-                    " but is actually of type " + className);
+                    " was created without validating of type " + getObject().getClass().getName() + " but is actually of type " + className);
             }
             flags &= ~FLAG_NEED_INHERITANCE_VALIDATION;
         }
 
+        // Add on version field if not currently set and using version field (surrogate will be added automatically by the query if required)
+        int[] fieldNumbersToFetch = fieldNumbers;
+        if (cmd.isVersioned())
+        {
+            VersionMetaData vermd = cmd.getVersionMetaDataForClass();
+            if (vermd != null && vermd.getFieldName() != null)
+            {
+                int verFieldNum = cmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
+                boolean versionPresent = false;
+                for (int i=0;i<fieldNumbers.length;i++)
+                {
+                    if (fieldNumbers[i] == verFieldNum)
+                    {
+                        versionPresent = true;
+                        break;
+                    }
+                }
+                if (!versionPresent)
+                {
+                    // Add version field to fields to be fetched
+                    int[] tmpFieldNumbers = new int[fieldNumbers.length + 1];
+                    for (int i=0;i<fieldNumbers.length;i++)
+                    {
+                        tmpFieldNumbers[i] = fieldNumbers[i];
+                    }
+                    tmpFieldNumbers[fieldNumbers.length] = verFieldNum;
+                    fieldNumbersToFetch = tmpFieldNumbers;
+                }
+            }
+        }
+
         // TODO If the field has "loadFetchGroup" defined, then add it to the fetch plan etc
-        getStoreManager().getPersistenceHandler().fetchObject(this, fieldNumbers);
+        getStoreManager().getPersistenceHandler().fetchObject(this, fieldNumbersToFetch);
     }
 
     /**
