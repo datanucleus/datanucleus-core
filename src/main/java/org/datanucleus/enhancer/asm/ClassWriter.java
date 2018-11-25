@@ -123,7 +123,7 @@ public class ClassWriter extends ClassVisitor {
   /** The number_of_classes field of the InnerClasses attribute, or 0. */
   private int numberOfInnerClasses;
 
-  /** The 'classes' array of the InnerClasses attribute, or <tt>null</tt>. */
+  /** The 'classes' array of the InnerClasses attribute, or {@literal null}. */
   private ByteVector innerClasses;
 
   /** The class_index field of the EnclosingMethod attribute, or 0. */
@@ -138,34 +138,34 @@ public class ClassWriter extends ClassVisitor {
   /** The source_file_index field of the SourceFile attribute, or 0. */
   private int sourceFileIndex;
 
-  /** The debug_extension field of the SourceDebugExtension attribute, or <tt>null</tt>. */
+  /** The debug_extension field of the SourceDebugExtension attribute, or {@literal null}. */
   private ByteVector debugExtension;
 
   /**
    * The last runtime visible annotation of this class. The previous ones can be accessed with the
-   * {@link AnnotationWriter#previousAnnotation} field. May be <tt>null</tt>.
+   * {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
    */
   private AnnotationWriter lastRuntimeVisibleAnnotation;
 
   /**
    * The last runtime invisible annotation of this class. The previous ones can be accessed with the
-   * {@link AnnotationWriter#previousAnnotation} field. May be <tt>null</tt>.
+   * {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
    */
   private AnnotationWriter lastRuntimeInvisibleAnnotation;
 
   /**
    * The last runtime visible type annotation of this class. The previous ones can be accessed with
-   * the {@link AnnotationWriter#previousAnnotation} field. May be <tt>null</tt>.
+   * the {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
    */
   private AnnotationWriter lastRuntimeVisibleTypeAnnotation;
 
   /**
    * The last runtime invisible type annotation of this class. The previous ones can be accessed
-   * with the {@link AnnotationWriter#previousAnnotation} field. May be <tt>null</tt>.
+   * with the {@link AnnotationWriter#previousAnnotation} field. May be {@literal null}.
    */
   private AnnotationWriter lastRuntimeInvisibleTypeAnnotation;
 
-  /** The Module attribute of this class, or <tt>null</tt>. */
+  /** The Module attribute of this class, or {@literal null}. */
   private ModuleWriter moduleWriter;
 
   /** The host_class_index field of the NestHost attribute, or 0. */
@@ -174,12 +174,12 @@ public class ClassWriter extends ClassVisitor {
   /** The number_of_classes field of the NestMembers attribute, or 0. */
   private int numberOfNestMemberClasses;
 
-  /** The 'classes' array of the NestMembers attribute, or <tt>null</tt>. */
+  /** The 'classes' array of the NestMembers attribute, or {@literal null}. */
   private ByteVector nestMemberClasses;
 
   /**
    * The first non standard attribute of this class. The next ones can be accessed with the {@link
-   * Attribute#nextAttribute} field. May be <tt>null</tt>.
+   * Attribute#nextAttribute} field. May be {@literal null}.
    *
    * <p><b>WARNING</b>: this list stores the attributes in the <i>reverse</i> order of their visit.
    * firstAttribute is actually the last attribute visited in {@link #visitAttribute}. The {@link
@@ -321,10 +321,10 @@ public class ClassWriter extends ClassVisitor {
     if (visible) {
       return lastRuntimeVisibleAnnotation =
           new AnnotationWriter(symbolTable, annotation, lastRuntimeVisibleAnnotation);
-    } else {
-      return lastRuntimeInvisibleAnnotation =
-          new AnnotationWriter(symbolTable, annotation, lastRuntimeInvisibleAnnotation);
     }
+
+    return lastRuntimeInvisibleAnnotation =
+            new AnnotationWriter(symbolTable, annotation, lastRuntimeInvisibleAnnotation);
   }
 
   @Override
@@ -341,10 +341,10 @@ public class ClassWriter extends ClassVisitor {
     if (visible) {
       return lastRuntimeVisibleTypeAnnotation =
           new AnnotationWriter(symbolTable, typeAnnotation, lastRuntimeVisibleTypeAnnotation);
-    } else {
-      return lastRuntimeInvisibleTypeAnnotation =
-          new AnnotationWriter(symbolTable, typeAnnotation, lastRuntimeInvisibleTypeAnnotation);
     }
+
+    return lastRuntimeInvisibleTypeAnnotation =
+            new AnnotationWriter(symbolTable, typeAnnotation, lastRuntimeInvisibleTypeAnnotation);
   }
 
   @Override
@@ -657,9 +657,9 @@ public class ClassWriter extends ClassVisitor {
     // Third step: replace the ASM specific instructions, if any.
     if (hasAsmInstructions) {
       return replaceAsmInstructions(result.data, hasFrames);
-    } else {
-      return result.data;
     }
+
+    return result.data;
   }
 
   /**
@@ -905,7 +905,7 @@ public class ClassWriter extends ClassVisitor {
    * @param owner the internal name of the method's owner class.
    * @param name the method's name.
    * @param descriptor the method's descriptor.
-   * @param isInterface <tt>true</tt> if <tt>owner</tt> is an interface.
+   * @param isInterface {@literal true} if {@code owner} is an interface.
    * @return the index of a new or already existing method reference item.
    */
   public int newMethod(
@@ -964,12 +964,12 @@ public class ClassWriter extends ClassVisitor {
     }
     if (class1.isInterface() || class2.isInterface()) {
       return "java/lang/Object";
-    } else {
-      do {
-        class1 = class1.getSuperclass();
-      } while (!class1.isAssignableFrom(class2));
-      return class1.getName().replace('.', '/');
     }
+
+    do {
+        class1 = class1.getSuperclass();
+    } while (!class1.isAssignableFrom(class2));
+    return class1.getName().replace('.', '/');
   }
 
   /**

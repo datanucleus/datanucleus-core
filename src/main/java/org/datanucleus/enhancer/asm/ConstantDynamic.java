@@ -135,7 +135,7 @@ public final class ConstantDynamic {
   /**
    * Returns the size of this constant.
    *
-   * @return the size of this constant, i.e., 2 for <tt>long</tt> and <tt>double</tt>, 1 otherwise.
+   * @return the size of this constant, i.e., 2 for {@code long} and {@code double}, 1 otherwise.
    */
   public int getSize() {
     char firstCharOfDescriptor = descriptor.charAt(0);

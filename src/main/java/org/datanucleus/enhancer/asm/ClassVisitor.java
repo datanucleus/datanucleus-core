@@ -29,10 +29,10 @@ package org.datanucleus.enhancer.asm;
 
 /**
  * A visitor to visit a Java class. The methods of this class must be called in the following order:
- * <tt>visit</tt> [ <tt>visitSource</tt> ] [ <tt>visitModule</tt> ][ <tt>visitNestHost</tt> ][
- * <tt>visitOuterClass</tt> ] ( <tt>visitAnnotation</tt> | <tt>visitTypeAnnotation</tt> |
- * <tt>visitAttribute</tt> )* ( <tt>visitNestMember</tt> | <tt>visitInnerClass</tt> |
- * <tt>visitField</tt> | <tt>visitMethod</tt> )* <tt>visitEnd</tt>.
+ * {@code visit} [ {@code visitSource} ] [ {@code visitModule} ][ {@code visitNestHost} ][ {@code
+ * visitOuterClass} ] ( {@code visitAnnotation} | {@code visitTypeAnnotation} | {@code
+ * visitAttribute} )* ( {@code visitNestMember} | {@code visitInnerClass} | {@code visitField} |
+ * {@code visitMethod} )* {@code visitEnd}.
  *
  * @author Eric Bruneton
  */
@@ -81,13 +81,13 @@ public abstract class ClassVisitor {
    * @param access the class's access flags (see {@link Opcodes}). This parameter also indicates if
    *     the class is deprecated.
    * @param name the internal name of the class (see {@link Type#getInternalName()}).
-   * @param signature the signature of this class. May be <tt>null</tt> if the class is not a
+   * @param signature the signature of this class. May be {@literal null} if the class is not a
    *     generic one, and does not extend or implement generic classes or interfaces.
    * @param superName the internal of name of the super class (see {@link Type#getInternalName()}).
-   *     For interfaces, the super class is {@link Object}. May be <tt>null</tt>, but only for the
+   *     For interfaces, the super class is {@link Object}. May be {@literal null}, but only for the
    *     {@link Object} class.
    * @param interfaces the internal names of the class's interfaces (see {@link
-   *     Type#getInternalName()}). May be <tt>null</tt>.
+   *     Type#getInternalName()}). May be {@literal null}.
    */
   public void visit(
       final int version,
@@ -107,7 +107,7 @@ public abstract class ClassVisitor {
    * @param source the name of the source file from which the class was compiled. May be {@literal
    *     null}.
    * @param debug additional debug information to compute the correspondence between source and
-   *     compiled elements of the class. May be <tt>null</tt>.
+   *     compiled elements of the class. May be {@literal null}.
    */
   public void visitSource(final String source, final String debug) {
     if (cv != null) {
@@ -121,8 +121,8 @@ public abstract class ClassVisitor {
    * @param name the fully qualified name (using dots) of the module.
    * @param access the module access flags, among {@code ACC_OPEN}, {@code ACC_SYNTHETIC} and {@code
    *     ACC_MANDATED}.
-   * @param version the module version, or <tt>null</tt>.
-   * @return a visitor to visit the module values, or <tt>null</tt> if this visitor is not
+   * @param version the module version, or {@literal null}.
+   * @return a visitor to visit the module values, or {@literal null} if this visitor is not
    *     interested in visiting this module.
    */
   public ModuleVisitor visitModule(final String name, final int access, final String version) {
@@ -159,10 +159,10 @@ public abstract class ClassVisitor {
    * enclosing class.
    *
    * @param owner internal name of the enclosing class of the class.
-   * @param name the name of the method that contains the class, or <tt>null</tt> if the class is
+   * @param name the name of the method that contains the class, or {@literal null} if the class is
    *     not enclosed in a method of its enclosing class.
-   * @param descriptor the descriptor of the method that contains the class, or <tt>null</tt> if the
-   *     class is not enclosed in a method of its enclosing class.
+   * @param descriptor the descriptor of the method that contains the class, or {@literal null} if
+   *     the class is not enclosed in a method of its enclosing class.
    */
   public void visitOuterClass(final String owner, final String name, final String descriptor) {
     if (cv != null) {
@@ -174,8 +174,8 @@ public abstract class ClassVisitor {
    * Visits an annotation of the class.
    *
    * @param descriptor the class descriptor of the annotation class.
-   * @param visible <tt>true</tt> if the annotation is visible at runtime.
-   * @return a visitor to visit the annotation values, or <tt>null</tt> if this visitor is not
+   * @param visible {@literal true} if the annotation is visible at runtime.
+   * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
    *     interested in visiting this annotation.
    */
   public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
@@ -193,11 +193,11 @@ public abstract class ClassVisitor {
    *     TypeReference#CLASS_TYPE_PARAMETER_BOUND} or {@link TypeReference#CLASS_EXTENDS}. See
    *     {@link TypeReference}.
    * @param typePath the path to the annotated type argument, wildcard bound, array element type, or
-   *     static inner type within 'typeRef'. May be <tt>null</tt> if the annotation targets
+   *     static inner type within 'typeRef'. May be {@literal null} if the annotation targets
    *     'typeRef' as a whole.
    * @param descriptor the class descriptor of the annotation class.
-   * @param visible <tt>true</tt> if the annotation is visible at runtime.
-   * @return a visitor to visit the annotation values, or <tt>null</tt> if this visitor is not
+   * @param visible {@literal true} if the annotation is visible at runtime.
+   * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
    *     interested in visiting this annotation.
    */
   public AnnotationVisitor visitTypeAnnotation(
@@ -246,9 +246,9 @@ public abstract class ClassVisitor {
    *
    * @param name the internal name of an inner class (see {@link Type#getInternalName()}).
    * @param outerName the internal name of the class to which the inner class belongs (see {@link
-   *     Type#getInternalName()}). May be <tt>null</tt> for not member classes.
+   *     Type#getInternalName()}). May be {@literal null} for not member classes.
    * @param innerName the (simple) name of the inner class inside its enclosing class. May be
-   *     <tt>null</tt> for anonymous inner classes.
+   *     {@literal null} for anonymous inner classes.
    * @param access the access flags of the inner class as originally declared in the enclosing
    *     class.
    */
@@ -266,15 +266,15 @@ public abstract class ClassVisitor {
    *     the field is synthetic and/or deprecated.
    * @param name the field's name.
    * @param descriptor the field's descriptor (see {@link Type}).
-   * @param signature the field's signature. May be <tt>null</tt> if the field's type does not use
+   * @param signature the field's signature. May be {@literal null} if the field's type does not use
    *     generic types.
-   * @param value the field's initial value. This parameter, which may be <tt>null</tt> if the field
-   *     does not have an initial value, must be an {@link Integer}, a {@link Float}, a {@link
-   *     Long}, a {@link Double} or a {@link String} (for <tt>int</tt>, <tt>float</tt>,
-   *     <tt>long</tt> or <tt>String</tt> fields respectively). <i>This parameter is only used for
-   *     static fields</i>. Its value is ignored for non static fields, which must be initialized
-   *     through bytecode instructions in constructors or methods.
-   * @return a visitor to visit field annotations and attributes, or <tt>null</tt> if this class
+   * @param value the field's initial value. This parameter, which may be {@literal null} if the
+   *     field does not have an initial value, must be an {@link Integer}, a {@link Float}, a {@link
+   *     Long}, a {@link Double} or a {@link String} (for {@code int}, {@code float}, {@code long}
+   *     or {@code String} fields respectively). <i>This parameter is only used for static
+   *     fields</i>. Its value is ignored for non static fields, which must be initialized through
+   *     bytecode instructions in constructors or methods.
+   * @return a visitor to visit field annotations and attributes, or {@literal null} if this class
    *     visitor is not interested in visiting these annotations and attributes.
    */
   public FieldVisitor visitField(
@@ -291,19 +291,19 @@ public abstract class ClassVisitor {
 
   /**
    * Visits a method of the class. This method <i>must</i> return a new {@link MethodVisitor}
-   * instance (or <tt>null</tt>) each time it is called, i.e., it should not return a previously
+   * instance (or {@literal null}) each time it is called, i.e., it should not return a previously
    * returned visitor.
    *
    * @param access the method's access flags (see {@link Opcodes}). This parameter also indicates if
    *     the method is synthetic and/or deprecated.
    * @param name the method's name.
    * @param descriptor the method's descriptor (see {@link Type}).
-   * @param signature the method's signature. May be <tt>null</tt> if the method parameters, return
-   *     type and exceptions do not use generic types.
+   * @param signature the method's signature. May be {@literal null} if the method parameters,
+   *     return type and exceptions do not use generic types.
    * @param exceptions the internal names of the method's exception classes (see {@link
-   *     Type#getInternalName()}). May be <tt>null</tt>.
-   * @return an object to visit the byte code of the method, or <tt>null</tt> if this class visitor
-   *     is not interested in visiting the code of this method.
+   *     Type#getInternalName()}). May be {@literal null}.
+   * @return an object to visit the byte code of the method, or {@literal null} if this class
+   *     visitor is not interested in visiting the code of this method.
    */
   public MethodVisitor visitMethod(
       final int access,

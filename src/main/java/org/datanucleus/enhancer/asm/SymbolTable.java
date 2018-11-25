@@ -47,7 +47,7 @@ final class SymbolTable {
   final ClassWriter classWriter;
 
   /**
-   * The ClassReader from which this SymbolTable was constructed, or <tt>null</tt> if it was
+   * The ClassReader from which this SymbolTable was constructed, or {@literal null} if it was
    * constructed from scratch.
    */
   private final ClassReader sourceClassReader;
@@ -281,7 +281,7 @@ final class SymbolTable {
   /**
    * Returns the ClassReader from which this SymbolTable was constructed.
    *
-   * @return the ClassReader from which this SymbolTable was constructed, or <tt>null</tt> if it
+   * @return the ClassReader from which this SymbolTable was constructed, or {@literal null} if it
    *     was constructed from scratch.
    */
   ClassReader getSource() {
@@ -358,9 +358,9 @@ final class SymbolTable {
     if (bootstrapMethods != null) {
       addConstantUtf8(Constants.BOOTSTRAP_METHODS);
       return 8 + bootstrapMethods.length;
-    } else {
-      return 0;
     }
+
+    return 0;
   }
 
   /**

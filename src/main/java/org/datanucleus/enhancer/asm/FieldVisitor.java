@@ -29,8 +29,8 @@ package org.datanucleus.enhancer.asm;
 
 /**
  * A visitor to visit a Java field. The methods of this class must be called in the following order:
- * ( <tt>visitAnnotation</tt> | <tt>visitTypeAnnotation</tt> | <tt>visitAttribute</tt> )*
- * <tt>visitEnd</tt>.
+ * ( {@code visitAnnotation} | {@code visitTypeAnnotation} | {@code visitAttribute} )* {@code
+ * visitEnd}.
  *
  * @author Eric Bruneton
  */
@@ -75,8 +75,8 @@ public abstract class FieldVisitor {
    * Visits an annotation of the field.
    *
    * @param descriptor the class descriptor of the annotation class.
-   * @param visible <tt>true</tt> if the annotation is visible at runtime.
-   * @return a visitor to visit the annotation values, or <tt>null</tt> if this visitor is not
+   * @param visible {@literal true} if the annotation is visible at runtime.
+   * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
    *     interested in visiting this annotation.
    */
   public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
@@ -92,11 +92,11 @@ public abstract class FieldVisitor {
    * @param typeRef a reference to the annotated type. The sort of this type reference must be
    *     {@link TypeReference#FIELD}. See {@link TypeReference}.
    * @param typePath the path to the annotated type argument, wildcard bound, array element type, or
-   *     static inner type within 'typeRef'. May be <tt>null</tt> if the annotation targets
+   *     static inner type within 'typeRef'. May be {@literal null} if the annotation targets
    *     'typeRef' as a whole.
    * @param descriptor the class descriptor of the annotation class.
-   * @param visible <tt>true</tt> if the annotation is visible at runtime.
-   * @return a visitor to visit the annotation values, or <tt>null</tt> if this visitor is not
+   * @param visible {@literal true} if the annotation is visible at runtime.
+   * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
    *     interested in visiting this annotation.
    */
   public AnnotationVisitor visitTypeAnnotation(

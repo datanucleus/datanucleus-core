@@ -64,8 +64,8 @@ final class Handler {
   final int catchType;
 
   /**
-   * The internal name of the type of exceptions handled by this handler, or <tt>null</tt> to catch
-   * any exceptions.
+   * The internal name of the type of exceptions handled by this handler, or {@literal null} to
+   * catch any exceptions.
    */
   final String catchTypeDescriptor;
 
@@ -80,7 +80,7 @@ final class Handler {
    * @param handlerPc the handler_pc field of this JVMS exception_table entry.
    * @param catchType The catch_type field of this JVMS exception_table entry.
    * @param catchTypeDescriptor The internal name of the type of exceptions handled by this handler,
-   *     or <tt>null</tt> to catch any exceptions.
+   *     or {@literal null} to catch any exceptions.
    */
   Handler(
       final Label startPc,
@@ -111,17 +111,17 @@ final class Handler {
    * Removes the range between start and end from the Handler list that begins with the given
    * element.
    *
-   * @param firstHandler the beginning of a Handler list. May be <tt>null</tt>.
+   * @param firstHandler the beginning of a Handler list. May be {@literal null}.
    * @param start the start of the range to be removed.
-   * @param end the end of the range to be removed. Maybe <tt>null</tt>.
+   * @param end the end of the range to be removed. Maybe {@literal null}.
    * @return the exception handler list with the start-end range removed.
    */
   static Handler removeRange(final Handler firstHandler, final Label start, final Label end) {
     if (firstHandler == null) {
       return null;
-    } else {
-      firstHandler.nextHandler = removeRange(firstHandler.nextHandler, start, end);
     }
+    firstHandler.nextHandler = removeRange(firstHandler.nextHandler, start, end);
+
     int handlerStart = firstHandler.startPc.bytecodeOffset;
     int handlerEnd = firstHandler.endPc.bytecodeOffset;
     int rangeStart = start.bytecodeOffset;
@@ -134,10 +134,10 @@ final class Handler {
       if (rangeEnd >= handlerEnd) {
         // If [handlerStart,handlerEnd[ is included in [rangeStart,rangeEnd[, remove firstHandler.
         return firstHandler.nextHandler;
-      } else {
-        // [handlerStart,handlerEnd[ - [rangeStart,rangeEnd[ = [rangeEnd,handlerEnd[
-        return new Handler(firstHandler, end, firstHandler.endPc);
       }
+
+      // [handlerStart,handlerEnd[ - [rangeStart,rangeEnd[ = [rangeEnd,handlerEnd[
+      return new Handler(firstHandler, end, firstHandler.endPc);
     } else if (rangeEnd >= handlerEnd) {
       // [handlerStart,handlerEnd[ - [rangeStart,rangeEnd[ = [handlerStart,rangeStart[
       return new Handler(firstHandler, firstHandler.startPc, start);
@@ -152,7 +152,7 @@ final class Handler {
   /**
    * Returns the number of elements of the Handler list that begins with the given element.
    *
-   * @param firstHandler the beginning of a Handler list. May be <tt>null</tt>.
+   * @param firstHandler the beginning of a Handler list. May be {@literal null}.
    * @return the number of elements of the Handler list that begins with 'handler'.
    */
   static int getExceptionTableLength(final Handler firstHandler) {
@@ -169,7 +169,7 @@ final class Handler {
    * Returns the size in bytes of the JVMS exception_table corresponding to the Handler list that
    * begins with the given element. <i>This includes the exception_table_length field.</i>
    *
-   * @param firstHandler the beginning of a Handler list. May be <tt>null</tt>.
+   * @param firstHandler the beginning of a Handler list. May be {@literal null}.
    * @return the size in bytes of the exception_table_length and exception_table structures.
    */
   static int getExceptionTableSize(final Handler firstHandler) {
@@ -180,7 +180,7 @@ final class Handler {
    * Puts the JVMS exception_table corresponding to the Handler list that begins with the given
    * element. <i>This includes the exception_table_length field.</i>
    *
-   * @param firstHandler the beginning of a Handler list. May be <tt>null</tt>.
+   * @param firstHandler the beginning of a Handler list. May be {@literal null}.
    * @param output where the exception_table_length and exception_table structures must be put.
    */
   static void putExceptionTable(final Handler firstHandler, final ByteVector output) {

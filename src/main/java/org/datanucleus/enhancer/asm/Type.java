@@ -39,31 +39,31 @@ import java.lang.reflect.Method;
  */
 public final class Type {
 
-  /** The sort of the <tt>void</tt> type. See {@link #getSort}. */
+  /** The sort of the {@code void} type. See {@link #getSort}. */
   public static final int VOID = 0;
 
-  /** The sort of the <tt>boolean</tt> type. See {@link #getSort}. */
+  /** The sort of the {@code boolean} type. See {@link #getSort}. */
   public static final int BOOLEAN = 1;
 
-  /** The sort of the <tt>char</tt> type. See {@link #getSort}. */
+  /** The sort of the {@code char} type. See {@link #getSort}. */
   public static final int CHAR = 2;
 
-  /** The sort of the <tt>byte</tt> type. See {@link #getSort}. */
+  /** The sort of the {@code byte} type. See {@link #getSort}. */
   public static final int BYTE = 3;
 
-  /** The sort of the <tt>short</tt> type. See {@link #getSort}. */
+  /** The sort of the {@code short} type. See {@link #getSort}. */
   public static final int SHORT = 4;
 
-  /** The sort of the <tt>int</tt> type. See {@link #getSort}. */
+  /** The sort of the {@code int} type. See {@link #getSort}. */
   public static final int INT = 5;
 
-  /** The sort of the <tt>float</tt> type. See {@link #getSort}. */
+  /** The sort of the {@code float} type. See {@link #getSort}. */
   public static final int FLOAT = 6;
 
-  /** The sort of the <tt>long</tt> type. See {@link #getSort}. */
+  /** The sort of the {@code long} type. See {@link #getSort}. */
   public static final int LONG = 7;
 
-  /** The sort of the <tt>double</tt> type. See {@link #getSort}. */
+  /** The sort of the {@code double} type. See {@link #getSort}. */
   public static final int DOUBLE = 8;
 
   /** The sort of array reference types. See {@link #getSort}. */
@@ -81,32 +81,32 @@ public final class Type {
   /** The descriptors of the primitive types. */
   private static final String PRIMITIVE_DESCRIPTORS = "VZCBSIFJD";
 
-  /** The <tt>void</tt> type. */
+  /** The {@code void} type. */
   public static final Type VOID_TYPE = new Type(VOID, PRIMITIVE_DESCRIPTORS, VOID, VOID + 1);
 
-  /** The <tt>boolean</tt> type. */
+  /** The {@code boolean} type. */
   public static final Type BOOLEAN_TYPE =
       new Type(BOOLEAN, PRIMITIVE_DESCRIPTORS, BOOLEAN, BOOLEAN + 1);
 
-  /** The <tt>char</tt> type. */
+  /** The {@code char} type. */
   public static final Type CHAR_TYPE = new Type(CHAR, PRIMITIVE_DESCRIPTORS, CHAR, CHAR + 1);
 
-  /** The <tt>byte</tt> type. */
+  /** The {@code byte} type. */
   public static final Type BYTE_TYPE = new Type(BYTE, PRIMITIVE_DESCRIPTORS, BYTE, BYTE + 1);
 
-  /** The <tt>short</tt> type. */
+  /** The {@code short} type. */
   public static final Type SHORT_TYPE = new Type(SHORT, PRIMITIVE_DESCRIPTORS, SHORT, SHORT + 1);
 
-  /** The <tt>int</tt> type. */
+  /** The {@code int} type. */
   public static final Type INT_TYPE = new Type(INT, PRIMITIVE_DESCRIPTORS, INT, INT + 1);
 
-  /** The <tt>float</tt> type. */
+  /** The {@code float} type. */
   public static final Type FLOAT_TYPE = new Type(FLOAT, PRIMITIVE_DESCRIPTORS, FLOAT, FLOAT + 1);
 
-  /** The <tt>long</tt> type. */
+  /** The {@code long} type. */
   public static final Type LONG_TYPE = new Type(LONG, PRIMITIVE_DESCRIPTORS, LONG, LONG + 1);
 
-  /** The <tt>double</tt> type. */
+  /** The {@code double} type. */
   public static final Type DOUBLE_TYPE =
       new Type(DOUBLE, PRIMITIVE_DESCRIPTORS, DOUBLE, DOUBLE + 1);
 
@@ -206,9 +206,9 @@ public final class Type {
       } else {
         throw new AssertionError();
       }
-    } else {
-      return getType(getDescriptor(clazz));
     }
+
+    return getType(getDescriptor(clazz));
   }
 
   /**
@@ -746,10 +746,10 @@ public final class Type {
     currentChar = methodDescriptor.charAt(currentOffset + 1);
     if (currentChar == 'V') {
       return argumentsSize << 2;
-    } else {
-      int returnSize = (currentChar == 'J' || currentChar == 'D') ? 2 : 1;
-      return argumentsSize << 2 | returnSize;
     }
+
+    int returnSize = (currentChar == 'J' || currentChar == 'D') ? 2 : 1;
+    return argumentsSize << 2 | returnSize;
   }
 
   /**
@@ -791,37 +791,37 @@ public final class Type {
         default:
           throw new AssertionError();
       }
-    } else {
-      switch (sort) {
+    }
+
+    switch (sort) {
         case VOID:
-          if (opcode != Opcodes.IRETURN) {
-            throw new UnsupportedOperationException();
-          }
-          return Opcodes.RETURN;
+            if (opcode != Opcodes.IRETURN) {
+                throw new UnsupportedOperationException();
+            }
+            return Opcodes.RETURN;
         case BOOLEAN:
         case BYTE:
         case CHAR:
         case SHORT:
         case INT:
-          return opcode;
+            return opcode;
         case FLOAT:
-          return opcode + (Opcodes.FRETURN - Opcodes.IRETURN);
+            return opcode + (Opcodes.FRETURN - Opcodes.IRETURN);
         case LONG:
-          return opcode + (Opcodes.LRETURN - Opcodes.IRETURN);
+            return opcode + (Opcodes.LRETURN - Opcodes.IRETURN);
         case DOUBLE:
-          return opcode + (Opcodes.DRETURN - Opcodes.IRETURN);
+            return opcode + (Opcodes.DRETURN - Opcodes.IRETURN);
         case ARRAY:
         case OBJECT:
         case INTERNAL:
-          if (opcode != Opcodes.ILOAD && opcode != Opcodes.ISTORE && opcode != Opcodes.IRETURN) {
-            throw new UnsupportedOperationException();
-          }
-          return opcode + (Opcodes.ARETURN - Opcodes.IRETURN);
+            if (opcode != Opcodes.ILOAD && opcode != Opcodes.ISTORE && opcode != Opcodes.IRETURN) {
+                throw new UnsupportedOperationException();
+            }
+            return opcode + (Opcodes.ARETURN - Opcodes.IRETURN);
         case METHOD:
-          throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException();
         default:
-          throw new AssertionError();
-      }
+            throw new AssertionError();
     }
   }
 
@@ -833,7 +833,7 @@ public final class Type {
    * Tests if the given object is equal to this type.
    *
    * @param object the object to be compared to this type.
-   * @return <tt>true</tt> if the given object is equal to this type.
+   * @return {@literal true} if the given object is equal to this type.
    */
   @Override
   public boolean equals(final Object object) {

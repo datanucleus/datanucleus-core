@@ -345,7 +345,7 @@ public class ClassReader {
    * Returns the internal of name of the super class (see {@link Type#getInternalName()}). For
    * interfaces, the super class is {@link Object}.
    *
-   * @return the internal name of the super class, or <tt>null</tt> for {@link Object} class.
+   * @return the internal name of the super class, or {@literal null} for {@link Object} class.
    * @see ClassVisitor#visit(int, int, String, String, String, String[])
    */
   public String getSuperName() {
@@ -2772,7 +2772,7 @@ public class ClassReader {
    * @param annotationVisitor the visitor that must visit the element_value structure.
    * @param elementValueOffset the start offset in {@link #b} of the element_value structure to be
    *     read.
-   * @param elementName the name of the element_value structure to be read, or <tt>null</tt>.
+   * @param elementName the name of the element_value structure to be read, or {@literal null}.
    * @param charBuffer the buffer used to read strings in the constant pool.
    * @return the end offset of the JVMS 'element_value' structure.
    */
@@ -3272,7 +3272,7 @@ public class ClassReader {
    * @param codeAttributeOffset the start offset of the enclosing Code attribute in {@link #b}, or
    *     -1 if the attribute to be read is not a code attribute. The 6 attribute header bytes
    *     (attribute_name_index and attribute_length) are not taken into account here.
-   * @param labels the labels of the method's code, or <tt>null</tt> if the attribute to be read
+   * @param labels the labels of the method's code, or {@literal null} if the attribute to be read
    *     is not a code attribute.
    * @return the attribute that has been read.
    */
