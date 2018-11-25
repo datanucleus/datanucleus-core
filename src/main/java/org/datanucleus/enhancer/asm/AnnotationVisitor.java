@@ -39,7 +39,7 @@ public abstract class AnnotationVisitor {
 
   /**
    * The ASM API version implemented by this visitor. The value of this field must be one of {@link
-   * Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link Opcodes#ASM7_EXPERIMENTAL}.
+   * Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
    */
   protected final int api;
 
@@ -50,8 +50,7 @@ public abstract class AnnotationVisitor {
    * Constructs a new {@link AnnotationVisitor}.
    *
    * @param api the ASM API version implemented by this visitor. Must be one of {@link
-   *     Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link
-   *     Opcodes#ASM7_EXPERIMENTAL}.
+   *     Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
    */
   public AnnotationVisitor(final int api) {
     this(api, null);
@@ -61,16 +60,12 @@ public abstract class AnnotationVisitor {
    * Constructs a new {@link AnnotationVisitor}.
    *
    * @param api the ASM API version implemented by this visitor. Must be one of {@link
-   *     Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link
-   *     Opcodes#ASM7_EXPERIMENTAL}.
+   *     Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
    * @param annotationVisitor the annotation visitor to which this visitor must delegate method
    *     calls. May be null.
    */
   public AnnotationVisitor(final int api, final AnnotationVisitor annotationVisitor) {
-    if (api != Opcodes.ASM6
-        && api != Opcodes.ASM5
-        && api != Opcodes.ASM4
-        && api != Opcodes.ASM7_EXPERIMENTAL) {
+    if (api != Opcodes.ASM6 && api != Opcodes.ASM5 && api != Opcodes.ASM4 && api != Opcodes.ASM7) {
       throw new IllegalArgumentException();
     }
     this.api = api;

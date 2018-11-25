@@ -206,7 +206,8 @@ abstract class Symbol {
    *     the (ASM specific) type table of a class (depending on 'tag').
    * @param tag the symbol type. Must be one of the static tag values defined in this class.
    * @param owner The internal name of the symbol's owner class. Maybe <tt>null</tt>.
-   * @param name The name of the symbol's corresponding class field or method. Maybe <tt>null</tt>.
+   * @param name The name of the symbol's corresponding class field or method. Maybe {@literal
+   *     null}.
    * @param value The string value of this symbol. Maybe <tt>null</tt>.
    * @param data The numeric value of this symbol.
    */
@@ -226,6 +227,8 @@ abstract class Symbol {
   }
 
   /**
+   * Returns the result {@link Type#getArgumentsAndReturnSizes} on {@link #value}.
+   *
    * @return the result {@link Type#getArgumentsAndReturnSizes} on {@link #value} (memoized in
    *     {@link #info} for efficiency). This should only be used for {@link
    *     #CONSTANT_METHODREF_TAG}, {@link #CONSTANT_INTERFACE_METHODREF_TAG} and {@link

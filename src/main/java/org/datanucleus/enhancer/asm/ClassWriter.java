@@ -234,7 +234,7 @@ public class ClassWriter extends ClassVisitor {
    *     maximum stack size nor the stack frames will be computed for these methods</i>.
    */
   public ClassWriter(final ClassReader classReader, final int flags) {
-    super(Opcodes.ASM6);
+    super(Opcodes.ASM7);
     symbolTable = classReader == null ? new SymbolTable(this) : new SymbolTable(this, classReader);
     if ((flags & COMPUTE_FRAMES) != 0) {
       this.compute = MethodWriter.COMPUTE_ALL_FRAMES;
@@ -282,7 +282,7 @@ public class ClassWriter extends ClassVisitor {
       sourceFileIndex = symbolTable.addConstantUtf8(file);
     }
     if (debug != null) {
-      debugExtension = new ByteVector().encodeUTF8(debug, 0, Integer.MAX_VALUE);
+      debugExtension = new ByteVector().encodeUtf8(debug, 0, Integer.MAX_VALUE);
     }
   }
 
@@ -298,7 +298,7 @@ public class ClassWriter extends ClassVisitor {
   }
 
   @Override
-  public void visitNestHostExperimental(final String nestHost) {
+  public void visitNestHost(final String nestHost) {
     nestHostClassIndex = symbolTable.addConstantClass(nestHost).index;
   }
 
@@ -321,10 +321,10 @@ public class ClassWriter extends ClassVisitor {
     if (visible) {
       return lastRuntimeVisibleAnnotation =
           new AnnotationWriter(symbolTable, annotation, lastRuntimeVisibleAnnotation);
+    } else {
+      return lastRuntimeInvisibleAnnotation =
+          new AnnotationWriter(symbolTable, annotation, lastRuntimeInvisibleAnnotation);
     }
-
-    return lastRuntimeInvisibleAnnotation =
-            new AnnotationWriter(symbolTable, annotation, lastRuntimeInvisibleAnnotation);
   }
 
   @Override
@@ -341,10 +341,10 @@ public class ClassWriter extends ClassVisitor {
     if (visible) {
       return lastRuntimeVisibleTypeAnnotation =
           new AnnotationWriter(symbolTable, typeAnnotation, lastRuntimeVisibleTypeAnnotation);
+    } else {
+      return lastRuntimeInvisibleTypeAnnotation =
+          new AnnotationWriter(symbolTable, typeAnnotation, lastRuntimeInvisibleTypeAnnotation);
     }
-
-    return lastRuntimeInvisibleTypeAnnotation =
-            new AnnotationWriter(symbolTable, typeAnnotation, lastRuntimeInvisibleTypeAnnotation);
   }
 
   @Override
@@ -355,7 +355,7 @@ public class ClassWriter extends ClassVisitor {
   }
 
   @Override
-  public void visitNestMemberExperimental(final String nestMember) {
+  public void visitNestMember(final String nestMember) {
     if (nestMemberClasses == null) {
       nestMemberClasses = new ByteVector();
     }
@@ -383,10 +383,9 @@ public class ClassWriter extends ClassVisitor {
       innerClasses.putShort(innerName == null ? 0 : symbolTable.addConstantUtf8(innerName));
       innerClasses.putShort(access);
       nameSymbol.info = numberOfInnerClasses;
-    } else {
-      // Compare the inner classes entry nameSymbol.info - 1 with the arguments of this method and
-      // throw an exception if there is a difference?
     }
+    // Else, compare the inner classes entry nameSymbol.info - 1 with the arguments of this method
+    // and throw an exception if there is a difference?
   }
 
   @Override
@@ -658,9 +657,9 @@ public class ClassWriter extends ClassVisitor {
     // Third step: replace the ASM specific instructions, if any.
     if (hasAsmInstructions) {
       return replaceAsmInstructions(result.data, hasFrames);
+    } else {
+      return result.data;
     }
-
-    return result.data;
   }
 
   /**
@@ -674,7 +673,7 @@ public class ClassWriter extends ClassVisitor {
    *     ones.
    */
   private byte[] replaceAsmInstructions(final byte[] classFile, final boolean hasFrames) {
-    Attribute[] attributes = getAttributePrototypes();
+    final Attribute[] attributes = getAttributePrototypes();
     firstField = null;
     lastField = null;
     firstMethod = null;
@@ -743,6 +742,7 @@ public class ClassWriter extends ClassVisitor {
    * @param value the String value.
    * @return the index of a new or already existing UTF8 item.
    */
+  // DontCheck(AbbreviationAsWordInName): can't be renamed (for backward binary compatibility).
   public int newUTF8(final String value) {
     return symbolTable.addConstantUtf8(value);
   }
@@ -947,13 +947,13 @@ public class ClassWriter extends ClassVisitor {
     Class<?> class1;
     try {
       class1 = Class.forName(type1.replace('/', '.'), false, classLoader);
-    } catch (Exception e) {
+    } catch (ClassNotFoundException e) {
       throw new TypeNotPresentException(type1, e);
     }
     Class<?> class2;
     try {
       class2 = Class.forName(type2.replace('/', '.'), false, classLoader);
-    } catch (Exception e) {
+    } catch (ClassNotFoundException e) {
       throw new TypeNotPresentException(type2, e);
     }
     if (class1.isAssignableFrom(class2)) {
@@ -964,12 +964,12 @@ public class ClassWriter extends ClassVisitor {
     }
     if (class1.isInterface() || class2.isInterface()) {
       return "java/lang/Object";
-    }
-
-    do {
+    } else {
+      do {
         class1 = class1.getSuperclass();
-    } while (!class1.isAssignableFrom(class2));
-    return class1.getName().replace('.', '/');
+      } while (!class1.isAssignableFrom(class2));
+      return class1.getName().replace('.', '/');
+    }
   }
 
   /**
