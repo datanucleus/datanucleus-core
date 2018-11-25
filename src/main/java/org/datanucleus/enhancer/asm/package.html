@@ -3,5 +3,15 @@
     ASM v6.2.1 : a small and fast bytecode manipulation framework.
     This is repackaged from "org.ow2.asm" in ASM v6.2.1.
     The only changes in the code were to fix javadocs error.
+
+    <p>
+    The process to upgrade this "repackaged" ASM is as follows :-
+    <ol>
+        <li>Open <i>datanucleus-core</i> in Eclipse (or equivalent IDE)</li>
+        <li>Download and open the source code for the version of ASM that you want in Eclipse</li>
+        <li>Copy all files from <b>org.objectweb.asm</b> (but not sub-packages), and paste these into <b>org.datanucleus.enhancer.asm</b></li>
+        <li>Inspect all warnings in Eclipse and fix the formatting of the ASM methods to avoid ALL warnings.</li>
+        <li>Update <i>package.html</i> of <b>org.datanucleus.enhancer.asm</b> to mention the current version of ASM that is repackaged</li>
+    </ol>
 </body>
 </html>
