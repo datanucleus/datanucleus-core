@@ -124,7 +124,7 @@ final class FieldWriter extends FieldVisitor {
       final String descriptor,
       final String signature,
       final Object constantValue) {
-    super(Opcodes.ASM6);
+    super(Opcodes.ASM7);
     this.symbolTable = symbolTable;
     this.accessFlags = access;
     this.nameIndex = symbolTable.addConstantUtf8(name);
@@ -151,10 +151,10 @@ final class FieldWriter extends FieldVisitor {
     if (visible) {
       return lastRuntimeVisibleAnnotation =
           new AnnotationWriter(symbolTable, annotation, lastRuntimeVisibleAnnotation);
+    } else {
+      return lastRuntimeInvisibleAnnotation =
+          new AnnotationWriter(symbolTable, annotation, lastRuntimeInvisibleAnnotation);
     }
-
-    return lastRuntimeInvisibleAnnotation =
-            new AnnotationWriter(symbolTable, annotation, lastRuntimeInvisibleAnnotation);
   }
 
   @Override
@@ -171,10 +171,10 @@ final class FieldWriter extends FieldVisitor {
     if (visible) {
       return lastRuntimeVisibleTypeAnnotation =
           new AnnotationWriter(symbolTable, typeAnnotation, lastRuntimeVisibleTypeAnnotation);
+    } else {
+      return lastRuntimeInvisibleTypeAnnotation =
+          new AnnotationWriter(symbolTable, typeAnnotation, lastRuntimeInvisibleTypeAnnotation);
     }
-
-    return lastRuntimeInvisibleTypeAnnotation =
-            new AnnotationWriter(symbolTable, typeAnnotation, lastRuntimeInvisibleTypeAnnotation);
   }
 
   @Override
