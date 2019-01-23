@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.flush;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -39,9 +40,9 @@ import org.datanucleus.util.NucleusLogger;
 public class FlushNonReferential implements FlushProcess
 {
     /* (non-Javadoc)
-     * @see org.datanucleus.FlushProcess#execute(org.datanucleus.ExecutionContext, java.util.List, java.util.List, org.datanucleus.flush.OperationQueue)
+     * @see org.datanucleus.FlushProcess#execute(org.datanucleus.ExecutionContext, java.util.Collection, java.util.Collection, org.datanucleus.flush.OperationQueue)
      */
-    public List<NucleusOptimisticException> execute(ExecutionContext ec, List<ObjectProvider> primaryOPs, List<ObjectProvider> secondaryOPs, OperationQueue opQueue)
+    public List<NucleusOptimisticException> execute(ExecutionContext ec, Collection<ObjectProvider> primaryOPs, Collection<ObjectProvider> secondaryOPs, OperationQueue opQueue)
     {
         // Make copy of ObjectProviders so we don't have ConcurrentModification issues
         Set<ObjectProvider> opsToFlush = new HashSet<ObjectProvider>();

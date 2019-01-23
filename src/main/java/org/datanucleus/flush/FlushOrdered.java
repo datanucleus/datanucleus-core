@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.flush;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -37,9 +38,9 @@ import org.datanucleus.util.NucleusLogger;
 public class FlushOrdered implements FlushProcess
 {
     /* (non-Javadoc)
-     * @see org.datanucleus.FlushProcess#execute(org.datanucleus.ExecutionContext, java.util.List, java.util.List, org.datanucleus.flush.OperationQueue)
+     * @see org.datanucleus.FlushProcess#execute(org.datanucleus.ExecutionContext, java.util.Collection, java.util.Collection, org.datanucleus.flush.OperationQueue)
      */
-    public List<NucleusOptimisticException> execute(ExecutionContext ec, List<ObjectProvider> primaryOPs, List<ObjectProvider> secondaryOPs, OperationQueue opQueue)
+    public List<NucleusOptimisticException> execute(ExecutionContext ec, Collection<ObjectProvider> primaryOPs, Collection<ObjectProvider> secondaryOPs, OperationQueue opQueue)
     {
         // Note that opQueue is not processed directly here, but instead will be processed via callbacks from the persistence of other objects
         // TODO The opQueue needs to be processed from here instead of via the callbacks, see NUCCORE-904

@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.flush;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.datanucleus.ExecutionContext;
@@ -37,6 +38,5 @@ public interface FlushProcess
      * @param opQueue Queue of operations
      * @return Any optimistic exceptions during the deletes/inserts/updates
      */
-    List<NucleusOptimisticException> execute(ExecutionContext ec, 
-        List<ObjectProvider> primaryOPs, List<ObjectProvider> secondaryOPs, OperationQueue opQueue);
+    List<NucleusOptimisticException> execute(ExecutionContext ec, Collection<ObjectProvider> primaryOPs, Collection<ObjectProvider> secondaryOPs, OperationQueue opQueue);
 }

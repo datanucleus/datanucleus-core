@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -170,10 +171,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     private final Map<Object, ObjectProvider> enlistedOPCache = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
 
     /** List of ObjectProviders for all current dirty objects managed by this context. */
-    private final List<ObjectProvider> dirtyOPs = new ArrayList<>();
+    private final Collection<ObjectProvider> dirtyOPs = new LinkedHashSet<>();
 
     /** List of ObjectProviders for all current dirty objects made dirty by reachability. */
-    private final List<ObjectProvider> indirectDirtyOPs = new ArrayList<>();
+    private final Collection<ObjectProvider> indirectDirtyOPs = new LinkedHashSet<>();
 
     private OperationQueue operationQueue = null;
 
@@ -415,7 +416,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // "Detach-on-Close", detaching all currently cached objects
             // TODO This will remove objects from the L1 cache one-by-one. Is there a possibility for optimisation? See also AttachDetachTest.testDetachOnClose
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("010011"));
-            List<ObjectProvider> toDetach = new ArrayList<>(cache.values());
+            Collection<ObjectProvider> toDetach = new LinkedHashSet<>(cache.values());
 
             try
             {
