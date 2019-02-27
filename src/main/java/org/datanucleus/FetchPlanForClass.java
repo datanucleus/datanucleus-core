@@ -423,7 +423,7 @@ public class FetchPlanForClass
             cacheKey.set(i, loadedMembers[i]);
         }
         Boolean result = plan.getCachedIsToCallPostLoadFetchPlan(cmd, cacheKey);
-        
+
         if (result == null) 
         {
             result = Boolean.FALSE;
@@ -431,7 +431,7 @@ public class FetchPlanForClass
             for (int i = 0; i < fieldsInActualFetchPlan.length; i++)
             {
                 final int fieldNumber = fieldsInActualFetchPlan[i];
-                String fieldName = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getFullFieldName();
+
                 // if field in actual fetch plan was not previously loaded
                 if (!loadedMembers[fieldNumber])
                 {
@@ -445,7 +445,7 @@ public class FetchPlanForClass
                         // compute only if necessary, as that's expensive to do
                         if (cmd.hasFetchGroupWithPostLoad())
                         {
-                            // field must be in a fetch-group which has post-load set to true
+                            // Statically defined fetch groups : field must be in a fetch-group which has post-load set to true
                             Integer fieldNumberInteger = Integer.valueOf(fieldNumber);
                             Set<FetchGroupMetaData> fetchGroups = null;
                             if (fetchGroupsByMemberNumber != null)
@@ -462,26 +462,32 @@ public class FetchPlanForClass
                                 }
                                 fetchGroupsByMemberNumber.put(fieldNumberInteger, fetchGroups);
                             }
+
                             for (Iterator it = fetchGroups.iterator(); it.hasNext();)
                             {
                                 FetchGroupMetaData fgmd = (FetchGroupMetaData) it.next();
                                 if (fgmd.getPostLoad().booleanValue())
                                 {
                                     result = Boolean.TRUE;
+                                    break;
                                 }
                             }
                         }
-                        
-                        if (plan.dynamicGroups != null)
+                        if (!result)
                         {
-                            Class cls = plan.clr.classForName(cmd.getFullClassName());
-                            for (Iterator<FetchGroup> it = plan.dynamicGroups.iterator(); it.hasNext();)
+                            if (plan.dynamicGroups != null)
                             {
-                                FetchGroup group = it.next();
-                                Set groupMembers = group.getMembers();
-                                if (group.getType().isAssignableFrom(cls) && groupMembers.contains(fieldName) && group.getPostLoad())
+                                // Dynamic Fetch groups
+                                String fieldName = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
+                                Class cls = plan.clr.classForName(cmd.getFullClassName());
+                                for (Iterator<FetchGroup> it = plan.dynamicGroups.iterator(); it.hasNext();)
                                 {
-                                    result = Boolean.TRUE;
+                                    FetchGroup group = it.next();
+                                    Set groupMembers = group.getMembers();
+                                    if (group.getType().isAssignableFrom(cls) && groupMembers.contains(fieldName) && group.getPostLoad())
+                                    {
+                                        result = Boolean.TRUE;
+                                    }
                                 }
                             }
                         }
@@ -494,6 +500,7 @@ public class FetchPlanForClass
             }
             plan.cacheIsToCallPostLoadFetchPlan(cmd, cacheKey, result);
         }
+
         return result.booleanValue();
     }
 
