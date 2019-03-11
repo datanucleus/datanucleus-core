@@ -216,6 +216,11 @@ public class DyadicExpression extends Expression
     
     public String toString()
     {
+        if (getRight() == null)
+        {
+            // Monadic cases
+            return "DyadicExpression{"+ getOperator() + " " + getLeft() + "}";
+        }
         return "DyadicExpression{"+ getLeft() + " " + getOperator() + " " + getRight() + "}";
     }
 }
