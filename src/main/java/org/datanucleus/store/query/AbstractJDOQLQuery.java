@@ -408,9 +408,8 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
 
     /**
      * Method to compile the JDOQL query.
-     * This implementation assumes that we are using the "generic" JDOQL compiler in 
-     * <i>org.datanucleus.query.compiler</i>. If not then override this method.
-     * Will populate the "compilation" class variable.
+     * This implementation assumes that we are using the "generic" JDOQL compiler in <i>org.datanucleus.query.compiler</i>. 
+     * If not then override this method. Will populate the "compilation" class variable.
      * @param parameterValues Map of parameter values keyed by parameter name.
      */
     protected void compileInternal(Map parameterValues)
@@ -423,8 +422,10 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
             }
             else
             {
+                NucleusLogger.GENERAL.info(">> RESULT CLASS DEFINED BUT NO RESULT SO DEFAULTING TO DISTINCT THIS");
                 // When result class specified and no result then default the result to "DISTINCT this"
-                result = "DISTINCT this";
+                result = "this";
+                resultDistinct = true;
             }
         }
 
