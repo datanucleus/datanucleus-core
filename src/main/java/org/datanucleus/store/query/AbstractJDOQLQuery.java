@@ -422,7 +422,6 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
             }
             else
             {
-                NucleusLogger.GENERAL.info(">> RESULT CLASS DEFINED BUT NO RESULT SO DEFAULTING TO DISTINCT THIS");
                 // When result class specified and no result then default the result to "DISTINCT this"
                 result = "this";
                 resultDistinct = true;
