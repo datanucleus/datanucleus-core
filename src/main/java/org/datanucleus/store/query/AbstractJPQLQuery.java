@@ -155,8 +155,7 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
     {
         String queryCacheKey = toString();
 
-		// JPQL single string doesn't include range so add it since (datastore) compile will depend on it 
-		// if evaluated in datastore
+		// JPQL single string doesn't include range so add it since (datastore) compile will depend on it if evaluated in datastore
         if (range != null)
         {
             queryCacheKey += (" RANGE " + range);
@@ -172,6 +171,12 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
         if (!subclasses)
         {
             queryCacheKey += " EXCLUDE SUBCLASSES";
+        }
+
+        String multiTenancyId = ec.getNucleusContext().getMultiTenancyId(ec, getCandidateClassMetaData());
+        if (multiTenancyId != null)
+        {
+            queryCacheKey += (" " + multiTenancyId);
         }
 
         return queryCacheKey;

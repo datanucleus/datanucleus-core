@@ -1895,6 +1895,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     @Override
     public String getMultiTenancyId(ExecutionContext ec, AbstractClassMetaData cmd)
     {
+        // TODO This does nothing with the class currently. Use it
         if (multiTenancyProvider != null)
         {
             return multiTenancyProvider.getTenantId(ec);

@@ -213,6 +213,12 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
             queryCacheKey += (" " + getFetchPlan().toString());
         }
 
+        String multiTenancyId = ec.getNucleusContext().getMultiTenancyId(ec, getCandidateClassMetaData());
+        if (multiTenancyId != null)
+        {
+            queryCacheKey += (" " + multiTenancyId);
+        }
+
         return queryCacheKey;
 	}
 
