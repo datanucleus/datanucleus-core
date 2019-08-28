@@ -825,6 +825,12 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
 
     protected AbstractClassMetaData getCandidateClassMetaData()
     {
+        // TODO If this is called for a JPQL query that has a FROM only, BEFORE the FROM is processed in compileGeneric then we have nothing to go off.
+        if (candidateClass == null && candidateClassName == null)
+        {
+            return null;
+        }
+
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(candidateClass, clr);
         if (candidateClass.isInterface())
         {
