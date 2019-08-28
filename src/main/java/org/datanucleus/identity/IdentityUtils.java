@@ -147,6 +147,41 @@ public class IdentityUtils
         return id instanceof DatastoreId ? ((DatastoreId)id).getKeyAsObject() : null;
     }
 
+    public static Class getSingleFieldIdentityTypeForKeyType(Class keyType)
+    {
+        if (keyType == null)
+        {
+            return null;
+        }
+
+        if (Long.class == keyType)
+        {
+            return ClassConstants.IDENTITY_SINGLEFIELD_LONG;
+        }
+        if (Integer.class == keyType)
+        {
+            return ClassConstants.IDENTITY_SINGLEFIELD_INT;
+        }
+        if (Short.class == keyType)
+        {
+            return ClassConstants.IDENTITY_SINGLEFIELD_SHORT;
+        }
+        if (Byte.class == keyType)
+        {
+            return ClassConstants.IDENTITY_SINGLEFIELD_BYTE;
+        }
+        if (Character.class == keyType)
+        {
+            return ClassConstants.IDENTITY_SINGLEFIELD_CHAR;
+        }
+        if (String.class == keyType)
+        {
+            return ClassConstants.IDENTITY_SINGLEFIELD_STRING;
+        }
+
+        return ClassConstants.IDENTITY_SINGLEFIELD_OBJECT;
+    }
+
     /**
      * Accessor for the type of the single field application-identity key given the single field identity type.
      * @param idType Single field identity type
