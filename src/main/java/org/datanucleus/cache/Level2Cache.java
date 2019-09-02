@@ -132,8 +132,8 @@ public interface Level2Cache extends Serializable
 
     /**
      * Method to put an object in the cache.
-     * @param oid The Object id for this object
-     * @param pc The L2 cacheable persistable object
+     * @param oid The Object id for this object (see StateManager.getInternalObjectId)
+     * @param pc The L2-cacheable persistable object
      * @return The value previously associated with this oid
      * @param <T> Type of the object represented
      */
