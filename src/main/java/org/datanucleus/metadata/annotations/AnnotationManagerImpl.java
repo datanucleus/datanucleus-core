@@ -182,7 +182,7 @@ public class AnnotationManagerImpl implements AnnotationManager
             }
             catch (Exception e)
             {
-                NucleusLogger.METADATA.warn(Localiser.msg("MetaData.AnnotationReaderNotFound", readerClassName));
+                NucleusLogger.METADATA.warn(Localiser.msg("044207", cls.getName(), readerClassName));
                 return null;
             }
         }
@@ -228,7 +228,7 @@ public class AnnotationManagerImpl implements AnnotationManager
             }
             catch (Exception e)
             {
-                NucleusLogger.METADATA.warn(Localiser.msg("MetaData.ClassAnnotationHandlerNotFound", annotationName));
+                NucleusLogger.METADATA.warn(Localiser.msg("044208", annotationName));
                 return null;
             }
         }
@@ -269,7 +269,7 @@ public class AnnotationManagerImpl implements AnnotationManager
                 }
                 catch (Exception e)
                 {
-                    NucleusLogger.METADATA.warn(Localiser.msg("MetaData.MemberAnnotationHandlerNotFound", annotationName));
+                    NucleusLogger.METADATA.warn(Localiser.msg("044209", annotationName));
                     return null;
                 }
             }
