@@ -158,6 +158,50 @@ public class DN2NamingFactory extends AbstractNamingFactory
                 name = "DELETED";
             }
         }
+        else if (type == ColumnType.CREATEUSER_COLUMN)
+        {
+            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_CREATEUSER_COLUMN_NAME))
+            {
+                name = cmd.getValueForExtension(MetaData.EXTENSION_CLASS_CREATEUSER_COLUMN_NAME);
+            }
+            if (name == null)
+            {
+                name = "CREATE_USER";
+            }
+        }
+        else if (type == ColumnType.CREATETIMESTAMP_COLUMN)
+        {
+            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_CREATETIMESTAMP_COLUMN_NAME))
+            {
+                name = cmd.getValueForExtension(MetaData.EXTENSION_CLASS_CREATETIMESTAMP_COLUMN_NAME);
+            }
+            if (name == null)
+            {
+                name = "CREATE_TIMESTAMP";
+            }
+        }
+        else if (type == ColumnType.UPDATEUSER_COLUMN)
+        {
+            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_UPDATEUSER_COLUMN_NAME))
+            {
+                name = cmd.getValueForExtension(MetaData.EXTENSION_CLASS_UPDATEUSER_COLUMN_NAME);
+            }
+            if (name == null)
+            {
+                name = "UPDATE_USER";
+            }
+        }
+        else if (type == ColumnType.UPDATETIMESTAMP_COLUMN)
+        {
+            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_UPDATETIMESTAMP_COLUMN_NAME))
+            {
+                name = cmd.getValueForExtension(MetaData.EXTENSION_CLASS_UPDATETIMESTAMP_COLUMN_NAME);
+            }
+            if (name == null)
+            {
+                name = "UPDATE_TIMESTAMP";
+            }
+        }
         else
         {
             throw new NucleusException("This method does not support columns of type " + type);

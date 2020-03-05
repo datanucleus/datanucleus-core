@@ -42,4 +42,12 @@ public enum ColumnType
     ADAPTER_COLUMN,
     /** Column for soft-delete. */
     SOFTDELETE_COLUMN,
+    /** Column for AUDIT @CreateUser. */
+    CREATEUSER_COLUMN,
+    /** Column for AUDIT @CreateTimestamp. */
+    CREATETIMESTAMP_COLUMN,
+    /** Column for AUDIT @UpdateUser. */
+    UPDATEUSER_COLUMN,
+    /** Column for AUDIT @UpdateTimestamp. */
+    UPDATETIMESTAMP_COLUMN
 }

@@ -584,6 +584,22 @@ public class CompleteClassTable implements Table
             }
             this.softDeleteColumn = col;
         }
+        if (cmd.hasExtension(MetaData.EXTENSION_CLASS_CREATEUSER))
+        {
+            // TODO Support this
+        }
+        if (cmd.hasExtension(MetaData.EXTENSION_CLASS_CREATETIMESTAMP))
+        {
+            // TODO Support this
+        }
+        if (cmd.hasExtension(MetaData.EXTENSION_CLASS_UPDATEUSER))
+        {
+            // TODO Support this
+        }
+        if (cmd.hasExtension(MetaData.EXTENSION_CLASS_UPDATETIMESTAMP))
+        {
+            // TODO Support this
+        }
 
         // Reorder all columns to respect column positioning information. Note this assumes the user has provided complete information
         List<Column> unorderedCols = new ArrayList();

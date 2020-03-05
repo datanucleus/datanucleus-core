@@ -80,6 +80,36 @@ public class MetaData implements Serializable
     /** Class : when the class will use soft deletion, specifies the column name to use. */
     public static final String EXTENSION_CLASS_SOFTDELETE_COLUMN_NAME = "softdelete-column-name";
 
+    /** Class : when the class will have a create-user column for auditing. */
+    public static final String EXTENSION_CLASS_CREATEUSER = "createuser";
+
+    /** Class : when the class will have a create-user column for auditing, specifies the column name to use. */
+    public static final String EXTENSION_CLASS_CREATEUSER_COLUMN_NAME = "createuser-column-name";
+
+    /** Class : when the class will have a create-user column for auditing, defines the length of column to use. */
+    public static final String EXTENSION_CLASS_CREATEUSER_COLUMN_LENGTH = "createuser-column-length";
+
+    /** Class : when the class will have a update-user column for auditing. */
+    public static final String EXTENSION_CLASS_UPDATEUSER = "updateuser";
+
+    /** Class : when the class will have a update-user column for auditing, specifies the column name to use. */
+    public static final String EXTENSION_CLASS_UPDATEUSER_COLUMN_NAME = "updateuser-column-name";
+
+    /** Class : when the class will have a update-user column for auditing, defines the length of column to use. */
+    public static final String EXTENSION_CLASS_UPDATEUSER_COLUMN_LENGTH = "updateuser-column-length";
+
+    /** Class : when the class will have a create-timestamp column for auditing. */
+    public static final String EXTENSION_CLASS_CREATETIMESTAMP = "createtimestamp";
+
+    /** Class : when the class will have a create-timestamp column for auditing, specifies the column name to use. */
+    public static final String EXTENSION_CLASS_CREATETIMESTAMP_COLUMN_NAME = "createtimestamp-column-name";
+
+    /** Class : when the class will have a update-timestamp column for auditing. */
+    public static final String EXTENSION_CLASS_UPDATETIMESTAMP = "updatetimestamp";
+
+    /** Class : when the class will have a update-timestamp column for auditing, specifies the column name to use. */
+    public static final String EXTENSION_CLASS_UPDATETIMESTAMP_COLUMN_NAME = "updatetimestamp-column-name";
+
     /** Class : define the name of a field that will store the version of this class. */
     public static final String EXTENSION_CLASS_VERSION_FIELD_NAME = "field-name";
 
