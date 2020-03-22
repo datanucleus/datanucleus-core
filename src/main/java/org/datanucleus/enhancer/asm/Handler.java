@@ -122,6 +122,7 @@ final class Handler {
     }
 
     firstHandler.nextHandler = removeRange(firstHandler.nextHandler, start, end);
+
     int handlerStart = firstHandler.startPc.bytecodeOffset;
     int handlerEnd = firstHandler.endPc.bytecodeOffset;
     int rangeStart = start.bytecodeOffset;
