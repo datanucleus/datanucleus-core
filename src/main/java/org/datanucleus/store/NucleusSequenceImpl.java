@@ -77,7 +77,6 @@ public class NucleusSequenceImpl implements NucleusSequence
             props.putAll(seqExtensions);
         }
         props.put("sequence-name", seqMetaData.getDatastoreSequence());
-        props.put("sequence-name", seqMetaData.getDatastoreSequence());
         if (seqMetaData.getAllocationSize() > 0)
         {
             props.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + seqMetaData.getAllocationSize());
