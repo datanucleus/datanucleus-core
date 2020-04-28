@@ -602,11 +602,17 @@ public class MetaDataUtils
         {
             return false;
         }
-        if (jdbcType == JdbcType.INTEGER || jdbcType == JdbcType.SMALLINT || jdbcType == JdbcType.TINYINT || jdbcType == JdbcType.NUMERIC || jdbcType == JdbcType.BIGINT)
+        switch (jdbcType)
         {
-            return true;
+            case INTEGER :
+            case SMALLINT :
+            case TINYINT :
+            case NUMERIC :
+            case BIGINT :
+                return true;
+            default :
+                return false;
         }
-        return false;
     }
 
     /**
@@ -620,11 +626,15 @@ public class MetaDataUtils
         {
             return false;
         }
-        if (jdbcType == JdbcType.DECIMAL || jdbcType == JdbcType.FLOAT || jdbcType == JdbcType.REAL || jdbcType == JdbcType.DECIMAL)
+        switch (jdbcType)
         {
-            return true;
+            case DECIMAL :
+            case FLOAT :
+            case REAL :
+                return true;
+            default :
+                return false;
         }
-        return false;
     }
 
     /**
@@ -638,12 +648,19 @@ public class MetaDataUtils
         {
             return false;
         }
-        if (jdbcType == JdbcType.CHAR || jdbcType == JdbcType.VARCHAR || jdbcType == JdbcType.CLOB || jdbcType == JdbcType.LONGVARCHAR ||
-            jdbcType == JdbcType.NCHAR || jdbcType == JdbcType.NVARCHAR || jdbcType == JdbcType.LONGNVARCHAR)
+        switch (jdbcType)
         {
-            return true;
+            case CHAR :
+            case VARCHAR :
+            case CLOB :
+            case LONGVARCHAR :
+            case NCHAR :
+            case NVARCHAR :
+            case LONGNVARCHAR :
+                return true;
+            default :
+                return false;
         }
-        return false;
     }
 
     /**
