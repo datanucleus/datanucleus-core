@@ -19,9 +19,13 @@ package org.datanucleus.query;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.datanucleus.query.expression.DyadicExpression;
 import org.datanucleus.query.expression.Expression;
+import org.datanucleus.query.expression.Expression.Operator;
 import org.datanucleus.query.expression.InvokeExpression;
 import org.datanucleus.query.expression.Literal;
 import org.datanucleus.query.expression.ParameterExpression;
@@ -43,6 +47,25 @@ public class JDOQLQueryHelper
             "select", "unique", "into", "from", "exclude", "subclasses", "where",
             "variables", "parameters", "group", "order", "by", "range"
             };
+    
+    private static final Map<Operator, String> DYADIC_OP_JDOQL_MAP = Stream.of(new Object[][]{
+            {Expression.OP_AND, " && "},
+            {Expression.OP_OR, " || "},
+            {Expression.OP_BIT_AND, " & "},
+            {Expression.OP_BIT_OR, " | "},
+            {Expression.OP_BIT_XOR, " ^ "},
+            {Expression.OP_ADD, " + "},
+            {Expression.OP_SUB, " - "},
+            {Expression.OP_MUL, " * "},
+            {Expression.OP_DIV, " / "},
+            {Expression.OP_EQ, " == "},
+            {Expression.OP_GT, " > "},
+            {Expression.OP_LT, " < "},
+            {Expression.OP_GTEQ, " >= "},
+            {Expression.OP_LTEQ, " <= "},
+            {Expression.OP_NOTEQ, " != "},
+            {Expression.OP_DISTINCT, ""}
+    }).collect(Collectors.toMap(p -> (Operator) p[0], p -> (String) p[1]));
 
     /**
      * Convenience method returning if the supplied name is a keyword for this query language.
@@ -192,70 +215,12 @@ public class JDOQLQueryHelper
                 str.append(JDOQLQueryHelper.getJDOQLForExpression(left));
             }
 
+            String opString = DYADIC_OP_JDOQL_MAP.get(dyExpr.getOperator());
+
             // Special cases
-            if (dyExpr.getOperator() == Expression.OP_AND)
+            if (opString != null)
             {
-                str.append(" && ");
-            }
-            else if (dyExpr.getOperator() == Expression.OP_OR)
-            {
-                str.append(" || ");
-            }
-            else if (dyExpr.getOperator() == Expression.OP_BIT_AND)
-            {
-                str.append(" & ");
-            }
-            else if (dyExpr.getOperator() == Expression.OP_BIT_OR)
-            {
-                str.append(" | ");
-            }
-            else if (dyExpr.getOperator() == Expression.OP_BIT_XOR)
-            {
-                str.append(" ^ ");
-            }
-            else if (dyExpr.getOperator() == Expression.OP_ADD)
-            {
-                str.append(" + ");
-            }
-            else if (dyExpr.getOperator() == Expression.OP_SUB)
-            {
-                str.append(" - ");
-            }
-            else if (dyExpr.getOperator() == Expression.OP_MUL)
-            {
-                str.append(" * ");
-            }
-            else if (dyExpr.getOperator() == Expression.OP_DIV)
-            {
-                str.append(" / ");
-            }
-            else if (dyExpr.getOperator() == Expression.OP_EQ)
-            {
-                str.append(" == ");
-            }
-            else if (dyExpr.getOperator() == Expression.OP_GT)
-            {
-                str.append(" > ");
-            }
-            else if (dyExpr.getOperator() == Expression.OP_LT)
-            {
-                str.append(" < ");
-            }
-            else if (dyExpr.getOperator() == Expression.OP_GTEQ)
-            {
-                str.append(" >= ");
-            }
-            else if (dyExpr.getOperator() == Expression.OP_LTEQ)
-            {
-                str.append(" <= ");
-            }
-            else if (dyExpr.getOperator() == Expression.OP_NOTEQ)
-            {
-                str.append(" != ");
-            }
-            else if (dyExpr.getOperator() == Expression.OP_DISTINCT)
-            {
-                // Processed above
+                str.append(opString);
             }
             else
             {
