@@ -316,6 +316,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
      * This implementation supports "COUNT" method. 
      * Override this in subclasses to implement other methods.
      * @return The size
+     * @throws ArithmeticException if the size overflows the integer return type
      */
     protected int getSizeUsingMethod()
     {
@@ -363,7 +364,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
                     }
 
                     countQuery.closeAll();
-                    return (int)count;
+                    return Math.toIntExact(count);
                 }
                 else if (query.getCompilation().getQueryLanguage().equalsIgnoreCase(Query.LANGUAGE_JPQL))
                 {
@@ -396,7 +397,7 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
                     }
 
                     countQuery.closeAll();
-                    return (int)count;
+                    return Math.toIntExact(count);
                 }
             }
 
