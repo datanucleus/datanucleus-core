@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -493,38 +494,7 @@ public class MetaDataUtils
         }
 
         // Remove all duplicates from the list but retain the original ordering
-        int noOfDups = 0;
-        for (int i=0;i<implTypes.length;i++)
-        {
-            for (int j=0;j<i;j++)
-            {
-                if (implTypes[j].equals(implTypes[i]))
-                {
-                    noOfDups++;
-                    break;
-                }
-            }
-        }
-        String[] impls = new String[implTypes.length-noOfDups];
-        int n = 0;
-        for (int i=0;i<implTypes.length;i++)
-        {
-            boolean dup = false;
-            for (int j=0;j<i;j++)
-            {
-                if (implTypes[j].equals(implTypes[i]))
-                {
-                    dup = true;
-                    break;
-                }
-            }
-            if (!dup)
-            {
-                impls[n++] = implTypes[i];
-            }
-        }
-
-        return impls;
+        return new LinkedHashSet<>(Arrays.asList(implTypes)).toArray(new String[0]);
     }
 
     /**
