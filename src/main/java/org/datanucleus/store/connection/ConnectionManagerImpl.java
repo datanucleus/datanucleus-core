@@ -20,6 +20,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.connection;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -226,8 +227,7 @@ public class ConnectionManagerImpl implements ConnectionManager
         Map<String, Object> options = null;
         if (isolationLevel >= 0)
         {
-            options = new HashMap<>();
-            options.put(Transaction.TRANSACTION_ISOLATION_OPTION, Integer.valueOf(isolationLevel));
+            options = Collections.singletonMap(Transaction.TRANSACTION_ISOLATION_OPTION, isolationLevel);
         }
 
         ManagedConnection mconn = allocateManagedConnection(primary, null, null, options);
