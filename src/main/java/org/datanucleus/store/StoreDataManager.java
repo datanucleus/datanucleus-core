@@ -64,7 +64,8 @@ public class StoreDataManager
      */
     protected void registerStoreData(StoreData data)
     {
-        // Index any classes by the class name
+        // storeDataByClass is keyed by either the class name (when FCO) or
+        // the (fully-qualified) field name (when SCO)
         if (storeDataByClass.containsKey(data.getName()))
         {
             return;
