@@ -57,16 +57,6 @@ public class StoreData
 
     /**
      * Constructor.
-     * @param name Fully-qualified ame of the class/member.
-     * @param type Type of data (FCO/SCO)
-     */
-    public StoreData(String name, Type type)
-    {
-        this(name, null, type, null);
-    }
-
-    /**
-     * Constructor.
      * @param name Fully-qualified name of the class/member.
      * @param metadata MetaData for the class or field (if available)
      * @param type Type of data (FCO/SCO)

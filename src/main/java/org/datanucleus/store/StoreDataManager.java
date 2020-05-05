@@ -35,10 +35,10 @@ import org.datanucleus.util.NucleusLogger;
 public class StoreDataManager
 {
     /** Map of all managed store data, keyed by the class/field name. */
-    protected Map<String, StoreData> storeDataByClass = new ConcurrentHashMap<String, StoreData>();
+    protected Map<String, StoreData> storeDataByName = new ConcurrentHashMap<String, StoreData>();
 
     /** the memory image of schema data before running it **/
-    protected Map<String, StoreData> savedStoreDataByClass;
+    protected Map<String, StoreData> savedStoreDataByName;
 
     /**
      * Clear the cache
@@ -50,12 +50,12 @@ public class StoreDataManager
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("032002"));
         }
 
-        storeDataByClass.clear();
+        storeDataByName.clear();
     }
 
     public void deregisterClass(String className)
     {
-        storeDataByClass.remove(className);
+        storeDataByName.remove(className);
     }
 
     /**
@@ -64,14 +64,13 @@ public class StoreDataManager
      */
     protected void registerStoreData(StoreData data)
     {
-        // storeDataByClass is keyed by either the class name (when FCO) or
-        // the (fully-qualified) field name (when SCO)
-        if (storeDataByClass.containsKey(data.getName()))
+        // storeDataByClass is keyed by either the class name (when FCO) or the (fully-qualified) field name (when SCO)
+        if (storeDataByName.containsKey(data.getName()))
         {
             return;
         }
 
-        storeDataByClass.put(data.getName(), data);
+        storeDataByName.put(data.getName(), data);
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
@@ -92,7 +91,7 @@ public class StoreDataManager
     {
         Collection<StoreData> results = null;
 
-        Collection storeDatas = storeDataByClass.values();
+        Collection storeDatas = storeDataByName.values();
         Iterator<StoreData> iterator = storeDatas.iterator();
         while (iterator.hasNext())
         {
@@ -120,13 +119,13 @@ public class StoreDataManager
     }
 
     /**
-     * Accessor for whether the specified class is managed currently
-     * @param className The name of the class
+     * Accessor for whether the specified class (when FCO) or fully qualified field (when SCO) is managed currently
+     * @param className The name of the class (or fully qualified field)
      * @return Whether it is managed
      */
     public boolean managesClass(String className)
     {
-        return storeDataByClass.containsKey(className);
+        return storeDataByName.containsKey(className);
     }
     
     /**
@@ -135,27 +134,27 @@ public class StoreDataManager
      */
     public Collection<StoreData> getManagedStoreData()
     {
-        return Collections.unmodifiableCollection(storeDataByClass.values());
+        return Collections.unmodifiableCollection(storeDataByName.values());
     }
 
     /**
-     * Get the StoreData by the given className
-     * @param className the fully qualified class name
+     * Get the StoreData by the given class name
+     * @param name the fully qualified class name
      * @return the StoreData
      */
     public StoreData get(String className)
     {
-        return storeDataByClass.get(className);
+        return storeDataByName.get(className);
     }
 
     /**
-     * Get the StoreData by the given field/property, if it has some specific store data component (join table).
+     * Get the StoreData by the given field/property when SCO, if it has some specific store data component (join table).
      * @param mmd metadata for the the field/property
      * @return the StoreData
      */
     public StoreData get(AbstractMemberMetaData mmd)
     {
-        return storeDataByClass.get(mmd.getFullFieldName());
+        return storeDataByName.get(mmd.getFullFieldName());
     }
 
     /**
@@ -164,7 +163,7 @@ public class StoreDataManager
      */
     public int size()
     {
-        return storeDataByClass.size();
+        return storeDataByName.size();
     }
 
     /**
@@ -172,7 +171,7 @@ public class StoreDataManager
      */
     public void begin()
     {
-        savedStoreDataByClass = new ConcurrentHashMap<String, StoreData>(storeDataByClass);
+        savedStoreDataByName = new ConcurrentHashMap<String, StoreData>(storeDataByName);
     }
     
     /**
@@ -180,8 +179,8 @@ public class StoreDataManager
      */
     public void rollback()
     {
-        storeDataByClass = savedStoreDataByClass;
-        savedStoreDataByClass = null;
+        storeDataByName = savedStoreDataByName;
+        savedStoreDataByName = null;
     }
     
     /**
@@ -189,6 +188,6 @@ public class StoreDataManager
      */
     public void commit()
     {
-        savedStoreDataByClass = null;
+        savedStoreDataByName = null;
     }
 }

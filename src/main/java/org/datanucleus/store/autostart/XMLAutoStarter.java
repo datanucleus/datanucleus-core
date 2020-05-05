@@ -144,7 +144,8 @@ public class XMLAutoStarter extends AbstractAutoStartMechanism
         {
             Element element = (Element) classElements.item(i);
 
-            StoreData data = new StoreData(element.getAttribute("name"), element.getAttribute("type").equals("FCO") ? StoreData.Type.FCO : StoreData.Type.SCO);
+            // TODO Likely should just use "FCO" here since these are all classes, not fields
+            StoreData data = new StoreData(element.getAttribute("name"), null, element.getAttribute("type").equals("FCO") ? StoreData.Type.FCO : StoreData.Type.SCO, null);
             autoStartClasses.add(data.getName());
 
             NamedNodeMap attributeMap = element.getAttributes();
