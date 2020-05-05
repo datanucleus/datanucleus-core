@@ -38,16 +38,14 @@ public class URLStringConverter implements TypeConverter<URL, String>
             return null;
         }
 
-        URL url = null;
         try
         {
-            url = new java.net.URL(str.trim());
+            return new java.net.URL(str.trim());
         }
         catch (MalformedURLException mue)
         {
             throw new NucleusDataStoreException(Localiser.msg("016002", str, URL.class.getName()), mue);
         }
-        return url;
     }
 
     public String toDatastoreType(URL url)

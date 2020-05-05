@@ -17,9 +17,9 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.converters;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
@@ -32,29 +32,8 @@ import org.datanucleus.util.Localiser;
 public class DateStringConverter implements TypeConverter<Date, String>, ColumnLengthDefiningTypeConverter
 {
     private static final long serialVersionUID = 4638239842151376340L;
-    private static final ThreadLocal<FormatterInfo> formatterThreadInfo = new ThreadLocal<FormatterInfo>()
-    {
-        protected FormatterInfo initialValue()
-        {
-            return new FormatterInfo();
-        }
-    };
 
-    static class FormatterInfo
-    {
-        SimpleDateFormat formatter;
-    }
-
-    private DateFormat getFormatter()
-    {
-        FormatterInfo formatInfo = formatterThreadInfo.get();
-        if (formatInfo.formatter == null)
-        {
-            // TODO Handle millisecs
-            formatInfo.formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-        }
-        return formatInfo.formatter;
-    }
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy");
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.types.converters.ColumnLengthDefiningTypeConverter#getDefaultColumnLength(int)
@@ -78,9 +57,9 @@ public class DateStringConverter implements TypeConverter<Date, String>, ColumnL
 
         try
         {
-            return getFormatter().parse(str);
+            return Date.from(Instant.from(FORMATTER.parse(str)));
         }
-        catch (ParseException pe)
+        catch (DateTimeParseException pe)
         {
             throw new NucleusDataStoreException(Localiser.msg("016002", str, Date.class.getName()), pe);
         }
@@ -88,6 +67,6 @@ public class DateStringConverter implements TypeConverter<Date, String>, ColumnL
 
     public String toDatastoreType(Date date)
     {
-        return date != null ? getFormatter().format(date) : null;
+        return date != null ? FORMATTER.format(date.toInstant()) : null;
     }
 }

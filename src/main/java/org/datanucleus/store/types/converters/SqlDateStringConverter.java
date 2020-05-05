@@ -19,6 +19,9 @@ package org.datanucleus.store.types.converters;
 
 import java.sql.Date;
 
+import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
+
 /**
  * Class to handle the conversion between java.sql.Date and a String form.
  */
@@ -33,7 +36,14 @@ public class SqlDateStringConverter implements TypeConverter<Date, String>
             return null;
         }
 
-        return java.sql.Date.valueOf(str);
+        try
+        {
+            return java.sql.Date.valueOf(str);
+        }
+        catch (IllegalArgumentException iae)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("016002", str, Date.class.getName()), iae);
+        }
     }
 
     public String toDatastoreType(Date date)

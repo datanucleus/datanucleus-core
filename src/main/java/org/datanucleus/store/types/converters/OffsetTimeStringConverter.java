@@ -18,9 +18,10 @@ Contributors:
 package org.datanucleus.store.types.converters;
 
 import java.time.OffsetTime;
+import java.time.format.DateTimeParseException;
 
-import org.datanucleus.store.types.converters.ColumnLengthDefiningTypeConverter;
-import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
 
 /**
  * Class to handle the conversion between java.time.OffsetTime and a String form.
@@ -35,8 +36,14 @@ public class OffsetTimeStringConverter implements TypeConverter<OffsetTime, Stri
         {
             return null;
         }
-
-        return OffsetTime.parse(str);
+        try
+        {
+            return OffsetTime.parse(str);
+        }
+        catch (DateTimeParseException pe)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("016002", str, OffsetTime.class.getName()), pe);
+        }
     }
 
     public String toDatastoreType(OffsetTime time)

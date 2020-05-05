@@ -17,6 +17,9 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.converters;
 
+import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
+
 /**
  * Class to handle the conversion between java.lang.Long and a String form.
  */
@@ -37,7 +40,7 @@ public class LongStringConverter implements TypeConverter<Long, String>
         }
         catch (NumberFormatException nfe)
         {
-            return null;
+            throw new NucleusDataStoreException(Localiser.msg("016002", str, Long.class.getName()), nfe);
         }
     }
 
@@ -47,6 +50,6 @@ public class LongStringConverter implements TypeConverter<Long, String>
         {
             return null;
         }
-        return "" + val;
+        return val.toString();
     }
 }

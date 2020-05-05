@@ -18,8 +18,10 @@ Contributors:
 package org.datanucleus.store.types.converters;
 
 import java.time.Period;
+import java.time.format.DateTimeParseException;
 
-import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
 
 /**
  * Class to handle the conversion between java.time.Period and a String form.
@@ -35,7 +37,14 @@ public class PeriodStringConverter implements TypeConverter<Period, String>
             return null;
         }
 
-        return Period.parse(str);
+        try
+        {
+            return Period.parse(str);
+        }
+        catch (DateTimeParseException pe)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("016002", str, Period.class.getName()), pe);
+        }
     }
 
     public String toDatastoreType(Period per)

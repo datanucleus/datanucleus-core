@@ -18,9 +18,10 @@ Contributors:
 package org.datanucleus.store.types.converters;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
-import org.datanucleus.store.types.converters.ColumnLengthDefiningTypeConverter;
-import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
 
 /**
  * Class to handle the conversion between java.time.LocalDate and a String form.
@@ -36,7 +37,14 @@ public class LocalDateStringConverter implements TypeConverter<LocalDate, String
             return null;
         }
 
-        return LocalDate.parse(str);
+        try
+        {
+            return LocalDate.parse(str);
+        }
+        catch (DateTimeParseException pe)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("016002", str, LocalDate.class.getName()), pe);
+        }
     }
 
     public String toDatastoreType(LocalDate date)

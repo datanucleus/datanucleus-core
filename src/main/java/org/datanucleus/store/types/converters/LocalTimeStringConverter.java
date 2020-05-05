@@ -18,9 +18,12 @@ Contributors:
 package org.datanucleus.store.types.converters;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 
+import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.store.types.converters.ColumnLengthDefiningTypeConverter;
 import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.util.Localiser;
 
 /**
  * Class to handle the conversion between java.time.LocalTime and a String form.
@@ -36,7 +39,14 @@ public class LocalTimeStringConverter implements TypeConverter<LocalTime, String
             return null;
         }
 
-        return LocalTime.parse(str);
+        try
+        {
+            return LocalTime.parse(str);
+        }
+        catch (DateTimeParseException pe)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("016002", str, LocalTime.class.getName()), pe);
+        }
     }
 
     public String toDatastoreType(LocalTime date)
