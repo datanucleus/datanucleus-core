@@ -64,24 +64,14 @@ public class StoreDataManager
      */
     protected void registerStoreData(StoreData data)
     {
-        if (data.isFCO())
+        // storeDataByClass is keyed by either the class name (when FCO) or
+        // the (fully-qualified) field name (when SCO)
+        if (storeDataByClass.containsKey(data.getName()))
         {
-            // Index any classes by the class name
-            if (storeDataByClass.containsKey(data.getName()))
-            {
-                return;
-            }
-            storeDataByClass.put(data.getName(), data); // Keyed by class name
+            return;
         }
-        else
-        {
-            // Index any fields by the name of the field
-            if (storeDataByClass.containsKey(data.getName()))
-            {
-                return;
-            }
-            storeDataByClass.put(data.getName(), data); // Keyed by AbstractMemberMetaData
-        }
+
+        storeDataByClass.put(data.getName(), data);
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
