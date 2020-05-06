@@ -33,7 +33,10 @@ package org.datanucleus.util;
 /**
  * A Base64 Encoder/Decoder.
  * <p>This class is used to encode and decode data in Base64 format as described in RFC 1521.
+ *
+ * @deprecated Replaced by {@link java.util.Base64}
  */
+@Deprecated
 public class Base64
 {
     // Mapping table from 6-bit nibbles to Base64 characters.
