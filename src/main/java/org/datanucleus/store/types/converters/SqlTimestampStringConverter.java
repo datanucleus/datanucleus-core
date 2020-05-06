@@ -19,6 +19,9 @@ package org.datanucleus.store.types.converters;
 
 import java.sql.Timestamp;
 
+import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
+
 /**
  * Class to handle the conversion between java.sql.Timestamp and a String form.
  */
@@ -33,7 +36,14 @@ public class SqlTimestampStringConverter implements TypeConverter<Timestamp, Str
             return null;
         }
 
-        return java.sql.Timestamp.valueOf(str);
+        try
+        {
+            return java.sql.Timestamp.valueOf(str);
+        }
+        catch (IllegalArgumentException iae)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("016002", str, Timestamp.class.getName()), iae);
+        }
     }
 
     public String toDatastoreType(Timestamp ts)

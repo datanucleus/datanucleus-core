@@ -17,9 +17,11 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.converters;
 
+import java.time.DateTimeException;
 import java.time.ZoneId;
 
-import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
 
 /**
  * Class to handle the conversion between java.time.ZoneId and String.
@@ -35,7 +37,14 @@ public class ZoneIdStringConverter implements TypeConverter<ZoneId, String>
             return null;
         }
 
-        return ZoneId.of(str);
+        try
+        {
+            return ZoneId.of(str);
+        }
+        catch (DateTimeException dte)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("016002", str, ZoneId.class.getName()), dte);
+        }
     }
 
     public String toDatastoreType(ZoneId zone)

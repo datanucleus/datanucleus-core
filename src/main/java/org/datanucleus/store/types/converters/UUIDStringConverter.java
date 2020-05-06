@@ -19,6 +19,8 @@ package org.datanucleus.store.types.converters;
 
 import java.util.UUID;
 
+import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -35,7 +37,14 @@ public class UUIDStringConverter implements TypeConverter<UUID, String>, ColumnL
             return null;
         }
 
-        return UUID.fromString(str);
+        try
+        {
+            return UUID.fromString(str);
+        }
+        catch (IllegalArgumentException iae)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("016002", str, UUID.class.getName()), iae);
+        }
     }
 
     public String toDatastoreType(UUID uuid)

@@ -17,9 +17,11 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.converters;
 
+import java.time.DateTimeException;
 import java.time.ZoneOffset;
 
-import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
 
 /**
  * Class to handle the conversion between java.time.ZoneOffset and String.
@@ -35,7 +37,14 @@ public class ZoneOffsetStringConverter implements TypeConverter<ZoneOffset, Stri
             return null;
         }
 
-        return ZoneOffset.of(str);
+        try
+        {
+            return ZoneOffset.of(str);
+        }
+        catch (DateTimeException dte)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("016002", str, ZoneOffset.class.getName()), dte);
+        }
     }
 
     public String toDatastoreType(ZoneOffset offset)

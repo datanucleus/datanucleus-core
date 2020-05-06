@@ -19,6 +19,9 @@ package org.datanucleus.store.types.converters;
 
 import java.sql.Time;
 
+import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
+
 /**
  * Class to handle the conversion between java.sql.Time and a String form.
  */
@@ -33,7 +36,14 @@ public class SqlTimeStringConverter implements TypeConverter<Time, String>
             return null;
         }
 
-        return java.sql.Time.valueOf(str);
+        try
+        {
+            return java.sql.Time.valueOf(str);
+        }
+        catch (IllegalArgumentException iae)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("016002", str, Time.class.getName()), iae);
+        }
     }
 
     public String toDatastoreType(Time time)

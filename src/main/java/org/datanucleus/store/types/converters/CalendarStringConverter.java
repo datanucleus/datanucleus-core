@@ -17,11 +17,11 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.converters;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAccessor;
 import java.util.Calendar;
-import java.util.Date;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.util.Localiser;
@@ -33,28 +33,8 @@ import org.datanucleus.util.Localiser;
 public class CalendarStringConverter implements TypeConverter<Calendar, String>, ColumnLengthDefiningTypeConverter
 {
     private static final long serialVersionUID = -4905708644688677004L;
-    private static final ThreadLocal<FormatterInfo> formatterThreadInfo = new ThreadLocal<FormatterInfo>()
-    {
-        protected FormatterInfo initialValue()
-        {
-            return new FormatterInfo();
-        }
-    };
 
-    static class FormatterInfo
-    {
-        SimpleDateFormat formatter;
-    }
-
-    private DateFormat getFormatter()
-    {
-        FormatterInfo formatInfo = formatterThreadInfo.get();
-        if (formatInfo.formatter == null)
-        {
-            formatInfo.formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-        }
-        return formatInfo.formatter;
-    }
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy");
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.types.converters.ColumnLengthDefiningTypeConverter#getDefaultColumnLength(int)
@@ -78,12 +58,11 @@ public class CalendarStringConverter implements TypeConverter<Calendar, String>,
 
         try
         {
-            Date date = getFormatter().parse(str);
             Calendar cal = Calendar.getInstance();
-            cal.setTime(date);
+            cal.setTimeInMillis(Instant.from(FORMATTER.parse(str)).toEpochMilli());
             return cal;
         }
-        catch (ParseException pe)
+        catch (DateTimeParseException pe)
         {
             throw new NucleusDataStoreException(Localiser.msg("016002", str, Calendar.class.getName()), pe);
         }
@@ -91,6 +70,6 @@ public class CalendarStringConverter implements TypeConverter<Calendar, String>,
 
     public String toDatastoreType(Calendar cal)
     {
-        return cal != null ? getFormatter().format(cal.getTime()) : null;
+        return cal != null ? FORMATTER.format(cal.getTime().toInstant()) : null;
     }
 }

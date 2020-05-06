@@ -17,6 +17,11 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.converters;
 
+import java.util.Calendar;
+
+import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
+
 /**
  * Class to handle the conversion between java.lang.Integer and a String form.
  */
@@ -37,7 +42,7 @@ public class IntegerStringConverter implements TypeConverter<Integer, String>
         }
         catch (NumberFormatException nfe)
         {
-            return null;
+            throw new NucleusDataStoreException(Localiser.msg("016002", str, Integer.class.getName()), nfe);
         }
     }
 
@@ -47,6 +52,6 @@ public class IntegerStringConverter implements TypeConverter<Integer, String>
         {
             return null;
         }
-        return "" + val;
+        return val.toString();
     }
 }

@@ -19,6 +19,8 @@ package org.datanucleus.store.types.converters;
 
 import java.net.URI;
 
+import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -35,7 +37,14 @@ public class URIStringConverter implements TypeConverter<URI, String>
             return null;
         }
 
-        return java.net.URI.create(str.trim());
+        try
+        {
+            return java.net.URI.create(str.trim());
+        }
+        catch (IllegalArgumentException iae)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("016002", str, URI.class.getName()), iae);
+        }
     }
 
     public String toDatastoreType(URI uri)
