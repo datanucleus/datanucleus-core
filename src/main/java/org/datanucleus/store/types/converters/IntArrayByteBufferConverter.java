@@ -39,9 +39,7 @@ public class IntArrayByteBufferConverter implements TypeConverter<int[], ByteBuf
             return null;
         }
         byte[] bytes = TypeConversionHelper.getByteArrayFromIntArray(memberValue);
-        ByteBuffer byteBuffer = ByteBuffer.allocate(bytes.length);
-        byteBuffer.put(bytes);
-        return byteBuffer;
+        return ByteBuffer.wrap(bytes);
     }
 
     /* (non-Javadoc)

@@ -39,9 +39,7 @@ public class BooleanArrayByteBufferConverter implements TypeConverter<boolean[],
             return null;
         }
         byte[] bytes = TypeConversionHelper.getByteArrayFromBooleanArray(memberValue);
-        ByteBuffer byteBuffer = ByteBuffer.allocate(bytes.length);
-        byteBuffer.put(bytes);
-        return byteBuffer;
+        return ByteBuffer.wrap(bytes);
     }
 
     /* (non-Javadoc)

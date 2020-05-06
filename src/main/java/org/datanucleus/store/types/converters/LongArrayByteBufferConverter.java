@@ -39,9 +39,7 @@ public class LongArrayByteBufferConverter implements TypeConverter<long[], ByteB
             return null;
         }
         byte[] bytes = TypeConversionHelper.getByteArrayFromLongArray(memberValue);
-        ByteBuffer byteBuffer = ByteBuffer.allocate(bytes.length);
-        byteBuffer.put(bytes);
-        return byteBuffer;
+        return ByteBuffer.wrap(bytes);
     }
 
     /* (non-Javadoc)

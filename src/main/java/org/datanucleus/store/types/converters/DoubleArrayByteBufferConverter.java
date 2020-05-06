@@ -39,9 +39,7 @@ public class DoubleArrayByteBufferConverter implements TypeConverter<double[], B
             return null;
         }
         byte[] bytes = TypeConversionHelper.getByteArrayFromDoubleArray(memberValue);
-        ByteBuffer byteBuffer = ByteBuffer.allocate(bytes.length);
-        byteBuffer.put(bytes);
-        return byteBuffer;
+        return ByteBuffer.wrap(bytes);
     }
 
     /* (non-Javadoc)

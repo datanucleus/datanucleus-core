@@ -39,9 +39,7 @@ public class CharArrayByteBufferConverter implements TypeConverter<char[], ByteB
             return null;
         }
         byte[] bytes = TypeConversionHelper.getByteArrayFromCharArray(memberValue);
-        ByteBuffer byteBuffer = ByteBuffer.allocate(bytes.length);
-        byteBuffer.put(bytes);
-        return byteBuffer;
+        return ByteBuffer.wrap(bytes);
     }
 
     /* (non-Javadoc)
