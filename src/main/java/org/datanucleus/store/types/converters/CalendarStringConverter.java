@@ -20,7 +20,6 @@ package org.datanucleus.store.types.converters;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.temporal.TemporalAccessor;
 import java.util.Calendar;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;

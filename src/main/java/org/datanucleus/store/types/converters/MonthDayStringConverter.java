@@ -18,7 +18,6 @@ Contributors:
 package org.datanucleus.store.types.converters;
 
 import java.time.MonthDay;
-import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;

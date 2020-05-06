@@ -17,8 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.converters;
 
-import java.util.Calendar;
-
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.util.Localiser;
 
