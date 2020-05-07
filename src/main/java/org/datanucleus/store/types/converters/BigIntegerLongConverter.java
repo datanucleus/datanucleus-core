@@ -19,9 +19,6 @@ package org.datanucleus.store.types.converters;
 
 import java.math.BigInteger;
 
-import org.datanucleus.exceptions.NucleusDataStoreException;
-import org.datanucleus.util.Localiser;
-
 /**
  * Class to handle the conversion between java.math.BigInteger and a Long form.
  */
@@ -36,14 +33,7 @@ public class BigIntegerLongConverter implements TypeConverter<BigInteger, Long>
             return null;
         }
 
-        try
-        {
-            return BigInteger.valueOf(val);
-        }
-        catch (NumberFormatException nfe)
-        {
-            throw new NucleusDataStoreException(Localiser.msg("016002", val, BigInteger.class.getName()), nfe);
-        }
+        return BigInteger.valueOf(val);
     }
 
     public Long toDatastoreType(BigInteger bi)

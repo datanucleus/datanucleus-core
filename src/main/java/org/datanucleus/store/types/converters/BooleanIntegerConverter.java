@@ -17,9 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.converters;
 
-import org.datanucleus.exceptions.NucleusDataStoreException;
-import org.datanucleus.util.Localiser;
-
 /**
  * Class to handle the conversion between java.lang.Boolean and an Integer (0, 1) form.
  */
@@ -34,14 +31,7 @@ public class BooleanIntegerConverter implements TypeConverter<Boolean, Integer>
             return null;
         }
 
-        try
-        {
-            return val == 1 ? true : false;
-        }
-        catch (NumberFormatException nfe)
-        {
-            throw new NucleusDataStoreException(Localiser.msg("016002", val, Boolean.class.getName()), nfe);
-        }
+        return val == 1 ? true : false;
     }
 
     public Integer toDatastoreType(Boolean bool)
