@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
@@ -44,18 +45,15 @@ public class BufferedImageByteArrayConverter implements TypeConverter<BufferedIm
             return null;
         }
 
-        byte[] bytes = null;
-        try
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(8192))
         {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(8192);
             ImageIO.write(memberValue, "jpg", baos);
-            bytes = baos.toByteArray();
-            baos.close();
+            return baos.toByteArray();
         }
-        catch (IOException e)
+        catch (IOException ioe)
         {
+            throw new NucleusException("Error serialising object of type BufferedImage to byte array", ioe);
         }
-        return bytes;
     }
 
     /* (non-Javadoc)
@@ -74,7 +72,7 @@ public class BufferedImageByteArrayConverter implements TypeConverter<BufferedIm
         }
         catch (IOException ioe)
         {
-            return null;
+            throw new NucleusException("Error deserialising image datastoreValue", ioe);
         }
     }
 }
