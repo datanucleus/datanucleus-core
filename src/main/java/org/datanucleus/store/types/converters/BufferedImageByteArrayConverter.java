@@ -24,8 +24,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.exceptions.NucleusDataStoreException;
 
 /**
  * Convenience class to handle Java serialisation of a BufferedImage object to/from byte[].
@@ -52,7 +51,7 @@ public class BufferedImageByteArrayConverter implements TypeConverter<BufferedIm
         }
         catch (IOException ioe)
         {
-            throw new NucleusException("Error serialising object of type BufferedImage to byte array", ioe);
+            throw new NucleusDataStoreException("Error serialising object of type BufferedImage to byte array", ioe);
         }
     }
 
@@ -72,7 +71,7 @@ public class BufferedImageByteArrayConverter implements TypeConverter<BufferedIm
         }
         catch (IOException ioe)
         {
-            throw new NucleusException("Error deserialising image datastoreValue", ioe);
+            throw new NucleusDataStoreException("Error deserialising image datastoreValue", ioe);
         }
     }
 }
