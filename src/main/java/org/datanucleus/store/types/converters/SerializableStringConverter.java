@@ -23,10 +23,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Base64;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.types.converters.TypeConverter;
-import org.datanucleus.util.Base64;
 
 /**
  * Convenience class to handle Java serialisation of a Serializable object to/from String.
@@ -51,7 +51,7 @@ public class SerializableStringConverter implements TypeConverter<Serializable, 
             {
                 oos = new ObjectOutputStream(baos);
                 oos.writeObject(memberValue);
-                str = new String(Base64.encode(baos.toByteArray()));
+                str = Base64.getEncoder().encodeToString(baos.toByteArray());
             }
             finally
             {
@@ -81,7 +81,7 @@ public class SerializableStringConverter implements TypeConverter<Serializable, 
      */
     public Serializable toMemberType(String datastoreValue)
     {
-        byte[] bytes = Base64.decode(datastoreValue);
+        byte[] bytes = Base64.getDecoder().decode(datastoreValue);
         Serializable obj = null;
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
         ObjectInputStream ois = null;
