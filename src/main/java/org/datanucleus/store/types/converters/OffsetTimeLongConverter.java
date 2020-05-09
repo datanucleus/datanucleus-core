@@ -17,8 +17,12 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.converters;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import org.datanucleus.store.types.converters.TypeConverter;
 
@@ -36,8 +40,8 @@ public class OffsetTimeLongConverter implements TypeConverter<OffsetTime, Long>
             return null;
         }
 
-        LocalTime time = LocalTime.ofNanoOfDay(val);
-        return OffsetTime.from(time);
+        ZonedDateTime time_zoned = LocalDateTime.of(LocalDate.now(), LocalTime.ofNanoOfDay(val)).atZone(ZoneId.systemDefault());
+        return OffsetTime.from(time_zoned);
     }
 
     public Long toDatastoreType(OffsetTime time)
