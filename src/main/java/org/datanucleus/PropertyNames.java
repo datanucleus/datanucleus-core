@@ -203,6 +203,7 @@ public class PropertyNames
     public static final String PROPERTY_SCHEMA_VALIDATE_TABLES = "datanucleus.schema.validateTables";
     public static final String PROPERTY_SCHEMA_VALIDATE_COLUMNS = "datanucleus.schema.validateColumns";
     public static final String PROPERTY_SCHEMA_VALIDATE_CONSTRAINTS = "datanucleus.schema.validateConstraints";
+    public static final String PROPERTY_SCHEMA_TXN_ISOLATION = "datanucleus.schema.transactionIsolation";
 
     public static final String PROPERTY_VALIDATION_MODE = "datanucleus.validation.mode";
     public static final String PROPERTY_VALIDATION_GROUP_PREPERSIST = "datanucleus.validation.group.pre-persist";
