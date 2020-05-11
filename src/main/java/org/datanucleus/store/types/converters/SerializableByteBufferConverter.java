@@ -25,8 +25,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 
-import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.exceptions.NucleusDataStoreException;
 
 /**
  * Convenience class to handle Java serialisation of a Serializable object to/from ByteBuffer.
@@ -46,38 +45,18 @@ public class SerializableByteBufferConverter implements TypeConverter<Serializab
             return null;
         }
 
-        byte[] bytes = null;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = null;
-        try
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream())
         {
-            try
+            try (ObjectOutputStream oos = new ObjectOutputStream(baos))
             {
-                oos = new ObjectOutputStream(baos);
                 oos.writeObject(memberValue);
-                bytes = baos.toByteArray();
             }
-            finally
-            {
-                try
-                {
-                    baos.close();
-                }
-                finally
-                {
-                    if (oos != null)
-                    {
-                        oos.close();
-                    }
-                }
-            }
+            return ByteBuffer.wrap(baos.toByteArray());
         }
         catch (IOException ioe)
         {
-            throw new NucleusException("Error serialising object of type " + memberValue.getClass().getName() + " to ByteBuffer", ioe);
+            throw new NucleusDataStoreException("Error serialising object of type " + memberValue.getClass().getName() + " to ByteBuffer", ioe);
         }
-
-        return ByteBuffer.wrap(bytes);
     }
 
     /* (non-Javadoc)
@@ -90,37 +69,18 @@ public class SerializableByteBufferConverter implements TypeConverter<Serializab
             return null;
         }
 
-        Serializable obj = null;
-        byte [] dataStoreValueInBytes = new byte[datastoreValue.remaining()];
+        byte[] dataStoreValueInBytes = new byte[datastoreValue.remaining()];
         datastoreValue.get(dataStoreValueInBytes);
-        ByteArrayInputStream bais = new ByteArrayInputStream(dataStoreValueInBytes);
-        ObjectInputStream ois = null;
-        try
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(dataStoreValueInBytes))
         {
-            try
+            try (ObjectInputStream ois = new ObjectInputStream(bais))
             {
-                ois = new ObjectInputStream(bais);
-                obj = (Serializable)ois.readObject();
-            }
-            finally
-            {
-                try
-                {
-                    bais.close();
-                }
-                finally
-                {
-                    if (ois != null)
-                    {
-                        ois.close();
-                    }
-                }
+                return (Serializable) ois.readObject();
             }
         }
         catch (Exception e)
         {
-            throw new NucleusException("Error deserialising " + datastoreValue, e);
+            throw new NucleusDataStoreException("Error deserialising " + datastoreValue, e);
         }
-        return obj;
     }
 }
