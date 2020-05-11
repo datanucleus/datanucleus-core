@@ -25,8 +25,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 
-import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.exceptions.NucleusDataStoreException;
 
 /**
  * Convenience class to handle Java serialisation of a Serializable object to/from ByteBuffer.
@@ -56,7 +55,7 @@ public class SerializableByteBufferConverter implements TypeConverter<Serializab
         }
         catch (IOException ioe)
         {
-            throw new NucleusException("Error serialising object of type " + memberValue.getClass().getName() + " to ByteBuffer", ioe);
+            throw new NucleusDataStoreException("Error serialising object of type " + memberValue.getClass().getName() + " to ByteBuffer", ioe);
         }
     }
 
@@ -81,7 +80,7 @@ public class SerializableByteBufferConverter implements TypeConverter<Serializab
         }
         catch (Exception e)
         {
-            throw new NucleusException("Error deserialising " + datastoreValue, e);
+            throw new NucleusDataStoreException("Error deserialising " + datastoreValue, e);
         }
     }
 }
