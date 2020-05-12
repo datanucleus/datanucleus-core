@@ -1129,16 +1129,27 @@ public class ClassUtils
         }
         else
         {
-            baseType = type.substring(type.lastIndexOf('.')+1);
+            baseType = type.substring(type.lastIndexOf('.') + 1);
         }
 
         // Check against our known (supported) java.lang classes
-        if (baseType.equals("String") || baseType.equals("Object") || baseType.equals("Boolean") || baseType.equals("Byte") ||
-            baseType.equals("Character") || baseType.equals("Double") || baseType.equals("Float") || baseType.equals("Integer") ||
-            baseType.equals("Long") || baseType.equals("Short") || baseType.equals("Number") || baseType.equals("StringBuffer") || baseType.equals("StringBuilder"))
-        {
-            return "java.lang." + baseType;
+        switch (baseType) {
+            case "String" :
+            case "Object" :
+            case "Boolean":
+            case "Byte":
+            case "Character":
+            case "Double":
+            case "Float":
+            case "Integer":
+            case "Long":
+            case "Short":
+            case "Number":
+            case "StringBuffer":
+            case "StringBuilder":
+                return "java.lang." + baseType;
         }
+
         return type;
     }
 
