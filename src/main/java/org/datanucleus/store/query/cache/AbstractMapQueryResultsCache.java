@@ -23,6 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.datanucleus.NucleusContext;
 import org.datanucleus.PropertyNames;
@@ -37,6 +39,8 @@ import org.datanucleus.util.NucleusLogger;
 public class AbstractMapQueryResultsCache implements QueryResultsCache
 {
     private static final long serialVersionUID = -1071931192920096219L;
+
+    private static final Pattern EVICT_PATTERN = Pattern.compile("(JDOQL|JPQL):.* FROM (.*)");
 
     /** Keys to pin, if entering into the cache. */
     Set<String> keysToPin = new HashSet<String>();
@@ -85,20 +89,15 @@ public class AbstractMapQueryResultsCache implements QueryResultsCache
         while (iter.hasNext())
         {
             String key = iter.next();
-            if (key.matches("JDOQL:.* FROM " + candidate.getName() + ".*"))
+            Matcher m = EVICT_PATTERN.matcher(key);
+            if (m.matches())
             {
-                NucleusLogger.GENERAL.info(">> Evicting query results for key="+key);
-                iter.remove();
-            }
-            else if (key.matches("JPQL:.* FROM " + candidate.getName() + ".*"))
-            {
-                NucleusLogger.GENERAL.info(">> Evicting query results for key="+key);
-                iter.remove();
-            }
-            else if (key.matches("JPQL:.* FROM " + cmd.getEntityName()+".*"))
-            {
-                NucleusLogger.GENERAL.info(">> Evicting query results for key="+key);
-                iter.remove();
+                String rest = m.group(2);
+                if (rest.startsWith(candidate.getName()) || rest.startsWith(cmd.getEntityName()))
+                {
+                    NucleusLogger.GENERAL.info(">> Evicting query results for key=" + key);
+                    iter.remove();
+                }
             }
         }
     }
