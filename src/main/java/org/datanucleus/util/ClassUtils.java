@@ -1133,7 +1133,8 @@ public class ClassUtils
         }
 
         // Check against our known (supported) java.lang classes
-        switch (baseType) {
+        switch (baseType)
+        {
             case "String" :
             case "Object" :
             case "Boolean":
@@ -1154,27 +1155,23 @@ public class ClassUtils
     }
 
     /**
-     * Method to check if 2 classes are direct descendents. So one of them is a
-     * superclass of the other.
+     * Method to check if 2 classes are direct descendants, so whether one of them is a superclass of the other.
      * @param clr ClassLoaderResolver for loading the classes 
      * @param class_name_1 Name of first class
      * @param class_name_2 Name of second class
-     * @return Whether they are direct descendents.
+     * @return Whether they are direct descendants.
      */
-    public static boolean classesAreDescendents(ClassLoaderResolver clr,
-                                                String class_name_1,
-                                                String class_name_2)
+    public static boolean classesAreDescendents(ClassLoaderResolver clr, String class_name_1, String class_name_2)
     {
-        Class class_1=clr.classForName(class_name_1);
-        Class class_2=clr.classForName(class_name_2);
+        Class class_1 = clr.classForName(class_name_1);
+        Class class_2 = clr.classForName(class_name_2);
         if (class_1 == null || class_2 == null)
         {
             return false;
         }
 
         // Check for direct descendents
-        if (class_1.isAssignableFrom(class_2) ||
-            class_2.isAssignableFrom(class_1))
+        if (class_1.isAssignableFrom(class_2) || class_2.isAssignableFrom(class_1))
         {
             return true;
         }
@@ -1340,18 +1337,19 @@ public class ClassUtils
         {
             return null;
         }
-        methodName = methodName.substring(prefixLength);
-        if (methodName.length() == 1)
+        String truncMethodName = methodName.substring(prefixLength);
+        if (truncMethodName.length() == 1)
         {
-            return methodName.toLowerCase();
+            return truncMethodName.toLowerCase();
         }
-        char firstChar = methodName.charAt(0);
-        if (Character.isUpperCase(firstChar) && Character.isLowerCase(methodName.charAt(1)))
+
+        // If capitalised name (e.g URL), don't lowercase first character, otherwise do
+        char firstChar = truncMethodName.charAt(0);
+        if (Character.isUpperCase(firstChar) && Character.isLowerCase(truncMethodName.charAt(1)))
         {
-            return Character.toLowerCase(firstChar) + methodName.substring(1);
+            return Character.toLowerCase(firstChar) + truncMethodName.substring(1);
         }
-        // If capitalised name (e.g URL), don't lowercase first character
-        return methodName;
+        return truncMethodName;
     }
 
     /**
