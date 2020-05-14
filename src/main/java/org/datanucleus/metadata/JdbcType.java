@@ -128,11 +128,11 @@ public enum JdbcType
                 return SQLXML;
             case Types.TIME:
                 return TIME;
-            case 2013:
+            case Types.TIME_WITH_TIMEZONE:
                 return TIME_WITH_TIMEZONE;
             case Types.TIMESTAMP:
                 return TIMESTAMP;
-            case 2014:
+            case Types.TIMESTAMP_WITH_TIMEZONE:
                 return TIMESTAMP_WITH_TIMEZONE;
             case Types.TINYINT:
                 return TINYINT;
