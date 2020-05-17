@@ -345,6 +345,7 @@ public class StringUtils
         StringTokenizer tokens = new StringTokenizer(str, ",");
         while (tokens.hasMoreTokens())
         {
+            // TODO Should omit the toUpperCase and a caller can do that to the input if they need it
             set.add(tokens.nextToken().trim().toUpperCase());
         }
 
