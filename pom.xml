@@ -130,7 +130,7 @@
             <version>3.0.1</version>
             <optional>true</optional>
         </dependency>
-        <dependency>
+        <dependency> <!-- Not present in Maven central, so take from DN_M2_Repo -->
             <groupId>javax.management</groupId>
             <artifactId>jmx</artifactId>
             <version>1.2.1</version>
