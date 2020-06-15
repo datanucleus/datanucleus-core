@@ -30,8 +30,6 @@ import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
-import org.datanucleus.enhancer.EnhancerClassAdapter;
-import org.datanucleus.enhancer.EnhancerClassChecker;
 import org.datanucleus.enhancer.asm.AnnotationVisitor;
 import org.datanucleus.enhancer.asm.Attribute;
 import org.datanucleus.enhancer.asm.ClassReader;

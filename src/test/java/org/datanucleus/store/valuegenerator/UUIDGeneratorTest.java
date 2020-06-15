@@ -18,8 +18,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.valuegenerator;
 
-import org.datanucleus.store.valuegenerator.UUIDGenerator;
-
 import junit.framework.TestCase;
 
 /**

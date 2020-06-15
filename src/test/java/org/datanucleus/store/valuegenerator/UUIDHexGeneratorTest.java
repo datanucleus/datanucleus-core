@@ -18,8 +18,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.valuegenerator;
 
-import org.datanucleus.store.valuegenerator.UUIDHexGenerator;
-
 import junit.framework.TestCase;
 
 /**

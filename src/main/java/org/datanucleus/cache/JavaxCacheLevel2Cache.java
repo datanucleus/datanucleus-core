@@ -35,7 +35,6 @@ import org.datanucleus.NucleusContext;
 import org.datanucleus.Configuration;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.cache.AbstractLevel2Cache;
-import org.datanucleus.cache.CachedPC;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;

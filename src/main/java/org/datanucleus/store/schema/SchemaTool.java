@@ -48,7 +48,6 @@ import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.PersistenceUnitMetaData;
 import org.datanucleus.store.StoreManager;
-import org.datanucleus.store.schema.SchemaAwareStoreManager;
 import org.datanucleus.util.CommandLine;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;

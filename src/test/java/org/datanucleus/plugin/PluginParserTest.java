@@ -16,12 +16,6 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ClassLoaderResolverImpl;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.plugin.Bundle;
-import org.datanucleus.plugin.ConfigurationElement;
-import org.datanucleus.plugin.Extension;
-import org.datanucleus.plugin.ExtensionPoint;
-import org.datanucleus.plugin.NonManagedPluginRegistry;
-import org.datanucleus.plugin.PluginParser;
 
 public class PluginParserTest extends TestCase
 {

@@ -33,11 +33,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.plugin.Bundle;
-import org.datanucleus.plugin.Extension;
-import org.datanucleus.plugin.ExtensionPoint;
 import org.datanucleus.plugin.PluginParser.Parser;
-import org.datanucleus.plugin.PluginRegistry;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.w3c.dom.Element;

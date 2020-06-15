@@ -24,8 +24,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Random;
 
-import org.datanucleus.util.StringUtils;
-
 import junit.framework.TestCase;
 
 /**

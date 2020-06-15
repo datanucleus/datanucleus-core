@@ -32,10 +32,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.plugin.Bundle;
-import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.Extension;
-import org.datanucleus.plugin.ExtensionPoint;
 import org.datanucleus.plugin.PluginRegistry;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;

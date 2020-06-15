@@ -26,9 +26,6 @@ import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ClassLoaderResolverImpl;
-import org.datanucleus.enhancer.ClassEnhancerImpl;
-import org.datanucleus.enhancer.EnhancerPropertyGetterAdapter;
-import org.datanucleus.enhancer.EnhancerPropertySetterAdapter;
 import org.datanucleus.enhancer.asm.ClassWriter;
 import org.datanucleus.enhancer.asm.Label;
 import org.datanucleus.enhancer.asm.MethodVisitor;

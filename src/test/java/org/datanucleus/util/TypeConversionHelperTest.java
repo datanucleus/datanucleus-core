@@ -24,8 +24,6 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import org.datanucleus.util.TypeConversionHelper;
-
 import junit.framework.TestCase;
 
 /**

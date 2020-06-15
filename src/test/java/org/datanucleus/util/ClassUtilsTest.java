@@ -33,7 +33,6 @@ import org.datanucleus.ClassLoaderResolverImpl;
 import org.datanucleus.enhancement.ExecutionContextReference;
 import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.enhancement.StateManager;
-import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.ClassUtilsTest.MyBaseClass;
 
 /**
