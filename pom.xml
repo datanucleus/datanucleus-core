@@ -25,17 +25,6 @@
     <properties>
     </properties>
 
-    <repositories>
-        <!-- For any artifacts that aren't present in Maven Central -->
-        <repository>
-            <id>DN_M2_Repo</id>
-            <url>http://www.datanucleus.org/downloads/maven2/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <build>
         <plugins>
             <plugin>
@@ -110,7 +99,6 @@
             <version>[1.2, 1.3)</version>
             <optional>true</optional>
         </dependency>
-
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
@@ -118,6 +106,7 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- For Java Management/MX4J -->
         <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j</artifactId>
@@ -130,14 +119,8 @@
             <version>3.0.1</version>
             <optional>true</optional>
         </dependency>
-        <dependency> <!-- Not present in Maven central, so take from DN_M2_Repo -->
-            <groupId>javax.management</groupId>
-            <artifactId>jmx</artifactId>
-            <version>1.2.1</version>
-            <optional>true</optional>
-        </dependency>
 
-        <!-- Required for SchemaToolTask/EnhancerTask -->
+        <!-- For SchemaToolTask/EnhancerTask -->
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
