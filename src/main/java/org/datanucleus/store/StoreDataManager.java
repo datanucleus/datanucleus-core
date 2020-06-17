@@ -139,7 +139,7 @@ public class StoreDataManager
 
     /**
      * Get the StoreData by the given class name
-     * @param name the fully qualified class name
+     * @param className the fully qualified class name
      * @return the StoreData
      */
     public StoreData get(String className)
