@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>datanucleus-core</artifactId>
-    <version>5.2.3-SNAPSHOT</version>
+    <version>5.2.3</version>
 
     <name>DataNucleus Core</name>
     <description>
