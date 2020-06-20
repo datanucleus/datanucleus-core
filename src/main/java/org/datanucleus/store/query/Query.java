@@ -94,7 +94,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     public static final String EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE = "datanucleus.query.closeResultsAtManagerClose";
     public static final String EXTENSION_JDOQL_STRICT = "datanucleus.jdoql.strict";
     public static final String EXTENSION_JPQL_STRICT = "datanucleus.jpql.strict";
-    public static final String EXTENSION_SQL_SYNTAX_CHECKS = "datanucleus.sql.syntaxChecks";
+    public static final String EXTENSION_SQL_SYNTAX_CHECKS = PropertyNames.PROPERTY_QUERY_SQL_SYNTAXCHECKS;
 
     protected final transient StoreManager storeMgr;
 

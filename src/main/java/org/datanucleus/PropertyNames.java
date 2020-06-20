@@ -227,6 +227,7 @@ public class PropertyNames
     public static final String PROPERTY_QUERY_SQL_ALLOWALL = "datanucleus.query.sql.allowAll";
     public static final String PROPERTY_QUERY_JDOQL_ALLOWALL = "datanucleus.query.jdoql.allowAll";
     public static final String PROPERTY_QUERY_JPQL_ALLOW_RANGE = "datanucleus.query.jpql.allowRange";
+    public static final String PROPERTY_QUERY_SQL_SYNTAXCHECKS = "datanucleus.query.sql.syntaxChecks";
     public static final String PROPERTY_QUERY_FLUSH_BEFORE_EXECUTE = "datanucleus.query.flushBeforeExecution";
     public static final String PROPERTY_QUERY_USE_FETCHPLAN = "datanucleus.query.useFetchPlan";
     public static final String PROPERTY_QUERY_CHECK_UNUSED_PARAMS = "datanucleus.query.checkUnusedParameters";
