@@ -19,6 +19,7 @@ package org.datanucleus.store.query;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.PropertyNames;
@@ -135,6 +136,18 @@ public abstract class AbstractJDOQLQuery extends AbstractJavaQuery
                 NucleusLogger.QUERY.warn("Candidate class for JDOQL single-string query (" + candidateClassName + ") could not be resolved", e);
             }
         }
+    }
+
+    /**
+     * Method to return the names of the extensions supported by this query.
+     * To be overridden by subclasses where they support additional extensions.
+     * @return The supported extension names
+     */
+    public Set<String> getSupportedExtensions()
+    {
+        Set<String> supported = super.getSupportedExtensions();
+        supported.add(EXTENSION_JDOQL_STRICT);
+        return supported;
     }
 
     /**
