@@ -86,15 +86,17 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     public static final String EXTENSION_EVALUATE_IN_MEMORY = PropertyNames.PROPERTY_QUERY_EVALUATE_IN_MEMORY;
     public static final String EXTENSION_CHECK_UNUSED_PARAMETERS = PropertyNames.PROPERTY_QUERY_CHECK_UNUSED_PARAMS;
 
+    public static final String EXTENSION_JDOQL_STRICT = PropertyNames.PROPERTY_QUERY_JDOQL_STRICT;
+    public static final String EXTENSION_JPQL_STRICT = PropertyNames.PROPERTY_QUERY_JPQL_STRICT;
+    public static final String EXTENSION_SQL_SYNTAX_CHECKS = PropertyNames.PROPERTY_QUERY_SQL_SYNTAXCHECKS;
+
     /** Extension for the benefit of JPQL so that we can exclude subclasses (not possible with JPA API). */
     public static final String EXTENSION_EXCLUDE_SUBCLASSES="datanucleus.query.excludeSubclasses";
 
-    public static final String EXTENSION_MULTITHREAD = "datanucleus.query.multithread";
+    public static final String EXTENSION_MULTITHREAD = "datanucleus.query.multithread"; // TODO Is this used now
+
     public static final String EXTENSION_RESULT_CACHE_TYPE = "datanucleus.query.resultCacheType";
     public static final String EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE = "datanucleus.query.closeResultsAtManagerClose";
-    public static final String EXTENSION_JDOQL_STRICT = "datanucleus.jdoql.strict";
-    public static final String EXTENSION_JPQL_STRICT = "datanucleus.jpql.strict";
-    public static final String EXTENSION_SQL_SYNTAX_CHECKS = PropertyNames.PROPERTY_QUERY_SQL_SYNTAXCHECKS;
 
     protected final transient StoreManager storeMgr;
 
