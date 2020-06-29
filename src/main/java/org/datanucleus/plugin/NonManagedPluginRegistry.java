@@ -59,8 +59,8 @@ import org.datanucleus.util.StringUtils;
 
 /**
  * Manages the registry of Extensions and Extension Points outside any OSGI container.
- * This implementation cannot handle multiple versions of the same plugin, so it either raises an exception
- * or logs the issue as a warning. This is different to that mandated by the OSGi specification 3.0 $3.5.2
+ * This implementation cannot handle multiple versions of the same plugin, so it either raises an exception or logs the issue as a warning. 
+ * This is different to that mandated by the OSGi specification 3.0 $3.5.2.
  */
 public class NonManagedPluginRegistry implements PluginRegistry
 {

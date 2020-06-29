@@ -23,11 +23,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 
 /**
- * Loader and registry of Extensions and Extension Points. The implementation of this interface must have a public
- * constructor taking the ClassLoaderResolver interface as argument. 
+ * Loader and registry of Extensions and Extension Points. 
+ * The implementation of this interface must have a public constructor taking the ClassLoaderResolver interface as argument. 
  * The plugin registry metadata/bundle resolution is ruled by OSGi specification. 
  * The following sections of the OSGi 3.0 specification must be fully supported: 3.5.2, 3.5.3, 3.2.4, 3.2.5. 
  * The section 3.6.3 is optional. All other OSGi parts not mentioned above are not likely to be supported.
+ * <p>
+ * See https://dzone.com/articles/extensionserviceplugin-mechanisms-in-java
+ * for a comparison of some different plugin mechanisms in Java. The one we use is based around Eclipse extensions/extension points.
  */
 public interface PluginRegistry
 {
