@@ -117,6 +117,7 @@ public class VersionMetaData extends MetaData
                 AbstractMemberMetaData vermmd = ((AbstractClassMetaData)getParent()).getMetaDataForMember(fieldName);
                 if (vermmd != null && java.util.Date.class.isAssignableFrom(vermmd.getType()))
                 {
+                    // TODO Support other date-time types
                     NucleusLogger.METADATA.debug("Setting version-strategy of field " + vermmd.getFullFieldName() + " to DATE_TIME since is Date-based");
                     versionStrategy = VersionStrategy.DATE_TIME;
                 }
