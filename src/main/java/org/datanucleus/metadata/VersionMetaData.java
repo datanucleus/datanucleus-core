@@ -115,11 +115,20 @@ public class VersionMetaData extends MetaData
             if (getParent() instanceof AbstractClassMetaData)
             {
                 AbstractMemberMetaData vermmd = ((AbstractClassMetaData)getParent()).getMetaDataForMember(fieldName);
-                if (vermmd != null && java.util.Date.class.isAssignableFrom(vermmd.getType()))
+                if (vermmd != null)
                 {
-                    // TODO Support other date-time types
-                    NucleusLogger.METADATA.debug("Setting version-strategy of field " + vermmd.getFullFieldName() + " to DATE_TIME since is Date-based");
-                    versionStrategy = VersionStrategy.DATE_TIME;
+                    if (java.util.Date.class.isAssignableFrom(vermmd.getType()))
+                    {
+                        // java.util.Date, java.sql.Date, java.sql.Time, java.sql.Timestamp
+                        NucleusLogger.METADATA.debug("Setting version-strategy of field " + vermmd.getFullFieldName() + " to DATE_TIME since is Date-based");
+                        versionStrategy = VersionStrategy.DATE_TIME;
+                    }
+                    else if (java.util.Calendar.class.isAssignableFrom(vermmd.getType()))
+                    {
+                        NucleusLogger.METADATA.debug("Setting version-strategy of field " + vermmd.getFullFieldName() + " to DATE_TIME since is Calendar-based");
+                        versionStrategy = VersionStrategy.DATE_TIME;
+                    }
+                    // TODO Support other date-time types e.g java.time
                 }
             }
         }

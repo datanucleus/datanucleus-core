@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.state;
 
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -179,8 +180,12 @@ public class LockManagerImpl implements LockManager
         boolean valid;
         if (versionStrategy == VersionStrategy.DATE_TIME)
         {
-            // TODO Support other date-time types
-            valid = ((Timestamp)versionObject).getTime() == ((Timestamp)versionDatastore).getTime();
+            if (versionObject instanceof Calendar)
+            {
+                valid = ((Calendar)versionObject).getTimeInMillis() == ((Calendar)versionDatastore).getTimeInMillis();
+            }
+            // TODO Support other date-time types e.g java.time
+            valid = ((java.util.Date)versionObject).getTime() == ((java.util.Date)versionDatastore).getTime();
         }
         else if (versionStrategy == VersionStrategy.VERSION_NUMBER)
         {
@@ -222,9 +227,9 @@ public class LockManagerImpl implements LockManager
         }
         else if (versionStrategy == VersionStrategy.NONE)
         {
-            // Set an initial value, otherwise return the current value
             if (currentVersion == null)
             {
+                // Set an initial value, using numeric as the basis
                 if (vermd.getFieldName() != null)
                 {
                     AbstractMemberMetaData verMmd = ((AbstractClassMetaData)vermd.getParent()).getMetaDataForMember(vermd.getFieldName());
@@ -237,13 +242,30 @@ public class LockManagerImpl implements LockManager
                         return Short.valueOf((short)1);
                     }
                 }
-                return Long.valueOf(1); // Assumed to be numeric
+                return Long.valueOf(1);
             }
+
             return currentVersion;
         }
         else if (versionStrategy == VersionStrategy.DATE_TIME)
         {
-            // TODO Support other date-time types e.g java.util.Calendar, java.time.XXX
+            if (vermd.getFieldName() != null)
+            {
+                AbstractMemberMetaData verMmd = ((AbstractClassMetaData)vermd.getParent()).getMetaDataForMember(vermd.getFieldName());
+                if (Calendar.class.isAssignableFrom(verMmd.getType()))
+                {
+                    return Calendar.getInstance();
+                }
+                else if (java.sql.Time.class.isAssignableFrom(verMmd.getType()))
+                {
+                    return new java.sql.Time(System.currentTimeMillis());
+                }
+                else if (java.sql.Date.class.isAssignableFrom(verMmd.getType()))
+                {
+                    return new java.sql.Date(System.currentTimeMillis());
+                }
+                // TODO Support other date-time types e.g java.time.XXX
+            }
             return new Timestamp(System.currentTimeMillis());
         }
         else if (versionStrategy == VersionStrategy.VERSION_NUMBER)
