@@ -128,7 +128,12 @@ public class VersionMetaData extends MetaData
                         NucleusLogger.METADATA.debug("Setting version-strategy of field " + vermmd.getFullFieldName() + " to DATE_TIME since is Calendar-based");
                         versionStrategy = VersionStrategy.DATE_TIME;
                     }
-                    // TODO Support other date-time types e.g java.time
+                    else if (java.time.Instant.class.isAssignableFrom(vermmd.getType()))
+                    {
+                        NucleusLogger.METADATA.debug("Setting version-strategy of field " + vermmd.getFullFieldName() + " to DATE_TIME since is Instant-based");
+                        versionStrategy = VersionStrategy.DATE_TIME;
+                    }
+                    // TODO Support other date-time types e.g java.time XXXDateTime
                 }
             }
         }

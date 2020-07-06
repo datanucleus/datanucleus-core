@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.state;
 
-import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -184,8 +183,15 @@ public class LockManagerImpl implements LockManager
             {
                 valid = ((Calendar)versionObject).getTimeInMillis() == ((Calendar)versionDatastore).getTimeInMillis();
             }
+            else if (versionObject instanceof java.time.Instant)
+            {
+                valid = ((java.time.Instant)versionObject).equals(versionDatastore);
+            }
             // TODO Support other date-time types e.g java.time
-            valid = ((java.util.Date)versionObject).getTime() == ((java.util.Date)versionDatastore).getTime();
+            else
+            {
+                valid = ((java.util.Date)versionObject).getTime() == ((java.util.Date)versionDatastore).getTime();
+            }
         }
         else if (versionStrategy == VersionStrategy.VERSION_NUMBER)
         {
@@ -264,9 +270,13 @@ public class LockManagerImpl implements LockManager
                 {
                     return new java.sql.Date(System.currentTimeMillis());
                 }
+                else if (java.time.Instant.class.isAssignableFrom(verMmd.getType()))
+                {
+                    return java.time.Instant.now();
+                }
                 // TODO Support other date-time types e.g java.time.XXX
             }
-            return new Timestamp(System.currentTimeMillis());
+            return new java.sql.Timestamp(System.currentTimeMillis());
         }
         else if (versionStrategy == VersionStrategy.VERSION_NUMBER)
         {
