@@ -179,6 +179,7 @@ public class LockManagerImpl implements LockManager
         boolean valid;
         if (versionStrategy == VersionStrategy.DATE_TIME)
         {
+            // TODO Support other date-time types
             valid = ((Timestamp)versionObject).getTime() == ((Timestamp)versionDatastore).getTime();
         }
         else if (versionStrategy == VersionStrategy.VERSION_NUMBER)
@@ -231,6 +232,10 @@ public class LockManagerImpl implements LockManager
                     {
                         return Integer.valueOf(1);
                     }
+                    else if (verMmd.getType() == Short.class || verMmd.getType() == short.class)
+                    {
+                        return Short.valueOf((short)1);
+                    }
                 }
                 return Long.valueOf(1); // Assumed to be numeric
             }
@@ -238,6 +243,7 @@ public class LockManagerImpl implements LockManager
         }
         else if (versionStrategy == VersionStrategy.DATE_TIME)
         {
+            // TODO Support other date-time types e.g java.util.Calendar, java.time.XXX
             return new Timestamp(System.currentTimeMillis());
         }
         else if (versionStrategy == VersionStrategy.VERSION_NUMBER)
@@ -258,6 +264,10 @@ public class LockManagerImpl implements LockManager
                     {
                         return initValue;
                     }
+                    else if (verMmd.getType() == Short.class || verMmd.getType() == short.class)
+                    {
+                        return initValue.shortValue();
+                    }
                 }
                 return Long.valueOf(initValue);
             }
@@ -265,6 +275,10 @@ public class LockManagerImpl implements LockManager
             if (currentVersion instanceof Integer)
             {
                 return Integer.valueOf(((Integer)currentVersion).intValue()+1);
+            }
+            else if (currentVersion instanceof Short)
+            {
+                return Short.valueOf((short) (((Short)currentVersion).shortValue()+1));
             }
             return Long.valueOf(((Long)currentVersion).longValue()+1);
         }
