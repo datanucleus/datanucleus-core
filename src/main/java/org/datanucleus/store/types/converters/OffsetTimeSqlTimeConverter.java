@@ -21,8 +21,6 @@ import java.sql.Time;
 import java.util.Calendar;
 import java.time.OffsetTime;
 
-import org.datanucleus.store.types.converters.TypeConverter;
-
 /**
  * Class to handle the conversion between java.time.OffsetTime and java.sql.Time.
  */

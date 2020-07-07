@@ -26,7 +26,6 @@ import java.io.Serializable;
 import java.util.Base64;
 
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
  * Convenience class to handle Java serialisation of a Serializable object to/from String.

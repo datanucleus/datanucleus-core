@@ -19,9 +19,6 @@ package org.datanucleus.store.types.converters;
 
 import java.time.YearMonth;
 
-import org.datanucleus.store.types.converters.MultiColumnConverter;
-import org.datanucleus.store.types.converters.TypeConverter;
-
 /**
  * Class to handle the conversion between java.time.YearMonth and int[] (the year and the month).
  */

@@ -23,7 +23,6 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.management.ManagementServer;
 import org.datanucleus.util.NucleusLogger;
 
 /**

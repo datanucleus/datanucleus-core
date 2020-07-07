@@ -21,7 +21,6 @@ import java.time.MonthDay;
 import java.time.format.DateTimeParseException;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
-import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.util.Localiser;
 
 /**

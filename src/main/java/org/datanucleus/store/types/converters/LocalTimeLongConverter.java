@@ -19,8 +19,6 @@ package org.datanucleus.store.types.converters;
 
 import java.time.LocalTime;
 
-import org.datanucleus.store.types.converters.TypeConverter;
-
 /**
  * Class to handle the conversion between java.time.LocalTime and a long form (nanos of day).
  */

@@ -22,7 +22,6 @@ import javax.transaction.TransactionManager;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
-import org.datanucleus.transaction.jta.TransactionManagerLocator;
 import org.datanucleus.util.NucleusLogger;
 
 /**

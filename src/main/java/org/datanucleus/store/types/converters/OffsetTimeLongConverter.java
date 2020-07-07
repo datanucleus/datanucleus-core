@@ -24,8 +24,6 @@ import java.time.OffsetTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import org.datanucleus.store.types.converters.TypeConverter;
-
 /**
  * Class to handle the conversion between java.time.OffsetTime and a long form (nanos of day).
  */

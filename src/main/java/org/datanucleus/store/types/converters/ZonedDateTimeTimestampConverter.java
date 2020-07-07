@@ -22,8 +22,6 @@ import java.util.Date;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import org.datanucleus.store.types.converters.TypeConverter;
-
 /**
  * Class to handle the conversion between java.time.ZonedDateTime and java.sql.Timestamp.
  */

@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.datanucleus.ExecutionContext;
 import org.datanucleus.util.NucleusLogger;
 
 /**

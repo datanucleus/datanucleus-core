@@ -21,8 +21,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
-import org.datanucleus.store.types.converters.ColumnLengthDefiningTypeConverter;
-import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.util.Localiser;
 
 /**

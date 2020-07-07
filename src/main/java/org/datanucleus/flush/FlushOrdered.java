@@ -26,7 +26,6 @@ import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusOptimisticException;
-import org.datanucleus.flush.FlushProcess;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;

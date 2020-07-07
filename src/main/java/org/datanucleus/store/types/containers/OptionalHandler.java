@@ -25,7 +25,6 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.store.types.ElementContainerAdapter;
 import org.datanucleus.store.types.TypeManager;
-import org.datanucleus.store.types.containers.CollectionHandler;
 
 public class OptionalHandler extends CollectionHandler<Optional>
 {

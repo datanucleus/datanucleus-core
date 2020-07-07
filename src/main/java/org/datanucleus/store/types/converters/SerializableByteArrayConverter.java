@@ -25,7 +25,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
  * Convenience class to handle Java serialisation of a Serializable object to/from byte[].

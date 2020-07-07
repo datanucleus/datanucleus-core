@@ -21,8 +21,6 @@ import java.sql.Date;
 import java.time.MonthDay;
 import java.time.ZoneId;
 
-import org.datanucleus.store.types.converters.TypeConverter;
-
 /**
  * Class to handle the conversion between java.time.MonthDay and java.sql.Date.
  */

@@ -34,7 +34,6 @@ import javax.naming.Context;
 import mx4j.tools.naming.NamingService;
 
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.management.ManagementServer;
 import org.datanucleus.util.NucleusLogger;
 
 /**

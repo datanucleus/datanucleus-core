@@ -19,8 +19,6 @@ package org.datanucleus.store.types.converters;
 
 import java.time.Duration;
 
-import org.datanucleus.store.types.converters.TypeConverter;
-
 /**
  * Class to handle the conversion between java.time.Duration and a Double form.
  */

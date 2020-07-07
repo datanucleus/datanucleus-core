@@ -21,8 +21,6 @@ import java.util.Date;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 
-import org.datanucleus.store.types.converters.TypeConverter;
-
 /**
  * Class to handle the conversion between java.time.OffsetDateTime and java.util.Date.
  */

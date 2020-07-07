@@ -20,7 +20,6 @@ package org.datanucleus.store.types.converters;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 
-import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.util.TypeConversionHelper;
 
 /**
