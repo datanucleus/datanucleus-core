@@ -1745,6 +1745,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         return this;
     }
 
+    // TODO Parameterise these text strings. See also the associated annotation handlers in api-jdo/api-jpa
     public boolean isCreateUser()
     {
         return hasExtension("create-user");
