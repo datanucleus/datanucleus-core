@@ -292,7 +292,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_SQL_ALLOWALL, null, false, false, true);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL, null, false, false, true);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_JPQL_ALLOW_RANGE, null, false, false, true);
-        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_SQL_SYNTAXCHECKS, null, false, false, true);
+        conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_SQL_SYNTAXCHECKS, null, true, false, true);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_FLUSH_BEFORE_EXECUTE, null, false, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_USE_FETCHPLAN, null, true, false, false);
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_QUERY_CHECK_UNUSED_PARAMS, null, true, false, false);
