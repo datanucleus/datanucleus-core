@@ -777,7 +777,8 @@ public class DataNucleusEnhancer
                     }
                     catch (NucleusException ne)
                     {
-                        // No "persistence.xml" files found yet they have specified a persistence-unit name!
+                        LOGGER.error("Enhance of persistence-unit threw exception", ne);
+                        // (More than likely that) No "persistence.xml" files found yet they have specified a persistence-unit name!
                         throw new NucleusEnhanceException(Localiser.msg("005008", comp.getValue()));
                     }
 
