@@ -17,8 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.query.compiler;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -2218,8 +2216,8 @@ public class JPQLParser extends AbstractParser
 
         Object litValue = null;
         String sLiteral;
-        BigDecimal fLiteral;
-        BigInteger iLiteral;
+        Number fLiteral;
+        Number iLiteral;
         Boolean bLiteral;
         boolean single_quote_next = lexer.nextIsSingleQuote();
         if ((sLiteral = lexer.parseStringLiteral()) != null)
@@ -2236,20 +2234,13 @@ public class JPQLParser extends AbstractParser
         }
         else if ((fLiteral = lexer.parseFloatingPointLiteral()) != null)
         {
+            // Can be Float, Double or BigDecimal
             litValue = fLiteral;
         }
         else if ((iLiteral = lexer.parseIntegerLiteral()) != null)
         {
-            // Represent as BigInteger or Long depending on length
-            String longStr = "" + iLiteral.longValue();
-            if (longStr.length() < iLiteral.toString().length())
-            {
-                litValue = iLiteral;
-            }
-            else
-            {
-                litValue = iLiteral.longValue();
-            }
+            // Can be Integer, Long or BigInteger
+            litValue = iLiteral;
         }
         else if ((bLiteral = lexer.parseBooleanLiteralIgnoreCase()) != null)
         {

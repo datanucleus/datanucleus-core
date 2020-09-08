@@ -33,9 +33,8 @@ import org.datanucleus.exceptions.NucleusUserException;
  * Lexer for a Query.
  * Allows a class to work its way through the parsed string, obtaining relevant components with each 
  * call, or peeking ahead before deciding what component to parse next.
- * Would work with JDOQL or JPQL. The only difference is the input of parameter prefixes.
- * With JDOQL all parameters are prefixed ":", whereas in JPQL you can have numbered parameters "?"
- * and named parameters ":".
+ * Would work with JDOQL or JPQL, the only difference being the input of parameter prefixes.
+ * With JDOQL all parameters are prefixed ":", whereas in JPQL you can have numbered parameters "?" and named parameters ":".
  */
 public class Lexer
 {
@@ -390,7 +389,7 @@ public class Lexer
      * Parse an integer number from the current position.
      * @return The integer number parsed (null if not valid).
      */
-    public BigInteger parseIntegerLiteral()
+    public Number parseIntegerLiteral()
     {
         int savedIdx = skipWS();
 
@@ -455,9 +454,33 @@ public class Lexer
 
         if (c == 'l' || c == 'L')
         {
+            // Explicit Long
             ci.next();
+
+            return Long.parseLong(negate ? "-" + digits.toString() : digits.toString(), radix);
         }
 
+        // Try Integer
+        try
+        {
+            return Integer.parseInt(negate ? "-" + digits.toString() : digits.toString(), radix);
+        }
+        catch (NumberFormatException nfe)
+        {
+            // Not Integer
+        }
+
+        // Try Long
+        try
+        {
+            return Long.parseLong(negate ? "-" + digits.toString() : digits.toString(), radix);
+        }
+        catch (NumberFormatException nfe)
+        {
+            // Not Long
+        }
+
+        // Fallback to BigInteger
         if (negate)
         {
             return new BigInteger(digits.toString(), radix).negate();
@@ -469,13 +492,12 @@ public class Lexer
      * Parse a floating point number from the current position.
      * @return The floating point number parsed (null if not valid).
      */
-    public BigDecimal parseFloatingPointLiteral()
+    public Number parseFloatingPointLiteral()
     {
         int savedIdx = skipWS();
         StringBuilder val = new StringBuilder();
         boolean dotSeen = false;
         boolean expSeen = false;
-        boolean sfxSeen = false;
 
         char c = ci.current();
         boolean negate = false;
@@ -530,16 +552,46 @@ public class Lexer
             while (isDecDigit(c));
         }
 
-        if (c == 'f' || c == 'F' || c == 'd' || c == 'D')
+        if (c == 'f' || c == 'F')
         {
-            sfxSeen = true;
+            // Explicit Float
             ci.next();
+
+            return new Float(negate ? "-" + val.toString() : val.toString());
         }
 
-        if (!dotSeen && !expSeen && !sfxSeen)
+        if (c == 'd' || c == 'D')
+        {
+            // Explicit Double
+            ci.next();
+
+            return new Double(negate ? "-" + val.toString() : val.toString());
+        }
+
+        if (!dotSeen && !expSeen)
         {
             ci.setIndex(savedIdx);
             return null;
+        }
+
+        // Try Float
+        try
+        {
+            return Float.parseFloat(negate ? "-" + val.toString() : val.toString());
+        }
+        catch (NumberFormatException nfe)
+        {
+            // Not Float
+        }
+
+        // Try Double
+        try
+        {
+            return Double.parseDouble(negate ? "-" + val.toString() : val.toString());
+        }
+        catch (NumberFormatException nfe)
+        {
+            // Not Double
         }
 
         if (negate)
