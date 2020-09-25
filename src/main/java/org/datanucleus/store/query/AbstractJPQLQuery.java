@@ -186,7 +186,7 @@ public abstract class AbstractJPQLQuery extends AbstractJavaQuery
             queryCacheKey += " EXCLUDE SUBCLASSES";
         }
 
-        String multiTenancyId = ec.getNucleusContext().getMultiTenancyId(ec, null); // TODO Fill in last arg
+        String multiTenancyId = ec.getNucleusContext().getMultiTenancyId(ec);
         if (multiTenancyId != null)
         {
             queryCacheKey += (" " + multiTenancyId);

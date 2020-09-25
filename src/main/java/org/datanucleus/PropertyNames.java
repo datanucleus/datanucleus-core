@@ -163,8 +163,10 @@ public class PropertyNames
     public static final String PROPERTY_MAPPING_CATALOG = "datanucleus.mapping.Catalog";
     public static final String PROPERTY_MAPPING_SCHEMA = "datanucleus.mapping.Schema";
 
-    public static final String PROPERTY_MAPPING_TENANT_ID = "datanucleus.TenantID";
+    public static final String PROPERTY_MAPPING_TENANT_ID = "datanucleus.TenantId";
+    public static final String PROPERTY_MAPPING_TENANT_READ_IDS = "datanucleus.TenantReadIds";
     public static final String PROPERTY_MAPPING_TENANT_PROVIDER = "datanucleus.TenantProvider";
+
     public static final String PROPERTY_MAPPING_CURRENT_USER = "datanucleus.CurrentUser";
     public static final String PROPERTY_MAPPING_CURRENT_USER_PROVIDER = "datanucleus.CurrentUserProvider";
 

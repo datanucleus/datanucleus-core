@@ -362,6 +362,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
 
         // Multitenancy
         conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID, null, null, null, false, true);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_TENANT_READ_IDS, null, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_MAPPING_TENANT_PROVIDER, null, null, null, false, false);
 
         // Current user
@@ -1894,14 +1895,33 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
      * @see org.datanucleus.PersistenceNucleusContext#getMultiTenancyId(org.datanucleus.ExecutionContext, org.datanucleus.metadata.AbstractClassMetaData)
      */
     @Override
-    public String getMultiTenancyId(ExecutionContext ec, AbstractClassMetaData cmd)
+    public String getMultiTenancyId(ExecutionContext ec)
     {
-        // TODO This does nothing with the class currently. Use it
         if (multiTenancyProvider != null)
         {
             return multiTenancyProvider.getTenantId(ec);
         }
         return ec.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID);
+    }
+
+    @Override
+    public String[] getMultiTenancyReadIds(ExecutionContext ec)
+    {
+        if (multiTenancyProvider != null)
+        {
+            String[] tenantReadIds = multiTenancyProvider.getTenantReadIds(ec);
+            return (tenantReadIds != null) ? tenantReadIds : new String[] {multiTenancyProvider.getTenantId(ec)};
+        }
+
+        String readIds = config.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_READ_IDS);
+        if (readIds != null)
+        {
+            // Return the tenant read ids if defined (for context)
+            return readIds.split(",");
+        }
+
+        // Fallback to just the current tenant id for this execution context
+        return new String[] {ec.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID)};
     }
 
     /* (non-Javadoc)

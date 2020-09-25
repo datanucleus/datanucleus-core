@@ -25,5 +25,17 @@ import org.datanucleus.ExecutionContext;
  */
 public interface MultiTenancyProvider
 {
+    /**
+     * Return the tenant id for the current tenant (for use in all WRITE operations).
+     * @param ec ExecutionContext
+     * @return The tenant id
+     */
     String getTenantId(ExecutionContext ec);
+
+    /**
+     * Return the tenant id(s) that the current tenant can view (for use in all READ operations).
+     * @param ec ExecutionContext
+     * @return The read tenant ids
+     */
+    String[] getTenantReadIds(ExecutionContext ec);
 }
