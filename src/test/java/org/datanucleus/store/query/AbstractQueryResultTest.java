@@ -1,7 +1,7 @@
 package org.datanucleus.store.query;
 
 import junit.framework.TestCase;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import java.util.List;
 import java.util.ArrayList;
