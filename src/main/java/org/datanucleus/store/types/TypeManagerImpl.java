@@ -15,6 +15,7 @@ limitations under the License.
 Contributors:
 2004 Erik Bengtson - added interfaces methods
 2008 Andy Jefferson - added java type handling separate from mapped types
+2020 Andi Huber - added support for priority based type registration
     ...
 **********************************************************************/
 package org.datanucleus.store.types;
@@ -123,6 +124,9 @@ public class TypeManagerImpl implements TypeManager, Serializable
 
     /** Map of java types, keyed by the class name. */
     protected Map<String, JavaType> javaTypes = new ConcurrentHashMap<>();
+    
+    /** Map of java type priorities, keyed by the class name. */
+    protected Map<String, Integer> javaTypePriorities = new ConcurrentHashMap<>();
 
     /** Map of ContainerHandlers, keyed by the container type class name. */
     protected Map<Class, ? super ContainerHandler> containerHandlersByClass = new ConcurrentHashMap<>();
@@ -1167,6 +1171,7 @@ public class TypeManagerImpl implements TypeManager, Serializable
                 String genericTypeName = elems[i].getAttribute("generic-type");
                 String embeddedString = elems[i].getAttribute("embedded");
                 String dfgString = elems[i].getAttribute("dfg");
+                String priorityString = elems[i].getAttribute("priority");
                 String wrapperType = elems[i].getAttribute("wrapper-type");
                 String wrapperTypeBacked = elems[i].getAttribute("wrapper-type-backed");
                 String typeConverterName = elems[i].getAttribute("converter-name");
@@ -1181,6 +1186,16 @@ public class TypeManagerImpl implements TypeManager, Serializable
                 if (dfgString != null && dfgString.equalsIgnoreCase("true"))
                 {
                     dfg = true;
+                }
+                int priority = 0;
+                if (priorityString != null && !StringUtils.isWhitespace(priorityString))
+                {
+                    try {
+                        priority = Integer.parseInt(priorityString.trim());
+                    } catch (Exception e) {
+                        // if cannot parse, silently fallback
+                        priority = 0;
+                    }
                 }
                 if (!StringUtils.isWhitespace(wrapperType))
                 {
@@ -1218,7 +1233,16 @@ public class TypeManagerImpl implements TypeManager, Serializable
                         javaTypeName += "<" + genericTypeName + ">";
                     }
 
-                    if (!javaTypes.containsKey(javaTypeName))
+                    
+                    boolean doRegister = !javaTypes.containsKey(javaTypeName);
+                    if(!doRegister) {
+                        // check whether new priority wins over already registered priority
+                        final int priorityToBeat = 
+                                Optional.ofNullable(javaTypePriorities.get(javaTypeName)).orElse(0);
+                        doRegister = priority > priorityToBeat;
+                    }
+                    
+                    if (doRegister)
                     {
                         // Only add first entry for a java type (ordered by the "priority" flag)
 
@@ -1233,6 +1257,12 @@ public class TypeManagerImpl implements TypeManager, Serializable
                             typeName += "<" + genericType.getName() + ">";
                         }
                         javaTypes.put(typeName, new JavaType(cls, genericType, embedded, dfg, wrapperClass, wrapperClassBacked, containerHandlerClass, typeConverterName));
+
+                        // keep track of registered priority values, 
+                        // as an optimization, save heap usage, don't collect priority==0 
+                        if(priority>0) {
+                            javaTypePriorities.put(javaTypeName, priority);
+                        }
                     }
                 }
                 catch (ClassNotResolvedException cnre)
