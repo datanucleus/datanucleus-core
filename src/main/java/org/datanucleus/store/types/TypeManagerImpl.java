@@ -116,7 +116,7 @@ import org.datanucleus.util.StringUtils;
  */
 public class TypeManagerImpl implements TypeManager, Serializable
 {
-    private static final long serialVersionUID = -8715639980649093551L;
+    private static final long serialVersionUID = 8217508318434539002L;
 
     protected NucleusContext nucCtx;
 
@@ -125,9 +125,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
     /** Map of java types, keyed by the class name. */
     protected Map<String, JavaType> javaTypes = new ConcurrentHashMap<>();
     
-    /** Map of java type priorities, keyed by the class name. */
-    protected Map<String, Integer> javaTypePriorities = new ConcurrentHashMap<>();
-
     /** Map of ContainerHandlers, keyed by the container type class name. */
     protected Map<Class, ? super ContainerHandler> containerHandlersByClass = new ConcurrentHashMap<>();
 
@@ -164,7 +161,6 @@ public class TypeManagerImpl implements TypeManager, Serializable
     {
         containerHandlersByClass = null;
         javaTypes = null;
-        javaTypePriorities = null;
 
         typeConverterByName.clear();
         typeConverterMap.clear();
@@ -1162,6 +1158,9 @@ public class TypeManagerImpl implements TypeManager, Serializable
         addJavaType(Enum[].class, null, true, false, null, null, ArrayHandler.class, null);
         addJavaType(Object[].class, null, true, false, null, null, ArrayHandler.class, null);
 
+        // Map of java type priorities, keyed by the class name
+        final Map<String, Integer> javaTypePriorities = new HashMap<>();
+        
         // Add on any plugin mechanism types
         ConfigurationElement[] elems = mgr.getConfigurationElementsForExtension("org.datanucleus.java_type", null, null);
         if (elems != null)
