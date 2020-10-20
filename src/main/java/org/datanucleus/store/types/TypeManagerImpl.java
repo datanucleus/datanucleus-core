@@ -1190,9 +1190,12 @@ public class TypeManagerImpl implements TypeManager, Serializable
                 int priority = 0;
                 if (priorityString != null && !StringUtils.isWhitespace(priorityString))
                 {
-                    try {
+                    try 
+                    {
                         priority = Integer.parseInt(priorityString.trim());
-                    } catch (Exception e) {
+                    } 
+                    catch (Exception e) 
+                    {
                         // if cannot parse, silently fallback
                         priority = 0;
                     }
@@ -1235,18 +1238,16 @@ public class TypeManagerImpl implements TypeManager, Serializable
 
                     // Register entries for a java type based on the "priority" flag,
                     // where higher priority is allowed to override lower priority. 
-                    
                     boolean doRegister = !javaTypes.containsKey(javaTypeName);
-                    if(!doRegister) {
+                    if(!doRegister)
+                    {
                         // check whether new priority wins over already registered priority
-                        final int priorityToBeat = 
-                                Optional.ofNullable(javaTypePriorities.get(javaTypeName)).orElse(0);
+                        final int priorityToBeat = Optional.ofNullable(javaTypePriorities.get(javaTypeName)).orElse(0);
                         doRegister = priority > priorityToBeat;
                     }
-                    
+
                     if (doRegister)
                     {
-
                         Class wrapperClass = loadClass(mgr, elems, i, wrapperType, "016005");
                         Class wrapperClassBacked = loadClass(mgr, elems, i, wrapperTypeBacked, "016005");
                         Class containerHandlerClass = loadClass(mgr, elems, i, containerHandlerType, "016009");
@@ -1259,9 +1260,9 @@ public class TypeManagerImpl implements TypeManager, Serializable
                         }
                         javaTypes.put(typeName, new JavaType(cls, genericType, embedded, dfg, wrapperClass, wrapperClassBacked, containerHandlerClass, typeConverterName));
 
-                        // keep track of registered priority values, 
-                        // as an optimization, save heap usage, don't collect priority<=0 
-                        if(priority>0) {
+                        // keep track of registered priority values, as an optimization, save heap usage, don't collect priority<=0 
+                        if (priority > 0) 
+                        {
                             javaTypePriorities.put(javaTypeName, priority);
                         }
                     }
