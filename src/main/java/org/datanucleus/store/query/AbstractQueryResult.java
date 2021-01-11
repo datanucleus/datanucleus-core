@@ -322,7 +322,12 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
     {
         if (resultSizeMethod.equalsIgnoreCase("COUNT"))
         {
-            if (query != null && query.getCompilation() != null)
+            if (query == null)
+            {
+                throw new NucleusUserException("datanucleus.query.resultSizeMethod of \"COUNT\" selected, but query / connection has been closed. " + 
+                    "Keep it open if you want to use size() \"COUNT\" method");
+            }
+            else if (query.getCompilation() != null)
             {
                 ExecutionContext ec = query.getExecutionContext();
                 if (query.getCompilation().getQueryLanguage().equalsIgnoreCase(Query.LANGUAGE_JDOQL))
