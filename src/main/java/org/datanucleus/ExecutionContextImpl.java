@@ -4824,7 +4824,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 int[] loadedFieldNums = cachedPC.getLoadedFieldNumbers();
                 String fieldNames = (loadedFieldNums == null || loadedFieldNums.length == 0) ? "" : StringUtils.intArrayToString(loadedFieldNums);
-                NucleusLogger.CACHE.debug(Localiser.msg("004003", StringUtils.toJVMIDString(op.getObject()), op.getInternalObjectId(), fieldNames, cachedPC.getVersion()));
+//                NucleusLogger.CACHE.debug(Localiser.msg("004003", StringUtils.toJVMIDString(op.getObject()), op.getInternalObjectId(), fieldNames, cachedPC.getVersion()));
+                NucleusLogger.CACHE.debug(Localiser.msg("004003", StringUtils.toJVMIDString(op.getObject()), 
+                    IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), fieldNames, cachedPC.getVersion()));
             }
         }
 
