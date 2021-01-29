@@ -799,6 +799,10 @@ public class JDOQLParser extends AbstractParser
         }
         else
         {
+            if (castNode != null)
+            {
+                throw new QueryCompilerSyntaxException("Found CAST expression with nothing after", lexer.getIndex(), lexer.getInput());
+            }
             throw new QueryCompilerSyntaxException("Method/Identifier expected", lexer.getIndex(), lexer.getInput());
         }
 
@@ -939,11 +943,19 @@ public class JDOQLParser extends AbstractParser
      */
     private boolean processCast()
     {
+        int idx = lexer.getIndex();
         String typeName = lexer.parseCast();
         if (typeName == null)
         {
             return false;
         }
+        if (lexer.remaining().isEmpty())
+        {
+            // Nothing after cast so must not be a cast, e.g "(booleanIdentifier)"
+            lexer.setIndex(idx);
+            return false;
+        }
+        // TODO Check the typeName for a valid class (allowing for candidate, or imports), otherwise assume it is an identifier and move lexer back
 
         Node castNode = new Node(NodeType.CAST, typeName);
         stack.push(castNode);

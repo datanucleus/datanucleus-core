@@ -80,6 +80,11 @@ public class Lexer
         return ci.getIndex();
     }
 
+    public void setIndex(int idx)
+    {
+        ci.setIndex(idx);
+    }
+
     /**
      * Skip over any whitespace from the current position.
      * @return The new position
