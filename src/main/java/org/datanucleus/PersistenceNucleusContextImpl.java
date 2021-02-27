@@ -1917,15 +1917,33 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             return (tenantReadIds != null) ? tenantReadIds : new String[] {multiTenancyProvider.getTenantId(ec)};
         }
 
-        String readIds = config.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_READ_IDS);
+        // Check for tenantReadIds property (either overridden in EC, or from config)
+        String readIds = null;
+        if (ec != null)
+        {
+            readIds = ec.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_READ_IDS);
+        }
+        if (readIds == null)
+        {
+            readIds = config.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_READ_IDS);
+        }
         if (readIds != null)
         {
-            // Return the tenant read ids if defined (for context)
             return readIds.split(",");
         }
 
-        // Fallback to just the current tenant id for this execution context
-        return new String[] {ec.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID)};
+        // Fallback to current tenant id (either overridden in EC, or from config)
+        String tenantId = null;
+        if (ec != null)
+        {
+            // Overridden in EC
+            tenantId = ec.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID);
+        }
+        if (tenantId == null)
+        {
+            tenantId = config.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID);
+        }
+        return new String[] {tenantId};
     }
 
     /* (non-Javadoc)
