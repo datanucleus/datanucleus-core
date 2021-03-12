@@ -3834,6 +3834,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 id = nucCtx.getIdentityManager().getDatastoreId((String)key);
             }
         }
+        else if (cmd.getIdentityType() == IdentityType.DATASTORE && (key instanceof Number))
+        {
+            // Assume that the user called newObjectId passing in a numeric surrogate field value
+            id = nucCtx.getIdentityManager().getDatastoreId(pcClass.getName(), key);
+        }
         else
         {
             // Key is not a string, and is not SingleFieldIdentity
