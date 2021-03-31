@@ -36,7 +36,7 @@ public class GregorianCalendar extends java.util.GregorianCalendar implements SC
     protected transient AbstractMemberMetaData ownerMmd;
 
     /**
-     * Creates a <tt>GregorianCalendar</tt> object that represents the time at which it was allocated.
+     * Creates a <i>GregorianCalendar</i> object that represents the time at which it was allocated.
      * Assigns owning object and field name.
      * @param op ObjectProvider for the owning object
      * @param mmd Metadata for the member

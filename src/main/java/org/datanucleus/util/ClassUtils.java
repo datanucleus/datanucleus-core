@@ -2099,7 +2099,7 @@ public class ClassUtils
 
     /**
      * Returns an array of integers containing the indices of all elements in
-     * <tt>flags</tt> that are in the <tt>state</tt> passed as argument.
+     * <i>flags</i> that are in the <i>state</i> passed as argument.
      * @param flags Array of flags (true or false)
      * @param state The state to search (true or false)
      * @return The settings of the flags
@@ -2128,7 +2128,7 @@ public class ClassUtils
 
     /**
      * Returns an array of integers containing the indices of all elements in
-     * <tt>flags</tt> whose index occurs in <tt>indices</tt> and whose value is <tt>state</tt>.
+     * <i>flags</i> whose index occurs in <i>indices</i> and whose value is <i>state</i>.
      * @param flags the boolean array
      * @param indices The positions in the array
      * @param state The state that we want to match

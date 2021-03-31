@@ -34,7 +34,7 @@ public class SqlDate extends java.sql.Date implements SCO<java.sql.Date>
     protected transient AbstractMemberMetaData ownerMmd;
 
     /**
-     * Creates a <tt>SqlDate</tt> object that represents the time at which
+     * Creates a <i>SqlDate</i> object that represents the time at which
      * it was allocated. Assigns owning object and field name.
      * @param op ObjectProvider for the owning object
      * @param mmd Metadata for the member
@@ -164,7 +164,7 @@ public class SqlDate extends java.sql.Date implements SCO<java.sql.Date>
     }
 
     /**
-     * Sets the year of this <tt>Date</tt> object to be the specified 
+     * Sets the year of this <i>Date</i> object to be the specified 
      * value plus 1900. This <code>Date</code> object is modified so 
      * that it represents a point in time within the specified year, 
      * with the month, date, hour, minute, and second the same as 
@@ -186,7 +186,7 @@ public class SqlDate extends java.sql.Date implements SCO<java.sql.Date>
 
     /**
      * Sets the month of this date to the specified value. This 
-     * <tt>Date</tt> object is modified so that it represents a point 
+     * <i>Date</i> object is modified so that it represents a point 
      * in time within the specified month, with the year, date, hour, 
      * minute, and second the same as before, as interpreted in the 
      * local time zone. If the date was October 31, for example, and 
@@ -205,8 +205,8 @@ public class SqlDate extends java.sql.Date implements SCO<java.sql.Date>
     }
 
     /**
-     * Sets the day of the month of this <tt>Date</tt> object to the 
-     * specified value. This <tt>Date</tt> object is modified so that 
+     * Sets the day of the month of this <i>Date</i> object to the 
+     * specified value. This <i>Date</i> object is modified so that 
      * it represents a point in time within the specified day of the 
      * month, with the year, month, hour, minute, and second the same 
      * as before, as interpreted in the local time zone. If the date 

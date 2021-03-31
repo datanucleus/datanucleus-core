@@ -20,7 +20,7 @@ package org.datanucleus.exceptions;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>ClassNotDetachableException</tt> is thrown if an attempt is
+ * A <i>ClassNotDetachableException</i> is thrown if an attempt is
  * made to detach an object whose class is not detachable.
  */
 public class ClassNotDetachableException extends NucleusUserException

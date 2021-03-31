@@ -884,15 +884,15 @@ public class SCOUtils
     }
 
     /**
-     * Returns <tt>true</tt> if this collection contains the specified element. More formally, returns
-     * <tt>true</tt> if and only if this collection contains at least one element <tt>it</tt> such that
-     * <tt>(o==null ? it==null : o.equals(it))</tt>.
+     * Returns <i>true</i> if this collection contains the specified element. More formally, returns
+     * <i>true</i> if and only if this collection contains at least one element <i>it</i> such that
+     * <i>(o==null ? it==null : o.equals(it))</i>.
      * <p>
      * This implementation iterates over the elements in the collection, checking each element in turn for
      * equality with the specified element.
      * @param backingStore the Store
      * @param op the ObjectProvider
-     * @return <tt>true</tt> if this collection contains the specified element.
+     * @return <i>true</i> if this collection contains the specified element.
      */
     public static Object[] toArray(CollectionStore backingStore, ObjectProvider op)
     {
@@ -912,7 +912,7 @@ public class SCOUtils
      * @param a the array into which the elements of the collection are to be stored, if it is big enough;
      * otherwise, a new array of the same runtime type is allocated for this purpose.
      * @return an array containing the elements of the collection.
-     * @throws NullPointerException if the specified array is <tt>null</tt>.
+     * @throws NullPointerException if the specified array is <i>null</i>.
      * @throws ArrayStoreException if the runtime type of the specified array is not a supertype of the
      * runtime type of every element in this collection.
      */

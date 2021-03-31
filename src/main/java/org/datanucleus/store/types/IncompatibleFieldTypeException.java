@@ -23,7 +23,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>IncompatibleFieldTypeException</tt> is thrown if an incompatible field
+ * A <i>IncompatibleFieldTypeException</i> is thrown if an incompatible field
  * type is specified in the construction of a second-class object instance.
  */
 public class IncompatibleFieldTypeException extends NucleusUserException

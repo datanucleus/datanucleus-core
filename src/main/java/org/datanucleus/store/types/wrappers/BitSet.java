@@ -34,7 +34,7 @@ public class BitSet extends java.util.BitSet implements SCO<java.util.BitSet>
     protected transient AbstractMemberMetaData ownerMmd;
 
     /**
-     * Creates a <tt>BitSet</tt> object. Assigns owning object and field name.
+     * Creates a <i>BitSet</i> object. Assigns owning object and field name.
      * @param op ObjectProvider for the owning object
      * @param mmd Metadata for the member
      */

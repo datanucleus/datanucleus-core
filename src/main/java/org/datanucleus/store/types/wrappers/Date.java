@@ -34,7 +34,7 @@ public class Date extends java.util.Date implements SCO<java.util.Date>
     protected transient AbstractMemberMetaData ownerMmd;
 
     /**
-     * Creates a <tt>Date</tt> object that represents the time at which it was allocated.
+     * Creates a <i>Date</i> object that represents the time at which it was allocated.
      * Assigns owning object and field name.
      * @param op ObjectProvider for the owning object
      * @param mmd Metadata for the member
@@ -164,7 +164,7 @@ public class Date extends java.util.Date implements SCO<java.util.Date>
     }
 
     /**
-     * Sets the year of this <tt>Date</tt> object to be the specified 
+     * Sets the year of this <i>Date</i> object to be the specified 
      * value plus 1900. This <code>Date</code> object is modified so 
      * that it represents a point in time within the specified year, 
      * with the month, date, hour, minute, and second the same as 
@@ -186,7 +186,7 @@ public class Date extends java.util.Date implements SCO<java.util.Date>
 
     /**
      * Sets the month of this date to the specified value. This 
-     * <tt>Date</tt> object is modified so that it represents a point 
+     * <i>Date</i> object is modified so that it represents a point 
      * in time within the specified month, with the year, date, hour, 
      * minute, and second the same as before, as interpreted in the 
      * local time zone. If the date was October 31, for example, and 
@@ -205,8 +205,8 @@ public class Date extends java.util.Date implements SCO<java.util.Date>
     }
 
     /**
-     * Sets the day of the month of this <tt>Date</tt> object to the 
-     * specified value. This <tt>Date</tt> object is modified so that 
+     * Sets the day of the month of this <i>Date</i> object to the 
+     * specified value. This <i>Date</i> object is modified so that 
      * it represents a point in time within the specified day of the 
      * month, with the year, month, hour, minute, and second the same 
      * as before, as interpreted in the local time zone. If the date 
@@ -226,8 +226,8 @@ public class Date extends java.util.Date implements SCO<java.util.Date>
     }
 
     /**
-     * Sets the hour of this <tt>Date</tt> object to the specified value. 
-     * This <tt>Date</tt> object is modified so that it represents a point 
+     * Sets the hour of this <i>Date</i> object to the specified value. 
+     * This <i>Date</i> object is modified so that it represents a point 
      * in time within the specified hour of the day, with the year, month, 
      * date, minute, and second the same as before, as interpreted in the 
      * local time zone.
@@ -244,8 +244,8 @@ public class Date extends java.util.Date implements SCO<java.util.Date>
     }
 
     /**
-     * Sets the minutes of this <tt>Date</tt> object to the specified value. 
-     * This <tt>Date</tt> object is modified so that it represents a point 
+     * Sets the minutes of this <i>Date</i> object to the specified value. 
+     * This <i>Date</i> object is modified so that it represents a point 
      * in time within the specified minute of the hour, with the year, month, 
      * date, hour, and second the same as before, as interpreted in the 
      * local time zone.
@@ -262,8 +262,8 @@ public class Date extends java.util.Date implements SCO<java.util.Date>
     }
 
     /**
-     * Sets the seconds of this <tt>Date</tt> to the specified value. 
-     * This <tt>Date</tt> object is modified so that it represents a 
+     * Sets the seconds of this <i>Date</i> to the specified value. 
+     * This <i>Date</i> object is modified so that it represents a 
      * point in time within the specified second of the minute, with 
      * the year, month, date, hour, and minute the same as before, as 
      * interpreted in the local time zone.

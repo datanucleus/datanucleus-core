@@ -20,7 +20,7 @@ package org.datanucleus.exceptions;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>ObjectDetachedException</tt> is thrown if an attempt is
+ * A <i>ObjectDetachedException</i> is thrown if an attempt is
  * made to use the object in a process that doesn't allow detached objects.
  */
 public class ObjectDetachedException extends NucleusUserException

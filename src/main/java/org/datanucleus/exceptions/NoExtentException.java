@@ -21,7 +21,7 @@ package org.datanucleus.exceptions;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>NoExtentException</tt> is thrown if an attempt is made to perform an
+ * A <i>NoExtentException</i> is thrown if an attempt is made to perform an
  * operation using a class that is not backed by an extent (ie table or view)
  * in the database and the operation is not supported on such classes.
  *

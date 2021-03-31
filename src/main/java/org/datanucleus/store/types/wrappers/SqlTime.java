@@ -33,7 +33,7 @@ public class SqlTime extends java.sql.Time implements SCO<java.sql.Time>
     protected transient AbstractMemberMetaData ownerMmd;
 
     /**
-     * Creates a <tt>SqlTime</tt> object that represents the time at which it was allocated.
+     * Creates a <i>SqlTime</i> object that represents the time at which it was allocated.
      * @param op ObjectProvider for the owning object
      * @param mmd Metadata for the member
      */
@@ -152,8 +152,8 @@ public class SqlTime extends java.sql.Time implements SCO<java.sql.Time>
     }
 
     /**
-     * Sets the time of this <tt>Time</tt> object to the specified value.
-     * This <tt>Time</tt> object is modified so that it represents a point in
+     * Sets the time of this <i>Time</i> object to the specified value.
+     * This <i>Time</i> object is modified so that it represents a point in
      * time with the hour, minute, second as specified.
      *
      * @param   time   millisecs since 1 Jan 1970, 00:00:00 GMT

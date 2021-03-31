@@ -233,8 +233,8 @@ public abstract class AbstractQueryResult<E> extends AbstractList<E> implements 
     public abstract ListIterator<E> listIterator();
 
     /**
-     * Returns <tt>true</tt> if this collection contains no elements.
-     * @return <tt>true</tt> if this collection contains no elements.
+     * Returns <i>true</i> if this collection contains no elements.
+     * @return <i>true</i> if this collection contains no elements.
      */
     public boolean isEmpty()
     {

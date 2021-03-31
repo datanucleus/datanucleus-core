@@ -19,7 +19,7 @@ Contributors:
 package org.datanucleus.exceptions;
 
 /**
- * A <tt>DatastoreValidationException</tt> is thrown if a mismatch is discovered
+ * A <i>DatastoreValidationException</i> is thrown if a mismatch is discovered
  * between what the JDO runtime thinks the datastore should look like and what it
  * actually looks like.
  */

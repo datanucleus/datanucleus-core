@@ -20,7 +20,7 @@ package org.datanucleus.exceptions;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>CommitStateTransitionException</tt> is thrown when an error occurs
+ * A <i>CommitStateTransitionException</i> is thrown when an error occurs
  * transitioning from one lifecycle state to another.
  */
 public class CommitStateTransitionException extends NucleusException

@@ -24,7 +24,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>IllegalStateTransitionException</tt> is thrown if a life-cycle
+ * A <i>IllegalStateTransitionException</i> is thrown if a life-cycle
  * state attempts a transition that is illegal.  This indicates a coding
  * bug in the JDO implementation.
  */

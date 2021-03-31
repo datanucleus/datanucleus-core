@@ -1154,7 +1154,7 @@ public class TypeConversionHelper
      * other separators of fields, so as long as the numbers are in the order year, month, day, hour, minute, second then we accept it.
      * @param s Timestamp string
      * @param cal The Calendar to use for conversion
-     * @return Corresponding <tt>java.sql.Timestamp</tt> value.
+     * @return Corresponding <i>java.sql.Timestamp</i> value.
      * @exception java.lang.IllegalArgumentException Thrown if the format of the
      * String is invalid
      */
@@ -1268,7 +1268,7 @@ public class TypeConversionHelper
      * of the passed Calendar.
      * @param ts The timestamp to be formatted.
      * @param cal The Calendar
-     * @return  A String in <tt>yyyy-mm-dd hh:mm:ss.fffffffff</tt> format.
+     * @return  A String in <i>yyyy-mm-dd hh:mm:ss.fffffffff</i> format.
      * @see java.sql.Timestamp
      */
     public static String timestampToString(Timestamp ts, Calendar cal)

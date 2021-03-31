@@ -19,7 +19,7 @@ Contributors:
 package org.datanucleus.exceptions;
 
 /**
- * A <tt>ClassNotResolvedException</tt> is thrown if an attempt is
+ * A <i>ClassNotResolvedException</i> is thrown if an attempt is
  * made to load a class that cannot be found by the ClassLoaderResolver.
  */
 public class ClassNotResolvedException extends NucleusException
