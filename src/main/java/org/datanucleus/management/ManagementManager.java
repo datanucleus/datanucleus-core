@@ -154,10 +154,6 @@ public class ManagementManager
                     {
                         mgmtServer = new PlatformManagementServer();
                     }
-                    else if (jmxType.equals("mx4j"))
-                    {
-                        mgmtServer = new Mx4jManagementServer();
-                    }
                 }
                 if (mgmtServer == null)
                 {
