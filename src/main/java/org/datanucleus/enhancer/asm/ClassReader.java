@@ -101,6 +101,9 @@ public class ClassReader {
   // DontCheck(MemberName): can't be renamed (for backward binary compatibility).
   public final byte[] b;
 
+  /** The offset in bytes of the ClassFile's access_flags field. */
+  public final int header;
+
   /**
    * A byte array containing the JVMS ClassFile structure to be parsed. <i>The content of this array
    * must not be modified. This field is intended for {@link Attribute} sub classes, and is normally
@@ -147,9 +150,6 @@ public class ClassReader {
    */
   private final int maxStringLength;
 
-  /** The offset in bytes of the ClassFile's access_flags field. */
-  public final int header;
-
   // -----------------------------------------------------------------------------------------------
   // Constructors
   // -----------------------------------------------------------------------------------------------
@@ -191,7 +191,7 @@ public class ClassReader {
     this.b = classFileBuffer;
     // Check the class' major_version. This field is after the magic and minor_version fields, which
     // use 4 and 2 bytes respectively.
-    if (checkClassVersion && readShort(classFileOffset + 6) > Opcodes.V15) {
+    if (checkClassVersion && readShort(classFileOffset + 6) > Opcodes.V17) {
       throw new IllegalArgumentException(
           "Unsupported class file major version " + readShort(classFileOffset + 6));
     }
@@ -415,8 +415,7 @@ public class ClassReader {
    * @param parsingOptions the options to use to parse this class. One or more of {@link
    *     #SKIP_CODE}, {@link #SKIP_DEBUG}, {@link #SKIP_FRAMES} or {@link #EXPAND_FRAMES}.
    */
-  @SuppressWarnings("deprecation")
-public void accept(
+  public void accept(
       final ClassVisitor classVisitor,
       final Attribute[] attributePrototypes,
       final int parsingOptions) {
@@ -468,8 +467,8 @@ public void accept(
     String nestHostClass = null;
     // - The offset of the NestMembers attribute, or 0.
     int nestMembersOffset = 0;
-    // - The offset of the PermittedSubtypes attribute, or 0
-    int permittedSubtypesOffset = 0;
+    // - The offset of the PermittedSubclasses attribute, or 0
+    int permittedSubclassesOffset = 0;
     // - The offset of the Record attribute, or 0.
     int recordOffset = 0;
     // - The non standard attributes (linked with their {@link Attribute#nextAttribute} field).
@@ -494,8 +493,8 @@ public void accept(
         nestHostClass = readClass(currentAttributeOffset, charBuffer);
       } else if (Constants.NEST_MEMBERS.equals(attributeName)) {
         nestMembersOffset = currentAttributeOffset;
-      } else if (Constants.PERMITTED_SUBTYPES.equals(attributeName)) {
-        permittedSubtypesOffset = currentAttributeOffset;
+      } else if (Constants.PERMITTED_SUBCLASSES.equals(attributeName)) {
+        permittedSubclassesOffset = currentAttributeOffset;
       } else if (Constants.SIGNATURE.equals(attributeName)) {
         signature = readUTF8(currentAttributeOffset, charBuffer);
       } else if (Constants.RUNTIME_VISIBLE_ANNOTATIONS.equals(attributeName)) {
@@ -507,6 +506,9 @@ public void accept(
       } else if (Constants.SYNTHETIC.equals(attributeName)) {
         accessFlags |= Opcodes.ACC_SYNTHETIC;
       } else if (Constants.SOURCE_DEBUG_EXTENSION.equals(attributeName)) {
+        if (attributeLength > classFileBuffer.length - currentAttributeOffset) {
+          throw new IllegalArgumentException();
+        }
         sourceDebugExtension =
             readUtf(currentAttributeOffset, attributeLength, new char[attributeLength]);
       } else if (Constants.RUNTIME_INVISIBLE_ANNOTATIONS.equals(attributeName)) {
@@ -673,14 +675,14 @@ public void accept(
       }
     }
 
-    // Visit the PermittedSubtypes attribute.
-    if (permittedSubtypesOffset != 0) {
-      int numberOfPermittedSubtypes = readUnsignedShort(permittedSubtypesOffset);
-      int currentPermittedSubtypeOffset = permittedSubtypesOffset + 2;
-      while (numberOfPermittedSubtypes-- > 0) {
-        classVisitor.visitPermittedSubtypeExperimental(
-            readClass(currentPermittedSubtypeOffset, charBuffer));
-        currentPermittedSubtypeOffset += 2;
+    // Visit the PermittedSubclasses attribute.
+    if (permittedSubclassesOffset != 0) {
+      int numberOfPermittedSubclasses = readUnsignedShort(permittedSubclassesOffset);
+      int currentPermittedSubclassesOffset = permittedSubclassesOffset + 2;
+      while (numberOfPermittedSubclasses-- > 0) {
+        classVisitor.visitPermittedSubclass(
+            readClass(currentPermittedSubclassesOffset, charBuffer));
+        currentPermittedSubclassesOffset += 2;
       }
     }
 
@@ -1517,6 +1519,9 @@ public void accept(
     final int maxLocals = readUnsignedShort(currentOffset + 2);
     final int codeLength = readInt(currentOffset + 4);
     currentOffset += 8;
+    if (codeLength > classFileBuffer.length - currentOffset) {
+      throw new IllegalArgumentException();
+    }
 
     // Read the bytecode 'code' array to create a label for each referenced instruction.
     final int bytecodeStartOffset = currentOffset;
@@ -2968,7 +2973,7 @@ public void accept(
       // Parse the array_value array.
       while (numElementValuePairs-- > 0) {
         currentOffset =
-            readElementValue(annotationVisitor, currentOffset, /* named = */ null, charBuffer);
+            readElementValue(annotationVisitor, currentOffset, /* elementName= */ null, charBuffer);
       }
     }
     if (annotationVisitor != null) {
@@ -3446,7 +3451,6 @@ public void accept(
   private int[] readBootstrapMethodsAttribute(final int maxStringLength) {
     char[] charBuffer = new char[maxStringLength];
     int currentAttributeOffset = getFirstAttributeOffset();
-    int[] currentBootstrapMethodOffsets = null;
     for (int i = readUnsignedShort(currentAttributeOffset - 2); i > 0; --i) {
       // Read the attribute_info's attribute_name and attribute_length fields.
       String attributeName = readUTF8(currentAttributeOffset, charBuffer);
@@ -3454,17 +3458,17 @@ public void accept(
       currentAttributeOffset += 6;
       if (Constants.BOOTSTRAP_METHODS.equals(attributeName)) {
         // Read the num_bootstrap_methods field and create an array of this size.
-        currentBootstrapMethodOffsets = new int[readUnsignedShort(currentAttributeOffset)];
+        int[] result = new int[readUnsignedShort(currentAttributeOffset)];
         // Compute and store the offset of each 'bootstrap_methods' array field entry.
         int currentBootstrapMethodOffset = currentAttributeOffset + 2;
-        for (int j = 0; j < currentBootstrapMethodOffsets.length; ++j) {
-          currentBootstrapMethodOffsets[j] = currentBootstrapMethodOffset;
+        for (int j = 0; j < result.length; ++j) {
+          result[j] = currentBootstrapMethodOffset;
           // Skip the bootstrap_method_ref and num_bootstrap_arguments fields (2 bytes each),
           // as well as the bootstrap_arguments array field (of size num_bootstrap_arguments * 2).
           currentBootstrapMethodOffset +=
               4 + readUnsignedShort(currentBootstrapMethodOffset + 2) * 2;
         }
-        return currentBootstrapMethodOffsets;
+        return result;
       }
       currentAttributeOffset += attributeLength;
     }
