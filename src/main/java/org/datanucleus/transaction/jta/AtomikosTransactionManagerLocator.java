@@ -46,7 +46,7 @@ public class AtomikosTransactionManagerLocator implements TransactionManagerLoca
         Class cls = clr.classForName("com.atomikos.icatch.jta.UserTransactionManager");
         try
         {
-            return (TransactionManager) cls.newInstance();
+            return (TransactionManager) cls.getDeclaredConstructor().newInstance();
         }
         catch (Exception e)
         {

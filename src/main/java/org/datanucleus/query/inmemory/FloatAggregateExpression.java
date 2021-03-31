@@ -31,7 +31,7 @@ public class FloatAggregateExpression extends NumericAggregateExpression
     {
         if (obj instanceof Float)
         {
-            return new Float(((Float) obj).floatValue() + ((Float) value).floatValue());
+            return Float.valueOf(((Float) obj).floatValue() + ((Float) value).floatValue());
         }
         return super.add(obj);
     }
@@ -45,7 +45,7 @@ public class FloatAggregateExpression extends NumericAggregateExpression
     {
         if (obj instanceof Float)
         {
-            return new Float(((Float) value).floatValue() / ((Float) obj).floatValue());
+            return Float.valueOf(((Float) value).floatValue() / ((Float) obj).floatValue());
         }
         return super.add(obj);
     }

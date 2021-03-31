@@ -38,7 +38,7 @@ public abstract class ReferenceValueMapTestCase extends TestCase
         {
             freeMem = rt.freeMemory();
             String key = "" + added;
-            Object value = new Integer(added++);
+            Object value = Integer.valueOf(added++);
 
             map.put(key, value);
 
@@ -59,7 +59,7 @@ public abstract class ReferenceValueMapTestCase extends TestCase
         for (int i = 0; i < keyArray.length; i++)
         {
             keyArray[i] = "" + i;
-            valueArray[i] = new Integer(i);
+            valueArray[i] = Integer.valueOf(i);
 
             map.put(keyArray[i], valueArray[i]);
         }

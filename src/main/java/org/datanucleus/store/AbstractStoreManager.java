@@ -226,7 +226,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 try
                 {
                     Class decrypterCls = clr.classForName(decrypterName);
-                    ConnectionEncryptionProvider decrypter = (ConnectionEncryptionProvider) decrypterCls.newInstance();
+                    ConnectionEncryptionProvider decrypter = (ConnectionEncryptionProvider) decrypterCls.getDeclaredConstructor().newInstance();
                     password = decrypter.decrypt(password);
                 }
                 catch (Exception e)

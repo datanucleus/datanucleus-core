@@ -42,12 +42,12 @@ public class DurationTest extends TestCase
         assertEquals(999999999l, (long) ((d2Double.doubleValue()*1E9) - (d2Double.longValue()*1E9)));
 
         // Conversion of Double to Duration
-        Double dbl1 = new Double(8.000600010);
+        Double dbl1 = Double.valueOf(8.000600010);
         Duration dbl1Dur = conv.toMemberType(dbl1);
         assertEquals(8, dbl1Dur.getSeconds());
         assertEquals(600010, dbl1Dur.getNano(), 1);
 
-        Double dbl2 = new Double(5.070000099);
+        Double dbl2 = Double.valueOf(5.070000099);
         Duration dbl2Dur = conv.toMemberType(dbl2);
         assertEquals(5, dbl2Dur.getSeconds());
         assertEquals(70000099, dbl2Dur.getNano(), 1);

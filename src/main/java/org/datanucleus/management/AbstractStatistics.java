@@ -395,7 +395,7 @@ public abstract class AbstractStatistics
                 values.removeFirst();
             }
             sum += value;
-            values.addLast(new Double(value));
+            values.addLast(Double.valueOf(value));
             average = sum / values.size();
             return average;
         }

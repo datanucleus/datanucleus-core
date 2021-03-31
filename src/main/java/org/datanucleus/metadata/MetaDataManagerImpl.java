@@ -1312,7 +1312,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         {
             try 
             {
-                return (MetaDataScanner) clr.classForName((String)so).newInstance();
+                return (MetaDataScanner) clr.classForName((String)so).getDeclaredConstructor().newInstance();
             }
             catch (Throwable t)
             {

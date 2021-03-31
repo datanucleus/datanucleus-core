@@ -562,7 +562,7 @@ public class Lexer
             // Explicit Float
             ci.next();
 
-            return new Float(negate ? "-" + val.toString() : val.toString());
+            return Float.valueOf(negate ? "-" + val.toString() : val.toString());
         }
 
         if (c == 'd' || c == 'D')
@@ -570,7 +570,7 @@ public class Lexer
             // Explicit Double
             ci.next();
 
-            return new Double(negate ? "-" + val.toString() : val.toString());
+            return Double.valueOf(negate ? "-" + val.toString() : val.toString());
         }
 
         if (!dotSeen && !expSeen)

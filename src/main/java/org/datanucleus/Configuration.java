@@ -570,7 +570,7 @@ public class Configuration extends PropertyStore implements Serializable
                 {
                     // Core properties are not in plugin.xml, so load via class loader since the class is in this bundle
                     Class validatorCls = nucCtx.getClassLoaderResolver(getClass().getClassLoader()).classForName(validatorName);
-                    validator = (PropertyValidator)validatorCls.newInstance();
+                    validator = (PropertyValidator)validatorCls.getDeclaredConstructor().newInstance();
                 }
                 if (validator != null)
                 {

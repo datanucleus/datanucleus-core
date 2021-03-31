@@ -15,11 +15,11 @@ public class AbstractQueryResultTest extends TestCase
 {
     List list = new AbstractQueryResultImpl(null);
 
-    Integer i10 = new Integer(10);
+    Integer i10 = Integer.valueOf(10);
 
-    Integer i20 = new Integer(20);
+    Integer i20 = Integer.valueOf(20);
 
-    Integer i30 = new Integer(30);
+    Integer i30 = Integer.valueOf(30);
 
     public AbstractQueryResultTest(String name)
     {

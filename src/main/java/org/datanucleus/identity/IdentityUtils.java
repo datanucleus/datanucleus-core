@@ -402,7 +402,7 @@ public class IdentityUtils
         try
         {
             // All user-defined PK classes have a default constructor
-            Object id = idClass.newInstance();
+            Object id = idClass.getDeclaredConstructor().newInstance();
 
             for (int i=0;i<pkFieldNums.length;i++)
             {

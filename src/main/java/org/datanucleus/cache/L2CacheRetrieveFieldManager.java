@@ -399,7 +399,7 @@ public class L2CacheRetrieveFieldManager extends AbstractFieldManager
         
         try
         {
-            newContainer = container.getClass().newInstance();
+            newContainer = container.getClass().getDeclaredConstructor().newInstance();
         }
         catch (Exception e)
         {

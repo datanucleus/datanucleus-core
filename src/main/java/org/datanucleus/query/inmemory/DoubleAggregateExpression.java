@@ -31,7 +31,7 @@ public class DoubleAggregateExpression extends NumericAggregateExpression
     {
         if (obj instanceof Double)
         {
-            return new Double(((Double) obj).doubleValue() + ((Double) value).doubleValue());
+            return Double.valueOf(((Double) obj).doubleValue() + ((Double) value).doubleValue());
         }
         return super.add(obj);
     }
@@ -45,7 +45,7 @@ public class DoubleAggregateExpression extends NumericAggregateExpression
     {
         if (obj instanceof Double)
         {
-            return new Double(((Double) value).doubleValue() / ((Double) obj).doubleValue());
+            return Double.valueOf(((Double) value).doubleValue() / ((Double) obj).doubleValue());
         }
         return super.add(obj);
     }

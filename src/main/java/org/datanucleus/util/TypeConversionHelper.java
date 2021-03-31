@@ -724,7 +724,7 @@ public class TypeConversionHelper
         Double[] a = new Double[d.length];
         for (int i=0; i < a.length; i++)
         {
-            a[i] = new Double(d[i]);
+            a[i] = Double.valueOf(d[i]);
         }
         return a;
     }
@@ -762,7 +762,7 @@ public class TypeConversionHelper
         Float[] a = new Float[d.length];
         for (int i=0; i < a.length; i++)
         {
-            a[i] = new Float(d[i]);
+            a[i] = Float.valueOf(d[i]);
         }
         return a;
     }

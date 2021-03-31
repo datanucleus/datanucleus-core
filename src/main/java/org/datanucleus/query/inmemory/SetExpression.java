@@ -341,7 +341,7 @@ public class SetExpression
             {
                 if (val == null)
                 {
-                    val = new Double(0);
+                    val = Double.valueOf(0);
                 }
                 memexpr = new DoubleAggregateExpression(((Float)result).doubleValue());
             }
@@ -349,7 +349,7 @@ public class SetExpression
             {
                 if (val == null)
                 {
-                    val = new Double(0);
+                    val = Double.valueOf(0);
                 }
                 memexpr = new DoubleAggregateExpression((Double)result);
             }
@@ -409,12 +409,12 @@ public class SetExpression
         if (val instanceof Float)
         {
             memexpr = new FloatAggregateExpression((Float)val);
-            divisor = new Float(i);
+            divisor = Float.valueOf(i);
         }
         else if (val instanceof Double)
         {
             memexpr = new DoubleAggregateExpression((Double)val);
-            divisor = new Double(i);
+            divisor = Double.valueOf(i);
         }
         else if (val instanceof Long)
         {

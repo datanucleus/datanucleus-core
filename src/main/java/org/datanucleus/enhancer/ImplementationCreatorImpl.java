@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.enhancer;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -96,7 +97,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
                 }
 
                 // Concrete class that is PC so just create an instance using its no args constructor
-                return cls.newInstance();
+                return cls.getDeclaredConstructor().newInstance();
             }
 
             // Interface, so we need an implemenation
@@ -113,6 +114,14 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
                 metaDataMgr.registerPersistentInterface(imd, obj.getClass(), clr);
             }
             return obj;
+        }
+        catch (InvocationTargetException e)
+        {
+            throw new NucleusUserException(e.toString(),e);
+        }
+        catch (NoSuchMethodException e)
+        {
+            throw new NucleusUserException(e.toString(),e);
         }
         catch (ClassNotFoundException e)
         {
@@ -138,7 +147,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
      * @throws IllegalAccessException If an error occurs
      */    
     protected Persistable newInstance(InterfaceMetaData imd, ClassLoaderResolver clr) 
-    throws ClassNotFoundException, InstantiationException, IllegalAccessException
+    throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException
     {
         // Check that all methods of the interface are declared as persistent properties
         Class cls = clr.classForName(imd.getFullClassName());
@@ -182,7 +191,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
         }
 
         // Create an instance of the class using default constructor
-        Object instance = this.loader.loadClass(implFullClassName).newInstance();
+        Object instance = this.loader.loadClass(implFullClassName).getDeclaredConstructor().newInstance();
         if (instance instanceof Persistable)
         {
             return (Persistable) instance;
@@ -219,7 +228,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
      * @throws IllegalAccessException if an error occurs
      */    
     protected Persistable newInstance(ClassMetaData cmd, ClassLoaderResolver clr) 
-    throws ClassNotFoundException, InstantiationException, IllegalAccessException
+    throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException
     {
         // Check that all abstract methods of the class are declared as persistent properties
         Class cls = clr.classForName(cmd.getFullClassName());
@@ -263,7 +272,7 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
         }
 
         // Create an instance of the class using default constructor
-        Object instance = this.loader.loadClass(implFullClassName).newInstance();
+        Object instance = this.loader.loadClass(implFullClassName).getDeclaredConstructor().newInstance();
         if (instance instanceof Persistable)
         {
             return (Persistable) instance;

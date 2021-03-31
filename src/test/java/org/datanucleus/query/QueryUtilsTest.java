@@ -32,7 +32,7 @@ public class QueryUtilsTest extends TestCase
     public void testClassical()
     {
         Object[] fieldValues = new Object[2];
-        fieldValues[0] = new Long(2);
+        fieldValues[0] = Long.valueOf(2);
         fieldValues[1] = "jerome";
         
         Object myObject = QueryUtils.createResultObjectUsingArgumentedConstructor(MyResultClass.class, 
@@ -48,7 +48,7 @@ public class QueryUtilsTest extends TestCase
     public void testNullField()
     {
         Object[] fieldValues = new Object[2];
-        fieldValues[0] = new Long(2);
+        fieldValues[0] = Long.valueOf(2);
         fieldValues[1] = null;
         Object myObject = QueryUtils.createResultObjectUsingArgumentedConstructor(MyResultClass.class, 
             fieldValues, new Class[] {Long.class, String.class});

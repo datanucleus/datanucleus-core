@@ -1773,6 +1773,7 @@ public class ClassUtils
      * @param args The arguments
      * @return The value
      */
+    @SuppressWarnings("deprecation")
     public static Object getValueOfMethodByReflection(Object object, String methodName, Object... args)
     {
         Object methodValue;
@@ -1832,6 +1833,7 @@ public class ClassUtils
      * @param fieldName Name of the field
      * @return The value
      */
+    @SuppressWarnings("deprecation")
     public static Object getValueOfFieldByReflection(Object object, String fieldName)
     {
         Object fieldValue;

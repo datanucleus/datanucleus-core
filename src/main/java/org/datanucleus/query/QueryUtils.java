@@ -278,7 +278,7 @@ public class QueryUtils
         try
         {
             // Create the object
-            obj = resultClass.newInstance();
+            obj = resultClass.getDeclaredConstructor().newInstance();
         }
         catch (Exception e)
         {
@@ -323,7 +323,7 @@ public class QueryUtils
         try
         {
             // Create the object
-            obj = resultClass.newInstance();
+            obj = resultClass.getDeclaredConstructor().newInstance();
         }
         catch (Exception e)
         {
@@ -811,7 +811,7 @@ public class QueryUtils
             Double rightVal = null;
             if (left instanceof BigDecimal)
             {
-                leftVal = new Double(((BigDecimal)left).doubleValue());
+                leftVal = Double.valueOf(((BigDecimal)left).doubleValue());
             }
             else if (left instanceof Double)
             {
@@ -819,31 +819,31 @@ public class QueryUtils
             }
             else if (left instanceof Float)
             {
-                leftVal = new Double(((Float)left).doubleValue());
+                leftVal = Double.valueOf(((Float)left).doubleValue());
             }
             else if (left instanceof BigInteger)
             {
-                leftVal = new Double(((BigInteger)left).doubleValue());
+                leftVal = Double.valueOf(((BigInteger)left).doubleValue());
             }
             else if (left instanceof Long)
             {
-                leftVal = new Double(((Long)left).doubleValue());
+                leftVal = Double.valueOf(((Long)left).doubleValue());
             }
             else if (left instanceof Integer)
             {
-                leftVal = new Double(((Integer)left).doubleValue());
+                leftVal = Double.valueOf(((Integer)left).doubleValue());
             }
             else if (left instanceof Short)
             {
-                leftVal = new Double(((Short)left).doubleValue());
+                leftVal = Double.valueOf(((Short)left).doubleValue());
             }
             else if (left instanceof Enum)
             {
-                leftVal = new Double(((Enum)left).ordinal());
+                leftVal = Double.valueOf(((Enum)left).ordinal());
             }
             if (right instanceof BigDecimal)
             {
-                rightVal = new Double(((BigDecimal)right).doubleValue());
+                rightVal = Double.valueOf(((BigDecimal)right).doubleValue());
             }
             else if (right instanceof Double)
             {
@@ -851,27 +851,27 @@ public class QueryUtils
             }
             else if (right instanceof Float)
             {
-                rightVal = new Double(((Float)right).doubleValue());
+                rightVal = Double.valueOf(((Float)right).doubleValue());
             }
             else if (right instanceof BigInteger)
             {
-                rightVal = new Double(((BigInteger)right).doubleValue());
+                rightVal = Double.valueOf(((BigInteger)right).doubleValue());
             }
             else if (right instanceof Long)
             {
-                rightVal = new Double(((Long)right).doubleValue());
+                rightVal = Double.valueOf(((Long)right).doubleValue());
             }
             else if (right instanceof Integer)
             {
-                rightVal = new Double(((Integer)right).doubleValue());
+                rightVal = Double.valueOf(((Integer)right).doubleValue());
             }
             else if (right instanceof Short)
             {
-                rightVal = new Double(((Short)right).doubleValue());
+                rightVal = Double.valueOf(((Short)right).doubleValue());
             }
             else if (right instanceof Enum)
             {
-                rightVal = new Double(((Enum)right).ordinal());
+                rightVal = Double.valueOf(((Enum)right).ordinal());
             }            
 
             if (leftVal == null || rightVal == null)

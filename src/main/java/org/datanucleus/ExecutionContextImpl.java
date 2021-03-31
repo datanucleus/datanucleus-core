@@ -21,6 +21,7 @@ Contributors:
 package org.datanucleus;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -2809,9 +2810,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             // Concrete PC class so instantiate here
             try
             {
-                return cls.newInstance();
+                return cls.getDeclaredConstructor().newInstance();
             }
-            catch (IllegalAccessException|InstantiationException e)
+            catch (IllegalAccessException|InstantiationException|InvocationTargetException|NoSuchMethodException e)
             {
                 throw new NucleusUserException(e.toString(), e);
             }

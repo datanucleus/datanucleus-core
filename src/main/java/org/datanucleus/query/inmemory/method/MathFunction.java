@@ -74,11 +74,11 @@ public abstract class MathFunction implements InvocationEvaluator
         Object result = null;
         if (paramValue instanceof Double)
         {
-            result = new Double(evaluateMathFunction(((Double)paramValue).doubleValue()));
+            result = Double.valueOf(evaluateMathFunction(((Double)paramValue).doubleValue()));
         }
         else if (paramValue instanceof Float)
         {
-            result = new Float(evaluateMathFunction(((Float)paramValue).floatValue()));
+            result = Float.valueOf((float)evaluateMathFunction(((Float)paramValue).floatValue()));
         }
         else if (paramValue instanceof BigDecimal)
         {
@@ -86,11 +86,11 @@ public abstract class MathFunction implements InvocationEvaluator
         }
         else if (paramValue instanceof Integer)
         {
-            result = new Double(evaluateMathFunction(((Integer)paramValue).doubleValue()));
+            result = Double.valueOf(evaluateMathFunction(((Integer)paramValue).doubleValue()));
         }
         else if (paramValue instanceof Long)
         {
-            result = new Double(evaluateMathFunction(((Long)paramValue).doubleValue()));
+            result = Double.valueOf(evaluateMathFunction(((Long)paramValue).doubleValue()));
         }
         else
         {
