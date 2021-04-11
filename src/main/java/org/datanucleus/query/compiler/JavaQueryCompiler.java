@@ -770,6 +770,7 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                     aliasNode = lastChild;
                 }
             }
+            // TODO If we allow JPQL creator expression to have ALIAS then need to process NAME for those too.
             if (aliasNode != null)
             {
                 alias = (String)aliasNode.getNodeValue();

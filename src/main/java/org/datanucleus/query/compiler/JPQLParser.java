@@ -24,6 +24,7 @@ import java.util.List;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.query.QueryCompilerSyntaxException;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Implementation of a parser for JPQL query language.
@@ -2111,7 +2112,20 @@ public class JPQLParser extends AbstractParser
                     {
                         // Argument for the method call, add as a node property
                         processExpression();
-                        node.addProperty(stack.pop());
+                        Node methodParamNode = stack.pop();
+
+                        // TODO Cater for having "AS alias" when this is a creator expression
+                        if (lexer.peekStringIgnoreCase("AS "))
+                        {
+                            lexer.parseStringIgnoreCase("AS ");
+                            lexer.skipWS();
+                            String alias = lexer.parseIdentifier();
+//                            Node argAliasNode = new Node(NodeType.NAME, alias);
+//                            methodParamNode.appendChildNode(argAliasNode);
+                            NucleusLogger.GENERAL.debug(">>     Found creator with alias=" + alias + " but currently ignored (see jpa-spec-297)");
+                        }
+
+                        node.addProperty(methodParamNode);
                     }
                     while (lexer.parseChar(','));
 
