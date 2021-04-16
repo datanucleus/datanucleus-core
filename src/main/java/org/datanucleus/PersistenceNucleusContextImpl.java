@@ -412,30 +412,26 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         {
             generateSchema = true;
 
-            if (generateScripts)
+            // Add any properties that are needed by schema generation (before we create StoreManager)
+            if (!config.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL)) 
             {
-                // Add any properties that are needed by schema generation (before we create StoreManager)
-                // since script creation requires it
-                if (!config.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL)) 
-                {
-                    config.setProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL, "true"); 
-                }
-                if (!config.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES)) 
-                {
-                    config.setProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, "true");
-                } 
-                if (!config.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS))
-                {
-                    config.setProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, "true"); 
-                }
-                if (!config.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS))
-                {
-                    config.setProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, "true");
-                }
-                if (!config.getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY))
-                {
-                    config.setProperty(PropertyNames.PROPERTY_DATASTORE_READONLY, "false"); 
-                }
+                config.setProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL, "true"); 
+            }
+            if (!config.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES)) 
+            {
+                config.setProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, "true");
+            } 
+            if (!config.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS))
+            {
+                config.setProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, "true"); 
+            }
+            if (!config.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS))
+            {
+                config.setProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, "true");
+            }
+            if (!config.getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY))
+            {
+                config.setProperty(PropertyNames.PROPERTY_DATASTORE_READONLY, "false"); 
             }
         }
 
