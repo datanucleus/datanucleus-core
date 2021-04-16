@@ -408,31 +408,10 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             generateModeStr = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_MODE);
             generateScripts = true;
         }
+
         if (generateModeStr != null && !generateModeStr.equalsIgnoreCase("none"))
         {
             generateSchema = true;
-
-            // Add any properties that are needed by schema generation (before we create StoreManager)
-            if (!config.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL)) 
-            {
-                config.setProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL, "true"); 
-            }
-            if (!config.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES)) 
-            {
-                config.setProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, "true");
-            } 
-            if (!config.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS))
-            {
-                config.setProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, "true"); 
-            }
-            if (!config.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS))
-            {
-                config.setProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, "true");
-            }
-            if (!config.getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY))
-            {
-                config.setProperty(PropertyNames.PROPERTY_DATASTORE_READONLY, "false"); 
-            }
         }
 
         // Create the StoreManager
@@ -1011,6 +990,9 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             SchemaAwareStoreManager schemaStoreMgr = (SchemaAwareStoreManager) storeMgr;
             SchemaTool schemaTool = new SchemaTool();
 
+            // Set schema properties to allow us to do schema changes
+            storeMgr.enableSchemaGeneration();
+
             if (mode == Mode.CREATE)
             {
                 if (generateScripts)
@@ -1224,6 +1206,9 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                     ((SchemaScriptAwareStoreManager)storeMgr).executeScript(scriptContent);
                 }
             }
+
+            // Reset schema properties on StoreManager
+            storeMgr.resetSchemaGeneration();
         }
         else
         {

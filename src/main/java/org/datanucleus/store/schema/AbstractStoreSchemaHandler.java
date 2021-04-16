@@ -31,16 +31,16 @@ public abstract class AbstractStoreSchemaHandler implements StoreSchemaHandler
     protected StoreManager storeMgr;
 
     /** Whether to auto create any database (catalog/schema). */
-    protected final boolean autoCreateDatabase;
+    protected boolean autoCreateDatabase;
 
     /** Whether to auto create any tables. */
-    protected final boolean autoCreateTables;
+    protected boolean autoCreateTables;
 
     /** Whether to auto create any columns that are missing. */
-    protected final boolean autoCreateColumns;
+    protected boolean autoCreateColumns;
 
     /** Whether to auto create any constraints */
-    protected final boolean autoCreateConstraints;
+    protected boolean autoCreateConstraints;
 
     /** Whether to warn only when any errors occur on auto-create. */
     protected final boolean autoCreateWarnOnError;
@@ -61,32 +61,8 @@ public abstract class AbstractStoreSchemaHandler implements StoreSchemaHandler
     {
         this.storeMgr = storeMgr;
 
-        boolean readOnlyDatastore = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY);
-        if (readOnlyDatastore)
-        {
-        	autoCreateDatabase = false;
-            autoCreateTables = false;
-            autoCreateColumns = false;
-            autoCreateConstraints = false;
-        }
-        else
-        {
-            boolean autoCreateAll = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL);
-            if (autoCreateAll)
-            {
-            	autoCreateDatabase = true;
-                autoCreateTables = true;
-                autoCreateColumns = true;
-                autoCreateConstraints = true;
-            }
-            else
-            {
-            	autoCreateDatabase = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_DATABASE);
-                autoCreateTables = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES);
-                autoCreateColumns = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS);
-                autoCreateConstraints = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS);
-            }
-        }
+        resetSchemaGeneration();
+
         autoCreateWarnOnError = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_WARNONERROR);
     	autoDeleteColumns = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTODELETE_COLUMNS);
 
@@ -228,5 +204,45 @@ public abstract class AbstractStoreSchemaHandler implements StoreSchemaHandler
     {
         // Override this if you allow access to schema information
         return null;
+    }
+
+    @Override
+    public void enableSchemaGeneration()
+    {
+        autoCreateDatabase = true;
+        autoCreateTables = true;
+        autoCreateColumns = true;
+        autoCreateConstraints = true;
+    }
+
+    @Override
+    public void resetSchemaGeneration()
+    {
+        boolean readOnlyDatastore = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY);
+        if (readOnlyDatastore)
+        {
+            autoCreateDatabase = false;
+            autoCreateTables = false;
+            autoCreateColumns = false;
+            autoCreateConstraints = false;
+        }
+        else
+        {
+            boolean autoCreateAll = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_ALL);
+            if (autoCreateAll)
+            {
+                autoCreateDatabase = true;
+                autoCreateTables = true;
+                autoCreateColumns = true;
+                autoCreateConstraints = true;
+            }
+            else
+            {
+                autoCreateDatabase = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_DATABASE);
+                autoCreateTables = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES);
+                autoCreateColumns = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS);
+                autoCreateConstraints = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS);
+            }
+        }
     }
 }

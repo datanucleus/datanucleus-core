@@ -1392,6 +1392,18 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         return nucleusContext.getConfiguration().getBooleanObjectProperty(name);
     }
 
+    @Override
+    public void enableSchemaGeneration()
+    {
+        schemaHandler.enableSchemaGeneration();
+    }
+
+    @Override
+    public void resetSchemaGeneration()
+    {
+        schemaHandler.resetSchemaGeneration();
+    }
+
     /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#useBackedSCOWrapperForMember(org.datanucleus.metadata.AbstractMemberMetaData, org.datanucleus.store.ExecutionContext)
      */

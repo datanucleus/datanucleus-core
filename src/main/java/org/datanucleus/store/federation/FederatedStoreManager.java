@@ -628,6 +628,18 @@ public class FederatedStoreManager implements StoreManager
         return primaryStoreMgr.getStringProperty(name);
     }
 
+    @Override
+    public void enableSchemaGeneration()
+    {
+        primaryStoreMgr.enableSchemaGeneration();
+    }
+
+    @Override
+    public void resetSchemaGeneration()
+    {
+        primaryStoreMgr.resetSchemaGeneration();
+    }
+
     /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#transactionStarted(org.datanucleus.store.ExecutionContext)
      */

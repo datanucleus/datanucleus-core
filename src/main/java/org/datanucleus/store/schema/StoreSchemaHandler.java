@@ -98,4 +98,14 @@ public interface StoreSchemaHandler
      * @return Schema data definition for this name
      */
     StoreSchemaData getSchemaData(Object connection, String name, Object[] values);
+
+    /**
+     * Convenience method to override the specified schema generation properties and enable schema generation.
+     */
+    void enableSchemaGeneration();
+
+    /**
+     * Convenience method to reset the schema generation properties to their initial creation values, effectively undoing a call to <i>enableSchemaGeneration</i>.
+     */
+    void resetSchemaGeneration();
 }

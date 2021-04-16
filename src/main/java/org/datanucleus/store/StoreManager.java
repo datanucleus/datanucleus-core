@@ -513,6 +513,16 @@ public interface StoreManager
     String getStringProperty(String name);
 
     /**
+     * Convenience method to override the specified schema generation properties and enable schema generation.
+     */
+    void enableSchemaGeneration();
+
+    /**
+     * Convenience method to reset the schema generation properties to their initial creation values, effectively undoing a call to <i>enableSchemaGeneration</i>.
+     */
+    void resetSchemaGeneration();
+
+    /**
      * Method to inform the StoreManager that a transaction has started for the specified execution context.
      * This allows the StoreManager to initialise any objects as required.
      * @param ec ExecutionContext
