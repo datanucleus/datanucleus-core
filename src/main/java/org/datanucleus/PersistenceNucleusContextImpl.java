@@ -249,10 +249,10 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         // Schema Generation
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_MODE, null, "none", CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_MODE, null, "none", CorePropertyValidator.class.getName(), false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_CREATE_ORDER, null, null, null, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_CREATE_ORDER, null, null, CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_TARGET, null, "datanucleus-schema-create.ddl", null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_SOURCE, null, null, null, false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DROP_ORDER, null, null, null, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DROP_ORDER, null, null, CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_TARGET, null, "datanucleus-schema-drop.ddl", null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_SOURCE, null, null, null, false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_LOAD_SOURCE, null, null, null, false, false);

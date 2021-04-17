@@ -346,6 +346,21 @@ public class CorePropertyValidator implements PropertyValidator
                 }
             }
         }
+        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_SCHEMA_GENERATE_CREATE_ORDER) ||
+                name.equalsIgnoreCase(PropertyNames.PROPERTY_SCHEMA_GENERATE_DROP_ORDER))
+        {
+            if (value instanceof String)
+            {
+                String strVal = (String)value;
+                if (strVal.equalsIgnoreCase("script") ||
+                    strVal.equalsIgnoreCase("metadata") || 
+                    strVal.equalsIgnoreCase("metadata-then-script") ||
+                    strVal.equalsIgnoreCase("script-then-metadata"))
+                {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 }
