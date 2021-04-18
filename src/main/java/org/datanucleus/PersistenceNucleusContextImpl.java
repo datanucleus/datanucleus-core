@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -1233,6 +1234,11 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         }
     }
 
+    /**
+     * Method to load the contents of a file given a resource name.
+     * @param scriptResourceName The resource name (filename?)
+     * @return The contents
+     */
     private String getDatastoreScriptForResourceName(String scriptResourceName)
     {
         if (StringUtils.isWhitespace(scriptResourceName))
@@ -1250,6 +1256,12 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
             }
             catch (Exception e)
             {
+                // Try via the ClassLoaderResolver
+                URL url = getClassLoaderResolver(getClass().getClassLoader()).getResource(scriptResourceName, null);
+                if (url != null)
+                {
+                    file = new File(url.getFile());
+                }
             }
         }
 
