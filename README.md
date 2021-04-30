@@ -119,6 +119,23 @@ Adds a queued operation to the queue for removal of this element.
 
 ----  
 
+### MetaData Process
+
+The _MetaDataManager_ is responsible for loading and providing access to the metadata for all persistable classes. 
+MetaData can come from Java annotations, XML metadata files, or via the JDO MetaData API.
+
+Each class is represented via a _org.datanucleus.metadata.ClassMetaData_
+[[Javadoc]](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/metadata/ClassMetaData.html).
+This in turn has a Collection of 
+_org.datanucleus.metadata.FieldMetaData_
+[[Javadoc]](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/metadata/FieldMetaData.html) andy/or
+_org.datanucleus.metadata.PropertyMetaData_
+[[Javadoc]](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/metadata/PropertyMetaData.html)
+depending whether the metadata is specified on a field or on a getter/setter method.
+Fields/properties are numbered alphabetically, with the _absolute_ field number starting at the root class in an inheritance tree
+and the _relative_ field number starting in the current class.
+
+----
 
 ### Query Process
 
