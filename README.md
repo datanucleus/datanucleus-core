@@ -119,6 +119,20 @@ Adds a queued operation to the queue for removal of this element.
 
 ----  
 
+### Flush Process
+
+When a set of mutating operations are required to be flushed (e.g transaction commit) the _FlushProcess_ for the *StoreManager*
+is executed. At the start of the flush process we have a set of primary objects that were directly modified by the user and passed in to calls,
+as well as a set of secondary objects that were connected to primary objects by relationships, and were also modified. A "modification" could mean
+insert, update, delete. 
+
+An RDBMS uses a _org.datanucleus.flush.FlushOrdered_
+[[Javadoc]](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/flush/FlushOrdered.html).
+Other datastores typically use a _org.datanucleus.flush.FlushNonReferential_
+[[Javadoc]](http://www.datanucleus.org/javadocs/core/latest/org/datanucleus/flush/FlushNonReferential.html).
+
+----  
+
 ### MetaData Process
 
 The _MetaDataManager_ is responsible for loading and providing access to the metadata for all persistable classes. 
