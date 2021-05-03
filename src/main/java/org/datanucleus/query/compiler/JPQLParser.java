@@ -2053,6 +2053,65 @@ public class JPQLParser extends AbstractParser
                 stack.push(next);
                 return true;
             }
+            else if (method.equalsIgnoreCase("EXTRACT"))
+            {
+                // EXTRACT((YEAR | MONTH | DAY | HOUR | MINUTE | SECOND) FROM date_primary)
+                // Convert to be equivalent temporal function call
+                processExpression();
+                Node datetimeNode = stack.pop();
+                String datetimeType = (String) datetimeNode.getNodeValue();
+
+                if (lexer.parseStringIgnoreCase("FROM "))
+                {
+                    // Ignore the FROM
+                }
+                else
+                {
+                    throw new QueryCompilerSyntaxException("FROM expected", lexer.getIndex(), lexer.getInput());
+                }
+
+                processExpression();
+                Node datePrimaryNode = stack.pop();
+
+                if (!lexer.parseChar(')'))
+                {
+                    throw new QueryCompilerSyntaxException("')' expected", lexer.getIndex(), lexer.getInput());
+                }
+
+                Node invokeNode = null;
+                if (datetimeType.equalsIgnoreCase("YEAR"))
+                {
+                    invokeNode = new Node(NodeType.INVOKE, "YEAR");
+                }
+                else if (datetimeType.equalsIgnoreCase("MONTH"))
+                {
+                    invokeNode = new Node(NodeType.INVOKE, "MONTH");
+                }
+                else if (datetimeType.equalsIgnoreCase("DAY"))
+                {
+                    invokeNode = new Node(NodeType.INVOKE, "DAY");
+                }
+                else if (datetimeType.equalsIgnoreCase("HOUR"))
+                {
+                    invokeNode = new Node(NodeType.INVOKE, "HOUR");
+                }
+                else if (datetimeType.equalsIgnoreCase("MINUTE"))
+                {
+                    invokeNode = new Node(NodeType.INVOKE, "MINUTE");
+                }
+                else if (datetimeType.equalsIgnoreCase("SECOND"))
+                {
+                    invokeNode = new Node(NodeType.INVOKE, "SECOND");
+                }
+                // TODO Support QUARTER, WEEK, DATE, TIME, but needs support in store plugins
+                else
+                {
+                    throw new QueryCompilerSyntaxException("YEAR|MONTH|DAY|HOUR|MINUTE|SECOND expected", lexer.getIndex(), lexer.getInput());
+                }
+                invokeNode.addProperty(datePrimaryNode);
+                stack.push(invokeNode);
+                return true;
+            }
             else if (method.equalsIgnoreCase("SIZE"))
             {
                 // SIZE(collection_valued_path_expression)
