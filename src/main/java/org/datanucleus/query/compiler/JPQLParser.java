@@ -2079,35 +2079,23 @@ public class JPQLParser extends AbstractParser
                 }
 
                 Node invokeNode = null;
-                if (datetimeType.equalsIgnoreCase("YEAR"))
+                if (datetimeType.equalsIgnoreCase("YEAR") ||
+                    datetimeType.equalsIgnoreCase("MONTH") ||
+                    datetimeType.equalsIgnoreCase("DAY") ||
+                    datetimeType.equalsIgnoreCase("HOUR") ||
+                    datetimeType.equalsIgnoreCase("MINUTE") ||
+                    datetimeType.equalsIgnoreCase("SECOND") ||
+                    datetimeType.equalsIgnoreCase("QUARTER") ||
+                    datetimeType.equalsIgnoreCase("WEEK"))
                 {
-                    invokeNode = new Node(NodeType.INVOKE, "YEAR");
+                    invokeNode = new Node(NodeType.INVOKE, datetimeType.toUpperCase());
                 }
-                else if (datetimeType.equalsIgnoreCase("MONTH"))
-                {
-                    invokeNode = new Node(NodeType.INVOKE, "MONTH");
-                }
-                else if (datetimeType.equalsIgnoreCase("DAY"))
-                {
-                    invokeNode = new Node(NodeType.INVOKE, "DAY");
-                }
-                else if (datetimeType.equalsIgnoreCase("HOUR"))
-                {
-                    invokeNode = new Node(NodeType.INVOKE, "HOUR");
-                }
-                else if (datetimeType.equalsIgnoreCase("MINUTE"))
-                {
-                    invokeNode = new Node(NodeType.INVOKE, "MINUTE");
-                }
-                else if (datetimeType.equalsIgnoreCase("SECOND"))
-                {
-                    invokeNode = new Node(NodeType.INVOKE, "SECOND");
-                }
-                // TODO Support QUARTER, WEEK, DATE, TIME, but needs support in store plugins
+                // TODO Support DATE, TIME, but needs support in store plugins
                 else
                 {
-                    throw new QueryCompilerSyntaxException("YEAR|MONTH|DAY|HOUR|MINUTE|SECOND expected", lexer.getIndex(), lexer.getInput());
+                    throw new QueryCompilerSyntaxException("YEAR|MONTH|DAY|HOUR|MINUTE|SECOND|WEEK|QUARTER expected", lexer.getIndex(), lexer.getInput());
                 }
+
                 invokeNode.addProperty(datePrimaryNode);
                 stack.push(invokeNode);
                 return true;
