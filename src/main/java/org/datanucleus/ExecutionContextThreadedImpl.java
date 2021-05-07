@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.Extent;
 
@@ -453,7 +454,7 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void replaceObjectId(Object pc, Object oldID, Object newID)
+    public void replaceObjectId(Persistable pc, Object oldID, Object newID)
     {
         try
         {

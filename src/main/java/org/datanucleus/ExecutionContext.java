@@ -569,16 +569,16 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param validate Whether to validate the id
      * @return The object
      */
-    Object findObject(Object id, boolean validate);
+    Persistable findObject(Object id, boolean validate);
 
     /**
-     * Accessor for objects with the specified identities.
+     * Accessor for persistable objects with the specified identities.
      * @param ids Ids of the object(s).
      * @param validate Whether to validate the object state
-     * @return The Objects with these ids (same order)
+     * @return The persistable objects with these ids (same order)
      * @throws NucleusObjectNotFoundException if an object doesn't exist in the datastore
      */
-    Object[] findObjectsById(Object[] ids, boolean validate);
+    Persistable[] findObjectsById(Object[] ids, boolean validate);
 
     /**
      * Accessor for an object given the object id.
@@ -591,7 +591,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param objectClassName Class name for the object with this id (if known, optional)
      * @return The Object
      */
-    Object findObject(Object id, boolean validate, boolean checkInheritance, String objectClassName);
+    Persistable findObject(Object id, boolean validate, boolean checkInheritance, String objectClassName);
 
     /**
      * Accessor for an object given the object id. Typically used after a query to apply the retrieved values to an object.
@@ -602,7 +602,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param checkInheritance Whether to check the inheritance of this object
      * @return the Object
      */
-    Object findObject(Object id, FieldValues fv, Class pcClass, boolean ignoreCache, boolean checkInheritance);
+    Persistable findObject(Object id, FieldValues fv, Class pcClass, boolean ignoreCache, boolean checkInheritance);
 
     /**
      * Accessor for the Extent for a class (and optionally its subclasses).
@@ -891,7 +891,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param oldID the old id
      * @param newID the new id
      */
-    void replaceObjectId(Object pc, Object oldID, Object newID);
+    void replaceObjectId(Persistable pc, Object oldID, Object newID);
 
     /**
      * Access a referenced object for this ObjectProvider during the attach/detach process.

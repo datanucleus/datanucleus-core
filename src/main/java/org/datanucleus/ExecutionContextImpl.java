@@ -3122,7 +3122,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return (T) getStoreManager().getPersistenceHandler().findObjectForUnique(this, cmd, memberNames, memberValues);
     }
 
-    public Object findObject(Object id, boolean validate)
+    public Persistable findObject(Object id, boolean validate)
     {
         return findObject(id, validate, validate, null);
     }
@@ -3138,11 +3138,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param checkInheritance Whether to check the inheritance on the id of the object
      * @return The Object
      */
-    public Object findObject(Object id, FieldValues fv, Class cls, boolean ignoreCache, boolean checkInheritance)
+    public Persistable findObject(Object id, FieldValues fv, Class cls, boolean ignoreCache, boolean checkInheritance)
     {
         assertIsOpen();
 
-        Object pc = null;
+        Persistable pc = null;
         ObjectProvider op = null;
 
         if (!ignoreCache)
@@ -3154,7 +3154,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (pc == null)
         {
             // Find direct from the datastore if supported
-            pc = getStoreManager().getPersistenceHandler().findObject(this, id);
+            pc = (Persistable) getStoreManager().getPersistenceHandler().findObject(this, id);
         }
 
         boolean createdHollow = false;
@@ -3198,7 +3198,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
                 createdHollow = true;
                 op = nucCtx.getObjectProviderFactory().newForHollow(this, cls, id, fv); // Will put object in L1 cache
-                pc = op.getObject();
+                pc = (Persistable) op.getObject();
                 putObjectIntoLevel2Cache(op, false);
             }
         }
@@ -3227,7 +3227,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @return The Objects with these ids (same order)
      * @throws NucleusObjectNotFoundException if an object doesn't exist in the datastore
      */
-    public Object[] findObjectsById(Object[] identities, boolean validate)
+    public Persistable[] findObjectsById(Object[] identities, boolean validate)
     {
         if (identities == null)
         {
@@ -3235,7 +3235,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         }
         else if (identities.length == 1)
         {
-            return new Object[] {findObject(identities[0], validate, validate, null)};
+            return new Persistable[] {findObject(identities[0], validate, validate, null)};
         }
         for (int i=0;i<identities.length;i++)
         {
@@ -3264,14 +3264,14 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             ids[i] = identities[i];
         }
 
-        Map pcById = new HashMap(identities.length);
+        Map<Object, Persistable> pcById = new HashMap(identities.length);
         List idsToFind = new ArrayList();
         ApiAdapter api = getApiAdapter();
 
         // Check the L1 cache
         for (int i=0;i<ids.length;i++)
         {
-            Object pc = getObjectFromLevel1Cache(ids[i]);
+            Persistable pc = getObjectFromLevel1Cache(ids[i]);
             if (pc != null)
             {
                 if (ids[i] instanceof SCOID)
@@ -3294,14 +3294,14 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         if (!idsToFind.isEmpty() && l2CacheEnabled)
         {
             // Check the L2 cache for those not found
-            Map pcsById = getObjectsFromLevel2Cache(idsToFind);
+            Map<Object, Persistable> pcsById = getObjectsFromLevel2Cache(idsToFind);
             if (!pcsById.isEmpty())
             {
                 // Found some so add to the values, and remove from the "toFind" list
-                Iterator<Map.Entry> entryIter = pcsById.entrySet().iterator();
+                Iterator<Map.Entry<Object, Persistable>> entryIter = pcsById.entrySet().iterator();
                 while (entryIter.hasNext())
                 {
-                    Map.Entry entry = entryIter.next();
+                    Map.Entry<Object, Persistable> entry = entryIter.next();
                     pcById.put(entry.getKey(), entry.getValue());
                     idsToFind.remove(entry.getKey());
                 }
@@ -3331,18 +3331,18 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         }
 
-        Object[] foundPcs = null;
+        Persistable[] foundPcs = null;
         if (!idsToFind.isEmpty())
         {
             // Try to find unresolved objects direct from the datastore if supported by the datastore (e.g ODBMS)
-            foundPcs = getStoreManager().getPersistenceHandler().findObjects(this, idsToFind.toArray());
+            foundPcs = (Persistable[]) getStoreManager().getPersistenceHandler().findObjects(this, idsToFind.toArray());
         }
 
         int foundPcIdx = 0;
         for (Object id : idsToFind)
         {
             Object idOrig = id; // Id target class could change due to inheritance level
-            Object pc = foundPcs != null ? foundPcs[foundPcIdx++] : null;
+            Persistable pc = foundPcs != null ? foundPcs[foundPcIdx++] : null;
             ObjectProvider op = null;
             if (pc != null)
             {
@@ -3383,7 +3383,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         }
 
                         op = nucCtx.getObjectProviderFactory().newForHollow(this, pcClass, id);
-                        pc = op.getObject();
+                        pc = (Persistable) op.getObject();
                         if (!validate)
                         {
                             // Mark the ObjectProvider as needing to validate this object before loading fields
@@ -3432,7 +3432,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         }
 
-        Object[] objs = new Object[ids.length];
+        Persistable[] objs = new Persistable[ids.length];
         for (int i=0;i<ids.length;i++)
         {
             Object id = ids[i];
@@ -3454,7 +3454,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @return The Object with this id
      * @throws NucleusObjectNotFoundException if the object doesn't exist in the datastore
      */
-    public Object findObject(Object id, boolean validate, boolean checkInheritance, String objectClassName)
+    public Persistable findObject(Object id, boolean validate, boolean checkInheritance, String objectClassName)
     {
         if (id == null)
         {
@@ -3471,7 +3471,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         boolean fromCache = false;
 
         // try to find object in cache(s)
-        Object pc = getObjectFromCache(id);
+        Persistable pc = getObjectFromCache(id);
         ObjectProvider op = null;
         if (pc != null)
         {
@@ -3495,7 +3495,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         else
         {
             // Find it direct from the store if the store supports that
-            pc = getStoreManager().getPersistenceHandler().findObject(this, id);
+            pc = (Persistable) getStoreManager().getPersistenceHandler().findObject(this, id);
             if (pc != null)
             {
                 op = findObjectProvider(pc);
@@ -3528,7 +3528,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                         }
 
                         op = nucCtx.getObjectProviderFactory().newForHollow(this, pcClass, id);
-                        pc = op.getObject();
+                        pc = (Persistable) op.getObject();
                         if (!checkInheritance && !validate)
                         {
                             // Mark the ObjectProvider as needing to validate this object before loading fields
@@ -3567,7 +3567,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     // Underlying object was changed in the validation process. This can happen when the datastore
                     // is responsible for managing object references and it no longer recognises the cached value.
                     fromCache = false;
-                    pc = op.getObject();
+                    pc = (Persistable) op.getObject();
                     putObjectIntoLevel1Cache(op);
                 }
             }
@@ -3592,8 +3592,8 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         Object id;
         String className;
-        Object pc;
-        public ClassDetailsForId(Object id, String className, Object pc)
+        Persistable pc;
+        public ClassDetailsForId(Object id, String className, Persistable pc)
         {
             this.id = id;
             this.className = className;
@@ -3642,7 +3642,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             checkedClassName = true;
         }
 
-        Object pc = null;
+        Persistable pc = null;
         if (checkInheritance)
         {
             // Validate the inheritance level
@@ -5300,7 +5300,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param oldID the old id it was known by
      * @param newID the new id
      */
-    public void replaceObjectId(Object pc, Object oldID, Object newID)
+    public void replaceObjectId(Persistable pc, Object oldID, Object newID)
     {
         if (pc == null || newID == null)
         {
