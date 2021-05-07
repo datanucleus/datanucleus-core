@@ -163,7 +163,7 @@ public interface ObjectProvider<T> extends StateManager
      * @param cachedPC The cached PC object
      * @param id Id to assign to the persistable object
      */
-    void initialiseForCachedPC(CachedPC<T> cachedPC, Object id);
+    void initialiseForCachedPC(CachedPC cachedPC, Object id);
 
     /**
      * Accessor for the ClassMetaData for this object.

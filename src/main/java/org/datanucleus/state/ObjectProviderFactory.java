@@ -178,5 +178,5 @@ public interface ObjectProviderFactory
      * @param <T> Type of the persistable class
      * @return The ObjectProvider
      */
-    <T> ObjectProvider<T> newForCachedPC(ExecutionContext ec, Object id, CachedPC<T> cachedPC);
+    <T> ObjectProvider<T> newForCachedPC(ExecutionContext ec, Object id, CachedPC cachedPC);
 }

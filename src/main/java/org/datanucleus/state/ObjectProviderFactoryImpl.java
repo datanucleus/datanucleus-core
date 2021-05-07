@@ -260,7 +260,7 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
      * @param id Id to assign to the persistable object
      * @param cachedPC CachedPC object from the L2 cache
      */
-    public <T> ObjectProvider<T> newForCachedPC(ExecutionContext ec, Object id, CachedPC<T> cachedPC)
+    public <T> ObjectProvider<T> newForCachedPC(ExecutionContext ec, Object id, CachedPC cachedPC)
     {
         AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(cachedPC.getObjectClass(), ec.getClassLoaderResolver());
         ObjectProvider op = getObjectProvider(ec, cmd);

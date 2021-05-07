@@ -35,12 +35,12 @@ import org.datanucleus.util.StringUtils;
  * <li>Where the field contains an embedded/serialised persistable object, we store a nested CachedPC object representing that object (since it doesn't exist in its own right).</li>
  * </ul>
  */
-public class CachedPC<T> implements Serializable, Comparable<CachedPC<T>>
+public class CachedPC implements Serializable, Comparable<CachedPC>
 {
     private static final long serialVersionUID = 1326244752228266953L;
 
     /** Class of the object being cached. */
-    private Class<T> cls;
+    private Class cls;
 
     /** Identity of the object being cached. This is to allow recreation of the object when using uniqueKey lookup. This will be null if embedded/serialised. */
     private Object id;
@@ -61,7 +61,7 @@ public class CachedPC<T> implements Serializable, Comparable<CachedPC<T>>
      * @param vers Version of the object (optional)
      * @param id Identity of the object
      */
-    public CachedPC(Class<T> cls, boolean[] loadedFields, Object vers, Object id)
+    public CachedPC(Class cls, boolean[] loadedFields, Object vers, Object id)
     {
         this.cls = cls;
         this.id = id;
@@ -74,7 +74,7 @@ public class CachedPC<T> implements Serializable, Comparable<CachedPC<T>>
         this.version = vers;
     }
 
-    public Class<T> getObjectClass()
+    public Class getObjectClass()
     {
         return cls;
     }
@@ -127,9 +127,9 @@ public class CachedPC<T> implements Serializable, Comparable<CachedPC<T>>
         loadedFields[fieldNumber] = loaded;
     }
 
-    public synchronized CachedPC<T> getCopy()
+    public synchronized CachedPC getCopy()
     {
-        CachedPC<T> copy = new CachedPC(cls, loadedFields, version, id);
+        CachedPC copy = new CachedPC(cls, loadedFields, version, id);
         if (fieldValues != null)
         {
             // TODO Some (mutable) field values may need copying

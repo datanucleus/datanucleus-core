@@ -667,7 +667,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      * @param cachedPC The cached PC object
      * @param id Id to assign to the Persistable object
      */
-    public void initialiseForCachedPC(CachedPC<Persistable> cachedPC, Object id)
+    public void initialiseForCachedPC(CachedPC cachedPC, Object id)
     {
         // Create a new copy of the input object type, performing the majority of the initialisation
         initialiseForHollow(id, null, cachedPC.getObjectClass());
@@ -1355,7 +1355,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         Level2Cache l2cache = myEC.getNucleusContext().getLevel2Cache();
         if (l2cache != null && myEC.getNucleusContext().isClassCacheable(cmd) && !myEC.isObjectModifiedInTransaction(myID))
         {
-            CachedPC<Persistable> cachedPC = l2cache.get(myID);
+            CachedPC cachedPC = l2cache.get(myID);
             if (cachedPC != null)
             {
                 // This originally just updated the L2 cache for fields where the L2 cache didn't have a value for that field, like this
@@ -1404,7 +1404,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         Level2Cache l2cache = myEC.getNucleusContext().getLevel2Cache();
         if (l2cache != null && myEC.getNucleusContext().isClassCacheable(cmd))
         {
-            CachedPC<Persistable> cachedPC = l2cache.get(myID);
+            CachedPC cachedPC = l2cache.get(myID);
             if (cachedPC != null)
             {
                 int[] cacheFieldsToLoad = ClassUtils.getFlagsSetTo(cachedPC.getLoadedFields(), fieldNumbers, true);
