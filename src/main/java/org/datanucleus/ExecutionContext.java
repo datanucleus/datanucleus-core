@@ -25,6 +25,7 @@ import java.util.concurrent.locks.Lock;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.cache.Level1Cache;
 import org.datanucleus.enhancement.ExecutionContextReference;
+import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.exceptions.ClassNotPersistableException;
 import org.datanucleus.exceptions.NoPersistenceInformationException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
@@ -624,7 +625,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param id Id of the object
      * @return Persistable object (with connected ObjectProvider).
      */
-    Object getObjectFromCache(Object id);
+    Persistable getObjectFromCache(Object id);
 
     /**
      * Convenience method to access objects in the cache.
@@ -632,7 +633,7 @@ public interface ExecutionContext extends ExecutionContextReference
      * @param ids Ids of the objects
      * @return Persistable objects (with connected ObjectProvider).
      */
-    Object[] getObjectsFromCache(Object[] ids);
+    Persistable[] getObjectsFromCache(Object[] ids);
 
     /**
      * Method to remove an object from the L1 cache.

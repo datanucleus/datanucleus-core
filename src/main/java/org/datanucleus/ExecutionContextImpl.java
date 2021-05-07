@@ -5024,10 +5024,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param id Id of the object
      * @return Persistable object (with connected ObjectProvider).
      */
-    public Object getObjectFromCache(Object id)
+    public Persistable getObjectFromCache(Object id)
     {
         // Try Level 1 first
-        Object pc = getObjectFromLevel1Cache(id);
+        Persistable pc = getObjectFromLevel1Cache(id);
         if (pc != null)
         {
             return pc;
@@ -5048,13 +5048,14 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param ids Ids of the objects
      * @return Persistable objects (with connected ObjectProviders), or null.
      */
-    public Object[] getObjectsFromCache(Object[] ids)
+    public Persistable[] getObjectsFromCache(Object[] ids)
     {
         if (ids == null || ids.length == 0)
         {
             return null;
         }
-        Object[] objs = new Object[ids.length];
+
+        Persistable[] objs = new Persistable[ids.length];
 
         // Try L1 cache
         Collection idsNotFound = new HashSet();
@@ -5070,7 +5071,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         // Try L2 cache
         if (!idsNotFound.isEmpty())
         {
-            Map l2ObjsById = getObjectsFromLevel2Cache(idsNotFound);
+            Map<Object, Persistable> l2ObjsById = getObjectsFromLevel2Cache(idsNotFound);
             for (int i=0;i<ids.length;i++)
             {
                 if (objs[i] == null)
@@ -5088,9 +5089,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param id Id of the object
      * @return Persistable object (with connected ObjectProvider).
      */
-    public Object getObjectFromLevel1Cache(Object id)
+    protected Persistable getObjectFromLevel1Cache(Object id)
     {
-        Object pc = null;
+        Persistable pc = null;
         ObjectProvider op = null;
 
         if (cache != null)
@@ -5098,7 +5099,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             op = cache.get(id);
             if (op != null)
             {
-                pc = op.getObject();
+                pc = (Persistable) op.getObject();
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
                     NucleusLogger.CACHE.debug(Localiser.msg("003008", StringUtils.toJVMIDString(pc), IdentityUtils.getPersistableIdentityForId(id), 
@@ -5124,9 +5125,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param id Id of the object
      * @return Persistable object (with connected ObjectProvider).
      */
-    protected Object getObjectFromLevel2Cache(Object id)
+    protected Persistable getObjectFromLevel2Cache(Object id)
     {
-        Object pc = null;
+        Persistable pc = null;
 
         if (l2CacheEnabled)
         {
@@ -5149,7 +5150,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 // Create active version of cached object with ObjectProvider connected and same id
                 ObjectProvider op = nucCtx.getObjectProviderFactory().newForCachedPC(this, id, cachedPC);
-                pc = op.getObject(); // Object in P_CLEAN state
+                pc = (Persistable) op.getObject(); // Object in P_CLEAN state
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
                     NucleusLogger.CACHE.debug(Localiser.msg("004006", IdentityUtils.getPersistableIdentityForId(id),
@@ -5184,9 +5185,9 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param uniKey The CacheUniqueKey to use in lookups
      * @return Identity of the associated object
      */
-    protected Object getObjectFromLevel2CacheForUnique(CacheUniqueKey uniKey)
+    protected Persistable getObjectFromLevel2CacheForUnique(CacheUniqueKey uniKey)
     {
-        Object pc = null;
+        Persistable pc = null;
 
         if (l2CacheEnabled)
         {
@@ -5206,7 +5207,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
                 // Create active version of cached object with ObjectProvider connected and same id
                 ObjectProvider op = nucCtx.getObjectProviderFactory().newForCachedPC(this, id, cachedPC);
-                pc = op.getObject(); // Object in P_CLEAN state
+                pc = (Persistable) op.getObject(); // Object in P_CLEAN state
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
                     NucleusLogger.CACHE.debug(Localiser.msg("004006", IdentityUtils.getPersistableIdentityForId(id),
@@ -5241,14 +5242,14 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      * @param ids Collection of ids to retrieve
      * @return Map of persistable objects (with connected ObjectProvider) keyed by their id if found in the L2 cache
      */
-    protected Map getObjectsFromLevel2Cache(Collection ids)
+    protected Map<Object, Persistable> getObjectsFromLevel2Cache(Collection ids)
     {
         if (l2CacheEnabled)
         {
             // TODO Restrict to only those ids that are cacheable
             Level2Cache l2Cache = nucCtx.getLevel2Cache();
             Map<Object, CachedPC> cachedPCs = l2Cache.getAll(ids);
-            Map pcsById = new HashMap(cachedPCs.size());
+            Map<Object, Persistable> pcsById = new HashMap(cachedPCs.size());
 
             for (Map.Entry<Object, CachedPC> entry : cachedPCs.entrySet())
             {
@@ -5258,7 +5259,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     // Create active version of cached object with ObjectProvider connected and same id
                     ObjectProvider op = nucCtx.getObjectProviderFactory().newForCachedPC(this, id, cachedPC);
-                    Object pc = op.getObject(); // Object in P_CLEAN state
+                    Persistable pc = (Persistable)op.getObject(); // Object in P_CLEAN state
                     if (NucleusLogger.CACHE.isDebugEnabled())
                     {
                         NucleusLogger.CACHE.debug(Localiser.msg("004006", IdentityUtils.getPersistableIdentityForId(id),
@@ -5282,8 +5283,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     if (NucleusLogger.CACHE.isDebugEnabled())
                     {
-                        NucleusLogger.CACHE.debug(Localiser.msg("004005",
-                            IdentityUtils.getPersistableIdentityForId(id)));
+                        NucleusLogger.CACHE.debug(Localiser.msg("004005", IdentityUtils.getPersistableIdentityForId(id)));
                     }
                 }
             }
