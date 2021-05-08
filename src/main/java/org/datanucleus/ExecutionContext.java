@@ -76,15 +76,6 @@ public interface ExecutionContext extends ExecutionContextReference
 
     void initialise(Object owner, Map<String, Object> options);
 
-    /**
-     * Method to return the owner object.
-     * For JDO this will return the PersistenceManager in use.
-     * For JPA this will return the EntityManager in use.
-     * Note: This is used by the bytecode enhancement contract.
-     * @return The owner manager object
-     */
-    Object getOwner();
-
     Level1Cache getLevel1Cache();
 
     /**

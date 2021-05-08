@@ -653,10 +653,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         int referenceCounter = 0;
 
         /** Map of the owner of an attached object, keyed by the object. Present when performing attachment. */
-        Map<Object, ObjectProvider> attachedOwnerByObject = null;
+        Map<Persistable, ObjectProvider> attachedOwnerByObject = null;
 
         /** Map of attached PC object keyed by the id. Present when performing a attachment. */
-        Map attachedPCById = null;
+        Map<Object, Persistable> attachedPCById = null;
 
         boolean merging = false;
 
@@ -2455,10 +2455,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         assertClassPersistable(pc.getClass());
 
         // Store the owner for this persistable object being attached
-        Map attachedOwnerByObject = getThreadContextInfo().attachedOwnerByObject; // For the current thread
+        Map<Persistable, ObjectProvider> attachedOwnerByObject = getThreadContextInfo().attachedOwnerByObject; // For the current thread
         if (attachedOwnerByObject != null)
         {
-            attachedOwnerByObject.put(pc, ownerOP);
+            attachedOwnerByObject.put((Persistable) pc, ownerOP);
         }
 
         ApiAdapter api = getApiAdapter();
@@ -2516,10 +2516,10 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         assertDetachable(pc);
 
         // Store the owner for this persistable object being attached
-        Map attachedOwnerByObject = getThreadContextInfo().attachedOwnerByObject; // For the current thread
+        Map<Persistable, ObjectProvider> attachedOwnerByObject = getThreadContextInfo().attachedOwnerByObject; // For the current thread
         if (attachedOwnerByObject != null)
         {
-            attachedOwnerByObject.put(pc, ownerOP);
+            attachedOwnerByObject.put((Persistable) pc, ownerOP);
         }
 
         ApiAdapter api = getApiAdapter();
@@ -2566,7 +2566,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             if (detached)
             {
                 T obj = null;
-                Map attachedPCById = getThreadContextInfo().attachedPCById; // For the current thread
+                Map<Object, Persistable> attachedPCById = getThreadContextInfo().attachedPCById; // For the current thread
                 if (attachedPCById != null) // Only used by persistObject process
                 {
                     obj = (T) attachedPCById.get(getApiAdapter().getIdForObject(pc));
@@ -2580,15 +2580,14 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     // If the object is detached, re-attach it
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("010018", 
-                            StringUtils.toJVMIDString(pc), StringUtils.toJVMIDString(pcTarget)));
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("010018", StringUtils.toJVMIDString(pc), StringUtils.toJVMIDString(pcTarget)));
                     }
                     pcTarget = (T) findObjectProvider(pcTarget).attachCopy(pc, sco);
 
                     // Save the detached-attached PCs for later reference
                     if (attachedPCById != null) // Only used by persistObject process
                     {
-                        attachedPCById.put(getApiAdapter().getIdForObject(pc), pcTarget);
+                        attachedPCById.put(getApiAdapter().getIdForObject(pc), (Persistable) pcTarget);
                     }
                 }
             }

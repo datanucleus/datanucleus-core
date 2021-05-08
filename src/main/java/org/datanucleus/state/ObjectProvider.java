@@ -176,22 +176,14 @@ public interface ObjectProvider<T> extends StateManager
     StoreManager getStoreManager();
 
     /**
-     * The object being persisted, or a virtual object containing properties to be persisted
-     * For persistence of (depends on the API/language):
-     * - Java objects, the object returned is the actual Java object being persisted
-     * - JSON objects, the object returned is an instance of org.json.JSONObject
-     * - XML objects, the object returned is an instance of org.w3c.dom.Node
-     * 
-     * Warning: to obtain the type being persisted use getClassMetaData(), otherwise the store
-     * will not be able objects from any language
-     * @return the object being persisted, or a virtual object containing properties to be persisted
+     * Accessor for the persistable object managed by this StateManager.
+     * @return the persistable object
      */
     T getObject();
 
     /**
      * Returns a printable form of the managed object.
-     * Typically returns Object.toString() form of the managed object.
-     * @return The printable form of the object
+     * @return The object reference for the persistable object.
      */
     String getObjectAsPrintable();
 
