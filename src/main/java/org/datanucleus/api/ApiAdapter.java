@@ -48,6 +48,8 @@ public interface ApiAdapter extends Serializable
      */
     boolean isMemberDefaultPersistent(Class type);
 
+    String getXMLMetaDataForClass(AbstractClassMetaData cmd, String prefix, String indent);
+
     // ------------------------------ Object Lifecycle --------------------------------
 
     /**
