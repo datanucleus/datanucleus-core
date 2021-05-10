@@ -1,5 +1,5 @@
 <BODY>
-    Package handling the compilation of queries.
+    Package handling the (generic) compilation of queries.
     Provides compilation of "string-based" queries. Provides handling for different query languages such as JDOQL and JPQL.
     Compilation of a string-based query goes through two steps.
     <ol>
@@ -7,5 +7,6 @@
         <li>Compilation of the Node tree into an expression tree</li>
     </ol>
     From this tree the evaluation process can be configured to convert it into the native query language for the datastore; this part is handled within each datastore plugin.
-    From this tree an in-memory evaluation can be performed. This is provided in the <i>org.datanucleus.query.evaluator</i> package and subpackage(s).
+
+    From this tree an in-memory evaluation can be performed. This is provided in the <i>org.datanucleus.store.query.inmemory</i> package and subpackage(s).
 </BODY>
