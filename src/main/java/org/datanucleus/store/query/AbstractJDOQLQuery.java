@@ -24,12 +24,10 @@ import java.util.Set;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.ClassNotResolvedException;
-import org.datanucleus.query.JDOQLSingleStringParser;
-import org.datanucleus.query.QueryUtils;
-import org.datanucleus.query.compiler.JDOQLCompiler;
-import org.datanucleus.query.compiler.JavaQueryCompiler;
-import org.datanucleus.query.compiler.QueryCompilation;
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.query.compiler.JDOQLCompiler;
+import org.datanucleus.store.query.compiler.JavaQueryCompiler;
+import org.datanucleus.store.query.compiler.QueryCompilation;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 

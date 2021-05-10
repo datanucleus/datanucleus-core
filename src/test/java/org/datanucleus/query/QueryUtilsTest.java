@@ -17,6 +17,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.query;
 
+import org.datanucleus.store.query.QueryUtils;
+
 import junit.framework.TestCase;
 
 /**

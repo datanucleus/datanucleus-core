@@ -29,7 +29,7 @@ import javax.cache.spi.CachingProvider;
 
 import org.datanucleus.NucleusContext;
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.query.compiler.QueryCompilation;
+import org.datanucleus.store.query.compiler.QueryCompilation;
 import org.datanucleus.util.NucleusLogger;
 
 /**

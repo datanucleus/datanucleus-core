@@ -1,0 +1,313 @@
+/**********************************************************************
+Copyright (c) 2008 Andy Jefferson and others. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Contributors:
+    ...
+**********************************************************************/
+package org.datanucleus.store.query;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.datanucleus.store.query.expression.DyadicExpression;
+import org.datanucleus.store.query.expression.Expression;
+import org.datanucleus.store.query.expression.InvokeExpression;
+import org.datanucleus.store.query.expression.Literal;
+import org.datanucleus.store.query.expression.ParameterExpression;
+import org.datanucleus.store.query.expression.PrimaryExpression;
+import org.datanucleus.store.query.expression.VariableExpression;
+import org.datanucleus.store.query.expression.Expression.Operator;
+
+/**
+ * JDOQL query helper class providing key information about the language etc.
+ */
+public class JDOQLQueryHelper
+{
+    /** Keywords used in single-string JDOQL. Uppercase variants specified here, but we allow the lowercase form. */
+    static final String[] SINGLE_STRING_KEYWORDS = {
+            "SELECT", "UNIQUE", "INTO", "FROM", "EXCLUDE", "SUBCLASSES", "WHERE",
+            "VARIABLES", "PARAMETERS", "GROUP", "ORDER", "BY", "RANGE"
+            };
+    /** Keywords in lowercase (we avoid calling toLowerCase() multiple times, which is expensive operation) **/
+    static final String[] SINGLE_STRING_KEYWORDS_LOWERCASE = {
+            "select", "unique", "into", "from", "exclude", "subclasses", "where",
+            "variables", "parameters", "group", "order", "by", "range"
+            };
+    
+    private static final Map<Operator, String> DYADIC_OP_JDOQL_MAP = Stream.of(new Object[][]{
+            {Expression.OP_AND, " && "},
+            {Expression.OP_OR, " || "},
+            {Expression.OP_BIT_AND, " & "},
+            {Expression.OP_BIT_OR, " | "},
+            {Expression.OP_BIT_XOR, " ^ "},
+            {Expression.OP_ADD, " + "},
+            {Expression.OP_SUB, " - "},
+            {Expression.OP_MUL, " * "},
+            {Expression.OP_DIV, " / "},
+            {Expression.OP_EQ, " == "},
+            {Expression.OP_GT, " > "},
+            {Expression.OP_LT, " < "},
+            {Expression.OP_GTEQ, " >= "},
+            {Expression.OP_LTEQ, " <= "},
+            {Expression.OP_NOTEQ, " != "},
+            {Expression.OP_DISTINCT, ""}
+    }).collect(Collectors.toMap(p -> (Operator) p[0], p -> (String) p[1]));
+
+    /**
+     * Convenience method returning if the supplied name is a keyword for this query language.
+     * @param name Name to check
+     * @return Whether it is a keyword
+     */
+    public static boolean isKeyword(String name)
+    {
+        for (int i=0;i<SINGLE_STRING_KEYWORDS.length;i++)
+        {
+            // JDOQL is case-sensitive - lowercase or UPPERCASE only
+            if (name.equals(SINGLE_STRING_KEYWORDS[i]) || 
+                name.equals(SINGLE_STRING_KEYWORDS_LOWERCASE[i]))
+            {
+                return true;
+            }
+        }
+        if (name.equals("IMPORT") || name.equals("import"))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Convenience method returning if the supplied name is a keyword for this query language, allowing
+     * the DataNucleus extension keywords (UPDATE, DELETE, SET).
+     * @param name Name to check
+     * @return Whether it is a keyword
+     */
+    public static boolean isKeywordExtended(String name)
+    {
+        for (int i=0;i<SINGLE_STRING_KEYWORDS.length;i++)
+        {
+            // JDOQL is case-sensitive - lowercase or UPPERCASE only
+            if (name.equals(SINGLE_STRING_KEYWORDS[i]) || 
+                name.equals(SINGLE_STRING_KEYWORDS_LOWERCASE[i]))
+            {
+                return true;
+            }
+        }
+        if (name.equals("DELETE") || name.equals("delete"))
+        {
+            return true;
+        }
+        if (name.equals("UPDATE") || name.equals("update"))
+        {
+            return true;
+        }
+        if (name.equals("SET") || name.equals("set"))
+        {
+            return true;
+        }
+        if (name.equals("IMPORT") || name.equals("import"))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Utility to check if a name is a valid Java identifier.
+     * Used by JDOQL in validating the names of parameters/variables.
+     * @param s The name
+     * @return Whether it is a valid identifier in Java.
+     **/
+    public static boolean isValidJavaIdentifierForJDOQL(String s)
+    {
+        int len = s.length();
+        if (len < 1)
+        {
+            return false;
+        }
+
+        if (s.equals("this"))
+        {
+            // Use of "this" is restricted in JDOQL
+            return false;
+        }
+
+        char[] c = new char[len];
+        s.getChars(0, len, c, 0);
+
+        if (!Character.isJavaIdentifierStart(c[0]))
+        {
+            return false;
+        }
+
+        for (int i = 1; i < len; ++i)
+        {
+            if (!Character.isJavaIdentifierPart(c[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Convenience method to extract the FROM candidate from a JDOQL query string.
+     * @param query The query string
+     * @return The from candidate
+     */
+    public static String getCandidateFromJDOQLString(String query)
+    {
+        if (query == null)
+        {
+            return null;
+        }
+        int fromStartPos = query.indexOf(" FROM ");
+        if (fromStartPos < 0)
+        {
+            fromStartPos = query.indexOf(" from ");
+        }
+        if (fromStartPos < 0)
+        {
+            return null;
+        }
+
+        String fromStr = query.substring(fromStartPos + 6).trim();
+        int fromEndPos = fromStr.indexOf(' ');
+        String fromCandidate = fromStr;
+        if (fromEndPos > 0)
+        {
+            fromCandidate = fromStr.substring(0, fromEndPos);
+        }
+        return fromCandidate;
+    }
+
+    public static String getJDOQLForExpression(Expression expr)
+    {
+        if (expr instanceof DyadicExpression)
+        {
+            DyadicExpression dyExpr = (DyadicExpression)expr;
+            Expression left = dyExpr.getLeft();
+            Expression right = dyExpr.getRight();
+            StringBuilder str = new StringBuilder("(");
+            if (dyExpr.getOperator() == Expression.OP_DISTINCT)
+            {
+                // Distinct goes in front of the left expression
+                str.append("DISTINCT ");
+            }
+
+            if (left != null)
+            {
+                str.append(JDOQLQueryHelper.getJDOQLForExpression(left));
+            }
+
+            String opString = DYADIC_OP_JDOQL_MAP.get(dyExpr.getOperator());
+
+            // Special cases
+            if (opString != null)
+            {
+                str.append(opString);
+            }
+            else
+            {
+                // TODO Support other operators
+                throw new UnsupportedOperationException("Dont currently support operator " + dyExpr.getOperator() + " in JDOQL conversion");
+            }
+
+            if (right != null)
+            {
+                str.append(JDOQLQueryHelper.getJDOQLForExpression(right));
+            }
+            str.append(")");
+            return str.toString();
+        }
+        else if (expr instanceof PrimaryExpression)
+        {
+            PrimaryExpression primExpr = (PrimaryExpression)expr;
+            if (primExpr.getLeft() != null)
+            {
+                return JDOQLQueryHelper.getJDOQLForExpression(primExpr.getLeft()) + "." + primExpr.getId();
+            }
+            return primExpr.getId();
+        }
+        else if (expr instanceof ParameterExpression)
+        {
+            ParameterExpression paramExpr = (ParameterExpression)expr;
+            if (paramExpr.getId() != null)
+            {
+                return ":" + paramExpr.getId();
+            }
+            return "?" + paramExpr.getPosition();
+        }
+        else if (expr instanceof VariableExpression)
+        {
+            VariableExpression varExpr = (VariableExpression)expr;
+            return varExpr.getId();
+        }
+        else if (expr instanceof InvokeExpression)
+        {
+            InvokeExpression invExpr = (InvokeExpression)expr;
+            StringBuilder str = new StringBuilder();
+            if (invExpr.getLeft() != null)
+            {
+                str.append(JDOQLQueryHelper.getJDOQLForExpression(invExpr.getLeft())).append(".");
+            }
+            str.append(invExpr.getOperation());
+            str.append("(");
+            List<Expression> args = invExpr.getArguments();
+            if (args != null)
+            {
+                Iterator<Expression> iter = args.iterator();
+                while (iter.hasNext())
+                {
+                    str.append(JDOQLQueryHelper.getJDOQLForExpression(iter.next()));
+                    if (iter.hasNext())
+                    {
+                        str.append(",");
+                    }
+                }
+            }
+            str.append(")");
+            return str.toString();
+        }
+        else if (expr instanceof Literal)
+        {
+            Literal litExpr = (Literal)expr;
+            Object value = litExpr.getLiteral();
+            if (value instanceof String || value instanceof Character)
+            {
+                return "'" + value.toString() + "'";
+            }
+            else if (value instanceof Boolean)
+            {
+                return (Boolean)value ? "TRUE" : "FALSE";
+            }
+            else
+            {
+                if (litExpr.getLiteral() == null)
+                {
+                    return "null";
+                }
+                return litExpr.getLiteral().toString();
+            }
+        }
+        else
+        {
+            throw new UnsupportedOperationException("Dont currently support " + expr.getClass().getName() + " in JDOQLHelper");
+        }
+    }
+}

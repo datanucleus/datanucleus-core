@@ -19,7 +19,7 @@ package org.datanucleus.store.query.cache;
 
 import java.util.Map;
 
-import org.datanucleus.query.compiler.QueryCompilation;
+import org.datanucleus.store.query.compiler.QueryCompilation;
 
 /**
  * Abstract representation of a cache of generic query compilations.

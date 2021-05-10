@@ -29,8 +29,8 @@ import java.util.regex.Pattern;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.query.QueryUtils;
 import org.datanucleus.store.query.Query;
+import org.datanucleus.store.query.QueryUtils;
 import org.datanucleus.util.NucleusLogger;
 
 /**

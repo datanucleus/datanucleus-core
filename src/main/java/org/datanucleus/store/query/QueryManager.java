@@ -20,11 +20,11 @@ package org.datanucleus.store.query;
 import java.util.List;
 import java.util.Map;
 
-import org.datanucleus.query.compiler.QueryCompilation;
-import org.datanucleus.query.inmemory.InvocationEvaluator;
 import org.datanucleus.store.query.cache.QueryCompilationCache;
 import org.datanucleus.store.query.cache.QueryDatastoreCompilationCache;
 import org.datanucleus.store.query.cache.QueryResultsCache;
+import org.datanucleus.store.query.compiler.QueryCompilation;
+import org.datanucleus.store.query.inmemory.InvocationEvaluator;
 
 /**
  * Interface providing a way of creating instances of queries for datastores, caching of generic and datastore compilations,

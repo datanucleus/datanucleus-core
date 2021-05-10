@@ -17,7 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.query.cache;
 
-import org.datanucleus.query.compiler.QueryCompilation;
+import org.datanucleus.store.query.compiler.QueryCompilation;
 
 /**
  * Cache for query compilations (generic).
