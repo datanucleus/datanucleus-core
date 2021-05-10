@@ -18,11 +18,10 @@ Contributors:
 package org.datanucleus;
 
 /**
- * Create instances of persistable objects. Instantiation of interfaces or
- * abstract classes is impossible, and for this reason concrete classes are generated and 
- * and enhanced at runtime by the ImplementationCreator. The generated classes
- * are loaded/defined by an internal ClassLoader to the ImplementationCreator. The internal
- * ClassLoader delegates to the ClassLoaderResolver (loader) the load of user classes.
+ * Create instances of persistable objects. 
+ * Instantiation of interfaces or abstract classes is impossible, and for this reason concrete classes are generated and and enhanced at runtime by the ImplementationCreator. 
+ * The generated classes are loaded/defined by an internal ClassLoader to the ImplementationCreator. 
+ * The internal ClassLoader delegates to the ClassLoaderResolver (loader) the load of user classes.
  */
 public interface ImplementationCreator
 {

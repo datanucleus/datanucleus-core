@@ -145,6 +145,8 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
      * @throws ClassNotFoundException If an error occurs
      * @throws InstantiationException If an error occurs
      * @throws IllegalAccessException If an error occurs
+     * @throws InvocationTargetException If an error occurs
+     * @throws NoSuchMethodException If an error occurs
      */    
     protected Persistable newInstance(InterfaceMetaData imd, ClassLoaderResolver clr) 
     throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException
@@ -226,6 +228,8 @@ public class ImplementationCreatorImpl implements Serializable, ImplementationCr
      * @throws ClassNotFoundException if an error occurs
      * @throws InstantiationException if an error occurs
      * @throws IllegalAccessException if an error occurs
+     * @throws InvocationTargetException If an error occurs
+     * @throws NoSuchMethodException If an error occurs
      */    
     protected Persistable newInstance(ClassMetaData cmd, ClassLoaderResolver clr) 
     throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException
