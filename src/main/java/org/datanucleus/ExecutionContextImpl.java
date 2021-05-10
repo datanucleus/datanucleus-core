@@ -3330,18 +3330,18 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             }
         }
 
-        Persistable[] foundPcs = null;
+        Object[] foundPcs = null;
         if (!idsToFind.isEmpty())
         {
             // Try to find unresolved objects direct from the datastore if supported by the datastore (e.g ODBMS)
-            foundPcs = (Persistable[]) getStoreManager().getPersistenceHandler().findObjects(this, idsToFind.toArray());
+            foundPcs = getStoreManager().getPersistenceHandler().findObjects(this, idsToFind.toArray());
         }
 
         int foundPcIdx = 0;
         for (Object id : idsToFind)
         {
             Object idOrig = id; // Id target class could change due to inheritance level
-            Persistable pc = foundPcs != null ? foundPcs[foundPcIdx++] : null;
+            Persistable pc = foundPcs != null ? (Persistable)foundPcs[foundPcIdx++] : null;
             ObjectProvider op = null;
             if (pc != null)
             {
