@@ -67,6 +67,8 @@ public abstract class AbstractManagedConnection implements ManagedConnection
         this.conn = null;
     }
 
+    boolean processingClose = false;
+
     /**
      * Release this connection back to us so we can pool it if required. In the case of a transactional
      * connection it is allocated and released and always pooled (not committed) during the transaction. 
@@ -80,7 +82,15 @@ public abstract class AbstractManagedConnection implements ManagedConnection
             if (useCount == 0)
             {
                 // Close if this is the last use of the connection
-                close();
+                if (!processingClose) 
+                {
+                    // Note that we don't allow attempts to close a connection that is already being closed.
+                    // This is because we may have e.g a JDOQL which retrieves some objects when non-tx, the connection close is called
+                    // This then tries to load all results of the query. If the results load requires a subsequent SQL to get some additional info
+                    // that then would result in a further attempt to call close(), which would go back to the original JDOQL and reattempt the load.
+                    processingClose = true;
+                    close();
+                }
             }
         }
     }
