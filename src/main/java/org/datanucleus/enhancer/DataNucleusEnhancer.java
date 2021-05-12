@@ -820,7 +820,7 @@ public class DataNucleusEnhancer
             }
         }
 
-        throw new NucleusException("No enhanced bytes available for " + className);
+        throw new NucleusException(Localiser.msg("005034", className));
     }
 
     /**
@@ -840,7 +840,7 @@ public class DataNucleusEnhancer
             }
         }
 
-        throw new NucleusException("No pk class bytes available for " + className);
+        throw new NucleusException(Localiser.msg("005035", className));
     }
 
     /**
@@ -962,15 +962,15 @@ public class DataNucleusEnhancer
                 {
                     if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
                     {
-                        addMessage("ENHANCED (Persistable) : " + cmd.getFullClassName(), false);
+                        addMessage(Localiser.msg("005036", cmd.getFullClassName()), false);
                     }
                     else if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_AWARE)
                     {
-                        addMessage("ENHANCED (PersistenceAware) : " + cmd.getFullClassName(), false);
+                        addMessage(Localiser.msg("005037", cmd.getFullClassName()), false);
                     }
                     else
                     {
-                        addMessage("NOT ENHANCED (NonPersistent) : " + cmd.getFullClassName(), false);
+                        addMessage(Localiser.msg("005038", cmd.getFullClassName()), false);
                     }
                 }
             }
@@ -980,15 +980,15 @@ public class DataNucleusEnhancer
                 {
                     if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
                     {
-                        addMessage("ERROR (Persistable) : " + cmd.getFullClassName(), false);
+                        addMessage(Localiser.msg("005039", cmd.getFullClassName()), false);
                     }
                     else if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_AWARE)
                     {
-                        addMessage("ERROR (PersistenceAware) : " + cmd.getFullClassName(), false);
+                        addMessage(Localiser.msg("005040", cmd.getFullClassName()), false);
                     }
                     else
                     {
-                        addMessage("NOT ENHANCED (NonPersistent) : " + cmd.getFullClassName(), false);
+                        addMessage(Localiser.msg("005038", cmd.getFullClassName()), false);
                     }
                 }
                 if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE || cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_AWARE)
@@ -1003,7 +1003,7 @@ public class DataNucleusEnhancer
             // Exception thrown in saving the enhanced file
             if (isVerbose())
             {
-                addMessage("ERROR (NonPersistent) : " + cmd.getFullClassName(), false);
+                addMessage(Localiser.msg("005041", cmd.getFullClassName()), false);
             }
 
             String msg = Localiser.msg("005018", cmd.getFullClassName(), ioe.getMessage());
@@ -1041,15 +1041,15 @@ public class DataNucleusEnhancer
             {
                 if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
                 {
-                    addMessage("ENHANCED (Persistable) : " + cmd.getFullClassName(), false);
+                    addMessage(Localiser.msg("005036", cmd.getFullClassName()), false);
                 }
                 else if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_AWARE)
                 {
-                    addMessage("ENHANCED (PersistenceAware) : " + cmd.getFullClassName(), false);
+                    addMessage(Localiser.msg("005037", cmd.getFullClassName()), false);
                 }
                 else
                 {
-                    addMessage("NOT ENHANCED (NonPersistent) : " + cmd.getFullClassName(), false);
+                    addMessage(Localiser.msg("005038", cmd.getFullClassName()), false);
                 }
             }
         }
@@ -1059,15 +1059,15 @@ public class DataNucleusEnhancer
             {
                 if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_CAPABLE)
                 {
-                    addMessage("NOT ENHANCED (Persistable) : " + cmd.getFullClassName(), false);
+                    addMessage(Localiser.msg("005039", cmd.getFullClassName()), false);
                 }
                 else if (cmd.getPersistenceModifier() == ClassPersistenceModifier.PERSISTENCE_AWARE)
                 {
-                    addMessage("NOT ENHANCED (PersistenceAware) : " + cmd.getFullClassName(), false);
+                    addMessage(Localiser.msg("005040", cmd.getFullClassName()), false);
                 }
                 else
                 {
-                    addMessage("NOT ENHANCED (NonPersistent) : " + cmd.getFullClassName(), false);
+                    addMessage(Localiser.msg("005038", cmd.getFullClassName()), false);
                 }
             }
         }
