@@ -231,10 +231,10 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      * This is required because the query can be executed multiple times changing
      * the input slightly each time for example.
      */
-    protected transient Set<QueryResult> queryResults = new HashSet(1);
+    protected transient Set<QueryResult> queryResults = new HashSet<>(1);
 
     /** Currently executing object for this query, keyed by the thread, to allow for cancellation. */
-    protected transient Map<Thread, Object> tasks = new ConcurrentHashMap(1);
+    protected transient Map<Thread, Object> tasks = new ConcurrentHashMap<>(1);
 
     /**
      * Constructs a new query instance that uses the given ExecutionContext.
@@ -567,7 +567,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     {
         if (extensions == null)
         {
-            extensions = new HashMap();
+            extensions = new HashMap<>();
         }
         extensions.put(key, value);
         if (key.equals(EXTENSION_EXCLUDE_SUBCLASSES))
@@ -596,7 +596,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
      */
     public void setExtensions(Map<String, Object> extensions)
     {
-        this.extensions = extensions != null ? new HashMap(extensions) : null;
+        this.extensions = extensions != null ? new HashMap<>(extensions) : null;
         if (extensions != null && extensions.containsKey(EXTENSION_EXCLUDE_SUBCLASSES))
         {
             subclasses = !getBooleanExtensionProperty(EXTENSION_EXCLUDE_SUBCLASSES, false);
@@ -971,7 +971,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     {
         if (implicitParameters == null)
         {
-            implicitParameters = new HashMap();
+            implicitParameters = new HashMap<>();
         }
         implicitParameters.put(name, value);
 
@@ -1918,7 +1918,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
                 clr.setPrimary(candidateClass.getClassLoader());
             }
 
-            this.inputParameters = new HashMap();
+            this.inputParameters = new HashMap<>();
             if (implicitParameters != null)
             {
                 inputParameters.putAll(implicitParameters);
@@ -2350,7 +2350,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     protected Map getParameterMapForValues(Object[] parameterValues)
     {
         // Generate a parameter map from the parameter names to these input values
-        Map parameterMap = new HashMap();
+        Map parameterMap = new HashMap<>();
         int position = 0;
         if (explicitParameters != null)
         {

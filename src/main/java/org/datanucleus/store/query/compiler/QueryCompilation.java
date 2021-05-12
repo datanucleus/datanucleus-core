@@ -131,7 +131,7 @@ public class QueryCompilation implements Serializable
     {
         if (subqueryCompilations == null)
         {
-            subqueryCompilations = new HashMap();
+            subqueryCompilations = new HashMap<>();
         }
         subqueryCompilations.put(alias, compilation);
     }
@@ -467,10 +467,10 @@ public class QueryCompilation implements Serializable
         if (subqueryCompilations != null)
         {
             str.append("\n");
-            Iterator subqIter = subqueryCompilations.entrySet().iterator();
+            Iterator<Map.Entry<String, QueryCompilation>> subqIter = subqueryCompilations.entrySet().iterator();
             while (subqIter.hasNext())
             {
-                Map.Entry<String, QueryCompilation> entry = (Map.Entry)subqIter.next();
+                Map.Entry<String, QueryCompilation> entry = subqIter.next();
                 str.append(indent).append("[subquery: " + entry.getKey() + "\n");
                 str.append(entry.getValue().debugString(indent + "  ")).append("]");
                 if (subqIter.hasNext())

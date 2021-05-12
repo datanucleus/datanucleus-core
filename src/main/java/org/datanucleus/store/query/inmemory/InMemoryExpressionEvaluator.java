@@ -69,7 +69,7 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
     String queryLanguage = null;
 
     // Note that the chosen queue needs to allow null elements
-    Deque stack = new LinkedList();
+    Deque<Object> stack = new LinkedList<>();
 
     /** Map of input parameter values, keyed by their name. */
     Map parameterValues;
@@ -839,12 +839,12 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             // Static function
             if (method.toLowerCase().equals("count"))
             {
-                Collection coll = (Collection)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
+                Collection<Object> coll = (Collection<Object>)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
                 SetExpression setexpr = new SetExpression(coll, candidateAlias);
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
                 {
-                    coll = new HashSet(coll); // No dups in HashSet
+                    coll = new HashSet<>(coll); // No dups in HashSet
                 }
 
                 int stackSizeOrig = stack.size();
@@ -858,12 +858,12 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             }
             else if (method.toLowerCase().equals("sum"))
             {
-                Collection coll = (Collection)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
+                Collection<Object> coll = (Collection<Object>)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
                 SetExpression setexpr = new SetExpression(coll, candidateAlias);
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
                 {
-                    coll = new HashSet(coll); // No dups in HashSet
+                    coll = new HashSet<>(coll); // No dups in HashSet
                 }
 
                 int stackSizeOrig = stack.size();
@@ -877,12 +877,12 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             }
             else if (method.toLowerCase().equals("avg"))
             {
-                Collection coll = (Collection)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
+                Collection<Object> coll = (Collection<Object>)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
                 SetExpression setexpr = new SetExpression(coll, candidateAlias);
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
                 {
-                    coll = new HashSet(coll); // No dups in HashSet
+                    coll = new HashSet<>(coll); // No dups in HashSet
                 }
 
                 int stackSizeOrig = stack.size();
@@ -896,12 +896,12 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             }
             else if (method.toLowerCase().equals("min"))
             {
-                Collection coll = (Collection)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
+                Collection<Object> coll = (Collection<Object>)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
                 SetExpression setexpr = new SetExpression(coll, candidateAlias);
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
                 {
-                    coll = new HashSet(coll); // No dups in HashSet
+                    coll = new HashSet<>(coll); // No dups in HashSet
                 }
 
                 int stackSizeOrig = stack.size();
@@ -915,12 +915,12 @@ public class InMemoryExpressionEvaluator extends AbstractExpressionEvaluator
             }
             else if (method.toLowerCase().equals("max"))
             {
-                Collection coll = (Collection)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
+                Collection<Object> coll = (Collection<Object>)state.get(JavaQueryInMemoryEvaluator.RESULTS_SET);
                 SetExpression setexpr = new SetExpression(coll, candidateAlias);
                 Expression paramExpr = invokeExpr.getArguments().get(0);
                 if (paramExpr.getOperator() == Expression.OP_DISTINCT)
                 {
-                    coll = new HashSet(coll); // No dups in HashSet
+                    coll = new HashSet<>(coll); // No dups in HashSet
                 }
 
                 int stackSizeOrig = stack.size();

@@ -230,7 +230,7 @@ public class FetchPlan implements Serializable
      */
     public synchronized Set<String> getGroups()
     {
-        return Collections.unmodifiableSet(new HashSet(groups));
+        return Collections.unmodifiableSet(new HashSet<String>(groups));
     }
 
     /**
@@ -245,7 +245,7 @@ public class FetchPlan implements Serializable
 
         if (grpNames != null)
         {
-            Set g = new HashSet(grpNames);
+            Set<String> g = new HashSet<String>(grpNames);
             groups.addAll(g);
 
             Iterator<String> iter = grpNames.iterator();
@@ -420,7 +420,7 @@ public class FetchPlan implements Serializable
             detachmentRoots = null;
         }
 
-        detachmentRoots = new ArrayList();
+        detachmentRoots = new ArrayList<>();
         detachmentRoots.addAll(roots);
         return this;
     }
@@ -613,7 +613,7 @@ public class FetchPlan implements Serializable
         {
             isToCallPostLoadFetchPlanByCmd = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
         }
-        Map cachedIsToCallPostLoadFetchPlan = isToCallPostLoadFetchPlanByCmd.get(cmd);
+        Map<BitSet, Boolean> cachedIsToCallPostLoadFetchPlan = isToCallPostLoadFetchPlanByCmd.get(cmd);
         if (cachedIsToCallPostLoadFetchPlan == null)
         {
             cachedIsToCallPostLoadFetchPlan = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
@@ -628,7 +628,7 @@ public class FetchPlan implements Serializable
         {
             isToCallPostLoadFetchPlanByCmd = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
         }
-        Map cachedIsToCallPostLoadFetchPlan = isToCallPostLoadFetchPlanByCmd.get(cmd);
+        Map<BitSet, Boolean> cachedIsToCallPostLoadFetchPlan = isToCallPostLoadFetchPlanByCmd.get(cmd);
         if (cachedIsToCallPostLoadFetchPlan != null)
         {
             cachedIsToCallPostLoadFetchPlan.clear();

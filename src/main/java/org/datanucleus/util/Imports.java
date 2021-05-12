@@ -37,8 +37,8 @@ import org.datanucleus.exceptions.NucleusUserException;
 public class Imports
 {
     private Map<String, Class> primitives = new HashMap<String, Class>();
-    private Map<String, String> importedClassesByName = new HashMap();
-    private Set<String> importedPackageNames = new HashSet();
+    private Map<String, String> importedClassesByName = new HashMap<>();
+    private Set<String> importedPackageNames = new HashSet<>();
 
     /**
      * Constructor.
