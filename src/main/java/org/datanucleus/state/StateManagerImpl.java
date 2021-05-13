@@ -1200,7 +1200,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 myEC.flushInternal(false);
             }
 
-            myEC.getNucleusContext();
             if (!isEmbedded())
             {
                 // Nothing to delete if embedded
@@ -4685,6 +4684,36 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         finally
         {
             flags &= ~FLAG_MAKING_TRANSIENT;
+        }
+    }
+
+    /**
+     * Make the managed object transient as a result of persistence-by-reachability when run at commit time.
+     * The object was brought into persistence by reachability but found to not be needed at commit time.
+     * Here we delete it from persistence (since it will have been persisted/flushed to the datastore), and
+     * then we migrate the lifecycle to transient (which disconnects this ObjectProvider).
+     */
+    public void makeTransientForReachability()
+    {
+        // Call any lifecycle listeners waiting for this event.
+        getCallbackHandler().preDelete(myPC);
+
+        // Delete the object from the datastore (includes reachability)
+        internalDeletePersistent();
+
+        // Call any lifecycle listeners waiting for this event.
+        getCallbackHandler().postDelete(myPC);
+
+        // Update lifecycle state to TRANSIENT
+        dirty = true;
+        preStateChange();
+        try
+        {
+            myLC = myLC.transitionMakeTransient(this, false, true);
+        }
+        finally
+        {
+            postStateChange();
         }
     }
 

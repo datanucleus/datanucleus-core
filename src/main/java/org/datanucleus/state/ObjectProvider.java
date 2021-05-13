@@ -662,6 +662,11 @@ public interface ObjectProvider<T> extends StateManager
     void makeTransient(FetchPlanState state);
 
     /**
+     * Make the managed object transient due to reachability (at commit) finding it not needing to be persisted.
+     */
+    void makeTransientForReachability();
+
+    /**
      * Method to make the managed object persistent.
      */
     void makePersistent();

@@ -164,11 +164,11 @@ public class ReachabilityAtCommitHandler
             // from makePersistent in this txn, or enlisted existing objects) then run reachability checks
             if (!persistedIds.isEmpty() && !flushedNewIds.isEmpty())
             {
-                Set currentReachables = new HashSet();
+                Set<Object> currentReachableIds = new HashSet<>();
 
                 // Run "reachability" on all known persistent objects for this txn
                 Object ids[] = persistedIds.toArray();
-                Set objectNotFound = new HashSet();
+                Set<Object> objectIdsNotFound = new HashSet<>();
                 for (int i=0; i<ids.length; i++)
                 {
                     if (!deletedIds.contains(ids[i]))
@@ -181,7 +181,7 @@ public class ReachabilityAtCommitHandler
                         {
                             ObjectProvider op = ec.findObjectProvider(ec.findObject(ids[i], true, true, null));
 
-                            if (!op.isDeleted() && !currentReachables.contains(ids[i]))
+                            if (!op.isDeleted() && !currentReachableIds.contains(ids[i]))
                             {
                                 // Make sure all of its relation fields are loaded before continuing. Is this necessary, since its enlisted?
                                 op.loadUnloadedRelationFields();
@@ -191,10 +191,10 @@ public class ReachabilityAtCommitHandler
                                 {
                                     NucleusLogger.PERSISTENCE.debug(Localiser.msg("007000", StringUtils.toJVMIDString(op.getObject()), ids[i], op.getLifecycleState()));
                                 }
-                                currentReachables.add(ids[i]);
+                                currentReachableIds.add(ids[i]);
 
                                 // Go through all relation fields using ReachabilityFieldManager
-                                ReachabilityFieldManager pcFM = new ReachabilityFieldManager(op, currentReachables);
+                                ReachabilityFieldManager pcFM = new ReachabilityFieldManager(op, currentReachableIds);
                                 int[] relationFieldNums = op.getClassMetaData().getRelationMemberPositions(ec.getClassLoaderResolver());
                                 if (relationFieldNums != null && relationFieldNums.length > 0)
                                 {
@@ -204,7 +204,7 @@ public class ReachabilityAtCommitHandler
                         }
                         catch (NucleusObjectNotFoundException ex)
                         {
-                            objectNotFound.add(ids[i]);
+                            objectIdsNotFound.add(ids[i]);
                         }
                     }
                     else
@@ -214,7 +214,7 @@ public class ReachabilityAtCommitHandler
                 }
 
                 // Remove any of the "reachable" instances that are no longer "reachable"
-                flushedNewIds.removeAll(currentReachables);
+                flushedNewIds.removeAll(currentReachableIds);
 
                 Object nonReachableIds[] = flushedNewIds.toArray();
                 if (nonReachableIds != null && nonReachableIds.length > 0)
@@ -230,14 +230,14 @@ public class ReachabilityAtCommitHandler
                         }
                         try
                         {
-                            if (!objectNotFound.contains(nonReachableIds[i]))
+                            if (!objectIdsNotFound.contains(nonReachableIds[i]))
                             {
                                 ObjectProvider op = ec.findObjectProvider(ec.findObject(nonReachableIds[i], true, true, null));
 
                                 if (!op.getLifecycleState().isDeleted() && !ec.getApiAdapter().isDetached(op.getObject()))
                                 {
                                     // Null any relationships for relation fields of this object
-                                    op.replaceFields(op.getClassMetaData().getNonPKMemberPositions(), new NullifyRelationFieldManager(op));
+                                    op.replaceFields(op.getClassMetaData().getRelationMemberPositions(ec.getClassLoaderResolver()), new NullifyRelationFieldManager(op));
                                     ec.flush();
                                 }
                             }
@@ -248,20 +248,23 @@ public class ReachabilityAtCommitHandler
                         }
                     }
 
-                    // B). Remove the objects
+                    // B). Remove the objects and migrate back to transient
                     for (int i=0; i<nonReachableIds.length; i++)
                     {
                         try
                         {
-                            if (!objectNotFound.contains(nonReachableIds[i]))
+                            if (!objectIdsNotFound.contains(nonReachableIds[i]))
                             {
                                 ObjectProvider op = ec.findObjectProvider(ec.findObject(nonReachableIds[i], true, true, null));
-                                op.deletePersistent();
+                                if (!op.isDeleted()) // If the object has since been deleted then no need to do anything
+                                {
+                                    op.makeTransientForReachability();
+                                }
                             }
                         }
                         catch (NucleusObjectNotFoundException ex)
                         {
-                            //just ignore if the file does not exist anymore  
+                            // just ignore if the object does not exist anymore  
                         }
                     }
                 }
