@@ -305,3 +305,13 @@ The handling for multi-tenancy code is present in each of the store plugins but 
 * __isClassMultiTenant__ : returns whether a class should use a multi-tenancy discriminator
 * __getMultiTenancyId__ : return the tenancy id to populate for the current context.
 
+
+### CDI Integration
+
+DataNucleus allows use of CDI injected resources into attribute converter classes (JDO and JPA) as well as JPA lifecycle listeners.
+The basis for this is the specification of the persistence property *datanucleus.cdi.bean.manager*. 
+If this is set then when creating an instance of the objected with injected resources, we call 
+
+    CDIHandler.createObjectWithInjectedDependencies(cls);
+
+

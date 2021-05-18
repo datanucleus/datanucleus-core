@@ -130,6 +130,9 @@ public class PropertyNames
     public static final String PROPERTY_CONNECTION_NONTX_RELEASE_AFTER_USE = "datanucleus.connection.nontx.releaseAfterUse";
     public static final String PROPERTY_CONNECTION_SINGLE_CONNECTION = "datanucleus.connection.singleConnectionPerExecutionContext";
 
+    public static final String PROPERTY_DATASTORE_READ_TIMEOUT = "datanucleus.datastoreReadTimeout";
+    public static final String PROPERTY_DATASTORE_WRITE_TIMEOUT = "datanucleus.datastoreWriteTimeout";
+
     public static final String PROPERTY_CACHE_L1_TYPE = "datanucleus.cache.level1.type";
     public static final String PROPERTY_CACHE_L2_TYPE = "datanucleus.cache.level2.type";
     public static final String PROPERTY_CACHE_COLLECTIONS = "datanucleus.cache.collections";
@@ -170,6 +173,8 @@ public class PropertyNames
     public static final String PROPERTY_MAPPING_CURRENT_USER = "datanucleus.CurrentUser";
     public static final String PROPERTY_MAPPING_CURRENT_USER_PROVIDER = "datanucleus.CurrentUserProvider";
 
+    public static final String PROPERTY_STORE_ALLOW_REFS_WITHOUT_IMPLS = "datanucleus.store.allowReferencesWithNoImplementations";
+
     public static final String PROPERTY_IDENTIFIER_NAMING_FACTORY = "datanucleus.identifier.namingFactory";
     public static final String PROPERTY_IDENTIFIER_CASE = "datanucleus.identifier.case";
     public static final String PROPERTY_IDENTIFIER_TABLE_PREFIX = "datanucleus.identifier.tablePrefix";
@@ -177,12 +182,8 @@ public class PropertyNames
     public static final String PROPERTY_IDENTIFIER_WORD_SEPARATOR = "datanucleus.identifier.wordSeparator";
     public static final String PROPERTY_IDENTIFIER_FACTORY = "datanucleus.identifierFactory"; // TODO Drop this when RDBMS uses NamingFactory
 
-    public static final String PROPERTY_DATASTORE_READ_TIMEOUT = "datanucleus.datastoreReadTimeout";
-    public static final String PROPERTY_DATASTORE_WRITE_TIMEOUT = "datanucleus.datastoreWriteTimeout";
     public static final String PROPERTY_DATASTORE_READONLY = "datanucleus.readOnlyDatastore";
     public static final String PROPERTY_DATASTORE_READONLY_ACTION = "datanucleus.readOnlyDatastoreAction";
-
-    public static final String PROPERTY_STORE_ALLOW_REFS_WITHOUT_IMPLS = "datanucleus.store.allowReferencesWithNoImplementations";
 
     public static final String PROPERTY_SCHEMA_GENERATE_DATABASE_MODE = "datanucleus.generateSchema.database.mode";
     public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_MODE = "datanucleus.generateSchema.scripts.mode";
