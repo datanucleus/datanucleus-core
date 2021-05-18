@@ -25,7 +25,8 @@ import org.datanucleus.store.types.TypeManager;
 
 /**
  * Manager that nullifies any Collection/Map/PC fields of the object.
- * Used by "persistence by reachability at commit" functionality.
+ * NOTE : If called on a non-relation field, this will reset the field to 0!
+ * Used by "persistence-by-reachability at commit" functionality.
  */
 public class NullifyRelationFieldManager extends AbstractFieldManager
 {
