@@ -346,8 +346,8 @@ public class CorePropertyValidator implements PropertyValidator
                 }
             }
         }
-        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_SCHEMA_GENERATE_CREATE_ORDER) ||
-                name.equalsIgnoreCase(PropertyNames.PROPERTY_SCHEMA_GENERATE_DROP_ORDER))
+        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_CREATE_ORDER) ||
+                name.equalsIgnoreCase(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_DROP_ORDER))
         {
             if (value instanceof String)
             {

@@ -185,15 +185,17 @@ public class PropertyNames
     public static final String PROPERTY_DATASTORE_READONLY = "datanucleus.readOnlyDatastore";
     public static final String PROPERTY_DATASTORE_READONLY_ACTION = "datanucleus.readOnlyDatastoreAction";
 
-    public static final String PROPERTY_SCHEMA_GENERATE_DATABASE_MODE = "datanucleus.generateSchema.database.mode";
-    public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_MODE = "datanucleus.generateSchema.scripts.mode";
-    public static final String PROPERTY_SCHEMA_GENERATE_CREATE_ORDER = "datanucleus.generateSchema.create.order";
-    public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_TARGET = "datanucleus.generateSchema.scripts.create.target";
-    public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_SOURCE = "datanucleus.generateSchema.scripts.create.source";
-    public static final String PROPERTY_SCHEMA_GENERATE_DROP_ORDER = "datanucleus.generateSchema.drop.order";
-    public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_TARGET = "datanucleus.generateSchema.scripts.drop.target";
-    public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_SOURCE = "datanucleus.generateSchema.scripts.drop.source";
-    public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_LOAD_SOURCE = "datanucleus.generateSchema.scripts.load";
+    public static final String PROPERTY_SCHEMA_GENERATE_DATABASE_MODE = "datanucleus.schema.generateDatabase.mode";
+    public static final String PROPERTY_SCHEMA_GENERATE_DATABASE_CREATE_SCRIPT = "datanucleus.schema.generateDatabase.createScript";
+    public static final String PROPERTY_SCHEMA_GENERATE_DATABASE_DROP_SCRIPT = "datanucleus.schema.generateDatabase.dropScript";
+    public static final String PROPERTY_SCHEMA_GENERATE_DATABASE_CREATE_ORDER = "datanucleus.schema.generateDatabase.create.order";
+    public static final String PROPERTY_SCHEMA_GENERATE_DATABASE_DROP_ORDER = "datanucleus.schema.generateDatabase.drop.order";
+
+    public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_MODE = "datanucleus.schema.generateScripts.mode";
+    public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE = "datanucleus.schema.generateScripts.create";
+    public static final String PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP = "datanucleus.schema.generateScripts.drop";
+
+    public static final String PROPERTY_SCHEMA_LOAD_SCRIPT = "datanucleus.schema.loadScript";
 
     public static final String PROPERTY_SCHEMA_AUTOCREATE_ALL = "datanucleus.schema.autoCreateAll";
     public static final String PROPERTY_SCHEMA_AUTOCREATE_DATABASE = "datanucleus.schema.autoCreateDatabase";

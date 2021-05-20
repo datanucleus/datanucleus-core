@@ -250,13 +250,13 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         // Schema Generation
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_MODE, null, "none", CorePropertyValidator.class.getName(), false, false);
         conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_MODE, null, "none", CorePropertyValidator.class.getName(), false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_CREATE_ORDER, null, null, CorePropertyValidator.class.getName(), false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_TARGET, null, "datanucleus-schema-create.ddl", null, false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_SOURCE, null, null, null, false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DROP_ORDER, null, null, CorePropertyValidator.class.getName(), false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_TARGET, null, "datanucleus-schema-drop.ddl", null, false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_SOURCE, null, null, null, false, false);
-        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_LOAD_SOURCE, null, null, null, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_CREATE_ORDER, null, null, CorePropertyValidator.class.getName(), false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE, null, "datanucleus-schema-create.ddl", null, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_CREATE_SCRIPT, null, null, null, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_DROP_ORDER, null, null, CorePropertyValidator.class.getName(), false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP, null, "datanucleus-schema-drop.ddl", null, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_DROP_SCRIPT, null, null, null, false, false);
+        conf.addDefaultProperty(PropertyNames.PROPERTY_SCHEMA_LOAD_SCRIPT, null, null, null, false, false);
 
         // Cache
         conf.addDefaultBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS, null, true, false, true);
@@ -999,14 +999,14 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 if (generateScripts)
                 {
                     // Generate the required script
-                    schemaTool.setDdlFile(config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_TARGET));
+                    schemaTool.setDdlFile(config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE));
                     schemaTool.createSchemaForClasses(schemaStoreMgr, schemaClassNames);
                 }
                 else
                 {
                     // Process the required metadata/script
-                    String createOrder = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_CREATE_ORDER);
-                    String createScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_SOURCE);
+                    String createOrder = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_CREATE_ORDER);
+                    String createScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_CREATE_SCRIPT);
                     if (StringUtils.isWhitespace(createScript))
                     {
                         createScript = null;
@@ -1052,14 +1052,14 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 if (generateScripts)
                 {
                     // Generate the required script
-                    schemaTool.setDdlFile(config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_TARGET));
+                    schemaTool.setDdlFile(config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP));
                     schemaTool.deleteSchemaForClasses(schemaStoreMgr, schemaClassNames);
                 }
                 else
                 {
                     // Process the required metadata/script
-                    String dropOrder = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DROP_ORDER);
-                    String dropScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_SOURCE);
+                    String dropOrder = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_DROP_ORDER);
+                    String dropScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_DROP_SCRIPT);
                     if (StringUtils.isWhitespace(dropScript))
                     {
                         dropScript = null;
@@ -1105,17 +1105,17 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 if (generateScripts)
                 {
                     // Generate the required scripts
-                    schemaTool.setDdlFile(config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_TARGET));
+                    schemaTool.setDdlFile(config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP));
                     schemaTool.deleteSchemaForClasses(schemaStoreMgr, schemaClassNames);
 
-                    schemaTool.setDdlFile(config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_TARGET));
+                    schemaTool.setDdlFile(config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE));
                     schemaTool.createSchemaForClasses(schemaStoreMgr, schemaClassNames);
                 }
                 else
                 {
                     // Process the required metadata/scripts
-                    String dropOrder = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DROP_ORDER);
-                    String dropScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_DROP_SOURCE);
+                    String dropOrder = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_DROP_ORDER);
+                    String dropScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_DROP_SCRIPT);
                     if (StringUtils.isWhitespace(dropScript))
                     {
                         dropScript = null;
@@ -1155,8 +1155,8 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                         schemaTool.deleteSchemaForClasses(schemaStoreMgr, schemaClassNames);
                     }
 
-                    String createOrder = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_CREATE_ORDER);
-                    String createScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_CREATE_SOURCE);
+                    String createOrder = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_CREATE_ORDER);
+                    String createScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_CREATE_SCRIPT);
                     if (StringUtils.isWhitespace(createScript))
                     {
                         createScript = null;
@@ -1198,7 +1198,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 }
             }
 
-            String loadScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_GENERATE_SCRIPTS_LOAD_SOURCE);
+            String loadScript = config.getStringProperty(PropertyNames.PROPERTY_SCHEMA_LOAD_SCRIPT);
             if (!StringUtils.isWhitespace(loadScript))
             {
                 String scriptContent = getDatastoreScriptForResourceName(loadScript);
