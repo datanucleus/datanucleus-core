@@ -22,12 +22,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.fieldmanager.NullifyRelationFieldManager;
 import org.datanucleus.store.fieldmanager.ReachabilityFieldManager;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
-import org.datanucleus.util.StringUtils;
 
 /**
  * Handler to process "persistence-by-reachability" at commit.
@@ -189,7 +189,7 @@ public class ReachabilityAtCommitHandler
                                 // Add this object id since not yet reached
                                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                                 {
-                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007000", StringUtils.toJVMIDString(op.getObject()), ids[i], op.getLifecycleState()));
+                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007000", IdentityUtils.getPersistableIdentityForId(ids[i]), op.getLifecycleState()));
                                 }
                                 currentReachableIds.add(ids[i]);
 

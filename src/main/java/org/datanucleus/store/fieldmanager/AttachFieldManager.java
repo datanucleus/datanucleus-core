@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
@@ -35,7 +36,6 @@ import org.datanucleus.store.types.SCOContainer;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
-import org.datanucleus.util.StringUtils;
 
 /**
  * Utility class to handle the attach of fields.
@@ -199,7 +199,7 @@ public class AttachFieldManager extends AbstractFieldManager
                     // Detached object didn't use wrapped field
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029", StringUtils.toJVMIDString(attachedOP.getObject()), attachedOP.getInternalObjectId(), mmd.getName()));
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029", IdentityUtils.getPersistableIdentityForId(attachedOP.getInternalObjectId()), mmd.getName()));
                     }
                     sco = ec.getTypeManager().createSCOInstance(attachedOP, mmd, value.getClass(), null, false);
                     if (sco instanceof SCOContainer)

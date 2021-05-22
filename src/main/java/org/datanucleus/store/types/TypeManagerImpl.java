@@ -500,8 +500,9 @@ public class TypeManagerImpl implements TypeManager, Serializable
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029", StringUtils.toJVMIDString(ownerOP.getObject()), 
-                        ownerOP.getExecutionContext() != null ? IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()) : ownerOP.getInternalObjectId(), mmd.getName()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029", 
+                        ownerOP.getExecutionContext() != null ? IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()) : ownerOP.getInternalObjectId(), 
+                        mmd.getName()));
                 }
             }
 

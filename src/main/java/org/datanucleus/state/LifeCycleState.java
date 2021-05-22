@@ -25,7 +25,6 @@ import org.datanucleus.FetchPlan;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.Localiser;
-import org.datanucleus.util.StringUtils;
 
 /**
  * Base Class representing the life cycle state. Implemented for individual states.
@@ -94,8 +93,7 @@ public abstract class LifeCycleState
 
         if (NucleusLogger.LIFECYCLE.isDebugEnabled())
         {
-            NucleusLogger.LIFECYCLE.debug(Localiser.msg("027016", StringUtils.toJVMIDString(op.getObject()), 
-                IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), this, newState));
+            NucleusLogger.LIFECYCLE.debug(Localiser.msg("027016", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), this, newState));
         }
 
         if (isTransactional)

@@ -1361,7 +1361,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 CachedPC copyCachedPC = cachedPC.getCopy();
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
-                    NucleusLogger.CACHE.debug(Localiser.msg("026033", StringUtils.toJVMIDString(getObject()), myID, StringUtils.intArrayToString(cacheFieldsToLoad)));
+                    NucleusLogger.CACHE.debug(Localiser.msg("026033", IdentityUtils.getPersistableIdentityForId(myID), StringUtils.intArrayToString(cacheFieldsToLoad)));
                 }
 
                 provideFields(cacheFieldsToLoad, new L2CachePopulateFieldManager(this, copyCachedPC));
@@ -1403,8 +1403,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                 {
                     if (NucleusLogger.CACHE.isDebugEnabled())
                     {
-                        NucleusLogger.CACHE.debug(Localiser.msg("026034", StringUtils.toJVMIDString(getObject()), myID,
-                            StringUtils.intArrayToString(cacheFieldsToLoad)));
+                        NucleusLogger.CACHE.debug(Localiser.msg("026034", IdentityUtils.getPersistableIdentityForId(myID), StringUtils.intArrayToString(cacheFieldsToLoad)));
                     }
 
                     L2CacheRetrieveFieldManager l2RetFM = new L2CacheRetrieveFieldManager(this, cachedPC);
@@ -4802,7 +4801,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                                 String fieldName = cmd.getMetaDataForManagedMemberAtAbsolutePosition(i).getName();
                                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                                 {
-                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026032", StringUtils.toJVMIDString(myPC), IdentityUtils.getPersistableIdentityForId(myID), fieldName));
+                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026032", IdentityUtils.getPersistableIdentityForId(myID), fieldName));
                                 }
                                 unloadField(fieldName);
                             }
@@ -4839,7 +4838,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             else
             {
                 // Warn the user since they selected detachAllOnCommit
-                NucleusLogger.PERSISTENCE.warn(Localiser.msg("026031", myPC.getClass().getName(), IdentityUtils.getPersistableIdentityForId(myID)));
+                NucleusLogger.PERSISTENCE.warn(Localiser.msg("026031", IdentityUtils.getPersistableIdentityForId(myID)));
 
                 // Make the object transient
                 makeTransient(null);

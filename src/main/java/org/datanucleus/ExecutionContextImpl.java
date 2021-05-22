@@ -1132,7 +1132,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
         if (NucleusLogger.TRANSACTION.isDebugEnabled())
         {
-            NucleusLogger.TRANSACTION.debug(Localiser.msg("015017", StringUtils.toJVMIDString(op.getObject()), op.getInternalObjectId().toString()));
+            NucleusLogger.TRANSACTION.debug(Localiser.msg("015017", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId())));
         }
         enlistedOPCache.put(op.getInternalObjectId(), op);
     }
@@ -1147,8 +1147,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         {
             if (NucleusLogger.TRANSACTION.isDebugEnabled())
             {
-                NucleusLogger.TRANSACTION.debug(Localiser.msg("015019", StringUtils.toJVMIDString(op.getObject()), 
-                    IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId())));
+                NucleusLogger.TRANSACTION.debug(Localiser.msg("015019", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId())));
             }
         }
     }
@@ -1401,7 +1400,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 if (NucleusLogger.TRANSACTION.isDebugEnabled())
                 {
-                    NucleusLogger.TRANSACTION.debug(Localiser.msg("015017", StringUtils.toJVMIDString(op.getObject()), op.getInternalObjectId().toString()));
+                    NucleusLogger.TRANSACTION.debug(Localiser.msg("015017", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId())));
                 }
                 enlistedOPCache.put(op.getInternalObjectId(), op);
             }
@@ -4294,7 +4293,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     if (nucCtx.getLevel2Cache().containsOid(id))
                     {
-                        NucleusLogger.CACHE.debug(Localiser.msg("004014", id));
+                        NucleusLogger.CACHE.debug(Localiser.msg("004014", IdentityUtils.getPersistableIdentityForId(id)));
                     }
                 }
                 if (idsToRemove == null)
@@ -4317,7 +4316,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     // Object has been deleted so remove from L2 cache
                     if (NucleusLogger.CACHE.isDebugEnabled())
                     {
-                        NucleusLogger.CACHE.debug(Localiser.msg("004007", StringUtils.toJVMIDString(obj), op.getInternalObjectId()));
+                        NucleusLogger.CACHE.debug(Localiser.msg("004007", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId())));
                     }
                     if (idsToRemove == null)
                     {
@@ -4688,8 +4687,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 if (oldOP == null)
                 {
-                    NucleusLogger.CACHE.debug(Localiser.msg("003004", StringUtils.toJVMIDString(op.getObject()), 
-                        IdentityUtils.getPersistableIdentityForId(id), StringUtils.booleanArrayToString(op.getLoadedFields())));
+                    NucleusLogger.CACHE.debug(Localiser.msg("003004", IdentityUtils.getPersistableIdentityForId(id), StringUtils.booleanArrayToString(op.getLoadedFields())));
                 }
             }
         }
@@ -4809,7 +4807,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 int[] loadedFieldNums = cachedPC.getLoadedFieldNumbers();
                 String fieldNames = (loadedFieldNums == null || loadedFieldNums.length == 0) ? "" : StringUtils.intArrayToString(loadedFieldNums);
-                NucleusLogger.CACHE.debug(Localiser.msg("004015", StringUtils.toJVMIDString(op.getObject()), op.getInternalObjectId(), 
+                NucleusLogger.CACHE.debug(Localiser.msg("004015", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
                     fieldNames, cachedPC.getVersion(), StringUtils.intArrayToString(fieldsToUpdate)));
             }
         }
@@ -4829,9 +4827,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             {
                 int[] loadedFieldNums = cachedPC.getLoadedFieldNumbers();
                 String fieldNames = (loadedFieldNums == null || loadedFieldNums.length == 0) ? "" : StringUtils.intArrayToString(loadedFieldNums);
-//                NucleusLogger.CACHE.debug(Localiser.msg("004003", StringUtils.toJVMIDString(op.getObject()), op.getInternalObjectId(), fieldNames, cachedPC.getVersion()));
-                NucleusLogger.CACHE.debug(Localiser.msg("004003", StringUtils.toJVMIDString(op.getObject()), 
-                    IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), fieldNames, cachedPC.getVersion()));
+                NucleusLogger.CACHE.debug(Localiser.msg("004003", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), fieldNames, cachedPC.getVersion()));
             }
         }
 
@@ -5101,8 +5097,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 pc = (Persistable) op.getObject();
                 if (NucleusLogger.CACHE.isDebugEnabled())
                 {
-                    NucleusLogger.CACHE.debug(Localiser.msg("003008", StringUtils.toJVMIDString(pc), IdentityUtils.getPersistableIdentityForId(id), 
-                        StringUtils.booleanArrayToString(op.getLoadedFields())));
+                    NucleusLogger.CACHE.debug(Localiser.msg("003008", IdentityUtils.getPersistableIdentityForId(id), StringUtils.booleanArrayToString(op.getLoadedFields())));
                 }
 
                 // Wipe the detach state that may have been added if the object has been serialised in the meantime
@@ -5320,8 +5315,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                     // Remove the old variant
                     if (NucleusLogger.CACHE.isDebugEnabled())
                     {
-                        NucleusLogger.CACHE.debug(Localiser.msg("003012", StringUtils.toJVMIDString(pc), 
-                            IdentityUtils.getPersistableIdentityForId(oldID), IdentityUtils.getPersistableIdentityForId(newID)));
+                        NucleusLogger.CACHE.debug(Localiser.msg("003012", IdentityUtils.getPersistableIdentityForId(oldID), IdentityUtils.getPersistableIdentityForId(newID)));
                     }
                     cache.remove(oldID);
                 }
@@ -5341,8 +5335,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 enlistedOPCache.put(newID, op);
                 if (NucleusLogger.TRANSACTION.isDebugEnabled())
                 {
-                    NucleusLogger.TRANSACTION.debug(Localiser.msg("015018", StringUtils.toJVMIDString(pc),
-                        IdentityUtils.getPersistableIdentityForId(oldID), IdentityUtils.getPersistableIdentityForId(newID)));
+                    NucleusLogger.TRANSACTION.debug(Localiser.msg("015018", IdentityUtils.getPersistableIdentityForId(oldID), IdentityUtils.getPersistableIdentityForId(newID)));
                 }
             }
         }

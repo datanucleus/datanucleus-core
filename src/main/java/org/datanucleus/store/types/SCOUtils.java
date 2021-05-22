@@ -82,8 +82,7 @@ public class SCOUtils
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             AbstractMemberMetaData mmd = ownerOP.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(memberNumber);
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("026030", StringUtils.toJVMIDString(ownerOP.getObject()), 
-                IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getName()));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("026030", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getName()));
         }
         ownerOP.replaceField(memberNumber, unwrappedValue);
         return unwrappedValue;
@@ -114,8 +113,9 @@ public class SCOUtils
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029", StringUtils.toJVMIDString(ownerOP.getObject()), 
-                        ownerOP.getExecutionContext() != null ? IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()) : ownerOP.getInternalObjectId(), mmd.getName()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029",
+                        ownerOP.getExecutionContext() != null ? IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()) : ownerOP.getInternalObjectId(), 
+                        mmd.getName()));
                 }
             }
             return ownerOP.getExecutionContext().getTypeManager().createSCOInstance(ownerOP, mmd, value.getClass(), value, replaceFieldIfChanged);

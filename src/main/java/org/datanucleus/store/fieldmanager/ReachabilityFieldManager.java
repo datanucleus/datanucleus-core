@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
@@ -28,7 +29,6 @@ import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
-import org.datanucleus.util.StringUtils;
 
 /**
  * Field manager that runs reachability on all PC objects referenced from the source object.
@@ -77,7 +77,7 @@ public class ReachabilityFieldManager extends AbstractFieldManager
                 // Add this object id since not yet reached
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007000", StringUtils.toJVMIDString(obj), objID, objOP.getLifecycleState()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007000", IdentityUtils.getPersistableIdentityForId(objID), objOP.getLifecycleState()));
                 }
                 reachables.add(objID);
 
