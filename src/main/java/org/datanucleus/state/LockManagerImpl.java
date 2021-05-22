@@ -25,6 +25,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusOptimisticException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaData;
@@ -209,7 +210,8 @@ public class LockManagerImpl implements LockManager
 
         if (!valid)
         {
-            throw new NucleusOptimisticException(Localiser.msg("032016", op.getObjectAsPrintable(), op.getInternalObjectId(), "" + versionDatastore, "" + versionObject), op.getObject());
+            throw new NucleusOptimisticException(Localiser.msg("032016", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
+                "" + versionDatastore, "" + versionObject), op.getObject());
         }
     }
 

@@ -226,7 +226,7 @@ public class ReachabilityAtCommitHandler
                     {
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("010033", nonReachableIds[i]));
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("010033", IdentityUtils.getPersistableIdentityForId(nonReachableIds[i])));
                         }
                         try
                         {
