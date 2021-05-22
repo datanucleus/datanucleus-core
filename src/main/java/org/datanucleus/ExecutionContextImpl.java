@@ -2483,13 +2483,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 if (l1CachedOP != null && l1CachedOP.getObject() != pc)
                 {
                     // attached object with the same id already present in the L1 cache so cannot attach in-situ
-                    throw new NucleusUserException(Localiser.msg("010017", StringUtils.toJVMIDString(pc)));
+                    throw new NucleusUserException(Localiser.msg("010017", IdentityUtils.getPersistableIdentityForId(id)));
                 }
             }
 
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("010016", StringUtils.toJVMIDString(pc)));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("010016", IdentityUtils.getPersistableIdentityForId(id)));
             }
             ObjectProvider op = nucCtx.getObjectProviderFactory().newForDetached(this, pc, id, api.getVersionForObject(pc));
             op.attach(sco);

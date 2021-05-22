@@ -292,7 +292,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     {
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("026011", StringUtils.toJVMIDString(myPC), this));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("026011", IdentityUtils.getPersistableIdentityForId(myID), this));
         }
 
         // Transitioning to TRANSIENT state, so if any postLoad action is pending we do it before. 
@@ -4852,8 +4852,8 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
     /**
      * Method to make detached copy of this instance
-     * If the object is detachable then the copy will be migrated to DETACHED state, otherwise will migrate
-     * the copy to TRANSIENT. Used by "ExecutionContext.detachObjectCopy()".
+     * If the object is detachable then the copy will be migrated to DETACHED state, otherwise will migrate the copy to TRANSIENT. 
+     * Used by "ExecutionContext.detachObjectCopy()".
      * @param state State for the detachment process
      * @return the detached Persistable instance
      */
@@ -5101,7 +5101,10 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             if (nonPKFieldNumbers != null && nonPKFieldNumbers.length > 0)
             {
                 // Attach the (non-PK) fields from the transient
-                NucleusLogger.GENERAL.debug("Attaching id=" + getInternalObjectId() + " fields=" + StringUtils.intArrayToString(nonPKFieldNumbers));
+                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                {
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026035", IdentityUtils.getPersistableIdentityForId(getInternalObjectId()), StringUtils.intArrayToString(nonPKFieldNumbers)));
+                }
                 detachedSM.provideFields(nonPKFieldNumbers, new AttachFieldManager(this, cmd.getSCOMutableMemberFlags(), cmd.getNonPKMemberFlags(), true, true, false));
             }
 
@@ -5183,7 +5186,10 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             if (attachFieldNumbers != null)
             {
                 // Only update the fields that were detached, and only update them if there are any to update
-                NucleusLogger.GENERAL.debug("Attaching id=" + getInternalObjectId() + " fields=" + StringUtils.intArrayToString(attachFieldNumbers));
+                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                {
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("026035", IdentityUtils.getPersistableIdentityForId(getInternalObjectId()), StringUtils.intArrayToString(attachFieldNumbers)));
+                }
                 provideFields(attachFieldNumbers, new AttachFieldManager(this, cmd.getSCOMutableMemberFlags(), dirtyFields, persistent, true, false));
             }
 
@@ -5336,7 +5342,10 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         catch (NucleusException ne)
         {
             // Log any errors in the attach
-            NucleusLogger.PERSISTENCE.debug("Unexpected exception thrown in attach", ne);
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            {
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("026036", IdentityUtils.getPersistableIdentityForId(getInternalObjectId()), ne.getMessage()), ne);
+            }
             throw ne;
         }
         finally
@@ -5387,7 +5396,10 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         if (attachFieldNumbers != null)
         {
             // Attach all dirty fields, and load other loaded fields
-            NucleusLogger.GENERAL.debug("Attaching id=" + getInternalObjectId() + " fields=" + StringUtils.intArrayToString(attachFieldNumbers));
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            {
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("026035", IdentityUtils.getPersistableIdentityForId(getInternalObjectId()), StringUtils.intArrayToString(attachFieldNumbers)));
+            }
             detachedOP.provideFields(attachFieldNumbers, new AttachFieldManager(this, cmd.getSCOMutableMemberFlags(), dirtyFields, persistent, cascade, true));
         }
     }
