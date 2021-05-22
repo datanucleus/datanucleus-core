@@ -936,14 +936,6 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     }
 
     /**
-     * Method called before a change in state.
-     */
-    protected void preStateChange()
-    {
-        flags |= FLAG_CHANGING_STATE;
-    }
-
-    /**
      * Method to refresh the object.
      */
     public void refresh()
@@ -986,7 +978,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         {
             if (myLC.isTransactional && !myLC.isPersistent)
             {
-                // make the transient instance persistent in the datastore, if is transactional and !persistent 
+                // make the transient instance persistent in the datastore, if is transactional and !persistent
                 makePersistent();
                 myLC = myLC.transitionMakePersistent(this);
             }
@@ -1500,7 +1492,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             {
                 myEC.removeObjectFromLevel1Cache(myID);
                 myEC.removeObjectFromLevel2Cache(myID);
-                throw new NucleusObjectNotFoundException("Object with id " + myID + 
+                throw new NucleusObjectNotFoundException("Object with id " + IdentityUtils.getPersistableIdentityForId(myID) + 
                     " was created without validating of type " + getObject().getClass().getName() + " but is actually of type " + className);
             }
             flags &= ~FLAG_NEED_INHERITANCE_VALIDATION;
@@ -4498,7 +4490,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         if (isFlushedNew())
         {
             // With CompoundIdentity bidir relations when the SM is created for this object ("initialiseForPersistentNew") the persist
-            // of the PK PC fields can cause the flush of this object, and so it is already persisted by the time we ge here
+            // of the PK PC fields can cause the flush of this object, and so it is already persisted by the time we get here
             registerTransactional();
             return;
         }
@@ -5623,6 +5615,14 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             // Not during flush, and not transactional-transient, and not inserting - so mark as dirty
             myEC.markDirty(this, true);
         }
+    }
+
+    /**
+     * Method called before a change in state.
+     */
+    protected void preStateChange()
+    {
+        flags |= FLAG_CHANGING_STATE;
     }
 
     /**
