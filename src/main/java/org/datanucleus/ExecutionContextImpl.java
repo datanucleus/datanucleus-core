@@ -3621,7 +3621,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         else if (id instanceof DatastoreUniqueLongId)
         {
             // Should have been found using "persistenceHandler.findObject()"
-            throw new NucleusObjectNotFoundException(Localiser.msg("010026"), id);
+            throw new NucleusObjectNotFoundException(Localiser.msg("010026", IdentityUtils.getPersistableIdentityForId(id)), id);
         }
         else if (objectClassName != null)
         {
@@ -3647,7 +3647,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             className = checkedClassName ? originalClassName : getClassNameForObjectId(id);
             if (className == null)
             {
-                throw new NucleusObjectNotFoundException(Localiser.msg("010026"), id);
+                throw new NucleusObjectNotFoundException(Localiser.msg("010026", IdentityUtils.getPersistableIdentityForId(id)), id);
             }
 
             if (!checkedClassName)
