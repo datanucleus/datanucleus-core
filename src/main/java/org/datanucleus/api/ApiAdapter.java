@@ -36,7 +36,7 @@ import org.datanucleus.state.LifeCycleState;
 public interface ApiAdapter extends Serializable
 {
     /**
-     * Accessor for the name of the API. JDO, JPA etc
+     * Accessor for the name of the API. JDO, JPA, Jakarta etc
      * @return Name of the API
      */
     String getName();
@@ -49,6 +49,13 @@ public interface ApiAdapter extends Serializable
     boolean isMemberDefaultPersistent(Class type);
 
     String getXMLMetaDataForClass(AbstractClassMetaData cmd, String prefix, String indent);
+
+    /**
+     * Method to return any default location that doesn't need specifying for "mapping-file" in the persistence.xml.
+     * With JPA/Jakarta this is META-INF/orm.xml. With JDO we don't have such a location.
+     * @return The default location to try for a mapping-file for this API
+     */
+    String getDefaultMappingFileLocation();
 
     // ------------------------------ Object Lifecycle --------------------------------
 
@@ -317,6 +324,13 @@ public interface ApiAdapter extends Serializable
      * @return The default properties (if any) for this API
      */
     Map getDefaultFactoryProperties();
+
+    /**
+     * Whether we should add in metadata when using persistent properties and a property is not specified.
+     * True means we add in metadata when not explicitly specified. False means if a property is not defined then it is not persistent.
+     * @return Whether to default it (JDO = false, JPA/Jakarta = true)
+     */
+    boolean getDefaultPersistentPropertyWhenNotSpecified();
 
     // ------------------------------ ObjectProvider --------------------------------
 

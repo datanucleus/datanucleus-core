@@ -32,7 +32,7 @@ import org.datanucleus.util.CommandLine;
  * Will never process classes in packages "java.", "javax.", "org.datanucleus." (when not "test" or "samples").
  * Accepts the following (optional) arguments
  * <ul>
- * <li>api : JDO, JPA - default=JDO</li>
+ * <li>api : JDO, JPA, Jakarta - default=JDO</li>
  * <li>generatePK : true, false - default=true</li>
  * <li>generateConstructor : true, false - default=true</li>
  * <li>detachListener : true, false - default=false</li>

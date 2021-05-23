@@ -26,7 +26,7 @@ public enum MetadataFileType
     JDO_ORM_FILE("orm"),
     JDO_QUERY_FILE("jdoquery"),
     ANNOTATIONS("annotations"),
-    JPA_MAPPING_FILE("jpa_mapping");
+    JPA_MAPPING_FILE("jpa_mapping"); // Also Jakarta mapping
 
     String name;
 

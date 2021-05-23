@@ -32,7 +32,7 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * Implementation of an entity resolver for MetaData XML files.
- * Note that this applies to ALL types of MetaData XML (persistence.xml, JDO package.jdo, JDO package.orm, JDO package.jdoquery, JPA orm.xml).
+ * Note that this applies to ALL types of MetaData XML (persistence.xml, JDO package.jdo, JDO package.orm, JDO package.jdoquery, JPA/Jakarta orm.xml).
  * We could, potentially, separate these different types of MetaData XML file, and hence split up the entities based on the handler, but not considered a priority currently.
  */
 public class MetaDataEntityResolver extends AbstractXMLEntityResolver

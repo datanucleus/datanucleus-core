@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.identity.IdentityUtils;
@@ -337,8 +338,8 @@ public class ClassMetaData extends AbstractClassMetaData
      */
     protected void addMetaDataForMembersNotInMetaData(Class cls)
     {
-        // Access API since we treat things differently for JPA and JDO
-        String api = mmgr.getNucleusContext().getApiName();
+        // Access API since we treat things differently for JPA/Jakarta and JDO
+        ApiAdapter apiAdapter = mmgr.getNucleusContext().getApiAdapter();
 
         Set<String> memberNames = new HashSet<>();
         for (AbstractMemberMetaData mmd : members)
@@ -383,9 +384,9 @@ public class ClassMetaData extends AbstractClassMetaData
             // Add fields/properties in the current class that have been omitted by the user (subject to the API default handling)
             if (hasProperties)
             {
-                if (api.equalsIgnoreCase("JPA")) // TODO Make this a flag in the ApiFactory whether we default to persistent properties when not specified
+                if (apiAdapter.getDefaultPersistentPropertyWhenNotSpecified())
                 {
-                    // JPA : when we are using properties go through and add properties for those not specified in the populating class.
+                    // When we are using properties go through and add properties for those not specified in the populating class.
                     Method[] clsMethods = cls.getDeclaredMethods();
                     for (int i=0;i<clsMethods.length;i++)
                     {
@@ -414,7 +415,7 @@ public class ClassMetaData extends AbstractClassMetaData
                 }
                 else
                 {
-                    // With JDO we only use properties when defined explicitly
+                    // Only use properties when defined explicitly
                 }
             }
 
@@ -432,7 +433,7 @@ public class ClassMetaData extends AbstractClassMetaData
                     if (!memberNames.contains(clsFields[i].getName()))
                     {
                         // No field/property of this name
-                        if (hasProperties && api.equalsIgnoreCase("JPA")) // With JPA, if using props then don't add a field as well (since a PropertyMetaData will be present by default)
+                        if (hasProperties && apiAdapter.getDefaultPersistentPropertyWhenNotSpecified()) // Using props, so don't add a field as well (since PropertyMetaData added)
                         {
                             // Do nothing
                         }

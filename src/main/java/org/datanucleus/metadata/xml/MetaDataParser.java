@@ -49,7 +49,7 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * Class to provide the parsing framework for parsing metadata files.
  * This will support parsing of any metadata files where the resultant object is derived from org.datanucleus.metadata.MetaData, so can be used on JDO files, ORM files,
- * JDOQUERY files, JPA ORM files, or JPA "persistence.xml" files. Can be used for any future metadata files too.
+ * JDOQUERY files, JPA/Jakarta ORM files, or JPA/Jakarta "persistence.xml" files. Can be used for any future metadata files too.
  * <P>
  * Provides 3 different entry points depending on whether the caller has a URL, a file, or an InputStream.
  * </P>

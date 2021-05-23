@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Listener for events, following the JPA model.
+ * Listener for events, following the JPA/Jakarta model.
  */
 public class EventListenerMetaData extends MetaData
 {

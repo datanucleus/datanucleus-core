@@ -600,7 +600,7 @@ public class SchemaTool
                 throw new NucleusUserException("SchemaTool has been specified to use persistence-unit with name " + persistenceUnitName + " but none was found with that name");
             }
 
-            if (api.equalsIgnoreCase("JPA"))
+            if (api.equalsIgnoreCase("JPA") || api.equalsIgnoreCase("Jakarta")) // TODO Put this in API so we dont need to check on strings
             {
                 pumd.clearJarFiles(); // Don't use JARs when in JavaSE for JPA
             }

@@ -884,16 +884,18 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
             Set<String> mappingFileNames = new HashSet<>();
             if (allowXML)
             {
-                if (nucleusContext.getApiName().equalsIgnoreCase("JPA"))
+                String defaultMappingFile = nucleusContext.getApiAdapter().getDefaultMappingFileLocation();
+                if (defaultMappingFile != null)
                 {
-                    mappingFileNames.add("META-INF/orm.xml"); // Default location for JPA
+                    mappingFileNames.add(defaultMappingFile);
                 }
                 if (pumd.getMappingFiles() != null)
                 {
                     // <mapping-file>
                     mappingFileNames.addAll(pumd.getMappingFiles());
                 }
-                if (nucleusContext.getApiName().equalsIgnoreCase("JDO")) // When in JDO mode grab any package.jdo
+
+                if (nucleusContext.getApiName().equalsIgnoreCase("JDO")) // When in JDO mode grab any package.jdo TODO Abstract this into api-jdo and ApiAdapter
                 {
                     // <jar-file>
                     Set jarFileNames = pumd.getJarFiles();
@@ -2365,15 +2367,14 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     sequenceMetaDataByPackageSequence = new ConcurrentHashMap<>();
                 }
 
-                // The problem here is that with JDO we want the sequence to be fully-qualified
-                // yet JPA wants the sequence name itself. Also we could be using JPA annotations
-                // with JDO persistence, or mixed mode, so need to cater for both ways
+                // The problem here is that with JDO we want the sequence to be fully-qualified yet JPA/Jakarta wants the sequence name itself. 
+                // Also we could be using JPA/Jakarta annotations with JDO persistence, or mixed mode, so need to cater for both ways
                 for (SequenceMetaData seqmd : seqmds)
                 {
                     // Register using its fully qualified name (JDO)
                     sequenceMetaDataByPackageSequence.put(seqmd.getFullyQualifiedName(), seqmd);
 
-                    // Register using its basic name (JPA)
+                    // Register using its basic name (JPA/Jakarta)
                     sequenceMetaDataByPackageSequence.put(seqmd.getName(), seqmd);
                 }
             }

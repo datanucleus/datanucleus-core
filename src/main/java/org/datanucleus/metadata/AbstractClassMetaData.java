@@ -60,20 +60,20 @@ public abstract class AbstractClassMetaData extends MetaData
     /** Class name */
     protected final String name;
 
-    /** Entity name. Required by JPA $4.3.1 for accessing this class in queries. */
+    /** Entity name. Required by JPA/Jakarta $4.3.1 for accessing this class in queries. */
     protected String entityName;
 
     /** Whether this class is explicitly marked as MappedSuperclass. Will be false when using JDO. */
     protected boolean mappedSuperclass = false;
 
     /** 
-     * Whether the class is fully defined, and hence instantiable. This is false when it is a JPA MappedSuperclass
+     * Whether the class is fully defined, and hence instantiable. This is false when it is a JPA/Jakarta MappedSuperclass
      * and has no PK fields defined (will be defined in the derived Entity). 
      * This is different to whether the class is abstract - use ClassMetaData.isAbstract() for that.
      */
     protected boolean instantiable = true;
 
-    /** Whether the class has been explicitly marked as using FIELD access (JPA). */
+    /** Whether the class has been explicitly marked as using FIELD access (JPA/Jakarta). */
     protected Boolean accessViaField = null;
 
     /** Identity-type tag value. */
@@ -932,7 +932,7 @@ public abstract class AbstractClassMetaData extends MetaData
                 AbstractClassMetaData baseCmd = getBaseAbstractClassMetaData();
                 if (getBaseInheritanceStrategy() != null)
                 {
-                    // A strategy for the full inheritance tree is defined (like in JPA) so use that
+                    // A strategy for the full inheritance tree is defined (like in JPA/Jakarta) so use that
                     String treeStrategy = getBaseInheritanceStrategy();
                     if (InheritanceMetaData.INHERITANCE_TREE_STRATEGY_JOINED.equals(treeStrategy))
                     {
@@ -1025,7 +1025,7 @@ public abstract class AbstractClassMetaData extends MetaData
                         if (inheritanceMetaData.getDiscriminatorMetaData() == null &&
                             mmgr.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_USE_DISCRIMINATOR_FOR_SINGLE_TABLE))
                         {
-                            // JPA : When using SINGLE_TABLE at the root, then we must have a Discriminator (JPA spec says default length 31)
+                            // JPA/Jakarta : When using SINGLE_TABLE at the root, then we must have a Discriminator (JPA/Jakarta spec says default length 31)
                             if (NucleusLogger.METADATA.isDebugEnabled())
                             {
                                 NucleusLogger.METADATA.debug("Class " + getFullClassName() + " defined to use SINGLE_TABLE for the inheritance tree but no discriminator defined, so adding one");

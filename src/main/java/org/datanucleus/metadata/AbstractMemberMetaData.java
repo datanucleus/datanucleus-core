@@ -128,16 +128,16 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     /** Whether to update this relation when updating the owning object. */
     protected Boolean cascadeUpdate;
 
-    /** Whether to delete this relation when deleting the owning object (JPA). TODO Link this to dependent */
+    /** Whether to delete this relation when deleting the owning object (JPA/Jakarta). TODO Link this to dependent */
     protected Boolean cascadeDelete;
 
-    /** Whether to detach this relation when detaching the owning object (JPA). */
+    /** Whether to detach this relation when detaching the owning object (JPA/Jakarta). */
     protected Boolean cascadeDetach;
 
-    /** Whether to refresh this relation when refreshing the owning object (JPA). */
+    /** Whether to refresh this relation when refreshing the owning object (JPA/Jakarta). */
     protected Boolean cascadeRefresh;
 
-    /** Whether to remove orphans when deleting the owning object (JPA). */
+    /** Whether to remove orphans when deleting the owning object (JPA/Jakarta). */
     protected boolean cascadeRemoveOrphans = false;
 
     /** load-fetch-group value. */
@@ -613,7 +613,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
         if (storeInLob)
         {
-            // Set up the jdbcType/serialized settings according to the field type in line with JPA
+            // Set up the jdbcType/serialized settings according to the field type in line with JPA/Jakarta
             boolean useClob = false;
             if (type == String.class ||
                 (type.isArray() && type.getComponentType() == Character.class) || (type.isArray() && type.getComponentType() == char.class))
@@ -676,7 +676,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         }
         if (embeddedMetaData != null)
         {
-            // Update with any extensions (for lack of features in JPA)
+            // Update with any extensions (for lack of features in JPA/Jakarta)
             if (hasExtension("null-indicator-column"))
             {
                 embeddedMetaData.setNullIndicatorColumn(getValueForExtension("null-indicator-column"));
@@ -698,7 +698,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             {
 //                if (cascadeDelete)
 //                {
-//                    // User has set cascade-delete (JPA) so set the element as dependent
+//                    // User has set cascade-delete (JPA/Jakarta) so set the element as dependent
 //                    getCollection().element.dependent = Boolean.TRUE;
 //                }
 //                getCollection().populate(clr, primary, mmgr);
@@ -729,7 +729,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
             {
 //                if (cascadeDelete)
 //                {
-//                    // User has set cascade-delete (JPA) so set the element as dependent
+//                    // User has set cascade-delete (JPA/Jakarta) so set the element as dependent
 //                    getArray().element.dependent = Boolean.TRUE;
 //                }
 //                getArray().populate(clr, primary, mmgr);
@@ -1327,7 +1327,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     {
         if (hasExtension(MetaData.EXTENSION_MEMBER_CACHEABLE))
         {
-            // JPA doesn't have way of specifying field cacheability so use extension
+            // JPA/Jakarta doesn't have way of specifying field cacheability so use extension
             return getValueForExtension(MetaData.EXTENSION_MEMBER_CACHEABLE).equalsIgnoreCase("false") ? false : true;
         }
         return cacheable;
@@ -1745,7 +1745,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         return this;
     }
 
-    // TODO Parameterise these text strings. See also the associated annotation handlers in api-jdo/api-jpa
+    // TODO Parameterise these text strings. See also the associated annotation handlers in api-jdo/api-jpa/api-jakarta
     public boolean isCreateUser()
     {
         return hasExtension("create-user");

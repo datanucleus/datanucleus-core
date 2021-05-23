@@ -71,13 +71,14 @@ public class RuntimeEnhancer
                 //we cannot reload these classes due to security constraints
                 return super.loadClass(name, resolve);
             }
-            else if (name.startsWith("javax."))
+            else if (name.startsWith("javax.") || name.startsWith("jakarta."))
             {
-                //just relay JDO/JPA annotations to super loader to avoid ClassCastExceptions
+                //just relay JDO/JPA/Jakarta annotations to super loader to avoid ClassCastExceptions
                 return super.loadClass(name, resolve);
             }
-            else if (name.startsWith("org.datanucleus.jpa.annotations") ||
-                     name.startsWith("org.datanucleus.api.jpa.annotations"))
+            else if (name.startsWith("org.datanucleus.api.jdo.annotations") ||
+                     name.startsWith("org.datanucleus.api.jpa.annotations") ||
+                     name.startsWith("org.datanucleus.api.jakarta.annotations"))
             {
                 //just relay DN extension annotations to super loader to avoid ClassCastExceptions
                 return super.loadClass(name, resolve);
