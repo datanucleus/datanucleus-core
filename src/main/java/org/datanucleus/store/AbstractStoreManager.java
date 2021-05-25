@@ -302,7 +302,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             {
                 namingFactory = new DN2NamingFactory(nucleusContext);
             }
-            else if ("jpa".equalsIgnoreCase(namingFactoryName))
+            else if ("jpa".equalsIgnoreCase(namingFactoryName) || "jakarta".equalsIgnoreCase(namingFactoryName))
             {
                 namingFactory = new JPANamingFactory(nucleusContext);
             }
