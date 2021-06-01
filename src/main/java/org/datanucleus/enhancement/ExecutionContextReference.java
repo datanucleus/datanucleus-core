@@ -25,7 +25,7 @@ package org.datanucleus.enhancement;
 public interface ExecutionContextReference
 {
     /**
-     * Accessor for the owner of the ExecutionContext. This will typically be a PersistenceManager (JDO) or EntityManager (JPA).
+     * Accessor for the owner of the ExecutionContext. This will be a PersistenceManager (JDO) or EntityManager (JPA/Jakarta).
      * @return The owner
      */
     Object getOwner();

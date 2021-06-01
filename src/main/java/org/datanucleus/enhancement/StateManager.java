@@ -58,8 +58,8 @@ public interface StateManager
     StateManager replacingStateManager(Persistable pc, StateManager sm);
 
     /**
-     * Tests whether this object is dirty. Instances that have been modified, deleted, or newly made
-     * persistent in the current transaction return <code>true</code>.
+     * Tests whether this object is dirty. 
+     * Instances that have been modified, deleted, or newly made persistent in the current transaction return <code>true</code>.
      * <P>
      * Transient nontransactional instances return <code>false</code>.
      * <P>
@@ -70,11 +70,11 @@ public interface StateManager
     boolean isDirty(Persistable pc);
 
     /**
-     * Tests whether this object is transactional. Instances that respect transaction boundaries return
-     * <code>true</code>. These instances include transient instances made transactional as a result of being
-     * the target of a <code>makeTransactional</code> method call; newly made persistent or deleted persistent
-     * instances; persistent instances read in data store transactions; and persistent instances modified in
-     * optimistic transactions.
+     * Tests whether this object is transactional. 
+     * Instances that respect transaction boundaries return <code>true</code>. 
+     * These instances include transient instances made transactional as a result of being the target of a <code>makeTransactional</code> method call; 
+     * newly made persistent or deleted persistent instances; persistent instances read in data store transactions; and persistent instances modified 
+     * in optimistic transactions.
      * <P>
      * Transient nontransactional instances return <code>false</code>.
      * <P>
@@ -84,8 +84,8 @@ public interface StateManager
     boolean isTransactional(Persistable pc);
 
     /**
-     * Tests whether this object is persistent. Instances whose state is stored in the data store return
-     * <code>true</code>.
+     * Tests whether this object is persistent. 
+     * Instances whose state is stored in the data store return <code>true</code>.
      * <P>
      * Transient instances return <code>false</code>.
      * <P>
@@ -95,8 +95,8 @@ public interface StateManager
     boolean isPersistent(Persistable pc);
 
     /**
-     * Tests whether this object has been newly made persistent. Instances that have been made persistent in
-     * the current transaction return <code>true</code>.
+     * Tests whether this object has been newly made persistent.
+     * Instances that have been made persistent in the current transaction return <code>true</code>.
      * <P>
      * Transient instances return <code>false</code>.
      * <P>
@@ -106,8 +106,8 @@ public interface StateManager
     boolean isNew(Persistable pc);
 
     /**
-     * Tests whether this object has been deleted. Instances that have been deleted in the current transaction
-     * return <code>true</code>.
+     * Tests whether this object has been deleted.
+     * Instances that have been deleted in the current transaction return <code>true</code>.
      * <P>
      * Transient instances return <code>false</code>.
      * <P>
@@ -127,18 +127,16 @@ public interface StateManager
     void makeDirty(Persistable pc, String fieldName);
 
     /**
-     * Return the object representing the identity of the calling instance. If the identity is being
-     * changed in the current transaction, this method returns the identity as of the beginning of the
-     * transaction.
+     * Return the object representing the identity of the calling instance. 
+     * If the identity is being changed in the current transaction, this method returns the identity as of the beginning of the transaction.
      * @param pc the calling <code>Persistable</code> instance
      * @return the object representing the identity of the calling instance
      */
     Object getObjectId(Persistable pc);
 
     /**
-     * Return the object representing the identity of the calling instance. If the identity is being
-     * changed in the current transaction, this method returns the current identity as changed in the
-     * transaction.
+     * Return the object representing the identity of the calling instance.
+     * If the identity is being changed in the current transaction, this method returns the current identity as changed in the transaction.
      * @param pc the calling <code>Persistable</code> instance
      * @return the object representing the identity of the calling instance
      */

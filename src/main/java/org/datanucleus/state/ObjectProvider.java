@@ -70,10 +70,9 @@ public interface ObjectProvider<T> extends StateManager
     void disconnect();
 
     /**
-     * Initialises a state manager to manage a hollow instance having the given object ID and the given
-     * (optional) field values. This constructor is used for creating new instances of existing persistent
-     * objects, and consequently shouldnt be used when the StoreManager controls the creation of such objects
-     * (such as in an ODBMS).
+     * Initialises a state manager to manage a hollow instance having the given object ID and the given (optional) field values.
+     * This constructor is used for creating new instances of existing persistent objects, and consequently shouldn't be used when 
+     * the StoreManager controls the creation of such objects (such as in an ODBMS).
      * @param id the JDO identity of the object.
      * @param fv the initial field values of the object (optional)
      * @param pcClass Class of the object that this will manage the state for
@@ -83,8 +82,7 @@ public interface ObjectProvider<T> extends StateManager
     /**
      * Initialises a state manager to manage a HOLLOW / P_CLEAN instance having the given FieldValues.
      * This constructor is used for creating new instances of existing persistent objects using application 
-     * identity, and consequently shouldnt be used when the StoreManager controls the creation of such objects
-     * (such as in an ODBMS).
+     * identity, and consequently shouldn't be used when the StoreManager controls the creation of such objects (such as in an ODBMS).
      * @param fv the initial field values of the object.
      * @param pcClass Class of the object that this will manage the state for
      * @deprecated Remove use of this and use initialiseForHollow
@@ -102,19 +100,17 @@ public interface ObjectProvider<T> extends StateManager
 
     /**
      * Initialises a state manager to manage the passed persistent instance having the given object ID.
-     * Used where we have retrieved a PC object from a datastore directly (not field-by-field), for example on
-     * an object datastore. This initialiser will not add ObjectProviders to all related PCs. This must be done by
-     * any calling process. This simply adds the ObjectProvider to the specified object and records the id, setting
-     * all fields of the object as loaded.
+     * Used where we have retrieved a PC object from a datastore directly (not field-by-field), for example on an object datastore. 
+     * This initialiser will not add ObjectProviders to all related PCs. This must be done by any calling process. 
+     * This simply adds the ObjectProvider to the specified object and records the id, setting all fields of the object as loaded.
      * @param id the identity of the object.
      * @param pc The object to be managed
      */
     void initialiseForPersistentClean(Object id, T pc);
 
     /**
-     * Initialises a state manager to manage a persistable instance that will be EMBEDDED/SERIALISED 
-     * into another persistable object. The instance will not be assigned an identity in the process 
-     * since it is a SCO.
+     * Initialises a state manager to manage a persistable instance that will be EMBEDDED/SERIALISED into another persistable object. 
+     * The instance will not be assigned an identity in the process since it is a SCO.
      * @param pc The persistable to manage (see copyPc also)
      * @param copyPc Whether the ObjectProvider should manage a copy of the passed PC or that one
      */
@@ -122,10 +118,8 @@ public interface ObjectProvider<T> extends StateManager
 
     /**
      * Initialises a state manager to manage a transient instance that is becoming newly persistent.
-     * A new object ID for the instance is obtained from the store manager and the object is inserted
-     * in the data store.
-     * <p>This constructor is used for assigning state managers to existing
-     * instances that are transitioning to a persistent state.
+     * A new object ID for the instance is obtained from the store manager and the object is inserted in the data store.
+     * <p>This constructor is used for assigning state managers to existing instances that are transitioning to a persistent state.
      * @param pc the instance being make persistent.
      * @param preInsertChanges Any changes to make before inserting
      */
@@ -135,8 +129,7 @@ public interface ObjectProvider<T> extends StateManager
      * Initialises a state manager to manage a Transactional Transient instance.
      * A new object ID for the instance is obtained from the store manager and the object is inserted in the data store.
      * <p>
-     * This constructor is used for assigning state managers to Transient
-     * instances that are transitioning to a transient clean state.
+     * This constructor is used for assigning state managers to Transient instances that are transitioning to a transient clean state.
      * @param pc the instance being make persistent.
      */
     void initialiseForTransactionalTransient(T pc);
@@ -150,16 +143,14 @@ public interface ObjectProvider<T> extends StateManager
     void initialiseForDetached(T pc, Object id, Object version);
 
     /**
-     * Initialises the ObjectProvider to manage a persistable object that is not persistent but is
-     * about to be deleted.
+     * Initialises the ObjectProvider to manage a persistable object that is not persistent but is about to be deleted.
      * @param pc the object to delete
      */
     void initialiseForPNewToBeDeleted(T pc);
 
     /**
      * Initialise the ObjectProvider, assigning the specified id to the object. 
-     * This is used when getting objects out of the L2 Cache, where they have no ObjectProvider 
-     * assigned, and returning them as associated with a particular ExecutionContext.
+     * This is used when getting objects out of the L2 Cache, where they have no ObjectProvider assigned, and returning them as associated with a particular ExecutionContext.
      * @param cachedPC The cached PC object
      * @param id Id to assign to the persistable object
      */
@@ -176,7 +167,7 @@ public interface ObjectProvider<T> extends StateManager
     StoreManager getStoreManager();
 
     /**
-     * Accessor for the persistable object managed by this StateManager.
+     * Accessor for the persistable object being managed.
      * @return the persistable object
      */
     T getObject();
@@ -188,7 +179,7 @@ public interface ObjectProvider<T> extends StateManager
     String getObjectAsPrintable();
 
     /**
-     * Accessor for the id of the object managed by this ObjectProvider.
+     * Accessor for the id of the object being managed.
      * @return The identity of the object
      */
     Object getInternalObjectId();
@@ -202,14 +193,14 @@ public interface ObjectProvider<T> extends StateManager
     LifeCycleState getLifecycleState();
 
     /**
-     * Method to change the value of the specified field. This will not make the field dirty
+     * Method to change the value of the specified field. This WILL NOT make the field dirty.
      * @param fieldNumber (absolute) field number of the field
      * @param value The new value.
      */
     void replaceField(int fieldNumber, Object value);
 
     /**
-     * Method to change the value of the specified field. This will make the field dirty.
+     * Method to change the value of the specified field. This WILL make the field dirty.
      * @param fieldNumber (absolute) field number of the field
      * @param value The new value.
      */
@@ -217,22 +208,21 @@ public interface ObjectProvider<T> extends StateManager
 
     /**
      * Convenience method to change the value of a field that is assumed loaded.
-     * Will mark the object/field as dirty if it isnt previously.
-     * Only for use in management of relations.
+     * Will mark the object/field as dirty if it isn't previously. Only for use in management of relations.
      * @param fieldNumber Number of field
      * @param newValue The new value
      */
     void replaceFieldValue(int fieldNumber, Object newValue);
 
     /**
-     * Method to update the data in the object with the values from the passed FieldManager
+     * Method to update the data in the object with the values from the passed FieldManager.
      * @param fieldNumbers (absolute) field numbers of the fields to update
      * @param fm The FieldManager
      */
     void replaceFields(int fieldNumbers[], FieldManager fm);
 
     /**
-     * Method to update the data in the object with the values from the passed FieldManager
+     * Method to update the data in the object with the values from the passed FieldManager.
      * @param fieldNumbers (absolute) field numbers of the fields to update
      * @param fm The FieldManager
      * @param replaceWhenDirty Whether to replace these fields if the field is dirty
@@ -240,8 +230,7 @@ public interface ObjectProvider<T> extends StateManager
     void replaceFields(int fieldNumbers[], FieldManager fm, boolean replaceWhenDirty);
 
     /**
-     * Method to update the data in the object with the values from the passed
-     * FieldManager. Only non loaded fields are updated
+     * Method to update the data in the object with the values from the passed FieldManager. Only non loaded fields are updated.
      * @param fieldNumbers (absolute) field numbers of the fields to update
      * @param fm The FieldManager
      */
@@ -275,9 +264,8 @@ public interface ObjectProvider<T> extends StateManager
 
     /**
      * Method to set an associated value stored with this object.
-     * This is for a situation such as in ORM where this object can have an "external" foreign-key
-     * provided by an owning object (e.g 1-N uni relation and this is the element with no knowledge
-     * of the owner, so the associated value is the FK value).
+     * This is for a situation such as in ORM where this object can have an "external" foreign-key provided by an owning object 
+     * (e.g 1-N uni relation and this is the element with no knowledge of the owner, so the associated value is the FK value).
      * @param key Key for the value
      * @param value The associated value
      */
@@ -285,9 +273,8 @@ public interface ObjectProvider<T> extends StateManager
 
     /**
      * Accessor for the value of an external field.
-     * This is for a situation such as in ORM where this object can have an "external" foreign-key
-     * provided by an owning object (e.g 1-N uni relation and this is the element with no knowledge
-     * of the owner, so the associated value is the FK value).
+     * This is for a situation such as in ORM where this object can have an "external" foreign-key provided by an owning object 
+     * (e.g 1-N uni relation and this is the element with no knowledge of the owner, so the associated value is the FK value).
      * @param key The key for this associated information
      * @return The value stored (if any) against this key
      */
@@ -359,8 +346,8 @@ public interface ObjectProvider<T> extends StateManager
     boolean isFlushedToDatastore();
 
     /**
-     * Whether this record has been flushed to the datastore in this transaction (i.e called persist() and is in
-     * the datastore now). If user has called persist() on it yet not yet persisted then returns false.
+     * Whether this record has been flushed to the datastore in this transaction (i.e called persist() and is in the datastore now). 
+     * If user has called persist() on it yet not yet persisted then returns false.
      * @return Whether this is flushed new.
      */
     boolean isFlushedNew();
@@ -393,7 +380,7 @@ public interface ObjectProvider<T> extends StateManager
     boolean isWaitingToBeFlushedToDatastore();
 
     /**
-     * Update the acitvity state.
+     * Update the activity state.
      * @param state the activity state
      */
     void changeActivityState(ActivityState state);
@@ -405,7 +392,7 @@ public interface ObjectProvider<T> extends StateManager
     boolean isInserting();
 
     /**
-     * Tests whether this object is in the process of being deleted.
+     * Tests whether this object is being deleted.
      * @return true if this instance is being deleted.
      */
     boolean isDeleting();
@@ -431,7 +418,7 @@ public interface ObjectProvider<T> extends StateManager
 
     /**
      * Convenience method to load the passed field values.
-     * Loads the fields using any required fetch plan and calls jdoPostLoad() as appropriate.
+     * Loads the fields using any required fetch plan and calls postLoad as appropriate.
      * @param fv Field Values to load (including any fetch plan to use when loading)
      */
     void loadFieldValues(FieldValues fv);
@@ -461,8 +448,7 @@ public interface ObjectProvider<T> extends StateManager
 
     /**
      * Convenience method to load a field from the datastore.
-     * Used in attaching fields and checking their old values (so we don't
-     * want any postLoad method being called).
+     * Used in attaching fields and checking their old values (so we don't want any postLoad method being called).
      * TODO Merge this with one of the loadXXXFields methods.
      * @param fieldNumber The field number.
      */
@@ -503,7 +489,7 @@ public interface ObjectProvider<T> extends StateManager
 
     /**
      * Method to clear all saved fields on the object.
-     **/
+     */
     void clearSavedFields();
     
     /**
@@ -592,18 +578,18 @@ public interface ObjectProvider<T> extends StateManager
     void updateFieldAfterInsert(Object pc, int fieldNumber);
 
     /**
-     * Method to allow the setting of the id of the PC object. This is used when it is obtained after persisting
-     * the object to the datastore. In the case of RDBMS, this may be via auto-increment, or in the case of ODBMS
-     * this may be an accessor for the id after storing.
+     * Method to allow the setting of the id of the PC object. 
+     * This is used when it is obtained after persisting the object to the datastore. 
+     * In the case of RDBMS, this may be via auto-increment, or in the case of ODBMS this may be an accessor for the id after storing.
      * @param id the id received from the datastore. May be an OID, or the key value for an OID, or an application id.
      */
     void setPostStoreNewObjectId(Object id);
 
     /**
      * Method to swap the managed object for the supplied object.
-     * This is of particular use for object datastores where the datastore is responsible for creating
-     * the in-memory object and where we have a temporary object that we want to swap for the datastore
-     * generated object. Makes no change to what fields are loaded/dirty etc, just swaps the managed object.
+     * This is of particular use for object datastores where the datastore is responsible for creating the in-memory object and where we 
+     * have a temporary object that we want to swap for the datastore generated object. 
+     * Makes no change to what fields are loaded/dirty etc, just swaps the managed object.
      * @param pc The persistable object to use
      */
     void replaceManagedPC(T pc);
@@ -634,7 +620,7 @@ public interface ObjectProvider<T> extends StateManager
 
     /**
      * Method to return if the version is loaded.
-     * If the class represented is not versioned then returns true
+     * If the class represented is not versioned then returns true.
      * @return Whether it is loaded.
      */
     boolean isVersionLoaded();
@@ -690,7 +676,7 @@ public interface ObjectProvider<T> extends StateManager
     T attachCopy(T detachedPC, boolean embedded);
 
     /**
-     * Method to attach the object managed by this ObjectProvider.
+     * Method to attach the object being managed.
      * @param embedded Whether it is embedded
      */
     void attach(boolean embedded);
@@ -709,21 +695,19 @@ public interface ObjectProvider<T> extends StateManager
     T detachCopy(FetchPlanState state);
 
     /**
-     * Method to detach the persistable object.
+     * Method to detach the managed object.
      * @param state State for the detachment process
      */
     void detach(FetchPlanState state);
 
     /**
-     * Validates whether the persistence capable instance exists in the
-     * datastore. If the instance does not exist in the datastore, this method
-     * will fail raising a NucleusObjectNotFoundException.
+     * Validates whether the persistence capable instance exists in the datastore.
+     * If the instance does not exist in the datastore, this method will fail raising a NucleusObjectNotFoundException.
      */
     void validate();
 
     /**
-     * Mark the state manager as needing to validate the inheritance of the managed object existence 
-     * before loading fields.
+     * Mark the state manager as needing to validate the inheritance of the managed object existence before loading fields.
      */
     void markForInheritanceValidation();
 
@@ -759,8 +743,7 @@ public interface ObjectProvider<T> extends StateManager
     void postCommit(Transaction tx);
 
     /**
-     * Convenience interceptor to allow operations to be performed before any rollback is
-     * performed.
+     * Convenience interceptor to allow operations to be performed before any rollback is performed.
      * @param tx The transaction
      */
     void preRollback(Transaction tx);
@@ -771,15 +754,15 @@ public interface ObjectProvider<T> extends StateManager
     void resetDetachState();
 
     /**
-     * Convenience method to retrieve the detach state from the passed ObjectProvider's object
+     * Convenience method to retrieve the detach state from the passed ObjectProvider's managed object
      * @param op ObjectProvider
      */
     void retrieveDetachState(ObjectProvider op);
 
     /**
-     * Look to the database to determine which class this object is. This parameter is a hint. Set false, if it's
-     * already determined the correct pcClass for this pc "object" in a certain
-     * level in the hierarchy. Set to true and it will look to the database.
+     * Look to the database to determine which class this object is. 
+     * This parameter is a hint. Set false, if it's already determined the correct pcClass for this pc "object" in a certain level in the hierarchy. 
+     * Set to true and it will look to the database.
      * TODO This is only called by some outdated code in LDAPUtils; remove it when that is fixed
      * @param fv the initial field values of the object.
      * @deprecated Dont use this, to be removed

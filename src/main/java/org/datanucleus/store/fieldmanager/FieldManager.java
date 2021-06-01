@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 Contributors:
-2004 Erik Bengtson - extends ObjectIdFieldManager
 2007 Andy Jefferson - removed dependence on JDO so can be used with JPA
     ...
 **********************************************************************/
