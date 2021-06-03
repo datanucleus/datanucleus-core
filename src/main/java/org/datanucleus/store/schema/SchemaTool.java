@@ -40,7 +40,6 @@ import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PersistenceNucleusContextImpl;
 import org.datanucleus.Configuration;
 import org.datanucleus.PropertyNames;
-import org.datanucleus.StoreNucleusContext;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.FileMetaData;
@@ -292,7 +291,7 @@ public class SchemaTool
         }
 
         // Create a NucleusContext for use with this mode
-        StoreNucleusContext nucleusCtx = null;
+        PersistenceNucleusContext nucleusCtx = null;
         try
         {
             Properties props = (propsFileName!=null) ? PersistenceUtils.setPropertiesUsingFile(propsFileName) : null;
@@ -530,7 +529,7 @@ public class SchemaTool
      * @return The NucleusContext to use
      * @throws NucleusException Thrown if an error occurs in creating the required NucleusContext
      */
-    public static StoreNucleusContext getNucleusContextForMode(Mode mode, String api, Map userProps, String persistenceUnitName, String ddlFile, boolean verbose)
+    public static PersistenceNucleusContext getNucleusContextForMode(Mode mode, String api, Map userProps, String persistenceUnitName, String ddlFile, boolean verbose)
     {
         return getNucleusContextForMode(mode, api, userProps, persistenceUnitName, ddlFile, verbose, false);
     }
@@ -547,7 +546,7 @@ public class SchemaTool
      * @return The NucleusContext to use
      * @throws NucleusException Thrown if an error occurs in creating the required NucleusContext
      */
-    public static StoreNucleusContext getNucleusContextForMode(Mode mode, String api, Map userProps, String persistenceUnitName, String ddlFile, boolean verbose,
+    public static PersistenceNucleusContext getNucleusContextForMode(Mode mode, String api, Map userProps, String persistenceUnitName, String ddlFile, boolean verbose,
             boolean ignoreMetaDataForMissingClasses)
     {
         // Extract any properties that affect NucleusContext startup

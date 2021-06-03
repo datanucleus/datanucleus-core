@@ -27,6 +27,7 @@ import org.datanucleus.management.FactoryStatistics;
 import org.datanucleus.management.ManagementManager;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.state.ObjectProviderFactory;
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.autostart.AutoStartMechanism;
 import org.datanucleus.transaction.ResourcedTransactionManager;
 import org.datanucleus.transaction.jta.JTASyncRegistry;
@@ -35,8 +36,10 @@ import org.datanucleus.transaction.jta.JTASyncRegistry;
  * Context for use in the persistence process.
  * Adds on many extra services to the basic+store contexts, for transactions, executionContext, identity handling, object providers, autostart, L2 cache etc.
  */
-public interface PersistenceNucleusContext extends StoreNucleusContext
+public interface PersistenceNucleusContext extends NucleusContext
 {
+    StoreManager getStoreManager();
+
     AutoStartMechanism getAutoStartMechanism();
 
     ObjectProviderFactory getObjectProviderFactory();
