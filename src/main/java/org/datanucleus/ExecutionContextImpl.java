@@ -4115,7 +4115,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     {
         if (operationQueue != null)
         {
-            // TODO Remove this when NUCCORE-904 is implemented, and process operationQueue in flush()
+            // TODO Remove this when core-50 is implemented, and process operationQueue in flush()
             operationQueue.performAll(backingStore, op);
         }
     }
@@ -4493,7 +4493,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 try
                 {
                     // Perform any operations required after committing
-                    // TODO this if is due to sms that can have lc == null, why?, should not be here then
+                    // TODO this if is due to ops that can have lc == null, why?, should not be here then
                     if (ops[i] != null && ops[i].getObject() != null &&
                             (api.isPersistent(ops[i].getObject()) || api.isTransactional(ops[i].getObject())))
                     {
