@@ -23,7 +23,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.ImplementationCreator;
 import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;

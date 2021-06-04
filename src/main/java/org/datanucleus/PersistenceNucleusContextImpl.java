@@ -43,6 +43,7 @@ import org.datanucleus.cache.Level2Cache;
 import org.datanucleus.cache.NullLevel2Cache;
 import org.datanucleus.cache.SoftLevel2Cache;
 import org.datanucleus.cache.WeakLevel2Cache;
+import org.datanucleus.enhancer.ImplementationCreator;
 import org.datanucleus.enhancer.ImplementationCreatorImpl;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.DatastoreInitialisationException;

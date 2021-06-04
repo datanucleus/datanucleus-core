@@ -15,7 +15,9 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus;
+package org.datanucleus.enhancer;
+
+import org.datanucleus.ClassLoaderResolver;
 
 /**
  * Create instances of persistable objects. 

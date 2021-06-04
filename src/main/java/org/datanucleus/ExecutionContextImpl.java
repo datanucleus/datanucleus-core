@@ -47,6 +47,7 @@ import org.datanucleus.cache.SoftRefCache;
 import org.datanucleus.cache.StrongRefCache;
 import org.datanucleus.cache.WeakRefCache;
 import org.datanucleus.enhancement.Persistable;
+import org.datanucleus.enhancer.ImplementationCreator;
 import org.datanucleus.exceptions.ClassNotDetachableException;
 import org.datanucleus.exceptions.ClassNotPersistableException;
 import org.datanucleus.exceptions.ClassNotResolvedException;

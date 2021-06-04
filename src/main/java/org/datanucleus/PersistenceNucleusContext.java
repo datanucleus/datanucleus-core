@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.datanucleus.cache.Level2Cache;
+import org.datanucleus.enhancer.ImplementationCreator;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityManager;
 import org.datanucleus.management.FactoryStatistics;
