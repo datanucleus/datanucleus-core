@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus;
+package org.datanucleus.transaction;
 
 /**
  * Listener of events raised on transaction begin, commit, rollback and flush.

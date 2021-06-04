@@ -21,8 +21,8 @@ package org.datanucleus.store.connection;
 import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.Transaction;
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.transaction.Transaction;
 
 /**
  * Manager of connections for a StoreManager, allowing ManagedConnection pooling, enlistment in transaction.

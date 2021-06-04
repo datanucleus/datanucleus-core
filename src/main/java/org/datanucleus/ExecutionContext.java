@@ -45,6 +45,7 @@ import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.store.types.scostore.Store;
+import org.datanucleus.transaction.Transaction;
 
 /**
  * Context of execution for persistence operations.

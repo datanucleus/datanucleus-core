@@ -21,7 +21,6 @@ package org.datanucleus.state;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.FetchPlanState;
-import org.datanucleus.Transaction;
 import org.datanucleus.cache.CachedPC;
 import org.datanucleus.enhancement.StateManager;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
@@ -29,6 +28,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.fieldmanager.FieldManager;
+import org.datanucleus.transaction.Transaction;
 
 /**
  * Provider of field information for a managed object.

@@ -31,14 +31,14 @@ import org.datanucleus.ClassConstants;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
-import org.datanucleus.Transaction;
-import org.datanucleus.TransactionEventListener;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.federation.FederatedStoreManager;
 import org.datanucleus.transaction.ResourcedTransaction;
+import org.datanucleus.transaction.Transaction;
+import org.datanucleus.transaction.TransactionEventListener;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -341,7 +341,7 @@ public class ConnectionManagerImpl implements ConnectionManager
      * @param options Options for the connection (e.g isolation). These will override those of the txn itself
      * @return The ManagedConnection
      */
-    private ManagedConnection allocateManagedConnection(boolean primary, final ExecutionContext ec, final org.datanucleus.Transaction transaction, Map options)
+    private ManagedConnection allocateManagedConnection(boolean primary, final ExecutionContext ec, final org.datanucleus.transaction.Transaction transaction, Map options)
     {
         ConnectionFactory factory = primary ? primaryConnectionFactory : secondaryConnectionFactory;
         if (ec != null && connectionCachingEnabled)
@@ -462,7 +462,7 @@ public class ConnectionManagerImpl implements ConnectionManager
      * @param transaction The transaction that we add a listener to
      * @param mconn Managed connection being used
      */
-    private void configureTransactionEventListener(final org.datanucleus.Transaction transaction, final ManagedConnection mconn)
+    private void configureTransactionEventListener(final org.datanucleus.transaction.Transaction transaction, final ManagedConnection mconn)
     {
         // Add handler for any enlisted connection to the transaction so we know when to close it
         if (mconn.closeAfterTransactionEnd())

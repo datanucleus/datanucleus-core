@@ -20,7 +20,7 @@ Contributors:
 2013 Andy Jefferson - added autoJoin, isJoined, and getIsActive for JPA requirements.
     ...
 **********************************************************************/
-package org.datanucleus;
+package org.datanucleus.transaction.jta;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -31,28 +31,29 @@ import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
 
+import org.datanucleus.Configuration;
+import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.properties.PropertyStore;
 import org.datanucleus.store.connection.ConnectionFactory;
 import org.datanucleus.store.connection.ConnectionResourceType;
 import org.datanucleus.transaction.NucleusTransactionException;
-import org.datanucleus.transaction.jta.JTASyncRegistry;
+import org.datanucleus.transaction.TransactionImpl;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
  * Transaction that is synchronized with a Java Transaction Service (JTA) transaction.
- * Works only in environments where a TransactionManager is present. This transaction joins to the 
- * transaction via the TransactionManager, and the TransactionManager notifies this class of completion 
- * via the beforeCompletion/afterCompletion callback hooks. This transaction can be configured as "autoJoin"
- * whereby it will try to join when it is created and otherwise when isActive() is called. When it is not
- * set to "autoJoin" the developer has to call <pre>joinTransaction</pre> which will check the current
- * join status and join as necessary.
+ * Works only in environments where a TransactionManager is present. 
+ * This transaction joins to the transaction via the TransactionManager, and the TransactionManager notifies this class of completion via the 
+ * beforeCompletion/afterCompletion callback hooks. 
+ * This transaction can be configured as "autoJoin" whereby it will try to join when it is created and otherwise when isActive() is called. 
+ * When it is not set to "autoJoin" the developer has to call <pre>joinTransaction</pre> which will check the current join status and join as necessary.
  * <p>
  * When this transaction is being used the transactions must be controlled using javax.transaction.UserTransaction,
  * and not using local transactions (e.g PM.currentTransaction().begin()). 
  * Should also work for SessionBeans, as per spec UserTransaction reflects SessionBean-based tx demarcation.
- * See also {@link org.datanucleus.Transaction}
+ * See also {@link org.datanucleus.transaction.Transaction}
  */
 public class JTATransactionImpl extends TransactionImpl implements Synchronization 
 {
@@ -84,7 +85,7 @@ public class JTATransactionImpl extends TransactionImpl implements Synchronizati
      * @param autoJoin Whether to auto-join to the underlying UserTransaction on isActive and at creation?
      * @param properties Properties to use with the transaction
      */
-    JTATransactionImpl(ExecutionContext ec, boolean autoJoin, PropertyStore properties)
+    public JTATransactionImpl(ExecutionContext ec, boolean autoJoin, PropertyStore properties)
     {
         super(ec, properties);
         this.autoJoin = autoJoin;

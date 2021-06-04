@@ -200,7 +200,7 @@ public abstract class LifeCycleState
      * @param tx Transaction.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionBegin(ObjectProvider op, org.datanucleus.Transaction tx)
+    public LifeCycleState transitionBegin(ObjectProvider op, org.datanucleus.transaction.Transaction tx)
     {
         return this;
     }
@@ -211,7 +211,7 @@ public abstract class LifeCycleState
      * @param tx the Transaction been committed.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionCommit(ObjectProvider op, org.datanucleus.Transaction tx)
+    public LifeCycleState transitionCommit(ObjectProvider op, org.datanucleus.transaction.Transaction tx)
     {
         return this;
     }
@@ -222,7 +222,7 @@ public abstract class LifeCycleState
      * @param tx Transaction.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionRollback(ObjectProvider op, org.datanucleus.Transaction tx)
+    public LifeCycleState transitionRollback(ObjectProvider op, org.datanucleus.transaction.Transaction tx)
     {
         return this;
     }

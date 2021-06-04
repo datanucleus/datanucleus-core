@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus;
+package org.datanucleus.transaction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,37 +27,34 @@ import java.util.Set;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
+import org.datanucleus.Configuration;
+import org.datanucleus.ExecutionContext;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.exceptions.TransactionActiveOnBeginException;
 import org.datanucleus.exceptions.TransactionNotActiveException;
 import org.datanucleus.properties.PropertyStore;
-import org.datanucleus.transaction.HeuristicMixedException;
-import org.datanucleus.transaction.HeuristicRollbackException;
-import org.datanucleus.transaction.NucleusTransactionException;
-import org.datanucleus.transaction.RollbackException;
-import org.datanucleus.transaction.ResourcedTransactionManager;
-import org.datanucleus.transaction.TransactionUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Implementation of a transaction for an ExecutionContext, for a datastore. See {@link org.datanucleus.Transaction}.
+ * Implementation of a (local) transaction for an ExecutionContext, for a datastore. See {@link org.datanucleus.transaction.Transaction}.
  * This is not thread-safe.
  */
 public class TransactionImpl implements Transaction
 {
-    ExecutionContext ec;
+    protected ExecutionContext ec;
 
-    ResourcedTransactionManager txnMgr;
+    protected ResourcedTransactionManager txnMgr;
 
     /** Whether the transaction is active. */
-    boolean active = false;
+    protected boolean active = false;
 
     /** Flag for whether we are currently committing. */
-    boolean committing;
+    protected boolean committing;
 
     /** Synchronisation object, for committing and rolling back. Only for JDO. */
     Synchronization sync;
@@ -82,7 +79,7 @@ public class TransactionImpl implements Transaction
     /** start time of the transaction */
     long beginTime = -1;
 
-    boolean closed = false;
+    protected boolean closed = false;
     
     private PropertyStore properties;
 

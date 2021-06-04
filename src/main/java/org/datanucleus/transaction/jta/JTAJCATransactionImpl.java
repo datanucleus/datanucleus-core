@@ -17,15 +17,17 @@ Contributors:
 2007 GUido Anzuoni - move TX Manager lookup to Context
     ...
 **********************************************************************/
-package org.datanucleus;
+package org.datanucleus.transaction.jta;
 
 import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 
+import org.datanucleus.ExecutionContext;
 import org.datanucleus.properties.PropertyStore;
 import org.datanucleus.transaction.NucleusTransactionException;
+import org.datanucleus.transaction.TransactionImpl;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -49,7 +51,7 @@ public class JTAJCATransactionImpl extends TransactionImpl implements Synchroniz
      * @param ec ExecutionContext
      * @param properties Properties to use with the transaction
      */
-    JTAJCATransactionImpl(ExecutionContext ec, PropertyStore properties)
+    public JTAJCATransactionImpl(ExecutionContext ec, PropertyStore properties)
     {
         super(ec, properties);
 

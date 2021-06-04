@@ -1112,7 +1112,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      * Method invoked just before a transaction starts for the ExecutionContext managing us.
      * @param tx The transaction
      */
-    public void preBegin(org.datanucleus.Transaction tx)
+    public void preBegin(org.datanucleus.transaction.Transaction tx)
     {
         preStateChange();
         try
@@ -1129,7 +1129,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      * This method is invoked just after a commit is performed in a Transaction involving the persistable object managed by this StateManager
      * @param tx The transaction
      */
-    public void postCommit(org.datanucleus.Transaction tx)
+    public void postCommit(org.datanucleus.transaction.Transaction tx)
     {
         preStateChange();
         try
@@ -1150,7 +1150,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      * This method is invoked just before a rollback is performed in a Transaction involving the persistable object managed by this StateManager.
      * @param tx The transaction
      */
-    public void preRollback(org.datanucleus.Transaction tx)
+    public void preRollback(org.datanucleus.transaction.Transaction tx)
     {
         preStateChange();
         try
