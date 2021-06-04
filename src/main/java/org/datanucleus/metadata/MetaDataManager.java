@@ -49,7 +49,7 @@ public interface MetaDataManager
 
     AnnotationManager getAnnotationManager();
 
- //   MetaDataParser getMetaDataParser(boolean validate);
+ //   XmlMetaDataParser getXmlMetaDataParser(boolean validate);
 
     String getEnhancedMethodNamePrefix();
 

@@ -47,17 +47,17 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Class to provide the parsing framework for parsing metadata files.
- * This will support parsing of any metadata files where the resultant object is derived from org.datanucleus.metadata.MetaData, so can be used on JDO files, ORM files,
- * JDOQUERY files, JPA/Jakarta ORM files, or JPA/Jakarta "persistence.xml" files. Can be used for any future metadata files too.
+ * Class to provide the parsing framework for parsing XML metadata files.
+ * This will support parsing of any metadata files where the resultant object is derived from org.datanucleus.metadata.MetaData, so can be used on JDO XML files, 
+ * ORM XML files, JDOQUERY XML files, JPA/Jakarta orm.xml files, or JDO/JPA/Jakarta "persistence.xml" files. Can be used for any future XML metadata files too.
  * <P>
  * Provides 3 different entry points depending on whether the caller has a URL, a file, or an InputStream.
  * </P>
  */
-public class MetaDataParser extends DefaultHandler
+public class XmlMetaDataParser extends DefaultHandler
 {
     /** EntityResolver for all XML MetaData. */
-    protected MetaDataEntityResolver entityResolver = null;
+    protected XmlMetaDataEntityResolver entityResolver = null;
 
     /** MetaData manager. */
     protected final MetaDataManager mgr;
@@ -81,13 +81,13 @@ public class MetaDataParser extends DefaultHandler
      * @param validate Whether to validate while parsing
      * @param namespaceAware Whether to support namespaces
      */
-    public MetaDataParser(MetaDataManager mgr, PluginManager pluginMgr, boolean validate, boolean namespaceAware)
+    public XmlMetaDataParser(MetaDataManager mgr, PluginManager pluginMgr, boolean validate, boolean namespaceAware)
     {
         this.mgr = mgr;
         this.pluginMgr = pluginMgr;
         this.validate = validate;
         this.namespaceAware = namespaceAware;
-        this.entityResolver = new MetaDataEntityResolver(pluginMgr);
+        this.entityResolver = new XmlMetaDataEntityResolver(pluginMgr);
         this.parser = createSAXParser();
     }
 
@@ -147,13 +147,13 @@ public class MetaDataParser extends DefaultHandler
     }
 
     /**
-     * Method to parse a MetaData file given the URL of the file.
+     * Method to parse an XML MetaData file given the URL of the file.
      * @param url Url of the metadata file
      * @param handlerName Name of the handler plugin to use when parsing
      * @return The MetaData for this file
      * @throws NucleusException thrown if error occurred
      */
-    public MetaData parseMetaDataURL(URL url, String handlerName)
+    public MetaData parseXmlMetaDataURL(URL url, String handlerName)
     {
         if (url == null)
         {
@@ -187,17 +187,17 @@ public class MetaDataParser extends DefaultHandler
         }
 
         // Parse the file
-        return parseMetaDataStream(in, url.toString(), handlerName);
+        return parseXmlMetaDataStream(in, url.toString(), handlerName);
     }
 
     /**
-     * Method to parse a MetaData file given the filename.
+     * Method to parse an XML MetaData file given the filename.
      * @param fileName Name of the file
      * @param handlerName Name of the handler plugin to use when parsing
      * @return The MetaData for this file
      * @throws NucleusException if error occurred
      */
-    public MetaData parseMetaDataFile(String fileName, String handlerName)
+    public MetaData parseXmlMetaDataFile(String fileName, String handlerName)
     {
         InputStream in = null;
         try
@@ -226,11 +226,11 @@ public class MetaDataParser extends DefaultHandler
         }
 
         // Parse the file
-        return parseMetaDataStream(in, fileName, handlerName);
+        return parseXmlMetaDataStream(in, fileName, handlerName);
     }
 
     /**
-     * Method to parse a MetaData file given an InputStream.
+     * Method to parse an XML MetaData file given an InputStream.
      * Closes the input stream when finished.
      * @param in input stream
      * @param filename Name of the file (if applicable)
@@ -238,7 +238,7 @@ public class MetaDataParser extends DefaultHandler
      * @return The MetaData for this file
      * @throws NucleusException thrown if error occurred
      */
-    public MetaData parseMetaDataStream(InputStream in, String filename, String handlerName)
+    public MetaData parseXmlMetaDataStream(InputStream in, String filename, String handlerName)
     {
         if (in == null)
         {
@@ -262,7 +262,7 @@ public class MetaDataParser extends DefaultHandler
                     if ("persistence".equalsIgnoreCase(handlerName)) 
                     {
                         // "persistence.xml"
-                        handler = new org.datanucleus.metadata.xml.PersistenceFileMetaDataHandler(mgr, filename, entityResolver);
+                        handler = new PersistenceXmlMetaDataHandler(mgr, filename, entityResolver);
                     } 
                     else 
                     {                        
@@ -284,13 +284,13 @@ public class MetaDataParser extends DefaultHandler
                 }
 
                 // Set whether to validate
-                ((AbstractMetaDataHandler) handler).setValidate(validate);
+                ((AbstractXmlMetaDataHandler) handler).setValidate(validate);
 
                 // Parse the metadata
                 parser.parse(in, handler);
 
                 // Return the FileMetaData that has been parsed
-                return ((AbstractMetaDataHandler) handler).getMetaData();
+                return ((AbstractXmlMetaDataHandler) handler).getMetaData();
             }
         }
         catch (NucleusException e)

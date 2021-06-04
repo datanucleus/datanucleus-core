@@ -44,7 +44,7 @@ Contributors:
     <extension-point id="java_type" name="Java Type" schema="schema/java_type.exsd"/>
     <extension-point id="type_converter" name="Java Converter Type" schema="schema/type_converter.exsd"/>
     <extension-point id="persistence_properties" name="Persistence Properties" schema="schema/persistenceproperties.exsd"/>
-    <extension-point id="metadata_handler" name="MetaData Handler" schema="schema/metadata_handler.exsd"/>
+    <extension-point id="metadata_handler" name="MetaData XML Handler" schema="schema/metadata_handler.exsd"/>
     <extension-point id="metadata_manager" name="MetaDataManager" schema="schema/metadata_manager.exsd"/>
     <extension-point id="metadata_entityresolver" name="MetaDataEntityResolver" schema="schema/metadata_entityresolver.exsd"/>
     <extension-point id="annotations" name="Annotations" schema="schema/annotations.exsd"/>
@@ -52,7 +52,7 @@ Contributors:
     <extension-point id="member_annotation_handler" name="Member Annotation Handler" schema="schema/member_annotation_handler.exsd"/>
     <extension-point id="identifier_namingfactory" name="Identifier NamingFactory" schema="schema/identifier_namingfactory.exsd"/>
 
-    <!-- METADATA ENTITY RESOLVERS -->
+    <!-- XML METADATA ENTITY RESOLVERS -->
     <extension point="org.datanucleus.metadata_entityresolver">
         <!-- Persistence XML -->
         <entityresolver identity="http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd" type="SYSTEM" url="/org/datanucleus/metadata/persistence_2_2.xsd"/>

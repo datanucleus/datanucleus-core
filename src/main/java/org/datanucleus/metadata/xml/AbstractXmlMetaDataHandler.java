@@ -33,10 +33,10 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Abstract handler for MetaData parsing.
- * Should be extended to handle processing of specific types of metadata.
+ * Abstract handler for XML MetaData parsing.
+ * This class is extended to handle processing of specific types of metadata.
  */
-public class AbstractMetaDataHandler extends DefaultHandler
+public class AbstractXmlMetaDataHandler extends DefaultHandler
 {
     /** Manager for the MetaData. */
     protected final MetaDataManager mmgr;
@@ -69,7 +69,7 @@ public class AbstractMetaDataHandler extends DefaultHandler
      * @param filename The filename
      * @param resolver Entity Resolver to use (null if not available)
      */
-    public AbstractMetaDataHandler(MetaDataManager mmgr, String filename, EntityResolver resolver)
+    public AbstractXmlMetaDataHandler(MetaDataManager mmgr, String filename, EntityResolver resolver)
     {
         super();
         this.mmgr = mmgr;

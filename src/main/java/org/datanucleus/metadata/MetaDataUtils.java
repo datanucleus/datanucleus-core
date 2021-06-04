@@ -34,7 +34,7 @@ import org.datanucleus.ClassNameConstants;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.metadata.xml.MetaDataParser;
+import org.datanucleus.metadata.xml.XmlMetaDataParser;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
@@ -112,28 +112,28 @@ public class MetaDataUtils
     /**
      * Convenience method that returns if a field stores a persistable object.
      * Doesn't care if the persistable object is serialised or embedded, just that it is persistable.
-     * @param fmd MetaData for the field
+     * @param mmd MetaData for the field
      * @param ec ExecutionContext
      * @return Whether it stores a persistable object
      */
-    public boolean storesPersistable(AbstractMemberMetaData fmd, ExecutionContext ec)
+    public boolean storesPersistable(AbstractMemberMetaData mmd, ExecutionContext ec)
     {
-        if (fmd == null)
+        if (mmd == null)
         {
             return false;
         }
 
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
         MetaDataManager mmgr = ec.getMetaDataManager();
-        if (fmd.hasCollection())
+        if (mmd.hasCollection())
         {
-            if (fmd.getCollection().elementIsPersistent())
+            if (mmd.getCollection().elementIsPersistent())
             {
                 // Collection of PC elements
                 return true;
             }
 
-            String elementType = fmd.getCollection().getElementType();
+            String elementType = mmd.getCollection().getElementType();
             Class elementCls = clr.classForName(elementType);
             if (mmgr.getMetaDataForImplementationOfReference(elementCls, null, clr) != null)
             {
@@ -144,7 +144,7 @@ public class MetaDataUtils
             {
                 try
                 {
-                    String[] impls = getImplementationNamesForReferenceField(fmd, FieldRole.ROLE_COLLECTION_ELEMENT, clr, mmgr);
+                    String[] impls = getImplementationNamesForReferenceField(mmd, FieldRole.ROLE_COLLECTION_ELEMENT, clr, mmgr);
                     if (impls != null)
                     {
                         elementCls = clr.classForName(impls[0]);
@@ -161,15 +161,15 @@ public class MetaDataUtils
                 }
             }
         }
-        else if (fmd.hasMap())
+        else if (mmd.hasMap())
         {
-            if (fmd.getMap().keyIsPersistent())
+            if (mmd.getMap().keyIsPersistent())
             {
                 // Map of PC keys
                 return true;
             }
 
-            String keyType = fmd.getMap().getKeyType();
+            String keyType = mmd.getMap().getKeyType();
             Class keyCls = clr.classForName(keyType);
             if (mmgr.getMetaDataForImplementationOfReference(keyCls, null, clr) != null)
             {
@@ -180,7 +180,7 @@ public class MetaDataUtils
             {
                 try
                 {
-                    String[] impls = getImplementationNamesForReferenceField(fmd, FieldRole.ROLE_MAP_KEY, clr, mmgr);
+                    String[] impls = getImplementationNamesForReferenceField(mmd, FieldRole.ROLE_MAP_KEY, clr, mmgr);
                     if (impls != null)
                     {
                         keyCls = clr.classForName(impls[0]);
@@ -197,13 +197,13 @@ public class MetaDataUtils
                 }
             }
 
-            if (fmd.getMap().valueIsPersistent())
+            if (mmd.getMap().valueIsPersistent())
             {
                 // Map of PC values
                 return true;
             }
 
-            String valueType = fmd.getMap().getValueType();
+            String valueType = mmd.getMap().getValueType();
             Class valueCls = clr.classForName(valueType);
             if (mmgr.getMetaDataForImplementationOfReference(valueCls, null, clr) != null)
             {
@@ -214,7 +214,7 @@ public class MetaDataUtils
             {
                 try
                 {
-                    String[] impls = getImplementationNamesForReferenceField(fmd, FieldRole.ROLE_MAP_VALUE, clr, mmgr);
+                    String[] impls = getImplementationNamesForReferenceField(mmd, FieldRole.ROLE_MAP_VALUE, clr, mmgr);
                     if (impls != null)
                     {
                         valueCls = clr.classForName(impls[0]);
@@ -231,15 +231,15 @@ public class MetaDataUtils
                 }
             }
         }
-        else if (fmd.hasArray())
+        else if (mmd.hasArray())
         {
-            if (mmgr.getApiAdapter().isPersistable(fmd.getType().getComponentType()))
+            if (mmgr.getApiAdapter().isPersistable(mmd.getType().getComponentType()))
             {
                 // persistable[]
                 return true;
             }
 
-            String elementType = fmd.getArray().getElementType();
+            String elementType = mmd.getArray().getElementType();
             Class elementCls = clr.classForName(elementType);
             if (mmgr.getApiAdapter().isPersistable(elementCls))
             {
@@ -255,7 +255,7 @@ public class MetaDataUtils
             {
                 try
                 {
-                    String[] impls = getImplementationNamesForReferenceField(fmd, FieldRole.ROLE_ARRAY_ELEMENT, clr, mmgr);
+                    String[] impls = getImplementationNamesForReferenceField(mmd, FieldRole.ROLE_ARRAY_ELEMENT, clr, mmgr);
                     if (impls != null)
                     {
                         elementCls = clr.classForName(impls[0]);
@@ -275,12 +275,12 @@ public class MetaDataUtils
         else
         {
             // 1-1 relation with PC
-            if (ClassUtils.isReferenceType(fmd.getType()) && mmgr.getMetaDataForImplementationOfReference(fmd.getType(), null, clr) != null)
+            if (ClassUtils.isReferenceType(mmd.getType()) && mmgr.getMetaDataForImplementationOfReference(mmd.getType(), null, clr) != null)
             {
                 // Reference type for an FCO
                 return true;
             }
-            if (mmgr.getMetaDataForClass(fmd.getType(), clr) != null)
+            if (mmgr.getMetaDataForClass(mmd.getType(), clr) != null)
             {
                 return true;
             }
@@ -289,36 +289,35 @@ public class MetaDataUtils
     }
 
     /**
-     * Convenience method that returns if a field stores a First-Class object (FCO).
-     * If a field object is serialised/embedded then doesn't count the object as FCO - use
-     * storesPersistable() if you want that not checking.
-     * @param fmd MetaData for the field
+     * Convenience method that returns if a member stores a First-Class object (FCO).
+     * If a field object is serialised/embedded then doesn't count the object as FCO - use storesPersistable() if you want that not checking.
+     * @param mmd MetaData for the member
      * @param ec ExecutionContext
      * @return Whether it stores a FCO
      */
-    public boolean storesFCO(AbstractMemberMetaData fmd, ExecutionContext ec)
+    public boolean storesFCO(AbstractMemberMetaData mmd, ExecutionContext ec)
     {
-        if (fmd == null)
+        if (mmd == null)
         {
             return false;
         }
 
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
         MetaDataManager mgr = ec.getMetaDataManager();
-        if (fmd.isSerialized() || fmd.isEmbedded())
+        if (mmd.isSerialized() || mmd.isEmbedded())
         {
             // Serialised or embedded fields have no FCO
             return false;
         }
-        else if (fmd.hasCollection() && !fmd.getCollection().isSerializedElement() && !fmd.getCollection().isEmbeddedElement())
+        else if (mmd.hasCollection() && !mmd.getCollection().isSerializedElement() && !mmd.getCollection().isEmbeddedElement())
         {
-            if (fmd.getCollection().elementIsPersistent())
+            if (mmd.getCollection().elementIsPersistent())
             {
                 // Collection of PC elements
                 return true;
             }
 
-            String elementType = fmd.getCollection().getElementType();
+            String elementType = mmd.getCollection().getElementType();
             Class elementCls = clr.classForName(elementType);
             if (elementCls != null && ClassUtils.isReferenceType(elementCls) && mgr.getMetaDataForImplementationOfReference(elementCls, null, clr) != null)
             {
@@ -326,15 +325,15 @@ public class MetaDataUtils
                 return true;
             }
         }
-        else if (fmd.hasMap())
+        else if (mmd.hasMap())
         {
-            if (fmd.getMap().keyIsPersistent() && !fmd.getMap().isEmbeddedKey() && !fmd.getMap().isSerializedKey())
+            if (mmd.getMap().keyIsPersistent() && !mmd.getMap().isEmbeddedKey() && !mmd.getMap().isSerializedKey())
             {
                 // Map of PC keys
                 return true;
             }
 
-            String keyType = fmd.getMap().getKeyType();
+            String keyType = mmd.getMap().getKeyType();
             Class keyCls = clr.classForName(keyType);
             if (keyCls != null && ClassUtils.isReferenceType(keyCls) && mgr.getMetaDataForImplementationOfReference(keyCls, null, clr) != null)
             {
@@ -342,13 +341,13 @@ public class MetaDataUtils
                 return true;
             }
                 
-            if (fmd.getMap().valueIsPersistent() && !fmd.getMap().isEmbeddedValue() && !fmd.getMap().isSerializedValue())
+            if (mmd.getMap().valueIsPersistent() && !mmd.getMap().isEmbeddedValue() && !mmd.getMap().isSerializedValue())
             {
                 // Map of PC values
                 return true;
             }
 
-            String valueType = fmd.getMap().getValueType();
+            String valueType = mmd.getMap().getValueType();
             Class valueCls = clr.classForName(valueType);
             if (valueCls != null && ClassUtils.isReferenceType(valueCls) && mgr.getMetaDataForImplementationOfReference(valueCls, null, clr) != null)
             {
@@ -356,9 +355,9 @@ public class MetaDataUtils
                 return true;
             }
         }
-        else if (fmd.hasArray() && !fmd.getArray().isSerializedElement() && !fmd.getArray().isEmbeddedElement())
+        else if (mmd.hasArray() && !mmd.getArray().isSerializedElement() && !mmd.getArray().isEmbeddedElement())
         {
-            if (mgr.getApiAdapter().isPersistable(fmd.getType().getComponentType()))
+            if (mgr.getApiAdapter().isPersistable(mmd.getType().getComponentType()))
             {
                 // persistable[]
                 return true;
@@ -367,12 +366,12 @@ public class MetaDataUtils
         else
         {
             // 1-1 relation with PC
-            if (ClassUtils.isReferenceType(fmd.getType()) && mgr.getMetaDataForImplementationOfReference(fmd.getType(), null, clr) != null)
+            if (ClassUtils.isReferenceType(mmd.getType()) && mgr.getMetaDataForImplementationOfReference(mmd.getType(), null, clr) != null)
             {
                 // Reference type for an FCO
                 return true;
             }
-            if (mgr.getMetaDataForClass(fmd.getType(), clr) != null)
+            if (mgr.getMetaDataForClass(mmd.getType(), clr) != null)
             {
                 return true;
             }
@@ -799,7 +798,7 @@ public class MetaDataUtils
      */
     public static PersistenceFileMetaData[] parsePersistenceFiles(PluginManager pluginMgr, String persistenceFilename, boolean validate, boolean namespaceAware, ClassLoaderResolver clr)
     {
-        MetaDataParser parser = new MetaDataParser(null, pluginMgr, validate, namespaceAware);
+        XmlMetaDataParser parser = new XmlMetaDataParser(null, pluginMgr, validate, namespaceAware);
 
         if (persistenceFilename != null)
         {
@@ -807,7 +806,7 @@ public class MetaDataUtils
             try
             {
                 URL fileURL = new URL(persistenceFilename);
-                MetaData permd = parser.parseMetaDataURL(fileURL, "persistence");
+                MetaData permd = parser.parseXmlMetaDataURL(fileURL, "persistence");
                 return new PersistenceFileMetaData[] {(PersistenceFileMetaData)permd};
             }
             catch (MalformedURLException mue)
@@ -832,7 +831,7 @@ public class MetaDataUtils
             {
                 // Parse the "persistence.xml"
                 URL fileURL = (URL)files.nextElement();
-                MetaData permd = parser.parseMetaDataURL(fileURL, "persistence");
+                MetaData permd = parser.parseXmlMetaDataURL(fileURL, "persistence");
                 metadata.add(permd);
             }
         }

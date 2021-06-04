@@ -31,15 +31,15 @@ import org.datanucleus.util.AbstractXMLEntityResolver;
 import org.datanucleus.util.NucleusLogger;
 
 /**
- * Implementation of an entity resolver for MetaData XML files.
- * Note that this applies to ALL types of MetaData XML (persistence.xml, JDO package.jdo, JDO package.orm, JDO package.jdoquery, JPA/Jakarta orm.xml).
+ * Implementation of an entity resolver for XML MetaData files.
+ * Note that this applies to ALL types of XML MetaData (persistence.xml, JDO package.jdo, JDO package.orm, JDO package.jdoquery, JPA/Jakarta orm.xml).
  * We could, potentially, separate these different types of MetaData XML file, and hence split up the entities based on the handler, but not considered a priority currently.
  */
-public class MetaDataEntityResolver extends AbstractXMLEntityResolver
+public class XmlMetaDataEntityResolver extends AbstractXMLEntityResolver
 {
     final PluginManager pluginMgr;
 
-    public MetaDataEntityResolver(PluginManager pluginMgr)
+    public XmlMetaDataEntityResolver(PluginManager pluginMgr)
     {
         this.pluginMgr = pluginMgr;
 
@@ -72,7 +72,7 @@ public class MetaDataEntityResolver extends AbstractXMLEntityResolver
         {
             if (elems[i].getAttribute("type") == null)
             {
-                InputStream in = MetaDataParser.class.getResourceAsStream(elems[i].getAttribute("url"));
+                InputStream in = XmlMetaDataParser.class.getResourceAsStream(elems[i].getAttribute("url"));
                 if (in == null)
                 {
                     NucleusLogger.METADATA.warn("local resource \"" + elems[i].getAttribute("url") + "\" does not exist!!!");

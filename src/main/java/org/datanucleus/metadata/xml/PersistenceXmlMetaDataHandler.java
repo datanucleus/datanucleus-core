@@ -32,15 +32,15 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Parser handler for "persistence.xml" files to convert them into a PersistenceFileMetaData.
+ * XML parser handler for "persistence.xml" files to convert them into a PersistenceFileMetaData.
  * Implements DefaultHandler and handles the extracting of MetaData from the XML elements/attributes. 
- * This class simply constructs the MetaData representation mirroring what is in the MetaData file.
+ * This class simply constructs the MetaData representation mirroring what is in the XML MetaData file.
  * <P>
- * Operates the parse process using a Stack. MetaData components are added to the stack as they are encountered and created. 
+ * Operates the parse process using a Stack. XML MetaData components are added to the stack as they are encountered and created. 
  * They are then popped off the stack when the end element is encountered.
  * </P>
  */
-public class PersistenceFileMetaDataHandler extends AbstractMetaDataHandler
+public class PersistenceXmlMetaDataHandler extends AbstractXmlMetaDataHandler
 {
     URI rootURI = null;
 
@@ -50,7 +50,7 @@ public class PersistenceFileMetaDataHandler extends AbstractMetaDataHandler
      * @param filename The name of the file to parse
      * @param resolver Entity Resolver to use (null if not available)
      */
-    public PersistenceFileMetaDataHandler(MetaDataManager mgr, String filename, EntityResolver resolver)
+    public PersistenceXmlMetaDataHandler(MetaDataManager mgr, String filename, EntityResolver resolver)
     {
         super(mgr, filename, resolver);
         metadata = new PersistenceFileMetaData(filename);

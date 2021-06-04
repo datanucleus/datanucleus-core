@@ -320,10 +320,10 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         }
     }
 
-    /*public MetaDataParser getMetaDataParser(boolean validate)
+    /*public XmlMetaDataParser getXmlMetaDataParser(boolean validate)
     {
         // TODO Support access to "metaDataParser" to avoid creating multiple
-        return new MetaDataParser(this, nucleusContext.getPluginManager(), validate);
+        return new XmlMetaDataParser(this, nucleusContext.getPluginManager(), validate);
     }*/
 
     /* (non-Javadoc)
@@ -737,7 +737,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                             URL url = (URL)files.nextElement();
                             if (url != null && fileMetaDataByURLString.get(url.toString()) == null)
                             {
-                                FileMetaData filemd = parseFile(url);
+                                FileMetaData filemd = parseXmlFile(url);
                                 if (filemd != null)
                                 {
                                     // Register the file
@@ -1057,7 +1057,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                                 URL url = (URL)files.nextElement();
                                 if (url != null && fileMetaDataByURLString.get(url.toString()) == null)
                                 {
-                                    FileMetaData filemd = parseFile(url);
+                                    FileMetaData filemd = parseXmlFile(url);
                                     if (filemd != null)
                                     {
                                         // Register the file
@@ -1424,7 +1424,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
                     if (filemd == null)
                     {
                         // Valid metadata, and not already loaded
-                        filemd = parseFile(fileURL);
+                        filemd = parseXmlFile(fileURL);
                         if (filemd != null)
                         {
                             registerFile(fileURL.toString(), filemd, clr);
@@ -2257,7 +2257,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
      * @param fileURL URL of the file
      * @return The FileMetaData for this file
      */
-    protected abstract FileMetaData parseFile(URL fileURL);
+    protected abstract FileMetaData parseXmlFile(URL fileURL);
 
     /* (non-Javadoc)
      * @see org.datanucleus.metadata.MetaDataManager#registerFile(java.lang.String, org.datanucleus.metadata.FileMetaData, org.datanucleus.ClassLoaderResolver)
