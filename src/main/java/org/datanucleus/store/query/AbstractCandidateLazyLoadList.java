@@ -33,7 +33,7 @@ public abstract class AbstractCandidateLazyLoadList extends AbstractLazyLoadList
     protected ExecutionContext ec;
 
     /** Collection of class metadata suitable for returned objects that haven't yet been fully processed. */
-    protected List<AbstractClassMetaData> cmds = new ArrayList<AbstractClassMetaData>();
+    protected List<AbstractClassMetaData> cmds = new ArrayList<>();
 
     public AbstractCandidateLazyLoadList(Class cls, boolean subclasses, ExecutionContext ec, String cacheType)
     {

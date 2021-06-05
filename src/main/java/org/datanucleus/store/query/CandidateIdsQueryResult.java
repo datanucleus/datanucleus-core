@@ -34,10 +34,9 @@ import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 /**
  * QueryResult taking in the list of identities of the objects of candidate type.
  * This is used where we cached the results of a query (the "ids") and just want to materialise them.
- * User can define the query extension "datanucleus.query.resultCache.type" to define the type of internal
- * caching of objects once they are found.
- * User can also define whether the returned objects are validated against the datastore upon retrieval
- * using the query extension "datanucleus.query.resultCache.validateObjects" (default=true)
+ * User can define the query extension "datanucleus.query.resultCache.type" to define the type of internal caching of objects once they are found.
+ * User can also define whether the returned objects are validated against the datastore upon retrieval using the query extension 
+ * "datanucleus.query.resultCache.validateObjects" (default=true).
  */
 public class CandidateIdsQueryResult<E> extends AbstractQueryResult<E>
 {
@@ -56,10 +55,10 @@ public class CandidateIdsQueryResult<E> extends AbstractQueryResult<E>
         size = ids != null ? ids.size() : 0; // Size is known
 
         // Allow override of validate setting
-        validateObjects = query.getBooleanExtensionProperty("datanucleus.query.resultCache.validateObjects", true);
+        validateObjects = query.getBooleanExtensionProperty(Query.EXTENSION_RESULT_CACHE_VALIDATE_OBJECTS, true);
 
         // Cache the results in whatever form they are required
-        String ext = (String)query.getExtension("datanucleus.query.resultCache.type");
+        String ext = (String)query.getExtension(Query.EXTENSION_RESULT_CACHE_TYPE);
         if (ext != null)
         {
             if (ext.equalsIgnoreCase("soft"))

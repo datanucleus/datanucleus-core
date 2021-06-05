@@ -93,6 +93,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
 
     public static final String EXTENSION_MULTITHREAD = "datanucleus.query.multithread"; // TODO Is this used now
 
+    public static final String EXTENSION_RESULT_CACHE_VALIDATE_OBJECTS = PropertyNames.PROPERTY_QUERY_RESULTCACHE_VALIDATEOBJECTS;
     public static final String EXTENSION_RESULT_CACHE_TYPE = "datanucleus.query.resultCacheType";
     public static final String EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE = "datanucleus.query.closeResultsAtManagerClose";
 
