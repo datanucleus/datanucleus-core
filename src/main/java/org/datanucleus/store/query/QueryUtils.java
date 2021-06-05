@@ -464,7 +464,7 @@ public class QueryUtils
                     {
                         try
                         {
-                            Object convValue = ClassUtils.convertValue(value, args[0]);
+                            Object convValue = TypeConversionHelper.convertTo(value, args[0]);
                             methods[i].invoke(obj, new Object[]{convValue});
                             fieldSet = true;
                             if (NucleusLogger.QUERY.isDebugEnabled())

@@ -967,65 +967,6 @@ public class ClassUtils
     }
 
     /**
-     * Convenience method to convert the passed value to an object of the specified type (if possible).
-     * If no such conversion is supported will return null. If the required type is a primitive will
-     * return an object of the wrapper type.
-     * @param value The value
-     * @param cls The class
-     * @return The converted value (or null)
-     */
-    public static Object convertValue(Object value, Class cls)
-    {
-        if (value == null)
-        {
-            return null;
-        }
-
-        Class type = cls;
-        if (cls.isPrimitive())
-        {
-            type = getWrapperTypeForPrimitiveType(cls);
-        }
-        if (type.isAssignableFrom(value.getClass()))
-        {
-            // Already in the correct type
-            return value;
-        }
-
-        if (type == Long.class && value instanceof Number)
-        {
-            return Long.valueOf(((Number)value).longValue());
-        }
-        else if (type == Integer.class && value instanceof Number)
-        {
-            return Integer.valueOf(((Number)value).intValue());
-        }
-        else if (type == Short.class && value instanceof Number)
-        {
-            return Short.valueOf(((Number)value).shortValue());
-        }
-        else if (type == Float.class && value instanceof Number)
-        {
-            return Float.valueOf(((Number)value).floatValue());
-        }
-        else if (type == Double.class && value instanceof Number)
-        {
-            return Double.valueOf(((Number)value).doubleValue());
-        }
-        else if (type == Boolean.class && value instanceof Long)
-        {
-            // Convert a Long (0, 1) to Boolean (FALSE, TRUE) and null otherwise
-            return (Long)value == 0 ? Boolean.FALSE : ((Long)value == 1 ? Boolean.TRUE : null);
-        }
-        else if (type == Boolean.class && value instanceof Integer)
-        {
-            // Convert a Integer (0, 1) to Boolean (FALSE, TRUE) and null otherwise
-            return (Integer)value == 0 ? Boolean.FALSE : ((Integer)value == 1 ? Boolean.TRUE : null);
-        }
-        return null;
-    }
-
-    /**
      * Convenience method to return if two types are compatible.
      * Returns true if both types are primitive/wrappers and are of the same type.
      * Returns true if clsName2 is the same or a subclass of cls1.
