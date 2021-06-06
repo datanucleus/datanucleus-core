@@ -24,6 +24,10 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
@@ -984,6 +988,18 @@ public class TypeConversionHelper
         {
             return value.toString();
         }
+        else if (type == Date.class)
+        {
+            if (value instanceof java.time.LocalDate)
+            {
+                java.time.LocalDate localDate = (java.time.LocalDate)value;
+                return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            }
+            else if (value instanceof java.sql.Date)
+            {
+                return new java.sql.Date(((Date)value).getTime());
+            }
+        }
         else if (type == java.sql.Timestamp.class)
         {
             if (value instanceof Date)
@@ -998,6 +1014,11 @@ public class TypeConversionHelper
             {
                 return new java.sql.Date(((Date)value).getTime());
             }
+            else if (value instanceof java.time.LocalDate)
+            {
+                java.time.LocalDate localDate = (java.time.LocalDate)value;
+                return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            }
             return java.sql.Date.valueOf(value.toString());
         }
         else if (type == java.sql.Time.class)
@@ -1008,7 +1029,50 @@ public class TypeConversionHelper
             }
             return java.sql.Time.valueOf(value.toString());
         }
-        // TODO Add LocalDate, LocalTime, LocalDateTime etc
+        else if (type == java.time.LocalDate.class)
+        {
+            if (value instanceof java.sql.Timestamp)
+            {
+                return ((java.sql.Timestamp)value).toLocalDateTime().toLocalDate();
+            }
+            else if (value instanceof java.sql.Date)
+            {
+                return ((java.sql.Date)value).toLocalDate();
+            }
+            else if (value instanceof Date)
+            {
+                Date date = (Date)value;
+                return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneId.systemDefault()).toLocalDate();
+            }
+        }
+        else if (type == java.time.LocalDateTime.class)
+        {
+            if (value instanceof java.sql.Timestamp)
+            {
+                return ((java.sql.Timestamp)value).toLocalDateTime();
+            }
+            else if (value instanceof Date)
+            {
+                Date date = (Date)value;
+                return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneId.systemDefault()).toLocalDate();
+            }
+        }
+        else if (type == java.time.LocalTime.class)
+        {
+            if (value instanceof java.sql.Timestamp)
+            {
+                return ((java.sql.Timestamp)value).toLocalDateTime().toLocalTime();
+            }
+            else if (value instanceof java.sql.Time)
+            {
+                return ((java.sql.Time)value).toLocalTime();
+            }
+            else if (value instanceof Date)
+            {
+                Date date = (Date)value;
+                return LocalTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneId.systemDefault());
+            }
+        }
         else if (type == UUID.class)
         {
             if (value instanceof String)
