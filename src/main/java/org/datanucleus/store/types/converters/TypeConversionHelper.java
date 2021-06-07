@@ -18,7 +18,7 @@ Contributors:
 2005 Andy Jefferson - added Timestamp/String converters
     ...
 **********************************************************************/
-package org.datanucleus.util;
+package org.datanucleus.store.types.converters;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -31,6 +31,10 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.UUID;
+
+import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.I18nUtils;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Class with methods for type conversion.

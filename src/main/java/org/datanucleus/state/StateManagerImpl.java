@@ -98,11 +98,11 @@ import org.datanucleus.store.types.SCOCollection;
 import org.datanucleus.store.types.SCOContainer;
 import org.datanucleus.store.types.SCOMap;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.store.types.converters.TypeConversionHelper;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
-import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Implementation of a StateManager, supporting the bytecode enhancement contract of DataNucleus.

@@ -67,6 +67,7 @@ import org.datanucleus.store.schema.naming.DN2NamingFactory;
 import org.datanucleus.store.schema.naming.JPANamingFactory;
 import org.datanucleus.store.schema.naming.NamingCase;
 import org.datanucleus.store.schema.naming.NamingFactory;
+import org.datanucleus.store.types.converters.TypeConversionHelper;
 import org.datanucleus.store.valuegenerator.AbstractConnectedGenerator;
 import org.datanucleus.store.valuegenerator.ValueGenerationConnectionProvider;
 import org.datanucleus.store.valuegenerator.ValueGenerationManager;
@@ -75,7 +76,6 @@ import org.datanucleus.store.valuegenerator.ValueGenerator;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
-import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * An abstract representation of a Store Manager.

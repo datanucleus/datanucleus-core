@@ -56,12 +56,12 @@ import org.datanucleus.store.query.expression.ParameterExpression;
 import org.datanucleus.store.query.expression.Expression.Operator;
 import org.datanucleus.store.query.inmemory.InMemoryExpressionEvaluator;
 import org.datanucleus.store.query.inmemory.InMemoryFailure;
+import org.datanucleus.store.types.converters.TypeConversionHelper;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Imports;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
-import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Utilities for use in queries.

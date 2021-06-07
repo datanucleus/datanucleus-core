@@ -91,6 +91,7 @@ import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.Extent;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.StorePersistenceHandler.PersistenceBatchType;
+import org.datanucleus.store.types.converters.TypeConversionHelper;
 import org.datanucleus.store.types.scostore.Store;
 import org.datanucleus.transaction.Transaction;
 import org.datanucleus.transaction.TransactionEventListener;
@@ -102,7 +103,6 @@ import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
-import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Manager for persistence/retrieval of objects within an execution context, equating to the work required by JDO PersistenceManager and JPA EntityManager.
