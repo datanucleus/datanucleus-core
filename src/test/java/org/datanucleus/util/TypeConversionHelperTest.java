@@ -20,9 +20,6 @@ package org.datanucleus.util;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import org.datanucleus.store.types.converters.ArrayConversionHelper;
 
@@ -33,45 +30,6 @@ import junit.framework.TestCase;
  */
 public class TypeConversionHelperTest extends TestCase
 {
-    /**
-     * Test for conversion of Timestamp to String.
-     */
-    public void testStringToTimestamp()
-    {
-        // Try a standard JDBC format string
-        String timestampStr = "2005-06-06 10:00:00.000000000";
-        Calendar sampleCal = new GregorianCalendar();
-        Timestamp ts = null;
-        try
-        {
-            ts = TypeConversionHelper.stringToTimestamp(timestampStr, sampleCal);
-        }
-        catch (Exception e)
-        {
-            fail("Exception thrown while converting timestamp : " + e.getMessage());
-        }
-
-        Calendar cal = new GregorianCalendar();
-        cal.setTimeInMillis(ts.getTime());
-        assertEquals("Year in Timestamp is incorrect", cal.get(Calendar.YEAR), 2005);
-        assertEquals("Month in Timestamp is incorrect", cal.get(Calendar.MONTH), 5);
-        assertEquals("Day in Timestamp is incorrect", cal.get(Calendar.DAY_OF_MONTH), 6);
-        assertEquals("Hour in Timestamp is incorrect", cal.get(Calendar.HOUR_OF_DAY), 10);
-        assertEquals("Minute in Timestamp is incorrect", cal.get(Calendar.MINUTE), 0);
-        assertEquals("Second in Timestamp is incorrect", cal.get(Calendar.SECOND), 0);
-
-        // Try an example of the crap that Oracles driver emits.
-        timestampStr = "2005-6-16.9.31. 14.0";
-        try
-        {
-            ts = TypeConversionHelper.stringToTimestamp(timestampStr, sampleCal);
-        }
-        catch (Exception e)
-        {
-            fail("Exception thrown while converting timestamp : " + e.getMessage());
-        }
-    }
-    
     /**
      * Test BigDecimal conversions
      */
