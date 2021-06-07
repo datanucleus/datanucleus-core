@@ -878,7 +878,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     public void setProperty(String name, Object value)
     {
-        NucleusLogger.GENERAL.info(">> EC.setProperty name=" + name + " val=" + value);
         /*if (tx.isActive())
         {
             // Don't allow change of options during a transaction
