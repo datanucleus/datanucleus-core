@@ -20,8 +20,6 @@ package org.datanucleus.store.types.converters;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 
-import org.datanucleus.util.TypeConversionHelper;
-
 /**
  * Convenience class to handle Java serialisation of a BigDecimal[] object to/from ByteBuffer.
  */
@@ -38,7 +36,7 @@ public class BigDecimalArrayByteBufferConverter implements TypeConverter<BigDeci
         {
             return null;
         }
-        byte[] bytes = TypeConversionHelper.getByteArrayFromBigDecimalArray(memberValue);
+        byte[] bytes = ArrayConversionHelper.getByteArrayFromBigDecimalArray(memberValue);
         return ByteBuffer.wrap(bytes);
     }
 
@@ -51,6 +49,6 @@ public class BigDecimalArrayByteBufferConverter implements TypeConverter<BigDeci
         {
             return null;
         }
-        return TypeConversionHelper.getBigDecimalArrayFromByteArray(datastoreValue.array());
+        return ArrayConversionHelper.getBigDecimalArrayFromByteArray(datastoreValue.array());
     }
 }

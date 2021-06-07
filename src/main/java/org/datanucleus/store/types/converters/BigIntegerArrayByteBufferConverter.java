@@ -20,8 +20,6 @@ package org.datanucleus.store.types.converters;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
-import org.datanucleus.util.TypeConversionHelper;
-
 /**
  * Convenience class to handle Java serialisation of a BigInteger[] object to/from ByteBuffer.
  */
@@ -38,7 +36,7 @@ public class BigIntegerArrayByteBufferConverter implements TypeConverter<BigInte
         {
             return null;
         }
-        byte[] bytes = TypeConversionHelper.getByteArrayFromBigIntegerArray(memberValue);
+        byte[] bytes = ArrayConversionHelper.getByteArrayFromBigIntegerArray(memberValue);
         return ByteBuffer.wrap(bytes);
     }
 
@@ -51,6 +49,6 @@ public class BigIntegerArrayByteBufferConverter implements TypeConverter<BigInte
         {
             return null;
         }
-        return TypeConversionHelper.getBigIntegerArrayFromByteArray(datastoreValue.array());
+        return ArrayConversionHelper.getBigIntegerArrayFromByteArray(datastoreValue.array());
     }
 }

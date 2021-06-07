@@ -19,8 +19,6 @@ package org.datanucleus.store.types.converters;
 
 import java.nio.ByteBuffer;
 
-import org.datanucleus.util.TypeConversionHelper;
-
 /**
  * Convenience class to handle Java serialisation of a boolean[] object to/from ByteBuffer.
  */
@@ -37,7 +35,7 @@ public class BooleanArrayByteBufferConverter implements TypeConverter<boolean[],
         {
             return null;
         }
-        byte[] bytes = TypeConversionHelper.getByteArrayFromBooleanArray(memberValue);
+        byte[] bytes = ArrayConversionHelper.getByteArrayFromBooleanArray(memberValue);
         return ByteBuffer.wrap(bytes);
     }
 
@@ -50,6 +48,6 @@ public class BooleanArrayByteBufferConverter implements TypeConverter<boolean[],
         {
             return null;
         }
-        return TypeConversionHelper.getBooleanArrayFromByteArray(datastoreValue.array());
+        return ArrayConversionHelper.getBooleanArrayFromByteArray(datastoreValue.array());
     }
 }

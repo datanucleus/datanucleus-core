@@ -19,8 +19,6 @@ package org.datanucleus.store.types.converters;
 
 import java.nio.ByteBuffer;
 
-import org.datanucleus.util.TypeConversionHelper;
-
 /**
  * Convenience class to handle Java serialisation of a long[] object to/from ByteBuffer.
  */
@@ -37,7 +35,7 @@ public class LongArrayByteBufferConverter implements TypeConverter<long[], ByteB
         {
             return null;
         }
-        byte[] bytes = TypeConversionHelper.getByteArrayFromLongArray(memberValue);
+        byte[] bytes = ArrayConversionHelper.getByteArrayFromLongArray(memberValue);
         return ByteBuffer.wrap(bytes);
     }
 
@@ -50,6 +48,6 @@ public class LongArrayByteBufferConverter implements TypeConverter<long[], ByteB
         {
             return null;
         }
-        return TypeConversionHelper.getLongArrayFromByteArray(datastoreValue.array());
+        return ArrayConversionHelper.getLongArrayFromByteArray(datastoreValue.array());
     }
 }

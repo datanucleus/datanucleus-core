@@ -19,8 +19,6 @@ package org.datanucleus.store.types.converters;
 
 import java.nio.ByteBuffer;
 
-import org.datanucleus.util.TypeConversionHelper;
-
 /**
  * Convenience class to handle Java serialisation of a Byte[] object to/from ByteBuffer.
  */
@@ -38,7 +36,7 @@ public class ByteObjectArrayByteBufferConverter implements TypeConverter<Byte[],
             return null;
         }
 
-        byte[] bytes = TypeConversionHelper.getByteArrayFromByteObjectArray(memberValue);
+        byte[] bytes = ArrayConversionHelper.getByteArrayFromByteObjectArray(memberValue);
         return ByteBuffer.wrap(bytes);
     }
 
@@ -54,6 +52,6 @@ public class ByteObjectArrayByteBufferConverter implements TypeConverter<Byte[],
 
         byte [] dataStoreValueInBytes = new byte[datastoreValue.remaining()];
         datastoreValue.get(dataStoreValueInBytes);
-        return TypeConversionHelper.getByteObjectArrayFromByteArray(datastoreValue.array());
+        return ArrayConversionHelper.getByteObjectArrayFromByteArray(datastoreValue.array());
     }
 }

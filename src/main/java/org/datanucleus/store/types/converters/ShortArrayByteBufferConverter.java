@@ -19,8 +19,6 @@ package org.datanucleus.store.types.converters;
 
 import java.nio.ByteBuffer;
 
-import org.datanucleus.util.TypeConversionHelper;
-
 /**
  * Convenience class to handle Java serialisation of a short[] object to/from ByteBuffer.
  */
@@ -37,7 +35,7 @@ public class ShortArrayByteBufferConverter implements TypeConverter<short[], Byt
         {
             return null;
         }
-        byte[] bytes = TypeConversionHelper.getByteArrayFromShortArray(memberValue);
+        byte[] bytes = ArrayConversionHelper.getByteArrayFromShortArray(memberValue);
         ByteBuffer byteBuffer = ByteBuffer.allocate(bytes.length);
         byteBuffer.put(bytes);
         return byteBuffer;
@@ -52,6 +50,6 @@ public class ShortArrayByteBufferConverter implements TypeConverter<short[], Byt
         {
             return null;
         }
-        return TypeConversionHelper.getShortArrayFromByteArray(datastoreValue.array());
+        return ArrayConversionHelper.getShortArrayFromByteArray(datastoreValue.array());
     }
 }
