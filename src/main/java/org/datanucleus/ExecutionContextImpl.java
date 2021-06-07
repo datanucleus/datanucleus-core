@@ -768,7 +768,11 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
      */
     protected void initialiseLevel1Cache()
     {
-        String level1Type = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_CACHE_L1_TYPE);
+        String level1Type = getStringProperty(PropertyNames.PROPERTY_CACHE_L1_TYPE);
+        if (level1Type == null)
+        {
+            level1Type = nucCtx.getConfiguration().getStringProperty(PropertyNames.PROPERTY_CACHE_L1_TYPE);
+        }
         if (Level1Cache.NONE_NAME.equalsIgnoreCase(level1Type))
         {
             return;
@@ -874,6 +878,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     public void setProperty(String name, Object value)
     {
+        NucleusLogger.GENERAL.info(">> EC.setProperty name=" + name + " val=" + value);
         /*if (tx.isActive())
         {
             // Don't allow change of options during a transaction
@@ -930,13 +935,6 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             flushMode = FlushMode.getFlushModeForString((String) value);
             return;
         }
-
-        if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
-        {
-            String intName = getNucleusContext().getConfiguration().getInternalNameForProperty(name);
-            getNucleusContext().getConfiguration().validatePropertyValue(intName, value);
-            properties.setProperty(intName.toLowerCase(Locale.ENGLISH), value);
-        }
         else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_CACHE_L2_TYPE))
         {
             // Allow the user to turn off L2 caching with this ExecutionContext
@@ -945,6 +943,40 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 // Turn off L2 cache
                 setLevel2Cache(false);
             }
+            else
+            {
+                NucleusLogger.PERSISTENCE.warn("Only support disabling L2 cache via property on PM/EM. Ignored");
+            }
+            return;
+        }
+        else if (name.equalsIgnoreCase(PropertyNames.PROPERTY_CACHE_L1_TYPE))
+        {
+            // Allow the user to turn off L1 caching with this ExecutionContext
+            if ("none".equalsIgnoreCase((String)value))
+            {
+                if (cache != null)
+                {
+                    if (!cache.isEmpty())
+                    {
+                        NucleusLogger.PERSISTENCE.warn("Can only disable L1 cache when it is empty. Ignored");
+                        return;
+                    }
+                    cache.clear();
+                    cache = null;   
+                }
+            }
+            else
+            {
+                NucleusLogger.PERSISTENCE.warn("Only support disabling L1 cache via property on PM/EM. Ignored");
+            }
+            return;
+        }
+
+        if (properties.hasProperty(name.toLowerCase(Locale.ENGLISH)))
+        {
+            String intName = getNucleusContext().getConfiguration().getInternalNameForProperty(name);
+            getNucleusContext().getConfiguration().validatePropertyValue(intName, value);
+            properties.setProperty(intName.toLowerCase(Locale.ENGLISH), value);
         }
         else
         {
