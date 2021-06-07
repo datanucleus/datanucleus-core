@@ -19,6 +19,7 @@ Contributors:
 package org.datanucleus.metadata;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -630,6 +631,89 @@ public class MetaDataUtils
             default :
                 return false;
         }
+    }
+
+    public static JdbcType getJdbcTypeForEnum(AbstractMemberMetaData mmd, FieldRole role, ClassLoaderResolver clr)
+    {
+        JdbcType jdbcType = JdbcType.VARCHAR;
+        if (mmd != null)
+        {
+            String methodName = null;
+            Class enumType = null;
+            ColumnMetaData[] colmds = null;
+            if (role == FieldRole.ROLE_FIELD)
+            {
+                enumType = mmd.getType();
+                if (mmd.hasExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER))
+                {
+                    methodName = mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER);
+                }
+                colmds = mmd.getColumnMetaData();
+            }
+            else if (role == FieldRole.ROLE_COLLECTION_ELEMENT || role == FieldRole.ROLE_ARRAY_ELEMENT)
+            {
+                if (mmd.getElementMetaData() != null)
+                {
+                    enumType = clr.classForName(mmd.hasCollection() ? mmd.getCollection().getElementType() : mmd.getArray().getElementType());
+                    if (mmd.getElementMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER))
+                    {
+                        methodName = mmd.getElementMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER);
+                    }
+                    colmds = mmd.getElementMetaData().getColumnMetaData();
+                }
+            }
+            else if (role == FieldRole.ROLE_MAP_KEY)
+            {
+                if (mmd.getKeyMetaData() != null)
+                {
+                    enumType = clr.classForName(mmd.getMap().getKeyType());
+                    if (mmd.getKeyMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER))
+                    {
+                        methodName = mmd.getKeyMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER);
+                    }
+                    colmds = mmd.getKeyMetaData().getColumnMetaData();
+                }
+            }
+            else if (role == FieldRole.ROLE_MAP_VALUE)
+            {
+                if (mmd.getValueMetaData() != null)
+                {
+                    enumType = clr.classForName(mmd.getMap().getValueType());
+                    if (mmd.getValueMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER))
+                    {
+                        methodName = mmd.getValueMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER);
+                    }
+                    colmds = mmd.getValueMetaData().getColumnMetaData();
+                }
+            }
+
+            if (methodName == null)
+            {
+                if (colmds != null && colmds.length == 1 && colmds[0].getJdbcType() != null)
+                {
+                    jdbcType = colmds[0].getJdbcType();
+                }
+            }
+            else
+            {
+                try
+                {
+                    Method getterMethod = ClassUtils.getMethodForClass(enumType, methodName, null);
+                    Class returnType = getterMethod.getReturnType();
+                    if (returnType == short.class || returnType == int.class || returnType == long.class || Number.class.isAssignableFrom(returnType))
+                    {
+                        return JdbcType.INTEGER;
+                    }
+                    return JdbcType.VARCHAR;
+                }
+                catch (Exception e)
+                {
+                    NucleusLogger.PERSISTENCE.warn("Specified enum value-getter for method " + methodName + " on field " + mmd.getFullFieldName() + " gave an error on extracting the value", e);
+                }
+            }
+        }
+
+        return jdbcType;
     }
 
     /**
