@@ -19,7 +19,6 @@ Contributors:
 package org.datanucleus.store.valuegenerator;
 
 import org.datanucleus.store.StoreManager;
-import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Value generator for a UUID hexadecimal format.
@@ -57,14 +56,40 @@ public class UUIDHexGenerator extends AbstractUUIDGenerator
     {
         StringBuilder str = new StringBuilder(32);
 
-        str.append(TypeConversionHelper.getHexFromInt(IP_ADDRESS));
-        str.append(TypeConversionHelper.getHexFromInt(JVM_UNIQUE));
+        str.append(getHexFromInt(IP_ADDRESS));
+        str.append(getHexFromInt(JVM_UNIQUE));
         short timeHigh = (short) (System.currentTimeMillis() >>> 32);
-        str.append(TypeConversionHelper.getHexFromShort(timeHigh));
+        str.append(getHexFromShort(timeHigh));
         int timeLow = (int) System.currentTimeMillis();
-        str.append(TypeConversionHelper.getHexFromInt(timeLow));
-        str.append(TypeConversionHelper.getHexFromShort(getCount()));
+        str.append(getHexFromInt(timeLow));
+        str.append(getHexFromShort(getCount()));
 
+        return str.toString();
+    }
+
+    /**
+     * Utility to convert an int into a 8-char hex String
+     * @param val The int
+     * @return The hex String form of the int
+     */
+    private static String getHexFromInt(int val)
+    {
+        StringBuilder str = new StringBuilder("00000000");
+        String hexstr = Integer.toHexString(val);
+        str.replace(8 - hexstr.length(), 8, hexstr);
+        return str.toString();
+    }
+
+    /**
+     * Utility to convert a short into a 4-char hex String
+     * @param val The short
+     * @return The hex String form of the short
+     */
+    private static String getHexFromShort(short val)
+    {
+        StringBuilder str = new StringBuilder("0000");
+        String hexstr = Integer.toHexString(val);
+        str.replace(4 - hexstr.length(), 4, hexstr);
         return str.toString();
     }
 }

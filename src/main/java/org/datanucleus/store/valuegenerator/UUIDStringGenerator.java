@@ -19,7 +19,6 @@ Contributors:
 package org.datanucleus.store.valuegenerator;
 
 import org.datanucleus.store.StoreManager;
-import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Value generator for a UUID String format.
@@ -54,14 +53,14 @@ public class UUIDStringGenerator extends AbstractUUIDGenerator
      */
     protected String getIdentifier()
     {
-        byte[] ipAddrBytes = TypeConversionHelper.getBytesFromInt(IP_ADDRESS);
-        byte[] jvmBytes = TypeConversionHelper.getBytesFromInt(JVM_UNIQUE);
+        byte[] ipAddrBytes = getBytesFromInt(IP_ADDRESS);
+        byte[] jvmBytes = getBytesFromInt(JVM_UNIQUE);
         short timeHigh = (short) (System.currentTimeMillis() >>> 32);
-        byte[] timeHighBytes = TypeConversionHelper.getBytesFromShort(timeHigh);
+        byte[] timeHighBytes = getBytesFromShort(timeHigh);
         int timeLow = (int) System.currentTimeMillis();
-        byte[] timeLowBytes = TypeConversionHelper.getBytesFromInt(timeLow);
+        byte[] timeLowBytes = getBytesFromInt(timeLow);
         short count = getCount();
-        byte[] countBytes = TypeConversionHelper.getBytesFromShort(count);
+        byte[] countBytes = getBytesFromShort(count);
 
         byte[] bytes = new byte[16];
         int pos = 0;
@@ -94,5 +93,37 @@ public class UUIDStringGenerator extends AbstractUUIDGenerator
         {
             return new String(bytes);
         }
+    }
+
+    /**
+     * Utility to convert an int into a byte array
+     * @param val The int
+     * @return The bytes
+     */
+    private static byte[] getBytesFromInt(int val)
+    {
+        byte[] arr = new byte[4];
+        for (int i=3;i>=0;i--)
+        {
+            arr[i] = (byte) ((0xFFl & val) + Byte.MIN_VALUE);
+            val >>>= 8;
+        }
+        return arr;
+    }
+
+    /**
+     * Utility to convert a short into a a byte array
+     * @param val The short
+     * @return The bytes
+     */
+    private static byte[] getBytesFromShort(short val)
+    {
+        byte[] arr = new byte[2];
+        for (int i=1;i>=0;i--)
+        {
+            arr[i] = (byte) ((0xFFl & val)  + Byte.MIN_VALUE);
+            val >>>= 8;
+        }
+        return arr;
     }
 }

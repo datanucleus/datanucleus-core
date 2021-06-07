@@ -23,7 +23,6 @@ import java.net.InetAddress;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
-import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Value generator for a UUID format. To be extended by implementations giving the UUID in particular forms.
@@ -39,7 +38,7 @@ public abstract class AbstractUUIDGenerator extends AbstractGenerator<String>
         int ipAddr = 0;
         try
         {
-            ipAddr = TypeConversionHelper.getIntFromByteArray(InetAddress.getLocalHost().getAddress());
+            ipAddr = getIntFromByteArray(InetAddress.getLocalHost().getAddress());
         }
         catch (Exception e)
         {
@@ -115,4 +114,20 @@ public abstract class AbstractUUIDGenerator extends AbstractGenerator<String>
             return counter++;
         }
     }
+
+    /**
+     * Utility to convert a byte array to an int.
+     * @param bytes The byte array
+     * @return The int
+     */
+    private static int getIntFromByteArray(byte[] bytes)
+    {
+        int val = 0;
+        for (int i=0; i<4; i++)
+        {
+            val = (val << 8) - Byte.MIN_VALUE + bytes[i];
+        }
+        return val;
+    }
+
 }
