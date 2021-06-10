@@ -46,7 +46,6 @@ import org.datanucleus.exceptions.TransactionNotActiveException;
 import org.datanucleus.exceptions.TransactionNotReadableException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.QueryResultMetaData;
-import org.datanucleus.store.Extent;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.query.compiler.QueryCompilation;
 import org.datanucleus.store.query.compiler.Symbol;

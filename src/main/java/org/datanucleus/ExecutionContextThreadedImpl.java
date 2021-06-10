@@ -24,7 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.datanucleus.enhancement.Persistable;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.Extent;
+import org.datanucleus.store.query.Extent;
 
 /**
  * ExecutionContext to attempt to handle multi-threaded PM/EM cases.

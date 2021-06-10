@@ -15,7 +15,7 @@
  Contributors:
  ...
  **********************************************************************/
-package org.datanucleus.store;
+package org.datanucleus.store.query;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -26,7 +26,7 @@ import org.datanucleus.util.Localiser;
  * Abstract representation of a JDO Extent.
  * Suitable for use with all datastores.
  */
-public abstract class AbstractExtent<T> implements org.datanucleus.store.Extent<T>
+public abstract class AbstractExtent<T> implements org.datanucleus.store.query.Extent<T>
 {
     /** ExecutionContext */
     protected final ExecutionContext ec;

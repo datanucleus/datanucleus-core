@@ -58,6 +58,8 @@ import org.datanucleus.store.autostart.AutoStartMechanism;
 import org.datanucleus.store.connection.ConnectionManager;
 import org.datanucleus.store.connection.ConnectionManagerImpl;
 import org.datanucleus.store.connection.ManagedConnection;
+import org.datanucleus.store.query.DefaultCandidateExtent;
+import org.datanucleus.store.query.Extent;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.query.QueryManagerImpl;

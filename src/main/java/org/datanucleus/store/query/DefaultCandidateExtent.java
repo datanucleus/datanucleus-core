@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store;
+package org.datanucleus.store.query;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,8 +25,6 @@ import java.util.Map;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.store.query.Query;
-import org.datanucleus.store.query.QueryResult;
 
 /**
  * Extent that does a simple JDOQL query for the candidate with/without subclasses.

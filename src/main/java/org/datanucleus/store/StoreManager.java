@@ -34,6 +34,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.store.connection.ConnectionManager;
+import org.datanucleus.store.query.Extent;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.schema.StoreSchemaHandler;

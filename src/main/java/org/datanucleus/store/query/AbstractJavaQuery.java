@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.store.Extent;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.StringUtils;
 

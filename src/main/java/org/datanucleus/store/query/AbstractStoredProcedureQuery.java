@@ -26,7 +26,6 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.QueryResultMetaData;
 import org.datanucleus.metadata.StoredProcQueryParameterMode;
-import org.datanucleus.store.Extent;
 import org.datanucleus.store.StoreManager;
 
 /**

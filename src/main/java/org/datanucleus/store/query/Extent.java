@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store;
+package org.datanucleus.store.query;
 
 import java.util.Iterator;
 
