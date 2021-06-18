@@ -1421,7 +1421,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         if (jtaTxManager == null)
         {
             // Find the JTA transaction manager - there is no standard way to do this so use the finder process.
-            // See also http://www.onjava.com/pub/a/onjava/2005/07/20/transactions.html
             jtaTxManager = new TransactionManagerFinder(this).getTransactionManager(getClassLoaderResolver((ClassLoader)config.getProperty(PropertyNames.PROPERTY_CLASSLOADER_PRIMARY)));
             if (jtaTxManager == null)
             {
@@ -1485,13 +1484,11 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     @Override
     public BeanValidationHandler getBeanValidationHandler(ExecutionContext ec)
     {
-        if (config.hasPropertyNotNull(PropertyNames.PROPERTY_VALIDATION_MODE))
+        String validationMode = config.getStringProperty(PropertyNames.PROPERTY_VALIDATION_MODE);
+        if ("none".equalsIgnoreCase(validationMode))
         {
-            if (config.getStringProperty(PropertyNames.PROPERTY_VALIDATION_MODE).equalsIgnoreCase("none"))
-            {
-                validatorFactoryInit = true;
-                return null;
-            }
+            validatorFactoryInit = true;
+            return null;
         }
 
         try
@@ -1516,7 +1513,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                     }
                     catch (ClassNotResolvedException cnre)
                     {
-                        NucleusLogger.PERSISTENCE.debug("No BeanValidation API present so cannot utilise BeanValidation hooks");
+                        NucleusLogger.PERSISTENCE.debug("No BeanValidation API (javax.validation) present so cannot utilise BeanValidation hooks");
                     }
                 }
             }
@@ -1529,12 +1526,9 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         }
         catch (Throwable ex) //throwable used to catch linkage errors
         {
-            if (config.hasPropertyNotNull(PropertyNames.PROPERTY_VALIDATION_MODE))
+            if ("callback".equalsIgnoreCase(validationMode))
             {
-                if (config.getStringProperty(PropertyNames.PROPERTY_VALIDATION_MODE).equalsIgnoreCase("callback"))
-                {
-                    throw ec.getApiAdapter().getUserExceptionForException(ex.getMessage(), (Exception)ex);
-                }
+                throw ec.getApiAdapter().getUserExceptionForException(ex.getMessage(), (Exception)ex);
             }
 
             NucleusLogger.GENERAL.warn("Unable to create validator handler", ex);
