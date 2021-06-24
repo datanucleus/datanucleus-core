@@ -124,9 +124,8 @@ public class QueryUtils
     }
 
     /**
-     * Convenience method to return if the "result" clause from a java string-based query language
-     * includes only aggregates. This provides useful information when determining if the results
-     * will be a single row.
+     * Convenience method to return if the "result" clause from a java string-based query language includes only aggregates. 
+     * This provides useful information when determining if the results will be a single row.
      * @param result The result required
      * @return Whether it has only aggregates
      */
@@ -137,24 +136,15 @@ public class QueryUtils
             return false;
         }
 
-        String resultDefn = result;
-        if (resultDefn.toLowerCase().startsWith("distinct"))
-        {
-            resultDefn = resultDefn.substring(8);
-        }
+        String resultDefn = result.toLowerCase().startsWith("distinct") ? result.substring(8) : result;
         StringTokenizer tokenizer = new StringTokenizer(resultDefn, ",");
         while (tokenizer.hasMoreTokens())
         {
             String token = tokenizer.nextToken().trim().toLowerCase();
-            if (token.startsWith("max") || token.startsWith("min") || 
-                token.startsWith("avg") || token.startsWith("sum"))
+            if (token.startsWith("max") || token.startsWith("min") || token.startsWith("avg") || token.startsWith("sum"))
             {
                 token = token.substring(3).trim();
-                if (token.startsWith("("))
-                {
-                    // Aggregate
-                }
-                else
+                if (!token.startsWith("("))
                 {
                     // Not aggregate (some name that starts min, max, avg, sum etc)
                     return false;
@@ -163,11 +153,7 @@ public class QueryUtils
             else if (token.startsWith("count"))
             {
                 token = token.substring(5).trim();
-                if (token.startsWith("("))
-                {
-                    // Aggregate
-                }
-                else
+                if (!token.startsWith("("))
                 {
                     // Not aggregate (some name that starts count...)
                     return false;
@@ -206,11 +192,9 @@ public class QueryUtils
     }
 
     /**
-     * Convenience method to create an instance of the result class with the provided field
-     * values, using a constructor taking the arguments. If the returned object is null there
-     * is no constructor with the correct signature. Tries to find a constructor taking the required
-     * arguments. Uses the fieldTypes first (if specified), then (if not specified) uses the type of
-     * the fieldValues, otherwise uses Object as the argument type.
+     * Convenience method to create an instance of the result class with the provided field values, using a constructor taking the arguments. 
+     * If the returned object is null there is no constructor with the correct signature. Tries to find a constructor taking the required arguments. 
+     * Uses the fieldTypes first (if specified), then (if not specified) uses the type of the fieldValues, otherwise uses Object as the argument type.
      * @param resultClass The class of results that need creating
      * @param fieldValues The field values
      * @param fieldTypes The field types (optional). If specified needs same number as fieldValues
@@ -246,9 +230,8 @@ public class QueryUtils
                 obj = ctr.newInstance(fieldValues);
                 if (NucleusLogger.QUERY.isDebugEnabled())
                 {
-                    String msg = "ResultObject of type " + resultClass.getName() + 
-                        " created with following constructor arguments: " + StringUtils.objectArrayToString(fieldValues);
-                    NucleusLogger.QUERY.debug(msg);
+                    NucleusLogger.QUERY.debug("ResultObject of type " + resultClass.getName() + 
+                        " created with following constructor arguments: " + StringUtils.objectArrayToString(fieldValues));
                 }
             }
             catch (Exception e)
@@ -261,17 +244,17 @@ public class QueryUtils
     }
 
     /**
-     * Convenience method to create an instance of the result class with the provided field
-     * values, using the default constructor and setting the fields using either public fields,
-     * or setters, or a put method. If one of these parts is not found in the result class the
-     * returned object is null.
+     * Convenience method to create an instance of the result class with the provided field values, using the default constructor and setting the fields 
+     * using either public fields, or setters, or a put method. 
+     * If one of these parts is not found in the result class the returned object is null.
      * @param resultClass Result class that we need to create an object of
      * @param resultFieldNames Names of the fields in the results
      * @param resultClassFieldNames Map of the result class fields, keyed by the field name
      * @param fieldValues The field values
      * @return The result class object
      */
-    public static Object createResultObjectUsingDefaultConstructorAndSetters(Class resultClass, String[] resultFieldNames, Map<String, Field> resultClassFieldNames, Object[] fieldValues)
+    public static Object createResultObjectUsingDefaultConstructorAndSetters(Class resultClass, String[] resultFieldNames, Map<String, Field> resultClassFieldNames, 
+            Object[] fieldValues)
     {
         Object obj = null;
         try
@@ -292,14 +275,18 @@ public class QueryUtils
             Field field = resultClassFieldNames.get(resultFieldNames[i].toUpperCase());
             if (!setFieldForResultObject(obj, resultFieldNames[i], field, fieldValues[i]))
             {
-                String fieldType = "null";
-                if (fieldValues[i] != null)
+                if (field == null) 
                 {
-                    fieldType = fieldValues[i].getClass().getName();
+                    // Field was null, and impossible to find setter etc either. Column doesn't exist in result class
+                    NucleusLogger.GENERAL.info(Localiser.msg("021215", resultFieldNames[i]));
                 }
-                String msg = Localiser.msg("021204", resultClass.getName(), resultFieldNames[i], fieldType);
-                NucleusLogger.QUERY.error(msg);
-                throw new NucleusUserException(msg);
+                else
+                {
+                    String fieldType = (fieldValues[i] != null) ? fieldValues[i].getClass().getName() : "null";
+                    String msg = Localiser.msg("021204", resultClass.getName(), resultFieldNames[i], fieldType);
+                    NucleusLogger.QUERY.error(msg);
+                    throw new NucleusUserException(msg);
+                }
             }
         }
 
@@ -392,8 +379,7 @@ public class QueryUtils
                             fieldSet = true;
                             if (NucleusLogger.QUERY.isDebugEnabled())
                             {
-                                String msg = "ResultObject set field=" + fieldName + " using reflection";
-                                NucleusLogger.QUERY.debug(msg);
+                                NucleusLogger.QUERY.debug("ResultObject set field=" + fieldName + " using reflection");
                             }
                         }
                         catch (Exception e2)
@@ -405,29 +391,18 @@ public class QueryUtils
             }
             if (!fieldSet && NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(Localiser.msg("021209", 
-                    obj.getClass().getName(), declaredFieldName));
+                NucleusLogger.QUERY.debug(Localiser.msg("021209", obj.getClass().getName(), declaredFieldName));
             }
         }
 
         // Try (public) setMethod()
         if (!fieldSet)
         {
-            String setMethodName = "set" + fieldName.substring(0,1).toUpperCase() + fieldName.substring(1);
-            if (field != null)
-            {
-                setMethodName = "set" + fieldName.substring(0,1).toUpperCase() + field.getName().substring(1);
-            }
+            String setMethodName = (field != null) ? 
+                "set" + fieldName.substring(0,1).toUpperCase() + field.getName().substring(1) : "set" + fieldName.substring(0,1).toUpperCase() + fieldName.substring(1);
 
-            Class argType = null;
-            if (value != null)
-            {
-                argType = value.getClass();
-            }
-            else if (field != null)
-            {
-                argType = field.getType();
-            }
+            Class argType = value != null ? value.getClass() : (field != null) ? field.getType() : null;
+
             Method m = ClassUtils.getMethodWithArgument(obj.getClass(), setMethodName, argType);
             if (m != null && Modifier.isPublic(m.getModifiers()))
             {
@@ -438,8 +413,7 @@ public class QueryUtils
                     fieldSet = true;
                     if (NucleusLogger.QUERY.isDebugEnabled())
                     {
-                        String msg = "ResultObject set field=" + fieldName + " using public " + setMethodName + "() method";
-                        NucleusLogger.QUERY.debug(msg);
+                        NucleusLogger.QUERY.debug("ResultObject set field=" + fieldName + " using public " + setMethodName + "() method");
                     }
                 }
                 catch (Exception e)
@@ -469,8 +443,7 @@ public class QueryUtils
                             fieldSet = true;
                             if (NucleusLogger.QUERY.isDebugEnabled())
                             {
-                                String msg = "ResultObject set field=" + fieldName + " using " + setMethodName + "() method after converting value";
-                                NucleusLogger.QUERY.debug(msg);
+                                NucleusLogger.QUERY.debug("ResultObject set field=" + fieldName + " using " + setMethodName + "() method after converting value");
                             }
                             break;
                         }
@@ -499,8 +472,7 @@ public class QueryUtils
                     fieldSet = true;
                     if (NucleusLogger.QUERY.isDebugEnabled())
                     {
-                        String msg = "ResultObject set field=" + fieldName + " using put() method";
-                        NucleusLogger.QUERY.debug(msg);
+                        NucleusLogger.QUERY.debug("ResultObject set field=" + fieldName + " using put() method");
                     }
                 }
                 catch (Exception e)
@@ -510,8 +482,7 @@ public class QueryUtils
             }
             if (!fieldSet && NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(Localiser.msg("021208", 
-                    obj.getClass().getName(), "put"));
+                NucleusLogger.QUERY.debug(Localiser.msg("021208", obj.getClass().getName(), "put"));
             }
         }
 
@@ -681,23 +652,16 @@ public class QueryUtils
      */
     public static String getStringValueForExpression(Expression expr, Map parameters)
     {
-        String paramValue = null;
         if (expr instanceof ParameterExpression)
         {
-            ParameterExpression paramExpr = (ParameterExpression) expr;
-            Object obj = getValueForParameterExpression(parameters, paramExpr);
-            paramValue = getStringValue(obj);
+            return getStringValue(getValueForParameterExpression(parameters, (ParameterExpression) expr));
         }
         else if (expr instanceof Literal)
         {
-            Literal literal = (Literal) expr;
-            paramValue = getStringValue(literal.getLiteral());
+            return getStringValue(((Literal)expr).getLiteral());
         }
-        else
-        {
-            throw new NucleusException("getStringValueForExpression(expr) where expr is instanceof " + expr.getClass().getName() + " not supported");
-        }
-        return paramValue;
+
+        throw new NucleusException("getStringValueForExpression(expr) where expr is instanceof " + expr.getClass().getName() + " not supported");
     }
 
     /**
@@ -1140,8 +1104,7 @@ public class QueryUtils
             }
         }
 
-        throw new NucleusException("Attempt to evaluate relational expression between " + left + 
-            " and " + right + " with operation = " + op + " impossible to perform");
+        throw new NucleusException("Attempt to evaluate relational expression between " + left + " and " + right + " with operation = " + op + " impossible to perform");
     }
 
     /**
@@ -1199,8 +1162,7 @@ public class QueryUtils
     }
 
     /**
-     * Convenience method to return the ParameterExpression for the specified position
-     * if found in the expression tree starting at <pre>rootExpr</pre>
+     * Convenience method to return the ParameterExpression for the specified position if found in the expression tree starting at <pre>rootExpr</pre>
      * @param rootExpr The expression
      * @param pos The position
      * @return The ParameterExpression (if found)
@@ -1251,16 +1213,8 @@ public class QueryUtils
 
     public static boolean queryParameterTypesAreCompatible(Class cls1, Class cls2)
     {
-        Class first = cls1;
-        Class second = cls2;
-        if (cls1.isPrimitive())
-        {
-            first = ClassUtils.getWrapperTypeForPrimitiveType(cls1);
-        }
-        if (cls2.isPrimitive())
-        {
-            second = ClassUtils.getWrapperTypeForPrimitiveType(cls2);
-        }
+        Class first  = cls1.isPrimitive() ? ClassUtils.getWrapperTypeForPrimitiveType(cls1) : cls1;
+        Class second = cls2.isPrimitive() ? ClassUtils.getWrapperTypeForPrimitiveType(cls2) : cls2;
 
         if (first.isAssignableFrom(second))
         {
@@ -1347,8 +1301,8 @@ public class QueryUtils
      * @param queryLanguage The language of this query (JDOQL, JPQL etc)
      * @return The ordered List of candidates
      */
-    public static List orderCandidates(List candidates, final Expression[] ordering, final Map state, final String candidateAlias, final ExecutionContext ec, final ClassLoaderResolver clr,
-            final Map parameterValues, final Imports imports, final String queryLanguage)
+    public static List orderCandidates(List candidates, final Expression[] ordering, final Map state, final String candidateAlias, final ExecutionContext ec, 
+            final ClassLoaderResolver clr, final Map parameterValues, final Imports imports, final String queryLanguage)
     {
         if (ordering == null)
         {
@@ -1364,12 +1318,10 @@ public class QueryUtils
                 for (int i=0; i<ordering.length; i++)
                 {
                     state.put(candidateAlias, obj1);
-                    Object a = ordering[i].evaluate(
-                        new InMemoryExpressionEvaluator(ec, parameterValues, state, imports, clr, candidateAlias, queryLanguage));
+                    Object a = ordering[i].evaluate(new InMemoryExpressionEvaluator(ec, parameterValues, state, imports, clr, candidateAlias, queryLanguage));
 
                     state.put(candidateAlias, obj2);
-                    Object b = ordering[i].evaluate(
-                        new InMemoryExpressionEvaluator(ec, parameterValues, state, imports, clr, candidateAlias, queryLanguage));
+                    Object b = ordering[i].evaluate(new InMemoryExpressionEvaluator(ec, parameterValues, state, imports, clr, candidateAlias, queryLanguage));
 
                     if (a instanceof InMemoryFailure || b instanceof InMemoryFailure)
                     {
