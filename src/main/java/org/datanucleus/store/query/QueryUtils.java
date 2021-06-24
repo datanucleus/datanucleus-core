@@ -271,7 +271,7 @@ public class QueryUtils
      * @param fieldValues The field values
      * @return The result class object
      */
-    public static Object createResultObjectUsingDefaultConstructorAndSetters(Class resultClass, String[] resultFieldNames, Map resultClassFieldNames, Object[] fieldValues)
+    public static Object createResultObjectUsingDefaultConstructorAndSetters(Class resultClass, String[] resultFieldNames, Map<String, Field> resultClassFieldNames, Object[] fieldValues)
     {
         Object obj = null;
         try
@@ -289,7 +289,7 @@ public class QueryUtils
         for (int i=0;i<fieldValues.length;i++)
         {
             // Update the fields of our object with the field values
-            Field field = (Field) resultClassFieldNames.get(resultFieldNames[i].toUpperCase());
+            Field field = resultClassFieldNames.get(resultFieldNames[i].toUpperCase());
             if (!setFieldForResultObject(obj, resultFieldNames[i], field, fieldValues[i]))
             {
                 String fieldType = "null";
