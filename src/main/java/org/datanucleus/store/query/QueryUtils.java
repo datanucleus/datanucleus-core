@@ -224,19 +224,18 @@ public class QueryUtils
 
     /**
      * Convenience method to create an instance of the result class with the specified arg constructor and with the provided field values.
-     * @param resultClass The class of results that need creating
      * @param ctr Argumented constructor
      * @param fieldValues The field values
      * @return The result class object
      */
-    public static Object createResultObjectUsingArgumentedConstructor(Constructor ctr, Class resultClass, Object[] fieldValues)
+    public static Object createResultObjectUsingArgumentedConstructor(Constructor ctr, Object[] fieldValues)
     {
         try
         {
             Object obj = ctr.newInstance(fieldValues);
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug("ResultObject of type " + resultClass.getName() + 
+                NucleusLogger.QUERY.debug("ResultObject of type " + ctr.getDeclaringClass().getName() + 
                     " created with following constructor arguments: " + StringUtils.objectArrayToString(fieldValues));
             }
             return obj;
@@ -280,56 +279,6 @@ public class QueryUtils
         }
 
         return null;
-    }
-
-    /**
-     * Convenience method to create an instance of the result class with the provided field values, using the default constructor and setting the fields 
-     * using either public fields, or setters, or a put method. 
-     * If one of these parts is not found in the result class the returned object is null.
-     * @param resultClass Result class that we need to create an object of
-     * @param resultFieldNames Names of the fields in the results
-     * @param resultClassFieldNames Map of the result class fields, keyed by the field name
-     * @param fieldValues The field values
-     * @return The result class object
-     */
-    public static Object createResultObjectUsingDefaultConstructorAndSetters(Class resultClass, String[] resultFieldNames, Map<String, Field> resultClassFieldNames, 
-            Object[] fieldValues)
-    {
-        Object obj = null;
-        try
-        {
-            // Create the object
-            obj = resultClass.getDeclaredConstructor().newInstance();
-        }
-        catch (Exception e)
-        {
-            String msg = Localiser.msg("021205", resultClass.getName());
-            NucleusLogger.QUERY.error(msg);
-            throw new NucleusUserException(msg);
-        }
-
-        for (int i=0;i<fieldValues.length;i++)
-        {
-            // Update the fields of our object with the field values
-            Field field = resultClassFieldNames.get(resultFieldNames[i].toUpperCase());
-            if (!setFieldForResultObject(obj, resultFieldNames[i], field, fieldValues[i]))
-            {
-                if (field == null) 
-                {
-                    // Field was null, and impossible to find setter etc either. Column doesn't exist in result class
-                    NucleusLogger.GENERAL.info(Localiser.msg("021215", resultFieldNames[i]));
-                }
-                else
-                {
-                    String fieldType = (fieldValues[i] != null) ? fieldValues[i].getClass().getName() : "null";
-                    String msg = Localiser.msg("021204", resultClass.getName(), resultFieldNames[i], fieldType);
-                    NucleusLogger.QUERY.error(msg);
-                    throw new NucleusUserException(msg);
-                }
-            }
-        }
-
-        return obj;
     }
 
     /**
