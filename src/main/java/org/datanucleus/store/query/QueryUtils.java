@@ -192,17 +192,14 @@ public class QueryUtils
     }
 
     /**
-     * Convenience method to create an instance of the result class with the provided field values, using a constructor taking the arguments. 
-     * If the returned object is null there is no constructor with the correct signature. Tries to find a constructor taking the required arguments. 
-     * Uses the fieldTypes first (if specified), then (if not specified) uses the type of the fieldValues, otherwise uses Object as the argument type.
-     * @param resultClass The class of results that need creating
-     * @param fieldValues The field values
-     * @param fieldTypes The field types (optional). If specified needs same number as fieldValues
-     * @return The result class object
+     * Convenience method to obtain the constructor for the result class taking in the specified argument types.
+     * @param resultClass Result class
+     * @param fieldTypes Argument types (if known)
+     * @param fieldValues Argument values (if types not provided)
+     * @return The constructor (or null if none found)
      */
-    public static Object createResultObjectUsingArgumentedConstructor(Class resultClass, Object[] fieldValues, Class[] fieldTypes)
+    public static Constructor getResultClassConstructorForArguments(Class resultClass, Class[] fieldTypes, Object[] fieldValues)
     {
-        Object obj = null;
         Class[] ctrTypes = new Class[fieldValues.length];
         for (int i=0;i<ctrTypes.length;i++)
         {
@@ -222,17 +219,59 @@ public class QueryUtils
             }
         }
 
-        Constructor ctr = ClassUtils.getConstructorWithArguments(resultClass, ctrTypes);
+        return ClassUtils.getConstructorWithArguments(resultClass, ctrTypes);
+    }
+
+    /**
+     * Convenience method to create an instance of the result class with the specified arg constructor and with the provided field values.
+     * @param resultClass The class of results that need creating
+     * @param ctr Argumented constructor
+     * @param fieldValues The field values
+     * @return The result class object
+     */
+    public static Object createResultObjectUsingArgumentedConstructor(Constructor ctr, Class resultClass, Object[] fieldValues)
+    {
+        try
+        {
+            Object obj = ctr.newInstance(fieldValues);
+            if (NucleusLogger.QUERY.isDebugEnabled())
+            {
+                NucleusLogger.QUERY.debug("ResultObject of type " + resultClass.getName() + 
+                    " created with following constructor arguments: " + StringUtils.objectArrayToString(fieldValues));
+            }
+            return obj;
+        }
+        catch (Exception e)
+        {
+            // do nothing
+        }
+
+        return null;
+    }
+
+    /**
+     * Convenience method to create an instance of the result class with the provided field values, using a constructor taking the arguments. 
+     * If the returned object is null there is no constructor with the correct signature. Tries to find a constructor taking the required arguments. 
+     * Uses the fieldTypes first (if specified), then (if not specified) uses the type of the fieldValues, otherwise uses Object as the argument type.
+     * @param resultClass The class of results that need creating
+     * @param fieldValues The field values
+     * @param fieldTypes The field types (optional). If specified needs same number as fieldValues
+     * @return The result class object
+     */
+    public static Object createResultObjectUsingArgumentedConstructor(Class resultClass, Object[] fieldValues, Class[] fieldTypes)
+    {
+        Constructor ctr = getResultClassConstructorForArguments(resultClass, fieldTypes, fieldValues);
         if (ctr != null)
         {
             try
             {
-                obj = ctr.newInstance(fieldValues);
+                Object obj = ctr.newInstance(fieldValues);
                 if (NucleusLogger.QUERY.isDebugEnabled())
                 {
                     NucleusLogger.QUERY.debug("ResultObject of type " + resultClass.getName() + 
                         " created with following constructor arguments: " + StringUtils.objectArrayToString(fieldValues));
                 }
+                return obj;
             }
             catch (Exception e)
             {
@@ -240,7 +279,7 @@ public class QueryUtils
             }
         }
 
-        return obj;
+        return null;
     }
 
     /**
@@ -353,11 +392,7 @@ public class QueryUtils
         // Try setting the (public) field directly
         if (!fieldSet)
         {
-            String declaredFieldName = fieldName;
-            if (field != null)
-            {
-                declaredFieldName = field.getName();
-            }
+            String declaredFieldName = (field != null) ? field.getName() : fieldName;
             Field f = ClassUtils.getFieldForClass(obj.getClass(),declaredFieldName);
             if (f != null && Modifier.isPublic(f.getModifiers()))
             {
