@@ -669,7 +669,36 @@ public class ExpressionCompiler
             List<Expression> parameterExprs = null;
             if (method)
             {
-                parameterExprs = getExpressionsForPropertiesOfNode(currentNode);
+                // Extract aliases of parameters if specified, and apply to compiled expressions
+                if (currentNode.hasProperties())
+                {
+                    parameterExprs = new ArrayList();
+                    List<Node> paramNodes = currentNode.getProperties();
+                    for (Node paramNode : paramNodes)
+                    {
+                        List<Node> paramChildNodes = paramNode.getChildNodes();
+                        String paramAlias = null;
+                        if (paramChildNodes != null && paramChildNodes.size() > 0)
+                        {
+                            Node paramLastChild = paramChildNodes.get(paramChildNodes.size()-1);
+                            if (paramLastChild.getNodeType() == NodeType.NAME)
+                            {
+                                paramAlias = (String) paramLastChild.getNodeValue();
+                                paramChildNodes.remove(paramChildNodes.size()-1);
+                            }
+                        }
+                        Expression paramExpr = compileExpression(paramNode);
+                        if (paramAlias != null)
+                        {
+                            paramExpr.setAlias(paramAlias);
+                        }
+                        parameterExprs.add(paramExpr);
+                    }
+                }
+                else
+                {
+                    parameterExprs = Collections.EMPTY_LIST;
+                }
             }
             else
             {

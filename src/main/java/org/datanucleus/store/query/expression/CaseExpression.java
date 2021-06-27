@@ -91,6 +91,10 @@ public class CaseExpression extends Expression
         {
             str.append("ELSE ").append(elseExpr);
         }
+        if (alias != null)
+        {
+            str.append(" AS ").append(alias);
+        }
         return str.toString();
     }
 
