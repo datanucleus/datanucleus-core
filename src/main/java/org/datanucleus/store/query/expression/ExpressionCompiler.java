@@ -591,7 +591,7 @@ public class ExpressionCompiler
                 else if (childNode.getNodeType() == NodeType.IDENTIFIER)
                 {
                     String identifier = childNode.getNodeId();
-                    List tuples = new ArrayList();
+                    List<String> tuples = new ArrayList();
                     tuples.add(identifier);
                     boolean moreIdentifierNodes = true;
                     while (moreIdentifierNodes)
@@ -819,12 +819,12 @@ public class ExpressionCompiler
         }
         else if (node.getNodeType() == NodeType.SUBQUERY)
         {
-            List children = node.getChildNodes();
+            List<Node> children = node.getChildNodes();
             if (children.size() != 1)
             {
                 throw new QueryCompilerSyntaxException("Invalid number of children for SUBQUERY node : " + node);
             }
-            Node varNode = (Node)children.get(0);
+            Node varNode = children.get(0);
             VariableExpression subqueryExpr = new VariableExpression(varNode.getNodeId());
             Expression currentExpr = new SubqueryExpression((String)node.getNodeValue(), subqueryExpr);
             return currentExpr;
