@@ -362,12 +362,10 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     }
 
     /**
-     * Method to provide the details of the field being represented by this MetaData hence populating
-     * certain parts of the MetaData. This is used to firstly provide defaults for attributes that aren't 
-     * specified in the MetaData, and secondly to report any errors with attributes that have been specifed 
-     * that are inconsistent with the field being represented. 
-     * Either a field or a method should be passed in (one or the other) depending on what is being represented
-     * by this "member".
+     * Method to provide the details of the field being represented by this MetaData hence populating certain parts of the MetaData. 
+     * This is used to firstly provide defaults for attributes that aren't specified in the MetaData, and secondly to report any errors with 
+     * attributes that have been specifed that are inconsistent with the field being represented. 
+     * Either a field or a method should be passed in (one or the other) depending on what is being represented by this "member".
      * @param clr ClassLoaderResolver to use for any class loading 
      * @param field Field that we are representing (if it's a field)
      * @param method Method(property) that we are representing (if it's a method).
@@ -790,8 +788,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         {
             persistenceFlags = 0;
         }
-        else if (FieldPersistenceModifier.TRANSACTIONAL.equals(persistenceModifier) &&
-                 Modifier.isTransient(memberRepresented.getModifiers()))
+        else if (FieldPersistenceModifier.TRANSACTIONAL.equals(persistenceModifier) && Modifier.isTransient(memberRepresented.getModifiers()))
         {
             persistenceFlags = (byte) (Persistable.CHECK_WRITE | serializable);
         }
@@ -1338,7 +1335,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         cacheable = cache;
     }
 
-    // TODO Make use of this in DN core
+    // TODO Make use of this in DN core and remove NucleusLogger message below
     public String getLoadFetchGroup()
     {
         return loadFetchGroup;
@@ -1346,7 +1343,11 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     public void setLoadFetchGroup(String loadFetchGroup)
     {
-        this.loadFetchGroup = loadFetchGroup;
+        if (!StringUtils.isWhitespace(loadFetchGroup))
+        {
+            NucleusLogger.METADATA.warn("Metadata attribute 'load-fetch-group' is not currently utilised");
+            this.loadFetchGroup = loadFetchGroup;
+        }
     }
 
     public String getTypeConverterName()
@@ -1699,7 +1700,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
      */
     public boolean isCascadeDelete()
     {
-        // TODO Never called?
         return cascadeDelete;
     }
 
@@ -1745,25 +1745,24 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         return this;
     }
 
-    // TODO Parameterise these text strings. See also the associated annotation handlers in api-jdo/api-jpa/api-jakarta
     public boolean isCreateUser()
     {
-        return hasExtension("create-user");
+        return hasExtension(MetaData.EXTENSION_MEMBER_CREATE_USER);
     }
 
     public boolean isCreateTimestamp()
     {
-        return hasExtension("create-timestamp");
+        return hasExtension(MetaData.EXTENSION_MEMBER_CREATE_TIMESTAMP);
     }
 
     public boolean isUpdateUser()
     {
-        return hasExtension("update-user");
+        return hasExtension(MetaData.EXTENSION_MEMBER_UPDATE_USER);
     }
 
     public boolean isUpdateTimestamp()
     {
-        return hasExtension("update-timestamp");
+        return hasExtension(MetaData.EXTENSION_MEMBER_UPDATE_TIMESTAMP);
     }
 
     public AbstractMemberMetaData setColumn(String col)
@@ -1880,7 +1879,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     }
 
     /**
-     * Accessor for the field id
+     * Accessor for the absolute field id
      * @return field id
      */
     public int getAbsoluteFieldNumber()
@@ -2898,8 +2897,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     /**
      * Convenience method to return if this member relates to a persistent interface.
-     * All members that have a relation will return NONE from getRelationType but can be
-     * accessed through here.
+     * All members that have a relation will return NONE from getRelationType but can be accessed through here.
      * TODO Merge this with relation methods so we only need the relationType/relatedMemberMetaData.
      * @param clr ClassLoader resolver
      * @return Whether it is for a persistent interface

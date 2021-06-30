@@ -184,6 +184,18 @@ public class MetaData implements Serializable
     /** Member : shared relation, where the relation discriminator column is part of the PK. */
     public static final String EXTENSION_MEMBER_RELATION_DISCRIM_PK = "relation-discriminator-pk";
 
+    /** Member : create user extension. */
+    public static final String EXTENSION_MEMBER_CREATE_USER = "create-user";
+
+    /** Member : create timestamp extension. */
+    public static final String EXTENSION_MEMBER_CREATE_TIMESTAMP = "create-timestamp";
+
+    /** Member : create user extension. */
+    public static final String EXTENSION_MEMBER_UPDATE_USER = "update-user";
+
+    /** Member : create timestamp extension. */
+    public static final String EXTENSION_MEMBER_UPDATE_TIMESTAMP = "update-timestamp";
+
     /** Class : definition of VIEW (when mapping to a view). */
     public static final String EXTENSION_CLASS_VIEW_DEFINITION = "view-definition";
 

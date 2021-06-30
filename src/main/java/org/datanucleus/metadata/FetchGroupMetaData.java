@@ -25,18 +25,15 @@ import java.util.Set;
 
 /**
  * A fetch group defines a particular loaded state for an object graph. 
- * It specifies fields/properties to be loaded for all of the instances in the graph when
- * this fetch group is active.
+ * It specifies fields/properties to be loaded for all of the instances in the graph when this fetch group is active.
  */
 public class FetchGroupMetaData extends MetaData
 {
     private static final long serialVersionUID = -9024912323171424927L;
 
     /**
-     * The post-load attribute on the fetch-group element indicates whether the
-     * jdoPost-Load callback will be made when the fetch group is loaded. It
-     * defaults to false, for all fetch groups except the default fetch group,
-     * on which it defaults to true.
+     * The post-load attribute on the fetch-group element indicates whether the jdoPostLoad callback will be made when the fetch group is loaded. 
+     * It defaults to false, for all fetch groups except the default fetch group, on which it defaults to true.
      */
     boolean postLoad = false;
 
@@ -56,10 +53,10 @@ public class FetchGroupMetaData extends MetaData
      * A contained fetch-group element indicates that the named group is to be included in the group 
      * being defined. Nested fetch group elements are limited to only the name attribute.
      */
-    protected Set<FetchGroupMetaData> fetchGroups = null;    
+    protected Set<FetchGroupMetaData> fetchGroups = null;
 
     /** members (fields/properties) declared to be in this fetch group. */
-    protected Set<FetchGroupMemberMetaData> members = null;    
+    protected Set<FetchGroupMemberMetaData> members = null;
 
     /**
      * Constructor for a named fetch group. Set fields using setters, before populate().
