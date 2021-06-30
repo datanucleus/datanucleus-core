@@ -17,10 +17,11 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.metadata;
 
+import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Metadata for a member of a fetch group
+ * Metadata defining a member of a fetch-group.
  */
 public class FetchGroupMemberMetaData extends MetaData
 {
@@ -32,9 +33,14 @@ public class FetchGroupMemberMetaData extends MetaData
 
     boolean isProperty = false;
 
-    public FetchGroupMemberMetaData(MetaData parent, String name)
+    public FetchGroupMemberMetaData(FetchGroupMetaData parent, String name)
     {
         super(parent);
+        if (name != null && (name.indexOf(".") > 0 || name.indexOf("#") > 0))
+        {
+            NucleusLogger.METADATA.warn("FetchGroup " + parent.getName() + " has member with name '" + name + "'. " + 
+                "Use of dot/hash syntax is not currently supported! Specify any fields on the FetchGroup for that class. See issue core-34 for details");
+        }
         this.name = name;
     }
 
