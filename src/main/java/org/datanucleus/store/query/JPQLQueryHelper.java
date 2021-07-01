@@ -17,16 +17,23 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.query;
 
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.store.query.expression.CaseExpression;
 import org.datanucleus.store.query.expression.DyadicExpression;
 import org.datanucleus.store.query.expression.Expression;
 import org.datanucleus.store.query.expression.InvokeExpression;
 import org.datanucleus.store.query.expression.Literal;
 import org.datanucleus.store.query.expression.ParameterExpression;
 import org.datanucleus.store.query.expression.PrimaryExpression;
+import org.datanucleus.store.query.expression.SubqueryExpression;
 import org.datanucleus.store.query.expression.VariableExpression;
+import org.datanucleus.store.query.expression.CaseExpression.ExpressionPair;
 
 /**
  * JPQL query helper class providing key information about the language etc.
@@ -158,7 +165,23 @@ public class JPQLQueryHelper
             DyadicExpression dyExpr = (DyadicExpression)expr;
             Expression left = dyExpr.getLeft();
             Expression right = dyExpr.getRight();
-            StringBuilder str = new StringBuilder("(");
+            StringBuilder str = new StringBuilder();
+
+            if (dyExpr.getOperator() == Expression.OP_CAST)
+            {
+                str.append("TREAT(");
+                str.append(JPQLQueryHelper.getJPQLForExpression(left));
+                str.append(" AS ");
+                if (right == null)
+                {
+                    throw new NucleusUserException("Attempt to CAST but right argument is null");
+                }
+                str.append(((Literal)right).getLiteral());
+                str.append(")");
+                return str.toString();
+            }
+
+            str.append("(");
             if (left != null)
             {
                 str.append(JPQLQueryHelper.getJPQLForExpression(left));
@@ -237,6 +260,11 @@ public class JPQLQueryHelper
         else if (expr instanceof PrimaryExpression)
         {
             PrimaryExpression primExpr = (PrimaryExpression)expr;
+            Expression exprLeft = expr.getLeft();
+            if (exprLeft != null)
+            {
+                return JPQLQueryHelper.getJPQLForExpression(exprLeft) + "." + primExpr.getId();
+            }
             return primExpr.getId();
         }
         else if (expr instanceof ParameterExpression)
@@ -300,6 +328,10 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("indexOf"))
             {
+                if (args == null || args.isEmpty())
+                {
+                    throw new NucleusUserException("Attempt to perform LOCATE without any arguments");
+                }
                 StringBuilder str = new StringBuilder("LOCATE(");
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
                 if (args != null && !args.isEmpty())
@@ -317,6 +349,10 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("substring"))
             {
+                if (args == null || args.isEmpty())
+                {
+                    throw new NucleusUserException("Attempt to perform SUBSTRING without any arguments");
+                }
                 StringBuilder str = new StringBuilder("SUBSTRING(");
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
                 if (args != null && !args.isEmpty())
@@ -384,7 +420,7 @@ public class JPQLQueryHelper
             {
                 if (args == null || args.isEmpty())
                 {
-                    throw new NucleusUserException("Cannot use 'matches' without an argument");
+                    throw new NucleusUserException("Attempt to perform LIKE without any arguments");
                 }
                 StringBuilder str = new StringBuilder();
                 str.append(JPQLQueryHelper.getJPQLForExpression(invoked));
@@ -400,11 +436,11 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("contains"))
             {
-                StringBuilder str = new StringBuilder();
                 if (args == null || args.isEmpty())
                 {
-                    throw new NucleusUserException("Cannot use 'contains' without an argument");
+                    throw new NucleusUserException("Attempt to perform MEMBER OF without any arguments");
                 }
+                StringBuilder str = new StringBuilder();
                 Expression firstExpr = args.get(0);
                 str.append(JPQLQueryHelper.getJPQLForExpression(firstExpr));
                 str.append(" MEMBER OF ");
@@ -415,7 +451,7 @@ public class JPQLQueryHelper
             {
                 if (args == null || args.isEmpty())
                 {
-                    throw new NucleusUserException("Cannot use 'COUNT' without an argument");
+                    throw new NucleusUserException("Attempt to perform COUNT without any arguments");
                 }
                 Expression argExpr = args.get(0);
                 if (argExpr instanceof DyadicExpression && ((DyadicExpression)argExpr).getOperator() == Expression.OP_DISTINCT)
@@ -427,6 +463,10 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("COALESCE"))
             {
+                if (args == null || args.isEmpty())
+                {
+                    throw new NucleusUserException("Attempt to perform COALESCE without any arguments");
+                }
                 StringBuilder str = new StringBuilder("COALESCE(");
                 if (args != null && !args.isEmpty())
                 {
@@ -445,6 +485,10 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("NULLIF"))
             {
+                if (args == null || args.isEmpty())
+                {
+                    throw new NucleusUserException("Attempt to perform NULLIF without any arguments");
+                }
                 StringBuilder str = new StringBuilder("NULLIF(");
                 if (args != null && !args.isEmpty())
                 {
@@ -463,33 +507,96 @@ public class JPQLQueryHelper
             }
             else if (method.equalsIgnoreCase("ABS"))
             {
+                if (args == null || args.isEmpty())
+                {
+                    throw new NucleusUserException("Attempt to perform ABS without any arguments");
+                }
                 String argExprStr = (args != null && !args.isEmpty()) ? JPQLQueryHelper.getJPQLForExpression(args.get(0)) : "";
                 return "ABS(" + argExprStr + ")";
             }
             else if (method.equalsIgnoreCase("AVG"))
             {
-                String argExprStr = (args != null && !args.isEmpty()) ? JPQLQueryHelper.getJPQLForExpression(args.get(0)) : "";
-                return "AVG(" + argExprStr + ")";
+                if (args == null || args.isEmpty())
+                {
+                    throw new NucleusUserException("Attempt to perform AVG without any arguments");
+                }
+                Expression argExpr = args.get(0);
+                if (argExpr instanceof DyadicExpression && ((DyadicExpression)argExpr).getOperator() == Expression.OP_DISTINCT)
+                {
+                    DyadicExpression dyExpr = (DyadicExpression)argExpr;
+                    return "AVG(DISTINCT " + JPQLQueryHelper.getJPQLForExpression(dyExpr.getLeft()) + ")";
+                }
+                return "AVG(" + JPQLQueryHelper.getJPQLForExpression(argExpr) + ")";
             }
             else if (method.equalsIgnoreCase("MAX"))
             {
-                String argExprStr = (args != null && !args.isEmpty()) ? JPQLQueryHelper.getJPQLForExpression(args.get(0)) : "";
-                return "MAX(" + argExprStr + ")";
+                if (args == null || args.isEmpty())
+                {
+                    throw new NucleusUserException("Attempt to perform MAX without any arguments");
+                }
+                Expression argExpr = args.get(0);
+                if (argExpr instanceof DyadicExpression && ((DyadicExpression)argExpr).getOperator() == Expression.OP_DISTINCT)
+                {
+                    DyadicExpression dyExpr = (DyadicExpression)argExpr;
+                    return "MAX(DISTINCT " + JPQLQueryHelper.getJPQLForExpression(dyExpr.getLeft()) + ")";
+                }
+                return "MAX(" + JPQLQueryHelper.getJPQLForExpression(argExpr) + ")";
             }
             else if (method.equalsIgnoreCase("MIN"))
             {
-                String argExprStr = (args != null && !args.isEmpty()) ? JPQLQueryHelper.getJPQLForExpression(args.get(0)) : "";
-                return "MIN(" + argExprStr + ")";
+                if (args == null || args.isEmpty())
+                {
+                    throw new NucleusUserException("Attempt to perform MIN without any arguments");
+                }
+                Expression argExpr = args.get(0);
+                if (argExpr instanceof DyadicExpression && ((DyadicExpression)argExpr).getOperator() == Expression.OP_DISTINCT)
+                {
+                    DyadicExpression dyExpr = (DyadicExpression)argExpr;
+                    return "MIN(DISTINCT " + JPQLQueryHelper.getJPQLForExpression(dyExpr.getLeft()) + ")";
+                }
+                return "MIN(" + JPQLQueryHelper.getJPQLForExpression(argExpr) + ")";
             }
             else if (method.equalsIgnoreCase("SQRT"))
             {
-                String argExprStr = (args != null && !args.isEmpty()) ? JPQLQueryHelper.getJPQLForExpression(args.get(0)) : "";
-                return "SQRT(" + argExprStr + ")";
+                if (args == null || args.isEmpty())
+                {
+                    throw new NucleusUserException("Attempt to perform SQRT without any arguments");
+                }
+                Expression argExpr = args.get(0);
+                return "SQRT(" + JPQLQueryHelper.getJPQLForExpression(argExpr) + ")";
             }
             else if (method.equalsIgnoreCase("SUM"))
             {
-                String argExprStr = (args != null && !args.isEmpty()) ? JPQLQueryHelper.getJPQLForExpression(args.get(0)) : "";
-                return "SUM(" + argExprStr + ")";
+                if (args == null || args.isEmpty())
+                {
+                    throw new NucleusUserException("Attempt to perform SUM without any arguments");
+                }
+                Expression argExpr = args.get(0);
+                if (argExpr instanceof DyadicExpression && ((DyadicExpression)argExpr).getOperator() == Expression.OP_DISTINCT)
+                {
+                    DyadicExpression dyExpr = (DyadicExpression)argExpr;
+                    return "SUM(DISTINCT " + JPQLQueryHelper.getJPQLForExpression(dyExpr.getLeft()) + ")";
+                }
+                return "SUM(" + JPQLQueryHelper.getJPQLForExpression(argExpr) + ")";
+            }
+            else if (method.equalsIgnoreCase("SQL_function"))
+            {
+                if (args == null || args.isEmpty())
+                {
+                    throw new NucleusUserException("Attempt to perform FUNCTION without any arguments");
+                }
+                StringBuilder str = new StringBuilder("FUNCTION(");
+                for (int i=0;i<args.size();i++)
+                {
+                    Expression argExpr = args.get(i);
+                    str.append(JPQLQueryHelper.getJPQLForExpression(argExpr));
+                    if (i < args.size()-1)
+                    {
+                        str.append(",");
+                    }
+                }
+                str.append(")");
+                return str.toString();
             }
             // TODO Support this
             throw new UnsupportedOperationException("Dont currently support InvokeExpression (" + invExpr + ") conversion into JPQL");
@@ -504,7 +611,29 @@ public class JPQLQueryHelper
             }
             else if (value instanceof Boolean)
             {
-                return (Boolean)value ? "TRUE" : "FALSE";
+                return ((Boolean)value ? "TRUE" : "FALSE");
+            }
+            else if (value instanceof Time)
+            {
+                SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+                String timeStr = formatter.format((Time)value);
+                return "{t '" + timeStr + "'}";
+            }
+            else if (value instanceof Date)
+            {
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                String dateStr = formatter.format((Date)value);
+                return "{d '" + dateStr + "'}";
+            }
+            else if (value instanceof Timestamp)
+            {
+                return "{ts '" + value.toString() + "'}";
+            }
+            else if (value instanceof java.util.Date)
+            {
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String datetimeStr = formatter.format((java.util.Date)value);
+                return "{ts '" + datetimeStr + "'}";
             }
             else
             {
@@ -515,6 +644,39 @@ public class JPQLQueryHelper
         {
             VariableExpression varExpr = (VariableExpression)expr;
             return varExpr.getId();
+        }
+        else if (expr instanceof SubqueryExpression)
+        {
+            SubqueryExpression subqExpr = (SubqueryExpression)expr;
+            return subqExpr.getKeyword() + " " + JPQLQueryHelper.getJPQLForExpression(subqExpr.getRight());
+        }
+        else if (expr instanceof CaseExpression)
+        {
+            CaseExpression caseExpr = (CaseExpression)expr;
+            List<ExpressionPair> conds = caseExpr.getConditions();
+            Expression elseExpr = caseExpr.getElseExpression();
+            StringBuilder str = new StringBuilder("CASE ");
+            if (conds != null)
+            {
+                for (ExpressionPair cond : conds)
+                {
+                    Expression whenExpr = cond.getWhenExpression();
+                    Expression actionExpr = cond.getActionExpression();
+                    str.append("WHEN ");
+                    str.append(JPQLQueryHelper.getJPQLForExpression(whenExpr));
+                    str.append(" THEN ");
+                    str.append(JPQLQueryHelper.getJPQLForExpression(actionExpr));
+                    str.append(" ");
+                }
+            }
+            if (elseExpr != null)
+            {
+                str.append("ELSE ");
+                str.append(JPQLQueryHelper.getJPQLForExpression(elseExpr));
+                str.append(" ");
+            }
+            str.append("END");
+            return str.toString();
         }
         else
         {
