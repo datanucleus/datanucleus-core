@@ -26,6 +26,12 @@ import org.datanucleus.util.StringUtils;
 
 /**
  * Representation of a discriminator in an inheritance strategy.
+ * Three strategies are supported
+ * <ul>
+ * <li>*value-map* - where we define a value for each class as the discriminator value</li>
+ * <li>*class-name* - where we use the class name as the discriminator value</li>
+ * <li>*value-map-entity-name* - where we use the "entity" name as the discriminator value</li>
+ * </ul>
  */
 public class DiscriminatorMetaData extends MetaData
 {
@@ -46,7 +52,7 @@ public class DiscriminatorMetaData extends MetaData
     /** Whether the discriminator is indexed or not and whether it is unique */
     protected IndexedValue indexed = null;
 
-    /** Definition of any indexing of the discriminator column. TODO Drop this since it doesn't add to what we already have. */
+    /** Detail of any indexing of the discriminator column (optional). */
     protected IndexMetaData indexMetaData;
 
     public DiscriminatorMetaData()

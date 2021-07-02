@@ -26,11 +26,9 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Three common strategies for versioning instances are supported by standard
- * metadata. These include state-comparison, timestamp, and version-number.
+ * Three common strategies for versioning instances are supported by standard metadata.
  * <ul>
- * <li>State-comparison involves comparing the values in specific columns to
- * determine if the database row was changed.</li>
+ * <li>State-comparison involves comparing the values in specific columns to determine if the database row was changed.</li>
  * <li>Timestamp involves comparing the value in a date-time column in the table.
  * The first time in a transaction the row is updated, the timestamp value is updated to the current time.</li>
  * <li>Version-number involves comparing the value in a numeric column in the table.
@@ -39,8 +37,8 @@ import org.datanucleus.util.StringUtils;
  * <p>
  * There are two forms of version storage.
  * <ul>
- * <li>The JDO method of adding a surrogate column, using the column/columns/index info in this class</li>
- * <li>The JPA method of using an existing field/method. This uses the "fieldName" info only</li>
+ * <li>Surrogate column - the default in JDO, using the column/columns/index info in this class</li>
+ * <li>Defined field - the default in JPA. This uses the "fieldName" info only</li>
  * </ul>
  */
 public class VersionMetaData extends MetaData
@@ -56,7 +54,7 @@ public class VersionMetaData extends MetaData
     /** Contains the metadata for column. */
     protected ColumnMetaData columnMetaData;
 
-    /** IndexMetaData for the version column. TODO Drop this since it doesn't add to what we already have. */
+    /** Detail of any indexing of the version column (optional). */
     protected IndexMetaData indexMetaData;
 
     /** Indexed value. */
