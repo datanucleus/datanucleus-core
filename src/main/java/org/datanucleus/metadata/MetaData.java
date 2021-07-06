@@ -202,6 +202,9 @@ public class MetaData implements Serializable
     /** Class : definition of imports for VIEW (when mapping to a view). */
     public static final String EXTENSION_CLASS_VIEW_IMPORTS = "view-imports";
 
+    /** Index : orderings of columns in an index, comma separated series of "ASC", "DESC" etc. */
+    public static final String EXTENSION_INDEX_COLUMN_ORDERING = "index-column-ordering";
+
     /** State of the MetaData. */
     protected int metaDataState = METADATA_CREATED_STATE;
 
