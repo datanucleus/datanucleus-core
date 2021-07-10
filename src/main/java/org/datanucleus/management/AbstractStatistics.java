@@ -19,8 +19,6 @@ package org.datanucleus.management;
 
 import java.util.LinkedList;
 
-import org.datanucleus.NucleusContextHelper;
-
 /**
  * Abstract base class for a statistics object.
  */
@@ -80,7 +78,7 @@ public abstract class AbstractStatistics
         {
             // Register the MBean with the active JMX manager
             registeredName = manager.getDomainName() + ":InstanceName=" + manager.getInstanceName() + ",Type=" + this.getClass().getName() + ",Name=Manager" + 
-                NucleusContextHelper.random.nextLong();
+                ManagementManager.random.nextLong();
             mgmtManager.registerMBean(this, registeredName);
         }
     }

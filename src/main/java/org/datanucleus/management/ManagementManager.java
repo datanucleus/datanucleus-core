@@ -17,8 +17,9 @@ Contributors:
 ***********************************************************************/
 package org.datanucleus.management;
 
+import java.util.Random;
+
 import org.datanucleus.NucleusContext;
-import org.datanucleus.NucleusContextHelper;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.util.NucleusLogger;
@@ -36,6 +37,9 @@ import org.datanucleus.util.StringUtils;
  */
 public class ManagementManager
 {
+    /** Random number generator, for use when needing unique names. */
+    public static final Random random = new Random();
+
     /** NucleusContext that we are managing. **/
     final private NucleusContext nucleusContext;
     
@@ -64,7 +68,7 @@ public class ManagementManager
         {
             this.domainName = "datanucleus";
         }
-        this.instanceName = "datanucleus-" + NucleusContextHelper.random.nextInt();
+        this.instanceName = "datanucleus-" + random.nextInt();
 
         startManagementServer();
     }

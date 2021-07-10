@@ -22,13 +22,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.transaction.Synchronization;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-import org.datanucleus.NucleusContextHelper;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -39,6 +39,9 @@ import org.datanucleus.util.StringUtils;
  */
 public class ResourcedTransaction
 {
+    /** Random number generator, for use when needing unique names. */
+    public static final Random random = new Random();
+
     final static int STATUS_ACTIVE = 0;
     final static int STATUS_MARKED_ROLLBACK = 1;
     final static int STATUS_PREPARED = 2;
@@ -51,7 +54,7 @@ public class ResourcedTransaction
     final static int STATUS_ROLLING_BACK = 9;
 
     /** id of this instance **/
-    private static final int NODE_ID = NucleusContextHelper.random.nextInt();
+    private static final int NODE_ID = random.nextInt();
 
     /** sequence number for global transactions **/
     private static int NEXT_GLOBAL_TRANSACTION_ID = 1;

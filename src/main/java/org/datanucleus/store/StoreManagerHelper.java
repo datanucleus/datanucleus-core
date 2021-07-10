@@ -15,89 +15,27 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus;
+package org.datanucleus.store;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
 import java.util.Map;
-import java.util.Random;
 
+import org.datanucleus.ClassConstants;
+import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.NucleusContext;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.exceptions.TransactionIsolationNotSupportedException;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.Extension;
-import org.datanucleus.store.StoreManager;
 import org.datanucleus.util.Localiser;
 
 /**
- * Helper methods for NucleusContext operations.
+ * Helper methods for StoreManager operations.
  */
-public class NucleusContextHelper
+public class StoreManagerHelper
 {
-    /** Random number generator, for use when needing unique names. */
-    public static final Random random = new Random();
-
-    /**
-     * Method to return the transaction isolation level that will be used for the provided StoreManager
-     * bearing in mind the specified level the user requested.
-     * @param storeMgr The Store Manager
-     * @param transactionIsolation Requested isolation level
-     * @return Isolation level to use
-     * @throws TransactionIsolationNotSupportedException When no suitable level available given the requested level
-     */
-    public static String getTransactionIsolationForStoreManager(StoreManager storeMgr, String transactionIsolation)
-    {
-        if (transactionIsolation != null)
-        {
-            // Transaction isolation has been specified and we need to provide at least this level
-            // Order of priority is :-
-            // read-uncommitted (lowest), read-committed, repeatable-read, serializable (highest)
-            Collection<String> supportedOptions = storeMgr.getSupportedOptions();
-            if (!supportedOptions.contains("TransactionIsolationLevel." + transactionIsolation))
-            {
-                // Requested transaction isolation isn't supported by datastore so check for higher
-                if (transactionIsolation.equals("read-uncommitted"))
-                {
-                    if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_READ_COMMITTED))
-                    {
-                        return "read-committed";
-                    }
-                    else if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_REPEATABLE_READ))
-                    {
-                        return "repeatable-read";
-                    }
-                    else if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE))
-                    {
-                        return "serializable";
-                    }
-                }
-                else if (transactionIsolation.equals("read-committed"))
-                {
-                    if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_REPEATABLE_READ))
-                    {
-                        return "repeatable-read";
-                    }
-                    else if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE))
-                    {
-                        return "serializable";
-                    }
-                }
-                else if (transactionIsolation.equals("repeatable-read"))
-                {
-                    if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE))
-                    {
-                        return "serializable";
-                    }
-                }
-                else
-                {
-                    throw new TransactionIsolationNotSupportedException(transactionIsolation);
-                }
-            }
-        }
-        return transactionIsolation;
-    }
+    static Class[] STORE_MGR_CTR_ARG_TYPES = new Class[] {ClassConstants.CLASS_LOADER_RESOLVER, ClassConstants.PERSISTENCE_NUCLEUS_CONTEXT, Map.class};
 
     /**
      * Method to create a StoreManager based on the specified properties passed in.
@@ -111,8 +49,6 @@ public class NucleusContextHelper
     public static StoreManager createStoreManagerForProperties(Map<String, Object> props, Map<String, Object> datastoreProps, ClassLoaderResolver clr, NucleusContext nucCtx)
     {
         Extension[] exts = nucCtx.getPluginManager().getExtensionPoint("org.datanucleus.store_manager").getExtensions();
-        Class[] ctrArgTypes = new Class[] {ClassConstants.CLASS_LOADER_RESOLVER, ClassConstants.PERSISTENCE_NUCLEUS_CONTEXT, Map.class};
-        Object[] ctrArgs = new Object[] {clr, nucCtx, datastoreProps};
 
         StoreManager storeMgr = null;
 
@@ -137,8 +73,9 @@ public class NucleusContextHelper
                         // Either no URL, or url defined so take this StoreManager
                         try
                         {
-                            storeMgr = (StoreManager)nucCtx.getPluginManager().createExecutableExtension("org.datanucleus.store_manager", "url-key", 
-                                url == null ? urlKey : url, "class-name", ctrArgTypes, ctrArgs);
+                            Object[] ctrArgs = new Object[] {clr, nucCtx, datastoreProps};
+                            storeMgr = (StoreManager)nucCtx.getPluginManager().createExecutableExtension("org.datanucleus.store_manager", 
+                                "url-key", url == null ? urlKey : url, "class-name", STORE_MGR_CTR_ARG_TYPES, ctrArgs);
                         }
                         catch (InvocationTargetException ex)
                         {
@@ -166,10 +103,13 @@ public class NucleusContextHelper
         }
         else
         {
-            // Assumed to be using RDBMS since only that allows ConnectionFactory/ConnectionFactoryName TODO If any other stores start supporting ConnectionFactory then update this
+            // Assumed to be using RDBMS since only that allows ConnectionFactory/ConnectionFactoryName 
+            // TODO If any other stores start supporting ConnectionFactory then update this
             try
             {
-                storeMgr = (StoreManager)nucCtx.getPluginManager().createExecutableExtension("org.datanucleus.store_manager", "key", "rdbms", "class-name", ctrArgTypes, ctrArgs);
+                Object[] ctrArgs = new Object[] {clr, nucCtx, datastoreProps};
+                storeMgr = (StoreManager)nucCtx.getPluginManager().createExecutableExtension("org.datanucleus.store_manager", "key", "rdbms", 
+                    "class-name", STORE_MGR_CTR_ARG_TYPES, ctrArgs);
             }
             catch (InvocationTargetException ex)
             {

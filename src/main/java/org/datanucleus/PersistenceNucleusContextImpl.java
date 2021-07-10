@@ -71,6 +71,7 @@ import org.datanucleus.state.ObjectProviderFactory;
 import org.datanucleus.state.ObjectProviderFactoryImpl;
 import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.StoreManagerHelper;
 import org.datanucleus.store.autostart.AutoStartMechanism;
 import org.datanucleus.store.autostart.ClassesAutoStarter;
 import org.datanucleus.store.autostart.MetaDataAutoStarter;
@@ -84,6 +85,7 @@ import org.datanucleus.store.schema.SchemaTool;
 import org.datanucleus.store.schema.SchemaTool.Mode;
 import org.datanucleus.transaction.NucleusTransactionException;
 import org.datanucleus.transaction.ResourcedTransactionManager;
+import org.datanucleus.transaction.TransactionUtils;
 import org.datanucleus.transaction.jta.JTASyncRegistry;
 import org.datanucleus.transaction.jta.JTASyncRegistryUnavailableException;
 import org.datanucleus.transaction.jta.TransactionManagerFinder;
@@ -424,13 +426,13 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 // Find the StoreManager using the persistence property if specified
                 NucleusLogger.DATASTORE.debug("Creating StoreManager for datastore");
                 Map<String, Object> datastoreProps = config.getDatastoreProperties();
-                this.storeMgr = NucleusContextHelper.createStoreManagerForProperties(config.getPersistenceProperties(), datastoreProps, clr, this);
+                this.storeMgr = StoreManagerHelper.createStoreManagerForProperties(config.getPersistenceProperties(), datastoreProps, clr, this);
 
                 // Make sure the isolation level is valid for this StoreManager and correct if necessary
                 String transactionIsolation = config.getStringProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION);
                 if (transactionIsolation != null)
                 {
-                    String reqdIsolation = NucleusContextHelper.getTransactionIsolationForStoreManager(storeMgr, transactionIsolation);
+                    String reqdIsolation = TransactionUtils.getTransactionIsolationForStoreManager(storeMgr, transactionIsolation);
                     if (!transactionIsolation.equalsIgnoreCase(reqdIsolation))
                     {
                         config.setProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION, reqdIsolation);

@@ -17,11 +17,77 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.transaction;
 
+import java.util.Collection;
+
+import org.datanucleus.exceptions.TransactionIsolationNotSupportedException;
+import org.datanucleus.store.StoreManager;
+
 /**
  * Utility methods relating to transactions.
  */
 public class TransactionUtils
 {
+    /**
+     * Method to return the transaction isolation level that will be used for the provided StoreManager
+     * bearing in mind the specified level the user requested.
+     * @param storeMgr The Store Manager
+     * @param transactionIsolation Requested isolation level
+     * @return Isolation level to use
+     * @throws TransactionIsolationNotSupportedException When no suitable level available given the requested level
+     */
+    public static String getTransactionIsolationForStoreManager(StoreManager storeMgr, String transactionIsolation)
+    {
+        if (transactionIsolation != null)
+        {
+            // Transaction isolation has been specified and we need to provide at least this level
+            // Order of priority is :-
+            // read-uncommitted (lowest), read-committed, repeatable-read, serializable (highest)
+            Collection<String> supportedOptions = storeMgr.getSupportedOptions();
+            if (!supportedOptions.contains("TransactionIsolationLevel." + transactionIsolation))
+            {
+                // Requested transaction isolation isn't supported by datastore so check for higher
+                if (transactionIsolation.equals("read-uncommitted"))
+                {
+                    if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_READ_COMMITTED))
+                    {
+                        return "read-committed";
+                    }
+                    else if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_REPEATABLE_READ))
+                    {
+                        return "repeatable-read";
+                    }
+                    else if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE))
+                    {
+                        return "serializable";
+                    }
+                }
+                else if (transactionIsolation.equals("read-committed"))
+                {
+                    if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_REPEATABLE_READ))
+                    {
+                        return "repeatable-read";
+                    }
+                    else if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE))
+                    {
+                        return "serializable";
+                    }
+                }
+                else if (transactionIsolation.equals("repeatable-read"))
+                {
+                    if (supportedOptions.contains(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE))
+                    {
+                        return "serializable";
+                    }
+                }
+                else
+                {
+                    throw new TransactionIsolationNotSupportedException(transactionIsolation);
+                }
+            }
+        }
+        return transactionIsolation;
+    }
+
     /**
      * Accessor for a string name of a transaction isolation level.
      * @param isolation The isolation level (as defined by UserTransaction).
