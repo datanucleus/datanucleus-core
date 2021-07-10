@@ -20,6 +20,8 @@ package org.datanucleus.metadata;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.datanucleus.util.NucleusLogger;
+
 /**
  * Listener for events, following the JPA/Jakarta model.
  */
@@ -76,6 +78,9 @@ public class EventListenerMetaData extends MetaData
         if (methodNamesByCallbackName.get(callbackClassName) != null)
         {
             // Only accept the first encountered method of a callback type
+            // TODO Do we want to allow multiple callbacks of a particular type e.g PreStore?
+            NucleusLogger.GENERAL.warn("Attempt to register a callback " + callbackClassName + " for " + className + "." + methodName + 
+                " but callback already registered for this callback");
             return;
         }
 
