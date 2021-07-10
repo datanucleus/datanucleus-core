@@ -18,24 +18,14 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.state;
 
-import org.datanucleus.BeanValidationHandler;
-
 /**
  * CallBack handlers receive notification of events on persistent objects. 
- * Handlers are responsible for invoking event listeners/callback methods on Callback or Listener
- * implementations.
+ * Handlers are responsible for invoking event listeners/callback methods on Callback or Listener implementations.
  * 
- * When a validation handler is set, the prePersist, preStore and preDelete callbacks will be routed through to
- * this validation handler.
+ * When a validation handler is set, the prePersist, preStore and preDelete callbacks will be routed through to this validation handler.
  */
 public interface CallbackHandler
 {
-    /**
-     * Method to set the handler for bean validation.
-     * @param handler Handler for bean validation
-     */
-    void setBeanValidationHandler(BeanValidationHandler handler);
-
     /**
      * Callback after the object has been created.
      * @param pc The Object

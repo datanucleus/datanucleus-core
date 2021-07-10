@@ -5476,7 +5476,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
                 {
                     callbackHandler = (CallbackHandler) getNucleusContext().getPluginManager().createExecutableExtension(
                         "org.datanucleus.callbackhandler", "name", getNucleusContext().getApiName(), "class-name",
-                        new Class[] {ClassConstants.PERSISTENCE_NUCLEUS_CONTEXT}, new Object[] {getNucleusContext()});
+                        new Class[] {ClassConstants.EXECUTION_CONTEXT}, new Object[] {this});
                 }
                 catch (Exception e)
                 {
