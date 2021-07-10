@@ -48,14 +48,14 @@ public class BeanValidationHandler
     /**
      * Constructor for a validation handler.
      * @param ec ExecutionContext that we are persisting in
-     * @param factory Validation factory
+     * @param validatorFactory Validation factory
      */
-    public BeanValidationHandler(ExecutionContext ec, ValidatorFactory factory)
+    public BeanValidationHandler(ExecutionContext ec, Object validatorFactory)
     {
         conf = ec.getNucleusContext().getConfiguration();
         clr = ec.getClassLoaderResolver();
 
-        validator = factory.usingContext().traversableResolver(new PersistenceTraversalResolver(ec)).getValidator();
+        validator = ((ValidatorFactory)validatorFactory).usingContext().traversableResolver(new PersistenceTraversalResolver(ec)).getValidator();
     }
 
     public void close()

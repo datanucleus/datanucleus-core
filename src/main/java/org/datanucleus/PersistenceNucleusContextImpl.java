@@ -36,7 +36,6 @@ import java.util.TreeSet;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.validation.Validation;
-import javax.validation.ValidatorFactory;
 
 import org.datanucleus.cache.JavaxCacheLevel2Cache;
 import org.datanucleus.cache.Level2Cache;
@@ -1518,11 +1517,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
                 }
             }
 
-            if (validatorFactory != null)
-            {
-                return new BeanValidationHandler(ec, (ValidatorFactory)validatorFactory);
-            }
-            return null;
+            return (validatorFactory != null) ? new BeanValidationHandler(ec, validatorFactory) : null;
         }
         catch (Throwable ex) //throwable used to catch linkage errors
         {
