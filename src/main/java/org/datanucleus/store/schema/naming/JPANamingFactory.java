@@ -68,7 +68,11 @@ public class JPANamingFactory extends AbstractNamingFactory
         if (cmd.getTable() != null)
         {
             name = cmd.getTable();
-            // TODO This may have "catalog.schema.name"
+            if (name.indexOf('.') > 0)
+            {
+                // In the case of the "table" being of the form "catalog.schema.name"
+                name = name.substring(name.lastIndexOf('.')+1);
+            }
         }
         if (name == null)
         {
@@ -99,7 +103,11 @@ public class JPANamingFactory extends AbstractNamingFactory
             {
                 // Join table name specified at this side of bidir relation
                 name = mmd.getTable();
-                // TODO This may have "catalog.schema.name"
+                if (name.indexOf('.') >= 0)
+                {
+                    // In the case of the "table" being of the form "catalog.schema.name"
+                    name = name.substring(name.lastIndexOf('.')+1);
+                }
             }
             else
             {
@@ -108,7 +116,11 @@ public class JPANamingFactory extends AbstractNamingFactory
                 if (relatedMmds != null && relatedMmds[0].getTable() != null)
                 {
                     name = relatedMmds[0].getTable();
-                    // TODO This may have "catalog.schema.name"
+                    if (name.indexOf('.') >= 0)
+                    {
+                        // In the case of the "table" being of the form "catalog.schema.name"
+                        name = name.substring(name.lastIndexOf('.')+1);
+                    }
                 }
             }
         }

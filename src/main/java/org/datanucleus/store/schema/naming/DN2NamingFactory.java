@@ -69,7 +69,11 @@ public class DN2NamingFactory extends AbstractNamingFactory
             if (mmd.getTable() != null)
             {
                 name = mmd.getTable();
-                // TODO This may have "catalog.schema.name"
+                if (name.indexOf('.') > 0)
+                {
+                    // In the case of the "table" being of the form "catalog.schema.name"
+                    name = name.substring(name.lastIndexOf('.')+1);
+                }
             }
             else
             {
@@ -77,7 +81,11 @@ public class DN2NamingFactory extends AbstractNamingFactory
                 if (relatedMmds != null && relatedMmds[0].getTable() != null)
                 {
                     name = relatedMmds[0].getTable();
-                    // TODO This may have "catalog.schema.name"
+                    if (name.indexOf('.') > 0)
+                    {
+                        // In the case of the "table" being of the form "catalog.schema.name"
+                        name = name.substring(name.lastIndexOf('.')+1);
+                    }
                 }
             }
         }
@@ -276,7 +284,7 @@ public class DN2NamingFactory extends AbstractNamingFactory
                 }
                 else
                 {
-                    
+                    // TODO Handle this case
                 }
             }
             else

@@ -125,7 +125,11 @@ public abstract class AbstractNamingFactory implements NamingFactory
         if (cmd.getTable() != null)
         {
             name = cmd.getTable();
-            // TODO This may have "catalog.schema.name"
+            if (name.indexOf('.') > 0)
+            {
+                // In the case of the "table" being of the form "catalog.schema.name"
+                name = name.substring(name.lastIndexOf('.')+1);
+            }
         }
         if (name == null)
         {
