@@ -48,13 +48,13 @@ public enum JdbcType
     NVARCHAR(Types.NVARCHAR),
     OTHER(Types.OTHER),
     REAL(Types.REAL),
-    REF_CURSOR(2012), // JDK 1.8+
+    REF_CURSOR(Types.REF_CURSOR),
     SMALLINT(Types.SMALLINT),
     SQLXML(Types.SQLXML),
     TIME(Types.TIME),
-    TIME_WITH_TIMEZONE(2013), // JDK 1.8+
+    TIME_WITH_TIMEZONE(Types.TIME_WITH_TIMEZONE),
     TIMESTAMP(Types.TIMESTAMP),
-    TIMESTAMP_WITH_TIMEZONE(2014), // JDK 1.8+
+    TIMESTAMP_WITH_TIMEZONE(Types.TIMESTAMP_WITH_TIMEZONE),
     TINYINT(Types.TINYINT),
     VARBINARY(Types.VARBINARY),
     VARCHAR(Types.VARCHAR),
@@ -122,6 +122,8 @@ public enum JdbcType
                 return OTHER;
             case Types.REAL:
                 return REAL;
+            case Types.REF_CURSOR:
+                return REF_CURSOR;
             case Types.SMALLINT:
                 return SMALLINT;
             case Types.SQLXML:
