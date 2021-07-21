@@ -338,7 +338,7 @@ public class NonManagedPluginRegistry implements PluginRegistry
                 {
                     // protocol formats:
                     // jar:http:<path>!<manifest-file>, zip:http:<path>!<manifest-file>
-                    // e.g jar:http://<host>[:port]/[app-path]/jpox-java5.jar!/plugin.xml
+                    // e.g jar:http://<host>[:port]/[app-path]/datanucleus-java5.jar!/plugin.xml
                     JarURLConnection jarConnection = (JarURLConnection) manifest.openConnection();
                     URL url = jarConnection.getJarFileURL();
                     mf = jarConnection.getManifest();

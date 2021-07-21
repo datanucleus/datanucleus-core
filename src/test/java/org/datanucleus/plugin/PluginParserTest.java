@@ -101,7 +101,7 @@ public class PluginParserTest extends TestCase
         try
         {
             mgr.registerBundle(clr.getResource("/org/datanucleus/samples/plugin/MANIFEST1-1.MF",null)); 
-        	fail("Expected JPOXException");
+        	fail("Expected NucleusException");
         }
         catch(NucleusException ex)
         {

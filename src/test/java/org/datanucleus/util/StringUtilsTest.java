@@ -45,14 +45,10 @@ public class StringUtilsTest extends TestCase
      */
     public void testIsWhitespace()
     {
-        assertTrue("null String should have been confirmed as whitespace but wasn't",
-            StringUtils.isWhitespace(null));
-        assertTrue("empty String should have been confirmed as whitespace but wasn't",
-            StringUtils.isWhitespace("   "));
-        assertTrue("Non empty String should have been defined as not whitespace but was",
-            !StringUtils.isWhitespace("JPOX"));
-        assertTrue("Partly empty String should have been defined as not whitespace but was",
-            !StringUtils.isWhitespace("   JPOXWorld "));
+        assertTrue("null String should have been confirmed as whitespace but wasn't", StringUtils.isWhitespace(null));
+        assertTrue("empty String should have been confirmed as whitespace but wasn't", StringUtils.isWhitespace("   "));
+        assertTrue("Non empty String should have been defined as not whitespace but was", !StringUtils.isWhitespace("DataNucleus"));
+        assertTrue("Partly empty String should have been defined as not whitespace but was", !StringUtils.isWhitespace("   DataNucleusWorld "));
     }
     
     /**
@@ -60,12 +56,9 @@ public class StringUtilsTest extends TestCase
      */
     public void testAreStringsEqual()
     {
-        assertTrue("Identical Strings should have been decreed equal but weren't",
-            StringUtils.areStringsEqual("JPOX","JPOX"));
-        assertTrue("Non-identical Strings should have been decreed as non-equal but were",
-            !StringUtils.areStringsEqual("JPOX","Kodo"));
-        assertTrue("Null strings should have been decreed equal but weren't",
-            StringUtils.areStringsEqual(null,null));
+        assertTrue("Identical Strings should have been decreed equal but weren't", StringUtils.areStringsEqual("DataNucleus", "DataNucleus"));
+        assertTrue("Non-identical Strings should have been decreed as non-equal but were", !StringUtils.areStringsEqual("DataNucleus", "Kodo"));
+        assertTrue("Null strings should have been decreed equal but weren't", StringUtils.areStringsEqual(null,null));
         assertTrue("Null and non-null Strings should have been decreed as non-equal, but were",
             !StringUtils.areStringsEqual("null",null));
     }
@@ -75,10 +68,8 @@ public class StringUtilsTest extends TestCase
      */
     public void testLeftAlignedPaddedString()
     {
-        assertTrue("String left aligned (extending the string) was incorrect",
-            StringUtils.leftAlignedPaddedString("JPOX",10).equals("JPOX      "));
-        assertTrue("String left aligned (same length) was incorrect",
-            StringUtils.leftAlignedPaddedString("JPOX",4).equals("JPOX"));
+        assertTrue("String left aligned (extending the string) was incorrect", StringUtils.leftAlignedPaddedString("DataNucleus",17).equals("DataNucleus      "));
+        assertTrue("String left aligned (same length) was incorrect", StringUtils.leftAlignedPaddedString("DataNucleus",11).equals("DataNucleus"));
     }
     
     /**
@@ -87,9 +78,9 @@ public class StringUtilsTest extends TestCase
     public void testRightAlignedPaddedString()
     {
         assertTrue("String right aligned (extending the string) was incorrect",
-            StringUtils.rightAlignedPaddedString("JPOX",10).equals("      JPOX"));
+            StringUtils.rightAlignedPaddedString("DataNucleus",17).equals("      DataNucleus"));
         assertTrue("String right aligned (same length) was incorrect",
-            StringUtils.rightAlignedPaddedString("JPOX",4).equals("JPOX"));
+            StringUtils.rightAlignedPaddedString("DataNucleus",11).equals("DataNucleus"));
     }
     
     /**
@@ -97,8 +88,8 @@ public class StringUtilsTest extends TestCase
      */
     public void testSplit()
     {
-        String[] tokens=StringUtils.split("JPOX Kodo JDOGenie"," ");
-        assertTrue("First token of split string is incorrect", tokens[0].equals("JPOX"));
+        String[] tokens=StringUtils.split("DataNucleus Kodo JDOGenie"," ");
+        assertTrue("First token of split string is incorrect", tokens[0].equals("DataNucleus"));
         assertTrue("Second token of split string is incorrect", tokens[1].equals("Kodo"));
         assertTrue("Third token of split string is incorrect", tokens[2].equals("JDOGenie"));
         

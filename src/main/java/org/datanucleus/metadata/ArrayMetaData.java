@@ -13,8 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License. 
 
 Contributors:
-2007 Xuan Baldauf - Support for the ability of users to explictly state that an array whose component type is not 
-                    persistable may still have persistable elements. See http://www.jpox.org/servlet/jira/browse/CORE-3274
+2007 Xuan Baldauf - Support for the ability of users to explictly state that an array whose component type is not persistable may still have persistable elements.
     ...
 **********************************************************************/
 package org.datanucleus.metadata;

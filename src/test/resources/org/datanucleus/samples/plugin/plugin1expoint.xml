@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin
    id="org.datanucleus"
-   name="JPOX Core"
-   provider-name="JPOX"
+   name="DataNucleus Core"
+   provider-name="DataNucleus"
    version="1.0">
    
    <extension-point id="testID" name="testName" schema="/org/datanucleus/samples/plugin/plugin1.xsd"/>

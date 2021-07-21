@@ -14,7 +14,7 @@ limitations under the License.
 
 
 Contributors:
-2007 Xuan Baldauf - little reduction in code duplication to anticipate changes regarding issue http://www.jpox.org/servlet/jira/browse/CORE-3272
+2007 Xuan Baldauf - little reduction in code duplication to anticipate changes regarding issue
     ...
 **********************************************************************/
 package org.datanucleus.metadata;
