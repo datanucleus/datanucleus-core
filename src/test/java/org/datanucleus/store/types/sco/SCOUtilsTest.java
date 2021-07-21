@@ -17,7 +17,7 @@ import org.datanucleus.store.types.scostore.CollectionStore;
 public class SCOUtilsTest extends TestCase
 {
     /*
-     * Test method for 'org.jpox.sco.SCOUtils.toArray(CollectionStore, StateManager)'
+     * Test method for SCOUtils.toArray(CollectionStore, StateManager)
      */
     public void testToArrayCollectionStoreStateManager()
     {
@@ -30,7 +30,7 @@ public class SCOUtilsTest extends TestCase
     }
 
     /*
-     * Test method for 'org.jpox.sco.SCOUtils.toArray(CollectionStore, StateManager, Object[])'
+     * Test method for SCOUtils.toArray(CollectionStore, StateManager, Object[])
      */
     public void testToArrayCollectionStoreStateManagerObjectArray()
     {

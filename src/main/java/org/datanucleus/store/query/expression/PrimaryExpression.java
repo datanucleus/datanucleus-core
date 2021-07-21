@@ -153,7 +153,7 @@ public class PrimaryExpression extends Expression
 
         if (symbol == null)
         {
-            // This may be due to an entry like "org.jpox.samples.MyClass" used for "instanceof"
+            // This may be due to an entry like "org.datanucleus.samples.MyClass" used for "instanceof"
             String className = getId();
 
             try
