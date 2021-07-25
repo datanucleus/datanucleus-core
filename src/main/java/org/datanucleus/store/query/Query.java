@@ -78,9 +78,12 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     public static final String EXTENSION_USE_FETCH_PLAN = PropertyNames.PROPERTY_QUERY_USE_FETCHPLAN;
     public static final String EXTENSION_RESULT_SIZE_METHOD = PropertyNames.PROPERTY_QUERY_RESULT_SIZE_METHOD;
     public static final String EXTENSION_LOAD_RESULTS_AT_COMMIT = PropertyNames.PROPERTY_QUERY_LOAD_RESULTS_AT_COMMIT;
-    public static final String EXTENSION_COMPILATION_CACHED = PropertyNames.PROPERTY_QUERY_COMPILATION_CACHED;
+    public static final String EXTENSION_RESULT_CACHE_TYPE = "datanucleus.query.resultCacheType";
+    public static final String EXTENSION_RESULT_CACHE_VALIDATE_OBJECTS = PropertyNames.PROPERTY_QUERY_RESULTCACHE_VALIDATEOBJECTS;
     public static final String EXTENSION_RESULTS_CACHED = PropertyNames.PROPERTY_QUERY_RESULTS_CACHED;
+    public static final String EXTENSION_COMPILATION_CACHED = PropertyNames.PROPERTY_QUERY_COMPILATION_CACHED;
     public static final String EXTENSION_EVALUATE_IN_MEMORY = PropertyNames.PROPERTY_QUERY_EVALUATE_IN_MEMORY;
+    public static final String EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE = "datanucleus.query.closeResultsAtManagerClose";
     public static final String EXTENSION_CHECK_UNUSED_PARAMETERS = PropertyNames.PROPERTY_QUERY_CHECK_UNUSED_PARAMS;
 
     public static final String EXTENSION_JDOQL_STRICT = PropertyNames.PROPERTY_QUERY_JDOQL_STRICT;
@@ -90,11 +93,6 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     /** Extension for the benefit of JPQL so that we can exclude subclasses (not possible with JPA API). */
     public static final String EXTENSION_EXCLUDE_SUBCLASSES="datanucleus.query.excludeSubclasses";
 
-    public static final String EXTENSION_MULTITHREAD = "datanucleus.query.multithread"; // TODO Is this used now
-
-    public static final String EXTENSION_RESULT_CACHE_VALIDATE_OBJECTS = PropertyNames.PROPERTY_QUERY_RESULTCACHE_VALIDATEOBJECTS;
-    public static final String EXTENSION_RESULT_CACHE_TYPE = "datanucleus.query.resultCacheType";
-    public static final String EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE = "datanucleus.query.closeResultsAtManagerClose";
 
     protected final transient StoreManager storeMgr;
 
@@ -687,11 +685,17 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         extensions.add(EXTENSION_RESULT_SIZE_METHOD);
         extensions.add(EXTENSION_LOAD_RESULTS_AT_COMMIT);
         extensions.add(EXTENSION_RESULT_CACHE_TYPE);
+        extensions.add(EXTENSION_RESULT_CACHE_VALIDATE_OBJECTS);
         extensions.add(EXTENSION_RESULTS_CACHED);
         extensions.add(EXTENSION_COMPILATION_CACHED);
-        extensions.add(EXTENSION_MULTITHREAD);
         extensions.add(EXTENSION_EVALUATE_IN_MEMORY);
         extensions.add(EXTENSION_CLOSE_RESULTS_AT_EC_CLOSE);
+        extensions.add(EXTENSION_CHECK_UNUSED_PARAMETERS);
+        extensions.add(EXTENSION_JDOQL_STRICT);
+        extensions.add(EXTENSION_JPQL_STRICT);
+        extensions.add(EXTENSION_SQL_SYNTAX_CHECKS);
+        extensions.add(EXTENSION_EXCLUDE_SUBCLASSES);
+
         return extensions;
     }
 
