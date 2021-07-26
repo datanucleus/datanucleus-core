@@ -93,6 +93,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
     /** Extension for the benefit of JPQL so that we can exclude subclasses (not possible with JPA API). */
     public static final String EXTENSION_EXCLUDE_SUBCLASSES="datanucleus.query.excludeSubclasses";
 
+    public static final String EXTENSION_QUERY_TYPE = "datanucleus.query.type";
 
     protected final transient StoreManager storeMgr;
 
@@ -695,6 +696,7 @@ public abstract class Query<T> implements Serializable, ExecutionContextListener
         extensions.add(EXTENSION_JPQL_STRICT);
         extensions.add(EXTENSION_SQL_SYNTAX_CHECKS);
         extensions.add(EXTENSION_EXCLUDE_SUBCLASSES);
+        extensions.add(EXTENSION_QUERY_TYPE);
 
         return extensions;
     }
