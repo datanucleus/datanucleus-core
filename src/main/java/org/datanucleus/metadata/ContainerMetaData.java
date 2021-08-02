@@ -138,10 +138,10 @@ public class ContainerMetaData extends MetaData
     }
 
     /**
-     * Accessor for the parent field name
-     * @return Parent field name.
+     * Accessor for the parent member name
+     * @return Parent member name.
      */
-    public String getFieldName()
+    public String getMemberName()
     {
         if (parent != null)
         {

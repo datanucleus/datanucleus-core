@@ -228,7 +228,7 @@ public class VersionMetaData extends MetaData
         return this;
     }
 
-    public final String getFieldName()
+    public final String getFieldName() // TODO Change to memberName
     {
         return fieldName;
     }

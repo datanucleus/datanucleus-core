@@ -87,7 +87,7 @@ public class ArrayMetaData extends ContainerMetaData
         Class fieldType = mmd.getType();
         if (!fieldType.isArray())
         {
-            throw new InvalidMemberMetaDataException("044141", mmd.getClassName(), getFieldName());
+            throw new InvalidMemberMetaDataException("044141", mmd.getClassName(), getMemberName());
         }
         Class componentType = fieldType.getComponentType();
 
@@ -175,7 +175,7 @@ public class ArrayMetaData extends ContainerMetaData
                 {
                     // Impossible to persist an array of a non-PC element without a join table or without serialising the array
                     // TODO Should this be an exception?
-                    String msg = Localiser.msg("044142", mmd.getClassName(), getFieldName(), arrayComponentType);
+                    String msg = Localiser.msg("044142", mmd.getClassName(), getMemberName(), arrayComponentType);
                     NucleusLogger.METADATA.warn(msg);
                 }
             }

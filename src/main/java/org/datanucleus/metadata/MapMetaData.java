@@ -156,7 +156,7 @@ public class MapMetaData extends ContainerMetaData
         if (!keyTypeClass.getName().equals(key.typeName))
         {
             // The value-type has been resolved from what was specified in the MetaData - update to the fully-qualified name
-            NucleusLogger.METADATA.info(Localiser.msg("044148", getFieldName(), mmd.getClassName(false), key.typeName, keyTypeClass.getName()));
+            NucleusLogger.METADATA.info(Localiser.msg("044148", getMemberName(), mmd.getClassName(false), key.typeName, keyTypeClass.getName()));
             key.typeName = keyTypeClass.getName();
         }
 
@@ -289,7 +289,7 @@ public class MapMetaData extends ContainerMetaData
         if (!valueTypeClass.getName().equals(value.typeName))
         {
             // The value-type has been resolved from what was specified in the MetaData - update to the fully-qualified name
-            NucleusLogger.METADATA.info(Localiser.msg("044151", getFieldName(), mmd.getClassName(false), value.typeName, valueTypeClass.getName()));
+            NucleusLogger.METADATA.info(Localiser.msg("044151", getMemberName(), mmd.getClassName(false), value.typeName, valueTypeClass.getName()));
             value.typeName = valueTypeClass.getName();
         }
 

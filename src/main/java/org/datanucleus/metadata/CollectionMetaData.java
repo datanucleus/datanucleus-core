@@ -100,13 +100,13 @@ public class CollectionMetaData extends ContainerMetaData
             if (!elementTypeClass.getName().equals(element.typeName))
             {
                 // The element-type has been resolved from what was specified in the MetaData - update to the fully-qualified name
-                NucleusLogger.METADATA.info(Localiser.msg("044135", getFieldName(), mmd.getClassName(false), element.typeName, elementTypeClass.getName()));
+                NucleusLogger.METADATA.info(Localiser.msg("044135", getMemberName(), mmd.getClassName(false), element.typeName, elementTypeClass.getName()));
                 element.typeName = elementTypeClass.getName();
             }
         }
         catch (ClassNotResolvedException cnre)
         {
-            throw new InvalidMemberMetaDataException("044134", mmd.getClassName(), getFieldName(), element.typeName);
+            throw new InvalidMemberMetaDataException("044134", mmd.getClassName(), getMemberName(), element.typeName);
         }
 
 		// "embedded-element"

@@ -110,8 +110,8 @@ public class MetaData implements Serializable
     /** Class : when the class will have a update-timestamp column for auditing, specifies the column name to use. */
     public static final String EXTENSION_CLASS_UPDATETIMESTAMP_COLUMN_NAME = "updatetimestamp-column-name";
 
-    /** Class : define the name of a field that will store the version of this class. */
-    public static final String EXTENSION_CLASS_VERSION_FIELD_NAME = "field-name";
+    /** Class : define the name of a member that will store the version of this class. */
+    public static final String EXTENSION_CLASS_VERSION_FIELD_NAME = "field-name"; // TODO Change to member-name
 
     /** Class : initial value to use for this class for versioning (when using version-number strategy). */
     public static final String EXTENSION_VERSION_NUMBER_INITIAL_VALUE = "version-initial-value";
