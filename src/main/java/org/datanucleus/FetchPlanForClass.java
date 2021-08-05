@@ -120,31 +120,26 @@ public class FetchPlanForClass
      */
     public int getMaxRecursionDepthForMember(int memberNum)
     {
-        // prepare array of FetchGroupMetaData from current fetch plan
-        Set<String> currentGroupNames = new HashSet(plan.getGroups());
-
-        // find FetchGroupMetaDatas that contain the field in question
-        Set<FetchGroupMetaData> fetchGroupsContainingField = getFetchGroupsForMemberNumber(cmd.getFetchGroupMetaData(currentGroupNames), memberNum);
-
-        // find recursion depth for field in its class <field> definition
+        // Find fallback recursion depth for member in its class metadata definition
         int recursionDepth = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum).getRecursionDepth();
         if (recursionDepth == AbstractMemberMetaData.UNDEFINED_RECURSION_DEPTH)
         {
             recursionDepth = AbstractMemberMetaData.DEFAULT_RECURSION_DEPTH;
         }
 
-        // find if it has been overridden in a <fetch-group> definition
-        String fieldName = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum).getName();
-        for (Iterator<FetchGroupMetaData> iter = fetchGroupsContainingField.iterator(); iter.hasNext();)
+        // find FetchGroupMetaDatas that contain the field in question, and see if it has been overridden
+        String memberName = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNum).getName();
+        Set<FetchGroupMetaData> fetchGroupsContainingField = getFetchGroupsForMemberNumber(cmd.getFetchGroupMetaData(plan.getGroups()), memberNum);
+        for (FetchGroupMetaData fgmd : fetchGroupsContainingField)
         {
-            FetchGroupMetaData fgmd = iter.next();
             Set<FetchGroupMemberMetaData> fgmmds = fgmd.getMembers();
             if (fgmmds != null)
             {
                 for (FetchGroupMemberMetaData fgmmd : fgmmds)
                 {
-                    if (fgmmd.getName().equals(fieldName))
+                    if (fgmmd.getName().equals(memberName))
                     {
+                        // TODO Add concept of "max" as per this method's name
                         if (fgmmd.getRecursionDepth() != AbstractMemberMetaData.UNDEFINED_RECURSION_DEPTH)
                         {
                             recursionDepth = fgmmd.getRecursionDepth();
@@ -423,6 +418,7 @@ public class FetchPlanForClass
             cacheKey.set(i, loadedMembers[i]);
         }
         Boolean result = plan.getCachedIsToCallPostLoadFetchPlan(cmd, cacheKey);
+        Set<String> fpGroups = plan.getGroups();
 
         if (result == null) 
         {
@@ -435,7 +431,7 @@ public class FetchPlanForClass
                 // if field in actual fetch plan was not previously loaded
                 if (!loadedMembers[fieldNumber])
                 {
-                    if (cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).isDefaultFetchGroup() && plan.getGroups().contains(FetchPlan.DEFAULT))
+                    if (cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).isDefaultFetchGroup() && fpGroups.contains(FetchPlan.DEFAULT))
                     {
                         // to call jdoPostLoad, field must be in default-fetch-group when DFG is active
                         result = Boolean.TRUE;
@@ -512,7 +508,7 @@ public class FetchPlanForClass
      */
     private Set<FetchGroupMetaData> getFetchGroupsForMemberNumber(Set<FetchGroupMetaData> fgmds, int memberNum)
     {
-        Set<FetchGroupMetaData> fetchGroups = new HashSet();
+        Set<FetchGroupMetaData> fetchGroups = new HashSet<>();
         if (fgmds != null)
         {
             for (FetchGroupMetaData fgmd : fgmds)
