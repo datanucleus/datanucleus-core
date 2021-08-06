@@ -46,29 +46,21 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * A mutable second-class Map object. 
- * Uses a "delegate" as a local store for the Map. Uses a "backing store"
- * (SetStore) to represent the datastore. The "delegate" is updated with the
- * "backing store" information at necessary intervals. 
+ * Uses a "delegate" as a local store for the Map. Uses a "backing store" (SetStore) to represent the datastore. 
+ * The "delegate" is updated with the "backing store" information at necessary intervals. 
  *
  * <H3>Modes of Operation</H3>
  * The user can operate the map in 2 modes.
- * The <B>cached</B> mode will use an internal cache of the elements (in the
- * "delegate") reading them at the first opportunity and then using the cache
- * thereafter.
- * The <B>non-cached</B> mode will just go direct to the "backing store" each
- * call.
+ * The <B>cached</B> mode will use an internal cache of the elements (in the "delegate") reading them at the first opportunity and then using the cache thereafter.
+ * The <B>non-cached</B> mode will just go direct to the "backing store" each call.
  *
  * <H3>Mutators</H3>
- * When the backing store is present any updates are passed direct to the
- * datastore as well as to the "delegate". If the "backing store" isn't present
- * the changes are made to the "delegate" only.
+ * When the backing store is present any updates are passed direct to the datastore as well as to the "delegate". 
+ * If the "backing store" isn't present the changes are made to the "delegate" only.
  *
  * <H3>Accessors</H3>
- * When any accessor method is invoked, it typically checks whether the
- * map has been loaded from its backing store and does this as
- * necessary. Some methods (<B>size()</B>, <B>containsKey()</B>) just check if
- * everything is loaded and use the delegate if possible, otherwise going
- * direct to the datastore.
+ * When any accessor method is invoked, it typically checks whether the map has been loaded from its backing store and does this as necessary. 
+ * Some methods (<B>size()</B>, <B>containsKey()</B>) just check if everything is loaded and use the delegate if possible, otherwise going direct to the datastore.
  */
 public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> implements BackedSCO
 {
@@ -176,7 +168,14 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
                     else
                     {
                         backingStore.clear(ownerOP);
-                        backingStore.putAll(ownerOP, newValue);
+                        if (useCache)
+                        {
+                            backingStore.putAll(ownerOP, newValue, Collections.emptyMap());
+                        }
+                        else
+                        {
+                            backingStore.putAll(ownerOP, newValue);
+                        }
                     }
                 }
                 delegate.putAll(newValue);
