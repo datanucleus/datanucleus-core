@@ -1467,7 +1467,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      */
     public void loadFieldFromDatastore(int fieldNumber)
     {
-        loadFieldsFromDatastore((fieldNumber >= 0) ? (new int[] {fieldNumber}) : null);
+        loadFieldsFromDatastore((fieldNumber >= 0) ? (new int[] {fieldNumber}) : new int[] {});
     }
 
     /**
@@ -2301,7 +2301,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                         }
                         else
                         {
-                            loadFieldsFromDatastore(null);
+                            loadFieldsFromDatastore(new int[] {});
                         }
                     }
                 }

@@ -1267,10 +1267,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             List<EmbeddedOwnerRelation> embRels = opEmbeddedInfoByEmbedded.get(op);
             if (embRels != null)
             {
-                for (EmbeddedOwnerRelation rel : embRels)
+                if (opEmbeddedInfoByOwner != null)
                 {
-                    // Remove from owner lookup too
-                    opEmbeddedInfoByOwner.remove(rel.getOwnerOP());
+                    for (EmbeddedOwnerRelation rel : embRels)
+                    {
+                        // Remove from owner lookup too
+                        opEmbeddedInfoByOwner.remove(rel.getOwnerOP());
+                    }
                 }
                 opEmbeddedInfoByEmbedded.remove(op);
             }
@@ -1281,10 +1284,13 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
             List<EmbeddedOwnerRelation> embRels = opEmbeddedInfoByOwner.get(op);
             if (embRels != null)
             {
-                for (EmbeddedOwnerRelation rel : embRels)
+                if (opEmbeddedInfoByEmbedded != null)
                 {
-                    // Remove from embedded lookup too
-                    opEmbeddedInfoByEmbedded.remove(rel.getEmbeddedOP());
+                    for (EmbeddedOwnerRelation rel : embRels)
+                    {
+                        // Remove from embedded lookup too
+                        opEmbeddedInfoByEmbedded.remove(rel.getEmbeddedOP());
+                    }
                 }
                 opEmbeddedInfoByOwner.remove(op);
             }
