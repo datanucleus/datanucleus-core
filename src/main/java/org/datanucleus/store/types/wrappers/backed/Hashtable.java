@@ -19,6 +19,7 @@ package org.datanucleus.store.types.wrappers.backed;
 
 import java.io.ObjectStreamException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.Map;
@@ -45,8 +46,11 @@ import org.datanucleus.util.NucleusLogger;
 public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashtable<K, V> implements BackedSCO
 {
     protected transient MapStore<K, V> backingStore;
+
     protected transient boolean allowNulls = false;
+
     protected transient boolean useCache = true;
+
     protected transient boolean isCacheLoaded = false;
 
     /**
@@ -64,16 +68,18 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
 
         if (!SCOUtils.mapHasSerialisedKeysAndValues(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            this.backingStore = (MapStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(), 
-                mmd, java.util.Hashtable.class);
+            this.backingStore = (MapStore) ((BackedSCOStoreManager) ownerOP.getStoreManager())
+                    .getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(), mmd, java.util.Hashtable.class);
         }
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this, useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
+            NucleusLogger.PERSISTENCE.debug(
+                SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this, useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
         }
     }
 
+    @Override
     public void initialise(java.util.Hashtable newValue, Object oldValue)
     {
         if (newValue != null)
@@ -85,7 +91,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
                 Iterator iter = newValue.entrySet().iterator();
                 while (iter.hasNext())
                 {
-                    Map.Entry entry = (Map.Entry)iter.next();
+                    Map.Entry entry = (Map.Entry) iter.next();
                     Object key = entry.getKey();
                     Object value = entry.getValue();
                     if (ownerMmd.getMap().keyIsPersistent())
@@ -93,7 +99,8 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
                         ObjectProvider keyOP = ec.findObjectProvider(key);
                         if (keyOP == null)
                         {
-                            keyOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                            keyOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP,
+                                ownerMmd.getAbsoluteFieldNumber());
                         }
                     }
                     if (ownerMmd.getMap().valueIsPersistent())
@@ -101,7 +108,8 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
                         ObjectProvider valOP = ec.findObjectProvider(value);
                         if (valOP == null)
                         {
-                            valOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                            valOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP,
+                                ownerMmd.getAbsoluteFieldNumber());
                         }
                     }
                 }
@@ -115,7 +123,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
             if (useCache)
             {
                 // Load up old values into delegate as starting point
-                java.util.Map oldMap = (java.util.Map)oldValue;
+                java.util.Map oldMap = (java.util.Map) oldValue;
                 if (oldMap != null)
                 {
                     delegate.putAll(oldMap);
@@ -131,7 +139,8 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
                 {
                     if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
-                        // If not yet flushed to store then no need to add to queue (since will be handled via insert)
+                        // If not yet flushed to store then no need to add to queue (since will be handled via
+                        // insert)
                         if (ownerOP.isFlushedToDatastore() || !ownerOP.getLifecycleState().isNew())
                         {
                             ownerOP.getExecutionContext().addOperationToQueue(new MapClearOperation(ownerOP, backingStore));
@@ -139,7 +148,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
                             Iterator iter = newValue.entrySet().iterator();
                             while (iter.hasNext())
                             {
-                                java.util.Map.Entry entry = (java.util.Map.Entry)iter.next();
+                                java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
                                 ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, entry.getKey(), entry.getValue()));
                             }
                         }
@@ -147,7 +156,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
                     else
                     {
                         backingStore.clear(ownerOP);
-                        backingStore.putAll(ownerOP, newValue);
+                        backingStore.putAll(ownerOP, newValue, Collections.emptyMap());
                     }
                 }
                 delegate.putAll(newValue);
@@ -161,6 +170,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * Method to initialise the SCO from an existing value.
      * @param m Object to set value using.
      */
+    @Override
     public void initialise(java.util.Hashtable m)
     {
         if (m != null)
@@ -172,7 +182,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
                 Iterator iter = m.entrySet().iterator();
                 while (iter.hasNext())
                 {
-                    Map.Entry entry = (Map.Entry)iter.next();
+                    Map.Entry entry = (Map.Entry) iter.next();
                     Object key = entry.getKey();
                     Object value = entry.getValue();
                     if (ownerMmd.getMap().keyIsPersistent())
@@ -180,7 +190,8 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
                         ObjectProvider keyOP = ec.findObjectProvider(key);
                         if (keyOP == null)
                         {
-                            keyOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                            keyOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP,
+                                ownerMmd.getAbsoluteFieldNumber());
                         }
                     }
                     if (ownerMmd.getMap().valueIsPersistent())
@@ -188,7 +199,8 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
                         ObjectProvider valOP = ec.findObjectProvider(value);
                         if (valOP == null)
                         {
-                            valOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                            valOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP,
+                                ownerMmd.getAbsoluteFieldNumber());
                         }
                     }
                 }
@@ -207,6 +219,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
     /**
      * Method to initialise the SCO for use.
      */
+    @Override
     public void initialise()
     {
         if (useCache && !SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd))
@@ -220,6 +233,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
+    @Override
     public java.util.Hashtable getValue()
     {
         loadFromStore();
@@ -227,9 +241,10 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
     }
 
     /**
-     * Method to effect the load of the data in the SCO.
-     * Used when the SCO supports lazy-loading to tell it to load all now.
+     * Method to effect the load of the data in the SCO. Used when the SCO supports lazy-loading to tell it to
+     * load all now.
      */
+    @Override
     public void load()
     {
         if (useCache)
@@ -239,10 +254,11 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
     }
 
     /**
-     * Method to return if the SCO has its contents loaded.
-     * If the SCO doesn't support lazy loading will just return true.
+     * Method to return if the SCO has its contents loaded. If the SCO doesn't support lazy loading will just
+     * return true.
      * @return Whether it is loaded
      */
+    @Override
     public boolean isLoaded()
     {
         return useCache ? isCacheLoaded : false;
@@ -268,9 +284,11 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.datanucleus.store.types.backed.BackedSCO#getBackingStore()
      */
+    @Override
     public Store getBackingStore()
     {
         return backingStore;
@@ -283,6 +301,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * @param newValue New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
+    @Override
     public void updateEmbeddedKey(K key, int fieldNumber, Object newValue, boolean makeDirty)
     {
         if (backingStore != null)
@@ -298,6 +317,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * @param newValue New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
+    @Override
     public void updateEmbeddedValue(V value, int fieldNumber, Object newValue, boolean makeDirty)
     {
         if (backingStore != null)
@@ -309,6 +329,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
     /**
      * Method to unset the owner and field details.
      */
+    @Override
     public void unsetOwner()
     {
         if (backingStore != null)
@@ -318,13 +339,16 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
     }
 
     // ------------------ Implementation of Hashtable methods ------------------
- 
+
     /**
      * Creates and returns a copy of this object.
-     * <P>Mutable second-class Objects are required to provide a public clone method in order to allow for copying persistable objects.
-     * In contrast to Object.clone(), this method must not throw a CloneNotSupportedException.
+     * <P>
+     * Mutable second-class Objects are required to provide a public clone method in order to allow for
+     * copying persistable objects. In contrast to Object.clone(), this method must not throw a
+     * CloneNotSupportedException.
      * @return The cloned object
      */
+    @Override
     public synchronized Object clone()
     {
         if (useCache)
@@ -340,6 +364,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * @param key The key
      * @return Whether it is contained
      **/
+    @Override
     public synchronized boolean containsKey(Object key)
     {
         if (useCache && isCacheLoaded)
@@ -360,6 +385,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * @param value The value
      * @return Whether it is contained
      **/
+    @Override
     public boolean containsValue(Object value)
     {
         if (useCache && isCacheLoaded)
@@ -379,6 +405,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * Accessor for the set of entries in the Map.
      * @return Set of entries
      **/
+    @Override
     public java.util.Set entrySet()
     {
         if (useCache)
@@ -398,6 +425,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * @param o The map to compare against.
      * @return Whether they are equal.
      **/
+    @Override
     public synchronized boolean equals(Object o)
     {
         if (useCache)
@@ -413,7 +441,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
         {
             return false;
         }
-        java.util.Map m = (java.util.Map)o;
+        java.util.Map m = (java.util.Map) o;
 
         return entrySet().equals(m.entrySet());
     }
@@ -445,6 +473,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * @param key The key
      * @return The value.
      **/
+    @Override
     public synchronized V get(Object key)
     {
         if (useCache)
@@ -463,6 +492,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * Method to generate a hashcode for this Map.
      * @return The hashcode.
      **/
+    @Override
     public synchronized int hashCode()
     {
         if (useCache)
@@ -487,6 +517,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * Method to return if the Map is empty.
      * @return Whether it is empty.
      **/
+    @Override
     public synchronized boolean isEmpty()
     {
         return size() == 0;
@@ -496,6 +527,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * Accessor for the set of keys in the Map.
      * @return Set of keys.
      **/
+    @Override
     public java.util.Set keySet()
     {
         if (useCache)
@@ -514,6 +546,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * Method to return the size of the Map.
      * @return The size
      **/
+    @Override
     public synchronized int size()
     {
         if (useCache && isCacheLoaded)
@@ -533,6 +566,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * Accessor for the set of values in the Map.
      * @return Set of values.
      **/
+    @Override
     public Collection values()
     {
         if (useCache)
@@ -548,10 +582,11 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
     }
 
     // -------------------------------- Mutator methods ------------------------
- 
+
     /**
      * Method to clear the Hashtable
      **/
+    @Override
     public synchronized void clear()
     {
         makeDirty();
@@ -581,6 +616,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * @param value The value
      * @return The previous value for the specified key.
      **/
+    @Override
     public synchronized V put(K key, V value)
     {
         // Reject inappropriate values
@@ -637,6 +673,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * Method to add the specified Map's values under their keys here.
      * @param m The map
      **/
+    @Override
     public synchronized void putAll(java.util.Map m)
     {
         makeDirty();
@@ -654,13 +691,13 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
                 Iterator iter = m.entrySet().iterator();
                 while (iter.hasNext())
                 {
-                    Map.Entry entry = (Map.Entry)iter.next();
+                    Map.Entry entry = (Map.Entry) iter.next();
                     ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, entry.getKey(), entry.getValue()));
                 }
             }
             else
             {
-                backingStore.putAll(ownerOP, m);
+                backingStore.putAll(ownerOP, m, useCache ? Collections.unmodifiableMap(delegate) : null);
             }
         }
         delegate.putAll(m);
@@ -676,6 +713,7 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
      * @param key The key to remove
      * @return The value that was removed from this key.
      **/
+    @Override
     public synchronized V remove(Object key)
     {
         makeDirty();
@@ -713,18 +751,16 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
     }
 
     /**
-     * The writeReplace method is called when ObjectOutputStream is preparing
-     * to write the object to the stream. The ObjectOutputStream checks whether
-     * the class defines the writeReplace method. If the method is defined, the
-     * writeReplace method is called to allow the object to designate its
-     * replacement in the stream. The object returned should be either of the
-     * same type as the object passed in or an object that when read and 
-     * resolved will result in an object of a type that is compatible with all
-     * references to the object.
-     * 
+     * The writeReplace method is called when ObjectOutputStream is preparing to write the object to the
+     * stream. The ObjectOutputStream checks whether the class defines the writeReplace method. If the method
+     * is defined, the writeReplace method is called to allow the object to designate its replacement in the
+     * stream. The object returned should be either of the same type as the object passed in or an object that
+     * when read and resolved will result in an object of a type that is compatible with all references to the
+     * object.
      * @return the replaced object
      * @throws ObjectStreamException if an error occurs
      */
+    @Override
     protected Object writeReplace() throws ObjectStreamException
     {
         if (useCache)

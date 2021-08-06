@@ -1,5 +1,5 @@
 /**********************************************************************
-Copyright (c) 2002 Mike Martin (TJDO) and others. All rights reserved. 
+Copyright (c) 2002 Mike Martin (TJDO) and others. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -10,7 +10,7 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
-limitations under the License. 
+limitations under the License.
 
 Contributors:
 2003 Andy Jefferson - coding standards
@@ -55,14 +55,14 @@ public interface MapStore<K, V> extends Store
     boolean valuesAreSerialised();
 
     // -------------------------------- Map Methods ----------------------------
- 
+
     /**
      * Accessor for whether the Map contains this value.
      * @param op ObjectProvider for the owner of the map.
      * @param value The value to check
      * @return Whether it is contained.
      */
-    boolean containsValue(ObjectProvider op, Object value);
+    boolean containsValue(ObjectProvider<?> op, Object value);
 
     /**
      * Accessor for whether the Map contains this key.
@@ -70,72 +70,84 @@ public interface MapStore<K, V> extends Store
      * @param key The key to check
      * @return Whether it is contained.
      */
-    boolean containsKey(ObjectProvider op, Object key);
+    boolean containsKey(ObjectProvider<?> op, Object key);
 
     /**
      * Accessor for a value from the Map.
-     * @param op ObjectProvider for the owner of the map. 
+     * @param op ObjectProvider for the owner of the map.
      * @param key Key for the value.
      * @return Value for this key.
      */
-    V get(ObjectProvider op, Object key);
+    V get(ObjectProvider<?> op, Object key);
 
     /**
      * Method to add a value to the Map against this key.
-     * @param op ObjectProvider for the owner of the map. 
+     * @param op ObjectProvider for the owner of the map.
      * @param key The key.
      * @param value The value.
      * @return Value that was previously against this key.
      */
-    V put(ObjectProvider op, K key, V value);
+    V put(ObjectProvider<?> op, K key, V value);
 
     /**
      * Method to add a map of values to the Map.
-     * @param op ObjectProvider for the owner of the map. 
+     * @param op ObjectProvider for the owner of the map.
      * @param m The map to add.
-     */ 
-    void putAll(ObjectProvider op, Map<? extends K, ? extends V> m);
+     */
+    void putAll(ObjectProvider<?> op, Map<? extends K, ? extends V> m);
+
+    /**
+     * Method to add a map of values to the Map.
+     * @param op ObjectProvider for the owner of the map.
+     * @param m The map to add.
+     * @param cachedDelegate The known cached entries in map before the putAll operation. null means entries
+     * of map is unknown.
+     */
+    default void putAll(ObjectProvider<?> op, Map<? extends K, ? extends V> m, Map<K, V> delegate)
+    {
+        putAll(op, m);
+    }
 
     /**
      * Method to remove a value from the Map.
-     * @param op ObjectProvider for the owner of the map. 
+     * @param op ObjectProvider for the owner of the map.
      * @param key Key whose value is to be removed.
      * @return Value that was removed.
      */
-    V remove(ObjectProvider op, Object key);
+    V remove(ObjectProvider<?> op, Object key);
 
     /**
      * Method to remove a value from the Map.
-     * @param op ObjectProvider for the owner of the map. 
+     * @param op ObjectProvider for the owner of the map.
      * @param key Key whose value is to be removed.
      * @param val Value for this key when the value is known (to save the lookup)
      * @return Value that was removed.
      */
-    V remove(ObjectProvider op, Object key, Object val);
+    V remove(ObjectProvider<?> op, Object key, Object val);
 
     /**
      * Method to clear the map.
-     * @param op ObjectProvider for the owner of the map. 
+     * @param op ObjectProvider for the owner of the map.
      */
-    void clear(ObjectProvider op);
+    void clear(ObjectProvider<?> op);
 
     /**
      * Accessor for a backing store representing the key set for the Map.
      * @return Keys for the Map.
      */
-    SetStore keySetStore();
+    SetStore<K> keySetStore();
 
     /**
      * Accessor for a backing store representing the values in the Map.
      * @return Values for the Map.
      */
-    CollectionStore valueCollectionStore();
+    CollectionStore<V> valueCollectionStore();
 
     /**
      * Accessor for a backing store representing the entry set for the Map.
      * @return Entry set for the Map.
      */
-    SetStore entrySetStore();
+    SetStore<Map.Entry<K, V>> entrySetStore();
 
     /**
      * Method to update an embedded key in the map.
@@ -145,7 +157,7 @@ public interface MapStore<K, V> extends Store
      * @param newValue The new value for the field
      * @return Whether the element was modified
      */
-    boolean updateEmbeddedKey(ObjectProvider op, Object key, int fieldNumber, Object newValue);
+    boolean updateEmbeddedKey(ObjectProvider<?> op, Object key, int fieldNumber, Object newValue);
 
     /**
      * Method to update an embedded value in the map.
@@ -155,5 +167,5 @@ public interface MapStore<K, V> extends Store
      * @param newValue The new value for the field
      * @return Whether the element was modified
      */
-    boolean updateEmbeddedValue(ObjectProvider op, Object value, int fieldNumber, Object newValue);
+    boolean updateEmbeddedValue(ObjectProvider<?> op, Object value, int fieldNumber, Object newValue);
 }

@@ -11,7 +11,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- 
+
 
 Contributors:
     ...
@@ -20,6 +20,7 @@ package org.datanucleus.store.types.wrappers.backed;
 
 import java.io.ObjectStreamException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -38,14 +39,17 @@ import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
- * A mutable second-class Properties object. Backed by a MapStore object.
- * The key and value types of this class is {@link java.lang.String}.
+ * A mutable second-class Properties object. Backed by a MapStore object. The key and value types of this
+ * class is {@link java.lang.String}.
  */
 public class Properties extends org.datanucleus.store.types.wrappers.Properties implements BackedSCO
 {
     protected transient MapStore backingStore;
+
     protected transient boolean allowNulls = false;
+
     protected transient boolean useCache = true;
+
     protected transient boolean isCacheLoaded = false;
 
     /**
@@ -63,29 +67,30 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
 
         if (!SCOUtils.mapHasSerialisedKeysAndValues(mmd) && mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
         {
-            this.backingStore = (MapStore)((BackedSCOStoreManager)ownerOP.getStoreManager()).getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(), 
-                mmd, java.util.Map.class);
+            this.backingStore = (MapStore) ((BackedSCOStoreManager) ownerOP.getStoreManager())
+                    .getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(), mmd, java.util.Map.class);
         }
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this, useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
+            NucleusLogger.PERSISTENCE.debug(
+                SCOUtils.getContainerInfoMessage(ownerOP, ownerMmd.getName(), this, useCache, allowNulls, SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd)));
         }
     }
 
+    @Override
     public void initialise(java.util.Properties newValue, Object oldValue)
     {
         if (newValue != null)
         {
             // Check for the case of serialised maps, and assign ObjectProviders to any PC keys/values without
-            if (SCOUtils.mapHasSerialisedKeysAndValues(ownerMmd) &&
-                (ownerMmd.getMap().keyIsPersistent() || ownerMmd.getMap().valueIsPersistent()))
+            if (SCOUtils.mapHasSerialisedKeysAndValues(ownerMmd) && (ownerMmd.getMap().keyIsPersistent() || ownerMmd.getMap().valueIsPersistent()))
             {
                 ExecutionContext ec = ownerOP.getExecutionContext();
                 Iterator iter = newValue.entrySet().iterator();
                 while (iter.hasNext())
                 {
-                    Map.Entry entry = (Map.Entry)iter.next();
+                    Map.Entry entry = (Map.Entry) iter.next();
                     Object key = entry.getKey();
                     Object value = entry.getValue();
                     if (ownerMmd.getMap().keyIsPersistent())
@@ -93,7 +98,8 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                         ObjectProvider objSM = ec.findObjectProvider(key);
                         if (objSM == null)
                         {
-                            objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                            objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP,
+                                ownerMmd.getAbsoluteFieldNumber());
                         }
                     }
                     if (ownerMmd.getMap().valueIsPersistent())
@@ -101,7 +107,8 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                         ObjectProvider objSM = ec.findObjectProvider(value);
                         if (objSM == null)
                         {
-                            objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                            objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP,
+                                ownerMmd.getAbsoluteFieldNumber());
                         }
                     }
                 }
@@ -115,7 +122,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
             if (useCache)
             {
                 // Load up old values into delegate as starting point
-                java.util.Map oldMap = (java.util.Map)oldValue;
+                java.util.Map oldMap = (java.util.Map) oldValue;
                 if (oldMap != null)
                 {
                     delegate.putAll(oldMap);
@@ -131,7 +138,8 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                 {
                     if (SCOUtils.useQueuedUpdate(ownerOP))
                     {
-                        // If not yet flushed to store then no need to add to queue (since will be handled via insert)
+                        // If not yet flushed to store then no need to add to queue (since will be handled via
+                        // insert)
                         if (ownerOP.isFlushedToDatastore() || !ownerOP.getLifecycleState().isNew())
                         {
                             ownerOP.getExecutionContext().addOperationToQueue(new MapClearOperation(ownerOP, backingStore));
@@ -139,7 +147,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                             Iterator iter = newValue.entrySet().iterator();
                             while (iter.hasNext())
                             {
-                                java.util.Map.Entry entry = (java.util.Map.Entry)iter.next();
+                                java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
                                 ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, entry.getKey(), entry.getValue()));
                             }
                         }
@@ -147,7 +155,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                     else
                     {
                         backingStore.clear(ownerOP);
-                        backingStore.putAll(ownerOP, newValue);
+                        backingStore.putAll(ownerOP, newValue, Collections.emptyMap());
                     }
                 }
                 delegate.putAll(newValue);
@@ -161,6 +169,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
      * Method to initialise the SCO from an existing value.
      * @param m Object to set value using.
      */
+    @Override
     public void initialise(java.util.Properties m)
     {
         if (m != null)
@@ -172,7 +181,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                 Iterator iter = m.entrySet().iterator();
                 while (iter.hasNext())
                 {
-                    Map.Entry entry = (Map.Entry)iter.next();
+                    Map.Entry entry = (Map.Entry) iter.next();
                     Object key = entry.getKey();
                     Object value = entry.getValue();
                     if (ownerMmd.getMap().keyIsPersistent())
@@ -180,7 +189,8 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                         ObjectProvider objSM = ec.findObjectProvider(key);
                         if (objSM == null)
                         {
-                            objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                            objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP,
+                                ownerMmd.getAbsoluteFieldNumber());
                         }
                     }
                     if (ownerMmd.getMap().valueIsPersistent())
@@ -188,7 +198,8 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                         ObjectProvider objSM = ec.findObjectProvider(value);
                         if (objSM == null)
                         {
-                            objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP, ownerMmd.getAbsoluteFieldNumber());
+                            objSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP,
+                                ownerMmd.getAbsoluteFieldNumber());
                         }
                     }
                 }
@@ -207,6 +218,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
     /**
      * Method to initialise the SCO for use.
      */
+    @Override
     public void initialise()
     {
         if (useCache && !SCOUtils.useCachedLazyLoading(ownerOP, ownerMmd))
@@ -220,6 +232,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
      * Accessor for the unwrapped value that we are wrapping.
      * @return The unwrapped value
      */
+    @Override
     public java.util.Properties getValue()
     {
         loadFromStore();
@@ -227,9 +240,10 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
     }
 
     /**
-     * Method to effect the load of the data in the SCO.
-     * Used when the SCO supports lazy-loading to tell it to load all now.
+     * Method to effect the load of the data in the SCO. Used when the SCO supports lazy-loading to tell it to
+     * load all now.
      */
+    @Override
     public void load()
     {
         if (useCache)
@@ -239,10 +253,11 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
     }
 
     /**
-     * Method to return if the SCO has its contents loaded.
-     * If the SCO doesn't support lazy loading will just return true.
+     * Method to return if the SCO has its contents loaded. If the SCO doesn't support lazy loading will just
+     * return true.
      * @return Whether it is loaded
      */
+    @Override
     public boolean isLoaded()
     {
         return useCache ? isCacheLoaded : false;
@@ -257,8 +272,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", 
-                    ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
 
@@ -269,9 +283,11 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.datanucleus.store.types.backed.BackedSCO#getBackingStore()
      */
+    @Override
     public Store getBackingStore()
     {
         return backingStore;
@@ -284,6 +300,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
      * @param newValue New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
+    @Override
     public void updateEmbeddedKey(Object key, int fieldNumber, Object newValue, boolean makeDirty)
     {
         if (backingStore != null)
@@ -299,6 +316,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
      * @param newValue New value for this field
      * @param makeDirty Whether to make the SCO field dirty.
      */
+    @Override
     public void updateEmbeddedValue(Object value, int fieldNumber, Object newValue, boolean makeDirty)
     {
         if (backingStore != null)
@@ -310,6 +328,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
     /**
      * Method to unset the owner and field details.
      **/
+    @Override
     public void unsetOwner()
     {
         super.unsetOwner();
@@ -320,13 +339,16 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
     }
 
     // ------------------ Implementation of Hashtable methods ------------------
-    
+
     /**
      * Creates and returns a copy of this object.
-     * <P>Mutable second-class Objects are required to provide a public clone method in order to allow for copying persistable objects.
-     * In contrast to Object.clone(), this method must not throw a CloneNotSupportedException.
+     * <P>
+     * Mutable second-class Objects are required to provide a public clone method in order to allow for
+     * copying persistable objects. In contrast to Object.clone(), this method must not throw a
+     * CloneNotSupportedException.
      * @return The cloned object
      */
+    @Override
     public synchronized Object clone()
     {
         if (useCache)
@@ -336,12 +358,13 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
 
         return delegate.clone();
     }
-    
+
     /**
      * Method to return if the map contains this key
      * @param key The key
      * @return Whether it is contained
      **/
+    @Override
     public synchronized boolean containsKey(Object key)
     {
         if (useCache && isCacheLoaded)
@@ -353,15 +376,16 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         {
             return backingStore.containsKey(ownerOP, key);
         }
-        
+
         return delegate.containsKey(key);
     }
-    
+
     /**
      * Method to return if the map contains this value.
      * @param value The value
      * @return Whether it is contained
      **/
+    @Override
     public boolean containsValue(Object value)
     {
         if (useCache && isCacheLoaded)
@@ -373,14 +397,15 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         {
             return backingStore.containsValue(ownerOP, value);
         }
-        
+
         return delegate.containsValue(value);
     }
-    
+
     /**
      * Accessor for the set of entries in the Map.
      * @return Set of entries
      **/
+    @Override
     public java.util.Set entrySet()
     {
         if (useCache)
@@ -391,22 +416,23 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         {
             return new Set(ownerOP, ownerMmd, false, backingStore.entrySetStore());
         }
-        
+
         return delegate.entrySet();
     }
-    
+
     /**
      * Method to check the equality of this map, and another.
      * @param o The map to compare against.
      * @return Whether they are equal.
      **/
+    @Override
     public synchronized boolean equals(Object o)
     {
         if (useCache)
         {
             loadFromStore();
         }
-        
+
         if (o == this)
         {
             return true;
@@ -415,8 +441,8 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         {
             return false;
         }
-        java.util.Map m = (java.util.Map)o;
-        
+        java.util.Map m = (java.util.Map) o;
+
         return entrySet().equals(m.entrySet());
     }
 
@@ -425,6 +451,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
      * @param key The key
      * @return The value.
      */
+    @Override
     public synchronized Object get(Object key)
     {
         if (useCache)
@@ -435,7 +462,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         {
             return backingStore.get(ownerOP, key);
         }
-        
+
         return delegate.get(key);
     }
 
@@ -444,6 +471,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
      * @param key The key
      * @return The value.
      */
+    @Override
     public synchronized String getProperty(String key)
     {
         if (useCache)
@@ -453,17 +481,18 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         else if (backingStore != null)
         {
             Object val = backingStore.get(ownerOP, key);
-            String strVal = (val instanceof String) ? (String)val : null;
+            String strVal = (val instanceof String) ? (String) val : null;
             return ((strVal == null) && (defaults != null)) ? defaults.getProperty(key) : strVal;
         }
 
         return delegate.getProperty(key);
     }
-    
+
     /**
      * Method to generate a hashcode for this Map.
      * @return The hashcode.
      **/
+    @Override
     public synchronized int hashCode()
     {
         if (useCache)
@@ -478,25 +507,27 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
             {
                 h += i.next().hashCode();
             }
-            
+
             return h;
         }
         return delegate.hashCode();
     }
-    
+
     /**
      * Method to return if the Map is empty.
      * @return Whether it is empty.
      **/
+    @Override
     public synchronized boolean isEmpty()
     {
         return size() == 0;
     }
-    
+
     /**
      * Accessor for the set of keys in the Map.
      * @return Set of keys.
      **/
+    @Override
     public java.util.Set keySet()
     {
         if (useCache)
@@ -507,14 +538,15 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         {
             return new Set(ownerOP, ownerMmd, false, backingStore.keySetStore());
         }
-        
+
         return delegate.keySet();
     }
-    
+
     /**
      * Method to return the size of the Map.
      * @return The size
      **/
+    @Override
     public synchronized int size()
     {
         if (useCache && isCacheLoaded)
@@ -526,14 +558,15 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         {
             return backingStore.entrySetStore().size(ownerOP);
         }
-        
+
         return delegate.size();
     }
-    
+
     /**
      * Accessor for the set of values in the Map.
      * @return Set of values.
      **/
+    @Override
     public Collection values()
     {
         if (useCache)
@@ -544,20 +577,21 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         {
             return new org.datanucleus.store.types.wrappers.backed.Collection(ownerOP, ownerMmd, true, backingStore.valueCollectionStore());
         }
-        
+
         return delegate.values();
     }
-    
+
     // -------------------------------- Mutator methods ------------------------
-    
+
     /**
      * Method to clear the Hashtable
      **/
+    @Override
     public synchronized void clear()
     {
         makeDirty();
         delegate.clear();
-        
+
         if (backingStore != null)
         {
             if (SCOUtils.useQueuedUpdate(ownerOP))
@@ -575,14 +609,15 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
             ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
     }
-    
+
     /**
      * Method to add a value against a key to the Hashtable
      * @param key The key
      * @param value The value
      * @return The previous value for the specified key.
      **/
-    public synchronized Object put(Object key,Object value)
+    @Override
+    public synchronized Object put(Object key, Object value)
     {
         // Reject inappropriate elements
         if (!allowNulls)
@@ -633,11 +668,12 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
         }
         return oldValue;
     }
-    
+
     /**
      * Method to add the specified Map's values under their keys here.
      * @param m The map
      **/
+    @Override
     public synchronized void putAll(java.util.Map m)
     {
         makeDirty();
@@ -655,13 +691,13 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                 Iterator iter = m.entrySet().iterator();
                 while (iter.hasNext())
                 {
-                    Map.Entry entry = (Map.Entry)iter.next();
+                    Map.Entry entry = (Map.Entry) iter.next();
                     ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, entry.getKey(), entry.getValue()));
                 }
             }
             else
             {
-                backingStore.putAll(ownerOP, m);
+                backingStore.putAll(ownerOP, m, useCache ? Collections.unmodifiableMap(delegate) : null);
             }
         }
         delegate.putAll(m);
@@ -671,12 +707,13 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
             ownerOP.getExecutionContext().processNontransactionalUpdate();
         }
     }
-    
+
     /**
      * Method to remove the value for a key from the Hashtable
      * @param key The key to remove
      * @return The value that was removed from this key.
      **/
+    @Override
     public synchronized Object remove(Object key)
     {
         makeDirty();
@@ -719,24 +756,23 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
      * @param value The value
      * @return The previous value for the specified key.
      */
+    @Override
     public synchronized Object setProperty(String key, String value)
     {
         return put(key, value);
     }
 
     /**
-     * The writeReplace method is called when ObjectOutputStream is preparing
-     * to write the object to the stream. The ObjectOutputStream checks whether
-     * the class defines the writeReplace method. If the method is defined, the
-     * writeReplace method is called to allow the object to designate its
-     * replacement in the stream. The object returned should be either of the
-     * same type as the object passed in or an object that when read and 
-     * resolved will result in an object of a type that is compatible with all
-     * references to the object.
-     * 
+     * The writeReplace method is called when ObjectOutputStream is preparing to write the object to the
+     * stream. The ObjectOutputStream checks whether the class defines the writeReplace method. If the method
+     * is defined, the writeReplace method is called to allow the object to designate its replacement in the
+     * stream. The object returned should be either of the same type as the object passed in or an object that
+     * when read and resolved will result in an object of a type that is compatible with all references to the
+     * object.
      * @return the replaced object
      * @throws ObjectStreamException if an error occurs
      */
+    @Override
     protected Object writeReplace() throws ObjectStreamException
     {
         if (useCache)
