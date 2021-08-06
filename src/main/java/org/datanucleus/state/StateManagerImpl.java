@@ -3010,12 +3010,17 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                     loadedOldValue = true;
                     oldValue = provideField(fieldNumber);
                 }
-
-                if (relationType != RelationType.NONE && newValue == null && (mmd.isDependent() || mmd.isCascadeRemoveOrphans()))
+                else if (relationType != RelationType.NONE && newValue == null && (mmd.isDependent() || mmd.isCascadeRemoveOrphans()))
                 {
                     // Field being nulled and is dependent so load the existing value so it can be deleted
                     loadField(fieldNumber);
                     loadedOldValue = true;
+                    oldValue = provideField(fieldNumber);
+                }
+                else if (relationType == RelationType.NONE && cmd.getSCOContainerMemberFlags()[fieldNumber])
+                {
+                    // Situation such as SCO field being replaced by "new HashMap(...)" so old value not loaded yet
+                    loadField(fieldNumber);
                     oldValue = provideField(fieldNumber);
                 }
                 // TODO When field has relation consider loading it always for managed relations
@@ -3080,7 +3085,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                     }
                     if (!equalButContainerRefChanged)
                     {
-                        ((SCO) oldValue).unsetOwner();
+                        ((SCO)oldValue).unsetOwner();
                     }
                 }
                 if (newValue instanceof SCO)

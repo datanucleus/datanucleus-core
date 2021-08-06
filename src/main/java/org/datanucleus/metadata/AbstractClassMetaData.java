@@ -210,6 +210,8 @@ public abstract class AbstractClassMetaData extends MetaData
     /** Flags of the SCO mutable state for all fields/properties. */
     protected boolean[] scoMutableMemberFlags;
 
+    protected boolean[] scoContainerMemberFlags;
+
     /** Absolute positions of all SCO fields/properties that aren't containers. */
     protected int[] scoNonContainerMemberPositions = null;
 
@@ -2618,6 +2620,32 @@ public abstract class AbstractClassMetaData extends MetaData
     {
         checkInitialised();
         return scoMutableMemberFlags;
+    }
+
+    /**
+     * Accessor for the flags of whether members are SCO "containers" (Collection/Map)
+     * @return The array of SCO container flags
+     */
+    public boolean[] getSCOContainerMemberFlags()
+    {
+        if (scoContainerMemberFlags == null)
+        {
+            checkInitialised();
+            scoContainerMemberFlags = new boolean[memberCount];
+            for (int i=0;i<memberCount;i++)
+            {
+                AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePositionInternal(i);
+                if (java.util.Collection.class.isAssignableFrom(mmd.getType()) || java.util.Map.class.isAssignableFrom(mmd.getType()))
+                {
+                    scoContainerMemberFlags[i] = true;
+                }
+                else
+                {
+                    scoContainerMemberFlags[i] = false;
+                }
+            }
+        }
+        return scoContainerMemberFlags;
     }
 
     /**

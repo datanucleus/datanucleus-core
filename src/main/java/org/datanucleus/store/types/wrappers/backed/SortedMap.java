@@ -155,14 +155,7 @@ public class SortedMap<K, V> extends org.datanucleus.store.types.wrappers.Sorted
                     else
                     {
                         backingStore.clear(ownerOP);
-                        if (useCache)
-                        {
-                            backingStore.putAll(ownerOP, newValue, Collections.emptyMap());
-                        }
-                        else
-                        {
-                            backingStore.putAll(ownerOP, newValue);
-                        }
+                        backingStore.putAll(ownerOP, newValue, Collections.emptyMap());
                     }
                 }
                 delegate.putAll(newValue);

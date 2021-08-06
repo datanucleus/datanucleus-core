@@ -148,14 +148,7 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
                     else
                     {
                         backingStore.clear(ownerOP);
-                        if (useCache)
-                        {
-                            backingStore.putAll(ownerOP, newValue, Collections.emptyMap());
-                        }
-                        else
-                        {
-                            backingStore.putAll(ownerOP, newValue);
-                        }
+                        backingStore.putAll(ownerOP, newValue, Collections.emptyMap());
                     }
                 }
                 delegate.putAll(newValue);
