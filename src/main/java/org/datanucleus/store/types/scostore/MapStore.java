@@ -97,6 +97,17 @@ public interface MapStore<K, V> extends Store
     void putAll(ObjectProvider op, Map<? extends K, ? extends V> m);
 
     /**
+     * Method to add a map of values to the Map where we know the existing Map values prior to the putAll call.
+     * @param op ObjectProvider for the owner of the map.
+     * @param m The map to add.
+     * @param delegate The map prior to the putAll call.
+     */
+    default void putAll(ObjectProvider<?> op, Map<? extends K, ? extends V> m, Map<K, V> delegate)
+    {
+        putAll(op, m);
+    }
+
+    /**
      * Method to remove a value from the Map.
      * @param op ObjectProvider for the owner of the map. 
      * @param key Key whose value is to be removed.

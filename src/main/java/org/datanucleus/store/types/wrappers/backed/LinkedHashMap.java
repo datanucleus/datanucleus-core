@@ -20,6 +20,7 @@ package org.datanucleus.store.types.wrappers.backed;
 
 import java.io.ObjectStreamException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.Map;
@@ -664,7 +665,14 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
             }
             else
             {
-                backingStore.putAll(ownerOP, m);
+                if (useCache)
+                {
+                    backingStore.putAll(ownerOP, m, Collections.unmodifiableMap(delegate));
+                }
+                else
+                {
+                    backingStore.putAll(ownerOP, m);
+                }
             }
         }
         delegate.putAll(m);
