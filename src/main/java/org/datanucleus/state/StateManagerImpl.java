@@ -3017,7 +3017,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
                     loadedOldValue = true;
                     oldValue = provideField(fieldNumber);
                 }
-                else if (relationType == RelationType.NONE && cmd.getSCOContainerMemberFlags()[fieldNumber])
+                else if (relationType == RelationType.NONE && cmd.getSCOContainerMemberFlags()[fieldNumber] && !mmd.isSerialized())
                 {
                     // Situation such as SCO field being replaced by "new HashMap(...)" so old value not loaded yet
                     loadField(fieldNumber);

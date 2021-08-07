@@ -2546,7 +2546,7 @@ public abstract class AbstractClassMetaData extends MetaData
         checkInitialised();
         if (scoNonContainerMemberPositions == null)
         {
-            int[] noncontainerMemberPositions;
+            // Find number of SCO mutable members that are not SCO containers
             int numberNonContainerSCOFields = 0;
             for (int scoMutableMemberPosition : scoMutableMemberPositions)
             {
@@ -2557,59 +2557,18 @@ public abstract class AbstractClassMetaData extends MetaData
                 }
             }
 
-            noncontainerMemberPositions = new int[numberNonContainerSCOFields];
+            scoNonContainerMemberPositions = new int[numberNonContainerSCOFields];
             int nonContNum = 0;
             for (int scoMutableMemberPosition : scoMutableMemberPositions)
             {
                 AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePosition(scoMutableMemberPosition);
                 if (!(java.util.Collection.class.isAssignableFrom(mmd.getType())) && !(java.util.Map.class.isAssignableFrom(mmd.getType())))
                 {
-                    noncontainerMemberPositions[nonContNum++] = scoMutableMemberPosition;
+                    scoNonContainerMemberPositions[nonContNum++] = scoMutableMemberPosition;
                 }
             }
-
-            scoNonContainerMemberPositions = noncontainerMemberPositions;
         }
         return scoNonContainerMemberPositions;
-    }
-
-    /** Positions of all SCO fields/properties that are containers. */
-    protected int[] secondClassContainerMemberPositions = null;
-
-    /**
-     * Accessor for the absolute positions of all SCO fields/properties that are containers.
-     * @return Positions of all SCO container fields/properties.
-     */
-    public int[] getSCOContainerMemberPositions()
-    {
-        checkInitialised();
-        if (secondClassContainerMemberPositions == null)
-        {
-            int[] containerMemberPositions;
-            int numberContainerSCOFields = 0;
-            for (int scoMutableMemberPosition : scoMutableMemberPositions)
-            {
-                AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePosition(scoMutableMemberPosition);
-                if (java.util.Collection.class.isAssignableFrom(mmd.getType()) || java.util.Map.class.isAssignableFrom(mmd.getType()))
-                {
-                    numberContainerSCOFields++;
-                }
-            }
-
-            containerMemberPositions = new int[numberContainerSCOFields];
-            int contNum = 0;
-            for (int scoMutableMemberPosition : scoMutableMemberPositions)
-            {
-                AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePosition(scoMutableMemberPosition);
-                if (java.util.Collection.class.isAssignableFrom(mmd.getType()) || java.util.Map.class.isAssignableFrom(mmd.getType()))
-                {
-                    containerMemberPositions[contNum++] = scoMutableMemberPosition;
-                }
-            }
-
-            secondClassContainerMemberPositions = containerMemberPositions;
-        }
-        return secondClassContainerMemberPositions;
     }
 
     /**
@@ -2623,7 +2582,7 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
-     * Accessor for the flags of whether members are SCO "containers" (Collection/Map)
+     * Accessor for the flags of whether members are SCO "containers" (Collection/Map/array).
      * @return The array of SCO container flags
      */
     public boolean[] getSCOContainerMemberFlags()
@@ -2635,7 +2594,7 @@ public abstract class AbstractClassMetaData extends MetaData
             for (int i=0;i<memberCount;i++)
             {
                 AbstractMemberMetaData mmd = getMetaDataForManagedMemberAtAbsolutePositionInternal(i);
-                if (java.util.Collection.class.isAssignableFrom(mmd.getType()) || java.util.Map.class.isAssignableFrom(mmd.getType()))
+                if (java.util.Collection.class.isAssignableFrom(mmd.getType()) || java.util.Map.class.isAssignableFrom(mmd.getType()) || mmd.getType().isArray())
                 {
                     scoContainerMemberFlags[i] = true;
                 }
