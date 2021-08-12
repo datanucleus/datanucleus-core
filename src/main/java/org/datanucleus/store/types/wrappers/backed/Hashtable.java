@@ -612,6 +612,10 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, key, value));
             }
+            else if(useCache && value != delegate.get(key))
+            {
+                // no-op
+            }
             else
             {
                 oldValue = backingStore.put(ownerOP, key, value);
@@ -702,6 +706,10 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerOP, backingStore, key, delegateRemoved));
                 removed = delegateRemoved;
+            }
+            else if (useCache)
+            {
+                removed = backingStore.remove(ownerOP, key, delegateRemoved);
             }
             else
             {
