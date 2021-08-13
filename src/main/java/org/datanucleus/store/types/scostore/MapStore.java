@@ -90,6 +90,19 @@ public interface MapStore<K, V> extends Store
     V put(ObjectProvider op, K key, V value);
 
     /**
+     * Method to add a value to the Map against this key, where we know the previous value for the key (if present).
+     * @param op ObjectProvider for the owner of the map. 
+     * @param key The key.
+     * @param value The value.
+     * @param previousValue The previous value
+     * @param present Whether the key is present
+     */
+    default void put(ObjectProvider op, K key, V value, V previousValue, boolean present)
+    {
+        put(op, key, value);
+    }
+
+    /**
      * Method to add a map of values to the Map.
      * @param op ObjectProvider for the owner of the map. 
      * @param m The map to add.
@@ -100,9 +113,9 @@ public interface MapStore<K, V> extends Store
      * Method to add a map of values to the Map where we know the existing Map values prior to the putAll call.
      * @param op ObjectProvider for the owner of the map.
      * @param m The map to add.
-     * @param delegate The map prior to the putAll call.
+     * @param previousMap The map prior to the putAll call.
      */
-    default void putAll(ObjectProvider<?> op, Map<? extends K, ? extends V> m, Map<K, V> delegate)
+    default void putAll(ObjectProvider<?> op, Map<? extends K, ? extends V> m, Map<K, V> previousMap)
     {
         putAll(op, m);
     }
@@ -116,11 +129,11 @@ public interface MapStore<K, V> extends Store
     V remove(ObjectProvider op, Object key);
 
     /**
-     * Method to remove a value from the Map.
+     * Method to remove a value from the Map where we know the value assigned to this key (to avoid lookups).
      * @param op ObjectProvider for the owner of the map. 
      * @param key Key whose value is to be removed.
      * @param val Value for this key when the value is known (to save the lookup)
-     * @return Value that was removed.
+     * @return Value that was removed. TODO Remove the return type since we know the value when calling this method
      */
     V remove(ObjectProvider op, Object key, Object val);
 

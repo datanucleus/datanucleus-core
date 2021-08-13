@@ -666,6 +666,11 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, key, value));
             }
+            else if (useCache)
+            {
+                oldValue = delegate.get(key);
+                backingStore.put(ownerOP, key, value, oldValue, delegate.containsKey(key));
+            }
             else
             {
                 oldValue = backingStore.put(ownerOP, key, value);

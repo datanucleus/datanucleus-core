@@ -763,6 +763,11 @@ public class TreeMap<K, V> extends org.datanucleus.store.types.wrappers.TreeMap<
             {
                 ownerOP.getExecutionContext().addOperationToQueue(new MapPutOperation(ownerOP, backingStore, key, value));
             }
+            else if (useCache)
+            {
+                oldValue = delegate.get(key);
+                backingStore.put(ownerOP, key, value, oldValue, delegate.containsKey(key));
+            }
             else
             {
                 oldValue = backingStore.put(ownerOP, key, value);
