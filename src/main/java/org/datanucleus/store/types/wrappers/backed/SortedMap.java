@@ -854,6 +854,10 @@ public class SortedMap<K, V> extends org.datanucleus.store.types.wrappers.Sorted
                 ownerOP.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerOP, backingStore, key, delegateRemoved));
                 removed = delegateRemoved;
             }
+            else if (useCache)
+            {
+                removed = backingStore.remove(ownerOP, key, delegateRemoved);
+            }
             else
             {
                 removed = backingStore.remove(ownerOP, key);

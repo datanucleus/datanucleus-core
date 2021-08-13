@@ -707,6 +707,10 @@ public class LinkedHashMap<K, V> extends org.datanucleus.store.types.wrappers.Li
                 ownerOP.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerOP, backingStore, key, delegateRemoved));
                 removed = delegateRemoved;
             }
+            else if (useCache)
+            {
+                removed = backingStore.remove(ownerOP, key, delegateRemoved);
+            }
             else
             {
                 removed = backingStore.remove(ownerOP, key);

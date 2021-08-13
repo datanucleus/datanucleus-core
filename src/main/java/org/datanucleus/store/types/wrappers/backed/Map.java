@@ -757,6 +757,10 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
                 ownerOP.getExecutionContext().addOperationToQueue(new MapRemoveOperation(ownerOP, backingStore, key, delegateRemoved));
                 removed = delegateRemoved;
             }
+            else if (useCache)
+            {
+                removed = backingStore.remove(ownerOP, key, delegateRemoved);
+            }
             else
             {
                 removed = backingStore.remove(ownerOP, key);
