@@ -133,9 +133,8 @@ public interface MapStore<K, V> extends Store
      * @param op ObjectProvider for the owner of the map. 
      * @param key Key whose value is to be removed.
      * @param val Value for this key when the value is known (to save the lookup)
-     * @return Value that was removed. TODO Remove the return type since we know the value when calling this method
      */
-    V remove(ObjectProvider op, Object key, Object val);
+    void remove(ObjectProvider op, Object key, Object val);
 
     /**
      * Method to clear the map.

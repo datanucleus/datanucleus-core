@@ -764,7 +764,8 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
             }
             else if (useCache)
             {
-                removed = backingStore.remove(ownerOP, key, delegateRemoved);
+                backingStore.remove(ownerOP, key, delegateRemoved);
+                removed = delegateRemoved;
             }
             else
             {

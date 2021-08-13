@@ -710,7 +710,8 @@ public class Hashtable<K, V> extends org.datanucleus.store.types.wrappers.Hashta
             }
             else if (useCache)
             {
-                removed = backingStore.remove(ownerOP, key, delegateRemoved);
+                backingStore.remove(ownerOP, key, delegateRemoved);
+                removed = delegateRemoved;
             }
             else
             {

@@ -711,7 +711,8 @@ public class Properties extends org.datanucleus.store.types.wrappers.Properties 
             }
             else if (useCache)
             {
-                removed = backingStore.remove(ownerOP, key, delegateRemoved);
+                backingStore.remove(ownerOP, key, delegateRemoved);
+                removed = delegateRemoved;
             }
             else
             {

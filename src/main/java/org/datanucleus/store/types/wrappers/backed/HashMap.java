@@ -704,7 +704,8 @@ public class HashMap<K, V> extends org.datanucleus.store.types.wrappers.HashMap<
             }
             else if (useCache)
             {
-                removed = backingStore.remove(ownerOP, key, delegateRemoved);
+                backingStore.remove(ownerOP, key, delegateRemoved);
+                removed = delegateRemoved;
             }
             else
             {
