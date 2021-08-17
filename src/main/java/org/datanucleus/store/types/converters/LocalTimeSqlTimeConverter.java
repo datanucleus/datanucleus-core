@@ -38,6 +38,7 @@ public class LocalTimeSqlTimeConverter implements TypeConverter<LocalTime, Time>
         {
             return null;
         }
+        // TODO return time.toLocalTime
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(time.getTime()), ZoneId.systemDefault()).toLocalTime();
     }
 
@@ -47,6 +48,7 @@ public class LocalTimeSqlTimeConverter implements TypeConverter<LocalTime, Time>
         {
             return null;
         }
+        // TODO return Time.valueOf(time)
         return new Time(Date.from(time.atDate(LocalDate.now()).atZone(ZoneId.systemDefault()).toInstant()).getTime());
     }
 }
