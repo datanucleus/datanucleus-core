@@ -694,7 +694,6 @@ public class CompleteClassTable implements Table
                 columnByName.put(col.getName(), col);
             }
         }
-//        NucleusLogger.GENERAL.info(">> " + debugString());
     }
 
     protected TypeConverter getTypeConverterForMember(AbstractMemberMetaData mmd, ColumnMetaData[] colmds, TypeManager typeMgr)
@@ -741,7 +740,7 @@ public class CompleteClassTable implements Table
             }
             else
             {
-                // Single column, so try to match the JDBC type if provided
+                // Single column, so try to match the JDBC type IF provided
                 JdbcType jdbcType = colmds != null && colmds.length > 0 ? colmds[0].getJdbcType() : null;
                 if (jdbcType != null)
                 {
@@ -771,7 +770,8 @@ public class CompleteClassTable implements Table
                 else
                 {
                     // Fallback to default type converter for this member type (if any)
-                    typeConv = typeMgr.getDefaultTypeConverterForType(mmd.getType());
+                    // NOTE We disable this because each datastore may choose to support other types so it should be for those to set any fallback TypeConverter
+                    //typeConv = typeMgr.getDefaultTypeConverterForType(mmd.getType());
                 }
             }
         }
