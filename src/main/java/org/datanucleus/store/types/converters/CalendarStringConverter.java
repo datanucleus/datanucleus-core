@@ -18,22 +18,23 @@ Contributors:
 package org.datanucleus.store.types.converters;
 
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.util.Localiser;
 
 /**
  * Class to handle the conversion between java.util.Calendar and a String form.
- * The String form follows the format "EEE MMM dd HH:mm:ss zzz yyyy". That is, milliseconds are not retained currently.
+ * Uses java.time.Instant as an intermediary.
+ * Results in a String form like "2021-08-17T09:19:01.585Z".
  */
 public class CalendarStringConverter implements TypeConverter<Calendar, String>, ColumnLengthDefiningTypeConverter
 {
     private static final long serialVersionUID = -4905708644688677004L;
-
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy");
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.types.converters.ColumnLengthDefiningTypeConverter#getDefaultColumnLength(int)
@@ -57,9 +58,9 @@ public class CalendarStringConverter implements TypeConverter<Calendar, String>,
 
         try
         {
-            Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(Instant.from(FORMATTER.parse(str)).toEpochMilli());
-            return cal;
+            Instant inst = Instant.parse(str);
+            ZonedDateTime zdt = ZonedDateTime.ofInstant(inst, ZoneId.systemDefault());
+            return GregorianCalendar.from(zdt);
         }
         catch (DateTimeParseException pe)
         {
@@ -69,6 +70,6 @@ public class CalendarStringConverter implements TypeConverter<Calendar, String>,
 
     public String toDatastoreType(Calendar cal)
     {
-        return cal != null ? FORMATTER.format(cal.getTime().toInstant()) : null;
+        return cal != null ? cal.toInstant().toString() : null;
     }
 }
