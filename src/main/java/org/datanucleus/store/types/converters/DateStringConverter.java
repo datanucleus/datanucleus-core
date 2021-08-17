@@ -18,22 +18,17 @@ Contributors:
 package org.datanucleus.store.types.converters;
 
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.time.ZoneId;
 import java.util.Date;
-
-import org.datanucleus.exceptions.NucleusDataStoreException;
-import org.datanucleus.util.Localiser;
 
 /**
  * Class to handle the conversion between java.util.Date and a String form.
- * The String form follows the format "EEE MMM dd HH:mm:ss zzz yyyy". That is, milliseconds are not retained currently.
+ * Uses java.time.Instant as an intermediary.
+ * Results in a String form like "2021-08-17T09:19:01.585Z".
  */
 public class DateStringConverter implements TypeConverter<Date, String>, ColumnLengthDefiningTypeConverter
 {
     private static final long serialVersionUID = 4638239842151376340L;
-
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy");
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.types.converters.ColumnLengthDefiningTypeConverter#getDefaultColumnLength(int)
@@ -55,18 +50,17 @@ public class DateStringConverter implements TypeConverter<Date, String>, ColumnL
             return null;
         }
 
-        try
-        {
-            return Date.from(Instant.from(FORMATTER.parse(str)));
-        }
-        catch (DateTimeParseException pe)
-        {
-            throw new NucleusDataStoreException(Localiser.msg("016002", str, Date.class.getName()), pe);
-        }
+        Instant inst = Instant.parse(str);
+        return Date.from(inst.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     public String toDatastoreType(Date date)
     {
-        return date != null ? FORMATTER.format(date.toInstant()) : null;
+        if (date == null)
+        {
+            return null;
+        }
+
+        return date.toInstant().toString();
     }
 }
