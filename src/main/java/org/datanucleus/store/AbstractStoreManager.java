@@ -102,7 +102,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     protected PersistenceNucleusContext nucleusContext;
 
     /** Manager for value generation. */
-    protected ValueGenerationManager valueGenerationMgr = new ValueGenerationManagerImpl(this);
+    protected ValueGenerationManager valueGenerationMgr = null;
 
     /** Manager for the data definition in the datastore. */
     protected StoreDataManager storeDataMgr = new StoreDataManager();
@@ -136,6 +136,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     {
         this.storeManagerKey = key;
         this.nucleusContext = nucleusContext;
+
         if (props != null)
         {
             // Store the properties for this datastore
@@ -149,6 +150,8 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
 
         // Set up connection handling
         registerConnectionMgr();
+
+        this.valueGenerationMgr = new ValueGenerationManagerImpl(this);
 
         nucleusContext.addExecutionContextListener(new ExecutionContext.LifecycleListener()
         {
