@@ -1695,33 +1695,56 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     }
 
     /**
-     * Method to retrieve an object.
-     * @param obj The object
-     * @param fgOnly Whether to retrieve the current fetch group fields only
+     * Method to retrieve fields for objects.
+     * @param useFetchPlan Whether to use the current fetch plan
+     * @param pcs The objects to retrieve the fields for
      */
-    public void retrieveObject(Object obj, boolean fgOnly)
+    public void retrieveObjects(boolean useFetchPlan, Object... pcs)
     {
-        if (obj == null)
+        if (pcs == null || pcs.length == 0)
         {
             return;
         }
 
-        try
+        // TODO Consider doing these in bulk where possible if several objects of the same type
+        List failures = null;
+        for (Object pc : pcs)
         {
-            clr.setPrimary(obj.getClass().getClassLoader());
-            assertClassPersistable(obj.getClass());
-            assertNotDetached(obj);
-
-            ObjectProvider op = findObjectProvider(obj);
-            if (op == null)
+            if (pc == null)
             {
-                throw new NucleusUserException(Localiser.msg("010048", StringUtils.toJVMIDString(obj), getApiAdapter().getIdForObject(obj), "retrieve"));
+                continue;
             }
-            op.retrieve(fgOnly);
+
+            try
+            {
+                clr.setPrimary(pc.getClass().getClassLoader());
+                assertClassPersistable(pc.getClass());
+                assertNotDetached(pc);
+
+                ObjectProvider op = findObjectProvider(pc);
+                if (op == null)
+                {
+                    throw new NucleusUserException(Localiser.msg("010048", StringUtils.toJVMIDString(pc), getApiAdapter().getIdForObject(pc), "retrieve"));
+                }
+                op.retrieve(useFetchPlan);
+            }
+            catch (RuntimeException e)
+            {
+                if (failures == null)
+                {
+                    failures = new ArrayList();
+                }
+                failures.add(e);
+            }
+            finally
+            {
+                clr.unsetPrimary();
+            }
         }
-        finally
+
+        if (failures != null && !failures.isEmpty())
         {
-            clr.unsetPrimary();
+            throw new NucleusUserException(Localiser.msg("010037"), (Exception[]) failures.toArray(new Exception[failures.size()]));
         }
     }
 

@@ -197,13 +197,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void retrieveObject(Object obj, boolean fgOnly)
+    public void retrieveObjects(boolean useFetchPlan, Object... pcs)
     {
         try
         {
             lock.lock();
 
-            super.retrieveObject(obj, fgOnly);
+            super.retrieveObjects(useFetchPlan, pcs);
         }
         finally
         {

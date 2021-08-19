@@ -274,11 +274,11 @@ public interface ExecutionContext extends ExecutionContextReference
     void evictAllObjects();
 
     /**
-     * Method to retrieve the passed object.
-     * @param pc The object
-     * @param fgOnly Just retrieve the current fetch group
+     * Method to retrieve the (fields of the) passed object(s).
+     * @param useFetchPlan Whether to retrieve the current fetch plan
+     * @param pcs The objects
      */
-    void retrieveObject(Object pc, boolean fgOnly);
+    void retrieveObjects(boolean useFetchPlan, Object... pcs);
 
     /**
      * Method to persist the passed object.
