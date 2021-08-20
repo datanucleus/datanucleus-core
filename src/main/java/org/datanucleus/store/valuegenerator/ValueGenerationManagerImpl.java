@@ -103,10 +103,11 @@ public class ValueGenerationManagerImpl implements ValueGenerationManager
                 for (ConfigurationElement elem : elems)
                 {
                     // Assumed to not take any properties
+                    String valueGeneratorName = elem.getAttribute("name");
                     generator = (ValueGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store_valuegenerator", 
                         new String[] {"name", "unique"}, new String[] {elem.getName(), "true"},
-                        "class-name", new Class[] {StoreManager.class, String.class}, new Object[] {this, elem.getName()});
-                    uniqueGeneratorsByName.put(elem.getName(), generator);
+                        "class-name", new Class[] {StoreManager.class, String.class}, new Object[] {storeMgr, valueGeneratorName});
+                    uniqueGeneratorsByName.put(valueGeneratorName, generator);
                 }
             }
         }
