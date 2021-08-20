@@ -205,6 +205,12 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         nucleusContext = null;
     }
 
+    @Override
+    public boolean isClosed()
+    {
+        return nucleusContext == null;
+    }
+
     /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#getConnectionManager()
      */

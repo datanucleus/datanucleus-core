@@ -163,6 +163,8 @@ public interface StoreManager
 
     void close();
 
+    boolean isClosed();
+
     MetaDataManager getMetaDataManager();
 
     StorePersistenceHandler getPersistenceHandler();

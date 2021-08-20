@@ -193,6 +193,12 @@ public class FederatedStoreManager implements StoreManager
         nucleusContext = null;
     }
 
+    @Override
+    public boolean isClosed()
+    {
+        return nucleusContext == null;
+    }
+
     /**
      * Accessor for the StoreManager to use for persisting the specified class.
      * TODO Extend this so that we can persist some objects of one type into one datastore, and other
