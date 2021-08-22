@@ -25,22 +25,22 @@ import org.datanucleus.store.types.scostore.Store;
 /**
  * Set operation for a list where we have a backing store.
  */
-public class ListSetOperation implements SCOOperation
+public class ListSetOperation<E> implements SCOOperation
 {
     final ObjectProvider op;
     final int fieldNumber;
-    final ListStore store;
+    final ListStore<E> store;
 
     /** The position to set the value at. */
     final int index;
 
     /** The value to set. */
-    final Object value;
+    final E value;
 
     /** Whether to allow cascade-delete checks. */
     boolean allowCascadeDelete = true;
 
-    public ListSetOperation(ObjectProvider op, ListStore store, int index, Object value, boolean allowCascadeDelete)
+    public ListSetOperation(ObjectProvider op, ListStore<E> store, int index, E value, boolean allowCascadeDelete)
     {
         this.op = op;
         this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
@@ -50,7 +50,7 @@ public class ListSetOperation implements SCOOperation
         this.allowCascadeDelete = allowCascadeDelete;
     }
 
-    public ListSetOperation(ObjectProvider op, int fieldNum, int index, Object value, boolean allowCascadeDelete)
+    public ListSetOperation(ObjectProvider op, int fieldNum, int index, E value, boolean allowCascadeDelete)
     {
         this.op = op;
         this.fieldNumber = fieldNum;

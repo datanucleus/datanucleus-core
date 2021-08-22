@@ -28,19 +28,19 @@ import org.datanucleus.util.StringUtils;
  * This is usually for the situation where we have a backing store, but also can be used where we are removing an object from a collection and
  * the field is marked as cascade delete but we don't want to delete immediately.
  */
-public class CollectionRemoveOperation implements SCOOperation
+public class CollectionRemoveOperation<E> implements SCOOperation
 {
     final ObjectProvider op;
     final int fieldNumber;
-    final CollectionStore store;
+    final CollectionStore<E> store;
 
     /** The value to remove. */
-    final Object value;
+    final E value;
 
     /** Whether to allow cascade-delete checks. */
     final boolean allowCascadeDelete;
 
-    public CollectionRemoveOperation(ObjectProvider op, CollectionStore store, Object value, boolean allowCascadeDelete)
+    public CollectionRemoveOperation(ObjectProvider op, CollectionStore<E> store, E value, boolean allowCascadeDelete)
     {
         this.op = op;
         this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
@@ -49,7 +49,7 @@ public class CollectionRemoveOperation implements SCOOperation
         this.allowCascadeDelete = allowCascadeDelete;
     }
 
-    public CollectionRemoveOperation(ObjectProvider op, int fieldNum, Object value, boolean allowCascadeDelete)
+    public CollectionRemoveOperation(ObjectProvider op, int fieldNum, E value, boolean allowCascadeDelete)
     {
         this.op = op;
         this.fieldNumber = fieldNum;
@@ -71,7 +71,7 @@ public class CollectionRemoveOperation implements SCOOperation
      * Accessor for the value being removed.
      * @return Value being removed
      */
-    public Object getValue()
+    public E getValue()
     {
         return value;
     }

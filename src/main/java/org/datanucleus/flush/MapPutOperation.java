@@ -25,19 +25,19 @@ import org.datanucleus.store.types.scostore.Store;
 /**
  * Put operation for a map where we have a backing store.
  */
-public class MapPutOperation implements SCOOperation
+public class MapPutOperation<K, V> implements SCOOperation
 {
     final ObjectProvider op;
     final int fieldNumber;
-    final MapStore store;
+    final MapStore<K, V> store;
 
     /** The key to add. */
-    final Object key;
+    final K key;
 
     /** The value to add. */
-    final Object value;
+    final V value;
 
-    public MapPutOperation(ObjectProvider op, MapStore store, Object key, Object value)
+    public MapPutOperation(ObjectProvider op, MapStore store, K key, V value)
     {
         this.op = op;
         this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
@@ -46,7 +46,7 @@ public class MapPutOperation implements SCOOperation
         this.value = value;
     }
 
-    public MapPutOperation(ObjectProvider op, int fieldNum, Object key, Object value)
+    public MapPutOperation(ObjectProvider op, int fieldNum, K key, V value)
     {
         this.op = op;
         this.fieldNumber = fieldNum;

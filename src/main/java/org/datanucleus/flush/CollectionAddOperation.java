@@ -26,16 +26,16 @@ import org.datanucleus.util.StringUtils;
 /**
  * Add operation for a collection where we have a backing store.
  */
-public class CollectionAddOperation implements SCOOperation
+public class CollectionAddOperation<E> implements SCOOperation
 {
     final ObjectProvider op;
     final int fieldNumber;
-    final CollectionStore store;
+    final CollectionStore<E> store;
 
     /** The value to add. */
-    final Object value;
+    final E value;
 
-    public CollectionAddOperation(ObjectProvider op, CollectionStore store, Object value)
+    public CollectionAddOperation(ObjectProvider op, CollectionStore<E> store, E value)
     {
         this.op = op;
         this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
@@ -43,7 +43,7 @@ public class CollectionAddOperation implements SCOOperation
         this.value = value;
     }
 
-    public CollectionAddOperation(ObjectProvider op, int fieldNum, Object value)
+    public CollectionAddOperation(ObjectProvider op, int fieldNum, E value)
     {
         this.op = op;
         this.fieldNumber = fieldNum;
@@ -64,7 +64,7 @@ public class CollectionAddOperation implements SCOOperation
      * Accessor for the value being added.
      * @return Value being added
      */
-    public Object getValue()
+    public E getValue()
     {
         return value;
     }

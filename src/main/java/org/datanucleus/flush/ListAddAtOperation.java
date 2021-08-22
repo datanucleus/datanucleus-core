@@ -23,18 +23,18 @@ import org.datanucleus.store.types.scostore.ListStore;
 /**
  * Add operation at a position for a list where we have a backing store.
  */
-public class ListAddAtOperation extends CollectionAddOperation
+public class ListAddAtOperation<E> extends CollectionAddOperation<E>
 {
     /** Index to add the object at. */
     final int index;
 
-    public ListAddAtOperation(ObjectProvider op, ListStore store, int index, Object value)
+    public ListAddAtOperation(ObjectProvider op, ListStore<E> store, int index, E value)
     {
         super(op, store, value);
         this.index = index;
     }
 
-    public ListAddAtOperation(ObjectProvider op, int fieldNum, int index, Object value)
+    public ListAddAtOperation(ObjectProvider op, int fieldNum, int index, E value)
     {
         super(op, fieldNum, value);
         this.index = index;

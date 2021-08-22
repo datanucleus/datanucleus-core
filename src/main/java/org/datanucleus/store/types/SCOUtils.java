@@ -823,30 +823,28 @@ public class SCOUtils
      * @param store The Store
      * @param ownerOP ObjectProvider of the owner of the map.
      */
-    public static void populateMapDelegateWithStoreData(Map delegate, MapStore store, ObjectProvider ownerOP)
+    public static <K, V> void populateMapDelegateWithStoreData(Map<K, V> delegate, MapStore<K, V> store, ObjectProvider ownerOP)
     {
-        // If we have persistable keys then load them. The keys query will pull in the key fetch plan
-        // so this instantiates them in the cache
-        java.util.Set keys = new java.util.HashSet();
+        // If we have persistable keys then load them. The keys query will pull in the key fetch plan so this instantiates them in the cache
+        java.util.Set<K> keys = new java.util.HashSet<>();
         if (!store.keysAreEmbedded() && !store.keysAreSerialised())
         {
             // Retrieve the persistable keys
-            SetStore keystore = store.keySetStore();
-            Iterator keyIter = keystore.iterator(ownerOP);
+            SetStore<K> keystore = store.keySetStore();
+            Iterator<K> keyIter = keystore.iterator(ownerOP);
             while (keyIter.hasNext())
             {
                 keys.add(keyIter.next());
             }
         }
 
-        // If we have persistable values then load them. The values query will pull in the value fetch plan
-        // so this instantiates them in the cache
-        java.util.List values = new java.util.ArrayList();
+        // If we have persistable values then load them. The values query will pull in the value fetch plan so this instantiates them in the cache
+        java.util.List<V> values = new java.util.ArrayList<>();
         if (!store.valuesAreEmbedded() && !store.valuesAreSerialised())
         {
             // Retrieve the persistable values
-            CollectionStore valuestore = store.valueCollectionStore();
-            Iterator valueIter = valuestore.iterator(ownerOP);
+            CollectionStore<V> valuestore = store.valueCollectionStore();
+            Iterator<V> valueIter = valuestore.iterator(ownerOP);
             while (valueIter.hasNext())
             {
                 values.add(valueIter.next());
@@ -855,13 +853,14 @@ public class SCOUtils
 
         // Retrieve the entries (key-value pairs so we can associate them)
         // TODO Ultimately would like to just call this, but the entry query can omit the inheritance level of a key or value
-        SetStore entries = store.entrySetStore();
-        Iterator entryIter = entries.iterator(ownerOP);
+        // Likely the best thing to do is check for inheritance in key/value persistable types and if none then do in single entry call
+        SetStore<Map.Entry<K, V>> entries = store.entrySetStore();
+        Iterator<Map.Entry<K, V>> entryIter = entries.iterator(ownerOP);
         while (entryIter.hasNext())
         {
-            Map.Entry entry = (Map.Entry) entryIter.next();
-            Object key = entry.getKey();
-            Object value = entry.getValue();
+            Map.Entry<K, V> entry = entryIter.next();
+            K key = entry.getKey();
+            V value = entry.getValue();
             delegate.put(key, value);
         }
 

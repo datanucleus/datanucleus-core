@@ -146,19 +146,19 @@ public interface MapStore<K, V> extends Store
      * Accessor for a backing store representing the key set for the Map.
      * @return Keys for the Map.
      */
-    SetStore keySetStore();
+    SetStore<K> keySetStore();
 
     /**
      * Accessor for a backing store representing the values in the Map.
      * @return Values for the Map.
      */
-    CollectionStore valueCollectionStore();
+    CollectionStore<V> valueCollectionStore();
 
     /**
      * Accessor for a backing store representing the entry set for the Map.
      * @return Entry set for the Map.
      */
-    SetStore entrySetStore();
+    SetStore<Map.Entry<K,V>> entrySetStore();
 
     /**
      * Method to update an embedded key in the map.

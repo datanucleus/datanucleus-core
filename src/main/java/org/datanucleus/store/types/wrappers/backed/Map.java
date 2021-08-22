@@ -280,8 +280,7 @@ public class Map<K, V> extends org.datanucleus.store.types.wrappers.Map<K, V> im
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", 
-                    ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("023006", ownerOP.getObjectAsPrintable(), ownerMmd.getName()));
             }
             delegate.clear();
 

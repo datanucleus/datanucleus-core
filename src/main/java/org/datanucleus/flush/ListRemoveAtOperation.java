@@ -25,18 +25,18 @@ import org.datanucleus.store.types.scostore.Store;
 /**
  * Remove operation for a list at a particular index where we have a backing store.
  */
-public class ListRemoveAtOperation extends CollectionRemoveOperation
+public class ListRemoveAtOperation<E> extends CollectionRemoveOperation<E>
 {
     /** The index to remove. */
     final int index;
 
-    public ListRemoveAtOperation(ObjectProvider op, ListStore store, int index)
+    public ListRemoveAtOperation(ObjectProvider op, ListStore<E> store, int index)
     {
         super(op, store, null, true);
         this.index = index;
     }
 
-    public ListRemoveAtOperation(ObjectProvider op, int fieldNum, int index, Object value)
+    public ListRemoveAtOperation(ObjectProvider op, int fieldNum, int index, E value)
     {
         super(op, fieldNum, value, true);
         this.index = index;

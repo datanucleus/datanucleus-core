@@ -25,19 +25,19 @@ import org.datanucleus.store.types.scostore.Store;
 /**
  * Remove operation for a map where we have a backing store.
  */
-public class MapRemoveOperation implements SCOOperation
+public class MapRemoveOperation<K, V> implements SCOOperation
 {
     final ObjectProvider op;
     final int fieldNumber;
-    final MapStore store;
+    final MapStore<K, V> store;
 
     /** The key to remove. */
-    final Object key;
+    final K key;
 
     /** The value to remove. */
-    final Object value;
+    final V value;
 
-    public MapRemoveOperation(ObjectProvider op, MapStore store, Object key, Object val)
+    public MapRemoveOperation(ObjectProvider op, MapStore store, K key, V val)
     {
         this.op = op;
         this.fieldNumber = store.getOwnerMemberMetaData().getAbsoluteFieldNumber();
@@ -46,7 +46,7 @@ public class MapRemoveOperation implements SCOOperation
         this.value = val;
     }
 
-    public MapRemoveOperation(ObjectProvider op, int fieldNum, Object key, Object val)
+    public MapRemoveOperation(ObjectProvider op, int fieldNum, K key, V val)
     {
         this.op = op;
         this.fieldNumber = fieldNum;
