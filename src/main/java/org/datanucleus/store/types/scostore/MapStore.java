@@ -24,7 +24,7 @@ import java.util.Map;
 import org.datanucleus.state.ObjectProvider;
 
 /**
- * Interface representation of the backing store for a Map.
+ * Interface representation of the backing store for a Map, providing its interface with the datastore.
  * @param <K> Key type for this map
  * @param <V> Value type for this map
  */
@@ -91,6 +91,8 @@ public interface MapStore<K, V> extends Store
 
     /**
      * Method to add a value to the Map against this key, where we know the previous value for the key (if present).
+     * Default implementation simply calls the <cite>put(ObjectProvider, Object, Object)</cite> method.
+     * Override to provide an efficient implementation for this action.
      * @param op ObjectProvider for the owner of the map. 
      * @param key The key.
      * @param value The value.
@@ -105,7 +107,7 @@ public interface MapStore<K, V> extends Store
     /**
      * Method to add a map of values to the Map.
      * @param op ObjectProvider for the owner of the map. 
-     * @param m The map to add.
+     * @param m The map to put.
      */ 
     void putAll(ObjectProvider op, Map<? extends K, ? extends V> m);
 
@@ -141,6 +143,19 @@ public interface MapStore<K, V> extends Store
      * @param op ObjectProvider for the owner of the map. 
      */
     void clear(ObjectProvider op);
+
+    /**
+     * Method to update the map to be the supplied map of entries.
+     * Default implementation simply does a clear followed by putAll.
+     * Override this and provide an efficient implementation for this action.
+     * @param op ObjectProvider of the object
+     * @param map The map to use
+     */
+    default void update(ObjectProvider op, Map<K, V> map)
+    {
+        clear(op);
+        putAll(op, map);
+    }
 
     /**
      * Accessor for a backing store representing the key set for the Map.
