@@ -19,6 +19,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.types.scostore;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.datanucleus.state.ObjectProvider;
@@ -154,7 +155,7 @@ public interface MapStore<K, V> extends Store
     default void update(ObjectProvider op, Map<K, V> map)
     {
         clear(op);
-        putAll(op, map);
+        putAll(op, map, Collections.emptyMap());
     }
 
     /**
