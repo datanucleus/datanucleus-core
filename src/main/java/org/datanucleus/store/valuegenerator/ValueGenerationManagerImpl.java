@@ -47,7 +47,7 @@ import org.datanucleus.util.StringUtils;
  * </ul>
  * Any unique generators are loaded at initialisation. Any datastore generators are loaded when required.
  * All generators are cached once created, and can be looked up by the member "key" that they are for.
- * 
+ *
  * <h3>Member Key</h3>
  * The member "key" is either the fully-qualified member name (e.g "mydomain.MyClass.myField") that is having its values generated, or
  * is for a (surrogate) datastore id member (e.g "mydomain.MyClass (datastore-id)").
@@ -103,10 +103,11 @@ public class ValueGenerationManagerImpl implements ValueGenerationManager
                 for (ConfigurationElement elem : elems)
                 {
                     // Assumed to not take any properties
-                    generator = (ValueGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store_valuegenerator", 
-                        new String[] {"name", "unique"}, new String[] {elem.getName(), "true"},
-                        "class-name", new Class[] {StoreManager.class, String.class}, new Object[] {this, elem.getName()});
-                    uniqueGeneratorsByName.put(elem.getName(), generator);
+                    String valueGeneratorName = elem.getAttribute("name");
+                    generator = (ValueGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store_valuegenerator",
+                        new String[] {"name", "unique"}, new String[] {valueGeneratorName, "true"},
+                        "class-name", new Class[] {StoreManager.class, String.class}, new Object[] {this.storeMgr, valueGeneratorName});
+                    uniqueGeneratorsByName.put(valueGeneratorName, generator);
                 }
             }
         }
@@ -191,9 +192,9 @@ public class ValueGenerationManagerImpl implements ValueGenerationManager
             // Check the plugin mechanism for a generator for this strategy
             try
             {
-                ConfigurationElement elem = storeMgr.getNucleusContext().getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator", 
+                ConfigurationElement elem = storeMgr.getNucleusContext().getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
                     new String[]{"name", "datastore"}, new String[] {strategyName, storeMgr.getStoreManagerKey()});
-                generatorClass = (elem != null) ? storeMgr.getNucleusContext().getPluginManager().loadClass(elem.getExtension().getPlugin().getSymbolicName(), 
+                generatorClass = (elem != null) ? storeMgr.getNucleusContext().getPluginManager().loadClass(elem.getExtension().getPlugin().getSymbolicName(),
                     elem.getAttribute("class-name")) : null;
             }
             catch (Exception e)
@@ -300,7 +301,7 @@ public class ValueGenerationManagerImpl implements ValueGenerationManager
     {
         PluginManager pluginMgr = storeMgr.getNucleusContext().getPluginManager();
 
-        ConfigurationElement elem = pluginMgr.getConfigurationElementForExtension("org.datanucleus.store_valuegenerator", 
+        ConfigurationElement elem = pluginMgr.getConfigurationElementForExtension("org.datanucleus.store_valuegenerator",
                 new String[]{"name", "datastore"}, new String[] {strategyName, storeMgr.getStoreManagerKey()});
         Class generatorClass = (elem != null) ? pluginMgr.loadClass(elem.getExtension().getPlugin().getSymbolicName(), elem.getAttribute("class-name")) : null;
         if (generatorClass == null)

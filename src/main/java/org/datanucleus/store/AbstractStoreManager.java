@@ -1,5 +1,5 @@
 /**********************************************************************
-Copyright (c) 2004 Andy Jefferson and others. All rights reserved. 
+Copyright (c) 2004 Andy Jefferson and others. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -10,7 +10,7 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
-limitations under the License. 
+limitations under the License.
 
 Contributors:
 2007 Xuan Baldauf - Contrib of notifyMainMemoryCopyIsInvalid(), findObject() (needed by DB4O plugin).
@@ -100,7 +100,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
     protected PersistenceNucleusContext nucleusContext;
 
     /** Manager for value generation. */
-    protected ValueGenerationManager valueGenerationMgr = new ValueGenerationManagerImpl(this);
+    protected ValueGenerationManager valueGenerationMgr;
 
     /** Manager for the data definition in the datastore. */
     protected StoreDataManager storeDataMgr = new StoreDataManager();
@@ -156,6 +156,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 connectionMgr.closeAllConnections(ec);
             }
         });
+        valueGenerationMgr = new ValueGenerationManagerImpl(this);
     }
 
     /**
@@ -309,7 +310,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             else
             {
                 // Fallback to the plugin mechanism
-                String namingFactoryClassName = nucleusContext.getPluginManager().getAttributeValueForExtension("org.datanucleus.identifier_namingfactory", 
+                String namingFactoryClassName = nucleusContext.getPluginManager().getAttributeValueForExtension("org.datanucleus.identifier_namingfactory",
                     "name", namingFactoryName, "class-name");
                 if (namingFactoryClassName == null)
                 {
@@ -321,7 +322,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                 {
                     Class[] argTypes = new Class[] {ClassConstants.NUCLEUS_CONTEXT};
                     Object[] args = new Object[] {nucleusContext};
-                    namingFactory = (NamingFactory)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.identifier_namingfactory", 
+                    namingFactory = (NamingFactory)nucleusContext.getPluginManager().createExecutableExtension("org.datanucleus.identifier_namingfactory",
                         "name", namingFactoryName, "class-name", argTypes, args);
                 }
                 catch (Throwable thr)
@@ -406,7 +407,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#getNucleusContext()
-     */   
+     */
     public PersistenceNucleusContext getNucleusContext()
     {
         return nucleusContext;
@@ -414,7 +415,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#getMetaDataManager()
-     */   
+     */
     public MetaDataManager getMetaDataManager()
     {
         return nucleusContext.getMetaDataManager();
@@ -483,7 +484,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             NucleusLogger.DATASTORE.debug("StoreManager : \"" + storeManagerKey + "\" (" + getClass().getName() + ")");
 
             NucleusLogger.DATASTORE.debug("Datastore : " +
-                (getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY) ? "read-only" : "read-write") + 
+                (getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY) ? "read-only" : "read-write") +
                 (getBooleanProperty(PropertyNames.PROPERTY_SERIALIZE_READ) ? ", useLocking" : ""));
 
             // Schema : Auto-Create/Validate
@@ -620,7 +621,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
      * @param clr ClassLoader resolver
      * @return The StoreData
      */
-    protected StoreData newStoreData(ClassMetaData cmd, ClassLoaderResolver clr) 
+    protected StoreData newStoreData(ClassMetaData cmd, ClassLoaderResolver clr)
     {
         return new StoreData(cmd.getFullClassName(), cmd, StoreData.Type.FCO, null);
     }
@@ -1097,7 +1098,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
                         mconn = connectionMgr.getConnection(ec);
                         return mconn;
                     }
-                    public void releaseConnection() 
+                    public void releaseConnection()
                     {
                         mconn.release();
                         mconn = null;
