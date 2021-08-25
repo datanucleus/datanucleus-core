@@ -3673,7 +3673,8 @@ public abstract class AbstractClassMetaData extends MetaData
 
     public boolean isMultitenant()
     {
-        return hasExtension(EXTENSION_CLASS_MULTITENANT);
+        return hasExtension(EXTENSION_CLASS_MULTITENANT) || hasExtension(EXTENSION_CLASS_MULTITENANCY_COLUMN_NAME) ||
+                hasExtension(EXTENSION_CLASS_MULTITENANCY_COLUMN_LENGTH) || hasExtension(EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE);
     }
 
     public boolean isSoftDelete()
