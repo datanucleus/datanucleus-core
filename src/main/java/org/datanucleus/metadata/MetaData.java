@@ -44,17 +44,13 @@ public class MetaData implements Serializable
 {
     private static final long serialVersionUID = -5477406260914096062L;
 
-    /** State representing the start state of MetaData, representing the initial values passed in. */
-    public static final int METADATA_CREATED_STATE = 0;
-
-    /** State reflecting that MetaData has been populated with real class definition adding any defaulted info. */
-    public static final int METADATA_POPULATED_STATE = 1;
-
-    /** State reflecting that MetaData object has been initialised with any internal info required. */
-    public static final int METADATA_INITIALISED_STATE = 2;
-
-    /** State reflecting that MetaData object has been modified with usage information (e.g defaulted column names). */
-    public static final int METADATA_USED_STATE = 3;
+    private enum State
+    {
+        CREATED,
+        POPULATED,
+        INITIALISED,
+        USED
+    }
 
     /** Vendor name (DataNucleus) used for extensions. */
     public static final String VENDOR_NAME = "datanucleus";
@@ -62,8 +58,8 @@ public class MetaData implements Serializable
     /** Class : read only. */
     public static final String EXTENSION_CLASS_READ_ONLY = "read-only";
 
-    /** Class : when using multitenancy, disables its use for this class. */
-    public static final String EXTENSION_CLASS_MULTITENANCY_DISABLE = "multitenancy-disable";
+    /** Class : when using multitenancy for this class. */
+    public static final String EXTENSION_CLASS_MULTITENANT = "multitenant";
 
     /** Class : when using multitenancy, defines the column name used for the mutitenancy discriminator. */
     public static final String EXTENSION_CLASS_MULTITENANCY_COLUMN_NAME = "multitenancy-column-name";
@@ -206,7 +202,7 @@ public class MetaData implements Serializable
     public static final String EXTENSION_INDEX_COLUMN_ORDERING = "index-column-ordering";
 
     /** State of the MetaData. */
-    protected int metaDataState = METADATA_CREATED_STATE;
+    protected State metaDataState = State.CREATED;
 
     /** Parent MetaData object, allowing hierarchical MetaData structure. */
     protected MetaData parent;
@@ -256,32 +252,32 @@ public class MetaData implements Serializable
 
     void setInitialised()
     {
-        metaDataState = METADATA_INITIALISED_STATE;
+        metaDataState = State.INITIALISED;
     }
 
     void setPopulated()
     {
-        metaDataState = METADATA_POPULATED_STATE;
+        metaDataState = State.POPULATED;
     }
 
     void setUsed()
     {
-        metaDataState = METADATA_USED_STATE;
+        metaDataState = State.USED;
     }
 
     public boolean isPopulated()
     {
-        return metaDataState >= METADATA_POPULATED_STATE;
+        return metaDataState == State.POPULATED || metaDataState == State.INITIALISED || metaDataState == State.USED;
     }
 
     public boolean isInitialised()
     {
-        return metaDataState >= METADATA_INITIALISED_STATE;
+        return metaDataState == State.INITIALISED || metaDataState == State.USED;
     }
 
     public boolean isUsed()
     {
-        return metaDataState == METADATA_USED_STATE;
+        return metaDataState == State.USED;
     }
 
     public MetaDataManager getMetaDataManager()

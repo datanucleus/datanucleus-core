@@ -559,7 +559,7 @@ public class CompleteClassTable implements Table
             this.discriminatorColumn = col;
         }
 
-        if (storeMgr.getNucleusContext().isClassMultiTenant(cmd))
+        if (cmd.isMultitenant())
         {
             // Multitenancy discriminator present : Add restriction for this tenant
             String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.MULTITENANCY_COLUMN);
@@ -572,7 +572,7 @@ public class CompleteClassTable implements Table
             this.multitenancyColumn = col;
         }
 
-        if (cmd.hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE))
+        if (cmd.isSoftDelete())
         {
             // Add surrogate soft-delete column TODO Cater for this specified in superclass applying to this class also?
             String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.SOFTDELETE_COLUMN);

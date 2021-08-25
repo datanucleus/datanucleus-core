@@ -58,7 +58,6 @@ import org.datanucleus.management.ManagementManager;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.FileMetaData;
 import org.datanucleus.metadata.IdentityType;
-import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataListener;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.QueryLanguage;
@@ -1875,7 +1874,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
         if (multiTenancyProvider != null || config.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID) != null)
         {
             // User has either provided a multiTenancyProvider, or specified the TenantId for the PMF/EMF
-            return !"true".equalsIgnoreCase(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_DISABLE));
+            return true;
         }
         return false;
     }

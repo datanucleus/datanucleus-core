@@ -3671,6 +3671,16 @@ public abstract class AbstractClassMetaData extends MetaData
         return pkmd;
     }
 
+    public boolean isMultitenant()
+    {
+        return hasExtension(EXTENSION_CLASS_MULTITENANT);
+    }
+
+    public boolean isSoftDelete()
+    {
+        return hasExtension(EXTENSION_CLASS_SOFTDELETE);
+    }
+
     /**
      * Method to return the ClassMetaData records for classes referenced by this object. 
      * This adds the entries to orderedCmds ordered by dependency, and to referencedCmds for fast lookups.
