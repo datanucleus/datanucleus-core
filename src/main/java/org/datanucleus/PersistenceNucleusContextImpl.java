@@ -1883,7 +1883,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
      * @see org.datanucleus.PersistenceNucleusContext#getMultiTenancyId(org.datanucleus.ExecutionContext, org.datanucleus.metadata.AbstractClassMetaData)
      */
     @Override
-    public String getMultiTenancyId(ExecutionContext ec)
+    public String getTenantId(ExecutionContext ec)
     {
         if (multiTenancyProvider != null)
         {

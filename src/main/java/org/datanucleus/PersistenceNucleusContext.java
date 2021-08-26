@@ -205,7 +205,7 @@ public interface PersistenceNucleusContext extends NucleusContext
     boolean isFederated();
 
     /**
-     * Accessor for whether the supplied class is multi-tenant (i.e with a tenancy id column).
+     * Accessor for whether the supplied class is multi-tenant (i.e with a tenant id discriminator).
      * @param cmd The class
      * @return Whether it is multi-tenant
      */
@@ -216,7 +216,7 @@ public interface PersistenceNucleusContext extends NucleusContext
      * @param ec ExecutionContext
      * @return The tenant id for this context.
      */
-    String getMultiTenancyId(ExecutionContext ec);
+    String getTenantId(ExecutionContext ec);
 
     /**
      * Accessor for the ids of the tenants that should be included in any read operations.
