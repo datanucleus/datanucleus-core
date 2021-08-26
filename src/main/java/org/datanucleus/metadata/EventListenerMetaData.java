@@ -79,8 +79,8 @@ public class EventListenerMetaData extends MetaData
         {
             // Only accept the first encountered method of a callback type
             // TODO Do we want to allow multiple callbacks of a particular type e.g PreStore?
-            NucleusLogger.GENERAL.warn("Attempt to register a callback " + callbackClassName + " for " + className + "." + methodName + 
-                " but callback already registered for this callback");
+            NucleusLogger.METADATA.debug("Attempt to register a callback " + callbackClassName + " for " + className + "." + methodName + 
+                " but callback already registered for this callback : " + methodNamesByCallbackName.get(callbackClassName), new Exception());
             return;
         }
 
