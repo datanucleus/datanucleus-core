@@ -1110,6 +1110,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return tx.getOptimistic();
     }
 
+    @Override
+    public String getTenantId()
+    {
+        return nucCtx.getTenantId(this);
+    }
+
     /**
      * Tests whether this persistable object is in the process of being inserted.
      * @param pc the object to verify the status

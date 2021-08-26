@@ -213,6 +213,7 @@ public interface PersistenceNucleusContext extends NucleusContext
 
     /**
      * Accessor for the tenant id for the ExecutionContext.
+     * Returns the MultiTenancyProvider id (if specified) or relays to the ExecutionContext "tenantId" property (or global tenantId if that is not defined).
      * @param ec ExecutionContext
      * @return The tenant id for this context.
      */
