@@ -118,6 +118,8 @@ public abstract class AbstractClassMetaData extends MetaData
     /** Identity MetaData */
     protected IdentityMetaData identityMetaData;
 
+    protected MultitenancyMetaData multitenancyMetaData;
+
     /** Flag whether the identity was specified by the user. */
     protected boolean identitySpecified = false;
 
@@ -3605,6 +3607,27 @@ public abstract class AbstractClassMetaData extends MetaData
         return idmd;
     }
 
+    public final MultitenancyMetaData getMultitenancyMetaData()
+    {
+        return multitenancyMetaData;
+    }
+
+    public final void setMultitenancyMetaData(MultitenancyMetaData mtmd)
+    {
+        this.multitenancyMetaData = mtmd;
+        if (this.multitenancyMetaData != null)
+        {
+            this.multitenancyMetaData.parent = this;
+        }
+    }
+
+    public MultitenancyMetaData newMultitenancyMetaData()
+    {
+        MultitenancyMetaData mtmd = new MultitenancyMetaData();
+        setMultitenancyMetaData(mtmd);
+        return mtmd;
+    }
+
     /**
      * Mutator for the inheritance MetaData.
      * @param inheritanceMetaData The inheritanceMetaData to set.
@@ -3669,12 +3692,6 @@ public abstract class AbstractClassMetaData extends MetaData
         PrimaryKeyMetaData pkmd = new PrimaryKeyMetaData();
         setPrimaryKeyMetaData(pkmd);
         return pkmd;
-    }
-
-    public boolean isMultitenant()
-    {
-        return hasExtension(EXTENSION_CLASS_MULTITENANT) || hasExtension(EXTENSION_CLASS_MULTITENANCY_COLUMN_NAME) ||
-                hasExtension(EXTENSION_CLASS_MULTITENANCY_COLUMN_LENGTH) || hasExtension(EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE);
     }
 
     public boolean isSoftDelete()

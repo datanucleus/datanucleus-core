@@ -44,6 +44,7 @@ import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.MetaDataUtils;
+import org.datanucleus.metadata.MultitenancyMetaData;
 import org.datanucleus.metadata.PropertyMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
@@ -559,7 +560,8 @@ public class CompleteClassTable implements Table
             this.discriminatorColumn = col;
         }
 
-        if (cmd.isMultitenant())
+        MultitenancyMetaData mtmd = cmd.getMultitenancyMetaData();
+        if (mtmd != null)
         {
             // Multitenancy discriminator present : Add restriction for this tenant
             String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.MULTITENANCY_COLUMN);

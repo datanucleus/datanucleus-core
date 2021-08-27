@@ -317,6 +317,10 @@ public class InterfaceMetaData extends AbstractClassMetaData
             {
                 inheritanceMetaData.initialise(clr);
             }
+            if (multitenancyMetaData != null)
+            {
+                multitenancyMetaData.initialise(clr);
+            }
 
             if (identityType == IdentityType.APPLICATION)
             {

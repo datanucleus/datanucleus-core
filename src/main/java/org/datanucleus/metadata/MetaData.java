@@ -58,16 +58,16 @@ public class MetaData implements Serializable
     /** Class : read only. */
     public static final String EXTENSION_CLASS_READ_ONLY = "read-only";
 
-    /** Class : when using multitenancy for this class. */
+    /** Class : when using multitenancy for this class. */ // TODO Drop this when we support <multitenancy> XML metadata
     public static final String EXTENSION_CLASS_MULTITENANT = "multitenant";
 
-    /** Class : when using multitenancy, defines the column name used for the mutitenancy discriminator. */
+    /** Class : when using multitenancy, defines the column name used for the mutitenancy discriminator. */ // TODO Drop this when we support <multitenancy> XML metadata
     public static final String EXTENSION_CLASS_MULTITENANCY_COLUMN_NAME = "multitenancy-column-name";
 
-    /** Class : when using multitenancy, defines the length of column used for the mutitenancy discriminator. */
+    /** Class : when using multitenancy, defines the length of column used for the mutitenancy discriminator. */ // TODO Drop this when we support <multitenancy> XML metadata
     public static final String EXTENSION_CLASS_MULTITENANCY_COLUMN_LENGTH = "multitenancy-column-length";
 
-    /** Class : when using multitenancy, defines the jdbc-type used for the mutitenancy discriminator column. */
+    /** Class : when using multitenancy, defines the jdbc-type used for the mutitenancy discriminator column. */ // TODO Drop this when we support <multitenancy> XML metadata
     public static final String EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE = "multitenancy-jdbc-type";
 
     /** Class : when the class will use soft deletion (deletion flag column) rather than actually deleting objects. */
