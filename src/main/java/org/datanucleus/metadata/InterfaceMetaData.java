@@ -321,6 +321,10 @@ public class InterfaceMetaData extends AbstractClassMetaData
             {
                 multitenancyMetaData.initialise(clr);
             }
+            if (softDeleteMetaData != null)
+            {
+                softDeleteMetaData.initialise(clr);
+            }
 
             if (identityType == IdentityType.APPLICATION)
             {

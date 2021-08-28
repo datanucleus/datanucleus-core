@@ -120,6 +120,8 @@ public abstract class AbstractClassMetaData extends MetaData
 
     protected MultitenancyMetaData multitenancyMetaData;
 
+    protected SoftDeleteMetaData softDeleteMetaData;
+
     /** Flag whether the identity was specified by the user. */
     protected boolean identitySpecified = false;
 
@@ -3628,6 +3630,32 @@ public abstract class AbstractClassMetaData extends MetaData
         return mtmd;
     }
 
+    public final SoftDeleteMetaData getSoftDeleteMetaData()
+    {
+        return softDeleteMetaData;
+    }
+
+    public final void setSoftDeleteMetaData(SoftDeleteMetaData sdmd)
+    {
+        this.softDeleteMetaData = sdmd;
+        if (this.softDeleteMetaData != null)
+        {
+            this.softDeleteMetaData.parent = this;
+        }
+    }
+
+    public SoftDeleteMetaData newSoftDeleteMetaData()
+    {
+        SoftDeleteMetaData sdmd = new SoftDeleteMetaData();
+        setSoftDeleteMetaData(sdmd);
+        return sdmd;
+    }
+
+    public boolean isSoftDelete()
+    {
+        return softDeleteMetaData != null;
+    }
+
     /**
      * Mutator for the inheritance MetaData.
      * @param inheritanceMetaData The inheritanceMetaData to set.
@@ -3692,11 +3720,6 @@ public abstract class AbstractClassMetaData extends MetaData
         PrimaryKeyMetaData pkmd = new PrimaryKeyMetaData();
         setPrimaryKeyMetaData(pkmd);
         return pkmd;
-    }
-
-    public boolean isSoftDelete()
-    {
-        return hasExtension(EXTENSION_CLASS_SOFTDELETE);
     }
 
     /**

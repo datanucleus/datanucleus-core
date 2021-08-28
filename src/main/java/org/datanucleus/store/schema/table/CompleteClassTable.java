@@ -47,6 +47,7 @@ import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.MultitenancyMetaData;
 import org.datanucleus.metadata.PropertyMetaData;
 import org.datanucleus.metadata.RelationType;
+import org.datanucleus.metadata.SoftDeleteMetaData;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.schema.naming.ColumnType;
@@ -56,6 +57,7 @@ import org.datanucleus.store.types.converters.MultiColumnConverter;
 import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Representation of a table for a class where the class is stored in "complete-table" inheritance (or in JPA "TablePerClass")
@@ -564,9 +566,19 @@ public class CompleteClassTable implements Table
         if (mtmd != null)
         {
             // Multitenancy discriminator present : Add restriction for this tenant
-            String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.MULTITENANCY_COLUMN);
+            ColumnMetaData colmd = mtmd.getColumnMetaData();
+            String colName = mtmd.getColumnName();
+            if (colmd != null)
+            {
+                colName = colmd.getName();
+            }
+            if (StringUtils.isWhitespace(colName))
+            {
+                // Generate name since not specified
+                colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.MULTITENANCY_COLUMN);
+            }
             Column col = addColumn(null, colName, ColumnType.MULTITENANCY_COLUMN); // TODO Support column position
-            col.setJdbcType(JdbcType.VARCHAR);
+            col.setJdbcType(colmd.getJdbcType() != null ? colmd.getJdbcType() : JdbcType.VARCHAR);
             if (schemaVerifier != null)
             {
                 schemaVerifier.attributeMember(new MemberColumnMappingImpl(null, col));
@@ -574,12 +586,23 @@ public class CompleteClassTable implements Table
             this.multitenancyColumn = col;
         }
 
-        if (cmd.isSoftDelete())
+        SoftDeleteMetaData sdmd = cmd.getSoftDeleteMetaData();
+        if (sdmd != null)
         {
             // Add surrogate soft-delete column TODO Cater for this specified in superclass applying to this class also?
-            String colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.SOFTDELETE_COLUMN);
+            ColumnMetaData colmd = sdmd.getColumnMetaData();
+            String colName = sdmd.getColumnName();
+            if (colmd != null)
+            {
+                colName = colmd.getName();
+            }
+            if (StringUtils.isWhitespace(colName))
+            {
+                // Generate name since not specified
+                colName = storeMgr.getNamingFactory().getColumnName(cmd, ColumnType.SOFTDELETE_COLUMN);
+            }
             Column col = addColumn(null, colName, ColumnType.SOFTDELETE_COLUMN);
-            col.setJdbcType(JdbcType.BOOLEAN);
+            col.setJdbcType(colmd.getJdbcType() != null ? colmd.getJdbcType() : JdbcType.BOOLEAN);
             if (schemaVerifier != null)
             {
                 schemaVerifier.attributeMember(new MemberColumnMappingImpl(null, col));
