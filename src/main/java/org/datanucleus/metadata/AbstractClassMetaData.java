@@ -3553,9 +3553,9 @@ public abstract class AbstractClassMetaData extends MetaData
      */
     public VersionMetaData newVersionMetadata()
     {
-        VersionMetaData vermd = new VersionMetaData();
-        setVersionMetaData(vermd);
-        return vermd;
+        this.versionMetaData = new VersionMetaData();
+        this.versionMetaData.parent = this;
+        return this.versionMetaData;
     }
 
     /**
@@ -3596,9 +3596,10 @@ public abstract class AbstractClassMetaData extends MetaData
      */
     public DatastoreIdentityMetaData newDatastoreIdentityMetadata()
     {
-        DatastoreIdentityMetaData dimd = new DatastoreIdentityMetaData();
-        setDatastoreIdentityMetaData(dimd);
-        return dimd;
+        this.datastoreIdentityMetaData = new DatastoreIdentityMetaData();
+        this.datastoreIdentityMetaData.parent = this;
+        this.identitySpecified = true;
+        return this.datastoreIdentityMetaData;
     }
 
     public final MultitenancyMetaData getMultitenancyMetaData()
@@ -3617,9 +3618,9 @@ public abstract class AbstractClassMetaData extends MetaData
 
     public MultitenancyMetaData newMultitenancyMetaData()
     {
-        MultitenancyMetaData mtmd = new MultitenancyMetaData();
-        setMultitenancyMetaData(mtmd);
-        return mtmd;
+        this.multitenancyMetaData = new MultitenancyMetaData();
+        this.multitenancyMetaData.parent = this;
+        return this.multitenancyMetaData;
     }
 
     public final SoftDeleteMetaData getSoftDeleteMetaData()
@@ -3638,9 +3639,9 @@ public abstract class AbstractClassMetaData extends MetaData
 
     public SoftDeleteMetaData newSoftDeleteMetaData()
     {
-        SoftDeleteMetaData sdmd = new SoftDeleteMetaData();
-        setSoftDeleteMetaData(sdmd);
-        return sdmd;
+        this.softDeleteMetaData = new SoftDeleteMetaData();
+        this.softDeleteMetaData.parent = this;
+        return this.softDeleteMetaData;
     }
 
     public boolean isSoftDelete()
@@ -3676,9 +3677,9 @@ public abstract class AbstractClassMetaData extends MetaData
      */
     public InheritanceMetaData newInheritanceMetadata()
     {
-        InheritanceMetaData inhmd = new InheritanceMetaData();
-        setInheritanceMetaData(inhmd);
-        return inhmd;
+        this.inheritanceMetaData = new InheritanceMetaData();
+        this.inheritanceMetaData.parent = this;
+        return this.inheritanceMetaData;
     }
 
     /**
@@ -3709,9 +3710,9 @@ public abstract class AbstractClassMetaData extends MetaData
      */
     public PrimaryKeyMetaData newPrimaryKeyMetadata()
     {
-        PrimaryKeyMetaData pkmd = new PrimaryKeyMetaData();
-        setPrimaryKeyMetaData(pkmd);
-        return pkmd;
+        this.primaryKeyMetaData = new PrimaryKeyMetaData();
+        this.primaryKeyMetaData.parent = this;
+        return this.primaryKeyMetaData;
     }
 
     /**

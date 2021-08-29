@@ -580,6 +580,14 @@ public class MetaDataMerger
         {
             primaryCmd.setDatastoreIdentityMetaData(annotCmd.datastoreIdentityMetaData);
         }
+        if (primaryCmd.multitenancyMetaData == null && annotCmd.multitenancyMetaData != null)
+        {
+            primaryCmd.setMultitenancyMetaData(annotCmd.multitenancyMetaData);
+        }
+        if (primaryCmd.softDeleteMetaData == null && annotCmd.softDeleteMetaData != null)
+        {
+            primaryCmd.setSoftDeleteMetaData(annotCmd.softDeleteMetaData);
+        }
         if (primaryCmd.inheritanceMetaData == null && annotCmd.inheritanceMetaData != null)
         {
             primaryCmd.setInheritanceMetaData(annotCmd.inheritanceMetaData);
