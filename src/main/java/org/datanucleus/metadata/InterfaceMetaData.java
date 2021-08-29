@@ -287,21 +287,20 @@ public class InterfaceMetaData extends AbstractClassMetaData
                 }
             }
 
-            // If using datastore id and user hasn't provided the identity element,
-            // add a defaulted one (using the superclass if available)
-            if (identityType == IdentityType.DATASTORE && identityMetaData == null)
+            // If using datastore id and user hasn't provided the identity element, add a defaulted one (using the superclass if available)
+            if (identityType == IdentityType.DATASTORE && datastoreIdentityMetaData == null)
             {
                 if (pcSuperclassMetaData != null)
                 {
-                    IdentityMetaData superImd = pcSuperclassMetaData.getIdentityMetaData();
-                    identityMetaData = new IdentityMetaData();
-                    identityMetaData.setColumnName(superImd.getColumnName());
-                    identityMetaData.setValueStrategy(superImd.getValueStrategy());
-                    identityMetaData.setSequence(superImd.getSequence());
+                    DatastoreIdentityMetaData superDimd = pcSuperclassMetaData.getDatastoreIdentityMetaData();
+                    datastoreIdentityMetaData = new DatastoreIdentityMetaData();
+                    datastoreIdentityMetaData.setColumnName(superDimd.getColumnName());
+                    datastoreIdentityMetaData.setValueStrategy(superDimd.getValueStrategy());
+                    datastoreIdentityMetaData.setSequence(superDimd.getSequence());
                 }
                 else
                 {
-                    identityMetaData = new IdentityMetaData();
+                    datastoreIdentityMetaData = new DatastoreIdentityMetaData();
                 }
             }
 
@@ -309,9 +308,9 @@ public class InterfaceMetaData extends AbstractClassMetaData
             {
                 versionMetaData.initialise(clr);
             }
-            if (identityMetaData != null)
+            if (datastoreIdentityMetaData != null)
             {
-                identityMetaData.initialise(clr);
+                datastoreIdentityMetaData.initialise(clr);
             }
             if (inheritanceMetaData != null)
             {

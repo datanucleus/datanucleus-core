@@ -997,13 +997,13 @@ public class MetaDataUtils
         return useString;
     }
 
-    public static Class getTypeOfDatastoreIdentity(IdentityMetaData idmd)
+    public static Class getTypeOfDatastoreIdentity(DatastoreIdentityMetaData dimd)
     {
-        if (idmd == null)
+        if (dimd == null)
         {
             return long.class;
         }
-        if (idmd.getValueStrategy() == ValueGenerationStrategy.UUIDHEX || idmd.getValueStrategy() == ValueGenerationStrategy.UUIDSTRING)
+        if (dimd.getValueStrategy() == ValueGenerationStrategy.UUIDHEX || dimd.getValueStrategy() == ValueGenerationStrategy.UUIDSTRING)
         {
             return String.class;
         }

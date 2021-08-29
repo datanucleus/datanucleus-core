@@ -112,11 +112,9 @@ public abstract class AbstractClassMetaData extends MetaData
     /** Full name (e.g org.datanucleus.MyClass) */
     protected final String fullName;
 
-    /** Version MetaData */
     protected VersionMetaData versionMetaData;
 
-    /** Identity MetaData */
-    protected IdentityMetaData identityMetaData;
+    protected DatastoreIdentityMetaData datastoreIdentityMetaData;
 
     protected MultitenancyMetaData multitenancyMetaData;
 
@@ -125,10 +123,8 @@ public abstract class AbstractClassMetaData extends MetaData
     /** Flag whether the identity was specified by the user. */
     protected boolean identitySpecified = false;
 
-    /** Inheritance MetaData */
     protected InheritanceMetaData inheritanceMetaData;
 
-    /** PrimaryKey MetaData */
     protected PrimaryKeyMetaData primaryKeyMetaData;
 
     /** EventListeners. Use a list to preserve ordering. */
@@ -166,16 +162,12 @@ public abstract class AbstractClassMetaData extends MetaData
 
     protected Set<FetchGroupMetaData> fetchGroups = null;
 
-    /** List of foreign-keys */
     protected List<ForeignKeyMetaData> foreignKeys = null;
 
-    /** List of indexes */
     protected List<IndexMetaData> indexes = null;
 
-    /** List of uniqueConstraints */
     protected List<UniqueMetaData> uniqueConstraints = null;
 
-    /** List of joins */
     protected List<JoinMetaData> joins = null;
 
     /** List of all members (fields/properties). */
@@ -306,7 +298,7 @@ public abstract class AbstractClassMetaData extends MetaData
         }
 
         setVersionMetaData(imd.versionMetaData);
-        setIdentityMetaData(imd.identityMetaData);
+        setDatastoreIdentityMetaData(imd.datastoreIdentityMetaData);
         setPrimaryKeyMetaData(imd.primaryKeyMetaData);
 
         if (imd.inheritanceMetaData != null)
@@ -695,22 +687,22 @@ public abstract class AbstractClassMetaData extends MetaData
         if (pcSuperclassMetaData != null)
         {
             AbstractClassMetaData baseCmd = getBaseAbstractClassMetaData();
-            IdentityMetaData baseImd = baseCmd.getIdentityMetaData();
+            DatastoreIdentityMetaData baseImd = baseCmd.getDatastoreIdentityMetaData();
             if (baseCmd.identitySpecified && identitySpecified &&
                 baseImd != null && baseImd.getValueStrategy() != null &&
-                identityMetaData != null && identityMetaData.getValueStrategy() != null &&
-                identityMetaData.getValueStrategy() != baseImd.getValueStrategy() &&
-                identityMetaData.getValueStrategy() != null && 
-                identityMetaData.getValueStrategy() != ValueGenerationStrategy.NATIVE)
+                datastoreIdentityMetaData != null && datastoreIdentityMetaData.getValueStrategy() != null &&
+                datastoreIdentityMetaData.getValueStrategy() != baseImd.getValueStrategy() &&
+                datastoreIdentityMetaData.getValueStrategy() != null && 
+                datastoreIdentityMetaData.getValueStrategy() != ValueGenerationStrategy.NATIVE)
             {
                 // User made deliberate attempt to change strategy in this subclass
-                throw new InvalidClassMetaDataException("044094", fullName, identityMetaData.getValueStrategy(), baseImd.getValueStrategy());
+                throw new InvalidClassMetaDataException("044094", fullName, datastoreIdentityMetaData.getValueStrategy(), baseImd.getValueStrategy());
             }
 
-            if (baseCmd.identitySpecified && identityMetaData != null && baseImd != null && baseImd.getValueStrategy() != identityMetaData.getValueStrategy())
+            if (baseCmd.identitySpecified && datastoreIdentityMetaData != null && baseImd != null && baseImd.getValueStrategy() != datastoreIdentityMetaData.getValueStrategy())
             {
                 // Make sure the strategy matches the parent (likely just took the default "native" schema)
-                identityMetaData.setValueStrategy(baseImd.getValueStrategy());
+                datastoreIdentityMetaData.setValueStrategy(baseImd.getValueStrategy());
             }
         }
     }
@@ -3567,46 +3559,46 @@ public abstract class AbstractClassMetaData extends MetaData
     }
 
     /**
-     * Mutator for the identity MetaData.
-     * @param identityMetaData The identityMetaData to set.
+     * Mutator for the datastore identity MetaData.
+     * @param identityMetaData The datastore identity MetaData to set.
      */
-    public final void setIdentityMetaData(IdentityMetaData identityMetaData)
+    public final void setDatastoreIdentityMetaData(DatastoreIdentityMetaData identityMetaData)
     {
-        this.identityMetaData = identityMetaData;
-        if (this.identityMetaData != null)
+        this.datastoreIdentityMetaData = identityMetaData;
+        if (this.datastoreIdentityMetaData != null)
         {
-            this.identityMetaData.parent = this;
+            this.datastoreIdentityMetaData.parent = this;
         }
         identitySpecified = true;
     }
 
     /**
-     * Accessor for identityMetaData
-     * @return Returns the identityMetaData.
+     * Accessor for datastore identity MetaData
+     * @return Returns the datastore identity MetaData.
      */
-    public final IdentityMetaData getIdentityMetaData()
+    public final DatastoreIdentityMetaData getDatastoreIdentityMetaData()
     {
-        return identityMetaData;
+        return datastoreIdentityMetaData;
     }
 
     /**
      * Convenience method to return the root identity metadata for this inheritance tree.
-     * @return IdentityMetaData at the base
+     * @return DatastoreIdentityMetaData at the base
      */
-    public final IdentityMetaData getBaseIdentityMetaData()
+    public final DatastoreIdentityMetaData getBaseDatastoreIdentityMetaData()
     {
-        return (pcSuperclassMetaData != null) ? pcSuperclassMetaData.getBaseIdentityMetaData() : identityMetaData;
+        return (pcSuperclassMetaData != null) ? pcSuperclassMetaData.getBaseDatastoreIdentityMetaData() : datastoreIdentityMetaData;
     }
 
     /**
-     * Method to create a new identity metadata, set to use it, and return it.
-     * @return The identity metadata
+     * Method to create a new datastore identity metadata, set to use it, and return it.
+     * @return The datastore identity metadata
      */
-    public IdentityMetaData newIdentityMetadata()
+    public DatastoreIdentityMetaData newDatastoreIdentityMetadata()
     {
-        IdentityMetaData idmd = new IdentityMetaData();
-        setIdentityMetaData(idmd);
-        return idmd;
+        DatastoreIdentityMetaData dimd = new DatastoreIdentityMetaData();
+        setDatastoreIdentityMetaData(dimd);
+        return dimd;
     }
 
     public final MultitenancyMetaData getMultitenancyMetaData()

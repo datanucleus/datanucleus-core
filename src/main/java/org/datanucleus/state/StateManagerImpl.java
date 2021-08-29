@@ -3511,7 +3511,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
         boolean idSet = false;
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
-            if (cmd.getIdentityMetaData() == null || !getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, -1))
+            if (cmd.getDatastoreIdentityMetaData() == null || !getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, -1))
             {
                 // Assumed to be set
                 myID = myEC.newObjectId(cmd.getFullClassName(), myPC);

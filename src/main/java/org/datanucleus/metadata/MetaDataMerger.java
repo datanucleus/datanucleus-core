@@ -133,10 +133,10 @@ public class MetaDataMerger
             // TODO Support merging bit by bit
             primaryCmd.setInheritanceMetaData(ormCmd.getInheritanceMetaData());
         }
-        if (ormCmd.getIdentityMetaData() != null)
+        if (ormCmd.getDatastoreIdentityMetaData() != null)
         {
             // TODO Support merging bit by bit
-            primaryCmd.setIdentityMetaData(ormCmd.getIdentityMetaData());
+            primaryCmd.setDatastoreIdentityMetaData(ormCmd.getDatastoreIdentityMetaData());
         }
         if (ormCmd.getVersionMetaData() != null)
         {
@@ -576,9 +576,9 @@ public class MetaDataMerger
         {
             primaryCmd.setVersionMetaData(annotCmd.versionMetaData);
         }
-        if (primaryCmd.identityMetaData == null && annotCmd.identityMetaData != null)
+        if (primaryCmd.datastoreIdentityMetaData == null && annotCmd.datastoreIdentityMetaData != null)
         {
-            primaryCmd.setIdentityMetaData(annotCmd.identityMetaData);
+            primaryCmd.setDatastoreIdentityMetaData(annotCmd.datastoreIdentityMetaData);
         }
         if (primaryCmd.inheritanceMetaData == null && annotCmd.inheritanceMetaData != null)
         {

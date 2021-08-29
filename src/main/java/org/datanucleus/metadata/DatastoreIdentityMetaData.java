@@ -21,10 +21,11 @@ package org.datanucleus.metadata;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Meta-Data for the datastore-identity of a class. Provides a surrogate datastore field.
+ * Meta-Data for the datastore-identity of a class. 
+ * Provides a surrogate datastore field.
  * Also defines the generation strategy for the identity values.
  */
-public class IdentityMetaData extends MetaData
+public class DatastoreIdentityMetaData extends MetaData
 {
     private static final long serialVersionUID = 4740941674001139996L;
 
@@ -46,7 +47,7 @@ public class IdentityMetaData extends MetaData
     /**
      * Default constructor. Set fields using setters, before populate().
      */
-    public IdentityMetaData()
+    public DatastoreIdentityMetaData()
     {
     }
 
@@ -73,7 +74,7 @@ public class IdentityMetaData extends MetaData
         return columnName;
     }
 
-    public IdentityMetaData setColumnName(String columnName)
+    public DatastoreIdentityMetaData setColumnName(String columnName)
     {
         if (!StringUtils.isWhitespace(columnName))
         {
@@ -101,7 +102,7 @@ public class IdentityMetaData extends MetaData
         return strategy;
     }
 
-    public IdentityMetaData setValueStrategy(ValueGenerationStrategy strategy)
+    public DatastoreIdentityMetaData setValueStrategy(ValueGenerationStrategy strategy)
     {
         this.strategy = strategy;
         return this;
@@ -112,7 +113,7 @@ public class IdentityMetaData extends MetaData
         return sequence;
     }
 
-    public IdentityMetaData setSequence(String sequence)
+    public DatastoreIdentityMetaData setSequence(String sequence)
     {
         this.sequence = StringUtils.isWhitespace(sequence) ? null : sequence;
         if (this.sequence != null && this.strategy == null)
@@ -128,7 +129,7 @@ public class IdentityMetaData extends MetaData
         return valueGeneratorName;
     }
 
-    public IdentityMetaData setValueGeneratorName(String generator)
+    public DatastoreIdentityMetaData setValueGeneratorName(String generator)
     {
         this.valueGeneratorName = StringUtils.isWhitespace(generator) ? null : generator;
         return this;
@@ -136,7 +137,7 @@ public class IdentityMetaData extends MetaData
 
     public String toString()
     {
-        StringBuilder str = new StringBuilder("IdentityMetaData[");
+        StringBuilder str = new StringBuilder("DatastoreIdentityMetaData[");
         str.append("strategy=").append(strategy);
         if (columnMetaData != null)
         {

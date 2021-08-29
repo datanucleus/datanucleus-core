@@ -188,9 +188,9 @@ public class JPANamingFactory extends AbstractNamingFactory
         }
         else if (type == ColumnType.DATASTOREID_COLUMN)
         {
-            if (cmd.getIdentityMetaData() != null)
+            if (cmd.getDatastoreIdentityMetaData() != null)
             {
-                ColumnMetaData idcolmd = cmd.getIdentityMetaData().getColumnMetaData();
+                ColumnMetaData idcolmd = cmd.getDatastoreIdentityMetaData().getColumnMetaData();
                 if (idcolmd != null)
                 {
                     name = idcolmd.getName();

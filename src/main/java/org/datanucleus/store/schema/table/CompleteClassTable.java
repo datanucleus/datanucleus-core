@@ -497,15 +497,15 @@ public class CompleteClassTable implements Table
             {
                 schemaVerifier.attributeMember(new MemberColumnMappingImpl(null, col));
             }
-            if (cmd.getIdentityMetaData() != null && cmd.getIdentityMetaData().getColumnMetaData() != null)
+            if (cmd.getDatastoreIdentityMetaData() != null && cmd.getDatastoreIdentityMetaData().getColumnMetaData() != null)
             {
-                if (cmd.getIdentityMetaData().getColumnMetaData().getPosition() != null)
+                if (cmd.getDatastoreIdentityMetaData().getColumnMetaData().getPosition() != null)
                 {
-                    col.setPosition(cmd.getIdentityMetaData().getColumnMetaData().getPosition());
+                    col.setPosition(cmd.getDatastoreIdentityMetaData().getColumnMetaData().getPosition());
                 }
-                if (cmd.getIdentityMetaData().getColumnMetaData().getJdbcType() != null)
+                if (cmd.getDatastoreIdentityMetaData().getColumnMetaData().getJdbcType() != null)
                 {
-                    col.setJdbcType(cmd.getIdentityMetaData().getColumnMetaData().getJdbcType());
+                    col.setJdbcType(cmd.getDatastoreIdentityMetaData().getColumnMetaData().getJdbcType());
                 }
             }
             this.datastoreIdColumn = col;

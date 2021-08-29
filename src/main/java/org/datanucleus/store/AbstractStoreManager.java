@@ -45,7 +45,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.ClassPersistenceModifier;
-import org.datanucleus.metadata.IdentityMetaData;
+import org.datanucleus.metadata.DatastoreIdentityMetaData;
 import org.datanucleus.metadata.ValueGenerationStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaDataManager;
@@ -806,7 +806,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             }
 
             // Datastore-id
-            IdentityMetaData idmd = cmd.getBaseIdentityMetaData();
+            DatastoreIdentityMetaData idmd = cmd.getBaseDatastoreIdentityMetaData();
             if (idmd == null)
             {
                 // native
@@ -883,7 +883,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         {
             // datastore-identity surrogate field
             fieldName = cmd.getFullClassName() + " (datastore id)";
-            strategy = cmd.getIdentityMetaData().getValueStrategy();
+            strategy = cmd.getDatastoreIdentityMetaData().getValueStrategy();
         }
 
         if (mmd != null)
@@ -943,9 +943,9 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         {
             // datastore-identity surrogate field
             fieldName = cmd.getFullClassName() + " (datastore id)";
-            strategy = cmd.getIdentityMetaData().getValueStrategy();
-            sequence = cmd.getIdentityMetaData().getSequence();
-            valueGeneratorName = cmd.getIdentityMetaData().getValueGeneratorName();
+            strategy = cmd.getDatastoreIdentityMetaData().getValueStrategy();
+            sequence = cmd.getDatastoreIdentityMetaData().getSequence();
+            valueGeneratorName = cmd.getDatastoreIdentityMetaData().getValueGeneratorName();
         }
 
         String strategyName = strategy.toString();
@@ -1057,7 +1057,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
             }
         }
 
-        IdentityMetaData idmd = cmd.getBaseIdentityMetaData();
+        DatastoreIdentityMetaData idmd = cmd.getBaseDatastoreIdentityMetaData();
         if (idmd != null && idmd.getColumnMetaData() != null)
         {
             if (MetaDataUtils.isJdbcTypeString(idmd.getColumnMetaData().getJdbcType()))
@@ -1155,7 +1155,7 @@ public abstract class AbstractStoreManager extends PropertyStore implements Stor
         {
             // datastore-identity surrogate field
             // always use the root IdentityMetaData since the root class defines the identity
-            IdentityMetaData idmd = cmd.getBaseIdentityMetaData();
+            DatastoreIdentityMetaData idmd = cmd.getBaseDatastoreIdentityMetaData();
             strategy = idmd.getValueStrategy();
             sequence = idmd.getSequence();
             extensions = idmd.getExtensions();

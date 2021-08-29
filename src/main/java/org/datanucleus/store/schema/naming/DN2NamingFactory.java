@@ -131,9 +131,9 @@ public class DN2NamingFactory extends AbstractNamingFactory
         }
         else if (type == ColumnType.DATASTOREID_COLUMN)
         {
-            if (cmd.getIdentityMetaData() != null)
+            if (cmd.getDatastoreIdentityMetaData() != null)
             {
-                ColumnMetaData idcolmds = cmd.getIdentityMetaData().getColumnMetaData();
+                ColumnMetaData idcolmds = cmd.getDatastoreIdentityMetaData().getColumnMetaData();
                 if (idcolmds != null)
                 {
                     name = idcolmds.getName();
