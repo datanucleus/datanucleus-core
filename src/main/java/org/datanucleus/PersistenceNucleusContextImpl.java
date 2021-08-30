@@ -1866,20 +1866,6 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.PersistenceNucleusContext#isClassMultiTenant(org.datanucleus.metadata.AbstractClassMetaData)
-     */
-    @Override
-    public boolean isClassMultiTenant(AbstractClassMetaData cmd)
-    {
-        if (multiTenancyProvider != null || config.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID) != null)
-        {
-            // User has either provided a multiTenancyProvider, or specified the TenantId for the PMF/EMF
-            return true;
-        }
-        return false;
-    }
-
-    /* (non-Javadoc)
      * @see org.datanucleus.PersistenceNucleusContext#getMultiTenancyId(org.datanucleus.ExecutionContext, org.datanucleus.metadata.AbstractClassMetaData)
      */
     @Override

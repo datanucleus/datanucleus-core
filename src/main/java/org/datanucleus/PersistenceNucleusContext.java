@@ -205,13 +205,6 @@ public interface PersistenceNucleusContext extends NucleusContext
     boolean isFederated();
 
     /**
-     * Accessor for whether the supplied class is multi-tenant (i.e with a tenant id discriminator).
-     * @param cmd The class
-     * @return Whether it is multi-tenant
-     */
-    boolean isClassMultiTenant(AbstractClassMetaData cmd);
-
-    /**
      * Accessor for the tenant id for the ExecutionContext.
      * Returns the MultiTenancyProvider id (if specified) or relays to the ExecutionContext "tenantId" property (or global tenantId if that is not defined).
      * @param ec ExecutionContext
