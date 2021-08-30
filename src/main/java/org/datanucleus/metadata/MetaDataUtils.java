@@ -846,7 +846,7 @@ public class MetaDataUtils
             }
 
             // Initialise the MetaDataManager using the mapping files and class names
-            FileMetaData[] filemds1 = metaDataMgr.loadMetadataFiles(metadataFiles.toArray(new String[metadataFiles.size()]), null);
+            FileMetaData[] filemds1 = metaDataMgr.loadMetaDataFiles(metadataFiles.toArray(new String[metadataFiles.size()]), null);
             FileMetaData[] filemds2 = metaDataMgr.loadClasses(classNames.toArray(new String[classNames.size()]), null);
             filemds = new FileMetaData[filemds1.length + filemds2.length];
             int pos = 0;

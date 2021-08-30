@@ -498,7 +498,7 @@ public class DataNucleusEnhancer
 
         // Load the meta-data for the registered components to enhance.
         long startTime = System.currentTimeMillis();
-        Collection<FileMetaData> fileMetaData = getFileMetadataForInput();
+        Collection<FileMetaData> fileMetaData = getFileMetaDataForInput();
 
         // Enhance the classes implied by the FileMetaData
         long inputTime = System.currentTimeMillis();
@@ -576,7 +576,7 @@ public class DataNucleusEnhancer
 
         // Load the meta-data for the registered components to enhance.
         long startTime = System.currentTimeMillis();
-        Collection<FileMetaData> fileMetaData = getFileMetadataForInput();
+        Collection<FileMetaData> fileMetaData = getFileMetaDataForInput();
 
         // Validate the classes implied by the FileMetaData
         long inputTime = System.currentTimeMillis();
@@ -634,7 +634,7 @@ public class DataNucleusEnhancer
      * them into the MetaDataManager, returning the associated FileMetaData.
      * @return The FileMetaData for the registered components.
      */
-    protected Collection<FileMetaData> getFileMetadataForInput()
+    protected Collection<FileMetaData> getFileMetaDataForInput()
     {
         Iterator<EnhanceComponent> iter = componentsToEnhance.iterator();
         Collection<FileMetaData> fileMetaData = new ArrayList<FileMetaData>();
@@ -724,12 +724,12 @@ public class DataNucleusEnhancer
                     if (comp.getValue() instanceof String)
                     {
                         // Single mapping file
-                        filemds = metadataMgr.loadMetadataFiles(new String[] {(String)comp.getValue()}, userClassLoader);
+                        filemds = metadataMgr.loadMetaDataFiles(new String[] {(String)comp.getValue()}, userClassLoader);
                     }
                     else
                     {
                         // Multiple mapping files
-                        filemds = metadataMgr.loadMetadataFiles((String[])comp.getValue(), userClassLoader);
+                        filemds = metadataMgr.loadMetaDataFiles((String[])comp.getValue(), userClassLoader);
                     }
                     break;
 

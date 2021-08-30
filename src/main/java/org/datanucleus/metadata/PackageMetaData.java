@@ -55,7 +55,7 @@ public class PackageMetaData extends MetaData
     protected String schema;
 
     /**
-     * Constructor. Create packages using FileMetaData.newPackageMetadata()
+     * Constructor. Create packages using FileMetaData.newPackageMetaData()
      * @param name Name of package
      */
     PackageMetaData(final String name)
@@ -322,7 +322,7 @@ public class PackageMetaData extends MetaData
      * @param className Name of the class (in this package)
      * @return The class metadata
      */
-    public ClassMetaData newClassMetadata(String className)
+    public ClassMetaData newClassMetaData(String className)
     {
         if (StringUtils.isWhitespace(className))
         {
@@ -371,7 +371,7 @@ public class PackageMetaData extends MetaData
      * @param intfName Name of the interface (in this package)
      * @return The interface metadata
      */
-    public InterfaceMetaData newInterfaceMetadata(String intfName)
+    public InterfaceMetaData newInterfaceMetaData(String intfName)
     {
         InterfaceMetaData imd = new InterfaceMetaData(this, intfName);
         return addInterface(imd);
@@ -402,7 +402,7 @@ public class PackageMetaData extends MetaData
      * @param seqStrategy Strategy for the sequence
      * @return The sequence metadata
      */
-    public SequenceMetaData newSequenceMetadata(String seqName, String seqStrategy)
+    public SequenceMetaData newSequenceMetaData(String seqName, String seqStrategy)
     {
         SequenceMetaData seqmd = new SequenceMetaData(seqName, seqStrategy);
         addSequence(seqmd);
@@ -433,7 +433,7 @@ public class PackageMetaData extends MetaData
      * @param name Name of the table generator
      * @return The metadata
      */
-    public TableGeneratorMetaData newTableGeneratorMetadata(String name)
+    public TableGeneratorMetaData newTableGeneratorMetaData(String name)
     {
         TableGeneratorMetaData tgmd = new TableGeneratorMetaData(name);
 

@@ -33,7 +33,7 @@ public class FileMetaData extends MetaData
     private static final long serialVersionUID = 6622356672262681288L;
 
     /** Type of file (JDO, ORM, JDOQUERY, etc) */
-    protected MetadataFileType type;
+    protected MetaDataFileType type;
 
     /** Name of file */
     protected String filename;
@@ -103,12 +103,12 @@ public class FileMetaData extends MetaData
         return this;
     }
 
-    public MetadataFileType getType()
+    public MetaDataFileType getType()
     {
         return type;
     }
 
-    public FileMetaData setType(MetadataFileType type)
+    public FileMetaData setType(MetaDataFileType type)
     {
         this.type = type;
         return this;
@@ -243,7 +243,7 @@ public class FileMetaData extends MetaData
      * @param queryName Name of the query
      * @return The Query metadata
      */
-    public QueryMetaData newQueryMetadata(String queryName)
+    public QueryMetaData newQueryMetaData(String queryName)
     {
         QueryMetaData qmd = new QueryMetaData(queryName);
 
@@ -276,7 +276,7 @@ public class FileMetaData extends MetaData
         return qmd;
     }
 
-    public FetchPlanMetaData newFetchPlanMetadata(String name)
+    public FetchPlanMetaData newFetchPlanMetaData(String name)
     {
         FetchPlanMetaData fpmd = new FetchPlanMetaData(name);
 
@@ -295,7 +295,7 @@ public class FileMetaData extends MetaData
      * @param name Name of the package
      * @return The PackageMetadata
      */
-    public PackageMetaData newPackageMetadata(String name)
+    public PackageMetaData newPackageMetaData(String name)
     {
         PackageMetaData pmd = new PackageMetaData(name);
         if (packages == null)
@@ -369,7 +369,7 @@ public class FileMetaData extends MetaData
      * @param name Name of the result
      * @return The query result metadata
      */
-    public QueryResultMetaData newQueryResultMetadata(String name)
+    public QueryResultMetaData newQueryResultMetaData(String name)
     {
         QueryResultMetaData qrmd = new QueryResultMetaData(name);
         addQueryResultMetaData(qrmd);

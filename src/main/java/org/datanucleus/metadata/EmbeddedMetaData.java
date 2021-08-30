@@ -478,7 +478,7 @@ public class EmbeddedMetaData extends MetaData
      * Method to create a new discriminator metadata, assign it to this inheritance, and return it.
      * @return The discriminator metadata
      */
-    public DiscriminatorMetaData newDiscriminatorMetadata()
+    public DiscriminatorMetaData newDiscriminatorMetaData()
     {
         DiscriminatorMetaData dismd = new DiscriminatorMetaData();
         setDiscriminatorMetaData(dismd);

@@ -54,7 +54,7 @@ public class TableGeneratorMetaData extends MetaData
     protected long allocationSize = 50;
 
     /**
-     * Constructor. Create via PackageMetaData.newTableGeneratorMetadata(...)
+     * Constructor. Create via PackageMetaData.newTableGeneratorMetaData(...)
      * @param name The generator name
      */
     TableGeneratorMetaData(final String name)

@@ -494,10 +494,10 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.metadata.MetaDataManager#loadMetadataFiles(java.lang.String[], java.lang.ClassLoader)
+     * @see org.datanucleus.metadata.MetaDataManager#loadMetaDataFiles(java.lang.String[], java.lang.ClassLoader)
      */
     @Override
-    public FileMetaData[] loadMetadataFiles(String[] metadataFiles, ClassLoader loader)
+    public FileMetaData[] loadMetaDataFiles(String[] metadataFiles, ClassLoader loader)
     {
         if (!allowMetaDataLoad)
         {
@@ -1965,7 +1965,7 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
         {
             // Get the MetaData for this class/interface
             if (cmd.getPackageMetaData() != null && cmd.getPackageMetaData().getFileMetaData() != null &&
-                    cmd.getPackageMetaData().getFileMetaData().getType() == MetadataFileType.ANNOTATIONS)
+                    cmd.getPackageMetaData().getFileMetaData().getType() == MetaDataFileType.ANNOTATIONS)
             {
                 // Our MetaData is derived from the Annotations so nothing to merge!
                 return;
@@ -2814,8 +2814,8 @@ public abstract class MetaDataManagerImpl implements Serializable, MetaDataManag
 
         // Check for annotations (use dummy file/package so we have a place for it)
         FileMetaData filemd = new FileMetaData();
-        filemd.setType(MetadataFileType.ANNOTATIONS);
-        PackageMetaData pmd = filemd.newPackageMetadata(clsPackageName);
+        filemd.setType(MetaDataFileType.ANNOTATIONS);
+        PackageMetaData pmd = filemd.newPackageMetaData(clsPackageName);
         AbstractClassMetaData cmd = annotationManager.getMetaDataForClass(cls, pmd, clr);
         if (cmd != null)
         {

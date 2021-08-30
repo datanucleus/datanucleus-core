@@ -115,7 +115,7 @@ public class InheritanceMetaData extends MetaData
      * Method to create a new JoinMetaData, set it, and return it.
      * @return The join metadata
      */
-    public JoinMetaData newJoinMetadata()
+    public JoinMetaData newJoinMetaData()
     {
         JoinMetaData joinmd = new JoinMetaData();
         setJoinMetaData(joinmd);
@@ -137,7 +137,7 @@ public class InheritanceMetaData extends MetaData
      * Method to create a new discriminator metadata, assign it to this inheritance, and return it.
      * @return The discriminator metadata
      */
-    public DiscriminatorMetaData newDiscriminatorMetadata()
+    public DiscriminatorMetaData newDiscriminatorMetaData()
     {
         DiscriminatorMetaData dismd = new DiscriminatorMetaData();
         setDiscriminatorMetaData(dismd);

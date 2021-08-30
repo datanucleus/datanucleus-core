@@ -20,7 +20,7 @@ package org.datanucleus.metadata;
 /**
  * Enum for the different types of metadata "files".
  */
-public enum MetadataFileType 
+public enum MetaDataFileType 
 {
     JDO_FILE("jdo"),
     JDO_ORM_FILE("orm"),
@@ -30,7 +30,7 @@ public enum MetadataFileType
 
     String name;
 
-    private MetadataFileType(String name)
+    private MetaDataFileType(String name)
     {
         this.name = name;
     }

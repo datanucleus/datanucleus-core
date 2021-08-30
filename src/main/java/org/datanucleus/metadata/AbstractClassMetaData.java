@@ -1030,11 +1030,11 @@ public abstract class AbstractClassMetaData extends MetaData
                             }
                             if (mmgr.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_METADATA_USE_DISCRIMINATOR_DEFAULT_CLASS_NAME))
                             {
-                                inheritanceMetaData.newDiscriminatorMetadata().setStrategy(DiscriminatorStrategy.CLASS_NAME).setIndexed("true").newColumnMetaData().setLength(31);
+                                inheritanceMetaData.newDiscriminatorMetaData().setStrategy(DiscriminatorStrategy.CLASS_NAME).setIndexed("true").newColumnMetaData().setLength(31);
                             }
                             else
                             {
-                                inheritanceMetaData.newDiscriminatorMetadata().setStrategy(DiscriminatorStrategy.VALUE_MAP_ENTITY_NAME).setIndexed("true").newColumnMetaData().setLength(31);
+                                inheritanceMetaData.newDiscriminatorMetaData().setStrategy(DiscriminatorStrategy.VALUE_MAP_ENTITY_NAME).setIndexed("true").newColumnMetaData().setLength(31);
                             }
                         }
                         inheritanceMetaData.strategy = InheritanceStrategy.NEW_TABLE;
@@ -1128,7 +1128,7 @@ public abstract class AbstractClassMetaData extends MetaData
                     // Impose the full class name as the discriminator value since not set
                     if (dismd == null)
                     {
-                        dismd = inheritanceMetaData.newDiscriminatorMetadata();
+                        dismd = inheritanceMetaData.newDiscriminatorMetaData();
                     }
                     if (NucleusLogger.METADATA.isDebugEnabled())
                     {
@@ -2827,7 +2827,7 @@ public abstract class AbstractClassMetaData extends MetaData
      * @param queryName Name of the query
      * @return The Query metadata
      */
-    public QueryMetaData newQueryMetadata(String queryName)
+    public QueryMetaData newQueryMetaData(String queryName)
     {
         if (StringUtils.isWhitespace(queryName))
         {
@@ -2881,7 +2881,7 @@ public abstract class AbstractClassMetaData extends MetaData
      * @param queryName Name of the proc query
      * @return The Query metadata
      */
-    public StoredProcQueryMetaData newStoredProcQueryMetadata(String queryName)
+    public StoredProcQueryMetaData newStoredProcQueryMetaData(String queryName)
     {
         if (StringUtils.isWhitespace(queryName))
         {
@@ -2954,7 +2954,7 @@ public abstract class AbstractClassMetaData extends MetaData
      * Method to create a new index metadata, add it, and return it.
      * @return The index metadata
      */
-    public IndexMetaData newIndexMetadata()
+    public IndexMetaData newIndexMetaData()
     {
         IndexMetaData idxmd = new IndexMetaData();
         addIndex(idxmd);
@@ -2993,7 +2993,7 @@ public abstract class AbstractClassMetaData extends MetaData
      * Method to create a new FK metadata, add it, and return it.
      * @return The FK metadata
      */
-    public ForeignKeyMetaData newForeignKeyMetadata()
+    public ForeignKeyMetaData newForeignKeyMetaData()
     {
         ForeignKeyMetaData fkmd = new ForeignKeyMetaData();
         addForeignKey(fkmd);
@@ -3032,7 +3032,7 @@ public abstract class AbstractClassMetaData extends MetaData
      * Method to create a new unique metadata, add it, and return it.
      * @return The unique metadata
      */
-    public UniqueMetaData newUniqueMetadata()
+    public UniqueMetaData newUniqueMetaData()
     {
         UniqueMetaData unimd = new UniqueMetaData();
         addUniqueConstraint(unimd);
@@ -3074,7 +3074,7 @@ public abstract class AbstractClassMetaData extends MetaData
      * @param fieldName Name of the field
      * @return The metadata
      */
-    public FieldMetaData newFieldMetadata(String fieldName)
+    public FieldMetaData newFieldMetaData(String fieldName)
     {
         FieldMetaData fmd = new FieldMetaData(this, fieldName);
         addMember(fmd);
@@ -3086,7 +3086,7 @@ public abstract class AbstractClassMetaData extends MetaData
      * @param propName Name of the property
      * @return The metadata
      */
-    public PropertyMetaData newPropertyMetadata(String propName)
+    public PropertyMetaData newPropertyMetaData(String propName)
     {
         PropertyMetaData pmd = new PropertyMetaData(this, propName);
         addMember(pmd);
@@ -3551,7 +3551,7 @@ public abstract class AbstractClassMetaData extends MetaData
      * Method to create a new version metadata, set to use it, and return it.
      * @return The version metadata
      */
-    public VersionMetaData newVersionMetadata()
+    public VersionMetaData newVersionMetaData()
     {
         this.versionMetaData = new VersionMetaData();
         this.versionMetaData.parent = this;
@@ -3594,7 +3594,7 @@ public abstract class AbstractClassMetaData extends MetaData
      * Method to create a new datastore identity metadata, set to use it, and return it.
      * @return The datastore identity metadata
      */
-    public DatastoreIdentityMetaData newDatastoreIdentityMetadata()
+    public DatastoreIdentityMetaData newDatastoreIdentityMetaData()
     {
         this.datastoreIdentityMetaData = new DatastoreIdentityMetaData();
         this.datastoreIdentityMetaData.parent = this;
@@ -3675,7 +3675,7 @@ public abstract class AbstractClassMetaData extends MetaData
      * Method to create a new inheritance metadata, set to use it, and return it.
      * @return The inheritance metadata
      */
-    public InheritanceMetaData newInheritanceMetadata()
+    public InheritanceMetaData newInheritanceMetaData()
     {
         this.inheritanceMetaData = new InheritanceMetaData();
         this.inheritanceMetaData.parent = this;
@@ -3708,7 +3708,7 @@ public abstract class AbstractClassMetaData extends MetaData
      * Method to create a new primary key metadata, set to use it, and return it.
      * @return The primary key metadata
      */
-    public PrimaryKeyMetaData newPrimaryKeyMetadata()
+    public PrimaryKeyMetaData newPrimaryKeyMetaData()
     {
         this.primaryKeyMetaData = new PrimaryKeyMetaData();
         this.primaryKeyMetaData.parent = this;

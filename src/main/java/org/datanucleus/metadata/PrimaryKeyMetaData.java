@@ -61,7 +61,7 @@ public class PrimaryKeyMetaData extends MetaData implements ColumnMetaDataContai
             this.columnName = StringUtils.isWhitespace(name) ? null : name;
             if (columns == null)
             {
-                ColumnMetaData colmd = newColumnMetadata();
+                ColumnMetaData colmd = newColumnMetaData();
                 colmd.setName(columnName);
                 addColumn(colmd);
             }
@@ -100,7 +100,7 @@ public class PrimaryKeyMetaData extends MetaData implements ColumnMetaDataContai
      * Method to create a new column, add it, and return it.
      * @return The column metadata
      */
-    public ColumnMetaData newColumnMetadata()
+    public ColumnMetaData newColumnMetaData()
     {
         ColumnMetaData colmd = new ColumnMetaData();
         addColumn(colmd);

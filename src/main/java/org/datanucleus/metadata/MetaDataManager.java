@@ -114,7 +114,7 @@ public interface MetaDataManager
      * @return Array of the FileMetaData that is managed
      * @throws NucleusUserException (with nested exceptions) if an error occurs parsing the files
      */
-    FileMetaData[] loadMetadataFiles(String[] metadataFiles, ClassLoader loader);
+    FileMetaData[] loadMetaDataFiles(String[] metadataFiles, ClassLoader loader);
 
     /**
      * Method to load up all metadata for the specified classes.
