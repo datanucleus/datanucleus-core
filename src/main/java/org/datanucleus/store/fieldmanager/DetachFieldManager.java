@@ -149,13 +149,15 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
         else
         {
             // 1-1 PC
-            if (copy)
+            if (mmd.isCascadeDetach())
             {
-                return processPersistableCopy(value);
-            }
+                if (copy)
+                {
+                    return processPersistableCopy(value);
+                }
 
-            // TODO If cascadeDetach is false then don't do this
-            processPersistable(value);
+                processPersistable(value);
+            }
         }
 
         return value;
@@ -217,27 +219,33 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
     {
         Object detachedContainer;
 
-        // TODO If cascadeDetach is false then don't do this
-        ElementContainerAdapter containerAdapter = containerHandler.getAdapter(container);
-        if (copy)
+        if (mmd.isCascadeDetach())
         {
-            detachedContainer = containerHandler.newContainer(mmd);
-            ElementContainerAdapter<Object> copyAdapter = containerHandler.getAdapter(detachedContainer);
-            for (Object element : containerAdapter)
+            ElementContainerAdapter containerAdapter = containerHandler.getAdapter(container);
+            if (copy)
             {
-                copyAdapter.add(processPersistableCopy(element));
-            }
+                detachedContainer = containerHandler.newContainer(mmd);
+                ElementContainerAdapter<Object> copyAdapter = containerHandler.getAdapter(detachedContainer);
+                for (Object element : containerAdapter)
+                {
+                    copyAdapter.add(processPersistableCopy(element));
+                }
 
-            // Get the updated version of the container
-            detachedContainer = copyAdapter.getContainer();
+                // Get the updated version of the container
+                detachedContainer = copyAdapter.getContainer();
+            }
+            else
+            {
+                detachedContainer = container;
+                for (Object element : containerAdapter)
+                {
+                    processPersistable(element);
+                }
+            }
         }
         else
         {
             detachedContainer = container;
-            for (Object element : containerAdapter)
-            {
-                processPersistable(element);
-            }
         }
 
         return detachedContainer;
@@ -248,52 +256,57 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
     {
         Object detachedMapContainer;
 
-        // TODO If cascadeDetach is false then don't do this
-        MapContainerAdapter<Object> mapAdapter = containerHandler.getAdapter(mapContainer);
-
-        if (copy)
+        if (mmd.isCascadeDetach())
         {
-            detachedMapContainer = containerHandler.newContainer(mmd);
-            MapMetaData mapMd = mmd.getMap();
-            MapContainerAdapter copyAdapter = containerHandler.getAdapter(detachedMapContainer);
-            for (Entry<Object, Object> entry : mapAdapter.entries())
+            MapContainerAdapter<Object> mapAdapter = containerHandler.getAdapter(mapContainer);
+            if (copy)
             {
-                Object key = entry.getKey();
-                if (mapMd.keyIsPersistent())
+                detachedMapContainer = containerHandler.newContainer(mmd);
+                MapMetaData mapMd = mmd.getMap();
+                MapContainerAdapter copyAdapter = containerHandler.getAdapter(detachedMapContainer);
+                for (Entry<Object, Object> entry : mapAdapter.entries())
                 {
-                    key = processPersistableCopy(key);
+                    Object key = entry.getKey();
+                    if (mapMd.keyIsPersistent())
+                    {
+                        key = processPersistableCopy(key);
+                    }
+
+                    Object value = entry.getValue();
+                    if (mapMd.valueIsPersistent())
+                    {
+                        value = processPersistableCopy(value);
+                    }
+
+                    copyAdapter.put(key, value);
                 }
 
-                Object value = entry.getValue();
-                if (mapMd.valueIsPersistent())
-                {
-                    value = processPersistableCopy(value);
-                }
-
-                copyAdapter.put(key, value);
+                // Get the updated version of the container
+                detachedMapContainer = copyAdapter.getContainer();
             }
+            else
+            {
+                detachedMapContainer = mapContainer;
+                MapMetaData mapMd = mmd.getMap();
+                for (Entry<Object, Object> entry : mapAdapter.entries())
+                {
+                    Object key = entry.getKey();
+                    if (mapMd.keyIsPersistent())
+                    {
+                        processPersistable(key);
+                    }
 
-            // Get the updated version of the container
-            detachedMapContainer = copyAdapter.getContainer();
+                    Object value = entry.getValue();
+                    if (mapMd.valueIsPersistent())
+                    {
+                        processPersistable(value);
+                    }
+                }
+            }
         }
         else
         {
             detachedMapContainer = mapContainer;
-            MapMetaData mapMd = mmd.getMap();
-            for (Entry<Object, Object> entry : mapAdapter.entries())
-            {
-                Object key = entry.getKey();
-                if (mapMd.keyIsPersistent())
-                {
-                    processPersistable(key);
-                }
-
-                Object value = entry.getValue();
-                if (mapMd.valueIsPersistent())
-                {
-                    processPersistable(value);
-                }
-            }
         }
 
         return detachedMapContainer;
