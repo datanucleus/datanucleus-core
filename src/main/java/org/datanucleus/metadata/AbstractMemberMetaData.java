@@ -113,14 +113,14 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     /** embedded tag value. */
     protected Boolean embedded;
 
-    /** Whether this field contains a reference that should be deleted when deleting this field.  */
-    protected Boolean dependent;
-
     /** serialized tag value. */
     protected Boolean serialized;
 
     /** cacheable tag value. */
     protected boolean cacheable = true;
+
+    /** Whether this field contains a reference that should be deleted when deleting this field. */
+    protected Boolean dependent;
 
     /** Whether to persist this relation when persisting the owning object. */
     protected Boolean cascadePersist;
@@ -128,7 +128,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     /** Whether to update this relation when updating the owning object. */
     protected Boolean cascadeUpdate;
 
-    /** Whether to delete this relation when deleting the owning object (JPA/Jakarta). TODO Link this to dependent */
+    /** Whether to delete this relation when deleting the owning object (JPA/Jakarta). This is only used at metadata population. See "dependent". */
     protected Boolean cascadeDelete;
 
     /** Whether to detach this relation when detaching the owning object (JPA/Jakarta). */
@@ -1625,30 +1625,12 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     public boolean isDefaultFetchGroup()
     {
-        if (defaultFetchGroup == null)
-        {
-            return false;
-        }
-        return defaultFetchGroup.booleanValue();
+        return defaultFetchGroup == null ? false : defaultFetchGroup.booleanValue();
     }
 
     public void setDefaultFetchGroup(boolean dfg)
     {
          this.defaultFetchGroup = Boolean.valueOf(dfg);
-    }
-
-    public boolean isDependent()
-    {
-        if (dependent == null)
-        {
-            return false;
-        }
-        return dependent.booleanValue();
-    }
-
-    public void setDependent(boolean dependent)
-    {
-        this.dependent = Boolean.valueOf(dependent);
     }
 
     public boolean isEmbedded()
@@ -1674,6 +1656,16 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     public String getMapsIdAttribute()
     {
         return mapsIdAttribute;
+    }
+
+    public boolean isDependent()
+    {
+        return dependent == null ? false : dependent.booleanValue();
+    }
+
+    public void setDependent(boolean dependent)
+    {
+        this.dependent = Boolean.valueOf(dependent);
     }
 
     /**
@@ -1723,11 +1715,65 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
 
     /**
      * Accessor for the whether this field should remove orphans at delete.
-     * @return Whether to reove orphans at delete
+     * @return Whether to remove orphans at delete
      */
     public boolean isCascadeRemoveOrphans()
     {
         return cascadeRemoveOrphans;
+    }
+
+    /**
+     * Mutator for the cascading of persist operations on this field.
+     * @param cascade Whether to cascade at persist
+     */
+    public void setCascadePersist(boolean cascade)
+    {
+        this.cascadePersist = cascade;
+    }
+
+    /**
+     * Mutator for the cascading of update operations on this field.
+     * @param cascade Whether to cascade at update
+     */
+    public void setCascadeUpdate(boolean cascade)
+    {
+        this.cascadeUpdate = cascade;
+    }
+
+    /**
+     * Mutator for the cascading of delete operations on this field.
+     * @param cascade Whether to cascade at delete
+     */
+    public void setCascadeDelete(boolean cascade)
+    {
+        this.cascadeDelete = cascade;
+    }
+
+    /**
+     * Mutator for the cascading of detach operations on this field.
+     * @param cascade Whether to cascade at detach
+     */
+    public void setCascadeDetach(boolean cascade)
+    {
+        this.cascadeDetach = cascade;
+    }
+
+    /**
+     * Mutator for the cascading of refresh operations on this field.
+     * @param cascade Whether to cascade at refresh
+     */
+    public void setCascadeRefresh(boolean cascade)
+    {
+        this.cascadeRefresh = cascade;
+    }
+
+    /**
+     * Mutator for the cascading of orphan removal operations on this field.
+     * @param cascade Whether to remove orphans on remove
+     */
+    public void setCascadeRemoveOrphans(boolean cascade)
+    {
+        this.cascadeRemoveOrphans = cascade;
     }
 
     public boolean isPrimaryKey()
@@ -1949,10 +1995,9 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     }
 
     /**
-     * Accessor for a collection container for this field. Returns null if no
-     * collection attached.
+     * Accessor for a collection container for this field. Returns null if no collection present.
      * @return The MetaData of the container for this field if a Collection.
-     **/
+     */
     public CollectionMetaData getCollection()
     {
         if (containerMetaData != null && containerMetaData instanceof CollectionMetaData)
@@ -1963,10 +2008,9 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     }
 
     /**
-     * Accessor for a map container for this field. Returns null if no map
-     * attached.
+     * Accessor for a map container for this field. Returns null if no map present.
      * @return The MetaData of the container for this field if a Map.
-     **/
+     */
     public MapMetaData getMap()
     {
         if (containerMetaData != null && containerMetaData instanceof MapMetaData)
@@ -1976,14 +2020,49 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         return null;
     }
 
-    public final String getMappedBy()
+    /**
+     * Accessor for whether the field has a container.
+     * @return Whether it represents a container.
+     */
+    public boolean hasContainer()
     {
-        return mappedBy;
+        return containerMetaData != null;
     }
 
-    public void setMappedBy(String mappedBy)
+    /**
+     * Accessor for whether the field has an array
+     * @return return true if has array
+     */
+    public boolean hasArray()
     {
-        this.mappedBy = StringUtils.isWhitespace(mappedBy) ? null : mappedBy;
+        return containerMetaData == null ? false : (containerMetaData instanceof ArrayMetaData);
+    }
+
+    /**
+     * Accessor for whether the field has a collection
+     * @return return true if has collection
+     */
+    public boolean hasCollection()
+    {
+        return containerMetaData == null ? false : (containerMetaData instanceof CollectionMetaData);
+    }
+
+    /**
+     * Accessor for whether the field has a collection that holds only one element.
+     * @return Whether this is a collection with single element
+     */
+    public boolean isSingleCollection()
+    {
+        return containerMetaData instanceof CollectionMetaData && ((CollectionMetaData) containerMetaData).singleElement;
+    }
+
+    /**
+     * Accessor for whether the field has a map.
+     * @return return true if has map
+     */
+    public boolean hasMap()
+    {
+        return containerMetaData == null ? false : (containerMetaData instanceof MapMetaData);
     }
 
     /**
@@ -2029,6 +2108,16 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     public final EmbeddedMetaData getEmbeddedMetaData()
     {
         return embeddedMetaData;
+    }
+
+    public final String getMappedBy()
+    {
+        return mappedBy;
+    }
+
+    public void setMappedBy(String mappedBy)
+    {
+        this.mappedBy = StringUtils.isWhitespace(mappedBy) ? null : mappedBy;
     }
 
     public void setDeleteAction(String action)
@@ -2103,51 +2192,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         ColumnMetaData colmd = new ColumnMetaData();
         addColumn(colmd);
         return colmd;
-    }
-
-    /**
-     * Accessor for whether the field has a container.
-     * @return Whether it represents a container.
-     */
-    public boolean hasContainer()
-    {
-        return containerMetaData != null;
-    }
-
-    /**
-     * Accessor for whether the field has an array
-     * @return return true if has array
-     */
-    public boolean hasArray()
-    {
-        return containerMetaData == null ? false : (containerMetaData instanceof ArrayMetaData);
-    }
-
-    /**
-     * Accessor for whether the field has a collection
-     * @return return true if has collection
-     */
-    public boolean hasCollection()
-    {
-        return containerMetaData == null ? false : (containerMetaData instanceof CollectionMetaData);
-    }
-
-    /**
-     * Accessor for whether the field has a collection that holds only one element.
-     * @return Whether this is a collection with single element
-     */
-    public boolean isSingleCollection()
-    {
-        return containerMetaData instanceof CollectionMetaData && ((CollectionMetaData) containerMetaData).singleElement;
-    }
-
-    /**
-     * Accessor for whether the field has a map.
-     * @return return true if has map
-     */
-    public boolean hasMap()
-    {
-        return containerMetaData == null ? false : (containerMetaData instanceof MapMetaData);
     }
 
     /**
@@ -2252,60 +2296,6 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     public String getRelationTypeString()
     {
         return relationTypeString;
-    }
-
-    /**
-     * Mutator for the cascading of persist operations on this field.
-     * @param cascade Whether to cascade at persist
-     */
-    public void setCascadePersist(boolean cascade)
-    {
-        this.cascadePersist = cascade;
-    }
-
-    /**
-     * Mutator for the cascading of update operations on this field.
-     * @param cascade Whether to cascade at update
-     */
-    public void setCascadeUpdate(boolean cascade)
-    {
-        this.cascadeUpdate = cascade;
-    }
-
-    /**
-     * Mutator for the cascading of delete operations on this field.
-     * @param cascade Whether to cascade at delete
-     */
-    public void setCascadeDelete(boolean cascade)
-    {
-        this.cascadeDelete = cascade;
-    }
-
-    /**
-     * Mutator for the cascading of detach operations on this field.
-     * @param cascade Whether to cascade at detach
-     */
-    public void setCascadeDetach(boolean cascade)
-    {
-        this.cascadeDetach = cascade;
-    }
-
-    /**
-     * Mutator for the cascading of refresh operations on this field.
-     * @param cascade Whether to cascade at refresh
-     */
-    public void setCascadeRefresh(boolean cascade)
-    {
-        this.cascadeRefresh = cascade;
-    }
-
-    /**
-     * Mutator for the cascading of orphan removal operations on this field.
-     * @param cascade Whether to remove orphans on remove
-     */
-    public void setCascadeRemoveOrphans(boolean cascade)
-    {
-        this.cascadeRemoveOrphans = cascade;
     }
 
     /**
