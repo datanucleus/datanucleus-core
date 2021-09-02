@@ -147,8 +147,8 @@ public class MetaData implements Serializable
     /** Member : whether the field is cascade-persist (for JDO). */
     public static final String EXTENSION_MEMBER_CASCADE_PERSIST = "cascade-persist";
 
-    /** Member : whether the field is cascade-update (for JDO). */
-    public static final String EXTENSION_MEMBER_CASCADE_UPDATE = "cascade-update";
+    /** Member : whether the field is cascade-attach (for JDO). */
+    public static final String EXTENSION_MEMBER_CASCADE_ATTACH = "cascade-attach";
 
     /** Member : whether the field is cascade-detach (for JDO). */
     public static final String EXTENSION_MEMBER_CASCADE_DETACH = "cascade-detach";

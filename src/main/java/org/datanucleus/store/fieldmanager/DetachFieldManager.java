@@ -250,7 +250,7 @@ public class DetachFieldManager extends AbstractFetchDepthFieldManager
 
         return detachedContainer;
     }
-    
+
     private Object processMapContainer(int fieldNumber, Object mapContainer, AbstractMemberMetaData mmd,
             ContainerHandler<Object, MapContainerAdapter<Object>> containerHandler)
     {

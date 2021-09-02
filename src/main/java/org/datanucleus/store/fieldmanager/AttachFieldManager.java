@@ -96,9 +96,8 @@ public class AttachFieldManager extends AbstractFieldManager
      */
     public void storeObjectField(int fieldNumber, Object value)
     {
-        // Note : when doing updates always do replaceField first and makeDirty after since the replaceField
-        // can cause flush() to be called meaning that an update with null would be made before the new value
-        // makes it into the field
+        // Note : when doing updates always do replaceField first and makeDirty after since the replaceField can cause flush() to be called 
+        // meaning that an update with null would be made before the new value makes it into the field
         AbstractClassMetaData cmd = attachedOP.getClassMetaData();
         AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         ExecutionContext ec = attachedOP.getExecutionContext();
@@ -107,6 +106,7 @@ public class AttachFieldManager extends AbstractFieldManager
 //        boolean processWhenExisting = true;
         if (mmd.hasExtension("attach"))
         {
+            // Undocumented extension, allow a user to mark a field as never attach. Arguably we should unload the (attached) field, so it goes to DB for original value
             if (mmd.getValueForExtension("attach").equalsIgnoreCase("never"))
             {
                 // Member is tagged to not attach, so put a null
@@ -118,6 +118,23 @@ public class AttachFieldManager extends AbstractFieldManager
 //            {
 //                processWhenExisting = false;
 //            }
+        }
+
+        // TODO Link the mmd extension flag in with what is passed in to the AttachFieldManager?
+        if (RelationType.isRelationSingleValued(relationType) && !mmd.isCascadeAttach())
+        {
+            // We have cascade-attach disabled for this member, so we unload it (forces load from DB)
+            NucleusLogger.GENERAL.debug(">> AttachFM.storeObjectField mmd=" + mmd.getFullFieldName() + " but not allowed to merge it, so unloading field");
+            // Member is tagged to not attach, so unload it
+            attachedOP.unloadField(mmd.getName());
+            return;
+        }
+        else if (RelationType.isRelationMultiValued(relationType) && !mmd.isCascadeAttach())
+        {
+            NucleusLogger.GENERAL.debug(">> AttachFM.storeObjectField mmd=" + mmd.getFullFieldName() + " but not allowed to merge it, so unloading field");
+            // Member is tagged to not attach, so unload it
+            attachedOP.unloadField(mmd.getName());
+            return;
         }
 
         // Use ContainerHandlers to support non-JDK Collections and single element collections

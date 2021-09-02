@@ -872,9 +872,9 @@ public class MetaDataMerger
         {
             primaryFmd.cascadePersist = annotFmd.cascadePersist;
         }
-        if (annotFmd.cascadeUpdate != null && primaryFmd.cascadeUpdate == null)
+        if (annotFmd.cascadeAttach != null && primaryFmd.cascadeAttach == null)
         {
-            primaryFmd.cascadeUpdate = annotFmd.cascadeUpdate;
+            primaryFmd.cascadeAttach = annotFmd.cascadeAttach;
         }
         if (annotFmd.cascadeDelete != null && primaryFmd.cascadeDelete == null)
         {

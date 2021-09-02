@@ -125,11 +125,11 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     /** Whether to persist this relation when persisting the owning object. */
     protected Boolean cascadePersist;
 
-    /** Whether to update this relation when updating the owning object. */
-    protected Boolean cascadeUpdate;
-
     /** Whether to delete this relation when deleting the owning object (JPA/Jakarta). This is only used at metadata population. See "dependent". */
     protected Boolean cascadeDelete;
+
+    /** Whether to attach this relation when attaching the owning object. */
+    protected Boolean cascadeAttach;
 
     /** Whether to detach this relation when detaching the owning object (JPA/Jakarta). */
     protected Boolean cascadeDetach;
@@ -260,7 +260,7 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         this.embedded = mmd.embedded;
         this.serialized = mmd.serialized;
         this.cascadePersist = mmd.cascadePersist;
-        this.cascadeUpdate = mmd.cascadeUpdate;
+        this.cascadeAttach = mmd.cascadeAttach;
         this.cascadeDelete = mmd.cascadeDelete;
         this.cascadeDetach = mmd.cascadeDetach;
         this.cascadeRefresh = mmd.cascadeRefresh;
@@ -385,9 +385,9 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
         {
             cascadePersist = apiAdapter.getDefaultCascadePersistForField();
         }
-        if (cascadeUpdate == null)
+        if (cascadeAttach == null)
         {
-            cascadeUpdate = apiAdapter.getDefaultCascadeUpdateForField();
+            cascadeAttach = apiAdapter.getDefaultCascadeAttachForField();
         }
         if (cascadeDelete == null)
         {
@@ -1109,17 +1109,17 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
                 cascadePersist = false;
             }
         }
-        if (hasExtension(MetaData.EXTENSION_MEMBER_CASCADE_UPDATE))
+        if (hasExtension(MetaData.EXTENSION_MEMBER_CASCADE_ATTACH))
         {
             // JDO doesn't have a metadata attribute for this so we use an extension
-            String cascadeValue = getValueForExtension(MetaData.EXTENSION_MEMBER_CASCADE_UPDATE);
+            String cascadeValue = getValueForExtension(MetaData.EXTENSION_MEMBER_CASCADE_ATTACH);
             if (cascadeValue.equalsIgnoreCase("true"))
             {
-                cascadeUpdate = true;
+                cascadeAttach = true;
             }
             else if (cascadeValue.equalsIgnoreCase("false"))
             {
-                cascadeUpdate = false;
+                cascadeAttach = false;
             }
         }
         if (hasExtension(MetaData.EXTENSION_MEMBER_CASCADE_DETACH))
@@ -1678,21 +1678,21 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     }
 
     /**
-     * Accessor for the whether this field should be cascaded at update.
-     * @return Whether to cascade at update
-     */
-    public boolean isCascadeUpdate()
-    {
-        return cascadeUpdate;
-    }
-
-    /**
      * Accessor for the whether this field should be cascaded at delete.
      * @return Whether to cascade at delete
      */
     public boolean isCascadeDelete()
     {
         return cascadeDelete;
+    }
+
+    /**
+     * Accessor for the whether this field should be cascaded at attach.
+     * @return Whether to cascade at attach
+     */
+    public boolean isCascadeAttach()
+    {
+        return cascadeAttach;
     }
 
     /**
@@ -1732,12 +1732,12 @@ public abstract class AbstractMemberMetaData extends MetaData implements Compara
     }
 
     /**
-     * Mutator for the cascading of update operations on this field.
-     * @param cascade Whether to cascade at update
+     * Mutator for the cascading of attach operations on this field.
+     * @param cascade Whether to cascade at attach
      */
-    public void setCascadeUpdate(boolean cascade)
+    public void setCascadeAttach(boolean cascade)
     {
-        this.cascadeUpdate = cascade;
+        this.cascadeAttach = cascade;
     }
 
     /**

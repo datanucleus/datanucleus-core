@@ -290,16 +290,16 @@ public interface ApiAdapter extends Serializable
     boolean getDefaultCascadePersistForField();
 
     /**
-     * Method to return the default setting for cascading update of a field
-     * @return default cascade update setting.
-     */
-    boolean getDefaultCascadeUpdateForField();
-
-    /**
      * Method to return the default setting for cascading delete of a field
      * @return default cascade delete setting.
      */
     boolean getDefaultCascadeDeleteForField();
+
+    /**
+     * Method to return the default setting for cascading attach of a field
+     * @return default cascade attach setting.
+     */
+    boolean getDefaultCascadeAttachForField();
 
     /**
      * Method to return the default setting for cascading detach of a field
