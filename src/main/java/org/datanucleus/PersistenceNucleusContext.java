@@ -218,7 +218,7 @@ public interface PersistenceNucleusContext extends NucleusContext
      * @param ec ExecutionContext
      * @return The tenant id(s) for use when reading
      */
-    String[] getMultiTenancyReadIds(ExecutionContext ec);
+    String[] getTenantReadIds(ExecutionContext ec);
 
     /**
      * Accessor for the current user for the supplied ExecutionContext.

@@ -1879,7 +1879,7 @@ public class PersistenceNucleusContextImpl extends AbstractNucleusContext implem
     }
 
     @Override
-    public String[] getMultiTenancyReadIds(ExecutionContext ec)
+    public String[] getTenantReadIds(ExecutionContext ec)
     {
         if (multiTenancyProvider != null)
         {
