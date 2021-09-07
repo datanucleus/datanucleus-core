@@ -773,7 +773,7 @@ public class JPQLParser extends AbstractParser
                     Node sizeNode = new Node(NodeType.INVOKE, "size");
                     inputNode.insertChildNode(sizeNode);
                     Node isEmptyNode = new Node(NodeType.OPERATOR, not ? "!=" : "==");
-                    isEmptyNode.appendChildNode(inputNode);
+                    isEmptyNode.appendChildNode(inputRootNode);
                     Node zeroNode = new Node(NodeType.LITERAL, 0);
                     isEmptyNode.appendChildNode(zeroNode);
                     stack.push(isEmptyNode);
