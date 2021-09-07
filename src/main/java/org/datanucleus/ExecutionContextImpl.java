@@ -1116,6 +1116,12 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
         return nucCtx.getTenantId(this);
     }
 
+    @Override
+    public String getCurrentUser()
+    {
+        return nucCtx.getCurrentUser(this);
+    }
+
     /**
      * Tests whether this persistable object is in the process of being inserted.
      * @param pc the object to verify the status

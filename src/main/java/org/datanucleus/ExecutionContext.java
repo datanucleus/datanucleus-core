@@ -853,10 +853,16 @@ public interface ExecutionContext extends ExecutionContextReference
     Set<FetchGroup> getFetchGroupsWithName(String name);
 
     /**
-     * Accessor for the tenant id for the ExecutionContext.
+     * Accessor for the tenant id, for this ExecutionContext.
      * @return The tenant id for this context.
      */
     String getTenantId();
+
+    /**
+     * Accessor for the current user, for this ExecutionContext.
+     * @return The current user for this context
+     */
+    String getCurrentUser();
 
     /**
      * Accessor for the lock object for this ExecutionContext.
