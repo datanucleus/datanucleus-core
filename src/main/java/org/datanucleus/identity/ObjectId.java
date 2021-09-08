@@ -64,7 +64,7 @@ public class ObjectId extends SingleFieldId
             }
             keyString = paramString.substring(indexOfDelimiter + 1);
             keyClassName = paramString.substring(0, indexOfDelimiter);
-            key = construct(keyClassName, keyString);
+            key = constructKey(keyClassName, keyString);
         }
         else
         {
@@ -198,12 +198,11 @@ public class ObjectId extends SingleFieldId
      * Construct an instance of the parameter class, using the keyString as an argument to the constructor. 
      * If the class has a StringConstructor instance registered, use it. 
      * If not, try to find a constructor for the class with a single String argument. Otherwise, throw a NucleusUserException.
-     * TODO Consider moving this to ObjectId or IdentityManager
      * @param className the name of the class
      * @param keyString the String parameter for the constructor
      * @return the result of construction
      */
-    public static Object construct(String className, String keyString)
+    public static Object constructKey(String className, String keyString)
     {
         StringConstructor stringConstructor;
         try

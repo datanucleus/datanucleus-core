@@ -155,7 +155,6 @@ public class Node
      */
     public Node getFirstChild()
     {
-        // TODO Phase out the use of cursorPos
         cursorPos = 0;
         if (childNodes.size() < 1)
         {

@@ -201,7 +201,7 @@ public abstract class AbstractAnnotationReader implements AnnotationReader
                     }
                 }
 
-                // TODO Clear up whether we are processing just properties or just fields or mixed mode. Currently we process both
+                // TODO If the user selects just FIELDS then only process FIELDS, and ditto PROPERTIES. This does both
                 // Process the getters
                 for (AnnotatedMember method : annotatedGetterMethods)
                 {

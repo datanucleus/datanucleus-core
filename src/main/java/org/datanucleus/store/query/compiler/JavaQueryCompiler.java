@@ -400,7 +400,15 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                                             if (joinedMembers[k].endsWith("#KEY"))
                                             {
                                                 joinedCmd = mmd.getMap().getKeyClassMetaData(clr);
-                                                // TODO Set joinedCls
+                                                if (joinedCmd != null)
+                                                {
+                                                    // JPA assumption that the value is an entity ... but it may not be!
+                                                    joinedCls = clr.classForName(joinedCmd.getFullClassName());
+                                                }
+                                                else
+                                                {
+                                                    joinedCls = clr.classForName(mmd.getMap().getKeyType());
+                                                }
                                             }
                                             else
                                             {
@@ -758,7 +766,6 @@ public abstract class JavaQueryCompiler implements SymbolResolver
 
             // Find the last child of this node, and check for an alias (type = NAME)
             String alias = null;
-            Node aliasNode = null;
             List<Node> childNodes = node[i].getChildNodes();
             if (childNodes != null && childNodes.size() > 0)
             {
@@ -766,14 +773,13 @@ public abstract class JavaQueryCompiler implements SymbolResolver
                 if (lastChild.getNodeType() == NodeType.NAME)
                 {
                     // Alias node
-                    aliasNode = lastChild;
+                    Node aliasNode = lastChild;
+                    if (aliasNode != null)
+                    {
+                        alias = (String)aliasNode.getNodeValue();
+                        node[i].removeChildNode(aliasNode);
+                    }
                 }
-            }
-            // TODO If we allow JPQL creator expression to have ALIAS then need to process NAME for those too.
-            if (aliasNode != null)
-            {
-                alias = (String)aliasNode.getNodeValue();
-                node[i].removeChildNode(aliasNode);
             }
             if (candidateAliasOrig != null)
             {
