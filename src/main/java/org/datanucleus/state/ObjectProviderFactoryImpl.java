@@ -121,7 +121,7 @@ public class ObjectProviderFactoryImpl implements ObjectProviderFactory
      * @param ec ExecutionContext
      * @param pcClass the class of the new instance to be created.
      * @param fv the initial field values of the object.
-     * @deprecated Use newForHollowPopulated instead
+     * @deprecated Use newForHollow instead
      */
     public <T> ObjectProvider<T> newForHollowPopulatedAppId(ExecutionContext ec, Class<T> pcClass, final FieldValues fv)
     {
