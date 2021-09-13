@@ -132,9 +132,6 @@ public class MetaData implements Serializable
     /** Member : when field is enum, name of the method to get the "value" of the enum. */
     public static final String EXTENSION_MEMBER_ENUM_VALUE_GETTER = "enum-value-getter";
 
-    /** Member : when field is enum, name of the method to return the enum given the value. @deprecated */
-    public static final String EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE = "enum-getter-by-value";
-
     /** Member : when the field is Calendar, signifies that it should be stored as a single column. */
     public static final String EXTENSION_MEMBER_CALENDAR_ONE_COLUMN = "calendar-one-column";
 

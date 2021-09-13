@@ -37,11 +37,9 @@ public class EnumConversionHelper
     {
         Class enumType = mmd.getType();
         String valueGetterMethodName = null;
-        String getEnumStatisMethodName = null;
         if (role == FieldRole.ROLE_FIELD && mmd.hasExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER))
         {
             valueGetterMethodName = mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER);
-            getEnumStatisMethodName = mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE);
         }
         else if (role == FieldRole.ROLE_COLLECTION_ELEMENT)
         {
@@ -49,7 +47,6 @@ public class EnumConversionHelper
             if (mmd.getElementMetaData() != null && mmd.getElementMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER))
             {
                 valueGetterMethodName = mmd.getElementMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER);
-                getEnumStatisMethodName = mmd.getElementMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE);
             }
         }
         else if (role == FieldRole.ROLE_ARRAY_ELEMENT)
@@ -58,7 +55,6 @@ public class EnumConversionHelper
             if (mmd.getElementMetaData() != null && mmd.getElementMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER))
             {
                 valueGetterMethodName = mmd.getElementMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER);
-                getEnumStatisMethodName = mmd.getElementMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE);
             }
         }
         else if (role == FieldRole.ROLE_MAP_KEY)
@@ -67,7 +63,6 @@ public class EnumConversionHelper
             if (mmd.getKeyMetaData() != null && mmd.getKeyMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER))
             {
                 valueGetterMethodName = mmd.getKeyMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER);
-                getEnumStatisMethodName = mmd.getKeyMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE);
             }
         }
         else if (role == FieldRole.ROLE_MAP_VALUE)
@@ -76,7 +71,6 @@ public class EnumConversionHelper
             if (mmd.getValueMetaData() != null && mmd.getValueMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER))
             {
                 valueGetterMethodName = mmd.getValueMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER);
-                getEnumStatisMethodName = mmd.getValueMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE);
             }
         }
 
@@ -113,35 +107,6 @@ public class EnumConversionHelper
                     {
                         // Exception in invocation. Do something
                     }
-                }
-            }
-            else if (getEnumStatisMethodName != null)
-            {
-                // Deprecated : legacy method : provided static getter method to return the Enum
-                try
-                {
-                    Method getterMethod = ClassUtils.getMethodForClass(enumType, getEnumStatisMethodName, new Class[] {int.class});
-                    if (getterMethod != null)
-                    {
-                        return getterMethod.invoke(null, new Object[] {((Number)value).intValue()});
-                    }
-
-                    getterMethod = ClassUtils.getMethodForClass(enumType, getEnumStatisMethodName, new Class[] {short.class});
-                    if (getterMethod != null)
-                    {
-                        return getterMethod.invoke(null, new Object[] {((Number)value).shortValue()});
-                    }
-
-                    getterMethod = ClassUtils.getMethodForClass(enumType, getEnumStatisMethodName, new Class[] {String.class});
-                    if (getterMethod != null)
-                    {
-                        return getterMethod.invoke(null, new Object[] {(String)value});
-                    }
-                }
-                catch (Exception e)
-                {
-                    NucleusLogger.PERSISTENCE.warn("Specified enum getter-by-value for field " + mmd.getFullFieldName() +
-                        " gave an error on extracting the enum so just using the ordinal : " + e.getMessage());
                 }
             }
         }
