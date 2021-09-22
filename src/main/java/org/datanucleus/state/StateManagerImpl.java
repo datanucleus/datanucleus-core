@@ -5940,6 +5940,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
      * Method to convert the persistable object into String form.
      * @param pc The persistable object
      * @param cmd Metadata for the class
+     * @return The string containing the description of the Persistable
      */
     private static String convertPCToString(Object pc, AbstractClassMetaData cmd)
     {
@@ -6000,7 +6001,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
     /**
      * Utility to dump the contents of the StateManager to the provided log.
-     * @param out PrintWriter to dump to
+     * @param log Logger to use
      */
     public void log(NucleusLogger log)
     {

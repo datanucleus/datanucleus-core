@@ -63,7 +63,7 @@ public abstract class LifeCycleState
     /** illegal state **/
     public static final int ILLEGAL_STATE    = 13;
 
-    // These are state flags that are set to required valuers in specific state 
+    // State flags that are set to required valuers in specific state 
     protected boolean isDirty;
     protected boolean isNew;
     protected boolean isDeleted;
@@ -83,37 +83,37 @@ public abstract class LifeCycleState
 
     /**
      * Utility to change state to a new state.
-     * @param op ObjectProvider
+     * @param sm StateManager
      * @param newStateType The new state
      * @return new LifeCycle state.
      */
-    protected final LifeCycleState changeState(ObjectProvider op, int newStateType)
+    protected final LifeCycleState changeState(ObjectProvider sm, int newStateType)
     {
-        LifeCycleState newState = op.getExecutionContext().getNucleusContext().getApiAdapter().getLifeCycleState(newStateType);
+        LifeCycleState newState = sm.getExecutionContext().getNucleusContext().getApiAdapter().getLifeCycleState(newStateType);
 
         if (NucleusLogger.LIFECYCLE.isDebugEnabled())
         {
-            NucleusLogger.LIFECYCLE.debug(Localiser.msg("027016", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), this, newState));
+            NucleusLogger.LIFECYCLE.debug(Localiser.msg("027016", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), this, newState));
         }
 
         if (isTransactional)
         {
             if (newState == null || !newState.isTransactional)
             {
-                op.evictFromTransaction();
+                sm.evictFromTransaction();
             }
         }
         else
         {
             if (newState != null && newState.isTransactional)
             {
-                op.enlistInTransaction();
+                sm.enlistInTransaction();
             }
         }
 
         if (newState == null)
         {
-            op.disconnect();
+            sm.disconnect();
         }
 
         return newState;
@@ -121,17 +121,17 @@ public abstract class LifeCycleState
     
     /**
      * Utility to change state to a new state.
-     * @param op ObjectProvider
+     * @param sm StateManager
      * @param newStateType The new state
      * @return new LifeCycle state.
      */
-    protected final LifeCycleState changeTransientState(ObjectProvider op, int newStateType)
+    protected final LifeCycleState changeTransientState(ObjectProvider sm, int newStateType)
     {
-        LifeCycleState newState = op.getExecutionContext().getNucleusContext().getApiAdapter().getLifeCycleState(newStateType);
+        LifeCycleState newState = sm.getExecutionContext().getNucleusContext().getApiAdapter().getLifeCycleState(newStateType);
         
         try 
         {
-            op.enlistInTransaction();
+            sm.enlistInTransaction();
         }
         catch (Exception e)
         {
@@ -143,186 +143,185 @@ public abstract class LifeCycleState
 
     /**
      * Method to transition to persistent state.
-     * @param op ObjectProvider.
+     * @param sm StateManager.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionMakePersistent(ObjectProvider op)
+    public LifeCycleState transitionMakePersistent(ObjectProvider sm)
     {
         return this;
     }
 
     /**
      * Method to transition to delete persistent state.
-     * @param op ObjectProvider.
+     * @param sm StateManager.
      * @return new LifeCycle state.
      */
-    public LifeCycleState transitionDeletePersistent(ObjectProvider op)
+    public LifeCycleState transitionDeletePersistent(ObjectProvider sm)
     {
         return this;
     }
 
     /**
      * Method to transition to transactional state.
-     * @param op ObjectProvider.
+     * @param sm StateManager.
      * @param refreshFields Whether to refresh loaded fields
      * @return new LifeCycle state.
      */
-    public LifeCycleState transitionMakeTransactional(ObjectProvider op, boolean refreshFields)
+    public LifeCycleState transitionMakeTransactional(ObjectProvider sm, boolean refreshFields)
     {
         return this;
     }
 
     /**
      * Method to transition to nontransactional state.
-     * @param op ObjectProvider.
+     * @param sm StateManager.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionMakeNontransactional(ObjectProvider op)
+    public LifeCycleState transitionMakeNontransactional(ObjectProvider sm)
     {
         return this;
     }
 
     /**
      * Method to transition to transient state.
-     * @param op ObjectProvider.
+     * @param sm StateManager.
      * @param useFetchPlan to make transient the fields in the fetch plan
      * @param detachAllOnCommit Whether to detach on commit
      * @return new LifeCycle state.
      */
-    public LifeCycleState transitionMakeTransient(ObjectProvider op, boolean useFetchPlan, boolean detachAllOnCommit)
+    public LifeCycleState transitionMakeTransient(ObjectProvider sm, boolean useFetchPlan, boolean detachAllOnCommit)
     {
         return this;
     }
 
     /**
      * Method to transition to transaction begin state.
-     * @param op ObjectProvider.
+     * @param sm StateManager.
      * @param tx Transaction.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionBegin(ObjectProvider op, org.datanucleus.transaction.Transaction tx)
+    public LifeCycleState transitionBegin(ObjectProvider sm, org.datanucleus.transaction.Transaction tx)
     {
         return this;
     }
     
     /**
      * Method to transition to commit state.
-     * @param op ObjectProvider.
+     * @param sm StateManager.
      * @param tx the Transaction been committed.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionCommit(ObjectProvider op, org.datanucleus.transaction.Transaction tx)
+    public LifeCycleState transitionCommit(ObjectProvider sm, org.datanucleus.transaction.Transaction tx)
     {
         return this;
     }
 
     /**
      * Method to transition to rollback state.
-     * @param op ObjectProvider.
+     * @param sm StateManager.
      * @param tx Transaction.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionRollback(ObjectProvider op, org.datanucleus.transaction.Transaction tx)
+    public LifeCycleState transitionRollback(ObjectProvider sm, org.datanucleus.transaction.Transaction tx)
     {
         return this;
     }
 
     /**
      * Method to transition to refresh state.
-     * @param op ObjectProvider.
+     * @param sm StateManager.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionRefresh(ObjectProvider op)
+    public LifeCycleState transitionRefresh(ObjectProvider sm)
     {
         return this;
     }
 
     /**
      * Method to transition to evict state.
-     * @param op ObjectProvider.
+     * @param sm StateManager.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionEvict(ObjectProvider op)
+    public LifeCycleState transitionEvict(ObjectProvider sm)
     {
         return this;
     }
 
     /**
      * Method to transition to read-field state.
-     * @param op ObjectProvider.
+     * @param sm StateManager.
      * @param isLoaded if the field was previously loaded 
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionReadField(ObjectProvider op, boolean isLoaded)
+    public LifeCycleState transitionReadField(ObjectProvider sm, boolean isLoaded)
     {
         return this;
     }
 
     /**
      * Method to transition to write-field state.
-     * @param op ObjectProvider.
+     * @param sm StateManager.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionWriteField(ObjectProvider op)
+    public LifeCycleState transitionWriteField(ObjectProvider sm)
     {
         return this;
     }
 
     /**
      * Method to transition to retrieve state.
-     * @param op ObjectProvider.
+     * @param sm StateManager.
      * @param fgOnly only retrieve the current fetch group fields
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionRetrieve(ObjectProvider op, boolean fgOnly)
+    public LifeCycleState transitionRetrieve(ObjectProvider sm, boolean fgOnly)
     {
         return this;
     }
     
     /**
      * Method to transition to retrieve state.
-     * @param op ObjectProvider.
+     * @param sm StateManager.
      * @param fetchPlan the fetch plan to load fields
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionRetrieve(ObjectProvider op, FetchPlan fetchPlan)
+    public LifeCycleState transitionRetrieve(ObjectProvider sm, FetchPlan fetchPlan)
     {
         return this;
     }
 
     /**
      * Method to transition to detached-clean.
-     * @param op ObjectProvider.
+     * @param sm StateManager.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionDetach(ObjectProvider op)
+    public LifeCycleState transitionDetach(ObjectProvider sm)
     {
         return this;
     }
 
     /**
      * Method to transition to persistent-clean.
-     * @param op ObjectProvider.
+     * @param sm StateManager.
      * @return new LifeCycle state.
      **/
-    public LifeCycleState transitionAttach(ObjectProvider op)
+    public LifeCycleState transitionAttach(ObjectProvider sm)
     {
         return this;
     }
 
     /**
      * Method to transition when serialised.
-     * @param op ObjectProvider
+     * @param sm StateManager
      * @return The new LifeCycle state
      */
-    public LifeCycleState transitionSerialize(ObjectProvider op)
+    public LifeCycleState transitionSerialize(ObjectProvider sm)
     {
         return this;
     }
 
     /**
-     * Return whether the object is dirty, ie has been changed
-     * (created, updated, deleted) in this Tx.
+     * Return whether the object is dirty, ie has been changed (created, updated, deleted) in this Tx.
      * @return Whether the object is dirty. 
      */
     public final boolean isDirty()
