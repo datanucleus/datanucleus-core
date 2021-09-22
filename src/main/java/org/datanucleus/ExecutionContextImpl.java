@@ -3972,7 +3972,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     /**
      * Method to mark an object (ObjectProvider) as dirty.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param directUpdate Whether the object has had a direct update made on it (if known)
      */
     public void markDirty(ObjectProvider op, boolean directUpdate)
@@ -4034,7 +4034,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
     /**
      * Method to return the RelationshipManager for the ObjectProvider.
      * If we are currently managing relations and the ObjectProvider has no RelationshipManager allocated then one is created.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @return The RelationshipManager
      */
     public RelationshipManager getRelationshipManager(ObjectProvider op)
@@ -4804,7 +4804,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     /**
      * Method to add/update the managed object into the L2 cache as long as it isn't modified in the current transaction.
-     * @param op ObjectProvider for the object
+     * @param op StateManager for the object
      * @param updateIfPresent Whether to update it in the L2 cache if already present
      */
     protected void putObjectIntoLevel2Cache(ObjectProvider op, boolean updateIfPresent)
@@ -4830,7 +4830,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     /**
      * Convenience method to convert the object managed by the ObjectProvider into a form suitable for caching in an L2 cache.
-     * @param op ObjectProvider for the object
+     * @param op StateManager for the object
      * @param currentCachedPC Current L2 cached object (if any) to use for updating
      * @return The cacheable form of the object
      */
@@ -4987,7 +4987,7 @@ public class ExecutionContextImpl implements ExecutionContext, TransactionEventL
 
     /**
      * Convenience method to add/update an object in the L2 cache.
-     * @param op ObjectProvider of the object to add.
+     * @param op StateManager of the object to add.
      * @param updateIfPresent Whether to update the L2 cache if it is present
      */
     protected void putObjectIntoLevel2CacheInternal(ObjectProvider op, boolean updateIfPresent)

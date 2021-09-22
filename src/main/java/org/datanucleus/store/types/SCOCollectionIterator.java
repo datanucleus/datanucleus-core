@@ -40,7 +40,7 @@ public class SCOCollectionIterator<E> implements Iterator<E>
     /**
      * Constructor taking the delegate or backing store.
      * @param sco The owner sco
-     * @param op ObjectProvider of SCO Collection to iterate
+     * @param op StateManager of SCO Collection to iterate
      * @param theDelegate The delegate collection
      * @param backingStore The backing store (connected to the DB)
      * @param useDelegate Whether to use the delegate

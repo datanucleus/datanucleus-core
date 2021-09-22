@@ -439,7 +439,7 @@ public interface ExecutionContext extends ExecutionContextReference
     /**
      * Method to attach the passed object (and related objects).
      * Throws an exception if another (persistent) object with the same id exists in the L1 cache already.
-     * @param op ObjectProvider of the owning object that has this in a field causing its attach
+     * @param op StateManager of the owning object that has this in a field causing its attach
      * @param pc The (detached) object
      * @param sco Whether the object has no identity (embedded or serialised)
      */
@@ -447,7 +447,7 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Method to attach a copy of the passed object (and related objects).
-     * @param op ObjectProvider of the owning object that has this in a field causing its attach
+     * @param op StateManager of the owning object that has this in a field causing its attach
      * @param pc The object
      * @param sco Whether it has no identity (second-class object)
      * @param <T> Type of the persistable object
@@ -494,7 +494,7 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Mark the specified ObjectProvider as dirty
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param directUpdate Whether the object has had a direct update made on it (if known)
      */
     void markDirty(ObjectProvider op, boolean directUpdate);
@@ -778,7 +778,7 @@ public interface ExecutionContext extends ExecutionContextReference
     /**
      * Method to flush all queued operations for the specified backing store (if any).
      * @param backingStore The backing store
-     * @param op ObjectProvider
+     * @param op StateManager
      */
     void flushOperationsForBackingStore(Store backingStore, ObjectProvider op);
 
@@ -802,7 +802,7 @@ public interface ExecutionContext extends ExecutionContextReference
 
     /**
      * Accessor for the RelationshipManager for the provided ObjectProvider.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @return The RelationshipManager
      */
     RelationshipManager getRelationshipManager(ObjectProvider op);

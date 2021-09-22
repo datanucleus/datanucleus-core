@@ -755,7 +755,7 @@ public interface ObjectProvider<T> extends StateManager
 
     /**
      * Convenience method to retrieve the detach state from the passed ObjectProvider's managed object
-     * @param op ObjectProvider
+     * @param op StateManager
      */
     void retrieveDetachState(ObjectProvider op);
 

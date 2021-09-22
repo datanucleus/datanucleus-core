@@ -137,7 +137,7 @@ public class ReferentialStateManagerImpl extends StateManagerImpl
     /**
      * Method called by another ObjectProvider when this object has registered that it needs to know
      * when the other object has been inserted.
-     * @param op ObjectProvider of the other object that has just been inserted
+     * @param op StateManager of the other object that has just been inserted
      */
     void insertionCompleted(ReferentialStateManagerImpl op)
     {

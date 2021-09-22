@@ -60,7 +60,7 @@ public class RelationshipManagerImpl implements RelationshipManager
 
     /**
      * Constructor.
-     * @param op ObjectProvider for the object that we are managing relations for.
+     * @param op StateManager for the object that we are managing relations for.
      */
     public RelationshipManagerImpl(ObjectProvider op)
     {

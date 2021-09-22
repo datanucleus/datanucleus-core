@@ -35,7 +35,7 @@ public class BitSet extends java.util.BitSet implements SCO<java.util.BitSet>
 
     /**
      * Creates a <i>BitSet</i> object. Assigns owning object and field name.
-     * @param op ObjectProvider for the owning object
+     * @param op StateManager for the owning object
      * @param mmd Metadata for the member
      */
     public BitSet(ObjectProvider op, AbstractMemberMetaData mmd)

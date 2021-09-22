@@ -35,7 +35,7 @@ public abstract class AbstractFetchFieldManager extends AbstractFieldManager
 
     /**
      * Constructor to use when retrieving values of fields of existing objects.
-     * @param op ObjectProvider for the object
+     * @param op StateManager for the object
      */
     public AbstractFetchFieldManager(ObjectProvider op)
     {

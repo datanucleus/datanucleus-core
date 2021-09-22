@@ -38,7 +38,7 @@ public class GregorianCalendar extends java.util.GregorianCalendar implements SC
     /**
      * Creates a <i>GregorianCalendar</i> object that represents the time at which it was allocated.
      * Assigns owning object and field name.
-     * @param op ObjectProvider for the owning object
+     * @param op StateManager for the owning object
      * @param mmd Metadata for the member
      */
     public GregorianCalendar(ObjectProvider op, AbstractMemberMetaData mmd)

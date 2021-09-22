@@ -36,7 +36,7 @@ public class SqlDate extends java.sql.Date implements SCO<java.sql.Date>
     /**
      * Creates a <i>SqlDate</i> object that represents the time at which
      * it was allocated. Assigns owning object and field name.
-     * @param op ObjectProvider for the owning object
+     * @param op StateManager for the owning object
      * @param mmd Metadata for the member
      */
     public SqlDate(ObjectProvider op, AbstractMemberMetaData mmd)

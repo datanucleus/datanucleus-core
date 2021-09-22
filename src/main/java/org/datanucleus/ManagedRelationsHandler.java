@@ -60,7 +60,7 @@ public class ManagedRelationsHandler
     /**
      * Method to return the RelationshipManager for the specified ObjectProvider.
      * If none is currently present will create one
-     * @param op ObjectProvider
+     * @param op StateManager
      * @return The RelationshipManager for this object
      */
     public RelationshipManager getRelationshipManagerForObjectProvider(ObjectProvider op)

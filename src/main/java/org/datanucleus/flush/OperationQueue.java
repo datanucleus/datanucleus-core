@@ -116,7 +116,7 @@ public class OperationQueue
      * Method to perform all operations queued for the specified ObjectProvider and backing store.
      * Those operations are then removed from the queue.
      * @param store The backing store
-     * @param op ObjectProvider
+     * @param op StateManager
      */
     public void performAll(Store store, ObjectProvider op)
     {

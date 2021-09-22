@@ -40,7 +40,7 @@ public interface CollectionStore<E> extends Store
 
     /**
      * Method to update en embedded element in the collection.
-     * @param op ObjectProvider for the owner of the collection
+     * @param op StateManager for the owner of the collection
      * @param element The element
      * @param fieldNumber Field to update in the element
      * @param value The new value for the field
@@ -52,21 +52,21 @@ public interface CollectionStore<E> extends Store
  
     /**
      * Accessor for an iterator for the collection.
-     * @param op ObjectProvider for the owner of the collection. 
+     * @param op StateManager for the owner of the collection. 
      * @return Iterator for the collection.
      **/
     Iterator<E> iterator(ObjectProvider op);
 
     /**
      * Accessor for the size of the collection.
-     * @param op ObjectProvider for the owner of the collection. 
+     * @param op StateManager for the owner of the collection. 
      * @return The size of the collection.
      **/
     int size(ObjectProvider op);
 
     /**
      * Method to check if an element exists in the collection.
-     * @param op ObjectProvider for the owner of the collection. 
+     * @param op StateManager for the owner of the collection. 
      * @param element Element to check
      * @return Whether the element exists in the collection.
      **/
@@ -74,7 +74,7 @@ public interface CollectionStore<E> extends Store
 
     /**
      * Method to add an element to the collection.
-     * @param op ObjectProvider for the owner of the collection. 
+     * @param op StateManager for the owner of the collection. 
      * @param element Element to add
      * @param size Current size of the collection if known. -1 if not known
      * @return Whether the element was added ok
@@ -83,7 +83,7 @@ public interface CollectionStore<E> extends Store
 
     /**
      * Method to add a collection of elements to the collection.
-     * @param op ObjectProvider for the owner of the collection. 
+     * @param op StateManager for the owner of the collection. 
      * @param elements Elements to add
      * @param size Current size of collection (if known). -1 if not known
      * @return Whether the elements were added ok
@@ -92,7 +92,7 @@ public interface CollectionStore<E> extends Store
 
     /**
      * Method to remove an element from the collection.
-     * @param op ObjectProvider for the owner of the collection. 
+     * @param op StateManager for the owner of the collection. 
      * @param element Element to remove
      * @param size Current size of collection if known. -1 if not known
      * @param allowDependentField Whether to allow any cascading delete actions to be fired from this removal
@@ -102,7 +102,7 @@ public interface CollectionStore<E> extends Store
 
     /**
      * Method to remove a collection of elements from the collection.
-     * @param op ObjectProvider for the owner of the collection. 
+     * @param op StateManager for the owner of the collection. 
      * @param elements Element to remove
      * @param size Current size of collection if known. -1 if not known
      * @return Whether the elements were removed ok
@@ -111,13 +111,13 @@ public interface CollectionStore<E> extends Store
 
     /**
      * Method to clear the collection.
-     * @param op ObjectProvider for the owner of the collection. 
+     * @param op StateManager for the owner of the collection. 
      **/
     void clear(ObjectProvider op);
 
     /**
      * Method to update the collection to be the supplied collection of elements.
-     * @param op ObjectProvider of the object
+     * @param op StateManager of the object
      * @param coll The collection to use
      */
     void update(ObjectProvider op, Collection coll);

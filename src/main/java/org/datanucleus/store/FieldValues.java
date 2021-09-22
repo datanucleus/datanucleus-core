@@ -27,13 +27,13 @@ public interface FieldValues
 {
     /**
      * Method to retrieve the fields and store them in the object managed by the ObjectProvider.
-     * @param op ObjectProvider for the object
+     * @param op StateManager for the object
      */
     void fetchFields(ObjectProvider op);
 
     /**
      * Method to retrieve the unloaded fields and store them in the object managed by the ObjectProvider. 
-     * @param op ObjectProvider for the object
+     * @param op StateManager for the object
      */
     void fetchNonLoadedFields(ObjectProvider op);
 

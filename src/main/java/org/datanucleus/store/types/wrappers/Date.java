@@ -36,7 +36,7 @@ public class Date extends java.util.Date implements SCO<java.util.Date>
     /**
      * Creates a <i>Date</i> object that represents the time at which it was allocated.
      * Assigns owning object and field name.
-     * @param op ObjectProvider for the owning object
+     * @param op StateManager for the owning object
      * @param mmd Metadata for the member
      */
     public Date(ObjectProvider op, AbstractMemberMetaData mmd)

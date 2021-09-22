@@ -35,7 +35,7 @@ public interface ListStore<E> extends CollectionStore<E>
 {
     /**
      * Method to add an element to the List.
-     * @param op ObjectProvider for the owner of the List. 
+     * @param op StateManager for the owner of the List. 
      * @param element Element to add
      * @param index Position to add the element. 
      * @param size Current size of list (if known). -1 if not known
@@ -44,7 +44,7 @@ public interface ListStore<E> extends CollectionStore<E>
 
     /**
      * Method to add a collection of elements to the List.
-     * @param op ObjectProvider for the owner of the List.
+     * @param op StateManager for the owner of the List.
      * @param c Collection of elements to add
      * @param index Position to add the elements.
      * @param size Current size of the list (if known). -1 if not known
@@ -54,7 +54,7 @@ public interface ListStore<E> extends CollectionStore<E>
 
     /**
      * Method to remove an element from the List.
-     * @param op ObjectProvider for the owner of the List.
+     * @param op StateManager for the owner of the List.
      * @param index Position to remove the element.
      * @param size Current size of the list (if known). -1 if not known
      * @return The element that was removed.
@@ -63,7 +63,7 @@ public interface ListStore<E> extends CollectionStore<E>
 
     /**
      * Method to retrieve an element from a position in the List.
-     * @param op ObjectProvider for the owner of the List.
+     * @param op StateManager for the owner of the List.
      * @param index Position of the element.
      * @return The element at that position.
      */
@@ -71,7 +71,7 @@ public interface ListStore<E> extends CollectionStore<E>
 
     /**
      * Method to update an element at a position in the List.
-     * @param op ObjectProvider for the owner of the List.
+     * @param op StateManager for the owner of the List.
      * @param index Position of the element.
      * @param element The element value
      * @param allowDependentField Whether to enable dependent field during this operation
@@ -81,7 +81,7 @@ public interface ListStore<E> extends CollectionStore<E>
 
     /**
      * Accessor for a sublist of elements between from and to indices.
-     * @param op ObjectProvider for the owner of the List.
+     * @param op StateManager for the owner of the List.
      * @param from Start position (inclusive)
      * @param to End position (exclusive)
      * @return List of elements in this range.
@@ -90,7 +90,7 @@ public interface ListStore<E> extends CollectionStore<E>
 
     /**
      * Method to return the position of an element in the List.
-     * @param op ObjectProvider for the owner of the List.
+     * @param op StateManager for the owner of the List.
      * @param element The element value
      * @return The position of the element.
      */
@@ -98,7 +98,7 @@ public interface ListStore<E> extends CollectionStore<E>
 
     /**
      * Method to return the last position of an element in the List.
-     * @param op ObjectProvider for the owner of the List.
+     * @param op StateManager for the owner of the List.
      * @param element The element value
      * @return The last position of the element.
      **/
@@ -106,7 +106,7 @@ public interface ListStore<E> extends CollectionStore<E>
 
     /**
      * Accessor for a list iterator for the List.
-     * @param op ObjectProvider for the owner of the List. 
+     * @param op StateManager for the owner of the List. 
      * @return List iterator for the List.
      */
 	ListIterator<E> listIterator(ObjectProvider op);

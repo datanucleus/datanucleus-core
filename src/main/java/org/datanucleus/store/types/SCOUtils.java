@@ -1323,7 +1323,7 @@ public class SCOUtils
 
     /**
      * Convenience method to return if we should use a queued update for the current operation.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @return Whether to use queued for this operation
      */
     public static boolean useQueuedUpdate(ObjectProvider op)

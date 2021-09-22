@@ -34,7 +34,7 @@ public class SqlTime extends java.sql.Time implements SCO<java.sql.Time>
 
     /**
      * Creates a <i>SqlTime</i> object that represents the time at which it was allocated.
-     * @param op ObjectProvider for the owning object
+     * @param op StateManager for the owning object
      * @param mmd Metadata for the member
      */
     public SqlTime(ObjectProvider op, AbstractMemberMetaData mmd)

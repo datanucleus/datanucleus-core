@@ -3277,7 +3277,7 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
 
     /**
      * Convenience method to retrieve the detach state from the passed ObjectProvider's object.
-     * @param op ObjectProvider
+     * @param op StateManager
      */
     public void retrieveDetachState(ObjectProvider op)
     {

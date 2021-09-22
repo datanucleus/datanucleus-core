@@ -154,7 +154,7 @@ public class LockManagerImpl implements LockManager
 
     /**
      * Perform an optimistic version check on the passed object, against the passed version in the datastore.
-     * @param op ObjectProvider of the object to check
+     * @param op StateManager of the object to check
      * @param versionStrategy Version strategy
      * @param versionDatastore Version of the object in the datastore
      * @throws NucleusUserException thrown when an invalid strategy is specified

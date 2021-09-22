@@ -59,7 +59,7 @@ public interface MapStore<K, V> extends Store
  
     /**
      * Accessor for whether the Map contains this value.
-     * @param op ObjectProvider for the owner of the map.
+     * @param op StateManager for the owner of the map.
      * @param value The value to check
      * @return Whether it is contained.
      */
@@ -67,7 +67,7 @@ public interface MapStore<K, V> extends Store
 
     /**
      * Accessor for whether the Map contains this key.
-     * @param op ObjectProvider for the owner of the map.
+     * @param op StateManager for the owner of the map.
      * @param key The key to check
      * @return Whether it is contained.
      */
@@ -75,7 +75,7 @@ public interface MapStore<K, V> extends Store
 
     /**
      * Accessor for a value from the Map.
-     * @param op ObjectProvider for the owner of the map. 
+     * @param op StateManager for the owner of the map. 
      * @param key Key for the value.
      * @return Value for this key.
      */
@@ -83,7 +83,7 @@ public interface MapStore<K, V> extends Store
 
     /**
      * Method to add a value to the Map against this key.
-     * @param op ObjectProvider for the owner of the map. 
+     * @param op StateManager for the owner of the map. 
      * @param key The key.
      * @param value The value.
      * @return Value that was previously against this key.
@@ -94,7 +94,7 @@ public interface MapStore<K, V> extends Store
      * Method to add a value to the Map against this key, where we know the previous value for the key (if present).
      * Default implementation simply calls the <cite>put(ObjectProvider, Object, Object)</cite> method.
      * Override to provide an efficient implementation for this action.
-     * @param op ObjectProvider for the owner of the map. 
+     * @param op StateManager for the owner of the map. 
      * @param key The key.
      * @param value The value.
      * @param previousValue The previous value
@@ -107,14 +107,14 @@ public interface MapStore<K, V> extends Store
 
     /**
      * Method to add a map of values to the Map.
-     * @param op ObjectProvider for the owner of the map. 
+     * @param op StateManager for the owner of the map. 
      * @param m The map to put.
      */ 
     void putAll(ObjectProvider op, Map<? extends K, ? extends V> m);
 
     /**
      * Method to add a map of values to the Map where we know the existing Map values prior to the putAll call.
-     * @param op ObjectProvider for the owner of the map.
+     * @param op StateManager for the owner of the map.
      * @param m The map to add.
      * @param previousMap The map prior to the putAll call.
      */
@@ -125,7 +125,7 @@ public interface MapStore<K, V> extends Store
 
     /**
      * Method to remove a value from the Map.
-     * @param op ObjectProvider for the owner of the map. 
+     * @param op StateManager for the owner of the map. 
      * @param key Key whose value is to be removed.
      * @return Value that was removed.
      */
@@ -133,7 +133,7 @@ public interface MapStore<K, V> extends Store
 
     /**
      * Method to remove a value from the Map where we know the value assigned to this key (to avoid lookups).
-     * @param op ObjectProvider for the owner of the map. 
+     * @param op StateManager for the owner of the map. 
      * @param key Key whose value is to be removed.
      * @param val Value for this key when the value is known (to save the lookup)
      */
@@ -141,7 +141,7 @@ public interface MapStore<K, V> extends Store
 
     /**
      * Method to clear the map.
-     * @param op ObjectProvider for the owner of the map. 
+     * @param op StateManager for the owner of the map. 
      */
     void clear(ObjectProvider op);
 
@@ -149,7 +149,7 @@ public interface MapStore<K, V> extends Store
      * Method to update the map to be the supplied map of entries.
      * Default implementation simply does a clear followed by putAll.
      * Override this and provide an efficient implementation for this action.
-     * @param op ObjectProvider of the object
+     * @param op StateManager of the object
      * @param map The map to use
      */
     default void update(ObjectProvider op, Map<K, V> map)
@@ -178,7 +178,7 @@ public interface MapStore<K, V> extends Store
 
     /**
      * Method to update an embedded key in the map.
-     * @param op ObjectProvider for the owner of the map
+     * @param op StateManager for the owner of the map
      * @param key The element
      * @param fieldNumber Field to update in the key
      * @param newValue The new value for the field
@@ -188,7 +188,7 @@ public interface MapStore<K, V> extends Store
 
     /**
      * Method to update an embedded value in the map.
-     * @param op ObjectProvider for the owner of the map
+     * @param op StateManager for the owner of the map
      * @param value The element
      * @param fieldNumber Field to update in the value
      * @param newValue The new value for the field

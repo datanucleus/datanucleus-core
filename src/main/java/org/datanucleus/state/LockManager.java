@@ -35,20 +35,20 @@ public interface LockManager
 {
     /**
      * Method to lock the object managed by the passed ObjectProvider (mode 1).
-     * @param op ObjectProvider for the object
+     * @param op StateManager for the object
      * @param lockMode mode for locking
      */
     void lock(ObjectProvider op, LockMode lockMode);
 
     /**
      * Method to unlock the object managed by the passed ObjectProvider (mode 1).
-     * @param op ObjectProvider for the object
+     * @param op StateManager for the object
      */
     void unlock(ObjectProvider op);
 
     /**
      * Accessor for the current lock mode for the object managed by the passed ObjectProvider (mode 1).
-     * @param op ObjectProvider for the object
+     * @param op StateManager for the object
      * @return The lock mode
      */
     LockMode getLockMode(ObjectProvider op);
@@ -79,7 +79,7 @@ public interface LockManager
 
     /**
      * Method to perform an optimistic version check on the specified ObjectProvider.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param versionStrategy The version strategy in use
      * @param versionDatastore Version of the object in the datastore
      */

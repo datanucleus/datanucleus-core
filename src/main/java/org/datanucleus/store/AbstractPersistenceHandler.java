@@ -84,7 +84,7 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
 
     /**
      * Convenience method to assert when this StoreManager is read-only and the specified object is attempting to be updated.
-     * @param op ObjectProvider for the object
+     * @param op StateManager for the object
      */
     public void assertReadOnlyForUpdateOfObject(ObjectProvider op)
     {
