@@ -33,7 +33,6 @@ Contributors:
  **********************************************************************/
 package org.datanucleus.state;
 
-import java.io.PrintWriter;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.BitSet;
@@ -5938,43 +5937,45 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     // ------------------------------ Helper Methods ---------------------------
 
     /**
-     * Method to dump a persistable object to the specified PrintWriter.
+     * Method to convert the persistable object into String form.
      * @param pc The persistable object
-     * @param out The PrintWriter
+     * @param cmd Metadata for the class
      */
-    private static void dumpPC(Object pc, AbstractClassMetaData cmd, PrintWriter out)
+    private static String convertPCToString(Object pc, AbstractClassMetaData cmd)
     {
-        out.println(StringUtils.toJVMIDString(pc));
+        StringBuilder str = new StringBuilder();
+        str.append(StringUtils.toJVMIDString(pc));
 
         if (pc == null)
         {
-            return;
+            return str.toString();
         }
 
-        out.print("dnStateManager = " + peekField(pc, "dnStateManager"));
-        out.print("dnFlags = ");
+        str.append(" [");
+        str.append("dnStateManager=").append(peekField(pc, "dnStateManager"));
+
         Object flagsObj = peekField(pc, "dnFlags");
         if (flagsObj instanceof Byte)
         {
             switch (((Byte)flagsObj).byteValue())
             {
                 case Persistable.LOAD_REQUIRED:
-                    out.println("LOAD_REQUIRED");
+                    str.append(", dnFlags=LOAD_REQUIRED");
                     break;
                 case Persistable.READ_OK:
-                    out.println("READ_OK");
+                    str.append(", dnFlags=READ_OK");
                     break;
                 case Persistable.READ_WRITE_OK:
-                    out.println("READ_WRITE_OK");
+                    str.append(", dnFlags=READ_WRITE_OK");
                     break;
                 default:
-                    out.println("???");
+                    str.append(", dnFlags=???");
                     break;
             }
         }
         else
         {
-            out.println(flagsObj);
+            str.append(", dnFlags=").append(flagsObj);
         }
 
         Class c = pc.getClass();
@@ -5983,74 +5984,77 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
             AbstractMemberMetaData[] mmds = cmd.getManagedMembers();
             for (AbstractMemberMetaData mmd : mmds)
             {
-                out.println(mmd.getName());
-                out.println(" = ");
-                out.println(peekField(pc, mmd.getName()));
+                str.append(", ").append(mmd.getName());
+                str.append("=");
+                str.append(peekField(pc, mmd.getName()));
             }
 
             c = c.getSuperclass();
             cmd = cmd.getSuperAbstractClassMetaData();
         }
         while (c != null && Persistable.class.isAssignableFrom(c));
+        
+        str.append("]");
+        return str.toString();
     }
 
     /**
-     * Utility to dump the contents of the StateManager.
+     * Utility to dump the contents of the StateManager to the provided log.
      * @param out PrintWriter to dump to
      */
-    public void dump(PrintWriter out)
+    public void log(NucleusLogger log)
     {
-        out.println("myEC = " + myEC);
-        out.println("myID = " + myID);
-        out.println("myLC = " + myLC);
-        out.println("cmd = " + cmd);
-        out.println("fieldCount = " + cmd.getMemberCount());
-        out.println("dirty = " + dirty);
-        out.println("flushing = " + isFlushing());
-        out.println("changingState = " + isChangingState());
-        out.println("postLoadPending = " + isPostLoadPending());
-        out.println("disconnecting = " + ((flags&FLAG_DISCONNECTING) != 0));
-        out.println("dirtyFields = " + StringUtils.booleanArrayToString(dirtyFields));
-        out.println("getSecondClassMutableFields() = " + StringUtils.booleanArrayToString(cmd.getSCOMutableMemberFlags()));
-        out.println("getAllFieldNumbers() = " + StringUtils.intArrayToString(cmd.getAllMemberPositions()));
-        out.println("secondClassMutableFieldNumbers = " + StringUtils.intArrayToString(cmd.getSCOMutableMemberPositions()));
+        log.debug("ObjectProvider[" + StringUtils.toJVMIDString(this) + "]");
+        log.debug("    myEC=" + myEC);
+        log.debug("    myID=" + myID);
+        log.debug("    myLC=" + myLC);
+        log.debug("    cmd=" + cmd);
+        log.debug("    fieldCount=" + cmd.getMemberCount());
+        log.debug("    dirty=" + dirty);
+        log.debug("    flushing=" + isFlushing());
+        log.debug("    changingState=" + isChangingState());
+        log.debug("    postLoadPending=" + isPostLoadPending());
+        log.debug("    disconnecting=" + ((flags&FLAG_DISCONNECTING) != 0));
+        log.debug("    loadedFields=" + StringUtils.booleanArrayToString(loadedFields));
+        log.debug("    dirtyFields=" + StringUtils.booleanArrayToString(dirtyFields));
+        log.debug("    getSecondClassMutableFields()=" + StringUtils.booleanArrayToString(cmd.getSCOMutableMemberFlags()));
+        log.debug("    getAllFieldNumbers()=" + StringUtils.intArrayToString(cmd.getAllMemberPositions()));
+        log.debug("    secondClassMutableFieldNumbers=" + StringUtils.intArrayToString(cmd.getSCOMutableMemberPositions()));
 
-        out.println();
         switch (persistenceFlags)
         {
             case Persistable.LOAD_REQUIRED:
-                out.println("persistenceFlags = LOAD_REQUIRED");
+                log.debug("    persistenceFlags=LOAD_REQUIRED");
                 break;
             case Persistable.READ_OK:
-                out.println("persistenceFlags = READ_OK");
+                log.debug("    persistenceFlags=READ_OK");
                 break;
             case Persistable.READ_WRITE_OK:
-                out.println("persistenceFlags = READ_WRITE_OK");
+                log.debug("    persistenceFlags=READ_WRITE_OK");
                 break;
             default:
-                out.println("persistenceFlags = ???");
+                log.debug("    persistenceFlags=???");
                 break;
         }
-        out.println("loadedFields = " + StringUtils.booleanArrayToString(loadedFields));
-        out.print("myPC = ");
-        dumpPC(myPC, cmd, out);
+        log.debug("    myPC=" + convertPCToString(myPC, cmd));
 
-        out.println();
         switch (savedPersistenceFlags)
         {
             case Persistable.LOAD_REQUIRED:
-                out.println("savedFlags = LOAD_REQUIRED");
+                log.debug("    savedFlags=LOAD_REQUIRED");
+                break;
             case Persistable.READ_OK:
-                out.println("savedFlags = READ_OK");
+                log.debug("    savedFlags=READ_OK");
+                break;
             case Persistable.READ_WRITE_OK:
-                out.println("savedFlags = READ_WRITE_OK");
+                log.debug("    savedFlags=READ_WRITE_OK");
+                break;
             default:
-                out.println("savedFlags = ???");
+                log.debug("    savedFlags=???");
+                break;
         }
-        out.println("savedLoadedFields = " + StringUtils.booleanArrayToString(savedLoadedFields));
-
-        out.print("savedImage = ");
-        dumpPC(savedImage, cmd, out);
+        log.debug("    savedLoadedFields=" + StringUtils.booleanArrayToString(savedLoadedFields));
+        log.debug("    savedImage = " + convertPCToString(savedImage, cmd));
     }
 
     /**
@@ -6063,11 +6067,8 @@ public class StateManagerImpl implements ObjectProvider<Persistable>
     {
         try
         {
-            /*
-             * This doesn't work due to security problems but you get the idea.
-             * I'm trying to get field values directly without going through
-             * the provideField machinery.
-             */
+            // This doesn't work due to security problems but you get the idea.
+            // I'm trying to get field values directly without going through the provideField machinery.
             Object value = obj.getClass().getDeclaredField(fieldName).get(obj);
             if (value instanceof Persistable)
             {
