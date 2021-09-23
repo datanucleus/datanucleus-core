@@ -55,10 +55,10 @@ public class OperationQueue
      */
     public void enqueue(Operation oper)
     {
-        ObjectProvider op = oper.getObjectProvider();
+        ObjectProvider sm = oper.getObjectProvider();
         if (oper instanceof SCOOperation)
         {
-            if (op.isWaitingToBeFlushedToDatastore())
+            if (sm.isWaitingToBeFlushedToDatastore())
             {
                 NucleusLogger.GENERAL.info(">> OperationQueue : not adding operation since owner not yet flushed - " + oper);
                 // Don't enlist since not yet flushed
@@ -116,13 +116,13 @@ public class OperationQueue
      * Method to perform all operations queued for the specified ObjectProvider and backing store.
      * Those operations are then removed from the queue.
      * @param store The backing store
-     * @param op StateManager
+     * @param sm StateManager
      */
-    public void performAll(Store store, ObjectProvider op)
+    public void performAll(Store store, ObjectProvider sm)
     {
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023005", op.getObjectAsPrintable(), store.getOwnerMemberMetaData().getFullFieldName()));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("023005", sm.getObjectAsPrintable(), store.getOwnerMemberMetaData().getFullFieldName()));
         }
 
         // Extract those operations for the specified backing store
@@ -131,7 +131,7 @@ public class OperationQueue
         while (operIter.hasNext())
         {
             Operation oper = operIter.next();
-            if (oper.getObjectProvider() == op && oper instanceof SCOOperation && ((SCOOperation)oper).getStore() == store)
+            if (oper.getObjectProvider() == sm && oper instanceof SCOOperation && ((SCOOperation)oper).getStore() == store)
             {
                 // Process operations for this Store and this ObjectProvider
                 flushOperations.add(oper);
@@ -148,12 +148,12 @@ public class OperationQueue
             {
                 if (!(store instanceof ListStore))
                 {
-                    if (isAddFollowedByRemoveOnSameSCO(store, op, oper, flushOperIter))
+                    if (isAddFollowedByRemoveOnSameSCO(store, sm, oper, flushOperIter))
                     {
                         // add+remove of the same element - ignore this and the next one
                         flushOperIter.next();
                     }
-                    else if (isRemoveFollowedByAddOnSameSCO(store, op, oper, flushOperIter))
+                    else if (isRemoveFollowedByAddOnSameSCO(store, sm, oper, flushOperIter))
                     {
                         // remove+add of the same element - ignore this and the next one
                         flushOperIter.next();
@@ -170,7 +170,7 @@ public class OperationQueue
             }
             else if (store instanceof MapStore)
             {
-                if (isPutFollowedByRemoveOnSameSCO(store, op, oper, flushOperIter))
+                if (isPutFollowedByRemoveOnSameSCO(store, sm, oper, flushOperIter))
                 {
                     // put+remove of the same key - ignore this and the next one
                     flushOperIter.next();
@@ -395,12 +395,12 @@ public class OperationQueue
      * Convenience optimisation checker to return if the current operation is ADD of an element that is
      * immediately REMOVED. Always leaves the iterator at the same position as starting
      * @param store The backing store
-     * @param op The object provider
+     * @param sm The StateManager
      * @param currentOper The current operation
      * @param listIter The iterator of operations
      * @return Whether this is an ADD that has a REMOVE of the same element immediately after
      */
-    protected static boolean isAddFollowedByRemoveOnSameSCO(Store store, ObjectProvider op, Operation currentOper, ListIterator<Operation> listIter)
+    protected static boolean isAddFollowedByRemoveOnSameSCO(Store store, ObjectProvider sm, Operation currentOper, ListIterator<Operation> listIter)
     {
         if (CollectionAddOperation.class.isInstance(currentOper))
         {
@@ -417,7 +417,7 @@ public class OperationQueue
                     {
                         addThenRemove = true;
                         NucleusLogger.PERSISTENCE.info("Member " + store.getOwnerMemberMetaData().getFullFieldName() + 
-                            " of " + StringUtils.toJVMIDString(op.getObject()) + " had an add then a remove of element " + 
+                            " of " + StringUtils.toJVMIDString(sm.getObject()) + " had an add then a remove of element " + 
                             StringUtils.toJVMIDString(value) + " - operations ignored");
                     }
                 }
@@ -434,12 +434,12 @@ public class OperationQueue
      * Convenience optimisation checker to return if the current operation is REMOVE of an element that is
      * immediately ADDed. Always leaves the iterator at the same position as starting
      * @param store The backing store
-     * @param op The object provider
+     * @param sm The StateManager
      * @param currentOper The current operation
      * @param listIter The iterator of operations
      * @return Whether this is a REMOVE that has an ADD of the same element immediately after
      */
-    protected static boolean isRemoveFollowedByAddOnSameSCO(Store store, ObjectProvider op, Operation currentOper, ListIterator<Operation> listIter)
+    protected static boolean isRemoveFollowedByAddOnSameSCO(Store store, ObjectProvider sm, Operation currentOper, ListIterator<Operation> listIter)
     {
         if (CollectionRemoveOperation.class.isInstance(currentOper))
         {
@@ -456,7 +456,7 @@ public class OperationQueue
                     {
                         removeThenAdd = true;
                         NucleusLogger.PERSISTENCE.info("Member" + store.getOwnerMemberMetaData().getFullFieldName() + 
-                            " of " + StringUtils.toJVMIDString(op.getObject()) + " had a remove then add of element " + 
+                            " of " + StringUtils.toJVMIDString(sm.getObject()) + " had a remove then add of element " + 
                             StringUtils.toJVMIDString(value) + " - operations ignored");
                     }
                 }
@@ -473,12 +473,12 @@ public class OperationQueue
      * Convenience optimisation checker to return if the current operation is PUT of a key that is
      * immediately REMOVED. Always leaves the iterator at the same position as starting
      * @param store The backing store
-     * @param op The object provider
+     * @param sm The StateManager
      * @param currentOper The current operation
      * @param listIter The iterator of operations
      * @return Whether this is a PUT that has a REMOVE of the same key immediately after
      */
-    protected static boolean isPutFollowedByRemoveOnSameSCO(Store store, ObjectProvider op, Operation currentOper, ListIterator<Operation> listIter)
+    protected static boolean isPutFollowedByRemoveOnSameSCO(Store store, ObjectProvider sm, Operation currentOper, ListIterator<Operation> listIter)
     {
         if (MapPutOperation.class.isInstance(currentOper))
         {
@@ -495,7 +495,7 @@ public class OperationQueue
                     {
                         putThenRemove = true;
                         NucleusLogger.PERSISTENCE.info("Member " + store.getOwnerMemberMetaData().getFullFieldName() + 
-                            " of " + StringUtils.toJVMIDString(op.getObject()) + " had a put then a remove of key " + 
+                            " of " + StringUtils.toJVMIDString(sm.getObject()) + " had a put then a remove of key " + 
                             StringUtils.toJVMIDString(key) + " - operations ignored");
                     }
                 }

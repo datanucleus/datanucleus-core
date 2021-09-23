@@ -946,7 +946,7 @@ public interface ExecutionContext extends ExecutionContextReference
     List<EmbeddedOwnerRelation> getOwnerInformationForEmbedded(ObjectProvider embOP);
 
     /**
-     * Accessor for the owner objects for the provided embedded object provider.
+     * Accessor for the owner objects for the provided embedded StateManager.
      * @param embOP The ObjectProvider that is embedded
      * @return The owner object(s) that have this object embedded.
      */

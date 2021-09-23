@@ -362,7 +362,7 @@ public interface ObjectProvider<T> extends StateManager
     void setFlushing(boolean flushing);
 
     /**
-     * Method to notify the object provider that the object has now been flushed to the datastore.
+     * Method to notify the StateManager that the object has now been flushed to the datastore.
      * This is performed when handling inserts or deletes in a batch external to the ObjectProvider.
      */
     void markAsFlushed();
