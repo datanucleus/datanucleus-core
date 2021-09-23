@@ -20,9 +20,8 @@ package org.datanucleus.store;
 import org.datanucleus.state.ObjectProvider;
 
 /**
- * Interface to be implemented by any StoreManager that provides objects that are actually created by the
- * underlying datastore. This is the case with ODBMS in general where they hand out objects and those are the
- * objects that should be managed.
+ * Interface to be implemented by any StoreManager that provides objects that are actually created by the underlying datastore. 
+ * This is the case with ODBMS in general where they hand out objects and those are the objects that should be managed.
  */
 public interface ObjectReferencingStoreManager
 {
@@ -44,7 +43,7 @@ public interface ObjectReferencingStoreManager
      * be overwritten by an authorative copy.
      *
      * This method marks the main memory copy of the object (on the Java heap) to be outdated in that sense.
-     * @param op The ObjectProvider managing the object
+     * @param sm StateManager managing the object
      */
-    void notifyObjectIsOutdated(ObjectProvider op);
+    void notifyObjectIsOutdated(ObjectProvider sm);
 }

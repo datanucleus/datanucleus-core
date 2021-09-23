@@ -65,10 +65,10 @@ public interface StorePersistenceHandler
 
     /**
      * Inserts a persistent object into the database.
-     * @param op The ObjectProvider of the object to be inserted.
+     * @param sm StateManager of the object to be inserted.
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    void insertObject(ObjectProvider op);
+    void insertObject(ObjectProvider sm);
 
     /**
      * Method to insert an array of objects to the datastore.
@@ -89,87 +89,87 @@ public interface StorePersistenceHandler
 
     /**
      * Updates a persistent object in the datastore.
-     * @param op The ObjectProvider of the object to be updated.
+     * @param sm StateManager of the object to be updated.
      * @param fieldNumbers The numbers of the fields to be updated.
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    void updateObject(ObjectProvider op, int fieldNumbers[]);
+    void updateObject(ObjectProvider sm, int fieldNumbers[]);
 
     /**
      * Deletes a persistent object from the datastore.
-     * @param op The ObjectProvider of the object to be deleted.
+     * @param sm StateManager of the object to be deleted.
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    void deleteObject(ObjectProvider op);
+    void deleteObject(ObjectProvider sm);
 
     /**
      * Method to delete an array of objects from the datastore.
-     * @param ops ObjectProviders for the objects to delete
+     * @param sms StateManagers for the objects to delete
      */
-    default void deleteObjects(ObjectProvider... ops)
+    default void deleteObjects(ObjectProvider... sms)
     {
-        if (ops.length == 1)
+        if (sms.length == 1)
         {
-            deleteObject(ops[0]);
+            deleteObject(sms[0]);
             return;
         }
 
-        for (int i=0;i<ops.length;i++)
+        for (int i=0;i<sms.length;i++)
         {
-            deleteObject(ops[i]);
+            deleteObject(sms[i]);
         }
     }
 
     /**
      * Fetches specified fields of a persistent object from the database.
-     * @param op The ObjectProvider of the object to be fetched.
+     * @param sm StateManager of the object to be fetched.
      * @param fieldNumbers The numbers of the fields to be fetched.
      * @throws NucleusObjectNotFoundException if the object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    void fetchObject(ObjectProvider op, int fieldNumbers[]);
+    void fetchObject(ObjectProvider sm, int fieldNumbers[]);
 
     /**
      * Fetches specified fields of several persistent objects (of the same type) from the database.
      * @param fieldNumbers The numbers of the fields to be fetched.
-     * @param ops The ObjectProviders of the objects to be fetched.
+     * @param sms StateManagers of the objects to be fetched.
      * @throws NucleusObjectNotFoundException if the object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    default void fetchObjects(int[] fieldNumbers, ObjectProvider... ops)
+    default void fetchObjects(int[] fieldNumbers, ObjectProvider... sms)
     {
         // Override this to provide bulk fetching of the same fields from multiple objects
-        for (ObjectProvider op : ops)
+        for (ObjectProvider sm : sms)
         {
-            fetchObject(op, fieldNumbers);
+            fetchObject(sm, fieldNumbers);
         }
     }
 
     /**
      * Locates this object in the datastore.
-     * @param op The ObjectProvider for the object to be found
+     * @param sm StateManager for the object to be found
      * @throws NucleusObjectNotFoundException if the object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    void locateObject(ObjectProvider op);
+    void locateObject(ObjectProvider sm);
 
     /**
      * Locates object(s) in the datastore.
-     * @param ops ObjectProvider(s) for the object(s) to be found
+     * @param sms StateManagers for the object(s) to be found
      * @throws NucleusObjectNotFoundException if an object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    default void locateObjects(ObjectProvider[] ops)
+    default void locateObjects(ObjectProvider[] sms)
     {
-        if (ops.length == 1)
+        if (sms.length == 1)
         {
-            locateObject(ops[0]);
+            locateObject(sms[0]);
             return;
         }
 
-        for (int i=0;i<ops.length;i++)
+        for (int i=0;i<sms.length;i++)
         {
-            locateObject(ops[i]);
+            locateObject(sms[i]);
         }
     }
 

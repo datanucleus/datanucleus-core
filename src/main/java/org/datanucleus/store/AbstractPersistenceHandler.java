@@ -84,25 +84,25 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
 
     /**
      * Convenience method to assert when this StoreManager is read-only and the specified object is attempting to be updated.
-     * @param op StateManager for the object
+     * @param sm StateManager for the object
      */
-    public void assertReadOnlyForUpdateOfObject(ObjectProvider op)
+    public void assertReadOnlyForUpdateOfObject(ObjectProvider sm)
     {
-        if (op.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY))
+        if (sm.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY))
         {
-            if (op.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
+            if (sm.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
             {
-                throw new DatastoreReadOnlyException(Localiser.msg("032004", op.getObjectAsPrintable()), op.getExecutionContext().getClassLoaderResolver());
+                throw new DatastoreReadOnlyException(Localiser.msg("032004", sm.getObjectAsPrintable()), sm.getExecutionContext().getClassLoaderResolver());
             }
 
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("032005", op.getObjectAsPrintable()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("032005", sm.getObjectAsPrintable()));
             }
             return;
         }
 
-        AbstractClassMetaData cmd = op.getClassMetaData();
+        AbstractClassMetaData cmd = sm.getClassMetaData();
         if (cmd.hasExtension(MetaData.EXTENSION_CLASS_READ_ONLY))
         {
             String value = cmd.getValueForExtension(MetaData.EXTENSION_CLASS_READ_ONLY);
@@ -111,14 +111,14 @@ public abstract class AbstractPersistenceHandler implements StorePersistenceHand
                 boolean readonly = Boolean.valueOf(value).booleanValue();
                 if (readonly)
                 {
-                    if (op.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
+                    if (sm.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DATASTORE_READONLY_ACTION).equalsIgnoreCase("EXCEPTION"))
                     {
-                        throw new DatastoreReadOnlyException(Localiser.msg("032006", op.getObjectAsPrintable()), op.getExecutionContext().getClassLoaderResolver());
+                        throw new DatastoreReadOnlyException(Localiser.msg("032006", sm.getObjectAsPrintable()), sm.getExecutionContext().getClassLoaderResolver());
                     }
 
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("032007", op.getObjectAsPrintable()));
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("032007", sm.getObjectAsPrintable()));
                     }
                     return;
                 }

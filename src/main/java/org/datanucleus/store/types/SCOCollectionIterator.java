@@ -40,12 +40,12 @@ public class SCOCollectionIterator<E> implements Iterator<E>
     /**
      * Constructor taking the delegate or backing store.
      * @param sco The owner sco
-     * @param op StateManager of SCO Collection to iterate
+     * @param sm StateManager of SCO Collection to iterate
      * @param theDelegate The delegate collection
      * @param backingStore The backing store (connected to the DB)
      * @param useDelegate Whether to use the delegate
      */
-    public SCOCollectionIterator(Collection<E> sco, ObjectProvider op, Collection<E> theDelegate, CollectionStore<E> backingStore, boolean useDelegate)
+    public SCOCollectionIterator(Collection<E> sco, ObjectProvider sm, Collection<E> theDelegate, CollectionStore<E> backingStore, boolean useDelegate)
     {
         ownerSCO = sco;
 
@@ -61,7 +61,7 @@ public class SCOCollectionIterator<E> implements Iterator<E>
         {
             if (backingStore != null)
             {
-                i = backingStore.iterator(op);
+                i = backingStore.iterator(sm);
             }
             else
             {

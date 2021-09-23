@@ -27,15 +27,15 @@ public interface FieldValues
 {
     /**
      * Method to retrieve the fields and store them in the object managed by StateManager.
-     * @param op StateManager for the object
+     * @param sm StateManager for the object
      */
-    void fetchFields(ObjectProvider op);
+    void fetchFields(ObjectProvider sm);
 
     /**
      * Method to retrieve the unloaded fields and store them in the object managed by StateManager. 
-     * @param op StateManager for the object
+     * @param sm StateManager for the object
      */
-    void fetchNonLoadedFields(ObjectProvider op);
+    void fetchNonLoadedFields(ObjectProvider sm);
 
     /**
      * Accessor for any FetchPlan to use when loading of fields (if any).

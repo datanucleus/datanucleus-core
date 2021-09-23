@@ -60,16 +60,16 @@ public class ManagedRelationsHandler
     /**
      * Method to return the RelationshipManager for the specified ObjectProvider.
      * If none is currently present will create one
-     * @param op StateManager
+     * @param sm StateManager
      * @return The RelationshipManager for this object
      */
-    public RelationshipManager getRelationshipManagerForObjectProvider(ObjectProvider op)
+    public RelationshipManager getRelationshipManagerForObjectProvider(ObjectProvider sm)
     {
-        RelationshipManager relMgr = managedRelationDetails.get(op);
+        RelationshipManager relMgr = managedRelationDetails.get(sm);
         if (relMgr == null)
         {
-            relMgr = new RelationshipManagerImpl(op);
-            managedRelationDetails.put(op, relMgr);
+            relMgr = new RelationshipManagerImpl(sm);
+            managedRelationDetails.put(sm, relMgr);
         }
         return relMgr;
     }
@@ -84,9 +84,9 @@ public class ManagedRelationsHandler
         return executing;
     }
 
-    public void addRelationshipManagerForObjectProvider(ObjectProvider op, RelationshipManager relMgr)
+    public void addRelationshipManagerForObjectProvider(ObjectProvider sm, RelationshipManager relMgr)
     {
-        managedRelationDetails.put(op, relMgr);
+        managedRelationDetails.put(sm, relMgr);
     }
 
     public void execute()
@@ -111,8 +111,8 @@ public class ManagedRelationsHandler
                 while (managedRelEntryIter.hasNext())
                 {
                     Map.Entry<ObjectProvider, RelationshipManager> managedRelEntry = managedRelEntryIter.next();
-                    ObjectProvider op = managedRelEntry.getKey();
-                    LifeCycleState lc = op.getLifecycleState();
+                    ObjectProvider sm = managedRelEntry.getKey();
+                    LifeCycleState lc = sm.getLifecycleState();
                     if (lc == null || lc.isDeleted())
                     {
                         // Has been deleted so ignore all relationship changes
@@ -128,8 +128,8 @@ public class ManagedRelationsHandler
             while (managedRelEntryIter.hasNext())
             {
                 Map.Entry<ObjectProvider, RelationshipManager> managedRelEntry = managedRelEntryIter.next();
-                ObjectProvider op = managedRelEntry.getKey();
-                LifeCycleState lc = op.getLifecycleState();
+                ObjectProvider sm = managedRelEntry.getKey();
+                LifeCycleState lc = sm.getLifecycleState();
                 if (lc == null || lc.isDeleted())
                 {
                     // Has been deleted so ignore all relationship changes

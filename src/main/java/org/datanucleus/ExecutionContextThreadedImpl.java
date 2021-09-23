@@ -113,13 +113,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void addObjectProviderToCache(ObjectProvider op)
+    public void addObjectProviderToCache(ObjectProvider sm)
     {
         try
         {
             lock.lock();
 
-            super.addObjectProviderToCache(op);
+            super.addObjectProviderToCache(sm);
         }
         finally
         {
@@ -127,13 +127,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void removeObjectProviderFromCache(ObjectProvider op)
+    public void removeObjectProviderFromCache(ObjectProvider sm)
     {
         try
         {
             lock.lock();
 
-            super.removeObjectProviderFromCache(op);
+            super.removeObjectProviderFromCache(sm);
         }
         finally
         {
@@ -295,13 +295,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void attachObject(ObjectProvider ownerOP, Object pc, boolean sco)
+    public void attachObject(ObjectProvider ownerSM, Object pc, boolean sco)
     {
         try
         {
             lock.lock();
 
-            super.attachObject(ownerOP, pc, sco);
+            super.attachObject(ownerSM, pc, sco);
         }
         finally
         {
@@ -309,13 +309,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public Object attachObjectCopy(ObjectProvider ownerOP, Object pc, boolean sco)
+    public Object attachObjectCopy(ObjectProvider ownerSM, Object pc, boolean sco)
     {
         try
         {
             lock.lock();
 
-            return super.attachObjectCopy(ownerOP, pc, sco);
+            return super.attachObjectCopy(ownerSM, pc, sco);
         }
         finally
         {
@@ -365,13 +365,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void clearDirty(ObjectProvider op)
+    public void clearDirty(ObjectProvider sm)
     {
         try
         {
             lock.lock();
 
-            super.clearDirty(op);
+            super.clearDirty(sm);
         }
         finally
         {
@@ -412,13 +412,13 @@ public class ExecutionContextThreadedImpl extends ExecutionContextImpl
         }
     }
 
-    public void markDirty(ObjectProvider op, boolean directUpdate)
+    public void markDirty(ObjectProvider sm, boolean directUpdate)
     {
         try
         {
             lock.lock();
 
-            super.markDirty(op, directUpdate);
+            super.markDirty(sm, directUpdate);
         }
         finally
         {

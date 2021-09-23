@@ -179,26 +179,26 @@ public class ReachabilityAtCommitHandler
                         }
                         try
                         {
-                            ObjectProvider op = ec.findObjectProvider(ec.findObject(ids[i], true, true, null));
+                            ObjectProvider sm = ec.findObjectProvider(ec.findObject(ids[i], true, true, null));
 
-                            if (!op.isDeleted() && !currentReachableIds.contains(ids[i]))
+                            if (!sm.isDeleted() && !currentReachableIds.contains(ids[i]))
                             {
                                 // Make sure all of its relation fields are loaded before continuing. Is this necessary, since its enlisted?
-                                op.loadUnloadedRelationFields();
+                                sm.loadUnloadedRelationFields();
 
                                 // Add this object id since not yet reached
                                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                                 {
-                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007000", IdentityUtils.getPersistableIdentityForId(ids[i]), op.getLifecycleState()));
+                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007000", IdentityUtils.getPersistableIdentityForId(ids[i]), sm.getLifecycleState()));
                                 }
                                 currentReachableIds.add(ids[i]);
 
                                 // Go through all relation fields using ReachabilityFieldManager
-                                ReachabilityFieldManager pcFM = new ReachabilityFieldManager(op, currentReachableIds);
-                                int[] relationFieldNums = op.getClassMetaData().getRelationMemberPositions(ec.getClassLoaderResolver());
+                                ReachabilityFieldManager pcFM = new ReachabilityFieldManager(sm, currentReachableIds);
+                                int[] relationFieldNums = sm.getClassMetaData().getRelationMemberPositions(ec.getClassLoaderResolver());
                                 if (relationFieldNums != null && relationFieldNums.length > 0)
                                 {
-                                    op.provideFields(relationFieldNums, pcFM);
+                                    sm.provideFields(relationFieldNums, pcFM);
                                 }
                             }
                         }
@@ -232,12 +232,12 @@ public class ReachabilityAtCommitHandler
                         {
                             if (!objectIdsNotFound.contains(nonReachableIds[i]))
                             {
-                                ObjectProvider op = ec.findObjectProvider(ec.findObject(nonReachableIds[i], true, true, null));
+                                ObjectProvider sm = ec.findObjectProvider(ec.findObject(nonReachableIds[i], true, true, null));
 
-                                if (!op.getLifecycleState().isDeleted() && !ec.getApiAdapter().isDetached(op.getObject()))
+                                if (!sm.getLifecycleState().isDeleted() && !ec.getApiAdapter().isDetached(sm.getObject()))
                                 {
                                     // Null any relationships for relation fields of this object
-                                    op.replaceFields(op.getClassMetaData().getRelationMemberPositions(ec.getClassLoaderResolver()), new NullifyRelationFieldManager(op));
+                                    sm.replaceFields(sm.getClassMetaData().getRelationMemberPositions(ec.getClassLoaderResolver()), new NullifyRelationFieldManager(sm));
                                     ec.flush();
                                 }
                             }
@@ -255,10 +255,10 @@ public class ReachabilityAtCommitHandler
                         {
                             if (!objectIdsNotFound.contains(nonReachableIds[i]))
                             {
-                                ObjectProvider op = ec.findObjectProvider(ec.findObject(nonReachableIds[i], true, true, null));
-                                if (!op.isDeleted()) // If the object has since been deleted then no need to do anything
+                                ObjectProvider sm = ec.findObjectProvider(ec.findObject(nonReachableIds[i], true, true, null));
+                                if (!sm.isDeleted()) // If the object has since been deleted then no need to do anything
                                 {
-                                    op.makeTransientForReachability();
+                                    sm.makeTransientForReachability();
                                 }
                             }
                         }

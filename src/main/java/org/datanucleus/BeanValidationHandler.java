@@ -30,7 +30,6 @@ import javax.validation.ValidatorFactory;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
-import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -191,8 +190,7 @@ public class BeanValidationHandler
             }
 
             // Return whether the field is loaded (and don't cause its loading)
-            ObjectProvider op = ec.findObjectProvider(traversableObject);
-            return op.isFieldLoaded(mmd.getAbsoluteFieldNumber());
+            return ec.findObjectProvider(traversableObject).isFieldLoaded(mmd.getAbsoluteFieldNumber());
         }
     }
 }

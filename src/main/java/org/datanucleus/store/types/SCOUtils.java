@@ -65,13 +65,13 @@ public class SCOUtils
 {
     /**
      * Method to unwrap a SCO field/property (if it is wrapped currently). If the member value is not a SCO will just return the value.
-     * @param ownerOP The ObjectProvider of the owner
+     * @param ownerSM StateManager of the owner
      * @param memberNumber The member number in the owner
      * @param sco The SCO value for the member
      * @return The unwrapped member value
      * TODO Move to TypeManager
      */
-    public static Object unwrapSCOField(ObjectProvider ownerOP, int memberNumber, SCO sco)
+    public static Object unwrapSCOField(ObjectProvider ownerSM, int memberNumber, SCO sco)
     {
         if (sco == null)
         {
@@ -81,51 +81,51 @@ public class SCOUtils
         Object unwrappedValue = sco.getValue();
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            AbstractMemberMetaData mmd = ownerOP.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(memberNumber);
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("026030", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getName()));
+            AbstractMemberMetaData mmd = ownerSM.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(memberNumber);
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("026030", IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()), mmd.getName()));
         }
-        ownerOP.replaceField(memberNumber, unwrappedValue);
+        ownerSM.replaceField(memberNumber, unwrappedValue);
         return unwrappedValue;
     }
 
     /**
      * Method to create a new SCO wrapper for the specified field/property. If the member value is a SCO already will just return the value.
-     * @param ownerOP The ObjectProvider of the owner
+     * @param ownerSM StateManager of the owner
      * @param memberNumber The member number in the owner
      * @param value The value to initialise the wrapper with (if any)
      * @param replaceFieldIfChanged Whether to replace the member in the object if wrapping the value
      * @return The wrapper (or original value if not wrappable)
      * TODO Move to TypeManager
      */
-    public static Object wrapSCOField(ObjectProvider ownerOP, int memberNumber, Object value, boolean replaceFieldIfChanged)
+    public static Object wrapSCOField(ObjectProvider ownerSM, int memberNumber, Object value, boolean replaceFieldIfChanged)
     {
-        if (value == null || !ownerOP.getClassMetaData().getSCOMutableMemberFlags()[memberNumber])
+        if (value == null || !ownerSM.getClassMetaData().getSCOMutableMemberFlags()[memberNumber])
         {
             // We don't wrap null objects currently
             return value;
         }
 
-        if (!(value instanceof SCO) || ownerOP.getObject() != ((SCO)value).getOwner())
+        if (!(value instanceof SCO) || ownerSM.getObject() != ((SCO)value).getOwner())
         {
             // Not a SCO wrapper, or is a SCO wrapper but not owned by this object
-            AbstractMemberMetaData mmd = ownerOP.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(memberNumber);
+            AbstractMemberMetaData mmd = ownerSM.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(memberNumber);
             if (replaceFieldIfChanged)
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
                     NucleusLogger.PERSISTENCE.debug(Localiser.msg("026029",
-                        ownerOP.getExecutionContext() != null ? IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()) : ownerOP.getInternalObjectId(), 
+                        ownerSM.getExecutionContext() != null ? IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()) : ownerSM.getInternalObjectId(), 
                         mmd.getName()));
                 }
             }
-            return ownerOP.getExecutionContext().getTypeManager().createSCOInstance(ownerOP, mmd, value.getClass(), value, replaceFieldIfChanged);
+            return ownerSM.getExecutionContext().getTypeManager().createSCOInstance(ownerSM, mmd, value.getClass(), value, replaceFieldIfChanged);
         }
         return value;
     }
 
     /**
      * Utility to generate a message representing the SCO container wrapper and its capabilities.
-     * @param ownerOP ObjectProvider for the owner
+     * @param ownerSM StateManager for the owner
      * @param fieldName Field with the container
      * @param cont The SCOContainer
      * @param useCache Whether to use caching of values in the container
@@ -133,9 +133,9 @@ public class SCOUtils
      * @param lazyLoading Whether to use lazy loading in the wrapper
      * @return The String
      */
-    public static String getContainerInfoMessage(ObjectProvider ownerOP, String fieldName, SCOContainer cont, boolean useCache, boolean allowNulls, boolean lazyLoading)
+    public static String getContainerInfoMessage(ObjectProvider ownerSM, String fieldName, SCOContainer cont, boolean useCache, boolean allowNulls, boolean lazyLoading)
     {
-        String msg = Localiser.msg("023004", ownerOP.getObjectAsPrintable(), fieldName, cont.getClass().getName(),
+        String msg = Localiser.msg("023004", ownerSM.getObjectAsPrintable(), fieldName, cont.getClass().getName(),
             "[cache-values=" + useCache + ", lazy-loading=" + lazyLoading + ", allow-nulls=" + allowNulls + "]");
         return msg;
     }
@@ -206,24 +206,23 @@ public class SCOUtils
     }
 
     /**
-     * Utility to return whether or not to use the container cache for the collection/map for the passed
-     * ObjectProvider SCO.
-     * @param ownerOP The ObjectProvider for the SCO field
+     * Utility to return whether or not to use the container cache for the collection/map for the passed ObjectProvider SCO.
+     * @param ownerSM StateManager for the SCO field
      * @param mmd Metadata for the member that we are considering
      * @return Whether to use the cache.
      */
-    public static boolean useContainerCache(ObjectProvider ownerOP, AbstractMemberMetaData mmd)
+    public static boolean useContainerCache(ObjectProvider ownerSM, AbstractMemberMetaData mmd)
     {
-        if (ownerOP == null)
+        if (ownerSM == null)
         {
             return false;
         }
 
         // Check whether we should cache collections based on PMF/PM
-        boolean useCache = ownerOP.getExecutionContext().getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS);
-        if (ownerOP.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS) != null)
+        boolean useCache = ownerSM.getExecutionContext().getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS);
+        if (ownerSM.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS) != null)
         {
-            useCache = ownerOP.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS);
+            useCache = ownerSM.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS);
         }
 
         if (mmd.getOrderMetaData() != null && !mmd.getOrderMetaData().isIndexedList())
@@ -242,21 +241,21 @@ public class SCOUtils
 
     /**
      * Accessor for whether the use lazy loading when caching the collection.
-     * @param ownerOP ObjectProvider of the owning object
+     * @param ownerSM StateManager of the owning object
      * @param mmd Meta-data of the collection/map field
      * @return Whether to use lazy loading when caching the collection
      */
-    public static boolean useCachedLazyLoading(ObjectProvider ownerOP, AbstractMemberMetaData mmd)
+    public static boolean useCachedLazyLoading(ObjectProvider ownerSM, AbstractMemberMetaData mmd)
     {
-        if (ownerOP == null)
+        if (ownerSM == null)
         {
             return false;
         }
 
         boolean lazy = false;
 
-        AbstractClassMetaData cmd = ownerOP.getClassMetaData();
-        Boolean lazyCollections = ownerOP.getExecutionContext().getNucleusContext().getConfiguration().getBooleanObjectProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS_LAZY);
+        AbstractClassMetaData cmd = ownerSM.getClassMetaData();
+        Boolean lazyCollections = ownerSM.getExecutionContext().getNucleusContext().getConfiguration().getBooleanObjectProperty(PropertyNames.PROPERTY_CACHE_COLLECTIONS_LAZY);
         if (lazyCollections != null)
         {
             // Global setting for PMF
@@ -271,7 +270,7 @@ public class SCOUtils
         {
             // Check if this SCO is in the current FetchPlan
             boolean inFP = false;
-            int[] fpFields = ownerOP.getExecutionContext().getFetchPlan().getFetchPlanForClass(cmd).getMemberNumbers();
+            int[] fpFields = ownerSM.getExecutionContext().getFetchPlan().getFetchPlanForClass(cmd).getMemberNumbers();
             int fieldNo = mmd.getAbsoluteFieldNumber();
             if (fpFields != null && fpFields.length > 0)
             {
@@ -456,17 +455,17 @@ public class SCOUtils
     /**
      * Convenience method for use by Collection/Set/HashSet attachCopy methods to add any new elements (added
      * whilst detached) to the collection.
-     * @param ownerOP Owner ObjectProvider
+     * @param ownerSM StateManager for the owner
      * @param scoColl The current (attached) SCO collection
      * @param detachedElements The collection of (detached) elements that we're merging
      * @param elementsWithoutId Whether the elements have no identity
      * @return If the Collection was updated
      */
-    public static boolean attachCopyElements(ObjectProvider ownerOP, Collection scoColl, Collection detachedElements, boolean elementsWithoutId)
+    public static boolean attachCopyElements(ObjectProvider ownerSM, Collection scoColl, Collection detachedElements, boolean elementsWithoutId)
     {
         boolean updated = false;
 
-        ApiAdapter api = ownerOP.getExecutionContext().getApiAdapter();
+        ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
 
         // Delete any elements that are no longer in the collection
         Iterator scoCollIter = scoColl.iterator();
@@ -550,7 +549,7 @@ public class SCOUtils
                 }
                 else
                 {
-                    ownerOP.getExecutionContext().attachObjectCopy(ownerOP, detachedElement, false);
+                    ownerSM.getExecutionContext().attachObjectCopy(ownerSM, detachedElement, false);
                 }
             }
         }
@@ -562,19 +561,19 @@ public class SCOUtils
      * Method to return an attached copy of the passed (detached) value. The returned attached copy is a SCO
      * wrapper. Goes through the existing elements in the store for this owner field and removes ones no
      * longer present, and adds new elements. All elements in the (detached) value are attached.
-     * @param ownerOP ObjectProvider for the owning object with the collection
+     * @param ownerSM StateManager for the owning object with the collection
      * @param detachedElements The detached elements in the collection
      * @param attached Collection to add the attached copies to
      * @param elementsWithoutIdentity Whether the elements have their own identity
      */
-    public static void attachCopyForCollection(ObjectProvider ownerOP, Object[] detachedElements, Collection attached, boolean elementsWithoutIdentity)
+    public static void attachCopyForCollection(ObjectProvider ownerSM, Object[] detachedElements, Collection attached, boolean elementsWithoutIdentity)
     {
-        ApiAdapter api = ownerOP.getExecutionContext().getApiAdapter();
+        ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
         for (int i = 0; i < detachedElements.length; i++)
         {
             if (api.isPersistable(detachedElements[i]) && api.isDetachable(detachedElements[i]))
             {
-                attached.add(ownerOP.getExecutionContext().attachObjectCopy(ownerOP, detachedElements[i], elementsWithoutIdentity));
+                attached.add(ownerSM.getExecutionContext().attachObjectCopy(ownerSM, detachedElements[i], elementsWithoutIdentity));
             }
             else
             {
@@ -587,16 +586,16 @@ public class SCOUtils
      * Method to return an attached copy of the passed (detached) value. The returned attached copy is a SCO
      * wrapper. Goes through the existing elements in the store for this owner field and removes ones no
      * longer present, and adds new elements. All elements in the (detached) value are attached.
-     * @param ownerOP ObjectProvider for the owning object with the map
+     * @param ownerSM StateManager for the owning object with the map
      * @param detachedEntries The detached entries in the map
      * @param attached Map to add the attached copies to
      * @param keysWithoutIdentity Whether the keys have their own identity
      * @param valuesWithoutIdentity Whether the values have their own identity
      */
-    public static void attachCopyForMap(ObjectProvider ownerOP, Set detachedEntries, Map attached, boolean keysWithoutIdentity, boolean valuesWithoutIdentity)
+    public static void attachCopyForMap(ObjectProvider ownerSM, Set detachedEntries, Map attached, boolean keysWithoutIdentity, boolean valuesWithoutIdentity)
     {
         Iterator iter = detachedEntries.iterator();
-        ApiAdapter api = ownerOP.getExecutionContext().getApiAdapter();
+        ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
         while (iter.hasNext())
         {
             Map.Entry entry = (Map.Entry) iter.next();
@@ -604,11 +603,11 @@ public class SCOUtils
             Object key = entry.getKey();
             if (api.isPersistable(val) && api.isDetachable(val))
             {
-                val = ownerOP.getExecutionContext().attachObjectCopy(ownerOP, val, valuesWithoutIdentity);
+                val = ownerSM.getExecutionContext().attachObjectCopy(ownerSM, val, valuesWithoutIdentity);
             }
             if (api.isPersistable(key) && api.isDetachable(key))
             {
-                key = ownerOP.getExecutionContext().attachObjectCopy(ownerOP, key, keysWithoutIdentity);
+                key = ownerSM.getExecutionContext().attachObjectCopy(ownerSM, key, keysWithoutIdentity);
             }
             attached.put(key, val);
         }
@@ -821,11 +820,11 @@ public class SCOUtils
      * "entries" (ids of keys and values) so we can associate the keys to the values.
      * @param delegate The delegate
      * @param store The Store
-     * @param ownerOP ObjectProvider of the owner of the map.
+     * @param ownerSM StateManager of the owner of the map.
      * @param <K> Type of the map key
      * @param <V> Type of the map value
      */
-    public static <K, V> void populateMapDelegateWithStoreData(Map<K, V> delegate, MapStore<K, V> store, ObjectProvider ownerOP)
+    public static <K, V> void populateMapDelegateWithStoreData(Map<K, V> delegate, MapStore<K, V> store, ObjectProvider ownerSM)
     {
         // If we have persistable keys then load them. The keys query will pull in the key fetch plan so this instantiates them in the cache
         java.util.Set<K> keys = new java.util.HashSet<>();
@@ -833,7 +832,7 @@ public class SCOUtils
         {
             // Retrieve the persistable keys
             SetStore<K> keystore = store.keySetStore();
-            Iterator<K> keyIter = keystore.iterator(ownerOP);
+            Iterator<K> keyIter = keystore.iterator(ownerSM);
             while (keyIter.hasNext())
             {
                 keys.add(keyIter.next());
@@ -846,7 +845,7 @@ public class SCOUtils
         {
             // Retrieve the persistable values
             CollectionStore<V> valuestore = store.valueCollectionStore();
-            Iterator<V> valueIter = valuestore.iterator(ownerOP);
+            Iterator<V> valueIter = valuestore.iterator(ownerSM);
             while (valueIter.hasNext())
             {
                 values.add(valueIter.next());
@@ -857,7 +856,7 @@ public class SCOUtils
         // TODO Ultimately would like to just call this, but the entry query can omit the inheritance level of a key or value
         // Likely the best thing to do is check for inheritance in key/value persistable types and if none then do in single entry call
         SetStore<Map.Entry<K, V>> entries = store.entrySetStore();
-        Iterator<Map.Entry<K, V>> entryIter = entries.iterator(ownerOP);
+        Iterator<Map.Entry<K, V>> entryIter = entries.iterator(ownerSM);
         while (entryIter.hasNext())
         {
             Map.Entry<K, V> entry = entryIter.next();
@@ -892,13 +891,13 @@ public class SCOUtils
      * This implementation iterates over the elements in the collection, checking each element in turn for
      * equality with the specified element.
      * @param backingStore the Store
-     * @param op StateManager
+     * @param sm StateManager
      * @return <i>true</i> if this collection contains the specified element.
      */
-    public static Object[] toArray(CollectionStore backingStore, ObjectProvider op)
+    public static Object[] toArray(CollectionStore backingStore, ObjectProvider sm)
     {
-        Object[] result = new Object[backingStore.size(op)];
-        Iterator it = backingStore.iterator(op);
+        Object[] result = new Object[backingStore.size(sm)];
+        Iterator it = backingStore.iterator(sm);
         for (int i = 0; it.hasNext(); i++)
         {
             result[i] = it.next();
@@ -909,7 +908,7 @@ public class SCOUtils
     /**
      * Returns an array containing all of the elements in this collection;
      * @param backingStore the Store
-     * @param op StateManager
+     * @param sm StateManager
      * @param a the array into which the elements of the collection are to be stored, if it is big enough;
      * otherwise, a new array of the same runtime type is allocated for this purpose.
      * @return an array containing the elements of the collection.
@@ -917,14 +916,14 @@ public class SCOUtils
      * @throws ArrayStoreException if the runtime type of the specified array is not a supertype of the
      * runtime type of every element in this collection.
      */
-    public static Object[] toArray(CollectionStore backingStore, ObjectProvider op, Object a[])
+    public static Object[] toArray(CollectionStore backingStore, ObjectProvider sm, Object a[])
     {
-        int size = backingStore.size(op);
+        int size = backingStore.size(sm);
         if (a.length < size)
         {
             a = (Object[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), size);
         }
-        Iterator it = backingStore.iterator(op);
+        Iterator it = backingStore.iterator(sm);
         for (int i = 0; i < size; i++)
         {
             a[i] = it.next();
@@ -994,18 +993,18 @@ public class SCOUtils
     /**
      * Convenience method to detach (recursively) all elements for a collection field. All elements that are
      * persistable will be detached.
-     * @param ownerOP ObjectProvider for the owning object with the collection
+     * @param ownerSM StateManager for the owning object with the collection
      * @param elements The elements in the collection
      * @param state FetchPlan state
      */
-    public static void detachForCollection(ObjectProvider ownerOP, Object[] elements, FetchPlanState state)
+    public static void detachForCollection(ObjectProvider ownerSM, Object[] elements, FetchPlanState state)
     {
-        ApiAdapter api = ownerOP.getExecutionContext().getApiAdapter();
+        ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
         for (int i = 0; i < elements.length; i++)
         {
             if (api.isPersistable(elements[i]))
             {
-                ownerOP.getExecutionContext().detachObject(state, elements[i]);
+                ownerSM.getExecutionContext().detachObject(state, elements[i]);
             }
         }
     }
@@ -1013,14 +1012,14 @@ public class SCOUtils
     /**
      * Convenience method to detach copies (recursively) of all elements for a collection field. All elements
      * that are persistable will be detached.
-     * @param ownerOP ObjectProvider for the owning object with the collection
+     * @param ownerSM StateManager for the owning object with the collection
      * @param elements The elements in the collection
      * @param state FetchPlan state
      * @param detached Collection to add the detached copies to
      */
-    public static void detachCopyForCollection(ObjectProvider ownerOP, Object[] elements, FetchPlanState state, Collection detached)
+    public static void detachCopyForCollection(ObjectProvider ownerSM, Object[] elements, FetchPlanState state, Collection detached)
     {
-        ApiAdapter api = ownerOP.getExecutionContext().getApiAdapter();
+        ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
         for (int i = 0; i < elements.length; i++)
         {
             if (elements[i] == null)
@@ -1032,7 +1031,7 @@ public class SCOUtils
                 Object object = elements[i];
                 if (api.isPersistable(object))
                 {
-                    detached.add(ownerOP.getExecutionContext().detachObjectCopy(state, object));
+                    detached.add(ownerSM.getExecutionContext().detachObjectCopy(state, object));
                 }
                 else
                 {
@@ -1045,13 +1044,13 @@ public class SCOUtils
     /**
      * Convenience method to attach (recursively) all elements for a collection field. All elements that are
      * persistable and not yet having an attached object will be attached.
-     * @param ownerOP ObjectProvider for the owning object with the collection
+     * @param ownerSM StateManager for the owning object with the collection
      * @param elements The elements to process
      * @param elementsWithoutIdentity Whether the elements have their own identity
      */
-    public static void attachForCollection(ObjectProvider ownerOP, Object[] elements, boolean elementsWithoutIdentity)
+    public static void attachForCollection(ObjectProvider ownerSM, Object[] elements, boolean elementsWithoutIdentity)
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
         ApiAdapter api = ec.getApiAdapter();
         for (int i = 0; i < elements.length; i++)
         {
@@ -1061,7 +1060,7 @@ public class SCOUtils
                 if (attached == null)
                 {
                     // Not yet attached so attach
-                    ec.attachObject(ownerOP, elements[i], elementsWithoutIdentity);
+                    ec.attachObject(ownerSM, elements[i], elementsWithoutIdentity);
                 }
             }
         }
@@ -1070,13 +1069,13 @@ public class SCOUtils
     /**
      * Convenience method to detach (recursively) all elements for a map field. All elements that are
      * persistable will be detached.
-     * @param ownerOP ObjectProvider for the owning object with the map
+     * @param ownerSM StateManager for the owning object with the map
      * @param entries The entries in the map
      * @param state FetchPlan state
      */
-    public static void detachForMap(ObjectProvider ownerOP, Set entries, FetchPlanState state)
+    public static void detachForMap(ObjectProvider ownerSM, Set entries, FetchPlanState state)
     {
-        ApiAdapter api = ownerOP.getExecutionContext().getApiAdapter();
+        ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
         for (Iterator it = entries.iterator(); it.hasNext();)
         {
             Map.Entry entry = (Map.Entry) it.next();
@@ -1084,11 +1083,11 @@ public class SCOUtils
             Object key = entry.getKey();
             if (api.isPersistable(key))
             {
-                ownerOP.getExecutionContext().detachObject(state, key);
+                ownerSM.getExecutionContext().detachObject(state, key);
             }
             if (api.isPersistable(val))
             {
-                ownerOP.getExecutionContext().detachObject(state, val);
+                ownerSM.getExecutionContext().detachObject(state, val);
             }
         }
     }
@@ -1096,14 +1095,14 @@ public class SCOUtils
     /**
      * Convenience method to detach copies (recursively) of all elements for a map field. All elements that
      * are persistable will be detached.
-     * @param ownerOP ObjectProvider for the owning object with the map
+     * @param ownerSM StateManager for the owning object with the map
      * @param entries The entries in the map
      * @param state FetchPlan state
      * @param detached Map to add the detached copies to
      */
-    public static void detachCopyForMap(ObjectProvider ownerOP, Set entries, FetchPlanState state, Map detached)
+    public static void detachCopyForMap(ObjectProvider ownerSM, Set entries, FetchPlanState state, Map detached)
     {
-        ApiAdapter api = ownerOP.getExecutionContext().getApiAdapter();
+        ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
         for (Iterator it = entries.iterator(); it.hasNext();)
         {
             Map.Entry entry = (Map.Entry) it.next();
@@ -1111,11 +1110,11 @@ public class SCOUtils
             Object key = entry.getKey();
             if (api.isPersistable(val))
             {
-                val = ownerOP.getExecutionContext().detachObjectCopy(state, val);
+                val = ownerSM.getExecutionContext().detachObjectCopy(state, val);
             }
             if (api.isPersistable(key))
             {
-                key = ownerOP.getExecutionContext().detachObjectCopy(state, key);
+                key = ownerSM.getExecutionContext().detachObjectCopy(state, key);
             }
             detached.put(key, val);
         }
@@ -1124,14 +1123,14 @@ public class SCOUtils
     /**
      * Convenience method to attach (recursively) all keys/values for a map field. All keys/values that are
      * persistable and don't already have an attached object will be attached.
-     * @param ownerOP ObjectProvider for the owning object with the map
+     * @param ownerSM StateManager for the owning object with the map
      * @param entries The entries in the map to process
      * @param keysWithoutIdentity Whether the keys have their own identity
      * @param valuesWithoutIdentity Whether the values have their own identity
      */
-    public static void attachForMap(ObjectProvider ownerOP, Set entries, boolean keysWithoutIdentity, boolean valuesWithoutIdentity)
+    public static void attachForMap(ObjectProvider ownerSM, Set entries, boolean keysWithoutIdentity, boolean valuesWithoutIdentity)
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
         ApiAdapter api = ec.getApiAdapter();
         for (Iterator it = entries.iterator(); it.hasNext();)
         {
@@ -1144,7 +1143,7 @@ public class SCOUtils
                 if (attached == null)
                 {
                     // Not yet attached so attach
-                    ownerOP.getExecutionContext().attachObject(ownerOP, key, keysWithoutIdentity);
+                    ownerSM.getExecutionContext().attachObject(ownerSM, key, keysWithoutIdentity);
                 }
             }
             if (api.isPersistable(val))
@@ -1153,7 +1152,7 @@ public class SCOUtils
                 if (attached == null)
                 {
                     // Not yet attached so attach
-                    ownerOP.getExecutionContext().attachObject(ownerOP, val, valuesWithoutIdentity);
+                    ownerSM.getExecutionContext().attachObject(ownerSM, val, valuesWithoutIdentity);
                 }
             }
         }
@@ -1313,22 +1312,22 @@ public class SCOUtils
 
     /**
      * Convenience accessor for whether to detach SCO objects as wrapped.
-     * @param ownerOP ObjectProvider
+     * @param ownerSM StateManager
      * @return Whether to detach SCOs in wrapped form
      */
-    public static boolean detachAsWrapped(ObjectProvider ownerOP)
+    public static boolean detachAsWrapped(ObjectProvider ownerSM)
     {
-        return ownerOP.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_DETACH_AS_WRAPPED);
+        return ownerSM.getExecutionContext().getBooleanProperty(PropertyNames.PROPERTY_DETACH_AS_WRAPPED);
     }
 
     /**
      * Convenience method to return if we should use a queued update for the current operation.
-     * @param op StateManager
+     * @param sm StateManager
      * @return Whether to use queued for this operation
      */
-    public static boolean useQueuedUpdate(ObjectProvider op)
+    public static boolean useQueuedUpdate(ObjectProvider sm)
     {
-        return op != null && op.getExecutionContext().operationQueueIsActive();
+        return sm != null && sm.getExecutionContext().operationQueueIsActive();
     }
 
     /**
